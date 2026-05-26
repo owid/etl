@@ -150,6 +150,7 @@ class DOD_MARS:
     CIVIL_WAR = "#dod:civil-war-mars"
     NON_CIVIL_WAR = "#dod:non-civil-war-mars"
     CONVENTIONAL_WARS = "#dod:conventional-war-mars"
+    MAJOR_PARTICIPANT = "#dod:major-participant-mars"
 
 
 class DOD_MIE:
@@ -189,6 +190,9 @@ STACKED_CONFIG = {
     "selectedFacetStrategy": "entity",
 }
 MAP_CONFIG = {"hasMapTab": True, "tab": "map", "selectedFacetStrategy": "entity"}
+
+# Note shown on country-level map views for sources with historical states.
+MISSING_STATES_NOTE = "Some states are not shown in the map because they do not exist anymore."
 
 # === MIC (MIE / COW-MID) constants ==========================================
 
@@ -345,6 +349,26 @@ class SourceSpec:
     # Whose deaths the source counts. UCDP / UCDP+PRIO / PRIO count combatants
     # *and* civilians; MARS and COW count only combatants.
     deaths_subjects: str = "combatants and civilians"
+    # Cause clause in deaths subtitles ("due to {deaths_cause}"). COW adds
+    # "disease, and starvation"; everyone else is just "fighting".
+    deaths_cause: str = "fighting"
+    # Plural noun for a single conflict event, used in count/rate subtitles and
+    # regional notes ("number of {unit_plural} divided…", "Some {unit_plural}
+    # affect several regions…"). COW / MARS say "wars".
+    unit_plural: str = "conflicts"
+    # Whether the source's deaths carry a labelled center estimate (best/low/high)
+    # → drives the "'Best' estimates as identified by X." note. COW (single) and
+    # MARS (low/high only) don't.
+    deaths_note_best: bool = True
+    # Whether count/rate by_sub_type views carry the "Some … affect several
+    # regions" note. MARS data isn't region-split, so it doesn't.
+    count_note_regions: bool = True
+    # Per-view note overrides for count/rate views where the source's note
+    # doesn't follow the regional-note rule (COW attaches "The number of states
+    # has increased…" to specific views). Keyed by
+    # (conflict_type, measure, conflict_sub_type, sub_measure); when present it
+    # replaces the default note.
+    count_note_override: dict[tuple[str, str, str, str], str] = field(default_factory=dict)
     # CT slug → DoD-link markdown (e.g. "[interstate conflicts](#dod:interstate-ucdp)").
     dod: dict[str, str] = field(default_factory=dict)
     # CT slug (parent) → combined DoD link used in by_sub_type subtitles.
@@ -352,6 +376,26 @@ class SourceSpec:
     # DoD anchor (full markdown link, "#dod:...") used in the conflict_participants
     # subtitle ("…states that were [primary participants](…)").
     dod_primary_participant: str = DOD_PRIMARY_PARTICIPANT
+    # conflict_participants subtitle shape. "named": "states that were
+    # [{participant_role}](dod) in at least one …" (UCDP/MARS). "plain":
+    # "states that participated in at least one …" (COW, no role link).
+    participant_style: Literal["named", "plain"] = "named"
+    participant_role: str = "primary participants"  # MARS: "major participants"
+    # When True, all_state_based participants reference the singular of
+    # `dod[ALL_STATE_BASED]` (MARS → "conventional war") instead of the
+    # interstate/intrastate/extrastate list.
+    participant_all_state_based_single: bool = False
+    # conflict_locations subtitle verb clause. UCDP: "caused at least one death
+    # in the country that year"; COW: "were ongoing that year".
+    locations_verb: str = "caused at least one death in the country that year"
+    # Override the conflict-type name used in conflict_locations titles (COW's
+    # locations data only covers interstate + intrastate, so its all_state_based
+    # locations read "interstate or intrastate wars" rather than "state-based wars").
+    locations_name: dict[str, str] = field(default_factory=dict)
+    # Whether country-level (map) views carry the "Some states are not shown in
+    # the map because they do not exist anymore." note. True for sources with
+    # historical states (COW, MARS, MIE, COW-MID).
+    map_note_missing_states: bool = False
     # Source name used in the "'Best' estimates as identified by X." note.
     # Most sources mirror UCDP's wording so the default is fine.
     # TODO: where is this surfaced?
@@ -850,6 +894,18 @@ def _dod_url(link: str) -> str:
     return link[open_paren + 2 : -1]
 
 
+def _dod_label(link: str) -> str:
+    """Extract the first word of a DoD link's bracket text.
+
+    `"[extrastate wars](#dod:extrastate-war-cow)"` → `"extrastate"`.
+    """
+    start = link.find("[")
+    end = link.find("]")
+    if start < 0 or end < 0:
+        return ""
+    return link[start + 1 : end].split()[0]
+
+
 def _set_view_config(view, spec: SourceSpec) -> None:
     """Fill in `title` / `subtitle` / `note` / chart-config blocks per view."""
     d = view.dimensions
@@ -878,31 +934,63 @@ def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str
     per_capita = measure == M.DEATH_RATE
     noun = "Death rate" if per_capita else spec.deaths_noun
     name = spec.ct_name[ctype]
+    # "based on where they occurred" only when deaths are resolved to the
+    # country of occurrence (UCDP's country_and_region_data). Regional-only
+    # sources (COW/MARS/PRIO) omit it.
+    # "based on where they occurred" marks deaths attributed to the country of
+    # occurrence. For atomic / aggregate views it tracks deaths_map_views
+    # membership (so UCDP extrastate — regional-only — is excluded). For
+    # by_sub_type stacks it tracks `located` (the parent aggregates country-
+    # resolved children), which only UCDP (country_and_region_data) is.
+    located = spec.deaths_sub_measure == "country_and_region_data"
+    has_map = (ctype, cst) in spec.deaths_map_views
+    map_suffix = " based on where they occurred" if has_map else ""
+    best_note = f"'Best' estimates as identified by {spec.ci_estimate_source}." if spec.deaths_note_best else None
+
+    # One-sided violence: victims are civilians, "from" (not "due to fighting
+    # in"), singular "was". Only UCDP carries it; never has by_sub_type.
+    if ctype == CT.ONE_SIDED:
+        dod = spec.dod[ctype]
+        cfg["title"] = f"{noun} from one-sided violence{map_suffix}"
+        if per_capita:
+            cfg["subtitle"] = f"Deaths of civilians from {dod} that was ongoing that year, per 100,000 people."
+        else:
+            cfg["subtitle"] = f"Included are deaths of civilians from {dod} that was ongoing that year."
+        if best_note:
+            cfg["note"] = best_note
+        if has_map:
+            cfg.update(MAP_CONFIG)
+        else:
+            cfg["selectedFacetStrategy"] = "entity"
+        return
 
     if cst == CST.BY_SUB_TYPE:
-        cfg["title"] = f"{noun} in {name} based on where they occurred"
+        suffix = " based on where they occurred" if located else ""
+        cfg["title"] = f"{noun} in {name}{suffix}"
         cfg["subtitle"] = _deaths_subtitle(spec, spec.dod_by_sub_type.get(ctype, spec.dod[ctype]), per_capita)
         cfg.update(STACKED_CONFIG)
         return
 
     if cst in (CST.ONLY_NON_INTERNATIONALIZED, CST.ONLY_INTERNATIONALIZED):
         word = "non-internationalized" if cst == CST.ONLY_NON_INTERNATIONALIZED else "internationalized"
+        intra_name = spec.ct_name[CT.INTRASTATE]  # "intrastate conflicts" / "intrastate wars"
         intrastate_anchor = _dod_url(spec.dod[CT.INTRASTATE])
-        cfg["title"] = f"{noun} in {word} intrastate conflicts"
+        cfg["title"] = f"{noun} in {word} {intra_name}"
         cfg["subtitle"] = _deaths_subtitle(
             spec,
-            f"[{word} intrastate conflicts]({intrastate_anchor})",
+            f"[{word} {intra_name}]({intrastate_anchor})",
             per_capita,
         )
-        cfg["note"] = f"'Best' estimates as identified by {spec.ci_estimate_source}."
+        if best_note:
+            cfg["note"] = best_note
         cfg["selectedFacetStrategy"] = "entity"
         return
 
     # na / all_sub_types — single-indicator or CI-stacked deaths view.
-    has_map = (ctype, cst) in spec.deaths_map_views
-    cfg["title"] = f"{noun} in {name} based on where they occurred" if has_map else f"{noun} in {name}"
+    cfg["title"] = f"{noun} in {name}{map_suffix}"
     cfg["subtitle"] = _deaths_subtitle(spec, spec.dod[ctype], per_capita)
-    cfg["note"] = f"'Best' estimates as identified by {spec.ci_estimate_source}."
+    if best_note:
+        cfg["note"] = best_note
     if has_map:
         cfg.update(MAP_CONFIG)
     else:
@@ -912,12 +1000,13 @@ def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str
 def _deaths_subtitle(spec: SourceSpec, dod_link: str, per_capita: bool) -> str:
     """Build the deaths/death-rate subtitle from a DoD-link fragment."""
     subjects = spec.deaths_subjects
+    cause = spec.deaths_cause
     if per_capita:
         return (
-            f"Deaths of {subjects} due to fighting, per 100,000 people. "
+            f"Deaths of {subjects} due to {cause}, per 100,000 people. "
             f"Included are {dod_link} that were ongoing that year."
         )
-    return f"Included are deaths of {subjects} due to fighting in {dod_link} that were ongoing that year."
+    return f"Included are deaths of {subjects} due to {cause} in {dod_link} that were ongoing that year."
 
 
 def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str, cst: str, sub_measure: str) -> None:
@@ -927,32 +1016,58 @@ def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str,
     new_prefix = "new " if is_new else ""
     lead = "Rate of" if rate else "Number of"
     verb = "started that year" if is_new else "were ongoing that year"
+    note_override = spec.count_note_override.get((ctype, measure, cst, sub_measure))
 
     if cst == CST.BY_SUB_TYPE:
         cfg["title"] = f"{lead} {new_prefix}{name}"
-        cfg["subtitle"] = _count_subtitle(spec.dod_by_sub_type.get(ctype, spec.dod[ctype]), rate, verb)
-        cfg["note"] = (
-            "Some conflicts affect several regions, and do not necessarily start at the same time "
-            "across them. The sum across all regions can therefore be higher than the global number."
-            if is_new
-            else "Some conflicts affect several regions. The sum across all regions can therefore "
-            "be higher than the global number."
-        )
+        cfg["subtitle"] = _count_subtitle(spec, spec.dod_by_sub_type.get(ctype, spec.dod[ctype]), rate, verb)
+        # An explicit per-view override wins; otherwise the regional note only
+        # applies to aggregates across conflict types (all_armed /
+        # all_state_based). Intrastate's by_sub_type is the internationalized
+        # split of the same conflicts, so PROD omits the regional note there.
+        if note_override is not None:
+            cfg["note"] = note_override
+        elif spec.count_note_regions and ctype in (CT.ALL_ARMED, CT.ALL_STATE_BASED):
+            cfg["note"] = (
+                f"Some {spec.unit_plural} affect several regions, and do not necessarily start at the same "
+                "time across them. The sum across all regions can therefore be higher than the global number."
+                if is_new
+                else f"Some {spec.unit_plural} affect several regions. The sum across all regions can "
+                "therefore be higher than the global number."
+            )
         cfg.update(STACKED_CONFIG)
         return
 
+    # One-sided violence: counted as discrete "one-sided conflicts" (you count
+    # events, not "violence"), and grammatically singular ("Included is … that
+    # was ongoing"). The DoD link text stays "one-sided violence".
+    if ctype == CT.ONE_SIDED:
+        sing_verb = "started that year" if is_new else "was ongoing that year"
+        cfg["title"] = f"{lead} {new_prefix}one-sided conflicts"
+        body = f"Included is {spec.dod[ctype]} that {sing_verb}."
+        if rate:
+            cfg["subtitle"] = (
+                f"The number of {spec.unit_plural} divided by the number of all states. This accounts "
+                f"for the changing number of states over time. {body}"
+            )
+        else:
+            cfg["subtitle"] = body
+        return
+
     cfg["title"] = f"{lead} {new_prefix}{name}"
-    cfg["subtitle"] = _count_subtitle(spec.dod[ctype], rate, verb, interstate=ctype == CT.INTERSTATE)
+    cfg["subtitle"] = _count_subtitle(spec, spec.dod[ctype], rate, verb, interstate=ctype == CT.INTERSTATE)
+    if note_override is not None:
+        cfg["note"] = note_override
 
 
-def _count_subtitle(dod_link: str, rate: bool, verb: str, interstate: bool = False) -> str:
+def _count_subtitle(spec: SourceSpec, dod_link: str, rate: bool, verb: str, interstate: bool = False) -> str:
     """Build the number_of_conflicts / conflict_rate subtitle."""
     if not rate:
         return f"Included are {dod_link} that {verb}."
     # Interstate's ongoing rate uses a state-pair denominator (per_country_pair).
     denom = "all state-pairs" if interstate else "all states"
     return (
-        f"The number of conflicts divided by the number of {denom}. This accounts for the changing "
+        f"The number of {spec.unit_plural} divided by the number of {denom}. This accounts for the changing "
         f"number of states over time. Included are {dod_link} that {verb}."
     )
 
@@ -960,33 +1075,58 @@ def _count_subtitle(dod_link: str, rate: bool, verb: str, interstate: bool = Fal
 def _participants_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_measure: str) -> None:
     name = spec.ct_name[ctype]
     country_level = sub_measure == "country_level_data"
+
+    # One-sided violence: "engaging in" / "primary perpetrators of at least one
+    # instance of".
+    if ctype == CT.ONE_SIDED:
+        cfg["title"] = "States engaging in one-sided violence" if country_level else "Number of states engaging in one-sided violence"
+        cfg["subtitle"] = (
+            f"Included are states that were [primary perpetrators]({spec.dod_primary_participant}) "
+            f"of at least one instance of {spec.dod[ctype]} that year."
+        )
+        if country_level:
+            cfg.update(MAP_CONFIG)
+            if spec.map_note_missing_states:
+                cfg["note"] = MISSING_STATES_NOTE
+        return
+
     cfg["title"] = f"States involved in {name}" if country_level else f"Number of states involved in {name}"
 
     # Singular form of the DoD link (UCDP "interstate conflicts" → "interstate
     # conflict", COW "interstate wars" → "interstate war").
-    if ctype == CT.ALL_STATE_BASED:
+    if ctype == CT.ALL_STATE_BASED and spec.participant_all_state_based_single:
+        dod_sing = _singularize_dod(spec.dod[ctype])
+    elif ctype == CT.ALL_STATE_BASED:
         dod_sing = _all_state_based_dod_singular(spec)
     else:
-        dod_sing = spec.dod[ctype].replace("conflicts](", "conflict](").replace("wars](", "war](")
+        dod_sing = _singularize_dod(spec.dod[ctype])
 
-    cfg["subtitle"] = (
-        f"Included are states that were [primary participants]({spec.dod_primary_participant}) "
-        f"in at least one {dod_sing} that year."
-    )
+    if spec.participant_style == "plain":
+        cfg["subtitle"] = f"Included are states that participated in at least one {dod_sing} that year."
+    else:
+        cfg["subtitle"] = (
+            f"Included are states that were [{spec.participant_role}]({spec.dod_primary_participant}) "
+            f"in at least one {dod_sing} that year."
+        )
     if country_level:
         cfg.update(MAP_CONFIG)
+        if spec.map_note_missing_states:
+            cfg["note"] = MISSING_STATES_NOTE
+
+
+def _singularize_dod(link: str) -> str:
+    """"[interstate wars](url)" → "[interstate war](url)"."""
+    return link.replace("conflicts](", "conflict](").replace("wars](", "war](")
 
 
 def _all_state_based_dod_singular(spec: SourceSpec) -> str:
-    """Build the "interstate, intrastate, or extrasystemic conflict" fragment using
-    the spec's interstate / intrastate / extrastate DoD anchors, in singular form."""
+    """Build the "interstate, intrastate, or extrastate war/conflict" fragment
+    using the spec's per-CT DoD anchors, deriving each label from the spec's
+    own link text (UCDP "extrasystemic" vs COW "extrastate")."""
     parts = []
-    for ctype, label in (
-        (CT.INTERSTATE, "interstate"),
-        (CT.INTRASTATE, "intrastate"),
-        (CT.EXTRASTATE, "extrasystemic"),
-    ):
+    for ctype in (CT.INTERSTATE, CT.INTRASTATE, CT.EXTRASTATE):
         if ctype in spec.dod:
+            label = _dod_label(spec.dod[ctype])
             parts.append(f"[{label}]({_dod_url(spec.dod[ctype])})")
     # Detect whether the source talks about "wars" instead of "conflicts".
     noun = "war" if spec.ct_name[CT.INTERSTATE].endswith("wars") else "conflict"
@@ -1000,12 +1140,26 @@ def _all_state_based_dod_singular(spec: SourceSpec) -> str:
 def _locations_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_measure: str) -> None:
     name = spec.ct_name[ctype]
     country_level = sub_measure == "country_level_data"
-    cfg["title"] = (
-        f"Countries where {name} took place" if country_level else f"Number of countries where {name} took place"
-    )
-    cfg["subtitle"] = f"Included are {spec.dod[ctype]} that caused at least one death in the country that year."
+
+    if ctype == CT.ONE_SIDED:
+        cfg["title"] = (
+            "Countries where one-sided violence took place"
+            if country_level
+            else "Number of countries where one-sided violence took place"
+        )
+        cfg["subtitle"] = f"Included is {spec.dod[ctype]} that {spec.locations_verb}."
+    else:
+        loc_name = spec.locations_name.get(ctype, name)
+        cfg["title"] = (
+            f"Countries where {loc_name} took place"
+            if country_level
+            else f"Number of countries where {loc_name} took place"
+        )
+        cfg["subtitle"] = f"Included are {spec.dod[ctype]} that {spec.locations_verb}."
     if country_level:
         cfg.update(MAP_CONFIG)
+        if spec.map_note_missing_states:
+            cfg["note"] = MISSING_STATES_NOTE
 
 
 # ---------------------------------------------------------------------------
@@ -1129,7 +1283,7 @@ def _mic_participants_text(cfg: dict[str, Any], spec: SourceSpec, sub_measure: s
         f"where force was [threatened, displayed, or used]({spec.mic_dod_force_url}) that year."
     )
     if country_level:
-        cfg["note"] = "Some states are not shown in the map because they do not exist anymore."
+        cfg["note"] = MISSING_STATES_NOTE
         cfg.update(MAP_CONFIG)
 
 
@@ -1574,6 +1728,20 @@ MARS_SPEC = SourceSpec(
     main_table="mars",
     country_table="mars_country",
     deaths_subjects="combatants",
+    unit_plural="wars",
+    deaths_note_best=False,
+    count_note_regions=False,
+    participant_role="major participants",
+    dod_primary_participant=DOD_MARS.MAJOR_PARTICIPANT,
+    participant_all_state_based_single=True,
+    map_note_missing_states=True,
+    # MARS labels all state-based as "wars", interstate as "interstate wars",
+    # and intrastate (civil war) as "civil wars".
+    ct_name={
+        CT.ALL_STATE_BASED: "wars",
+        CT.INTERSTATE: "interstate wars",
+        CT.INTRASTATE: "civil wars",
+    },
     measures={
         M.DEATHS,
         M.DEATH_RATE,
@@ -1618,6 +1786,30 @@ COW_SPEC = SourceSpec(
     country_table="cow_country",
     locations_table="cow_locations",
     deaths_subjects="combatants",
+    deaths_cause="fighting, disease, and starvation",
+    unit_plural="wars",
+    deaths_note_best=False,
+    participant_style="plain",
+    locations_verb="were ongoing that year",
+    locations_name={CT.ALL_STATE_BASED: "interstate or intrastate wars"},
+    map_note_missing_states=True,
+    # PROD attaches bespoke notes to a few COW count/rate views that don't
+    # follow the regional-note rule (matched to PROD; see ai/ diff IDs).
+    count_note_override={
+        # ID 153 — adds the "states increased" prefix to the regional note.
+        (CT.ALL_ARMED, M.CONFLICT_RATE, CST.BY_SUB_TYPE, "all_ongoing_conflicts"): (
+            "The number of states has increased a lot over time. Some wars affect several regions. "
+            "The sum across all regions can therefore be higher than the global number."
+        ),
+        # ID 163 — regional note on the (otherwise note-less) interstate count.
+        (CT.INTERSTATE, M.N_CONFLICTS, CST.NA, "all_ongoing_conflicts"): (
+            "Some wars affect several regions. The sum across all regions can therefore be higher than the global number."
+        ),
+        # ID 177 — "states increased" note on the intrastate by_sub_type count.
+        (CT.INTRASTATE, M.N_CONFLICTS, CST.BY_SUB_TYPE, "all_ongoing_conflicts"): (
+            "The number of states has increased a lot over time."
+        ),
+    },
     measures={
         M.DEATHS,
         M.DEATH_RATE,
@@ -1736,7 +1928,7 @@ PRIO_SPEC = SourceSpec(
         CT.INTRASTATE: {M.N_CONFLICTS, M.CONFLICT_RATE},
     },
     dod={
-        CT.ALL_STATE_BASED: f"[interstate]({DOD_UCDP.INTERSTATE}), [intrastate]({DOD_UCDP.INTRASTATE}) and [extrasystemic]({DOD_UCDP.EXTRASYSTEMIC}) conflicts",
+        CT.ALL_STATE_BASED: f"[interstate]({DOD_UCDP.INTERSTATE}), [intrastate]({DOD_UCDP.INTRASTATE}), and [extrasystemic]({DOD_UCDP.EXTRASYSTEMIC}) conflicts",
         CT.INTERSTATE: f"[interstate conflicts]({DOD_UCDP.INTERSTATE})",
         CT.INTRASTATE: f"[intrastate conflicts]({DOD_UCDP.INTRASTATE})",
         CT.EXTRASTATE: f"[extrasystemic conflicts]({DOD_UCDP.EXTRASYSTEMIC})",
@@ -1876,5 +2068,15 @@ def run() -> None:
         collection_dimension_slug="data_source",
         collection_dimension_name="Data source",
         collection_choices_names=[spec.name for spec in PROGRAMMATIC_SPECS],
+    )
+
+    # The "related question" link is the same on every view. The YAML's
+    # `common_views` can't carry it post-combine (group_views recreates views),
+    # so set it globally here.
+    final.set_global_config(
+        {
+            "relatedQuestionText": "How do different approaches measure armed conflicts and their deaths?",
+            "relatedQuestionUrl": "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths",
+        }
     )
     final.save(tolerate_extra_indicators=True)
