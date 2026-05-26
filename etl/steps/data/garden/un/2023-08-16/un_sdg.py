@@ -29,6 +29,12 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_meadow = ds_meadow[paths.short_name]
 
+    # Capture the snapshot origin from the meadow column metadata before the
+    # legacy pd.DataFrame cast strips it. Re-attached to each output table's
+    # `value` column so the grapher step can pick it up without reloading the
+    # snapshot.
+    base_origin = tb_meadow["value"].metadata.origins[0]
+
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
 
@@ -67,6 +73,7 @@ def run(dest_dir: str) -> None:
         tb_garden.metadata = tb_meadow.metadata
         short_name = tb_garden.index[0][4] + "_" + tb_garden.index[0][5]
         tb_garden.metadata.short_name = underscore(short_name)
+        tb_garden["value"].metadata.origins = [base_origin]
         ds_garden.add(tb_garden)
 
     ds_garden.save()

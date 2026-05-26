@@ -1,102 +1,67 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
-import pandas as pd
 from owid.catalog import Table
-from structlog import get_logger
 
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
-log = get_logger()
-
-# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
-    log.info("flu_vaccine_policy.start")
-
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
+def run() -> None:
     ds_meadow = paths.load_dataset("flu_vaccine_policy")
+    tb = ds_meadow.read("flu_vaccine_policy")
 
-    # Read table from meadow dataset.
-    tb_meadow = ds_meadow["flu_vaccine_policy"]
+    # Cast all columns to string for cleaning, then restore the int year.
+    tb = tb.astype(str).astype({"year": int})
 
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow).reset_index().astype(str).astype({"year": int})
-
-    #
-    # Process data.
-    #
-    log.info("flu_vaccine_policy.harmonize_countries")
-    df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    tb = paths.regions.harmonize_names(
+        tb,
+        country_col="country",
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
     )
-    # Replacing value codes with either missing data or a more descriptive value
-    df = df.replace({"ND": np.nan, "nan": np.nan, "NR": "Not relevant", "Unknown": np.nan})
-    # Removing strings from some values e.g. commas in numbers but not full-stops
-    df["how_many_doses_of_influenza_vaccine_were_distributed"] = df[
+
+    # Replace status/sentinel codes with NaN or descriptive values.
+    tb = tb.replace({"ND": np.nan, "nan": np.nan, "<NA>": np.nan, "NR": "Not relevant", "Unknown": np.nan})
+
+    # Strip commas/text from the doses column so it can be parsed as a number.
+    tb["how_many_doses_of_influenza_vaccine_were_distributed"] = tb[
         "how_many_doses_of_influenza_vaccine_were_distributed"
     ].str.replace(r"[^0-9\.]", "", regex=True)
 
-    df = clean_binary_colums(df)
-    df = clean_hemisphere_formulation(df)
-    df = remove_erroneous_zeros(df)
+    tb = _clean_binary_columns(tb)
+    tb = _clean_hemisphere_formulation(tb)
+    tb = _remove_erroneous_zeros(tb)
 
-    # Create a new table with the processed data.
-    df = df.set_index(["country", "year"], verify_integrity=True)
-    tb_garden = Table(df, like=tb_meadow)
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
-    # Save changes in the new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
-    log.info("flu_vaccine_policy.end")
+
+def _clean_binary_columns(tb: Table) -> Table:
+    """Restrict binary columns (is_/are_/were_) to 'Yes' / 'No' / NaN."""
+    binary_cols = tb.columns[tb.columns.str.startswith(("is", "are", "were"))]
+    for col in binary_cols:
+        tb[col] = tb[col].where(tb[col].isin(["Yes", "No"]), np.nan)
+    return tb
 
 
-def clean_binary_colums(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Clean columns where the only desired outputs should be 'Yes', 'No' or 'Not relevant'
-    """
-    # Select out the columns that start with 'is', 'are', 'were' or 'does
-    binary_cols = df.columns[df.columns.str.startswith(("is", "are", "were"))]
-    dict_map = {"Yes": "Yes", "No": "No"}
-    df[binary_cols] = df[binary_cols].applymap(dict_map.get).fillna(np.nan)
-
-    return df
-
-
-def clean_hemisphere_formulation(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Ensure consistency in the terms used to describe the hemisphere formulations
-    """
-
-    df["what_vaccine_formulation_is_used"] = df["what_vaccine_formulation_is_used"].replace(
+def _clean_hemisphere_formulation(tb: Table) -> Table:
+    """Normalise hemisphere labels."""
+    tb["what_vaccine_formulation_is_used"] = tb["what_vaccine_formulation_is_used"].replace(
         {"Northern hemisphere": "Northern Hemisphere", "Hemisferio Sur": "Southern Hemisphere"}
     )
-
-    assert all(
-        df["what_vaccine_formulation_is_used"].isin(
-            [np.nan, "Not relevant", "Both", "Northern Hemisphere", "Southern Hemisphere"]
-        )
-    )
-
-    return df
+    expected = {"Not relevant", "Both", "Northern Hemisphere", "Southern Hemisphere"}
+    actual = set(tb["what_vaccine_formulation_is_used"].dropna().unique())
+    unexpected = actual - expected
+    assert not unexpected, f"Unexpected hemisphere values: {unexpected}"
+    return tb
 
 
-def remove_erroneous_zeros(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Remove the handful of zeros that are found in columns where it is not clear what they mean.
-    """
-    cols = df.columns.drop("how_many_doses_of_influenza_vaccine_were_distributed")
-    df[cols] = df[cols].replace(0, np.nan)
-
-    return df
+def _remove_erroneous_zeros(tb: Table) -> Table:
+    """Zeros in non-numeric columns are ambiguous — drop them."""
+    cols = tb.columns.drop("how_many_doses_of_influenza_vaccine_were_distributed")
+    tb[cols] = tb[cols].replace(0, np.nan)
+    return tb

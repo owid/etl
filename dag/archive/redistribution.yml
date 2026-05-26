@@ -108,4 +108,13 @@ steps:
   data://grapher/oecd/2025-06-30/government_at_a_glance:
     - data://garden/oecd/2025-06-30/government_at_a_glance
 
+  # SIPRI Military Expenditure Database
+  data://meadow/sipri/2025-04-28/military_expenditure:
+    - snapshot://sipri/2025-04-28/military_expenditure.xlsx
+  data://garden/sipri/2025-04-28/military_expenditure:
+    - data://meadow/sipri/2025-04-28/military_expenditure
+    - data://garden/worldbank_wdi/2026-02-27/wdi
+  data://grapher/sipri/2025-04-28/military_expenditure:
+    - data://garden/sipri/2025-04-28/military_expenditure
+
 

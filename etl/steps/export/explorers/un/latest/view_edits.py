@@ -379,6 +379,14 @@ class ViewEditor:
             indicator_name = v.dimensions["indicator"]
             age = v.dimensions["age"]
             if indicator_name == "sex_ratio":
+                # Sex ratio at birth sits tightly around the biological norm
+                # (~105). Pin yAxisMin to 90 so the variation is visible —
+                # a 0-baseline flattens the curve.
+                if age == "0":
+                    if v.config is None:
+                        v.config = {"yAxisMin": 90}
+                    else:
+                        v.config["yAxisMin"] = 90
                 for indicator in v.indicators.y:
                     self._add_map_brackets_display(age, "all", indicator_name, indicator)
             self._apply_grouped_view_metadata(v, ds_grapher)

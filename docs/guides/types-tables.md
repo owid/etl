@@ -6,7 +6,7 @@ icon: material/table
 
 In ETL, we work with Table object, which is derived from pandas.DataFrame to adjust it to our needs. Setting the types of your columns is crucial for performance and memory optimization. In this guide, we'll cover the types we use in our ETL pipeline and how to set them.
 
-As a general summary, we use nullable data types, and therefore recommend the usage of Float64, Int64 and string[pyarrow] types. We also avoid using np.nan and prefer pd.NA.
+As a general summary, we use nullable data types, and therefore recommend the usage of `Float64`, `Int64` and `string[pyarrow]` types. We also avoid using `np.nan` and prefer `pd.NA`.
 
 ### Loading tables
 The preferred way to load a table from a dataset is

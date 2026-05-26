@@ -11,20 +11,25 @@ def process_views(
     combine_metadata_when_mult: bool = False,
 ):
     """Process views in Collection configuration."""
-    # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
+    # Resolve short-form catalog paths to full paths. Collection.save() does this again
+    # before validation; doing it here too means anything that reads view paths between
+    # create_collection and save sees full paths.
     tables_by_name = get_tables_by_name_mapping(dependencies)
 
     for view in collection.views:
-        # Expand paths
-        view.expand_paths(tables_by_name)
-
-        # Combine metadata/config with definitions.common_views
+        # Merge common_views FIRST so any short-form paths it injects
+        # (e.g. `colorVariableId: regions#owid_region`) are visible to expand_paths
+        # below. The opposite order leaves merged paths un-expanded — the failure
+        # surfaces later at `combine_collections` time where dependencies are empty.
         if (collection.definitions is not None) and (collection.definitions.common_views is not None):
             view.combine_with_common(collection.definitions.common_views)
         else:
             # Validate even when there are no common_views to merge — the view's own config
             # might have incompatible settings
             view.validate_color_scale_config()
+
+        # Expand short-form catalog paths in the (now-merged) view config and indicators.
+        view.expand_paths(tables_by_name)
 
         # Combine metadata in views which contain multiple indicators
         if combine_metadata_when_mult and view.metadata_is_needed:  # Check if view "contains multiple indicators"

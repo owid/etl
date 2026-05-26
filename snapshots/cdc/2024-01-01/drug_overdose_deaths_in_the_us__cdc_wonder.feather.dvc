@@ -1,13 +1,14 @@
 meta:
-  source:
-    name: US Centers for Disease Control and Prevention WONDER
+  origin:
+    producer: US Centers for Disease Control and Prevention
+    title: CDC WONDER - Drug overdose deaths in the US
     description: |-
-      The National Center for Health Statistics (NCHS) at the Centers for Disease Control and Prevention collects information on deaths involving drugs commonly associated with fatal overdose. This information is available in a searchable database called <a href="https://wonder.cdc.gov/">CDC Wonder</a>.
-    url: https://www.drugabuse.gov/related-topics/trends-statistics/overdose-death-rates
-    date_accessed: 2026-03-10
-    published_by: US Centers for Disease Control and Prevention WONDER
-  name: Drug overdose deaths in the US (CDC WONDER)
-  description: ''
+      The National Center for Health Statistics (NCHS) at the Centers for Disease Control and Prevention collects information on deaths involving drugs commonly associated with fatal overdose. This information is available in a searchable database called CDC Wonder (https://wonder.cdc.gov/).
+    citation_full: US Centers for Disease Control and Prevention WONDER. Drug overdose deaths in the US.
+    attribution_short: CDC
+    url_main: https://www.drugabuse.gov/related-topics/trends-statistics/overdose-death-rates
+    date_accessed: '2024-01-01'
+    date_published: '2024'
 outs:
   - md5: d25116350039711c714d8360818c6a62
     size: 9042

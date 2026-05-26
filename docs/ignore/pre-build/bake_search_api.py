@@ -31,6 +31,14 @@ def main():
     print("Generating markdown documentation...")
     markdown = generate_markdown(spec)
 
+    # The upstream OpenAPI description points at `../data/index.md#indicator-search`,
+    # which doesn't exist on our docs site. Redirect to the Semantic Search API page
+    # in this repo.
+    markdown = markdown.replace(
+        "[Data API](../data/index.md#indicator-search)",
+        "[Semantic Search API](semantic-search-api.md)",
+    )
+
     print(f"Writing documentation to {output_path}...")
     output_path.write_text(markdown)
 

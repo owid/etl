@@ -5,7 +5,7 @@
 
 ## Introduction and summary
 
-In our article ["Putting solar panels on land used for biofuels would produce enough electricity for all cars and trucks to go electric"](https://ourworldindata.org/biofuel-land-solar-electric-vehicles), we explore how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic (PV).
+In our article [“Putting solar panels on land used for biofuels would produce enough electricity for all cars and trucks to go electric”](https://ourworldindata.org/biofuel-land-solar-electric-vehicles), we explore how much land is currently used to grow crops for biofuels, and the opportunity cost of that land compared with using it for solar photovoltaic (PV).
 
 This technical document serves as a companion to that article.
 Here, we explain how our estimates are derived and compare our assumptions with alternative ones in the literature.
@@ -32,7 +32,7 @@ If we replaced them with electric vehicles, they'd need less than 10 PWh of elec
 
 However, once they take away biofuel co-products, they estimate a net area of 32.0 million hectares of cropland attributed to first-generation biofuel feedstock.
 
-Their analysis includes 9 regions (United States, Brazil, EU + UK, Indonesia, China, India, Argentina, Canada, and Thailand) which cover 95% of the global biofuel production.
+Their analysis includes nine regions (United States, Brazil, EU + UK, Indonesia, China, India, Argentina, Canada, and Thailand) which cover 95% of the global biofuel production.
 However, note that 95% of production from those countries doesn't translate into 95% of land; in fact those countries may import feedstock from other countries.
 They do point out this caveat:
 > Global trade in biofuel feedstocks (rather than finished fuel), which is not captured by this data, is also sizeable; but it is not trivial to determine from general trade data which feedstocks are used in the biofuels industry versus other industries (cf. Malins & Sandford, 2022).
@@ -43,7 +43,7 @@ Despite this caveat, we will take Cerulogy's estimate at face value for the rema
 
 [The UFOP Report on Global Market Supply 2022/2023](https://www.ufop.de/files/4716/7878/1413/UFOP_Global_Suppy_Report_2022-2023.pdf) says that:
 
-> Crop plants were grown on more than 1.4 billion hectares worldwide in 2021. [...]
+> Crop plants were grown on more than 1.4 billion hectares worldwide in 2021. \[...\]
 Only around 8 per cent of the area was used in biofuels production.
 
 [FAOSTAT's Land Use dataset](https://www.fao.org/faostat/en/#data/RL) estimates that global cropland area in 2021 was [1.57 billion hectares](https://ourworldindata.org/grapher/cropland-area?tab=line&country=~OWID_WRL) (and hasn't changed much in the last decade).
@@ -65,10 +65,10 @@ Given that we couldn't find a clear origin for UFOP's large estimate on the exte
 
 ### Alternative estimate by Popp et al. (2018)
 
-[Popp et al. (2018)](https://www.researchgate.net/publication/324131165_Biofuel_use_Peculiarities_and_implications) estimated that 2% of global cropland is devoted to biofuels (30-35 million gross hectares).
+[Popp et al. (2018)](https://www.researchgate.net/publication/324131165_Biofuel_use_Peculiarities_and_implications) estimated that 2% of global cropland is devoted to biofuels (30–35 million gross hectares).
 After removing co-products, the area would be smaller.
 They say:
-> If we include co-products [...] then the land that is needed to grow feedstocks reduces [...] to about 1.5%.
+> If we include co-products \[...\] then the land that is needed to grow feedstocks reduces \[...\] to about 1.5%.
 
 This would imply around 23 million hectares.
 
@@ -186,7 +186,7 @@ This is in very good agreement with our estimate, given that their energy densit
 An alternative estimate of solar energy density comes from [Victoria et al. (2021)](https://www.sciencedirect.com/science/article/pii/S2542435121001008).
 In their supplementary Note S3, they say:
 
-> [...] Assuming 17% efficiency and that only 30% of the land is covered by solar panels in large-scale installations, the capacity density results in 51 W / m², which is in agreement with values reported in [Ong et al. (2013)](https://www.osti.gov/servlets/purl/1086349/).
+> \[...\] Assuming 17% efficiency and that only 30% of the land is covered by solar panels in large-scale installations, the capacity density results in 51 W / m², which is in agreement with values reported in [Ong et al. (2013)](https://www.osti.gov/servlets/purl/1086349/).
 For an average annual generation for solar PV of 1370 kWh / kW, 38 million ha would be needed.
 The land area of the world is 13,003 million ha [OWID (2019)](https://ourworldindata.org/land-use).
 Hence, our current electricity consumption could be supplied by solar PV covering 0.3% of the available land.
@@ -262,7 +262,7 @@ Covering all those kilometers traveled by car would therefore use:
 
 That means 3.44 PWh of electricity would be needed to power the global car fleet, assuming all cars were electric.
 
-The efficiency of electric cars varies based on model, age, size and other factors.
+The efficiency of electric cars varies based on model, age, size, and other factors.
 We can assume a value of 0.2 kWh per kilometer based on several sources.
 This analysis by [Weiss et al. (2024)](https://www.mdpi.com/2071-1050/16/17/7529) of the European car fleet found certified and average ratings of 19 kWh and 21 kWh per 100 kilometers.
 That's around 0.2 kWh per kilometer.
@@ -273,7 +273,7 @@ The average across this huge number of models and brands was 0.19 kWh per kilome
 Doing the same estimate for trucks is a bit more challenging, because their electric models have not reached market penetration in the way that electric cars have.
 They are at an earlier stage of development, so numbers on energy efficiency are more difficult to find.
 
-The International Energy Agency [estimates that](https://www.iea.org/data-and-statistics/data-product/world-energy-outlook-2025-free-dataset#tables-for-scenario-projections) heavy-duty trucks covered 35000 billion tonne-kilometers in 2024.
+The International Energy Agency [estimates that](https://www.iea.org/data-and-statistics/data-product/world-energy-outlook-2025-free-dataset#tables-for-scenario-projections) heavy-duty trucks covered 35,000 billion tonne-kilometers in 2024.
 
 To convert to kilometers, we assume that the average truck load is around 12 tonnes.
 That gives:

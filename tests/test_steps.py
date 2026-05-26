@@ -46,6 +46,7 @@ from owid.catalog import Dataset
 def run(dest_dir):
     ds = Dataset.create_empty(dest_dir)
     ds.metadata.short_name = "test"
+    ds.metadata.namespace = "test_ns"
     ds.save()
             """,
             file=ostream,
@@ -57,6 +58,24 @@ def test_data_step():
         _create_mock_py_file(step_name)
         DataStep(step_name, []).run()
         Dataset((paths.DATA_DIR / step_name).as_posix())
+
+
+def test_data_step_recovers_from_partial_output():
+    # Simulate a previously interrupted run that left dest_dir without index.json
+    # (e.g. shutil.rmtree partially failed mid-write). The next run should
+    # self-heal rather than crash on the corrupt state.
+    with temporary_step() as step_name:
+        _create_mock_py_file(step_name)
+        dest_dir = paths.DATA_DIR / step_name
+        dest_dir.mkdir(parents=True)
+        (dest_dir / "leftover.parquet").write_bytes(b"junk")
+        assert not (dest_dir / "index.json").exists()
+
+        DataStep(step_name, []).run()
+
+        assert (dest_dir / "index.json").exists()
+        assert not (dest_dir / "leftover.parquet").exists()
+        Dataset(dest_dir.as_posix())
 
 
 def test_data_step_becomes_dirty_when_pandas_version_changes():
@@ -89,13 +108,9 @@ def temporary_step() -> Iterator[str]:
             shutil.rmtree(data_dir.as_posix())
 
         py_file = paths.STEP_DIR / "data" / f"{name}.py"
-        ipy_file = paths.STEP_DIR / "data" / f"{name}.ipynb"
 
         if py_file.exists():
             py_file.unlink()
-
-        if ipy_file.exists():
-            ipy_file.unlink()
 
 
 def test_dependency_ordering():
@@ -308,6 +323,7 @@ tables:
             # Create initial dataset
             ds = Dataset.create_empty(dataset_dir.as_posix())
             ds.metadata.short_name = "test_dataset"
+            ds.metadata.namespace = "test_ns"
 
             # Create a table with one indicator
             tb = Table(pd.DataFrame({"value": [1, 2, 3]}, index=pd.Index([2020, 2021, 2022], name="year")))

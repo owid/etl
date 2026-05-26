@@ -1,20 +1,21 @@
 meta:
-  source:
-    name: IHME GBD (2019)
-    url: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30925-9/fulltext
-    source_data_url: |-
-      gAAAAABnRYlazzL_oEfuzBXSmjRVB2Y_aOmXSCAXVYIW_72BvzIYsW9GUt8OjdfLueLZUKFP-ZGq7e8B19xEzO3nPErc9S9x8w5MaFQeUEEwgZHOHjHGCjfOxrcUDXEQ-RyBwZuKmo7Ngy5dTDkh_sza4x9FOhmx5yUB25NI0TKhPhkPxrC_AIads-3sWMviypayPf_OebJnlMZUgRBEnRYqUH5sGcQTZvpi2ixly61NvwF_oU1_8FZL8iyj9mDiUvBP-kpERU3L
-    date_accessed: '2024-11-26'
-    publication_year: 2020
-    published_by: |-
-      Vos, T., Lim, S. S., Abbafati, C., Abbas, K. M., Abbasi, M., Abbasifard, M., Abbasi-Kangevari, M., Abbastabar, H., Abd-Allah, F., Abdelalim, A., Abdollahi, M., Abdollahpour, I., Abolhassani, H., Aboyans, V., Abrams, E. M., Abreu, L. G., Abrigo, M. R. M., Abu-Raddad, L. J., Abushouk, A. I., … Murray, C. J. L. (2020). Global burden of 369 diseases and injuries in 204 countries and territories, 1990–2019: A systematic analysis for the Global Burden of Disease Study 2019. The Lancet, 396(10258), 1204–1222.
-  name: Countries with mental health data in GBD 2019
-  description: |-
-    Dataset showing the number of countries with primary data on the prevalence of mental illnesses. These were found after a systematic review, grey literature search and expert consultation, to identify studies with data on the prevalence of each mental illness.
+  origin:
+    producer: IHME, Global Burden of Disease
+    title: Global Burden of Disease Study
+    description: |-
+      Dataset showing the number of countries with primary data on the prevalence of mental illnesses. These were found after a systematic review, grey literature search and expert consultation, to identify studies with data on the prevalence of each mental illness.
 
-    'The GBD inclusion criteria stipulated that: (1) the diagnostic criteria must be from 1980 onward; (2) “caseness” must be based on clinical threshold as established by the DSM, ICD, Chinese Classification of Mental Disorders (CCMD), or diagnosed by a clinician using established tools; (3) sufficient information must be provided on study method and sample characteristics to assess the quality of the study; and (4) study samples must be representative of the general population (i.e., case studies, veterans, or refugee samples were excluded). No limitation was set on the language of publication.'
-  license:
-    url: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30925-9/fulltext
+      'The GBD inclusion criteria stipulated that: (1) the diagnostic criteria must be from 1980 onward; (2) "caseness" must be based on clinical threshold as established by the DSM, ICD, Chinese Classification of Mental Disorders (CCMD), or diagnosed by a clinician using established tools; (3) sufficient information must be provided on study method and sample characteristics to assess the quality of the study; and (4) study samples must be representative of the general population (i.e., case studies, veterans, or refugee samples were excluded). No limitation was set on the language of publication.'
+    title_snapshot: Global Burden of Disease Study - Countries with mental health data in GBD 2019
+    citation_full: 'Vos, T., Lim, S. S., Abbafati, C., Abbas, K. M., Abbasi, M., Abbasifard, M., Abbasi-Kangevari, M., Abbastabar, H., Abd-Allah, F., Abdelalim, A., Abdollahi, M., Abdollahpour, I., Abolhassani, H., Aboyans, V., Abrams, E. M., Abreu, L. G., Abrigo, M. R. M., Abu-Raddad, L. J., Abushouk, A. I., … Murray, C. J. L. (2020). Global burden of 369 diseases and injuries in 204 countries and territories, 1990–2019: A systematic analysis for the Global Burden of Disease Study 2019. The Lancet, 396(10258), 1204–1222.'
+    attribution_short: IHME GBD
+    version_producer: GBD 2019
+    url_main: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30925-9/fulltext
+    url_download: gAAAAABnRYlazzL_oEfuzBXSmjRVB2Y_aOmXSCAXVYIW_72BvzIYsW9GUt8OjdfLueLZUKFP-ZGq7e8B19xEzO3nPErc9S9x8w5MaFQeUEEwgZHOHjHGCjfOxrcUDXEQ-RyBwZuKmo7Ngy5dTDkh_sza4x9FOhmx5yUB25NI0TKhPhkPxrC_AIads-3sWMviypayPf_OebJnlMZUgRBEnRYqUH5sGcQTZvpi2ixly61NvwF_oU1_8FZL8iyj9mDiUvBP-kpERU3L
+    date_accessed: '2024-11-26'
+    date_published: '2020'
+    license:
+      url: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30925-9/fulltext
   is_public: false
 outs:
   - md5: f972f0ff8f16acaf3af8c63d4e880e96

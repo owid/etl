@@ -1,0 +1,227 @@
+# Mini-explorer for bti indicators (used by democracy.py with combine_collections).
+# Carries only the views whose `dataset` dimension maps to this upstream source.
+# FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
+# `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
+# inherits it at chart render time. Per-view `config:` here is intentionally empty
+# for single-y views; multi-y views keep their combined chart config.
+
+definitions:
+  display_hl_aut: &display_hl_aut
+    name: "Hard-line autocracies"
+    color: "#8a148c"
+  display_mod_aut: &display_mod_aut
+    name: "Moderate autocracies"
+    color: "#d979d2"
+  display_hd_dem: &display_hd_dem
+    name: "Highly defective democracies"
+    color: "#1ac6d9"
+  display_def_dem: &display_def_dem
+    name: "Defective democracies"
+    color: "#0487d9"
+  display_con_dem: &display_con_dem
+    name: "Consolidating democracies"
+    color: "#034c8c"
+
+  group_config: &group_config
+    subtitle: "[Data](#dod:regimes-bertelsmann) by the [Bertelsmann Transformation Index](#dod:bertelsmann-transformation-index)."
+    note: "Data excludes long-term members of the OECD because they are considered stable democracies."
+  common_views:
+    - config:
+        colorVariableId: regions#owid_region
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+
+dimensions:
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: democratic_features
+        name: "\xad\xad\xad\xad\xadDemocratic features"
+      - slug: political_regime
+        name: "\xad\xad\xad\xad\xadPolitical regime"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      # Democratic features
+      - slug: main_index
+        name: "Main index"
+      - slug: stateness_index
+        name: "Stateness index"
+      - slug: political_participation_index
+        name: "Political participation index"
+      - slug: rule_of_law_index
+        name: "Rule of law index"
+      - slug: stability_of_democratic_institutions_index
+        name: "Stability of democratic institutions index"
+      - slug: political_and_social_integration_index
+        name: "Political and social integration index"
+      # Political regime
+      - slug: main_classification
+        name: "Main classification"
+      - slug: basic_state_functions_score
+        name: "Basic state functions score"
+      - slug: free_and_fair_elections_score
+        name: "\xad\xadFree and fair elections score"
+      - slug: effective_power_to_govern_score
+        name: "Effective power to govern score"
+      - slug: freedom_of_association_score
+        name: "\xadFreedom of association score"
+      - slug: freedom_of_expression_score
+        name: "\xadFreedom of expression score"
+      - slug: separation_of_powers_score
+        name: "Separation of powers score"
+      - slug: civil_rights_score
+        name: "Civil rights score"
+      - slug: democratic_features
+        name: "Democratic features"
+      - slug: number_and_share_of_democracies
+        name: "\xad\xadNumber and share of democracies"
+      - slug: people_living_in_democracies
+        name: "\xad\xadPeople living in democracies"
+
+views:
+  - dimensions:
+      metric: democratic_features
+      sub_metric: main_index
+    indicators:
+      y:
+        - catalogPath: bti#democracy_bti
+  - dimensions:
+      metric: democratic_features
+      sub_metric: stateness_index
+    indicators:
+      y:
+        - catalogPath: bti#state_bti
+  - dimensions:
+      metric: democratic_features
+      sub_metric: political_participation_index
+    indicators:
+      y:
+        - catalogPath: bti#political_participation_bti
+  - dimensions:
+      metric: democratic_features
+      sub_metric: rule_of_law_index
+    indicators:
+      y:
+        - catalogPath: bti#rule_of_law_bti
+  - dimensions:
+      metric: democratic_features
+      sub_metric: stability_of_democratic_institutions_index
+    indicators:
+      y:
+        - catalogPath: bti#stability_dem_inst_bti
+  - dimensions:
+      metric: democratic_features
+      sub_metric: political_and_social_integration_index
+    indicators:
+      y:
+        - catalogPath: bti#pol_soc_integr_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: bti#regime_bti
+    config:
+      colorVariableId: bti#regime_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: basic_state_functions_score
+    indicators:
+      y:
+        - catalogPath: bti#state_basic_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: free_and_fair_elections_score
+    indicators:
+      y:
+        - catalogPath: bti#electfreefair_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: effective_power_to_govern_score
+    indicators:
+      y:
+        - catalogPath: bti#effective_power_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: freedom_of_association_score
+    indicators:
+      y:
+        - catalogPath: bti#freeassoc_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: freedom_of_expression_score
+    indicators:
+      y:
+        - catalogPath: bti#freeexpr_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: separation_of_powers_score
+    indicators:
+      y:
+        - catalogPath: bti#sep_power_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: civil_rights_score
+    indicators:
+      y:
+        - catalogPath: bti#civ_rights_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: democratic_features
+    indicators:
+      y:
+        - catalogPath: bti#democracy_bti
+  - dimensions:
+      metric: political_regime
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: bti/num_countries#num_regime_bti__category_hard_line_autocracy
+          display: *display_hl_aut
+        - catalogPath: bti/num_countries#num_regime_bti__category_moderate_autocracy
+          display: *display_mod_aut
+        - catalogPath: bti/num_countries#num_regime_bti__category_highly_defective_democracy
+          display: *display_hd_dem
+        - catalogPath: bti/num_countries#num_regime_bti__category_defective_democracy
+          display: *display_def_dem
+        - catalogPath: bti/num_countries#num_regime_bti__category_consolidating_democracy
+          display: *display_con_dem
+    config:
+      title: "Countries that are democracies and autocracies"
+      <<: *group_config
+      type: "StackedArea StackedDiscreteBar"
+      stackMode: "relative"
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      metric: political_regime
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: bti/num_people#pop_regime_bti__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: bti/num_people#pop_regime_bti__category_hard_line_autocracy
+          display: *display_hl_aut
+        - catalogPath: bti/num_people#pop_regime_bti__category_moderate_autocracy
+          display: *display_mod_aut
+        - catalogPath: bti/num_people#pop_regime_bti__category_highly_defective_democracy
+          display: *display_hd_dem
+        - catalogPath: bti/num_people#pop_regime_bti__category_defective_democracy
+          display: *display_def_dem
+        - catalogPath: bti/num_people#pop_regime_bti__category_consolidating_democracy
+          display: *display_con_dem
+    config:
+      title: "People living in democracies and autocracies"
+      <<: *group_config
+      type: "StackedArea StackedDiscreteBar"

@@ -1,0 +1,21 @@
+dataset:
+  title: TE-13.3_GDP
+tables:
+  te_13_3_gdp:
+    variables:
+      gdp_growth__pct:
+        title: GDP Growth (%)
+        unit: '%'
+        description: The underlying real GDP per capita is in 2011US$ with multiple benchmarks.
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

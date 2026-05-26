@@ -15,21 +15,21 @@ tables:
   arable_land_per_crop_output:
     variables:
       area:
-        title: 'Arable land'
-        unit: 'hectares'
-        short_unit: 'ha'
+        title: "Arable land"
+        unit: "hectares"
+        short_unit: "ha"
         description_short: |
           Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
       index:
-        title: 'Gross Production Index Number'
-        unit: ''
-        short_unit: ''
+        title: "Gross Production Index Number"
+        unit: ""
+        short_unit: ""
         description_short: |
           Gross Production Index Number (2014-2016 = 100).
       arable_land_per_crop_output:
         title: Arable land needed to produce a fixed quantity of crops
-        unit: ''
-        short_unit: ''
+        unit: ""
+        short_unit: ""
         description_short: |
           Index of arable land needed to produce a fixed quantity of crops (where values in 1961 are equal to 1.0).
         description_key:
@@ -54,7 +54,7 @@ tables:
         description_short: |
           Fish stock are subpopulations of a particular species of fish which have common parameters such as location, growth and mortality which define their population dynamics. Fish stocks are within biologically sustainable levels when fish catch does not exceed the maximum sustainable yield (MSY) - the rate at which fish populations can regenerate.
       overexploited_fish:
-        title : "Percentage of overexploited fish stocks"
+        title: "Percentage of overexploited fish stocks"
         unit: "%"
         short_unit: "%"
         description_short: |
@@ -199,7 +199,7 @@ tables:
         unit: kilograms per hectare
         short_unit: kg/ha
         description_short: |
-           Nutrient phosphate (P2O5) from all fertilizer products per area of cropland, which corresponds to the sum of arable land and permanent crops.
+          Nutrient phosphate (P2O5) from all fertilizer products per area of cropland, which corresponds to the sum of arable land and permanent crops.
       potash_per_cropland:
         title: Potash use per area of cropland
         unit: kilograms per hectare
@@ -212,12 +212,25 @@ tables:
         short_unit: kg/ha
         description_short: |
           Agricultural use of all fertilizer products (including nitrogenous, potash, and phosphate fertilizers) per area of cropland, which corresponds to the sum of arable land and permanent crops.
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Fertilizers
+          grapher_config:
+            title: Fertilizer use per hectare of cropland
+            subtitle: Application of all fertilizer products (including nitrogenous, potash, and phosphate fertilizers), measured in kilograms of total nutrient per hectare of cropland.
+            hasMapTab: true
+            tab: map
+            originUrl: https://ourworldindata.org/fertilizers
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0, 10, 20, 50, 100, 200, 1]
       cropland:
         title: Area of cropland
         unit: hectares
         short_unit: ha
-        description_short:
-          Surface area of cropland, which corresponds to the sum of arable land and permanent crops.
+        description_short: Surface area of cropland, which corresponds to the sum of arable land and permanent crops.
       nitrogen_use:
         title: Nitrogen use
         unit: tonnes

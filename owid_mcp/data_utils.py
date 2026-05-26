@@ -17,6 +17,7 @@ import structlog
 import yaml
 from owid.catalog.core import CatalogPath
 
+from etl.http import HEADERS
 from owid_mcp.config import (
     ALGOLIA_API_KEY,
     ALGOLIA_APP_ID,
@@ -235,7 +236,7 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> dict[str, Any
     # Use JSON endpoint for better error handling
     datasette_json_url = f"{DATASETTE_BASE}?{qs}"
 
-    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS) as client:
         resp = await client.get(datasette_json_url)
 
         json_data = resp.json()
@@ -418,7 +419,7 @@ def build_efficient_rows(data_json: dict[str, Any], entities_meta: dict[int, dic
 
 async def fetch_json(url: str) -> dict[str, Any]:
     """Fetch JSON data from a URL."""
-    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS) as client:
         resp = await client.get(url)
         resp.raise_for_status()
         return resp.json()

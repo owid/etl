@@ -1,0 +1,27 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Nuclear Weapons
+        - War & Peace
+
+dataset:
+  update_period_days: 365
+
+tables:
+  nuclear_weapons_inventories:
+    variables:
+      number_of_warheads:
+        title: Number of nuclear warheads
+        unit: warheads
+        short_unit: ""
+        description_short: |-
+          Estimated number of nuclear warheads in the stockpiles of nuclear powers.
+        description_key:
+          - Stockpiles include warheads assigned to military forces, but exclude retired warheads queued for dismantlement.
+          - Retired warheads are only included in the global total.
+          - The exact number of countries' warheads is secret, and the estimates are based on publicly available information, historical records, and occasional leaks.
+          - Warheads vary substantially in their destructing power.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0

@@ -3,12 +3,12 @@ import math
 from typing import Any
 
 import numpy as np
-import requests
 from sqlalchemy import Engine
 from sqlalchemy.orm import Session
 
 from etl.config import OWIDEnv
 from etl.grapher.model import Chart
+from etl.http import session as http_session
 
 
 def round_to_n_sig_figs(x: float, n: int) -> float:
@@ -85,7 +85,7 @@ def get_variable_max_year(variable_id: int, env: OWIDEnv) -> int | None:
         Maximum year in the data, or None if no data
     """
     url = env.indicator_data_url(variable_id)
-    response = requests.get(url)
+    response = http_session.get(url)
     response.raise_for_status()
     data = response.json()
 
@@ -180,7 +180,7 @@ def get_variable_data_hash(variable_id: int, env: OWIDEnv, round_values: bool = 
     """
     url = env.indicator_data_url(variable_id)
 
-    response = requests.get(url)
+    response = http_session.get(url)
     response.raise_for_status()
 
     data = response.json()

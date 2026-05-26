@@ -9,7 +9,7 @@ status: new
 
 Our team assembled a dataset and published the article [Tracking historical progress against slavery and forced labor: a long run data view](https://ourworldindata.org/slavery) to show when each country ended large-scale forced labor (or whether a country has not abolished it).
 
-"Large-scale" forced labor here means forced labor that was common and entrenched — tolerated, enabled, or imposed by authorities, rather than isolated abuse.
+“Large-scale” forced labor here means forced labor that was common and entrenched — tolerated, enabled, or imposed by authorities, rather than isolated abuse.
 
 The data shows that almost all countries have ended large-scale forced labor, often surprisingly recently. This has been well documented in the many excellent books by historians and social scientists. What we add to this is a quantitative, bird's-eye perspective on the global history of slavery and forced labor.
 
@@ -26,9 +26,9 @@ V-Dem's expert surveys include two questions on forced labor: one asks about how
 
 The full survey question for men \[women\] is:
 
-> **Question:** "Are adult men \[women\] free from servitude and other kinds of forced labor?"
+> **Question:** “Are adult men \[women\] free from servitude and other kinds of forced labor?”
 >
-> **Clarification:** Involuntary servitude occurs when an adult is unable to quit a job s/he desires to leave — not by reason of economic necessity but rather by reason of employer's coercion. This includes labor camps but not work or service which forms part of normal civic obligations such as conscription or employment in command economies.
+> **Clarification:** Involuntary servitude occurs when an adult is unable to quit a job s/he desires to leave — not by reason of economic necessity but rather by reason of employer’s coercion. This includes labor camps but not work or service which forms part of normal civic obligations such as conscription or employment in command economies.
 
 **Responses:**
 
@@ -44,7 +44,7 @@ V-Dem takes the independent expert assessments and calculates an overall score. 
 
 This approach helps address key measurement challenges: using country experts helps measure what forced labor looks like in practice — not just what the law says. Asking the experts to rate forced labor on a scale recognizes that it exists everywhere, but at different levels. And the fact that each point on the scale comes with a clear description helps experts interpret the scores in a similar way, and makes different forms of forced labor more comparable across places and over time.
 
-Despite these strengths, V-Dem also has limitations that matter for our purposes here. First, its forced-labor indicators are designed to measure severity, not to draw a clear line between countries with and without large-scale forced labor. V-Dem's main measure places countries on a continuous scale, and a secondary measure places them on the original 0-4 scale. But neither specifies where a meaningful cutoff for “large-scale” forced labor should lie.
+Despite these strengths, V-Dem also has limitations that matter for our purposes here. First, its forced-labor indicators are designed to measure severity, not to draw a clear line between countries with and without large-scale forced labor. V-Dem's main measure places countries on a continuous scale, and a secondary measure places them on the original 0–4 scale. But neither specifies where a meaningful cutoff for “large-scale” forced labor should lie.
 
 Second, coverage is incomplete. Some of today's smaller countries are not included in V-Dem at all. Others are only covered from independence or from around 1900 onward[^vdem-coverage], and for a few country-years, the forced-labor assessment data are missing.
 

@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: UN Environment Programme
+    title: Consumption of controlled substances
+    description: |-
+      Data reported by Parties to the Montreal Protocol on the consumption of controlled substances, compiled by the UN Environment Programme Ozone Secretariat.
+
+      Negative values for a given year imply that quantities destroyed or quantities exported for the year exceeded the sum of production and imports, implying that the destroyed or exported quantities came from stockpiles.
+    title_snapshot: Consumption of controlled substances - Hydrochlorofluorocarbons (HCFCs)
+    description_snapshot: |-
+      Consumption of hydrochlorofluorocarbons (HCFCs), reported by country and year over the period 1986-2022.
+    citation_full: UN Environment Programme Ozone Secretariat (2023). Data on consumption of controlled substances. https://ozone.unep.org/countries/data-table.
+    attribution_short: UNEP
+    url_main: https://ozone.unep.org/countries/data-table
+    date_accessed: '2023-03-17'
+    date_published: '2023-03-16'
+outs:
+  - md5: c37b5dce2d945f478830e1d891942ef5
+    size: 212762
+    path: consumption_controlled_substances_hydrochlorofluorocarbons.xlsx

@@ -92,8 +92,6 @@ nav = [
             { "Structuring YAML file" = "architecture/metadata/structuring-yaml.md" },
             { "Data Pages Workflow" = "architecture/metadata/data_pages_workflow.md" },
             { "Propagation of metadata" = "architecture/metadata/propagation.md" },
-
-            { "ETL MetaGPT Tool" = "architecture/metadata/metadata_chatgpt_update.md" },
             { "FAQs" = "architecture/metadata/faqs.md" },
         ] },
     ] },
@@ -128,6 +126,7 @@ nav = [
         { "Our COVID work" = "api/covid.md" },
         { "Land use for biofuels vs. solar" = "analyses/biofuels_land_use/index.md" },
         { "Tracking historical progress against slavery and forced labor: a long-run data view" = "analyses/slavery_historical_data/index.md" },
+        { "Population projection tool" = "analyses/population_tool/index.md" },
     ] },
 ]
 
@@ -204,7 +203,7 @@ link = "https://linkedin.com/company/ourworldindata"
 variant = "modern"             # Use "classic" for Material for MkDocs appearance
 language = "en"
 custom_dir = "docs/overrides/"
-logo = "assets/site-logo.svg"
+logo = "assets/owid-logo.svg"
 favicon = "assets/favicon.png"
 
 features = [
@@ -429,3 +428,5 @@ glob = ["ignore/**", "ignore/"]
 tags_file = "tags.md"
 
 [project.plugins.glightbox]
+skip_classes = []
+manual = true

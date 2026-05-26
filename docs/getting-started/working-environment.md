@@ -218,13 +218,13 @@ If `make test` succeeds, then you should be able to build any dataset you like, 
 
 ## Git hooks
 
-We recommend installing the pre-commit hook, which automatically runs `make check` (lint, format, type-check) before every `git commit`:
+The pre-commit hook is activated automatically by `make .venv` (and any target that depends on it). It runs `make check` (lint, format, type-check) before every `git commit`, which prevents accidentally pushing code that fails CI.
+
+If you need to (re)activate it manually:
 
 ```bash
 make install-hooks
 ```
-
-This prevents accidentally pushing code that fails CI.
 
 ## VSCode setup
 

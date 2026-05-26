@@ -1,0 +1,32 @@
+dataset:
+  title: Figure_17.28_budget_balance
+tables:
+  figure_17_28_budget_balance:
+    variables:
+      consumer_price_inflation__pct:
+        title: Consumer price inflation (%)
+        unit: ''
+      cyclically_adjusted_budget_balance__as_a_pct_of_potential_gdp:
+        title: Cyclically-adjusted budget balance (as a % of potential GDP)
+        unit: '%'
+      real_oil_price_index__1960_5:
+        title: Real oil price index (1960=5)
+        unit: ''
+      short_term_nominal_interest_rate__pct:
+        title: Short term nominal interest rate (%)
+        unit: ''
+      short_term_real_interest_rate__pct:
+        title: Short term real interest rate (%)
+        unit: ''
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

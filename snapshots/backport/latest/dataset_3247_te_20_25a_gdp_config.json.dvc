@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3247
-    date_accessed: 2023-08-10 08:42:51.282673
+    url: https://admin.owid.io/admin/datasets/3247
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3247_te_20_25a_gdp
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ae0aa47187e142d8a730a3c224f51eea
-  size: 1875
-  path: dataset_3247_te_20_25a_gdp_config.json
+  - md5: af7933f9e86a7438e0a9c6d0869047d2
+    size: 2005
+    path: dataset_3247_te_20_25a_gdp_config.json

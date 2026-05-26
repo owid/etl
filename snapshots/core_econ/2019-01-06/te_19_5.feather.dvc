@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Milanovic
+    title: 'Global income inequality by the numbers: in history and now — an overview'
+    citation_full: 'Branko Milanovic. 2012. ''Global Income Inequality by the Numbers: In History and Now—an Overview''. Policy Research Working Paper 6259. The World Bank.'
+    url_main: http://documents.worldbank.org/curated/en/959251468176687085/pdf/wps6259.pdf
+    date_accessed: '2019-01-06'
+    date_published: '2012'
+  is_public: false
+outs:
+  - md5: 736d37ead00513e603552c97ae9a4546
+    size: 4642
+    path: te_19_5.feather

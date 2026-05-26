@@ -14,7 +14,7 @@ import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from owid.catalog.api.models import ResponseSet
-from owid.catalog.api.utils import _loading_data_from_api
+from owid.catalog.api.utils import _loading_data_from_api, session
 from owid.catalog.core.charts import ChartTable, ChartTableMeta
 from owid.catalog.core.meta import Origin, VariableMeta
 
@@ -245,7 +245,7 @@ def _load_chart_table_metadata(slug: str, *, timeout: int, base_url: str) -> dic
         ChartNotFoundError: If the chart does not exist.
     """
     url = f"{base_url}/{slug}.metadata.json"
-    resp = requests.get(url, timeout=timeout)
+    resp = session.get(url, timeout=timeout)
 
     if resp.status_code == 404:
         raise ChartNotFoundError(f"Failed to retrieve chart metadata. No such chart found: {slug} (url {url})")
@@ -269,7 +269,7 @@ def _load_chart_table_config(slug: str, *, timeout: int, base_url: str) -> dict[
         ChartNotFoundError: If the chart does not exist.
     """
     url = f"{base_url}/{slug}.config.json"
-    resp = requests.get(url, timeout=timeout)
+    resp = session.get(url, timeout=timeout)
 
     if resp.status_code == 404:
         raise ChartNotFoundError(f"Failed to retrieve chart config. No such chart found: {slug}")
@@ -303,7 +303,7 @@ def _load_chart_table_data(
         LicenseError: If the chart contains non-redistributable data.
     """
     url = f"{base_url}/{slug}.csv"
-    resp = requests.get(
+    resp = session.get(
         url,
         params=params,
         timeout=timeout,
