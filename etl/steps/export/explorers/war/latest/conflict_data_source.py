@@ -180,7 +180,7 @@ STACKED_CONFIG = {
 MAP_CONFIG = {"hasMapTab": True, "tab": "map", "selectedFacetStrategy": "entity"}
 
 # Human-readable conflict_type names + short labels used in templates. Specs
-# can override individual entries via `ct_name_override` / `ct_short_override`.
+# can override individual entries via `ct_name` / `ct_short` on the spec.
 CT_NAME = {
     CT.ALL_ARMED: "armed conflicts",
     CT.ALL_STATE_BASED: "state-based conflicts",
@@ -284,10 +284,11 @@ class SourceSpec:
     # else uses just "regional_data".
     deaths_sub_measure: str = "regional_data"
 
-    # Per-CT name overrides used in titles + display labels. Default falls back
-    # to CT_NAME / CT_SHORT. COW populates these to swap "conflicts" → "wars".
-    ct_name_override: dict[str, str] = field(default_factory=dict)
-    ct_short_override: dict[str, str] = field(default_factory=dict)
+    # Per-CT name dicts used in titles + display labels. Defaults from
+    # CT_NAME / CT_SHORT, overlaid with the spec's own entries in
+    # `__post_init__`. COW uses this to swap "conflicts" → "wars".
+    ct_name: dict[str, str] = field(default_factory=dict)
+    ct_short: dict[str, str] = field(default_factory=dict)
 
     # FAUST ------------------------------------------------------------------
     # Noun used in deaths titles. PRIO/UCDP say "Deaths"; "Battle deaths" would
@@ -309,6 +310,12 @@ class SourceSpec:
     # (conflict_type, conflict_sub_type).
     deaths_map_views: set[tuple[str, str]] = field(default_factory=set)
     deaths_map_with_cs: set[tuple[str, str]] = field(default_factory=set)
+
+    def __post_init__(self) -> None:
+        # Overlay the spec's partial CT name dicts onto the module defaults so
+        # callers can just read `spec.ct_name[ct]` without falling back.
+        self.ct_name = {**CT_NAME, **self.ct_name}
+        self.ct_short = {**CT_SHORT, **self.ct_short}
 
 
 # ===========================================================================
@@ -580,14 +587,6 @@ def _pick_best_or_low(inds: list[Indicator]) -> Indicator | None:
 # ===========================================================================
 
 
-def _ct_name(spec: SourceSpec, ctype: str) -> str:
-    return spec.ct_name_override.get(ctype) or CT_NAME[ctype]
-
-
-def _ct_short(spec: SourceSpec, ctype: str) -> str | None:
-    return spec.ct_short_override.get(ctype) or CT_SHORT.get(ctype)
-
-
 def _dod_url(link: str) -> str:
     """Extract the URL portion of a DoD markdown link.
 
@@ -623,7 +622,7 @@ def _set_view_config(view, spec: SourceSpec) -> None:
 def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str, cst: str) -> None:
     per_capita = measure == M.DEATH_RATE
     noun = "Death rate" if per_capita else spec.deaths_noun
-    name = _ct_name(spec, ctype)
+    name = spec.ct_name[ctype]
 
     if cst == CST.BY_SUB_TYPE:
         cfg["title"] = f"{noun} in {name} based on where they occurred"
@@ -667,7 +666,7 @@ def _deaths_subtitle(dod_link: str, per_capita: bool) -> str:
 def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str, cst: str, sub_measure: str) -> None:
     rate = measure == M.CONFLICT_RATE
     is_new = sub_measure == "only_new_conflicts"
-    name = _ct_name(spec, ctype)
+    name = spec.ct_name[ctype]
     new_prefix = "new " if is_new else ""
     lead = "Rate of" if rate else "Number of"
     verb = "started that year" if is_new else "were ongoing that year"
@@ -702,7 +701,7 @@ def _count_subtitle(dod_link: str, rate: bool, verb: str, interstate: bool = Fal
 
 
 def _participants_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_measure: str) -> None:
-    name = _ct_name(spec, ctype)
+    name = spec.ct_name[ctype]
     country_level = sub_measure == "country_level_data"
     cfg["title"] = f"States involved in {name}" if country_level else f"Number of states involved in {name}"
 
@@ -733,7 +732,7 @@ def _all_state_based_dod_singular(spec: SourceSpec) -> str:
         if ctype in spec.dod:
             parts.append(f"[{label}]({_dod_url(spec.dod[ctype])})")
     # Detect whether the source talks about "wars" instead of "conflicts".
-    noun = "war" if spec.ct_name_override.get(CT.INTERSTATE, "").endswith("wars") else "conflict"
+    noun = "war" if spec.ct_name[CT.INTERSTATE].endswith("wars") else "conflict"
     if len(parts) >= 2:
         return ", ".join(parts[:-1]) + f", or {parts[-1]} {noun}"
     if parts:
@@ -742,7 +741,7 @@ def _all_state_based_dod_singular(spec: SourceSpec) -> str:
 
 
 def _locations_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_measure: str) -> None:
-    name = _ct_name(spec, ctype)
+    name = spec.ct_name[ctype]
     country_level = sub_measure == "country_level_data"
     cfg["title"] = (
         f"Countries where {name} took place" if country_level else f"Number of countries where {name} took place"
@@ -782,7 +781,7 @@ def _set_deaths_displays(ys: list[Indicator], spec: SourceSpec, measure: str, ct
     """
     has_ci_variants = any("_low_" in i.catalogPath or "_high_" in i.catalogPath for i in ys)
     if not has_ci_variants:
-        short = _ct_short(spec, ctype)
+        short = spec.ct_short.get(ctype)
         if len(ys) == 1 and short:
             ys[0].display = {"name": short}
         return
@@ -804,7 +803,7 @@ def _set_deaths_displays(ys: list[Indicator], spec: SourceSpec, measure: str, ct
 
 def _set_count_display(ys: list[Indicator], spec: SourceSpec, ctype: str) -> None:
     """Single-indicator number_of_conflicts / conflict_rate view → CT short label."""
-    short = _ct_short(spec, ctype)
+    short = spec.ct_short.get(ctype)
     if len(ys) == 1 and short:
         ys[0].display = {"name": short}
 
@@ -1156,7 +1155,7 @@ COW_SPEC = SourceSpec(
         CT.ALL_ARMED: {M.DEATHS, M.DEATH_RATE, M.N_CONFLICTS, M.CONFLICT_RATE},
         CT.INTRASTATE: {M.N_CONFLICTS, M.CONFLICT_RATE},
     },
-    ct_name_override={
+    ct_name={
         CT.ALL_ARMED: "wars",
         CT.ALL_STATE_BASED: "state-based wars",
         CT.INTERSTATE: "interstate wars",
@@ -1164,7 +1163,7 @@ COW_SPEC = SourceSpec(
         CT.EXTRASTATE: "extrastate wars",
         CT.NON_STATE: "non-state wars",
     },
-    ct_short_override={
+    ct_short={
         CT.INTERSTATE: "Interstate wars",
         CT.INTRASTATE: "Intrastate wars",
         CT.EXTRASTATE: "Extrastate wars",
