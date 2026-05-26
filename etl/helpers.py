@@ -588,9 +588,11 @@ class PathFinder:
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
         if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
-        elif (step_type == "export") and (dependency["channel"] == "multidim"):
+        elif (step_type == "export") and (dependency["channel"] in ("multidim", "explorers")):
             collection_path = (
-                paths.EXPORT_MDIMS_DIR / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
+                paths.EXPORT_DIR
+                / dependency["channel"]
+                / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
             )
             return CollectionSet(collection_path)
         else:
@@ -633,11 +635,12 @@ class PathFinder:
         short_name: str | None = None,
         namespace: str | None = None,
         version: str | int | None = None,
+        channel: Literal["multidim", "explorers"] = "multidim",
     ) -> CollectionSet:
         cs = self.load_dependency(
             step_type="export",
             short_name=short_name or self.short_name,
-            channel="multidim",
+            channel=channel,
             namespace=namespace,
             version=version,
         )
