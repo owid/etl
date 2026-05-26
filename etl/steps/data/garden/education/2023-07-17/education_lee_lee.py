@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import owid.catalog.processing as pr
-import pandas as pd
 import shared
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
@@ -52,20 +50,6 @@ def run(dest_dir: str) -> None:
     # Load dataset containing regions data.
     ds_regions = paths.load_dataset("regions")
 
-    # Load the World Bank Education Dataset
-    ds_garden_wdi = paths.load_dataset("wdi")
-    tb_wdi = ds_garden_wdi["wdi"]
-
-    # Load the UNESCO Education Dataset
-    ds_garden_unesco = paths.load_dataset("education_opri")
-    tb_unesco = ds_garden_unesco["education_opri"]
-
-    # Extract enrollment rates from the World Bank and UNESCO datasets starting from 2010
-    enrolment_recent = extract_recent_data(tb_wdi, tb_unesco)
-
-    # Get the list of columns from the World Bank dataset
-    world_bank_indicators = enrolment_recent.columns
-
     #
     # Data Processing
     #
@@ -86,69 +70,22 @@ def run(dest_dir: str) -> None:
         )
     )
 
-    # Prepare enrollment and attainment data
-    tb_enrollment = prepare_enrollment_data(tb)
+    # Prepare attainment data (enrollment combination has moved to education_opri)
     tb_attainment = prepare_attainment_data(tb)
     tb_attainment = tb_attainment.dropna(subset=tb_attainment.columns.drop(["country", "year"]), how="all")
-    tb_attainment = tb_attainment.reset_index(drop=True)
-
-    # Merge enrollment and attainment data
-    merged_tb = pr.merge(tb_enrollment, tb_attainment, on=["year", "country"], how="outer")
 
     # Drop columns related to historic population values
-    merged_tb = merged_tb.drop(columns=[column for column in merged_tb.columns if "__thousands" in column])
-    merged_tb.columns = [underscore(col) for col in merged_tb.columns]
+    tb_attainment = tb_attainment.drop(columns=[column for column in tb_attainment.columns if "__thousands" in column])
+    tb_attainment.columns = [underscore(col) for col in tb_attainment.columns]
 
-    merged_tb = add_data_for_regions(tb=merged_tb, ds_regions=ds_regions)
-
-    # Concatenate historical and more recent enrollment data
-    hist_1985_tb = merged_tb[merged_tb["year"] < 1985]
-    tb_merged_enrollment = pr.concat([enrolment_recent, hist_1985_tb[world_bank_indicators]])
-    tb_merged_enrollment.set_index(["country", "year"], inplace=True)
-    # Differentiate these columns from the original data
-    tb_merged_enrollment.columns = tb_merged_enrollment.columns + "_combined_wb"
-    tb_merged_enrollment = tb_merged_enrollment.reset_index()
-
-    # Merge historical data with combined enrollment data
-    tb_merged_wb = pr.merge(tb_merged_enrollment, merged_tb, on=["country", "year"], how="outer")
-    tb_merged_wb = tb_merged_wb.dropna(how="all")
-
-    # Create female to male enrollment ratios
-    tb_merged_wb["female_over_male_enrollment_rates_primary"] = (
-        tb_merged_wb["f_primary_enrollment_rates_combined_wb"] / tb_merged_wb["m_primary_enrollment_rates_combined_wb"]
-    )
-    tb_merged_wb["female_over_male_enrollment_rates_secondary"] = (
-        tb_merged_wb["f_secondary_enrollment_rates_combined_wb"]
-        / tb_merged_wb["m_secondary_enrollment_rates_combined_wb"]
-    )
-    tb_merged_wb["female_over_male_enrollment_rates_tertiary"] = (
-        tb_merged_wb["f_tertiary_enrollment_rates_combined_wb"]
-        / tb_merged_wb["m_tertiary_enrollment_rates_combined_wb"]
-    )
+    tb_attainment = add_data_for_regions(tb=tb_attainment, ds_regions=ds_regions)
+    tb_attainment = tb_attainment.dropna(how="all")
 
     # Set metadata and format the dataframe for saving.
-    tb_merged_wb.metadata.short_name = paths.short_name
-    # Remove the value for United States in 1975 in the specified column
-    tb_merged_wb.loc[
-        (tb_merged_wb["country"] == "United States") & (tb_merged_wb["year"] == 1975),
-        "m_primary_enrollment_rates_combined_wb",
-    ] = pd.NA
-
-    tb_merged_wb = tb_merged_wb.underscore().set_index(["country", "year"], verify_integrity=True)
+    tb_attainment.metadata.short_name = paths.short_name
+    tb_attainment = tb_attainment.underscore().set_index(["country", "year"], verify_integrity=True)
 
     columns_to_use = [
-        "mf_primary_enrollment_rates_combined_wb",
-        "f_primary_enrollment_rates_combined_wb",
-        "m_primary_enrollment_rates_combined_wb",
-        "mf_secondary_enrollment_rates_combined_wb",
-        "f_secondary_enrollment_rates_combined_wb",
-        "m_secondary_enrollment_rates_combined_wb",
-        "mf_tertiary_enrollment_rates_combined_wb",
-        "f_tertiary_enrollment_rates_combined_wb",
-        "m_tertiary_enrollment_rates_combined_wb",
-        "female_over_male_enrollment_rates_primary",
-        "female_over_male_enrollment_rates_secondary",
-        "female_over_male_enrollment_rates_tertiary",
         "mf_youth_and_adults__15_64_years__percentage_of_no_education",
         "f_youth_and_adults__15_64_years__percentage_of_no_education",
         "f_adults__25_64_years__percentage_of_no_education",
@@ -156,69 +93,24 @@ def run(dest_dir: str) -> None:
         "mf_youth_and_adults__15_64_years__average_years_of_education",
         "f_youth_and_adults__15_64_years__average_years_of_education",
     ]
-    tb_merged_wb = tb_merged_wb[columns_to_use]
+    tb_attainment = tb_attainment[columns_to_use]
+
+    # Prepare enrollment data with regional aggregates (used by education_opri for combined historical series)
+    tb_enrollment = prepare_enrollment_data(tb)
+    tb_enrollment = tb_enrollment.dropna(subset=tb_enrollment.columns.drop(["country", "year"]), how="all")
+    tb_enrollment = add_data_for_regions(tb=tb_enrollment, ds_regions=ds_regions)
+    tb_enrollment = tb_enrollment.dropna(how="all")
+    tb_enrollment.metadata.short_name = "education_lee_lee_enrollment"
+    tb_enrollment = tb_enrollment.set_index(["country", "year"], verify_integrity=True)
 
     #
     # Save outputs
     #
     # Create a new garden dataset with the same metadata as the meadow dataset
-    ds_garden = create_dataset(dest_dir, tables=[tb_merged_wb], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb_attainment, tb_enrollment], check_variables_metadata=True)
 
     # Save the processed data in the new garden dataset
     ds_garden.save()
-
-
-def extract_recent_data(tb_wb: Table, tb_unesco: Table) -> Table:
-    """
-    Extracts enrollment rate indicators from the World Bank dataset.
-    The function specifically extracts net enrollment rates up to secondary education and gross enrollment rates for tertiary education.
-
-    :param tb_wb: Table containing World Bank education dataset
-    :return: DataFrame with selected enrollment rates for years above 2010
-    """
-
-    # Define columns to select for enrolment rates
-    select_enrolment_cols = [
-        # Tertiary enrollment columns
-        "se_ter_enrr",
-        "se_ter_enrr_fe",
-        "se_ter_enrr_ma",
-        # Secondary enrollment columns
-        "se_sec_nenr",
-        "se_sec_nenr_fe",
-        "se_sec_nenr_ma",
-    ]
-
-    select_primary = [
-        # Primary enrollment columns
-        "total_net_enrolment_rate__primary__both_sexes__pct",
-        "total_net_enrolment_rate__primary__female__pct",
-        "total_net_enrolment_rate__primary__male__pct",
-    ]
-
-    # Dictionary to rename columns to be consistent with Lee dataset
-    dictionary_to_rename_and_combine = {
-        "total_net_enrolment_rate__primary__both_sexes__pct": "mf_primary_enrollment_rates",
-        "total_net_enrolment_rate__primary__female__pct": "f_primary_enrollment_rates",
-        "total_net_enrolment_rate__primary__male__pct": "m_primary_enrollment_rates",
-        "se_ter_enrr": "mf_tertiary_enrollment_rates",
-        "se_ter_enrr_fe": "f_tertiary_enrollment_rates",
-        "se_ter_enrr_ma": "m_tertiary_enrollment_rates",
-        "se_sec_nenr": "mf_secondary_enrollment_rates",
-        "se_sec_nenr_fe": "f_secondary_enrollment_rates",
-        "se_sec_nenr_ma": "m_secondary_enrollment_rates",
-    }
-
-    # Select and rename columns
-    enrolment_wb = tb_wb[select_enrolment_cols].reset_index()
-    enrolment_unesco = tb_unesco[select_primary].reset_index()
-    enrolment_recent = pr.merge(enrolment_wb, enrolment_unesco, on=["country", "year"], how="outer")
-    enrolment_recent = enrolment_recent.rename(columns=dictionary_to_rename_and_combine)
-
-    # Select data above 1985
-    enrolment_recent = enrolment_recent[enrolment_recent["year"] >= 1985]
-
-    return enrolment_recent
 
 
 def melt_and_pivot(tb, id_vars: list[str], value_vars: list[str], index_vars: list[str], columns_vars: list[str]):
@@ -274,7 +166,6 @@ def prepare_enrollment_data(tb):
     enrollment_columns = ["primary_enrollment_rates", "secondary_enrollment_rates", "tertiary_enrollment_rates"]
     tb_enrollment = tb[enrollment_columns + id_vars_enrollment]
     tb_enrollment = tb_enrollment.dropna(subset=enrollment_columns, how="all")
-    tb_enrollment.reset_index(drop=True, inplace=True)
 
     tb_pivot_enrollment = melt_and_pivot(
         tb_enrollment, id_vars_enrollment, enrollment_columns, ["country", "year"], ["sex", "measurement"]

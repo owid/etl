@@ -1467,6 +1467,7 @@ tables:
       percentage_of_qualified_teachers_in_pre_primary_education__both_sexes__pct__qutp_02:
         title: Percentage of qualified teachers in pre-primary education
         description_short: Share of qualified teachers in [pre-primary education](#dod:pre-primary-education) who meet the minimum academic qualifications required in the subject they teach at that level in a given country.
+        unit: "%"
         short_unit: "%"
         description_key: *desc_key_qualified_teachers
         presentation:
@@ -1506,3 +1507,31 @@ tables:
           tolerance: *display_tolerance
 
 
+
+      # ========================================================================
+      # Additional chart variables
+      # ========================================================================
+
+      completion_rate__primary_education__both_sexes__pct__cr_1:
+        title: Completion rate in primary education (survey-based)
+        description_short: The share of children who are three to five years older than the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed it.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      completion_rate__lower_secondary_education__both_sexes__pct__cr_2:
+        title: Completion rate in lower secondary education (survey-based)
+        description_short: The share of children who are three to five years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed it.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
+      average_teacher_salary_in_primary_education_relative_to_other_professions_requiring_a_comparable_level_of_qualification__both_sexes__tsalary_1:
+        title: Average teacher salary in primary education relative to comparable professions
+        description_short: Average salary of primary school teachers as a ratio of the average salary of other professions requiring a comparable level of qualification.
+        unit: "ratio"
+        short_unit: ""
+        display:
+          numDecimalPlaces: 2

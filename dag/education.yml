@@ -16,8 +16,6 @@ steps:
       - snapshot://education/2023-07-17/education_lee_lee.xlsx
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
-    - data://garden/worldbank_wdi/2026-02-27/wdi
-    - data://garden/unesco/2026-05-12/education_opri
   data://grapher/education/2023-07-17/education_lee_lee:
     - data://garden/education/2023-07-17/education_lee_lee
 
@@ -63,7 +61,8 @@ steps:
     - snapshot://unesco/2026-05-12/education_opri.zip
   data://garden/unesco/2026-05-12/education_opri:
     - data://meadow/unesco/2026-05-12/education_opri
-    - snapshot://wb/2024-06-18/edstats_metadata.xls
+    - data://garden/unesco/2026-05-12/education_sdgs
+    - data://garden/education/2023-07-17/education_lee_lee
   data://grapher/unesco/2026-05-12/education_opri:
     - data://garden/unesco/2026-05-12/education_opri
 
@@ -72,7 +71,6 @@ steps:
     - snapshot://unesco/2026-05-12/education_sdgs.zip
   data://garden/unesco/2026-05-12/education_sdgs:
     - data://meadow/unesco/2026-05-12/education_sdgs
-    - snapshot://wb/2024-06-18/edstats_metadata.xls
     - data://garden/education/2017-09-30/public_expenditure
   data://grapher/unesco/2026-05-12/education_sdgs:
     - data://garden/unesco/2026-05-12/education_sdgs

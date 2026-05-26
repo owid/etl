@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table, VariableMeta
+from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
@@ -12,99 +12,113 @@ _WORLD_PRIORITY = {w: i for i, w in enumerate(_WORLD_VARIANTS)}
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Curated titles for indicators that have human-readable labels different from the raw UNESCO label.
-# Keys are the raw indicator labels as they appear as column names after the pivot
-# (label + ", " + indicator_id).
-_TITLE_OVERRIDES = {
-    "Adult literacy rate, population 15+ years, both sexes (%), LR.AG15T99": "Literacy rate among adults",
-    "Adult literacy rate, population 15+ years, female (%), LR.AG15T99.F": "Literacy rate among adult women",
-    "Adult literacy rate, population 15+ years, male (%), LR.AG15T99.M": "Literacy rate among adult men",
-    "Completion rate, lower secondary education, adjusted gender parity index (GPIA) (modelled data), CR.MOD.2.GPIA": "Completion rate in lower secondary education, adjusted gender parity index (GPIA)",
-    "Completion rate, primary education, adjusted gender parity index (GPIA) (modelled data), CR.MOD.1.GPIA": "Completion rate in primary education, adjusted gender parity index (GPIA)",
-    "Completion rate, upper secondary education, adjusted gender parity index (GPIA) (modelled data), CR.MOD.3.GPIA": "Completion rate in upper secondary education, adjusted gender parity index (GPIA)",
-    "Educational attainment rate, completed lower secondary education or higher, population 25+ years, both sexes (%), EA.2T8.AG25T99": "Share of the population with lower secondary education (25+)",
-    "Educational attainment rate, completed post-secondary non-tertiary education or higher, population 25+ years, both sexes (%), EA.4T8.AG25T99": "Share of the population with post-secondary education or higher (25+)",
-    "Elderly literacy rate, population 65+ years, both sexes (%), LR.AG65T99": "Literacy rate among older adults",
-    "Elderly literacy rate, population 65+ years, female (%), LR.AG65T99.F": "Literacy rate among older adult women",
-    "Elderly literacy rate, population 65+ years, male (%), LR.AG65T99.M": "Literacy rate among older adult men",
-    "Government expenditure on education as a percentage of GDP (%), XGDP.FSGOV": "Government spending on education as share of GDP",
-    "Gross enrolment ratio for tertiary education, both sexes (%), GER.5T8": "Gross enrollment ratio in tertiary education",
-    "Gross enrolment ratio for tertiary education, female (%), GER.5T8.F": "Gross enrollment ratio in tertiary education among women",
-    "Gross enrolment ratio for tertiary education, male (%), GER.5T8.M": "Gross enrollment ratio in tertiary education among men",
-    "Initial government funding per lower secondary student, constant PPP$, XUNIT.PPPCONST.2.FSGOV.FFNTR": "Government spending on lower secondary education per student",
-    "Initial government funding per pre-primary student, constant PPP$, XUNIT.PPPCONST.02.FSGOV.FFNTR": "Government spending on pre-primary education per student",
-    "Initial government funding per primary student, constant PPP$, XUNIT.PPPCONST.1.FSGOV.FFNTR": "Government spending on primary education per student",
-    "Initial government funding per tertiary student, constant PPP$, XUNIT.PPPCONST.5T8.FSGOV.FFNTR": "Government spending on tertiary education per student",
-    "Initial government funding per upper secondary student, constant PPP$, XUNIT.PPPCONST.3.FSGOV.FFNTR": "Government spending on upper secondary education per student",
-    "Net enrolment rate, pre-primary, both sexes (%), NER.02.CP": "Net enrollment rate in pre-primary education",
-    "Net enrolment rate, pre-primary, female (%), NER.02.F.CP": "Net enrollment rate in pre-primary education among girls",
-    "Net enrolment rate, pre-primary, male (%), NER.02.M.CP": "Net enrollment rate in pre-primary education among boys",
-    "Out-of-school rate for adolescents of lower secondary school age, adjusted gender parity index (GPIA) (modelled data), ROFST.MOD.2.GPIA": "Out-of-school rate for adolescents of lower secondary school age, adjusted gender parity index (GPIA), (modelled data), ROFST.MOD.2.GPIA",
-    "Out-of-school rate for adolescents of lower secondary school age, both sexes (%), ROFST.2.CP": "Out-of-school rate for adolescents of lower secondary school age",
-    "Out-of-school rate for adolescents of lower secondary school age, female (%), ROFST.2.F.CP": "Out-of-school rate for girls of lower secondary school age",
-    "Out-of-school rate for adolescents of lower secondary school age, male (%), ROFST.2.M.CP": "Out-of-school rate for boys of lower secondary school age",
-    "Out-of-school rate for children of primary school age, adjusted gender parity index (GPIA) (modelled data), ROFST.MOD.1.GPIA": "Out-of-school rate for children of primary school age, adjusted gender parity index (GPIA), (modelled data), ROFST.MOD.1.GPIA",
-    "Out-of-school rate for children of primary school age, both sexes (%), ROFST.1.CP": "Out-of-school rate for children of primary school age",
-    "Out-of-school rate for children of primary school age, female (%), ROFST.1.F.CP": "Out-of-school rate for girls of primary school age",
-    "Out-of-school rate for children of primary school age, male (%), ROFST.1.M.CP": "Out-of-school rate for boys of primary school age",
-    "Out-of-school rate for children one year before the official primary entry age, both sexes (%), ROFST.AGM1.CP": "Out-of-school rate for children one year before official primary entry age",
-    "Out-of-school rate for children one year before the official primary entry age, female (%), ROFST.AGM1.F.CP": "Out-of-school rate for girls one year before official primary entry age",
-    "Out-of-school rate for children one year before the official primary entry age, male (%), ROFST.AGM1.M.CP": "Out-of-school rate for boys one year before official primary entry age",
-    "Out-of-school rate for youth of upper secondary school age, adjusted gender parity index (GPIA) (modelled data), ROFST.MOD.3.GPIA": "Out-of-school rate for youth of upper secondary school age, adjusted gender parity index (GPIA), (modelled data), ROFST.MOD.3.GPIA",
-    "Out-of-school rate for youth of upper secondary school age, both sexes (%), ROFST.3.CP": "Out-of-school rate for youth of upper secondary school age",
-    "Out-of-school rate for youth of upper secondary school age, female (%), ROFST.3.F.CP": "Out-of-school rate for girls of upper secondary school age",
-    "Out-of-school rate for youth of upper secondary school age, male (%), ROFST.3.M.CP": "Out-of-school rate for boys of upper secondary school age",
-    "Percentage of qualified teachers in lower secondary education, both sexes (%), QUTP.2": "Percentage of qualified teachers in lower secondary education",
-    "Percentage of qualified teachers in pre-primary education, both sexes (%), QUTP.02": "Percentage of qualified teachers in pre-primary education",
-    "Percentage of qualified teachers in primary education, both sexes (%), QUTP.1": "Percentage of qualified teachers in primary education",
-    "Percentage of qualified teachers in secondary education, both sexes (%), QUTP.2T3": "Percentage of qualified teachers in secondary education",
-    "Percentage of qualified teachers in upper secondary education, both sexes (%), QUTP.3": "Percentage of qualified teachers in upper secondary education",
-    "Proportion of children/young people at the age of lower secondary education prepared for the future in mathematics, both sexes (%), PREPFUTURE.2.MATH": "Share of children achieving minimum math proficiency by the end of lower secondary age",
-    "Proportion of children/young people at the age of lower secondary education prepared for the future in mathematics, female (%), PREPFUTURE.2.MATH.F": "Share of girls achieving minimum math proficiency by the end of lower secondary age",
-    "Proportion of children/young people at the age of lower secondary education prepared for the future in mathematics, male (%), PREPFUTURE.2.MATH.M": "Share of boys achieving minimum math proficiency by the end of lower secondary age",
-    "Proportion of children/young people at the age of lower secondary education prepared for the future in reading, both sexes (%), PREPFUTURE.2.READ": "Share of children achieving minimum reading proficiency by the end of lower secondary age",
-    "Proportion of children/young people at the age of lower secondary education prepared for the future in reading, female (%), PREPFUTURE.2.READ.F": "Share of girls achieving minimum reading proficiency by the end of lower secondary age",
-    "Proportion of children/young people at the age of lower secondary education prepared for the future in reading, male (%), PREPFUTURE.2.READ.M": "Share of boys achieving minimum reading proficiency by the end of lower secondary age",
-    "Proportion of children/young people at the age of primary education prepared for the future in mathematics, both sexes (%), PREPFUTURE.1.MATH": "Share of children achieving minimum math proficiency by the end of primary age",
-    "Proportion of children/young people at the age of primary education prepared for the future in mathematics, female (%), PREPFUTURE.1.MATH.F": "Share of girls achieving minimum math proficiency by the end of primary age",
-    "Proportion of children/young people at the age of primary education prepared for the future in mathematics, male (%), PREPFUTURE.1.MATH.M": "Share of boys achieving minimum math proficiency by the end of primary age",
-    "Proportion of children/young people at the age of primary education prepared for the future in reading, both sexes (%), PREPFUTURE.1.READ": "Share of children achieving minimum reading proficiency by the end of primary age",
-    "Proportion of children/young people at the age of primary education prepared for the future in reading, female (%), PREPFUTURE.1.READ.F": "Share of girls achieving minimum reading proficiency by the end of primary age",
-    "Proportion of children/young people at the age of primary education prepared for the future in reading, male (%), PREPFUTURE.1.READ.M": "Share of boys achieving minimum reading proficiency by the end of primary age",
-    "Proportion of primary schools with access to basic drinking water (%), SCHBSP.1.WWATA": "Share of primary schools with access to drinking water",
-    "Proportion of primary schools with single-sex basic sanitation facilities (%), SCHBSP.1.WTOILA": "Share of primary schools with single-sex sanitation facilities",
-    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in mathematics, both sexes (%), MATH.LOWERSEC": "Share of students at the end of lower secondary education with minimum math skills",
-    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in mathematics, female (%), MATH.LOWERSEC.F": "Share of female students at the end of lower secondary education with minimum math skills",
-    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in mathematics, male (%), MATH.LOWERSEC.M": "Share of male students at the end of lower secondary education with minimum math skills",
-    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in reading, both sexes (%), READ.LOWERSEC": "Share of students at the end of lower secondary education with minimum reading skills",
-    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in reading, female (%), READ.LOWERSEC.F": "Share of female students at the end of lower secondary education with minimum reading skills",
-    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in reading, male (%), READ.LOWERSEC.M": "Share of male students at the end of lower secondary education with minimum reading skills",
-    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in mathematics, both sexes (%), MATH.PRIMARY": "Share of students with minimum math skills by the end of primary school",
-    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in mathematics, female (%), MATH.PRIMARY.F": "Share of female students with minimum math skills by the end of primary school",
-    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in mathematics, male (%), MATH.PRIMARY.M": "Share of male students with minimum math skills by the end of primary school",
-    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in reading, both sexes (%), READ.PRIMARY": "Share of students with minimum reading skills by the end of primary school",
-    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in reading, female (%), READ.PRIMARY.F": "Share of female students with minimum reading skills by the end of primary school",
-    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in reading, male (%), READ.PRIMARY.M": "Share of male students with minimum reading skills by the end of primary school",
-    "Pupil-qualified teacher ratio in pre-primary education (headcount basis), PTRHC.02.QUALIFIED": "Pupil-qualified teacher ratio in pre-primary education",
-    "Pupil-qualified teacher ratio in primary education (headcount basis), PTRHC.1.QUALIFIED": "Pupil-qualified teacher ratio in primary education",
-    "Youth literacy rate, population 15-24 years, adjusted gender parity index (GPIA), LR.AG15T24.GPIA": "Literacy rate among young people (15\u201324 years), adjusted gender parity index",
-    "Youth literacy rate, population 15-24 years, both sexes (%), LR.AG15T24": "Literacy rate among young people (15\u201324 years)",
-    "Youth literacy rate, population 15-24 years, female (%), LR.AG15T24.F": "Literacy rate among young women",
-    "Youth literacy rate, population 15-24 years, male (%), LR.AG15T24.M": "Literacy rate among young men",
-}
-
-# Unit overrides for indicators whose units need specific values not inferrable from the label.
-_UNIT_OVERRIDES = {
-    "Pupil-qualified teacher ratio in pre-primary education (headcount basis), PTRHC.02.QUALIFIED": (
-        1,
-        "pupils per teacher",
-        " ",
-    ),
-    "Pupil-qualified teacher ratio in primary education (headcount basis), PTRHC.1.QUALIFIED": (
-        1,
-        "pupils per teacher",
-        " ",
-    ),
+# Raw indicator_label_en values (before appending ", indicator_id") to keep in the final table.
+# Everything else from the ~2900-indicator long table is filtered out BEFORE consolidate_world_entries
+# and the pivot so that both operations are fast.
+_VARIABLES_TO_KEEP = {
+    # Adult literacy
+    "Adult literacy rate, population 15+ years, both sexes (%)",
+    "Adult literacy rate, population 15+ years, female (%)",
+    "Adult literacy rate, population 15+ years, male (%)",
+    # Youth literacy
+    "Youth literacy rate, population 15-24 years, both sexes (%)",
+    "Youth literacy rate, population 15-24 years, female (%)",
+    "Youth literacy rate, population 15-24 years, male (%)",
+    "Youth literacy rate, population 15-24 years, adjusted gender parity index (GPIA)",
+    # Elderly literacy
+    "Elderly literacy rate, population 65+ years, both sexes (%)",
+    "Elderly literacy rate, population 65+ years, female (%)",
+    "Elderly literacy rate, population 65+ years, male (%)",
+    # Completion rates — modelled (both sexes, female, male)
+    "Completion rate, primary education, both sexes (modelled data) (%)",
+    "Completion rate, primary education, female (modelled data) (%)",
+    "Completion rate, primary education, male (modelled data) (%)",
+    "Completion rate, primary education, adjusted gender parity index (GPIA) (modelled data)",
+    "Completion rate, lower secondary education, both sexes (modelled data) (%)",
+    "Completion rate, lower secondary education, female (modelled data) (%)",
+    "Completion rate, lower secondary education, male (modelled data) (%)",
+    "Completion rate, lower secondary education, adjusted gender parity index (GPIA) (modelled data)",
+    "Completion rate, upper secondary education, both sexes (modelled data) (%)",
+    "Completion rate, upper secondary education, female (modelled data) (%)",
+    "Completion rate, upper secondary education, male (modelled data) (%)",
+    "Completion rate, upper secondary education, adjusted gender parity index (GPIA) (modelled data)",
+    # Completion rates — observed (used in standalone charts)
+    "Completion rate, primary education, both sexes (%)",
+    "Completion rate, lower secondary education, both sexes (%)",
+    # Educational attainment
+    "Educational attainment rate, completed lower secondary education or higher, population 25+ years, both sexes (%)",
+    "Educational attainment rate, completed post-secondary non-tertiary education or higher, population 25+ years, both sexes (%)",
+    # Government expenditure on education as % of GDP
+    "Government expenditure on education as a percentage of GDP (%)",
+    # Government expenditure as % of total government expenditure
+    "Expenditure on education as a percentage of total government expenditure (%) (UIS calculation)",
+    # Per-student spending
+    "Initial government funding per pre-primary student, constant PPP$",
+    "Initial government funding per primary student, constant PPP$",
+    "Initial government funding per lower secondary student, constant PPP$",
+    "Initial government funding per upper secondary student, constant PPP$",
+    "Initial government funding per tertiary student, constant PPP$",
+    # Gross enrolment ratio — tertiary (used by OPRI combine_historical_enrollment)
+    "Gross enrolment ratio for tertiary education, both sexes (%)",
+    "Gross enrolment ratio for tertiary education, female (%)",
+    "Gross enrolment ratio for tertiary education, male (%)",
+    # Net enrolment rate — pre-primary
+    "Net enrolment rate, pre-primary, both sexes (%)",
+    "Net enrolment rate, pre-primary, female (%)",
+    "Net enrolment rate, pre-primary, male (%)",
+    # Out-of-school rates — observed (used by OPRI add_ner_from_oosr and MDims)
+    "Out-of-school rate for children of primary school age, both sexes (%)",
+    "Out-of-school rate for children of primary school age, female (%)",
+    "Out-of-school rate for children of primary school age, male (%)",
+    "Out-of-school rate for adolescents of lower secondary school age, both sexes (%)",
+    "Out-of-school rate for adolescents of lower secondary school age, female (%)",
+    "Out-of-school rate for adolescents of lower secondary school age, male (%)",
+    "Out-of-school rate for youth of upper secondary school age, both sexes (%)",
+    "Out-of-school rate for youth of upper secondary school age, female (%)",
+    "Out-of-school rate for youth of upper secondary school age, male (%)",
+    "Out-of-school rate for children one year before the official primary entry age, both sexes (%)",
+    "Out-of-school rate for children one year before the official primary entry age, female (%)",
+    "Out-of-school rate for children one year before the official primary entry age, male (%)",
+    # Qualified teachers
+    "Percentage of qualified teachers in pre-primary education, both sexes (%)",
+    "Percentage of qualified teachers in primary education, both sexes (%)",
+    "Percentage of qualified teachers in lower secondary education, both sexes (%)",
+    "Percentage of qualified teachers in secondary education, both sexes (%)",
+    "Percentage of qualified teachers in upper secondary education, both sexes (%)",
+    # Pupil-teacher ratios
+    "Pupil-qualified teacher ratio in pre-primary education (headcount basis)",
+    "Pupil-qualified teacher ratio in primary education (headcount basis)",
+    # School infrastructure
+    "Proportion of primary schools with access to basic drinking water (%)",
+    "Proportion of primary schools with single-sex basic sanitation facilities (%)",
+    # Proficiency — prepared for the future
+    "Proportion of children/young people at the age of primary education prepared for the future in mathematics, both sexes (%)",
+    "Proportion of children/young people at the age of primary education prepared for the future in mathematics, female (%)",
+    "Proportion of children/young people at the age of primary education prepared for the future in mathematics, male (%)",
+    "Proportion of children/young people at the age of primary education prepared for the future in reading, both sexes (%)",
+    "Proportion of children/young people at the age of primary education prepared for the future in reading, female (%)",
+    "Proportion of children/young people at the age of primary education prepared for the future in reading, male (%)",
+    "Proportion of children/young people at the age of lower secondary education prepared for the future in mathematics, both sexes (%)",
+    "Proportion of children/young people at the age of lower secondary education prepared for the future in mathematics, female (%)",
+    "Proportion of children/young people at the age of lower secondary education prepared for the future in mathematics, male (%)",
+    "Proportion of children/young people at the age of lower secondary education prepared for the future in reading, both sexes (%)",
+    "Proportion of children/young people at the age of lower secondary education prepared for the future in reading, female (%)",
+    "Proportion of children/young people at the age of lower secondary education prepared for the future in reading, male (%)",
+    # Proficiency — minimum proficiency level
+    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in reading, both sexes (%)",
+    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in reading, female (%)",
+    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in reading, male (%)",
+    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in mathematics, both sexes (%)",
+    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in mathematics, female (%)",
+    "Proportion of students at the end of primary education achieving at least a minimum proficiency level in mathematics, male (%)",
+    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in reading, both sexes (%)",
+    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in reading, female (%)",
+    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in reading, male (%)",
+    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in mathematics, both sexes (%)",
+    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in mathematics, female (%)",
+    "Proportion of students at the end of lower secondary education achieving at least a minimum proficiency level in mathematics, male (%)",
+    # Teacher salary (used in a standalone chart)
+    "Average teacher salary in primary education relative to other professions requiring a comparable level of qualification, both sexes",
 }
 
 # Backward-compatible short_name renames: maps NEW short_name (from 2026 UNESCO labels) → OLD short_name.
@@ -208,19 +222,10 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
     ds_meadow = paths.load_dataset("education_sdgs")
     ds_expenditure = paths.load_dataset("public_expenditure")
-
-    # Read table from meadow dataset.
     tb = ds_meadow.read("education_sdgs")
-
-    # Load historical expenditure data
     tb_expenditure = ds_expenditure.read("public_expenditure")
-
-    # Retrieve snapshot with the metadata provided via World Bank.
-    snap_wb = paths.load_snapshot("edstats_metadata.xls")
-    tb_wb = snap_wb.read()
 
     #
     # Process data.
@@ -230,45 +235,30 @@ def run() -> None:
     tb = paths.regions.harmonize_names(
         tb, country_col="country", countries_file=country_mapping_path, excluded_countries_file=excluded_countries_path
     )
+
+    # Drop rows with missing indicator labels and strip whitespace from labels
+    tb = tb[tb["indicator_label_en"].notna()]
+    tb["indicator_label_en"] = tb["indicator_label_en"].str.strip()
+
+    # Early filter: keep only the ~100 indicators we need.
+    # This runs before consolidate_world_entries and the pivot, making both much faster.
+    tb = tb[tb["indicator_label_en"].isin(_VARIABLES_TO_KEEP)]
+
     tb = consolidate_world_entries(tb)
-    # Drop columns that are not needed
     tb = tb.drop(columns=["magnitude", "qualifier"])
 
-    # Build long-description lookup from World Bank metadata (keyed by indicator label)
-    long_definition_map = {}
-    for indicator in tb["indicator_label_en"].unique():
-        defn = tb_wb[tb_wb["Indicator Name"] == indicator]["Long definition"].values
-        long_definition_map[indicator] = defn[0] if len(defn) > 0 else ""
-
-    tb["long_description"] = tb["indicator_label_en"].map(long_definition_map)
-
-    # Drop rows with missing indicator labels
-    tb = tb[tb["indicator_label_en"].notna()]
+    # Append indicator_id to label to form unique column names (some labels exist for multiple IDs)
     tb["indicator_label_en"] = tb["indicator_label_en"].astype(str) + ", " + tb["indicator_id"].astype(str)
 
     # Pivot the table to have indicators as columns
     tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
-
-    # Assign metadata for every column
-    long_desc_lookup = tb.set_index("indicator_label_en")["long_description"]
-    for column in tb_pivoted.columns:
-        meta = tb_pivoted[column].metadata
-        meta.display = {}
-        # Apply curated title where available, otherwise use the raw indicator label
-        meta.title = _TITLE_OVERRIDES.get(column, column)
-        if column in long_desc_lookup.index:
-            desc = long_desc_lookup[column]
-            meta.description_from_producer = desc.iloc[0] if hasattr(desc, "iloc") else desc
-        decimals, unit, short_unit = _unit_info(column)
-        if column in _UNIT_OVERRIDES:
-            decimals, unit, short_unit = _UNIT_OVERRIDES[column]
-        update_metadata(meta, display_decimals=decimals, unit=unit, short_unit=short_unit)
-
     tb_pivoted = tb_pivoted.reset_index()
 
     # Remove Turkey 1998 value for Government expenditure on education as a percentage of GDP (%), XGDP.FSGOV (likely an error)
-    mask = (tb_pivoted["country"] == "Turkey") & (tb_pivoted["year"] == 1998)
-    tb_pivoted.loc[mask, "Government expenditure on education as a percentage of GDP (%), XGDP.FSGOV"] = None
+    gdp_col = "Government expenditure on education as a percentage of GDP (%), XGDP.FSGOV"
+    if gdp_col in tb_pivoted.columns:
+        mask = (tb_pivoted["country"] == "Turkey") & (tb_pivoted["year"] == 1998)
+        tb_pivoted.loc[mask, gdp_col] = None
 
     tb_pivoted = tb_pivoted.format(["country", "year"])
 
@@ -278,7 +268,7 @@ def run() -> None:
     if existing_renames:
         tb_pivoted = tb_pivoted.rename(columns=existing_renames)
 
-    # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
+    # Combine recent expenditure data with historical estimates from a migrated dataset
     tb_pivoted = combine_historical_expenditure(tb_pivoted, tb_expenditure)
 
     #
@@ -338,39 +328,3 @@ def combine_historical_expenditure(tb: Table, tb_expenditure: Table) -> Table:
 
     tb = tb.format(["country", "year"])
     return tb
-
-
-def _unit_info(column: str) -> tuple:
-    """Return (display_decimals, unit, short_unit) from an indicator label.
-
-    Covers all unit suffixes observed in the UNESCO SDG dataset.
-    """
-    col = column.lower()
-    if "%" in col:
-        return 1, "%", "%"
-    elif "(days)" in col:
-        return 1, "days", ""
-    elif "(years)" in col:
-        return 1, "years", ""
-    elif any(pia in col for pia in ("gpia", "lpia", "wpia", "npia", "dpia", "ltpia")):
-        # Gender/learning/wealth/etc. parity index — dimensionless ratio
-        return 2, "index", ""
-    elif "index" in col:
-        return 1, "index", ""
-    elif "(current us$)" in col:
-        return 0, "current US$", "$"
-    elif "ppp$" in col:
-        return 0, "constant 2019 US$", "$"
-    elif "us$" in col or " usd" in col:
-        return 0, "current US$", "$"
-    elif "(number)" in col:
-        return 0, "number", ""
-    else:
-        return 0, " ", " "
-
-
-def update_metadata(meta: VariableMeta, display_decimals: int, unit: str, short_unit: str) -> None:
-    """Update metadata unit attributes in-place."""
-    meta.display["numDecimalPlaces"] = display_decimals
-    meta.unit = unit
-    meta.short_unit = short_unit
