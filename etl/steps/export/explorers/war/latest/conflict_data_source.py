@@ -52,6 +52,98 @@ paths = PathFinder(__file__)
 # Module-level constants
 # ===========================================================================
 
+
+class CT:
+    """Conflict-type slugs — single source of truth for the explorer's
+    `conflict_type` dim choices. Every reference in this module goes through
+    one of these constants rather than re-typing the slug string, so a typo
+    becomes a Python `AttributeError` at import time instead of a silent
+    missing-view or KeyError at run time.
+
+    The seven public names map directly to the explorer's `conflict_type`
+    dropdown choices. The two leading-underscore names are transient slugs
+    used only during the build to keep the intrastate sub-types separable
+    (so the by_sub_type stack builder can pick them up as siblings); they get
+    remapped back to `CT.INTRASTATE` via `INTRASTATE_VARIANT_REMAP` before save.
+    """
+
+    ALL_ARMED = "all_armed_conflicts"
+    ALL_STATE_BASED = "all_state_based_conflicts"
+    INTERSTATE = "interstate_conflicts"
+    INTRASTATE = "intrastate_conflicts"
+    EXTRASTATE = "extrastate_conflicts"
+    NON_STATE = "non_state_conflicts"
+    ONE_SIDED = "one_sided_violence"
+    # Build-time helpers (transient; see INTRASTATE_VARIANT_REMAP below).
+    _INTRA_INT = "_intrastate_int"
+    _INTRA_NON_INT = "_intrastate_non_int"
+
+
+class M:
+    """Measure slugs — single source of truth for the explorer's `measure` dim
+    choices. Used in `spec.measures`, the per-table indicator-name lists, and
+    branching logic throughout the FAUST helpers.
+    """
+
+    DEATHS = "conflict_deaths"
+    DEATH_RATE = "death_rate"
+    N_CONFLICTS = "number_of_conflicts"
+    CONFLICT_RATE = "conflict_rate"
+    LOCATIONS = "conflict_locations"
+    PARTICIPANTS = "conflict_participants"
+
+
+# === Definition-on-Demand anchors (one source of truth per data source) =====
+# Each `#dod:...` URL is typed once here and referenced symbolically below so a
+# typo becomes `AttributeError` at import. The spec's `dod` / `dod_by_sub_type`
+# fields use these via f-strings; helpers like `_dod_url` later extract the
+# anchor portion back out for subtitle templates.
+
+
+class DOD_UCDP:
+    """UCDP DoD anchor URLs."""
+
+    ARMED = "#dod:armed-conflict-ucdp"
+    INTERSTATE = "#dod:interstate-ucdp"
+    INTRASTATE = "#dod:intrastate-ucdp"
+    EXTRASYSTEMIC = "#dod:extrasystemic-ucdp"
+    NONSTATE = "#dod:nonstate-ucdp"
+    ONESIDED = "#dod:onesided-ucdp"
+
+
+class DOD_COW:
+    """COW DoD anchor URLs. Note the consistent `-war-cow` suffix."""
+
+    WAR = "#dod:war-cow"
+    STATE_BASED = "#dod:state-based-war-cow"
+    INTERSTATE = "#dod:interstate-war-cow"
+    INTRASTATE = "#dod:intrastate-war-cow"
+    EXTRASTATE = "#dod:extrastate-war-cow"
+    NON_STATE = "#dod:non-state-war-cow"
+
+
+class DOD_MARS:
+    """MARS DoD anchor URLs."""
+
+    INTERSTATE = "#dod:interstate-war-mars"
+    CIVIL_WAR = "#dod:civil-war-mars"
+    NON_CIVIL_WAR = "#dod:non-civil-war-mars"
+    CONVENTIONAL_WARS = "#dod:conventional-war-mars"
+
+
+class DOD_PRIO:
+    """PRIO DoD anchor URLs."""
+
+    STATE_BASED = "#dod:state-based-conflict-prio"
+    INTERSTATE = "#dod:interstate-prio"
+    INTRASTATE = "#dod:intrastate-prio"
+    EXTRASYSTEMIC = "#dod:extrasystemic-prio"
+
+
+# Used in every conflict_participants subtitle (override per-source if needed).
+DOD_PRIMARY_PARTICIPANT = "#dod:primary-participant-ucdp"
+
+
 # Per-indicator display blocks for confidence-interval (CI) stacks.
 BEST_DISPLAY = {"name": "Best estimate", "color": "#B13507"}
 LOW_DISPLAY = {"name": "Low estimate", "color": "#C3AEA6"}
@@ -74,20 +166,20 @@ MAP_CONFIG = {"hasMapTab": True, "tab": "map", "selectedFacetStrategy": "entity"
 # Human-readable conflict_type names + short labels used in templates. Specs
 # can override individual entries via `ct_name_override` / `ct_short_override`.
 CT_NAME = {
-    "all_armed_conflicts": "armed conflicts",
-    "all_state_based_conflicts": "state-based conflicts",
-    "interstate_conflicts": "interstate conflicts",
-    "intrastate_conflicts": "intrastate conflicts",
-    "extrastate_conflicts": "extrasystemic conflicts",
-    "non_state_conflicts": "non-state conflicts",
-    "one_sided_violence": "one-sided violence",
+    CT.ALL_ARMED: "armed conflicts",
+    CT.ALL_STATE_BASED: "state-based conflicts",
+    CT.INTERSTATE: "interstate conflicts",
+    CT.INTRASTATE: "intrastate conflicts",
+    CT.EXTRASTATE: "extrasystemic conflicts",
+    CT.NON_STATE: "non-state conflicts",
+    CT.ONE_SIDED: "one-sided violence",
 }
 CT_SHORT = {
-    "interstate_conflicts": "Interstate",
-    "intrastate_conflicts": "Intrastate",
-    "extrastate_conflicts": "Extrasystemic",
-    "non_state_conflicts": "Non-state",
-    "one_sided_violence": "One-sided violence",
+    CT.INTERSTATE: "Interstate",
+    CT.INTRASTATE: "Intrastate",
+    CT.EXTRASTATE: "Extrasystemic",
+    CT.NON_STATE: "Non-state",
+    CT.ONE_SIDED: "One-sided violence",
 }
 
 # "Parent" conflict types: their single-indicator (or CI-stacked) view uses
@@ -95,26 +187,26 @@ CT_SHORT = {
 # the parents are the aggregates plus intrastate (which has the
 # internationalized sub-types). For locations/participants only intrastate is
 # treated as a parent — see `_conflict_sub_type`.
-PARENT_CTS = {"all_armed_conflicts", "all_state_based_conflicts", "intrastate_conflicts"}
+PARENT_CTS = {CT.ALL_ARMED, CT.ALL_STATE_BASED, CT.INTRASTATE}
 
 # Helper conflict_type slugs used during the build to keep the two intrastate
 # sub-types separable (so by_sub_type stacks can pick them up as children).
 # They get remapped to `intrastate_conflicts` + a matching `conflict_sub_type`
 # in `build_source_explorer`.
 INTRASTATE_VARIANT_REMAP = {
-    "_intrastate_int": ("intrastate_conflicts", "only_internationalized_conflicts"),
-    "_intrastate_non_int": ("intrastate_conflicts", "only_non_internationalized_conflicts"),
+    CT._INTRA_INT: (CT.INTRASTATE, "only_internationalized_conflicts"),
+    CT._INTRA_NON_INT: (CT.INTRASTATE, "only_non_internationalized_conflicts"),
 }
 
 # Canonical dimension orderings used by `_refresh_dim_choices` after the build.
 CONFLICT_TYPE_ORDER = [
-    "all_armed_conflicts",
-    "all_state_based_conflicts",
-    "interstate_conflicts",
-    "intrastate_conflicts",
-    "extrastate_conflicts",
-    "non_state_conflicts",
-    "one_sided_violence",
+    CT.ALL_ARMED,
+    CT.ALL_STATE_BASED,
+    CT.INTERSTATE,
+    CT.INTRASTATE,
+    CT.EXTRASTATE,
+    CT.NON_STATE,
+    CT.ONE_SIDED,
 ]
 CONFLICT_SUB_TYPE_ORDER = [
     "na",
@@ -162,6 +254,7 @@ class SourceSpec:
 
     # Map: table conflict_type value (e.g. "interstate") → explorer slug.
     # Unrecognised table values cause the column to be dropped.
+    # TODO: Clarify this field, i don't understand.
     ct_map: dict[str, str] = field(default_factory=dict)
 
     # by_sub_type structure: parent CT slug → ordered list of (child_slug, label).
@@ -190,9 +283,10 @@ class SourceSpec:
     dod_by_sub_type: dict[str, str] = field(default_factory=dict)
     # DoD anchor (full markdown link, "#dod:...") used in the conflict_participants
     # subtitle ("…states that were [primary participants](…)").
-    dod_primary_participant: str = "#dod:primary-participant-ucdp"
+    dod_primary_participant: str = DOD_PRIMARY_PARTICIPANT
     # Source name used in the "'Best' estimates as identified by X." note.
     # Most sources mirror UCDP's wording so the default is fine.
+    # TODO: where is this surfaced?
     ci_estimate_source: str = "UCDP"
 
     # Map-tab + per-best colorScale settings for deaths views, keyed by
@@ -208,14 +302,14 @@ class SourceSpec:
 
 def _conflict_sub_type(measure: str, ctype: str) -> str:
     """Return the `conflict_sub_type` value for a non-stacked / non-CI view."""
-    if ctype == "_intrastate_int":
+    if ctype == CT._INTRA_INT:
         return "only_internationalized_conflicts"
-    if ctype == "_intrastate_non_int":
+    if ctype == CT._INTRA_NON_INT:
         return "only_non_internationalized_conflicts"
-    if measure in ("conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"):
+    if measure in (M.DEATHS, M.DEATH_RATE, M.N_CONFLICTS, M.CONFLICT_RATE):
         return "all_sub_types" if ctype in PARENT_CTS else "na"
     # locations / participants: only intrastate behaves as a parent.
-    return "all_sub_types" if ctype == "intrastate_conflicts" else "na"
+    return "all_sub_types" if ctype == CT.INTRASTATE else "na"
 
 
 def _parse_main_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any] | None:
@@ -226,12 +320,12 @@ def _parse_main_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any]
 
     # Deaths / death-rate families (CI: best/low/high × _per_capita).
     deaths_variants = {
-        spec.deaths_family: ("conflict_deaths", "best"),
-        f"{spec.deaths_family}_low": ("conflict_deaths", "low"),
-        f"{spec.deaths_family}_high": ("conflict_deaths", "high"),
-        f"{spec.deaths_family}_per_capita": ("death_rate", "best"),
-        f"{spec.deaths_family}_low_per_capita": ("death_rate", "low"),
-        f"{spec.deaths_family}_high_per_capita": ("death_rate", "high"),
+        spec.deaths_family: (M.DEATHS, "best"),
+        f"{spec.deaths_family}_low": (M.DEATHS, "low"),
+        f"{spec.deaths_family}_high": (M.DEATHS, "high"),
+        f"{spec.deaths_family}_per_capita": (M.DEATH_RATE, "best"),
+        f"{spec.deaths_family}_low_per_capita": (M.DEATH_RATE, "low"),
+        f"{spec.deaths_family}_high_per_capita": (M.DEATH_RATE, "high"),
     }
     if short in deaths_variants:
         measure, estimate = deaths_variants[short]
@@ -251,19 +345,19 @@ def _parse_main_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any]
         sub_measure = "all_ongoing_conflicts" if is_ongoing else "only_new_conflicts"
 
         if short == family:
-            return _maybe_dim_dict(spec, "number_of_conflicts", ctype, sub_measure)
+            return _maybe_dim_dict(spec, M.N_CONFLICTS, ctype, sub_measure)
 
         if short == f"{family}_per_country_pair":
             # Only kept for interstate-ongoing rates; drop the rest.
-            if not (is_ongoing and ctype == "interstate_conflicts"):
+            if not (is_ongoing and ctype == CT.INTERSTATE):
                 return None
-            return _maybe_dim_dict(spec, "conflict_rate", ctype, sub_measure)
+            return _maybe_dim_dict(spec, M.CONFLICT_RATE, ctype, sub_measure)
 
         if short == f"{family}_per_country":
             # Interstate-ongoing rate uses the per_country_pair variant instead.
-            if ctype == "interstate_conflicts" and is_ongoing:
+            if ctype == CT.INTERSTATE and is_ongoing:
                 return None
-            return _maybe_dim_dict(spec, "conflict_rate", ctype, sub_measure)
+            return _maybe_dim_dict(spec, M.CONFLICT_RATE, ctype, sub_measure)
 
     return None  # any other column family (civilians/combatants/unknown, etc.)
 
@@ -271,15 +365,15 @@ def _parse_main_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any]
 def _parse_country_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str, Any] | None:
     """Map a `country_table` column (conflict_participants) to explorer dims."""
     ctype = spec.ct_map.get(ct_raw)
-    if ctype is None or ctype == "non_state_conflicts":
+    if ctype is None or ctype == CT.NON_STATE:
         return None  # non-state has no "primary state participant" semantics
-    if "conflict_participants" not in spec.measures:
+    if M.PARTICIPANTS not in spec.measures:
         return None
 
     if short == "number_participants":
-        return _maybe_dim_dict(spec, "conflict_participants", ctype, "regional_data")
+        return _maybe_dim_dict(spec, M.PARTICIPANTS, ctype, "regional_data")
     if short == "participated_in_conflict":
-        return _maybe_dim_dict(spec, "conflict_participants", ctype, "country_level_data")
+        return _maybe_dim_dict(spec, M.PARTICIPANTS, ctype, "country_level_data")
     return None
 
 
@@ -288,13 +382,13 @@ def _parse_locations_col(spec: SourceSpec, short: str, ct_raw: str) -> dict[str,
     ctype = spec.ct_map.get(ct_raw)
     if ctype is None:
         return None
-    if "conflict_locations" not in spec.measures:
+    if M.LOCATIONS not in spec.measures:
         return None
 
     if short == "number_locations":
-        return _maybe_dim_dict(spec, "conflict_locations", ctype, "regional_data")
+        return _maybe_dim_dict(spec, M.LOCATIONS, ctype, "regional_data")
     if short == "is_location_of_conflict":
-        return _maybe_dim_dict(spec, "conflict_locations", ctype, "country_level_data")
+        return _maybe_dim_dict(spec, M.LOCATIONS, ctype, "country_level_data")
     return None
 
 
@@ -406,7 +500,7 @@ def _build_by_sub_type_views(c, spec: SourceSpec) -> None:
 
 def _by_sub_type_output_sub_measures(spec: SourceSpec, measure: str) -> list[str]:
     """The `sub_measure` values to emit a by_sub_type view for, given a measure."""
-    if measure in ("conflict_deaths", "death_rate"):
+    if measure in (M.DEATHS, M.DEATH_RATE):
         return [spec.deaths_sub_measure]
     return ["all_ongoing_conflicts", "only_new_conflicts"]
 
@@ -424,12 +518,12 @@ def _stacked_children(
         # Lookup the child's view's indicators. For deaths, fall back to the
         # loose index because intrastate-variant helpers carry sub_measure="na".
         inds = by_path.get((measure, child_ct, sub_measure))
-        if inds is None and measure in ("conflict_deaths", "death_rate"):
+        if inds is None and measure in (M.DEATHS, M.DEATH_RATE):
             inds = by_path_loose.get((measure, child_ct), [])
         if not inds:
             continue
 
-        if measure in ("conflict_deaths", "death_rate") and len(inds) > 1:
+        if measure in (M.DEATHS, M.DEATH_RATE) and len(inds) > 1:
             # CI-stacked deaths view → pick the best estimate (or low as
             # fallback for sources like MARS that don't carry a center).
             pick = _pick_best_or_low(inds)
@@ -512,20 +606,20 @@ def _set_view_config(view, spec: SourceSpec) -> None:
     sub_measure = d["sub_measure"]
     cfg = view.config or {}
 
-    if measure in ("conflict_deaths", "death_rate"):
+    if measure in (M.DEATHS, M.DEATH_RATE):
         _deaths_text(cfg, spec, measure, ctype, cst)
-    elif measure in ("number_of_conflicts", "conflict_rate"):
+    elif measure in (M.N_CONFLICTS, M.CONFLICT_RATE):
         _count_text(cfg, spec, measure, ctype, cst, sub_measure)
-    elif measure == "conflict_participants":
+    elif measure == M.PARTICIPANTS:
         _participants_text(cfg, spec, ctype, sub_measure)
-    elif measure == "conflict_locations":
+    elif measure == M.LOCATIONS:
         _locations_text(cfg, spec, ctype, sub_measure)
 
     view.config = cfg
 
 
 def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str, cst: str) -> None:
-    per_capita = measure == "death_rate"
+    per_capita = measure == M.DEATH_RATE
     noun = "Death rate" if per_capita else spec.deaths_noun
     name = _ct_name(spec, ctype)
 
@@ -537,7 +631,7 @@ def _deaths_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str
 
     if cst in ("only_non_internationalized_conflicts", "only_internationalized_conflicts"):
         word = "non-internationalized" if cst.startswith("only_non") else "internationalized"
-        intrastate_anchor = _dod_url(spec.dod["intrastate_conflicts"])
+        intrastate_anchor = _dod_url(spec.dod[CT.INTRASTATE])
         cfg["title"] = f"{noun} in {word} intrastate conflicts"
         cfg["subtitle"] = _deaths_subtitle(
             f"[{word} intrastate conflicts]({intrastate_anchor})",
@@ -569,7 +663,7 @@ def _deaths_subtitle(dod_link: str, per_capita: bool) -> str:
 
 
 def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str, cst: str, sub_measure: str) -> None:
-    rate = measure == "conflict_rate"
+    rate = measure == M.CONFLICT_RATE
     is_new = sub_measure == "only_new_conflicts"
     name = _ct_name(spec, ctype)
     new_prefix = "new " if is_new else ""
@@ -590,7 +684,7 @@ def _count_text(cfg: dict[str, Any], spec: SourceSpec, measure: str, ctype: str,
         return
 
     cfg["title"] = f"{lead} {new_prefix}{name}"
-    cfg["subtitle"] = _count_subtitle(spec.dod[ctype], rate, verb, interstate=ctype == "interstate_conflicts")
+    cfg["subtitle"] = _count_subtitle(spec.dod[ctype], rate, verb, interstate=ctype == CT.INTERSTATE)
 
 
 def _count_subtitle(dod_link: str, rate: bool, verb: str, interstate: bool = False) -> str:
@@ -612,7 +706,7 @@ def _participants_text(cfg: dict[str, Any], spec: SourceSpec, ctype: str, sub_me
 
     # Singular form of the DoD link (UCDP "interstate conflicts" → "interstate
     # conflict", COW "interstate wars" → "interstate war").
-    if ctype == "all_state_based_conflicts":
+    if ctype == CT.ALL_STATE_BASED:
         dod_sing = _all_state_based_dod_singular(spec)
     else:
         dod_sing = spec.dod[ctype].replace("conflicts](", "conflict](").replace("wars](", "war](")
@@ -630,14 +724,14 @@ def _all_state_based_dod_singular(spec: SourceSpec) -> str:
     the spec's interstate / intrastate / extrastate DoD anchors, in singular form."""
     parts = []
     for ctype, label in (
-        ("interstate_conflicts", "interstate"),
-        ("intrastate_conflicts", "intrastate"),
-        ("extrastate_conflicts", "extrasystemic"),
+        (CT.INTERSTATE, "interstate"),
+        (CT.INTRASTATE, "intrastate"),
+        (CT.EXTRASTATE, "extrasystemic"),
     ):
         if ctype in spec.dod:
             parts.append(f"[{label}]({_dod_url(spec.dod[ctype])})")
     # Detect whether the source talks about "wars" instead of "conflicts".
-    noun = "war" if spec.ct_name_override.get("interstate_conflicts", "").endswith("wars") else "conflict"
+    noun = "war" if spec.ct_name_override.get(CT.INTERSTATE, "").endswith("wars") else "conflict"
     if len(parts) >= 2:
         return ", ".join(parts[:-1]) + f", or {parts[-1]} {noun}"
     if parts:
@@ -670,11 +764,11 @@ def _set_view_displays(view, spec: SourceSpec) -> None:
     if cst == "by_sub_type":
         return
 
-    if measure in ("conflict_deaths", "death_rate"):
+    if measure in (M.DEATHS, M.DEATH_RATE):
         _set_deaths_displays(ys, spec, measure, ctype, cst)
-    elif measure in ("number_of_conflicts", "conflict_rate"):
+    elif measure in (M.N_CONFLICTS, M.CONFLICT_RATE):
         _set_count_display(ys, spec, ctype)
-    elif measure in ("conflict_locations", "conflict_participants"):
+    elif measure in (M.LOCATIONS, M.PARTICIPANTS):
         _set_locations_or_participants_displays(ys, measure, sub_measure=d["sub_measure"])
 
 
@@ -691,7 +785,7 @@ def _set_deaths_displays(ys: list[Indicator], spec: SourceSpec, measure: str, ct
             ys[0].display = {"name": short}
         return
 
-    per_capita = measure == "death_rate"
+    per_capita = measure == M.DEATH_RATE
     with_cs = (ctype, cst) in spec.deaths_map_with_cs
     for ind in ys:
         if "_low_" in ind.catalogPath:
@@ -715,7 +809,7 @@ def _set_count_display(ys: list[Indicator], spec: SourceSpec, ctype: str) -> Non
 
 def _set_locations_or_participants_displays(ys: list[Indicator], measure: str, sub_measure: str) -> None:
     """Locations always use the boolean colorScale; participants only at country level."""
-    needs_cs = measure == "conflict_locations" or sub_measure == "country_level_data"
+    needs_cs = measure == M.LOCATIONS or sub_measure == "country_level_data"
     if not needs_cs:
         return
     for ind in ys:
@@ -737,14 +831,12 @@ def build_source_explorer(spec: SourceSpec, yaml_config: dict[str, Any]):
     tables = _load_and_adjust(spec)
 
     # Indicator names per table, in the same order as `tables`.
-    main_inds = [
-        m for m in ("conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate") if m in spec.measures
-    ]
+    main_inds = [m for m in (M.DEATHS, M.DEATH_RATE, M.N_CONFLICTS, M.CONFLICT_RATE) if m in spec.measures]
     indicator_names: list[list[str]] = [main_inds]
     if spec.country_table:
-        indicator_names.append(["conflict_participants"])
+        indicator_names.append([M.PARTICIPANTS])
     if spec.locations_table:
-        indicator_names.append(["conflict_locations"])
+        indicator_names.append([M.LOCATIONS])
 
     # Reuse the YAML's dim definitions (minus data_source) so this sub-explorer
     # shares the same dim metadata as the YAML-driven one — required by
@@ -767,8 +859,9 @@ def build_source_explorer(spec: SourceSpec, yaml_config: dict[str, Any]):
 
     # 1) CI collapse: merge (best, low, high) → "_ci". Some sources (e.g. MARS)
     #    don't carry every CI variant — intersect against what's actually there.
-    est_dim = next(d for d in c.dimensions if d.slug == "_estimate")
-    ci_choices = [v for v in ("best", "low", "high") if v in est_dim.choice_slugs]
+    estimate_in_use = c.dimension_choices_in_use().get("_estimate", set())
+    print(spec.name, len(estimate_in_use), estimate_in_use)
+    ci_choices = [v for v in ("best", "low", "high") if v in estimate_in_use]
     if len(ci_choices) >= 2:
         c.group_views(
             groups=[{"dimension": "_estimate", "choices": ci_choices, "choice_new_slug": "_ci", "replace": True}]
@@ -781,12 +874,10 @@ def build_source_explorer(spec: SourceSpec, yaml_config: dict[str, Any]):
     # 3) Drop the helper intrastate-variant views for non-deaths measures.
     #    They only exist as children of the by_sub_type stacks above; the
     #    legacy explorer doesn't surface them standalone.
-    ct_dim = next(d for d in c.dimensions if d.slug == "conflict_type")
-    helpers_in_use = [s for s in INTRASTATE_VARIANT_REMAP if s in ct_dim.choice_slugs]
+    ct_in_use = c.dimension_choices_in_use().get("conflict_type", set())
+    helpers_in_use = [s for s in INTRASTATE_VARIANT_REMAP if s in ct_in_use]
     non_deaths_measures = [
-        m
-        for m in ("number_of_conflicts", "conflict_rate", "conflict_locations", "conflict_participants")
-        if m in spec.measures
+        m for m in (M.N_CONFLICTS, M.CONFLICT_RATE, M.LOCATIONS, M.PARTICIPANTS) if m in spec.measures
     ]
     if helpers_in_use and non_deaths_measures:
         c.drop_views([{"conflict_type": helpers_in_use, "measure": non_deaths_measures}])
@@ -826,76 +917,90 @@ UCDP_SPEC = SourceSpec(
     country_table="ucdp_country",
     locations_table="ucdp_locations",
     measures={
-        "conflict_deaths",
-        "death_rate",
-        "number_of_conflicts",
-        "conflict_rate",
-        "conflict_locations",
-        "conflict_participants",
+        M.DEATHS,
+        M.DEATH_RATE,
+        M.N_CONFLICTS,
+        M.CONFLICT_RATE,
+        M.LOCATIONS,
+        M.PARTICIPANTS,
     },
     ct_map={
-        "all": "all_armed_conflicts",
-        "state-based": "all_state_based_conflicts",
-        "interstate": "interstate_conflicts",
-        "intrastate": "intrastate_conflicts",
-        "intrastate (internationalized)": "_intrastate_int",
-        "intrastate (non-internationalized)": "_intrastate_non_int",
-        "extrasystemic": "extrastate_conflicts",
-        "non-state conflict": "non_state_conflicts",
-        "one-sided violence": "one_sided_violence",
+        "all": CT.ALL_ARMED,
+        "state-based": CT.ALL_STATE_BASED,
+        "interstate": CT.INTERSTATE,
+        "intrastate": CT.INTRASTATE,
+        "intrastate (internationalized)": CT._INTRA_INT,
+        "intrastate (non-internationalized)": CT._INTRA_NON_INT,
+        "extrasystemic": CT.EXTRASTATE,
+        "non-state conflict": CT.NON_STATE,
+        "one-sided violence": CT.ONE_SIDED,
     },
     deaths_sub_measure="country_and_region_data",
     by_sub_type_labels={
-        "all_armed_conflicts": [
-            ("one_sided_violence", "One-sided violence"),
-            ("non_state_conflicts", "Non-state"),
-            ("intrastate_conflicts", "Intrastate"),
-            ("extrastate_conflicts", "Extrasystemic"),
-            ("interstate_conflicts", "Interstate"),
+        CT.ALL_ARMED: [
+            (CT.ONE_SIDED, "One-sided violence"),
+            (CT.NON_STATE, "Non-state"),
+            (CT.INTRASTATE, "Intrastate"),
+            (CT.EXTRASTATE, "Extrasystemic"),
+            (CT.INTERSTATE, "Interstate"),
         ],
-        "all_state_based_conflicts": [
-            ("_intrastate_int", "Internationalized intrastate"),
-            ("_intrastate_non_int", "Non-internationalized intrastate"),
-            ("extrastate_conflicts", "Extrasystemic"),
-            ("interstate_conflicts", "Interstate"),
+        CT.ALL_STATE_BASED: [
+            (CT._INTRA_INT, "Internationalized intrastate"),
+            (CT._INTRA_NON_INT, "Non-internationalized intrastate"),
+            (CT.EXTRASTATE, "Extrasystemic"),
+            (CT.INTERSTATE, "Interstate"),
         ],
-        "intrastate_conflicts": [
-            ("_intrastate_non_int", "Non-internationalized intrastate"),
-            ("_intrastate_int", "Internationalized intrastate"),
+        CT.INTRASTATE: [
+            (CT._INTRA_NON_INT, "Non-internationalized intrastate"),
+            (CT._INTRA_INT, "Internationalized intrastate"),
         ],
     },
     by_sub_type_measures={
-        "all_armed_conflicts": {"conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"},
-        "all_state_based_conflicts": {"conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"},
-        "intrastate_conflicts": {"number_of_conflicts", "conflict_rate"},
+        CT.ALL_ARMED: {M.DEATHS, M.DEATH_RATE, M.N_CONFLICTS, M.CONFLICT_RATE},
+        CT.ALL_STATE_BASED: {M.DEATHS, M.DEATH_RATE, M.N_CONFLICTS, M.CONFLICT_RATE},
+        CT.INTRASTATE: {M.N_CONFLICTS, M.CONFLICT_RATE},
     },
     dod={
-        "all_armed_conflicts": "[armed conflicts](#dod:armed-conflict-ucdp)",
-        "all_state_based_conflicts": "[interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts",
-        "interstate_conflicts": "[interstate conflicts](#dod:interstate-ucdp)",
-        "intrastate_conflicts": "[intrastate conflicts](#dod:intrastate-ucdp)",
-        "extrastate_conflicts": "[extrasystemic conflicts](#dod:extrasystemic-ucdp)",
-        "non_state_conflicts": "[non-state conflicts](#dod:nonstate-ucdp)",
-        "one_sided_violence": "[one-sided violence](#dod:onesided-ucdp)",
+        CT.ALL_ARMED: f"[armed conflicts]({DOD_UCDP.ARMED})",
+        CT.ALL_STATE_BASED: (
+            f"[interstate]({DOD_UCDP.INTERSTATE}), "
+            f"[intrastate]({DOD_UCDP.INTRASTATE}), and "
+            f"[extrasystemic]({DOD_UCDP.EXTRASYSTEMIC}) conflicts"
+        ),
+        CT.INTERSTATE: f"[interstate conflicts]({DOD_UCDP.INTERSTATE})",
+        CT.INTRASTATE: f"[intrastate conflicts]({DOD_UCDP.INTRASTATE})",
+        CT.EXTRASTATE: f"[extrasystemic conflicts]({DOD_UCDP.EXTRASYSTEMIC})",
+        CT.NON_STATE: f"[non-state conflicts]({DOD_UCDP.NONSTATE})",
+        CT.ONE_SIDED: f"[one-sided violence]({DOD_UCDP.ONESIDED})",
     },
     dod_by_sub_type={
-        "all_armed_conflicts": "[interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), [extrasystemic](#dod:extrasystemic-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [one-sided violence](#dod:onesided-ucdp)",
-        "all_state_based_conflicts": "[interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts",
-        "intrastate_conflicts": "[non-internationalized and internationalized intrastate conflicts](#dod:intrastate-ucdp)",
+        CT.ALL_ARMED: (
+            f"[interstate]({DOD_UCDP.INTERSTATE}), "
+            f"[intrastate]({DOD_UCDP.INTRASTATE}), "
+            f"[extrasystemic]({DOD_UCDP.EXTRASYSTEMIC}), "
+            f"[non-state]({DOD_UCDP.NONSTATE}) conflicts, and "
+            f"[one-sided violence]({DOD_UCDP.ONESIDED})"
+        ),
+        CT.ALL_STATE_BASED: (
+            f"[interstate]({DOD_UCDP.INTERSTATE}), "
+            f"[intrastate]({DOD_UCDP.INTRASTATE}), and "
+            f"[extrasystemic]({DOD_UCDP.EXTRASYSTEMIC}) conflicts"
+        ),
+        CT.INTRASTATE: f"[non-internationalized and internationalized intrastate conflicts]({DOD_UCDP.INTRASTATE})",
     },
     deaths_map_views={
-        ("all_armed_conflicts", "all_sub_types"),
-        ("all_state_based_conflicts", "all_sub_types"),
-        ("interstate_conflicts", "na"),
-        ("intrastate_conflicts", "all_sub_types"),
-        ("non_state_conflicts", "na"),
-        ("one_sided_violence", "na"),
+        (CT.ALL_ARMED, "all_sub_types"),
+        (CT.ALL_STATE_BASED, "all_sub_types"),
+        (CT.INTERSTATE, "na"),
+        (CT.INTRASTATE, "all_sub_types"),
+        (CT.NON_STATE, "na"),
+        (CT.ONE_SIDED, "na"),
     },
     deaths_map_with_cs={
-        ("interstate_conflicts", "na"),
-        ("intrastate_conflicts", "all_sub_types"),
-        ("non_state_conflicts", "na"),
-        ("one_sided_violence", "na"),
+        (CT.INTERSTATE, "na"),
+        (CT.INTRASTATE, "all_sub_types"),
+        (CT.NON_STATE, "na"),
+        (CT.ONE_SIDED, "na"),
     },
 )
 
@@ -909,32 +1014,41 @@ UCDP_PRIO_SPEC = SourceSpec(
     name="UCDP + PRIO",
     dataset_path="ucdp_prio",
     main_table="ucdp_prio",
-    measures={"conflict_deaths", "death_rate"},
+    measures={M.DEATHS, M.DEATH_RATE},
     ct_map={
-        "state-based": "all_state_based_conflicts",
-        "interstate": "interstate_conflicts",
-        "intrastate": "intrastate_conflicts",
-        "intrastate (internationalized)": "_intrastate_int",
-        "intrastate (non-internationalized)": "_intrastate_non_int",
-        "extrasystemic": "extrastate_conflicts",
+        "state-based": CT.ALL_STATE_BASED,
+        "interstate": CT.INTERSTATE,
+        "intrastate": CT.INTRASTATE,
+        "intrastate (internationalized)": CT._INTRA_INT,
+        "intrastate (non-internationalized)": CT._INTRA_NON_INT,
+        "extrasystemic": CT.EXTRASTATE,
     },
     by_sub_type_labels={
-        "all_state_based_conflicts": [
-            ("_intrastate_int", "Internationalized intrastate"),
-            ("_intrastate_non_int", "Non-internationalized intrastate"),
-            ("extrastate_conflicts", "Extrasystemic"),
-            ("interstate_conflicts", "Interstate"),
+        CT.ALL_STATE_BASED: [
+            (CT._INTRA_INT, "Internationalized intrastate"),
+            (CT._INTRA_NON_INT, "Non-internationalized intrastate"),
+            (CT.EXTRASTATE, "Extrasystemic"),
+            (CT.INTERSTATE, "Interstate"),
         ],
     },
-    by_sub_type_measures={"all_state_based_conflicts": {"conflict_deaths", "death_rate"}},
+    by_sub_type_measures={CT.ALL_STATE_BASED: {M.DEATHS, M.DEATH_RATE}},
+    # UCDP+PRIO uses UCDP's DoD anchors since it adopts the UCDP definitions.
     dod={
-        "all_state_based_conflicts": "[interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts",
-        "interstate_conflicts": "[interstate conflicts](#dod:interstate-ucdp)",
-        "intrastate_conflicts": "[intrastate conflicts](#dod:intrastate-ucdp)",
-        "extrastate_conflicts": "[extrasystemic conflicts](#dod:extrasystemic-ucdp)",
+        CT.ALL_STATE_BASED: (
+            f"[interstate]({DOD_UCDP.INTERSTATE}), "
+            f"[intrastate]({DOD_UCDP.INTRASTATE}), and "
+            f"[extrasystemic]({DOD_UCDP.EXTRASYSTEMIC}) conflicts"
+        ),
+        CT.INTERSTATE: f"[interstate conflicts]({DOD_UCDP.INTERSTATE})",
+        CT.INTRASTATE: f"[intrastate conflicts]({DOD_UCDP.INTRASTATE})",
+        CT.EXTRASTATE: f"[extrasystemic conflicts]({DOD_UCDP.EXTRASYSTEMIC})",
     },
     dod_by_sub_type={
-        "all_state_based_conflicts": "[interstate](#dod:interstate-ucdp), [intrastate](#dod:intrastate-ucdp), and [extrasystemic](#dod:extrasystemic-ucdp) conflicts",
+        CT.ALL_STATE_BASED: (
+            f"[interstate]({DOD_UCDP.INTERSTATE}), "
+            f"[intrastate]({DOD_UCDP.INTRASTATE}), and "
+            f"[extrasystemic]({DOD_UCDP.EXTRASYSTEMIC}) conflicts"
+        ),
     },
 )
 
@@ -951,33 +1065,33 @@ MARS_SPEC = SourceSpec(
     main_table="mars",
     country_table="mars_country",
     measures={
-        "conflict_deaths",
-        "death_rate",
-        "number_of_conflicts",
-        "conflict_rate",
-        "conflict_participants",
+        M.DEATHS,
+        M.DEATH_RATE,
+        M.N_CONFLICTS,
+        M.CONFLICT_RATE,
+        M.PARTICIPANTS,
     },
     ct_map={
-        "all": "all_state_based_conflicts",
-        "civil war": "intrastate_conflicts",
-        "others (non-civil)": "interstate_conflicts",
+        "all": CT.ALL_STATE_BASED,
+        "civil war": CT.INTRASTATE,
+        "others (non-civil)": CT.INTERSTATE,
     },
     by_sub_type_labels={
-        "all_state_based_conflicts": [
-            ("intrastate_conflicts", "Civil wars"),
-            ("interstate_conflicts", "Interstate wars"),
+        CT.ALL_STATE_BASED: [
+            (CT.INTRASTATE, "Civil wars"),
+            (CT.INTERSTATE, "Interstate wars"),
         ],
     },
     by_sub_type_measures={
-        "all_state_based_conflicts": {"conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"},
+        CT.ALL_STATE_BASED: {M.DEATHS, M.DEATH_RATE, M.N_CONFLICTS, M.CONFLICT_RATE},
     },
     dod={
-        "all_state_based_conflicts": "[interstate](#dod:interstate-cow) and [civil](#dod:intrastate-cow) wars",
-        "interstate_conflicts": "[non-civil wars](#dod:non-civil-war-mars)",
-        "intrastate_conflicts": "[civil wars](#dod:civil-war-mars)",
+        CT.ALL_STATE_BASED: f"[conventional wars]({DOD_MARS.CONVENTIONAL_WARS})",
+        CT.INTERSTATE: f"[interstate wars]({DOD_MARS.INTERSTATE})",
+        CT.INTRASTATE: f"[civil wars]({DOD_MARS.CIVIL_WAR})",
     },
     dod_by_sub_type={
-        "all_state_based_conflicts": "[civil](#dod:civil-war-mars) and [non-civil](#dod:non-civil-war-mars) wars",
+        CT.ALL_STATE_BASED: f"[interstate]({DOD_MARS.INTERSTATE}) and [civil]({DOD_MARS.CIVIL_WAR}) wars",
     },
 )
 
@@ -994,69 +1108,74 @@ COW_SPEC = SourceSpec(
     country_table="cow_country",
     locations_table="cow_locations",
     measures={
-        "conflict_deaths",
-        "death_rate",
-        "number_of_conflicts",
-        "conflict_rate",
-        "conflict_locations",
-        "conflict_participants",
+        M.DEATHS,
+        M.DEATH_RATE,
+        M.N_CONFLICTS,
+        M.CONFLICT_RATE,
+        M.LOCATIONS,
+        M.PARTICIPANTS,
     },
     ct_map={
-        "all": "all_armed_conflicts",
-        "state-based": "all_state_based_conflicts",
-        "inter-state": "interstate_conflicts",
-        "intra-state": "intrastate_conflicts",
-        "intra-state (internationalized)": "_intrastate_int",
-        "intra-state (non-internationalized)": "_intrastate_non_int",
-        "extra-state": "extrastate_conflicts",
-        "non-state": "non_state_conflicts",
+        "all": CT.ALL_ARMED,
+        "state-based": CT.ALL_STATE_BASED,
+        "inter-state": CT.INTERSTATE,
+        "intra-state": CT.INTRASTATE,
+        "intra-state (internationalized)": CT._INTRA_INT,
+        "intra-state (non-internationalized)": CT._INTRA_NON_INT,
+        "extra-state": CT.EXTRASTATE,
+        "non-state": CT.NON_STATE,
     },
     by_sub_type_labels={
         # COW's all_armed by_sub_type expands intrastate into the two
         # internationalized variants. Stacking order matches PROD: internationalized
         # intrastate first (bottom of the stack), then non-internationalized,
         # non-state, extrastate, interstate (top).
-        "all_armed_conflicts": [
-            ("_intrastate_int", "Internationalized intrastate"),
-            ("_intrastate_non_int", "Non-internationalized intrastate"),
-            ("non_state_conflicts", "Non-state wars"),
-            ("extrastate_conflicts", "Extrastate wars"),
-            ("interstate_conflicts", "Interstate wars"),
+        CT.ALL_ARMED: [
+            (CT._INTRA_INT, "Internationalized intrastate"),
+            (CT._INTRA_NON_INT, "Non-internationalized intrastate"),
+            (CT.NON_STATE, "Non-state wars"),
+            (CT.EXTRASTATE, "Extrastate wars"),
+            (CT.INTERSTATE, "Interstate wars"),
         ],
-        "intrastate_conflicts": [
-            ("_intrastate_int", "Internationalized intrastate"),
-            ("_intrastate_non_int", "Non-internationalized intrastate"),
+        CT.INTRASTATE: [
+            (CT._INTRA_INT, "Internationalized intrastate"),
+            (CT._INTRA_NON_INT, "Non-internationalized intrastate"),
         ],
     },
     by_sub_type_measures={
-        "all_armed_conflicts": {"conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"},
-        "intrastate_conflicts": {"number_of_conflicts", "conflict_rate"},
+        CT.ALL_ARMED: {M.DEATHS, M.DEATH_RATE, M.N_CONFLICTS, M.CONFLICT_RATE},
+        CT.INTRASTATE: {M.N_CONFLICTS, M.CONFLICT_RATE},
     },
     ct_name_override={
-        "all_armed_conflicts": "wars",
-        "all_state_based_conflicts": "state-based wars",
-        "interstate_conflicts": "interstate wars",
-        "intrastate_conflicts": "intrastate wars",
-        "extrastate_conflicts": "extrastate wars",
-        "non_state_conflicts": "non-state wars",
+        CT.ALL_ARMED: "wars",
+        CT.ALL_STATE_BASED: "state-based wars",
+        CT.INTERSTATE: "interstate wars",
+        CT.INTRASTATE: "intrastate wars",
+        CT.EXTRASTATE: "extrastate wars",
+        CT.NON_STATE: "non-state wars",
     },
     ct_short_override={
-        "interstate_conflicts": "Interstate wars",
-        "intrastate_conflicts": "Intrastate wars",
-        "extrastate_conflicts": "Extrastate wars",
-        "non_state_conflicts": "Non-state wars",
+        CT.INTERSTATE: "Interstate wars",
+        CT.INTRASTATE: "Intrastate wars",
+        CT.EXTRASTATE: "Extrastate wars",
+        CT.NON_STATE: "Non-state wars",
     },
     dod={
-        "all_armed_conflicts": "[wars](#dod:war-cow)",
-        "all_state_based_conflicts": "[state-based wars](#dod:state-based-war-cow)",
-        "interstate_conflicts": "[interstate wars](#dod:interstate-war-cow)",
-        "intrastate_conflicts": "[intrastate wars](#dod:intrastate-war-cow)",
-        "extrastate_conflicts": "[extrastate wars](#dod:extrastate-war-cow)",
-        "non_state_conflicts": "[non-state wars](#dod:non-state-war-cow)",
+        CT.ALL_ARMED: f"[wars]({DOD_COW.WAR})",
+        CT.ALL_STATE_BASED: f"[state-based wars]({DOD_COW.STATE_BASED})",
+        CT.INTERSTATE: f"[interstate wars]({DOD_COW.INTERSTATE})",
+        CT.INTRASTATE: f"[intrastate wars]({DOD_COW.INTRASTATE})",
+        CT.EXTRASTATE: f"[extrastate wars]({DOD_COW.EXTRASTATE})",
+        CT.NON_STATE: f"[non-state wars]({DOD_COW.NON_STATE})",
     },
     dod_by_sub_type={
-        "all_armed_conflicts": "[interstate](#dod:interstate-war-cow), [intrastate](#dod:intrastate-war-cow), [extrastate](#dod:extrastate-war-cow), and [non-state](#dod:non-state-war-cow) wars",
-        "intrastate_conflicts": "[non-internationalized and internationalized intrastate wars](#dod:intrastate-war-cow)",
+        CT.ALL_ARMED: (
+            f"[interstate]({DOD_COW.INTERSTATE}), "
+            f"[intrastate]({DOD_COW.INTRASTATE}), "
+            f"[extrastate]({DOD_COW.EXTRASTATE}), and "
+            f"[non-state]({DOD_COW.NON_STATE}) wars"
+        ),
+        CT.INTRASTATE: f"[non-internationalized and internationalized intrastate wars]({DOD_COW.INTRASTATE})",
     },
 )
 
@@ -1073,47 +1192,51 @@ PRIO_SPEC = SourceSpec(
     main_table="prio_v31",
     country_table="prio_v31_country",
     measures={
-        "conflict_deaths",
-        "death_rate",
-        "number_of_conflicts",
-        "conflict_rate",
-        "conflict_participants",
+        M.DEATHS,
+        M.DEATH_RATE,
+        M.N_CONFLICTS,
+        M.CONFLICT_RATE,
+        M.PARTICIPANTS,
     },
     ct_map={
-        "all": "all_state_based_conflicts",
-        "state-based": "all_state_based_conflicts",
-        "interstate": "interstate_conflicts",
-        "intrastate": "intrastate_conflicts",
-        "intrastate (internationalized)": "_intrastate_int",
-        "intrastate (non-internationalized)": "_intrastate_non_int",
-        "extrasystemic": "extrastate_conflicts",
+        "all": CT.ALL_STATE_BASED,
+        "state-based": CT.ALL_STATE_BASED,
+        "interstate": CT.INTERSTATE,
+        "intrastate": CT.INTRASTATE,
+        "intrastate (internationalized)": CT._INTRA_INT,
+        "intrastate (non-internationalized)": CT._INTRA_NON_INT,
+        "extrasystemic": CT.EXTRASTATE,
     },
     deaths_family="number_deaths_ongoing_conflicts_battle",
     by_sub_type_labels={
-        "all_state_based_conflicts": [
-            ("_intrastate_int", "Internationalized intrastate"),
-            ("_intrastate_non_int", "Non-internationalized intrastate"),
-            ("extrastate_conflicts", "Extrasystemic"),
-            ("interstate_conflicts", "Interstate"),
+        CT.ALL_STATE_BASED: [
+            (CT._INTRA_INT, "Internationalized intrastate"),
+            (CT._INTRA_NON_INT, "Non-internationalized intrastate"),
+            (CT.EXTRASTATE, "Extrasystemic"),
+            (CT.INTERSTATE, "Interstate"),
         ],
-        "intrastate_conflicts": [
-            ("_intrastate_non_int", "Non-internationalized intrastate"),
-            ("_intrastate_int", "Internationalized intrastate"),
+        CT.INTRASTATE: [
+            (CT._INTRA_NON_INT, "Non-internationalized intrastate"),
+            (CT._INTRA_INT, "Internationalized intrastate"),
         ],
     },
     by_sub_type_measures={
-        "all_state_based_conflicts": {"conflict_deaths", "death_rate", "number_of_conflicts", "conflict_rate"},
-        "intrastate_conflicts": {"number_of_conflicts", "conflict_rate"},
+        CT.ALL_STATE_BASED: {M.DEATHS, M.DEATH_RATE, M.N_CONFLICTS, M.CONFLICT_RATE},
+        CT.INTRASTATE: {M.N_CONFLICTS, M.CONFLICT_RATE},
     },
     dod={
-        "all_state_based_conflicts": "[state-based conflicts](#dod:state-based-conflict-prio)",
-        "interstate_conflicts": "[interstate conflicts](#dod:interstate-prio)",
-        "intrastate_conflicts": "[intrastate conflicts](#dod:intrastate-prio)",
-        "extrastate_conflicts": "[extrasystemic conflicts](#dod:extrasystemic-prio)",
+        CT.ALL_STATE_BASED: f"[state-based conflicts]({DOD_PRIO.STATE_BASED})",
+        CT.INTERSTATE: f"[interstate conflicts]({DOD_PRIO.INTERSTATE})",
+        CT.INTRASTATE: f"[intrastate conflicts]({DOD_PRIO.INTRASTATE})",
+        CT.EXTRASTATE: f"[extrasystemic conflicts]({DOD_PRIO.EXTRASYSTEMIC})",
     },
     dod_by_sub_type={
-        "all_state_based_conflicts": "[interstate](#dod:interstate-prio), [intrastate](#dod:intrastate-prio), and [extrasystemic](#dod:extrasystemic-prio) conflicts",
-        "intrastate_conflicts": "[non-internationalized and internationalized intrastate conflicts](#dod:intrastate-prio)",
+        CT.ALL_STATE_BASED: (
+            f"[interstate]({DOD_PRIO.INTERSTATE}), "
+            f"[intrastate]({DOD_PRIO.INTRASTATE}), and "
+            f"[extrasystemic]({DOD_PRIO.EXTRASYSTEMIC}) conflicts"
+        ),
+        CT.INTRASTATE: f"[non-internationalized and internationalized intrastate conflicts]({DOD_PRIO.INTRASTATE})",
     },
 )
 
@@ -1128,8 +1251,38 @@ PRIO_SPEC = SourceSpec(
 PROGRAMMATIC_SPECS: list[SourceSpec] = [UCDP_SPEC, UCDP_PRIO_SPEC, MARS_SPEC, COW_SPEC, PRIO_SPEC]
 
 
+def _validate_constants_match_yaml(config: dict[str, Any]) -> None:
+    """Assert that the `CT` and `M` classes are in sync with the YAML's dim choices.
+
+    Catches drift between this module's slug constants and the YAML's
+    `conflict_type` / `measure` dimensions — e.g., adding a new measure to
+    `M` but forgetting to declare it in the YAML's dropdown (or vice versa)
+    would otherwise surface as a silent missing-view or KeyError at save.
+
+    Helper attrs on `CT` (those starting with `_`, like `CT._INTRA_INT`) are
+    transient build-time slugs and are intentionally excluded — they never
+    appear in the YAML's dim choices.
+    """
+    dims_by_slug = {d["slug"]: d for d in config.get("dimensions", [])}
+    for cls, dim_slug in [(CT, "conflict_type"), (M, "measure")]:
+        if dim_slug not in dims_by_slug:
+            raise ValueError(f"YAML config is missing the `{dim_slug}` dimension.")
+        py_slugs = {v for k, v in vars(cls).items() if isinstance(v, str) and not k.startswith("_")}
+        yaml_slugs = {c["slug"] for c in dims_by_slug[dim_slug]["choices"]}
+        if py_slugs != yaml_slugs:
+            only_py = sorted(py_slugs - yaml_slugs)
+            only_yaml = sorted(yaml_slugs - py_slugs)
+            details = []
+            if only_py:
+                details.append(f"in `{cls.__name__}` but missing from YAML `{dim_slug}` choices: {only_py}")
+            if only_yaml:
+                details.append(f"in YAML `{dim_slug}` choices but missing from `{cls.__name__}`: {only_yaml}")
+            raise ValueError(f"`{cls.__name__}` is out of sync with YAML — {'; '.join(details)}.")
+
+
 def run() -> None:
     yaml_config = paths.load_collection_config()
+    _validate_constants_match_yaml(yaml_config)
 
     # The YAML carries views only for sources not yet migrated (MIE + COW-MID).
     # It still defines all five dims and the explorer-level config.
