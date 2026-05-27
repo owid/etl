@@ -18,19 +18,36 @@ Two snapshots, two meadow tables:
       Row 2: 1991 / current-name hint in parentheses
       Rows 3..141: year and quality class
 
-The continent label "BG" marks blank separator columns and is dropped.
+Both sheets interleave real polity columns with blank spacer columns (row-0 codes like "BG", "DG",
+"FG", "IB"…"IN") and, on the right, aggregate/summary columns (continent totals and World totals,
+e.g. "WORLD Bod 1991", "World Bord Histor."). We keep only columns whose row-0 label is one of the
+five real continents and whose country name (row 1) is non-blank — this drops every spacer and every
+aggregate column in one go (more robust than blacklisting the ever-growing set of spacer codes).
 """
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-SEPARATOR_LABEL = "BG"
+CONTINENTS = {"AFRICA", "AMERICA", "ASIA", "EUROPE", "OCEANIA"}
 YEAR_MIN = 1800
 YEAR_MAX = 1938
+
+
+def _blank(x) -> bool:
+    """True for None, NaN, or whitespace-only cells (header cells come through as str or NaN)."""
+    return x is None or (isinstance(x, float) and pd.isna(x)) or str(x).strip() == ""
+
+
+def _clean(x):
+    """Stripped string, or None if blank."""
+    return None if _blank(x) else str(x).strip()
+
+
 QA_SHEET = "Quality Assessment"
 QA_VALID_CLASSES = {"A", "B", "C", "D", "E", "NE"}
 
@@ -82,7 +99,7 @@ def _reshape_population(tb_raw: Table) -> Table:
     body = body[body[0].between(YEAR_MIN, YEAR_MAX)]
 
     country_cols = [
-        i for i in range(1, tb_raw.shape[1]) if continents[i] != SEPARATOR_LABEL and countries_1991[i] not in (None, "")
+        i for i in range(1, tb_raw.shape[1]) if continents[i] in CONTINENTS and not _blank(countries_1991[i])
     ]
 
     body = body.rename(columns={0: "year"})
@@ -90,11 +107,11 @@ def _reshape_population(tb_raw: Table) -> Table:
 
     long["country"] = long["col_idx"].map(lambda i: str(countries_1991[i]).strip())
     long["continent"] = long["col_idx"].map(lambda i: continents[i])
-    long["historical_name"] = long["col_idx"].map(lambda i: (historical_names[i] or "").strip() or None)
+    long["historical_name"] = long["col_idx"].map(lambda i: _clean(historical_names[i]))
     long = long.drop(columns=["col_idx"])
 
-    long = long[long["population"].astype(str).str.len() > 0]
     long = long.dropna(subset=["population"])
+    long = long[long["population"].astype(str).str.strip() != ""]
 
     return long[["country", "year", "population", "continent", "historical_name"]]
 
@@ -115,9 +132,7 @@ def _reshape_quality(tb_raw: Table) -> Table:
     body = body[body[0].between(YEAR_MIN, YEAR_MAX)]
 
     country_cols = [
-        i
-        for i in range(1, tb_raw.shape[1])
-        if continents[i] not in (None, "", SEPARATOR_LABEL) and historical_names[i] not in (None, "")
+        i for i in range(1, tb_raw.shape[1]) if continents[i] in CONTINENTS and not _blank(historical_names[i])
     ]
 
     body = body.rename(columns={0: "year"})
@@ -126,10 +141,12 @@ def _reshape_quality(tb_raw: Table) -> Table:
     long["country"] = long["col_idx"].map(lambda i: str(historical_names[i]).strip())
     long["continent"] = long["col_idx"].map(lambda i: continents[i])
     long["current_name_hint"] = long["col_idx"].map(
-        lambda i: (current_hints[i] or "").strip().strip("()").strip() or None
+        lambda i: (_clean(current_hints[i]) or "").strip("()").strip() or None
     )
     long = long.drop(columns=["col_idx"])
 
+    # drop blank / not-estimated-as-blank cells (kept "NE" cells are explicit and valid)
+    long = long.dropna(subset=["quality_class"])
     long["quality_class"] = long["quality_class"].astype(str).str.strip()
     long = long[long["quality_class"].str.len() > 0]
 
