@@ -201,6 +201,23 @@ def build_scaffold(out: Path, explorer_slug, dim_names, exp_rows, mdims) -> Path
     return path
 
 
+def check_db_connection():
+    """Fail fast with actionable guidance if the grapher DB isn't reachable."""
+    try:
+        OWID_ENV.read_sql(text("SELECT 1"))
+    except Exception as e:  # noqa: BLE001 - connectivity preflight, surface a friendly hint
+        raise SystemExit(
+            "Cannot reach the grapher DB via OWID_ENV:\n"
+            f"  {type(e).__name__}: {str(e).splitlines()[0]}\n\n"
+            "This skill reads the explorer + MDIMs from the grapher DB. Point OWID_ENV at a DB\n"
+            "that has both, by one of:\n"
+            "  - running on a `staging-site-<branch>` branch (no prefix needed), or\n"
+            "  - `ENV_FILE=.env.prod DATA_API_ENV=production` (only if .env.prod exists), or\n"
+            "  - `ENV_FILE=<your creds file> [DATA_API_ENV=production]`.\n"
+            "If you don't have a credentials file, ask which one to use — don't hardcode secrets."
+        )
+
+
 def main():
     ap = argparse.ArgumentParser(description="Extract explorer + MDIM views into CSVs for redirect mapping.")
     ap.add_argument("--explorer", required=True, help="Explorer slug (explorers.slug)")
@@ -212,6 +229,8 @@ def main():
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+
+    check_db_connection()
 
     # Explorer
     df = OWID_ENV.read_sql(text("SELECT tsv FROM explorers WHERE slug = :slug"), params={"slug": args.explorer})

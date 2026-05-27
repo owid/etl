@@ -32,15 +32,40 @@ to write, seeded with auto-suggested matches.
   e.g. `natural_disasters/latest/deaths#deaths`. The MDIMs must be **published in the
   DB you connect to** (their fully-expanded views are read from `multi_dim_data_pages.config`).
 
-## DB access
+## DB access (confirm this *before* running)
 
-Both the explorer and the MDIMs are read from the grapher DB via `OWID_ENV`. Run either:
+Both the explorer and the MDIMs are read from the grapher DB via `OWID_ENV`, so the
+scripts only work where that DB actually contains both the explorer and the published
+MDIMs. There are three ways to point `OWID_ENV` at such a DB — **figure out which one
+applies before running, and don't assume `.env.prod` exists:**
 
-- from a **staging branch** (the usual case — `OWID_ENV` points at `staging-site-<branch>`, a prod clone), or
-- against **production** (read-only) by prefixing commands with `ENV_FILE=.env.prod DATA_API_ENV=production`.
+1. **Staging branch** (often easiest): if you're on a `staging-site-<branch>` branch,
+   `OWID_ENV` already points at that prod-clone DB — run the commands as-is, no prefix.
+2. **Production, read-only, via `.env.prod`**: prefix commands with
+   `ENV_FILE=.env.prod DATA_API_ENV=production`. **Only if `.env.prod` is present.**
+3. **Some other credentials file**: the user may keep prod (or other) DB creds in a
+   different env file — run with `ENV_FILE=<their file> [DATA_API_ENV=production]`.
 
-If a query returns nothing, the scripts stop with a clear message (explorer slug not
-found, or MDIM not published in this DB).
+**Preflight — check, then ask if needed:**
+
+```bash
+# Is .env.prod available?
+ls -la .env.prod 2>/dev/null && echo "found .env.prod" || echo "NO .env.prod"
+
+# Connectivity test (swap the ENV_FILE prefix for whatever applies; drop it on a staging branch):
+ENV_FILE=.env.prod DATA_API_ENV=production .venv/bin/python -c \
+  "from etl.config import OWID_ENV; print('DB OK:', OWID_ENV.read_sql('SELECT 1 AS x').iloc[0,0])"
+```
+
+If `.env.prod` is missing **and** you're not on a staging branch with the data, **stop
+and ask the user which credentials / env file to use** (e.g. "I don't see `.env.prod` —
+which env file holds DB credentials that can reach the explorer + MDIMs? Or should I run
+this from a staging branch?"). Then use that file as the `ENV_FILE=` prefix for both
+script invocations below. Don't hardcode credentials.
+
+If the connection works but a query returns nothing, the scripts stop with a clear
+message (explorer slug not found, or MDIM not published in this DB) — that means the DB
+you reached doesn't have it, so re-check which DB you're pointed at.
 
 ## Workflow
 
