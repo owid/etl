@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Outdoor Air Pollution
+        - Air Pollution
     unit: micrograms per cubic meter
     short_unit: µg/m³
     processing_level: minor
