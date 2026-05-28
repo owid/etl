@@ -7,7 +7,9 @@ steps:
     - data://meadow/emdat/2026-04-30/natural_disasters:
       - snapshot://emdat/2026-04-30/natural_disasters.xlsx
     - data://garden/worldbank_wdi/2026-02-27/wdi
-    - data://garden/demography/2024-07-15/population
+    # owid-issues#1232: F-T population OMM for staging A/B (was demography/2024-07-15/population —
+    # which is itself now F-T-swapped on this branch, but we pin to the new dated step for clarity)
+    - data://garden/demography/2026-05-28/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
   #
