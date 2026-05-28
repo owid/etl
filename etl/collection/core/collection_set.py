@@ -5,6 +5,7 @@ Works similarly to a Dataset (from owid.catalog), which is a collection of Table
 
 from pathlib import Path
 
+from etl.collection.explorer.core import Explorer
 from etl.collection.model.core import Collection
 
 
@@ -12,6 +13,12 @@ class CollectionSet:
     def __init__(self, path: Path):
         self.path = path
         self.collections = self._build_dictionary()
+        # Pick the concrete subclass to instantiate. The export directory layout
+        # encodes the collection type: `export/explorers/...` → Explorer,
+        # `export/multidim/...` → Collection. Without this dispatch,
+        # `Collection.load` on an Explorer config raises on the missing `title`
+        # field (which Explorer.from_dict defaults to `{}`).
+        self._cls: type[Collection] = Explorer if "explorers" in path.parts else Collection
 
     def _build_dictionary(self) -> dict[str, Path]:
         dix = {}
@@ -31,7 +38,7 @@ class CollectionSet:
         # Read MDIM
         path = self.collections[name]
         try:
-            c = Collection.load(str(path))
+            c = self._cls.load(str(path))
         except TypeError as e:
             # This is a workaround for the TypeError that occurs when loading the config file.
             raise TypeError(

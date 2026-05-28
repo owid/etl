@@ -244,4 +244,5 @@ Items that are easy to miss (obvious rules like "set title" are omitted — see 
 - [ ] `display.name` paired with `title_public` when set
 - [ ] No TODO/FIXME, no copy-paste errors, no producer names/years in titles
 - [ ] Repeated text uses anchors/aliases or `{definitions.xxx}`; Jinja for 10+ similar variables
+- [ ] Prose uses curly apostrophes/quotes (`’ “ ”`), not straight (`' "`) — straight marks are an LLM tell; see [check-metadata-style/STYLE_GUIDE.md](../check-metadata-style/STYLE_GUIDE.md)
 - [ ] Typo check passed
