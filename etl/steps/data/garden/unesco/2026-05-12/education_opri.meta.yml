@@ -19,10 +19,10 @@ definitions:
 
   # Base grapher configuration templates
   common_grapher_config: &common_grapher_config
-    maxTime: 2024
+    maxTime: 2025
     hasMapTab: true
   common_grapher_map_config: &common_grapher_map_config
-    time: 2024
+    time: 2025
     timeTolerance: 10
 
   # Value ranges for different indicator types
@@ -234,22 +234,16 @@ definitions:
     - The data comes from administrative records such as school enrollment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   desc_key_net_enr_historical: &desc_key_net_enr_historical
-    - Pre-1985 data are adjusted enrollment ratios from Lee and Lee (2016). These are modified versions of the gross enrollment ratio that account for grade repetition, making them more appropriate for long-run cross-country comparisons of educational investment.
-    - The net enrollment rate shows what percentage of children are enrolled at the education level intended for their age.
-    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, a primary school net enrollment of 90% means 90% of children between the ages of 6 and 11 years are enrolled in primary school. Children who are not enrolled in school or are enrolled at another education level are not counted here.
-    - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
-    - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely — some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
-    - The data comes from school administrative records that track enrollment by individual age, combined with population estimates from national statistics offices or UN sources.
+    - This indicator combines data from two sources. From 1985 onwards, it draws on UNESCO administrative records. Before 1985, it uses adjusted enrollment ratios from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html) — modified gross enrollment ratios that account for grade repetition. These serve as the best available approximation of net enrollment rates for earlier periods, when age-specific enrollment data were not widely collected.
+    - The net enrollment rate shows what share of children are enrolled at the education level intended for their age — for example, a rate of 90% means 90% of children in the official age group are enrolled at that level.
+    - A rate below 100% doesn't necessarily mean those children are out of school — some may be enrolled at a different level than expected for their age.
+    - Data comes from school administrative records that track enrollment by age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_ger_historical: &desc_key_ger_historical
-    - Pre-1985 data are adjusted enrollment ratios from Lee and Lee (2016). These are modified versions of the gross enrollment ratio that account for grade repetition, making them more appropriate for long-run cross-country comparisons of educational investment.
-    - The gross enrollment ratio counts all students enrolled at a specific education level, regardless of their age. This includes students who are younger or older than the official age range because they started school early, started late, or repeated grades.
-    - It measures enrollment at a given level by dividing the total number of students—of any age—by the size of the age group officially assigned to that level. For instance, primary enrollment counts everyone enrolled, even outside ages 6–11, but compares it only to the 6–11 population.
-    - Values can exceed 100% when students repeat grades or start late. For instance, primary school enrollment might include 12- or 13-year-olds who started late or repeated grades, pushing the ratio above 100%.
-    - A value of 100% does not guarantee that all children in the official age group are enrolled in school; some may be out of school entirely, but the ratio appears high due to older students being counted in the total.
-    - Values much lower than 100% indicate that many children of the official age are not enrolled at the expected education level - they may be out of school entirely, enrolled at a different level, or have never started school.
-    - Values much higher than 100% can indicate educational challenges such as high grade repetition rates, late school entry, or inefficient progression through the system.
-    - The data comes from administrative records such as school enrollment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
+    - This indicator combines data from two sources. From 1985 onwards, it draws on UNESCO administrative records. Before 1985, it uses gross enrollment ratios from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html).
+    - The gross enrollment ratio counts all students enrolled at a given education level, regardless of age — including those who started late or repeated grades. Values can exceed 100% for this reason.
+    - A value well below 100% suggests many children of the official age are not enrolled at that level. A value well above 100% often signals high rates of grade repetition or late entry.
+    - Data comes from administrative school records combined with population estimates from the United Nations or national statistics offices.
 
   # Educational attainment descriptions
   desc_key_mye: &desc_key_mye
@@ -1399,78 +1393,90 @@ tables:
 
       net_enrolment_rate__primary__both_sexes__pct__combined_historical:
         title: Net enrollment rate in primary education (combined historical)
-        description_short: Percentage of children of official primary school age enrolled in [primary education](#dod:primary-education). Historical data (pre-1985) are adjusted enrollment ratios from Lee and Lee (2016); recent data (1985 onwards) are from UNESCO.
+        description_short: Percentage of children of official primary school age enrolled in [primary education](#dod:primary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
-        description_processing: "Two series are concatenated at the 2000 threshold: Lee and Lee (2016) adjusted enrollment ratios for years before 2000, and UNESCO OPRI net enrollment rate data from 2000 onwards."
+        description_processing: |-
+          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html). Their enrollment ratios adjust for grade repetition, bringing them closer to a true net enrollment rate than raw gross enrollment ratios — though age-specific records needed for a true net rate were not widely available historically.
+          - 1985 onwards: Data comes from UNESCO OPRI, based on school censuses that track enrollment by individual age.
         presentation:
-          title_public: Net enrollment rate in primary education (historical)
+          title_public: Net enrollment rate in primary education
         display:
           numDecimalPlaces: 1
           name: Both sexes
 
       net_enrolment_rate__primary__female__pct__combined_historical:
         title: Net enrollment rate in primary education among girls (combined historical)
-        description_short: Percentage of girls of official primary school age enrolled in [primary education](#dod:primary-education). Historical data (pre-1985) are adjusted enrollment ratios from Lee and Lee (2016); recent data (1985 onwards) are from UNESCO.
+        description_short: Percentage of girls of official primary school age enrolled in [primary education](#dod:primary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
-        description_processing: "Two series are concatenated at the 2000 threshold: Lee and Lee (2016) adjusted enrollment ratios for years before 2000, and UNESCO OPRI net enrollment rate data (female) from 2000 onwards."
+        description_processing: |-
+          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html). Their enrollment ratios adjust for grade repetition, bringing them closer to a true net enrollment rate than raw gross enrollment ratios — though age-specific records needed for a true net rate were not widely available historically.
+          - 1985 onwards: Data comes from UNESCO OPRI, based on school censuses that track enrollment by individual age.
         presentation:
-          title_public: Net enrollment rate in primary education among girls (historical)
+          title_public: Net enrollment rate in primary education among girls
         display:
           numDecimalPlaces: 1
           name: Girls
 
       net_enrolment_rate__primary__male__pct__combined_historical:
         title: Net enrollment rate in primary education among boys (combined historical)
-        description_short: Percentage of boys of official primary school age enrolled in [primary education](#dod:primary-education). Historical data (pre-1985) are adjusted enrollment ratios from Lee and Lee (2016); recent data (1985 onwards) are from UNESCO.
+        description_short: Percentage of boys of official primary school age enrolled in [primary education](#dod:primary-education).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
-        description_processing: "Two series are concatenated at the 2000 threshold: Lee and Lee (2016) adjusted enrollment ratios for years before 2000, and UNESCO OPRI net enrollment rate data (male) from 2000 onwards."
+        description_processing: |-
+          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html). Their enrollment ratios adjust for grade repetition, bringing them closer to a true net enrollment rate than raw gross enrollment ratios — though age-specific records needed for a true net rate were not widely available historically.
+          - 1985 onwards: Data comes from UNESCO OPRI, based on school censuses that track enrollment by individual age.
         presentation:
-          title_public: Net enrollment rate in primary education among boys (historical)
+          title_public: Net enrollment rate in primary education among boys
         display:
           numDecimalPlaces: 1
           name: Boys
 
       gross_enrolment_ratio__tertiary__both_sexes__pct__combined_historical:
         title: Gross enrollment ratio in tertiary education (combined historical)
-        description_short: Share of all students enrolled in [tertiary education](#dod:tertiary-education), regardless of age, relative to the population of official tertiary school age. Historical data (pre-1985) are adjusted enrollment ratios from Lee and Lee (2016); recent data (1985 onwards) are from UNESCO.
+        description_short: Share of all students enrolled in [tertiary education](#dod:tertiary-education), regardless of age, relative to the population of official tertiary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger_historical
-        description_processing: "Two series are concatenated at the 1985 threshold: Lee and Lee (2016) adjusted enrollment ratios for years before 1985, and UNESCO SDG gross enrollment ratio data from 1985 onwards."
+        description_processing: |-
+          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), which reported gross enrollment ratios for tertiary education.
+          - 1985 onwards: Data comes from the UNESCO SDG dataset, based on administrative records that track enrollment by age and education level.
         presentation:
-          title_public: Gross enrollment ratio in tertiary education (historical)
+          title_public: Gross enrollment ratio in tertiary education
         display:
           numDecimalPlaces: 1
           name: Both sexes
 
       gross_enrolment_ratio__tertiary__female__pct__combined_historical:
         title: Gross enrollment ratio in tertiary education among women (combined historical)
-        description_short: Share of female students enrolled in [tertiary education](#dod:tertiary-education), regardless of age, relative to the female population of official tertiary school age. Historical data (pre-1985) are adjusted enrollment ratios from Lee and Lee (2016); recent data (1985 onwards) are from UNESCO.
+        description_short: Share of female students enrolled in [tertiary education](#dod:tertiary-education), regardless of age, relative to the female population of official tertiary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger_historical
-        description_processing: "Two series are concatenated at the 1985 threshold: Lee and Lee (2016) adjusted enrollment ratios for years before 1985, and UNESCO SDG gross enrollment ratio data (female) from 1985 onwards."
+        description_processing: |-
+          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), which reported gross enrollment ratios for tertiary education.
+          - 1985 onwards: Data comes from the UNESCO SDG dataset, based on administrative records that track enrollment by age and education level.
         presentation:
-          title_public: Gross enrollment ratio in tertiary education among women (historical)
+          title_public: Gross enrollment ratio in tertiary education among women
         display:
           numDecimalPlaces: 1
           name: Women
 
       gross_enrolment_ratio__tertiary__male__pct__combined_historical:
         title: Gross enrollment ratio in tertiary education among men (combined historical)
-        description_short: Share of male students enrolled in [tertiary education](#dod:tertiary-education), regardless of age, relative to the male population of official tertiary school age. Historical data (pre-1985) are adjusted enrollment ratios from Lee and Lee (2016); recent data (1985 onwards) are from UNESCO.
+        description_short: Share of male students enrolled in [tertiary education](#dod:tertiary-education), regardless of age, relative to the male population of official tertiary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger_historical
-        description_processing: "Two series are concatenated at the 1985 threshold: Lee and Lee (2016) adjusted enrollment ratios for years before 1985, and UNESCO SDG gross enrollment ratio data (male) from 1985 onwards."
+        description_processing: |-
+          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), which reported gross enrollment ratios for tertiary education.
+          - 1985 onwards: Data comes from the UNESCO SDG dataset, based on administrative records that track enrollment by age and education level.
         presentation:
-          title_public: Gross enrollment ratio in tertiary education among men (historical)
+          title_public: Gross enrollment ratio in tertiary education among men
         display:
           numDecimalPlaces: 1
           name: Men

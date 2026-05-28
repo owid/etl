@@ -55,63 +55,69 @@ tables:
   education_lee_lee_enrollment:
     variables:
       mf_primary_enrollment_rates:
-        title: Net enrolment rate, primary, both sexes (Lee & Lee)
+        title: Adjusted enrollment ratio, primary, both sexes
+        description_short: Share of children enrolled in primary school. Unlike the standard gross enrollment ratio, this measure adjusts for grade repetition, making it a closer approximation of the net enrollment rate and better suited for comparing trends across countries over time.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
 
       f_primary_enrollment_rates:
-        title: Net enrolment rate, primary, female (Lee & Lee)
+        title: Adjusted enrollment ratio, primary, female
+        description_short: Share of girls enrolled in primary school. Unlike the standard gross enrollment ratio, this measure adjusts for grade repetition, making it a closer approximation of the net enrollment rate and better suited for comparing trends across countries over time.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
 
       m_primary_enrollment_rates:
-        title: Net enrolment rate, primary, male (Lee & Lee)
+        title: Adjusted enrollment ratio, primary, male
+        description_short: Share of boys enrolled in primary school. Unlike the standard gross enrollment ratio, this measure adjusts for grade repetition, making it a closer approximation of the net enrollment rate and better suited for comparing trends across countries over time.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
 
       mf_secondary_enrollment_rates:
-        title: Net enrolment rate, secondary, both sexes (Lee & Lee)
+        title: Adjusted enrollment ratio, secondary, both sexes
+        description_short: Share of children enrolled in secondary school. Unlike the standard gross enrollment ratio, this measure adjusts for grade repetition, making it a closer approximation of the net enrollment rate and better suited for comparing trends across countries over time.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
 
       f_secondary_enrollment_rates:
-        title: Net enrolment rate, secondary, female (Lee & Lee)
+        title: Adjusted enrollment ratio, secondary, female
+        description_short: Share of girls enrolled in secondary school. Unlike the standard gross enrollment ratio, this measure adjusts for grade repetition, making it a closer approximation of the net enrollment rate and better suited for comparing trends across countries over time.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
 
       m_secondary_enrollment_rates:
-        title: Net enrolment rate, secondary, male (Lee & Lee)
+        title: Adjusted enrollment ratio, secondary, male
+        description_short: Share of boys enrolled in secondary school. Unlike the standard gross enrollment ratio, this measure adjusts for grade repetition, making it a closer approximation of the net enrollment rate and better suited for comparing trends across countries over time.
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
 
       mf_tertiary_enrollment_rates:
-        title: Gross enrolment ratio, tertiary, both sexes (Lee & Lee)
+        title: Gross enrolment ratio, tertiary, both sexes
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
 
       f_tertiary_enrollment_rates:
-        title: Gross enrolment ratio, tertiary, female (Lee & Lee)
+        title: Gross enrolment ratio, tertiary, female
         unit: '%'
         short_unit: '%'
         display:
           numDecimalPlaces: 1
 
       m_tertiary_enrollment_rates:
-        title: Gross enrolment ratio, tertiary, male (Lee & Lee)
+        title: Gross enrolment ratio, tertiary, male
         unit: '%'
         short_unit: '%'
         display:

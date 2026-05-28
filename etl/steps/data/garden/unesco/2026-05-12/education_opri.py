@@ -209,6 +209,9 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
     - Tertiary GER (1985+): UNESCO SDGs dataset (GER.5T8)
     - Primary and tertiary (pre-1985): Lee & Lee (2016) historical estimates
 
+    Both primary and tertiary use 1985 as the cutoff year between Lee & Lee
+    historical estimates and UNESCO recent data.
+
     Secondary enrollment is omitted because OPRI and SDGs only have separate
     lower/upper secondary series, not a single combined secondary series.
 
@@ -218,13 +221,11 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
     and OPRI/SDGs (1985+).
     """
 
-    # Pre-2000 historical data from Lee & Lee for primary (UNESCO world aggregates start at 2000).
-    # Pre-1985 for tertiary (UNESCO SDG world aggregates available from 1985).
-    # We use a single pre-2000 cutoff for tb_hist; the tertiary columns from 1985-1999
-    # will be filled by tb_tertiary below.
-    tb_hist = tb_lee[tb_lee["year"] < 2000].copy()
+    # Pre-1985 historical data from Lee & Lee for both primary and tertiary.
+    # Recent data (1985+) comes from UNESCO OPRI (primary) and SDGs (tertiary).
+    tb_hist = tb_lee[tb_lee["year"] < 1985].copy()
 
-    # 3. Recent primary NER (2000+) from OPRI itself
+    # 3. Recent primary NER (1985+) from OPRI itself
     opri_primary_map = {
         "Total net enrolment rate, primary, both sexes (%)": "mf_primary_enrollment_rates",
         "Total net enrolment rate, primary, female (%)": "f_primary_enrollment_rates",
@@ -234,7 +235,7 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
     tb_primary = (
         tb_opri[["country", "year"] + list(avail_primary)]
         .rename(columns=avail_primary)
-        .loc[lambda t: t["year"] >= 2000]
+        .loc[lambda t: t["year"] >= 1985]
         .copy()
     )
 
@@ -250,11 +251,9 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
     # 5. Merge recent primary + tertiary into one recent table
     tb_recent = pr.merge(tb_primary, tb_tertiary, on=["country", "year"], how="outer")
 
-    # 6. Combine historical (Lee & Lee) and recent (OPRI/SDG) using outer merge.
-    # Primary cutoff is 2000 and tertiary cutoff is 1985, so tb_hist (pre-2000) and
-    # tb_recent (tertiary from 1985+) overlap in 1985-1999. A simple concat would
-    # produce duplicate (country, year) rows. Instead, outer-merge and prefer the
-    # recent source, falling back to Lee & Lee where the recent source has no data.
+    # 6. Combine historical (Lee & Lee, pre-1985) and recent (OPRI/SDG, 1985+) using outer merge.
+    # The cutoff is 1985 for both primary and tertiary; prefer the recent source,
+    # falling back to Lee & Lee where the recent source has no data.
     tb_combined = pr.merge(tb_recent, tb_hist, on=["country", "year"], how="outer", suffixes=("", "_hist"))
 
     hist_enr_cols = [c for c in tb_hist.columns if c not in ["country", "year"]]
