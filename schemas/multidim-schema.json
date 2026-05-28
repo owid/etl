@@ -328,11 +328,11 @@
         "dimensions": {
             "type": "array",
             "title": "Collection dimensions",
-            "description": "Array of dimension objects that define the filter dropdowns available to users.",
+            "description": "Array of dimension objects that define the filter dropdowns available to users. An empty array (and a single view) means the collection is pushed as a regular Grapher chart instead of a multi-dim page.",
             "requirement_level": "required",
             "guidelines": [
                 [
-                    "Must contain at least one dimension."
+                    "Can be empty when the collection is a single chart (no dimension dropdowns)."
                 ],
                 [
                     "Each dimension creates a dropdown filter in the user interface."
