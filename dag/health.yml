@@ -573,7 +573,8 @@ steps:
       - data://garden/health/2025-02-19/measles_historical:
         - data://meadow/health/2025-02-19/measles_historical:
           - snapshot://health/2025-02-19/measles_historical.csv
-      - data://garden/demography/2024-07-15/population
+      # owid-issues#1232: F-T population OMM for staging A/B (was demography/2024-07-15/population)
+      - data://garden/demography/2026-05-28/population
 
   #
   # Cancer survival rates (GCO)
@@ -595,7 +596,8 @@ steps:
       - data://garden/health/2025-02-20/measles_deaths_public_health_reports:
         - data://meadow/health/2025-02-20/measles_deaths_public_health_reports:
           - snapshot://health/2025-02-20/measles_deaths_public_health_reports.csv
-      - data://garden/demography/2024-07-15/population
+      # owid-issues#1232: F-T population OMM for staging A/B (was demography/2024-07-15/population)
+      - data://garden/demography/2026-05-28/population
 
   #
   # US - reported diphtheria cases - long-run

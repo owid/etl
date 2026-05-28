@@ -62,7 +62,8 @@ steps:
   data://garden/gcp/2025-11-13/global_carbon_budget:
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
+    # owid-issues#1232: F-T population OMM for staging A/B (was demography/2024-07-15/population)
+    - data://garden/demography/2026-05-28/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/energy/2026-05-05/primary_energy_consumption
     - data://meadow/gcp/2025-11-13/global_carbon_budget:
@@ -93,7 +94,8 @@ steps:
       - snapshot://emissions/2025-12-04/national_contributions_temperature_response.csv
       - snapshot://emissions/2025-12-04/national_contributions_annual_emissions.csv
       - snapshot://emissions/2025-12-04/national_contributions_cumulative_emissions.csv
-    - data://garden/demography/2024-07-15/population
+    # owid-issues#1232: F-T population OMM for staging A/B (was demography/2024-07-15/population)
+    - data://garden/demography/2026-05-28/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
   #
