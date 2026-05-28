@@ -32,6 +32,25 @@ steps:
   data://grapher/demography/2024-07-15/population:
     - data://garden/demography/2024-07-15/population
 
+  # Federico-Tena variant of the OMM (owid-issues#1232 — F-T replaces Gapminder for 1800-1938;
+  # 1939-1949 bridged by per-country linear interpolation between F-T(1938) and UN WPP(1950)).
+  # Mirrors the 2024-07-15 step's output schema so consumers don't need code changes.
+  data://garden/demography/2026-05-28/population:
+    # HYDE 3.3
+    - data://garden/hyde/2024-01-02/all_indicators
+    # Federico-Tena V2 (1991 borders, 2026)
+    - data://garden/demography/2026-05-20/federico_tena_population
+    # Gapminder Systema Globalis — used for former states (USSR, Czechoslovakia, ...) only
+    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
+    # UN WPP (2024)
+    - data://garden/un/2024-07-12/un_wpp
+    # Auxiliary
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/faostat/2024-03-14/faostat_rl_auxiliary
+  data://grapher/demography/2026-05-28/population:
+    - data://garden/demography/2026-05-28/population
+
   # WPP ########################################
   # WPP (2024)
   data://meadow/un/2024-07-12/un_wpp:
