@@ -59,6 +59,16 @@ STACKED_FAMILY = {"StackedArea", "StackedBar", "StackedDiscreteBar"}
 SCHEMA_DEFAULT_CHART_TYPES = ["LineChart", "DiscreteBar"]
 
 CHART_ID_RE = re.compile(r"/charts/(\d+)")
+TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
+
+
+def short_admin_host() -> str:
+    """Return OWID_ENV.admin_api with the tailscale suffix stripped."""
+    return TAILSCALE_SUFFIX_RE.sub("", OWID_ENV.admin_api).rstrip("/").removesuffix("/api")
+
+
+def edit_link(chart_id: int) -> str:
+    return f"{short_admin_host()}/charts/{chart_id}/edit"
 
 _data_cache: dict[int, Any] = {}
 
@@ -291,10 +301,14 @@ def process_row(
 def print_action_table(results: list[dict]) -> None:
     print()
     print("PER-ROW ACTIONS")
-    print(f"{'chart':>6}  {'src':>6}  {'gdp_source':<13}  {'status':<8}  notes")
-    print("-" * 130)
+    print(f"{'chart':>6}  {'src':>6}  {'gdp_source':<13}  {'status':<8}  {'edit link':<60}  notes")
+    print("-" * 180)
     for r in results:
-        print(f"{r['chart']:>6}  {r['src']:>6}  {r['gdp_source']:<13}  {r['status']:<8}  {r['notes']}")
+        link = edit_link(r["chart"]) if isinstance(r["chart"], int) else ""
+        print(
+            f"{r['chart']:>6}  {r['src']:>6}  {r['gdp_source']:<13}  {r['status']:<8}  "
+            f"{link:<60}  {r['notes']}"
+        )
 
 
 def print_display_name_table(api: AdminAPI, results: list[dict]) -> None:
@@ -390,7 +404,7 @@ def main() -> int:
                 }
             )
 
-    print(f"Target admin: {OWID_ENV.admin_api}")
+    print(f"Target admin: {short_admin_host()}")
     print_action_table(results)
     print_display_name_table(api, results)
     return 0
