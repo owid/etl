@@ -43,6 +43,7 @@ Mirrors the admin's `applyDefaultsForScatter` and the extra moves we agreed on:
 5. **Mirrors source `yAxis.scaleType: log`** when the source uses it.
 6. **Mirrors source's manually-set y `display.name`** when present.
 7. Emits warnings (no action) for:
+   - Target has no `selectedEntityNames` — line/bar/slope views will fall back to Grapher defaults.
    - Source `excludedEntityNames` — would apply across all views, not just scatter.
    - GDP coverage mismatch — if y-indicator's earliest year predates the chosen GDP's coverage (WDI≈1990, PWT≈1950, Maddison≈year 1), suggest a deeper-history alternative.
    - Few entities on default scatter view — counts entities with both a y- and an x-value within tolerance at the default time; if fewer than ~15 AND source uses higher tolerance, recommends bumping target's y `display.tolerance`.

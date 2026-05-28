@@ -247,6 +247,9 @@ def process_row(
             notes.append(f"y.display.name: {prev!r} → {src_name!r}")
 
     # 7) Warnings (no action)
+    if not cfg.get("selectedEntityNames"):
+        notes.append("WARN: target has no selectedEntityNames — line/bar/slope views will fall back to Grapher defaults")
+
     excluded = src_cfg.get("excludedEntityNames")
     if excluded:
         notes.append(f"WARN: source excludes {excluded} (not applied on target)")
