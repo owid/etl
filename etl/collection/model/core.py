@@ -253,8 +253,15 @@ class Collection(MDIMBase):
     def upsert_to_db(self, owid_env: OWIDEnv):
         # Degenerate "single chart" case: no dimensions means no multi-dim page —
         # push to the charts table via the chart admin endpoint instead of
-        # `/multi-dims/`.
+        # `/multi-dims/`. A zero-dimension collection with multiple views is
+        # not a chart and not a valid MDIM either, so we refuse it explicitly.
         if len(self.dimensions) == 0:
+            if len(self.views) != 1:
+                raise ValueError(
+                    f"Collection '{self.catalog_path}' has no dimensions but "
+                    f"{len(self.views)} views. A zero-dimension collection must "
+                    f"have exactly one view (single-chart mode)."
+                )
             from etl.collection.chart_upsert import upsert_collection_as_chart
 
             upsert_collection_as_chart(self, owid_env)
