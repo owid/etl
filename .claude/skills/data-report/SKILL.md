@@ -28,7 +28,10 @@ data-reports/
     <slug>/                # kebab-case, identifies the report
       metadata.yaml        # title, authors, date, summary, tags, status
       index.html           # the report — self-contained
-      assets...            # any local images / data / css / js it needs
+      css/ js/ data/ ...   # any local images / css / js / json the report needs
+      assets/              # OPTIONAL: notebooks, build scripts, raw exports
+                           # — anything that explains how the report was made
+                           # but isn't required for it to render
   server.py                # renders the landing page from each metadata.yaml
   Makefile                 # `make new`, `make serve`, `make check`
 ```
@@ -38,6 +41,13 @@ data-reports/
   `http://data-reports.owid.io/reports/<slug>/`.
 - `index.html` should be **self-contained**: inline CSS/JS, or assets stored in
   the report's own folder. Don't depend on the landing-page styles.
+- **`assets/` is the conventional home for provenance** — Jupyter notebooks
+  (`.ipynb`), build scripts, raw CSV/parquet exports, and anything else that
+  documents *how* the report was produced. Files there are served by data-reports
+  too (everything under `/reports/<slug>/` is static), so you can link to them
+  from `index.html` (e.g. `<a href="assets/analysis.ipynb">Notebook</a>`). Put
+  files the report **needs to render** in `data/` / `css/` / `js/`; put files
+  that just explain the work in `assets/`.
 
 ## Locate (or clone) the data-reports repo
 
@@ -65,7 +75,7 @@ Collect (infer sensible defaults from the conversation / current analysis, then 
 | `authors` | List. Default to the current git user (`git config user.name`); confirm. |
 | `date` | `YYYY-MM-DD`. Default to today (`date -u +%Y-%m-%d`). |
 | `summary` | 1–2 sentences for the landing-page card. |
-| `tags` | Optional list, e.g. `[health, child-mortality]`. Helps search/filtering. |
+| `tags` | Optional list, **1–3 tags**. Stay broad (`population`, `health`, `methodology`) — they help search/filtering on the landing page, but a wall of narrow tags makes the cards noisy. Don't add a "draft" tag — `status` covers that. |
 | `status` | `draft` or `published`. Default `draft` until the user is happy. |
 
 Confirm these with the user before writing files.
@@ -147,6 +157,10 @@ Guidance for content:
   report folder and link to it.
 - Keep everything **relative and self-contained** so the report works at
   `/reports/<slug>/`.
+- **Don't add your own breadcrumb / "back to reports" link** — the data-reports
+  server injects a small fixed-position breadcrumb pill into every report
+  (top-left of the viewport, links back to `/`). Adding your own would
+  duplicate it.
 
 ### 4. Validate and preview
 
