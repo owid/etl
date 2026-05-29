@@ -7,9 +7,8 @@ definitions:
         - Global Education
       grapher_config:
         hasMapTab: true
-        maxTime: 2025
         map:
-          time: 2025
+          time: latest
           timeTolerance: 10
 
   display_tolerance: &display_tolerance 10
@@ -20,26 +19,13 @@ definitions:
 
   # Base grapher configuration templates
   common_grapher_config: &common_grapher_config
-    maxTime: 2025
     hasMapTab: true
 
   common_grapher_map_config: &common_grapher_map_config
-    time: 2025
+    time: latest
     timeTolerance: 10
 
-  # ============================================================================
-  # VALUE RANGES (BINS) FOR DIFFERENT INDICATOR TYPES
-  # ============================================================================
 
-  enrolment_rate_bins: &enrolment_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-  enrolment_rate_bins_gross: &enrolment_rate_bins_gross [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 1]
-  expenditure_bins: &expenditure_bins [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
-  expenditure_total_bins: &expenditure_total_bins [0, 4, 8, 12, 16, 20, 24, 1]
-  per_student_spending_bins: &per_student_spending_bins [0, 500, 1000, 5000, 10000, 15000, 20000, 25000, 1]
-  literacy_rate_bins: &literacy_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-  qualified_teachers_bins: &qualified_teachers_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-  proficiency_rate_bins: &proficiency_rate_bins [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-  out_of_school_bins: &out_of_school_bins [0, 10, 20, 30, 40, 50, 60, 1]
   # ============================================================================
   # ENROLLMENT CONFIGURATIONS (Primary, Secondary, Pre-primary)
   # ============================================================================
@@ -50,8 +36,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *enrolment_rate_bins
         baseColorScheme: YlGnBu
 
   grapher_config_enrolment_pubugn: &grapher_config_enrolment_pubugn
@@ -59,8 +43,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *enrolment_rate_bins_gross
         baseColorScheme: PuBuGn
 
   grapher_out_of_school_reds: &grapher_out_of_school_reds
@@ -68,8 +50,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *out_of_school_bins
         baseColorScheme: Reds
 
   grapher_completion: &grapher_completion
@@ -77,8 +57,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *enrolment_rate_bins
         baseColorScheme: Greens
   # ============================================================================
   # EXPENDITURE CONFIGURATIONS
@@ -89,8 +67,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_bins
         baseColorScheme: Blues
 
   grapher_config_expenditure_total: &grapher_config_expenditure_total
@@ -98,8 +74,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *expenditure_total_bins
         baseColorScheme: BuGn
 
   # Per-student spending configurations (using per-student bins)
@@ -108,8 +82,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
         baseColorScheme: Purples
 
 
@@ -122,8 +94,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *proficiency_rate_bins
         baseColorScheme: Purples
 
   grapher_config_proficiency_math: &grapher_config_proficiency_math
@@ -131,8 +101,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *proficiency_rate_bins
         baseColorScheme: Blues
 
   # ============================================================================
@@ -144,8 +112,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *literacy_rate_bins
         baseColorScheme: YlGnBu
 
   grapher_config_literacy_youth: &grapher_config_literacy_youth
@@ -153,8 +119,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *literacy_rate_bins
         baseColorScheme: BuGn
 
   grapher_config_literacy_elderly: &grapher_config_literacy_elderly
@@ -162,8 +126,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *literacy_rate_bins
         baseColorScheme: Blues
 
 
@@ -177,8 +139,6 @@ definitions:
     map:
       <<: *common_grapher_map_config
       colorScale:
-        binningStrategy: manual
-        customNumericValues: *qualified_teachers_bins
         baseColorScheme: Greens
 
   # ============================================================================
