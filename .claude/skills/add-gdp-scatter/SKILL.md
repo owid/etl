@@ -86,6 +86,10 @@ Push uses `apps.chart_sync.admin_api.AdminAPI.update_chart(id, cfg)`.
 - Does not adjust `selectedEntityNames`, `originUrl`, `subtitle`, `title`, or `note`.
 - Does not push to production — only to whatever environment `OWID_ENV` resolves to.
 
+## Hard rule: never migrate GDP-per-capita text
+
+The source charts are scatter-vs-GDP charts, so their title/subtitle/footnote describe the GDP relationship ("… vs. GDP per capita", "GDP per capita is adjusted for inflation and differences in living costs between countries", etc.). The target's primary view is **not** the scatter, so that framing does not belong on it. **Whenever porting any text from a source chart to a target (title, subtitle, footnote, display name), strip every GDP-per-capita clause first** — the "vs. GDP per capita" phrasing and the inflation/living-costs boilerplate tail. Port only the part describing the target's own indicator.
+
 ## Verifying after a run
 
 - Open `OWID_ENV.chart_site(slug)` for one of the targets and switch to the Scatter tab.
