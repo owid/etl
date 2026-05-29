@@ -778,12 +778,12 @@ tables:
 
       total_net_enrolment_rate__primary__both_sexes__pct:
         title: Net enrollment rate in primary education
-        description_short: Percentage of children of official primary school age who are enrolled in [primary education](#dod:primary-education).
+        description_short: The share of children of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrollment rate in primary education
+          title_public: Net enrollment rate in primary education
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -791,12 +791,12 @@ tables:
 
       total_net_enrolment_rate__primary__male__pct:
         title: Net enrollment rate in primary education among boys
-        description_short: Percentage of boys of official primary school age who are enrolled in [primary education](#dod:primary-education).
+        description_short: The share of boys of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrollment rate in primary education among boys
+          title_public: Net enrollment rate in primary education among boys
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -804,12 +804,12 @@ tables:
 
       total_net_enrolment_rate__primary__female__pct:
         title: Net enrollment rate in primary education among girls
-        description_short: Percentage of girls of official primary school age who are enrolled in [primary education](#dod:primary-education).
+        description_short: The share of girls of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrollment rate in primary education among girls
+          title_public: Net enrollment rate in primary education among girls
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -817,12 +817,12 @@ tables:
 
       total_net_enrolment_rate__lower_secondary__both_sexes__pct:
         title: Net enrollment rate in lower secondary education
-        description_short: Percentage of children of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education).
+        description_short: The share of children of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrollment rate in lower secondary education
+          title_public: Net enrollment rate in lower secondary education
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -830,12 +830,12 @@ tables:
 
       total_net_enrolment_rate__lower_secondary__male__pct:
         title: Net enrollment rate in lower secondary education among boys
-        description_short: Percentage of boys of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education).
+        description_short: The share of boys of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrollment rate in lower secondary education among boys
+          title_public: Net enrollment rate in lower secondary education among boys
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -843,12 +843,12 @@ tables:
 
       total_net_enrolment_rate__lower_secondary__female__pct:
         title: Net enrollment rate in lower secondary education among girls
-        description_short: Percentage of girls of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education).
+        description_short: The share of girls of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrollment rate in lower secondary education among girls
+          title_public: Net enrollment rate in lower secondary education among girls
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -856,12 +856,12 @@ tables:
 
       total_net_enrolment_rate__upper_secondary__both_sexes__pct:
         title: Net enrollment rate in upper secondary education
-        description_short: Percentage of children of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education).
+        description_short: The share of children of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrollment rate in upper secondary education
+          title_public: Net enrollment rate in upper secondary education
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -869,12 +869,12 @@ tables:
 
       total_net_enrolment_rate__upper_secondary__male__pct:
         title: Net enrollment rate in upper secondary education among boys
-        description_short: Percentage of boys of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education).
+        description_short: The share of boys of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrollment rate in upper secondary education among boys
+          title_public: Net enrollment rate in upper secondary education among boys
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -882,12 +882,12 @@ tables:
 
       total_net_enrolment_rate__upper_secondary__female__pct:
         title: Net enrollment rate in upper secondary education among girls
-        description_short: Percentage of girls of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education).
+        description_short: The share of girls of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
         presentation:
-          title_public:  Net enrollment rate in upper secondary education among girls
+          title_public: Net enrollment rate in upper secondary education among girls
           grapher_config: *grapher_config_enrolment_ylgnbu
         display:
           numDecimalPlaces: 1
@@ -904,7 +904,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrollment ratio in primary education
+          title_public: Gross enrollment ratio in primary education
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
@@ -917,7 +917,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrollment ratio in primary education among boys
+          title_public: Gross enrollment ratio in primary education among boys
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
@@ -930,7 +930,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrollment ratio in primary education among girls
+          title_public: Gross enrollment ratio in primary education among girls
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
@@ -943,7 +943,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrollment ratio in lower secondary education
+          title_public: Gross enrollment ratio in lower secondary education
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
@@ -956,7 +956,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrollment ratio in lower secondary education among boys
+          title_public: Gross enrollment ratio in lower secondary education among boys
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
@@ -969,7 +969,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrollment ratio in lower secondary education among girls
+          title_public: Gross enrollment ratio in lower secondary education among girls
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
@@ -982,11 +982,11 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrollment ratio in upper secondary education
+          title_public: Gross enrollment ratio in upper secondary education
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
-          name:  Upper secondary education
+          name: Upper secondary education
 
       gross_enrolment_ratio__upper_secondary__female__pct:
         title: Gross enrollment ratio in upper secondary education among girls
@@ -995,7 +995,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrollment ratio in upper secondary education among girls
+          title_public: Gross enrollment ratio in upper secondary education among girls
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
@@ -1008,7 +1008,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
         presentation:
-          title_public:  Gross enrollment ratio in upper secondary education among boys
+          title_public: Gross enrollment ratio in upper secondary education among boys
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
@@ -1393,7 +1393,7 @@ tables:
 
       net_enrolment_rate__primary__both_sexes__pct__combined_historical:
         title: Net enrollment rate in primary education (combined historical)
-        description_short: Percentage of children of official primary school age enrolled in [primary education](#dod:primary-education).
+        description_short: The share of children of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
@@ -1408,7 +1408,7 @@ tables:
 
       net_enrolment_rate__primary__female__pct__combined_historical:
         title: Net enrollment rate in primary education among girls (combined historical)
-        description_short: Percentage of girls of official primary school age enrolled in [primary education](#dod:primary-education).
+        description_short: The share of girls of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
@@ -1423,7 +1423,7 @@ tables:
 
       net_enrolment_rate__primary__male__pct__combined_historical:
         title: Net enrollment rate in primary education among boys (combined historical)
-        description_short: Percentage of boys of official primary school age enrolled in [primary education](#dod:primary-education).
+        description_short: The share of boys of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr_historical

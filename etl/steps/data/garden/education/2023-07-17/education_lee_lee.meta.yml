@@ -104,6 +104,7 @@ tables:
 
       mf_tertiary_enrollment_rates:
         title: Gross enrolment ratio, tertiary, both sexes
+        description_short: The number of people, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of typical tertiary education age (around 18–22 years old).
         unit: '%'
         short_unit: '%'
         display:
@@ -111,6 +112,7 @@ tables:
 
       f_tertiary_enrollment_rates:
         title: Gross enrolment ratio, tertiary, female
+        description_short: The number of girls, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the female population of typical tertiary education age (around 18–22 years old).
         unit: '%'
         short_unit: '%'
         display:
@@ -118,6 +120,7 @@ tables:
 
       m_tertiary_enrollment_rates:
         title: Gross enrolment ratio, tertiary, male
+        description_short: The number of boys, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the male population of typical tertiary education age (around 18–22 years old).
         unit: '%'
         short_unit: '%'
         display:
