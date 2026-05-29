@@ -4834,7 +4834,6 @@ tables:
         unit: ""
         short_unit: ""
 
-      # ---- Indicators added (Women's rights, marginalized ethnic groups, human rights, crime) ----
       agree_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: Agree"
         description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, men should have more right to a job than women".'
