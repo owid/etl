@@ -215,6 +215,7 @@ definitions:
     - It covers all types of public education spending — including teacher salaries, textbooks, school maintenance, capital projects such as building classrooms, and even external funding from international donors that is channeled through government budgets.
     - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
     - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrollment rates.
+    - Some implausible values have been removed. Sierra Leone (2023) and Chad (2024) reported spending figures exceeding 10% of GDP for individual education levels, which is not physically possible. Oman (2017, 2019, 2021) reported alternating-year spikes of 12–165% of GDP in level-specific columns while adjacent years were normal; these have been excluded.
 
   # Enrollment and attendance descriptions
   desc_key_net_enr: &desc_key_net_enr
