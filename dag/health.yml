@@ -833,10 +833,12 @@ steps:
 
   # Clinical trials - ClinicalTrials.gov
   # no meadow snapshot, as this is a large dataset
+  data://garden/health/2025-07-28/clinical_trials:
+    - snapshot://health/2025-07-28/clinical_trials.csv
   data://grapher/health/2025-07-28/clinical_trials:
     - data://garden/health/2025-07-28/clinical_trials
 
-  # Guinea worm certification
+ # Guinea worm certification
   data://meadow/who/2025-08-01/guinea_worm_certification:
     - snapshot://who/2025-08-01/guinea_worm.csv
   data://garden/who/2025-08-01/guinea_worm_certification:
@@ -847,20 +849,7 @@ steps:
     - snapshot://fasttrack/latest/guinea_worm_cases.csv
     - data://garden/who/2025-08-01/guinea_worm_certification
   data://grapher/who/2025-08-01/guinea_worm:
-    - data://garden/who/2025-08-01/guinea_worm:
-      - snapshot://fasttrack/latest/guinea_worm_cases.csv
-      # Guinea worm certification
-      - data://garden/who/2025-08-01/guinea_worm_certification:
-        - data://meadow/who/2025-08-01/guinea_worm_certification:
-          - snapshot://who/2025-08-01/guinea_worm.csv
-
-  # Guinea worm cases and certification - WHO
-  # uses fasttrack snapshot until 2024 and adds data directly in garden step from 2025 onwards
-  data://garden/who/2026-03-17/guinea_worm:
-    - snapshot://fasttrack/latest/guinea_worm_cases.csv
-    - data://garden/who/2025-08-01/guinea_worm_certification
-  data://grapher/who/2026-03-17/guinea_worm:
-    - data://garden/who/2026-03-17/guinea_worm
+    - data://garden/who/2025-08-01/guinea_worm
 
   # Guinea worm cases and certification - WHO
   # uses fasttrack snapshot until 2024 and adds data directly in garden step from 2025 onwards
