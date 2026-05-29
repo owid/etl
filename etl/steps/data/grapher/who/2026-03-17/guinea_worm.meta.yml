@@ -23,6 +23,7 @@ definitions:
       - Angola has had endemic status since 2020:  https://www.who.int/news/item/23-09-2020-eradicating-dracunculiasis-human-cases-and-animal-infections-decline-as-angola-becomes-endemic
       - Kenya was certified guinea worm free in 2018: https://www.who.int/news/item/21-03-2018-dracunculiasis-eradication-south-sudan-claims-interruption-of-transmission-in-humans
       - DRC was certified guinea worm free in 2022: https://www.who.int/news/item/15-12-2022-the-democratic-republic-of-the-congo-certified-free-of-dracunculiasis-transmission-by-who
+      - Cameroon was reclassified as endemic in 2025: https://iris.who.int/server/api/core/bitstreams/8aa14c5f-62f7-4e29-9088-57a60638c44f/content. This change is not applied retroactively to the data, but it is reflected in the certification status for Cameroon in 2025 and beyond.
   # The "Dracunculiasis eradication portal" is not reachable anymore - we still add it here for transparency and to document our data sources.
   cases_source: &cases_source |-
       For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen the data is from:
@@ -110,6 +111,7 @@ tables:
           - Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year. As of 2025, Sudan is the only country with pre-certification status.
           - Countries labeled pending surveillance have not had sufficient testing to determine their status or the number of cases in the country.
           - Countries labeled certified free of guinea worm disease have reported zero indigenous cases through active surveillance for at least three consecutive years. 200 countries, areas and territories have been certified free of guinea worm disease by the WHO. The latest are Kenya and the Democratic Republic of the Congo, which were certified in 2018 and 2022 respectively.
+          - In 2025 the WHO concluded that Cameroon (based on human and animal case counts) should be reclassified as endemic. As Cameroon was certified disease-free in 2007, this change is not applied retroactively to the data, but it is reflected in the certification status for Cameroon in 2025 and beyond.
         presentation:
           grapher_config:
             note: A country is classified as endemic if the disease is consistently present in the country. Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year. Countries labeled pending surveillance have not had sufficient testing todetermine their status or the number of cases in the country.
