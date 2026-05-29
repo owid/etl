@@ -53,6 +53,11 @@ GDP_CATALOG_PATTERNS = {
 
 CONTINENTS_ID = 900801
 POPULATION_ID = 953899
+# "Population (historical)" — a strict subset of regular Population (953899), which
+# spans -10000..2100 vs historical's -10000..2023. Reference scatters sometimes size
+# by historical population, but it buys nothing for bubble sizing, so we normalize it
+# to regular Population whenever a source scatter uses it.
+POPULATION_HISTORICAL_ID = 953903
 
 LINE_FAMILY = {"LineChart", "SlopeChart", "DiscreteBar", "Marimekko", "ScatterPlot"}
 STACKED_FAMILY = {"StackedArea", "StackedBar", "StackedDiscreteBar"}
@@ -208,11 +213,17 @@ def process_row(
             added.append("size=skipped (source has no size dim)")
         else:
             size_target = src_size_var or POPULATION_ID
-            dims.append({"variableId": size_target, "property": "size"})
-            added.append(
-                f"size={size_target}"
-                + (" (from source)" if size_target != POPULATION_ID else "")
-            )
+            # Normalize "Population (historical)" to regular Population — the latter is
+            # a strict superset for bubble sizing, so historical buys nothing.
+            if size_target == POPULATION_HISTORICAL_ID:
+                dims.append({"variableId": POPULATION_ID, "property": "size"})
+                added.append(f"size={POPULATION_ID} (normalized historical→regular population)")
+            else:
+                dims.append({"variableId": size_target, "property": "size"})
+                added.append(
+                    f"size={size_target}"
+                    + (" (from source)" if size_target != POPULATION_ID else "")
+                )
     cfg["dimensions"] = dims
     if added:
         notes.append("added " + ", ".join(added))

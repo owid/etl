@@ -37,7 +37,7 @@ Before processing any rows, the script queries `variables` for the latest id mat
 Mirrors the admin's `applyDefaultsForScatter` and the extra moves we agreed on:
 
 1. Adds `ScatterPlot` to `chartTypes`, preserving existing tabs. Seeds the schema default `[LineChart, DiscreteBar]` when `chartTypes` is unset.
-2. Appends x (the chosen GDP variable), color, size dimensions if absent. **If the source scatter uses a non-default color/size variable** (e.g. World Bank income groups for color, or a historical population series for size), the source's variableId is used on the target instead of the admin defaults `CONTINENTS_ID=900801` / `POPULATION_ID=953899`. **If the source has no `size` dim at all**, the target also gets none — the script will not add a default population sizing if the curator deliberately omitted it.
+2. Appends x (the chosen GDP variable), color, size dimensions if absent. **If the source scatter uses a non-default color/size variable** (e.g. World Bank income groups for color), the source's variableId is used on the target instead of the admin defaults `CONTINENTS_ID=900801` / `POPULATION_ID=953899`. **If the source has no `size` dim at all**, the target also gets none — the script will not add a default population sizing if the curator deliberately omitted it. **Exception — `Population (historical)` (953903) is normalized to regular `Population` (953899)**: regular Population spans −10000..2100 vs historical's −10000..2023, so it's a strict superset for bubble sizing and historical buys nothing. The action note records the normalization.
 3. Sets `matchingEntitiesOnly: true`.
 4. Sets `xAxis` to `scaleType: log` + `canChangeScaleType: true`.
 5. **Mirrors source `yAxis.scaleType: log`** when the source uses it.
