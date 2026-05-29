@@ -280,6 +280,8 @@ def process_row(
 
     # 6) yAxis bounds mirror — copy each of min/max the source explicitly sets,
     # preserving other target yAxis keys. Note: affects ALL views, not just scatter.
+    # A `max: 0` paired with `min: 0` is a degenerate (collapsed) axis — junk we
+    # neither replicate from the source nor leave on the target.
     bound_changes = []
     ya = dict(cfg.get("yAxis") or {})
     for bound in ("min", "max"):
@@ -287,9 +289,12 @@ def process_row(
             prev = ya.get(bound, "unset")
             ya[bound] = src_ya[bound]
             bound_changes.append(f"{bound}: {prev}→{src_ya[bound]}")
+    if ya.get("min") == 0 and ya.get("max") == 0:
+        ya.pop("max", None)
+        bound_changes.append("dropped degenerate max:0")
     if bound_changes:
         cfg["yAxis"] = ya
-        notes.append("yAxis bounds mirrored from source (" + ", ".join(bound_changes) + ")")
+        notes.append("yAxis bounds (" + ", ".join(bound_changes) + ")")
 
     # 7) y display.name mirror
     src_y = find_dim(src_cfg, "y")
