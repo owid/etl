@@ -409,6 +409,7 @@ tables:
       # Educational attainment (formal schooling)
       # ========================================================================
 
+          tolerance: 10
       educational_attainment_rate__completed_post_secondary_non_tertiary_education_or_higher__population_25plus_years__both_sexes__pct__ea_4t8_ag25t99:
         title: Share of the population with post-secondary education or higher (25+)
         description_short: The share of adults aged 25 and older who have completed [post-secondary](#dod:post-secondary-education) or [tertiary](#dod:tertiary-education) education.
@@ -428,6 +429,7 @@ tables:
           name: At least post-secondary education
           numDecimalPlaces: 1
 
+          tolerance: 10
       educational_attainment_rate__completed_lower_secondary_education_or_higher__population_25plus_years__both_sexes__pct__ea_2t8_ag25t99:
         title: Share of the population with lower secondary education (25+)
         description_short: The share of adults aged 25 and older who have completed [lower secondary](#dod:lower-secondary-education) education or higher.
@@ -450,6 +452,7 @@ tables:
       # Pupil-teacher ratios and qualified teachers
       # ========================================================================
 
+          tolerance: 10
       pupil_qualified_teacher_ratio_in_primary_education__headcount_basis__ptrhc_1_qualified:
         title: Pupil-qualified teacher ratio in primary education
         description_short: A qualified teacher is one who has the minimum academic qualifications necessary to teach at a [primary](#dod:primary-education) level of education in a given country.
@@ -469,6 +472,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       pupil_qualified_teacher_ratio_in_pre_primary_education__headcount_basis__ptrhc_02_qualified:
         title: Pupil-qualified teacher ratio in pre-primary education
         description_short: A qualified teacher is one who has the minimum academic qualifications necessary to teach at a [pre-primary](#dod:pre-primary-education) level of education in a given country.
@@ -488,6 +492,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       percentage_of_qualified_teachers_in_secondary_education__both_sexes__pct__qutp_2t3:
         title: Percentage of qualified teachers in secondary education
         description_short: Share of qualified teachers in [secondary](#dod:secondary-education) education represent those with the necessary academic qualifications to teach at that level in a given country.
@@ -509,6 +514,7 @@ tables:
       # OUT-OF-SCHOOL CHILDREN
       # ========================================================================
 
+          tolerance: 10
       out_of_school_rate_for_children_of_primary_school_age__both_sexes__pct__rofst_1_cp:
         title: Out-of-school rate for children of primary school age
         description_short: Children of [primary](#dod:primary-education) school age (typically 6–11 years) not enrolled in any level of education, expressed as a percentage of all children in that age group.
@@ -698,6 +704,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       proportion_of_primary_schools_with_single_sex_basic_sanitation_facilities__pct__schbsp_1_wtoila:
         title: Share of primary schools with single-sex sanitation facilities
         description_short: Percentage of [primary schools](#dod:primary-education) that have access to single-sex basic sanitation facilities, as defined by international standards.
@@ -718,6 +725,7 @@ tables:
       # enrollment ratios
       # ========================================================================
 
+          tolerance: 10
       gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
         title: Gross enrollment ratio in tertiary education
         description_short: The number of people, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of typical tertiary education age (around 18–22 years old).
@@ -731,6 +739,7 @@ tables:
           numDecimalPlaces: 1
           name: Tertiary education
 
+          tolerance: 10
       gross_enrolment_ratio_for_tertiary_education__female__pct__ger_5t8_f:
         title: Gross enrollment ratio in tertiary education among women
         description_short: The number of women, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of women of typical tertiary education age (around 18–22 years old).
@@ -744,6 +753,7 @@ tables:
           numDecimalPlaces: 1
           name: Women
 
+          tolerance: 10
       gross_enrolment_ratio_for_tertiary_education__male__pct__ger_5t8_m:
         title: Gross enrollment ratio in tertiary education among men
         description_short: The number of men, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of men of typical tertiary education age (around 18–22 years old).
@@ -757,6 +767,7 @@ tables:
           numDecimalPlaces: 1
           name: Men
 
+          tolerance: 10
       net_enrolment_rate__pre_primary__both_sexes__pct__ner_02_cp:
         title: Net enrollment rate in pre-primary education
         description_short: The share of children of [pre-primary](#dod:pre-primary-education) school age (typically 3–5 years old) who are enrolled in pre-primary education.
@@ -770,6 +781,7 @@ tables:
           numDecimalPlaces: 1
           name: Pre-primary education
 
+          tolerance: 10
       net_enrolment_rate__pre_primary__female__pct__ner_02_f_cp:
         title: Net enrollment rate in pre-primary education among girls
         description_short: The share of girls of [pre-primary](#dod:pre-primary-education) school age (typically 3–5 years old) who are enrolled in pre-primary education.
@@ -783,6 +795,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       net_enrolment_rate__pre_primary__male__pct__ner_02_m_cp:
         title: Net enrollment rate in pre-primary education among boys
         description_short: The share of boys of [pre-primary](#dod:pre-primary-education) school age (typically 3–5 years old) who are enrolled in pre-primary education.
@@ -800,6 +813,7 @@ tables:
       # Completion rates
       # ========================================================================
 
+          tolerance: 10
       completion_rate__primary_education__both_sexes__pct__modelled_data__cr_mod_1:
         title: Completion rate in primary education
         description_short: The share of children who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -813,6 +827,7 @@ tables:
           name: Primary education
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_2:
         title: Completion rate in lower secondary education
         description_short: The share of children who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -826,6 +841,7 @@ tables:
           name: Lower secondary education
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
         title: Completion rate in upper secondary education
         description_short: The share of children who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -839,6 +855,7 @@ tables:
           name: Upper secondary education
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__lower_secondary_education__female__pct__modelled_data__cr_mod_2_f:
         title: Completion rate in lower secondary education among girls
         description_short: The share of girls who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -852,6 +869,7 @@ tables:
           name: Girls
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__primary_education__female__pct__modelled_data__cr_mod_1_f:
         title: Completion rate in primary education among girls
         description_short: The share of girls who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -865,6 +883,7 @@ tables:
           name: Girls
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__upper_secondary_education__female__pct__modelled_data__cr_mod_3_f:
         title: Completion rate in upper secondary education among girls
         description_short: The share of girls who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -878,6 +897,7 @@ tables:
           name: Girls
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__lower_secondary_education__male__pct__modelled_data__cr_mod_2_m:
         title: Completion rate in lower secondary education among boys
         description_short: The share of boys who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -891,6 +911,7 @@ tables:
           name: Boys
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__primary_education__male__pct__modelled_data__cr_mod_1_m:
         title: Completion rate in primary education among boys
         description_short: The share of boys who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -904,6 +925,7 @@ tables:
           name: Boys
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__upper_secondary_education__male__pct__modelled_data__cr_mod_3_m:
         title: Completion rate in upper secondary education among boys
         description_short: The share of boys who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -917,6 +939,7 @@ tables:
           name: Boys
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__primary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
         title: Completion rate in primary education, adjusted gender parity index (GPIA)
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal primary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
@@ -933,6 +956,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_2_gpia:
         title: Completion rate in lower secondary education, adjusted gender parity index (GPIA)
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal lower secondary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
@@ -949,6 +973,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__upper_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_3_gpia:
         title: Completion rate in upper secondary education, adjusted gender parity index (GPIA)
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal upper secondary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
@@ -968,6 +993,7 @@ tables:
       # ========================================================================
       # Expenditure on education
       # ========================================================================
+          tolerance: 10
       expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf:
         title: Expenditure on education as share of government spending
         description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education.
@@ -985,6 +1011,7 @@ tables:
           numDecimalPlaces: 1
           name: Total across all levels of education
 
+          tolerance: 10
       government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov:
         title: Government spending on education as share of GDP
         unit: "% of GDP"
@@ -1512,6 +1539,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__lower_secondary_education__both_sexes__pct__cr_2:
         title: Completion rate in lower secondary education (survey-based)
         description_short: The share of children who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it.
@@ -1520,6 +1548,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__upper_secondary_education__both_sexes__pct__cr_3:
         title: Completion rate in upper secondary education (survey-based)
         description_short: The share of children who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
@@ -1532,6 +1561,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       completion_rate__upper_secondary_education__female__pct__cr_3_f:
         title: Completion rate in upper secondary education among girls (survey-based)
         description_short: The share of girls who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
@@ -1544,6 +1574,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       completion_rate__upper_secondary_education__male__pct__cr_3_m:
         title: Completion rate in upper secondary education among boys (survey-based)
         description_short: The share of boys who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
@@ -1556,6 +1587,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       average_teacher_salary_in_primary_education_relative_to_other_professions_requiring_a_comparable_level_of_qualification__both_sexes__tsalary_1:
         title: Average teacher salary in primary education relative to comparable professions
         description_short: Average salary of primary school teachers as a ratio of the average salary of other professions requiring a comparable level of qualification.
@@ -1563,3 +1595,4 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 2
+          tolerance: 10

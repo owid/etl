@@ -34,7 +34,7 @@ definitions:
   school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
   school_life_expectancy_tertiary_bins: &school_life_expectancy_tertiary_bins [0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 1]
   expenditure_bins_total: &expenditure_bins_total [0, 1000000000, 2000000000, 5000000000, 10000000000, 20000000000, 50000000000, 100000000000, 200000000000, 500000000000, 1000000000000, 1]
-  expenditure_bins_by_level: &expenditure_bins_by_level  [0, 1000000000, 2000000000, 5000000000, 10000000000, 20000000000, 50000000000, 1]
+  expenditure_bins_by_level: &expenditure_bins_by_level [0, 1000000000, 2000000000, 5000000000, 10000000000, 20000000000, 50000000000, 1]
 
   # Per-student spending bins (in international dollars per student)
   per_student_spending_bins: &per_student_spending_bins [0, 500, 1000, 5000, 10000, 15000, 20000, 25000, 1]
@@ -190,8 +190,7 @@ definitions:
   # DESCRIPTIONS
   # ============================================================================
 
-  description_processing_per_student: &description_processing_per_student
-    This indicator was calculated by dividing the total government expenditure on education at a specific level by the number of students enrolled at that level.
+  description_processing_per_student: &description_processing_per_student This indicator was calculated by dividing the total government expenditure on education at a specific level by the number of students enrolled at that level.
 
   # Government expenditure descriptions
   desc_key_govt_expenditure_constant_ppp: &desc_key_govt_expenditure_constant_ppp
@@ -257,10 +256,10 @@ definitions:
     - The data may not reflect recent progress in countries with infrequent surveys or outdated census information
 
   desc_key_sle: &desc_key_sle
-     - This indicator shows how many years a student starting school in that year is expected to spend in education.  It's based on the enrollment patterns observed in that country in that specific year.
-     - The calculation looks at how many students are enrolled at each age and education level, then estimates how long a new student would stay in school if those patterns continued. This includes time spent repeating grades, not just the official length of each school level.
-     - It measures participation in schooling - how long students are likely to stay in school - rather than whether they actually learn or graduate.
-     - Higher numbers mean students spend more years in school, either because the official school system is longer or because many students repeat grades.
+    - This indicator shows how many years a student starting school in that year is expected to spend in education.  It's based on the enrollment patterns observed in that country in that specific year.
+    - The calculation looks at how many students are enrolled at each age and education level, then estimates how long a new student would stay in school if those patterns continued. This includes time spent repeating grades, not just the official length of each school level.
+    - It measures participation in schooling - how long students are likely to stay in school - rather than whether they actually learn or graduate.
+    - Higher numbers mean students spend more years in school, either because the official school system is longer or because many students repeat grades.
 
   # Out-of-school descriptions
   desc_key_out_school: &desc_key_out_school
@@ -301,11 +300,11 @@ definitions:
 
   # Female teachers descriptions
   desc_key_female_teachers: &desc_key_female_teachers
-   - Teachers play a central role in shaping learning environments. This indicator shows what share of the teaching workforce at each education level is made up of women.
-   - It measures the number of female teachers as a percentage of all teachers at that education level, whether they work full-time or part-time, and whether they teach in person or remotely.
-   - The definition focuses on people who are actively teaching students and excludes school administrators like principals who don't teach, as well as volunteers or occasional workers.
-   - A value around 50% suggests roughly equal numbers of male and female teachers. Higher percentages mean women make up a larger share of the workforce, while lower values might indicate barriers to women entering teaching.
-   - The data comes from administrative records like school censuses or national education registries that track teacher numbers by gender and education level.
+    - Teachers play a central role in shaping learning environments. This indicator shows what share of the teaching workforce at each education level is made up of women.
+    - It measures the number of female teachers as a percentage of all teachers at that education level, whether they work full-time or part-time, and whether they teach in person or remotely.
+    - The definition focuses on people who are actively teaching students and excludes school administrators like principals who don't teach, as well as volunteers or occasional workers.
+    - A value around 50% suggests roughly equal numbers of male and female teachers. Higher percentages mean women make up a larger share of the workforce, while lower values might indicate barriers to women entering teaching.
+    - The data comes from administrative records like school censuses or national education registries that track teacher numbers by gender and education level.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -487,24 +486,27 @@ tables:
         unit: "years"
         description_key: *desc_key_mye
         display:
-         numDecimalPlaces: 1
+          numDecimalPlaces: 1
 
+          tolerance: 10
       mean_years_of_schooling__isced_1_or_higher__population_25plus_years__female:
         title: Average years of schooling for women
         description_short: Average number of years women older than 25 participated in formal education.
         unit: "years"
         description_key: *desc_key_mye
         display:
-         numDecimalPlaces: 1
+          numDecimalPlaces: 1
 
+          tolerance: 10
       mean_years_of_schooling__isced_1_or_higher__population_25plus_years__male:
         title: Average years of schooling for men
         description_short: Average number of years men older than 25 participated in formal education.
         unit: "years"
         description_key: *desc_key_mye
         display:
-         numDecimalPlaces: 1
+          numDecimalPlaces: 1
 
+          tolerance: 10
       mean_years_of_schooling__isced_1_or_higher__population_25plus_years__adjusted_gender_parity_index__gpia:
         title: Average years of schooling, adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal average years of schooling between men and women. Values below 1 favor men, and above 1 favor women.
@@ -526,6 +528,7 @@ tables:
       # PRIVATE INSTITUTIONS & EDUCATION SYSTEM STRUCTURE
       # ========================================================================
 
+          tolerance: 10
       percentage_of_enrolment_in_pre_primary_education_in_private_institutions__both_sexes__pct:
         title: Percentage of enrollment in pre-primary education in private institutions
         description_short: Private [pre-primary education](#dod:pre-primary-education) institutions are managed by private entities, such as NGOs, religious groups, or businesses, rather than public authorities, regardless of profit motive.
@@ -535,6 +538,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       percentage_of_enrolment_in_primary_education_in_private_institutions__both_sexes__pct:
         title: Percentage of enrollment in primary education in private institutions
         description_short: Private [primary](#dod:primary-education) institutions are managed by private entities, such as NGOs, religious groups, or businesses, rather than public authorities, regardless of profit motive.
@@ -548,6 +552,7 @@ tables:
       # ATTENDANCE RATES
       # ========================================================================
 
+          tolerance: 10
       total_net_attendance_rate__primary__both_sexes__pct:
         title: Total net attendance rate in primary education
         description_short: Total number of students of the official age group for [primary education](#dod:primary-education) who are attending school at any level of education, expressed as a percentage of the corresponding population.
@@ -561,6 +566,7 @@ tables:
       # STUDENT MOBILITY & INTERNATIONAL EDUCATION
       # ========================================================================
 
+          tolerance: 10
       outbound_mobility_ratio__all_regions__both_sexes__uis_estimate__pct:
         title: Share of students studying abroad
         description_short: Percentage of a country's [tertiary](#dod:tertiary-education) level students studying abroad as international students. International students are those that move from their home countries for education, identified based on their past education, residence, or distinct immigration regulations.
@@ -569,6 +575,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       inbound_mobility_rate__both_sexes__uis_estimate__pct:
         title: Share of students from abroad
         description_short: International students as a share of the country's overall [tertiary](#dod:tertiary-education) enrollment. International students are those who move from their home countries for education, identified based on their past education, residence, or distinct immigration regulations.
@@ -591,22 +598,24 @@ tables:
       # EDUCATION SYSTEM STRUCTURE (ages, duration, compulsory education)
       # ========================================================================
 
+          tolerance: 10
       official_entrance_age_to_compulsory_education__years:
         title: Official entrance age to compulsory education
         description_short: The official age for entering compulsory education is based on students starting at the earliest entrance age, studying full-time, and advancing without grade repetition or skipping.
         unit: "years"
         description_key:
-        - Children around the world begin formal education at different ages — this indicator shows the age at which students are officially expected to start a given level of education in their country.
-        - It assumes that students begin schooling on time, attend full-time, and progress without repeating or skipping any grades.
-        - The official entrance age is typically determined by national laws or education policies and usually reflects the most common age of entry, though not always.
-        - This indicator is essential for understanding how an education system is structured and is used as a reference point when calculating other key indicators like enrollment rates or school-age population estimates.
-        - It helps identify the age-specific demand for education services and supports national planning for staffing, infrastructure, and learning materials at each education level.
-        - Data on official entrance age is reported by national ministries of education and compiled by the UNESCO Institute for Statistics, following [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) to ensure international comparability.
-        - While this provides a standard benchmark, actual school entry may vary due to parental choices, local policies, or flexibility in school admissions.
-        - To fully interpret this indicator, it should be considered alongside the theoretical duration of the level of education, which indicates how long students are expected to remain in that level if they follow the system as designed.
+          - Children around the world begin formal education at different ages — this indicator shows the age at which students are officially expected to start a given level of education in their country.
+          - It assumes that students begin schooling on time, attend full-time, and progress without repeating or skipping any grades.
+          - The official entrance age is typically determined by national laws or education policies and usually reflects the most common age of entry, though not always.
+          - This indicator is essential for understanding how an education system is structured and is used as a reference point when calculating other key indicators like enrollment rates or school-age population estimates.
+          - It helps identify the age-specific demand for education services and supports national planning for staffing, infrastructure, and learning materials at each education level.
+          - Data on official entrance age is reported by national ministries of education and compiled by the UNESCO Institute for Statistics, following [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) to ensure international comparability.
+          - While this provides a standard benchmark, actual school entry may vary due to parental choices, local policies, or flexibility in school admissions.
+          - To fully interpret this indicator, it should be considered alongside the theoretical duration of the level of education, which indicates how long students are expected to remain in that level if they follow the system as designed.
         display:
           numDecimalPlaces: 0
 
+          tolerance: 10
       duration_of_compulsory_education__years:
         title: Duration of compulsory education
         description_short: The number of years of compulsory education is based on students starting at the earliest entrance age, studying full-time, and advancing without grade repetition or skipping.
@@ -624,6 +633,7 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          tolerance: 10
       official_entrance_age_to_pre_primary_education__years:
         title: Official entrance age to pre-primary education
         description_short: The official entry age at which children are expected to start [pre-primary education](#dod:pre-primary-education) according to national legislation or policies.
@@ -639,6 +649,7 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          tolerance: 10
       theoretical_duration_of_pre_primary_education__years:
         title: Theoretical duration of pre-primary education
         description_short: The average number of years that a child is expected to spend in [pre-primary](#dod:pre-primary-education) education, defined by country's official educational regulations or laws.
@@ -661,6 +672,7 @@ tables:
       # GENDER PARITY INDICES (enrollment rates)
       # ========================================================================
 
+          tolerance: 10
       total_net_enrolment_rate__primary__adjusted_gender_parity_index__gpia:
         title: Net enrollment rates in primary education, adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
@@ -678,6 +690,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       total_net_enrolment_rate__lower_secondary__adjusted_gender_parity_index__gpia:
         title: Net enrollment rates in lower secondary education, adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [lower secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
@@ -699,6 +712,7 @@ tables:
       # STAFF COMPENSATION & TEACHER WORKFORCE
       # ========================================================================
 
+          tolerance: 10
       all_staff_compensation_as_a_percentage_of_total_expenditure_in_public_institutions__pct:
         title: Share of total public education spending allocated to staff compensation
         description_short: Compensation for staff across all levels of education, both teaching and non-teaching, covers salaries, retirement contributions by employers, and additional benefits.
@@ -718,6 +732,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
+          tolerance: 10
       all_staff_compensation_as_a_percentage_of_total_expenditure_in_primary_public_institutions__pct:
         title: Share of total public education spending allocated to staff compensation in primary education
         description_short: Compensation for staff in [primary](#dod:primary-education) education, both teaching and non-teaching, covers salaries, retirement contributions by employers, and additional benefits.
@@ -737,6 +752,7 @@ tables:
           numDecimalPlaces: 1
 
 
+          tolerance: 10
       percentage_of_teachers_in_primary_education_who_are_female__pct:
         title: Share of primary school teachers who are women
         description_short: Percentage of female teachers among all teachers at the [primary](#dod:primary-education) education level during a given school year.
@@ -790,6 +806,7 @@ tables:
           numDecimalPlaces: 1
           name: Primary education
 
+          tolerance: 10
       total_net_enrolment_rate__primary__male__pct:
         title: Net enrollment rate in primary education among boys
         description_short: The share of boys of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
@@ -803,6 +820,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       total_net_enrolment_rate__primary__female__pct:
         title: Net enrollment rate in primary education among girls
         description_short: The share of girls of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
@@ -816,6 +834,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       total_net_enrolment_rate__lower_secondary__both_sexes__pct:
         title: Net enrollment rate in lower secondary education
         description_short: The share of children of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
@@ -829,6 +848,7 @@ tables:
           numDecimalPlaces: 1
           name: Lower secondary education
 
+          tolerance: 10
       total_net_enrolment_rate__lower_secondary__male__pct:
         title: Net enrollment rate in lower secondary education among boys
         description_short: The share of boys of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
@@ -842,6 +862,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       total_net_enrolment_rate__lower_secondary__female__pct:
         title: Net enrollment rate in lower secondary education among girls
         description_short: The share of girls of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
@@ -855,6 +876,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       total_net_enrolment_rate__upper_secondary__both_sexes__pct:
         title: Net enrollment rate in upper secondary education
         description_short: The share of children of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
@@ -868,6 +890,7 @@ tables:
           numDecimalPlaces: 1
           name: Upper secondary education
 
+          tolerance: 10
       total_net_enrolment_rate__upper_secondary__male__pct:
         title: Net enrollment rate in upper secondary education among boys
         description_short: The share of boys of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
@@ -881,6 +904,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       total_net_enrolment_rate__upper_secondary__female__pct:
         title: Net enrollment rate in upper secondary education among girls
         description_short: The share of girls of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
@@ -898,6 +922,7 @@ tables:
       # GROSS ENROLMENT RATIOS (by education level and gender)
       # ========================================================================
 
+          tolerance: 10
       gross_enrolment_ratio__primary__both_sexes__pct:
         title: Gross enrollment ratio in primary education
         description_short: Number of children of any age group who are enrolled in [primary](#dod:primary-education) education, expressed as a percentage of the total population of the official primary school age.
@@ -911,6 +936,7 @@ tables:
           numDecimalPlaces: 1
           name: Primary education
 
+          tolerance: 10
       gross_enrolment_ratio__primary__male__pct:
         title: Gross enrollment ratio in primary education among boys
         description_short: Number of boys of any age group who are enrolled in [primary](#dod:primary-education) education, expressed as a percentage of the total population of boys of official primary school age.
@@ -924,6 +950,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       gross_enrolment_ratio__primary__female__pct:
         title: Gross enrollment ratio in primary education among girls
         description_short: Number of girls of any age group who are enrolled in [primary](#dod:primary-education) education, expressed as a percentage of the total population of girls of official primary school age.
@@ -937,6 +964,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       gross_enrolment_ratio__lower_secondary__both_sexes__pct:
         title: Gross enrollment ratio in lower secondary education
         description_short: Number of children of any age group who are enrolled in [lower secondary](#dod:lower-secondary-education) education, expressed as a percentage of the total population of the official lower secondary school age.
@@ -950,6 +978,7 @@ tables:
           numDecimalPlaces: 1
           name: Lower secondary education
 
+          tolerance: 10
       gross_enrolment_ratio__lower_secondary__male__pct:
         title: Gross enrollment ratio in lower secondary education among boys
         description_short: Number of boys of any age group who are enrolled in [lower secondary](#dod:lower-secondary-education) education, expressed as a percentage of the total population of boys of official lower secondary school age.
@@ -963,6 +992,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       gross_enrolment_ratio__lower_secondary__female__pct:
         title: Gross enrollment ratio in lower secondary education among girls
         description_short: Number of girls of any age group who are enrolled in [lower secondary](#dod:lower-secondary-education) education, expressed as a percentage of the total population of girls of official lower secondary school age.
@@ -976,6 +1006,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       gross_enrolment_ratio__upper_secondary__both_sexes__pct:
         title: Gross enrollment ratio in upper secondary education
         description_short: Number of children of any age group who are enrolled in [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of the total population of the official upper secondary school age.
@@ -989,6 +1020,7 @@ tables:
           numDecimalPlaces: 1
           name: Upper secondary education
 
+          tolerance: 10
       gross_enrolment_ratio__upper_secondary__female__pct:
         title: Gross enrollment ratio in upper secondary education among girls
         description_short: Number of girls of any age group who are enrolled in [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of the total population of girls of official upper secondary school age.
@@ -1002,6 +1034,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       gross_enrolment_ratio__upper_secondary__male__pct:
         title: Gross enrollment ratio in upper secondary education among boys
         description_short: Number of boys of any age group who are enrolled in [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of the total population of boys of official upper secondary school age.
@@ -1015,6 +1048,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       gross_enrolment_ratio__secondary__both_sexes__pct:
         title: Gross enrollment ratio in secondary education
         description_short: Number of children of any age group who are enrolled in [secondary](#dod:secondary-education) education expressed as a percentage of the total population of the official secondary school age.
@@ -1027,6 +1061,7 @@ tables:
       # SCHOOL LIFE EXPECTANCY (by education level and gender)
       # ========================================================================
 
+          tolerance: 10
       school_life_expectancy__pre_primary__both_sexes__years:
         title: School life expectancy in pre-primary education
         description_short: Expected number of years a child of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
@@ -1039,6 +1074,7 @@ tables:
           numDecimalPlaces: 1
           name: Pre-primary education
 
+          tolerance: 10
       school_life_expectancy__pre_primary__female__years:
         title: School life expectancy in pre-primary education among girls
         description_short: Expected number of years a girl of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
@@ -1051,6 +1087,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       school_life_expectancy__pre_primary__male__years:
         title: School life expectancy in pre-primary education among boys
         description_short: Expected number of years a boy of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
@@ -1063,6 +1100,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       school_life_expectancy__primary__both_sexes__years:
         title: School life expectancy in primary education
         description_short: Expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
@@ -1075,6 +1113,7 @@ tables:
           numDecimalPlaces: 1
           name: Primary education
 
+          tolerance: 10
       school_life_expectancy__primary__female__years:
         title: School life expectancy in primary education among girls
         description_short: Expected number of years a girl of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
@@ -1087,6 +1126,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       school_life_expectancy__primary__male__years:
         title: School life expectancy in primary education among boys
         description_short: Expected number of years a boy of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
@@ -1099,6 +1139,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       school_life_expectancy__secondary__both_sexes__years:
         title: School life expectancy in secondary education
         description_short: Expected number of years a child of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
@@ -1111,6 +1152,7 @@ tables:
           numDecimalPlaces: 1
           name: Secondary education
 
+          tolerance: 10
       school_life_expectancy__secondary__female__years:
         title: School life expectancy in secondary education among girls
         description_short: Expected number of years a girl of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
@@ -1123,6 +1165,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       school_life_expectancy__secondary__male__years:
         title: School life expectancy in secondary education among boys
         description_short: Expected number of years a boy of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
@@ -1135,6 +1178,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       school_life_expectancy__tertiary__both_sexes__years:
         title: School life expectancy in tertiary education
         description_short: Expected number of years a child of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
@@ -1147,6 +1191,7 @@ tables:
           numDecimalPlaces: 1
           name: Tertiary education
 
+          tolerance: 10
       school_life_expectancy__tertiary__female__years:
         title: School life expectancy in tertiary education among girls
         description_short: Expected number of years a girl of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
@@ -1159,6 +1204,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       school_life_expectancy__tertiary__male__years:
         title: School life expectancy in tertiary education among boys
         description_short: Expected number of years a boy of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
@@ -1171,19 +1217,20 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       school_life_expectancy__primary__adjusted_gender_parity_index__gpia:
         title: School life expectancy in primary education, adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equality in the expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
-            - In many countries, boys and girls do not spend the same amount of time in primary school — this indicator shows how close they are to parity in expected school duration at the primary level.
-            - It focuses specifically on school life expectancy in [primary education](#dod:primary-education), comparing the average number of years girls and boys are expected to spend in primary school based on current age-specific enrollment rates.
-            - The adjusted gender parity index (GPIA) is calculated by dividing the female school life expectancy in primary education by the male school life expectancy. If the result exceeds 1, it is inverted and subtracted from 2 to produce a symmetrical scale from 0 to 2, with 1 representing perfect parity.
-            - A value of 1 means boys and girls are expected to spend the same number of years in primary school. Values below 1 indicate boys are expected to spend more time in school; values above 1 indicate girls are.
-            - This indicator assumes current enrollment trends continue over time and includes all children, even those who may never enrol, giving a comprehensive view of participation in primary education.
-            - The data comes from administrative sources such as school censuses and registers, as well as population estimates by age, typically provided by national statistical offices or the United Nations Population Division.
-            - Disaggregated by sex, this indicator helps identify gender gaps in access to and retention in primary schooling.
-            - As with all expectancy-based indicators, it does not reflect actual completion or quality of education and may not account for repetition or part-time attendance, which can vary across contexts.
+          - In many countries, boys and girls do not spend the same amount of time in primary school — this indicator shows how close they are to parity in expected school duration at the primary level.
+          - It focuses specifically on school life expectancy in [primary education](#dod:primary-education), comparing the average number of years girls and boys are expected to spend in primary school based on current age-specific enrollment rates.
+          - The adjusted gender parity index (GPIA) is calculated by dividing the female school life expectancy in primary education by the male school life expectancy. If the result exceeds 1, it is inverted and subtracted from 2 to produce a symmetrical scale from 0 to 2, with 1 representing perfect parity.
+          - A value of 1 means boys and girls are expected to spend the same number of years in primary school. Values below 1 indicate boys are expected to spend more time in school; values above 1 indicate girls are.
+          - This indicator assumes current enrollment trends continue over time and includes all children, even those who may never enrol, giving a comprehensive view of participation in primary education.
+          - The data comes from administrative sources such as school censuses and registers, as well as population estimates by age, typically provided by national statistical offices or the United Nations Population Division.
+          - Disaggregated by sex, this indicator helps identify gender gaps in access to and retention in primary schooling.
+          - As with all expectancy-based indicators, it does not reflect actual completion or quality of education and may not account for repetition or part-time attendance, which can vary across contexts.
         display:
           numDecimalPlaces: 1
 
@@ -1191,6 +1238,7 @@ tables:
       # GOVERNMENT EXPENDITURE AS A SHARE OF GDP (by education level)
       # ========================================================================
 
+          tolerance: 10
       government_expenditure_on_pre_primary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on pre-primary education as share of GDP
         description_short: Total annual [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed as a percentage of [GDP](#dod:gdp).
@@ -1275,7 +1323,7 @@ tables:
 
       government_expenditure_on_pre_primary_education__constant_pppdollar__millions:
         title: Government spending on pre-primary education
-        description_short:  Total annual [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        description_short: Total annual [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
         description_key: *desc_key_govt_expenditure_constant_ppp
@@ -1407,6 +1455,7 @@ tables:
           numDecimalPlaces: 1
           name: Both sexes
 
+          tolerance: 10
       net_enrolment_rate__primary__female__pct__combined_historical:
         title: Net enrollment rate in primary education among girls (combined historical)
         description_short: The share of girls of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
@@ -1422,6 +1471,7 @@ tables:
           numDecimalPlaces: 1
           name: Girls
 
+          tolerance: 10
       net_enrolment_rate__primary__male__pct__combined_historical:
         title: Net enrollment rate in primary education among boys (combined historical)
         description_short: The share of boys of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
@@ -1437,6 +1487,7 @@ tables:
           numDecimalPlaces: 1
           name: Boys
 
+          tolerance: 10
       gross_enrolment_ratio__tertiary__both_sexes__pct__combined_historical:
         title: Gross enrollment ratio in tertiary education (combined historical)
         description_short: Share of all students enrolled in [tertiary education](#dod:tertiary-education), regardless of age, relative to the population of official tertiary school age.
@@ -1452,6 +1503,7 @@ tables:
           numDecimalPlaces: 1
           name: Both sexes
 
+          tolerance: 10
       gross_enrolment_ratio__tertiary__female__pct__combined_historical:
         title: Gross enrollment ratio in tertiary education among women (combined historical)
         description_short: Share of female students enrolled in [tertiary education](#dod:tertiary-education), regardless of age, relative to the female population of official tertiary school age.
@@ -1467,6 +1519,7 @@ tables:
           numDecimalPlaces: 1
           name: Women
 
+          tolerance: 10
       gross_enrolment_ratio__tertiary__male__pct__combined_historical:
         title: Gross enrollment ratio in tertiary education among men (combined historical)
         description_short: Share of male students enrolled in [tertiary education](#dod:tertiary-education), regardless of age, relative to the male population of official tertiary school age.
@@ -1482,3 +1535,4 @@ tables:
           numDecimalPlaces: 1
           name: Men
 
+          tolerance: 10
