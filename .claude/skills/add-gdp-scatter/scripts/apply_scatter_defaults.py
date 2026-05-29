@@ -247,7 +247,9 @@ def process_row(
                     added.append(f"size={POPULATION_ID} (normalized population variant {size_target}→default)")
             else:
                 dims.append({"variableId": size_target, "property": "size"})
-                added.append(f"size={size_target} (non-population, from source)")
+                added.append(
+                    f"WARN: size={size_target} is non-population (mirrored from source) — review the bubble sizing"
+                )
     cfg["dimensions"] = dims
     if added:
         notes.append("added " + ", ".join(added))
