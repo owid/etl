@@ -153,6 +153,22 @@ VARS_DICT = {
     "E266": "Honest elections make a difference",
     "F028": "Attend religious services",
     "F028B": "Pray",
+    "C001": "Men more right to a job than women",
+    "C002": "Priority to nationals over immigrants",
+    "D057": "Housewife just as fulfilling",
+    "D059": "Men better political leaders",
+    "D060": "University more important for a boy",
+    "D061": "Pre-school child suffers with working mother",
+    "D078": "Men better business executives",
+    "H002_01": "Robberies",
+    "H002_03": "Police or military interfere",
+    "H002_04": "Racist behavior",
+    "H002_05": "Drug sale in streets",
+    "H003_01": "Didn't carry much money",
+    "H003_02": "Preferred not to go out at night",
+    "H003_03": "Carried a weapon",
+    "H004": "Victim of a crime",
+    "H005": "Family victim of a crime",
 }
 
 

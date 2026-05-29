@@ -126,6 +126,44 @@ RELIGION_HOW_OFTEN_PRAY_QUESTIONS = ["pray"]
 
 IMPORTANCE_OF_GOD_QUESTIONS = ["god"]
 
+JOBS_SCARCE_QUESTIONS = [
+    "men_more_right_to_a_job_than_women",
+    "priority_to_nationals_over_immigrants",
+]
+
+GENDER_ROLES_QUESTIONS = [
+    "housewife_just_as_fulfilling",
+    "men_better_political_leaders",
+    "university_more_important_for_a_boy",
+    "pre_school_child_suffers_with_working_mother",
+    "men_better_business_executives",
+]
+
+NEIGHBORHOOD_FREQUENCY_QUESTIONS = [
+    "robberies",
+    "police_or_military_interfere",
+    "racist_behavior",
+    "drug_sale_in_streets",
+]
+
+# H008_02 uses a different (often/sometimes/rarely/never) scale than the H002 frequency block
+FELT_UNSAFE_QUESTIONS = ["felt_unsafe_at_home"]
+
+SECURITY_ACTIONS_QUESTIONS = [
+    "didnt_carry_much_money",
+    "preferred_not_to_go_out_at_night",
+    "carried_a_weapon",
+    "victim_of_a_crime",
+    "family_victim_of_a_crime",
+]
+
+NEIGHBORHOOD_SECURITY_QUESTIONS = ["secure_neighborhood"]
+
+HUMAN_RIGHTS_RESPECT_QUESTIONS = ["respect_human_rights"]
+
+# Continuous index (kept on its native 0-1 scale, so it must be excluded from the 0 -> null replacement)
+WELZEL_EQUALITY_INDEX_COLUMNS = ["avg_score_welzel_equality"]
+
 
 def run() -> None:
     #
@@ -186,7 +224,8 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     dont_know_cols = [cols for cols in tb.columns if "dont_know" in cols]
 
     # Replace zero values with nulls, except for columns containing "no_answer" and "dont_know"
-    subset_cols = tb.columns.difference(no_answer_cols + dont_know_cols)
+    # The Welzel equality sub-index is a continuous 0-1 index where 0 is a valid value, so it is excluded too.
+    subset_cols = tb.columns.difference(no_answer_cols + dont_know_cols + WELZEL_EQUALITY_INDEX_COLUMNS)
     tb[subset_cols] = tb[subset_cols].replace(0, float("nan"))
 
     # Replace nulls in Schwartz questions by 0 when the main answer is not null
@@ -392,6 +431,55 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
             "not",
             "neutral",
         ],
+    )
+
+    # For jobs scarce questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=JOBS_SCARCE_QUESTIONS,
+        answers=["agree", "disagree", "neither"],
+    )
+
+    # For gender roles questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=GENDER_ROLES_QUESTIONS,
+        answers=["strongly_agree", "agree", "disagree", "strongly_disagree"],
+    )
+
+    # For neighborhood frequency questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=NEIGHBORHOOD_FREQUENCY_QUESTIONS,
+        answers=["very_frequently", "quite_frequently", "not_frequently", "not_at_all_frequently"],
+    )
+
+    # For security actions and crime victim questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=SECURITY_ACTIONS_QUESTIONS,
+        answers=["yes", "no"],
+    )
+
+    # For secure in neighborhood question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=NEIGHBORHOOD_SECURITY_QUESTIONS,
+        answers=["very", "quite", "not_very", "not_at_all"],
+    )
+
+    # For respect for human rights question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=HUMAN_RIGHTS_RESPECT_QUESTIONS,
+        answers=["great_deal", "some", "not_much", "none_at_all"],
+    )
+
+    # For felt unsafe from crime at home question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=FELT_UNSAFE_QUESTIONS,
+        answers=["often", "sometimes", "rarely", "never"],
     )
 
     # Drop rows with all null values in columns not country and year
@@ -677,6 +765,69 @@ def sanity_checks(tb: Table) -> Table:
             "dont_know_important",
             "no_answer_important",
         ],
+        margin=MARGIN,
+    )
+
+    # For jobs scarce questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=JOBS_SCARCE_QUESTIONS,
+        answers=["agree", "disagree", "neither", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For gender roles questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=GENDER_ROLES_QUESTIONS,
+        answers=["strongly_agree", "agree", "disagree", "strongly_disagree", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For neighborhood frequency questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=NEIGHBORHOOD_FREQUENCY_QUESTIONS,
+        answers=[
+            "very_frequently",
+            "quite_frequently",
+            "not_frequently",
+            "not_at_all_frequently",
+            "dont_know",
+            "no_answer",
+        ],
+        margin=MARGIN,
+    )
+
+    # For security actions and crime victim questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=SECURITY_ACTIONS_QUESTIONS,
+        answers=["yes", "no", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For secure in neighborhood question
+    tb = check_sum_100(
+        tb=tb,
+        questions=NEIGHBORHOOD_SECURITY_QUESTIONS,
+        answers=["very", "quite", "not_very", "not_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For respect for human rights question
+    tb = check_sum_100(
+        tb=tb,
+        questions=HUMAN_RIGHTS_RESPECT_QUESTIONS,
+        answers=["great_deal", "some", "not_much", "none_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For felt unsafe from crime at home question
+    tb = check_sum_100(
+        tb=tb,
+        questions=FELT_UNSAFE_QUESTIONS,
+        answers=["often", "sometimes", "rarely", "never", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
