@@ -1506,7 +1506,7 @@ tables:
 
       completion_rate__primary_education__both_sexes__pct__cr_1:
         title: Completion rate in primary education (survey-based)
-        description_short: The share of children who are three to five years older than the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed it.
+        description_short: The share of children who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it.
         unit: "%"
         short_unit: "%"
         display:
@@ -1514,11 +1514,47 @@ tables:
 
       completion_rate__lower_secondary_education__both_sexes__pct__cr_2:
         title: Completion rate in lower secondary education (survey-based)
-        description_short: The share of children who are three to five years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed it.
+        description_short: The share of children who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it.
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+
+      completion_rate__upper_secondary_education__both_sexes__pct__cr_3:
+        title: Completion rate in upper secondary education (survey-based)
+        description_short: The share of children who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in upper secondary education
+          grapher_config: *grapher_completion
+        display:
+          numDecimalPlaces: 1
+
+      completion_rate__upper_secondary_education__female__pct__cr_3_f:
+        title: Completion rate in upper secondary education among girls (survey-based)
+        description_short: The share of girls who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in upper secondary education among girls
+        display:
+          numDecimalPlaces: 1
+          name: Girls
+
+      completion_rate__upper_secondary_education__male__pct__cr_3_m:
+        title: Completion rate in upper secondary education among boys (survey-based)
+        description_short: The share of boys who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in upper secondary education among boys
+        display:
+          numDecimalPlaces: 1
+          name: Boys
 
       average_teacher_salary_in_primary_education_relative_to_other_professions_requiring_a_comparable_level_of_qualification__both_sexes__tsalary_1:
         title: Average teacher salary in primary education relative to comparable professions

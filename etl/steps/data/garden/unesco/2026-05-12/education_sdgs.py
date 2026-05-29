@@ -45,6 +45,9 @@ _VARIABLES_TO_KEEP = {
     # Completion rates — observed (used in standalone charts)
     "Completion rate, primary education, both sexes (%)",
     "Completion rate, lower secondary education, both sexes (%)",
+    "Completion rate, upper secondary education, both sexes (%)",
+    "Completion rate, upper secondary education, female (%)",
+    "Completion rate, upper secondary education, male (%)",
     # Educational attainment
     "Educational attainment rate, completed lower secondary education or higher, population 25+ years, both sexes (%)",
     "Educational attainment rate, completed post-secondary non-tertiary education or higher, population 25+ years, both sexes (%)",
