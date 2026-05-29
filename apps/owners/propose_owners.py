@@ -261,6 +261,24 @@ _COMMIT_SHA_BLOCKLIST: frozenset[str] = frozenset(
     }
 )
 
+# Manual overrides for steps where the git-log heuristic gets the
+# ownership wrong (or where there's no git history yet). The list is
+# treated as the final answer — the heuristic counts are discarded for
+# these steps. First entry = accountable owner.
+_OWNER_OVERRIDES: dict[str, list[str]] = {
+    # Veronika is the long-term owner; Mojmír's drive-by edits shouldn't
+    # promote him to primary.
+    "data://garden/artificial_intelligence/2026-04-24/energy_ai": ["Veronika Samborska"],
+    # Pablo is the de-facto owner; everyone has touched regions over time.
+    "data://garden/regions/2023-01-01/regions": ["Pablo Rosado"],
+    # New step from this PR — no git history yet, attribute to Pablo.
+    "data://garden/faostat/2026-02-25/additional_variables": ["Pablo Rosado"],
+    # Bastian originated the nuclear-weapons family; Pablo did recent maintenance.
+    "data://garden/war/2026-05-13/nuclear_weapons_inventories": ["Bastian Herre", "Pablo Rosado"],
+    "data://garden/war/2026-05-13/nuclear_weapons_tests": ["Bastian Herre", "Pablo Rosado"],
+    "data://garden/war/2026-05-13/nuclear_weapons_treaties": ["Bastian Herre", "Pablo Rosado"],
+}
+
 # How many top candidates to surface per dataset in the proposal.
 TOP_N = 3
 
@@ -380,6 +398,10 @@ def _aggregate(commits: list[_Commit], file_to_step: dict[str, str]) -> dict[str
         touched_steps = {file_to_step[f] for f in c.files if f in file_to_step}
         for step in touched_steps:
             per_step[step][owner] += 1
+    # Hard overrides win over the heuristic. Encode order via descending
+    # synthetic counts so the markdown ranking matches the override list.
+    for step, owners in _OWNER_OVERRIDES.items():
+        per_step[step] = Counter({name: len(owners) - i for i, name in enumerate(owners)})
     return per_step
 
 
