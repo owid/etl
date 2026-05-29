@@ -52,12 +52,7 @@ GDP_CATALOG_PATTERNS = {
 }
 
 CONTINENTS_ID = 900801
-POPULATION_ID = 953899
-# "Population (historical)" — a strict subset of regular Population (953899), which
-# spans -10000..2100 vs historical's -10000..2023. Reference scatters sometimes size
-# by historical population, but it buys nothing for bubble sizing, so we normalize it
-# to regular Population whenever a source scatter uses it.
-POPULATION_HISTORICAL_ID = 953903
+POPULATION_ID = 953899  # "Population" — the default sizing indicator (-10000..2100)
 
 LINE_FAMILY = {"LineChart", "SlopeChart", "DiscreteBar", "Marimekko", "ScatterPlot"}
 STACKED_FAMILY = {"StackedArea", "StackedBar", "StackedDiscreteBar"}
@@ -76,6 +71,34 @@ def edit_link(chart_id: int) -> str:
     return f"{short_admin_host()}/charts/{chart_id}/edit"
 
 _data_cache: dict[int, Any] = {}
+_pop_variant_cache: dict[int, bool] = {}
+
+
+def is_population_variant(var_id: int) -> bool:
+    """True if the variable is some flavour of a population count.
+
+    Reference scatters size bubbles by various population series (regular,
+    historical, UN WPP, etc.). For bubble sizing they're interchangeable, so we
+    always collapse them to the default Population indicator. Detected by the
+    variable's name starting with "Population" or its catalogPath living under a
+    population dataset.
+    """
+    if var_id == POPULATION_ID:
+        return True
+    if var_id in _pop_variant_cache:
+        return _pop_variant_cache[var_id]
+    df = OWID_ENV.read_sql(
+        "SELECT name, catalogPath FROM variables WHERE id = %(v)s",
+        params={"v": int(var_id)},
+    )
+    if df.empty:
+        result = False
+    else:
+        name = (df.iloc[0]["name"] or "").strip().lower()
+        path = (df.iloc[0]["catalogPath"] or "").lower()
+        result = name.startswith("population") or "/population/" in path
+    _pop_variant_cache[var_id] = result
+    return result
 
 
 def chart_id_from_url(url: str) -> int:
@@ -213,17 +236,18 @@ def process_row(
             added.append("size=skipped (source has no size dim)")
         else:
             size_target = src_size_var or POPULATION_ID
-            # Normalize "Population (historical)" to regular Population — the latter is
-            # a strict superset for bubble sizing, so historical buys nothing.
-            if size_target == POPULATION_HISTORICAL_ID:
+            # Any population variant (regular, historical, WPP, …) collapses to the
+            # default Population indicator — they're interchangeable for bubble sizing.
+            # A genuinely non-population size (GDP, area, …) is mirrored as-is.
+            if is_population_variant(size_target):
                 dims.append({"variableId": POPULATION_ID, "property": "size"})
-                added.append(f"size={POPULATION_ID} (normalized historical→regular population)")
+                if size_target == POPULATION_ID:
+                    added.append(f"size={POPULATION_ID}")
+                else:
+                    added.append(f"size={POPULATION_ID} (normalized population variant {size_target}→default)")
             else:
                 dims.append({"variableId": size_target, "property": "size"})
-                added.append(
-                    f"size={size_target}"
-                    + (" (from source)" if size_target != POPULATION_ID else "")
-                )
+                added.append(f"size={size_target} (non-population, from source)")
     cfg["dimensions"] = dims
     if added:
         notes.append("added " + ", ".join(added))
