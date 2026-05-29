@@ -1695,8 +1695,8 @@ foreach var in $neighborhood_frequency_questions {
 	gen avg_score_`var' = `var'
 
 	collapse (mean) frequently_agg_`var' not_frequently_agg_`var' very_frequently_`var' quite_frequently_`var' not_frequently_`var' not_at_all_frequently_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
-	tempfile neighborhood_frequency_`var'_file
-	save "`neighborhood_frequency_`var'_file'"
+	tempfile nbhd_freq_`var'_file
+	save "`nbhd_freq_`var'_file'"
 
 	restore
 	preserve
@@ -1995,7 +1995,7 @@ foreach var in $gender_roles_questions {
 }
 
 foreach var in $neighborhood_frequency_questions {
-	qui merge 1:1 year country using "`neighborhood_frequency_`var'_file'", nogenerate // keep(master match)
+	qui merge 1:1 year country using "`nbhd_freq_`var'_file'", nogenerate // keep(master match)
 }
 
 foreach var in $security_actions_questions {
