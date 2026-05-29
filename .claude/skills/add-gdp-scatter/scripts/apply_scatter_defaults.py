@@ -312,6 +312,11 @@ def process_row(
     if not cfg.get("selectedEntityNames"):
         notes.append("WARN: target has no selectedEntityNames — line/bar/slope views will fall back to Grapher defaults")
 
+    # On scatter, relative mode renders as "Display average annual change". We want
+    # the toggle available but OFF by default, i.e. stackMode must not be "relative".
+    if cfg.get("stackMode") == "relative":
+        notes.append("WARN: stackMode=relative — scatter defaults to 'average annual change'; set to absolute to disable the default")
+
     excluded = src_cfg.get("excludedEntityNames")
     if excluded:
         notes.append(f"WARN: source excludes {excluded} (not applied on target)")
