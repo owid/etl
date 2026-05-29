@@ -190,7 +190,7 @@ def process_row(
     src_color = find_dim(src_cfg, "color")
     src_size = find_dim(src_cfg, "size")
     color_target = (src_color or {}).get("variableId") or CONTINENTS_ID
-    size_target = (src_size or {}).get("variableId") or POPULATION_ID
+    src_size_var = (src_size or {}).get("variableId") if src_size else None
 
     added: list[str] = []
     if "x" not in props:
@@ -203,11 +203,16 @@ def process_row(
             + (" (from source)" if color_target != CONTINENTS_ID else "")
         )
     if "size" not in props:
-        dims.append({"variableId": size_target, "property": "size"})
-        added.append(
-            f"size={size_target}"
-            + (" (from source)" if size_target != POPULATION_ID else "")
-        )
+        if src_size is None:
+            # Source scatter has no size dim — skip on target too.
+            added.append("size=skipped (source has no size dim)")
+        else:
+            size_target = src_size_var or POPULATION_ID
+            dims.append({"variableId": size_target, "property": "size"})
+            added.append(
+                f"size={size_target}"
+                + (" (from source)" if size_target != POPULATION_ID else "")
+            )
     cfg["dimensions"] = dims
     if added:
         notes.append("added " + ", ".join(added))
