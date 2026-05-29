@@ -1017,7 +1017,7 @@ tables:
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
           name: Pre-primary education
 
       se_pre_enrr_fe:
@@ -1031,7 +1031,7 @@ tables:
           grapher_config: *grapher_config_enrolment_pubugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
           name: Girls
 
       se_pre_enrr_ma:
@@ -1046,7 +1046,7 @@ tables:
 
         display:
           numDecimalPlaces: 1
-          tolerance: 5
+          tolerance: 10
           name: Boys
 
       ####################################################################################################
