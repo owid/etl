@@ -151,7 +151,7 @@ definitions:
     - This indicator tracks how much a government spends on education at a specific level annually, adjusted for inflation and differences in the cost of living. Spending is expressed in constant [international-$](#dod:int_dollar_abbreviation), which allows for comparisons across countries and over time.
     - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
     - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations.
-    - This measure provides a comparable view of how much governments invest in education in absolute terms. But it doesn’t show how spending is distributed or how effectively it’s used — it should be interpreted alongside indicators like enrollment and per-student spending.
+    - This indicator provides a comparable view of how much governments invest in education in absolute terms. But it doesn’t show how spending is distributed or how effectively it’s used — it should be interpreted alongside indicators like enrollment and per-student spending.
 
   desc_key_govt_expenditure_constant_ppp_per_student: &desc_key_govt_expenditure_constant_ppp_per_student
     - This indicator shows how much a government spends per student per year at a particular level of education, expressed in constant [international-$](#dod:int_dollar_abbreviation).
@@ -191,13 +191,11 @@ definitions:
     - This indicator combines data from two sources. From 1985 onwards, it draws on UNESCO administrative records. Before 1985, it uses adjusted enrollment ratios from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html) — modified gross enrollment ratios that account for grade repetition. These serve as the best available approximation of net enrollment rates for earlier periods, when age-specific enrollment data were not widely collected.
     - The net enrollment rate shows what share of children are enrolled at the education level intended for their age — for example, a rate of 90% means 90% of children in the official age group are enrolled at that level.
     - A rate below 100% doesn't necessarily mean those children are out of school — some may be enrolled at a different level than expected for their age.
-    - Data comes from school administrative records that track enrollment by age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_ger_historical: &desc_key_ger_historical
     - This indicator combines data from two sources. From 1985 onwards, it draws on UNESCO administrative records. Before 1985, it uses gross enrollment ratios from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html).
     - The gross enrollment ratio counts all students enrolled at a given education level, regardless of age — including those who started late or repeated grades. Values can exceed 100% for this reason.
     - A value well below 100% suggests many children of the official age are not enrolled at that level. A value well above 100% often signals high rates of grade repetition or late entry.
-    - Data comes from administrative school records combined with population estimates from the United Nations or national statistics offices.
 
   # Educational attainment descriptions
   desc_key_mye: &desc_key_mye
@@ -206,7 +204,7 @@ definitions:
     - The calculation converts each person's highest completed education level into years - for example, someone who finished high school counts as having roughly 12 years of schooling, while someone who never attended school counts as 0 years
     - The data comes from censuses and surveys of adults aged 25 and older, including only formal education starting from primary school
     - This indicator captures how much schooling adults have accumulated over their lifetimes, showing the results of past investments in education systems
-    - Higher values indicate a population with stronger educational foundations, but the measure does not account for education quality or informal learning
+    - Higher values indicate a population with stronger educational foundations, but the indicator does not account for education quality or informal learning
     - The data may not reflect recent progress in countries with infrequent surveys or outdated census information
 
   desc_key_sle: &desc_key_sle
