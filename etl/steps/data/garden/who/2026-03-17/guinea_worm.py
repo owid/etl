@@ -66,6 +66,10 @@ def run() -> None:
     # Update certification status for current year (if there are no changes in certification status for any country in the current year).
     tb_cert = update_certification_status_no_changes(tb_cert, current_year=CURRENT_YEAR)
 
+    # Certification status change (Cameroon 2025) should be reflected in the data
+    tb_cert.loc[(tb_cert["country"] == "Cameroon") & (tb_cert["year"] == 2025), "certification_status"] = "Endemic"
+    tb_cert.loc[(tb_cert["country"] == "Cameroon") & (tb_cert["year"] == 2025), "year_certified"] = "Endemic"
+
     # Merge certification status into main table
     tb = pr.merge(tb_cases, tb_cert, on=["country", "year"], how="outer")
 

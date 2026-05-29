@@ -30,6 +30,7 @@ tables:
         description_key:
           - A country has to have no cases of guinea worm disease for three years while being actively surveilled to be "certified disease free".
           - A disease outbreak is endemic in a country if it is consistently present in the country. Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year. Countries labeled pending surveillance have not had sufficient testing to determine their status or the number of cases in the country.
+          - In 2025 the WHO concluded that Cameroon (based on human and animal case counts) should be reclassified as endemic. As Cameroon was certified disease-free in 2007, this change is not applied retroactively to the data, but it is reflected in the certification status for Cameroon in 2025 and beyond.
         unit: ""
       guinea_worm_reported_cases:
         title: Reported cases of guinea worm disease in humans
