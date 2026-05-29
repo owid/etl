@@ -11,6 +11,7 @@ stdin and, for each row:
 - Sets `matchingEntitiesOnly: true`.
 - Sets `xAxis` to log scale with `canChangeScaleType: true`.
 - Mirrors the source's `yAxis.scaleType: log` if present.
+- Mirrors the source's explicit `yAxis` min/max bounds if set.
 - Mirrors the source's manually-set y `display.name` if present.
 - Emits warnings (no action) for: source `excludedEntityNames`; GDP-coverage
   mismatch vs the y-indicator's earliest year; few entities visible on scatter
@@ -268,7 +269,8 @@ def process_row(
         notes.append("xAxis: log + canChangeScaleType")
 
     # 5) yAxis log mirror
-    if (src_cfg.get("yAxis") or {}).get("scaleType") == "log":
+    src_ya = src_cfg.get("yAxis") or {}
+    if src_ya.get("scaleType") == "log":
         ya = dict(cfg.get("yAxis") or {})
         if ya.get("scaleType") != "log":
             ya["scaleType"] = "log"
@@ -276,7 +278,20 @@ def process_row(
             cfg["yAxis"] = ya
             notes.append("yAxis: log + canChangeScaleType (mirrored from source)")
 
-    # 6) y display.name mirror
+    # 6) yAxis bounds mirror — copy each of min/max the source explicitly sets,
+    # preserving other target yAxis keys. Note: affects ALL views, not just scatter.
+    bound_changes = []
+    ya = dict(cfg.get("yAxis") or {})
+    for bound in ("min", "max"):
+        if bound in src_ya and src_ya[bound] != ya.get(bound):
+            prev = ya.get(bound, "unset")
+            ya[bound] = src_ya[bound]
+            bound_changes.append(f"{bound}: {prev}→{src_ya[bound]}")
+    if bound_changes:
+        cfg["yAxis"] = ya
+        notes.append("yAxis bounds mirrored from source (" + ", ".join(bound_changes) + ")")
+
+    # 7) y display.name mirror
     src_y = find_dim(src_cfg, "y")
     tgt_y = find_dim(cfg, "y")
     src_name = ((src_y or {}).get("display") or {}).get("name")
@@ -288,7 +303,7 @@ def process_row(
             tgt_y["display"] = tgt_display
             notes.append(f"y.display.name: {prev!r} → {src_name!r}")
 
-    # 7) Warnings (no action)
+    # 8) Warnings (no action)
     if not cfg.get("selectedEntityNames"):
         notes.append("WARN: target has no selectedEntityNames — line/bar/slope views will fall back to Grapher defaults")
 
@@ -307,7 +322,7 @@ def process_row(
         except Exception as e:
             notes.append(f"(coverage check failed: {e!s:.80})")
 
-    # 8) Tolerance recommendation
+    # 9) Tolerance recommendation
     try:
         tgt_tol = int((tgt_y or {}).get("display", {}).get("tolerance") or 0)
         src_tol = int((src_y or {}).get("display", {}).get("tolerance") or 0)
@@ -325,7 +340,7 @@ def process_row(
     except Exception as e:
         notes.append(f"(tolerance check failed: {e!s:.80})")
 
-    # 9) Push
+    # 10) Push
     try:
         res = api.update_chart(tgt_id, cfg)
         status = "OK" if res.get("success") else "FAIL"

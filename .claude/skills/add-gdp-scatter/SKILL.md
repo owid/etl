@@ -42,7 +42,7 @@ Mirrors the admin's `applyDefaultsForScatter` and the extra moves we agreed on:
    - **size**: the rule is *always use the default `Population` indicator (`POPULATION_ID=953899`) for any population-type size*. If the source sizes by any population variant (regular, historical, WPP, …), the target gets the default Population. A genuinely **non-population** size (e.g. GDP, area) is mirrored as-is **but raises a `WARN`** so the bubble sizing gets a manual review. **If the source has no `size` dim at all, the target also gets none** — the script won't add sizing the curator deliberately omitted. Population variants are detected by the variable's name starting with "Population" or its catalogPath living under a `/population/` dataset; the action note records any normalization.
 3. Sets `matchingEntitiesOnly: true`.
 4. Sets `xAxis` to `scaleType: log` + `canChangeScaleType: true`.
-5. **Mirrors source `yAxis.scaleType: log`** when the source uses it.
+5. **Mirrors source `yAxis.scaleType: log`** when the source uses it, and **mirrors any explicit `yAxis` min/max bounds** the source sets (each bound copied independently, preserving other target yAxis keys). Note: y-axis bounds affect all views, not just scatter.
 6. **Mirrors source's manually-set y `display.name`** when present.
 7. Emits warnings (no action) for:
    - Target has no `selectedEntityNames` — line/bar/slope views will fall back to Grapher defaults.
