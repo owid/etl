@@ -11,10 +11,9 @@ definitions:
   desc_key_question: &desc_key_question |-
     The survey question asked: "How often do you use artificial intelligence in your role?" with response options ranging from "Daily" to "Never."
   description_key_methodology: &methodology
-    - Based on online surveys of adults aged 18 and older who work full time or part time for organizations in the United States.
-    - Gallup surveys members of its panel using a sampling method designed to give people in the target population a known chance of being selected, rather than relying only on volunteers who choose to take part.
-    - Responses are weighted to reflect the U.S. employed adult population by gender, age, race, ethnicity, education, and region.
-    - Each survey round covered around 19,000 to 23,000 employed U.S. adults.
+    - Based on online surveys of adults aged 18 and older who work full-time or part-time in the United States.
+    - Responses are weighted to reflect the employed adult population in the United States by gender, age, race, ethnicity, education, and region.
+    - Each survey round covered around 19,000 to 23,000 employed US adults.
 
 dataset:
   update_period_days: 90
@@ -23,10 +22,10 @@ tables:
   ai_indicator:
     variables:
       daily_ai_users:
-        title: &daily_title Share of U.S. employees who use AI at work daily
+        title: &daily_title Share of US employees who use AI at work daily
         unit: "%"
         short_unit: "%"
-        description_short: The share of U.S. employees who say they use artificial intelligence at work every day.
+        description_short: The share of US employees who say they use artificial intelligence at work every day.
         description_key:
           - *desc_key_question
           - Daily AI users are employees who say they use artificial intelligence in their role daily.
@@ -38,14 +37,13 @@ tables:
           title_public: *daily_title
 
       frequent_ai_users:
-        title: &frequent_title Share of U.S. employees who use AI at work a few times a week or more
+        title: &frequent_title Share of US employees who use AI at work a few times a week or more
         unit: "%"
         short_unit: "%"
-        description_short: The share of U.S. employees who say they use artificial intelligence at work a few times a week or more.
+        description_short: The share of US employees who say they use artificial intelligence at work a few times a week or more.
         description_key:
           - *desc_key_question
-          - Frequent AI users are employees who say they use artificial intelligence in their role at least a few times a week.
-          - This includes employees who say they use it daily or a few times a week.
+          - Frequent AI users are employees who say they use artificial intelligence in their role at least a few times a week. This includes employees who say they use it daily or a few times a week.
           - *methodology
         display:
           numDecimalPlaces: 0
@@ -54,14 +52,13 @@ tables:
           title_public: *frequent_title
 
       total_ai_users:
-        title: &total_title Share of U.S. employees who use AI at work a few times a year or more
+        title: &total_title Share of US employees who use AI at work a few times a year or more
         unit: "%"
         short_unit: "%"
-        description_short: The share of U.S. employees who say they use artificial intelligence at work a few times a year or more.
+        description_short: The share of US employees who say they use artificial intelligence at work a few times a year or more.
         description_key:
           - *desc_key_question
-          - Total AI users are employees who say they use artificial intelligence in their role at least a few times a year.
-          - This includes employees who say they use it daily, a few times a week, a few times a month, or a few times a year.
+          - Total AI users are employees who say they use artificial intelligence in their role at least a few times a year. This includes employees who say they use it daily, a few times a week, a few times a month, or a few times a year.
           - *methodology
         display:
           numDecimalPlaces: 0

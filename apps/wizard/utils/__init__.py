@@ -33,11 +33,9 @@ from typing_extensions import Self
 from wfork_streamlit_profiler import Profiler
 
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
-from apps.wizard.utils.step_form import StepForm
 from etl.config import OWID_ENV, SENTRY_DSN, enable_sentry
 from etl.dag_helpers import load_dag
 from etl.db import read_sql
-from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
 from etl.paths import (
     APPS_DIR,
@@ -52,7 +50,6 @@ from etl.paths import (
 __all__ = [
     "load_wizard_defaults",
     "update_wizard_defaults_from_form",
-    "StepForm",
 ]
 
 # Logger
@@ -136,17 +133,6 @@ def get_namespaces(step_type: str) -> list[str]:
             raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
     namespaces = sorted(set(folder.name for folder in folders))
     return namespaces
-
-
-def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
-    with open(dag_path) as f:
-        doc = ruamel_load(f)
-
-    doc["steps"].pop(step, None)
-
-    with open(dag_path, "w") as f:
-        # Add new step to DAG
-        f.write(ruamel_dump(doc))
 
 
 class classproperty(property):
@@ -560,15 +546,14 @@ def enable_sentry_for_streamlit():
 def _get_staging_creation_time(session: Session):
     """Get staging server creation time.
 
-    Uses the earliest creation time among critical tables to ensure we capture
-    all changes made after the database was initially set up. Some tables may be
-    created/recreated later during the setup process, so we use the minimum.
+    Use the earliest creation time across all tables. Individual tables can be
+    rebuilt by migrations (for example ALTER TABLE), which updates their
+    information_schema create_time and makes a table allowlist too fragile.
     """
     query_ts = """
     SELECT MIN(create_time) as min_create_time
     FROM information_schema.tables
     WHERE table_schema = DATABASE()
-      AND table_name IN ('charts', 'variables', 'datasets', 'chart_dimensions')
     """
     df = read_sql(query_ts, session)
     assert len(df) == 1 and df["min_create_time"].notna().all(), (

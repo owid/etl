@@ -1,6 +1,8 @@
 ---
 name: migrate-dataset
 description: Migrate a legacy OWID dataset (no catalogPath) into the ETL pipeline. Use when user wants to migrate, backport, or convert a legacy dataset by ID, or mentions datasets without catalogPath.
+metadata:
+  internal: true
 ---
 
 # Migrate Legacy Dataset

@@ -18,6 +18,22 @@ const symbols = {
   undefinedStep: '❓'                // Step not defined anywhere
 };
 
+// Classify a raw line from a DAG YAML file. A URI followed by ``:`` is a
+// **step definition**; a plain URI reference is a **dependency**. Exported
+// so the test suite can pin this invariant explicitly.
+const DAG_URI_LINE_RE =
+  /^(?:\s*-\s*|\s*)(data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s#]+/;
+
+export function classifyDagLine(line: string): { uri: string; isDefinition: boolean } | null {
+  const match = DAG_URI_LINE_RE.exec(line);
+  if (!match) {
+    return null;
+  }
+  const uri = match[0].replace(/^\s*-\s*/, '').trim().replace(/:$/, '');
+  const isDefinition = line.trim().endsWith(':');
+  return { uri, isDefinition };
+}
+
 function parseStepUri(uri: string): { scheme: string; key: string; version: string, fullKey: string, filePaths: string[] } | null {
   const parts = uri.split('://');
   if (parts.length !== 2) {
@@ -97,45 +113,43 @@ function buildDAGIndex(): void {
   };
   walk(dagDir);
 
-  const uriRegex = /^(?:\s*-\s*|\s*)(data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s#]+/;
-
   for (const filePath of allYmlFiles) {
     const isArchive = filePath.includes(path.join('dag', 'archive'));
 
     try {
       const lines = fs.readFileSync(filePath, 'utf8').split('\n');
       for (const line of lines) {
-        const match = uriRegex.exec(line);
-        if (match) {
-          const uri = match[0].replace(/^\s*-\s*/, '').trim();
-          const parsed = parseStepUri(uri);
-          if (parsed) {
-            const isDefinition = line.trim().endsWith(':');
-            const isSnapshot = parsed.key.startsWith('snapshot://');
-            
-            // Only add references from active DAG to the allVersionsByKey
-            if (!isArchive) {
-              if (!allVersionsByKey.has(parsed.key)) {
-                allVersionsByKey.set(parsed.key, new Set());
-              }
-              allVersionsByKey.get(parsed.key)!.add(parsed.version);
-            }
-            
-            // If it's a definition in active DAG, track it separately
-            if (isDefinition && !isArchive) {
-              if (!definedVersionsByKey.has(parsed.key)) {
-                definedVersionsByKey.set(parsed.key, new Set());
-              }
-              definedVersionsByKey.get(parsed.key)!.add(parsed.version);
-            }
+        const classified = classifyDagLine(line);
+        if (!classified) {
+          continue;
+        }
+        const parsed = parseStepUri(classified.uri);
+        if (!parsed) {
+          continue;
+        }
+        const isDefinition = classified.isDefinition;
 
-            if (isDefinition) {
-              const count = stepDefinitionCount.get(parsed.fullKey) || 0;
-              stepDefinitionCount.set(parsed.fullKey, count + 1);
-              if (isArchive) {
-                archiveDefinedSteps.add(parsed.fullKey);
-              }
-            }
+        // Only add references from active DAG to the allVersionsByKey
+        if (!isArchive) {
+          if (!allVersionsByKey.has(parsed.key)) {
+            allVersionsByKey.set(parsed.key, new Set());
+          }
+          allVersionsByKey.get(parsed.key)!.add(parsed.version);
+        }
+
+        // If it's a definition in active DAG, track it separately
+        if (isDefinition && !isArchive) {
+          if (!definedVersionsByKey.has(parsed.key)) {
+            definedVersionsByKey.set(parsed.key, new Set());
+          }
+          definedVersionsByKey.get(parsed.key)!.add(parsed.version);
+        }
+
+        if (isDefinition) {
+          const count = stepDefinitionCount.get(parsed.fullKey) || 0;
+          stepDefinitionCount.set(parsed.fullKey, count + 1);
+          if (isArchive) {
+            archiveDefinedSteps.add(parsed.fullKey);
           }
         }
       }

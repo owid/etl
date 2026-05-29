@@ -28,6 +28,7 @@ def run() -> None:
         "covid.models.yml",
         "covid.xm_models.yml",
         "covid.cases_tests.yml",
+        "covid.explorer.yml",
         # "covid.vax_breakdowns.yml",
     ]
 

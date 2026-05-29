@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: O'Brien and Hunt, and UK Public Revenue
+    title: 'UK public revenue and O''Brien and Hunt fiscal data'
+    description: Data before 1700 is obtained from O'Brien and Hunt (1993), after 1700 from UK Public Revenue (2020). Interpolation is used for years with missing data.
+    citation_full: 'UK Public Revenue (2020); Patrick K. O''Brien and Philip A. Hunt (1993) "The rise of a fiscal state in England, 1485-1815". Historical Research 66 (160): pp.129-76.'
+    url_main: http://www.ukpublicrevenue.co.uk/download_multi_year_1700_2016UKk_16c1li011mcn_F1t10t40t
+    url_download: http://www.esfdb.org/table.aspx?resourceid=11686
+    date_accessed: '2020-08-03'
+    date_published: '2020'
+  is_public: false
+outs:
+  - md5: a6d0161bb08ee46b5583b4de89c8ffd2
+    size: 8146
+    path: te_22_2.feather

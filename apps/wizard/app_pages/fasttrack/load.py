@@ -16,7 +16,6 @@ from owid.catalog import (
     DatasetMeta,
     License,
     Origin,
-    Source,
     VariableMeta,
     VariablePresentationMeta,
 )
@@ -34,32 +33,30 @@ SHEET_TO_GID = {
     "raw_data": 901452831,
     "variables_meta": 777328216,
     "dataset_meta": 1719161864,
-    "sources_meta": 1399503534,
     "origins_meta": 279169148,
 }
 
 
 def load_existing_sheets_from_snapshots() -> list[dict[str, str]]:
     """Load available sheets from local environment."""
-    # get all fasttrack snapshots
-    metas = [SnapshotMeta.load_from_yaml(path) for path in (SNAPSHOTS_DIR / "fasttrack").rglob("*.dvc")]
-
     existing_sheets = []
-    for meta in metas:
-        # exclude local CSVs
-        if (getattr(meta.source, "name", None) or getattr(meta.origin, "version_producer")) == "Local CSV":
+    for path in (SNAPSHOTS_DIR / "fasttrack").rglob("*.dvc"):
+        try:
+            meta = SnapshotMeta.load_from_yaml(path)
+        except AssertionError:
+            # legacy source-only fasttrack snapshots (no origin) are no longer supported
             continue
 
-        if meta.source:
-            assert meta.source.source_data_url
-            url = meta.source.source_data_url
-            date_accessed = meta.source.date_accessed
-        elif meta.origin:
-            assert meta.origin.url_download
-            url = meta.origin.url_download
-            date_accessed = meta.origin.date_accessed
-        else:
-            raise ValueError("Neither source nor origin")
+        if not meta.origin:
+            continue
+
+        # exclude local CSVs
+        if meta.origin.version_producer == "Local CSV":
+            continue
+
+        assert meta.origin.url_download
+        url = meta.origin.url_download
+        date_accessed = meta.origin.date_accessed
 
         # decrypt URLs if private
         if not meta.is_public:
@@ -93,11 +90,12 @@ def load_data_from_csv(uploaded_file):
         st.write("Parsing data...")
         data = parse_data_from_csv(csv_df)
 
-        # Obtain dataset and other objects
+        # Obtain dataset and other objects. Use the parsed data's columns (which exclude
+        # fully-empty trailing columns) so metadata stays aligned with the data.
         st.write("Parsing metadata...")
         dataset_meta, variables_meta_dict, origin = parse_metadata_from_csv(
             uploaded_file.name,
-            csv_df.columns,
+            data.columns,
         )
     except ValidationError as e:
         st.exception(e)
@@ -146,7 +144,6 @@ def load_data_from_sheets(sheets_url, _status):
             dataset_meta, variables_meta_dict, origin = parse_metadata_from_sheets(
                 google_sheets["dataset_meta"],
                 google_sheets["variables_meta"],
-                google_sheets["sources_meta"],
                 google_sheets["origins_meta"],
             )
 
@@ -239,9 +236,6 @@ def import_google_sheets(url: str) -> dict[str, Any]:
     with concurrent.futures.ThreadPoolExecutor() as executor:
         data_future = executor.submit(lambda x: pd.read_csv(x), data_url)
         variables_meta_future = executor.submit(lambda x: pd.read_csv(x), f"{url}&gid={SHEET_TO_GID['variables_meta']}")
-        sources_meta_future = executor.submit(
-            lambda url: _fetch_url_or_empty_dataframe(url, header=None), f"{url}&gid={SHEET_TO_GID['sources_meta']}"
-        )
         origins_meta_future = executor.submit(
             lambda url: _fetch_url_or_empty_dataframe(url, header=None), f"{url}&gid={SHEET_TO_GID['origins_meta']}"
         )
@@ -250,7 +244,6 @@ def import_google_sheets(url: str) -> dict[str, Any]:
         "data": data_future.result(),
         "variables_meta": variables_meta_future.result(),
         "dataset_meta": dataset_meta,
-        "sources_meta": sources_meta_future.result(),
         "origins_meta": origins_meta_future.result(),
     }
 
@@ -258,6 +251,9 @@ def import_google_sheets(url: str) -> dict[str, Any]:
 def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
     # drop empty rows
     data_df = data_df.dropna(how="all")
+
+    # drop fully empty columns (e.g. pandas-named `Unnamed: N` from a stray trailing comma)
+    data_df = data_df.dropna(axis=1, how="all")
 
     # lowercase columns names
     for col in data_df.columns:
@@ -277,7 +273,27 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
     if data_df.year.dtype not in INT_TYPES and not _is_valid_date(data_df.year):
         raise ValidationError("Column 'year' should be integer or date")
 
+    _validate_unique_keys(data_df)
+
     return data_df.set_index(["country", "year"])
+
+
+def _validate_unique_keys(data_df: pd.DataFrame) -> None:
+    key_columns = ["country", "year"] + [col for col in data_df.columns if col.startswith("dim_")]
+    duplicated_keys = data_df.loc[data_df.duplicated(subset=key_columns, keep=False), key_columns]
+
+    if duplicated_keys.empty:
+        return
+
+    sample = duplicated_keys.drop_duplicates().head(20)
+    sample_text = sample.to_string(index=False)
+    extra = (
+        "" if len(duplicated_keys) <= 20 else f"\n\nShowing the first 20 duplicated rows out of {len(duplicated_keys)}."
+    )
+    raise ValidationError(
+        "Duplicate keys found in the incoming data. Each row must have a unique "
+        f"combination of {', '.join(key_columns)}.\n\n{sample_text}{extra}"
+    )
 
 
 def _is_valid_date(series: pd.Series) -> bool:
@@ -285,32 +301,6 @@ def _is_valid_date(series: pd.Series) -> bool:
     converted = pd.to_datetime(series, errors="coerce")
     # Check if there are any NaT (invalid dates)
     return bool(converted.notna().all())
-
-
-def _parse_sources(sources_meta_df: pd.DataFrame) -> Source | None:
-    if sources_meta_df.empty:
-        return None
-
-    sources = sources_meta_df.set_index(0).T.to_dict(orient="records")
-
-    if not sources:
-        return None
-
-    assert len(sources) == 1, "Only one source is supported for now"
-    source = sources[0]
-
-    if pd.isnull(source.get("date_accessed")):
-        source.pop("date_accessed", None)
-
-    if pd.isnull(source.get("publication_year")):
-        source.pop("publication_year")
-
-    # publisher_source is not used anymore
-    source.pop("publisher_source", None)
-    # short_name is not used anymore
-    source.pop("short_name", None)
-
-    return Source(**source)  # ty: ignore[call-non-callable]
 
 
 def _parse_origins(origins_meta_df: pd.DataFrame) -> Origin | None:
@@ -397,20 +387,15 @@ def _parse_variables(variables_meta_df: pd.DataFrame) -> dict[str, VariableMeta]
 def parse_metadata_from_sheets(
     dataset_meta_df: pd.DataFrame,
     variables_meta_df: pd.DataFrame,
-    sources_meta_df: pd.DataFrame,
     origins_meta_df: pd.DataFrame,
-) -> tuple[DatasetMeta, dict[str, VariableMeta], Origin | None]:
-    source = _parse_sources(sources_meta_df)
+) -> tuple[DatasetMeta, dict[str, VariableMeta], Origin]:
     origin = _parse_origins(origins_meta_df)
+    if origin is None:
+        raise ValidationError(
+            "Fasttrack now requires Origin metadata; the legacy 'sources_meta' sheet is no longer supported."
+        )
     dataset_meta = _parse_dataset(dataset_meta_df)
     variables_meta_dict = _parse_variables(variables_meta_df)
-
-    if origin and source:
-        raise ValidationError("Using origins and sources together is not yet supported")
-
-    # put all sources and origins to dataset level
-    if source:
-        dataset_meta.sources = [source]
 
     return dataset_meta, variables_meta_dict, origin
 

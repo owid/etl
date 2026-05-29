@@ -12,7 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
+import uuid
 import warnings
 from collections import defaultdict
 from collections.abc import Generator, Iterable
@@ -27,7 +27,6 @@ from types import ModuleType
 from typing import Any, Protocol, cast
 from urllib.parse import urlparse
 
-import fasteners
 import pandas as pd
 import requests
 import structlog
@@ -51,8 +50,6 @@ from etl.snapshot import Snapshot
 log = structlog.get_logger()
 
 DAG = dict[str, set[str]]
-
-ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
 
 # Dictionary to store metadata changes for each dataset if INSTANT flag is set
 INSTANT_METADATA_DIFF = {}
@@ -422,9 +419,39 @@ class DataStep(Step):
             else:
                 raise e
 
+    def _clean_partial_output(self) -> None:
+        """Remove dest_dir if it exists without index.json.
+
+        A directory without index.json indicates a previous run was interrupted
+        mid-write (e.g. shutil.rmtree partially failed, or the process was killed
+        between mkdir and metadata.save). Reading it as a Dataset would crash, so
+        clean it up and let the step re-run from scratch.
+
+        Renames the dir aside before rmtree so the original path disappears
+        atomically — avoids leaving the path half-deleted if rmtree itself races
+        with another writer (which is what creates this state in the first place).
+        """
+        if not self._dest_dir.is_dir() or (self._dest_dir / "index.json").exists():
+            return
+
+        log.warning(
+            "step.cleanup_partial_output",
+            step=self.path,
+            path=str(self._dest_dir),
+        )
+        # Unique suffix per attempt so a leftover temp dir from an earlier
+        # partial cleanup never collides with the next attempt.
+        tmp = self._dest_dir.with_name(f".{self._dest_dir.name}.tmp.{uuid.uuid4().hex}")
+        self._dest_dir.rename(tmp)
+        shutil.rmtree(tmp, ignore_errors=True)
+
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        # Self-heal partial output from a prior interrupted run before any read,
+        # otherwise _dataset_index_mtime below would crash on missing index.json.
+        self._clean_partial_output()
 
         if config.PREFER_DOWNLOAD:
             # if checksums match, download the dataset from the catalog
@@ -446,20 +473,10 @@ class DataStep(Step):
                     self._run_py_isolated()
                 else:
                     self._run_py()
-
-            # We lock this to prevent the following error
-            # ImportError: PyO3 modules may only be initialized once per interpreter process
-            elif sp.with_suffix(".ipynb").exists():
-                with ipynb_lock:
-                    self._run_notebook()
-
             else:
                 raise Exception(f"have no idea how to run step: {self.path}")
         except Exception:
-            # Clean up partial output so subsequent runs don't see an incomplete dataset
-            # (a directory without index.json would cause Dataset.__init__ to fail)
-            if self._dest_dir.is_dir() and not (self._dest_dir / "index.json").exists():
-                shutil.rmtree(self._dest_dir)
+            self._clean_partial_output()
             raise
 
         # was the index file modified? if not then `save` was not called
@@ -530,8 +547,6 @@ class DataStep(Step):
             sp.with_suffix(".py").exists()
             # folder of scripts with __init__.py
             or (sp / "__init__.py").exists()
-            # jupyter notebook
-            or sp.with_suffix(".ipynb").exists()
         )
 
     def checksum_input(self) -> str:
@@ -756,33 +771,6 @@ class DataStep(Step):
         except subprocess.CalledProcessError as e:
             sys.exit(e.returncode)
 
-    def _run_notebook(self) -> None:
-        "Run a parameterised Jupyter notebook."
-        # don't import it again if it's already imported to avoid
-        # ImportError: PyO3 modules may only be initialized once per interpreter process
-        if "papermill" not in sys.modules:
-            # smother deprecation warnings by papermill
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                import papermill as pm
-        else:
-            pm = sys.modules["papermill"]
-
-        notebook_path = self._search_path.with_suffix(".ipynb")
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            notebook_out = Path(tmp_dir) / "notebook.ipynb"
-            log_file = Path(tmp_dir) / "output.log"
-            with open(log_file.as_posix(), "w") as ostream:
-                pm.execute_notebook(
-                    notebook_path.as_posix(),
-                    notebook_out.as_posix(),
-                    parameters={"dest_dir": self._dest_dir.as_posix()},
-                    progress_bar=False,
-                    stdout_file=ostream,
-                    stderr_file=ostream,
-                    cwd=notebook_path.parent.as_posix(),
-                )
-
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
         url = f"{DEFAULT_CATALOG_URL}{self.path}/index.json"
@@ -986,7 +974,6 @@ class GrapherStep(Step):
             engine,
             dataset,
             dataset.metadata.namespace,
-            dataset.metadata.sources,
         )
 
         # We sometimes get a warning, but it's unclear where it is coming from
@@ -1089,9 +1076,7 @@ class GrapherStep(Step):
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
-            success = self._cleanup_ghost_resources(
-                engine, dataset_upsert_results, catalog_paths, list(dataset_upsert_results.source_ids.values())
-            )
+            success = self._cleanup_ghost_resources(engine, dataset_upsert_results, catalog_paths)
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
@@ -1115,7 +1100,6 @@ class GrapherStep(Step):
         engine: Engine,
         dataset_upsert_results,
         catalog_paths: list[str],
-        dataset_upserted_source_ids: list[int],
     ) -> bool:
         """
         Cleanup all ghost variables that weren't upserted
@@ -1138,7 +1122,6 @@ class GrapherStep(Step):
             upserted_variable_ids,
         )
 
-        db.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, dataset_upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable. We can do it in batch
         return success
 

@@ -39,7 +39,7 @@ def run() -> None:
 
     # Check years
     assert tb["year"].max() == 2024
-    assert tb_pre["year"].max() == 2025
+    assert tb_pre["year"].max() == 2026
 
     # Filter unnecessary columns
     tb = tb.filter(regex="^country|^year|^number_deaths_ongoing|^number_ongoing_conflicts__")
@@ -344,7 +344,7 @@ def _set_subtitle(view):
         if view.d.indicator == "deaths":
             subtitle = subtitle_template.format(placeholder=f" in {dod}")
             if view.matches(conflict_type="all", estimate="best", people="all"):
-                subtitle += " Data for 2025 is preliminary."
+                subtitle += " Data for 2025 is preliminary, and data for 2026 is incomplete and includes deaths within the first quarter."
             return subtitle
         elif view.d.indicator == "death_rate":
             return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")

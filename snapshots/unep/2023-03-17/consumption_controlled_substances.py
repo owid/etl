@@ -5,7 +5,7 @@ The data for this Snapshot needs to be downloaded and imported from a local file
     1. Go to https://ozone.unep.org/countries/data-table?q=countries/data
     2. Download each of the available datasets. Each table has an "X" (Excel-like) sign, click it to download the corresponding XLSX file.
     3. Name them with appropriate names (chemical name, using snake-case). Accepted names are listed in variable `CHEMICAL_NAMES`, which should
-       also match those stated in the DVC files ("consumption_controlled_substances.[checmical-name].xlsx.dvc").
+       also match those stated in the DVC files ("consumption_controlled_substances_[checmical-name].xlsx.dvc").
     4. Place all XLSX files into one single folder.
     5. Run the script as: `etls unep/2023-03-17/consumption_controlled_substances --path-to-folder /path/to/folder/with/xlsx/files`
 
@@ -54,7 +54,7 @@ def main(path_to_folder: Path | str, upload: bool) -> None:
     for name in names:
         # Create a new snapshot. Raise an error if DVC file for a given chemical is not found.
         try:
-            snap = Snapshot(f"unep/{SNAPSHOT_VERSION}/consumption_controlled_substances.{name}.xlsx")
+            snap = Snapshot(f"unep/{SNAPSHOT_VERSION}/consumption_controlled_substances_{name}.xlsx")
         except FileNotFoundError as e:
             raise ValueError(f"Could not find DVC file for chemical '{name}'.") from e
         # Ensure destination folder exists.

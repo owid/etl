@@ -3,7 +3,7 @@
 from typing import cast
 
 import numpy as np
-import pandas as pd
+import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -28,13 +28,18 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["wrp_2021"]
 
+    # Capture origins from a source column so we can propagate them through
+    # downstream pivots/value_counts/pivot_table operations, which create
+    # entirely new columns and drop column-level origins.
+    source_origins = list(tb["q8"].metadata.origins)
+
     #
     # Process data.
     #
     log.info("wrp_2021.harmonize_countries")
-    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    df = pd.DataFrame(tb)
-    # List of column names to keep in DataFrame (q8 and q9 are AI related)
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # List of column names to keep (q8 and q9 are AI related)
     select_cols = [
         "country",
         "year",
@@ -48,13 +53,13 @@ def run(dest_dir: str) -> None:
         "q9",
     ]
 
-    # Filter DataFrame to keep only the AI related columns
-    df = df[select_cols]
+    # Filter to keep only the AI related columns
+    tb = tb[select_cols]
 
-    # Map numerical values to categorical for certain columns in the DataFrame
-    df = map_values(df)
+    # Map numerical values to categorical for certain columns
+    tb = map_values(tb)
 
-    # List of columns to split the DataFrame by when calculating question responses
+    # List of columns to split by when calculating question responses
     columns_to_split_by = ["country", "gender", "education", "income_5", "emp_2010", "agegroups4", "globalregion"]
 
     # Dictionary to map response codes to labels for question 9
@@ -70,31 +75,21 @@ def run(dest_dir: str) -> None:
     # Dictionary to map response codes to labels for question 8
     dict_q8 = {1: "Yes, would feel safe", 2: "No, would not feel safe", 98: "DK(cars)", 99: "Refused(cars)"}
 
-    # Create a list of DataFrames for each column_to_split_by for question 8
-    df_q8_list = []
-    for column in columns_to_split_by:
-        df_q8_list.append(question_extract("q8", df, column, dict_q8))
+    # Build per-split tables for question 8 and concatenate
+    tb_q8_list = [question_extract("q8", tb, column, dict_q8) for column in columns_to_split_by]
+    tb_q8_c = pr.concat(tb_q8_list, ignore_index=True)
 
-    # Concatenate all the q8 DataFrames in the list to create a combined DataFrame
-    df_q8_c = pd.concat(df_q8_list)
-    df_q8_c.reset_index(drop=True, inplace=True)
+    # Build per-split tables for question 9 and concatenate
+    tb_q9_list = [question_extract("q9", tb, column, dict_q9) for column in columns_to_split_by]
+    tb_q9_c = pr.concat(tb_q9_list, ignore_index=True)
 
-    # Create a list of DataFrames for each column_to_split_by for question 9
-    df_q9_list = []
-    for column in columns_to_split_by:
-        df_q9_list.append(question_extract("q9", df, column, dict_q9))
-
-    # Concatenate all the q9 DataFrames in the list to create a combined DataFrame
-    df_q9_c = pd.concat(df_q9_list)
-    df_q9_c.reset_index(drop=True, inplace=True)
-
-    # Merge the two combined DataFrames on common columns
-    df_merge = pd.merge(df_q9_c, df_q8_c, on=columns_to_split_by + ["year"], how="outer")
+    # Merge the two combined tables on common columns
+    tb_merge = pr.merge(tb_q9_c, tb_q8_c, on=columns_to_split_by + ["year"], how="outer")
 
     # Now split categories (gender, income etc) into separate columns
-    # Copy df without categories (gender, income etc)
-    df_without_categories = (
-        df_merge[
+    # Copy tb without categories (gender, income etc)
+    tb_without_categories = (
+        tb_merge[
             [
                 "country",
                 "year",
@@ -114,7 +109,7 @@ def run(dest_dir: str) -> None:
         .copy()
     )
 
-    merge_rest = calculate_world_data(df_merge, df_without_categories)
+    merge_rest = calculate_world_data(tb_merge, tb_without_categories)
 
     tb = Table(merge_rest, short_name=paths.short_name, underscore=True)
 
@@ -124,6 +119,10 @@ def run(dest_dir: str) -> None:
     tb[["dk_no_op", "other_help_harm", "other_yes_no"]] = tb[["dk_no_op", "other_help_harm", "other_yes_no"]].replace(
         0.0, np.nan
     )
+
+    # Re-stamp origins onto every output column (pivots/value_counts dropped them).
+    for col in tb.columns:
+        tb[col].metadata.origins = list(source_origins)
 
     #
     # Save outputs.
@@ -137,24 +136,16 @@ def run(dest_dir: str) -> None:
     log.info("ai_wrp_2021.end")
 
 
-def calculate_percentage(df, column, valid_responses_dict, column_to_split_by):
+def calculate_percentage(tb, column, valid_responses_dict, column_to_split_by):
     """
-    Calculates the percentage of valid responses for a given column in a DataFrame, split by another column.
-    Args:
-        df (DataFrame): The input DataFrame.
-        column (str): The column name to calculate the percentage.
-        valid_responses_dict (dict): A dictionary mapping vali
-        d response codes to their corresponding labels.
-        column_to_split_by (str): The column name to split by.
-    Returns:
-        DataFrame: A DataFrame with columns: the column_to_split_by, "year", "column", "count", and "percentage".
+    Calculates the percentage of valid responses for a given column in a table, split by another column.
     """
     # Filter out invalid responses
-    valid_responses = df[column].isin(valid_responses_dict.keys())
-    df_filtered = df[[column_to_split_by, "year", column]][valid_responses].reset_index(drop=True)
+    valid_responses = tb[column].isin(valid_responses_dict.keys())
+    tb_filtered = tb[[column_to_split_by, "year", column]][valid_responses].reset_index(drop=True)
 
     # Group by country and year
-    grouped = df_filtered.groupby([column_to_split_by, "year"], observed=True)
+    grouped = tb_filtered.groupby([column_to_split_by, "year"], observed=True)
 
     # Count valid responses
     counts = grouped[column].value_counts().reset_index(name="count")
@@ -170,22 +161,14 @@ def calculate_percentage(df, column, valid_responses_dict, column_to_split_by):
     return counts
 
 
-def question_extract(q, df, column_to_split_by, dict_q):
+def question_extract(q, tb, column_to_split_by, dict_q):
     """
-    Computes the share of responses for a given column in a DataFrame, split by another column.
-    Args:
-        q (str): The question column name.
-        df (DataFrame): The input DataFrame.
-        column_to_split_by (str): The column name to split by.
-        dict_q (dict): A dictionary mapping valid response codes to their corresponding labels.
-    Returns:
-        DataFrame: A DataFrame with columns: "year", column_to_split_by, and either "Mostly help" or "Yes, would feel safe" depending on the question column.
+    Computes the share of responses for a given column in a table, split by another column.
     """
-    # Calculate percentage for worries about a terrorist attack
-    counts_q = calculate_percentage(df, q, dict_q, column_to_split_by)
+    counts_q = calculate_percentage(tb, q, dict_q, column_to_split_by)
 
     # Select relevant columns
-    select_df = counts_q[
+    select_tb = counts_q[
         [
             column_to_split_by,
             "year",
@@ -194,17 +177,17 @@ def question_extract(q, df, column_to_split_by, dict_q):
         ]
     ]
 
-    # Pivot the DataFrame
-    pivoted_df = select_df.pivot(
+    # Pivot the table
+    pivoted_tb = select_tb.pivot(
         index=[column_to_split_by, "year"],
         columns=q,
         values="percentage",
     )
-    pivoted_df.reset_index(inplace=True)
-    pivoted_df.columns.name = None
+    pivoted_tb = pivoted_tb.reset_index()
+    pivoted_tb.columns.name = None
 
     if q == "q9":
-        return pivoted_df[
+        return pivoted_tb[
             [
                 "year",
                 column_to_split_by,
@@ -217,21 +200,21 @@ def question_extract(q, df, column_to_split_by, dict_q):
             ]
         ]
     else:
-        return pivoted_df[
+        return pivoted_tb[
             ["year", column_to_split_by, "Yes, would feel safe", "No, would not feel safe", "DK(cars)", "Refused(cars)"]
         ]
 
 
-def calculate_world_data(df_merge, df_without_categories):
+def calculate_world_data(tb_merge, tb_without_categories):
     # Select rows with categories (NaN country rows)
-    world_df = df_merge[df_merge["country"].isna()].copy()
-    world_df.reset_index(drop=True, inplace=True)
+    world_tb = tb_merge[tb_merge["country"].isna()].copy()
+    world_tb = world_tb.reset_index(drop=True)
 
     # Set country as World
-    world_df["country"] = world_df["country"].astype(str)
-    world_df.loc[world_df["country"] == "nan", "country"] = "World"
+    world_tb["country"] = world_tb["country"].astype(str)
+    world_tb.loc[world_tb["country"] == "nan", "country"] = "World"
 
-    # Calculate the percentage of valid responses for "Mostly help", "Mostly harm", "Neither" in a DataFrame,
+    # Calculate the percentage of valid responses for "Mostly help", "Mostly harm", "Neither" in a table,
     # split by gender, income etc.
     columns_to_calculate = [
         "Mostly help",
@@ -243,37 +226,33 @@ def calculate_world_data(df_merge, df_without_categories):
     ]
     merge_help_harm_all = None
     for column in columns_to_calculate:
-        conc_df = pivot_by_category(world_df, column)
+        conc_tb = pivot_by_category(world_tb, column)
         if merge_help_harm_all is None:
-            merge_help_harm_all = conc_df
+            merge_help_harm_all = conc_tb
         else:
-            merge_help_harm_all = pd.merge(merge_help_harm_all, conc_df, on=["year", "country"], how="outer")
+            merge_help_harm_all = pr.merge(merge_help_harm_all, conc_tb, on=["year", "country"], how="outer")
 
-    # Calculate the percentage of valid responses for "Yes, would feel safe" in a DataFrame, split by gender, income etc.
+    # Calculate the percentage of valid responses for "Yes, would feel safe" in a table, split by gender, income etc.
     columns_to_calculate = ["Yes, would feel safe", "No, would not feel safe", "DK(cars)", "Refused(cars)"]
     merge_yes_no = None
     for column in columns_to_calculate:
-        conc_df = pivot_by_category(world_df, column)
+        conc_tb = pivot_by_category(world_tb, column)
         if merge_yes_no is None:
-            merge_yes_no = conc_df
+            merge_yes_no = conc_tb
         else:
-            merge_yes_no = pd.merge(merge_yes_no, conc_df, on=["year", "country"], how="outer")
+            merge_yes_no = pr.merge(merge_yes_no, conc_tb, on=["year", "country"], how="outer")
 
-    # Merge all dataframes into one
-    merge_categorized = pd.merge(merge_help_harm_all, merge_yes_no, on=["year", "country"], how="outer")
-    merge_rest = pd.merge(df_without_categories, merge_categorized, on=["year", "country"], how="outer")
+    # Merge all tables into one
+    merge_categorized = pr.merge(merge_help_harm_all, merge_yes_no, on=["year", "country"], how="outer")
+    merge_rest = pr.merge(tb_without_categories, merge_categorized, on=["year", "country"], how="outer")
 
-    merge_rest.set_index(["year", "country"], inplace=True)
+    merge_rest = merge_rest.set_index(["year", "country"])
     return merge_rest
 
 
-def map_values(df):
+def map_values(tb):
     """
-    Maps numerical values to categorical for certain columns in the DataFrame.
-    Args:
-        df (DataFrame): The input DataFrame.
-    Returns:
-        DataFrame: The DataFrame with mapped values for "gender", "education", "income_5", "emp_2010", "agegroups4", "globalregion" columns.
+    Maps numerical values to categorical for certain columns in the table.
     """
     gender = {1: "Male", 2: "Female"}
 
@@ -314,43 +293,34 @@ def map_values(df):
         15: "Australia and New Zealand",
     }
 
-    df["gender"] = df["gender"].map(gender)
-    df["education"] = df["education"].map(education_level)
-    df["income_5"] = df["income_5"].map(wealth_quintile)
-    df["emp_2010"] = df["emp_2010"].map(employment_status)
-    df["agegroups4"] = df["agegroups4"].map(age_group)
-    df["globalregion"] = df["globalregion"].map(region)
+    tb["gender"] = tb["gender"].map(gender)
+    tb["education"] = tb["education"].map(education_level)
+    tb["income_5"] = tb["income_5"].map(wealth_quintile)
+    tb["emp_2010"] = tb["emp_2010"].map(employment_status)
+    tb["agegroups4"] = tb["agegroups4"].map(age_group)
+    tb["globalregion"] = tb["globalregion"].map(region)
 
-    return df
+    return tb
 
 
-def pivot_by_category(df, question):
+def pivot_by_category(tb, question):
     """
-    Pivot the input DataFrame by categories and a specific question.
-
-    Parameters:
-        df (DataFrame): Input DataFrame to pivot.
-        question (str): The specific question to pivot on.
-
-    Returns:
-        DataFrame: Concatenated pivot tables with suffixed column names.
-
+    Pivot the input table by categories and a specific question.
     """
-    # Create an empty list to store the pivot tables
     pivot_tables = []
     cols_pivot = ["gender", "education", "income_5", "emp_2010", "agegroups4", "globalregion"]
 
-    # Iterate over each pivot column
     for pivot_col in cols_pivot:
-        # Pivot the dataframe for the current pivot column
-        pivoted_df = pd.pivot_table(df, values=question, index=["country", "year"], columns=pivot_col, observed=True)
-        # Append the pivot table to the list
-        pivot_tables.append(pivoted_df)
+        pivoted_tb = tb.pivot_table(values=question, index=["country", "year"], columns=pivot_col, observed=True)
+        pivot_tables.append(pivoted_tb)
 
     # Concatenate all the pivot tables along the columns
-    conc_df = pd.concat(pivot_tables, axis=1)
+    conc_tb = pr.concat(pivot_tables, axis=1)
 
     # Add suffix to column names
-    conc_df = conc_df.add_suffix("_" + question)
+    conc_tb = conc_tb.add_suffix("_" + question)
 
-    return conc_df
+    # Reset index so ["year", "country"] become columns for downstream merging.
+    conc_tb = conc_tb.reset_index()
+
+    return conc_tb

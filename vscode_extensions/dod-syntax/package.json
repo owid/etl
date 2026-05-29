@@ -3,13 +3,13 @@
   "publisher": "owid",
   "displayName": "DoD Syntax",
   "description": "Syntax highlighting, autocomplete, and hover details for Definition of Data (DoD) references",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "repository": {
     "type": "git",
     "url": "https://github.com/owid/etl"
   },
   "engines": {
-    "vscode": "^1.100.0"
+    "vscode": "^1.109.0"
   },
   "categories": [
     "Other"
@@ -57,7 +57,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.19.37",
-    "@types/vscode": "^1.110.0",
+    "@types/vscode": "^1.109.0",
     "@typescript-eslint/eslint-plugin": "^8.57.1",
     "@typescript-eslint/parser": "^8.57.1",
     "@vscode/test-cli": "^0.0.10",

@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: World Bank
+    title: World Development Indicators
+    citation_full: The World Bank Development Indicators (2018).
+    url_main: https://datacatalog.worldbank.org/dataset/world-development-indicators
+    date_accessed: '2019-01-25'
+    date_published: '2018'
+  is_public: false
+outs:
+  - md5: 1a8fee0d1eccda02ac51139697169142
+    size: 4674
+    path: te_13_9b.feather

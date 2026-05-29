@@ -11,7 +11,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 ENCODINGS = {
-    "united-kingdom.zip": "cp1252",
+    "united_kingdom.zip": "cp1252",
 }
 DEPENDENCIES_IGNORE = [
     "yougov_extra_mapping.csv",

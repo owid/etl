@@ -8,7 +8,6 @@ definitions:
       attribution_short: Penn World Table
       topic_tags:
         - Economic Growth
-    sources: []
     origins:
       - producer: Feenstra et al. (2015), Penn World Table (2021)
         attribution: Feenstra et al. (2015), Penn World Table (2021)
@@ -37,7 +36,6 @@ definitions:
 
 dataset:
   update_period_days: 550
-  sources: []
 tables:
   penn_world_table:
     variables:

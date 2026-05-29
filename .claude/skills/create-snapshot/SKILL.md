@@ -1,6 +1,8 @@
 ---
 name: create-snapshot
 description: Create a new snapshot (DVC file + Python script) from a url_main and optional url_download. Fetches the page, extracts metadata with AI, confirms with user, writes files, and runs the snapshot. Use when the user wants to add a new data source or create a snapshot from a URL.
+metadata:
+  internal: true
 ---
 
 # Create Snapshot
@@ -143,7 +145,9 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-
+@click.command()
+@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
+@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def run(upload: bool = True, path_to_file: str | None = None) -> None:
     """Create a new snapshot.
 

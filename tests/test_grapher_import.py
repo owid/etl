@@ -28,4 +28,36 @@ def test_calculate_checksum_metadata():
     meta = _get_metadata()
     df = _get_data()
 
-    assert db.calculate_checksum_metadata(meta, df) == "-1532881929668971636"
+    # Checksum should be deterministic
+    checksum = db.calculate_checksum_metadata(meta, df)
+    assert checksum == db.calculate_checksum_metadata(meta, df)
+
+    # Different metadata should produce different checksums
+    meta2 = VariableMeta(
+        origins=[Origin(title="Different", producer="Producer")],
+        presentation=VariablePresentationMeta(title_public="Title public"),
+    )
+    assert checksum != db.calculate_checksum_metadata(meta2, df)
+
+
+def test_calculate_checksum_metadata_invariant_to_empty_field_shapes():
+    """Empty list / None / missing-from-dict should all hash the same.
+
+    Regression: removing or flipping the default of a `VariableMeta` field (e.g. the
+    `sources` field dropped in #6081) used to silently flip every metadataChecksum,
+    making chart-diff flag every chart as METADATA CHANGE despite no observable
+    difference in the JSON. The checksum now hashes the pruned dict, so these
+    invisible shape flips collapse.
+    """
+    df = _get_data()
+
+    meta_with_empties = VariableMeta(
+        origins=[Origin(title="T", producer="P")],
+        description_key=[],
+        licenses=[],
+        sort=[],
+    )
+    meta_without_empties = VariableMeta(origins=[Origin(title="T", producer="P")])
+    assert db.calculate_checksum_metadata(meta_with_empties, df) == db.calculate_checksum_metadata(
+        meta_without_empties, df
+    )

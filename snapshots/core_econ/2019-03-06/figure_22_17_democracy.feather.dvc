@@ -1,0 +1,12 @@
+meta:
+  is_public: false
+  origin:
+    producer: Inter-Parliamentary Union
+    title: Women in parliaments - suffrage
+    citation_full: Inter-Parliamentary Union. Women in parliaments - suffrage. Inter-Parliamentary Union.
+    url_main: http://archive.ipu.org/wmn-e/suffrage.htm
+    date_accessed: '2019-03-06'
+outs:
+  - md5: 720f70a9db47fc0c1fd17a183af6098e
+    size: 3282
+    path: figure_22_17_democracy.feather

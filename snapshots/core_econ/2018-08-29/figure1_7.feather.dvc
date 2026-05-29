@@ -1,0 +1,14 @@
+meta:
+  is_public: false
+  origin:
+    producer: de Deo
+    title: New York Times article archive
+    description: Calculations by Simon DeDeo, Santa Fe Institute, from New York Times. 2016. 'NYT article archive'.
+    citation_full: Simon de Deo (2016).
+    url_main: https://help.nytimes.com/hc/en-us/articles/115014772767-Archives
+    date_accessed: '2018-08-29'
+    date_published: '2016'
+outs:
+  - md5: 56f4a392db7cd62c1537ae4922e5d91d
+    size: 6698
+    path: figure1_7.feather

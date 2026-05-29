@@ -8,12 +8,11 @@ import click
 import numpy as np
 import pandas as pd
 import structlog
-import yaml
 from rich_click.rich_command import RichCommand
 
 from etl import paths
 from etl.config import ADMIN_HOST
-from etl.dag_helpers import load_dag
+from etl.dag_helpers import load_dag, load_single_dag_file
 from etl.db import can_connect
 from etl.grapher.io import get_info_for_etl_datasets
 from etl.steps import extract_step_attributes, reverse_graph
@@ -187,12 +186,12 @@ def load_steps_for_each_dag_file() -> dict[str, dict[str, list[str]]]:
     dag_file_steps = {"active": {}, "archive": {}}
     for dag_file_path in dag_file_paths:
         for dag_file in dag_file_paths[dag_file_path]:
-            # Open the current dag file and read its steps.
-            with open(dag_file) as f:
-                content = yaml.load(f, Loader=yaml.Loader)["steps"]
-                if content:
-                    # Add an entry to the dictionary, with the name of the dag file, and the set of steps it contains.
-                    dag_file_steps[dag_file_path][dag_file.stem] = content
+            # ``load_single_dag_file`` returns the same flat ``{step: deps}``
+            # shape as ``load_dag`` but without following ``include``, so each
+            # step is attributed to the file that actually declares it.
+            content = load_single_dag_file(dag_file)
+            if content:
+                dag_file_steps[dag_file_path][dag_file.stem] = content
 
     return dag_file_steps
 
@@ -501,12 +500,11 @@ class VersionTracker:
             log.error(f"Unknown channel {channel} for step {step}.")
 
         path_to_script_detected = None
-        # A step script can exist either as a .py file, as a .ipynb file, or a __init__.py file inside a folder.
+        # A step script can exist either as a .py file or a __init__.py file inside a folder.
         # In the case of snapshots, there may or may not be a .py file, but there definitely needs to be a dvc file.
         # In that case, the corresponding script is not trivial to find, but at least we can return the dvc file.
         for path_to_script_candidate in [
             path_to_script.with_suffix(".py"),  # ty: ignore
-            path_to_script.with_suffix(".ipynb"),  # ty: ignore
             path_to_script / "__init__.py",  # ty: ignore
             path_to_script.with_name(path_to_script.name + ".dvc"),  # ty: ignore
         ]:

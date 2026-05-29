@@ -752,6 +752,10 @@ def create_cost_variables_adjusted_for_inflation(tb: Table, tb_wdi: Table) -> Ta
     # Add a column with the value of the GDP deflator on the base year.
     tb_gdp = tb_gdp.merge(base_deflator, on="country", how="left")
 
+    # Remove description from producer of GDP indicators, to avoid them from leaking into disasters metadata.
+    for column in ["gdp_deflator", "gdp_deflator_base"]:
+        tb_gdp[column].metadata.description_from_producer = None
+
     # Combine natural disasters with GDP data.
     tb = tb.merge(tb_gdp, on=["country", "year"], how="left")
 

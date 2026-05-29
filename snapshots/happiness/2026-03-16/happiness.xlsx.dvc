@@ -19,7 +19,7 @@ meta:
     attribution_short: WHR
 
     # Files
-    url_main: ttps://worldhappiness.report/ed/2026/
+    url_main: https://worldhappiness.report/ed/2026/
     date_accessed: '2026-03-16'
 
     # License

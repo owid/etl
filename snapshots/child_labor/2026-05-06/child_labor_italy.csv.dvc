@@ -1,0 +1,33 @@
+# This is a file extracted from Table 4 in page 20.
+# In case of updating, it needs to be uploaded manually
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Italian children at work, 1881-1961"
+    description: |-
+      This World Bank Working Paper provides long-run estimates of child labor in Italy from 1881 to 1961, drawing on historical census data to construct sector-specific child work participation rates by age and sex.
+    date_published: "2007"
+    title_snapshot: "Italian children at work, 1881-1961 - Child labor in Italy by sector"
+    description_snapshot: |-
+      Table 4, taken from the working paper on child labor in Italy.
+
+    # Citation
+    producer: Toniolo and Vecchi
+    citation_full: |-
+      Toniolo, G., & Vecchi, G. (2007). Italian children at work, 1881-1961. Table 4 (p. 20). World Bank.
+
+    # Files
+    url_main: https://documents1.worldbank.org/curated/en/232751468049199115/pdf/438940WP0Box321n0children001PUBLIC1.pdf
+    date_accessed: '2026-05-07'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://documents1.worldbank.org/curated/en/232751468049199115/pdf/438940WP0Box321n0children001PUBLIC1.pdf
+outs:
+  - md5: 9166335402f93c7644db307033f7aafb
+    size: 1085
+    path: child_labor_italy.csv

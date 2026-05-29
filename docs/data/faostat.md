@@ -7,7 +7,7 @@ provides free access to food and agriculture data from 1961 to the most recent y
 
 The data is distributed among different domains, each one with a unique dataset code (e.g. `qcl`).
 We create a new dataset (named, e.g. `faostat_qcl`) for each domain, although we are not including all FAOSTAT
-domains, only the ones listed below in section [Output datasets](##output-datasets).
+domains, only the ones listed below in section [Output datasets](#output-datasets).
 
 The main data from each domain is downloaded as a file.
 The location of each file and the date of their latest update is found by querying
@@ -113,7 +113,7 @@ The list of garden datasets is identical to the list of meadow datasets, except 
 - Datasets `faostat_fbsh` and `faostat_fbs` are not present.
 - `faostat_fbsc`: Food Balances Combined. This dataset is the combination of `faostat_fbsh` and `faostat_fbs`.
 - `food_explorer`: Dataset that generates the csv files that are read by the global-food explorer
-  (see [below](###explorers)). It uses data from the `faostat_fbsc` and `faostat_qcl` garden datasets.
+  (see [below](#explorers)). It uses data from the `faostat_fbsc` and `faostat_qcl` garden datasets.
 - `faostat_metadata`: This dataset mainly feeds from the meadow `faostat_metadata`, but it also loads the `custom_*`
   files, and each individual meadow dataset.
 

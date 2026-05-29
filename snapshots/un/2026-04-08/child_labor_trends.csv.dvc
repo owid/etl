@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: ILO-UNICEF Global Estimates of Child Labour
+    description: |-
+      The ILO-UNICEF 2024 Global Estimates of Child Labour provides an overview of child labour patterns and trends. It also describes the evolving profile of children in child labour, outlines the nature of child labour and where it is concentrated, and explores the impact of child labour on schooling. The report concludes with a discussion of the road ahead.
+    title_snapshot: ILO-UNICEF Global Estimates of Child Labour - Trends 2016–2024
+    description_snapshot: |-
+      Number (in thousands) and percentage of children aged 5 to 17 years in child labour and in hazardous work for 2016, 2020, and 2024, disaggregated by sex, age group, ILO regions, SDG regions, UNICEF regions, and national income grouping. Data are from the statistical annex of the ILO-UNICEF 2024 Global Estimates of Child Labour report.
+    date_published: "2025-06-11"
+    version_producer: '2024'
+
+    # Citation
+    producer: International Labour Organization and UNICEF
+    citation_full: |-
+      International Labour Organization and United Nations Children's Fund, Child Labour: Global estimates 2024, trends and the road forward, ILO and UNICEF, Geneva and New York, 2025. License: CC BY 4.0.
+    attribution_short: ILO and UNICEF
+
+    # Files
+    url_main: https://www.ilo.org/publications/major-publications/child-labour-global-estimates-2024-trends-and-road-forward
+    date_accessed: '2026-04-08'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.ilo.org/sites/default/files/2025-06/2024%20Global%20Estimates%20of%20Child%20Labour%20Report.pdf
+outs:
+  - md5: 9ba5688eafdef1f8598cda73d32d4a47
+    size: 6589
+    path: child_labor_trends.csv

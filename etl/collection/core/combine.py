@@ -171,6 +171,7 @@ def combine_collections(
     collection_dimension_slug: str | None = None,
     collection_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
+    _slug_changes_out: dict | None = None,
 ) -> E: ...
 
 
@@ -186,6 +187,7 @@ def combine_collections(
     collection_dimension_slug: str | None = None,
     collection_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
+    _slug_changes_out: dict | None = None,
 ) -> T: ...
 
 
@@ -201,6 +203,7 @@ def combine_collections(
     collection_dimension_slug: str | None = None,
     collection_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
+    _slug_changes_out: dict | None = None,
 ) -> Collection | Explorer:
     """Combine multiple collections (MDIMs or Explorers) into a single one.
 
@@ -228,6 +231,11 @@ def combine_collections(
             Names for the choices in the source dimension (should match the length of collections)
         is_explorer:
             Force the result to be an Explorer (True) or MDIM (False). If None (default), inferred from the input collections.
+        _slug_changes_out:
+            Internal. When a non-None dict is passed, it is mutated in-place with
+            the slug changes produced by conflict resolution. Structure:
+            ``{collection_id: {dimension_slug: {original_slug: renamed_slug}}}``.
+            Used by ``create_collection`` to remap per-table ``choice_renames``.
 
     Returns:
         A combined Collection or Explorer, matching the type of the input collections
@@ -270,11 +278,24 @@ def combine_collections(
                 "Dimensions are not the same across collections. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
             )
 
-    # Check for checkbox dimensions in the first collection
-    # TODO: Implement support for checkboxes when merging
+    # Checkbox dimensions are only safe to combine when all collections share the same
+    # definition (same slug/name/presentation AND same choice set). When they match, the
+    # merge is structurally identical to a 2-choice radio. The structural equality of
+    # everything except `choices` was already asserted above (see `dimensions_flatten`);
+    # we additionally require the choice slugs to match, since `_combine_dimensions`
+    # currently rebuilds the choice list by union and that would silently flip a checkbox
+    # into a 3+-choice widget if the sub-collections disagreed on the off/on slugs.
     for dim in collections[0].dimensions:
         if dim.ui_type == "checkbox" and is_explorer:
-            raise NotImplementedError("Checkbox dimensions are not supported yet for Explorers.")
+            ref_slugs = sorted(dim.choice_slugs)
+            for other in collections[1:]:
+                other_dim = next((d for d in other.dimensions if d.slug == dim.slug), None)
+                if other_dim is None or sorted(other_dim.choice_slugs) != ref_slugs:
+                    raise NotImplementedError(
+                        f"Checkbox dimension '{dim.slug}' has different choices across "
+                        "collections — merging is not supported. Ensure every sub-collection "
+                        "declares the same checkbox slug, choices, and `choice_slug_true`."
+                    )
 
     # Detect duplicate views + save dependencies
     seen_dims = set()
@@ -385,7 +406,12 @@ def combine_collections(
         [d.to_dict() for d in dimensions],
         cconfig.get("dimensions", []),
     )
-    cconfig["views"] = views
+    # Hand-listed YAML views (from the user's config) belong here — alongside the views
+    # accumulated from sub-collections. Sub-collection views are View instances; YAML views
+    # are dicts. `create_collection_from_config` (via Explorer.from_dict / Collection.from_dict)
+    # accepts both shapes.
+    yaml_views = cconfig.get("views") or []
+    cconfig["views"] = views + list(yaml_views)
 
     # Create the combined collection
     combined = create_collection_from_config(
@@ -409,6 +435,11 @@ def combine_collections(
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
                 log.warning(f" Collections {collection_names} map to {record[0]}")
+
+    # Expose slug changes to caller if requested (used by create_collection
+    # to remap per-table choice_renames after combining).
+    if _slug_changes_out is not None:
+        _slug_changes_out.update(choice_slug_changes)
 
     return combined
 
@@ -458,6 +489,13 @@ def _combine_dimensions(
 def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapping[str, Collection | Explorer]:
     """Access each explorer, and update choice slugs in views"""
     for collection_id, change in choice_slug_changes.items():
+        # `change` is the column from `_extract_choice_slug_changes`'s unstacked frame —
+        # dimensions with no conflicts in this collection come through as NaN. Drop them;
+        # pandas.DataFrame.replace rejects a nested mapping if any top-level value isn't a dict.
+        change = {k: v for k, v in change.items() if isinstance(v, dict) and v}
+        if not change:
+            continue
+
         # Get collection
         collection = collection_by_id[collection_id]
 

@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5134
-    date_accessed: 2023-08-10 07:50:04.418137
+    url: https://admin.owid.io/admin/datasets/5134
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5134_te_16_1
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0c672cdeb3d71480d7c6cfbed7873591
-  size: 1878
-  path: dataset_5134_te_16_1_config.json
+  - md5: 4c0f83c84233e9b99ec1237a67d705c2
+    size: 2008
+    path: dataset_5134_te_16_1_config.json

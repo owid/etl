@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Eggs market situation dashboard (2025-01-29)
+    description: |-
+      Weekly dashboard published by the European Commission presenting the market situation for eggs in the EU, including data on the structure of the laying hen flock by housing system (enriched cages, barn, free range, organic) for EU member states.
+    date_published: "2025-01-29"
+
+    # Citation
+    producer: European Commission
+    citation_full: |-
+      European Commission, Directorate-General for Agriculture and Rural Development. Eggs market situation dashboard (2025-01-29).
+
+    # Files
+    url_main: https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+    url_download: https://nexusavicultura.com/wp-content/uploads/2025/02/20250129-EU-eggs-market-situation-dashboard-by-EC.pdf
+    date_accessed: "2026-04-16"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://agriculture.ec.europa.eu/legal-notice_en
+
+outs:
+  - md5: 8d10d7678f98ea0fbe26a5d635ff5ff1
+    size: 991868
+    path: eu_eggs_dashboard_2025_01.pdf

@@ -1,4 +1,4 @@
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 from owid.catalog import api
 from owid.catalog.api import Client, fetch, search
@@ -9,7 +9,6 @@ from owid.catalog.core.meta import (
     DatasetMeta,
     License,
     Origin,
-    Source,
     TableMeta,
     VariableMeta,
     VariablePresentationMeta,
@@ -32,7 +31,6 @@ __all__ = [
     "TableMeta",
     "VariableMeta",
     "VariablePresentationMeta",
-    "Source",
     "Origin",
     "License",
     # backwards compatibility re-exports

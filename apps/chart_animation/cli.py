@@ -5,11 +5,12 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import click
-import requests
 from PIL import Image
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 from tqdm.auto import tqdm
+
+from etl.http import session as http_session
 
 # Initialize log.
 log = get_logger()
@@ -26,7 +27,7 @@ def get_chart_metadata(chart_url):
     base_url = urlunparse(urlparse(chart_url)._replace(query=""))
     chart_metadata_url = str(base_url).rstrip("/") + ".metadata.json"
     log.info(f"Fetching metadata from: {chart_metadata_url}")
-    response = requests.get(chart_metadata_url)
+    response = http_session.get(chart_metadata_url)
     response.raise_for_status()
     chart_metadata = response.json()
 
@@ -35,7 +36,7 @@ def get_chart_metadata(chart_url):
 
 def get_indicator_metadata(indicator_metadata_url):
     # Given an indicator metadata URL, get the indicator metadata.
-    response = requests.get(indicator_metadata_url)
+    response = http_session.get(indicator_metadata_url)
     response.raise_for_status()
     return response.json()
 
@@ -125,7 +126,7 @@ def download_chart_png(png_url, output_file):
 
     # Download PNG.
     try:
-        response = requests.get(png_url, stream=True)
+        response = http_session.get(png_url, stream=True)
         response.raise_for_status()
         with open(output_file, "wb") as file:
             for chunk in response.iter_content(chunk_size=8192):
@@ -286,15 +287,14 @@ def create_mp4_from_images(
     duration_of_animation=False,
     first_frame=0,
 ):
-    # Lazy import to avoid ffmpeg requirement at module load time
-    try:
-        from moviepy import ImageSequenceClip
-    except RuntimeError as e:
-        if "No ffmpeg exe could be found" in str(e):
-            raise RuntimeError(
-                "FFmpeg is required to create MP4 files. Please install ffmpeg or set the IMAGEIO_FFMPEG_EXE environment variable."
-            ) from e
-        raise
+    import shutil
+    import subprocess
+    import tempfile
+
+    if not shutil.which("ffmpeg"):
+        raise RuntimeError(
+            "FFmpeg is required to create MP4 files. Please install ffmpeg (e.g. `brew install ffmpeg`)."
+        )
 
     # Prepare a list of image objects.
     images = prepare_images(
@@ -309,14 +309,30 @@ def create_mp4_from_images(
     # Calculate frame rate from duration per frame.
     frame_rate = 1 / (duration / 1000)
 
-    temp_image_paths = []
-    for idx, img in enumerate(images[first_frame:]):
-        temp_path = f"/tmp/temp_image_{idx}.png"
-        img.save(temp_path)
-        temp_image_paths.append(temp_path)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        for idx, img in enumerate(images[first_frame:]):
+            img.save(Path(tmpdir) / f"frame_{idx:06d}.png")
 
-    clip = ImageSequenceClip(temp_image_paths, fps=frame_rate)
-    clip.write_videofile(output_file, codec="libx264", fps=frame_rate, preset="slow", audio=False)
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-framerate",
+                str(frame_rate),
+                "-i",
+                str(Path(tmpdir) / "frame_%06d.png"),
+                "-c:v",
+                "libx264",
+                "-preset",
+                "slow",
+                "-pix_fmt",
+                "yuv420p",
+                "-an",
+                output_file,
+            ],
+            check=True,
+            capture_output=True,
+        )
 
     return output_file
 

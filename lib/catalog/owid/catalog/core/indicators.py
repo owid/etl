@@ -26,11 +26,9 @@ from owid.catalog.core.meta import (
     PROCESSING_LEVELS_ORDER,
     License,
     Origin,
-    Source,
     VariableMeta,
     VariablePresentationMeta,
 )
-from owid.catalog.core.processing_log import ProcessingLog, enabled
 from owid.catalog.core.properties import metadata_property
 
 log = structlog.get_logger()
@@ -408,61 +406,6 @@ class Indicator(pd.Series):
     def set_categories(self, *args: Any, **kwargs: Any) -> Indicator:
         return Indicator(self.cat.set_categories(*args, **kwargs), name=self.name, metadata=self.metadata.copy())
 
-    def update_log(
-        self,
-        operation: str,
-        parents: list[Any] | None = None,
-        variable: str | None = None,
-        comment: str | None = None,
-    ) -> Indicator:
-        """Add an entry to the indicator's processing log.
-
-        Records data transformation operations for data provenance tracking.
-
-        Args:
-            operation: Name of the operation performed (e.g., "merge", "aggregate").
-            parents: List of parent indicators that contributed to this operation.
-                If None, uses the indicator itself as the only parent.
-            variable: Name of the variable for the log entry. If None, uses the
-                indicator's name or UNNAMED_INDICATOR.
-            comment: Optional comment describing the operation in detail.
-
-        Returns:
-            The indicator itself (for method chaining).
-
-        Example:
-            ```python
-            # Log a custom transformation
-            ind.update_log(
-                operation="normalize",
-                comment="Normalized to 2015 baseline"
-            )
-
-            # Log a merge operation
-            result.update_log(
-                operation="merge",
-                parents=[ind1, ind2],
-                comment="Combined GDP and population data"
-            )
-            ```
-        """
-        if variable is None:
-            # If a variable name is not specified, take it from the indicator, or otherwise use UNNAMED_INDICATOR.
-            variable = self.name or UNNAMED_INDICATOR
-
-        if parents is None:
-            # If parents are not specified, take the indicator itself as the only parent.
-            parents = [self]
-
-        # Add new entry to the indicator's processing log.
-        self.metadata.processing_log.add_entry(
-            variable=variable,
-            parents=parents,
-            operation=operation,
-            comment=comment,
-        )
-        return self
-
     def rolling(self, *args: Any, **kwargs: Any) -> IndicatorRolling:
         """Create a rolling window operation that preserves metadata.
 
@@ -661,31 +604,6 @@ def _get_metadata_value_from_indicators_if_all_identical(
     return combined_value
 
 
-def get_unique_sources_from_indicators(indicators: list[Indicator]) -> list[Source]:
-    """Get unique sources from a list of indicators.
-
-    Collects all unique Source objects from the metadata of multiple indicators,
-    preserving order of first occurrence.
-
-    Args:
-        indicators: List of Indicator objects to extract sources from.
-
-    Returns:
-        List of unique Source objects in order of first appearance.
-
-    Example:
-        ```python
-        sources = get_unique_sources_from_indicators([ind1, ind2, ind3])
-        print(f"Combined {len(sources)} unique sources")
-        ```
-    """
-    # Make a list of all sources of all indicators.
-    sources = []
-    for indicator in indicators:
-        sources += [s for s in indicator.metadata.sources if s not in sources]
-    return sources
-
-
 def get_unique_origins_from_indicators(indicators: list[Indicator]) -> list[Origin]:
     """Get unique origins from a list of indicators.
 
@@ -762,47 +680,6 @@ def get_unique_description_key_points_from_indicators(indicators: list[Indicator
     for indicator in indicators:
         description_key_points += [k for k in indicator.metadata.description_key if k not in description_key_points]
     return description_key_points
-
-
-def combine_indicators_processing_logs(
-    indicators: list[Indicator] | None = None,
-    *,
-    variables: list[Indicator] | None = None,
-) -> ProcessingLog:
-    """Combine processing logs from multiple indicators.
-
-    Merges all processing log entries from the provided indicators into a single
-    ProcessingLog object, maintaining chronological order.
-
-    Args:
-        indicators: List of Indicator objects whose processing logs should be combined.
-        variables: Deprecated alias for indicators parameter (for backwards compatibility).
-
-    Returns:
-        ProcessingLog object containing all entries from all indicators.
-
-    Example:
-        ```python
-        combined_log = combine_indicators_processing_logs([ind1, ind2, ind3])
-        print(f"Combined log has {len(combined_log)} entries")
-        ```
-    """
-    # Support both parameter names for backwards compatibility
-    if indicators is None and variables is not None:
-        indicators = variables
-    elif indicators is None:
-        indicators = []
-
-    # Make a list with all entries in the processing log of all indicators.
-    processing_log = sum(
-        [
-            indicator.metadata.processing_log if indicator.metadata.processing_log is not None else []
-            for indicator in indicators
-        ],
-        [],
-    )
-
-    return ProcessingLog(processing_log)  # ty: ignore
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:
@@ -963,7 +840,6 @@ def combine_indicators_metadata(
     metadata.short_unit = _get_metadata_value_from_indicators_if_all_identical(
         indicators=indicators_only, field="short_unit", operation=operation, warn_if_different=True
     )
-    metadata.sources = get_unique_sources_from_indicators(indicators=indicators_only)
     metadata.origins = get_unique_origins_from_indicators(indicators=indicators_only)
     metadata.licenses = get_unique_licenses_from_indicators(indicators=indicators_only)
     metadata.display = combine_indicators_display(indicators=indicators_only, operation=operation)
@@ -980,15 +856,6 @@ def combine_indicators_metadata(
     metadata.dimensions = _get_metadata_value_from_indicators_if_all_identical(
         indicators=indicators_only, field="dimensions", operation=operation, warn_if_different=True
     )
-
-    if enabled():
-        metadata.processing_log = combine_indicators_processing_logs(indicators=indicators_only)
-        if operation:
-            metadata.processing_log.add_entry(
-                variable=name,
-                parents=indicators,
-                operation=operation,
-            )
 
     return metadata
 

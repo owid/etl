@@ -1,0 +1,20 @@
+dataset:
+  title: TE-17.16_unemployment
+tables:
+  te_17_16_unemployment:
+    variables:
+      consumer_price_inflation__pct:
+        title: Consumer price inflation (%)
+        unit: '%'
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

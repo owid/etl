@@ -1,0 +1,145 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+  description_processing_hens: &description_processing_hens |-
+    - Data for the UK, US, and EU member states are sourced from official statistics. Data for other countries are taken from a compilation by the Welfare Footprint Institute, which combines national statistics and industry reports.
+    - For the UK, hen housing counts and shares are approximated from the share of eggs produced in each housing type, due to limited data availability.
+    - For the US, pastured hens are included under free-range, and organic hens not reported as free-range or pastured are included under barn or aviary.
+  description_processing_backfill: &description_processing_backfill
+    Data for 2006-2011 was suppressed in the 2026 release of UK egg statistics. Values from an earlier 2023 release were used to fill this gap.
+
+dataset:
+  title: "Eggs and hens statistics"
+
+tables:
+  egg_statistics:
+    title: UK egg statistics
+    variables:
+      number_of_eggs_all:
+        title: Total number of eggs produced in the UK
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: |
+          The total number of eggs packed in the UK, as reported by Defra. This total is available for all years even when breakdowns by production type are suppressed or unavailable.
+      number_of_eggs_from_hens_cage_free:
+        title: Number of eggs from cage-free hens
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          Cage-free housing systems include barns and free-range (non-organic and organic) farms.
+      number_of_eggs_from_hens_in_barns:
+        title: Number of eggs from hens in barns
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_backfill
+      number_of_eggs_from_hens_in_cages:
+        title: Number of eggs from hens in (enriched) cages
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      number_of_eggs_from_hens_free_range_not_organic:
+        title: Number of eggs from hens in non-organic, free-range farms
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      number_of_eggs_from_hens_free_range_organic:
+        title: Number of eggs from hens in organic, free-range farms
+        unit: eggs
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_backfill
+  hen_statistics:
+    title: Hen statistics by housing system
+    variables:
+      number_of_hens_all:
+        title: Total number of egg-laying hens
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_hens
+      number_of_hens_in_cages:
+        title: Number of egg-laying hens in cages
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_hens
+      number_of_hens_cage_free:
+        title: Number of egg-laying hens in cage-free systems
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_hens
+      number_of_hens_in_barns:
+        title: Number of egg-laying hens housed in a barn or aviary
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_hens
+      number_of_hens_free_range_not_organic:
+        title: Number of egg-laying hens in non-organic, free-range farms
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_hens
+      number_of_hens_free_range_organic:
+        title: Number of egg-laying hens in organic housing systems
+        unit: hens
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_processing: *description_processing_hens
+      share_of_hens_cage_free:
+        title: Share of egg-laying hens in cage-free systems
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description_short: |-
+          Cage-free housing systems include barns and free-range (non-organic and organic) farms.
+        description_processing: *description_processing_hens
+      share_of_hens_in_cages:
+        title: Share of egg-laying hens in cages
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description_short: |-
+          This includes conventional as well as enriched cages, which are larger, furnished cages that provide slightly more space than conventional ones.
+        description_processing: *description_processing_hens
+      share_of_hens_in_barns:
+        title: Share of egg-laying hens housed in a barn or aviary
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description_processing: *description_processing_hens
+      share_of_hens_free_range_not_organic:
+        title: Share of egg-laying hens in non-organic, free-range farms
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description_processing: *description_processing_hens
+      share_of_hens_free_range_organic:
+        title: Share of egg-laying hens in organic housing systems
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description_processing: *description_processing_hens

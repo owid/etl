@@ -717,7 +717,6 @@ tables:
               - url: >-
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       sh_sta_stnt_me_zs:
         title: Share of children who are stunted (modeled estimates)
         unit: '% of children under 5'
@@ -806,7 +805,6 @@ tables:
               - url: >-
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
       eg_cft_accs_zs:
         title: Access to clean fuels and technologies for cooking (% of population)
@@ -837,7 +835,7 @@ tables:
           - "To learn more, read our article: [Definitions: access to electricity](https://ourworldindata.org/definition-electricity-access)."
         presentation:
           title_public: Share of the population with access to electricity
-          attribution: Data compiled from multiple sources by World Bank
+          attribution: Data compiled from multiple sources by the World Bank
           attribution_short: World Bank
           topic_tags:
             - Access to Energy
@@ -890,7 +888,7 @@ tables:
         description_processing: We calculated the share of the population without access to electricity by subtracting the share of the population with access from 100%.
         presentation:
           title_public: Share of the population with no access to electricity
-          attribution: Data compiled from multiple sources by World Bank
+          attribution: Data compiled from multiple sources by the World Bank
           attribution_short: World Bank
           topic_tags:
             - Access to Energy
@@ -921,7 +919,7 @@ tables:
         description_processing: We calculated the number of people with access to electricity by multiplying the fraction of the population with access by the total population.
         presentation:
           title_public: Number of people with access to electricity
-          attribution: Data compiled from multiple sources by World Bank
+          attribution: Data compiled from multiple sources by the World Bank
           attribution_short: World Bank
           topic_tags:
             - Access to Energy
@@ -936,7 +934,7 @@ tables:
         description_processing: We calculated the number of people without access to electricity by multiplying the fraction of the population without access by the total population.
         presentation:
           title_public: Number of people without access to electricity
-          attribution: Data compiled from multiple sources by World Bank
+          attribution: Data compiled from multiple sources by the World Bank
           attribution_short: World Bank
           topic_tags:
             - Access to Energy

@@ -1,8 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -91,14 +91,14 @@ def prepare_share_of_eggs(tb_share: Table) -> Table:
     return tb_share
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset and read its tables.
-    ds_meadow: Dataset = paths.load_dependency("us_egg_production")
-    tb = ds_meadow["us_egg_production"].reset_index()
-    tb_share = ds_meadow["us_egg_production_share_cage_free"].reset_index()
+    ds_meadow = paths.load_dataset("us_egg_production")
+    tb = ds_meadow.read("us_egg_production")
+    tb_share = ds_meadow.read("us_egg_production_share_cage_free")
 
     #
     # Process data.
@@ -112,10 +112,8 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb, tb_share], default_metadata=ds_meadow.metadata, check_variables_metadata=True
-    )
+    # Create a new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb, tb_share], default_metadata=ds_meadow.metadata)
 
-    # Save changes in the new garden dataset.
+    # Save new garden dataset.
     ds_garden.save()

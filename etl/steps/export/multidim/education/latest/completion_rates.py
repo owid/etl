@@ -248,9 +248,9 @@ def generate_title_by_gender_and_level(view):
         raise ValueError(f"Unknown education level: {level}")
 
     if level == "level_side_by_side":
-        return f"Share of {gender_term} that have completed school, by education level"
+        return f"Share of {gender_term} who have completed school, by education level"
     else:
-        return f"Share of {gender_term} that have completed {level_term}"
+        return f"Share of {gender_term} who have completed {level_term}"
 
 
 def generate_subtitle_by_level(view):

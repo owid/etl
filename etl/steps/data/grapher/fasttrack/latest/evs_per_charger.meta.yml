@@ -1,14 +1,5 @@
 dataset:
-  namespace: fasttrack
-  version: latest
-  short_name: evs_per_charger
   title: DRAFT EVs per charger
-  description: ''
-  sources:
-  - name: Unknown
-    published_by: Unknown
-    publication_year: 2023
-    date_accessed: 2023-03-31
 tables:
   evs_per_charger:
     variables:

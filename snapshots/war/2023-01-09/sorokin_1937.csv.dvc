@@ -1,87 +1,51 @@
 meta:
-  namespace: war
-  short_name: sorokin_1937
-  name: 'Social and cultural dynamics. Volume III: Fluctuation of Social Relationships, War, and Revolution (1937)'
-  source_name: Sorokin (1937)
-  publication_year: 1937
-  publication_date: 1937-12-01
-  url: https://doi.org/10.2307/2143975
-  source_data_url: https://docs.google.com/spreadsheets/d/1Xo5e8aiFJnmv_aasFXU8MtzizSU0LxiysoUuErEJx3Q/edit?usp=sharing
-  file_extension: csv
-  license_url: https://about.jstor.org/terms/
-  license_name: JSTOR
-  date_accessed: 2023-01-09
-  is_public: true
-  description: >-
-    What years and countries are covered? 12th-20th century, 11 European countries
+  origin:
+    producer: Sorokin
+    title: 'Social and cultural dynamics. Volume III: Fluctuation of Social Relationships, War, and Revolution'
+    description: |-
+      What years and countries are covered? 12th–20th century, 11 European countries
 
-      - "We have taken almost all the known wars of Greece, Rome, Austria, Germany,
-    England, France, the Netherlands, Spain, Italy, Russia, and
-      Poland and Lithuania from the periods indicated in the subsequent tables (Chapter
-    Ten and Eleven) to the present time, or, in the case of
-      Greece and Rome, to the loss of Greek independence and to the so-called "end
-    of the Western Roman Empire," respectively" (Sorokin 1937: 283).
+      - "We have taken almost all the known wars of Greece, Rome, Austria, Germany, England, France, the Netherlands, Spain, Italy, Russia, and Poland and Lithuania from the periods indicated in the subsequent tables (Chapter Ten and Eleven) to the present time, or, in the case of Greece and Rome, to the loss of Greek independence and to the so-called "end of the Western Roman Empire," respectively" (Sorokin 1937: 283).
 
-      - "for Greece, for Rome, and for nine other European countries" (Sorokin 1937:
-    286).
+      - "for Greece, for Rome, and for nine other European countries" (Sorokin 1937: 286).
 
       - "From the twelfth to the twentieth century" (Sorokin 1937: 286).
 
       - 976 for France to 1925 (Sorokin 1937: 306-307).
 
+      Which conflicts are covered? Wars
 
-    Which conflicts are covered? Wars
+      Which deaths and casualties are covered? Direct military casualties
 
+      - Casualties, military, direct: "This study deals precisely with these three quantitative elements of war: the strength of the army, the number of casualties (killed and wounded), and the duration of each of the wars studied. No other aspect of the war phenomena is studied, not the economic losses, nor the morbidity and mortality of the civilian population, nor anything else" (Sorokin 1937: 282).
 
-    Which deaths and casualties are covered? Direct military casualties
+      - "general losses up to 47,000 [...] but mainly from sickness, therefore not included" (Sorokin 1937: 552).
 
-      - Casualties, military, direct: "This study deals precisely with these three
-    quantitative elements of war: the strength of the army,
-      the number of casualties (killed and wounded), and the duration of each of the
-    wars studied. No other aspect of the war phenomena is
-      studied, not the economic losses, nor the morbidity and mortality of the civilian
-    population, nor anything else" (Sorokin 1937: 282).
+      - Casualties are sometimes estimated based on army sizes and war duration: "Likewise, the total number of the casualties in a given war means the typical per cent of the casualties in regard to the strength of the army multiplied by the number of years during which the war lasted" (Sorokin 1937: 284).
 
-      - "general losses up to 47,000 [...] but mainly from sickness, therefore not
-    included" (Sorokin 1937: 552).
+      - War casualties sometimes estimated using annual casualties: "the total number of the casualties for each given war is obtained, either by multiplication of the typical per cent of the casualties by the number of years, or by putting down the actual data which exist in regard to this item for a given war as a whole" (Sorokin 1937: 284).
 
-      - Casualties are sometimes estimated based on army sizes and war duration: "Likewise,
-    the total number of the casualties in a given war means
-      the typical per cent of the casualties in regard to the strength of the army
-    multiplied by the number of years during which the war lasted"
-      (Sorokin 1937: 284).
+      - Data quality is rough: "This means that the figures given for each period are aimed not so much to lay down the actual number of the mobilized or killed and wounded as to obtain a rough measuring device to see the comparative increase or de- crease of war from period to period" (Sorokin 1937: 285).
 
-      - War casualties sometimes estimated using annual casualties: "the total number
-    of the casualties for each given war is obtained, either by
-      multiplication of the typical per cent of the casualties by the number of years,
-    or by putting down the actual data which exist in regard
-      to this item for a given war as a whole" (Sorokin 1937: 284).
+      How did he construct the data?
 
-      - Data quality is rough: "This means that the figures given for each period
-    are aimed not so much to lay down the actual number of the
-      mobilized or killed and wounded as to obtain a rough measuring device to see
-    the comparative increase or de- crease of war from period
-      to period" (Sorokin 1937: 285).
+      - "The actual data are taken from authoritative historical sources, often ably summarized and elaborated by various special historical works like the often-quoted works of Delbruck, Bodart, and various encyclopedias of war and military science" (Sorokin 1937: 285).
 
+      How did we construct our spreadsheet?
 
-    How did he construct the data?
+      - We accessed the book, the relevant methodological section starts on page 282, the detailed descriptions of wars and deaths starts on page 543.
 
-      - "The actual data are taken from authoritative historical sources, often ably
-    summarized and elaborated by various special historical
-      works like the often-quoted works of Delbruck, Bodart, and various encyclopedias
-    of war and military science" (Sorokin 1937: 285).
+      - We extracted deaths and casualties from Sorokin's numbers on which participant suffered which losses during any given conflict; Sorokin often does not provide estimates for all participants of a given conflict.
 
-
-    How did we construct our spreadsheet?
-
-      - We accessed the book, the relevant methodological section starts on page
-    282, the detailed descriptions of wars and deaths starts on
-      page 543.
-
-      - We extracted deaths and casualties from Sorokin's numbers on which participant
-    suffered which losses during any given conflict; Sorokin
-      often does not provide estimates for all participants of a given conflict.
-
+      This dataset provides information on direct military casualties from wars, drawn from the book by Sorokin (1937).
+    citation_full: 'Sorokin, Pitirim. 1937. Social and cultural dynamics. Volume Three: Fluctuation of Social Relationships, Wars, and Revolution. American Book Company.'
+    url_main: https://doi.org/10.2307/2143975
+    url_download: https://docs.google.com/spreadsheets/d/1Xo5e8aiFJnmv_aasFXU8MtzizSU0LxiysoUuErEJx3Q/edit?usp=sharing
+    date_accessed: '2023-01-09'
+    date_published: '1937-12-01'
+    license:
+      name: JSTOR
+      url: https://about.jstor.org/terms/
 wdir: ../../../data/snapshots/war/2023-01-09
 outs:
   - md5: b3f14480bf4936bccc548afa77d237b6

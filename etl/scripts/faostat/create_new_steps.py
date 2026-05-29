@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 from typing import cast
 
-from etl.dag_helpers import load_dag
+from etl.dag_helpers import flatten_dag_file, load_dag
 from etl.files import checksum_file
 from etl.paths import STEP_DIR
 from etl.scripts.faostat.shared import (
@@ -291,9 +291,7 @@ def find_latest_version_for_step(channel: str, step_name: str, namespace: str = 
 
     elif channel in ["meadow", "garden", "grapher"]:
         versions_dir = get_path_to_step_files(channel=channel, namespace=namespace)
-        dataset_versions = sorted(
-            list(versions_dir.glob(f"*/{step_name}.ipynb")) + list(versions_dir.glob(f"*/{step_name}.py"))
-        )
+        dataset_versions = sorted(versions_dir.glob(f"*/{step_name}.py"))
         if len(dataset_versions) > 0:
             latest_version = dataset_versions[-1].parent.name
         elif len(list(versions_dir.glob("latest"))) > 0:
@@ -647,6 +645,10 @@ def write_steps_to_dag_file(dag_steps: dict[str, set[str]], header_line: str | N
 
     if any_step_updated:
         log.info("Writing new steps to dag file.")
+        # Ensure the DAG file is flat before we blindly append new ``step:``
+        # blocks at its tail — a nested-syntax section at EOF would make
+        # the appended block land at the wrong nesting depth.
+        flatten_dag_file(DAG_FILE)
         # Add new lines to dag file.
         with open(DAG_FILE, "a") as _dag_file:
             _dag_file.write(new_step_lines)

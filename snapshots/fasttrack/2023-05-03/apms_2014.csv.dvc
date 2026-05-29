@@ -1,19 +1,18 @@
 meta:
-  source:
-    name: Adult Psychiatric Morbidity Survey 2014, England (2016)
-    url: https://www.gov.uk/government/statistics/adult-psychiatric-morbidity-survey-mental-health-and-wellbeing-england-2014
-    source_data_url: |-
+  origin:
+    producer: NHS Digital
+    title: 'Mental health and wellbeing in England: Adult Psychiatric Morbidity Survey 2014'
+    description: |-
+      This is a dataset of the prevalence of current depression in the general population in England, living in private households. Households were sampled randomly and individuals were interviewed using the revised Clinical Interview Schedule (CIS-R), which is a diagnostic structured interview format to determine whether people had common mental disorders in the past week. In this dataset, presence of a current episode of major depression was determined.
+    citation_full: 'McManus S, Bebbington P, Jenkins R, Brugha T. (eds.) (2016). Mental health and wellbeing in England: Adult Psychiatric Morbidity Survey 2014. Leeds: NHS Digital.'
+    url_main: https://www.gov.uk/government/statistics/adult-psychiatric-morbidity-survey-mental-health-and-wellbeing-england-2014
+    url_download: |-
       gAAAAABnRYjm-BZi3Nqs7In2gpZhuG03kWo5SiR_xJvXwncMzCmm--o4Z8FRFP55gIjTYun0AkKER23bHIUepBVraLszkW61lTi6JF3H7H0letw5MoLXJDe4S8UEwvkcq5h37pnxrcSJnzImSFrTQOuHF8l2kjJAF1QscQkYd_LGafvd9rWKkokdPPVLBf7iopl1gdm1gu7njbwKkauTdZyUbskGamH5fblFVs2LZv_GOGMQTv9yc4C-7dcXaRivHu-c-oU0j61D
     date_accessed: '2024-11-26'
-    publication_year: 2016
-    published_by: |-
-      "McManus S, Bebbington P, Jenkins R, Brugha T. (eds.) (2016) Mental health and wellbeing in England: Adult Psychiatric Morbidity Survey 2014. Leeds: NHS Digital"
-  name: Current depression in England by age and gender (APMS, 2014)
-  description: |-
-    This is a dataset of the prevalence of current depression in the general population in England, living in private households. Households were sampled randomly and individuals were interviewed using the revised Clinical Interview Schedule (CIS-R), which is a diagnostic structured interview format to determine whether people had common mental disorders in the past week. In this dataset, presence of a current episode of major depression was determined.
-  license:
-    name: Open Government Licence v3.0
-    url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+    date_published: '2016'
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
   is_public: false
 outs:
   - md5: 7a42c7cee959d16ae9d981f4b8b7ade1

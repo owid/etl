@@ -13,7 +13,7 @@ definitions:
 dataset:
   title: Human Capital in the Long Run (Lee and Lee 2016), WDI (World Bank) and UNESCO
   description: >
-    This dataset is based on 'Human Capital in the Long Run' by Lee and Lee (2016) and World Development Indicators by World Bank.
+    This dataset is based on 'Human Capital in the Long Run' by Lee and Lee (2016) and World Development Indicators by the World Bank.
     It includes indicators relating to enrollment rates in various levels of education, historic data on average years of education and educational attainment, specifically share of people with no education.
 
 tables:

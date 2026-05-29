@@ -1,6 +1,8 @@
 ---
 name: check-chart-preview
 description: Check chart or multidim preview on the staging server using a browser. Use when user wants to visually verify a chart renders correctly on staging, take a screenshot of a chart, or QA a chart/mdim preview.
+metadata:
+  internal: true
 ---
 
 # Check Chart/Mdim Preview on Staging

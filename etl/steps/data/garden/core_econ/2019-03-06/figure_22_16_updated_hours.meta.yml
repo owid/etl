@@ -1,0 +1,17 @@
+dataset:
+  title: Figure 22.16_updated_hours
+tables:
+  figure_22_16_updated_hours:
+    variables:
+      average_annual_hours_actually_worked_per_worker_in_2017__oecd:
+        title: Average annual hours actually worked per worker in 2017 (OECD)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

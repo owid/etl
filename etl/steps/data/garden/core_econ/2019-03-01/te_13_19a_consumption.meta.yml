@@ -1,0 +1,20 @@
+dataset:
+  title: TE-13.19a_Consumption
+tables:
+  te_13_19a_consumption:
+    variables:
+      growth_rate_of_private_final_consumption_expenditure__pct:
+        title: Growth rate of Private Final Consumption Expenditure (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code
