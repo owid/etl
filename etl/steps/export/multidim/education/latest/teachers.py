@@ -44,7 +44,7 @@ MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
     "addCountryMode": "add-country",
-    "sortBy": "entityName",
+    "sortBy": "custom",
 }
 
 # Configuration for grouped views (side-by-side comparisons)
@@ -54,7 +54,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "yAxis": {"min": 0, "max": 100, "facetDomain": "independent"},  # Percentage scale
     "selectedFacetStrategy": "entity",  # Allow entity selection
     "addCountryMode": "add-country",
-    "sortBy": "entityName",  # Allow adding countries for easier comparison
+    "sortBy": "custom",  # Allow adding countries for easier comparison
 }
 
 # --------------------- #
