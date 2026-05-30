@@ -1068,8 +1068,11 @@ def select_growth_factor(tb: Table) -> Table:
 
 def smooth_estimates(tb: Table) -> Table:
     """
-    Create smoothed estimates using 10-year rolling averages for headcount and headcount_ratio.
+    Create smoothed estimates using 11-year centered rolling averages for headcount and headcount_ratio.
     This addresses uncertainty in historical estimates.
+    A centered window is used (rather than a trailing one) so the smoothed value at year Y averages
+    [Y-5, Y+5]. A trailing window biases each decadal point upward, because the monotonically declining
+    poverty series leans on the higher-poverty preceding decade.
     Only keeps decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1 (plus all years from LATEST_YEAR_PIP_FILLED onwards).
     """
 
@@ -1091,20 +1094,21 @@ def smooth_estimates(tb: Table) -> Table:
     # Sort by country, year, and poverty line
     tb_avg = tb_avg.sort_values(["country", "year", "poverty_line"]).reset_index(drop=True)
 
-    # Calculate 10-year rolling averages per country and poverty line for headcount_ratio
+    # Calculate 11-year centered rolling averages per country and poverty line for headcount_ratio
     tb_avg["headcount_ratio_avg"] = tb_avg.groupby(["country", "poverty_line"])["headcount_ratio"].transform(
-        lambda x: x.rolling(window=10, min_periods=1).mean()
+        lambda x: x.rolling(window=11, min_periods=1, center=True).mean()
     )
 
-    # Calculate 10-year rolling averages per country and poverty line for headcount
+    # Calculate 11-year centered rolling averages per country and poverty line for headcount
     tb_avg["headcount_avg"] = tb_avg.groupby(["country", "poverty_line"])["headcount"].transform(
-        lambda x: x.rolling(window=10, min_periods=1).mean()
+        lambda x: x.rolling(window=11, min_periods=1, center=True).mean()
     )
 
-    # Replace values at LATEST_YEAR_PIP_FILLED - 1 with original values (to ensure continuity with PIP data)
-    mask_last_year = tb_avg["year"] == (LATEST_YEAR_PIP_FILLED - 1)
-    tb_avg.loc[mask_last_year, "headcount_ratio_avg"] = tb_avg.loc[mask_last_year, "headcount_ratio"]
-    tb_avg.loc[mask_last_year, "headcount_avg"] = tb_avg.loc[mask_last_year, "headcount"]
+    # Anchor the endpoints to the original values: EARLIEST_YEAR (no left-side data to smooth) and
+    # LATEST_YEAR_PIP_FILLED - 1 (to ensure continuity with PIP data).
+    mask_anchor = tb_avg["year"].isin([EARLIEST_YEAR, LATEST_YEAR_PIP_FILLED - 1])
+    tb_avg.loc[mask_anchor, "headcount_ratio_avg"] = tb_avg.loc[mask_anchor, "headcount_ratio"]
+    tb_avg.loc[mask_anchor, "headcount_avg"] = tb_avg.loc[mask_anchor, "headcount"]
 
     # Keep only decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1
     tb_avg = tb_avg[
