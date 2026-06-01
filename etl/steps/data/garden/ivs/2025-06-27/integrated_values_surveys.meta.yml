@@ -942,7 +942,7 @@ tables:
 
       inequality_eq_ineq:
         title: "Income equality: There should be greater incentives for individual effort"
-        description_short: '% of respondents replying in a scale from 6 to 10 when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
+        description_short: '% of respondents replying in a scale from 7 to 10 when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
         display:
           name: "There should be greater incentives for individual effort"
           <<: *common-display
