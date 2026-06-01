@@ -141,13 +141,24 @@ named for single-question custom blocks (e.g. `secure_neighborhood`, `very_secur
 
 ## Step 2 — Re-snapshot (same version, no bump)
 
-After the user regenerates `ivs.csv` (next to the `.dta`):
+After the user regenerates `ivs.csv` (next to the `.dta`), **first confirm the Stata run actually emitted
+your new columns** before snapshotting — cheap insurance against a botched/partial `.do` run:
+
+```python
+import pandas as pd
+cols = set(pd.read_csv("snapshots/ivs/<v>/ivs.csv", nrows=0).columns)
+# pre-rename raw names, i.e. {prefix}_{CODE} for loops + literal names for custom blocks
+assert {"at_least_weekly_E248B", "agree_E217", "better_off_science_world", "concerned_humankind"} <= cols
+```
+
+Then re-snapshot:
 
 ```bash
 .venv/bin/etls ivs/<v>/integrated_values_surveys --path-to-file snapshots/ivs/<v>/ivs.csv
 ```
 
-This overwrites the `.dvc` md5/size in place (commit that diff). Delete the local `ivs.csv` after.
+This overwrites the `.dvc` md5/size in place (commit that diff with a `📊🤖` message). Delete the local
+`ivs.csv` after.
 
 ## Step 3 — Meadow: `etl/steps/data/meadow/ivs/<v>/integrated_values_surveys.py`
 
@@ -205,6 +216,16 @@ adjacent-string-literal concatenation and silently yields `Dont know`. After app
 with `ruamel_load` and assert the count + that a new `avg_score_*` entry shows `unit == ""` and the
 `&common-display` anchor resolved (e.g. `numDecimalPlaces`).
 
+**`title` must be UNIQUE across the whole dataset** — grapher enforces this at the `--grapher` upload
+(`_adapt_table_for_grapher`), *not* at the garden build, so a clash sails through `check_sum_100` and only
+explodes at upload (`AssertionError: Variable titles are not unique`). The trap: an **aggregate** and a
+**category** that describe the same thing collide on title even when their column names differ. Real
+example from this work — the closeness category `close_*` and the high aggregate `feel_close_*` both wanted
+`title: "Feel close to X"`. Fix: disambiguate the aggregate `title` (`"Feel close to X (very close or
+close)"`) and keep the short label in `display.name` (only `title` must be unique — `display.name` may
+repeat). **Assert title uniqueness in the pre-flight** (Step 6), don't wait for the upload to catch it:
+`titles=[e["title"] for e in vars.values()]; assert len(titles)==len(set(titles))`.
+
 **Audit gotcha:** verify any stated scale range against the actual `.do` recode — a pre-existing entry had
 `"6 to 10"` where the recode was `>= 7`. Don't copy ranges blindly.
 
@@ -231,10 +252,14 @@ metakeys = set(meta["tables"]["integrated_values_surveys"]["variables"])
 print("stata not meta:", sorted(stata - metakeys) or "none ✓")
 print("meta not stata:", sorted(metakeys - stata) or "none ✓")   # restrict metakeys to the new ones
 # also: assert no new code endswith another new code (rename ambiguity)
+# and assert ALL titles are unique (grapher requires it — see Step 5):
+titles = [v["title"] for v in meta["tables"]["integrated_values_surveys"]["variables"].values()]
+assert len(titles) == len(set(titles)), "duplicate variable titles — grapher upload will fail"
 ```
 
-A clean both-empty diff (counts equal) means the Stata→meadow output, the garden groups, and the meta
-keys agree before a single pipeline step runs.
+A clean both-empty diff (counts equal) + unique titles means the Stata→meadow output, the garden groups,
+and the meta keys agree, and the grapher upload won't trip the title-uniqueness assert — all before a
+single pipeline step runs.
 
 ## Step 7 — Run & verify
 
@@ -243,8 +268,13 @@ keys agree before a single pipeline step runs.
 .venv/bin/etlr integrated_values_surveys --grapher --private   # upload to staging grapher
 ```
 
-- `check_sum_100` is the gate — green run = recodes sum to 100%.
-- Spot-check ranges: share columns 0–100; continuous index on its native scale (e.g. 0–1).
+- **Two separate gates:** the build (first command) runs `check_sum_100` in garden (green = recodes sum to
+  100%). The `--grapher` upload (second command) runs additional grapher-only validations — notably
+  **title uniqueness** — so always run it too; a title clash only surfaces here. Don't stop at the build.
+- Spot-check ranges by loading the garden dataset: share columns 0–100; each `avg_score` on its native
+  scale (frequency 1–5, closeness 1–4, agree 1–10, index 0–1).
+- The benign `DisplayNameWarning` about `presentation.title_public` (1000+ columns) is expected — IVS
+  doesn't set `title_public`; not an error.
 - `make check` before committing.
 
 ## Step 8 — Git (per repo CLAUDE.md)
@@ -270,8 +300,15 @@ list over-counts (e.g. `ds E069*` keeps `E069_64`/"Elections" which produces no 
 items are dropped in garden). Beware substring false-positives when reverse-matching ("elections" matches
 `..._free_elections`); verify the exact column exists before flipping. The Notion MCP has **no bulk row
 query** — fetch/update per row (`notion-search` returns titles only; `notion-fetch` returns `Available`;
-`notion-update-page` with `{"Available":"__YES__"}`). The row's `Answers` field is a handy independent
-cross-check of your recode mapping.
+`notion-update-page` with `command="update_properties"`, `properties={"Available":"__YES__"}`). The row's
+`Answers` field is a handy independent cross-check of your recode mapping.
+
+**Each row's title is exactly the code** (the `Variable` title property). Find a row by searching the data
+source for the code (`notion-search` with `data_source_url=collection://…`), but **match the title
+EXACTLY** — search is fuzzy and returns look-alikes (`E248B` query also returns `E248`; `G062` returns
+`F062`/`D062`; `E001` returns `Y001`/`F001`). Updates are independent per page, so fire all of them in
+parallel (one `notion-update-page` per code). Verify with one `notion-fetch` afterward that `Available`
+reads `"__YES__"`.
 
 ## Worked example
 
