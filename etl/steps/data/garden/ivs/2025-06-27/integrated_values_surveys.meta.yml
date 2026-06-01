@@ -4836,355 +4836,355 @@ tables:
 
       agree_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: Agree"
-        description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: Agree"
           <<: *common-display
       disagree_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of respondents replying "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: Disagree"
           <<: *common-display
       neither_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: Neither agree nor disagree"
-        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: Neither agree nor disagree"
           <<: *common-display
       dont_know_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of respondents replying "don''t know" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: Don't know"
           <<: *common-display
       no_answer_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of answers classified as "No answer" for the question "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: No answer"
           <<: *common-display
       agree_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: Agree"
-        description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: Agree"
           <<: *common-display
       disagree_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of respondents replying "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: Disagree"
           <<: *common-display
       neither_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: Neither agree nor disagree"
-        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: Neither agree nor disagree"
           <<: *common-display
       dont_know_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of respondents replying "don''t know" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: Don't know"
           <<: *common-display
       no_answer_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Do you agree, disagree or neither agree nor disagree with the following statement? - When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of answers classified as "No answer" for the question "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: No answer"
           <<: *common-display
       agree_agg_housewife_just_as_fulfilling:
         title: "Being a housewife is just as fulfilling as working for pay: Agree (aggregate)"
-        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - Being a housewife is just as fulfilling as working for pay".'
+        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "Being a housewife is just as fulfilling as working for pay".'
         display:
           name: "Being a housewife is just as fulfilling as working for pay: Agree/Strongly agree"
           <<: *common-display
       disagree_agg_housewife_just_as_fulfilling:
         title: "Being a housewife is just as fulfilling as working for pay: Disagree (aggregate)"
-        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - Being a housewife is just as fulfilling as working for pay".'
+        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "Being a housewife is just as fulfilling as working for pay".'
         display:
           name: "Being a housewife is just as fulfilling as working for pay: Disagree/Strongly disagree"
           <<: *common-display
       strongly_agree_housewife_just_as_fulfilling:
         title: "Being a housewife is just as fulfilling as working for pay: Strongly agree"
-        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - Being a housewife is just as fulfilling as working for pay".'
+        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "Being a housewife is just as fulfilling as working for pay".'
         display:
           name: "Being a housewife is just as fulfilling as working for pay: Strongly agree"
           <<: *common-display
       agree_housewife_just_as_fulfilling:
         title: "Being a housewife is just as fulfilling as working for pay: Agree"
-        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - Being a housewife is just as fulfilling as working for pay".'
+        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "Being a housewife is just as fulfilling as working for pay".'
         display:
           name: "Being a housewife is just as fulfilling as working for pay: Agree"
           <<: *common-display
       disagree_housewife_just_as_fulfilling:
         title: "Being a housewife is just as fulfilling as working for pay: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - Being a housewife is just as fulfilling as working for pay".'
+        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "Being a housewife is just as fulfilling as working for pay".'
         display:
           name: "Being a housewife is just as fulfilling as working for pay: Disagree"
           <<: *common-display
       strongly_disagree_housewife_just_as_fulfilling:
         title: "Being a housewife is just as fulfilling as working for pay: Strongly disagree"
-        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - Being a housewife is just as fulfilling as working for pay".'
+        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "Being a housewife is just as fulfilling as working for pay".'
         display:
           name: "Being a housewife is just as fulfilling as working for pay: Strongly disagree"
           <<: *common-display
       dont_know_housewife_just_as_fulfilling:
         title: "Being a housewife is just as fulfilling as working for pay: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - Being a housewife is just as fulfilling as working for pay".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "Being a housewife is just as fulfilling as working for pay".'
         display:
           name: "Being a housewife is just as fulfilling as working for pay: Don't know"
           <<: *common-display
       no_answer_housewife_just_as_fulfilling:
         title: "Being a housewife is just as fulfilling as working for pay: No answer"
-        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - Being a housewife is just as fulfilling as working for pay".'
+        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "Being a housewife is just as fulfilling as working for pay".'
         display:
           name: "Being a housewife is just as fulfilling as working for pay: No answer"
           <<: *common-display
       agree_agg_men_better_political_leaders:
         title: "On the whole, men make better political leaders than women do: Agree (aggregate)"
-        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better political leaders than women do".'
+        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better political leaders than women do".'
         display:
           name: "On the whole, men make better political leaders than women do: Agree/Strongly agree"
           <<: *common-display
       disagree_agg_men_better_political_leaders:
         title: "On the whole, men make better political leaders than women do: Disagree (aggregate)"
-        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better political leaders than women do".'
+        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better political leaders than women do".'
         display:
           name: "On the whole, men make better political leaders than women do: Disagree/Strongly disagree"
           <<: *common-display
       strongly_agree_men_better_political_leaders:
         title: "On the whole, men make better political leaders than women do: Strongly agree"
-        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better political leaders than women do".'
+        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better political leaders than women do".'
         display:
           name: "On the whole, men make better political leaders than women do: Strongly agree"
           <<: *common-display
       agree_men_better_political_leaders:
         title: "On the whole, men make better political leaders than women do: Agree"
-        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better political leaders than women do".'
+        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better political leaders than women do".'
         display:
           name: "On the whole, men make better political leaders than women do: Agree"
           <<: *common-display
       disagree_men_better_political_leaders:
         title: "On the whole, men make better political leaders than women do: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better political leaders than women do".'
+        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better political leaders than women do".'
         display:
           name: "On the whole, men make better political leaders than women do: Disagree"
           <<: *common-display
       strongly_disagree_men_better_political_leaders:
         title: "On the whole, men make better political leaders than women do: Strongly disagree"
-        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better political leaders than women do".'
+        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better political leaders than women do".'
         display:
           name: "On the whole, men make better political leaders than women do: Strongly disagree"
           <<: *common-display
       dont_know_men_better_political_leaders:
         title: "On the whole, men make better political leaders than women do: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better political leaders than women do".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better political leaders than women do".'
         display:
           name: "On the whole, men make better political leaders than women do: Don't know"
           <<: *common-display
       no_answer_men_better_political_leaders:
         title: "On the whole, men make better political leaders than women do: No answer"
-        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better political leaders than women do".'
+        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better political leaders than women do".'
         display:
           name: "On the whole, men make better political leaders than women do: No answer"
           <<: *common-display
       agree_agg_university_more_important_for_a_boy:
         title: "A university education is more important for a boy than for a girl: Agree (aggregate)"
-        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - A university education is more important for a boy than for a girl".'
+        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "A university education is more important for a boy than for a girl".'
         display:
           name: "A university education is more important for a boy than for a girl: Agree/Strongly agree"
           <<: *common-display
       disagree_agg_university_more_important_for_a_boy:
         title: "A university education is more important for a boy than for a girl: Disagree (aggregate)"
-        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - A university education is more important for a boy than for a girl".'
+        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "A university education is more important for a boy than for a girl".'
         display:
           name: "A university education is more important for a boy than for a girl: Disagree/Strongly disagree"
           <<: *common-display
       strongly_agree_university_more_important_for_a_boy:
         title: "A university education is more important for a boy than for a girl: Strongly agree"
-        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - A university education is more important for a boy than for a girl".'
+        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "A university education is more important for a boy than for a girl".'
         display:
           name: "A university education is more important for a boy than for a girl: Strongly agree"
           <<: *common-display
       agree_university_more_important_for_a_boy:
         title: "A university education is more important for a boy than for a girl: Agree"
-        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - A university education is more important for a boy than for a girl".'
+        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "A university education is more important for a boy than for a girl".'
         display:
           name: "A university education is more important for a boy than for a girl: Agree"
           <<: *common-display
       disagree_university_more_important_for_a_boy:
         title: "A university education is more important for a boy than for a girl: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - A university education is more important for a boy than for a girl".'
+        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "A university education is more important for a boy than for a girl".'
         display:
           name: "A university education is more important for a boy than for a girl: Disagree"
           <<: *common-display
       strongly_disagree_university_more_important_for_a_boy:
         title: "A university education is more important for a boy than for a girl: Strongly disagree"
-        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - A university education is more important for a boy than for a girl".'
+        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "A university education is more important for a boy than for a girl".'
         display:
           name: "A university education is more important for a boy than for a girl: Strongly disagree"
           <<: *common-display
       dont_know_university_more_important_for_a_boy:
         title: "A university education is more important for a boy than for a girl: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - A university education is more important for a boy than for a girl".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "A university education is more important for a boy than for a girl".'
         display:
           name: "A university education is more important for a boy than for a girl: Don't know"
           <<: *common-display
       no_answer_university_more_important_for_a_boy:
         title: "A university education is more important for a boy than for a girl: No answer"
-        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - A university education is more important for a boy than for a girl".'
+        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "A university education is more important for a boy than for a girl".'
         display:
           name: "A university education is more important for a boy than for a girl: No answer"
           <<: *common-display
       agree_agg_pre_school_child_suffers_with_working_mother:
         title: "When a mother works for pay, the children suffer: Agree (aggregate)"
-        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - When a mother works for pay, the children suffer".'
+        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "When a mother works for pay, the children suffer".'
         display:
           name: "When a mother works for pay, the children suffer: Agree/Strongly agree"
           <<: *common-display
       disagree_agg_pre_school_child_suffers_with_working_mother:
         title: "When a mother works for pay, the children suffer: Disagree (aggregate)"
-        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - When a mother works for pay, the children suffer".'
+        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "When a mother works for pay, the children suffer".'
         display:
           name: "When a mother works for pay, the children suffer: Disagree/Strongly disagree"
           <<: *common-display
       strongly_agree_pre_school_child_suffers_with_working_mother:
         title: "When a mother works for pay, the children suffer: Strongly agree"
-        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - When a mother works for pay, the children suffer".'
+        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "When a mother works for pay, the children suffer".'
         display:
           name: "When a mother works for pay, the children suffer: Strongly agree"
           <<: *common-display
       agree_pre_school_child_suffers_with_working_mother:
         title: "When a mother works for pay, the children suffer: Agree"
-        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - When a mother works for pay, the children suffer".'
+        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "When a mother works for pay, the children suffer".'
         display:
           name: "When a mother works for pay, the children suffer: Agree"
           <<: *common-display
       disagree_pre_school_child_suffers_with_working_mother:
         title: "When a mother works for pay, the children suffer: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - When a mother works for pay, the children suffer".'
+        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "When a mother works for pay, the children suffer".'
         display:
           name: "When a mother works for pay, the children suffer: Disagree"
           <<: *common-display
       strongly_disagree_pre_school_child_suffers_with_working_mother:
         title: "When a mother works for pay, the children suffer: Strongly disagree"
-        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - When a mother works for pay, the children suffer".'
+        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "When a mother works for pay, the children suffer".'
         display:
           name: "When a mother works for pay, the children suffer: Strongly disagree"
           <<: *common-display
       dont_know_pre_school_child_suffers_with_working_mother:
         title: "When a mother works for pay, the children suffer: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - When a mother works for pay, the children suffer".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "When a mother works for pay, the children suffer".'
         display:
           name: "When a mother works for pay, the children suffer: Don't know"
           <<: *common-display
       no_answer_pre_school_child_suffers_with_working_mother:
         title: "When a mother works for pay, the children suffer: No answer"
-        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - When a mother works for pay, the children suffer".'
+        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "When a mother works for pay, the children suffer".'
         display:
           name: "When a mother works for pay, the children suffer: No answer"
           <<: *common-display
       agree_agg_men_better_business_executives:
         title: "On the whole, men make better business executives than women do: Agree (aggregate)"
-        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better business executives than women do".'
+        description_short: '% of respondents replying "agree strongly" or "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better business executives than women do".'
         display:
           name: "On the whole, men make better business executives than women do: Agree/Strongly agree"
           <<: *common-display
       disagree_agg_men_better_business_executives:
         title: "On the whole, men make better business executives than women do: Disagree (aggregate)"
-        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better business executives than women do".'
+        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better business executives than women do".'
         display:
           name: "On the whole, men make better business executives than women do: Disagree/Strongly disagree"
           <<: *common-display
       strongly_agree_men_better_business_executives:
         title: "On the whole, men make better business executives than women do: Strongly agree"
-        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better business executives than women do".'
+        description_short: '% of respondents replying "agree strongly" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better business executives than women do".'
         display:
           name: "On the whole, men make better business executives than women do: Strongly agree"
           <<: *common-display
       agree_men_better_business_executives:
         title: "On the whole, men make better business executives than women do: Agree"
-        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better business executives than women do".'
+        description_short: '% of respondents replying "agree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better business executives than women do".'
         display:
           name: "On the whole, men make better business executives than women do: Agree"
           <<: *common-display
       disagree_men_better_business_executives:
         title: "On the whole, men make better business executives than women do: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better business executives than women do".'
+        description_short: '% of respondents replying "disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better business executives than women do".'
         display:
           name: "On the whole, men make better business executives than women do: Disagree"
           <<: *common-display
       strongly_disagree_men_better_business_executives:
         title: "On the whole, men make better business executives than women do: Strongly disagree"
-        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better business executives than women do".'
+        description_short: '% of respondents replying "strongly disagree" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better business executives than women do".'
         display:
           name: "On the whole, men make better business executives than women do: Strongly disagree"
           <<: *common-display
       dont_know_men_better_business_executives:
         title: "On the whole, men make better business executives than women do: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better business executives than women do".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better business executives than women do".'
         display:
           name: "On the whole, men make better business executives than women do: Don't know"
           <<: *common-display
       no_answer_men_better_business_executives:
         title: "On the whole, men make better business executives than women do: No answer"
-        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree? - On the whole, men make better business executives than women do".'
+        description_short: '% of answers classified as "No answer" for the question "For each of the following statements, can you tell me how strongly you agree or disagree? Do you strongly agree, agree, disagree, or strongly disagree?", when the statement was "On the whole, men make better business executives than women do".'
         display:
           name: "On the whole, men make better business executives than women do: No answer"
           <<: *common-display
       frequently_agg_robberies:
         title: "Frequency in the neighborhood: Robberies: Frequently (aggregate)"
-        description_short: '% of respondents replying "very frequently" or "quite frequently" when asked "How frequently do the following things occur in your neighborhood? - Robberies".'
+        description_short: '% of respondents replying "very frequently" or "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Robberies".'
         display:
           name: "Frequency in the neighborhood: Robberies: Frequently"
           <<: *common-display
       not_frequently_agg_robberies:
         title: "Frequency in the neighborhood: Robberies: Not frequently (aggregate)"
-        description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood? - Robberies".'
+        description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Robberies".'
         display:
           name: "Frequency in the neighborhood: Robberies: Not frequently"
           <<: *common-display
       very_frequently_robberies:
         title: "Frequency in the neighborhood: Robberies: Very frequently"
-        description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood? - Robberies".'
+        description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Robberies".'
         display:
           name: "Frequency in the neighborhood: Robberies: Very frequently"
           <<: *common-display
       quite_frequently_robberies:
         title: "Frequency in the neighborhood: Robberies: Quite frequently"
-        description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood? - Robberies".'
+        description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Robberies".'
         display:
           name: "Frequency in the neighborhood: Robberies: Quite frequently"
           <<: *common-display
       not_frequently_robberies:
         title: "Frequency in the neighborhood: Robberies: Not frequently"
-        description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood? - Robberies".'
+        description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Robberies".'
         display:
           name: "Frequency in the neighborhood: Robberies: Not frequently"
           <<: *common-display
       not_at_all_frequently_robberies:
         title: "Frequency in the neighborhood: Robberies: Not at all frequently"
-        description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood? - Robberies".'
+        description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Robberies".'
         display:
           name: "Frequency in the neighborhood: Robberies: Not at all frequently"
           <<: *common-display
       dont_know_robberies:
         title: "Frequency in the neighborhood: Robberies: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood? - Robberies".'
+        description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood?", regarding "Robberies".'
         display:
           name: "Frequency in the neighborhood: Robberies: Don't know"
           <<: *common-display
       no_answer_robberies:
         title: "Frequency in the neighborhood: Robberies: No answer"
-        description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood? - Robberies".'
+        description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood?", regarding "Robberies".'
         display:
           name: "Frequency in the neighborhood: Robberies: No answer"
           <<: *common-display
       avg_score_robberies:
         title: "Frequency in the neighborhood: Robberies: Average score"
-        description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood? - Robberies". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
+        description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood?", regarding "Robberies". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
         display:
           name: "Frequency in the neighborhood: Robberies: Average score"
           <<: *common-display
@@ -5192,55 +5192,55 @@ tables:
         short_unit: ""
       frequently_agg_police_or_military_interfere:
         title: "Frequency in the neighborhood: Police or military interfere with people's private life: Frequently (aggregate)"
-        description_short: '% of respondents replying "very frequently" or "quite frequently" when asked "How frequently do the following things occur in your neighborhood? - Police or military interfere with people''s private life".'
+        description_short: '% of respondents replying "very frequently" or "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Police or military interfere with people''s private life".'
         display:
           name: "Frequency in the neighborhood: Police or military interfere with people's private life: Frequently"
           <<: *common-display
       not_frequently_agg_police_or_military_interfere:
         title: "Frequency in the neighborhood: Police or military interfere with people's private life: Not frequently (aggregate)"
-        description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood? - Police or military interfere with people''s private life".'
+        description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Police or military interfere with people''s private life".'
         display:
           name: "Frequency in the neighborhood: Police or military interfere with people's private life: Not frequently"
           <<: *common-display
       very_frequently_police_or_military_interfere:
         title: "Frequency in the neighborhood: Police or military interfere with people's private life: Very frequently"
-        description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood? - Police or military interfere with people''s private life".'
+        description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Police or military interfere with people''s private life".'
         display:
           name: "Frequency in the neighborhood: Police or military interfere with people's private life: Very frequently"
           <<: *common-display
       quite_frequently_police_or_military_interfere:
         title: "Frequency in the neighborhood: Police or military interfere with people's private life: Quite frequently"
-        description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood? - Police or military interfere with people''s private life".'
+        description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Police or military interfere with people''s private life".'
         display:
           name: "Frequency in the neighborhood: Police or military interfere with people's private life: Quite frequently"
           <<: *common-display
       not_frequently_police_or_military_interfere:
         title: "Frequency in the neighborhood: Police or military interfere with people's private life: Not frequently"
-        description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood? - Police or military interfere with people''s private life".'
+        description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Police or military interfere with people''s private life".'
         display:
           name: "Frequency in the neighborhood: Police or military interfere with people's private life: Not frequently"
           <<: *common-display
       not_at_all_frequently_police_or_military_interfere:
         title: "Frequency in the neighborhood: Police or military interfere with people's private life: Not at all frequently"
-        description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood? - Police or military interfere with people''s private life".'
+        description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Police or military interfere with people''s private life".'
         display:
           name: "Frequency in the neighborhood: Police or military interfere with people's private life: Not at all frequently"
           <<: *common-display
       dont_know_police_or_military_interfere:
         title: "Frequency in the neighborhood: Police or military interfere with people's private life: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood? - Police or military interfere with people''s private life".'
+        description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood?", regarding "Police or military interfere with people''s private life".'
         display:
           name: "Frequency in the neighborhood: Police or military interfere with people's private life: Don't know"
           <<: *common-display
       no_answer_police_or_military_interfere:
         title: "Frequency in the neighborhood: Police or military interfere with people's private life: No answer"
-        description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood? - Police or military interfere with people''s private life".'
+        description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood?", regarding "Police or military interfere with people''s private life".'
         display:
           name: "Frequency in the neighborhood: Police or military interfere with people's private life: No answer"
           <<: *common-display
       avg_score_police_or_military_interfere:
         title: "Frequency in the neighborhood: Police or military interfere with people's private life: Average score"
-        description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood? - Police or military interfere with people''s private life". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
+        description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood?", regarding "Police or military interfere with people''s private life". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
         display:
           name: "Frequency in the neighborhood: Police or military interfere with people's private life: Average score"
           <<: *common-display
@@ -5248,55 +5248,55 @@ tables:
         short_unit: ""
       frequently_agg_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Frequently (aggregate)"
-        description_short: '% of respondents replying "very frequently" or "quite frequently" when asked "How frequently do the following things occur in your neighborhood? - Racist behavior".'
+        description_short: '% of respondents replying "very frequently" or "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Frequently"
           <<: *common-display
       not_frequently_agg_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Not frequently (aggregate)"
-        description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood? - Racist behavior".'
+        description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Not frequently"
           <<: *common-display
       very_frequently_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Very frequently"
-        description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood? - Racist behavior".'
+        description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Very frequently"
           <<: *common-display
       quite_frequently_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Quite frequently"
-        description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood? - Racist behavior".'
+        description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Quite frequently"
           <<: *common-display
       not_frequently_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Not frequently"
-        description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood? - Racist behavior".'
+        description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Not frequently"
           <<: *common-display
       not_at_all_frequently_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Not at all frequently"
-        description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood? - Racist behavior".'
+        description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Not at all frequently"
           <<: *common-display
       dont_know_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood? - Racist behavior".'
+        description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Don't know"
           <<: *common-display
       no_answer_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: No answer"
-        description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood? - Racist behavior".'
+        description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: No answer"
           <<: *common-display
       avg_score_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Average score"
-        description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood? - Racist behavior". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
+        description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Average score"
           <<: *common-display
@@ -5304,55 +5304,55 @@ tables:
         short_unit: ""
       frequently_agg_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Frequently (aggregate)"
-        description_short: '% of respondents replying "very frequently" or "quite frequently" when asked "How frequently do the following things occur in your neighborhood? - Drug sale in the streets".'
+        description_short: '% of respondents replying "very frequently" or "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Frequently"
           <<: *common-display
       not_frequently_agg_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Not frequently (aggregate)"
-        description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood? - Drug sale in the streets".'
+        description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Not frequently"
           <<: *common-display
       very_frequently_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Very frequently"
-        description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood? - Drug sale in the streets".'
+        description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Very frequently"
           <<: *common-display
       quite_frequently_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Quite frequently"
-        description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood? - Drug sale in the streets".'
+        description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Quite frequently"
           <<: *common-display
       not_frequently_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Not frequently"
-        description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood? - Drug sale in the streets".'
+        description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Not frequently"
           <<: *common-display
       not_at_all_frequently_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Not at all frequently"
-        description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood? - Drug sale in the streets".'
+        description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Not at all frequently"
           <<: *common-display
       dont_know_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood? - Drug sale in the streets".'
+        description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Don't know"
           <<: *common-display
       no_answer_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: No answer"
-        description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood? - Drug sale in the streets".'
+        description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: No answer"
           <<: *common-display
       avg_score_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Average score"
-        description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood? - Drug sale in the streets". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
+        description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Average score"
           <<: *common-display
@@ -5360,73 +5360,73 @@ tables:
         short_unit: ""
       yes_didnt_carry_much_money:
         title: "Done for security: Didn't carry much money: Yes"
-        description_short: '% of respondents replying "yes" when asked "Which of the following things have you done for reasons of security? - Didn''t carry much money".'
+        description_short: '% of respondents replying "yes" when asked "Which of the following things have you done for reasons of security?", regarding "Didn''t carry much money".'
         display:
           name: "Done for security: Didn't carry much money: Yes"
           <<: *common-display
       no_didnt_carry_much_money:
         title: "Done for security: Didn't carry much money: No"
-        description_short: '% of respondents replying "no" when asked "Which of the following things have you done for reasons of security? - Didn''t carry much money".'
+        description_short: '% of respondents replying "no" when asked "Which of the following things have you done for reasons of security?", regarding "Didn''t carry much money".'
         display:
           name: "Done for security: Didn't carry much money: No"
           <<: *common-display
       dont_know_didnt_carry_much_money:
         title: "Done for security: Didn't carry much money: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "Which of the following things have you done for reasons of security? - Didn''t carry much money".'
+        description_short: '% of respondents replying "don''t know" when asked "Which of the following things have you done for reasons of security?", regarding "Didn''t carry much money".'
         display:
           name: "Done for security: Didn't carry much money: Don't know"
           <<: *common-display
       no_answer_didnt_carry_much_money:
         title: "Done for security: Didn't carry much money: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Which of the following things have you done for reasons of security? - Didn''t carry much money".'
+        description_short: '% of answers classified as "No answer" for the question "Which of the following things have you done for reasons of security?", regarding "Didn''t carry much money".'
         display:
           name: "Done for security: Didn't carry much money: No answer"
           <<: *common-display
       yes_preferred_not_to_go_out_at_night:
         title: "Done for security: Preferred not to go out at night: Yes"
-        description_short: '% of respondents replying "yes" when asked "Which of the following things have you done for reasons of security? - Preferred not to go out at night".'
+        description_short: '% of respondents replying "yes" when asked "Which of the following things have you done for reasons of security?", regarding "Preferred not to go out at night".'
         display:
           name: "Done for security: Preferred not to go out at night: Yes"
           <<: *common-display
       no_preferred_not_to_go_out_at_night:
         title: "Done for security: Preferred not to go out at night: No"
-        description_short: '% of respondents replying "no" when asked "Which of the following things have you done for reasons of security? - Preferred not to go out at night".'
+        description_short: '% of respondents replying "no" when asked "Which of the following things have you done for reasons of security?", regarding "Preferred not to go out at night".'
         display:
           name: "Done for security: Preferred not to go out at night: No"
           <<: *common-display
       dont_know_preferred_not_to_go_out_at_night:
         title: "Done for security: Preferred not to go out at night: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "Which of the following things have you done for reasons of security? - Preferred not to go out at night".'
+        description_short: '% of respondents replying "don''t know" when asked "Which of the following things have you done for reasons of security?", regarding "Preferred not to go out at night".'
         display:
           name: "Done for security: Preferred not to go out at night: Don't know"
           <<: *common-display
       no_answer_preferred_not_to_go_out_at_night:
         title: "Done for security: Preferred not to go out at night: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Which of the following things have you done for reasons of security? - Preferred not to go out at night".'
+        description_short: '% of answers classified as "No answer" for the question "Which of the following things have you done for reasons of security?", regarding "Preferred not to go out at night".'
         display:
           name: "Done for security: Preferred not to go out at night: No answer"
           <<: *common-display
       yes_carried_a_weapon:
         title: "Done for security: Carried a knife, gun or other weapon: Yes"
-        description_short: '% of respondents replying "yes" when asked "Which of the following things have you done for reasons of security? - Carried a knife, gun or other weapon".'
+        description_short: '% of respondents replying "yes" when asked "Which of the following things have you done for reasons of security?", regarding "Carried a knife, gun or other weapon".'
         display:
           name: "Done for security: Carried a knife, gun or other weapon: Yes"
           <<: *common-display
       no_carried_a_weapon:
         title: "Done for security: Carried a knife, gun or other weapon: No"
-        description_short: '% of respondents replying "no" when asked "Which of the following things have you done for reasons of security? - Carried a knife, gun or other weapon".'
+        description_short: '% of respondents replying "no" when asked "Which of the following things have you done for reasons of security?", regarding "Carried a knife, gun or other weapon".'
         display:
           name: "Done for security: Carried a knife, gun or other weapon: No"
           <<: *common-display
       dont_know_carried_a_weapon:
         title: "Done for security: Carried a knife, gun or other weapon: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "Which of the following things have you done for reasons of security? - Carried a knife, gun or other weapon".'
+        description_short: '% of respondents replying "don''t know" when asked "Which of the following things have you done for reasons of security?", regarding "Carried a knife, gun or other weapon".'
         display:
           name: "Done for security: Carried a knife, gun or other weapon: Don't know"
           <<: *common-display
       no_answer_carried_a_weapon:
         title: "Done for security: Carried a knife, gun or other weapon: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Which of the following things have you done for reasons of security? - Carried a knife, gun or other weapon".'
+        description_short: '% of answers classified as "No answer" for the question "Which of the following things have you done for reasons of security?", regarding "Carried a knife, gun or other weapon".'
         display:
           name: "Done for security: Carried a knife, gun or other weapon: No answer"
           <<: *common-display
