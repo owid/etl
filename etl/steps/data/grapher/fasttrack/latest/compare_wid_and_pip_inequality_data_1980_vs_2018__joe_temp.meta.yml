@@ -1,7 +1,6 @@
 dataset:
   title: DRAFT Compare WID and PIP inequality data 1980 vs 2018 (Joe temp)
-  owners:
-    - Lucas Rodés-Guirao  # fasttrack
+
 tables:
   compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp:
     variables:

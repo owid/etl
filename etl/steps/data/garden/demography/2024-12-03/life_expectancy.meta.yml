@@ -80,8 +80,8 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
-    - Fiona Spooner
     - Lucas Rodés-Guirao
+    - Fiona Spooner
     - Edouard Mathieu
 tables:
   # HISTORICAL VALUES (until today)

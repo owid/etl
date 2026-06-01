@@ -25,6 +25,8 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
+import ruamel.yaml
+
 from etl.dag_helpers import load_dag
 from etl.files import ruamel_dump, ruamel_load
 from etl.owners import OWID_DATA_TEAM, resolve_owner
@@ -295,6 +297,24 @@ _OWNER_OVERRIDES: dict[str, list[str]] = {
     "data://garden/worldbank_wdi/2026-02-27/wdi": ["Mojmír Vinkler", "Pablo Arriagada"],
     # Pablo Arriagada owns the WB income-groups aggregations step.
     "data://garden/wb/2025-07-01/income_groups_aggregations": ["Pablo Arriagada"],
+    # Lucas's review (2026-06): swap him to first on these garden steps.
+    "data://garden/health/2026-01-19/unaids": ["Lucas Rodés-Guirao", "Fiona Spooner"],
+    "data://garden/un/2025-05-07/undp_hdr": ["Lucas Rodés-Guirao", "Veronika Samborska"],
+    "data://garden/demography/2024-12-03/life_expectancy": [
+        "Lucas Rodés-Guirao",
+        "Fiona Spooner",
+        "Edouard Mathieu",
+    ],
+    # Lucas claims these previously-unattributed garden steps.
+    "data://garden/democracy/2026-03-18/ert": ["Lucas Rodés-Guirao"],
+    "data://garden/democracy/2026-03-23/fh": ["Lucas Rodés-Guirao"],
+    "data://garden/war/2023-09-21/mie": ["Lucas Rodés-Guirao"],
+    # "Draft Joe" fasttracks were misattributed to Lucas by the backfill;
+    # they're Joe Hasell's drafts, so clear the owners block entirely.
+    "data-private://grapher/fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp": [],
+    "data-private://grapher/fasttrack/latest/compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp": [],
+    "data-private://grapher/fasttrack/latest/compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp": [],
+    "data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1993_2018": [],
 }
 
 # Whole-namespace claims: every active garden step in these namespaces
@@ -482,6 +502,18 @@ def _meta_path_for(files: list[Path]) -> Path | None:
     return next((p for p in files if p.name.endswith(".meta.yml")), None)
 
 
+def _meta_path_from_step(step: str) -> Path | None:
+    """Resolve any DAG step URI (garden, grapher/fasttrack, ...) to its .meta.yml.
+
+    Returns the repo-relative path if the file exists, else None.
+    """
+    if "://" not in step:
+        return None
+    suffix = step.split("//", 1)[1]
+    p = Path("etl/steps/data") / f"{suffix}.meta.yml"
+    return p if (BASE_DIR / p).exists() else None
+
+
 def _normalize_dataset_block(text: str) -> str:
     """Strip blank lines inside the ``dataset:`` block and ensure exactly one
     blank line before the following top-level key.
@@ -523,7 +555,11 @@ def _write_owners_to_yaml(meta_path: Path, desired: list[str]) -> str:
         return "skipped"
     with open(full) as f:
         original = f.read()
-    data = ruamel_load(io.StringIO(original))
+    try:
+        data = ruamel_load(io.StringIO(original))
+    except ruamel.yaml.constructor.DuplicateKeyError as e:
+        print(f"⚠ {meta_path}: malformed YAML ({e.problem}), skipping")
+        return "skipped"
     if not isinstance(data, dict) or "dataset" not in data:
         return "skipped"
     dataset = data["dataset"]
@@ -557,14 +593,9 @@ def _apply_overrides_to_yamls(steps: dict[str, list[Path]]) -> None:
             skipped += 1
 
     for step, owners in _OWNER_OVERRIDES.items():
-        files = steps.get(step)
-        if files is None:
-            print(f"⚠ {step}: not in active DAG, skipping")
-            skipped += 1
-            continue
-        meta = _meta_path_for(files)
+        meta = _meta_path_from_step(step)
         if meta is None:
-            print(f"⚠ {step}: no .meta.yml")
+            print(f"⚠ {step}: no .meta.yml on disk, skipping")
             skipped += 1
             continue
         result = _write_owners_to_yaml(meta, owners)
@@ -585,8 +616,13 @@ def _apply_overrides_to_yamls(steps: dict[str, list[Path]]) -> None:
         if not full.exists():
             skipped += 1
             continue
-        with open(full) as f:
-            data = ruamel_load(f)
+        try:
+            with open(full) as f:
+                data = ruamel_load(f)
+        except ruamel.yaml.constructor.DuplicateKeyError as e:
+            print(f"⚠ {meta}: malformed YAML ({e.problem}), skipping")
+            skipped += 1
+            continue
         if not isinstance(data, dict) or "dataset" not in data:
             skipped += 1
             continue
