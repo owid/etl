@@ -2,12 +2,9 @@ dataset:
   title: Regions data (OWID, 2023)
   description: |
     Region definitions and other useful data like alternative region names, historical region successors, and sub-region members.
-
   owners:
     - Pablo Rosado
-    - Lucas Rodés-Guirao
-    - Fiona Spooner
-    - Lars Yencken
+
 tables:
   regions:
     variables:

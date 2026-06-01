@@ -7,9 +7,10 @@ definitions:
 
 dataset:
   update_period_days: 365
-
   owners:
+    - Bastian Herre
     - Pablo Rosado
+
 tables:
   nuclear_weapons_inventories:
     variables:

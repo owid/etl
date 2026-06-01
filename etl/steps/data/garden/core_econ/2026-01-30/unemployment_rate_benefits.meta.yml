@@ -11,9 +11,6 @@ definitions:
 dataset:
   update_period_days: 365
 
-
-  owners:
-    - Pablo Arriagada
 tables:
   unemployment_rate_benefits:
     variables:

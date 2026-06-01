@@ -5,23 +5,28 @@ candidate owners for each active garden dataset, ranked by how often each
 OWID team member has touched the dataset's `.py` / `.meta.yml` files in
 non-sweep, non-formatting commits.
 
-The script is **read-only** — it does not edit any YAML. Use the output to
-drive per-author/per-namespace follow-up PRs that actually write `owners:`
-into each dataset's `.meta.yml`.
+By default the script is read-only and only writes the proposal markdown.
+Pass ``--apply`` to also write the entries from ``_OWNER_OVERRIDES`` and
+``_NAMESPACE_PRIMARY_OWNER`` into each dataset's ``.meta.yml`` (the git-log
+heuristic is *not* applied — only the explicit/namespace overrides).
 
 Run::
 
-    .venv/bin/python apps/owners/propose_owners.py
+    .venv/bin/python apps/owners/propose_owners.py            # proposal only
+    .venv/bin/python apps/owners/propose_owners.py --apply    # also edit YAMLs
 """
 
 from __future__ import annotations
 
+import argparse
+import io
 import subprocess
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
 from etl.dag_helpers import load_dag
+from etl.files import ruamel_dump, ruamel_load
 from etl.owners import OWID_DATA_TEAM, resolve_owner
 from etl.paths import BASE_DIR
 
@@ -277,6 +282,28 @@ _OWNER_OVERRIDES: dict[str, list[str]] = {
     "data://garden/war/2026-05-13/nuclear_weapons_inventories": ["Bastian Herre", "Pablo Rosado"],
     "data://garden/war/2026-05-13/nuclear_weapons_tests": ["Bastian Herre", "Pablo Rosado"],
     "data://garden/war/2026-05-13/nuclear_weapons_treaties": ["Bastian Herre", "Pablo Rosado"],
+    # Pablo Arriagada's review (2026-06): he only fixed an error in the
+    # CORE Econ steps, doesn't want to be owner.
+    "data://garden/core_econ/2026-01-07/growth_rate_gdp_productivity": [],
+    "data://garden/core_econ/2026-01-30/unemployment_rate_benefits": [],
+    # Pablo Arriagada only updated PIP refs in covid/compact; Lucas owns it.
+    "data://garden/covid/latest/compact": ["Lucas Rodés-Guirao", "Tuna Acisu"],
+    # WDI: Mojmír is primary; Pablo Arriagada happy to be secondary.
+    "data://garden/worldbank_wdi/2025-01-24/wdi": ["Mojmír Vinkler", "Pablo Arriagada", "Veronika Samborska"],
+    "data://garden/worldbank_wdi/2025-09-08/wdi": ["Mojmír Vinkler", "Pablo Arriagada", "Pablo Rosado"],
+    "data://garden/worldbank_wdi/2026-01-29/wdi": ["Mojmír Vinkler", "Pablo Arriagada"],
+    "data://garden/worldbank_wdi/2026-02-27/wdi": ["Mojmír Vinkler", "Pablo Arriagada"],
+    # Pablo Arriagada owns the WB income-groups aggregations step.
+    "data://garden/wb/2025-07-01/income_groups_aggregations": ["Pablo Arriagada"],
+}
+
+# Whole-namespace claims: every active garden step in these namespaces
+# is pinned to the named primary owner, regardless of what the git-log
+# heuristic says. Pre-empts sweep commits that would otherwise dilute
+# attribution, and auto-extends to new steps added under the namespace.
+_NAMESPACE_PRIMARY_OWNER: dict[str, str] = {
+    "chartbook": "Pablo Arriagada",
+    "lgbt_rights": "Pablo Arriagada",
 }
 
 # How many top candidates to surface per dataset in the proposal.
@@ -384,6 +411,15 @@ def _drop_sweeps(commits: list[_Commit], file_to_step: dict[str, str]) -> list[_
     return kept
 
 
+def _apply_namespace_pins(per_step: dict[str, Counter[str]], all_steps: dict[str, list[Path]]) -> None:
+    """Force the primary owner for every active step in a pinned namespace."""
+    for step in all_steps:
+        ns = _step_namespace(step)
+        owner = _NAMESPACE_PRIMARY_OWNER.get(ns)
+        if owner is not None:
+            per_step[step] = Counter({owner: 1})
+
+
 def _aggregate(commits: list[_Commit], file_to_step: dict[str, str]) -> dict[str, Counter[str]]:
     """For each step, count non-sweep commits per resolved OWID owner.
 
@@ -441,15 +477,152 @@ def _write_markdown(per_step: dict[str, Counter[str]], all_steps: dict[str, list
         f.write("Reference: canonical names = " + ", ".join(OWID_DATA_TEAM) + "\n")
 
 
+def _meta_path_for(files: list[Path]) -> Path | None:
+    """Return the .meta.yml from a step's file list, or None."""
+    return next((p for p in files if p.name.endswith(".meta.yml")), None)
+
+
+def _normalize_dataset_block(text: str) -> str:
+    """Strip blank lines inside the ``dataset:`` block and ensure exactly one
+    blank line before the following top-level key.
+
+    Ruamel sometimes drifts blank lines that originally sat *before* a top-level
+    key (e.g. ``tables:``) into the middle of the ``dataset:`` block when new
+    keys (e.g. ``owners:``) are inserted.
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    in_dataset = False
+    for line in lines:
+        if line.startswith("dataset:"):
+            in_dataset = True
+            out.append(line)
+            continue
+        if in_dataset:
+            if line and not line[0].isspace():
+                in_dataset = False
+                if out and out[-1].strip():
+                    out.append("")
+                out.append(line)
+                continue
+            if not line.strip():
+                continue
+        out.append(line)
+    return "\n".join(out)
+
+
+def _write_owners_to_yaml(meta_path: Path, desired: list[str]) -> str:
+    """Set or clear the ``dataset.owners`` field. Returns 'changed', 'noop', or 'skipped'.
+
+    Empty ``desired`` removes the ``owners`` key entirely. Always re-emits
+    the dataset block through the normalizer, so a re-run also repairs
+    blank-line drift left by previous edits.
+    """
+    full = BASE_DIR / meta_path
+    if not full.exists():
+        return "skipped"
+    with open(full) as f:
+        original = f.read()
+    data = ruamel_load(io.StringIO(original))
+    if not isinstance(data, dict) or "dataset" not in data:
+        return "skipped"
+    dataset = data["dataset"]
+    if desired:
+        dataset["owners"] = desired
+    elif "owners" in dataset:
+        del dataset["owners"]
+    new_text = _normalize_dataset_block(ruamel_dump(data))
+    if new_text == original:
+        return "noop"
+    with open(full, "w") as f:
+        f.write(new_text)
+    return "changed"
+
+
+def _apply_overrides_to_yamls(steps: dict[str, list[Path]]) -> None:
+    """Write ``_OWNER_OVERRIDES`` and ``_NAMESPACE_PRIMARY_OWNER`` into YAMLs.
+
+    Explicit overrides win over namespace pins. Namespace pins preserve any
+    existing co-owners but move the pinned name to position 0.
+    """
+    changed = noop = skipped = 0
+
+    def _track(result: str) -> None:
+        nonlocal changed, noop, skipped
+        if result == "changed":
+            changed += 1
+        elif result == "noop":
+            noop += 1
+        else:
+            skipped += 1
+
+    for step, owners in _OWNER_OVERRIDES.items():
+        files = steps.get(step)
+        if files is None:
+            print(f"⚠ {step}: not in active DAG, skipping")
+            skipped += 1
+            continue
+        meta = _meta_path_for(files)
+        if meta is None:
+            print(f"⚠ {step}: no .meta.yml")
+            skipped += 1
+            continue
+        result = _write_owners_to_yaml(meta, owners)
+        if result == "changed":
+            print(f"✓ {step} → {owners or '(removed)'}")
+        _track(result)
+
+    for step, files in steps.items():
+        if step in _OWNER_OVERRIDES:
+            continue
+        primary = _NAMESPACE_PRIMARY_OWNER.get(_step_namespace(step))
+        if primary is None:
+            continue
+        meta = _meta_path_for(files)
+        if meta is None:
+            continue
+        full = BASE_DIR / meta
+        if not full.exists():
+            skipped += 1
+            continue
+        with open(full) as f:
+            data = ruamel_load(f)
+        if not isinstance(data, dict) or "dataset" not in data:
+            skipped += 1
+            continue
+        current = list(data["dataset"].get("owners", []))
+        rest = [o for o in current if o != primary]
+        new_owners = [primary, *rest]
+        result = _write_owners_to_yaml(meta, new_owners)
+        if result == "changed":
+            print(f"✓ {step} → {new_owners} (namespace pin)")
+        _track(result)
+
+    print(f"\nYAML apply: {changed} changed, {noop} unchanged, {skipped} skipped")
+
+
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="Also write _OWNER_OVERRIDES and _NAMESPACE_PRIMARY_OWNER into each dataset's .meta.yml",
+    )
+    args = parser.parse_args()
+
     steps = _active_garden_datasets()
     file_to_step: dict[str, str] = {str(p): step for step, files in steps.items() for p in files}
     all_files = sorted({p for files in steps.values() for p in files})
     commits = _git_log_for_files(all_files)
     commits = _drop_sweeps(commits, file_to_step)
     per_step = _aggregate(commits, file_to_step)
+    _apply_namespace_pins(per_step, steps)
     _write_markdown(per_step, steps)
     print(f"Wrote proposal for {len(steps)} active garden datasets to {OUTPUT_PATH}")
+
+    if args.apply:
+        print("\nApplying overrides to YAMLs...")
+        _apply_overrides_to_yamls(steps)
 
 
 if __name__ == "__main__":

@@ -16,9 +16,9 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
   owners:
-    - Pablo Rosado
+    - Veronika Samborska
+
 tables:
   energy_ai:
     variables:

@@ -3,6 +3,8 @@ dataset:
   update_period_days: 365
   owners:
     - Mojmír Vinkler
+    - Pablo Arriagada
+
 tables:
   wdi:
     variables:
