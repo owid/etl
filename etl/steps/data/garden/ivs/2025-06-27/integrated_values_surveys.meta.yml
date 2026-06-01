@@ -6073,13 +6073,13 @@ tables:
         unit: ""
         short_unit: ""
       feel_close_how_close_you_feel_to_continent:
-        title: 'Feel close to continent'
+        title: 'Feel close to continent (very close or close)'
         description_short: '% of respondents who feel close (very close or close) to their continent (for example, Europe or Asia), when asked how close they feel to their continent (for example, Europe or Asia). Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Feel close to continent'
           <<: *common-display
       not_close_how_close_you_feel_to_continent:
-        title: 'Do not feel close to continent'
+        title: 'Do not feel close to continent (not very close or not close at all)'
         description_short: '% of respondents who do not feel close (not very close or not close at all) to their continent (for example, Europe or Asia), when asked how close they feel to their continent (for example, Europe or Asia). Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Do not feel close to continent'
@@ -6130,13 +6130,13 @@ tables:
         unit: ""
         short_unit: ""
       feel_close_how_close_you_feel_to_world:
-        title: 'Feel close to world'
+        title: 'Feel close to world (very close or close)'
         description_short: '% of respondents who feel close (very close or close) to the world, when asked how close they feel to the world. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Feel close to world'
           <<: *common-display
       not_close_how_close_you_feel_to_world:
-        title: 'Do not feel close to world'
+        title: 'Do not feel close to world (not very close or not close at all)'
         description_short: '% of respondents who do not feel close (not very close or not close at all) to the world, when asked how close they feel to the world. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Do not feel close to world'
@@ -6187,13 +6187,13 @@ tables:
         unit: ""
         short_unit: ""
       feel_close_how_close_you_feel_to_village_town_or_city:
-        title: 'Feel close to village, town or city'
+        title: 'Feel close to village, town or city (very close or close)'
         description_short: '% of respondents who feel close (very close or close) to their village, town or city, when asked how close they feel to their village, town or city. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Feel close to village, town or city'
           <<: *common-display
       not_close_how_close_you_feel_to_village_town_or_city:
-        title: 'Do not feel close to village, town or city'
+        title: 'Do not feel close to village, town or city (not very close or not close at all)'
         description_short: '% of respondents who do not feel close (not very close or not close at all) to their village, town or city, when asked how close they feel to their village, town or city. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Do not feel close to village, town or city'
@@ -6244,13 +6244,13 @@ tables:
         unit: ""
         short_unit: ""
       feel_close_how_close_you_feel_to_county_region_district:
-        title: 'Feel close to county, region or district'
+        title: 'Feel close to county, region or district (very close or close)'
         description_short: '% of respondents who feel close (very close or close) to their county, region or district, when asked how close they feel to their county, region or district. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Feel close to county, region or district'
           <<: *common-display
       not_close_how_close_you_feel_to_county_region_district:
-        title: 'Do not feel close to county, region or district'
+        title: 'Do not feel close to county, region or district (not very close or not close at all)'
         description_short: '% of respondents who do not feel close (not very close or not close at all) to their county, region or district, when asked how close they feel to their county, region or district. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Do not feel close to county, region or district'
@@ -6301,13 +6301,13 @@ tables:
         unit: ""
         short_unit: ""
       feel_close_how_close_you_feel_to_country:
-        title: 'Feel close to country'
+        title: 'Feel close to country (very close or close)'
         description_short: '% of respondents who feel close (very close or close) to their country, when asked how close they feel to their country. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Feel close to country'
           <<: *common-display
       not_close_how_close_you_feel_to_country:
-        title: 'Do not feel close to country'
+        title: 'Do not feel close to country (not very close or not close at all)'
         description_short: '% of respondents who do not feel close (not very close or not close at all) to their country, when asked how close they feel to their country. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
         display:
           name: 'Do not feel close to country'
