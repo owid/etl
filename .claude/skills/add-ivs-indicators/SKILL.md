@@ -23,7 +23,7 @@ End-to-end flow:
 ```
 edit ivs_create_file.do  →  USER runs it in Stata → regenerates ivs.csv
   → re-snapshot (same version)  →  meadow VARS_DICT  →  garden constants + checks
-  →  garden .meta.yml  →  etlr (meadow→garden→grapher)  →  [optional] Notion Available flags
+  →  garden .meta.yml  →  etlr (meadow→garden→grapher)  →  Notion Available flags
 ```
 
 Find the active version first: `ls etl/steps/data/garden/ivs/`. All paths below use `<v>` for it
@@ -257,7 +257,10 @@ git push
 
 Post `@codex review` as a **separate** PR comment; keep the PR body in sync with substantial pushes.
 
-## Step 9 — Notion `Available` dictionary (optional follow-up)
+## Step 9 — Notion `Available` dictionary (required)
+
+This is **not** optional — always finish the job by flipping the flags so the dictionary reflects what's
+actually in the dataset.
 
 The **Integrated Values Surveys dictionary** Notion DB (`collection://fd3a1354-9da6-48e7-91bb-a0665ddd0f0b`)
 has an `Available` checkbox per code. Flip `Available = ✅` **only for codes that survive into the garden
