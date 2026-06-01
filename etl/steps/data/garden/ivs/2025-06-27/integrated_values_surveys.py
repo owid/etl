@@ -164,6 +164,49 @@ HUMAN_RIGHTS_RESPECT_QUESTIONS = ["respect_human_rights"]
 # Continuous index (kept on its native 0-1 scale, so it must be excluded from the 0 -> null replacement)
 WELZEL_EQUALITY_INDEX_COLUMNS = ["avg_score_welzel_equality"]
 
+# Media information source questions (5-point frequency: daily/weekly/monthly/less than monthly/never)
+MEDIA_QUESTIONS = [
+    "information_source_daily_newspaper",
+    "information_source_talk_with_friends_or_colleagues",
+    "information_source_tv_news",
+    "information_source_radio_news",
+    "information_source_mobile_phone",
+    "information_source_email",
+    "information_source_internet",
+]
+
+# How close you feel questions (4-point: very close/close/not very close/not close at all)
+CLOSENESS_QUESTIONS = [
+    "how_close_you_feel_to_continent",
+    "how_close_you_feel_to_world",
+    "how_close_you_feel_to_village_town_or_city",
+    "how_close_you_feel_to_county_region_district",
+    "how_close_you_feel_to_country",
+]
+
+# Science and technology agreement questions (10-point: completely disagree to completely agree)
+TECHNOLOGY_QUESTIONS = [
+    "science_and_technology_make_life_healthier_and_easier",
+    "science_and_technology_bring_more_opportunities_for_next_generation",
+    "we_depend_too_much_on_science_and_not_enough_on_faith",
+    "science_breaks_down_ideas_of_right_and_wrong",
+]
+
+# Science and technology: is the world better or worse off (10-point), single custom block
+SCIENCE_WORLD_QUESTIONS = ["science_world"]
+
+# Aims of country (multinomial: one choice out of four named goals)
+AIMS_COUNTRY_QUESTIONS = ["aims_of_country_first_choice", "aims_of_country_second_choice"]
+
+# Aims of respondent (multinomial: one choice out of four named goals)
+AIMS_RESPONDENT_QUESTIONS = ["aims_of_respondent_first_choice", "aims_of_respondent_second_choice"]
+
+# Most important goal (multinomial: one choice out of four named goals)
+MOST_IMPORTANT_QUESTIONS = ["most_important_first_choice", "most_important_second_choice"]
+
+# Feel concerned about humankind (5-point), single custom block
+HUMANKIND_CONCERN_QUESTIONS = ["humankind"]
+
 
 def run() -> None:
     #
@@ -480,6 +523,62 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
         tb=tb,
         questions=FELT_UNSAFE_QUESTIONS,
         answers=["often", "sometimes", "rarely", "never"],
+    )
+
+    # For media information source questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=MEDIA_QUESTIONS,
+        answers=["daily", "weekly", "monthly", "less_than_monthly", "never"],
+    )
+
+    # For how close you feel questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=CLOSENESS_QUESTIONS,
+        answers=["very_close", "close", "not_very_close", "not_close_at_all"],
+    )
+
+    # For science and technology agreement questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=TECHNOLOGY_QUESTIONS,
+        answers=["agree", "neutral", "disagree"],
+    )
+
+    # For science and technology world better/worse off question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=SCIENCE_WORLD_QUESTIONS,
+        answers=["better_off", "neutral", "worse_off"],
+    )
+
+    # For aims of country questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=AIMS_COUNTRY_QUESTIONS,
+        answers=["economic_growth", "strong_defence", "more_say", "beautiful_cities"],
+    )
+
+    # For aims of respondent questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=AIMS_RESPONDENT_QUESTIONS,
+        answers=["maintaining_order", "give_people_say", "fighting_prices", "freedom_of_speech"],
+    )
+
+    # For most important goal questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=MOST_IMPORTANT_QUESTIONS,
+        answers=["stable_economy", "humane_society", "ideas_over_money", "fight_crime"],
+    )
+
+    # For feel concerned about humankind question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=HUMANKIND_CONCERN_QUESTIONS,
+        answers=["very_much", "much", "to_a_certain_extent", "not_so_much", "not_at_all"],
     )
 
     # Drop rows with all null values in columns not country and year
@@ -828,6 +927,85 @@ def sanity_checks(tb: Table) -> Table:
         tb=tb,
         questions=FELT_UNSAFE_QUESTIONS,
         answers=["often", "sometimes", "rarely", "never", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For media information source questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=MEDIA_QUESTIONS,
+        answers=["daily", "weekly", "monthly", "less_than_monthly", "never", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For how close you feel questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=CLOSENESS_QUESTIONS,
+        answers=["very_close", "close", "not_very_close", "not_close_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For science and technology agreement questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=TECHNOLOGY_QUESTIONS,
+        answers=["agree", "neutral", "disagree", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For science and technology world better/worse off question
+    tb = check_sum_100(
+        tb=tb,
+        questions=SCIENCE_WORLD_QUESTIONS,
+        answers=["better_off", "neutral", "worse_off", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For aims of country questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=AIMS_COUNTRY_QUESTIONS,
+        answers=["economic_growth", "strong_defence", "more_say", "beautiful_cities", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For aims of respondent questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=AIMS_RESPONDENT_QUESTIONS,
+        answers=[
+            "maintaining_order",
+            "give_people_say",
+            "fighting_prices",
+            "freedom_of_speech",
+            "dont_know",
+            "no_answer",
+        ],
+        margin=MARGIN,
+    )
+
+    # For most important goal questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=MOST_IMPORTANT_QUESTIONS,
+        answers=["stable_economy", "humane_society", "ideas_over_money", "fight_crime", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For feel concerned about humankind question
+    tb = check_sum_100(
+        tb=tb,
+        questions=HUMANKIND_CONCERN_QUESTIONS,
+        answers=[
+            "very_much",
+            "much",
+            "to_a_certain_extent",
+            "not_so_much",
+            "not_at_all",
+            "dont_know",
+            "no_answer",
+        ],
         margin=MARGIN,
     )
 

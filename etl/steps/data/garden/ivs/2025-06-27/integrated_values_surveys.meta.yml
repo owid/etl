@@ -5631,3 +5631,1203 @@ tables:
           <<: *common-display
         unit: ""
         short_unit: ""
+      at_least_weekly_information_source_daily_newspaper:
+        title: 'Daily newspaper: used at least weekly'
+        description_short: '% of respondents who use a daily newspaper at least weekly (daily or weekly) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Daily newspaper: used at least weekly'
+          <<: *common-display
+      less_than_weekly_information_source_daily_newspaper:
+        title: 'Daily newspaper: used less than weekly'
+        description_short: '% of respondents who use a daily newspaper less than weekly (monthly, less than monthly or never) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Daily newspaper: used less than weekly'
+          <<: *common-display
+      daily_information_source_daily_newspaper:
+        title: 'Daily newspaper: used daily'
+        description_short: '% of respondents who use a daily newspaper daily to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Daily newspaper: used daily'
+          <<: *common-display
+      weekly_information_source_daily_newspaper:
+        title: 'Daily newspaper: used weekly'
+        description_short: '% of respondents who use a daily newspaper weekly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Daily newspaper: used weekly'
+          <<: *common-display
+      monthly_information_source_daily_newspaper:
+        title: 'Daily newspaper: used monthly'
+        description_short: '% of respondents who use a daily newspaper monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Daily newspaper: used monthly'
+          <<: *common-display
+      less_than_monthly_information_source_daily_newspaper:
+        title: 'Daily newspaper: used less than monthly'
+        description_short: '% of respondents who use a daily newspaper less than monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Daily newspaper: used less than monthly'
+          <<: *common-display
+      never_information_source_daily_newspaper:
+        title: 'Daily newspaper: never used'
+        description_short: '% of respondents who never use a daily newspaper to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Daily newspaper: never used'
+          <<: *common-display
+      dont_know_information_source_daily_newspaper:
+        title: 'Daily newspaper as information source: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how often they use a daily newspaper to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Daily newspaper as information source: Don''t know'
+          <<: *common-display
+      no_answer_information_source_daily_newspaper:
+        title: 'Daily newspaper as information source: No answer'
+        description_short: '% of answers classified as "No answer" when asked how often they use a daily newspaper to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Daily newspaper as information source: No answer'
+          <<: *common-display
+      avg_score_information_source_daily_newspaper:
+        title: 'Daily newspaper as information source: average frequency score'
+        description_short: 'Average frequency score for using a daily newspaper to obtain information, on a scale from 1 to 5 where 1 means "daily" and 5 means "never".'
+        display:
+          name: 'Daily newspaper as information source: average frequency score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      at_least_weekly_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues: used at least weekly'
+        description_short: '% of respondents who use talking with friends or colleagues at least weekly (daily or weekly) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Talking with friends or colleagues: used at least weekly'
+          <<: *common-display
+      less_than_weekly_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues: used less than weekly'
+        description_short: '% of respondents who use talking with friends or colleagues less than weekly (monthly, less than monthly or never) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Talking with friends or colleagues: used less than weekly'
+          <<: *common-display
+      daily_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues: used daily'
+        description_short: '% of respondents who use talking with friends or colleagues daily to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Talking with friends or colleagues: used daily'
+          <<: *common-display
+      weekly_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues: used weekly'
+        description_short: '% of respondents who use talking with friends or colleagues weekly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Talking with friends or colleagues: used weekly'
+          <<: *common-display
+      monthly_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues: used monthly'
+        description_short: '% of respondents who use talking with friends or colleagues monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Talking with friends or colleagues: used monthly'
+          <<: *common-display
+      less_than_monthly_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues: used less than monthly'
+        description_short: '% of respondents who use talking with friends or colleagues less than monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Talking with friends or colleagues: used less than monthly'
+          <<: *common-display
+      never_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues: never used'
+        description_short: '% of respondents who never use talking with friends or colleagues to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Talking with friends or colleagues: never used'
+          <<: *common-display
+      dont_know_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues as information source: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how often they use talking with friends or colleagues to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Talking with friends or colleagues as information source: Don''t know'
+          <<: *common-display
+      no_answer_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues as information source: No answer'
+        description_short: '% of answers classified as "No answer" when asked how often they use talking with friends or colleagues to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Talking with friends or colleagues as information source: No answer'
+          <<: *common-display
+      avg_score_information_source_talk_with_friends_or_colleagues:
+        title: 'Talking with friends or colleagues as information source: average frequency score'
+        description_short: 'Average frequency score for using talking with friends or colleagues to obtain information, on a scale from 1 to 5 where 1 means "daily" and 5 means "never".'
+        display:
+          name: 'Talking with friends or colleagues as information source: average frequency score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      at_least_weekly_information_source_tv_news:
+        title: 'TV news: used at least weekly'
+        description_short: '% of respondents who use TV news at least weekly (daily or weekly) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'TV news: used at least weekly'
+          <<: *common-display
+      less_than_weekly_information_source_tv_news:
+        title: 'TV news: used less than weekly'
+        description_short: '% of respondents who use TV news less than weekly (monthly, less than monthly or never) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'TV news: used less than weekly'
+          <<: *common-display
+      daily_information_source_tv_news:
+        title: 'TV news: used daily'
+        description_short: '% of respondents who use TV news daily to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'TV news: used daily'
+          <<: *common-display
+      weekly_information_source_tv_news:
+        title: 'TV news: used weekly'
+        description_short: '% of respondents who use TV news weekly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'TV news: used weekly'
+          <<: *common-display
+      monthly_information_source_tv_news:
+        title: 'TV news: used monthly'
+        description_short: '% of respondents who use TV news monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'TV news: used monthly'
+          <<: *common-display
+      less_than_monthly_information_source_tv_news:
+        title: 'TV news: used less than monthly'
+        description_short: '% of respondents who use TV news less than monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'TV news: used less than monthly'
+          <<: *common-display
+      never_information_source_tv_news:
+        title: 'TV news: never used'
+        description_short: '% of respondents who never use TV news to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'TV news: never used'
+          <<: *common-display
+      dont_know_information_source_tv_news:
+        title: 'TV news as information source: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how often they use TV news to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'TV news as information source: Don''t know'
+          <<: *common-display
+      no_answer_information_source_tv_news:
+        title: 'TV news as information source: No answer'
+        description_short: '% of answers classified as "No answer" when asked how often they use TV news to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'TV news as information source: No answer'
+          <<: *common-display
+      avg_score_information_source_tv_news:
+        title: 'TV news as information source: average frequency score'
+        description_short: 'Average frequency score for using TV news to obtain information, on a scale from 1 to 5 where 1 means "daily" and 5 means "never".'
+        display:
+          name: 'TV news as information source: average frequency score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      at_least_weekly_information_source_radio_news:
+        title: 'Radio news: used at least weekly'
+        description_short: '% of respondents who use radio news at least weekly (daily or weekly) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Radio news: used at least weekly'
+          <<: *common-display
+      less_than_weekly_information_source_radio_news:
+        title: 'Radio news: used less than weekly'
+        description_short: '% of respondents who use radio news less than weekly (monthly, less than monthly or never) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Radio news: used less than weekly'
+          <<: *common-display
+      daily_information_source_radio_news:
+        title: 'Radio news: used daily'
+        description_short: '% of respondents who use radio news daily to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Radio news: used daily'
+          <<: *common-display
+      weekly_information_source_radio_news:
+        title: 'Radio news: used weekly'
+        description_short: '% of respondents who use radio news weekly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Radio news: used weekly'
+          <<: *common-display
+      monthly_information_source_radio_news:
+        title: 'Radio news: used monthly'
+        description_short: '% of respondents who use radio news monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Radio news: used monthly'
+          <<: *common-display
+      less_than_monthly_information_source_radio_news:
+        title: 'Radio news: used less than monthly'
+        description_short: '% of respondents who use radio news less than monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Radio news: used less than monthly'
+          <<: *common-display
+      never_information_source_radio_news:
+        title: 'Radio news: never used'
+        description_short: '% of respondents who never use radio news to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Radio news: never used'
+          <<: *common-display
+      dont_know_information_source_radio_news:
+        title: 'Radio news as information source: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how often they use radio news to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Radio news as information source: Don''t know'
+          <<: *common-display
+      no_answer_information_source_radio_news:
+        title: 'Radio news as information source: No answer'
+        description_short: '% of answers classified as "No answer" when asked how often they use radio news to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Radio news as information source: No answer'
+          <<: *common-display
+      avg_score_information_source_radio_news:
+        title: 'Radio news as information source: average frequency score'
+        description_short: 'Average frequency score for using radio news to obtain information, on a scale from 1 to 5 where 1 means "daily" and 5 means "never".'
+        display:
+          name: 'Radio news as information source: average frequency score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      at_least_weekly_information_source_mobile_phone:
+        title: 'Mobile phone: used at least weekly'
+        description_short: '% of respondents who use a mobile phone at least weekly (daily or weekly) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Mobile phone: used at least weekly'
+          <<: *common-display
+      less_than_weekly_information_source_mobile_phone:
+        title: 'Mobile phone: used less than weekly'
+        description_short: '% of respondents who use a mobile phone less than weekly (monthly, less than monthly or never) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Mobile phone: used less than weekly'
+          <<: *common-display
+      daily_information_source_mobile_phone:
+        title: 'Mobile phone: used daily'
+        description_short: '% of respondents who use a mobile phone daily to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Mobile phone: used daily'
+          <<: *common-display
+      weekly_information_source_mobile_phone:
+        title: 'Mobile phone: used weekly'
+        description_short: '% of respondents who use a mobile phone weekly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Mobile phone: used weekly'
+          <<: *common-display
+      monthly_information_source_mobile_phone:
+        title: 'Mobile phone: used monthly'
+        description_short: '% of respondents who use a mobile phone monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Mobile phone: used monthly'
+          <<: *common-display
+      less_than_monthly_information_source_mobile_phone:
+        title: 'Mobile phone: used less than monthly'
+        description_short: '% of respondents who use a mobile phone less than monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Mobile phone: used less than monthly'
+          <<: *common-display
+      never_information_source_mobile_phone:
+        title: 'Mobile phone: never used'
+        description_short: '% of respondents who never use a mobile phone to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Mobile phone: never used'
+          <<: *common-display
+      dont_know_information_source_mobile_phone:
+        title: 'Mobile phone as information source: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how often they use a mobile phone to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Mobile phone as information source: Don''t know'
+          <<: *common-display
+      no_answer_information_source_mobile_phone:
+        title: 'Mobile phone as information source: No answer'
+        description_short: '% of answers classified as "No answer" when asked how often they use a mobile phone to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Mobile phone as information source: No answer'
+          <<: *common-display
+      avg_score_information_source_mobile_phone:
+        title: 'Mobile phone as information source: average frequency score'
+        description_short: 'Average frequency score for using a mobile phone to obtain information, on a scale from 1 to 5 where 1 means "daily" and 5 means "never".'
+        display:
+          name: 'Mobile phone as information source: average frequency score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      at_least_weekly_information_source_email:
+        title: 'Email: used at least weekly'
+        description_short: '% of respondents who use email at least weekly (daily or weekly) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Email: used at least weekly'
+          <<: *common-display
+      less_than_weekly_information_source_email:
+        title: 'Email: used less than weekly'
+        description_short: '% of respondents who use email less than weekly (monthly, less than monthly or never) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Email: used less than weekly'
+          <<: *common-display
+      daily_information_source_email:
+        title: 'Email: used daily'
+        description_short: '% of respondents who use email daily to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Email: used daily'
+          <<: *common-display
+      weekly_information_source_email:
+        title: 'Email: used weekly'
+        description_short: '% of respondents who use email weekly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Email: used weekly'
+          <<: *common-display
+      monthly_information_source_email:
+        title: 'Email: used monthly'
+        description_short: '% of respondents who use email monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Email: used monthly'
+          <<: *common-display
+      less_than_monthly_information_source_email:
+        title: 'Email: used less than monthly'
+        description_short: '% of respondents who use email less than monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Email: used less than monthly'
+          <<: *common-display
+      never_information_source_email:
+        title: 'Email: never used'
+        description_short: '% of respondents who never use email to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Email: never used'
+          <<: *common-display
+      dont_know_information_source_email:
+        title: 'Email as information source: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how often they use email to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Email as information source: Don''t know'
+          <<: *common-display
+      no_answer_information_source_email:
+        title: 'Email as information source: No answer'
+        description_short: '% of answers classified as "No answer" when asked how often they use email to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Email as information source: No answer'
+          <<: *common-display
+      avg_score_information_source_email:
+        title: 'Email as information source: average frequency score'
+        description_short: 'Average frequency score for using email to obtain information, on a scale from 1 to 5 where 1 means "daily" and 5 means "never".'
+        display:
+          name: 'Email as information source: average frequency score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      at_least_weekly_information_source_internet:
+        title: 'Internet: used at least weekly'
+        description_short: '% of respondents who use the internet at least weekly (daily or weekly) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Internet: used at least weekly'
+          <<: *common-display
+      less_than_weekly_information_source_internet:
+        title: 'Internet: used less than weekly'
+        description_short: '% of respondents who use the internet less than weekly (monthly, less than monthly or never) to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Internet: used less than weekly'
+          <<: *common-display
+      daily_information_source_internet:
+        title: 'Internet: used daily'
+        description_short: '% of respondents who use the internet daily to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Internet: used daily'
+          <<: *common-display
+      weekly_information_source_internet:
+        title: 'Internet: used weekly'
+        description_short: '% of respondents who use the internet weekly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Internet: used weekly'
+          <<: *common-display
+      monthly_information_source_internet:
+        title: 'Internet: used monthly'
+        description_short: '% of respondents who use the internet monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Internet: used monthly'
+          <<: *common-display
+      less_than_monthly_information_source_internet:
+        title: 'Internet: used less than monthly'
+        description_short: '% of respondents who use the internet less than monthly to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Internet: used less than monthly'
+          <<: *common-display
+      never_information_source_internet:
+        title: 'Internet: never used'
+        description_short: '% of respondents who never use the internet to obtain information about what is going on in this country and the world. Possible answers are "Daily", "Weekly", "Monthly", "Less than monthly" and "Never".'
+        display:
+          name: 'Internet: never used'
+          <<: *common-display
+      dont_know_information_source_internet:
+        title: 'Internet as information source: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how often they use the internet to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Internet as information source: Don''t know'
+          <<: *common-display
+      no_answer_information_source_internet:
+        title: 'Internet as information source: No answer'
+        description_short: '% of answers classified as "No answer" when asked how often they use the internet to obtain information about what is going on in this country and the world.'
+        display:
+          name: 'Internet as information source: No answer'
+          <<: *common-display
+      avg_score_information_source_internet:
+        title: 'Internet as information source: average frequency score'
+        description_short: 'Average frequency score for using the internet to obtain information, on a scale from 1 to 5 where 1 means "daily" and 5 means "never".'
+        display:
+          name: 'Internet as information source: average frequency score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      feel_close_how_close_you_feel_to_continent:
+        title: 'Feel close to continent'
+        description_short: '% of respondents who feel close (very close or close) to their continent (for example, Europe or Asia), when asked how close they feel to their continent (for example, Europe or Asia). Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to continent'
+          <<: *common-display
+      not_close_how_close_you_feel_to_continent:
+        title: 'Do not feel close to continent'
+        description_short: '% of respondents who do not feel close (not very close or not close at all) to their continent (for example, Europe or Asia), when asked how close they feel to their continent (for example, Europe or Asia). Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Do not feel close to continent'
+          <<: *common-display
+      very_close_how_close_you_feel_to_continent:
+        title: 'Feel very close to continent'
+        description_short: '% of respondents who feel very close to their continent (for example, Europe or Asia), when asked how close they feel to their continent (for example, Europe or Asia). Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel very close to continent'
+          <<: *common-display
+      close_how_close_you_feel_to_continent:
+        title: 'Feel close to continent'
+        description_short: '% of respondents who feel close to their continent (for example, Europe or Asia), when asked how close they feel to their continent (for example, Europe or Asia). Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to continent'
+          <<: *common-display
+      not_very_close_how_close_you_feel_to_continent:
+        title: 'Feel not very close to continent'
+        description_short: '% of respondents who feel not very close to their continent (for example, Europe or Asia), when asked how close they feel to their continent (for example, Europe or Asia). Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not very close to continent'
+          <<: *common-display
+      not_close_at_all_how_close_you_feel_to_continent:
+        title: 'Feel not close at all to continent'
+        description_short: '% of respondents who feel not close at all to their continent (for example, Europe or Asia), when asked how close they feel to their continent (for example, Europe or Asia). Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not close at all to continent'
+          <<: *common-display
+      dont_know_how_close_you_feel_to_continent:
+        title: 'How close you feel to continent: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how close they feel to their continent (for example, Europe or Asia).'
+        display:
+          name: 'How close you feel to continent: Don''t know'
+          <<: *common-display
+      no_answer_how_close_you_feel_to_continent:
+        title: 'How close you feel to continent: No answer'
+        description_short: '% of answers classified as "No answer" when asked how close they feel to their continent (for example, Europe or Asia).'
+        display:
+          name: 'How close you feel to continent: No answer'
+          <<: *common-display
+      avg_score_how_close_you_feel_to_continent:
+        title: 'How close you feel to continent: average score'
+        description_short: 'Average score for how close respondents feel to their continent (for example, Europe or Asia), on a scale from 1 to 4 where 1 means "very close" and 4 means "not close at all".'
+        display:
+          name: 'How close you feel to continent: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      feel_close_how_close_you_feel_to_world:
+        title: 'Feel close to world'
+        description_short: '% of respondents who feel close (very close or close) to the world, when asked how close they feel to the world. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to world'
+          <<: *common-display
+      not_close_how_close_you_feel_to_world:
+        title: 'Do not feel close to world'
+        description_short: '% of respondents who do not feel close (not very close or not close at all) to the world, when asked how close they feel to the world. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Do not feel close to world'
+          <<: *common-display
+      very_close_how_close_you_feel_to_world:
+        title: 'Feel very close to world'
+        description_short: '% of respondents who feel very close to the world, when asked how close they feel to the world. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel very close to world'
+          <<: *common-display
+      close_how_close_you_feel_to_world:
+        title: 'Feel close to world'
+        description_short: '% of respondents who feel close to the world, when asked how close they feel to the world. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to world'
+          <<: *common-display
+      not_very_close_how_close_you_feel_to_world:
+        title: 'Feel not very close to world'
+        description_short: '% of respondents who feel not very close to the world, when asked how close they feel to the world. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not very close to world'
+          <<: *common-display
+      not_close_at_all_how_close_you_feel_to_world:
+        title: 'Feel not close at all to world'
+        description_short: '% of respondents who feel not close at all to the world, when asked how close they feel to the world. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not close at all to world'
+          <<: *common-display
+      dont_know_how_close_you_feel_to_world:
+        title: 'How close you feel to world: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how close they feel to the world.'
+        display:
+          name: 'How close you feel to world: Don''t know'
+          <<: *common-display
+      no_answer_how_close_you_feel_to_world:
+        title: 'How close you feel to world: No answer'
+        description_short: '% of answers classified as "No answer" when asked how close they feel to the world.'
+        display:
+          name: 'How close you feel to world: No answer'
+          <<: *common-display
+      avg_score_how_close_you_feel_to_world:
+        title: 'How close you feel to world: average score'
+        description_short: 'Average score for how close respondents feel to the world, on a scale from 1 to 4 where 1 means "very close" and 4 means "not close at all".'
+        display:
+          name: 'How close you feel to world: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      feel_close_how_close_you_feel_to_village_town_or_city:
+        title: 'Feel close to village, town or city'
+        description_short: '% of respondents who feel close (very close or close) to their village, town or city, when asked how close they feel to their village, town or city. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to village, town or city'
+          <<: *common-display
+      not_close_how_close_you_feel_to_village_town_or_city:
+        title: 'Do not feel close to village, town or city'
+        description_short: '% of respondents who do not feel close (not very close or not close at all) to their village, town or city, when asked how close they feel to their village, town or city. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Do not feel close to village, town or city'
+          <<: *common-display
+      very_close_how_close_you_feel_to_village_town_or_city:
+        title: 'Feel very close to village, town or city'
+        description_short: '% of respondents who feel very close to their village, town or city, when asked how close they feel to their village, town or city. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel very close to village, town or city'
+          <<: *common-display
+      close_how_close_you_feel_to_village_town_or_city:
+        title: 'Feel close to village, town or city'
+        description_short: '% of respondents who feel close to their village, town or city, when asked how close they feel to their village, town or city. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to village, town or city'
+          <<: *common-display
+      not_very_close_how_close_you_feel_to_village_town_or_city:
+        title: 'Feel not very close to village, town or city'
+        description_short: '% of respondents who feel not very close to their village, town or city, when asked how close they feel to their village, town or city. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not very close to village, town or city'
+          <<: *common-display
+      not_close_at_all_how_close_you_feel_to_village_town_or_city:
+        title: 'Feel not close at all to village, town or city'
+        description_short: '% of respondents who feel not close at all to their village, town or city, when asked how close they feel to their village, town or city. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not close at all to village, town or city'
+          <<: *common-display
+      dont_know_how_close_you_feel_to_village_town_or_city:
+        title: 'How close you feel to village, town or city: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how close they feel to their village, town or city.'
+        display:
+          name: 'How close you feel to village, town or city: Don''t know'
+          <<: *common-display
+      no_answer_how_close_you_feel_to_village_town_or_city:
+        title: 'How close you feel to village, town or city: No answer'
+        description_short: '% of answers classified as "No answer" when asked how close they feel to their village, town or city.'
+        display:
+          name: 'How close you feel to village, town or city: No answer'
+          <<: *common-display
+      avg_score_how_close_you_feel_to_village_town_or_city:
+        title: 'How close you feel to village, town or city: average score'
+        description_short: 'Average score for how close respondents feel to their village, town or city, on a scale from 1 to 4 where 1 means "very close" and 4 means "not close at all".'
+        display:
+          name: 'How close you feel to village, town or city: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      feel_close_how_close_you_feel_to_county_region_district:
+        title: 'Feel close to county, region or district'
+        description_short: '% of respondents who feel close (very close or close) to their county, region or district, when asked how close they feel to their county, region or district. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to county, region or district'
+          <<: *common-display
+      not_close_how_close_you_feel_to_county_region_district:
+        title: 'Do not feel close to county, region or district'
+        description_short: '% of respondents who do not feel close (not very close or not close at all) to their county, region or district, when asked how close they feel to their county, region or district. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Do not feel close to county, region or district'
+          <<: *common-display
+      very_close_how_close_you_feel_to_county_region_district:
+        title: 'Feel very close to county, region or district'
+        description_short: '% of respondents who feel very close to their county, region or district, when asked how close they feel to their county, region or district. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel very close to county, region or district'
+          <<: *common-display
+      close_how_close_you_feel_to_county_region_district:
+        title: 'Feel close to county, region or district'
+        description_short: '% of respondents who feel close to their county, region or district, when asked how close they feel to their county, region or district. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to county, region or district'
+          <<: *common-display
+      not_very_close_how_close_you_feel_to_county_region_district:
+        title: 'Feel not very close to county, region or district'
+        description_short: '% of respondents who feel not very close to their county, region or district, when asked how close they feel to their county, region or district. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not very close to county, region or district'
+          <<: *common-display
+      not_close_at_all_how_close_you_feel_to_county_region_district:
+        title: 'Feel not close at all to county, region or district'
+        description_short: '% of respondents who feel not close at all to their county, region or district, when asked how close they feel to their county, region or district. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not close at all to county, region or district'
+          <<: *common-display
+      dont_know_how_close_you_feel_to_county_region_district:
+        title: 'How close you feel to county, region or district: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how close they feel to their county, region or district.'
+        display:
+          name: 'How close you feel to county, region or district: Don''t know'
+          <<: *common-display
+      no_answer_how_close_you_feel_to_county_region_district:
+        title: 'How close you feel to county, region or district: No answer'
+        description_short: '% of answers classified as "No answer" when asked how close they feel to their county, region or district.'
+        display:
+          name: 'How close you feel to county, region or district: No answer'
+          <<: *common-display
+      avg_score_how_close_you_feel_to_county_region_district:
+        title: 'How close you feel to county, region or district: average score'
+        description_short: 'Average score for how close respondents feel to their county, region or district, on a scale from 1 to 4 where 1 means "very close" and 4 means "not close at all".'
+        display:
+          name: 'How close you feel to county, region or district: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      feel_close_how_close_you_feel_to_country:
+        title: 'Feel close to country'
+        description_short: '% of respondents who feel close (very close or close) to their country, when asked how close they feel to their country. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to country'
+          <<: *common-display
+      not_close_how_close_you_feel_to_country:
+        title: 'Do not feel close to country'
+        description_short: '% of respondents who do not feel close (not very close or not close at all) to their country, when asked how close they feel to their country. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Do not feel close to country'
+          <<: *common-display
+      very_close_how_close_you_feel_to_country:
+        title: 'Feel very close to country'
+        description_short: '% of respondents who feel very close to their country, when asked how close they feel to their country. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel very close to country'
+          <<: *common-display
+      close_how_close_you_feel_to_country:
+        title: 'Feel close to country'
+        description_short: '% of respondents who feel close to their country, when asked how close they feel to their country. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel close to country'
+          <<: *common-display
+      not_very_close_how_close_you_feel_to_country:
+        title: 'Feel not very close to country'
+        description_short: '% of respondents who feel not very close to their country, when asked how close they feel to their country. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not very close to country'
+          <<: *common-display
+      not_close_at_all_how_close_you_feel_to_country:
+        title: 'Feel not close at all to country'
+        description_short: '% of respondents who feel not close at all to their country, when asked how close they feel to their country. Possible answers are "Very close", "Close", "Not very close" and "Not close at all".'
+        display:
+          name: 'Feel not close at all to country'
+          <<: *common-display
+      dont_know_how_close_you_feel_to_country:
+        title: 'How close you feel to country: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how close they feel to their country.'
+        display:
+          name: 'How close you feel to country: Don''t know'
+          <<: *common-display
+      no_answer_how_close_you_feel_to_country:
+        title: 'How close you feel to country: No answer'
+        description_short: '% of answers classified as "No answer" when asked how close they feel to their country.'
+        display:
+          name: 'How close you feel to country: No answer'
+          <<: *common-display
+      avg_score_how_close_you_feel_to_country:
+        title: 'How close you feel to country: average score'
+        description_short: 'Average score for how close respondents feel to their country, on a scale from 1 to 4 where 1 means "very close" and 4 means "not close at all".'
+        display:
+          name: 'How close you feel to country: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      agree_science_and_technology_make_life_healthier_and_easier:
+        title: 'Agree: Science and technology make life better'
+        description_short: '% of respondents who place themselves between 7 and 10 (agreement) when asked how much they agree or disagree with the statement "Science and technology are making our lives healthier, easier, and more comfortable", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Agree: Science and technology make life better'
+          <<: *common-display
+      neutral_science_and_technology_make_life_healthier_and_easier:
+        title: 'Neutral: Science and technology make life better'
+        description_short: '% of respondents who place themselves at 5 or 6 (neutral) when asked how much they agree or disagree with the statement "Science and technology are making our lives healthier, easier, and more comfortable", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Neutral: Science and technology make life better'
+          <<: *common-display
+      disagree_science_and_technology_make_life_healthier_and_easier:
+        title: 'Disagree: Science and technology make life better'
+        description_short: '% of respondents who place themselves between 1 and 4 (disagreement) when asked how much they agree or disagree with the statement "Science and technology are making our lives healthier, easier, and more comfortable", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Disagree: Science and technology make life better'
+          <<: *common-display
+      dont_know_science_and_technology_make_life_healthier_and_easier:
+        title: 'Science and technology make life better: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how much they agree or disagree with the statement "Science and technology are making our lives healthier, easier, and more comfortable", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Science and technology make life better: Don''t know'
+          <<: *common-display
+      no_answer_science_and_technology_make_life_healthier_and_easier:
+        title: 'Science and technology make life better: No answer'
+        description_short: '% of answers classified as "No answer" when asked how much they agree or disagree with the statement "Science and technology are making our lives healthier, easier, and more comfortable", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Science and technology make life better: No answer'
+          <<: *common-display
+      avg_score_science_and_technology_make_life_healthier_and_easier:
+        title: 'Science and technology make life better: average score'
+        description_short: 'Average score when asked how much they agree or disagree with the statement "Science and technology are making our lives healthier, easier, and more comfortable", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Science and technology make life better: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      agree_science_and_technology_bring_more_opportunities_for_next_generation:
+        title: 'Agree: Science and technology bring more opportunities'
+        description_short: '% of respondents who place themselves between 7 and 10 (agreement) when asked how much they agree or disagree with the statement "Because of science and technology, there will be more opportunities for the next generation", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Agree: Science and technology bring more opportunities'
+          <<: *common-display
+      neutral_science_and_technology_bring_more_opportunities_for_next_generation:
+        title: 'Neutral: Science and technology bring more opportunities'
+        description_short: '% of respondents who place themselves at 5 or 6 (neutral) when asked how much they agree or disagree with the statement "Because of science and technology, there will be more opportunities for the next generation", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Neutral: Science and technology bring more opportunities'
+          <<: *common-display
+      disagree_science_and_technology_bring_more_opportunities_for_next_generation:
+        title: 'Disagree: Science and technology bring more opportunities'
+        description_short: '% of respondents who place themselves between 1 and 4 (disagreement) when asked how much they agree or disagree with the statement "Because of science and technology, there will be more opportunities for the next generation", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Disagree: Science and technology bring more opportunities'
+          <<: *common-display
+      dont_know_science_and_technology_bring_more_opportunities_for_next_generation:
+        title: 'Science and technology bring more opportunities: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how much they agree or disagree with the statement "Because of science and technology, there will be more opportunities for the next generation", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Science and technology bring more opportunities: Don''t know'
+          <<: *common-display
+      no_answer_science_and_technology_bring_more_opportunities_for_next_generation:
+        title: 'Science and technology bring more opportunities: No answer'
+        description_short: '% of answers classified as "No answer" when asked how much they agree or disagree with the statement "Because of science and technology, there will be more opportunities for the next generation", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Science and technology bring more opportunities: No answer'
+          <<: *common-display
+      avg_score_science_and_technology_bring_more_opportunities_for_next_generation:
+        title: 'Science and technology bring more opportunities: average score'
+        description_short: 'Average score when asked how much they agree or disagree with the statement "Because of science and technology, there will be more opportunities for the next generation", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Science and technology bring more opportunities: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      agree_we_depend_too_much_on_science_and_not_enough_on_faith:
+        title: 'Agree: We depend too much on science, not faith'
+        description_short: '% of respondents who place themselves between 7 and 10 (agreement) when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Agree: We depend too much on science, not faith'
+          <<: *common-display
+      neutral_we_depend_too_much_on_science_and_not_enough_on_faith:
+        title: 'Neutral: We depend too much on science, not faith'
+        description_short: '% of respondents who place themselves at 5 or 6 (neutral) when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Neutral: We depend too much on science, not faith'
+          <<: *common-display
+      disagree_we_depend_too_much_on_science_and_not_enough_on_faith:
+        title: 'Disagree: We depend too much on science, not faith'
+        description_short: '% of respondents who place themselves between 1 and 4 (disagreement) when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Disagree: We depend too much on science, not faith'
+          <<: *common-display
+      dont_know_we_depend_too_much_on_science_and_not_enough_on_faith:
+        title: 'We depend too much on science, not faith: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'We depend too much on science, not faith: Don''t know'
+          <<: *common-display
+      no_answer_we_depend_too_much_on_science_and_not_enough_on_faith:
+        title: 'We depend too much on science, not faith: No answer'
+        description_short: '% of answers classified as "No answer" when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'We depend too much on science, not faith: No answer'
+          <<: *common-display
+      avg_score_we_depend_too_much_on_science_and_not_enough_on_faith:
+        title: 'We depend too much on science, not faith: average score'
+        description_short: 'Average score when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'We depend too much on science, not faith: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      agree_science_breaks_down_ideas_of_right_and_wrong:
+        title: 'Agree: Science breaks down ideas of right and wrong'
+        description_short: '% of respondents who place themselves between 7 and 10 (agreement) when asked how much they agree or disagree with the statement "One of the bad effects of science is that it breaks down people''s ideas of right and wrong", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Agree: Science breaks down ideas of right and wrong'
+          <<: *common-display
+      neutral_science_breaks_down_ideas_of_right_and_wrong:
+        title: 'Neutral: Science breaks down ideas of right and wrong'
+        description_short: '% of respondents who place themselves at 5 or 6 (neutral) when asked how much they agree or disagree with the statement "One of the bad effects of science is that it breaks down people''s ideas of right and wrong", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Neutral: Science breaks down ideas of right and wrong'
+          <<: *common-display
+      disagree_science_breaks_down_ideas_of_right_and_wrong:
+        title: 'Disagree: Science breaks down ideas of right and wrong'
+        description_short: '% of respondents who place themselves between 1 and 4 (disagreement) when asked how much they agree or disagree with the statement "One of the bad effects of science is that it breaks down people''s ideas of right and wrong", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Disagree: Science breaks down ideas of right and wrong'
+          <<: *common-display
+      dont_know_science_breaks_down_ideas_of_right_and_wrong:
+        title: 'Science breaks down ideas of right and wrong: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked how much they agree or disagree with the statement "One of the bad effects of science is that it breaks down people''s ideas of right and wrong", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Science breaks down ideas of right and wrong: Don''t know'
+          <<: *common-display
+      no_answer_science_breaks_down_ideas_of_right_and_wrong:
+        title: 'Science breaks down ideas of right and wrong: No answer'
+        description_short: '% of answers classified as "No answer" when asked how much they agree or disagree with the statement "One of the bad effects of science is that it breaks down people''s ideas of right and wrong", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Science breaks down ideas of right and wrong: No answer'
+          <<: *common-display
+      avg_score_science_breaks_down_ideas_of_right_and_wrong:
+        title: 'Science breaks down ideas of right and wrong: average score'
+        description_short: 'Average score when asked how much they agree or disagree with the statement "One of the bad effects of science is that it breaks down people''s ideas of right and wrong", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
+        display:
+          name: 'Science breaks down ideas of right and wrong: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      better_off_science_world:
+        title: 'World better off because of science and technology'
+        description_short: '% of respondents who place themselves between 7 and 10 (the world is better off) when asked whether, all things considered, the world is better off or worse off because of science and technology, on a scale where 1 means "the world is a lot worse off" and 10 means "the world is a lot better off".'
+        display:
+          name: 'World better off because of science and technology'
+          <<: *common-display
+      neutral_science_world:
+        title: 'World neither better nor worse off because of science and technology'
+        description_short: '% of respondents who place themselves at 5 or 6 (neutral) when asked whether, all things considered, the world is better off or worse off because of science and technology, on a scale where 1 means "the world is a lot worse off" and 10 means "the world is a lot better off".'
+        display:
+          name: 'World neither better nor worse off because of science and technology'
+          <<: *common-display
+      worse_off_science_world:
+        title: 'World worse off because of science and technology'
+        description_short: '% of respondents who place themselves between 1 and 4 (the world is worse off) when asked whether, all things considered, the world is better off or worse off because of science and technology, on a scale where 1 means "the world is a lot worse off" and 10 means "the world is a lot better off".'
+        display:
+          name: 'World worse off because of science and technology'
+          <<: *common-display
+      dont_know_science_world:
+        title: 'World better or worse off because of science and technology: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked whether, all things considered, the world is better off or worse off because of science and technology, on a scale where 1 means "the world is a lot worse off" and 10 means "the world is a lot better off".'
+        display:
+          name: 'World better/worse off (science): Don''t know'
+          <<: *common-display
+      no_answer_science_world:
+        title: 'World better or worse off because of science and technology: No answer'
+        description_short: '% of answers classified as "No answer" when asked whether, all things considered, the world is better off or worse off because of science and technology, on a scale where 1 means "the world is a lot worse off" and 10 means "the world is a lot better off".'
+        display:
+          name: 'World better/worse off (science): No answer'
+          <<: *common-display
+      avg_score_science_world:
+        title: 'World better or worse off because of science and technology: average score'
+        description_short: 'Average score when asked whether, all things considered, the world is better off or worse off because of science and technology, on a scale where 1 means "the world is a lot worse off" and 10 means "the world is a lot better off".'
+        display:
+          name: 'World better/worse off (science): average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+      economic_growth_aims_of_country_first_choice:
+        title: 'A high level of economic growth (first choice, aims of the country)'
+        description_short: '% of respondents who chose "a high level of economic growth" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'A high level of economic growth (first choice)'
+          <<: *common-display
+      strong_defence_aims_of_country_first_choice:
+        title: 'Strong defence forces (first choice, aims of the country)'
+        description_short: '% of respondents who chose "making sure this country has strong defence forces" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'Strong defence forces (first choice)'
+          <<: *common-display
+      more_say_aims_of_country_first_choice:
+        title: 'People have more say (first choice, aims of the country)'
+        description_short: '% of respondents who chose "seeing that people have more say about how things are done at their jobs and in their communities" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'People have more say (first choice)'
+          <<: *common-display
+      beautiful_cities_aims_of_country_first_choice:
+        title: 'More beautiful cities and countryside (first choice, aims of the country)'
+        description_short: '% of respondents who chose "trying to make our cities and countryside more beautiful" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'More beautiful cities and countryside (first choice)'
+          <<: *common-display
+      dont_know_aims_of_country_first_choice:
+        title: 'Aims of the country (first choice): Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'Aims of the country (first choice): Don''t know'
+          <<: *common-display
+      no_answer_aims_of_country_first_choice:
+        title: 'Aims of the country (first choice): No answer'
+        description_short: '% of answers classified as "No answer" when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'Aims of the country (first choice): No answer'
+          <<: *common-display
+      economic_growth_aims_of_country_second_choice:
+        title: 'A high level of economic growth (second choice, aims of the country)'
+        description_short: '% of respondents who chose "a high level of economic growth" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'A high level of economic growth (second choice)'
+          <<: *common-display
+      strong_defence_aims_of_country_second_choice:
+        title: 'Strong defence forces (second choice, aims of the country)'
+        description_short: '% of respondents who chose "making sure this country has strong defence forces" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'Strong defence forces (second choice)'
+          <<: *common-display
+      more_say_aims_of_country_second_choice:
+        title: 'People have more say (second choice, aims of the country)'
+        description_short: '% of respondents who chose "seeing that people have more say about how things are done at their jobs and in their communities" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'People have more say (second choice)'
+          <<: *common-display
+      beautiful_cities_aims_of_country_second_choice:
+        title: 'More beautiful cities and countryside (second choice, aims of the country)'
+        description_short: '% of respondents who chose "trying to make our cities and countryside more beautiful" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'More beautiful cities and countryside (second choice)'
+          <<: *common-display
+      dont_know_aims_of_country_second_choice:
+        title: 'Aims of the country (second choice): Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'Aims of the country (second choice): Don''t know'
+          <<: *common-display
+      no_answer_aims_of_country_second_choice:
+        title: 'Aims of the country (second choice): No answer'
+        description_short: '% of answers classified as "No answer" when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        display:
+          name: 'Aims of the country (second choice): No answer'
+          <<: *common-display
+      maintaining_order_aims_of_respondent_first_choice:
+        title: 'Maintaining order in the nation (first choice, aims of the respondent)'
+        description_short: '% of respondents who chose "maintaining order in the nation" as their first most important goal, when asked which goal should be most important, choosing their first most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Maintaining order in the nation (first choice)'
+          <<: *common-display
+      give_people_say_aims_of_respondent_first_choice:
+        title: 'Give people more say in government (first choice, aims of the respondent)'
+        description_short: '% of respondents who chose "giving people more say in important government decisions" as their first most important goal, when asked which goal should be most important, choosing their first most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Give people more say in government (first choice)'
+          <<: *common-display
+      fighting_prices_aims_of_respondent_first_choice:
+        title: 'Fighting rising prices (first choice, aims of the respondent)'
+        description_short: '% of respondents who chose "fighting rising prices" as their first most important goal, when asked which goal should be most important, choosing their first most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Fighting rising prices (first choice)'
+          <<: *common-display
+      freedom_of_speech_aims_of_respondent_first_choice:
+        title: 'Protecting freedom of speech (first choice, aims of the respondent)'
+        description_short: '% of respondents who chose "protecting freedom of speech" as their first most important goal, when asked which goal should be most important, choosing their first most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Protecting freedom of speech (first choice)'
+          <<: *common-display
+      dont_know_aims_of_respondent_first_choice:
+        title: 'Aims of the respondent (first choice): Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked which goal should be most important, choosing their first most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Aims of the respondent (first choice): Don''t know'
+          <<: *common-display
+      no_answer_aims_of_respondent_first_choice:
+        title: 'Aims of the respondent (first choice): No answer'
+        description_short: '% of answers classified as "No answer" when asked which goal should be most important, choosing their first most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Aims of the respondent (first choice): No answer'
+          <<: *common-display
+      maintaining_order_aims_of_respondent_second_choice:
+        title: 'Maintaining order in the nation (second choice, aims of the respondent)'
+        description_short: '% of respondents who chose "maintaining order in the nation" as their second most important goal, when asked which goal should be most important, choosing their second most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Maintaining order in the nation (second choice)'
+          <<: *common-display
+      give_people_say_aims_of_respondent_second_choice:
+        title: 'Give people more say in government (second choice, aims of the respondent)'
+        description_short: '% of respondents who chose "giving people more say in important government decisions" as their second most important goal, when asked which goal should be most important, choosing their second most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Give people more say in government (second choice)'
+          <<: *common-display
+      fighting_prices_aims_of_respondent_second_choice:
+        title: 'Fighting rising prices (second choice, aims of the respondent)'
+        description_short: '% of respondents who chose "fighting rising prices" as their second most important goal, when asked which goal should be most important, choosing their second most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Fighting rising prices (second choice)'
+          <<: *common-display
+      freedom_of_speech_aims_of_respondent_second_choice:
+        title: 'Protecting freedom of speech (second choice, aims of the respondent)'
+        description_short: '% of respondents who chose "protecting freedom of speech" as their second most important goal, when asked which goal should be most important, choosing their second most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Protecting freedom of speech (second choice)'
+          <<: *common-display
+      dont_know_aims_of_respondent_second_choice:
+        title: 'Aims of the respondent (second choice): Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked which goal should be most important, choosing their second most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Aims of the respondent (second choice): Don''t know'
+          <<: *common-display
+      no_answer_aims_of_respondent_second_choice:
+        title: 'Aims of the respondent (second choice): No answer'
+        description_short: '% of answers classified as "No answer" when asked which goal should be most important, choosing their second most important goal among four options ("maintaining order in the nation"; "giving people more say in important government decisions"; "fighting rising prices"; "protecting freedom of speech").'
+        display:
+          name: 'Aims of the respondent (second choice): No answer'
+          <<: *common-display
+      stable_economy_most_important_first_choice:
+        title: 'A stable economy (first choice, most important goal)'
+        description_short: '% of respondents who chose "a stable economy" as their first most important goal, when asked which goal should be most important, choosing their first most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'A stable economy (first choice)'
+          <<: *common-display
+      humane_society_most_important_first_choice:
+        title: 'A more humane society (first choice, most important goal)'
+        description_short: '% of respondents who chose "progress toward a less impersonal and more humane society" as their first most important goal, when asked which goal should be most important, choosing their first most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'A more humane society (first choice)'
+          <<: *common-display
+      ideas_over_money_most_important_first_choice:
+        title: 'Ideas count more than money (first choice, most important goal)'
+        description_short: '% of respondents who chose "progress toward a society in which ideas count more than money" as their first most important goal, when asked which goal should be most important, choosing their first most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'Ideas count more than money (first choice)'
+          <<: *common-display
+      fight_crime_most_important_first_choice:
+        title: 'The fight against crime (first choice, most important goal)'
+        description_short: '% of respondents who chose "the fight against crime" as their first most important goal, when asked which goal should be most important, choosing their first most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'The fight against crime (first choice)'
+          <<: *common-display
+      dont_know_most_important_first_choice:
+        title: 'Most important goal (first choice): Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked which goal should be most important, choosing their first most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'Most important goal (first choice): Don''t know'
+          <<: *common-display
+      no_answer_most_important_first_choice:
+        title: 'Most important goal (first choice): No answer'
+        description_short: '% of answers classified as "No answer" when asked which goal should be most important, choosing their first most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'Most important goal (first choice): No answer'
+          <<: *common-display
+      stable_economy_most_important_second_choice:
+        title: 'A stable economy (second choice, most important goal)'
+        description_short: '% of respondents who chose "a stable economy" as their second most important goal, when asked which goal should be most important, choosing their second most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'A stable economy (second choice)'
+          <<: *common-display
+      humane_society_most_important_second_choice:
+        title: 'A more humane society (second choice, most important goal)'
+        description_short: '% of respondents who chose "progress toward a less impersonal and more humane society" as their second most important goal, when asked which goal should be most important, choosing their second most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'A more humane society (second choice)'
+          <<: *common-display
+      ideas_over_money_most_important_second_choice:
+        title: 'Ideas count more than money (second choice, most important goal)'
+        description_short: '% of respondents who chose "progress toward a society in which ideas count more than money" as their second most important goal, when asked which goal should be most important, choosing their second most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'Ideas count more than money (second choice)'
+          <<: *common-display
+      fight_crime_most_important_second_choice:
+        title: 'The fight against crime (second choice, most important goal)'
+        description_short: '% of respondents who chose "the fight against crime" as their second most important goal, when asked which goal should be most important, choosing their second most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'The fight against crime (second choice)'
+          <<: *common-display
+      dont_know_most_important_second_choice:
+        title: 'Most important goal (second choice): Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked which goal should be most important, choosing their second most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'Most important goal (second choice): Don''t know'
+          <<: *common-display
+      no_answer_most_important_second_choice:
+        title: 'Most important goal (second choice): No answer'
+        description_short: '% of answers classified as "No answer" when asked which goal should be most important, choosing their second most important goal among four options ("a stable economy"; "progress toward a less impersonal and more humane society"; "progress toward a society in which ideas count more than money"; "the fight against crime").'
+        display:
+          name: 'Most important goal (second choice): No answer'
+          <<: *common-display
+      concerned_humankind:
+        title: 'Concerned about humankind'
+        description_short: '% of respondents who feel concerned (very much or much) about the living conditions of humankind, when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        display:
+          name: 'Concerned about humankind'
+          <<: *common-display
+      not_concerned_humankind:
+        title: 'Not concerned about humankind'
+        description_short: '% of respondents who feel not concerned (not so much or not at all) about the living conditions of humankind, when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        display:
+          name: 'Not concerned about humankind'
+          <<: *common-display
+      very_much_humankind:
+        title: 'Concerned about humankind: very much'
+        description_short: '% of respondents who feel concerned about the living conditions of humankind "very much", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        display:
+          name: 'Concerned about humankind: very much'
+          <<: *common-display
+      much_humankind:
+        title: 'Concerned about humankind: much'
+        description_short: '% of respondents who feel concerned about the living conditions of humankind "much", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        display:
+          name: 'Concerned about humankind: much'
+          <<: *common-display
+      to_a_certain_extent_humankind:
+        title: 'Concerned about humankind: to a certain extent'
+        description_short: '% of respondents who feel concerned about the living conditions of humankind "to a certain extent", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        display:
+          name: 'Concerned about humankind: to a certain extent'
+          <<: *common-display
+      not_so_much_humankind:
+        title: 'Concerned about humankind: not so much'
+        description_short: '% of respondents who feel concerned about the living conditions of humankind "not so much", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        display:
+          name: 'Concerned about humankind: not so much'
+          <<: *common-display
+      not_at_all_humankind:
+        title: 'Concerned about humankind: not at all'
+        description_short: '% of respondents who feel concerned about the living conditions of humankind "not at all", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        display:
+          name: 'Concerned about humankind: not at all'
+          <<: *common-display
+      dont_know_humankind:
+        title: 'Concerned about humankind: Don''t know'
+        description_short: '% of respondents replying "Don''t know" when asked to what extent they feel concerned about the living conditions of humankind.'
+        display:
+          name: 'Concerned about humankind: Don''t know'
+          <<: *common-display
+      no_answer_humankind:
+        title: 'Concerned about humankind: No answer'
+        description_short: '% of answers classified as "No answer" when asked to what extent they feel concerned about the living conditions of humankind.'
+        display:
+          name: 'Concerned about humankind: No answer'
+          <<: *common-display
+      avg_score_humankind:
+        title: 'Concerned about humankind: average score'
+        description_short: 'Average score for how concerned respondents feel about the living conditions of humankind, on a scale from 1 to 5 where 1 means "very much" and 5 means "not at all".'
+        display:
+          name: 'Concerned about humankind: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
