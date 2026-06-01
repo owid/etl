@@ -15,9 +15,7 @@ definitions:
     - |-
       The UN collects data based on each country's own national definition of urban and rural areas. While this reflects how countries themselves understand their urbanization, it limits international comparability.
     - |-
-      In its 2025 revision, the UN World Urbanization Prospects adopted the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/) as a framework to better harmonize national definitions and improve consistency across countries. Data based on national definitions are still reported alongside the GHSL-based estimates, as they reflect how countries themselves measure and track urbanization.
-    - |-
-      For internationally comparable data on urbanization, consider our charts using [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php) classification, which applies consistent criteria across all countries using population density and settlement size thresholds.
+      The UN's 2025 revision adopted the [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php) framework as a reference to make national definitions more consistent. National definitions are still reported because they reflect how countries themselves measure and track urbanization. For cross-country comparisons, our charts using DEGURBA are a better choice, since it applies the same definition of urban everywhere.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
