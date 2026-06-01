@@ -1756,63 +1756,63 @@ tables:
 
       agree_agg_work_is_a_duty:
         title: "Work is a duty towards society: Agree (aggregate)"
-        description_short: '% of respondents replying "agree" or "strongly agree" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of respondents replying "agree" or "strongly agree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: Agree/Strongly agree"
           <<: *common-display
 
       disagree_agg_work_is_a_duty:
         title: "Work is a duty towards society: Disagree (aggregate)"
-        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: Disagree/Strongly disagree"
           <<: *common-display
 
       strongly_agree_work_is_a_duty:
         title: "Work is a duty towards society: Strongly agree"
-        description_short: '% of respondents replying "strongly agree" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of respondents replying "strongly agree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: Strongly agree"
           <<: *common-display
 
       agree_work_is_a_duty:
         title: "Work is a duty towards society: Agree"
-        description_short: '% of respondents replying "agree" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of respondents replying "agree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: Agree"
           <<: *common-display
 
       neither_work_is_a_duty:
         title: "Work is a duty towards society: Neither agree nor disagree"
-        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: Neither agree or disagree"
           <<: *common-display
 
       disagree_work_is_a_duty:
         title: "Work is a duty towards society: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of respondents replying "disagree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: Disagree"
           <<: *common-display
 
       strongly_disagree_work_is_a_duty:
         title: "Work is a duty towards society: Strongly disagree"
-        description_short: '% of respondents replying "strongly disagree" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of respondents replying "strongly disagree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: Strongly disagree"
           <<: *common-display
 
       dont_know_work_is_a_duty:
         title: "Work is a duty towards society: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of respondents replying "don''t know" when asked "Do you agree or disagree with the following statements?", when the statement was "Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: Don't know"
           <<: *common-display
 
       no_answer_work_is_a_duty:
         title: "Work is a duty towards society: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of answers classified as "No answer" for the question "Do you agree or disagree with the following statements?", when the statement was "Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: No answer"
           <<: *common-display
@@ -1820,63 +1820,63 @@ tables:
 
       agree_agg_work_should_come_first:
         title: "Work should come first: Agree (aggregate)"
-        description_short: '% of respondents replying "agree" or "strongly agree" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of respondents replying "agree" or "strongly agree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: Agree/Strongly agree"
           <<: *common-display
 
       disagree_agg_work_should_come_first:
         title: "Work should come first: Disagree (aggregate)"
-        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: Disagree/Strongly disagree"
           <<: *common-display
 
       strongly_agree_work_should_come_first:
         title: "Work should come first: Strongly agree"
-        description_short: '% of respondents replying "strongly agree" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of respondents replying "strongly agree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: Strongly agree"
           <<: *common-display
 
       agree_work_should_come_first:
         title: "Work should come first: Agree"
-        description_short: '% of respondents replying "agree" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of respondents replying "agree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: Agree"
           <<: *common-display
 
       neither_work_should_come_first:
         title: "Work should come first: Neither agree nor disagree"
-        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: Neither agree or disagree"
           <<: *common-display
 
       disagree_work_should_come_first:
         title: "Work should come first: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of respondents replying "disagree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: Disagree"
           <<: *common-display
 
       strongly_disagree_work_should_come_first:
         title: "Work should come first: Strongly disagree"
-        description_short: '% of respondents replying "strongly disagree" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of respondents replying "strongly disagree" when asked "Do you agree or disagree with the following statements?", when the statement was "Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: Strongly disagree"
           <<: *common-display
 
       dont_know_work_should_come_first:
         title: "Work should come first: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of respondents replying "don''t know" when asked "Do you agree or disagree with the following statements?", when the statement was "Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: Don't know"
           <<: *common-display
 
       no_answer_work_should_come_first:
         title: "Work should come first: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of answers classified as "No answer" for the question "Do you agree or disagree with the following statements?", when the statement was "Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: No answer"
           <<: *common-display
