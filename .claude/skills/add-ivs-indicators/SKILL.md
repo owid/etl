@@ -310,6 +310,48 @@ EXACTLY** — search is fuzzy and returns look-alikes (`E248B` query also return
 parallel (one `notion-update-page` per code). Verify with one `notion-fetch` afterward that `Available`
 reads `"__YES__"`.
 
+## Step 10 — Indicator → admin-link table (share with reviewers / PR comment)
+
+After the upload, produce a compact **one-row-per-question** table that links each response option to its
+Grapher admin page — handy for a PR comment or a hand-off to a topic reviewer. A **generic** script lives
+at `scripts/indicator_admin_table.py` (next to this skill) — it hardcodes **no** indicators. Edit only the
+small CONFIG block (`VERSION`, `BRANCH`, `ENV`) and run it:
+
+```bash
+.venv/bin/python .claude/skills/add-ivs-indicators/scripts/indicator_admin_table.py
+```
+
+It works in three moves, all auto-derived:
+1. **Which variables did the PR create?** Diff the garden `.meta.yml` variable keys between `master` and
+   the PR branch (one entry per variable): `meta_keys(BRANCH) - meta_keys("master")`. Robust even when the
+   working tree is on `master` (it uses `git show <ref>:<file>`).
+2. **Resolve variable ids** from the Grapher DB and cluster columns into questions. Loop-group columns →
+   IVS code via the **branch meadow `VARS_DICT`** (it reverses `{underscore(label): code}` and matches the
+   longest column suffix, so `family_victim_of_a_crime` beats `victim_of_a_crime`). Custom single-question
+   blocks (no `VARS_DICT` entry, so the column carries no code) are clustered by stripping a generic IVS
+   recode-prefix vocabulary and keyed by their column **suffix**; their label is derived from the variable
+   `name`s. Link text = the option prefix (`agree`, `dont_know`, `no_answer`, `avg_score`, `*_agg`…).
+3. **Emit** `| IVS code | Question | option links |` rows — one flat table by default.
+
+Three **optional** dicts in CONFIG add editorial polish without reintroducing hardcoded indicators:
+`TOPICS = {"Human Rights": ["E124", ...], ...}` (group/order rows), `LABELS = {code_or_suffix: "…"}`
+(nicer question wording), and `CODE_FOR = {custom_suffix: "IVS_CODE"}` (give custom blocks like
+`humankind`→`E158`, `science_world`→`E234`, `secure_neighborhood`→`H001` their real code). PR #6180's
+output used all three; with them empty you still get a complete, correct table.
+
+**Staging vs production differ only in the DB connection + admin base** (the script switches on `ENV`):
+- **Staging** (`ENV="staging"`): container = `staging-site-<branch normalised & truncated to 28 chars>`
+  (via `get_container_name`); admin `http://<container>/admin/variables/<id>`. On `master`,
+  `OWIDEnv.read_sql` falls back to local, so the script connects to `<container>.tail6e23.ts.net` MySQL
+  **directly**. The `datasets.catalogPath` has **no** `grapher/` prefix (e.g.
+  `ivs/<v>/integrated_values_surveys`) even though `variables.catalogPath` does — filter on the dataset row
+  accordingly.
+- **Production** (`ENV="production"`): admin base is `https://admin.owid.io/admin` (from
+  `OWIDEnv().indicators_admin_site`). The indicators exist in production **only after the PR is merged and
+  the dataset re-published**, and **production variable ids differ from staging** — always re-query the prod
+  DB (don't reuse staging ids). The script asserts all expected columns matched, which doubles as a
+  "is it published yet?" check.
+
 ## Worked example
 
 PR **owid/etl#6180** is a full reference diff — it spans nearly every shape above (3/4/5-pt agree, 4-pt
