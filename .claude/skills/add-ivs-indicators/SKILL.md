@@ -50,13 +50,18 @@ regenerate the CSV.
 ## Step 0 — Verify scales against the `.dta` (NEVER from memory)
 
 Model-recalled survey wording/scales are unreliable — verify. The authoritative code→category mapping
-for each variable lives in the `.dta` value labels. Read them per column:
+for each variable lives in the `.dta` value labels. Read **every code you're adding in one pass**:
 
 ```python
 import pandas as pd
 path = "snapshots/ivs/<v>/Integrated_values_surveys_1981-2022.dta"
-s = pd.read_stata(path, columns=["C001"], convert_categoricals=True)["C001"]
-print(list(s.cat.categories))   # order == code 1, 2, 3, … (the IVS coding)
+# .dta is row-major: each read_stata() streams the whole 878 MB file once. Read EVERY code you
+# need in ONE pass, then inspect each from the in-memory frame — NOT one read_stata() per code
+# (that re-streams the 878 MB file per code: ~24 full passes for 24 codes, ~10x slower).
+codes = ["C001", "C002", "H002_01"]  # all the codes you're adding
+df = pd.read_stata(path, columns=codes, convert_categoricals=True)
+for c in codes:
+    print(c, list(df[c].cat.categories))   # order == code 1, 2, 3, … (the IVS coding)
 ```
 
 (`StataReader.value_labels()` mapping is unreliable for these vars — use `convert_categoricals=True`.)
