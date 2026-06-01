@@ -65,8 +65,15 @@ def run() -> None:
     tb_rural_pop = pr.concat([tb_hyde_rural, tb_un_rural], ignore_index=True)
 
     # Merge into a single combined table
-    tb_combined = pr.merge(tb_share, tb_urban_pop.rename(columns={"population": "urban_population"}), on=["country", "year"], how="outer")
-    tb_combined = pr.merge(tb_combined, tb_rural_pop.rename(columns={"population": "rural_population"}), on=["country", "year"], how="outer")
+    tb_combined = pr.merge(
+        tb_share, tb_urban_pop.rename(columns={"population": "urban_population"}), on=["country", "year"], how="outer"
+    )
+    tb_combined = pr.merge(
+        tb_combined,
+        tb_rural_pop.rename(columns={"population": "rural_population"}),
+        on=["country", "year"],
+        how="outer",
+    )
     tb_combined = tb_combined.format(["country", "year"], short_name="urban_share_with_hyde")
 
     tb = tb.format(["country", "year", "area_type", "data_type"])
