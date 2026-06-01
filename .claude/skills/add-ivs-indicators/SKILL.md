@@ -41,6 +41,15 @@ ask the user for them** (or download from worldvaluessurvey.org → *Data and do
 - **WVS-7 master questionnaire** (`…WVS-7_Master_Questionnaire_…English.pdf`) — verbatim question stems +
   answer-category wording (look up by Q-number).
   Path: *Data Download → Wave 7 (2017-2022)* (matches the current IVS version) *→ Questionnaire link*.
+- **EVS 2017 field questionnaire** (`ZA7500_q_gb.pdf`, the Great Britain master) — the **fallback** for
+  older EVS-only items that never made it into WVS-7 (so they're absent from the WVS-7 PDF). Look up by
+  the EVS variable name / question number (e.g. the IVS `E158` "concern about humankind" = EVS **Q60,
+  item v216** "the living conditions of all humans all over the world"). Source:
+  europeanvaluesstudy.eu → *Methodology, data, documentation → Survey 2017 → full release EVS2017 →
+  participating countries → questionnaires*. Ask the user for it if it's not in the snapshot folder.
+
+To find which questionnaire a code lives in, check the dictionary's WVS-7 vs EVS columns: if the **WVS-7
+variable name is blank** for that IVS code, it's EVS-only — go to the EVS questionnaire.
 
 The 878 MB `.dta` is likewise git-ignored and must be present in `snapshots/ivs/<v>/` locally to
 regenerate the CSV.
@@ -96,7 +105,24 @@ to the master `keep S002VS S002EVS S003 S017 $questions` line.
 | single 4-pt question | `happiness` block (A008) |
 | 3-pt agree/disagree/neither | `political action` loop (E025) |
 | 5-pt agree (with neutral) | `work` loop (C039/C041) |
+| **5-pt frequency** (Daily/Weekly/Monthly/Less than monthly/Never) | extend the `worries` 4-pt loop to 5 levels (no exact twin) |
+| **10-pt agree / better-worse** | `income_equality` block (E035): aggregates `>=7` / `5\|6` neutral / `<=4`, **+ `avg_score` native 1–10** |
+| **multinomial 1-of-N named choice** (respondent picks one option) | `environment_vs_econ` block (B008): one 0/1 dummy per option, **no aggregate, no avg_score** |
 | continuous 0–1 index | custom (see Y022 below) |
+
+For a **10-pt** block the three aggregates (`>=7`, `5\|6`, `<=4`) + `dont_know` + `no_answer` partition
+to 100% — that's what `check_sum_100` checks (`avg_score` is extra). For **multinomial**, the N option
+dummies + `dont_know` + `no_answer` sum to 100%. When several questions share the **same** option codes
+(e.g. E001/E002 "aims of country: 1st/2nd choice" both map 1–4 to the same four goals), put them in one
+loop.
+
+**Aggregate-name collisions:** an aggregate must not collide with a category name. The closeness 4-pt
+scale has a category `close` (code 2), so the high aggregate (`1|2`) must be named `feel_close`, not
+`close`. Similarly check any `not_*` aggregate vs a `not_*` category before naming.
+
+**Aggregates and `avg_score` are NOT part of the `check_sum_100` partition** — only the mutually-exclusive
+categories + `dont_know` + `no_answer` sum to 100. Aggregates (`worry_`, `feel_close_`, `agree_`,
+`at_least_weekly_`…) are derived extras layered on top.
 
 **Stata name limits (this WILL bite you):** local-macro / `tempfile` names are capped at **31 chars**
 (variable names at 32). `tempfile neighborhood_frequency_\`var'_file` (35) errors with `r(198)`. Keep
@@ -130,6 +156,14 @@ i.e. the loop groups. The rename works by `column.endswith(code)`, then snake_ca
 single-question blocks already produce final names, so they get **no** `VARS_DICT` entry. Check that no
 new code is a suffix of another (e.g. `H002_01` vs `H002_1` — fine; just be deliberate).
 
+**Labels: avoid `:` and other punctuation.** `rename_vars` snake_cases in two steps — first a crude
+`.str.lower().str.replace(" ", "_")`, then `tb.format()` applies the real `underscore()`. A label like
+`"Information source: Daily newspaper"` ends up as `information_source__daily_newspaper` (the colon
+becomes a **second** underscore). Use colon-free labels (`"Information source daily newspaper"`) so the
+final suffix is clean single-underscore (`information_source_daily_newspaper`), and put the nicely
+punctuated wording in the `.meta.yml` `title`/`description_short` instead. **Codes with trailing letters**
+(e.g. `E248B`, `G007_18_B`) work fine with `endswith`.
+
 ## Step 4 — Garden: `etl/steps/data/garden/ivs/<v>/integrated_values_surveys.py`
 
 Per categorical group add:
@@ -143,22 +177,33 @@ Derive the **exact** garden column suffixes (so the constants match meadow outpu
 transform meadow uses:
 
 ```python
-from owid.catalog.utils import underscore
-suffix = underscore("Didn't carry much money".lower().replace(" ", "_"))  # -> "didnt_carry_much_money"
+from owid.catalog.core.utils import underscore   # owid.catalog.utils path is deprecated
+suffix = underscore("Information source daily newspaper")  # -> "information_source_daily_newspaper"
 ```
 
-(apostrophes are dropped, hyphens → `_`.)
+(apostrophes are dropped, hyphens → `_`; a colon would leave a double `__`, so keep labels colon-free.)
 
-**Continuous index:** no `replace_dont_know`/`check_sum`. Crucially, **exclude it from the
-`replace(0, NaN)` step** (0 is a valid index value) — add its column to the difference set there.
+**`avg_score` and the `replace(0, NaN)` step.** Only indices where **0 is a genuine value** need to be
+excluded from the 0→null replacement (`WELZEL_EQUALITY_INDEX_COLUMNS`, the 0–1 Welzel index). An ordinary
+`avg_score_*` on a 1–N scale (frequency 1–5, closeness 1–4, agree 1–10, …) **never equals 0**, so the
+replacement is a no-op for it — do **not** add those to the exclusion set. A truly continuous block also
+gets **no** `replace_dont_know`/`check_sum`.
 
 ## Step 5 — Metadata: `etl/steps/data/garden/ivs/<v>/integrated_values_surveys.meta.yml`
 
 Every new column needs an entry: `title`, single-quoted `description_short` (quote the question stem +
 answer options, double internal apostrophes for YAML), and `display.name` + `<<: *common-display`. Source
 the wording from the questionnaire PDF; the code→category order from the `.dta`. Index/unit-less columns
-override `unit: ""` / `short_unit: ""` (and e.g. `numDecimalPlaces: 2`). Generate the entries
-programmatically (it's 100+ columns) and append to the `variables:` block.
+(the `avg_score_*`) override `unit: ""` / `short_unit: ""` and `numDecimalPlaces: 2`; share columns inherit
+`unit: "%"` from `&common-display`. Generate the entries programmatically (it's 100s of columns) and append
+to the `variables:` block. To re-run the generator after a wording fix, splice cleanly: find the first new
+key in the file, truncate from there, and re-append the regenerated block (don't blindly append twice).
+
+**YAML quoting in a Python generator:** keep RAW apostrophes in your strings and run them through one
+single-quote helper that doubles `'`→`''`. Do **not** hand-write `'Don''t know'` in Python source — that's
+adjacent-string-literal concatenation and silently yields `Dont know`. After appending, re-parse the file
+with `ruamel_load` and assert the count + that a new `avg_score_*` entry shows `unit == ""` and the
+`&common-display` anchor resolved (e.g. `numDecimalPlaces`).
 
 **Audit gotcha:** verify any stated scale range against the actual `.do` recode — a pre-existing entry had
 `"6 to 10"` where the recode was `>= 7`. Don't copy ranges blindly.
@@ -167,15 +212,29 @@ programmatically (it's 100+ columns) and append to the `variables:` block.
 
 Assert the set of new column names is **identical** across three places, or you get silent breakage:
 (a) what Stata+meadow produce, (b) the garden `check_sum_100`/`replace_dont_know` groups, (c) the
-`.meta.yml` keys. Script it:
+`.meta.yml` keys. Reconstruct (a) directly from the `.do` collapse lists — every column the loop emits is
+`{prefix}_{underscore(VARS_DICT_label)}` for loop groups, or the literal name for custom blocks — then
+diff against the meta keys:
 
 ```python
+from owid.catalog.core.utils import underscore
 from etl.files import ruamel_load
+
+# the exact (prefix list) per group, mirroring each .do collapse line (incl. aggregates + avg_score)
+GROUPS = {("E248B", "E254B", ...): ["at_least_weekly", "less_than_weekly", "daily", ..., "avg_score"], ...}
+LABELS = {"E248B": "Information source daily newspaper", ...}  # == meadow VARS_DICT
+stata = {f"{p}_{underscore(LABELS[c])}" for codes, prefs in GROUPS.items() for c in codes for p in prefs}
+stata |= {f"{p}_humankind" for p in [...]}            # custom blocks: literal names, no rename
+
 meta = ruamel_load(open("etl/steps/data/garden/ivs/<v>/integrated_values_surveys.meta.yml").read())
 metakeys = set(meta["tables"]["integrated_values_surveys"]["variables"])
-expected = set()  # build from your group constants × answer prefixes, same logic as garden
-print("missing in meta:", sorted(expected - metakeys) or "none ✓")
+print("stata not meta:", sorted(stata - metakeys) or "none ✓")
+print("meta not stata:", sorted(metakeys - stata) or "none ✓")   # restrict metakeys to the new ones
+# also: assert no new code endswith another new code (rename ambiguity)
 ```
+
+A clean both-empty diff (counts equal) means the Stata→meadow output, the garden groups, and the meta
+keys agree before a single pipeline step runs.
 
 ## Step 7 — Run & verify
 
@@ -213,6 +272,6 @@ cross-check of your recode mapping.
 
 ## Worked example
 
-A full reference implementation (20 codes across women's rights / ethnic groups / human rights / crime,
-including a 3-pt agree group, a 4-pt agree group, two reused frequency/binary loops, two single-question
-4-pt blocks, and the Y022 continuous index) is PR **owid/etl#6180** — read its diff for concrete patterns.
+PR **owid/etl#6180** is a full reference diff — it spans nearly every shape above (3/4/5-pt agree, 4-pt
+frequency & closeness, binary, 5-pt frequency, 10-pt agree + better/worse, multinomial 1-of-N, the Y022
+0–1 index, and an EVS-fallback single-question block).
