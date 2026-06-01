@@ -29,15 +29,21 @@ edit ivs_create_file.do  →  USER runs it in Stata → regenerates ivs.csv
 Find the active version first: `ls etl/steps/data/garden/ivs/`. All paths below use `<v>` for it
 (e.g. `2025-06-27`).
 
-## Reference files (in this skill's `reference/`)
+## Reference docs (kept out of git — `*.pdf`/`*.xlsx` are git-ignored)
 
-- `F00011424-Common_EVS_WVS_Dictionary_IVS.xlsx` — the **Common EVS/WVS dictionary**: maps each IVS code
-  to its WVS-7 / EVS variable name (the **Q-number**) and label. Sheet `IVS_EVS_and_WVS_Variables`.
-- `F00010738-WVS-7_Master_Questionnaire_2017-2020_English.pdf` — the **verbatim** question stems and
-  answer-category wording (use the Q-number from the dictionary to find the question).
+Two documents make scale/wording verification easy. They normally sit in `snapshots/ivs/<v>/` during an
+IVS update but are **git-ignored**, so they're not in the repo. **If they aren't in the snapshot folder,
+ask the user for them** (or download from worldvaluessurvey.org → *Data and documentation → Data Download*):
 
-The 878 MB `.dta` is **git-ignored** and is **not** bundled — it must already be present in
-`snapshots/ivs/<v>/` on the user's machine to regenerate the CSV.
+- **Common EVS/WVS dictionary** (`…Common_EVS_WVS_Dictionary_IVS.xlsx`) — maps each IVS code to its WVS-7 /
+  EVS variable name (the **Q-number**) and label (sheet `IVS_EVS_and_WVS_Variables`).
+  Path: *Data Download → WVS/EVS Trend 1981-2022 → IVS documentation: IVS Common EVS-WVS dictionary*.
+- **WVS-7 master questionnaire** (`…WVS-7_Master_Questionnaire_…English.pdf`) — verbatim question stems +
+  answer-category wording (look up by Q-number).
+  Path: *Data Download → Wave 7 (2017-2022)* (matches the current IVS version) *→ Questionnaire link*.
+
+The 878 MB `.dta` is likewise git-ignored and must be present in `snapshots/ivs/<v>/` locally to
+regenerate the CSV.
 
 ---
 
@@ -62,7 +68,7 @@ Key gotchas:
   `Very / Quite / Not / Not at all frequently`; H008_02 ("felt unsafe at home") =
   `Often / Sometimes / Rarely / Never` — don't lump them into one block.
 - Missing codes follow `.a` Don't know, `.b` No answer, `.c/.d/.e` excluded. Negative codes aren't used.
-- Confirm the Q-number + verbatim wording from the bundled **dictionary** + **questionnaire**.
+- Confirm the Q-number + verbatim wording from the **dictionary** + **questionnaire** (see Reference docs).
 
 For the user-facing wording, prefer the fuller **questionnaire** text; for the answer/category names the
 `.dta` labels and questionnaire may differ slightly ("some respect" vs "fairly much respect") — they mean
