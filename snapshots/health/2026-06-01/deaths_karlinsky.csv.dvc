@@ -15,3 +15,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 5fa92c5a195fb7c1c3e9a90a9e71e920
+    size: 62841
+    path: deaths_karlinsky.csv
