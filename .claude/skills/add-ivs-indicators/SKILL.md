@@ -210,6 +210,22 @@ the wording from the questionnaire PDF; the code→category order from the `.dta
 to the `variables:` block. To re-run the generator after a wording fix, splice cleanly: find the first new
 key in the file, truncate from there, and re-append the regenerated block (don't blindly append twice).
 
+**Battery questions — separate the prompt from the item (no bare `" - "`).** Many WVS/EVS questions read
+a generic prompt then list items ("For each of the following statements… - Being a housewife…"). Never
+leave the raw `" - "` separator in `description_short` — it reads as two sentences mashed together. Instead
+end the prompt's quote and re-open a quote for the specific item, choosing the connector by what the item
+*is* (the dataset already does this for the justifiable battery: `…using this card", when the statement was "…"`):
+
+| Stem shape | Item type | Pattern | Example |
+|---|---|---|---|
+| plural "For **each** of the following **statements**…?" | a statement | `…?", when the statement was "<item>"` | gender-roles, justifiable |
+| "…the following **things** occur/have you done…?" | a situation/action | `…?", regarding "<item>"` | neighborhood frequency, security actions |
+| **singular** "…with the following **statement**?" | the (only) statement | **drop the dash**, no connector: `…statement? <item>` | jobs-scarce (C001/C002) |
+
+Rationale: the connector noun must fit the item ("when the **thing** was" reads badly → use **"regarding"**);
+and the singular-statement stem already names its statement, so a connector is redundant — just drop the
+dash. Match the existing `", when the statement was "` style (with the comma) for the plural-statements case.
+
 **YAML quoting in a Python generator:** keep RAW apostrophes in your strings and run them through one
 single-quote helper that doubles `'`→`''`. Do **not** hand-write `'Don''t know'` in Python source — that's
 adjacent-string-literal concatenation and silently yields `Dont know`. After appending, re-parse the file
