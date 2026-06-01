@@ -3,7 +3,7 @@
   "publisher": "owid",
   "displayName": "Chart Preview",
   "description": "Live preview panel for .chart.yml files using OWID Grapher",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/owid/etl"
