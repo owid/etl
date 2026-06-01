@@ -42,8 +42,8 @@ def run() -> None:
     # Add data_type dimension (estimates vs projections).
     tb["data_type"] = tb["year"].apply(lambda y: "estimates" if y <= 2025 else "projections")
 
-    # Build combined urban share: HYDE for years before UN national definitions start, UN thereafter.
-    tb_urban = tb[tb["area_type"] == "urban"][["country", "year", "share"]].copy()
+    # Build combined urban share: HYDE for years before UN national definitions start, UN estimates thereafter (no projections).
+    tb_urban = tb[(tb["area_type"] == "urban") & (tb["data_type"] == "estimates")][["country", "year", "share"]].copy()
     min_un_year = int(tb_urban["year"].min())
 
     tb_hyde_pre = tb_hyde[tb_hyde["year"] < min_un_year][["country", "year", "urbc_c_share"]].copy()

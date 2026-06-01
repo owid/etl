@@ -97,7 +97,7 @@ tables:
   urban_share_with_hyde:
     variables:
       share:
-        title: Share of population living in urban areas
+        title: Share of population living in urban areas – HYDE and UN national definitions combined
         unit: '%'
         short_unit: '%'
         description_short: Share of total population living in urban areas. Based on each country's national definition of urban areas (UN World Urbanization Prospects) from 1950 onward, extended back to 10,000 BCE using HYDE estimates.
