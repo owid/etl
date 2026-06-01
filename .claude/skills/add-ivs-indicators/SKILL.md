@@ -210,21 +210,23 @@ the wording from the questionnaire PDF; the code→category order from the `.dta
 to the `variables:` block. To re-run the generator after a wording fix, splice cleanly: find the first new
 key in the file, truncate from there, and re-append the regenerated block (don't blindly append twice).
 
-**Battery questions — separate the prompt from the item (no bare `" - "`).** Many WVS/EVS questions read
-a generic prompt then list items ("For each of the following statements… - Being a housewife…"). Never
-leave the raw `" - "` separator in `description_short` — it reads as two sentences mashed together. Instead
-end the prompt's quote and re-open a quote for the specific item, choosing the connector by what the item
-*is* (the dataset already does this for the justifiable battery: `…using this card", when the statement was "…"`):
+**Battery questions — separate the prompt from the item.** Many WVS/EVS questions read a generic prompt
+then list items (e.g. "…with the following statements? - Work is a duty…"). In `description_short` never
+leave a raw `" - "` separator **and** never let the item dangle straight after the "?" (e.g.
+`…statements? Work is a duty…`) — both read as two sentences mashed together. End the prompt's quote and
+re-open a quote for the item, picking the connector by what the item *is*:
 
-| Stem shape | Item type | Pattern | Example |
-|---|---|---|---|
-| plural "For **each** of the following **statements**…?" | a statement | `…?", when the statement was "<item>"` | gender-roles, justifiable |
-| "…the following **things** occur/have you done…?" | a situation/action | `…?", regarding "<item>"` | neighborhood frequency, security actions |
-| **singular** "…with the following **statement**?" | the (only) statement | **drop the dash**, no connector: `…statement? <item>` | jobs-scarce (C001/C002) |
+| Case | Pattern | Examples |
+|---|---|---|
+| **plural** "…the following **statements**?" (or stem ending on a scale phrase) | `…?", when the statement was "<statement>"` | gender-roles, **work**, justifiable |
+| **singular** "…with the following **statement**?" | **no connector** — drop the dash, item follows directly: `…statement? <statement>` | jobs-scarce (C001/C002) |
+| non-statement items (situations, actions, "things") | `…?", regarding "<item>"` — or a fitting noun where one reads cleanly | neighborhood frequency, security actions; **worries** already uses `…situations?", when the situation was "…"` |
 
-Rationale: the connector noun must fit the item ("when the **thing** was" reads badly → use **"regarding"**);
-and the singular-statement stem already names its statement, so a connector is redundant — just drop the
-dash. Match the existing `", when the statement was "` style (with the comma) for the plural-statements case.
+Rationale: the deciding factor for statements is **singular vs plural** — a singular "the following
+statement?" already names its one statement so a connector is redundant (just drop the dash), while a
+plural battery needs the connector to say which item. The connector **noun must fit the item**: "when the
+**thing** was" reads badly, so use **"regarding"** (or a clean noun like "situation"/"characteristic").
+Always use the comma form `", when the … was "`, matching the pre-existing justifiable battery.
 
 **YAML quoting in a Python generator:** keep RAW apostrophes in your strings and run them through one
 single-quote helper that doubles `'`→`''`. Do **not** hand-write `'Don''t know'` in Python source — that's
