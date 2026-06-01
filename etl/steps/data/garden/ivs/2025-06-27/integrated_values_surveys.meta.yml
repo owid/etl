@@ -4836,61 +4836,61 @@ tables:
 
       agree_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: Agree"
-        description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: Agree"
           <<: *common-display
       disagree_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of respondents replying "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: Disagree"
           <<: *common-display
       neither_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: Neither agree nor disagree"
-        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: Neither agree nor disagree"
           <<: *common-display
       dont_know_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of respondents replying "don''t know" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: Don't know"
           <<: *common-display
       no_answer_men_more_right_to_a_job_than_women:
         title: "Jobs scarce: Men should have more right to a job than women: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, men should have more right to a job than women".'
+        description_short: '% of answers classified as "No answer" for the question "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, men should have more right to a job than women".'
         display:
           name: "Jobs scarce: Men should have more right to a job than women: No answer"
           <<: *common-display
       agree_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: Agree"
-        description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: Agree"
           <<: *common-display
       disagree_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: Disagree"
-        description_short: '% of respondents replying "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of respondents replying "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: Disagree"
           <<: *common-display
       neither_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: Neither agree nor disagree"
-        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: Neither agree nor disagree"
           <<: *common-display
       dont_know_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of respondents replying "don''t know" when asked "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: Don't know"
           <<: *common-display
       no_answer_priority_to_nationals_over_immigrants:
         title: "Jobs scarce: Employers should give priority to nationals over immigrants: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Do you agree, disagree or neither agree nor disagree with the following statement?", when the statement was "When jobs are scarce, employers should give priority to people of this country over immigrants".'
+        description_short: '% of answers classified as "No answer" for the question "Do you agree, disagree or neither agree nor disagree with the following statement? When jobs are scarce, employers should give priority to people of this country over immigrants".'
         display:
           name: "Jobs scarce: Employers should give priority to nationals over immigrants: No answer"
           <<: *common-display
