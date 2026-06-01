@@ -125,6 +125,8 @@ Additionally, to construct indicators per capita, per GDP, and per unit energy, 
 
 ## Changelog
 
+- 2026-06-01:
+  - Changed the units of `co2_per_unit_energy` from kilograms to grams of CO₂ per kilowatt-hour.
 - 2025-12-04:
   - Update greenhouse gases using the latest data from Jones et al. (2025).
 - 2025-11-13:
