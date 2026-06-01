@@ -3,7 +3,7 @@ definitions:
   common:
     presentation:
       grapher_config:
-        note: Urban and rural estimates are based on each country's national definition, which varies across countries. Cross-country comparisons should be made with caution.
+        note: Because the estimates of city and metropolitan areas are based on national definitions of what constitutes a city or metropolitan area, cross-country comparisons should be made with caution.
       topic_tags:
         - Urbanization
     processing_level: major
