@@ -1,0 +1,103 @@
+config:
+  explorerTitle: Conflict
+  explorerSubtitle: Explore the world's conflicts through their deaths, number, and locations.
+  isPublished: true
+  selection:
+    - World
+  entityType: region
+  hideAnnotationFieldsInTitle: true
+  yAxisMin: 0
+  tab: map
+
+dimensions:
+  - slug: conflict_type
+    name: "Conflict type"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: all_armed_conflicts
+        name: "All armed conflicts"
+      - slug: all_state_based_conflicts
+        name: "All state-based conflicts"
+      - slug: interstate_conflicts
+        name: "Interstate conflicts"
+      - slug: intrastate_conflicts
+        name: "Intrastate conflicts"
+      - slug: extrastate_conflicts
+        name: "Extrastate conflicts"
+      - slug: non_state_conflicts
+        name: "Non-state conflicts"
+      - slug: one_sided_violence
+        name: "One-sided violence"
+  - slug: measure
+    name: "Measure"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: conflict_deaths
+        name: "Conflict deaths"
+      - slug: death_rate
+        name: "Death rate"
+      - slug: number_of_conflicts
+        name: "Number of conflicts"
+      - slug: conflict_rate
+        name: "Conflict rate"
+      - slug: conflict_locations
+        name: "Conflict locations"
+      - slug: conflict_participants
+        name: "Conflict participants"
+  - slug: conflict_sub_type
+    name: "Conflict sub-type"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: na
+        name: ""
+      - slug: by_sub_type
+        name: "By sub-type"
+      - slug: all_sub_types
+        name: "All sub-types"
+      - slug: only_non_internationalized_conflicts
+        name: "Only non-internationalized conflicts"
+      - slug: only_internationalized_conflicts
+        name: "Only internationalized conflicts"
+      - slug: only_wars
+        name: "Only wars"
+  - slug: data_source
+    name: Data source
+    presentation:
+      type: dropdown
+    choices:
+      - slug: ucdp
+        name: Uppsala Conflict Data Program
+      - slug: ucdp_prio
+        name: UCDP + PRIO
+      - slug: mars
+        name: Project Mars
+      - slug: mie
+        name: Militarized Interstate Events
+      - slug: cow
+        name: Correlates of War – Wars
+      - slug: cow_mid
+        name: Correlates of War — Militarized Interstate Disputes
+      - slug: prio
+        name: Peace Research Institute Oslo
+  - slug: sub_measure
+    name: "Sub-measure"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: na
+        name: ""
+      - slug: country_and_region_data
+        name: "Country and regional data"
+      - slug: all_ongoing_conflicts
+        name: "All ongoing conflicts"
+      - slug: only_new_conflicts
+        name: "Only new conflicts"
+      - slug: regional_data
+        name: "Regional data"
+      - slug: country_level_data
+        name: "Country-level data"
+
+views: []

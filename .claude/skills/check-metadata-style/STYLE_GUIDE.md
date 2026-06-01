@@ -223,8 +223,21 @@ Always use em dashes (—) for asides, and add spaces on both sides of the em da
 
 Always use double quotes for quotations and titles. Single quotes are used only for quotations within quotations.
 
-- ❌ 'Climate change is the defining issue of our time', stated the researcher.
-- ✅ "Climate change is the defining issue of our time", stated the researcher.
+- ❌ ‘Climate change is the defining issue of our time’, stated the researcher.
+- ✅ “Climate change is the defining issue of our time”, stated the researcher.
+
+### Use curly apostrophes and quotation marks
+
+Use curly (“typographic”) apostrophes and quotation marks, not straight ones. Word processors curl these automatically, but LLMs and code editors emit the straight versions — so a mix of straight and curly marks in the same text is a tell-tale sign of pasted machine output.
+
+- Apostrophe: `’` (U+2019), not `'`
+- Double quotes: `“ … ”` (U+201C/U+201D), not `" … "`
+- Single quotes, for a quote within a quote: `‘ … ’` (U+2018/U+2019), not `' … '`
+
+- ❌ The world's population didn't "peak" in 2020.
+- ✅ The world’s population didn’t “peak” in 2020.
+
+Exception: keep straight marks (or proper primes) where they are technically meaningful — units and measurements such as 5'10" or 30″ of arc, and any code, identifiers, or text quoted verbatim from a source.
 
 ### Never capitalize after colons
 

@@ -1110,3 +1110,11 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/who/2026-05-22/gho:
     - data://garden/who/2026-05-22/gho
+  data://meadow/health/2026-06-01/deaths_karlinsky:
+    - snapshot://health/2026-06-01/deaths_karlinsky.csv
+  data://garden/health/2026-06-01/deaths_karlinsky:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/health/2026-06-01/deaths_karlinsky
+  # Death completion (Karlinsky, 2024)
+  data://grapher/health/2026-06-01/deaths_karlinsky:
+    - data://garden/health/2026-06-01/deaths_karlinsky
