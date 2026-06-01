@@ -8,15 +8,26 @@ definitions:
         - Urbanization
     processing_level: major
   description_key_common: &description_key_common
-    - |-
-      National definitions of urban areas vary considerably across countries. Each country applies its own criteria, which may be based on population size thresholds, population density, type of economic activity, physical characteristics of settlements, level of infrastructure and services, administrative status, or a combination of these factors.
-    - |-
-      A settlement classified as "urban" in one country might be considered "rural" in another, making direct cross-country comparisons challenging.
-    - |-
-      The UN collects data based on each country's own national definition of urban and rural areas. While this reflects how countries themselves understand their urbanization, it limits international comparability.
-    - |-
-      The UN's 2025 revision adopted the [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php) framework as a reference to make national definitions more consistent. National definitions are still reported because they reflect how countries themselves measure and track urbanization. For cross-country comparisons, our charts using DEGURBA are a better choice, since it applies the same definition of urban everywhere.
-
+  - |-
+    Countries classify their territory into urban and rural areas using their
+    own criteria. Some base this on administrative status; others use
+    population thresholds, density, employment structure, or some combination.
+    Because these criteria vary so widely, similar places can be classified
+    differently from one country to the next.
+  - |-
+    The UN has historically collected data using each country's own definition,
+    which reflects how governments plan and maintain continuity with earlier
+    statistics. But it means the figures do not always measure the same thing
+    across countries.
+  - |-
+    For international comparisons, the UN's 2025 revision adopted the
+    [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php)
+    framework alongside its traditional national-definitions estimates. DEGURBA
+    applies the same population density and settlement size thresholds
+    everywhere, so that similar places are classified consistently regardless
+    of which country they are in. Our charts using
+    [DEGURBA data](https://ourworldindata.org/search?datasetProducts=Global+Human+Settlement+Layer+Dataset)
+    are a better choice when comparing across countries.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -98,7 +109,7 @@ tables:
         title: Share of population living in urban areas – HYDE and UN national definitions combined
         unit: '%'
         short_unit: '%'
-        description_short: Share of total population living in urban areas. Based on each country's national definition of urban areas (UN World Urbanization Prospects) from 1950 onward, extended back to 10,000 BCE using HYDE estimates.
+        description_short: Share of total population living in urban areas, based on national definitions, with historical estimates extending back to 10,000 BCE.
         description_key:
           - *description_key_common
           - |-
@@ -117,7 +128,7 @@ tables:
         title: Urban population – HYDE and UN national definitions combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in urban areas. Based on each country's national definition of urban areas (UN World Urbanization Prospects) from 1950 onward, extended back to 10,000 BCE using HYDE estimates.
+        description_short: Number of people living in urban areas, based on national definitions, with historical estimates extending back to 10,000 BCE.
         description_key:
           - *description_key_common
           - |-
@@ -136,7 +147,7 @@ tables:
         title: Rural population – HYDE and UN national definitions combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in rural areas. Based on each country's national definition of rural areas (UN World Urbanization Prospects) from 1950 onward, extended back to 10,000 BCE using HYDE estimates.
+        description_short: Number of people living in rural areas, based on national definitions, with historical estimates extending back to 10,000 BCE.
         description_key:
           - *description_key_common
           - |-
