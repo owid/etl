@@ -1,9 +1,14 @@
+# NOTE: Global.health discontinued the mpox-2024 line list (last report 2024-12-20) and the
+# url_download below now returns "403 Access Denied". There is no replacement endpoint. This
+# snapshot is frozen historical data and is no longer refreshable from source; the monkeypox update
+# (scripts/update-monkeypox.sh) has been disabled. The data remains available from our catalog/R2.
 meta:
   origin:
     producer: Global.health
     title: Mpox - 2024
     citation_full: Global.health Mpox (accessed on 2024-09-02)
     url_main: https://global.health/
+    # url_download no longer accessible (403 Access Denied as of 2026-06-01); source discontinued.
     url_download: https://mpox-2024.s3.eu-central-1.amazonaws.com/latest.csv
     date_accessed: '2024-09-02'
     date_published: '2024-09-02'
