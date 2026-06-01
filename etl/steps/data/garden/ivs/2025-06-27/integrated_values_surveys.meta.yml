@@ -158,7 +158,7 @@ tables:
 
       confidence_civil_services:
         title: "Trust: Confidence in the civil services"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in organization "Civil services".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Civil services".'
         display:
           name: "Trust: Confidence in the civil services"
           <<: *common-display
@@ -312,7 +312,7 @@ tables:
 
       confidence_cis:
         title: "Trust: Confidence in CIS"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in organization "Commonwealth of Independent States (CIS)".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Commonwealth of Independent States (CIS)".'
         display:
           name: "Trust: Confidence in CIS"
           <<: *common-display
@@ -3844,55 +3844,55 @@ tables:
 
       good_experts_make_decisions:
         title: "Democracy - Experts, not government, making decisions: Good"
-        description_short: '% of respondents replying "Very good" or "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        description_short: '% of respondents replying "Very good" or "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having experts, not government, make decisions according to what they think is best for the country".'
         display:
           name: "Experts, not government, making decisions: Good"
           <<: *common-display
       bad_experts_make_decisions:
         title: "Democracy - Experts, not government, making decisions: Bad"
-        description_short: '% of respondents replying "Very bad" or "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        description_short: '% of respondents replying "Very bad" or "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having experts, not government, make decisions according to what they think is best for the country".'
         display:
           name: "Experts, not government, making decisions: Bad"
           <<: *common-display
       very_good_experts_make_decisions:
         title: "Democracy - Experts, not government, making decisions: Very good"
-        description_short: '% of respondents replying "Very good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        description_short: '% of respondents replying "Very good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having experts, not government, make decisions according to what they think is best for the country".'
         display:
           name: "Experts, not government, making decisions: Very good"
           <<: *common-display
       fairly_good_experts_make_decisions:
         title: "Democracy - Experts, not government, making decisions: Fairly good"
-        description_short: '% of respondents replying "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        description_short: '% of respondents replying "Fairly good" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having experts, not government, make decisions according to what they think is best for the country".'
         display:
           name: "Experts, not government, making decisions: Fairly good"
           <<: *common-display
       fairly_bad_experts_make_decisions:
         title: "Democracy - Experts, not government, making decisions: Fairly bad"
-        description_short: '% of respondents replying "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        description_short: '% of respondents replying "Fairly bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having experts, not government, make decisions according to what they think is best for the country".'
         display:
           name: "Experts, not government, making decisions: Fairly bad"
           <<: *common-display
       very_bad_experts_make_decisions:
         title: "Democracy - Experts, not government, making decisions: Very bad"
-        description_short: '% of respondents replying "Very bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        description_short: '% of respondents replying "Very bad" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having experts, not government, make decisions according to what they think is best for the country".'
         display:
           name: "Experts, not government, making decisions: Very bad"
           <<: *common-display
       dont_know_experts_make_decisions:
         title: "Democracy - Experts, not government, making decisions: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        description_short: '% of respondents replying "don''t know" when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having experts, not government, make decisions according to what they think is best for the country".'
         display:
           name: "Experts, not government, making decisions: Don't know"
           <<: *common-display
       no_answer_experts_make_decisions:
         title: "Democracy - Experts, not government, making decisions: No answer"
-        description_short: '% of answers classified as "No answer" for the question "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country".'
+        description_short: '% of answers classified as "No answer" for the question "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having experts, not government, make decisions according to what they think is best for the country".'
         display:
           name: "Experts, not government, making decisions: No answer"
           <<: *common-display
       avg_score_experts_make_decisions:
         title: "Democracy - Experts, not government, making decisions: Average score"
-        description_short: 'Average score in a scale from 1 to 4 when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system the system is "Having experts, not government, make decisions according to what they think is best for the country". In the scale, 1 means very good and 4 means very bad.'
+        description_short: 'Average score in a scale from 1 to 4 when asked "I''m going to describe various types of political systems and ask what you think about each as a way of governing this country. For each one, would you say it is a very good, fairly good, fairly bad or very bad way of governing this country?" when the system is "Having experts, not government, make decisions according to what they think is best for the country". In the scale, 1 means very good and 4 means very bad.'
         display:
           name: "Experts, not government, making decisions: Average score"
           <<: *common-display
