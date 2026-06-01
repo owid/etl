@@ -6770,61 +6770,61 @@ tables:
           <<: *common-display
       concerned_humankind:
         title: 'Concerned about humankind'
-        description_short: '% of respondents who feel concerned (very much or much) about the living conditions of humankind, when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        description_short: '% of respondents who feel concerned (very much or much) about the living conditions of all humans all over the world, when asked to what extent they feel concerned about the living conditions of all humans all over the world. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
         display:
           name: 'Concerned about humankind'
           <<: *common-display
       not_concerned_humankind:
         title: 'Not concerned about humankind'
-        description_short: '% of respondents who feel not concerned (not so much or not at all) about the living conditions of humankind, when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        description_short: '% of respondents who feel not concerned (not so much or not at all) about the living conditions of all humans all over the world, when asked to what extent they feel concerned about the living conditions of all humans all over the world. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
         display:
           name: 'Not concerned about humankind'
           <<: *common-display
       very_much_humankind:
         title: 'Concerned about humankind: very much'
-        description_short: '% of respondents who feel concerned about the living conditions of humankind "very much", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        description_short: '% of respondents who feel concerned about the living conditions of all humans all over the world "very much", when asked to what extent they feel concerned about the living conditions of all humans all over the world. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
         display:
           name: 'Concerned about humankind: very much'
           <<: *common-display
       much_humankind:
         title: 'Concerned about humankind: much'
-        description_short: '% of respondents who feel concerned about the living conditions of humankind "much", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        description_short: '% of respondents who feel concerned about the living conditions of all humans all over the world "much", when asked to what extent they feel concerned about the living conditions of all humans all over the world. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
         display:
           name: 'Concerned about humankind: much'
           <<: *common-display
       to_a_certain_extent_humankind:
         title: 'Concerned about humankind: to a certain extent'
-        description_short: '% of respondents who feel concerned about the living conditions of humankind "to a certain extent", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        description_short: '% of respondents who feel concerned about the living conditions of all humans all over the world "to a certain extent", when asked to what extent they feel concerned about the living conditions of all humans all over the world. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
         display:
           name: 'Concerned about humankind: to a certain extent'
           <<: *common-display
       not_so_much_humankind:
         title: 'Concerned about humankind: not so much'
-        description_short: '% of respondents who feel concerned about the living conditions of humankind "not so much", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        description_short: '% of respondents who feel concerned about the living conditions of all humans all over the world "not so much", when asked to what extent they feel concerned about the living conditions of all humans all over the world. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
         display:
           name: 'Concerned about humankind: not so much'
           <<: *common-display
       not_at_all_humankind:
         title: 'Concerned about humankind: not at all'
-        description_short: '% of respondents who feel concerned about the living conditions of humankind "not at all", when asked to what extent they feel concerned about the living conditions of humankind. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
+        description_short: '% of respondents who feel concerned about the living conditions of all humans all over the world "not at all", when asked to what extent they feel concerned about the living conditions of all humans all over the world. Possible answers are "Very much", "Much", "To a certain extent", "Not so much" and "Not at all".'
         display:
           name: 'Concerned about humankind: not at all'
           <<: *common-display
       dont_know_humankind:
         title: 'Concerned about humankind: Don''t know'
-        description_short: '% of respondents replying "Don''t know" when asked to what extent they feel concerned about the living conditions of humankind.'
+        description_short: '% of respondents replying "Don''t know" when asked to what extent they feel concerned about the living conditions of all humans all over the world.'
         display:
           name: 'Concerned about humankind: Don''t know'
           <<: *common-display
       no_answer_humankind:
         title: 'Concerned about humankind: No answer'
-        description_short: '% of answers classified as "No answer" when asked to what extent they feel concerned about the living conditions of humankind.'
+        description_short: '% of answers classified as "No answer" when asked to what extent they feel concerned about the living conditions of all humans all over the world.'
         display:
           name: 'Concerned about humankind: No answer'
           <<: *common-display
       avg_score_humankind:
         title: 'Concerned about humankind: average score'
-        description_short: 'Average score for how concerned respondents feel about the living conditions of humankind, on a scale from 1 to 5 where 1 means "very much" and 5 means "not at all".'
+        description_short: 'Average score for how concerned respondents feel about the living conditions of all humans all over the world, on a scale from 1 to 5 where 1 means "very much" and 5 means "not at all".'
         display:
           name: 'Concerned about humankind: average score'
           numDecimalPlaces: 2
