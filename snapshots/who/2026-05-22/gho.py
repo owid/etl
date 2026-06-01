@@ -29,6 +29,8 @@ import html
 import io
 import json
 import os
+import re
+import time
 import urllib.parse
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
@@ -36,12 +38,10 @@ from pathlib import Path
 from typing import Any
 
 import click
-import html2text
 import pandas as pd
 import requests
 import structlog
 import tenacity
-from bs4 import BeautifulSoup
 from joblib import Memory
 from owid import repack
 
@@ -55,9 +55,10 @@ memory = Memory(CACHE_DIR, verbose=0)
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
-# Only include specified indicators, useful for debugging
+# Only include specified indicators, useful for debugging. Use SUBSET=debug to run the
+# historical hand-picked debug subset.
 SUBSET = os.environ.get("SUBSET")
-if SUBSET:
+if SUBSET == "debug":
     subset_list = [
         "WHS3_45",
         "PHE_HHAIR_POP_CLEAN_FUELS",
@@ -83,7 +84,7 @@ if SUBSET:
         "SDGNTDTREATMENT",
         "MH_1",
     ]
-    SUBSET += "," + ",".join(subset_list)
+    SUBSET = ",".join(subset_list)
 
 # Labels of indicators that cannot be empty even if GHO API returns empty response
 NON_EMPTY_LABELS = [
@@ -91,76 +92,76 @@ NON_EMPTY_LABELS = [
     "NTD_YAWSNUM",
 ]
 
-# Currently not used, because Athena API returns richer response with DEFINITION_XML that
-#   contains the ID of the indicator.
-# def fetch_indicators():
-#     df = pd.DataFrame(requests.get("https://ghoapi.azureedge.net/api/Indicator").json()["value"])
-#     return df[["IndicatorCode", "IndicatorName"]]
+# Current GHO data API. This replaced the retired Athena API for indicator data.
+GHO_ODATA_BASE = "https://ghoapi.azureedge.net/api"
+
+# Current WHO metadata registry API. This returns structured metadata records and is
+# preferable to scraping the rendered HTML metadata pages.
+METADATA_REGISTRY_API = "https://www.who.int/api/multimedias/indicatormetadataregistrydefinitions"
+
+# Latest Athena-era snapshot used to restore the label -> metadata URL fields
+# that Athena exposed. Data are fetched from the current GHO OData API.
+METADATA_MAPPING_SNAPSHOT = "who/2025-05-19/gho.zip"
 
 
 @memory.cache()
-def load_indicators() -> pd.DataFrame:
+def load_metadata_mapping(_cache_version: int = 2) -> pd.DataFrame:
+    """Load old Athena-era label -> metadata fields from the 2025-05-19 snapshot."""
+    snap = Snapshot(METADATA_MAPPING_SNAPSHOT)
+    snap.pull(force=False, retries=3)
+
+    with zipfile.ZipFile(snap.path) as zf:
+        with zf.open("indicators.feather") as f:
+            mapping = pd.read_feather(f)
+
+    columns = ["label", "display", "url", "DEFINITION_XML", "CATEGORY", "IMR_ID", "metadata"]
+    mapping = mapping[columns].rename(columns={"metadata": "old_metadata"})
+    return mapping.astype("string")
+
+
+@memory.cache()
+def load_indicators(_cache_version: int = 2) -> pd.DataFrame:
+    """Load indicator list from the GHO OData API.
+
+    The legacy Athena API (apps.who.int/gho/athena/api/GHO) was taken offline.
+    We now use the OData API (ghoapi.azureedge.net/api/Indicator) which provides
+    IndicatorCode (→ label) and IndicatorName (→ display). The other columns that
+    the old Athena API returned (url, DEFINITION_XML, CATEGORY, IMR_ID) are kept
+    so that downstream code (get_metadata_for_row, meadow step) still runs without
+    changes. Metadata URL fields are filled from the extracted old-snapshot mapping.
+    """
     log.info("load_indicators")
-    url_indicators = "https://apps.who.int/gho/athena/api/GHO?format=json"
-    js = requests.get(url_indicators).json()
+    url_indicators = f"{GHO_ODATA_BASE}/Indicator"
+    js = requests.get(url_indicators, timeout=60).json()
 
-    indicators = js["dimension"][0]["code"]
-    for ind in indicators:
-        # explode attributes
-        for attr in ind.pop("attr"):
-            ind[attr["category"]] = attr["value"]
+    df = pd.DataFrame(js["value"])
 
-    df = pd.DataFrame(indicators)
+    # Rename to match the schema expected by the rest of the script and meadow step.
+    df = df.rename(columns={"IndicatorCode": "label", "IndicatorName": "display"})
+    df = df.drop(columns=["Language"], errors="ignore")
 
-    # exclude unnecessary columns
-    # NOTE: DEFINITION_XML link is broken
-    df = df.drop(columns=["display_sequence", "DISPLAY_FR", "DISPLAY_ES", "RENDERER_ID"])
+    # Restore legacy metadata fields from the latest Athena-era snapshot mapping.
+    metadata_mapping = load_metadata_mapping().drop(columns=["display"], errors="ignore")
+    df = df.merge(metadata_mapping, on="label", how="left")
 
-    # unescape special characters
-    df.display = df.display.map(lambda x: html.unescape(x) if x else x)
+    # unescape special characters (IndicatorName may contain HTML entities)
+    df["display"] = df["display"].map(lambda x: html.unescape(x) if x else x)
 
     # be consistent with indicators in this list https://www.who.int/data/gho/data/indicators/indicators-index
-    df.display = df.display.str.replace("≥", ">=").str.replace("≤", "<=")
+    df["display"] = df["display"].str.replace("≥", ">=").str.replace("≤", "<=")
 
     return df
 
 
-def load_metadata_urls() -> dict[str, str]:
-    """Load metadata URLs for indicators. This is more reliable than `url` field in the indicators list which
-    could be sometimes empty."""
-    log.info("load_metadata_urls")
-    url = "https://www.who.int/data/gho/data/indicators/indicators-index"
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    meta_links = {}
-
-    for a_href in soup.find_all("a", href=lambda href: href and "gho/data" in href):  # ty: ignore
-        link = a_href.attrs["href"]
-        # relative link
-        if link.startswith("/data/gho"):
-            link = "https://www.who.int" + link
-        meta_links[a_href.text.strip()] = link
-
-    return meta_links
-
-
 def load_metadata_urls_from_registry() -> dict[str, str]:
-    """Load metadata URLs for indicators. This is more reliable than `url` field in the indicators list which
-    could be sometimes empty."""
+    """Load metadata URLs for indicators from WHO's structured metadata registry API."""
     log.info("load_metadata_urls_from_registry")
-    url = "https://www.who.int/data/gho/indicator-metadata-registry"
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    registry = load_metadata_registry()
 
     meta_links = {}
-
-    for a_href in soup.find_all("a", href=lambda href: href and "data/gho" in href):  # ty: ignore
-        link = a_href.attrs["href"]
-        # relative link
-        if link.startswith("/data/gho"):
-            link = "https://www.who.int" + link
-        meta_links[a_href.text.strip()] = link
+    for record in registry.itertuples():
+        identifier = record.UrlName if pd.notna(record.UrlName) and record.UrlName else record.IMRID
+        meta_links[record.Name] = f"https://www.who.int/data/gho/indicator-metadata-registry/imr-details/{identifier}"
 
     return meta_links
 
@@ -170,8 +171,8 @@ class EmptyResponseError(Exception):
 
 
 @tenacity.retry(
-    wait=tenacity.wait_fixed(2),
-    stop=tenacity.stop_after_attempt(5),
+    wait=tenacity.wait_exponential(multiplier=2, min=2, max=60),
+    stop=tenacity.stop_after_attempt(8),
 )
 @memory.cache()
 def fetch_url_with_retry(url: str, retry_empty: bool = False) -> requests.Response:
@@ -184,69 +185,168 @@ def fetch_url_with_retry(url: str, retry_empty: bool = False) -> requests.Respon
 
 
 @memory.cache()
-def fetch_metadata(url: str) -> str:
-    """Get indicator's metadata in Markdown. We could also return it as JSON to make it easier to parse later."""
-    log.info("fetch_metadata", url=url)
+def load_metadata_registry() -> pd.DataFrame:
+    """Load all current WHO metadata registry records from the structured API."""
+    log.info("load_metadata_registry")
+    rows = []
+    top = 100
+    skip = 0
 
-    resp = fetch_url_with_retry(url)
+    while True:
+        resp = requests.get(METADATA_REGISTRY_API, params={"$top": top, "$skip": skip}, timeout=60)
+        resp.raise_for_status()
+        batch = resp.json().get("value", [])
+        if not batch:
+            break
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+        rows.extend(batch)
+        if len(batch) < top:
+            break
+        skip += top
+
+    return pd.DataFrame(rows).astype({"IMRID": "string", "UrlName": "string"})
+
+
+def _metadata_url_identifier(url: str) -> str:
+    """Extract the IMR id or slug from an imr-details URL."""
+    parsed_url = urllib.parse.urlparse(url)
+    path = urllib.parse.unquote(parsed_url.path.rstrip("/"))
+    return path.rsplit("/", 1)[-1]
+
+
+def _format_metadata_value(output_field: str, value: Any) -> str:
+    """Format API values close to the old HTML-to-Markdown scraper output."""
+    value = str(value).replace("<br>\r\n", "  \n").replace("<br>", "  \n").strip()
+    value = re.sub(r"[ \t]{2,}(?!\n)", " ", value)
+
+    if output_field in {"Other possible data sources", "Preferred data sources"}:
+        value = " \n\n".join(part.strip() for part in value.split(",") if part.strip())
+    elif output_field == "Contact person email" and "@" in value:
+        value = f"[{value}](mailto:{value}?Subject=Global Health Observatory Enquiry)"
+
+    return value
+
+
+def _format_metadata_registry_record(record: pd.Series) -> str:
+    """Convert a registry API record into the JSON shape used by previous snapshots."""
+    field_mapping = {
+        "Short name": "ShortName",
+        "Data type": "indicatordatatypeString",
+        "Topic": "TopicString",
+        "Rationale": "Rationale",
+        "Definition": "Definition",
+        "Disaggregation": "Disaggregation",
+        "Method of measurement": "MeasurementMethod",
+        "Method of estimation": "MethodOfEstimation",
+        "Method of estimation of global and regional aggregates": "MethodOfEstimationOfRegionalAndGlobalEstimates",
+        "Other possible data sources": "OtherPossibleDataSourcesString",
+        "Preferred data sources": "PreferredDataSourcesString",
+        "Unit of Measure": "UnitOfMeasure",
+        "Expected frequency of data dissemination": "ExpectedFrequencyOfDataDissemination",
+        "Expected frequency of data collection": "ExpectedFrequencyOfDataCollection",
+        "Comments": "Comments",
+        "Contact person email": "ContactPersonEmail",
+        "Name": "Name",
+        "Data Type Representation": "indicatordatatyperepresentationString",
+        "IMRID": "IMRID",
+    }
 
     meta = {}
-    for metadata_box in soup.find_all("div", {"class": "metadata-box"}):
-        div_title = metadata_box.find("div", {"class": "metadata-title"})
-        title = div_title.text
-
-        # remove element
-        div_title.decompose()
-
-        # convert rest to markdown
-        content = html2text.html2text(str(metadata_box), bodywidth=0).strip()
-        stripped_title = title.strip().replace(":", "")
-
-        # save to JSON
-        meta[stripped_title] = content
+    for output_field, api_field in field_mapping.items():
+        value = record.get(api_field)
+        if pd.notna(value) and value not in ("", False):
+            meta[output_field] = _format_metadata_value(output_field, value)
 
     return json.dumps(meta)
 
 
+def _resolve_metadata_url_identifier(url: str) -> str:
+    """Resolve WHO redirects and return the final IMR id or slug."""
+    # Avoid rate-limiting from WHO's metadata pages when resolving old redirected IDs.
+    time.sleep(1)
+    resp = fetch_url_with_retry(url)
+    return _metadata_url_identifier(resp.url)
+
+
+@memory.cache()
+def fetch_metadata(url: str) -> str:
+    """Get indicator metadata from WHO's structured metadata registry API.
+
+    The metadata record itself comes from the batched registry API. Per-indicator
+    HTML pages are only requested when an old URL is missing from the registry API,
+    so that WHO redirects like /65 -> /2977 can be resolved.
+    """
+    registry = load_metadata_registry()
+    identifier = _metadata_url_identifier(url)
+
+    # Most current URLs use either /imr-details/<IMRID> or /imr-details/<UrlName>.
+    matches = registry[(registry["IMRID"] == identifier) | (registry["UrlName"] == identifier)]
+
+    # Some old numeric URLs redirect to a new registry record, e.g. /65 -> /2977.
+    # Resolve only when the original identifier was not present in the structured API.
+    if matches.empty:
+        log.info("resolve_metadata_redirect", url=url)
+        resolved_identifier = _resolve_metadata_url_identifier(url)
+        matches = registry[(registry["IMRID"] == resolved_identifier) | (registry["UrlName"] == resolved_identifier)]
+
+    if matches.empty:
+        return "{}"
+
+    return _format_metadata_registry_record(matches.iloc[0])
+
+
+def _previous_metadata_or_empty(row: Any) -> str:
+    """Return previous snapshot metadata if available, otherwise an empty JSON object."""
+    if hasattr(row, "old_metadata") and pd.notna(row.old_metadata) and row.old_metadata != "{}":
+        log.warning("Falling back to previous snapshot metadata", indicator=row.display)
+        return row.old_metadata
+    return "{}"
+
+
 def get_metadata_for_row(row: Any, name_to_metadata_url: dict[str, str]) -> str:
-    try:
-        metadata_url = name_to_metadata_url[row.display]
-    except KeyError:
-        # get ID from atttributes
-        if hasattr(row, "IMR_ID") and not pd.isnull(row.IMR_ID):
-            metadata_url = f"https://www.who.int/data/gho/indicator-metadata-registry/imr-details/{row.IMR_ID}"
-        elif row.url in ("0",):
-            log.warning("Invalid metadata URL for indicator", indicator=row.display, url=row.url)
-            return "{}"
-        elif row.url:
-            # fallback to `url`
-            metadata_url = row.url
-        elif row.DEFINITION_XML and not pd.isnull(row.DEFINITION_XML):
-            # extract ID from DEFINITION_XML like http://apps.who.int/gho/indicatorregistryservice/publicapiservice.asmx/IndicatorGetAsXml?profileCode=WHO&applicationCode=System&languageAlpha2=en&indicatorId=129
-            try:
-                qs = urllib.parse.parse_qs(row.DEFINITION_XML)
-            except Exception:
-                log.warning("Invalid DEFINITION_XML for indicator", indicator=row.display, url=row.DEFINITION_XML)
-                raise
-            if "indicatorId" not in qs:
-                raise ValueError(f"No indicatorId in DEFINITION_XML: {row.DEFINITION_XML}")
-            metadata_url = (
-                f"https://www.who.int/data/gho/indicator-metadata-registry/imr-details/{qs['indicatorId'][0]}"
-            )
-        else:
-            log.warning("Metadata URL for indicator is empty", indicator=row.display)
-            return "{}"
+    # Prefer the Athena-era metadata URL extracted from the previous snapshot.
+    # WHO redirects stale IMR URLs to the current metadata record where needed.
+    if pd.notna(row.url) and row.url in ("0",):
+        log.warning("Invalid metadata URL for indicator", indicator=row.display, url=row.url)
+        return _previous_metadata_or_empty(row)
+    elif pd.notna(row.url) and row.url:
+        metadata_url = row.url
+    elif hasattr(row, "IMR_ID") and pd.notna(row.IMR_ID):
+        metadata_url = f"https://www.who.int/data/gho/indicator-metadata-registry/imr-details/{row.IMR_ID}"
+    else:
+        try:
+            metadata_url = name_to_metadata_url[row.display]
+        except KeyError:
+            if pd.notna(row.DEFINITION_XML) and row.DEFINITION_XML:
+                # extract ID from DEFINITION_XML like http://apps.who.int/gho/indicatorregistryservice/publicapiservice.asmx/IndicatorGetAsXml?profileCode=WHO&applicationCode=System&languageAlpha2=en&indicatorId=129
+                try:
+                    qs = urllib.parse.parse_qs(row.DEFINITION_XML)
+                except Exception:
+                    log.warning("Invalid DEFINITION_XML for indicator", indicator=row.display, url=row.DEFINITION_XML)
+                    raise
+                if "indicatorId" not in qs:
+                    raise ValueError(f"No indicatorId in DEFINITION_XML: {row.DEFINITION_XML}")
+                metadata_url = (
+                    f"https://www.who.int/data/gho/indicator-metadata-registry/imr-details/{qs['indicatorId'][0]}"
+                )
+            else:
+                log.warning("Metadata URL for indicator is empty", indicator=row.display)
+                return _previous_metadata_or_empty(row)
 
     if metadata_url.startswith("https://cms.who.int/data/gho"):
         # metadata behind login
-        return "{}"
+        return _previous_metadata_or_empty(row)
     elif not _metadata_url_is_valid(metadata_url):
         log.warning("Invalid metadata URL for indicator", indicator=row.display, url=row.url)
-        return "{}"
+        return _previous_metadata_or_empty(row)
     else:
-        return fetch_metadata(metadata_url)
+        metadata = fetch_metadata(metadata_url)
+        if metadata != "{}":
+            return metadata
+
+        # If WHO's current metadata registry no longer exposes this old IMR id,
+        # preserve the previous snapshot's metadata rather than dropping coverage.
+        return _previous_metadata_or_empty(row)
 
 
 def _metadata_url_is_valid(url: str) -> bool:
@@ -263,22 +363,20 @@ def _metadata_url_is_valid(url: str) -> bool:
 
 @memory.cache()
 def fetch_dimensions():
-    df = pd.DataFrame(requests.get("https://ghoapi.azureedge.net/api/Dimension").json()["value"])
+    df = pd.DataFrame(requests.get(f"{GHO_ODATA_BASE}/Dimension").json()["value"])
     return df[["Code", "Title"]]
 
 
 @memory.cache()
 def fetch_dimension_values(dim_code: str):
-    df = pd.DataFrame(
-        requests.get(f"https://ghoapi.azureedge.net/api/DIMENSION/{dim_code}/DimensionValues").json()["value"]
-    )
+    df = pd.DataFrame(requests.get(f"{GHO_ODATA_BASE}/DIMENSION/{dim_code}/DimensionValues").json()["value"])
     return df[["Code", "Title"]].set_index("Code")["Title"].to_dict()
 
 
 @memory.cache()
 def _fetch_and_repack_data(ind_code: str) -> pd.DataFrame:
     log.info("fetch_data", ind_code=ind_code)
-    url = f"https://ghoapi.azureedge.net/api/{ind_code}?$format=json"
+    url = f"{GHO_ODATA_BASE}/{ind_code}?$format=json"
     resp = fetch_url_with_retry(url, retry_empty=True)
     resp.raise_for_status()
 
@@ -385,10 +483,9 @@ def add_df_to_zip(zipf: zipfile.ZipFile, fname: str, df: pd.DataFrame) -> None:
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option(
-    "--cache/--no-cache",
-    default=False,
-    type=bool,
-    help="Use cache. Useful for debugging. Don't use for the final snapshot.",
+    "--clear-cache",
+    is_flag=True,
+    help="Clear the joblib cache before running. By default, cached metadata/data downloads are reused.",
 )
 @click.option(
     "--max-workers",
@@ -397,9 +494,9 @@ def add_df_to_zip(zipf: zipfile.ZipFile, fname: str, df: pd.DataFrame) -> None:
     type=int,
     help="Number of parallel workers for downloads.",
 )
-def main(upload: bool, cache: bool, max_workers: int) -> None:
-    # Clear cache.
-    if not cache:
+def main(upload: bool, clear_cache: bool, max_workers: int) -> None:
+    # Reuse cache by default to avoid re-downloading thousands of WHO metadata pages.
+    if clear_cache:
         memory.clear()
 
     # Create a new snapshot.
@@ -408,21 +505,25 @@ def main(upload: bool, cache: bool, max_workers: int) -> None:
     # Get a list of indicators.
     df_indicators = load_indicators()
 
-    # Get a dictionary of indicator name -> metadata URL
-    # name_to_metadata_url = load_metadata_urls()
+    # Get a dictionary of indicator name -> metadata URL.
     name_to_metadata_url = load_metadata_urls_from_registry()
 
     if SUBSET:
         df_indicators = df_indicators[df_indicators.label.isin(SUBSET.split(","))]
 
-    # Download metadata for each of them and add it a JSON.
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+    # Download metadata for each of them and add it a JSON. Keep this sequential
+    # to avoid WHO rate-limiting the metadata registry pages.
+    with ThreadPoolExecutor(max_workers=1) as executor:
         df_indicators["metadata"] = list(
             executor.map(
                 lambda row: get_metadata_for_row(row, name_to_metadata_url),
                 list(df_indicators.itertuples()),
             )
         )
+
+    # Keep old metadata only as an internal fallback helper; don't persist it in
+    # the new snapshot's indicator table.
+    df_indicators = df_indicators.drop(columns=["old_metadata"], errors="ignore")
 
     # Create a ZIP file
     snap.path.parent.mkdir(exist_ok=True, parents=True)

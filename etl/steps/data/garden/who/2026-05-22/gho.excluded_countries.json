@@ -92,13 +92,9 @@
   "Europe region, stratum A (EUR A) (WHO)",
   "Western Pacific region, stratum B (WPR B) (WHO)",
   "Americas region, stratum B (AMR B) (WHO)",
-
   "FAO Low Income Food Deficit Countries (FAO)",
-
   "Least Developed Countries (LDCs) (UN)",
-
   "Europe, Northern America, Australia and New Zealand (UN)",
-
   "Small island developing States (SIDS) (UN)",
   "Developing regions (MDG) (UN)",
   "Developed regions (MDG) (UN)",
@@ -154,7 +150,6 @@
   "Eastern Asia (UN SDG)",
   "Eastern and Southern Africa (MGH)",
   "Latin America and the Caribbean (UNICEF) (MGH)",
-
   "Central Asia (UN SDG)",
   "Northern Africa (UN SDG)",
   "Middle East and North Africa (UNICEF) (MGH)",
@@ -210,5 +205,12 @@
   "South East Asia region, stratum B (SEAR B) (WHO)",
   "Landlocked developing countries (LLDCs) (UN)",
   "Northern America (21) (UN)",
-  "Northern America and Europe (MGH)"
+  "Northern America and Europe (MGH)",
+  "RC_ECA (UN RC)",
+  "RC_ECE (UN RC)",
+  "RC_ECLAL (UN RC)",
+  "RC_ESCAP (UN RC)",
+  "RC_ESCWA (UN RC)",
+  "South-East Asia with Indonesia (WHO)",
+  "Western Pacific without Indonesia (WHO)"
 ]

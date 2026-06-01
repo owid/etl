@@ -1,7 +1,7 @@
 tables:
-  prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct:
+  overweight_among_adults__bmi__gt__25_kg_m2__age_standardized_estimate__pct:
     variables:
-      prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct:
+      overweight_among_adults__bmi__gt__25_kg_m2__age_standardized_estimate__pct:
         title: Share of adults who are overweight (age-standardized)
   maternal_mortality_ratio__per_100_000_live_births:
     variables:
@@ -45,7 +45,7 @@ tables:
             - fragment_id: stunting-causes
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            title: 'Malnutrition: Share of children who are stunted'
+            title: 'Malnutrition: share of children who are stunted'
             subtitle: >-
               The share of children younger than five years old that are defined as stunted.
               [Stunting](#dod:stunting) is when a child is significantly shorter than the

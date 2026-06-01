@@ -1,6 +1,8 @@
 definitions:
   common:
+    processing_level: minor
     presentation:
+      attribution_short: WHO
       topic_tags:
         - Global Health
 

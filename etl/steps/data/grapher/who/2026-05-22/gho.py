@@ -30,15 +30,6 @@ def run() -> None:
         if tb_name == col:
             tb[[col, col + "_low", col + "_high"]] /= 1000
 
-        # There are zero values for countries which are obviously wrong.
-        if tb_name == "proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct":
-            x = tb["proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct"]
-            for country in ("Bulgaria", "Libya", "Lebanon"):
-                assert (x.xs(country, level="country") == 0).all(), (
-                    "These countries have zero values by mistake. If they get fixed, remove this hotfix."
-                )
-                tb.loc[tb.index.get_level_values("country") == country, :] = pd.NA
-
         # Invalid data from GHO, drop them for now.
         if tb_name == "attribution_of_road_traffic_deaths_to_alcohol__pct":
             col = "attribution_of_road_traffic_deaths_to_alcohol__pct"
@@ -71,14 +62,11 @@ def run() -> None:
                 ].metadata.description_from_producer
             ), error
         for column in tb.columns:
-            if "Millenium" in tb[column].metadata.description_from_producer:
-                tb[column].metadata.description_from_producer = tb[column].metadata.description_from_producer.replace(
-                    "Millenium", "Millennium"
-                )
-            if "patters" in tb[column].metadata.description_from_producer:
-                tb[column].metadata.description_from_producer = tb[column].metadata.description_from_producer.replace(
-                    "patters", "patterns"
-                )
+            dfp = tb[column].metadata.description_from_producer
+            if dfp and "Millenium" in dfp:
+                tb[column].metadata.description_from_producer = dfp.replace("Millenium", "Millennium")
+            if dfp and "patters" in dfp:
+                tb[column].metadata.description_from_producer = dfp.replace("patters", "patterns")
         ################################################################################################################
 
         if tb.empty:
@@ -86,6 +74,8 @@ def run() -> None:
             continue
 
         tb = tb.drop(columns=["comments"], errors="ignore")
+        # Drop label/code columns that have no unit/title/origins — they are lookup metadata, not indicators.
+        tb = tb.drop(columns=[c for c in tb.columns if c.startswith("ghe_cause_of_death_codes")], errors="ignore")
 
         tables.append(tb)
 

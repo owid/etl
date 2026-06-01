@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import json
+import re
 from typing import Any
 
 import numpy as np
@@ -8,6 +9,7 @@ import owid.catalog.processing as pr
 import pandas as pd
 import structlog
 from owid.catalog import Table, VariableMeta
+from owid.catalog.meta import VariablePresentationMeta
 from owid.catalog.utils import underscore
 from owid.repack import repack_series
 
@@ -53,7 +55,7 @@ NAN_VALUES = [
     "…",
 ]
 
-PRIORITY_OF_REGIONS = ["WORLDBANKREGION", "REGION", "UNICEFREGION", "UNREGION", "UNSDGREGION", "FAOREGION"]
+PRIORITY_OF_REGIONS = ["WORLDBANKREGION", "REGION", "UNICEFREGION", "UNREGION", "UNSDGREGION", "FAOREGION", "RCREGION"]
 
 
 def run() -> None:
@@ -199,6 +201,8 @@ def add_region_source_suffix(tb: Table) -> Table:
                 suffix = "MGH"
             case "GBDREGION":
                 suffix = "GBD"
+            case "RCREGION":
+                suffix = "UN RC"
             case _:
                 raise ValueError(f"Unknown region source: {region_source}")
 
@@ -296,13 +300,28 @@ def merge_identical_tables(tables: list[Table]) -> list[Table]:
     return new_tables
 
 
+def _normalize_text(s: str) -> str:
+    """Normalize whitespace in GHO source text.
+
+    The metadata-registry API returns text with CRLF line breaks and occasional
+    double spaces. Collapse to LF, strip, and squash runs of spaces — leave
+    intentional `\n` paragraph breaks intact for markdown rendering.
+    """
+    if not isinstance(s, str):
+        return s
+    s = s.replace("\r\n", "\n").replace("\r", "\n")
+    s = re.sub(r"[ \t]+", " ", s)
+    s = "\n".join(line.strip() for line in s.split("\n"))
+    return s.strip()
+
+
 def set_indicator(tb: Table, short_name: str, meta: dict[str, str]) -> Table:
     # create producer description from GHO metadata
     # NOTE: we already use Definition as description_short, so maybe we don't need it here?
     markdown_description = ""
     for heading in HEADINGS_TO_USE:
         if heading in meta:
-            markdown_description += f"#### {heading}\n{meta[heading]}\n\n"
+            markdown_description += f"#### {heading}\n{_normalize_text(meta[heading])}\n\n"
     markdown_description = markdown_description.strip()
 
     # Make sure the value is not the same as dimension
@@ -319,9 +338,9 @@ def set_indicator(tb: Table, short_name: str, meta: dict[str, str]) -> Table:
 
         new_col = short_name + suffix_short
         tb = tb.rename(columns={col: new_col})
-        tb[new_col].m.title = tb.m.title + suffix_long
+        tb[new_col].m.title = _normalize_text(tb.m.title) + suffix_long
         if "Definition" in meta:
-            tb[new_col].m.description_short = meta["Definition"]
+            tb[new_col].m.description_short = _normalize_text(meta["Definition"])
 
         # Convert description from producer to markdown from JSON
         tb[new_col].m.description_from_producer = markdown_description
@@ -332,9 +351,17 @@ def set_indicator(tb: Table, short_name: str, meta: dict[str, str]) -> Table:
         elif meta.get("Data type") == "Rate":
             tb[new_col].m.unit = "rate"
         elif "Unit of Measure" in meta:
-            tb[new_col].m.unit = meta["Unit of Measure"]
+            tb[new_col].m.unit = _normalize_text(meta["Unit of Measure"])
         else:
             tb[new_col].m.unit = ""
+
+        # Common defaults that `definitions.common` in the .meta.yml can't reach
+        # because these auto-generated tables aren't listed there.
+        tb[new_col].m.processing_level = "minor"
+        if tb[new_col].m.presentation is None:
+            tb[new_col].m.presentation = VariablePresentationMeta()
+        tb[new_col].m.presentation.attribution_short = "WHO"
+        tb[new_col].m.presentation.topic_tags = ["Global Health"]
 
     return tb
 
