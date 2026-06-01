@@ -123,8 +123,11 @@ MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2 = 3.664 * 1e6
 # Conversion from million tonnes of CO2 to tonnes of CO2.
 MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2 = 1e6
 
-# Conversion from tonnes of CO2 to kg of CO2 (used for emissions per GDP and per unit energy).
+# Conversion from tonnes of CO2 to kg of CO2 (used for emissions per GDP).
 TONNES_OF_CO2_TO_KG_OF_CO2 = 1000
+
+# Conversion from tonnes of CO2 to grams of CO2 (used for emissions per unit energy).
+TONNES_OF_CO2_TO_G_OF_CO2 = 1e6
 
 # In order to remove uninformative columns, keep only rows where at least one of the following columns has data.
 # All other columns are either derived variables, or global variables, or auxiliary variables from other datasets.
@@ -866,16 +869,16 @@ def combine_data_and_add_variables(
             100 * tb_co2_with_regions[f"cumulative_{column}"] / tb_co2_with_regions[f"global_cumulative_{column}"]
         )
 
-    # Add total emissions per unit energy (in kg of emissions per kWh).
+    # Add total emissions per unit energy (in grams of emissions per kWh).
     tb_co2_with_regions["emissions_total_per_unit_energy"] = (
-        TONNES_OF_CO2_TO_KG_OF_CO2
+        TONNES_OF_CO2_TO_G_OF_CO2
         * tb_co2_with_regions["emissions_total"]
         / (tb_co2_with_regions["primary_energy_consumption"] * TWH_TO_KWH)
     )
 
-    # Add total emissions (including land-use change) per unit energy (in kg of emissions per kWh).
+    # Add total emissions (including land-use change) per unit energy (in grams of emissions per kWh).
     tb_co2_with_regions["emissions_total_including_land_use_change_per_unit_energy"] = (
-        TONNES_OF_CO2_TO_KG_OF_CO2
+        TONNES_OF_CO2_TO_G_OF_CO2
         * tb_co2_with_regions["emissions_total_including_land_use_change"]
         / (tb_co2_with_regions["primary_energy_consumption"] * TWH_TO_KWH)
     )
