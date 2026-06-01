@@ -23,14 +23,6 @@ def create_omms(tables_dict: dict[str, Table], ds_population: Dataset, ds_region
     add_both_sexes_for_pneumonia(tables_dict)
 
     add_trachoma_and_onchocerciasis_aggregate(tables_dict, ds_regions)
-    # df_variables = add_youth_mortality_rates(
-    #    df_variables=df_variables,
-    #    younger_ind="Indicator:Under-five mortality rate (per 1000 live births) (SDG 3.2.1) - Sex:Both sexes",
-    #    older_ind="Indicator:Mortality rate among children ages 5 to 9 years (per 1000 children aged 5) - Sex:Both sexes",
-    #    new_ind_name_short="Under-ten mortality rate",
-    #    new_ind_name_long="Indicator:Under-ten mortality rate (per 1000 live births)",
-    #    new_ind_desc="Definition: Under ten mortality rate is the share of newborns who die before reaching the age of 10. It is calculated by OWID based on WHO Global Health Observatory data.",
-    # )
     add_vehicles_per_1000(tables_dict, ds_population)
 
 
@@ -107,47 +99,6 @@ def add_percentage_without_clean_cooking_fuels(tables_dict: dict[str, Table]) ->
     tb = tables_dict[indicator_name]
 
     tb[new_col] = 100 - tb[col]
-
-
-# def adjust_mortality_rates(younger_df: pd.DataFrame, older_df: pd.DataFrame, output_str: str) -> pd.Series:
-#     raise NotImplementedError("This function was commented in importers repository")
-#     df = younger_df.merge(older_df, on=["country", "year"], how="outer")
-#     df["adjusted_older_rate"] = ((1000 - df["value_x"]) / 1000) * df["value_y"]
-#     df[output_str] = df["adjusted_older_rate"] + df["value_x"]
-#     out_df = df[["country", "year", output_str]].dropna()
-
-#     return out_df
-
-
-# def add_youth_mortality_rates(
-#     df_variables: pd.DataFrame,
-#     younger_ind: str,
-#     older_ind: str,
-#     new_ind_name_short: str,
-#     new_ind_name_long: str,
-#     new_ind_desc: str,
-# ) -> pd.DataFrame:
-#     younger_id, younger_df = get_dataframe_from_variable_name(df_variables, younger_ind)
-#     older_id, older_df = get_dataframe_from_variable_name(df_variables, older_ind)
-#     new_df = adjust_mortality_rates(
-#         younger_df,
-#         older_df,
-#         new_ind_name_short,
-#     )
-#     new_var = df_variables[df_variables["name"] == younger_ind].copy()
-#     new_var["name"] = new_ind_name_long
-#     new_var["description"] = new_ind_desc
-#     new_var["id"] = max(df_variables["id"]) + 1
-
-#     new_df.to_csv(
-#         os.path.join(
-#             OUTPATH,
-#             "datapoints",
-#             "datapoints_%s.csv" % str(max(df_variables["id"]) + 1),
-#         )
-#     )
-#     df_variables = pd.concat([df_variables, new_var], axis=0)
-#     return df_variables
 
 
 def _add_global_total(tb: Table, ds_regions: Dataset) -> Table:
