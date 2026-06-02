@@ -2,6 +2,7 @@ from pathlib import Path
 
 from owid.catalog import Table
 from owl import Action, Dataset, Snapshot, SnapshotCapture
+from owl.catalog import load_snapshot
 from owl.grapher import upsert_dataset
 
 from etl.data_helpers import geo
@@ -17,7 +18,7 @@ def raw_data(snap: SnapshotCapture) -> None:
 
 @Dataset
 def deaths_karlinsky(raw_data: Snapshot) -> Table:
-    tb = Table(raw_data.read_csv())
+    tb = load_snapshot(raw_data, short_name="deaths_karlinsky")
 
     tb = tb.drop(columns=["continent", "source"])
     tb = tb.rename(columns={"country_name": "country"})
