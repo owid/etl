@@ -9,33 +9,40 @@ from __future__ import annotations
 
 import pandas as pd
 from owid.catalog import Origin, Table
+from owid.catalog import processing as pr
 
 from owl.snapshot import Snapshot
 
 
-def _read_snapshot(snapshot: Snapshot, **kwargs) -> pd.DataFrame:
+def _origin_from_snapshot(snapshot: Snapshot) -> Origin | None:
+    origin_dict = snapshot.meta.get("origin")
+    return Origin.from_dict(origin_dict) if origin_dict else None
+
+
+def _read_snapshot(snapshot: Snapshot, *, short_name: str | None = None, **kwargs) -> Table:
     path = snapshot.path()
     suffix = path.suffix.lower()
+    origin = _origin_from_snapshot(snapshot)
+    reader_kwargs = {"origin": origin, **kwargs}
     if suffix == ".csv":
-        return pd.read_csv(path, **kwargs)
-    if suffix in {".xls", ".xlsx"}:
-        return pd.read_excel(path, **kwargs)
-    if suffix == ".parquet":
-        result = snapshot.load()
-        if isinstance(result, tuple):
-            df, _meta = result
-            return df
-        return result
-    raise ValueError(
-        f"Cannot infer snapshot reader from suffix {path.suffix!r}; use snapshot.path() and read it manually."
-    )
+        tb = pr.read_csv(path, **reader_kwargs)
+    elif suffix in {".xls", ".xlsx"}:
+        tb = pr.read_excel(path, **reader_kwargs)
+    elif suffix == ".parquet":
+        tb = pr.read_parquet(path, **reader_kwargs)
+    else:
+        raise ValueError(
+            f"Cannot infer snapshot reader from suffix {path.suffix!r}; use snapshot.path() and read it manually."
+        )
+    tb.metadata.short_name = short_name or snapshot.name
+    return tb
 
 
 def load_snapshot(snapshot: Snapshot, short_name: str | None = None, **kwargs) -> Table:
     """Load a Snapshot as an owid-catalog Table with origins attached.
 
-    Wraps a raw snapshot file into a Table and, if the snapshot's ``meta.yml``
-    has an ``origin`` key, attaches it to every column's VariableMeta.
+    Uses owid-catalog processing readers and, if the snapshot's ``meta.yml``
+    has an ``origin`` key, passes it to the reader so origins are attached to every column.
 
     Args:
         snapshot: A @Snapshot object to load.
@@ -45,17 +52,7 @@ def load_snapshot(snapshot: Snapshot, short_name: str | None = None, **kwargs) -
     Returns:
         Table with data and (if available) origins on all columns.
     """
-    df = _read_snapshot(snapshot, **kwargs)
-    tb = Table(df, short_name=short_name or snapshot.name)
-
-    # Attach origin from .meta.yml if present
-    origin_dict = snapshot.meta.get("origin")
-    if origin_dict:
-        origin = Origin.from_dict(origin_dict)
-        for col in tb.columns:
-            tb[col].metadata.origins = [origin]
-
-    return tb
+    return _read_snapshot(snapshot, short_name=short_name, **kwargs)
 
 
 def export(tb: Table) -> tuple[pd.DataFrame, dict]:
