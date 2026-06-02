@@ -447,7 +447,9 @@ tables:
         title: "Annual CO₂ emissions including land-use change per unit energy"
         unit: "grams per kilowatt-hour"
         short_unit: "g/kWh"
-        description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in grams per kilowatt-hour of primary energy consumption."
+        description_short: "Annual carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours). [Land-use change emissions](#dod:land-use-change-emissions) are included."
+        display:
+          shortUnit: g
       emissions_total_per_gdp:
         title: "Annual CO₂ emissions per GDP (kg per international-$)"
         unit: "kilograms per international-$"
@@ -457,7 +459,9 @@ tables:
         title: "Annual CO₂ emissions per unit energy (grams per kilowatt-hour)"
         unit: "grams per kilowatt-hour"
         short_unit: "g/kWh"
-        description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in grams per kilowatt-hour of primary energy consumption."
+        description_short: "Annual carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours). [Land-use change emissions](#dod:land-use-change-emissions) are excluded."
+        display:
+          shortUnit: g
       gdp:
         title: "GDP"
         unit: "2011 international-$"
