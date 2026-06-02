@@ -97,13 +97,13 @@ fastest way to spot a mapping gap *the reviewer can't see by eye*.
 
 ## Sharing the HTML with the team
 
-The generated file is fully self-contained — you can just send it (Slack DM, email, etc.) and the reviewer opens it locally. For a link a whole team can hit without passing a file around, **publish it to `vibe.owid.io`** (OWID's internal site for sharing static apps / entries).
+The generated file is fully self-contained — you can just send it (Slack DM, email, etc.) and the reviewer opens it locally. For a link the whole team can hit without passing a file around, **publish it to `vibe.owid.io`** (OWID's internal site for sharing self-contained webapps).
 
-OWID ships a dedicated plugin skill for creating an entry on `vibe.owid.io`. It is **not** installed by default in this repo — install it once via `/plugin` in the Claude Code shell (it lives in the OWID Claude plugins marketplace). After this skill produces `ai/<slug>_view_review.html`, the typical follow-up is:
+The OWID **`vibe-app`** plugin skill handles the publish (scaffolds the entry in `owid/vibe-webapps` and ships it to `vibe.owid.io`). It is **not** installed by default in this repo — if `vibe-app` isn't in the user's skills list, tell them to install it once via `/plugin` in the Claude Code shell (it lives in the OWID Claude plugins marketplace). The typical follow-up after this skill produces `ai/<slug>_view_review.html` is:
 
-> "Publish `ai/<slug>_view_review.html` to vibe.owid.io as a new entry."
+> "Publish `ai/<slug>_view_review.html` to vibe.owid.io as a vibe app."
 
-…which Claude routes to that publishing skill. If the publishing skill isn't installed, Claude should tell the user to install it via `/plugin` first (don't try to reproduce its behaviour here — keep concerns separate).
+…which Claude routes to `/vibe-app`. Don't try to reproduce its behaviour here — keep the two concerns separate (this skill builds the HTML; `vibe-app` publishes it).
 
 ## After the reviewer is done
 
