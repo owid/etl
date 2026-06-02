@@ -18,7 +18,7 @@ def raw_data(snap: SnapshotCapture) -> None:
 
 @Dataset
 def deaths_karlinsky(raw_data: Snapshot) -> Table:
-    tb = load_snapshot(raw_data, short_name="deaths_karlinsky")
+    tb = load_snapshot(raw_data)
 
     tb = tb.drop(columns=["continent", "source"])
     tb = tb.rename(columns={"country_name": "country"})
