@@ -519,15 +519,20 @@ COMBINED_CONFIGS = [
     # ── Gender-affirming care: adults + minors combined ──────────────
     # 4 source columns (adults covered / restricted, minors covered / restricted) →
     # one categorical indicator over the adults×minors ∈ {covered, restricted, neither}
-    # grid. We map the 8 single-policy national states that occur in the data; only
-    # adults-restricted/minors-covered is unobserved and left to the default.
+    # grid. To keep the legend legible we consolidate the 8 single-policy states that occur
+    # in the data into 6 categories: the salient cases keep their own label (covered for
+    # both, adults-covered/minors-restricted, restricted for both), while the rarer
+    # one-group-only states are merged symmetrically into "Covered for adults or minors only"
+    # and "Restricted for adults or minors only". All states are still mapped explicitly (so
+    # _warn_on_unmapped_bucket_patterns keeps flagging anything new); nothing is silently
+    # swept into the catch-all.
     #
-    # NOTE: with the 8 states mapped, the "Varies by region or other" default now holds
-    # only (a) genuinely partial/subnational country-years (e.g. Canada, United States)
-    # and (b) the lone Brazil 2025 transition-year artefact (adults covered=1 AND
-    # restricted=1). On each new data release, re-check what reaches the default: route
-    # any new stable single-policy state to its own category, and treat covered+restricted
-    # (or legal+illegal) contradictions via the codebook's end-of-year recoding rule.
+    # NOTE: the "Varies by region or other" default holds only (a) genuinely partial/
+    # subnational country-years (e.g. Canada, United States) and (b) the lone Brazil 2025
+    # transition-year artefact (adults covered=1 AND restricted=1). On each new data release,
+    # re-check what reaches the default and what the unmapped-bucket warning surfaces: give a
+    # new stable state its own category, and treat covered+restricted (or legal+illegal)
+    # contradictions via the codebook's end-of-year recoding rule.
     {
         "short_name": "gender_affirming_care",
         "sources": [
@@ -538,15 +543,13 @@ COMBINED_CONFIGS = [
         ],
         "category_map": {
             "ac: 1 ar: 0 mc: 1 mr: 0": "Covered for adults and minors",
-            "ac: 1 ar: 0 mc: 0 mr: 0": "Covered for adults only",
+            "ac: 1 ar: 0 mc: 0 mr: 0": "Covered for adults or minors only",
+            "ac: 0 ar: 0 mc: 1 mr: 0": "Covered for adults or minors only",
             "ac: 1 ar: 0 mc: 0 mr: 1": "Adults covered, minors restricted",
             "ac: 0 ar: 1 mc: 0 mr: 1": "Restricted for both",
+            "ac: 0 ar: 1 mc: 0 mr: 0": "Restricted for adults or minors only",
+            "ac: 0 ar: 0 mc: 0 mr: 1": "Restricted for adults or minors only",
             "ac: 0 ar: 0 mc: 0 mr: 0": "Neither covered nor restricted",
-            # Single-policy national states previously dumped into the catch-all despite
-            # being definite (not regional): minors-only and adults-restricted-only.
-            "ac: 0 ar: 0 mc: 1 mr: 0": "Covered for minors only",
-            "ac: 0 ar: 0 mc: 0 mr: 1": "Restricted for minors only",
-            "ac: 0 ar: 1 mc: 0 mr: 0": "Restricted for adults only",
         },
         "default_category": "Varies by region or other",
     },
