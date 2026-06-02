@@ -95,13 +95,9 @@ For each step file, check:
 
 ### 8. Outdated practices
 
-Run the canonical detector. The source of truth is [vscode_extensions/detect-outdated-practices/src/extension.ts](vscode_extensions/detect-outdated-practices/src/extension.ts). Highlights to grep manually if the extension isn't running:
+**Run the `/check-outdated-practices` skill on every new step file** (snapshot, meadow, garden, _and_ any helper modules like `*_omms.py`). It reads [vscode_extensions/detect-outdated-practices/src/extension.ts](vscode_extensions/detect-outdated-practices/src/extension.ts) as the single source of truth and greps the full pattern set — don't hand-maintain a copy of the patterns here, and don't eyeball helper calls and decide they look current (the `geo.add_*` family looks fine but is flagged). Report every hit it returns as 🟡.
 
-- `if __name__ == "__main__":` in **snapshot files** — outdated. Remove it; snapshots run via `etls` / `etl snapshot`.
-- `geo.harmonize_countries(...)` in step files — replaced by `paths.regions.harmonize_names(...)`.
-- `dest_dir` argument, `paths.load_dependency(...)`, `np.where(...)` (strips origins), `index.map(...)` — all flagged.
-
-When in doubt, run the `/check-outdated-practices` skill on the new files.
+Separately, the metadata/origin-stripping patterns from CLAUDE.md (`pd.concat`→`pr.concat`, `pd.to_numeric`/`pd.to_datetime`→`pr.*`, `np.where`, `index.map(...)`, `pd.DataFrame(tb)` re-wrap) are **not** part of the extension — they're covered by the §7 code-clarity pass. Flag them there even when `copy_metadata`/`fillna` appears to mitigate.
 
 ### 8b. Carried-over annotations & sanity_checks (review side)
 

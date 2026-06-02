@@ -110,8 +110,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - After running, **always verify `dag/main.yml`**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow).
 
 1b) Check for outdated practices (check-outdated-practices skill)
-   - After `etl update` creates new step files, run the `/check-outdated-practices` skill on the newly created files
-   - This catches patterns like `if __name__ == "__main__"`, `geo.harmonize_countries()`, `dest_dir`, `paths.load_dependency()`, etc. that were copied from old versions
+   - After `etl update` creates new step files, run the `/check-outdated-practices` skill on **every** new step file — including helper modules that `etl update` doesn't generate but you copied by hand (e.g. `*_omms.py`), since those carry legacy patterns too
+   - The skill reads the extension as the source of truth for the full pattern set (the `geo.add_*` aggregation/population helpers are flagged, not just `geo.harmonize_countries`) — don't rely on a remembered subset
    - Fix any findings before proceeding — this avoids propagating legacy patterns into new versions
 
 1c) Catalog `# NOTE:` / `# TODO:` comments in the copied step files (don't resolve yet)
