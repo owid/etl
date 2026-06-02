@@ -639,6 +639,11 @@ def run() -> None:
     mask = tb.set_index(["law", "status"]).index.isin(placeholders)
     tb = tb.loc[~mask].reset_index(drop=True)
 
+    # Guard the `both = 1` transition-year branch of _binary_map (see its docstring): such
+    # rows fold into "Varies by region" with no partial data. Zero exist in v2.0; fail loudly
+    # if a future source version reintroduces them so each is re-checked by hand.
+    _assert_no_unhandled_transition_years(tb)
+
     # Country-level table — drop the requirement and enforcement columns here; they're
     # only used to build combined indicators and aren't published as per-row long-table
     # indicators.
@@ -698,6 +703,30 @@ def _detect_structural_placeholders(tb):
         f"Expected 18 placeholder (law, status) combos per codebook v2.0 §1.1; found {len(placeholders)}."
     )
     return placeholders
+
+
+# Two-direction laws whose combined indicator is built via _binary_map (legal vs illegal).
+_BINARY_LAWS = ["same_sex_acts", "marriage_equality", "transgender_military", "blood_donations"]
+
+
+def _assert_no_unhandled_transition_years(tb):
+    """Fail if any binary-mapped law has a country-year with legal=1 AND illegal=1.
+
+    Such "transition-year artefact" rows fold into "Varies by region" via _binary_map (or go
+    unmapped for marriage) despite carrying no partial/subnational data. As of v2.0 none exist;
+    if a future source version reintroduces them, re-check each occurrence by hand rather than
+    letting it silently inherit the "Varies by region" default. See _binary_map's docstring.
+    """
+    wide = tb.pivot_table(index=["country", "year", "law"], columns="status", values="proportion", aggfunc="first")
+    if "legal" not in wide or "illegal" not in wide:
+        return
+    both = wide[(wide["legal"] == 1) & (wide["illegal"] == 1)]
+    both = both[both.index.get_level_values("law").isin(_BINARY_LAWS)]
+    assert both.empty, (
+        f"Found {len(both)} (country, year, law) rows with legal=1 AND illegal=1 — a transition-year "
+        f"artefact that maps to 'Varies by region' with no partial data. Re-check each before trusting "
+        f"that mapping (see _binary_map docstring):\n{both.index.tolist()}"
+    )
 
 
 def _build_regional_aggregates(tb):
