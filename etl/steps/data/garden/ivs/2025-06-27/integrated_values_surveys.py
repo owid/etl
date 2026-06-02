@@ -1,16 +1,12 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
-from structlog import get_logger
 from tabulate import tabulate
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# Initialize logger.
-log = get_logger()
 
 # Set table format when printing
 TABLEFMT = "pretty"
@@ -1028,11 +1024,10 @@ def check_sum_100(tb: Table, questions: list[str], answers: list[str], margin: f
         ].notnull().all(axis=1)
         tb_error = tb[mask].reset_index(drop=True).copy()
 
-        if not tb_error.empty:
-            log.fatal(
-                f"""{len(tb_error)} answers for {q} are not adding up to 100%:
-                {tabulate(tb_error[["country", "year"] + answers_by_question + ["sum_check"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
-            )
+        assert tb_error.empty, (
+            f"{len(tb_error)} answers for {q} are not adding up to 100%:\n"
+            f"{tabulate(tb_error[['country', 'year'] + answers_by_question + ['sum_check']], headers='keys', tablefmt=TABLEFMT, floatfmt='.1f')}"
+        )
 
     # Remove sum_check
     tb = tb.drop(columns=["sum_check"])
