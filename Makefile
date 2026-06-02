@@ -8,7 +8,7 @@ include default.mk
 
 SRC = etl snapshots apps api_search tests docs owid_mcp owl_steps lib/owl/owl
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
-LIBS = lib/*
+LIBS = lib/catalog lib/datautils lib/repack
 
 help:
 	@echo 'Available commands:'
@@ -21,7 +21,6 @@ help:
 	@echo '  make docs.post     Transform non-md files in docs/ after build (e.g. notebooks)'
 	@echo '  make dot       	Build a visual graph of the dependencies'
 	@echo '  make etl       	Fetch data and run all transformations for garden'
-	@echo '  make owl       	Fetch Owl snapshots and run Owl transformations'
 	@echo '  make format    	Format code'
 	@echo '  make format-all 	Format code (including modules in lib/)'
 	@echo '  make full      	Fetch all data and run full transformations'
@@ -127,12 +126,6 @@ coverage: .venv
 etl: .venv
 	@echo '==> Running etl on garden'
 	.venv/bin/etl run garden
-
-owl: .venv
-	@echo '==> Fetching Owl snapshots'
-	.venv/bin/owl snapshot
-	@echo '==> Running Owl steps'
-	.venv/bin/owl run
 
 full: .venv
 	@echo '==> Running full etl'
