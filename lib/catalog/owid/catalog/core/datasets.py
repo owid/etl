@@ -399,29 +399,11 @@ class Dataset:
         extra_variables: Literal["raise", "ignore"] = "raise",
     ) -> None:
         """Update dataset and table metadata from a parsed metadata dictionary."""
-        from owid.catalog.core.meta import Source
         from owid.catalog.core.yaml_metadata import update_metadata_from_dict
 
         for k, v in metadata.get("dataset", {}).items():
             if k != "sources":
                 setattr(self.metadata, k, v)
-
-        dataset_sources = metadata.get("dataset", {}).get("sources")
-        if dataset_sources is not None:
-            if if_source_exists == "replace":
-                self.metadata.sources = []
-            new_sources = []
-            for source_annot in dataset_sources:
-                ds_sources = [s for s in self.metadata.sources if s.name == source_annot["name"]]
-                if ds_sources:
-                    ds_sources[0].update(**source_annot)
-                elif self.metadata.sources and if_source_exists == "fail":
-                    raise ValueError(
-                        f"Source {self.metadata.sources[0].name} would be overwritten by source {source_annot['name']}"
-                    )
-                else:
-                    new_sources.append(Source(**source_annot))
-            self.metadata.sources.extend(new_sources)
 
         for table_name in metadata.get("tables", {}).keys():
             try:
