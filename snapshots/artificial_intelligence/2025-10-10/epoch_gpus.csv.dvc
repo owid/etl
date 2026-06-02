@@ -19,13 +19,13 @@ meta:
     # Files
     url_main: https://epoch.ai/data/machine-learning-hardware
     url_download: https://epoch.ai/data/ml_hardware.zip
-    date_accessed: '2026-06-01'
+    date_accessed: '2026-06-02'
 
     # License
     license:
       name: CC BY 4.0
       url: https://epoch.ai/data/machine-learning-hardware
 outs:
-  - md5: b913efad460f59768583fc4aeba1791d
-    size: 94914
+  - md5: 31f58a62a7729959e237f856c9835a9e
+    size: 95782
     path: epoch_gpus.csv
