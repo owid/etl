@@ -8,7 +8,7 @@ The core framework (snapshot.py, dataset.py) doesn't depend on this.
 from __future__ import annotations
 
 import pandas as pd
-from owid.catalog import Origin, Table
+from owid.catalog import DatasetMeta, Origin, Table, TableMeta
 from owid.catalog import processing as pr
 
 from owl.snapshot import Snapshot
@@ -21,9 +21,8 @@ def _origin_from_snapshot(snapshot: Snapshot) -> Origin | None:
 
 def _read_snapshot(snapshot: Snapshot, *, short_name: str | None = None, **kwargs) -> Table:
     path = snapshot.path()
-    tb = pr.read(path, origin=_origin_from_snapshot(snapshot), **kwargs)
-    tb.metadata.short_name = short_name or snapshot.name
-    return tb
+    metadata = TableMeta(short_name=short_name or snapshot.name, dataset=DatasetMeta())
+    return pr.read(path, metadata=metadata, origin=_origin_from_snapshot(snapshot), **kwargs)
 
 
 def load_snapshot(snapshot: Snapshot, short_name: str | None = None, **kwargs) -> Table:

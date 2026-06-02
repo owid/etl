@@ -189,7 +189,10 @@ def _prepare_table(df: pd.DataFrame | Table, name: str, meta: dict[str, Any]) ->
     columns_meta = meta.get("columns", {})
     for col_name, col_meta in columns_meta.items():
         if col_name in tb.columns:
+            previous_meta = tb[col_name].metadata
             tb[col_name].metadata = _variable_meta_from_dict(col_meta)
+            if not tb[col_name].metadata.origins:
+                tb[col_name].metadata.origins = previous_meta.origins
 
     primary_key = [
         col_name
@@ -404,6 +407,13 @@ class Dataset:
             dataset_meta = CatalogDatasetMeta()
         else:
             dataset_meta = _dataset_meta_from_dict(merged)
+            if not dataset_meta.title:
+                origins = [
+                    origin for col in table.all_columns for origin in table.get_column_or_index(col).metadata.origins
+                ]
+                if origins:
+                    dataset_meta.title = origins[0].title
+                    dataset_meta.description = dataset_meta.description or origins[0].description
         dataset_meta.channel = self.channel or project.default_channel
         dataset_meta.namespace = info.namespace
         dataset_meta.version = info.version
