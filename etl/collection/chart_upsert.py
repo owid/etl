@@ -80,7 +80,7 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
         "collection.chart.upsert_success",
         slug=slug,
         chart_id=chart_id,
-        admin_url=f"{owid_env.admin_site}/admin/charts/{chart_id}/edit",
+        admin_url=f"{owid_env.admin_site}/charts/{chart_id}/edit",
     )
     return chart_id
 
