@@ -143,6 +143,13 @@ data/snapshots/by-md5/<md5><suffix>
 
 and records the content identity in `snapshot.lock.yml`.
 
+Keep both files under version control, but treat them differently:
+
+- `meta.yml` is human-authored metadata: source descriptions, licenses, dataset and column metadata.
+- `snapshot.lock.yml` is generated snapshot identity: exact captured bytes (`md5`, `size`, `suffix`, `captured_at`).
+
+Keeping the generated lock separate from authored metadata makes reviews cleaner: data changes show up in the lock file, while copy/metadata changes stay in `meta.yml`.
+
 ### Snapshot lock behavior
 
 `snapshot.lock.yml` is a content lock, not a fetch log. If you run `owl snapshot` again and the bytes are unchanged, Owl leaves the lock file untouched and reports:
