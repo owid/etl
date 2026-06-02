@@ -98,6 +98,13 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
     GAC 2025), and the v2.0+ subnational coverage means most countries with both
     directions populated are real subnational mixes. For both interpretations,
     "Varies by region" is a safer default than picking one direction arbitrarily.
+
+    NOTE (future updates): as of v2.0 the `both = 1` branch fires on ZERO country-years for
+    every binary-mapped law (same_sex_acts, blood_donations, transgender_military) — so
+    no row is currently labelled "Varies by region" without partial data. If a future
+    source version reintroduces `legal: 1 illegal: 1` rows, re-check each one by hand:
+    confirm it is a genuine transition-year artefact (and "Varies by region" is right)
+    rather than a stable regime that should map to a decided category.
     """
     m = {
         f"{prog_key}: 0 {reg_key}: 0": neither_label,
@@ -108,7 +115,8 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
         f"{prog_key}: 0.5 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 1 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 0.5 {reg_key}: 1": mixed_label,
-        f"{prog_key}: 1 {reg_key}: 1": mixed_label,  # was prog_label — see docstring
+        # NOTE: transition-year artefact; 0 rows in v2.0 — re-check each occurrence on future updates (see docstring).
+        f"{prog_key}: 1 {reg_key}: 1": mixed_label,
     }
     return m
 
