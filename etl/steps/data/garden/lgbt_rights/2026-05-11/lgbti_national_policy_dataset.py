@@ -616,7 +616,32 @@ def _build_one_combined(wide, config):
         eoe = wide[f"{law}__{status}__eoe"]
         unenforced_mask = (result == refinement["from_label"]) & (eoe == 0)
         result = result.where(~unenforced_mask, refinement["to_label"])
+
+    _warn_on_unmapped_bucket_patterns(config, keys)
     return result.copy_metadata(wide["country"])
+
+
+def _warn_on_unmapped_bucket_patterns(config, keys):
+    """Warn when an all-integer bucket combination is not explicitly mapped to a category.
+
+    For multi-input indicators (e.g. gender_affirming_care, which crosses adults × minors ×
+    {covered, restricted, neither}) an all-integer combination is a *definite* national state. If
+    it isn't in `category_map` it gets swept into the `default_category` catch-all (or, for configs
+    without one, leaks as a raw bucket string) — the gap that hid "Covered for minors only" etc.
+    Surface these so a reviewer can decide whether each deserves its own category. Partial (0.5)
+    combinations are excluded: those legitimately route to "Varies by region".
+    """
+    explicit = set(config["category_map"])
+    unmapped = keys.notna() & ~keys.isin(explicit) & ~keys.fillna("").str.contains("0.5")
+    if unmapped.any():
+        log.warning(
+            "lgbti_national_policy_dataset.unmapped_bucket_pattern",
+            indicator=config["short_name"],
+            patterns=keys[unmapped].value_counts().to_dict(),
+            hint="All-integer (non-partial) bucket combinations with no explicit category — each is a "
+            "definite state routed to the catch-all. Consider giving it its own category, or fix a "
+            "contradictory same-year coding (see gender_affirming_care).",
+        )
 
 
 def run() -> None:
