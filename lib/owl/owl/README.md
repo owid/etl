@@ -84,17 +84,17 @@ The generated `step.py` is intentionally small:
 ```python
 import pandas as pd
 
-from owl import ColumnMeta, Dataset, DatasetMeta, Snapshot
+from owl import ColumnMeta, Dataset, DatasetMeta, Snapshot, SnapshotCapture
 
 
 @Snapshot
-def raw_data(snap):
-    # Replace with snap.download("https://example.com/data.csv") or return a DataFrame.
+def raw_data(snap: SnapshotCapture) -> pd.DataFrame:
+    # Replace with snap.download("https://example.com/data.csv") and return None, or return a DataFrame.
     return pd.DataFrame({"country": ["World"], "year": [2026], "value": [1]})
 
 
 @Dataset
-def my_dataset(raw_data: Snapshot):
+def my_dataset(raw_data: Snapshot) -> tuple[pd.DataFrame, DatasetMeta]:
     df = raw_data.load()
     return df, DatasetMeta(
         title="TODO: dataset title",
@@ -177,7 +177,7 @@ Dataset functions can depend on snapshots or other Owl datasets by naming them a
 
 ```python
 @Dataset
-def my_dataset(raw_data: Snapshot):
+def my_dataset(raw_data: Snapshot) -> pd.DataFrame:
     df = raw_data.read_csv()
     return df
 ```
@@ -187,12 +187,14 @@ def my_dataset(raw_data: Snapshot):
 Use `ETLDataset` for read-only dependencies on datasets produced by the main ETL pipeline:
 
 ```python
+import pandas as pd
+
 from owl import Dataset, ETLDataset
 
 regions = ETLDataset("data://garden/regions/2023-01-01/regions")
 
 @Dataset
-def my_dataset(regions: ETLDataset):
+def my_dataset(regions: ETLDataset) -> pd.DataFrame:
     tb_regions = regions.read("regions")
     ...
 ```
@@ -209,12 +211,12 @@ Owl also has side-effect actions. The current main use is uploading a produced d
 
 ```python
 from owl import Action, Dataset
-from owl.grapher import upsert_dataset_to_grapher
+from owl.grapher import upsert_dataset
 
 
 @Action(kind="grapher", default=False)
-def upsert_to_grapher(my_dataset: Dataset):
-    upsert_dataset_to_grapher(my_dataset)
+def upsert_to_grapher(my_dataset: Dataset) -> None:
+    upsert_dataset(my_dataset)
 ```
 
 Run default actions with `owl run`, or Grapher actions explicitly with:

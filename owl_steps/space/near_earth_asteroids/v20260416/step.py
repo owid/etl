@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+import pandas as pd
 from owl.catalog import export, load_snapshot
 from owl.dataset import Dataset
 from owl.snapshot import Snapshot
@@ -43,7 +44,7 @@ def raw_data() -> Path:
 
 
 @Dataset
-def near_earth_asteroids(raw_data: Snapshot):
+def near_earth_asteroids(raw_data: Snapshot) -> tuple[pd.DataFrame, dict]:
     """Clean data and compute size-bucket counts."""
 
     tb = load_snapshot(raw_data)

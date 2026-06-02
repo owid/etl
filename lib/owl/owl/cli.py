@@ -77,7 +77,7 @@ def _find_snapshots(module) -> list[tuple[str, Snapshot]]:
 
 
 @click.group()
-def cli():
+def cli() -> None:
     pass
 
 
@@ -85,7 +85,7 @@ def cli():
 @click.argument("path")
 @click.option("--date", "version_date", default=None, help="Version date as YYYY-MM-DD or YYYYMMDD. Defaults to today.")
 @click.option("--snapshot/--no-snapshot", default=True, help="Include a starter snapshot.")
-def new_step(path, version_date, snapshot):
+def new_step(path: str, version_date: str | None, snapshot: bool) -> None:
     """Create a new Owl step scaffold (e.g. biodiversity/cherry_blossom)."""
     project = load_project()
     parts = pathlib.PurePosixPath(path).parts
@@ -113,10 +113,10 @@ def new_step(path, version_date, snapshot):
 
     step_dir.mkdir(parents=True, exist_ok=True)
     if snapshot:
-        step_source = f"""import pandas as pd\n\nfrom owl import ColumnMeta, Dataset, DatasetMeta, Snapshot\n\n\n@Snapshot\ndef raw_data(snap):\n    # Replace with snap.download("https://example.com/data.csv") or return a DataFrame.\n    return pd.DataFrame({{"country": ["World"], "year": [{iso_version[:4]}], "value": [1]}})\n\n\n@Dataset\ndef {dataset}(raw_data: Snapshot):\n    df = raw_data.load()\n    return df, DatasetMeta(\n        title="TODO: dataset title",\n        description="TODO: dataset description",\n        columns={{\n            "country": ColumnMeta(title="Country", role="entity"),\n            "year": ColumnMeta(title="Year", role="time"),\n            "value": ColumnMeta(title="Value", unit="TODO"),\n        }},\n    )\n"""
+        step_source = f"""import pandas as pd\n\nfrom owl import ColumnMeta, Dataset, DatasetMeta, Snapshot, SnapshotCapture\n\n\n@Snapshot\ndef raw_data(snap: SnapshotCapture) -> pd.DataFrame:\n    # Replace with snap.download("https://example.com/data.csv") and return None, or return a DataFrame.\n    return pd.DataFrame({{"country": ["World"], "year": [{iso_version[:4]}], "value": [1]}})\n\n\n@Dataset\ndef {dataset}(raw_data: Snapshot) -> tuple[pd.DataFrame, DatasetMeta]:\n    df = raw_data.load()\n    return df, DatasetMeta(\n        title="TODO: dataset title",\n        description="TODO: dataset description",\n        columns={{\n            "country": ColumnMeta(title="Country", role="entity"),\n            "year": ColumnMeta(title="Year", role="time"),\n            "value": ColumnMeta(title="Value", unit="TODO"),\n        }},\n    )\n"""
         meta_source = f'''snapshots:\n  raw_data:\n    origin:\n      title: "TODO: source title"\n      producer: "TODO: producer"\n      date_accessed: "{iso_version}"\n      url_main: "TODO: source URL"\n\ndatasets:\n  {dataset}: {{}}\n'''
     else:
-        step_source = f"""import pandas as pd\n\nfrom owl import ColumnMeta, Dataset, DatasetMeta\n\n\n@Dataset\ndef {dataset}():\n    df = pd.DataFrame({{"country": ["World"], "year": [{iso_version[:4]}], "value": [1]}})\n    return df, DatasetMeta(\n        title="TODO: dataset title",\n        description="TODO: dataset description",\n        columns={{\n            "country": ColumnMeta(title="Country", role="entity"),\n            "year": ColumnMeta(title="Year", role="time"),\n            "value": ColumnMeta(title="Value", unit="TODO"),\n        }},\n    )\n"""
+        step_source = f"""import pandas as pd\n\nfrom owl import ColumnMeta, Dataset, DatasetMeta\n\n\n@Dataset\ndef {dataset}() -> tuple[pd.DataFrame, DatasetMeta]:\n    df = pd.DataFrame({{"country": ["World"], "year": [{iso_version[:4]}], "value": [1]}})\n    return df, DatasetMeta(\n        title="TODO: dataset title",\n        description="TODO: dataset description",\n        columns={{\n            "country": ColumnMeta(title="Country", role="entity"),\n            "year": ColumnMeta(title="Year", role="time"),\n            "value": ColumnMeta(title="Value", unit="TODO"),\n        }},\n    )\n"""
         meta_source = f"""datasets:\n  {dataset}: {{}}\n"""
 
     step_path.write_text(step_source, encoding="utf-8")
@@ -135,7 +135,7 @@ def new_step(path, version_date, snapshot):
 )
 @click.option("--action", "action_kinds", multiple=True, help="Run actions of this kind. Can be repeated.")
 @click.option("--grapher", is_flag=True, default=False, help="Run Grapher upsert actions.")
-def run(pattern, force, action_kinds, grapher):
+def run(pattern: str | None, force: bool, action_kinds: tuple[str, ...], grapher: bool) -> None:
     """Run steps matching a regex pattern (e.g. "worldbank/.*", "who/life_expectancy").
 
     If no pattern is given, all steps are run.
@@ -169,7 +169,7 @@ def run(pattern, force, action_kinds, grapher):
 
 @cli.command()
 @click.argument("pattern", required=False)
-def snapshot(pattern):
+def snapshot(pattern: str | None) -> None:
     """Fetch and save snapshots for steps matching a regex pattern.
 
     This is the only way to update a snapshot. The pipeline never fetches data itself.
@@ -193,7 +193,7 @@ def snapshot(pattern):
 @cli.command()
 @click.argument("pattern", required=False)
 @click.option("--output", "-o", default="dag", help="Output filename (without extension).")
-def viz(pattern, output):
+def viz(pattern: str | None, output: str) -> None:
     """Visualize the dependency DAG for matching steps.
 
     Opens a PNG showing Snapshot → Dataset dependencies.

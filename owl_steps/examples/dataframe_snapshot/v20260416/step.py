@@ -7,7 +7,7 @@ from owl.snapshot import Snapshot
 
 
 @Snapshot
-def generated_data():
+def generated_data() -> pd.DataFrame:
     """A small DataFrame generated directly in Python and snapshotted as Parquet."""
     return pd.DataFrame(
         {
@@ -19,6 +19,6 @@ def generated_data():
 
 
 @Dataset
-def dataframe_snapshot_example(generated_data: Snapshot):
+def dataframe_snapshot_example(generated_data: Snapshot) -> tuple[pd.DataFrame, dict]:
     tb = load_snapshot(generated_data)
     return export(tb)

@@ -55,7 +55,7 @@ def recent_data() -> Path:
 
 
 @Dataset
-def cherry_blossom(historical_data: Snapshot, recent_data: Snapshot):
+def cherry_blossom(historical_data: Snapshot, recent_data: Snapshot) -> tuple[pd.DataFrame, dict]:
     """Combine historical + recent data, convert dates, compute rolling average."""
 
     tb_hist = load_snapshot(historical_data, skiprows=25)
@@ -104,7 +104,7 @@ def cherry_blossom(historical_data: Snapshot, recent_data: Snapshot):
 
 
 @Action(kind="grapher")
-def upsert_to_grapher(cherry_blossom: Dataset):
+def upsert_to_grapher(cherry_blossom: Dataset) -> None:
     """Upsert the cherry blossom dataset to Grapher MySQL."""
     dataset_id = upsert_dataset(cherry_blossom)
     print(f"  upserted Grapher dataset {dataset_id}")
