@@ -2,7 +2,7 @@
 definitions:
   common:
     presentation:
-      title_variant: Integrated Values Surveys
+      attribution_short: Integrated Values Surveys
       topic_tags:
         - Trust
     processing_level: major
