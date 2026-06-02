@@ -3,6 +3,7 @@ import inspect
 import pathlib
 import re
 import sys
+import textwrap
 from datetime import date
 from types import ModuleType
 
@@ -76,6 +77,84 @@ def _find_snapshots(module) -> list[tuple[str, Snapshot]]:
     ]
 
 
+def _render_step_template(dataset: str, year: str, *, with_snapshot: bool) -> str:
+    if with_snapshot:
+        return textwrap.dedent(
+            f"""
+            import pandas as pd
+
+            from owl import ColumnMeta, Dataset, DatasetMeta, Snapshot, SnapshotCapture
+
+
+            @Snapshot
+            def raw_data(snap: SnapshotCapture) -> pd.DataFrame:
+                # Replace with snap.download("https://example.com/data.csv") and return None, or return a DataFrame.
+                return pd.DataFrame({{"country": ["World"], "year": [{year}], "value": [1]}})
+
+
+            @Dataset
+            def {dataset}(raw_data: Snapshot) -> tuple[pd.DataFrame, DatasetMeta]:
+                df = raw_data.load()
+                return df, DatasetMeta(
+                    title="TODO: dataset title",
+                    description="TODO: dataset description",
+                    columns={{
+                        "country": ColumnMeta(title="Country", role="entity"),
+                        "year": ColumnMeta(title="Year", role="time"),
+                        "value": ColumnMeta(title="Value", unit="TODO"),
+                    }},
+                )
+            """
+        ).lstrip()
+
+    return textwrap.dedent(
+        f"""
+        import pandas as pd
+
+        from owl import ColumnMeta, Dataset, DatasetMeta
+
+
+        @Dataset
+        def {dataset}() -> tuple[pd.DataFrame, DatasetMeta]:
+            df = pd.DataFrame({{"country": ["World"], "year": [{year}], "value": [1]}})
+            return df, DatasetMeta(
+                title="TODO: dataset title",
+                description="TODO: dataset description",
+                columns={{
+                    "country": ColumnMeta(title="Country", role="entity"),
+                    "year": ColumnMeta(title="Year", role="time"),
+                    "value": ColumnMeta(title="Value", unit="TODO"),
+                }},
+            )
+        """
+    ).lstrip()
+
+
+def _render_meta_template(dataset: str, iso_version: str, *, with_snapshot: bool) -> str:
+    if with_snapshot:
+        return textwrap.dedent(
+            f'''
+            snapshots:
+              raw_data:
+                origin:
+                  title: "TODO: source title"
+                  producer: "TODO: producer"
+                  date_accessed: "{iso_version}"
+                  url_main: "TODO: source URL"
+
+            datasets:
+              {dataset}: {{}}
+            '''
+        ).lstrip()
+
+    return textwrap.dedent(
+        f"""
+        datasets:
+          {dataset}: {{}}
+        """
+    ).lstrip()
+
+
 @click.group()
 def cli() -> None:
     pass
@@ -112,15 +191,8 @@ def new_step(path: str, version_date: str | None, snapshot: bool) -> None:
         raise click.ClickException(f"Step already exists: {step_dir}")
 
     step_dir.mkdir(parents=True, exist_ok=True)
-    if snapshot:
-        step_source = f"""import pandas as pd\n\nfrom owl import ColumnMeta, Dataset, DatasetMeta, Snapshot, SnapshotCapture\n\n\n@Snapshot\ndef raw_data(snap: SnapshotCapture) -> pd.DataFrame:\n    # Replace with snap.download("https://example.com/data.csv") and return None, or return a DataFrame.\n    return pd.DataFrame({{"country": ["World"], "year": [{iso_version[:4]}], "value": [1]}})\n\n\n@Dataset\ndef {dataset}(raw_data: Snapshot) -> tuple[pd.DataFrame, DatasetMeta]:\n    df = raw_data.load()\n    return df, DatasetMeta(\n        title="TODO: dataset title",\n        description="TODO: dataset description",\n        columns={{\n            "country": ColumnMeta(title="Country", role="entity"),\n            "year": ColumnMeta(title="Year", role="time"),\n            "value": ColumnMeta(title="Value", unit="TODO"),\n        }},\n    )\n"""
-        meta_source = f'''snapshots:\n  raw_data:\n    origin:\n      title: "TODO: source title"\n      producer: "TODO: producer"\n      date_accessed: "{iso_version}"\n      url_main: "TODO: source URL"\n\ndatasets:\n  {dataset}: {{}}\n'''
-    else:
-        step_source = f"""import pandas as pd\n\nfrom owl import ColumnMeta, Dataset, DatasetMeta\n\n\n@Dataset\ndef {dataset}() -> tuple[pd.DataFrame, DatasetMeta]:\n    df = pd.DataFrame({{"country": ["World"], "year": [{iso_version[:4]}], "value": [1]}})\n    return df, DatasetMeta(\n        title="TODO: dataset title",\n        description="TODO: dataset description",\n        columns={{\n            "country": ColumnMeta(title="Country", role="entity"),\n            "year": ColumnMeta(title="Year", role="time"),\n            "value": ColumnMeta(title="Value", unit="TODO"),\n        }},\n    )\n"""
-        meta_source = f"""datasets:\n  {dataset}: {{}}\n"""
-
-    step_path.write_text(step_source, encoding="utf-8")
-    meta_path.write_text(meta_source, encoding="utf-8")
+    step_path.write_text(_render_step_template(dataset, iso_version[:4], with_snapshot=snapshot), encoding="utf-8")
+    meta_path.write_text(_render_meta_template(dataset, iso_version, with_snapshot=snapshot), encoding="utf-8")
     click.echo(f"Created {step_dir}")
     click.echo(f"Next: owl snapshot {namespace}/{dataset} && owl run {namespace}/{dataset}")
 
