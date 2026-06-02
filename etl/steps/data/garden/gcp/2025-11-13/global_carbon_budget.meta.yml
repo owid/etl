@@ -463,7 +463,7 @@ tables:
         description_short: "Carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours)."
         description_key:
           - Average amount of CO₂ emitted for each unit of energy a country uses. It is calculated by dividing emissions from [fossil fuels and industry](#dod:fossilemissions) by [primary energy consumption](#dod:primaryenergy).
-          - It reflects how carbon-intensive a country's energy is. Lower values indicate a larger role for low-carbon sources such as nuclear and renewables."
+          - It reflects how carbon-intensive a country's energy is. Lower values indicate a larger role for low-carbon sources such as nuclear and renewables.
         display:
           shortUnit: g
           numDecimalPlaces: 0
