@@ -46,11 +46,10 @@ def upsert_dataset(dataset: OwlDataset, *, workers: int | None = None) -> int:
     namespace = ds.metadata.namespace or info.namespace
     grapher_path = f"grapher/{namespace}/{info.version}/{dataset.name}"
 
-    dataset_upsert_result = db.upsert_dataset(engine, ds, namespace, ds.metadata.sources)
+    dataset_upsert_result = db.upsert_dataset(engine, ds, namespace)
     preloaded_checksums = db.load_dataset_variables(dataset_upsert_result.dataset_id, engine)
 
     catalog_paths: list[str] = []
-    uploaded_sources = list(dataset_upsert_result.source_ids.values())
     max_workers = workers or config.GRAPHER_INSERT_WORKERS
 
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -99,7 +98,6 @@ def upsert_dataset(dataset: OwlDataset, *, workers: int | None = None) -> int:
         upserted_variable_ids = list(gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths).values())
 
     cleanup_ok = db.cleanup_ghost_variables(engine, dataset_upsert_result.dataset_id, upserted_variable_ids)
-    db.cleanup_ghost_sources(engine, dataset_upsert_result.dataset_id, uploaded_sources)
     db.set_dataset_checksum_and_editedAt(
         dataset_upsert_result.dataset_id, ds.checksum() if cleanup_ok else "to_be_rerun"
     )
