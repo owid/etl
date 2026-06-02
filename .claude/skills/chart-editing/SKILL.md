@@ -17,12 +17,11 @@ This skill covers creating and editing those `.config.yml` files, pushing them t
 etl/steps/export/multidim/<namespace>/latest/<short_name>.config.yml
 ```
 
-Examples (this repo, as of Phase 1):
+Reference example in this repo:
 
 - `etl/steps/export/multidim/animal_welfare/latest/banning_of_chick_culling.config.yml`
-- `etl/steps/export/multidim/animal_welfare/latest/hens_by_housing_system.config.yml`
 
-The chart's public slug is auto-derived from the short name with underscores replaced by dashes (`hens_by_housing_system` → `hens-by-housing-system`).
+The chart's public slug is auto-derived from the short name with underscores replaced by dashes (`banning_of_chick_culling` → `banning-of-chick-culling`).
 
 ## Minimum viable config
 
@@ -82,12 +81,12 @@ The legend label defaults to the indicator's full title. For better legends, pas
 ```yaml
 indicators:
   y:
-    - catalogPath: "eggs_and_hens_statistics#number_of_hens_in_cages"
+    - catalogPath: "<dataset>#<indicator_a>"
       display:
-        name: "Cages"
-    - catalogPath: "eggs_and_hens_statistics#number_of_hens_in_barns"
+        name: "Short label A"
+    - catalogPath: "<dataset>#<indicator_b>"
       display:
-        name: "Barns"
+        name: "Short label B"
 ```
 
 Other useful `display` fields: `unit`, `shortUnit`, `numDecimalPlaces`, `roundingMode`, `numSignificantFigures`, `tolerance`, `zeroDay`.
