@@ -24,6 +24,7 @@ from owid.catalog import Table
 from owid.catalog.core.meta import DatasetMeta as CatalogDatasetMeta
 from owid.catalog.core.meta import VariableMeta
 
+from owl.etl_dataset import ETLDataset
 from owl.project import dataset_output_dir, load_project, parse_step_file
 from owl.snapshot import Snapshot, _load_yaml_sidecar, _step_rel_path
 
@@ -298,7 +299,7 @@ class Dataset:
         deps = []
         for param_name in sig.parameters:
             obj = module_globals.get(param_name)
-            if isinstance(obj, (Snapshot, Dataset)):
+            if isinstance(obj, (Snapshot, Dataset, ETLDataset)):
                 deps.append(obj)
         return deps
 
@@ -344,6 +345,9 @@ class Dataset:
                 if dep.is_stale():
                     return True
                 if dep._mtime_path.exists() and dep._mtime_path.stat().st_mtime > my_mtime:
+                    return True
+            elif isinstance(dep, ETLDataset):
+                if dep.identity_mtime() > my_mtime:
                     return True
 
         return False
@@ -477,7 +481,7 @@ class Action:
         deps = []
         for param_name in sig.parameters:
             obj = module_globals.get(param_name)
-            if isinstance(obj, (Snapshot, Dataset, Action)):
+            if isinstance(obj, (Snapshot, Dataset, ETLDataset, Action)):
                 deps.append(obj)
         return deps
 
@@ -523,6 +527,9 @@ class Action:
                 if dep.is_stale():
                     return True
                 if dep._mtime_path.exists() and dep._mtime_path.stat().st_mtime > my_mtime:
+                    return True
+            elif isinstance(dep, ETLDataset):
+                if dep.identity_mtime() > my_mtime:
                     return True
             elif isinstance(dep, Action):
                 if dep.is_stale():

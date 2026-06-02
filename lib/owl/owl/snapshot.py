@@ -328,15 +328,23 @@ class Snapshot:
                     ) from err
 
         lock = _read_snapshot_lock(self._source_file)
-        lock.setdefault("snapshots", {})[self.name] = {
+        snapshots = lock.setdefault("snapshots", {})
+        previous = snapshots.get(self.name) or {}
+        unchanged = previous.get("md5") == md5 and previous.get("size") == size and previous.get("suffix") == suffix
+
+        from owl.log import snapshot as _log_snapshot
+
+        if unchanged:
+            _log_snapshot(f"unchanged {self.name}: {md5}{suffix} ({size} bytes)")
+            return
+
+        snapshots[self.name] = {
             "captured_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "md5": md5,
             "size": size,
             "suffix": suffix,
         }
         _write_snapshot_lock(self._source_file, lock)
-
-        from owl.log import snapshot as _log_snapshot
 
         _log_snapshot(f"wrote {self.name}: {md5}{suffix} ({size} bytes)")
 
