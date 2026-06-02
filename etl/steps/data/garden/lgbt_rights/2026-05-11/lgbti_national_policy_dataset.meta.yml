@@ -878,8 +878,8 @@ tables:
           - Neither covered nor restricted
           - Restricted for adults only
           - Restricted for minors only
-          - Restricted for both
           - Varies by region or other
+          - Restricted for both
 
       # ── Gender marker change with legal-pathway requirements ─────
         processing_level: major
