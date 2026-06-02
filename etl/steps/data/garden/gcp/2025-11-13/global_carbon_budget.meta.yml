@@ -460,7 +460,7 @@ tables:
         title: "Annual CO₂ emissions per unit energy (grams per kilowatt-hour)"
         unit: "grams per kilowatt-hour"
         short_unit: "g/kWh"
-        description_short: "Annual carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours). [Land-use change emissions](#dod:land-use-change-emissions) are excluded."
+        description_short: "Annual carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours)."
         display:
           shortUnit: g
           numDecimalPlaces: 0
