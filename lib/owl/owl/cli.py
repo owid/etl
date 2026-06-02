@@ -8,8 +8,10 @@ from datetime import date
 from types import ModuleType
 
 import click
+import graphviz
 
 from owl.dataset import Action, Dataset
+from owl.log import step as log_step
 from owl.project import load_project, parse_step_file
 from owl.snapshot import Snapshot
 
@@ -77,46 +79,23 @@ def _find_snapshots(module) -> list[tuple[str, Snapshot]]:
     ]
 
 
-def _render_step_template(dataset: str, year: str, *, with_snapshot: bool) -> str:
-    if with_snapshot:
-        return textwrap.dedent(
-            f"""
-            import pandas as pd
-
-            from owl import ColumnMeta, Dataset, DatasetMeta, Snapshot, SnapshotCapture
-
-
-            @Snapshot
-            def raw_data(snap: SnapshotCapture) -> pd.DataFrame:
-                # Replace with snap.download("https://example.com/data.csv") and return None, or return a DataFrame.
-                return pd.DataFrame({{"country": ["World"], "year": [{year}], "value": [1]}})
-
-
-            @Dataset
-            def {dataset}(raw_data: Snapshot) -> tuple[pd.DataFrame, DatasetMeta]:
-                df = raw_data.load()
-                return df, DatasetMeta(
-                    title="TODO: dataset title",
-                    description="TODO: dataset description",
-                    columns={{
-                        "country": ColumnMeta(title="Country", role="entity"),
-                        "year": ColumnMeta(title="Year", role="time"),
-                        "value": ColumnMeta(title="Value", unit="TODO"),
-                    }},
-                )
-            """
-        ).lstrip()
-
+def _render_step_template(dataset: str, year: str) -> str:
     return textwrap.dedent(
         f"""
         import pandas as pd
 
-        from owl import ColumnMeta, Dataset, DatasetMeta
+        from owl import ColumnMeta, Dataset, DatasetMeta, Snapshot, SnapshotCapture
+
+
+        @Snapshot
+        def raw_data(snap: SnapshotCapture) -> pd.DataFrame:
+            # Replace with snap.download("https://example.com/data.csv") and return None, or return a DataFrame.
+            return pd.DataFrame({{"country": ["World"], "year": [{year}], "value": [1]}})
 
 
         @Dataset
-        def {dataset}() -> tuple[pd.DataFrame, DatasetMeta]:
-            df = pd.DataFrame({{"country": ["World"], "year": [{year}], "value": [1]}})
+        def {dataset}(raw_data: Snapshot) -> tuple[pd.DataFrame, DatasetMeta]:
+            df = raw_data.load()
             return df, DatasetMeta(
                 title="TODO: dataset title",
                 description="TODO: dataset description",
@@ -130,25 +109,17 @@ def _render_step_template(dataset: str, year: str, *, with_snapshot: bool) -> st
     ).lstrip()
 
 
-def _render_meta_template(dataset: str, iso_version: str, *, with_snapshot: bool) -> str:
-    if with_snapshot:
-        return textwrap.dedent(
-            f'''
-            snapshots:
-              raw_data:
-                origin:
-                  title: "TODO: source title"
-                  producer: "TODO: producer"
-                  date_accessed: "{iso_version}"
-                  url_main: "TODO: source URL"
-
-            datasets:
-              {dataset}: {{}}
-            '''
-        ).lstrip()
-
+def _render_meta_template(dataset: str, iso_version: str) -> str:
     return textwrap.dedent(
         f"""
+        snapshots:
+          raw_data:
+            origin:
+              title: "TODO: source title"
+              producer: "TODO: producer"
+              date_accessed: "{iso_version}"
+              url_main: "TODO: source URL"
+
         datasets:
           {dataset}: {{}}
         """
@@ -163,8 +134,7 @@ def cli() -> None:
 @cli.command("new")
 @click.argument("path")
 @click.option("--date", "version_date", default=None, help="Version date as YYYY-MM-DD or YYYYMMDD. Defaults to today.")
-@click.option("--snapshot/--no-snapshot", default=True, help="Include a starter snapshot.")
-def new_step(path: str, version_date: str | None, snapshot: bool) -> None:
+def new_step(path: str, version_date: str | None) -> None:
     """Create a new Owl step scaffold (e.g. biodiversity/cherry_blossom)."""
     project = load_project()
     parts = pathlib.PurePosixPath(path).parts
@@ -191,8 +161,8 @@ def new_step(path: str, version_date: str | None, snapshot: bool) -> None:
         raise click.ClickException(f"Step already exists: {step_dir}")
 
     step_dir.mkdir(parents=True, exist_ok=True)
-    step_path.write_text(_render_step_template(dataset, iso_version[:4], with_snapshot=snapshot), encoding="utf-8")
-    meta_path.write_text(_render_meta_template(dataset, iso_version, with_snapshot=snapshot), encoding="utf-8")
+    step_path.write_text(_render_step_template(dataset, iso_version[:4]), encoding="utf-8")
+    meta_path.write_text(_render_meta_template(dataset, iso_version), encoding="utf-8")
     click.echo(f"Created {step_dir}")
     click.echo(f"Next: owl snapshot {namespace}/{dataset} && owl run {namespace}/{dataset}")
 
@@ -214,8 +184,6 @@ def run(pattern: str | None, force: bool, action_kinds: tuple[str, ...], grapher
     Stale datasets (and their upstream dependencies) are rebuilt automatically.
     """
     steps_root = load_project().steps_root
-
-    from owl.log import step as log_step
 
     requested_action_kinds = set(action_kinds)
     if grapher:
@@ -248,8 +216,6 @@ def snapshot(pattern: str | None) -> None:
     """
     steps_root = load_project().steps_root
 
-    from owl.log import step as log_step
-
     for mod_name, module in _get_step_modules(steps_root, pattern):
         snapshots = _find_snapshots(module)
         if not snapshots:
@@ -270,8 +236,6 @@ def viz(pattern: str | None, output: str) -> None:
 
     Opens a PNG showing Snapshot → Dataset dependencies.
     """
-    import graphviz
-
     steps_root = load_project().steps_root
 
     dot = graphviz.Digraph("Owl", format="png")
