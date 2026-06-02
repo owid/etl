@@ -4,7 +4,6 @@ from owid.catalog import Table
 from structlog import get_logger
 from tabulate import tabulate
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -224,7 +223,7 @@ def run() -> None:
     # Drop columns
     tb = drop_indicators_and_replace_nans(tb)
 
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
 
     # Sanity checks
     tb = sanity_checks(tb)
