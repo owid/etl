@@ -21,19 +21,7 @@ def _origin_from_snapshot(snapshot: Snapshot) -> Origin | None:
 
 def _read_snapshot(snapshot: Snapshot, *, short_name: str | None = None, **kwargs) -> Table:
     path = snapshot.path()
-    suffix = path.suffix.lower()
-    origin = _origin_from_snapshot(snapshot)
-    reader_kwargs = {"origin": origin, **kwargs}
-    if suffix == ".csv":
-        tb = pr.read_csv(path, **reader_kwargs)
-    elif suffix in {".xls", ".xlsx"}:
-        tb = pr.read_excel(path, **reader_kwargs)
-    elif suffix == ".parquet":
-        tb = pr.read_parquet(path, **reader_kwargs)
-    else:
-        raise ValueError(
-            f"Cannot infer snapshot reader from suffix {path.suffix!r}; use snapshot.path() and read it manually."
-        )
+    tb = pr.read(path, origin=_origin_from_snapshot(snapshot), **kwargs)
     tb.metadata.short_name = short_name or snapshot.name
     return tb
 
