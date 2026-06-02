@@ -518,16 +518,16 @@ COMBINED_CONFIGS = [
     },
     # ── Gender-affirming care: adults + minors combined ──────────────
     # 4 source columns (adults covered / restricted, minors covered / restricted) →
-    # one categorical indicator. Of 81 possible 4-tuple patterns, only 12 occur in the
-    # v2 data; we map the 5 most common ones and route everything else to the
-    # "Varies by region or other" default.
+    # one categorical indicator over the adults×minors ∈ {covered, restricted, neither}
+    # grid. We map the 8 single-policy national states that occur in the data; only
+    # adults-restricted/minors-covered is unobserved and left to the default.
     #
-    # NOTE: as of v2.0 the only country-year reaching the "or other" part of the
-    # default bucket is Brazil 2025 (a transition-year artefact with both covered=1
-    # and restricted=1 for adults). On each new data release, re-check whether more
-    # transition-year cases appear here and across the two-direction policies — if
-    # the count grows materially, revisit whether to surface them as their own
-    # category or apply the codebook's end-of-year recoding rule.
+    # NOTE: with the 8 states mapped, the "Varies by region or other" default now holds
+    # only (a) genuinely partial/subnational country-years (e.g. Canada, United States)
+    # and (b) the lone Brazil 2025 transition-year artefact (adults covered=1 AND
+    # restricted=1). On each new data release, re-check what reaches the default: route
+    # any new stable single-policy state to its own category, and treat covered+restricted
+    # (or legal+illegal) contradictions via the codebook's end-of-year recoding rule.
     {
         "short_name": "gender_affirming_care",
         "sources": [
@@ -542,6 +542,11 @@ COMBINED_CONFIGS = [
             "ac: 1 ar: 0 mc: 0 mr: 1": "Adults covered, minors restricted",
             "ac: 0 ar: 1 mc: 0 mr: 1": "Restricted for both",
             "ac: 0 ar: 0 mc: 0 mr: 0": "Neither covered nor restricted",
+            # Single-policy national states previously dumped into the catch-all despite
+            # being definite (not regional): minors-only and adults-restricted-only.
+            "ac: 0 ar: 0 mc: 1 mr: 0": "Covered for minors only",
+            "ac: 0 ar: 0 mc: 0 mr: 1": "Restricted for minors only",
+            "ac: 0 ar: 1 mc: 0 mr: 0": "Restricted for adults only",
         },
         "default_category": "Varies by region or other",
     },

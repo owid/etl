@@ -42,7 +42,7 @@ definitions:
   description_key_so_gi_partial_note: |-
     "Varies by region" also covers asymmetric cases where one dimension is fully unprotected and the other is partially protected across subnational jurisdictions — e.g. a federal country where some states have hate-crime protections for sexual orientation but none for gender identity.
   derivation_gac: |-
-    From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The most common patterns get a dedicated category (e.g. covered for both, adults covered with minors restricted); rarer combinations are grouped as "Varies by region or other".
+    From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. Each single, definite national policy combination gets a dedicated category (covered or restricted, for adults and/or minors); only country-years with subnational variation or contradictory same-year coding are grouped as "Varies by region or other".
   derivation_gmc: |-
     From the original dataset, we combined the gender-marker-change proportion (the legal direction) with the recorded legal-pathway requirement to produce a single categorical indicator. When legal change of the gender marker is fully in effect, we classify countries by their procedural requirement ("Self-declaration is enough", "Diagnosis required", "Surgery required", "Surgery and sterilization required", or "Legally possible, requirement unknown" when the requirement is not recorded). Otherwise the country is classified as "Varies by region" (legal change is only partially in effect across subnational jurisdictions) or "Not legally possible" (no legal procedure exists).
 
@@ -863,7 +863,7 @@ tables:
           Interventions that help transgender and non-binary people align their bodies with their gender identity — such as hormone replacement therapy or surgery for adults, and puberty blockers, cross-sex hormones, or surgery for minors.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults only_** (gender-affirming healthcare is publicly funded for adults but not for minors), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Varies by region or other_** (rules differ between subnational jurisdictions, or both coverage and restriction are recorded in the same year because of a mid-year policy change) and **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors).'
+          - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults only_** (gender-affirming healthcare is publicly funded for adults but not for minors), **_Covered for minors only_** (gender-affirming healthcare is publicly funded for minors but not for adults), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Restricted for adults only_** (gender-affirming healthcare is explicitly restricted or banned for adults but no policy applies to minors), **_Restricted for minors only_** (gender-affirming healthcare is explicitly restricted or banned for minors but no policy applies to adults), **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors) and **_Varies by region or other_** (rules differ between subnational jurisdictions, or both coverage and restriction are recorded in the same year because of a mid-year policy change).'
         unit: ""
         short_unit: ""
         display:
@@ -873,10 +873,13 @@ tables:
         sort:
           - Covered for adults and minors
           - Covered for adults only
+          - Covered for minors only
           - Adults covered, minors restricted
           - Neither covered nor restricted
-          - Varies by region or other
+          - Restricted for adults only
+          - Restricted for minors only
           - Restricted for both
+          - Varies by region or other
 
       # ── Gender marker change with legal-pathway requirements ─────
         processing_level: major
@@ -3173,6 +3176,72 @@ tables:
         short_unit: ""
         display:
           name: Restricted for both
+          numDecimalPlaces: 0
+
+      gender_affirming_care_covered_for_minors_only_count:
+        title: Gender-affirming care (adults and minors) — Covered for minors only (number of countries)
+        description_short: The number of countries classified as "Covered for minors only" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Covered for minors only" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Covered for minors only
+          numDecimalPlaces: 0
+
+      gender_affirming_care_covered_for_minors_only_pop:
+        title: Gender-affirming care (adults and minors) — Covered for minors only (population)
+        description_short: The total population of countries classified as "Covered for minors only" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Covered for minors only" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Covered for minors only
+          numDecimalPlaces: 0
+
+      gender_affirming_care_restricted_for_minors_only_count:
+        title: Gender-affirming care (adults and minors) — Restricted for minors only (number of countries)
+        description_short: The number of countries classified as "Restricted for minors only" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Restricted for minors only" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Restricted for minors only
+          numDecimalPlaces: 0
+
+      gender_affirming_care_restricted_for_minors_only_pop:
+        title: Gender-affirming care (adults and minors) — Restricted for minors only (population)
+        description_short: The total population of countries classified as "Restricted for minors only" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Restricted for minors only" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Restricted for minors only
+          numDecimalPlaces: 0
+
+      gender_affirming_care_restricted_for_adults_only_count:
+        title: Gender-affirming care (adults and minors) — Restricted for adults only (number of countries)
+        description_short: The number of countries classified as "Restricted for adults only" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then counted the countries classified as "Restricted for adults only" within each region. {definitions.description_regions_processing}'
+        unit: countries
+        short_unit: ""
+        display:
+          name: Restricted for adults only
+          numDecimalPlaces: 0
+
+      gender_affirming_care_restricted_for_adults_only_pop:
+        title: Gender-affirming care (adults and minors) — Restricted for adults only (population)
+        description_short: The total population of countries classified as "Restricted for adults only" on the indicator on gender-affirming care for adults and minors.
+        processing_level: major
+        description_processing: '{definitions.derivation_gac} We then summed the populations of countries classified as "Restricted for adults only" within each region. {definitions.description_regions_processing}'
+        unit: people
+        short_unit: ""
+        display:
+          name: Restricted for adults only
           numDecimalPlaces: 0
 
       gender_affirming_care_varies_by_region_or_other_count:
