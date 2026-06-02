@@ -59,13 +59,16 @@ def parse_mapping(mapping_dir: Path, explorer_dim_names: list[str], mdim_shorts:
 
     cols = list(rows[0].keys())
     # Identify wide MDIM dim columns by `<short>_` prefix; ignore non-dim columns.
+    # Try the longest short first so that overlapping prefixes (e.g. `deaths` vs
+    # `deaths_by_age`) attach to the most specific MDIM.
     mdim_dim_cols: dict[str, list[tuple[str, str]]] = defaultdict(list)
     reserved = {"id", "target_mdim", "target_view_id", "shared_target_explorer_ids"}
     reserved |= {f"dimension_{i + 1}" for i in range(len(explorer_dim_names))}
+    shorts_by_length = sorted(mdim_shorts, key=len, reverse=True)
     for c in cols:
         if c in reserved:
             continue
-        for short in mdim_shorts:
+        for short in shorts_by_length:
             prefix = f"{short}_"
             if c.startswith(prefix):
                 mdim_dim_cols[short].append((c, c[len(prefix):]))
@@ -530,12 +533,18 @@ function jumpTo(k) { pos = parseInt(k, 10); render(); }
 
 function decide(status) {
   const rec = RECORDS[order[pos]];
+  // Remember the next record's id *before* re-filtering: when the active filter
+  // (e.g. "To review") drops the just-decided row, the new order shifts so
+  // a naive pos++ would skip the row we actually want to land on.
+  const nextId = (status && pos < order.length - 1) ? RECORDS[order[pos + 1]].id : null;
   const cur = decisions[rec.id] || {};
   cur.status = status;
   decisions[rec.id] = cur;
   persist();
-  if (status) {
-    if (pos < order.length - 1) { pos++; }
+  if (nextId !== null) {
+    applyFilter();
+    const idx = order.findIndex((i) => RECORDS[i].id === nextId);
+    if (idx >= 0) pos = idx;
   }
   render();
 }
