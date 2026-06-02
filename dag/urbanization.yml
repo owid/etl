@@ -78,6 +78,7 @@ steps:
   #
   data://grapher/un/2026-02-17/wup_national_definitions:
     - data://garden/un/2026-02-17/wup_national_definitions:
+      - data://garden/hyde/2024-01-02/all_indicators
       - data://meadow/un/2026-02-17/wup_national_definitions:
         - snapshot://un/2026-02-17/wup_urban_rural_population.xlsx
         - snapshot://un/2026-02-17/wup_urban_rural_population_share.xlsx
