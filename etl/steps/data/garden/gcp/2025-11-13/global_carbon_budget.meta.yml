@@ -444,10 +444,10 @@ tables:
         short_unit: "kg/$"
         description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per dollar of GDP (2011 international-$)."
       emissions_total_including_land_use_change_per_unit_energy:
-        title: "Annual CO₂ emissions including land-use change per unit energy"
+        title: "CO₂ emissions including land-use change per unit energy"
         unit: "grams per kilowatt-hour"
         short_unit: "g/kWh"
-        description_short: "Annual carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours). [Land-use change emissions](#dod:land-use-change-emissions) are included."
+        description_short: "Carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours). [Land-use change emissions](#dod:land-use-change-emissions) are included."
         display:
           shortUnit: g
           numDecimalPlaces: 0
@@ -457,10 +457,13 @@ tables:
         short_unit: "kg/$"
         description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per dollar of GDP (2011 international-$)."
       emissions_total_per_unit_energy:
-        title: "Annual CO₂ emissions per unit energy (grams per kilowatt-hour)"
+        title: "CO₂ emissions per unit energy"
         unit: "grams per kilowatt-hour"
         short_unit: "g/kWh"
-        description_short: "Annual carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours)."
+        description_short: "Carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours)."
+        description_key:
+          - Average amount of CO₂ emitted for each unit of energy a country uses. It is calculated by dividing emissions from [fossil fuels and industry](#dod:fossilemissions) by [primary energy consumption](#dod:primaryenergy).
+          - It reflects how carbon-intensive a country's energy is. Lower values indicate a larger role for low-carbon sources such as nuclear and renewables."
         display:
           shortUnit: g
           numDecimalPlaces: 0
