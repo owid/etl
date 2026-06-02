@@ -182,7 +182,7 @@ def _prepare_table(df: pd.DataFrame | Table, name: str, meta: dict[str, Any]) ->
     """Create an owid.catalog Table and attach variable metadata."""
     if isinstance(df, Table):
         tb = df.copy()
-        tb.metadata.short_name = tb.metadata.short_name or name
+        tb.metadata.short_name = name
     else:
         tb = Table(df, short_name=name)
 
