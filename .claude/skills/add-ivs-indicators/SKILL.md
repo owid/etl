@@ -247,6 +247,55 @@ repeat). **Assert title uniqueness in the pre-flight** (Step 6), don't wait for 
 **Audit gotcha:** verify any stated scale range against the actual `.do` recode — a pre-existing entry had
 `"6 to 10"` where the recode was `>= 7`. Don't copy ranges blindly.
 
+### Topic tags — assign per indicator, from the curated enum
+
+`presentation.topic_tags` is **not** free text. Valid values are the enum in
+[`schemas/dataset-schema.json`](schemas/dataset-schema.json) (the ~128 OWID topic **pages** — e.g.
+`Women's Rights`, `Human Rights`, `Migration`, `Democracy`, `Religion`, `Internet`, `Technological Change`,
+`Loneliness & Social Connections`, `War & Peace`, `Terrorism`, `Corruption`, `Marriages & Divorces`,
+`LGBT+ Rights`, `Happiness & Life Satisfaction`, `Economic Inequality`, `Economic Growth`, `Climate Change`,
+`Time Use`, `Working Hours`). Tags that exist in the grapher `tags` table but have **no topic page**
+(`Values`, `Crime`, `News`, `Communication Technology`) are **invalid** — they're silently dropped at upload
+with a `create_links.missing_tags` warning. Check every tag against the enum before writing it (see the
+Step 6 assertion).
+
+IVS spans many topics, so **do not** leave the whole dataset on one tag (the legacy default was a single
+`topic_tags: [Trust]` in `definitions.common`). Tag per indicator:
+
+- **Anchor per distinct tag-set under `definitions`** (the `undp_hdr.meta.yml` idiom), referenced per
+  variable — generate it programmatically by mapping each garden question-group → tag-set:
+  ```yaml
+  definitions:
+    topic_tags_women_rights: &topic_tags_women_rights
+      - Women's Rights
+  # …
+      gender_roles_var:
+        presentation:
+          topic_tags: *topic_tags_women_rights
+  ```
+  A **per-question override** dict handles splits within a group: justifiable `divorce`→`Marriages & Divorces`,
+  `homosexuality`→`LGBT+ Rights`, `cheating_on_taxes`/`accepting_a_bribe`→`Corruption`; worries
+  `war`/`civil_war`→`War & Peace`, `terrorist_attack`→`Terrorism`, `losing_job`→`Work & Employment`; media
+  `internet`/`email`/`mobile_phone`→`Internet`; jobs-scarce `men_more_right_to_a_job`→`Women's Rights`,
+  `priority_to_nationals`→`Migration`.
+- **Multiple tags are allowed** — e.g. environment-vs-economy → `[Climate Change, Economic Growth]`.
+- **No matching topic page → OMIT `topic_tags` entirely.** For the soft-attitude / crime-fear batteries
+  (Schwartz, important-in-life, neighbors, most-serious-problem, crime fear, traditional media) there is no
+  topic page. **Do not write `Uncategorized`** — it's a valid enum value but has no DB tag row, so it links to
+  nothing *and* logs a `missing_tags` warning per variable. Omitting gives the same result with no noise.
+  Drop the now-empty `presentation` block when `topic_tags` was its only key.
+- **`attribution_short` survives.** Setting only `topic_tags` on a variable does **not** wipe a common
+  `presentation.attribution_short` — the combiner merges `presentation` key-by-key
+  (`_merge_variable_metadata` `merge_fields`), so the common value still inherits.
+- **Sanity-check choices against what existing IVS charts already use** (chart tags can include non-topic-page
+  tags, so still filter your final pick through the enum):
+  ```sql
+  SELECT t.name, COUNT(DISTINCT c.id) FROM charts c
+  JOIN chart_dimensions cd ON cd.chartId=c.id JOIN variables v ON cd.variableId=v.id
+  JOIN chart_tags ct ON ct.chartId=c.id JOIN tags t ON ct.tagId=t.id
+  WHERE v.catalogPath LIKE '%ivs/<v>/%' GROUP BY t.name ORDER BY 2 DESC;
+  ```
+
 ## Step 6 — Pre-flight cross-check (before running the pipeline)
 
 Assert the set of new column names is **identical** across three places, or you get silent breakage:
@@ -273,6 +322,15 @@ print("meta not stata:", sorted(metakeys - stata) or "none ✓")   # restrict me
 # and assert ALL titles are unique (grapher requires it — see Step 5):
 titles = [v["title"] for v in meta["tables"]["integrated_values_surveys"]["variables"].values()]
 assert len(titles) == len(set(titles)), "duplicate variable titles — grapher upload will fail"
+
+# and: every topic_tag must be in the curated schema enum (else it's silently dropped at upload)
+import json
+schema = json.load(open("schemas/dataset-schema.json"))
+TAG_ENUM = set(schema["properties"]["tables"]["additionalProperties"]["properties"]["variables"]
+               ["additionalProperties"]["properties"]["presentation"]["properties"]["topic_tags"]["items"]["enum"])
+for v in meta["tables"]["integrated_values_surveys"]["variables"].values():
+    for t in (v.get("presentation") or {}).get("topic_tags", []):
+        assert t in TAG_ENUM, f"invalid topic_tag {t!r} — not a topic page in dataset-schema.json"
 ```
 
 A clean both-empty diff (counts equal) + unique titles means the Stata→meadow output, the garden groups,
@@ -293,6 +351,20 @@ single pipeline step runs.
   scale (frequency 1–5, closeness 1–4, agree 1–10, index 0–1).
 - The benign `DisplayNameWarning` about `presentation.title_public` (1000+ columns) is expected — IVS
   doesn't set `title_public`; not an error.
+- **Metadata-only changes (e.g. `topic_tags`) need the `data://grapher` dataset rebuilt — `grapher://… --only`
+  is not enough.** `etlr grapher://… --grapher --force --only` forces only the **upload** step, and `--only`
+  skips its `data://grapher` build dependency, so it re-uploads the **stale** grapher dataset (every variable
+  `skipped_no_changes`) and the new tags never reach the DB. Rebuild the built dataset itself —
+  `etlr data://grapher/ivs/<v>/integrated_values_surveys --private --force --only` (delete
+  `data/grapher/ivs/<v>/integrated_values_surveys/` first if in doubt) — **then** run the `--grapher` upload.
+  Confirm the links actually landed (and that omitted/`Uncategorized` columns produced **no**
+  `create_links.missing_tags` warnings):
+  ```python
+  from etl.config import OWID_ENV
+  print(OWID_ENV.read_sql("""SELECT t.name, COUNT(DISTINCT v.id) n FROM variables v
+    JOIN tags_variables_topic_tags tv ON tv.variableId=v.id JOIN tags t ON t.id=tv.tagId
+    WHERE v.catalogPath LIKE '%%ivs/<v>/%%' GROUP BY t.name ORDER BY n DESC""").to_string())
+  ```
 - `make check` before committing.
 
 ## Step 8 — Git (per repo CLAUDE.md)
