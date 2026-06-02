@@ -2454,7 +2454,7 @@ foreach var in $most_important_questions {
 
 qui merge 1:1 year country using "`humankind_concern_file'", nogenerate // keep(master match)
 
-* Get a list of variables excluding country and year (and avg_score_eq_ineq to not multiply it by 100)
+* Get a list of variables excluding country and year (and all avg_score_* columns, which stay on their native scales and must not be multiplied by 100)
 ds country year avg_score*, not
 
 * Multiply variables by 100 to get percentages
