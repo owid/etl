@@ -313,6 +313,17 @@ class Snapshot:
             cache_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(captured.path, cache_path)
 
+            lock = _read_snapshot_lock(self._source_file)
+            snapshots = lock.setdefault("snapshots", {})
+            previous = snapshots.get(self.name) or {}
+            unchanged = previous.get("md5") == md5 and previous.get("size") == size and previous.get("suffix") == suffix
+
+            from owl.log import snapshot as _log_snapshot
+
+            if unchanged:
+                _log_snapshot(f"unchanged {self.name}: {md5}{suffix} ({size} bytes)")
+                return
+
             project = load_project(pathlib.Path(self._source_file).parent)
             if project.snapshots_r2_remote:
                 key = _r2_key(md5)
@@ -326,17 +337,6 @@ class Snapshot:
                     raise RuntimeError(
                         f"Failed to upload snapshot to R2: {_rclone_uri(project.snapshots_r2_remote, key)}"
                     ) from err
-
-        lock = _read_snapshot_lock(self._source_file)
-        snapshots = lock.setdefault("snapshots", {})
-        previous = snapshots.get(self.name) or {}
-        unchanged = previous.get("md5") == md5 and previous.get("size") == size and previous.get("suffix") == suffix
-
-        from owl.log import snapshot as _log_snapshot
-
-        if unchanged:
-            _log_snapshot(f"unchanged {self.name}: {md5}{suffix} ({size} bytes)")
-            return
 
         snapshots[self.name] = {
             "captured_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),

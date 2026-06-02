@@ -539,6 +539,12 @@ class Action:
 
     def run(self, force=False):
         """Run the action if stale (or forced)."""
+        for dep in self._dependencies():
+            if isinstance(dep, Dataset):
+                dep.run(force=force)
+            elif isinstance(dep, Action):
+                dep.run(force=force)
+
         if not force and not self.is_stale():
             from owl.log import skip
 
