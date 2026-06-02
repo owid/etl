@@ -67,7 +67,11 @@ MARRIAGE_MAP = {
     "equality: 0.5 ban: 1 civil_unions: 0.5": "Varies by region",
     "equality: 0.5 ban: 1 civil_unions: 1": "Varies by region",  # Canada 2003–2004
     "equality: 0 ban: 0.5 civil_unions: 0": "Varies by region",
-    "equality: 0 ban: 1 civil_unions: 1": "Varies by region",
+    # Same-sex marriage banned nationally but civil unions recognized nationally: a national
+    # "civil unions only" regime, not a federal mismatch. The source codes these country-years
+    # with Sub_National_Variation=0 and no fractional proportions (e.g. Bolivia, Croatia,
+    # Hungary, Montenegro, Estonia, Latvia, Ecuador) — so "Varies by region" was wrong.
+    "equality: 0 ban: 1 civil_unions: 1": "Civil unions only",
     "equality: 0 ban: 1 civil_unions: 0.5": "Varies by region",
     "equality: 0 ban: 1 civil_unions: 0": "Banned",
 }
