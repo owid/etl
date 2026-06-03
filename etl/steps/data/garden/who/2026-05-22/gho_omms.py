@@ -1,32 +1,32 @@
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.data_helpers import geo
+from etl.helpers import PathFinder
 
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
-def create_omms(tables_dict: dict[str, Table], ds_population: Dataset, ds_regions: Dataset) -> None:
+def create_omms(tables_dict: dict[str, Table], paths: PathFinder) -> None:
     #  Adding a global total for Yaws - adding to existing variable
-    add_global_yaws(tables_dict, ds_regions)
+    add_global_yaws(tables_dict, paths)
     # Adding a variables for neonatal cases per million
-    add_neonatal_tetanus_cases_per_mil(tables_dict, ds_population)
+    add_neonatal_tetanus_cases_per_mil(tables_dict, paths)
     # Adding the % of people without access to clean cooking fuels (100 - existing variable)
     add_percentage_without_clean_cooking_fuels(tables_dict)
     # Adding the number of people without access to clean cooking fuels (population in year - existing variable)
-    add_population_without_clean_cooking_fuels(tables_dict, ds_population)
+    add_population_without_clean_cooking_fuels(tables_dict, paths)
 
-    add_global_total_leprosy(tables_dict, ds_regions)
+    add_global_total_leprosy(tables_dict, paths)
 
     add_both_sexes_for_pneumonia(tables_dict)
 
-    add_trachoma_and_onchocerciasis_aggregate(tables_dict, ds_regions)
-    add_vehicles_per_1000(tables_dict, ds_population)
+    add_trachoma_and_onchocerciasis_aggregate(tables_dict, paths)
+    add_vehicles_per_1000(tables_dict, paths)
 
 
-def add_trachoma_and_onchocerciasis_aggregate(tables_dict: dict[str, Table], ds_regions: Dataset) -> None:
+def add_trachoma_and_onchocerciasis_aggregate(tables_dict: dict[str, Table], paths: PathFinder) -> None:
     indicator_names = [
         "Population in areas that warrant treatment with antibiotics, facial cleanliness and environmental improvement for elimination of trachoma as a public health problem",
         "Number of people who received treatment with antibiotics for trachoma",
@@ -38,7 +38,7 @@ def add_trachoma_and_onchocerciasis_aggregate(tables_dict: dict[str, Table], ds_
         tb = tables_dict[indicator_name]
         tb = tb.reset_index()
         # Add global and regional totals
-        tb = geo.add_regions_to_table(tb=tb, regions=REGIONS, ds_regions=ds_regions, min_num_values_per_year=1)
+        tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS, min_num_values_per_year=1)
         tb = tb.format(["country", "year"])
         tables_dict[indicator_name] = tb
 
@@ -65,7 +65,7 @@ def add_both_sexes_for_pneumonia(tables_dict: dict[str, Table]) -> None:
     tables_dict[indicator_name] = tb
 
 
-def add_population_without_clean_cooking_fuels(tables_dict: dict[str, Table], ds_population: Dataset) -> None:
+def add_population_without_clean_cooking_fuels(tables_dict: dict[str, Table], paths: PathFinder) -> None:
     indicator_name = "Population with primary reliance on clean fuels and technologies for cooking (in millions)"
     col = "population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__in_millions"
     new_col = "population_without_primary_reliance_on_clean_fuels_and_technologies_for_cooking__in_millions"
@@ -73,7 +73,7 @@ def add_population_without_clean_cooking_fuels(tables_dict: dict[str, Table], ds
     tb = tables_dict[indicator_name]
 
     # Add population
-    tb = geo.add_population_to_table(tb=tb.reset_index(), ds_population=ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb=tb.reset_index(), warn_on_missing_countries=False)
 
     # Calculate the number of people without access to clean cooking fuels
     tb[new_col] = tb["population"] / 1000000 - tb[col]
@@ -101,7 +101,7 @@ def add_percentage_without_clean_cooking_fuels(tables_dict: dict[str, Table]) ->
     tb[new_col] = 100 - tb[col]
 
 
-def _add_global_total(tb: Table, ds_regions: Dataset) -> Table:
+def _add_global_total(tb: Table, paths: PathFinder) -> Table:
     """Add global total. Table shouldn't contain regional data."""
 
     # If the table already contains a global total, return it
@@ -109,7 +109,7 @@ def _add_global_total(tb: Table, ds_regions: Dataset) -> Table:
         return tb
 
     # Exclude regions from the sum
-    country_names = ds_regions["regions"].query('region_type == "country"').name
+    country_names = paths.regions.tb_regions.query('region_type == "country"').name
     total = tb[tb.index.get_level_values("country").isin(country_names)]
 
     # Calculate global total
@@ -119,22 +119,22 @@ def _add_global_total(tb: Table, ds_regions: Dataset) -> Table:
     return pr.concat([tb.reset_index(), global_total.reset_index()]).set_index(tb.index.names)
 
 
-def add_global_yaws(tables_dict: dict[str, Table], ds_regions: Dataset) -> None:
+def add_global_yaws(tables_dict: dict[str, Table], paths: PathFinder) -> None:
     indicator_name = "Number of cases of yaws reported"
-    tables_dict[indicator_name] = _add_global_total(tables_dict[indicator_name], ds_regions)
+    tables_dict[indicator_name] = _add_global_total(tables_dict[indicator_name], paths)
 
 
-def add_global_total_leprosy(tables_dict: dict[str, Table], ds_regions: Dataset) -> None:
+def add_global_total_leprosy(tables_dict: dict[str, Table], paths: PathFinder) -> None:
     indicator_name = "Number of new leprosy cases"
-    tables_dict[indicator_name] = _add_global_total(tables_dict[indicator_name], ds_regions)
+    tables_dict[indicator_name] = _add_global_total(tables_dict[indicator_name], paths)
 
 
-def add_neonatal_tetanus_cases_per_mil(tables_dict: dict[str, Table], ds_population: Dataset) -> None:
+def add_neonatal_tetanus_cases_per_mil(tables_dict: dict[str, Table], paths: PathFinder) -> None:
     indicator_name = "Neonatal tetanus - number of reported cases"
     tb = tables_dict[indicator_name]
 
     # Add population
-    tb = geo.add_population_to_table(tb=tb.reset_index(), ds_population=ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb=tb.reset_index(), warn_on_missing_countries=False)
 
     # We don't have precise population estimates for WHO regions, drop them
     tb = tb.dropna(subset=["population"])
@@ -146,11 +146,11 @@ def add_neonatal_tetanus_cases_per_mil(tables_dict: dict[str, Table], ds_populat
     tables_dict[indicator_name] = tb.drop(columns=["population"]).set_index(["year", "country"])
 
 
-def add_vehicles_per_1000(tables_dict: dict[str, Table], ds_population: Dataset) -> None:
+def add_vehicles_per_1000(tables_dict: dict[str, Table], paths: PathFinder) -> None:
     # Merge
     indicator_name = "Number of registered vehicles"
     tb = tables_dict[indicator_name]
-    tb = geo.add_population_to_table(tb=tb.reset_index(), ds_population=ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb=tb.reset_index(), warn_on_missing_countries=False)
 
     tb = tb.dropna(subset=["population"])
     tb["number_of_registered_vehicles_per_thousand"] = (

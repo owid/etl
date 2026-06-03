@@ -154,9 +154,7 @@ def run() -> None:
     assert len(tables) == len(tables_dict), "Duplicate titles in tables found"
 
     # Create OOMs
-    ds_population = paths.load_dataset("population")
-    ds_regions = paths.load_dataset("regions")
-    create_omms(tables_dict, ds_population, ds_regions)  # ty: ignore
+    create_omms(tables_dict, paths)
 
     #
     # Save outputs.
@@ -448,8 +446,14 @@ def check_duplicate_index(tb: Table) -> Table:
 
         duplicated_index = tb.index[tb.index.duplicated()]
         if len(duplicated_index) > 0:
-            # warn instead of raising an error, this could be potentially dangerous
-            # raise ValueError(f"Duplicated index found for {tb.m.short_name}:\n{tb.loc[duplicated_index[:10]]}")
+            # TODO: turn this into a hard error once the multi-dim indexing is fixed.
+            # Some indicators (e.g. air_17 = "Household air pollution attributable DALYs")
+            # ship rows whose `Dim1/Dim2/Dim3` positions shift, so ENVCAUSE values land
+            # in different garden columns row-by-row and collapse to `cause=NaN`,
+            # producing many rows with the same (year, country, sex, age_group, cause)
+            # index but different display_values. Until we fix the dim mapping, we
+            # warn and keep the first row; downstream charts may use any of the
+            # collapsed values. Tracked in the PR follow-ups.
             log.warning(
                 "Duplicated index found",
                 indicator=tb.m.short_name,
