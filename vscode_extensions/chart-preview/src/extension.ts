@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { readFile } from 'fs/promises';
+import { access, readFile } from 'fs/promises';
 import { ChildProcess, spawn } from 'child_process';
 
 const panels = new Map<string, vscode.WebviewPanel>();
@@ -177,7 +177,7 @@ async function parseExportMultidim(
 
 	let hasPy = false;
 	try {
-		await readFile(pyPath, 'utf8');
+		await access(pyPath);
 		hasPy = true;
 	} catch {
 		// No sibling .py — fully-declarative step.

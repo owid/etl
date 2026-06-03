@@ -3,6 +3,9 @@
 ## [0.0.5] – 2026-06-01
 - Support YAML-only export steps by linking DAG entries to adjacent `.config.yml` files when no `.py` file exists.
 
+## [0.0.4] – 2026-04-23
+- Internal version bump; no functional changes.
+
 ## [0.0.3] – 2025-05-27
 - Improved decoration system with clearer rules for active vs archive DAG files.
 - Enhanced error indicators (❌❗❓⚠️) to provide more detailed information.
