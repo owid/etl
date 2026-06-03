@@ -7,7 +7,8 @@ GENERIC: nothing about the specific indicators is hardcoded. The script
   3. maps each column → IVS question        — loop-group columns via the branch meadow VARS_DICT
      (suffix = underscore(label) → code); custom single-question blocks are clustered by stripping a
      generic recode-prefix vocabulary, keyed by their column suffix;
-  4. emits one row per question with every option ([agree], [dont_know], [avg_score], *_agg …) linked.
+  4. emits one row per question, every option linked and labelled with its real category name (from the
+     variable name), aggregates first (positive before negative), Yes before No, dk/na/avg last.
 
 Only edit the CONFIG block. TOPICS/LABELS/CODE_FOR are OPTIONAL polish (grouping, nicer labels, and an
 IVS code for custom blocks whose column name doesn't contain one); with all three empty you still get a
@@ -16,6 +17,7 @@ complete flat table keyed by code (loop groups) or column-suffix (custom blocks)
     .venv/bin/python .claude/skills/add-ivs-indicators/scripts/indicator_admin_table.py
 """
 
+import os
 import re
 import subprocess
 from collections import Counter
@@ -158,6 +160,65 @@ def label_for(qkey: str, names: list[str]) -> str:
     return Counter(stems).most_common(1)[0][0]
 
 
+# ── option-link labelling + ordering ────────────────────────────────────────
+# Label each option link with its real category name (so e.g. "Fairly much respect" is visible, not the
+# terse recode key "some"): strip the per-question shared prefix (and a parenthetical suffix) from the
+# variable name; fixed text for dk/na/avg; humanise the recode key when nothing strips cleanly.
+FIXED_OPT = {"dont_know": "Don't know", "no_answer": "No answer", "avg_score": "average score"}
+# Aggregate recode keys (the high/low/net rollups), and which of them are the "positive" rollup.
+POS_AGG = {"agg", "agree_agg", "frequently_agg", "feel_close", "at_least_weekly", "concerned"}
+NEG_AGG = {"not", "disagree_agg", "not_frequently_agg", "not_close", "less_than_weekly", "not_concerned"}
+
+
+def is_agg(p: str) -> bool:
+    return p == "agg" or p.endswith("_agg") or p in POS_AGG or p in NEG_AGG
+
+
+def option_labels(g) -> dict:
+    """prefix -> readable label, for one question's variables."""
+    cat = g[~g.prefix.isin(FIXED_OPT)]
+    names = list(cat.name)
+    cp = os.path.commonprefix(names)
+    cs = os.path.commonprefix([n[::-1] for n in names])[::-1]
+    cut_p = cp[: cp.rfind(": ") + 2] if ": " in cp else (cp[: cp.rfind(" ") + 1] if " " in cp else "")
+    cs_w = cs[cs.find(" ") :] if " " in cs else ""
+    cut_s = cs_w if cs_w.startswith(" (") else ""  # only strip a *parenthetical* common suffix
+    out = {}
+    for _, r in g.iterrows():
+        if r.prefix in FIXED_OPT:
+            out[r.prefix] = FIXED_OPT[r.prefix]
+            continue
+        s = r["name"]
+        if len(cut_p) >= 6 and s.startswith(cut_p):
+            s = s[len(cut_p) :]
+        if cut_s and s.endswith(cut_s):
+            s = s[: -len(cut_s)]
+        s = s.strip(" :,")
+        out[r.prefix] = (
+            s
+            if (s and s != r["name"].strip(" :,"))
+            else r.prefix.replace("_agg", " (aggregate)").replace("_", " ").strip().capitalize()
+        )
+    return out
+
+
+def order_key(prefix: str, label: str):
+    """Aggregates first (positive before negative), Yes before No, then categories; dk/na/avg last."""
+    if prefix == "dont_know":
+        return (5, 0, "")
+    if prefix == "no_answer":
+        return (6, 0, "")
+    if prefix == "avg_score":
+        return (7, 0, "")
+    if is_agg(prefix):
+        return (0, 0 if prefix in POS_AGG else 1, label)
+    if prefix == "yes":
+        return (2, 0, "")
+    if prefix == "no":
+        return (2, 1, "")
+    return (3, 0, label)
+
+
 # ── resolve ids + admin base (the only staging/production difference) ──
 if ENV == "staging":
     container = get_container_name(BRANCH)
@@ -187,12 +248,12 @@ v = pd.read_sql(
 v = v[v.shortName.isin(NEW)].copy()
 assert len(v) == len(NEW), f"matched {len(v)}/{len(NEW)} — dataset published to {ENV}? (prod ids differ from staging)"
 v["qkey"], v["prefix"] = zip(*v.shortName.map(split))
-v["k"] = v.prefix.map(lambda p: {"dont_know": 90, "no_answer": 91, "avg_score": 92}.get(p, 50))
 
-rows = {}  # qkey -> (label, links)
+rows = {}  # qkey -> (question label, option links)
 for qkey, g in v.groupby("qkey"):
-    g = g.sort_values(["k", "prefix"])
-    links = " · ".join(f"[{r.prefix}]({admin}/{r.id})" for _, r in g.iterrows())
+    lab = option_labels(g)  # prefix -> readable option label
+    items = sorted((order_key(r.prefix, lab[r.prefix]), lab[r.prefix], r.id) for _, r in g.iterrows())
+    links = " · ".join(f"[{label}]({admin}/{vid})" for _, label, vid in items)
     rows[qkey] = (label_for(qkey, g.name.tolist()), links)
 
 ds_id = pd.read_sql(f"SELECT id FROM datasets WHERE catalogPath='{CATALOG}'", engine)["id"].iloc[0]

@@ -454,8 +454,13 @@ It works in three moves, all auto-derived:
    longest column suffix, so `family_victim_of_a_crime` beats `victim_of_a_crime`). Custom single-question
    blocks (no `VARS_DICT` entry, so the column carries no code) are clustered by stripping a generic IVS
    recode-prefix vocabulary and keyed by their column **suffix**; their label is derived from the variable
-   `name`s. Link text = the option prefix (`agree`, `dont_know`, `no_answer`, `avg_score`, `*_agg`…).
-3. **Emit** `| IVS code | Question | option links |` rows — one flat table by default.
+   `name`s.
+3. **Label and order each option link.** Link text is the option's **real category name** (strip the
+   per-question shared prefix / a parenthetical suffix from the variable `name`; fixed text for
+   dk/na/avg; humanised recode key as last resort) — so e.g. E124 shows "Fairly much respect", not the
+   terse key `some`. Order within a question: **aggregates first** (positive rollup before negative),
+   **Yes before No**, then the remaining categories, then Don't know / No answer / average score.
+4. **Emit** `| IVS code | Question | option links |` rows — one flat table by default.
 
 Three **optional** dicts in CONFIG add editorial polish without reintroducing hardcoded indicators:
 `TOPICS = {"Human Rights": ["E124", ...], ...}` (group/order rows), `LABELS = {code_or_suffix: "…"}`
