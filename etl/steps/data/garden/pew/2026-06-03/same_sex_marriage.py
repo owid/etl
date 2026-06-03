@@ -8,9 +8,9 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Last year the legal-status / count / population series extends to. Bump this to the latest
-# year of coverage on each update (kept at 2025 in the 2026-06-03 refresh because no new
-# jurisdiction legalized same-sex marriage since 2025 — the source table was unchanged).
+# Last year the legal-status / count / population series extends to. This tracks the date the
+# source data is published for, not the access date: the Pew fact sheet is dated June 2025, so
+# the series stops in 2025. Bump this when Pew publishes a more recent edition of the table.
 LATEST_YEAR = 2025
 
 # Define regions to aggregate (continents + World + World Bank income groups)
