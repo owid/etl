@@ -1,27 +1,22 @@
 """Script to create a snapshot of dataset. This is a successor of https://github.com/owid/importers/tree/master/who_gho.
 
-There are three different Data APIs for Global Health Observatory:
-- [GHO Odata API](https://www.who.int/data/gho/info/gho-odata-api)
-- [Athena API](https://www.who.int/data/gho/info/athena-api)
-- [DataDot](https://data.who.int/indicators)
+Data and metadata are pulled from two separate WHO endpoints:
 
-The Athena API provides more intuitive access to CSV format than the Odata API. DataDot
-is still in beta and does not provide access to all indicators.
+- **Data**: the GHO OData API (https://www.who.int/data/gho/info/gho-odata-api). The
+  indicator catalog at `/api/Indicator` exposes only `IndicatorCode` + `IndicatorName`
+  per row — none of the legacy Athena fields (`url`, `IMR_ID`, `DEFINITION_XML`).
+  Per-indicator data rows live at `/api/<IndicatorCode>`.
+- **Metadata** (definitions, methodology, sources): WHO's Indicator Metadata Registry
+  API at `https://www.who.int/api/multimedias/indicatormetadataregistrydefinitions`,
+  which returns structured records keyed by IMR ID. We resolve `IndicatorCode → IMR ID`
+  by name first (via the registry's own listing), then fall back to the `label →
+  metadata URL` mapping from the previous snapshot for indicators whose names don't
+  align. Unmatched indicators ship with empty metadata.
 
-Athen API links:
-- [Examples](https://apps.who.int/gho/data/node.resources.examples?lang=en)
-- [Indicator list](https://apps.who.int/gho/athena/api/GHO?format=json)
-- [CSV Data for an indicator](http://apps.who.int/gho/athena/api/GHO/WHOSIS_000001?format=csv&profile=text)
-- [Metadata HTML](https://www.who.int/data/gho/indicator-metadata-registry/imr-details/1)
-
-Unfortunately the Athena API does not provide a way to download metadata, so we have to scrape it from
-HTML page with metadata.
-
-Another issue is that about 800 indicators in the list don't have `url` field with indicator ID, even though
-their metadata page at https://www.who.int/data/gho/indicator-metadata-registry/imr-details/1 exists.
-Because of that, we can't download the metadata. The workaround would be to match their names on
-https://www.who.int/data/gho/data/indicators/indicators-index and grab metadata from the links on that page.
-An example of such indicator without `url` field is HEMOGLOBINLEVEL_REPRODUCTIVEAGE_MEAN.
+The legacy Athena API (`apps.who.int/gho/athena`) was taken offline mid-2026; that's
+why this script no longer scrapes HTML metadata pages or relies on `DEFINITION_XML`
+to bridge IndicatorCodes to IMR IDs. WHO's newer DataDot platform (https://data.who.int)
+exposes rich metadata for ~60 flagship indicators only and is not used here.
 """
 
 import concurrent.futures
