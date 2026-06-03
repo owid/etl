@@ -142,10 +142,10 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "chartTypes": ["LineChart", "Dumbbell"],
-                    # Sort the dumbbell (and table) entities by the after-tax value, highest first
+                    # Sort the dumbbell (and table) entities by the after-tax value, lowest first
                     "sortBy": "column",
                     "sortColumnSlug": _after_tax_catalog_path,
-                    "sortOrder": "desc",
+                    "sortOrder": "asc",
                 },
                 "view_metadata": {
                     "description_short": lambda view: _get_before_vs_after_metadata(tb, view)["description_short"],

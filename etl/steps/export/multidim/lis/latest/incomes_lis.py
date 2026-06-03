@@ -164,10 +164,10 @@ def run() -> None:
                     "tab": "chart",
                     "chartTypes": ["LineChart", "Dumbbell"],
                     "missingDataStrategy": "hide",
-                    # Sort the dumbbell (and table) entities by the after-tax value, highest first
+                    # Sort the dumbbell (and table) entities by the after-tax value, lowest first
                     "sortBy": "column",
                     "sortColumnSlug": _after_tax_catalog_path,
-                    "sortOrder": "desc",
+                    "sortOrder": "asc",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
                     "note": "",
