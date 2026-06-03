@@ -193,6 +193,8 @@ def run() -> None:
     # Set display names for before_vs_after views
     for view in c.views:
         if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
+            # Order before -> after so the dumbbell arrow points from before to after taxes
+            view.indicators.y = sorted(view.indicators.y, key=lambda ind: 0 if "_mi_" in ind.catalogPath else 1)
             for ind in view.indicators.y:
                 if "_dhi_" in ind.catalogPath:
                     ind.display = {"name": "After taxes and benefits"}
