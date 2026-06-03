@@ -45,8 +45,6 @@ FILE_SLUG = "food-trade"
 
 # Hard-coded to match the YEAR constant in the garden step. Bump both together.
 YEAR = 2023
-SOURCE = "FAO, Detailed Trade Matrix (2026)"
-LICENSE = "CC BY-NC-SA 3.0 IGO"
 
 # Source of the (item name -> FAO item code) mapping. Same yaml the garden
 # step uses, so the product ids in this export are the canonical FAOSTAT codes
@@ -137,6 +135,12 @@ def run() -> None:
     #
     ds = paths.load_dataset("food_trade")
     tb = ds.read("food_trade", safe_types=False)
+
+    # Source attribution for the metadata JSON is read from the `value`
+    # column's origin (TM snapshot) — the default grapher "producer (year)"
+    # form — so it stays in sync with the dataset's metadata.
+    source = tb["value"].metadata.origins[0].attribution
+
     df = pd.DataFrame(tb)
     for col in ("exporter", "importer", "item"):
         df[col] = df[col].astype(str)
@@ -165,8 +169,7 @@ def run() -> None:
     #
     metadata = {
         "year": YEAR,
-        "source": SOURCE,
-        "license": LICENSE,
+        "source": source,
         "dimensions": {
             "entities": [{"id": entity_to_id[c], "name": c} for c in countries],
             "products": [{"id": product_to_id[p], "name": p} for p in products],
