@@ -1,11 +1,6 @@
 # Single-chart collection: `dimensions` is empty, so this is pushed as a regular
 # Grapher chart (not a multi-dim data page). Replicates chart:
 #   https://admin.owid.io/admin/charts/7118/edit
-title:
-  title: "Which countries have banned chick culling?"
-  title_variant: ""
-default_selection:
-  - "World"
 topic_tags:
   - "Animal Welfare"
 dimensions: []

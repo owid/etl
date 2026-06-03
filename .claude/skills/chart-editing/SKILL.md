@@ -26,11 +26,6 @@ The chart's public slug is auto-derived from the short name with underscores rep
 ## Minimum viable config
 
 ```yaml
-title:
-  title: "Your chart title"
-  title_variant: ""
-default_selection:
-  - "United States"
 topic_tags:
   - "Animal Welfare"
 dimensions: []
@@ -59,6 +54,7 @@ Key fields:
 - `dimensions: []` and exactly one view → this YAML pushes as a single chart, not an mdim page.
 - `views[0].indicators.y` — list of indicator catalog paths. For multi-series, list more than one.
 - `views[0].config` — the grapher config that becomes the chart's `etlConfig` in `chart_configs`. Same shape as a chart-admin export.
+- No top-level `title:` or `default_selection:` block — those exist only for multidim data pages and are ignored for single charts.
 
 ## DAG entry
 
