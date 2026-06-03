@@ -470,11 +470,15 @@ output used all three; with them empty you still get a complete, correct table.
   **directly**. The `datasets.catalogPath` has **no** `grapher/` prefix (e.g.
   `ivs/<v>/integrated_values_surveys`) even though `variables.catalogPath` does — filter on the dataset row
   accordingly.
-- **Production** (`ENV="production"`): admin base is `https://admin.owid.io/admin` (from
-  `OWIDEnv().indicators_admin_site`). The indicators exist in production **only after the PR is merged and
-  the dataset re-published**, and **production variable ids differ from staging** — always re-query the prod
-  DB (don't reuse staging ids). The script asserts all expected columns matched, which doubles as a
-  "is it published yet?" check.
+- **Production** (`ENV="production"`): admin base is `https://admin.owid.io/admin`. Reach the prod grapher
+  DB **directly over Tailscale** at host **`prod-db`, port 3306** (check `tailscale status` for it) with the
+  `live_grapher` creds from `.env`/`.env.live` — this is far more reliable than `.env`'s `127.0.0.1:3310`
+  local SSH tunnel, which is usually down (`Connection refused`). Build the engine with
+  `sqlalchemy.engine.URL.create(...)` so the special-char password is encoded correctly. The indicators
+  exist in production **only after the PR is merged and the dataset is deployed**, and **production variable
+  ids differ from staging** — always re-query prod (don't reuse staging ids). After merge, the
+  branch-vs-`master` diff is empty, so set `NEW_COLS_FILE` (e.g. the saved `ai/ivs_pr_new_cols.txt`) or
+  `BASE_REF` to the merge base. The `len(v) == len(NEW)` assert doubles as an "is it deployed yet?" check.
 
 ## Worked example
 

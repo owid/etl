@@ -32,6 +32,10 @@ VERSION = "2025-06-27"
 BRANCH = "data-womensrights-humanrights-crimeindicators"
 ENV = "staging"  # "staging" | "production"
 OUT = "ai/ivs_pr_by_topic.md"
+# Once the PR is MERGED, master already contains the new columns, so the branch-vs-master diff is empty.
+# Then either set BASE_REF to the merge-base / pre-merge commit, or point NEW_COLS_FILE at a saved list.
+BASE_REF = "master"
+NEW_COLS_FILE = ""  # e.g. "ai/ivs_pr_new_cols.txt"
 
 TOPICS: dict[str, list[str]] = {}  # OPTIONAL grouping/order: {"Topic": [code_or_suffix, ...]}
 LABELS: dict[str, str] = {}  # OPTIONAL label override: {code_or_suffix: "Nicer question label"}
@@ -121,7 +125,10 @@ def vars_dict(ref: str) -> dict:
     return ns["VARS_DICT"]
 
 
-NEW = meta_keys(BRANCH) - meta_keys("master")
+NEW = (
+    {c.strip() for c in open(NEW_COLS_FILE) if c.strip()} if NEW_COLS_FILE else meta_keys(BRANCH) - meta_keys(BASE_REF)
+)
+assert NEW, "no new columns — PR already merged into BASE_REF? set NEW_COLS_FILE or BASE_REF to the merge base"
 VD = vars_dict(BRANCH)
 CODE2LABEL = dict(VD)
 SUFFIX2CODE = {underscore(label): code for code, label in VD.items()}
@@ -158,9 +165,19 @@ if ENV == "staging":
         f"mysql+pymysql://owid:@{container}.tail6e23.ts.net:3306/owid", connect_args={"connect_timeout": 10}
     )
     admin, ds_admin = f"http://{container}/admin/variables", f"http://{container}/admin/datasets"
-else:  # production — needs prod DB creds; ids DIFFER from staging; only after merge + re-publish
-    env = OWIDEnv()  # or OWIDEnv.from_env_file(".env.prod")
-    engine, admin, ds_admin = env.engine, env.indicators_admin_site, env.datasets_admin_site
+else:  # production — reach the prod grapher DB directly over TAILSCALE (host `prod-db`, port 3306).
+    # This is more reliable than .env's `127.0.0.1:3310` local SSH tunnel (often down). Credentials are
+    # the live_grapher creds in .env / .env.live. ids DIFFER from staging and exist only after merge+deploy.
+    from sqlalchemy.engine import URL
+
+    c = OWIDEnv.from_env_file(".env").conf  # live_grapher user/pass (same in .env.live)
+    engine = create_engine(
+        URL.create(
+            "mysql+pymysql", username=c.DB_USER, password=c.DB_PASS, host="prod-db", port=3306, database=c.DB_NAME
+        ),
+        connect_args={"connect_timeout": 8},
+    )
+    admin, ds_admin = "https://admin.owid.io/admin/variables", "https://admin.owid.io/admin/datasets"
 
 v = pd.read_sql(
     f"SELECT v.id, v.shortName, v.name FROM variables v JOIN datasets d ON v.datasetId=d.id "
