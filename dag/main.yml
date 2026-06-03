@@ -663,6 +663,16 @@ steps:
       - data://meadow/itopf/2026-05-06/oil_spills:
         - snapshot://itopf/2026-05-06/oil_spills.pdf
 
+  data://meadow/pew/2026-06-03/same_sex_marriage:
+    - snapshot://pew/2026-06-03/same_sex_marriage.csv
+  data://garden/pew/2026-06-03/same_sex_marriage:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/pew/2026-06-03/same_sex_marriage
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2025-07-01/income_groups
+  # Same-Sex Marriage Around the World from Pew Research Center
+  data://grapher/pew/2026-06-03/same_sex_marriage:
+    - data://garden/pew/2026-06-03/same_sex_marriage
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
