@@ -10,13 +10,58 @@ Data and metadata are pulled from two separate WHO endpoints:
   API at `https://www.who.int/api/multimedias/indicatormetadataregistrydefinitions`,
   which returns structured records keyed by IMR ID. We resolve `IndicatorCode → IMR ID`
   by name first (via the registry's own listing), then fall back to the `label →
-  metadata URL` mapping from the previous snapshot for indicators whose names don't
-  align. Unmatched indicators ship with empty metadata.
+  metadata URL` mapping carried forward from the previous snapshot (see
+  `METADATA_MAPPING_SNAPSHOT`). Unmatched indicators ship with empty metadata.
 
 The legacy Athena API (`apps.who.int/gho/athena`) was taken offline mid-2026; that's
 why this script no longer scrapes HTML metadata pages or relies on `DEFINITION_XML`
 to bridge IndicatorCodes to IMR IDs. WHO's newer DataDot platform (https://data.who.int)
 exposes rich metadata for ~60 flagship indicators only and is not used here.
+
+------------------------------------------------------------------------------
+Maintainer notes — read before the next yearly update
+------------------------------------------------------------------------------
+
+**Why we fall back to a prior snapshot for metadata mapping.** OData's `/api/Indicator`
+endpoint dropped the columns Athena used to expose (`url`, `IMR_ID`, `DEFINITION_XML`,
+`CATEGORY`). Without them we can't reliably bridge an OData `IndicatorCode` to its
+matching IMR registry entry. So `load_metadata_mapping()` reads
+`METADATA_MAPPING_SNAPSHOT` (currently `who/2025-05-19/gho.zip`) and carries those four
+columns + the previous run's resolved `metadata` JSON forward via a LEFT JOIN on
+`label` (= IndicatorCode). New IndicatorCodes that didn't exist in the prior snapshot
+simply get NaN in those columns and fall through to the metadata-registry name match;
+old IndicatorCodes that are no longer in OData are dropped by the LEFT JOIN (only OData
+codes are kept).
+
+**Drift risks to watch each year.**
+
+1. *Stale IMR mappings.* If WHO renumbers IMR IDs in the registry, the
+   `IMR_ID` column we copy forward becomes wrong. After running, compare the count of
+   indicators that resolved metadata via "registry name match" vs. via "fallback mapping"
+   vs. "nothing" and surface in the PR description — a sudden jump in "nothing" usually
+   means the fallback drifted.
+2. *Compounding lag.* `METADATA_MAPPING_SNAPSHOT` should always be the **immediately
+   prior** stable snapshot, not a fixed historical pin. Each year, bump it to the
+   previous version (e.g. for the 2027 update, set it to `who/2026-05-22/gho.zip`).
+   Pinning further back compounds the staleness — indicators added in 2026 would never
+   get a fallback mapping.
+3. *Registry API coverage drift.* If WHO expands the metadata-registry API to cover
+   most indicators, the fallback becomes unnecessary. Each year, log the % of indicators
+   covered by registry-only resolution; once it crosses ~95% the fallback can be retired.
+4. *OData schema regression.* If WHO ever restores Athena-style metadata fields on
+   `/api/Indicator` (or publishes a richer indicator-catalog endpoint), prefer it over
+   the fallback — re-derive the four legacy columns from the live API and delete
+   `load_metadata_mapping()`.
+
+**Steps for the next update (2027+):**
+
+1. Run the snapshot; capture the coverage breakdown (registry / fallback / nothing).
+2. Bump `METADATA_MAPPING_SNAPSHOT` to the previous year's snapshot path.
+3. Re-check whether DataDot's `ddiindicators` table has grown beyond the current ~60
+   flagship indicators — if so, evaluate joining it on `AlternativeCodes`
+   (= `IndicatorCode`) as a primary source for those indicators (richer metadata).
+4. If metadata coverage drops below the previous year's number, investigate before
+   shipping — the fallback chain may have decayed.
 """
 
 import concurrent.futures
