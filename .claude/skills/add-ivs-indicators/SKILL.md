@@ -296,6 +296,40 @@ IVS spans many topics, so **do not** leave the whole dataset on one tag (the leg
   WHERE v.catalogPath LIKE '%ivs/<v>/%' GROUP BY t.name ORDER BY 2 DESC;
   ```
 
+**Sweep the untagged pool against the FULL enum — many items have a non-obvious nearest-fit page.** Don't stop
+at the obvious group→tag map. Print the whole `topic_tags` enum and walk each remaining untagged question
+against it; surprisingly specific pages exist. Real matches found this way (2026-06-03): justifiable
+`suicide`→`Suicides`, `political_violence`→`War & Peace`, `parents_beating_children`→`Violence Against Children
+& Children's Rights`, `man_beating_wife`→`Women's Rights`, `invitro_fertilization`→`Fertility Rate`; neighbours
+`immigrant_foreign_workers`→`Migration`, `aids`→`HIV/AIDS`, `drug_addicts`/`drug_sale_in_streets`→`Illicit Drug
+Use`, `heavy_drinkers`→`Alcohol Consumption`, `racist_behavior`→`Human Rights`; important-in-life
+`work`→`Work & Employment`, `politics`→`Democracy`, `leisure_time`→`Time Use`, `friends`/`family`→`Loneliness &
+Social Connections`; worry `not_being_able_to_provide_good_education`→`Global Education`. Present the candidate
+fits (clear vs. judgment-call) to the user/topic owner and let them confirm — they often know which existing
+charts already carry a tag (e.g. "our political-violence charts use War & Peace").
+
+**Add topic tags as SECONDARY tags to already-tagged items that also touch that topic** (multi-tag, primary
+first). E.g. items mentioning religion that are primarily something else get `Religion` added alongside:
+`religious_authorities_interpret_the_laws`→`[Democracy, Religion]`, `confidence_churches` /
+`confidence_organization_of_the_islamic_world` / `trust_another_religion`→`[Trust, Religion]`, E220
+science-vs-faith→`[Technological Change, Religion]`. Each distinct combo is its own anchor
+(`topic_tags_trust_religion`, …); reuse the existing single-tag anchor object when a variable's tag-set matches it.
+
+**Judge by what the indicator measures, not a keyword.** Literal keyword matching over-reaches: `family_victim_
+of_a_crime` mentions "family" but is a crime-victimisation question, **not** a family/social-connections one —
+don't tag it `Loneliness & Social Connections`. Same for "faith" inside a science item, etc. Flag the ambiguous
+ones to the user instead of auto-tagging.
+
+**Re-routing a tag → delete the orphan anchor.** If you move a variable from one tag to another
+(`invitro_fertilization`: Medicine & Biotechnology → Fertility Rate), and the old anchor is now referenced by
+nothing, remove it from `definitions` so no dead anchors linger.
+
+**Tag edits are metadata-only — the `data://grapher` dataset must be rebuilt or the DB won't update** (see
+Step 7's gotcha): `etlr grapher://… --grapher --force --only` alone re-uploads the **stale** built dataset and
+every variable is `skipped_no_changes`. Rebuild `data://grapher` (delete its output dir if unsure), then upload,
+then verify links landed in `tags_variables_topic_tags`. It's normal and fine to leave a large share untagged
+when no page fits (values/morality batteries, generic crime-fear, traditional media) — don't force a bad tag.
+
 ## Step 6 — Pre-flight cross-check (before running the pipeline)
 
 Assert the set of new column names is **identical** across three places, or you get silent breakage:
