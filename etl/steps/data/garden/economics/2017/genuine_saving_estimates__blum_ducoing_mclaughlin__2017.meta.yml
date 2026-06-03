@@ -1,5 +1,7 @@
 dataset:
   title: Genuine saving estimates by various measures - Blum, Ducoing, McLaughlin (2017)
+  owners:
+    - Max Roser  # backport
 tables:
   genuine_saving_estimates__blum_ducoing_mclaughlin__2017:
     variables:

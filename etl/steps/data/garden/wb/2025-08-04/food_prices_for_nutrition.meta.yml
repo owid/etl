@@ -16,20 +16,8 @@ definitions:
     # The indicator expresses the percentage of the total population unable to afford an energy sufficient diet in a given country and year. A diet is considered unaffordable when the diet cost plus expenditures for basic non-food needs exceed income per capita per day. The expenditures for basic non-food needs are calculated as average non-food expenditure shares of low-income consumer multiplied by internaitonal poverty lines set by the World Bank. The non-food expenditure share is 37% and 44% in low-income and lower-middle-income countries for the second quintile of consumers, and 54% in upper-middle-and-high-income countries for the first quintile of consumers, according to household surveys compiled by the World Bank. The international poverty lines are $2.15/day for low-income countries, $3.65/day for lower-middle-income countries, $6.85/day for upper-middle-income countries, and $24.36/day for high-income countries, in 2017PPP$. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle. Income data are provided by the World Bank’s Poverty and Inequality Platform. A value of zero indicates a null or a small number rounded down at the current precision level.
     - Non-food expenses are estimated by looking at how much low-income people typically spend on things like housing, clothing, and transportation.
     - This amount is calculated as the average share of non-food expenditure for a low-income consumer, multiplied by the international poverty line.
-    - "The average share of non-food expenditure is based on the spending habits of specific income groups (quintiles):
-
-      - In upper-middle-income and high-income countries, the first quintile of consumers is considered (the poorest 20% of consumers), where people spend around 54% of their income on non-food needs.
-
-      - In low-income and lower-middle-income countries, the second quintile is considered (the second lowest 20% of consumers), where people spend about 37% and 44% of their income on non-food needs, respectively."
-    - "The international poverty lines (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) are:
-
-      - For low-income countries: $2.15/day.
-
-      - For lower-middle-income countries: $3.65/day.
-
-      - For upper-middle-income countries: $6.85/day.
-
-      - For high-income countries: $24.36/day."
+    - "The average share of non-food expenditure is based on the spending habits of specific income groups (quintiles):\n- In upper-middle-income and high-income countries, the first quintile of consumers is considered (the poorest 20% of consumers), where people spend around 54% of their income on non-food needs.\n- In low-income and lower-middle-income countries, the second quintile is considered (the second lowest 20% of consumers), where people spend about 37% and 44% of their income on non-food needs, respectively."
+    - "The international poverty lines (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) are:\n- For low-income countries: $2.15/day.\n- For lower-middle-income countries: $3.65/day.\n- For upper-middle-income countries: $6.85/day.\n- For high-income countries: $24.36/day."
     - A value of zero indicates a null or a small number rounded down at the current precision level.
   description_key_number_of_population: &description_key_number_of_population
     - Population counts all residents regardless of legal status or citizenship.
@@ -37,15 +25,7 @@ definitions:
   description_key_poverty_lines: &description_key_poverty_lines
     # Original description:
     # The ratio of the cost of an energy sufficient diet to the food poverty lines, defined as $1.35/day for low-income countries (63% of the international poverty line of $2.15/day in 2017 PPP$), $2.04/day for lower-middle-income countries (56% of the international poverty line of $3.65/day in 2017 PPP$), $3.15/day for upper-middle-income countries (46% of the international poverty line of $6.85/day in 2017 PPP$), and $11.2/day (46% of the international poverty line of $24.36/day in 2017 PPP$). The percentages (63%, 56%, and 46%) represent the average food expenditure shares in the second quintile of consumers in low-income and lower-middle-income countries, and the first quintile of consumers in upper-middle-and-high-income countries, according to household surveys compiled by the World Bank. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle.
-    - "Poverty lines are defined (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) as follows:
-
-      - For low-income countries, $1.35/day (63% of the international poverty line of $2.15/day).
-
-      - For lower-middle-income countries, $2.04/day (56% of the international poverty line of $3.65/day).
-
-      - For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day).
-
-      - For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day)."
+    - "Poverty lines are defined (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) as follows:\n- For low-income countries, $1.35/day (63% of the international poverty line of $2.15/day).\n- For lower-middle-income countries, $2.04/day (56% of the international poverty line of $3.65/day).\n- For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day).\n- For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day)."
     - These percentages (63%, 56%, and 46%) represent the average food expenditure shares in the first quintile (the poorest 20th of the population) of consumers in upper-middle-income and high-income countries, and the second quintile of consumers in low-income and lower-middle-income countries, according to household surveys compiled by the World Bank.
   # Original descriptions (from https://www.worldbank.org/en/programs/icp/brief/foodpricesfornutrition#3):
   # - Cost of a Healthy Diet: A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related diseases. To measure access and affordability, the cost of meeting food-based dietary guidelines is computed using the least expensive foods available in each category at each place and time (see "Methods and options to monitor the cost and affordability of a healthy diet globally" and "Brief note: Methods and data sources" (Herforth et al. 2022) ). The cost of a healthy diet is the preferred indicator of diet costs as it uses the most affordable foods available at local markets to meet dietary needs for an active and healthy life, using standards adopted by national governments around the world. Total cost per day can be disaggregated by food group, showing the cost per day of the least expensive locally available items in each food group (fruits; vegetables; starchy staples; animal-source foods; legumes, nuts, and seeds; and oils and fats)
@@ -97,6 +77,8 @@ dataset:
     (1) Requirements fall roughly at the median of the entire population distribution, in the sense that least-cost diets to meet energy and nutrient requirements for people in this reference group approximate the median level of least costs for all sex-age groups over the entire life cycle. This reference group is therefore a good representation of the population as a whole.
     (2) Women of reproductive age are typically a nutritionally vulnerable population group, as seen in their increased risk of dietary inadequacies (due to social practices and norms that often disadvantage them in terms of access to food), which have important consequences for themselves and their children. Previous studies have also based their analyses on this reference group.
 
+  owners:
+    - Pablo Rosado
 tables:
   food_prices_for_nutrition:
     title: Food prices for nutrition

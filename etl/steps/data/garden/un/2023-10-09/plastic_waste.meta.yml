@@ -1,6 +1,9 @@
 # NOTE: To learn more about the fields, hover over their names.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+dataset:
+  owners:
+    - Veronika Samborska
 tables:
   plastic_waste:
     variables:

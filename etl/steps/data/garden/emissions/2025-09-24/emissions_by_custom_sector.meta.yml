@@ -12,6 +12,8 @@ dataset:
   title: Greenhouse gas emissions by custom sector
   non_redistributable: true
 
+  owners:
+    - Pablo Rosado
 tables:
   emissions_by_custom_sector:
     variables:

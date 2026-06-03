@@ -20,6 +20,8 @@ dataset:
 
     - Data from 1961 onwards is sourced from the Food and Agriculture Organization of the United Nations.
 
+  owners:
+    - Pablo Rosado
 tables:
   uk_long_term_yields:
     title: Long-term yields in the United Kingdom

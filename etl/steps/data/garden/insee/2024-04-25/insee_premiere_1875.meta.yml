@@ -20,6 +20,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   insee_premiere_1875:
     variables:

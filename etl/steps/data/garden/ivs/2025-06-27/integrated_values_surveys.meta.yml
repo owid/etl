@@ -97,6 +97,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Pablo Arriagada
 tables:
   integrated_values_surveys:
     variables:

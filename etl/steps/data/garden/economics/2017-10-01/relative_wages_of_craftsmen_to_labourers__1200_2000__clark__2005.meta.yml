@@ -1,5 +1,7 @@
 dataset:
   title: Relative wages of craftsmen to labourers, 1200-2000 - Clark (2005)
+  owners:
+    - Max Roser  # backport
 tables:
   relative_wages_of_craftsmen_to_labourers__1200_2000__clark__2005:
     variables:

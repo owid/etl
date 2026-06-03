@@ -4,6 +4,8 @@ dataset:
     The share of populations across the world that support climate action, and would be willing to give 1% of their income to it.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   public_support_climate_andre:
     variables:

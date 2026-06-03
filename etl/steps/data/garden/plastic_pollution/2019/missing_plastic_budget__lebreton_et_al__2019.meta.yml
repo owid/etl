@@ -1,5 +1,7 @@
 dataset:
   title: Missing plastic budget (Lebreton et al. 2019)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   missing_plastic_budget__lebreton_et_al__2019:
     variables:
@@ -10,8 +12,7 @@ tables:
         display:
           name: Macroplastics (>0.5cm)
           numDecimalPlaces: 0
-        description: Mass of accumulated buoyant macroplastics (>0.5cm) in the world's oceans under three projected emissions
-          scenarios.
+        description: Mass of accumulated buoyant macroplastics (>0.5cm) in the world's oceans under three projected emissions scenarios.
       accumulated_ocean_plastic__microplastics__lt_0_5cm:
         title: 'Accumulated ocean plastic: Microplastics (<0.5cm)'
         unit: tonnes
@@ -19,8 +20,7 @@ tables:
         display:
           name: Microplastics (<0.5cm)
           numDecimalPlaces: 0
-        description: Mass of accumulated degraded microplastics (<0.5cm) in the world's oceans under three projected emissions
-          scenarios.
+        description: Mass of accumulated degraded microplastics (<0.5cm) in the world's oceans under three projected emissions scenarios.
     dimensions:
       - name: year
         slug: year

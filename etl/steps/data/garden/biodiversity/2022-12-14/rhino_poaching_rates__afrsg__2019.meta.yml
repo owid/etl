@@ -1,5 +1,7 @@
 dataset:
   title: Rhino poaching rates (AfRSG, 2019)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   rhino_poaching_rates__afrsg__2019:
     variables:

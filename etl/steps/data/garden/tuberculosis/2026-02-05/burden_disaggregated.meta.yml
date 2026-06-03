@@ -57,6 +57,8 @@ definitions:
       <%- endif -%>
 dataset:
   title: Global Tuberculosis Report - Disaggregated Burden Estimates
+  owners:
+    - Fiona Spooner
 tables:
   burden_disaggregated:
     variables:

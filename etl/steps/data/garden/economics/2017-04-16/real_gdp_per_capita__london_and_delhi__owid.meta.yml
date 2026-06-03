@@ -1,5 +1,7 @@
 dataset:
   title: Real GDP per capita, London and Delhi - OWID
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   real_gdp_per_capita__london_and_delhi__owid:
     variables:

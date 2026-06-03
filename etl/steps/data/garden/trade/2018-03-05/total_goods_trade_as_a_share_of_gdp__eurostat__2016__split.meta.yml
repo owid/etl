@@ -1,5 +1,7 @@
 dataset:
   title: Total goods trade as a share of GDP (Eurostat (2016)) (split)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   total_goods_trade_as_a_share_of_gdp__eurostat__2016__split:
     variables:

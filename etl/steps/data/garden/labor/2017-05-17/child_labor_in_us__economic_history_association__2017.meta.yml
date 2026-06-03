@@ -1,5 +1,7 @@
 dataset:
   title: Child Labor in US - Economic History Association (2017)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   child_labor_in_us__economic_history_association__2017:
     variables:

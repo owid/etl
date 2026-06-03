@@ -1,5 +1,7 @@
 dataset:
   title: Child violence – Ending Violence in Childhood Report (2017)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   child_violence__ending_violence_in_childhood_report__2017:
     variables:
@@ -16,8 +18,7 @@ tables:
       children__13_15__who_reported_being_in_a_physical_fight_during_past_year:
         title: Children (13-15) who reported being in a physical fight during past year
         unit: '%'
-        description: Percentage  of children aged 13-15 who reported being in a physical fight one or more times during the
-          past 12 months
+        description: Percentage  of children aged 13-15 who reported being in a physical fight one or more times during the past 12 months
       girls__15_19__who_ever_experienced_forced_sexual_intercourse_or_any_other_forced_sexual_acts:
         title: Girls (15-19) who ever experienced forced sexual intercourse or any other forced sexual acts
         unit: '%'

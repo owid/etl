@@ -53,6 +53,8 @@ dataset:
 
     This dataset was constructed using data collected from various EIU yearly reports and a multi-year compilation by Gapminder.
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   eiu:
     common:

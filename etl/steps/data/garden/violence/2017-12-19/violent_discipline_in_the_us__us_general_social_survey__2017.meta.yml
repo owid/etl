@@ -1,5 +1,7 @@
 dataset:
   title: Violent discipline in the US (US General Social Survey (2017))
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   violent_discipline_in_the_us__us_general_social_survey__2017:
     variables:

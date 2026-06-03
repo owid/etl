@@ -1,5 +1,7 @@
 dataset:
   title: Seasonal influenza mortality – GLaMOR (2019)
+  owners:
+    - Saloni Dattani  # backport
 tables:
   seasonal_influenza_mortality__glamor__2019:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: AI Index Report (2022)
+  owners:
+    - Charlie Giattino  # backport
 tables:
   ai_index_report__2022:
     variables:

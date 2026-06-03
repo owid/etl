@@ -1,5 +1,7 @@
 dataset:
   title: Solar PV Systems Costs - Barbose & Darghouth (2016)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   solar_pv_systems_costs__barbose__and__darghouth__2016:
     variables:

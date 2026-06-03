@@ -1,5 +1,7 @@
 dataset:
   title: Drivers of recovery in European bird species (ZSL, 2022)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   drivers_of_recovery_in_european_bird_species__zsl__2022:
     variables:

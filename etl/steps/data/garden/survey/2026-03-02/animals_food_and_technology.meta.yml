@@ -12,10 +12,11 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Rosado
 tables:
   animals_food_and_technology:
-    variables:
-      {}
+    variables: {}
 
   animals_food_and_technology_responses:
     variables:

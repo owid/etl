@@ -21,6 +21,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   fossil_fuel_production:
     title: Fossil fuel production

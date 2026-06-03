@@ -27,6 +27,8 @@ dataset:
   update_period_days: 365
   title: "Country coverage in OWID Instagram posts"
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   ig_countries:
     variables:

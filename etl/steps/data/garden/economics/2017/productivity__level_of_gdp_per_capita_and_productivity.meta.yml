@@ -1,5 +1,7 @@
 dataset:
   title: Productivity - Level of GDP per capita and productivity
+  owners:
+    - Max Roser  # backport
 tables:
   productivity__level_of_gdp_per_capita_and_productivity:
     variables:

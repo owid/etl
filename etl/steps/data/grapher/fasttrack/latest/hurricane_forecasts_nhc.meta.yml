@@ -3,6 +3,8 @@ dataset:
   description: Track error of hurricanes and tropical cyclones from the National Hurricane Center.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   hurricane_forecasts_nhc:
     variables:

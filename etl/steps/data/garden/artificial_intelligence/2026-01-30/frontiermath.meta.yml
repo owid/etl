@@ -12,6 +12,8 @@ dataset:
   update_period_days: 31
 
 
+  owners:
+    - Veronika Samborska
 tables:
   epoch_benchmark_data:
     variables:

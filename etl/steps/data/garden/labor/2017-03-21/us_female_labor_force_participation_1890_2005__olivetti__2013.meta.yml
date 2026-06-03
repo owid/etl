@@ -1,5 +1,7 @@
 dataset:
   title: US Female Labor Force Participation 1890-2005 - Olivetti (2013)
+  owners:
+    - Sandra Tzvetkova  # backport
 tables:
   us_female_labor_force_participation_1890_2005__olivetti__2013:
     variables:

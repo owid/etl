@@ -1,5 +1,7 @@
 dataset:
   title: Year of smallpox eradication by country - WHO (1988)
+  owners:
+    - Sophie Ochmann  # backport
 tables:
   year_of_smallpox_eradication_by_country__who__1988:
     variables:

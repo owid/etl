@@ -1,5 +1,7 @@
 dataset:
   title: Projections of peak agricultural land - FAO (2006), OECD (2012), MEA (2005)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005:
     variables:

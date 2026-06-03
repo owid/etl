@@ -6,6 +6,8 @@ definitions:
 dataset:
   title: Food emissions by life-cycle stage (Poore and Nemecek, 2018)
 
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   food_emissions_by_life_cycle_stage__poore_and_nemecek__2018:
     variables:

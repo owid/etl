@@ -13,6 +13,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   broken_limits_le:
     variables:

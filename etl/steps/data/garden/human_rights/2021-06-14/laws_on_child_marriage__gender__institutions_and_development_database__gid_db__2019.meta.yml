@@ -1,5 +1,7 @@
 dataset:
   title: Laws on child marriage - Gender, Institutions and Development Database (GID-DB, 2019)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   laws_on_child_marriage__gender__institutions_and_development_database__gid_db__2019:
     variables:

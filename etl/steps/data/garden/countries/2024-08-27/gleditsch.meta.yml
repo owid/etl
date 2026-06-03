@@ -29,6 +29,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   gleditsch_regions:
     title: States in regions (Gleditsch)

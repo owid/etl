@@ -1,5 +1,7 @@
 dataset:
   title: Wealth (total) by component for various country groupings - World Bank (2017)
+  owners:
+    - Sandra Tzvetkova  # backport
 tables:
   wealth__total__by_component_for_various_country_groupings__world_bank__2017:
     variables:

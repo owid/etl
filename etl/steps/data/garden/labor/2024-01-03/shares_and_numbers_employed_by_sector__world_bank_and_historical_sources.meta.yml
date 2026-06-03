@@ -1,5 +1,7 @@
 dataset:
   title: Shares and numbers employed by sector (World Bank and historical sources)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   shares_and_numbers_employed_by_sector__world_bank_and_historical_sources:
     variables:

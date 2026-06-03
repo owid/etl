@@ -1,5 +1,7 @@
 dataset:
   title: Incidence of child labor (England, Italy, US, World) - Cunningham and Viazzo (1996) and others
+  owners:
+    - Max Roser  # backport
 tables:
   incidence_of_child_labor__england__italy__us__world__cunningham_and_viazzo__1996__and_others:
     variables:

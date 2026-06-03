@@ -30,6 +30,8 @@ dataset:
     - United States (1630-1907): [U.S. Department of Agriculture Forest Service (USDA FS) report: U.S. Forest Facts and Historical Trends](https://web.archive.org/web/20220728061823/https://www.fia.fs.fed.us/library/brochures/docs/2000/ForestFactsMetric.pdf)
     - United States (1920-1987): [U.S. Department of Agriculture Forest Service (USDA FS) report (2014): U.S. Forest Resource Facts and Historical Trends](https://www.fs.usda.gov/sites/default/files/legacy_files/media/types/publication/field_pdf/forestfacts-2014aug-fs1035-508complete.pdf)
     - Vietnam (1943-1985): [Forest Science Institute of Vietnam (FSIV) and Food and Agriculture Organization of the United Nations (FAO) report: Vietnam Forestry Outlook Study](https://web.archive.org/web/20230715025310/http://www.fao.org/3/am254e/am254e00.pdf)
+  owners:
+    - Fiona Spooner
 tables:
   forest_share:
     variables:

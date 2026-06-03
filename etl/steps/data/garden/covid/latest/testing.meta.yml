@@ -164,6 +164,8 @@ definitions:
 dataset:
   update_period_days: 0
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   testing:
     variables:

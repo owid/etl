@@ -23,13 +23,15 @@ definitions:
     processing_level: major
     presentation:
       topic_tags:
-      - CO2 & Greenhouse Gas Emissions
+        - CO2 & Greenhouse Gas Emissions
 
 dataset:
   update_period_days: 365
   description: |-
     Jones et al. quantify national and regional contributions to the increase of global mean surface temperature over the last few centuries.
 
+  owners:
+    - Pablo Rosado
 tables:
   national_contributions:
     variables:

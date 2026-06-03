@@ -10,6 +10,8 @@ definitions:
 dataset:
   title: World Urbanization Prospects Dataset - Urban Agglomerations by Size Class
 
+  owners:
+    - Veronika Samborska
 tables:
   urban_agglomerations_size_class:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Tax composition –   Arroyo Abad  and P. Lindert (2016)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   tax_composition__arroyo_abad__and_p__lindert__2016:
     variables:

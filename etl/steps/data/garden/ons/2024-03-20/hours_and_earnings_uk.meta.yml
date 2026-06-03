@@ -33,6 +33,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   hours_and_earnings_uk:
     variables:

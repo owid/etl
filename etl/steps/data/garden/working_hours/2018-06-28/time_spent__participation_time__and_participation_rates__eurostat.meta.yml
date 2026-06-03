@@ -1,5 +1,7 @@
 dataset:
   title: Time spent, participation time, and participation rates - Eurostat
+  owners:
+    - Diana Beltekian  # backport
 tables:
   time_spent__participation_time__and_participation_rates__eurostat:
     variables:

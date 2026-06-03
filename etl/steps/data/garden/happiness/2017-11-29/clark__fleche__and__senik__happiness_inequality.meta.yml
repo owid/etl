@@ -1,5 +1,7 @@
 dataset:
   title: Clark, Flèche & Senik – Happiness Inequality
+  owners:
+    - Max Roser  # backport
 tables:
   clark__fleche__and__senik__happiness_inequality:
     variables:

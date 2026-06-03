@@ -1,5 +1,7 @@
 dataset:
   title: Transport and communication costs, OECD Economic Outlook (2007)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   transport_and_communication_costs__oecd_economic_outlook__2007:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Tropical deforestation by country or region (Pendrill et al. (2019))
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   tropical_deforestation_by_country_or_region__pendrill_et_al__2019:
     variables:
