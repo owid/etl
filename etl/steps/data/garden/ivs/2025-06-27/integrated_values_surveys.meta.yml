@@ -503,6 +503,8 @@ tables:
         display:
           name: "Important in life: Family"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       not_important_in_life_family:
         title: "Not important in life: Family"
@@ -510,6 +512,8 @@ tables:
         display:
           name: "Not important in life: Family"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       very_important_in_life_family:
         title: "Very important in life: Family"
@@ -517,6 +521,8 @@ tables:
         display:
           name: "Very important in life: Family"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       rather_important_in_life_family:
         title: "Rather important in life: Family"
@@ -524,6 +530,8 @@ tables:
         display:
           name: "Rather important in life: Family"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       not_very_important_in_life_family:
         title: "Not very important in life: Family"
@@ -531,6 +539,8 @@ tables:
         display:
           name: "Not very important in life: Family"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       notatall_important_in_life_family:
         title: "Not at all important in life: Family"
@@ -538,6 +548,8 @@ tables:
         display:
           name: "Not at all important in life: Family"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       dont_know_important_in_life_family:
         title: "Don't know: Important in life: Family"
@@ -545,6 +557,8 @@ tables:
         display:
           name: "Don't know: Important in life: Family"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       no_answer_important_in_life_family:
         title: "No answer: Important in life: Family"
@@ -552,6 +566,8 @@ tables:
         display:
           name: "No answer: Important in life: Family"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
 
       important_in_life_friends:
