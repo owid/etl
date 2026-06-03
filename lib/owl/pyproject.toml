@@ -2,6 +2,10 @@
 name = "owid-owl"
 version = "0.1.0"
 description = "A lightweight OWID data pipeline framework that can run alongside the main ETL."
+authors = [
+    {name = "Our World in Data", email = "tech@ourworldindata.org"},
+]
+license = "MIT"
 readme = "owl/README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -12,15 +16,35 @@ dependencies = [
     "pyarrow>=16.0",
     "python-dotenv>=1.0",
     "pyyaml>=6.0",
+    "rich>=12.1.0",
+    "sqlalchemy>=2.0.30",
     "tomli>=2.0",
+    "tqdm>=4.66.0",
 ]
 
 [project.scripts]
 owl = "owl.cli:cli"
 
-[tool.hatch.build.targets.wheel]
-packages = ["owl"]
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ty==0.0.26",
+    "ruff==0.15.8",
+    "ipdb>=0.13.13",
+]
+
+[tool.uv]
+exclude-newer = "3 days"
+
+[tool.uv.sources]
+owid-catalog = { path = "../catalog", editable = true }
+
+[tool.ruff]
+extend = "../../pyproject.toml"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["owl"]

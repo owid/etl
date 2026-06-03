@@ -9,10 +9,6 @@ from __future__ import annotations
 import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from owid import catalog
-from sqlalchemy.orm import Session
-from tqdm import tqdm
-
 from apps.chart_sync.admin_api import AdminAPI
 from etl import config
 from etl.config import OWID_ENV
@@ -20,6 +16,10 @@ from etl.db import get_engine
 from etl.grapher import helpers as gh
 from etl.grapher import model as gm
 from etl.grapher import to_db as db
+from owid import catalog
+from sqlalchemy.orm import Session
+from tqdm import tqdm
+
 from owl.dataset import Dataset as OwlDataset
 from owl.project import parse_step_file
 
