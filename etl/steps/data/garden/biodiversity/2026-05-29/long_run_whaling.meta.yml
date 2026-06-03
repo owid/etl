@@ -30,7 +30,7 @@ definitions:
   subsistence_whaling_decades: |-
     Data pre-1990 does not include aboriginal subsistence whaling as it focusses on industrial whaling. Data after 1990 from the IWC includes subsistence whaling.
   soviet_illegal_catches: |-
-    Data before 1985 does not include illegal catches by the Soviet Union, as they are not available as a yearly breakdown. They are included in our catches by decade.
+    Data before 1985 does not include illegal catches by the Soviet Union, as they are not available as a yearly breakdown. They are included in our [catches by decade](https://ourworldindata.org/grapher/whales-killed-per-decade).
 
 
 dataset:
