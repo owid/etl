@@ -410,7 +410,9 @@ class Dataset:
 
         dataset_meta = CatalogDatasetMeta() if self._uses_catalog_metadata else _dataset_meta_from_dict(merged)
         if not dataset_meta.title:
-            origins = [origin for col in table.all_columns for origin in table.get_column_or_index(col).metadata.origins]
+            origins = [
+                origin for col in table.all_columns for origin in table.get_column_or_index(col).metadata.origins
+            ]
             if origins:
                 dataset_meta.title = origins[0].title
                 dataset_meta.description = dataset_meta.description or origins[0].description
