@@ -369,23 +369,35 @@ def merge_identical_tables(tables: list[Table]) -> list[Table]:
 
 
 def _normalize_text(s: str) -> str:
-    """Normalize whitespace in GHO source text.
+    """Normalize whitespace and strip raw HTML in GHO source text.
 
-    The metadata-registry API returns text with CRLF line breaks and occasional
-    double spaces. Collapse to LF, strip, and squash runs of spaces — leave
-    intentional `\n` paragraph breaks intact for markdown rendering.
+    The metadata-registry API returns text with CRLF line breaks, occasional
+    double spaces, and stray HTML tags (`<br>`, `</br>`, `<p>`, `<u>`, …) that
+    leak into rendered descriptions on the public site. We collapse CRLF to LF,
+    squash runs of spaces, strip leading/trailing whitespace on each line, and
+    remove HTML tags. Inequality patterns like "<5 years" or "<2 SD" are
+    preserved (the strip regex requires a letter after `<` to count as a tag).
     """
     if not isinstance(s, str):
         return s
+    # Strip HTML tags (but leave "<5 years"-style comparisons alone).
+    s = re.sub(r"<\s*/?[a-zA-Z][^>]*>", "", s)
     s = s.replace("\r\n", "\n").replace("\r", "\n")
     s = re.sub(r"[ \t]+", " ", s)
     s = "\n".join(line.strip() for line in s.split("\n"))
+    # Collapse runs of blank lines that the HTML strip may have left behind.
+    s = re.sub(r"\n{3,}", "\n\n", s)
     return s.strip()
 
 
 def set_indicator(tb: Table, short_name: str, meta: dict[str, str]) -> Table:
-    # create producer description from GHO metadata
-    # NOTE: we already use Definition as description_short, so maybe we don't need it here?
+    # Build a multi-section markdown block from GHO's structured metadata fields.
+    # This goes into description_from_producer (the indicator's metadata page, no
+    # length limit). We deliberately do NOT also assign Definition to
+    # description_short — definitions are often paragraphs long (the longest in
+    # this release is 12,710 chars) and description_short is meant to be the
+    # chart subtitle. Indicators we surface in charts set description_short
+    # explicitly via gho.meta.yml.
     markdown_description = ""
     for heading in HEADINGS_TO_USE:
         if heading in meta:
@@ -407,8 +419,6 @@ def set_indicator(tb: Table, short_name: str, meta: dict[str, str]) -> Table:
         new_col = short_name + suffix_short
         tb = tb.rename(columns={col: new_col})
         tb[new_col].m.title = _normalize_text(tb.m.title) + suffix_long
-        if "Definition" in meta:
-            tb[new_col].m.description_short = _normalize_text(meta["Definition"])
 
         # Convert description from producer to markdown from JSON
         tb[new_col].m.description_from_producer = markdown_description
