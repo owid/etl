@@ -36,6 +36,11 @@ OLD_DESCRIPTION_KEY_THR = 'This data shows the income threshold for a given deci
 NEW_DESCRIPTION_KEY_THR_ALL = 'This data shows the income threshold for each decile of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
 
 
+def _after_tax_catalog_path(view):
+    """Return the after-tax (dhi) indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
+    return next((i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None)
+
+
 def run() -> None:
     config = paths.load_collection_config()
 
@@ -166,9 +171,7 @@ def run() -> None:
                     "missingDataStrategy": "hide",
                     # Sort the dumbbell (and table) entities by the after-tax value, highest first
                     "sortBy": "column",
-                    "sortColumnSlug": lambda view: next(
-                        (i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None
-                    ),
+                    "sortColumnSlug": _after_tax_catalog_path,
                     "sortOrder": "desc",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
