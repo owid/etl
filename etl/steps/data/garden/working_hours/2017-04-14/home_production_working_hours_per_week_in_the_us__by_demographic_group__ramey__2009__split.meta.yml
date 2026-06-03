@@ -1,5 +1,7 @@
 dataset:
   title: Home production working hours per week in the US, by demographic group (Ramey (2009)) (split)
+  owners:
+    - Marco Molteni  # backport
 tables:
   home_production_working_hours_per_week_in_the_us__by_demographic_group__ramey__2009__split:
     variables:

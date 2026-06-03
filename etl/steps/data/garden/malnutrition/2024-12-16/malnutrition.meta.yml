@@ -2,6 +2,8 @@ dataset:
   title: Number of stunted, wasted and underweight children
   description: |
     Data on the prevalence of malnourishment is taken from the World Bank's World Development Indicators. It is measured in three metrics: i) Prevalence of stunting, height for age (% of children under 5); ii) Prevalence of wasting, weight for height (% of children under 5); iii) Prevalence of underweight, weight for age (% of children under 5)
+  owners:
+    - Fiona Spooner
 tables:
   malnutrition:
     variables:

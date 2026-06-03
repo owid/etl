@@ -1,5 +1,7 @@
 dataset:
   title: TE-13.19b_2_GDP
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_13_19b_2_gdp:
     variables:

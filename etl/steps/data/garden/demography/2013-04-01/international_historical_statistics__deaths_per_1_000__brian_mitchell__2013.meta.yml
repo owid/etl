@@ -1,5 +1,7 @@
 dataset:
   title: International Historical Statistics (Deaths per 1,000) - Brian Mitchell (2013)
+  owners:
+    - Max Roser  # backport
 tables:
   international_historical_statistics__deaths_per_1_000__brian_mitchell__2013:
     variables:

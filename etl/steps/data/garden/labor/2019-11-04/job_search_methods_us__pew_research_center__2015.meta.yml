@@ -1,5 +1,7 @@
 dataset:
   title: Job search methods US - Pew Research Center (2015)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   job_search_methods_us__pew_research_center__2015:
     variables:

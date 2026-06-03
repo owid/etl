@@ -18,6 +18,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Pablo Arriagada
 tables:
   world_inequality_database:
     # Learn more about the available fields:

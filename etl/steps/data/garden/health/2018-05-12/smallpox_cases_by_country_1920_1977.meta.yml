@@ -1,5 +1,7 @@
 dataset:
   title: Smallpox cases by country 1920-1977
+  owners:
+    - Sophie Ochmann  # backport
 tables:
   smallpox_cases_by_country_1920_1977:
     variables:

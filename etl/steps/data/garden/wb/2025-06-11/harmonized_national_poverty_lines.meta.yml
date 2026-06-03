@@ -15,6 +15,8 @@ dataset:
   update_period_days: 730
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   harmonized_national_poverty_lines:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Crude Birth and Death Rates (per 1,000), England and Wales 1541-2015 - Wrigley and Schofield, Mitchell, UK ONS
+  owners:
+    - Sandra Tzvetkova  # backport
 tables:
   crude_birth_and_death_rates__per_1_000__england_and_wales_1541_2015__wrigley_and_schofield__mitchell__uk_ons:
     variables:

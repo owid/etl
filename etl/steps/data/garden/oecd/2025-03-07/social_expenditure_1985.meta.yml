@@ -12,6 +12,8 @@ dataset:
   update_period_days: 0
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   social_expenditure_1985:
     variables:

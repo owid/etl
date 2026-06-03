@@ -1,5 +1,7 @@
 dataset:
   title: 20th century deaths in US - CDC
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   _20th_century_deaths_in_us__cdc:
     variables:

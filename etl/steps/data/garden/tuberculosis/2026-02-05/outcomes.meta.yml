@@ -10,6 +10,8 @@ definitions:
     unit: cases
 dataset:
   title: Global Tuberculosis Report - Treatment Outcomes
+  owners:
+    - Fiona Spooner
 tables:
   outcomes:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Time use across activities - OECD Gender data (2020)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   time_use_across_activities__oecd_gender_data__2020:
     variables:

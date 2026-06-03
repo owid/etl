@@ -13,7 +13,7 @@ definitions:
       topic_tags:
         - Medicine & Biotechnology
     display:
-          numDecimalPlaces: 0
+      numDecimalPlaces: 0
     processing_level: major
   notes:
     completed_trials: |
@@ -24,6 +24,8 @@ definitions:
 dataset:
   update_period_days: 365 # dataset itself is updated continuously, but I think updating it every year is sufficient for us
 
+  owners:
+    - Tuna Acisu
 tables:
   trials_per_year:
     variables:
@@ -64,7 +66,7 @@ tables:
       behavioral:
         title: Number of clinical trials with behavioral interventions
         description_short: |
-           Annual number of completed clinical trials registered globally in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve behavioral interventions. Behavioral interventions can include lifestyle changes, counseling, or other non-pharmaceutical treatments
+          Annual number of completed clinical trials registered globally in the [ClinicalTrials.gov](#dod:clinical-trials-gov) database that involve behavioral interventions. Behavioral interventions can include lifestyle changes, counseling, or other non-pharmaceutical treatments
         unit: trials
         short_unit: ""
         description_key:

@@ -12,6 +12,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Fiona Spooner
 tables:
   crime_survey:
     variables:

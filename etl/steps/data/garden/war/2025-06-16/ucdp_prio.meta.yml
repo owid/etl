@@ -25,8 +25,7 @@ definitions:
       The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
-    description_short_per_capita: <% set per_capita = ", per 100,000 people" %>
-      {definitions.all.description_short}
+    description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.all.description_short}
     conflict_type_base: |-
       This includes combatant and civilian deaths due to fighting
     ucdp_prio_linked: |-
@@ -109,6 +108,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   # MAIN INDICATORS
   ucdp_prio:

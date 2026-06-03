@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: Mean age at childbearing (HFD; UN WPP)
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   mean_age_childbearing:
     variables:

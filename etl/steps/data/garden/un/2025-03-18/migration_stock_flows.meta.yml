@@ -40,6 +40,8 @@ dataset:
   update_period_days: 729
 
 
+  owners:
+    - Tuna Acisu
 tables:
   migrant_stock_dest_origin:
     variables:

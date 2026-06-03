@@ -1,5 +1,7 @@
 dataset:
   title: Air travel trips per capita (Airbus, 2019)
+  owners:
+    - Max Roser  # backport
 tables:
   air_travel_trips_per_capita__airbus__2019:
     variables:

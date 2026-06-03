@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Veronika Samborska
 tables:
   ai_wrp_2021_grouped:
     variables:

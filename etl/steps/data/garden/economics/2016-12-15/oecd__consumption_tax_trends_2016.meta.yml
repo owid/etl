@@ -1,5 +1,7 @@
 dataset:
   title: OECD – Consumption Tax Trends 2016
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   oecd__consumption_tax_trends_2016:
     variables:

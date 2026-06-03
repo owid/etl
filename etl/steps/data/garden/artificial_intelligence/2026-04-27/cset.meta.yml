@@ -68,6 +68,9 @@ dataset:
   update_period_days: 180
 
 
+  owners:
+    - Edouard Mathieu
+    - Veronika Samborska
 tables:
   cset:
     variables:
@@ -101,7 +104,7 @@ tables:
         title: AI patent applications
         unit: applications
         description_short: |-
-         Patent applications for AI-related inventions, including pending applications that haven't yet been granted. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
+          Patent applications for AI-related inventions, including pending applications that haven't yet been granted. Each invention is counted once and attributed to the country where it was first filed, not the inventor's nationality.
         description_key: *description_key_patents
         description_processing: *description_processing_patents
 
@@ -118,11 +121,11 @@ tables:
         description_processing: *description_processing_patents
         presentation:
           title_public: |-
-              <% if field == "All" -%>
-              AI patents granted
-              <%- else -%>
-              AI patents granted: << field|lower >>
-              <%- endif %>
+            <% if field == "All" -%>
+            AI patents granted
+            <%- else -%>
+            AI patents granted: << field|lower >>
+            <%- endif %>
           grapher_config:
             note: According to calculations by CSET, the median time for a patent to be granted is 826 days from its initial filing date, while the average time is 860 days.
         display:

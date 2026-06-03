@@ -1,5 +1,7 @@
 dataset:
   title: Figure_17.28_budget_balance
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   figure_17_28_budget_balance:
     variables:

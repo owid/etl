@@ -1,5 +1,7 @@
 dataset:
   title: Trust – Eurostat
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   trust__eurostat:
     variables:

@@ -2,7 +2,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - CO2 & Greenhouse Gas Emissions
+        - CO2 & Greenhouse Gas Emissions
     processing_level: minor
     unit: grams of CO₂ per kilowatt-hour
     short_unit: gCO₂/kWh
@@ -10,6 +10,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   energy_emission_factors:
     variables:

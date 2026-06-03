@@ -9,6 +9,8 @@ dataset:
   update_period_days: 365
   title: Historical statistics for mineral and material commodities
 
+  owners:
+    - Pablo Rosado
 tables:
   # historical_production:
   #   title: Historical statistics for mineral and material commodities
@@ -28,4 +30,4 @@ tables:
     title: Historical statistics for mineral and material commodities
     variables:
       # Metadata is filled up programmatically.
-      {}
+        {}

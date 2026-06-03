@@ -12,6 +12,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   uk_historical_electricity:
     title: UK historical electricity

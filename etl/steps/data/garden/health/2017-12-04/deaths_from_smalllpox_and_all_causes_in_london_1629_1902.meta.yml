@@ -1,5 +1,7 @@
 dataset:
   title: Deaths from Smalllpox and all causes in London 1629-1902
+  owners:
+    - Sophie Ochmann  # backport
 tables:
   deaths_from_smalllpox_and_all_causes_in_london_1629_1902:
     variables:

@@ -1,8 +1,9 @@
 dataset:
   update_period_days: 180
 
+  owners:
+    - Pablo Rosado
 tables:
   owid_deflator:
     title: OWID Deflator
-    variables:
-      {}
+    variables: {}

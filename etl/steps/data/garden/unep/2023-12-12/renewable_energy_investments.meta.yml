@@ -16,6 +16,8 @@ dataset:
 
     Investment adjusts for re-invested equity, and includes estimates for undisclosed deals. Figures excludes investments in large hydropower schemes.
 
+  owners:
+    - Pablo Rosado
 tables:
   renewable_energy_investments:
     title: Investment in renewable energy by technology

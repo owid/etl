@@ -2,7 +2,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Climate Change
+        - Climate Change
     unit: "square kilometers"
     short_unit: "km²"
     description_short: Measured in square kilometers.
@@ -11,6 +11,8 @@ dataset:
   title: Snow Cover Extent
   update_period_days: 60
 
+  owners:
+    - Pablo Rosado
 tables:
   snow_cover_extent:
     title: Snow Cover Extent

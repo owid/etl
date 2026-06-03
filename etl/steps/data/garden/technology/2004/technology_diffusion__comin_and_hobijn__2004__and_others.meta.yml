@@ -1,5 +1,7 @@
 dataset:
   title: Technology Diffusion - Comin and Hobijn (2004) and others
+  owners:
+    - Diana Beltekian  # backport
 tables:
   technology_diffusion__comin_and_hobijn__2004__and_others:
     variables:
