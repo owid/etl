@@ -1,11 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
-from etl.data_helpers.geo import add_population_to_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -19,7 +18,6 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("homicide")
     # Load population dataset only goes up to 2023
-    ds_population = paths.load_dataset("population")
     # Load full population dataset including projections to calculate rates for 2024
     ds_pop_full = paths.load_dataset("un_wpp")
     tb_pop_full = ds_pop_full.read("population")
@@ -35,7 +33,7 @@ def run() -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = clean_up_categories(tb)
-    tb = calculate_united_kingdom(tb, ds_population)
+    tb = calculate_united_kingdom(tb)
     # Calculate rates for 2024 using counts from UNODC and medium population projections from UN WPP
     tb = calculate_rates_for_most_recent_year(tb, tb_pop_full)
     # Clean up variable names.
@@ -188,7 +186,7 @@ def clean_up_categories(tb: Table) -> Table:
     return tb
 
 
-def calculate_united_kingdom(tb: Table, ds_population: Dataset) -> Table:
+def calculate_united_kingdom(tb: Table) -> Table:
     """
     Calculate data for the UK as it is reported by the constituent countries
     """
@@ -208,7 +206,7 @@ def calculate_united_kingdom(tb: Table, ds_population: Dataset) -> Table:
 
     # Add in UK population to calculate rates
     tb_uk_rate = tb_uk.copy()
-    tb_uk_rate = add_population_to_table(tb_uk_rate, ds_population)
+    tb_uk_rate = paths.regions.add_population(tb_uk_rate)
     tb_uk_rate["value"] = tb_uk_rate["value"] / tb_uk_rate["population"] * 100000
     tb_uk_rate["unit_of_measurement"] = "Rate per 100,000 population"
     tb_uk_rate = tb_uk_rate.drop(columns=["population"])

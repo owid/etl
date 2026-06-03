@@ -4,10 +4,9 @@ Energy Institute Statistical Review dataset and Shift data on fossil fuel produc
 """
 
 import numpy as np
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.datautils import dataframes
 
-from etl.data_helpers.geo import add_population_to_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -140,7 +139,7 @@ def add_annual_change(tb: Table) -> Table:
     return combined
 
 
-def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
+def add_per_capita_variables(tb: Table) -> Table:
     """Add per-capita variables to combined Statistical Review and Shift data.
 
     Parameters
@@ -164,9 +163,8 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
         country for country in tb["country"].unique() if (("(EI)" in country) or ("(Shift)" in country))
     ]
     # Add population to data.
-    combined = add_population_to_table(
+    combined = paths.regions.add_population(
         tb=tb,
-        ds_population=ds_population,
         warn_on_missing_countries=True,
         interpolate_missing_population=True,
         expected_countries_without_population=expected_countries_without_population,
@@ -220,7 +218,6 @@ def run() -> None:
     tb_shift = ds_shift.read("energy_production_from_fossil_fuels", reset_index=False)
 
     # Load population dataset.
-    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -238,7 +235,7 @@ def run() -> None:
     tb = add_annual_change(tb=tb)
 
     # Add per-capita variables.
-    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
+    tb = add_per_capita_variables(tb=tb)
 
     # Remove spurious values and rows that only have nans.
     tb = remove_spurious_values(tb=tb)
