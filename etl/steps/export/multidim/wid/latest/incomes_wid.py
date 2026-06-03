@@ -142,6 +142,12 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "chartTypes": ["LineChart", "Dumbbell"],
+                    # Sort the dumbbell (and table) entities by the after-tax value, highest first
+                    "sortBy": "column",
+                    "sortColumnSlug": lambda view: next(
+                        (i.catalogPath for i in view.indicators.y if "after_tax" in i.catalogPath), None
+                    ),
+                    "sortOrder": "desc",
                 },
                 "view_metadata": {
                     "description_short": lambda view: _get_before_vs_after_metadata(tb, view)["description_short"],

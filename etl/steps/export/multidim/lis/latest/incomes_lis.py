@@ -164,6 +164,12 @@ def run() -> None:
                     "tab": "chart",
                     "chartTypes": ["LineChart", "Dumbbell"],
                     "missingDataStrategy": "hide",
+                    # Sort the dumbbell (and table) entities by the after-tax value, highest first
+                    "sortBy": "column",
+                    "sortColumnSlug": lambda view: next(
+                        (i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None
+                    ),
+                    "sortOrder": "desc",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
                     "note": "",
