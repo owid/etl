@@ -27,6 +27,7 @@ Assumptions:
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
 - [ ] Run ETL update workflow via `etl-update` subagent (help → dry run → approval → real run)
+- [ ] Add yourself to `dataset.owners` in the new garden `.meta.yml` (don't reorder; preserve existing names and markers)
 - [ ] Catalog `# NOTE:` / `# TODO:` comments carried over from the old step files into `notes_to_check.md`
 - [ ] Detect any `sanity_checks` functions and their log-control flags; append to `notes_to_check.md`
 - [ ] Create or reuse draft PR and work branch
@@ -71,6 +72,30 @@ Persistence:
 
 When you do stop, present a concise summary of the issue and what options exist.
 
+## When the update isn't a drop-in version bump
+
+Some updates carry structural changes that make the standard rename-only flow the wrong tool. Recognise them up front and adjust the workflow.
+
+**Triggers** — any of these means you're in restructure territory, not a version bump:
+- `short_name` changes (producer rebranded the dataset).
+- File format/schema changes (wide → long, different file extension with a different column set, new dimensions).
+- Policy/indicator set changes substantially (splits, dropped composites, newly added areas).
+- Score semantics change (e.g. binary → continuous with subnational coverage).
+
+**Workflow adjustments:**
+
+1. **Skip `etl update`.** The rename-only flow copies the old step files into a new folder — useless when the schema is different. Author the new step chain by hand, using the old version as inspiration but not as a starting copy.
+2. **Add the new chain to the DAG before archiving the old.** Leave both chains active while you build and validate v2; archive the v1 entries only once v2 is on staging and the chart remap is queued or done.
+3. **Decide on naming convention upfront.** Ask the user whether to preserve v1 short_names where they map cleanly, or to adopt the source's fresh naming scheme. Fresh naming is cleaner but means the auto-Indicator-Upgrader can't help.
+4. **Hand-curate the v1 → v2 indicator mapping.** When short_names change entirely, the auto-upgrader has nothing to match on, but the Indicator Upgrader also matches on **`title`** — so if v2 titles are descriptive (full sentences rather than the bare short_name), you can hand the user a table of v1 title → v2 title pairs and they can drive the chart remap from there. Generate this table from the v1 meta.yml + the v2 grapher catalog.
+5. **Defer the Slack and `/latest` announcements until charts have been remapped.** Both posts depend on `charts.published_count` and `charts.selected_views` from the v2 chain. Drafting them before the remap gives the wrong count (zero) and no representative views. Tell the user to ping you when the chart remap is done, then run steps 8 / 9 / 9b.
+
+For the **long-format with dimensions** sub-case specifically (e.g. one row per `(country, year, <dim1>, <dim2>)`), use the modern OWID pattern:
+- Meadow + garden: `tb.format(["country", "year", <dim1>, <dim2>, ...], sort_columns=True)`.
+- Aggregations: `paths.regions.add_aggregates(tb, index_columns=[...full key...], regions=REGIONS, aggregations={...})`.
+- Grapher: pass long tables through unchanged; the framework auto-expands them into per-cell variables.
+- Metadata: variables are keyed by the long-column name, with `<% if <dim> == "X" and <dim2> == "Y" %>...<% endif %>` Jinja blocks inside `title`, `description_short`, `display.name`. Grep this repo for `tb.format(["country", "year"` with more than two index entries to find current reference examples.
+
 ## Workflow orchestration
 
 0) Initial setup
@@ -83,6 +108,14 @@ When you do stop, present a concise summary of the issue and what options exist.
    - **CRITICAL**: Run `etl update` ONCE for the full step URI (e.g., `data://garden/namespace/old_version/short_name`). Do NOT run it separately per channel (snapshot, meadow, garden, grapher). Running it once ensures all cross-step DAG dependencies are updated together. Running it per-channel leaves stale version references in `dag/main.yml` (e.g., garden pointing to old meadow version).
    - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
    - After running, **always verify `dag/main.yml`**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow).
+
+1a-bis) Add yourself to `dataset.owners` in the new garden `.meta.yml`
+
+   You've just become a contributor to this dataset, so add your canonical OWID name to its `owners:` list. Don't reorder — keep the existing primary first; append yourself at the end. Skip if you're already there.
+
+   Your canonical name must match an entry in the schema enum (`schemas/dataset-schema.json`). Resolve it from `git config user.name` via `etl.owners.resolve_owner`; if that returns `None`, add a mapping in `etl/owners.py` and a row in the schema enum before continuing.
+
+   Edit the YAML in place, preserving comments and the existing `# review` / `# backport` / `# fasttrack` markers on other entries.
 
 1b) Check for outdated practices (check-outdated-practices skill)
    - After `etl update` creates new step files, run the `/check-outdated-practices` skill on the newly created files
@@ -358,15 +391,23 @@ When you do stop, present a concise summary of the issue and what options exist.
    ```
    This controls the auto-update cadence. Even when the rest of the `dataset:` block is empty, **never strip `update_period_days`** — leave the block in place with just that field.
 
-   **Link verification.** Run a HEAD request on every URL in the new `.dvc` and `.meta.yml` files (all channels — meadow `.meta.yml` files matter when they exist). Anything non-2xx is a hard blocker:
+   **Link verification.** Run a HEAD request on every URL in the new `.dvc` and `.meta.yml` files (all channels — meadow `.meta.yml` files matter when they exist). Anything non-2xx is a *signal*, not a guaranteed break — always double-check before acting:
    ```bash
-   for url in $(rg -No "https?://[^\"' ]+" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/ \
+   for url in $(rg --no-filename -No "https?://[^\"' ]+" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/ \
        | sed -E 's/[).,;:>]+$//' \
        | sort -u); do
-       printf "%s  %s\n" "$(curl -sI -o /dev/null -w '%{http_code}' --max-time 10 "$url")" "$url"
+       printf "%s  %s\n" "$(curl -sI -L -o /dev/null -w '%{http_code}' --max-time 15 -A 'Mozilla/5.0' "$url")" "$url"
    done
    ```
-   The `sed` strips trailing markdown/punctuation chars (`)`, `.`, `,`, `;`, `:`, `>`) so URLs inside `[text](url)` aren't reported as broken because of a stray closing paren. Fix any non-2xx hit on `url_main`, `url_download`, `license.url`, or URLs referenced from `description` / `description_key` before continuing.
+   The `--no-filename` flag prevents `rg` from prepending `path:` to each match (otherwise the for-loop tries to curl `path:url` and every check returns 000). `-A 'Mozilla/5.0'` sometimes coaxes a real response out of Cloudflare-fronted hosts, but it doesn't always work — see the next note.
+
+   **`curl` non-2xx ≠ broken.** Cloudflare-fronted sites (notably `ourworldindata.org`) can return **404** to curl on URLs that work fine in a browser, depending on edge-node routing, IP geolocation, and cached state. Before treating a 4xx as a real failure:
+
+   1. **Re-check with `WebFetch`** (the built-in tool). It uses a different code path and a `Mozilla/5.0` UA that Cloudflare usually accepts. A `200` with a coherent page body is authoritative — trust it over curl.
+   2. **If `WebFetch` also fails**, sanity-check the Wayback Machine: `https://web.archive.org/web/<year>/<url>`. A recent successful snapshot means the URL is reachable on the public internet and your local route is the problem.
+   3. **Only act on a true failure** — both `WebFetch` *and* Wayback unable to reach the URL — and even then **flag and ask the user before silently rewriting an external link in metadata**. Replacing a working link with a "safer" alternative because of a curl false-positive is worse than leaving the original. Apply the same restraint here as the global "Checkpoints — when to pause" section.
+
+   Fix any genuinely-non-2xx hit on `url_main`, `url_download`, `license.url`, or URLs referenced from `description` / `description_key` before continuing. The `sed` strips trailing markdown/punctuation chars (`)`, `.`, `,`, `;`, `:`, `>`) so URLs inside `[text](url)` aren't reported as broken because of a stray closing paren.
 
    **Verification.** After editing, re-run the affected step (with `--grapher` if grapher) so the catalog reflects the changes. Then confirm `presentation.attribution_short` actually landed:
    ```python
@@ -459,7 +500,7 @@ When you do stop, present a concise summary of the issue and what options exist.
    - Run the `data-updates-comms` skill with `workbench/<short_name>/update-context.yml` as input. `data-updates-comms` is the canonical owner of the Slack form wording, copy-paste format, editorial framing, search URL, and any standalone fallback gathering. Do not duplicate that rendering logic here.
    - Save the rendered draft to `workbench/<short_name>/slack-announcement.md`.
    - If `data-updates-comms` reports missing mechanical fields, gather them, update `update-context.yml`, and re-render rather than inventing values. Ask the user if a missing field requires judgment.
-   - **Add the announcement to the PR description** as a collapsed section titled "Slack Announcement".
+   - **Add the announcement to the PR description** as a collapsed `<details>` section titled "Slack Announcement", with the file content embedded inside a triple-backtick `markdown` fence.
    - **Post `@codex review` as a separate PR comment** (not in the PR description) to trigger an automated code review. Use:
      ```bash
      gh pr comment <pr_number> --body "@codex review"
@@ -488,7 +529,7 @@ When you do stop, present a concise summary of the issue and what options exist.
    - **CTA text** — descriptive: "Explore the updated data in our interactive charts" (default), "Explore all of the updated data in our interactive charts" (broad), "Explore the interactive version of this chart" (single chart), "Explore this data going back to YYYY in our interactive chart" (single chart with date depth).
    - **Image filename** — `YYYY-MM-data-update-<slug>.png` (e.g. `2026-04-data-update-h5n1-flu.png`). The skill doesn't generate the image; the user adds it to the Doc separately.
    - Save the draft to `workbench/<short_name>/data-update.md`.
-   - **Add a collapsed `<details>` section titled "Data update post (for OWID /latest)"** to the PR description, placed *after* the Slack-announcement section.
+   - **Add a collapsed `<details>` section titled "Data update post (for OWID /latest)"** to the PR description, placed *after* the Slack-announcement section, with the file content embedded inside a triple-backtick `markdown` fence.
    - Tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Data update post drafted at [workbench/<short_name>/data-update.md](workbench/<short_name>/data-update.md) in the Google Docs CMS format. Please create a new Google Doc in /Data updates, paste the draft, attach the chart screenshot, and share for review."` Always render `workbench/<short_name>/data-update.md` as a markdown link `[…](…)` rather than as a bare path or inline-code path — the chat UI renders it as clickable that way.
 
 10) Codex review: address comments and resolve threads
@@ -517,6 +558,7 @@ When you do stop, present a concise summary of the issue and what options exist.
 Commit and push incrementally as you go — after each step that produces code changes. Don't wait until the end. Use descriptive commit messages with appropriate emojis (the one auto-prepended by `etl pr` for the chosen category + 🤖 for AI-written code).
 
 At the end of the workflow, update the PR description with:
+- A **tracking-issue link** as the first line of the Summary — e.g. `Tracks: [owid/owid-issues#NNNN](https://github.com/owid/owid-issues/issues/NNNN)`. Most data updates have a corresponding `owid-issues` ticket; try to find it by searching the title or `<short_name>` first, and **ask the user for the issue number if you can't locate one** rather than skipping the link silently.
 - A summary of key changes at the top
 - Collapsed sections for each pipeline step (Snapshot, Meadow, Garden, Grapher)
 - A collapsed section for the Slack announcement
@@ -584,6 +626,20 @@ These pages need a fresh staging build, so they're only meaningful after the PR'
 - Column name changes: update garden processing code and metadata YAMLs (garden/grapher) to match schema changes.
 - Indexing: avoid leaking index columns from `reset_index()`; format tables with `tb.format(["country", "year"])` as appropriate.
 - Metadata validation errors are guidance — update YAML to add/remove variables as indicated.
+- **Mixed-type object columns at meadow**: when `pd.read_csv` produces an `object` column that mixes strings and `NaN` (common for sparse text columns like sources/comments/punishments), the feather repacker rejects it. Cast those columns to pandas `"string"` dtype before `tb.format(...)`.
+- **`paths.regions` auto-resolves DAG dependencies**: `paths.regions.add_population(tb)` and `paths.regions.add_aggregates(tb, regions=[...])` pick up the `population` and `income_groups` datasets directly from the DAG. Don't `paths.load_dataset("population")` and pass it through unless the helper specifically asks for the dataset — the parameter is unused.
+- **WB income-group aggregates**: add the four classification names (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`) to your `REGIONS` list and add `data://garden/wb/<latest>/income_groups` to the DAG. `paths.regions.add_aggregates(...)` auto-resolves the classification.
+- **Detect structural placeholders dynamically**: when a source ships "balanced panel" rows that are zero everywhere by design (status combos that exist only for completeness), detect them at runtime (`groupby(...).max() == 0`) and assert the count matches the codebook. A coding change in the source then surfaces as a test failure instead of silently shipping noise.
+- **Codebook-vs-data inconsistencies**: when the codebook documents one thing but the actual CSV shows another (placeholder claimed but non-zero rows present, etc.), preserve the data as-shipped and flag it in the PR description for the producer to confirm. Don't silently force the data to match the codebook.
+- **`processing_level: major` requires `description_processing`**: keep `processing_level: minor` as the common default and override to `major` only on indicators that have a `description_processing` field. Don't blanket-set `major` on the common block and then leave country-level proportions without their own processing note.
+- **Per-indicator description_processing reads better than a generic shared note**: when an indicator is derived (combined-categorical buckets, regional aggregates, computed counts), spell out *that indicator's* derivation. Reusing named definitions for shared boilerplate is fine; just compose them into per-indicator sentences rather than dropping a single generic note across all indicators.
+- **`description_key` in `definitions.common` propagates only to indicators without their own list**: if you want a bullet to appear on every indicator, either keep it on `common.description_key` and don't define per-indicator lists (it inherits), or prepend it explicitly to each per-indicator list (treats it as a "first bullet" pattern).
+- **Phantom-category audit on categorical indicators**: after building categorical indicators, sweep every indicator and compare YAML `sort:` labels against the unique values that actually appear in the data. Phantom labels (declared in `sort:` or in a category map but never produced) clutter chart legends with empty buckets. Either drop them from `sort:` and `description_key`, or remove them from the map if they can never occur given the data shape. Re-run the audit on every data refresh — phantoms can reappear when a category is dropped upstream.
+- **`NOTE:` comments for the next maintainer when behaviour is data-conditional**: when something in the code holds only because of the current data shape (e.g. "only 4 indicators have an EoE=0 row", "only Brazil 2025 is a transition-year artefact"), leave a `# NOTE:` comment near the relevant block asking the next data update to re-audit. Helps future maintainers spot which assumptions might decay before they bite.
+- **Indicator Upgrader CLI for one-shot chart remaps**: when v1 → v2 short_names change so much that the auto-upgrader can't match them, drive the remap manually. Write a small script that calls `WizardDB.add_variable_mapping(mapping={old_id: new_id, ...}, dataset_id_old=..., dataset_id_new=..., comments="...")` with the explicit pairs, then run `from apps.indicator_upgrade.upgrade import cli_upgrade_indicators; cli_upgrade_indicators(dry_run=True)` to preview affected charts, and `(dry_run=False)` to apply. Mappings stay in the wizard DB until `WizardDB.delete_variable_mapping()` is called, so a slug-collision failure can be recovered by fixing the slug and rerunning the upgrade — only un-upgraded charts get reattempted. The active staging DB is inferred from the current git branch.
+- **Drop-in vs restructure decision point**: when the new dataset has a different shape (long vs wide, more policies, changed score semantics, dropped composite measures), `etl update --rename` is the wrong starting point — the structure of meadow/garden/grapher needs to follow the new shape, and the rename flow will only produce confusion. Spot this fork early at the snapshot/codebook stage, before running `etl update`. Scaffold the new chain via the [`create-etl-steps`](../create-etl-steps/SKILL.md) skill (wraps the wizard's cookiecutter templates) or launch the wizard UI with `etlwiz` and use its "ETL Steps" page — both produce a consistent meadow/garden/grapher skeleton to fill in. Once scaffolded, **read the v1 scripts as a reference** for the source-specific logic that's still relevant (column-rename maps, status/category normalisations, country harmonisation map, sanity checks, codebook-driven structural assertions) — don't copy the v1 structure blindly, but port the bits that still apply to the new schema.
+
+When the update is review-heavy and you need iterative back-and-forth with a topic owner over staging, see the [`report-indicator-changes`](../report-indicator-changes/SKILL.md) skill for drafting the message.
 
 ## Artifacts (expected)
 

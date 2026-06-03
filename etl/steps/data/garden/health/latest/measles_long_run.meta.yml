@@ -3,6 +3,8 @@ definitions:
 dataset:
   title: Long-run reported cases of measles in the United States
   update_period_days: 7
+  owners:
+    - Fiona Spooner
 tables:
   measles_long_run:
     variables:

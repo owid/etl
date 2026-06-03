@@ -11,6 +11,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   historic_trade:
     variables:

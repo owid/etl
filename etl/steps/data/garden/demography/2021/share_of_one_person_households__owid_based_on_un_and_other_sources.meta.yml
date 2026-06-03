@@ -1,5 +1,7 @@
 dataset:
   title: Share of one person households - OWID based on UN and other sources
+  owners:
+    - Diana Beltekian  # backport
 tables:
   share_of_one_person_households__owid_based_on_un_and_other_sources:
     variables:

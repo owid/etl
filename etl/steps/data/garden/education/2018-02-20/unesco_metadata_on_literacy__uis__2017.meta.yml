@@ -1,5 +1,7 @@
 dataset:
   title: UNESCO metadata on literacy (UIS (2017))
+  owners:
+    - Diana Beltekian  # backport
 tables:
   unesco_metadata_on_literacy__uis__2017:
     variables:

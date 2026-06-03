@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Saloni Dattani  # fasttrack
 tables:
   replacement_fertility_basten_scherbov:
     variables:
@@ -11,8 +13,7 @@ tables:
         unit: ''
         display:
           numDecimalPlaces: 1.0
-        description: Estimated total fertility rate required to retain the same population size, after accounting for early
-          life mortality.
+        description: Estimated total fertility rate required to retain the same population size, after accounting for early life mortality.
       replacement_fertility_rate_projection:
         title: Replacement fertility rate (projection)
         unit: ''

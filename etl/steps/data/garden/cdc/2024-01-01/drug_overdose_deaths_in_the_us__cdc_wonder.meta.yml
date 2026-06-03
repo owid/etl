@@ -1,5 +1,7 @@
 dataset:
   title: Drug overdose deaths in the US (CDC WONDER)
+  owners:
+    - Sophie Ochmann  # backport
 tables:
   drug_overdose_deaths_in_the_us__cdc_wonder:
     variables:

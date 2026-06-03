@@ -11,6 +11,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   isaps_plastic_surgery:
     variables:

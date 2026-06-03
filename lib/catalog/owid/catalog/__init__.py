@@ -9,7 +9,6 @@ from owid.catalog.core.meta import (
     DatasetMeta,
     License,
     Origin,
-    Source,
     TableMeta,
     VariableMeta,
     VariablePresentationMeta,
@@ -32,7 +31,6 @@ __all__ = [
     "TableMeta",
     "VariableMeta",
     "VariablePresentationMeta",
-    "Source",
     "Origin",
     "License",
     # backwards compatibility re-exports

@@ -1,5 +1,7 @@
 dataset:
   title: Environment - Municipal waste, Generation and Treatment
+  owners:
+    - Aibek Aldabergenov  # backport
 tables:
   environment__municipal_waste__generation_and_treatment:
     variables:

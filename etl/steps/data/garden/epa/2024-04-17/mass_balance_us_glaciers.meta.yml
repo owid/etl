@@ -1,6 +1,8 @@
 dataset:
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   mass_balance_us_glaciers:
     title: Mass Balance of Glaciers in the United States
@@ -13,5 +15,5 @@ tables:
           Measured in meters of water equivalent, which represent changes in the average thickness of a glacier relative to a base year 1965.
         presentation:
           topic_tags:
-          - Climate Change
+            - Climate Change
         processing_level: minor

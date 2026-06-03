@@ -10,6 +10,8 @@ dataset:
   title: Cost and capacity of photovoltaic technology
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   nemet_2009:
     variables:

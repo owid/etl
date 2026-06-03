@@ -30,6 +30,8 @@ dataset:
   description: |-
     Jones et al. quantify national and regional contributions to the increase of global mean surface temperature over the last few centuries.
 
+  owners:
+    - Pablo Rosado
 tables:
   national_contributions:
     variables:

@@ -26,7 +26,6 @@ from owid.catalog.core.meta import (
     PROCESSING_LEVELS_ORDER,
     License,
     Origin,
-    Source,
     VariableMeta,
     VariablePresentationMeta,
 )
@@ -605,31 +604,6 @@ def _get_metadata_value_from_indicators_if_all_identical(
     return combined_value
 
 
-def get_unique_sources_from_indicators(indicators: list[Indicator]) -> list[Source]:
-    """Get unique sources from a list of indicators.
-
-    Collects all unique Source objects from the metadata of multiple indicators,
-    preserving order of first occurrence.
-
-    Args:
-        indicators: List of Indicator objects to extract sources from.
-
-    Returns:
-        List of unique Source objects in order of first appearance.
-
-    Example:
-        ```python
-        sources = get_unique_sources_from_indicators([ind1, ind2, ind3])
-        print(f"Combined {len(sources)} unique sources")
-        ```
-    """
-    # Make a list of all sources of all indicators.
-    sources = []
-    for indicator in indicators:
-        sources += [s for s in indicator.metadata.sources if s not in sources]
-    return sources
-
-
 def get_unique_origins_from_indicators(indicators: list[Indicator]) -> list[Origin]:
     """Get unique origins from a list of indicators.
 
@@ -866,7 +840,6 @@ def combine_indicators_metadata(
     metadata.short_unit = _get_metadata_value_from_indicators_if_all_identical(
         indicators=indicators_only, field="short_unit", operation=operation, warn_if_different=True
     )
-    metadata.sources = get_unique_sources_from_indicators(indicators=indicators_only)
     metadata.origins = get_unique_origins_from_indicators(indicators=indicators_only)
     metadata.licenses = get_unique_licenses_from_indicators(indicators=indicators_only)
     metadata.display = combine_indicators_display(indicators=indicators_only, operation=operation)

@@ -1,5 +1,7 @@
 dataset:
   title: DRAFT who_standard_pop
+  owners:
+    - Fiona Spooner  # fasttrack
 tables:
   who_standard_pop:
     variables:

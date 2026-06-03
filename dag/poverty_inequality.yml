@@ -15,6 +15,8 @@ steps:
     - data://meadow/wb/2026-03-24/world_bank_pip
   data://grapher/wb/2026-03-24/world_bank_pip:
     - data://garden/wb/2026-03-24/world_bank_pip
+  data://external/poverty_inequality/latest/world_bank_pip:
+    - data://garden/wb/2026-03-24/world_bank_pip
   export://multidim/wb/latest/poverty_pip:
     - data://grapher/wb/2026-03-24/world_bank_pip
   export://multidim/wb/latest/incomes_pip:
@@ -127,6 +129,8 @@ steps:
       - snapshot://wb/2026-03-25/thousand_bins_distribution.dta
   data://external/poverty_inequality/latest/thousand_bins_distribution:
     - data://garden/wb/2026-03-25/thousand_bins_distribution
+  export://s3/poverty_inequality/latest/income_distribution:
+    - data://garden/wb/2026-03-25/thousand_bins_distribution
 
   # Historical poverty estimates (combining thousand_bins with Maddison GDP growth)
   data://grapher/poverty_inequality/2025-10-23/historical_poverty:
@@ -141,6 +145,8 @@ steps:
       - data://garden/demography/2024-07-15/population
       - data://garden/demography/2025-12-10/population_ireland
       - data://garden/regions/2023-01-01/regions
+  data://external/poverty_inequality/latest/historical_poverty:
+    - data://garden/poverty_inequality/2025-10-23/historical_poverty
 
   # Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
   data://garden/cedlas/2025-04-01/sedlac:

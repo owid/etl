@@ -8,7 +8,7 @@ from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import fastjsonschema
 import pandas as pd
@@ -355,14 +355,33 @@ class Collection(MDIMBase):
         return dix
 
     def get_dimension(self, slug: str) -> Dimension:
-        """Get dimension object with slug `slug`"""
+        """Return the `Dimension` object whose slug matches `slug`.
+
+        Use this when you need the full dim (choices + presentation + metadata).
+        Raises ``ValueError`` if no dim with that slug exists.
+
+        Example:
+
+            >>> dim = c.get_dimension("sex")
+            >>> dim.choice_slugs
+            ['female', 'male']
+        """
         for dim in self.dimensions:
             if dim.slug == slug:
                 return dim
         raise ValueError(f"Dimension {slug} not found in dimensions!")
 
     def get_choice_names(self, dimension_slug: str) -> dict[str, str]:
-        """Get all choice names in a given dimension."""
+        """Return a `{choice_slug: choice_name}` map for one dimension.
+
+        Convenience for looking up the human-readable choice names declared on
+        the dim. Raises ``ValueError`` if `dimension_slug` is unknown.
+
+        Example:
+
+            >>> c.get_choice_names("sex")
+            {'female': 'Female', 'male': 'Male'}
+        """
         dimension = self.get_dimension(dimension_slug)
         choice_names = {}
         for choice in dimension.choices:
@@ -565,16 +584,156 @@ class Collection(MDIMBase):
                 continue
             dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences.get(dim.slug, set())]
 
+    def rename_choice_slug(
+        self,
+        dimension_slug: str,
+        old_slug: str,
+        new_slug: str,
+        dedup_slug: Literal["inherit", "overwrite"] | None = None,
+    ) -> None:
+        """Rename a choice slug across views AND the dim's ``choices`` list.
+
+        Use this when a build-time helper slug (e.g. ``_intra_int``) needs to be
+        rewritten to its canonical form before save, or when consolidating
+        multiple slugs into one (provided other dim coords keep the affected
+        views distinct).
+
+        **Hard rule (always enforced)**
+            After the rename, no two views may share the same set of dim
+            coordinates. Duplicate coordinates are a data-integrity violation
+            and cannot be bypassed via ``dedup_slug``.
+
+        **Soft rule (opt-in via ``dedup_slug``)**
+            If ``new_slug`` is already declared on the dim — either in use by
+            views or just sitting in ``dim.choices`` — the call fails by
+            default. Set ``dedup_slug`` to opt in and pick whose choice config
+            survives:
+
+            - ``"inherit"``: keep the existing ``new_slug`` DimensionChoice
+              (its name/description/group). Drop the old-slug entry.
+            - ``"overwrite"``: relabel the existing ``new_slug``
+              DimensionChoice with the config of ``old_slug``. Drop the
+              old-slug entry.
+
+        Args:
+            dimension_slug: The dim whose choice should be renamed. Must exist.
+            old_slug: The current slug. Must be declared on the dim. If no view
+                references it, the call still updates the dim entry (no-op on
+                views).
+            new_slug: The replacement slug.
+            dedup_slug: ``None`` (default — fail if ``new_slug`` is already
+                declared), ``"inherit"``, or ``"overwrite"``. See "Soft rule"
+                above.
+
+        Example:
+            >>> # Consolidate a helper slug into the canonical one
+            >>> c.rename_choice_slug(
+            ...     "conflict_type", "_intra_int", "intrastate_conflicts",
+            ...     dedup_slug="inherit",
+            ... )
+        """
+        dim = self.get_dimension(dimension_slug)
+
+        declared = {ch.slug: ch for ch in dim.choices}
+        if old_slug not in declared:
+            raise ValueError(
+                f"Cannot rename '{old_slug}' on dimension '{dimension_slug}': "
+                f"old slug is not declared on the dim. "
+                f"Declared choices: {sorted(declared)}"
+            )
+
+        if old_slug == new_slug:
+            return
+
+        # Hard rule: simulate the rename and reject any duplicate view
+        # coordinates. Runs first, before any state mutation.
+        seen: dict[tuple, dict[str, str]] = {}
+        for view in self.views:
+            coords = dict(view.dimensions)
+            if coords.get(dimension_slug) == old_slug:
+                coords[dimension_slug] = new_slug
+            key = tuple(sorted(coords.items()))
+            if key in seen:
+                raise ValueError(
+                    f"Cannot rename '{old_slug}' → '{new_slug}' on dimension "
+                    f"'{dimension_slug}': the result would contain duplicate "
+                    f"views with dim coordinates {coords}."
+                )
+            seen[key] = coords
+
+        # Soft rule: `new_slug` already declared on dim (in use or not) →
+        # require explicit `dedup_slug`.
+        if new_slug in declared:
+            if dedup_slug is None:
+                raise ValueError(
+                    f"Cannot rename '{old_slug}' → '{new_slug}' on dimension "
+                    f"'{dimension_slug}': the new slug is already declared on "
+                    f"the dim. Pass `dedup_slug='inherit'` to keep the "
+                    f"existing '{new_slug}' config, or "
+                    f"`dedup_slug='overwrite'` to replace it with the config "
+                    f"of '{old_slug}'."
+                )
+            if dedup_slug not in ("inherit", "overwrite"):
+                raise ValueError(f"`dedup_slug` must be 'inherit' or 'overwrite' (got {dedup_slug!r}).")
+            if dedup_slug == "overwrite":
+                # Copy old's metadata onto the existing new-slug choice,
+                # preserving the new entry's position in dim.choices.
+                old_choice = declared[old_slug]
+                new_choice = declared[new_slug]
+                new_choice.name = old_choice.name
+                new_choice.description = old_choice.description
+                new_choice.group = old_choice.group
+            # Both modes: drop the old-slug entry; the new-slug entry stays.
+            dim.choices = [ch for ch in dim.choices if ch.slug != old_slug]
+        else:
+            # Simple rename: mutate the old choice's slug in place so its
+            # position and metadata carry forward.
+            declared[old_slug].slug = new_slug
+
+        # Rewrite views referencing the old slug.
+        for view in self.views:
+            if view.dimensions.get(dimension_slug) == old_slug:
+                view.dimensions[dimension_slug] = new_slug
+
     @property
-    def dimension_slugs(self):
+    def dimension_slugs(self) -> list[str]:
+        """Return the dim slugs in declared order.
+
+        Example:
+
+            >>> c.dimension_slugs
+            ['sex', 'age', 'cause']
+        """
         return [dim.slug for dim in self.dimensions]
 
     @property
     def dimension_choices(self) -> dict[str, list[str]]:
-        """Get all dimension choices in the collection."""
+        """Return choice slugs **declared** on each dim, regardless of view use.
+
+        Reflects what's configured in the dim's ``.choices`` list (e.g. from
+        the YAML). Compare with :meth:`dimension_choices_in_use` for the
+        runtime "actually referenced by a view" subset.
+
+        Example:
+
+            >>> c.dimension_choices
+            {'sex': ['female', 'male'], 'age': ['0-4', '5-9', '10-14']}
+        """
         return {dim.slug: [choice.slug for choice in dim.choices] for dim in self.dimensions}
 
     def dimension_choices_in_use(self) -> dict[str, set[str]]:
+        """Return choice slugs **actually used** by at least one view, per dim.
+
+        Walks every view's ``view.dimensions`` and aggregates the values into
+        a set per dim. Useful for "is X still referenced anywhere?" checks
+        after grouping / dropping views. Compare with :attr:`dimension_choices`
+        for the declared (possibly-unused) set.
+
+        Example:
+
+            >>> c.dimension_choices_in_use()
+            {'sex': {'female', 'male'}, 'age': {'0-4', '5-9'}}
+        """
         from collections import defaultdict
 
         # Get all dimension choices in use
@@ -750,8 +909,14 @@ class Collection(MDIMBase):
             # Get dimension slug
             assert "dimension" in group, "Dimension must be provided!"
             dimension = group["dimension"]
-            # Get choice slugs
-            choices = _ensure_choices(group, dimension)
+            # Resolve the list of original choices to group. We snapshot this
+            # *before* adding `choice_new_slug` to the dim below, because the
+            # `replace`-pass at the end needs the pre-mutation list. Otherwise,
+            # when callers omit `choices` (which is documented to mean "group
+            # every choice on the dim"), `_ensure_choices` would later return
+            # the dim's choices *including* the just-added new slug, and the
+            # replace pass would delete the very views it just created.
+            choices = list(_ensure_choices(group, dimension))
 
             # Get new choice slug
             assert "choice_new_slug" in group, "Dimension must be provided!"
@@ -783,6 +948,10 @@ class Collection(MDIMBase):
                     "views": new_views_,
                     "dimension": dimension,
                     "choice_new": choice_new_slug,
+                    # Capture the resolved choices and replace flag here so the
+                    # post-grouping `replace`-pass uses the pre-mutation values.
+                    "choices": choices,
+                    "replace": group.get("replace", False),
                 }
             )
 
@@ -818,11 +987,12 @@ class Collection(MDIMBase):
         # Extend views
         self.views.extend(new_views_list)
 
-        # Remove original choices if asked to
-        for group in groups:
-            if group.get("replace", False):
-                dimension = group["dimension"]
-                choices = _ensure_choices(group, dimension)
+        # Remove original choices if asked to. Use the choices snapshotted in
+        # the loop above — see the long comment on `choices = …` for why.
+        for new_views in new_views_all:
+            if new_views["replace"]:
+                dimension = new_views["dimension"]
+                choices = new_views["choices"]
                 # Remove views with old choices
                 self.views = [view for view in self.views if view.dimensions[dimension] not in choices]
                 # Remove unused choices (only for the dimension being replaced, not all dimensions)
@@ -1055,31 +1225,42 @@ def replace_catalog_paths_with_ids(config):
 
     Currently, affected fields are:
 
-    - views[].config.sortColumnSlug
+    - views[].config.sortColumnSlug   (string slug)
+    - views[].config.map.columnSlug   (string slug)
+    - views[].config.colorVariableId  (integer variableId)
+    - views[].config.xVariableId      (integer variableId)
+    - views[].config.sizeVariableId   (integer variableId)
+
+    Slug fields stay strings; the *VariableId fields are coerced to int so the
+    Grapher admin API doesn't reject them. ``map_indicator_path_to_id`` accepts
+    either a pure-digit value (passes through) or a catalog path — short
+    (``table#col``) or full (``grapher/ns/version/table/file#col``) — and
+    resolves the latter via a DB lookup.
 
     These fields above are treated like fields in `dimensions`, and also accessed from:
     - `expand_catalog_paths`: To expand the indicator URI to be in its complete form.
     - `validate_multidim_config`: To validate that the indicators exist in the database.
 
     TODO: There might be other fields which might make references to indicators:
-        - config.map.columnSlug
         - config.focusedSeriesNames
     """
+    VAR_ID_FIELDS = ("colorVariableId", "xVariableId", "sizeVariableId")
+
     if "views" in config:
         views = config["views"]
         for view in views:
-            if "config" in view:
-                # Update sortColumnSlug
-                if "sortColumnSlug" in view["config"]:
-                    # Check if catalogPath
-                    # Map to variable ID
-                    view["config"]["sortColumnSlug"] = str(map_indicator_path_to_id(view["config"]["sortColumnSlug"]))
-                # Update map.columnSlug
-                if "map" in view["config"]:
-                    if "columnSlug" in view["config"]["map"]:
-                        view["config"]["map"]["columnSlug"] = str(
-                            map_indicator_path_to_id(view["config"]["map"]["columnSlug"])
-                        )
+            if "config" not in view:
+                continue
+            vcfg = view["config"]
+            # Slug fields — keep as string
+            if "sortColumnSlug" in vcfg:
+                vcfg["sortColumnSlug"] = str(map_indicator_path_to_id(vcfg["sortColumnSlug"]))
+            if "map" in vcfg and "columnSlug" in vcfg["map"]:
+                vcfg["map"]["columnSlug"] = str(map_indicator_path_to_id(vcfg["map"]["columnSlug"]))
+            # VariableId fields — coerce to int
+            for fname in VAR_ID_FIELDS:
+                if fname in vcfg:
+                    vcfg[fname] = int(map_indicator_path_to_id(vcfg[fname]))
 
     return config
 

@@ -1,5 +1,7 @@
 dataset:
   title: Global meat projections to 2050 - FAO
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   global_meat_projections_to_2050__fao:
     variables:

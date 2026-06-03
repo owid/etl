@@ -19,7 +19,6 @@ from urllib.parse import urljoin
 
 import jsonref
 import pandas as pd
-import requests
 import ruamel.yaml
 import structlog
 import yaml
@@ -27,6 +26,7 @@ from ruamel.yaml import YAML
 from yaml.dumper import Dumper
 
 from etl.config import TLS_VERIFY
+from etl.http import session as http_session
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 
 log = structlog.get_logger()
@@ -439,4 +439,4 @@ def get_schema_from_url(schema_url: str) -> dict:
     Dict[str, Any]
         Schema of a chart configuration.
     """
-    return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()
+    return http_session.get(schema_url, timeout=20, verify=TLS_VERIFY).json()

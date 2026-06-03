@@ -1,5 +1,7 @@
 dataset:
   title: Public support and opposition to nuclear energy- Ipsos MORI (2011)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   public_support_and_opposition_to_nuclear_energy__ipsos_mori__2011:
     variables:

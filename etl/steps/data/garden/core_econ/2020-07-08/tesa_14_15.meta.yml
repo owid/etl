@@ -1,5 +1,7 @@
 dataset:
   title: TESA_14.15
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   tesa_14_15:
     variables:

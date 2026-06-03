@@ -1,5 +1,7 @@
 dataset:
   title: World trade - upper bound (% of GDP) (Estevadeordal, Frantz, and Taylor (2003)) (split)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   world_trade__upper_bound__pct_of_gdp__estevadeordal__frantz__and_taylor__2003__split:
     variables:

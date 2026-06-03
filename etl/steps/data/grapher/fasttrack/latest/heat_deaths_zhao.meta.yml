@@ -4,6 +4,8 @@ dataset:
     The share of deaths across regions that are attributed to sub-optimal temperatures. This includes deaths related to cold and heat.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   heat_deaths_zhao:
     variables:

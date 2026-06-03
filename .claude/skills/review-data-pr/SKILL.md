@@ -38,6 +38,21 @@ From the changed files, identify:
 - New step files: `etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/<short_name>.{py,meta.yml}`
 - Old version (from `dag/archive/*.yml` or by grepping for the same `<short_name>`)
 
+### 3b. Update shape — version bump vs restructure
+
+Before running the pipeline, classify the PR. If any of the following are true, you're reviewing a **restructure**, not a version bump, and several downstream checks apply differently:
+
+- The `short_name` changed (old version uses one name, new version uses another).
+- The schema changed (wide ↔ long, different file format with a different column set, new dimensions).
+- The set of policies/indicators changed substantially (splits, dropped composites, newly added areas).
+- Score semantics changed (e.g. binary → continuous 0–1, units/scale changed).
+
+When it's a restructure:
+
+- **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
+- **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
+- **Slack + `/latest` drafts can legitimately be empty** in the first PR of a multi-PR restructure (chart remap pending). 🟢 if PR body explicitly defers them.
+
 ### 4. Run the full pipeline end-to-end
 
 ```bash
@@ -80,13 +95,9 @@ For each step file, check:
 
 ### 8. Outdated practices
 
-Run the canonical detector. The source of truth is [vscode_extensions/detect-outdated-practices/src/extension.ts](vscode_extensions/detect-outdated-practices/src/extension.ts). Highlights to grep manually if the extension isn't running:
+**Run the `/check-outdated-practices` skill on every new step file** (snapshot, meadow, garden, _and_ any helper modules like `*_omms.py`). It reads [vscode_extensions/detect-outdated-practices/src/extension.ts](vscode_extensions/detect-outdated-practices/src/extension.ts) as the single source of truth and greps the full pattern set — don't hand-maintain a copy of the patterns here, and don't eyeball helper calls and decide they look current (the `geo.add_*` family looks fine but is flagged). Report every hit it returns as 🟡.
 
-- `if __name__ == "__main__":` in **snapshot files** — outdated. Remove it; snapshots run via `etls` / `etl snapshot`.
-- `geo.harmonize_countries(...)` in step files — replaced by `paths.regions.harmonize_names(...)`.
-- `dest_dir` argument, `paths.load_dependency(...)`, `np.where(...)` (strips origins), `index.map(...)` — all flagged.
-
-When in doubt, run the `/check-outdated-practices` skill on the new files.
+Separately, the metadata/origin-stripping patterns from CLAUDE.md (`pd.concat`→`pr.concat`, `pd.to_numeric`/`pd.to_datetime`→`pr.*`, `np.where`, `index.map(...)`, `pd.DataFrame(tb)` re-wrap) are **not** part of the extension — they're covered by the §7 code-clarity pass. Flag them there even when `copy_metadata`/`fillna` appears to mitigate.
 
 ### 8b. Carried-over annotations & sanity_checks (review side)
 
@@ -95,6 +106,27 @@ When in doubt, run the `/check-outdated-practices` skill on the new files.
 - **Annotations**: scan the diff for any `# NOTE:` / `# TODO:` / `# FIXME:` / `# HACK:` / `# XXX:` that are unchanged from the old version. For each, confirm the PR body mentions whether the workaround is still needed, or that it was deleted with its code. Unresolved + undocumented = 🟡.
 - **Sanity-check log flags**: grep the diff for `SHOW_SANITY_CHECK_LOGS`, `DEBUG`, `LONG_FORMAT` set to `True`. If a debug flag was left enabled, that's a 🔴 — must be reverted.
 - **Silent deletes**: in any `sanity_checks` function, scan for `drop`, `filter`, `tb = tb[...]` — row removals that the user might miss. Make sure the PR body lists them.
+- **Findings surfaced, not just flags reverted**: if the step has any sanity-check logic (function or inline `# Sanity check` block), the PR body should carry a "Sanity-check findings" section reporting what the checks said on the new data. A green pipeline run is **not** proof the invariants held — checks that `paths.log.warning(...)`/`.critical(...)` instead of `assert`/`raise` pass silently. If the new garden chain has logging-style checks and the PR body has no findings section, re-run the garden step (`--private --force --only`) and scan stdout/stderr for `warning`, `dropped`, `outlier`, `AssertionError`. Undocumented findings = 🟡; a check that newly raises on the new data = 🔴 (must be triaged with the author per `/update-dataset` §5b).
+
+### 8c. Country harmonization audit (review side)
+
+`/update-dataset` §5c defines the full audit (validate `.countries.json` targets against the canonical regions + income-groups catalogs, audit `.excluded_countries.json`, scan the garden log for the three warnings, and confirm garden-output entities are canonical). As reviewer, verify the **outcome** — every entity reaching Grapher must be canonical, and any that isn't must be documented in the PR body.
+
+Run after the §4 pipeline build. Three checks:
+
+1. **Garden log warnings.** Re-run the garden step capturing output and scan for the three stable warning strings:
+   ```bash
+   .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+       > /tmp/<short_name>_harmon.log 2>&1
+   rg -n "missing values in mapping\.|unused values in mapping\.|Unknown country names in excluded countries file:" /tmp/<short_name>_harmon.log
+   ```
+   `missing values in mapping` (source countries not in `.countries.json`) is the actionable one — 🟡 unless the PR body documents the gap. `unused values in mapping` / `Unknown … excluded` are informational 🟢.
+
+2. **Garden-output entities are canonical.** This is the check that catches inline `tb["country"] = "…"` assignments and post-harmonization mutations the `.countries.json` review can't see. Build the canonical set (regions + latest income groups) and diff against the entities actually in the built garden tables — see the Python snippet in `/update-dataset` §5c (Python checks #3 + #5). Any entity in the garden output that isn't in canonical regions or income groups is 🔴 **unless** it's a legitimately custom source aggregate (e.g. `" (ILO)"`/`" (WB)"`-suffixed regions, BRICS, G7) that the PR body explicitly notes lives outside the canonical system.
+
+3. **Over-exclusion.** If `.excluded_countries.json` exists, flag any entry that *is* a canonical region/aggregate (`/update-dataset` §5c Python check #4) — dropping a real country/region silently is 🟡 unless the PR body says why (e.g. source double-counts "World").
+
+If the garden step doesn't use the harmonizer at all (no `.countries.json`; `country` assigned inline), checks #2 and #3 still apply — #2 is the only thing that catches non-canonical inline values.
 
 ### 9. Indicator metadata coverage & dataset block
 
@@ -106,6 +138,23 @@ Quick verification that `presentation.attribution_short` actually landed on the 
 make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE '%<ns>/<v>/<short_name>%'"
 ```
 Any `NULL` row is a 🔴.
+
+**Additional reviewer-side metadata checks:**
+
+- **`processing_level: major` must come with `description_processing`.** Grep the new garden meta.yml for `processing_level: major`. Each occurrence (whether on `definitions.common` or per-indicator) requires a `description_processing` field on that same scope. 🟡 mismatch.
+- **Per-indicator `description_processing` should describe the indicator's own derivation, not just point at a shared generic note.** When every aggregate indicator's `description_processing` is the exact same string (e.g. all four region indicators just reference `{definitions.description_regions_processing}` with no per-indicator detail), 🟡 flag — author should compose per-indicator sentences.
+- **Long-format-with-dimensions Jinja coverage.** When variables are keyed by a long-column name (e.g. `proportion`) with `<% if <dim> == "X" %>...<% endif %>` blocks for `title`, `description_short`, `display.name`, verify every active `(dim1, dim2)` cell renders a non-empty value. Easiest check: read every column from the grapher dataset and assert `metadata.title` is non-empty.
+- **`paths.regions.add_population(tb)` / `paths.regions.add_aggregates(tb, regions=[...])` auto-resolve their DAG dependencies.** If the garden step loads `population` (or `income_groups`) via `paths.load_dataset(...)` but never passes the dataset to anything, that's dead code — 🟡. The DAG dependency still needs to be declared either way.
+- **WB income groups in regional aggregates.** When the dataset is suitable for cross-country aggregation, check that the four WB income groups (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`) are in the `REGIONS` list, the `income_groups` DAG dep is declared, and `description_regions_processing` references the [income groups article](https://ourworldindata.org/world-bank-income-groups-explained). 🟢 informational if absent — not all datasets need this, but it's worth surfacing.
+- **Phantom-category audit on categorical indicators.** For any categorical/ordinal indicator (one whose meta declares a `sort:` label order or a category map), compare the declared labels against the values that actually appear in the built grapher data. Labels declared in `sort:` (or in a category map) but never produced clutter chart legends with empty buckets. Load each categorical column from the grapher dataset, take its unique values, and diff against the `sort:` list:
+  ```python
+  from owid.catalog import Dataset
+  ds = Dataset("data/grapher/<ns>/<v>/<short_name>")
+  tb = ds["<table>"]
+  present = set(tb["<col>"].dropna().astype(str).unique())
+  # compare `present` against the `sort:` labels in the .meta.yml
+  ```
+  Any `sort:`/map label with no backing value is 🟡 — author should drop it from `sort:`/`description_key` (or from the map if it can never occur). Re-check on every refresh: phantoms reappear when a category drops out upstream.
 
 ### 10. Metadata quality skills
 
@@ -120,6 +169,15 @@ rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/arch
 rg "<namespace>/<old_version>/<short_name>" dag/archive/ -g "*.yml"                    # should match
 rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"   # should be in old slot, not at bottom
 ```
+
+**Internal version consistency (the silent-stale-data bug).** `etl update` occasionally leaves a new step depending on an *old*-version dep (e.g. new garden still pointing at old meadow or old snapshot), which silently loads stale data. Verify every dep *inside* the new chain's block is on the new version. Read the new chain's DAG block and confirm none of its dependency lines reference `<old_version>`:
+
+```bash
+# Print the new chain's block and eyeball the dependency lines — none should contain <old_version>.
+rg -n -A8 "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml" | rg "<old_version>"   # should be empty
+```
+
+Any hit here is a 🔴 — the new step is wired to a stale dependency.
 
 Visual inspection of the diff for:
 - Comment headers (`# Source — dataset name.`) preserved above both archived and new entries
@@ -150,6 +208,8 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 
 **Out of scope for review:** Slack announcement and Anomalist + Chart Diff hand-off are author-side concerns, not reviewer checks.
 
+**Producer-docs vs. data consistency.** If the PR description notes a discrepancy between the producer's documentation (codebook, methodology page, README, release notes — whatever is available) and the actual file shipped, that's a 🟢 informational item — the author has surfaced it for producer follow-up. **Don't ask them to "fix" the data to match the docs**; the PR should preserve what the source shipped and flag the discrepancy.
+
 ### 14. Final report
 
 Structure the review with:
@@ -165,8 +225,8 @@ Structure the review with:
 
 ## Severity rubric
 
-- 🔴 **Blocker**: missing mandatory metadata field, broken link, failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived
-- 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues
+- 🔴 **Blocker**: missing mandatory metadata field, broken link, failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data
+- 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues, undocumented sanity-check findings, phantom `sort:` labels with no backing value, over-exclusion of a canonical region, undocumented `missing values in mapping` countries
 - 🟢 **Informational**: things to be aware of but not action items
 
 ## Notes

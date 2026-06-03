@@ -1,5 +1,7 @@
 dataset:
   title: Life satisfaction – Eurobarometer (2017)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   life_satisfaction__eurobarometer__2017:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: United Nations Peacekeeping
+  owners:
+    - Max Roser  # backport
 tables:
   united_nations_peacekeeping:
     variables:

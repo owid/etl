@@ -40,6 +40,60 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         scope: 'etl/steps/data/**'
     },
     {
+        // Matches geo.add_population_to_table (deprecated per its own docstring).
+        // Common patterns:
+        // - geo.add_population_to_table(tb=tb, ds_population=...)
+        // - tb = geo.add_population_to_table(...)
+        pattern: /geo\.add_population_to_table\(/g,
+        message: '`geo.add_population_to_table` is outdated. Use `paths.regions.add_population(tb)` instead (auto-resolves the population dataset from the DAG; for per-capita indicators, prefer `paths.regions.add_per_capita(tb)`).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.add_regions_to_table (deprecated per its own docstring).
+        // Common patterns:
+        // - geo.add_regions_to_table(tb=tb, ds_regions=..., regions=[...], aggregations=...)
+        // - tb = geo.add_regions_to_table(...)
+        pattern: /geo\.add_regions_to_table\(/g,
+        message: '`geo.add_regions_to_table` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.add_region_aggregates (older sibling of add_regions_to_table).
+        // The docstring at etl/data_helpers/geo.py:286 says: "use the add_aggregates() method of the Regions class".
+        pattern: /geo\.add_region_aggregates\(/g,
+        message: '`geo.add_region_aggregates` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.list_countries_in_region.
+        // The docstring at etl/data_helpers/geo.py:121 says: "use the get_region() method of the Regions class".
+        // The negative lookahead skips list_countries_in_region_that_must_have_data, which has its own warning below.
+        pattern: /geo\.list_countries_in_region(?!_that_must_have_data)\(/g,
+        message: '`geo.list_countries_in_region` is outdated. Use `paths.regions.get_region(<name>)` instead (auto-resolves regions from the DAG).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.list_countries_in_region_that_must_have_data.
+        // The docstring at etl/data_helpers/geo.py:178 says: "Currently no alternative is implemented." Flag anyway so the
+        // call site is visible — users may need to inline the logic or wait for a replacement.
+        pattern: /geo\.list_countries_in_region_that_must_have_data\(/g,
+        message: '`geo.list_countries_in_region_that_must_have_data` is deprecated and no replacement is currently implemented. Inline the country-selection logic locally and flag this for follow-up.',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.interpolate_table.
+        // The docstring at etl/data_helpers/geo.py:695 says: "Use `etl.data_helpers.misc.interpolate_table` instead".
+        pattern: /geo\.interpolate_table\(/g,
+        message: '`geo.interpolate_table` is outdated. Use `etl.data_helpers.misc.interpolate_table` instead.',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
         // Matches paths.load_dependency
         // Common patterns:
         // - paths.load_dependency("dataset_name")

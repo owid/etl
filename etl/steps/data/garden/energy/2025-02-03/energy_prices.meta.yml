@@ -9,3 +9,5 @@ dataset:
   title: European Energy Prices
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado

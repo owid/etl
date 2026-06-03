@@ -11,6 +11,8 @@ dataset:
   update_period_days: 9999 #last update was 2010, no further update planned
 
 
+  owners:
+    - Tuna Acisu
 tables:
   maternal_mortality:
     variables:

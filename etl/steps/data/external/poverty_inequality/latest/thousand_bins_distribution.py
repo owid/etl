@@ -1,6 +1,5 @@
-"""Thousand-bins global income distribution from World Bank PIP.
-
-Published as CSV and JSON for use by Grapher interactive charts and static charts.
+"""
+Thousand-bins global income distribution from World Bank PIP.
 """
 
 from etl.helpers import PathFinder

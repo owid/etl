@@ -1,5 +1,7 @@
 dataset:
   title: Emissions intensity & value added by sector - Linus et al.
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   emissions_intensity__and__value_added_by_sector__linus_et_al:
     variables:

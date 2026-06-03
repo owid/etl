@@ -1,5 +1,7 @@
 dataset:
   title: Population (Gapminder, 2022)
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   population:
     variables:

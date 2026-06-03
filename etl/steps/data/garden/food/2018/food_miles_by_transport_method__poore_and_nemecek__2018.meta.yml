@@ -1,5 +1,7 @@
 dataset:
   title: Food miles by transport method (Poore & Nemecek, 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   food_miles_by_transport_method__poore_and_nemecek__2018:
     variables:

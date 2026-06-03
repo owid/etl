@@ -1,5 +1,7 @@
 dataset:
   title: Rhino populations (AfRSG & other sources, 2022)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   rhino_populations__afrsg__and__other_sources__2022:
     variables:

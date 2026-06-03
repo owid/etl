@@ -3,6 +3,9 @@
 TODO: Fully decouple front-end from backend (see fasttrack.utils for back-end, i.e. should not have streamlit calls).
 """
 
+import contextlib
+import io
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -32,6 +35,29 @@ st.set_page_config(
     page_icon="🪄",
     layout="centered",
 )
+
+
+class _TeeStream:
+    """Write to two streams at once. Used so etl_main's stderr keeps going to the
+    log file while we also capture it for display in the UI."""
+
+    def __init__(self, *streams):
+        self._streams = streams
+
+    def write(self, data):
+        for s in self._streams:
+            try:
+                s.write(data)
+            except Exception:
+                pass
+        return len(data)
+
+    def flush(self):
+        for s in self._streams:
+            try:
+                s.flush()
+            except Exception:
+                pass
 
 
 # Reset states
@@ -354,16 +380,35 @@ else:
                 # Running ETL and upserting to GrapherDB...
                 st.write("Running ETL and upserting to GrapherDB...")
                 step = f"{fast_import.dataset.metadata.uri}"
-                etl_main(
-                    dag_path=DAG_FASTTRACK_PATH,
-                    includes=[step],
-                    grapher=True,
-                    private=not fast_import.dataset.metadata.is_public,
-                    workers=1,
-                    # NOTE: force is necessary because we are caching checksums with files.CACHE_CHECKSUM_FILE
-                    # we could have cleared the cache, but this is cleaner
-                    force=True,
-                )
+                # Forked step children print tracebacks to stderr and exit non-zero, which
+                # surfaces as SystemExit in this process. Capture stderr so we can show the
+                # actual traceback in the UI instead of silently stopping.
+                stderr_buffer = io.StringIO()
+                try:
+                    with contextlib.redirect_stderr(_TeeStream(sys.stderr, stderr_buffer)):
+                        etl_main(
+                            dag_path=DAG_FASTTRACK_PATH,
+                            includes=[step],
+                            grapher=True,
+                            private=not fast_import.dataset.metadata.is_public,
+                            workers=1,
+                            # NOTE: force is necessary because we are caching checksums with files.CACHE_CHECKSUM_FILE
+                            # we could have cleared the cache, but this is cleaner
+                            force=True,
+                        )
+                except SystemExit as exc:
+                    captured = stderr_buffer.getvalue().strip()
+                    st.error(f"ETL step failed (exit code {exc.code}). See traceback below.")
+                    if captured:
+                        st.code(captured, language="python-traceback")
+                    st.stop()
+                except Exception as exc:
+                    captured = stderr_buffer.getvalue().strip()
+                    st.error(f"ETL step failed: {exc}")
+                    if captured:
+                        st.code(captured, language="python-traceback")
+                    st.exception(exc)
+                    st.stop()
                 st.success("Import to MySQL successful!")
 
                 # Others
