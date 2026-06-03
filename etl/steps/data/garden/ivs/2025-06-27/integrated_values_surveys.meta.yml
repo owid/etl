@@ -34,6 +34,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Pablo Arriagada
 tables:
   integrated_values_surveys:
     variables:
@@ -524,7 +526,7 @@ tables:
           name: "Important in life: Politics"
           <<: *common-display
         presentation:
-            title_public: "Important in life: Politics"
+          title_public: "Important in life: Politics"
       not_important_in_life_politics:
         title: "Not important in life: Politics"
         description_short: '% of respondents replying "not very important" or "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'

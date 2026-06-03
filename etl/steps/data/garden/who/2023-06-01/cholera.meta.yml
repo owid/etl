@@ -1,22 +1,25 @@
+dataset:
+  owners:
+    - Fiona Spooner
 tables:
   cholera:
     variables:
-        cholera_case_fatality_rate:
-          title: Cholera case fatality rate
-          description_short: WHO calculates case fatality rates based on the numbers of cases and deaths as reported by national authorities. The case fatality rate is the number of reported deaths, divided by the number of reported cases, shown as a percentage.
-          unit: "%"
-          short_unit: "%"
-          display:
-            numDecimalPlaces: 2
-        cholera_reported_cases:
-          title: Reported cholera cases
-          description_short: Confirmed cholera cases, including those confirmed clinically, epidemiologically, or by laboratory investigation.
-          unit: reported cases
-          display:
-            numDecimalPlaces: 0
-        cholera_deaths:
-          title: Reported cholera deaths
-          description_short: Number of deaths from cholera reported to WHO.
-          unit: reported deaths
-          display:
-            numDecimalPlaces: 0
+      cholera_case_fatality_rate:
+        title: Cholera case fatality rate
+        description_short: WHO calculates case fatality rates based on the numbers of cases and deaths as reported by national authorities. The case fatality rate is the number of reported deaths, divided by the number of reported cases, shown as a percentage.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+      cholera_reported_cases:
+        title: Reported cholera cases
+        description_short: Confirmed cholera cases, including those confirmed clinically, epidemiologically, or by laboratory investigation.
+        unit: reported cases
+        display:
+          numDecimalPlaces: 0
+      cholera_deaths:
+        title: Reported cholera deaths
+        description_short: Number of deaths from cholera reported to WHO.
+        unit: reported deaths
+        display:
+          numDecimalPlaces: 0

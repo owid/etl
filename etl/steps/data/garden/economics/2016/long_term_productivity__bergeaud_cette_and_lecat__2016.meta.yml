@@ -1,5 +1,7 @@
 dataset:
   title: Long term productivity - Bergeaud, Cette, and Lecat (2016)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   long_term_productivity__bergeaud_cette_and_lecat__2016:
     variables:
@@ -19,8 +21,7 @@ tables:
       labor_productivity__bergeaud__cette__and_lecat__2016:
         title: Labor productivity (Bergeaud, Cette, and Lecat (2016))
         unit: ''
-        description: Labor productivity is defined as the ratio of GDP over total hours worked. Unit of measurement in $US
-          2010 ppp per hour.
+        description: Labor productivity is defined as the ratio of GDP over total hours worked. Unit of measurement in $US 2010 ppp per hour.
       total_factor_productivity__tfp__bergeaud__cette__and_lecat__2016:
         title: Total Factor Productivity (TFP) (Bergeaud, Cette, and Lecat (2016))
         unit: ''

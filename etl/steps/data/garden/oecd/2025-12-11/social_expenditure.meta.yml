@@ -111,6 +111,8 @@ dataset:
   update_period_days: 264
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   social_expenditure:
     variables:

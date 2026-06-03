@@ -69,6 +69,8 @@ macros: |-
 dataset:
   update_period_days: 1460
   non_redistributable: true
+  owners:
+    - Fiona Spooner
 tables:
   gbd_mental_health:
     variables:

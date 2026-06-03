@@ -1,5 +1,7 @@
 dataset:
   title: Gini index in 1980, 1990 & 2015 – GCIP (2018)
+  owners:
+    - Joe Hasell  # backport
 tables:
   gini_index_in_1980__1990__and__2015__gcip__2018:
     variables:

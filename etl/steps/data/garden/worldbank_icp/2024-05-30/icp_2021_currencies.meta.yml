@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Marcel Gerber
 tables:
   icp_2021_currencies:
     variables:

@@ -17,6 +17,8 @@ definitions:
 dataset:
   update_period_days: 30
 
+  owners:
+    - Veronika Samborska
 tables:
   datacenter_construction:
     variables:

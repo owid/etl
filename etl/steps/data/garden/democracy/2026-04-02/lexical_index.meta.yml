@@ -56,6 +56,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   lexical_index:
     common:

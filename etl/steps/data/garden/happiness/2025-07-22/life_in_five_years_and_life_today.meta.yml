@@ -9,6 +9,8 @@ dataset:
   update_period_days: 365
   non_redistributable: true
 
+  owners:
+    - Pablo Rosado
 tables:
   life_in_five_years_and_life_today:
     variables:

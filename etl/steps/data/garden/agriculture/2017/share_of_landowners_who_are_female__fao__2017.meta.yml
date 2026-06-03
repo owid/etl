@@ -1,5 +1,7 @@
 dataset:
   title: Share of landowners who are female - FAO (2017)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   share_of_landowners_who_are_female__fao__2017:
     variables:

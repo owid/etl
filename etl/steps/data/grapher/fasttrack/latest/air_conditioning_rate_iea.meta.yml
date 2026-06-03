@@ -3,6 +3,8 @@ dataset:
   description: Share of households that have air conditioning for a select number of countries.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   air_conditioning_rate_iea:
     variables:

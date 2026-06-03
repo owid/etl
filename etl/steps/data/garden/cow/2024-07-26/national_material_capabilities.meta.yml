@@ -206,6 +206,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   national_material_capabilities:
     variables:

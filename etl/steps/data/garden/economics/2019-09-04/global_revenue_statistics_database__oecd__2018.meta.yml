@@ -1,5 +1,7 @@
 dataset:
   title: Global Revenue Statistics Database - OECD (2018)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   global_revenue_statistics_database__oecd__2018:
     variables:

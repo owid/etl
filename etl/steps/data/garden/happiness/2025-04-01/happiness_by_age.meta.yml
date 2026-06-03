@@ -9,6 +9,8 @@ dataset:
   update_period_days: 0 # This dataset will probably not get updated
 
 
+  owners:
+    - Tuna Acisu
 tables:
   happiness_by_age:
     variables:

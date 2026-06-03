@@ -1,5 +1,7 @@
 dataset:
   title: Soil Lifespans (Evans et al. 2020)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   soil_lifespans__evans_et_al__2020:
     variables:

@@ -1,4 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
+dataset:
+  owners:
+    - Veronika Samborska
 definitions:
   common:
     processing_level: minor
@@ -41,8 +44,8 @@ tables:
         presentation:
           title_public: Performance on knowledge tests (MMLU)
         display:
-            name: Knowledge tests (MMLU)
-            numDecimalPlaces: 1
+          name: Knowledge tests (MMLU)
+          numDecimalPlaces: 1
 
       organisation:
         title: Organization
@@ -56,4 +59,4 @@ tables:
           - The AI systems shown here were built using machine learning and deep learning methods. These involve complex mathematical calculations that require significant computational resources. Training these systems generally involves feeding large amounts of data through various layers and nodes and adjusting internal system parameters over numerous iterations to optimize the system’s performance.
           - The training computation used can vary depending on factors such as the size of the dataset, size and complexity of the system architecture, and the level of parallelism used during training, among other reasons.
         display:
-            numDecimalPlaces: 0
+          numDecimalPlaces: 0

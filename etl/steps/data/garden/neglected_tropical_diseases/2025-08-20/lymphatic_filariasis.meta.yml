@@ -11,6 +11,8 @@ definitions:
 dataset:
   update_period_days: 365
   title: Preventive Chemotherapy (PC) Data Portal - Lymphatic Filariasis
+  owners:
+    - Fiona Spooner
 tables:
   lymphatic_filariasis:
     variables:

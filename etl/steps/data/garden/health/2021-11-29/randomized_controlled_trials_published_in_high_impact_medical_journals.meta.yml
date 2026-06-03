@@ -1,5 +1,7 @@
 dataset:
   title: Randomized controlled trials published in high-impact medical journals
+  owners:
+    - Saloni Dattani  # backport
 tables:
   randomized_controlled_trials_published_in_high_impact_medical_journals:
     variables:

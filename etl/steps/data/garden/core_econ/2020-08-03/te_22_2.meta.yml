@@ -1,5 +1,7 @@
 dataset:
   title: TE-22.2
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_22_2:
     variables:

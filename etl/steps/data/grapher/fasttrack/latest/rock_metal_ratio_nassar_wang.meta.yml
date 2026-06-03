@@ -3,6 +3,8 @@ dataset:
   description: The amount of rock that has to be mined to produce one unit of metal.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   rock_metal_ratio_nassar_wang:
     variables:

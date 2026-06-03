@@ -1,5 +1,7 @@
 dataset:
   title: Meat consumption in EU28 (OECD, 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   meat_consumption_in_eu28__oecd__2018:
     variables:

@@ -2,7 +2,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Climate Change
+        - Climate Change
   description_processing_baseline: &description_processing_baseline |-
     - We switch from using 1961-1990 to using 1861-1890 as our baseline to better show how temperatures have changed since pre-industrial times.
     - For each region, we calculate the mean temperature anomalies for 1961-1990 and for 1861-1890. The difference between these two means serves as the adjustment factor.
@@ -12,6 +12,8 @@ dataset:
   title: Climate Change Impacts
   update_period_days: 60
 
+  owners:
+    - Pablo Rosado
 tables:
   climate_change_impacts_annual:
     title: Climate Change Impacts - Annual

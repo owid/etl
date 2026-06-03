@@ -7,6 +7,9 @@ definitions:
 
 dataset:
   title: Long-run data – Gapminder & UN IGME
+  owners:
+    - Fiona Spooner
+    - Edouard Mathieu
 tables:
   long_run_child_mortality:
     variables:
@@ -85,9 +88,9 @@ tables:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
                 customNumericColors:
-                  - null
-                  - null
-                  - null
+                  - 
+                  - 
+                  - 
                 customNumericValues:
                   - 0
                   - 0.3

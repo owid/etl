@@ -1,5 +1,7 @@
 dataset:
   title: Lead concentrations in paint (IPEN, 2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   lead_concentrations_in_paint__ipen__2021:
     variables:

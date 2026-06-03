@@ -1,5 +1,7 @@
 dataset:
   title: Unadjusted female-male hourly wage ratios by percentile – Blau, Kahn (2017)
+  owners:
+    - Sandra Tzvetkova  # backport
 tables:
   unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017:
     variables:

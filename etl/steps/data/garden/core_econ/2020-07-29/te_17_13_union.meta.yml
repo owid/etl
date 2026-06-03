@@ -1,5 +1,7 @@
 dataset:
   title: TE-17.13_union
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_17_13_union:
     variables:

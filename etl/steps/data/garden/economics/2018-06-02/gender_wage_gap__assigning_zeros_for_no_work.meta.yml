@@ -1,5 +1,7 @@
 dataset:
   title: Gender wage gap (assigning zeros for no work)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   gender_wage_gap__assigning_zeros_for_no_work:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Water withdrawals and consumption - Aquastat
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   water_withdrawals_and_consumption__aquastat:
     variables:

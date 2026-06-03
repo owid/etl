@@ -10,6 +10,8 @@ definitions:
 dataset:
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   mueller_et_al_2012:
     title: Closing yield gaps through nutrient and water management

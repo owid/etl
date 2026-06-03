@@ -1,5 +1,7 @@
 dataset:
   title: Long run time use in Norway, by sex - Norway Statistics
+  owners:
+    - Diana Beltekian  # backport
 tables:
   long_run_time_use_in_norway__by_sex__norway_statistics:
     variables:
@@ -33,8 +35,7 @@ tables:
       time_spent_on_income_producing_work__all__statistics_norway:
         title: Time spent on income producing work, all (Statistics Norway)
         unit: minutes
-        description: Time spent on income producing work on an average day. Income producing work includes the travel to/from
-          work.
+        description: Time spent on income producing work on an average day. Income producing work includes the travel to/from work.
       time_spent_on_income_producing_work__female__statistics_norway:
         title: Time spent on income producing work, female (Statistics Norway)
         unit: minutes
@@ -78,8 +79,7 @@ tables:
       time_spent_on_personal_needs__all__statistics_norway:
         title: Time spent on personal needs, all (Statistics Norway)
         unit: minutes
-        description: Time spent on personal needs on an average day. Personal needs include night sleep, other personal care,
-          and meals.
+        description: Time spent on personal needs on an average day. Personal needs include night sleep, other personal care, and meals.
       time_spent_on_personal_needs__females__statistics_norway:
         title: Time spent on personal needs, females (Statistics Norway)
         unit: minutes

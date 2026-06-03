@@ -1,5 +1,7 @@
 dataset:
   title: Ukraine-Russia contribution to global food
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   ukraine_russia_contribution_to_global_food:
     variables:

@@ -2,7 +2,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Climate Change
+        - Climate Change
     processing_level: minor
     description_short: Measured in 10²² Joules.
     unit: 10²² Joules
@@ -12,6 +12,8 @@ dataset:
   title: Ocean Heat Content
   update_period_days: 60
 
+  owners:
+    - Pablo Rosado
 tables:
   ocean_heat_content_monthly:
     title: Ocean Heat Content - Monthly average
