@@ -462,6 +462,19 @@ tables:
             title: Per capita methane emissions
             subtitle: Per capita methane emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per person per year.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Reds
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 0.5
+                  - 1
+                  - 2
+                  - 3
+                  - 5
+                  - 7.5
+                  - 10
       annual_emissions_n2o_total_co2eq_per_capita:
         title: Per capita nitrous oxide emissions in CO₂ equivalents
         unit: tonnes of CO₂ equivalents per person
@@ -474,6 +487,18 @@ tables:
             title: Per capita nitrous oxide emissions
             subtitle: Per capita nitrous oxide emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per person per year.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Reds
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 0.25
+                  - 0.5
+                  - 1
+                  - 1.5
+                  - 2
+                  - 3
       annual_emissions_ghg_total_co2eq_per_capita:
         title: Per capita greenhouse gas emissions in CO₂ equivalents
         unit: tonnes of CO₂ equivalents per person
@@ -487,6 +512,19 @@ tables:
             subtitle: '[Greenhouse gas emissions](#dod:ghgemissions) include carbon dioxide, methane and nitrous oxide from all sources, including [land-use change](#dod:land-use-change-emissions). They are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) over a 100-year timescale.'
             note: Land-use change emissions can be negative.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: Reds
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 2
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 25
+                  - 30
       annual_emissions_ghg_fossil_co2eq_per_capita:
         title: Per capita greenhouse gas emissions from fossil fuels and industry in CO₂ equivalents
         unit: tonnes of CO₂ equivalents per person

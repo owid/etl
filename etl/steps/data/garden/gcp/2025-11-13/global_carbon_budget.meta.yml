@@ -618,6 +618,19 @@ tables:
             title: Carbon intensity of energy production
             subtitle: Amount of carbon dioxide emitted per unit of energy production, measured in grams of CO₂ per kilowatt-hour.
             tab: map
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 150
+                  - 200
+                  - 250
+                  - 300
+                  - 400
+                  - 500
       gdp:
         title: "GDP"
         unit: "2011 international-$"
