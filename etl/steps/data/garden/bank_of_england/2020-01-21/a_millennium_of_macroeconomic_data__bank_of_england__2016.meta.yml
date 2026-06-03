@@ -1,5 +1,7 @@
 dataset:
   title: A Millennium of Macroeconomic Data - Bank of England (2016)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   a_millennium_of_macroeconomic_data__bank_of_england__2016:
     variables:

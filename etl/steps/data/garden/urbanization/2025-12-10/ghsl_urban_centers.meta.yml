@@ -41,291 +41,291 @@ definitions:
     For small countries, values can change sharply when an entire area shifts from one classification to another.
 
   entityAnnotationsMapCapitals: &entityAnnotationsMapCapitals |-
-      Afghanistan: Kabul
-      Albania: Tirana
-      Algeria: Algiers
-      Angola: Luanda
-      Argentina: Buenos Aires
-      Armenia: Yerevan
-      Aruba: Oranjestad
-      Australia: Canberra
-      Austria: Vienna
-      Azerbaijan: Baku
-      Bahamas: Nassau
-      Bahrain: Manama
-      Bangladesh: Dhaka
-      Barbados: Bridgetown
-      Belarus: Minsk
-      Belgium: Brussels
-      Benin: Porto-Novo
-      Bolivia: La Paz
-      Bosnia and Herzegovina: Sarajevo
-      Botswana: Gaborone
-      Brazil: Brasilia
-      Brunei: Bandar Seri Begawan
-      Bulgaria: Sofia
-      Burkina Faso: Ouagadougou
-      Burundi: Gitega
-      Cambodia: Phnom Penh
-      Cameroon: Yaoundé
-      Canada: Ottawa
-      Central African Republic: Bangui
-      Chad: N'Djamena
-      Chile: Santiago
-      China: Beijing
-      Colombia: Bogota
-      Comoros: Moroni
-      Costa Rica: San José
-      Croatia: Zagreb
-      Cuba: Havana
-      Curacao: Willemstad
-      Cyprus: Strovolos [Nicosia]
-      Czechia: Prague
-      Cote d'Ivoire: Yamoussoukro
-      Democratic Republic of Congo: Kinshasa
-      Denmark: Copenhagen
-      Djibouti: Djibouti
-      Dominican Republic: Santo Domingo
-      Ecuador: Quito
-      Egypt: Cairo
-      El Salvador: San Salvador
-      Equatorial Guinea: Malabo
-      Eritrea: Asmara
-      Estonia: Tallinn
-      Ethiopia: Addis Ababa
-      Fiji: Suva
-      Finland: Helsinki
-      France: Paris
-      French Guiana: Cayenne
-      French Polynesia: Papeete
-      Gabon: Libreville
-      Georgia: Tbilisi
-      Germany: Berlin
-      Ghana: Accra
-      Greece: Athens
-      Guatemala: Guatemala City
-      Guinea-Bissau: Bissau
-      Guyana: Georgetown
-      Haiti: Port-au-Prince
-      Honduras: Tegucigalpa
-      Hungary: Budapest
-      Iceland: Reykjavik
-      India: New Delhi
-      Indonesia: Jakarta
-      Iran: Tehran
-      Iraq: Baghdad
-      Ireland: Dublin
-      Israel: Jerusalem
-      Italy: Rome
-      Jamaica: Kingston
-      Japan: Tokyo
-      Jersey: St. Helier
-      Jordan: Amman
-      Kazakhstan: Astana
-      Kenya: Nairobi
-      Kosovo: Pristina
-      Kuwait: Kuwait City
-      Kyrgyzstan: Bishkek
-      Laos: Vientiane
-      Latvia: Riga
-      Lebanon: Beirut
-      Lesotho: Maseru
-      Liberia: Monrovia
-      Libya: Tripoli
-      Lithuania: Vilnius
-      Luxembourg: Luxembourg
-      Madagascar: Antananarivo
-      Malawi: Lilongwe
-      Malaysia: Putrajaya
-      Maldives: Malé
-      Mali: Bamako
-      Malta: Valletta
-      Mauritania: Nouakchott
-      Mauritius: Port Louis
-      Mayotte: Mamoudzou
-      Moldova: Chișinău
-      Mongolia: Ulaanbaatar
-      Montenegro: Podgorica
-      Morocco: Rabat
-      Mozambique: Maputo
-      Myanmar: Pyinmana [Nay Pyi Taw]
-      Mexico: Mexico City
-      Namibia: Windhoek
-      Nepal: Kathmandu
-      Netherlands: The Hague
-      New Caledonia: Nouméa
-      New Zealand: Wellington
-      Nicaragua: Managua
-      Niger: Niamey
-      Nigeria: Abuja
-      North Korea: P'yŏngyang
-      North Macedonia: Skopje
-      Northern Cyprus: Nicosia
-      Norway: Oslo
-      Oman: Muscat
-      Pakistan: Islamabad
-      Palestine: Ramallah
-      Panama: Panama City
-      Papua New Guinea: Port Moresby
-      Paraguay: Asuncion
-      Peru: Lima
-      Philippines: Manila
-      Poland: Warsaw
-      Portugal: Lisbon
-      Puerto Rico: Bayamón [San Juan]
-      Qatar: Doha
-      Congo: Brazzaville
-      Romania: Bucharest
-      Russia: Moscow
-      Rwanda: Kigali
-      Reunion: Saint-Denis
-      Samoa: Apia
-      Saudi Arabia: Riyadh
-      Senegal: Dakar
-      Serbia: Belgrade
-      Sierra Leone: Freetown
-      Singapore: Singapore
-      Slovakia: Bratislava
-      Slovenia: Ljubljana
-      Solomon Islands: Honiara
-      Somalia: Mogadishu
-      South Africa: Pretoria
-      South Korea: Seoul
-      South Sudan: Juba
-      Spain: Madrid
-      Sri Lanka: Colombo [Sri Jayawardenepura Kotte]
-      Sudan: Khartoum
-      Suriname: Paramaribo
-      Sweden: Stockholm
-      Switzerland: Bern
-      Syria: Damascus
-      Sao Tome and Principe: São Tomé
-      Taiwan: Taipei
-      Tajikistan: Dushanbe
-      Tanzania: Dodoma
-      Thailand: Bangkok
-      East Timor: Dili
-      Togo: Lomé
-      Tonga: Nuku'alofa
-      Trinidad and Tobago: Port of Spain
-      Tunisia: Tunis
-      Turkey: Ankara
-      Turkmenistan: Ashgabat
-      Uganda: Kampala
-      Ukraine: Kyiv
-      United Arab Emirates: Abu Dhabi
-      United Kingdom: London
-      United States: Washington
-      Uruguay: Montevideo
-      Uzbekistan: Tashkent
-      Vanuatu: Port Vila
-      Venezuela: Caracas
-      Vietnam: Hanoi
-      Yemen: Sana'a
-      Zambia: Lusaka
-      Zimbabwe: Harare
+    Afghanistan: Kabul
+    Albania: Tirana
+    Algeria: Algiers
+    Angola: Luanda
+    Argentina: Buenos Aires
+    Armenia: Yerevan
+    Aruba: Oranjestad
+    Australia: Canberra
+    Austria: Vienna
+    Azerbaijan: Baku
+    Bahamas: Nassau
+    Bahrain: Manama
+    Bangladesh: Dhaka
+    Barbados: Bridgetown
+    Belarus: Minsk
+    Belgium: Brussels
+    Benin: Porto-Novo
+    Bolivia: La Paz
+    Bosnia and Herzegovina: Sarajevo
+    Botswana: Gaborone
+    Brazil: Brasilia
+    Brunei: Bandar Seri Begawan
+    Bulgaria: Sofia
+    Burkina Faso: Ouagadougou
+    Burundi: Gitega
+    Cambodia: Phnom Penh
+    Cameroon: Yaoundé
+    Canada: Ottawa
+    Central African Republic: Bangui
+    Chad: N'Djamena
+    Chile: Santiago
+    China: Beijing
+    Colombia: Bogota
+    Comoros: Moroni
+    Costa Rica: San José
+    Croatia: Zagreb
+    Cuba: Havana
+    Curacao: Willemstad
+    Cyprus: Strovolos [Nicosia]
+    Czechia: Prague
+    Cote d'Ivoire: Yamoussoukro
+    Democratic Republic of Congo: Kinshasa
+    Denmark: Copenhagen
+    Djibouti: Djibouti
+    Dominican Republic: Santo Domingo
+    Ecuador: Quito
+    Egypt: Cairo
+    El Salvador: San Salvador
+    Equatorial Guinea: Malabo
+    Eritrea: Asmara
+    Estonia: Tallinn
+    Ethiopia: Addis Ababa
+    Fiji: Suva
+    Finland: Helsinki
+    France: Paris
+    French Guiana: Cayenne
+    French Polynesia: Papeete
+    Gabon: Libreville
+    Georgia: Tbilisi
+    Germany: Berlin
+    Ghana: Accra
+    Greece: Athens
+    Guatemala: Guatemala City
+    Guinea-Bissau: Bissau
+    Guyana: Georgetown
+    Haiti: Port-au-Prince
+    Honduras: Tegucigalpa
+    Hungary: Budapest
+    Iceland: Reykjavik
+    India: New Delhi
+    Indonesia: Jakarta
+    Iran: Tehran
+    Iraq: Baghdad
+    Ireland: Dublin
+    Israel: Jerusalem
+    Italy: Rome
+    Jamaica: Kingston
+    Japan: Tokyo
+    Jersey: St. Helier
+    Jordan: Amman
+    Kazakhstan: Astana
+    Kenya: Nairobi
+    Kosovo: Pristina
+    Kuwait: Kuwait City
+    Kyrgyzstan: Bishkek
+    Laos: Vientiane
+    Latvia: Riga
+    Lebanon: Beirut
+    Lesotho: Maseru
+    Liberia: Monrovia
+    Libya: Tripoli
+    Lithuania: Vilnius
+    Luxembourg: Luxembourg
+    Madagascar: Antananarivo
+    Malawi: Lilongwe
+    Malaysia: Putrajaya
+    Maldives: Malé
+    Mali: Bamako
+    Malta: Valletta
+    Mauritania: Nouakchott
+    Mauritius: Port Louis
+    Mayotte: Mamoudzou
+    Moldova: Chișinău
+    Mongolia: Ulaanbaatar
+    Montenegro: Podgorica
+    Morocco: Rabat
+    Mozambique: Maputo
+    Myanmar: Pyinmana [Nay Pyi Taw]
+    Mexico: Mexico City
+    Namibia: Windhoek
+    Nepal: Kathmandu
+    Netherlands: The Hague
+    New Caledonia: Nouméa
+    New Zealand: Wellington
+    Nicaragua: Managua
+    Niger: Niamey
+    Nigeria: Abuja
+    North Korea: P'yŏngyang
+    North Macedonia: Skopje
+    Northern Cyprus: Nicosia
+    Norway: Oslo
+    Oman: Muscat
+    Pakistan: Islamabad
+    Palestine: Ramallah
+    Panama: Panama City
+    Papua New Guinea: Port Moresby
+    Paraguay: Asuncion
+    Peru: Lima
+    Philippines: Manila
+    Poland: Warsaw
+    Portugal: Lisbon
+    Puerto Rico: Bayamón [San Juan]
+    Qatar: Doha
+    Congo: Brazzaville
+    Romania: Bucharest
+    Russia: Moscow
+    Rwanda: Kigali
+    Reunion: Saint-Denis
+    Samoa: Apia
+    Saudi Arabia: Riyadh
+    Senegal: Dakar
+    Serbia: Belgrade
+    Sierra Leone: Freetown
+    Singapore: Singapore
+    Slovakia: Bratislava
+    Slovenia: Ljubljana
+    Solomon Islands: Honiara
+    Somalia: Mogadishu
+    South Africa: Pretoria
+    South Korea: Seoul
+    South Sudan: Juba
+    Spain: Madrid
+    Sri Lanka: Colombo [Sri Jayawardenepura Kotte]
+    Sudan: Khartoum
+    Suriname: Paramaribo
+    Sweden: Stockholm
+    Switzerland: Bern
+    Syria: Damascus
+    Sao Tome and Principe: São Tomé
+    Taiwan: Taipei
+    Tajikistan: Dushanbe
+    Tanzania: Dodoma
+    Thailand: Bangkok
+    East Timor: Dili
+    Togo: Lomé
+    Tonga: Nuku'alofa
+    Trinidad and Tobago: Port of Spain
+    Tunisia: Tunis
+    Turkey: Ankara
+    Turkmenistan: Ashgabat
+    Uganda: Kampala
+    Ukraine: Kyiv
+    United Arab Emirates: Abu Dhabi
+    United Kingdom: London
+    United States: Washington
+    Uruguay: Montevideo
+    Uzbekistan: Tashkent
+    Vanuatu: Port Vila
+    Venezuela: Caracas
+    Vietnam: Hanoi
+    Yemen: Sana'a
+    Zambia: Lusaka
+    Zimbabwe: Harare
 
   entityAnnotationsMapTop100: &entityAnnotationsMapTop100 |-
-      Abidjan: Côte d'Ivoire
-      Accra: Ghana
-      Addis Ababa: Ethiopia
-      Ahmedabad: India
-      Alexandria: Egypt
-      Amman: Jordan
-      Baghdad: Iraq
-      Bandung: Indonesia
-      Bangkok: Thailand
-      Beijing: China
-      Belo Horizonte: Brazil
-      Bengaluru: India
-      Bogota: Colombia
-      Buenos Aires: Argentina
-      Cairo: Egypt
-      Cape Town: South Africa
-      Casablanca: Morocco
-      Chattogram: Bangladesh
-      Chennai: India
-      Chengdu: China
-      Chaozhou: China
-      Chongqing: China
-      Colombo: Sri Lanka
-      Dar es Salaam: Tanzania
-      Dhaka: Bangladesh
-      Dubai: United Arab Emirates
-      Faisalabad: Pakistan
-      Guangzhou: China
-      Hajipur: India
-      Hangzhou: China
-      Hanoi: Vietnam
-      Harbin: China
-      Hefei: China
-      Ho Chi Minh City: Vietnam
-      Hong Kong: China
-      Hyderabad: India
-      Islamabad: Pakistan
-      Istanbul: Turkey
-      Jakarta: Indonesia
-      Johannesburg: South Africa
-      Kabul: Afghanistan
-      Kampala: Uganda
-      Kano: Nigeria
-      Kanpur: India
-      Karachi: Pakistan
-      Khartoum: Sudan
-      Kinshasa: Democratic Republic of Congo
-      Kochi: India
-      Kolkata: India
-      Kozhikode: India
-      Kuala Lumpur: Malaysia
-      Lagos: Nigeria
-      Lahore: Pakistan
-      Lima: Peru
-      London: United Kingdom
-      Los Angeles: United States
-      Luanda: Angola
-      Lucknow: India
-      Madrid: Spain
-      Manila: Philippines
-      Mashhad: Iran
-      Medan: Indonesia
-      Mexico City: Mexico
-      Moscow: Russia
-      Mumbai: India
-      Nagoya: Japan
-      Nairobi: Kenya
-      Nanjing: China
-      New Delhi: India
-      New York City: United States
-      Onitsha: Nigeria
-      Osaka: Japan
-      Paris: France
-      Pune: India
-      Riyadh: Saudi Arabia
-      Rio de Janeiro: Brazil
-      Saint Petersburg: Russia
-      Santiago: Chile
-      Santo Domingo: Dominican Republic
-      Sao Paulo: Brazil
-      Seoul: South Korea
-      Shanghai: China
-      Shenyang: China
-      Shenzhen: China
-      Singapore: Singapore
-      Surat: India
-      Surabaya: Indonesia
-      Suzhou: China
-      Sydney: Australia
-      Taipei: Taiwan
-      Tehran: Iran
-      Tianjin: China
-      Tokyo: Japan
-      Toronto: Canada
-      Wenzhou: China
-      Wuhan: China
-      Xi'an: China
-      Yangon: Myanmar
-      Yaounde: Cameroon
-      Zhengzhou: China
+    Abidjan: Côte d'Ivoire
+    Accra: Ghana
+    Addis Ababa: Ethiopia
+    Ahmedabad: India
+    Alexandria: Egypt
+    Amman: Jordan
+    Baghdad: Iraq
+    Bandung: Indonesia
+    Bangkok: Thailand
+    Beijing: China
+    Belo Horizonte: Brazil
+    Bengaluru: India
+    Bogota: Colombia
+    Buenos Aires: Argentina
+    Cairo: Egypt
+    Cape Town: South Africa
+    Casablanca: Morocco
+    Chattogram: Bangladesh
+    Chennai: India
+    Chengdu: China
+    Chaozhou: China
+    Chongqing: China
+    Colombo: Sri Lanka
+    Dar es Salaam: Tanzania
+    Dhaka: Bangladesh
+    Dubai: United Arab Emirates
+    Faisalabad: Pakistan
+    Guangzhou: China
+    Hajipur: India
+    Hangzhou: China
+    Hanoi: Vietnam
+    Harbin: China
+    Hefei: China
+    Ho Chi Minh City: Vietnam
+    Hong Kong: China
+    Hyderabad: India
+    Islamabad: Pakistan
+    Istanbul: Turkey
+    Jakarta: Indonesia
+    Johannesburg: South Africa
+    Kabul: Afghanistan
+    Kampala: Uganda
+    Kano: Nigeria
+    Kanpur: India
+    Karachi: Pakistan
+    Khartoum: Sudan
+    Kinshasa: Democratic Republic of Congo
+    Kochi: India
+    Kolkata: India
+    Kozhikode: India
+    Kuala Lumpur: Malaysia
+    Lagos: Nigeria
+    Lahore: Pakistan
+    Lima: Peru
+    London: United Kingdom
+    Los Angeles: United States
+    Luanda: Angola
+    Lucknow: India
+    Madrid: Spain
+    Manila: Philippines
+    Mashhad: Iran
+    Medan: Indonesia
+    Mexico City: Mexico
+    Moscow: Russia
+    Mumbai: India
+    Nagoya: Japan
+    Nairobi: Kenya
+    Nanjing: China
+    New Delhi: India
+    New York City: United States
+    Onitsha: Nigeria
+    Osaka: Japan
+    Paris: France
+    Pune: India
+    Riyadh: Saudi Arabia
+    Rio de Janeiro: Brazil
+    Saint Petersburg: Russia
+    Santiago: Chile
+    Santo Domingo: Dominican Republic
+    Sao Paulo: Brazil
+    Seoul: South Korea
+    Shanghai: China
+    Shenyang: China
+    Shenzhen: China
+    Singapore: Singapore
+    Surat: India
+    Surabaya: Indonesia
+    Suzhou: China
+    Sydney: Australia
+    Taipei: Taiwan
+    Tehran: Iran
+    Tianjin: China
+    Tokyo: Japan
+    Toronto: Canada
+    Wenzhou: China
+    Wuhan: China
+    Xi'an: China
+    Yangon: Myanmar
+    Yaounde: Cameroon
+    Zhengzhou: China
 
 
 # Learn more about the available fields:
@@ -334,6 +334,8 @@ dataset:
   title: GHSL Urban Centre Database 2025 (GHS-UCDB R2024A)
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   ghsl_urban_centers:
     variables:
@@ -1137,8 +1139,7 @@ tables:
           title_public: Population living in towns and suburbs with fewer than 50,000 people
 
       pop_citysize_below_50k_projections:
-        title: Population living in towns and suburbs with fewer than 50,000 people
-          (projected)
+        title: Population living in towns and suburbs with fewer than 50,000 people (projected)
         unit: people
         description_short: Projected total population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:

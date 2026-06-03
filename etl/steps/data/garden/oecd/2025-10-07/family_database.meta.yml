@@ -15,6 +15,8 @@ dataset:
   title: OECD Family Database
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   marriage_divorce_rates:
     variables:
@@ -39,9 +41,9 @@ tables:
           The crude divorce rate is defined as the number of divorces during a given year per 1,000 people.
           <% endif %>
         description_processing: |-
-            <% if indicator == "marriage_rate" %>
-            Marriage rates in the United States between 1886 and 1945 are sourced from the US Census, for years 1945 to 1990 they are sourced from the CDC. Recent data comes from OECD.
-            <% endif %>
+          <% if indicator == "marriage_rate" %>
+          Marriage rates in the United States between 1886 and 1945 are sourced from the US Census, for years 1945 to 1990 they are sourced from the CDC. Recent data comes from OECD.
+          <% endif %>
 
   mean_age_first_marriage:
     variables:
@@ -53,12 +55,7 @@ tables:
           Mean age of women at first marriage
           <% endif %>
         unit: years
-        description_short:
-          <% if indicator == "mean_age_first_marriage" and gender == "Female" %>
-           Average age of women who got married for the first time that year.
-          <% elif indicator == "mean_age_first_marriage" and gender == "Male" %>
-          Average age of men who got married for the first time that year.
-          <% endif %>
+        description_short: <% if indicator == "mean_age_first_marriage" and gender == "Female" %> Average age of women who got married for the first time that year. <% elif indicator == "mean_age_first_marriage" and gender == "Male" %> Average age of men who got married for the first time that year. <% endif %>
         description_from_producer: |-
           The mean age at first marriage, defined as the mean age in years of marrying persons at the time of marriage. This measure is disaggregated by sex with separate averages for men and women.
 

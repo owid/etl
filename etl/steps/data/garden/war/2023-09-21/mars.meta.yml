@@ -54,8 +54,7 @@ definitions:
       <%- elif conflict_type == "civil war" %>
       The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional civil wars that year
       <%- endif %>
-    description_short_per_capita: <% set per_capita = " per 100,000 people" %>
-      {definitions.number_deaths.description_short}
+    description_short_per_capita: <% set per_capita = " per 100,000 people" %> {definitions.number_deaths.description_short}
     description_key: &description_key_deaths
       - "{definitions.all.conflict_type}"
       - If a war lasted more than one year, we distributed its deaths evenly across years.
@@ -264,3 +263,5 @@ dataset:
     - Asia and Oceania: 700-990
 
     You can find more information about the data in our article: [To be published]
+  owners:
+    - Lucas Rodés-Guirao

@@ -1,16 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   others:
-    interval:
-      <% if interval == "cumulative" %>
-      over time
-      <% elif interval == "weekly" %>
-      in the last week
-      <% elif interval == "4-weekly" %>
-      in the last four weeks
-      <% elif interval == "7-day rolling sum" %>
-      in the last 7 days
-      <%- endif -%>
+    interval: <% if interval == "cumulative" %> over time <% elif interval == "weekly" %> in the last week <% elif interval == "4-weekly" %> in the last four weeks <% elif interval == "7-day rolling sum" %> in the last 7 days <%- endif -%>
   common:
     presentation:
       topic_tags:
@@ -23,6 +14,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   contributions:
     variables:

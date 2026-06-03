@@ -1,5 +1,7 @@
 dataset:
   title: Agricultural total factor productivity (USDA)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   agricultural_total_factor_productivity__usda:
     variables:

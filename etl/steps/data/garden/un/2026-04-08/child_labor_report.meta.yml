@@ -80,6 +80,8 @@ dataset:
   update_period_days: 429
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   child_labor:
     variables:

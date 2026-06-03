@@ -1,5 +1,7 @@
 dataset:
   title: Recycled plastic exports - Brooks et al. (2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   recycled_plastic_exports__brooks_et_al__2018:
     variables:

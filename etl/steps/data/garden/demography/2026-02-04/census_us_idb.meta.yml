@@ -19,6 +19,8 @@ dataset:
     This dataset includes key demographic indicators at 5-year intervals, providing comprehensive coverage of global population dynamics.
   update_period_days: 313
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   census_us_idb:
     variables:

@@ -23,6 +23,8 @@ dataset:
   update_period_days: 31
 
 
+  owners:
+    - Veronika Samborska
 tables:
   mmlu_by_model:
     variables:

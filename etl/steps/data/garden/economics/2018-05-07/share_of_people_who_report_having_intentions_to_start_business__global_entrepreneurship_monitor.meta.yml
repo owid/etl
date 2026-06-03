@@ -1,5 +1,7 @@
 dataset:
   title: Share of people who report having intentions to start business - Global Entrepreneurship Monitor
+  owners:
+    - Diana Beltekian  # backport
 tables:
   share_of_people_who_report_having_intentions_to_start_business__global_entrepreneurship_monitor:
     variables:

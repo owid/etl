@@ -1,5 +1,7 @@
 dataset:
   title: Percentage of Americans living alone, by age - IPUMS
+  owners:
+    - Diana Beltekian  # backport
 tables:
   percentage_of_americans_living_alone__by_age__ipums:
     variables:

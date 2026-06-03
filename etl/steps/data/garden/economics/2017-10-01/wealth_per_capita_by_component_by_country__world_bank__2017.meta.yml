@@ -1,5 +1,7 @@
 dataset:
   title: Wealth per capita by component by country - World Bank (2017)
+  owners:
+    - Max Roser  # backport
 tables:
   wealth_per_capita_by_component_by_country__world_bank__2017:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Renewable Investment as % of GDP - BNEP and World Bank
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   renewable_investment_as_pct_of_gdp__bnep_and_world_bank:
     variables:

@@ -22,6 +22,8 @@ definitions:
 
 dataset:
   title: Excess fertilizers (West et al. 2014)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   excess_fertilizers__west_et_al__2014:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Women's Economic Opportunity 2012 - Economist Intelligence Unit (2012)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   womens_economic_opportunity_2012__economist_intelligence_unit__2012:
     variables:

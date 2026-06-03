@@ -10,6 +10,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Fiona Spooner
 tables:
   cases_before_1975:
     variables:

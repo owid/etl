@@ -3,6 +3,8 @@ dataset:
   description: Carbon emissions from heating and cooling, and estimated energy demand of air conditioning.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   emissions_energy_heating_cooling_iea:
     variables:

@@ -13,6 +13,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Fiona Spooner
 tables:
   davenport_2021:
     variables:

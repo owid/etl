@@ -1,5 +1,7 @@
 dataset:
   title: Solid fuel use for cooking by region - Bonjour et al. (2013)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   solid_fuel_use_for_cooking_by_region__bonjour_et_al__2013:
     variables:

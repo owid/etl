@@ -4,6 +4,8 @@ dataset:
     The share of disaster events in the EM-DAT database with missing data for a given metric. This is measured over the period from 1990 to 2020.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   completeness_disaster_emdat:
     variables:

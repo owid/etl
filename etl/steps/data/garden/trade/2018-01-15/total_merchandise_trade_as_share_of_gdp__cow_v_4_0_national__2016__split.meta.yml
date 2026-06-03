@@ -1,5 +1,7 @@
 dataset:
   title: Total merchandise trade as share of GDP (COW v 4.0 National (2016)) (split)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   total_merchandise_trade_as_share_of_gdp__cow_v_4_0_national__2016__split:
     variables:

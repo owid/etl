@@ -13,12 +13,14 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   renewable_power_generation_costs:
     title: Renewable power generation costs
     common:
       description_key:
-      - Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in US$ per kilowatt-hour.
+        - Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in US$ per kilowatt-hour.
       unit: "constant {LATEST_YEAR} US$ per kilowatt-hour"
       short_unit: "$/kWh"
     variables:

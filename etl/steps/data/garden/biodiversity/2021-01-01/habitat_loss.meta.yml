@@ -1,5 +1,7 @@
 dataset:
   title: Biodiversity habitat loss (Williams et al. 2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   habitat_loss:
     variables:

@@ -398,6 +398,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   government_at_a_glance:
     variables:

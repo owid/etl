@@ -3,6 +3,8 @@ dataset:
   description: The number of hurricanes in the North Atlantic and landfalling in the United States since 1851.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   north_atlantic_hurricanes_noaa:
     variables:

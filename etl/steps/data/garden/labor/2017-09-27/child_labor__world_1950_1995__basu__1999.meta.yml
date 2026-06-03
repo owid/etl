@@ -1,5 +1,7 @@
 dataset:
   title: Child Labor (World 1950-1995) - Basu (1999)
+  owners:
+    - Max Roser  # backport
 tables:
   child_labor__world_1950_1995__basu__1999:
     variables:

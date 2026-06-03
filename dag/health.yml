@@ -91,21 +91,6 @@ steps:
       - data://meadow/unicef/2023-06-16/diarrhea:
         - snapshot://unicef/2023-06-16/diarrhea.xlsx
 
-  # Guinea worm - to archive
-  data://grapher/who/2024-06-17/guinea_worm:
-    - data://garden/who/2024-06-17/guinea_worm:
-      # Guinea worm - historical estimates
-      - data://garden/who/2023-06-29/guinea_worm_certification:
-        - data://meadow/who/2023-06-29/guinea_worm_certification:
-          - snapshot://who/2023-06-29/guinea_worm.csv
-      - snapshot://fasttrack/2024-06-17/guinea_worm.csv
-  # Guinea worm - to update
-  #data://garden/who/2025-04-16/guinea_worm:
-  #  - data://garden/who/2023-06-29/guinea_worm_certification
-  #  - snapshot://fasttrack/2024-06-17/guinea_worm.csv
-  #data://grapher/who/2025-04-16/guinea_worm:
-  #  - data://garden/who/2025-04-16/guinea_worm
-
   # Autopsies WHO-Europe
   data://grapher/who/2023-07-13/autopsy:
     - data://garden/who/2023-07-13/autopsy:
@@ -848,17 +833,31 @@ steps:
 
   # Clinical trials - ClinicalTrials.gov
   # no meadow snapshot, as this is a large dataset
+  data://garden/health/2025-07-28/clinical_trials:
+    - snapshot://health/2025-07-28/clinical_trials.csv
   data://grapher/health/2025-07-28/clinical_trials:
-    - data://garden/health/2025-07-28/clinical_trials:
-      - snapshot://health/2025-07-28/clinical_trials.csv
-  # Guinea worm cases
+    - data://garden/health/2025-07-28/clinical_trials
+
+ # Guinea worm certification
+  data://meadow/who/2025-08-01/guinea_worm_certification:
+    - snapshot://who/2025-08-01/guinea_worm.csv
+  data://garden/who/2025-08-01/guinea_worm_certification:
+    - data://meadow/who/2025-08-01/guinea_worm_certification
+
+    # Guinea worm cases
+  data://garden/who/2025-08-01/guinea_worm:
+    - snapshot://fasttrack/latest/guinea_worm_cases.csv
+    - data://garden/who/2025-08-01/guinea_worm_certification
   data://grapher/who/2025-08-01/guinea_worm:
-    - data://garden/who/2025-08-01/guinea_worm:
-      - snapshot://fasttrack/latest/guinea_worm_cases.csv
-      # Guinea worm certification
-      - data://garden/who/2025-08-01/guinea_worm_certification:
-        - data://meadow/who/2025-08-01/guinea_worm_certification:
-          - snapshot://who/2025-08-01/guinea_worm.csv
+    - data://garden/who/2025-08-01/guinea_worm
+
+  # Guinea worm cases and certification - WHO
+  # uses fasttrack snapshot until 2024 and adds data directly in garden step from 2025 onwards
+  data://garden/who/2026-03-17/guinea_worm:
+    - snapshot://fasttrack/latest/guinea_worm_cases.csv
+    - data://garden/who/2025-08-01/guinea_worm_certification
+  data://grapher/who/2026-03-17/guinea_worm:
+    - data://garden/who/2026-03-17/guinea_worm
 
   # WHO Mortality Database - Cancer specific
   data://garden/who/2025-08-05/mortality_database_cancer:
@@ -1101,3 +1100,11 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
   data://grapher/aqli/2026-03-30/air_quality_life_index:
     - data://garden/aqli/2026-03-30/air_quality_life_index
+  data://meadow/health/2026-06-01/deaths_karlinsky:
+    - snapshot://health/2026-06-01/deaths_karlinsky.csv
+  data://garden/health/2026-06-01/deaths_karlinsky:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/health/2026-06-01/deaths_karlinsky
+  # Death completion (Karlinsky, 2024)
+  data://grapher/health/2026-06-01/deaths_karlinsky:
+    - data://garden/health/2026-06-01/deaths_karlinsky

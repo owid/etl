@@ -13,6 +13,8 @@ dataset:
   update_period_days: 0 # no update expected
 
 
+  owners:
+    - Tuna Acisu
 tables:
   bilateral_remittance:
     variables:

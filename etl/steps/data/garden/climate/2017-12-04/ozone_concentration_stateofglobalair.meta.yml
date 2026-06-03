@@ -1,5 +1,7 @@
 dataset:
   title: Ozone concentration-StateofGlobalAir
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   ozone_concentration_stateofglobalair:
     variables:

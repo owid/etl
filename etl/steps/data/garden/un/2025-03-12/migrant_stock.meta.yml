@@ -24,6 +24,8 @@ dataset:
   update_period_days: 730 # had biyearly releases in the past, maybe they are going back to it?
 
 
+  owners:
+    - Tuna Acisu
 tables:
   migrant_stock:
     variables:

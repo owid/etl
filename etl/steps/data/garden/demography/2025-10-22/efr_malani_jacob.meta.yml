@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: "Effective Fertility Rates (Malani and Jacob)"
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   aggregated:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Figure 15.20_CentralBank
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   figure_15_20_centralbank:
     variables:

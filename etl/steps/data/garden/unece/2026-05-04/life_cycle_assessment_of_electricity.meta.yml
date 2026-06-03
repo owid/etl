@@ -20,6 +20,8 @@ dataset:
   update_period_days: 0
   title: Life-cycle Assessment of Electricity Sources
 
+  owners:
+    - Pablo Rosado
 tables:
   life_cycle_assessment_of_electricity:
     title: Life-cycle impacts of electricity sources

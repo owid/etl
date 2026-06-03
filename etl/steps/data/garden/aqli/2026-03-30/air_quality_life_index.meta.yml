@@ -33,6 +33,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Tuna Acisu
 tables:
   air_quality_life_index:
     variables:

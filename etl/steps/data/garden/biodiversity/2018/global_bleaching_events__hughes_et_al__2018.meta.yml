@@ -1,5 +1,7 @@
 dataset:
   title: Global bleaching events (Hughes et al. 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   global_bleaching_events__hughes_et_al__2018:
     variables:
