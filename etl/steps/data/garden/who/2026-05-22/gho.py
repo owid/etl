@@ -433,6 +433,14 @@ def set_indicator(tb: Table, short_name: str, meta: dict[str, str]) -> Table:
         else:
             tb[new_col].m.unit = ""
 
+        # Default chart precision to 1 decimal for percentages and rates.
+        # gho.meta.yml overrides still win (they're applied later in
+        # create_dataset and use replace-semantics on `display`).
+        if tb[new_col].m.unit in ("%", "rate"):
+            if tb[new_col].m.display is None:
+                tb[new_col].m.display = {}
+            tb[new_col].m.display.setdefault("numDecimalPlaces", 1)
+
         # Common defaults that `definitions.common` in the .meta.yml can't reach
         # because these auto-generated tables aren't listed there.
         tb[new_col].m.processing_level = "minor"
