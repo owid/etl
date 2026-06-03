@@ -381,17 +381,6 @@ steps:
       - data://meadow/oecd/2025-06-20/housing_prices:
         - snapshot://oecd/2025-06-20/housing_prices.csv
 
-  # Same-Sex Marriage Around the World from Pew Research Center
-  data://meadow/pew/2026-06-03/same_sex_marriage:
-    - snapshot://pew/2026-06-03/same_sex_marriage.csv
-  data://garden/pew/2026-06-03/same_sex_marriage:
-    - data://garden/regions/2023-01-01/regions
-    - data://meadow/pew/2026-06-03/same_sex_marriage
-    - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2025-07-01/income_groups
-  data://grapher/pew/2026-06-03/same_sex_marriage:
-    - data://garden/pew/2026-06-03/same_sex_marriage
-
   # Child Mortality Estimates - UN IGME - to archive
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme:
