@@ -1,6 +1,3 @@
-# Single-chart collection: `dimensions` is empty, so this is pushed as a regular
-# Grapher chart (not a multi-dim data page). Replicates chart:
-#   https://admin.owid.io/admin/charts/7118/edit
 topic_tags:
   - "Animal Welfare"
 dimensions: []
