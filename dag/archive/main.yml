@@ -761,6 +761,14 @@ steps:
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
 
+  # Same-Sex Marriage Around the World from Pew Research Center
+  data://grapher/pew/2025-06-27/same_sex_marriage:
+    - data://garden/pew/2025-06-27/same_sex_marriage:
+      - data://garden/demography/2024-07-15/population
+      - data://meadow/pew/2025-06-27/same_sex_marriage:
+        - snapshot://pew/2025-06-27/same_sex_marriage.csv
+      - data://garden/regions/2023-01-01/regions
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
