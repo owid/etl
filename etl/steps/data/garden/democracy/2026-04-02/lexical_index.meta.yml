@@ -309,7 +309,7 @@ tables:
           It combines the indicators `male_suffrage` and `female_suffrage` in Skaaning et al. (2015).
 
       suffrage_in_practice_lied:
-        title: Universal right to vote in practice
+        title: Universal right to vote in practice (binary)
         unit: ""
         description_short: |-
           Indicates whether virtually all adult citizens have the right to vote and elections for both the chief executive and the legislature are held.
@@ -317,7 +317,7 @@ tables:
           Takes on the value of 1 if both men and women have the right to vote (universal suffrage) and there are elections for both the chief executive and the legislature (`exe_leg_elec_lied` = 1); 0 otherwise. It differs from the "universal suffrage" indicator in that it also considers whether elections for the chief executive and the legislature are actually held.
 
       suffrage_in_practice_trich_lied:
-        title: Voting rights in practice
+        title: Universal right to vote in practice
         unit: ""
         description_short: |-
           Indicates whether virtually all adult citizens have the right to vote in practice (score 2), only men have broad voting rights in practice (score 1), or there are no broad voting rights in practice (score 0).
@@ -711,11 +711,11 @@ tables:
       num_suffrage_in_practice_lied:
         title: |-
           <%- if category == '-1' -%>
-          Number of countries with unknown universal voting rights in practice
+          Number of countries with unknown universal voting rights in practice (binary)
           <%- elif category == 'no' -%>
-          Number of countries that don't have universal voting rights in practice
+          Number of countries that don't have universal voting rights in practice (binary)
           <%- else -%>
-          Number of countries with universal voting rights in practice
+          Number of countries with universal voting rights in practice (binary)
           <%- endif -%>
         unit: "countries"
 
@@ -728,7 +728,7 @@ tables:
           <%- elif category == 'broad male voting rights' -%>
           Number of countries with broad voting rights for men in practice
           <%- else -%>
-          Number of countries with universal voting rights in practice (three categories)
+          Number of countries with universal voting rights in practice
           <%- endif -%>
         unit: "countries"
 
@@ -910,11 +910,11 @@ tables:
       pop_suffrage_in_practice_lied:
         title: |-
           <%- if category == '-1' -%>
-          People living in countries with unknown universal voting rights in practice
+          People living in countries with unknown universal voting rights in practice (binary)
           <%- elif category == 'no' -%>
-          People living in countries that don't have universal voting rights in practice
+          People living in countries that don't have universal voting rights in practice (binary)
           <%- else -%>
-          People living in countries with universal voting rights in practice
+          People living in countries with universal voting rights in practice (binary)
           <%- endif -%>
         unit: "people"
 
@@ -927,7 +927,7 @@ tables:
           <%- elif category == 'broad male voting rights' -%>
           People living in countries with broad voting rights for men in practice
           <%- else -%>
-          People living in countries with universal voting rights in practice (three categories)
+          People living in countries with universal voting rights in practice
           <%- endif -%>
         unit: "people"
 
