@@ -45,7 +45,7 @@ def run() -> None:
         groups=[
             {
                 "dimension": "welfare_type",
-                "choices": ["dhi", "mi"],
+                "choices": ["mi", "dhi"],
                 "choice_new_slug": "before_vs_after",
                 "view_config": {
                     "hideRelativeToggle": True,
@@ -72,8 +72,6 @@ def run() -> None:
     # Set display names for before_vs_after views
     for view in c.views:
         if view.dimensions.get("welfare_type") == "before_vs_after" and view.indicators.y:
-            # Order before -> after so the dumbbell arrow points from before to after taxes
-            view.indicators.y = sorted(view.indicators.y, key=lambda ind: 0 if "_mi_" in ind.catalogPath else 1)
             for ind in view.indicators.y:
                 if "_dhi_" in ind.catalogPath:
                     ind.display = {"name": "After taxes and benefits"}
@@ -88,7 +86,9 @@ def _get_before_vs_after_metadata(tb, view):
     if not view.indicators.y:
         return {"title": "", "subtitle": "", "description_key": []}
 
-    first_ind = view.indicators.y[0]
+    # Build the combined title/subtitle from the before-tax (mi) indicator, so it doesn't
+    # depend on the order of indicators in the view (mirrors the WID before_vs_after logic).
+    first_ind = next((i for i in view.indicators.y if "_mi_" in i.catalogPath), view.indicators.y[0])
     col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
 
     if col_name and col_name in tb.columns:
@@ -97,14 +97,14 @@ def _get_before_vs_after_metadata(tb, view):
 
         title = _assert_and_replace(
             grapher_config.get("title", "Gini coefficient"),
-            "after tax",
+            "before tax",
             "before vs. after tax",
             "grapher_config.title",
             col_name,
         )
         subtitle = _assert_and_replace(
             grapher_config.get("subtitle", ""),
-            " Inequality is measured here in terms of income after taxes and benefits.",
+            " Inequality is measured here in terms of income before taxes and benefits.",
             "",
             "grapher_config.subtitle",
             col_name,
