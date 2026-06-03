@@ -36,11 +36,6 @@ OLD_DESCRIPTION_KEY_THR = 'This data shows the income threshold for a given deci
 NEW_DESCRIPTION_KEY_THR_ALL = 'This data shows the income threshold for each decile of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
 
 
-def _after_tax_catalog_path(view):
-    """Return the after-tax (dhi) indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
-    return next((i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None)
-
-
 def run() -> None:
     config = paths.load_collection_config()
 
@@ -233,6 +228,11 @@ def _get_grouped_decile_subtitle(view):
         "share": f"The share of income received by each decile (tenth of the population). Income here is measured {wt_label}es and benefits.",
     }
     return subtitles.get(view.dimensions.get("indicator"), "")
+
+
+def _after_tax_catalog_path(view):
+    """Return the after-tax (dhi) indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
+    return next((i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None)
 
 
 def _get_before_vs_after_metadata(tb, view):

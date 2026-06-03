@@ -32,11 +32,6 @@ NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured bot
 DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY = "Data on income after tax and benefits is less widely available than that before tax. Where it is missing, distributions are constructed from the more widely available pre-tax data, combined with data on tax revenue and government expenditure. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/)."
 
 
-def _after_tax_catalog_path(view):
-    """Return the after-tax indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
-    return next((i.catalogPath for i in view.indicators.y if "after_tax" in i.catalogPath), None)
-
-
 def run() -> None:
     #
     # Load inputs.
@@ -197,6 +192,11 @@ def _get_grouped_quantile_subtitle(view):
     """Return subtitle for grouped quantile views."""
     welfare_type = view.dimensions.get("welfare_type")
     return f"The share of income received by each decile (tenth of the population). Income here is measured {welfare_type}es and benefits."
+
+
+def _after_tax_catalog_path(view):
+    """Return the after-tax indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
+    return next((i.catalogPath for i in view.indicators.y if "after_tax" in i.catalogPath), None)
 
 
 def _get_before_vs_after_metadata(tb, view):

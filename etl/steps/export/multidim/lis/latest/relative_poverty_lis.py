@@ -27,11 +27,6 @@ OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = (
 NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown separately. In most countries, relative poverty is lower after taxes and benefits than before, but the extent varies widely."
 
 
-def _after_tax_catalog_path(view):
-    """Return the after-tax (dhi) indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
-    return next((i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None)
-
-
 def run() -> None:
     config = paths.load_collection_config()
 
@@ -89,6 +84,11 @@ def run() -> None:
                     ind.display = {"name": "Before taxes and benefits"}
 
     c.save()
+
+
+def _after_tax_catalog_path(view):
+    """Return the after-tax (dhi) indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
+    return next((i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None)
 
 
 def _get_before_vs_after_metadata(tb, view):
