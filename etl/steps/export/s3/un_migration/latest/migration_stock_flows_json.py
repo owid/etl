@@ -110,6 +110,7 @@ def create_metadata_json(tb: Table, tb_pop: Table) -> tuple[dict, dict]:
 
     metadata = {
         "timeRange": {"start": int(tb["year"].min()), "end": int(tb["year"].max())},
+        "years": sorted(tb["year"].unique().tolist()),
         "source": "UN DESA, International Migrant Stock (2024)",
         "dimensions": {
             "entities": entities,
