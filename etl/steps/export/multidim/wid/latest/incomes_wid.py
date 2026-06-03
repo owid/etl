@@ -141,7 +141,7 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": ["LineChart", "Dumbbell"],
                 },
                 "view_metadata": {
                     "description_short": lambda view: _get_before_vs_after_metadata(tb, view)["description_short"],

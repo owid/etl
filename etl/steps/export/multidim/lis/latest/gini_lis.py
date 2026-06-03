@@ -52,7 +52,7 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": ["LineChart", "Dumbbell"],
                     "missingDataStrategy": "hide",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
