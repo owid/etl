@@ -79,6 +79,18 @@ definitions:
     - Religion
   topic_tags_suicides: &topic_tags_suicides
     - Suicides
+  topic_tags_violence_against_children_children_s_rights: &topic_tags_violence_against_children_children_s_rights
+    - Violence Against Children & Children's Rights
+  topic_tags_global_education: &topic_tags_global_education
+    - Global Education
+  topic_tags_alcohol_consumption: &topic_tags_alcohol_consumption
+    - Alcohol Consumption
+  topic_tags_hiv_aids: &topic_tags_hiv_aids
+    - HIV/AIDS
+  topic_tags_illicit_drug_use: &topic_tags_illicit_drug_use
+    - Illicit Drug Use
+  topic_tags_fertility_rate: &topic_tags_fertility_rate
+    - Fertility Rate
 dataset:
   update_period_days: 365
 
@@ -548,6 +560,8 @@ tables:
         display:
           name: "Important in life: Friends"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       not_important_in_life_friends:
         title: "Not important in life: Friends"
@@ -555,6 +569,8 @@ tables:
         display:
           name: "Not important in life: Friends"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       very_important_in_life_friends:
         title: "Very important in life: Friends"
@@ -562,6 +578,8 @@ tables:
         display:
           name: "Very important in life: Friends"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       rather_important_in_life_friends:
         title: "Rather important in life: Friends"
@@ -569,6 +587,8 @@ tables:
         display:
           name: "Rather important in life: Friends"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       not_very_important_in_life_friends:
         title: "Not very important in life: Friends"
@@ -576,6 +596,8 @@ tables:
         display:
           name: "Not very important in life: Friends"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       notatall_important_in_life_friends:
         title: "Not at all important in life: Friends"
@@ -583,6 +605,8 @@ tables:
         display:
           name: "Not at all important in life: Friends"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       dont_know_important_in_life_friends:
         title: "Don't know: Important in life: Friends"
@@ -590,6 +614,8 @@ tables:
         display:
           name: "Don't know: Important in life: Friends"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
       no_answer_important_in_life_friends:
         title: "No answer: Important in life: Friends"
@@ -597,6 +623,8 @@ tables:
         display:
           name: "No answer: Important in life: Friends"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_loneliness_social_connections
 
 
       important_in_life_leisure_time:
@@ -605,6 +633,8 @@ tables:
         display:
           name: "Important in life: Leisure time"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_time_use
 
       not_important_in_life_leisure_time:
         title: "Not important in life: Leisure time"
@@ -612,6 +642,8 @@ tables:
         display:
           name: "Not important in life: Leisure time"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_time_use
 
       very_important_in_life_leisure_time:
         title: "Very important in life: Leisure time"
@@ -619,6 +651,8 @@ tables:
         display:
           name: "Very important in life: Leisure time"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_time_use
 
       rather_important_in_life_leisure_time:
         title: "Rather important in life: Leisure time"
@@ -626,6 +660,8 @@ tables:
         display:
           name: "Rather important in life: Leisure time"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_time_use
 
       not_very_important_in_life_leisure_time:
         title: "Not very important in life: Leisure time"
@@ -633,6 +669,8 @@ tables:
         display:
           name: "Not very important in life: Leisure time"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_time_use
 
       notatall_important_in_life_leisure_time:
         title: "Not at all important in life: Leisure time"
@@ -640,6 +678,8 @@ tables:
         display:
           name: "Not at all important in life: Leisure time"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_time_use
 
       dont_know_important_in_life_leisure_time:
         title: "Don't know: Important in life: Leisure time"
@@ -647,6 +687,8 @@ tables:
         display:
           name: "Don't know: Important in life: Leisure time"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_time_use
 
       no_answer_important_in_life_leisure_time:
         title: "No answer: Important in life: Leisure time"
@@ -654,6 +696,8 @@ tables:
         display:
           name: "No answer: Important in life: Leisure time"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_time_use
 
 
       important_in_life_politics:
@@ -664,12 +708,15 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Important in life: Politics"
+          topic_tags: *topic_tags_democracy
       not_important_in_life_politics:
         title: "Not important in life: Politics"
         description_short: '% of respondents replying "not very important" or "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
         display:
           name: "Not important in life: Politics"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_democracy
 
       very_important_in_life_politics:
         title: "Very important in life: Politics"
@@ -677,6 +724,8 @@ tables:
         display:
           name: "Very important in life: Politics"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_democracy
 
       rather_important_in_life_politics:
         title: "Rather important in life: Politics"
@@ -684,6 +733,8 @@ tables:
         display:
           name: "Rather important in life: Politics"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_democracy
 
       not_very_important_in_life_politics:
         title: "Not very important in life: Politics"
@@ -691,6 +742,8 @@ tables:
         display:
           name: "Not very important in life: Politics"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_democracy
 
       notatall_important_in_life_politics:
         title: "Not at all important in life: Politics"
@@ -698,6 +751,8 @@ tables:
         display:
           name: "Not at all important in life: Politics"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_democracy
 
       dont_know_important_in_life_politics:
         title: "Don't know: Important in life: Politics"
@@ -705,6 +760,8 @@ tables:
         display:
           name: "Don't know: Important in life: Politics"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_democracy
 
       no_answer_important_in_life_politics:
         title: "No answer: Important in life: Politics"
@@ -712,6 +769,8 @@ tables:
         display:
           name: "No answer: Important in life: Politics"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_democracy
 
 
       important_in_life_work:
@@ -720,6 +779,8 @@ tables:
         display:
           name: "Important in life: Work"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_work_employment
 
       not_important_in_life_work:
         title: "Not important in life: Work"
@@ -727,6 +788,8 @@ tables:
         display:
           name: "Not important in life: Work"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_work_employment
 
       very_important_in_life_work:
         title: "Very important in life: Work"
@@ -734,6 +797,8 @@ tables:
         display:
           name: "Very important in life: Work"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_work_employment
 
       rather_important_in_life_work:
         title: "Rather important in life: Work"
@@ -741,6 +806,8 @@ tables:
         display:
           name: "Rather important in life: Work"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_work_employment
 
       not_very_important_in_life_work:
         title: "Not very important in life: Work"
@@ -748,6 +815,8 @@ tables:
         display:
           name: "Not very important in life: Work"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_work_employment
 
       notatall_important_in_life_work:
         title: "Not at all important in life: Work"
@@ -755,6 +824,8 @@ tables:
         display:
           name: "Not at all important in life: Work"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_work_employment
 
       dont_know_important_in_life_work:
         title: "Don't know: Important in life: Work"
@@ -762,6 +833,8 @@ tables:
         display:
           name: "Don't know: Important in life: Work"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_work_employment
 
       no_answer_important_in_life_work:
         title: "No answer: Important in life: Work"
@@ -769,6 +842,8 @@ tables:
         display:
           name: "No answer: Important in life: Work"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_work_employment
 
 
       important_in_life_religion:
@@ -2345,6 +2420,8 @@ tables:
         display:
           name: "Parents beating children: Not justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_violence_against_children_children_s_rights
 
       always_just_agg_parents_beating_children:
         title: "Parents beating children: Justifiable (aggregate)"
@@ -2352,6 +2429,8 @@ tables:
         display:
           name: "Parents beating children: Justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_violence_against_children_children_s_rights
 
       never_just_parents_beating_children:
         title: "Parents beating children: Never justifiable"
@@ -2359,6 +2438,8 @@ tables:
         display:
           name: "Parents beating children: Never justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_violence_against_children_children_s_rights
 
       always_just_parents_beating_children:
         title: "Parents beating children: Always justifiable"
@@ -2366,6 +2447,8 @@ tables:
         display:
           name: "Parents beating children: Always justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_violence_against_children_children_s_rights
 
       neutral_parents_beating_children:
         title: "Parents beating children: Neutral"
@@ -2373,6 +2456,8 @@ tables:
         display:
           name: "Parents beating children: Neutral"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_violence_against_children_children_s_rights
 
       dont_know_parents_beating_children:
         title: "Parents beating children: Don't know"
@@ -2380,6 +2465,8 @@ tables:
         display:
           name: "Parents beating children: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_violence_against_children_children_s_rights
 
       no_answer_parents_beating_children:
         title: "Parents beating children: No answer"
@@ -2387,6 +2474,8 @@ tables:
         display:
           name: "Parents beating children: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_violence_against_children_children_s_rights
 
       avg_score_parents_beating_children:
         title: "Parents beating children: Average score"
@@ -2398,6 +2487,8 @@ tables:
         short_unit: ""
 
 
+        presentation:
+          topic_tags: *topic_tags_violence_against_children_children_s_rights
       never_just_agg_violence_against_other_people:
         title: "Violence against other people: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Violence against other people". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3192,6 +3283,8 @@ tables:
         display:
           name: "Invitro fertilization: Not justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_fertility_rate
 
       always_just_agg_invitro_fertilization:
         title: "Invitro fertilization: Justifiable (aggregate)"
@@ -3199,6 +3292,8 @@ tables:
         display:
           name: "Invitro fertilization: Justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_fertility_rate
 
       never_just_invitro_fertilization:
         title: "Invitro fertilization: Never justifiable"
@@ -3206,6 +3301,8 @@ tables:
         display:
           name: "Invitro fertilization: Never justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_fertility_rate
 
       always_just_invitro_fertilization:
         title: "Invitro fertilization: Always justifiable"
@@ -3213,6 +3310,8 @@ tables:
         display:
           name: "Invitro fertilization: Always justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_fertility_rate
 
       neutral_invitro_fertilization:
         title: "Invitro fertilization: Neutral"
@@ -3220,6 +3319,8 @@ tables:
         display:
           name: "Invitro fertilization: Neutral"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_fertility_rate
 
       dont_know_invitro_fertilization:
         title: "Invitro fertilization: Don't know"
@@ -3227,6 +3328,8 @@ tables:
         display:
           name: "Invitro fertilization: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_fertility_rate
 
       no_answer_invitro_fertilization:
         title: "Invitro fertilization: No answer"
@@ -3234,6 +3337,8 @@ tables:
         display:
           name: "Invitro fertilization: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_fertility_rate
 
       avg_score_invitro_fertilization:
         title: "Invitro fertilization: Average score"
@@ -3245,6 +3350,8 @@ tables:
         short_unit: ""
 
 
+        presentation:
+          topic_tags: *topic_tags_fertility_rate
       never_just_agg_death_penalty:
         title: "Death penalty: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Death penalty". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3310,6 +3417,8 @@ tables:
         display:
           name: "Man beating wife: Not justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_women_s_rights
 
       always_just_agg_man_beating_wife:
         title: "Man beating wife: Justifiable (aggregate)"
@@ -3317,6 +3426,8 @@ tables:
         display:
           name: "Man beating wife: Justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_women_s_rights
 
       never_just_man_beating_wife:
         title: "Man beating wife: Never justifiable"
@@ -3324,6 +3435,8 @@ tables:
         display:
           name: "Man beating wife: Never justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_women_s_rights
 
       always_just_man_beating_wife:
         title: "Man beating wife: Always justifiable"
@@ -3331,6 +3444,8 @@ tables:
         display:
           name: "Man beating wife: Always justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_women_s_rights
 
       neutral_man_beating_wife:
         title: "Man beating wife: Neutral"
@@ -3338,6 +3453,8 @@ tables:
         display:
           name: "Man beating wife: Neutral"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_women_s_rights
 
       dont_know_man_beating_wife:
         title: "Man beating wife: Don't know"
@@ -3345,6 +3462,8 @@ tables:
         display:
           name: "Man beating wife: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_women_s_rights
 
       no_answer_man_beating_wife:
         title: "Man beating wife: No answer"
@@ -3352,6 +3471,8 @@ tables:
         display:
           name: "Man beating wife: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_women_s_rights
 
       avg_score_man_beating_wife:
         title: "Man beating wife: Average score"
@@ -3363,12 +3484,16 @@ tables:
         short_unit: ""
 
 
+        presentation:
+          topic_tags: *topic_tags_women_s_rights
       never_just_agg_political_violence:
         title: "Political violence: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Political violence". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Political violence: Not justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_war_peace
 
       always_just_agg_political_violence:
         title: "Political violence: Justifiable (aggregate)"
@@ -3376,6 +3501,8 @@ tables:
         display:
           name: "Political violence: Justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_war_peace
 
       never_just_political_violence:
         title: "Political violence: Never justifiable"
@@ -3383,6 +3510,8 @@ tables:
         display:
           name: "Political violence: Never justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_war_peace
 
       always_just_political_violence:
         title: "Political violence: Always justifiable"
@@ -3390,6 +3519,8 @@ tables:
         display:
           name: "Political violence: Always justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_war_peace
 
       neutral_political_violence:
         title: "Political violence: Neutral"
@@ -3397,6 +3528,8 @@ tables:
         display:
           name: "Political violence: Neutral"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_war_peace
 
       dont_know_political_violence:
         title: "Political violence: Don't know"
@@ -3404,6 +3537,8 @@ tables:
         display:
           name: "Political violence: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_war_peace
 
       no_answer_political_violence:
         title: "Political violence: No answer"
@@ -3411,6 +3546,8 @@ tables:
         display:
           name: "Political violence: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_war_peace
 
       avg_score_political_violence:
         title: "Political violence: Average score"
@@ -3422,6 +3559,8 @@ tables:
         short_unit: ""
 
 
+        presentation:
+          topic_tags: *topic_tags_war_peace
       worry_losing_job:
         title: "Losing my job or not finding a job: Worried (aggregate)"
         description_short: '% of respondents replying "very much" or "a great deal" when asked "To what degree are you worried about the following situations?", when the situation was "Losing my job or not finding a job".'
@@ -3512,6 +3651,8 @@ tables:
         display:
           name: "Not being able to give one's children a good education: Worried"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_global_education
 
       not_worry_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: Not worried (aggregate)"
@@ -3519,6 +3660,8 @@ tables:
         display:
           name: "Not being able to give one's children a good education: Not worried"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_global_education
 
       very_much_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: Very much worried"
@@ -3526,6 +3669,8 @@ tables:
         display:
           name: "Not being able to give one's children a good education: Very much worried"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_global_education
 
       a_great_deal_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: A great deal worried"
@@ -3533,6 +3678,8 @@ tables:
         display:
           name: "Not being able to give one's children a good education: A great deal worried"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_global_education
 
       not_much_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: Not much worried"
@@ -3540,6 +3687,8 @@ tables:
         display:
           name: "Not being able to give one's children a good education: Not much worried"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_global_education
 
       not_at_all_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: Not at all worried"
@@ -3547,6 +3696,8 @@ tables:
         display:
           name: "Not being able to give one's children a good education: Not at all worried"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_global_education
 
       dont_know_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: Don't know"
@@ -3554,6 +3705,8 @@ tables:
         display:
           name: "Not being able to give one's children a good education: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_global_education
 
       no_answer_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: No answer"
@@ -3561,6 +3714,8 @@ tables:
         display:
           name: "Not being able to give one's children a good education: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_global_education
 
       avg_score_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: Average score"
@@ -3572,6 +3727,8 @@ tables:
         short_unit: ""
 
 
+        presentation:
+          topic_tags: *topic_tags_global_education
       worry_war:
         title: "A war involving my country: Worried (aggregate)"
         description_short: '% of respondents replying "very much" or "a great deal" when asked "To what degree are you worried about the following situations?", when the situation was "A war involving my country".'
@@ -3932,6 +4089,8 @@ tables:
         display:
           name: "Neighbors being heavy drinkers: Not mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_alcohol_consumption
 
       mentioned_neighbors_heavy_drinkers:
         title: "Neighbors being heavy drinkers: Mentioned"
@@ -3939,6 +4098,8 @@ tables:
         display:
           name: "Neighbors being heavy drinkers: Mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_alcohol_consumption
 
       dont_know_neighbors_heavy_drinkers:
         title: "Neighbors being heavy drinkers: Don't know"
@@ -3946,6 +4107,8 @@ tables:
         display:
           name: "Neighbors being heavy drinkers: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_alcohol_consumption
 
       no_answer_neighbors_heavy_drinkers:
         title: "Neighbors being heavy drinkers: No answer"
@@ -3953,6 +4116,8 @@ tables:
         display:
           name: "Neighbors being heavy drinkers: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_alcohol_consumption
 
 
       notmentioned_neighbors_immigrant_foreign_workers:
@@ -3961,6 +4126,8 @@ tables:
         display:
           name: "Neighbors being immigrant/foreign workers: Not mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_migration
 
       mentioned_neighbors_immigrant_foreign_workers:
         title: "Neighbors being immigrant/foreign workers: Mentioned"
@@ -3968,6 +4135,8 @@ tables:
         display:
           name: "Neighbors being immigrant/foreign workers: Mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_migration
 
       dont_know_neighbors_immigrant_foreign_workers:
         title: "Neighbors being immigrant/foreign workers: Don't know"
@@ -3975,6 +4144,8 @@ tables:
         display:
           name: "Neighbors being immigrant/foreign workers: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_migration
 
       no_answer_neighbors_immigrant_foreign_workers:
         title: "Neighbors being immigrant/foreign workers: No answer"
@@ -3982,6 +4153,8 @@ tables:
         display:
           name: "Neighbors being immigrant/foreign workers: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_migration
 
 
       notmentioned_neighbors_aids:
@@ -3990,6 +4163,8 @@ tables:
         display:
           name: "Neighbors being people with AIDS: Not mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_hiv_aids
 
       mentioned_neighbors_aids:
         title: "Neighbors being people with AIDS: Mentioned"
@@ -3997,6 +4172,8 @@ tables:
         display:
           name: "Neighbors being people with AIDS: Mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_hiv_aids
 
       dont_know_neighbors_aids:
         title: "Neighbors being people with AIDS: Don't know"
@@ -4004,6 +4181,8 @@ tables:
         display:
           name: "Neighbors being people with AIDS: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_hiv_aids
 
       no_answer_neighbors_aids:
         title: "Neighbors being people with AIDS: No answer"
@@ -4011,6 +4190,8 @@ tables:
         display:
           name: "Neighbors being people with AIDS: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_hiv_aids
 
 
       notmentioned_neighbors_drug_addicts:
@@ -4019,6 +4200,8 @@ tables:
         display:
           name: "Neighbors being drug addicts: Not mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
 
       mentioned_neighbors_drug_addicts:
         title: "Neighbors being drug addicts: Mentioned"
@@ -4026,6 +4209,8 @@ tables:
         display:
           name: "Neighbors being drug addicts: Mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
 
       dont_know_neighbors_drug_addicts:
         title: "Neighbors being drug addicts: Don't know"
@@ -4033,6 +4218,8 @@ tables:
         display:
           name: "Neighbors being drug addicts: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
 
       no_answer_neighbors_drug_addicts:
         title: "Neighbors being drug addicts: No answer"
@@ -4040,6 +4227,8 @@ tables:
         display:
           name: "Neighbors being drug addicts: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
 
 
       notmentioned_neighbors_homosexuals:
@@ -6173,48 +6362,64 @@ tables:
         display:
           name: "Frequency in the neighborhood: Racist behavior: Frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
       not_frequently_agg_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Not frequently (aggregate)"
         description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Not frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
       very_frequently_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Very frequently"
         description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Very frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
       quite_frequently_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Quite frequently"
         description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Quite frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
       not_frequently_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Not frequently"
         description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Not frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
       not_at_all_frequently_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Not at all frequently"
         description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Not at all frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
       dont_know_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Don't know"
         description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
       no_answer_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: No answer"
         description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior".'
         display:
           name: "Frequency in the neighborhood: Racist behavior: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
       avg_score_racist_behavior:
         title: "Frequency in the neighborhood: Racist behavior: Average score"
         description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood?", regarding "Racist behavior". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
@@ -6223,54 +6428,72 @@ tables:
           <<: *common-display
         unit: ""
         short_unit: ""
+        presentation:
+          topic_tags: *topic_tags_human_rights
       frequently_agg_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Frequently (aggregate)"
         description_short: '% of respondents replying "very frequently" or "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
       not_frequently_agg_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Not frequently (aggregate)"
         description_short: '% of respondents replying "not frequently" or "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Not frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
       very_frequently_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Very frequently"
         description_short: '% of respondents replying "very frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Very frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
       quite_frequently_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Quite frequently"
         description_short: '% of respondents replying "quite frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Quite frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
       not_frequently_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Not frequently"
         description_short: '% of respondents replying "not frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Not frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
       not_at_all_frequently_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Not at all frequently"
         description_short: '% of respondents replying "not at all frequently" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Not at all frequently"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
       dont_know_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Don't know"
         description_short: '% of respondents replying "don''t know" when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
       no_answer_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: No answer"
         description_short: '% of answers classified as "No answer" for the question "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets".'
         display:
           name: "Frequency in the neighborhood: Drug sale in the streets: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
       avg_score_drug_sale_in_streets:
         title: "Frequency in the neighborhood: Drug sale in the streets: Average score"
         description_short: 'Average score in a scale from 1 to 4 when asked "How frequently do the following things occur in your neighborhood?", regarding "Drug sale in the streets". In the scale, 1 means "very frequently" and 4 means "not at all frequently".'
@@ -6279,6 +6502,8 @@ tables:
           <<: *common-display
         unit: ""
         short_unit: ""
+        presentation:
+          topic_tags: *topic_tags_illicit_drug_use
       yes_didnt_carry_much_money:
         title: "Done for security: Didn't carry much money: Yes"
         description_short: '% of respondents replying "yes" when asked "Which of the following things have you done for reasons of security?", regarding "Didn''t carry much money".'
