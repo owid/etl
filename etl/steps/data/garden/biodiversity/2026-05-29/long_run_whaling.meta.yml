@@ -1,0 +1,287 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Biodiversity
+        - Fish & Overfishing
+    unit: whales
+  source_rocha: |-
+    Data pre-1985 comes from: Rocha, R. C., Clapham, P. J., & Ivashchenko, Y. V. (2014). Emptying the oceans: a summary of industrial whaling catches in the 20th century. Marine Fisheries Review, 76(4), 37-48.
+  source_iwc: |-
+    Data after 1985 comes from the International Whaling Commission (IWC) which recorded the number of catches at: https://iwc.int/management-and-conservation/whaling/total-catches
+  source_rocha_decade: |-
+    Data pre-1990 comes from: Rocha, R. C., Clapham, P. J., & Ivashchenko, Y. V. (2014). Emptying the oceans: a summary of industrial whaling catches in the 20th century. Marine Fisheries Review, 76(4), 37-48.
+  source_iwc_decade: |-
+    Data after 1990 comes from the International Whaling Commission (IWC) which recorded the number of catches at: https://iwc.int/management-and-conservation/whaling/total-catches
+  source_comb: |-
+    This data comes from two sources: The paper "Emptying the oceans: a summary of industrial whaling catches in the 20th century" by Rocha et al. for data pre-1985, and the International Whaling Commission (IWC) for data after 1985.
+  source_comb_decades: |-
+    This data comes from two sources: The paper "Emptying the oceans: a summary of industrial whaling catches in the 20th century" by Rocha et al. for data pre-1990, and the International Whaling Commission (IWC) for data after 1990.
+  decade:
+    The year shown is the start year of the decade. For example, 1950 represents the decade from 1950-1959.
+  combining_whales:  |-
+    For continuity with the Rocha data, we combine common minke and Antarctic minke into a single 'minke' category, and blue and pygmy blue whales into a single 'blue' category. We also add bowhead whales to the "other/ unspecified" category in the Rocha data, as they are included in the IWC data but not in Rocha's.
+  subsistence_whaling: |-
+    Data pre-1985 does not include aboriginal subsistence whaling as it focusses on industrial whaling. Data after 1985 from the IWC includes subsistence whaling.
+  subsistence_whaling_decades: |-
+    Data pre-1990 does not include aboriginal subsistence whaling as it focusses on industrial whaling. Data after 1990 from the IWC includes subsistence whaling.
+  soviet_illegal_catches: |-
+    Data before 1985 does not include illegal catches by the Soviet Union, as they are not available as a yearly breakdown. They are included in our catches by decade.
+
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  long_run_whaling_decades:
+    variables:
+      blue:
+        title: Number of Blue Whales caught per decade
+        description_short: Number of Blue Whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      brydes:
+        title: Number of Bryde's Whales caught per decade
+        description_short: Number of Bryde's Whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      fin:
+        title: Number of Fin Whales caught per decade
+        description_short: Number of Fin Whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      gray:
+        title: Number of Gray Whales caught per decade
+        description_short: Number of Gray Whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      humpback:
+        title: Number of Humpback Whales caught per decade
+        description_short: Number of Humpback Whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      minke:
+        title: Number of Minke Whales caught per decade
+        description_short: Number of Minke Whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      right:
+        title: Number of Right Whales caught per decade
+        description_short: Number of Right Whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      sei:
+        title: Number of Sei Whales caught per decade
+        description_short: Number of Sei Whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      sperm:
+        title: Number of Sperm Whales caught per decade
+        description_short: Number of Sperm Whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      total:
+        title: Total number of whales caught per decade
+        description_short: Total number of whales caught per decade
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+      unspecified_other:
+        title: Number of whales caught per decade where species is unspecified or other
+        description_short: Number of whales caught per decade, where the species is unspecified or other
+        description_key:
+          - "{definitions.source_comb_decades}"
+          - "{definitions.decade}"
+          - "{definitions.subsistence_whaling_decades}"
+        description_processing: |-
+          - {definitions.source_iwc_decade}
+          - {definitions.source_rocha_decade}
+          - {definitions.combining_whales}
+
+  long_run_whaling_annual:
+    variables:
+      blue:
+        title: Number of Blue Whales caught annually
+        description_short: Number of Blue Whales caught annually. This includes both blue and pygmy blue whales.
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      brydes:
+        title: Number of Bryde's Whales caught annually
+        description_short: Number of Bryde's Whales caught annually
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      fin:
+        title: Number of Fin Whales caught annually
+        description_short: Number of Fin Whales caught annually
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      gray:
+        title: Number of Gray Whales caught annually
+        description_short: Number of Gray Whales caught annually
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      humpback:
+        title: Number of Humpback Whales caught annually
+        description_short: Number of Humpback Whales caught annually
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      minke:
+        title: Number of Minke Whales caught annually
+        description_short: Number of Minke Whales caught annually. This includes both common and Antarctic minke whales.
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      right:
+        title: Number of Right Whales caught annually
+        description_short: Number of Right Whales caught annually
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      sei:
+        title: Number of Sei Whales caught annually
+        description_short: Number of Sei Whales caught annually
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      sperm:
+        title: Number of Sperm Whales caught annually
+        description_short: Number of Sperm Whales caught annually
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      total:
+        title: Total number of whales caught annually
+        description_short: Total number of whales caught annually
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}
+      unspecified_other:
+        title: Number of whales caught annually, where species is unspecified or other
+        description_short: Number of whales caught annually where the species is unspecified or other
+        description_key:
+          - "{definitions.source_comb}"
+          - "{definitions.subsistence_whaling}"
+          - "{definitions.soviet_illegal_catches}"
+        description_processing: |-
+          - {definitions.source_iwc}
+          - {definitions.source_rocha}
+          - {definitions.combining_whales}

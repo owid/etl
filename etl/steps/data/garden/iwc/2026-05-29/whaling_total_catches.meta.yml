@@ -6,7 +6,6 @@ definitions:
         - Biodiversity
         - Fish & Overfishing
     unit: whales
-    short_unit: ""
     processing_level: minor
     description_from_producer: |-
       - The year is the "defined catch year," usually the year in which all catches were taken. For Antarctic operations it is defined as the start of the season (e.g. for the 1985/86 Antarctic Season the year is 1985).

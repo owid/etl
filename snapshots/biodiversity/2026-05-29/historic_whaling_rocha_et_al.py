@@ -1,9 +1,8 @@
 """Script to create a snapshot of dataset.
 
-Steps to download the data manually:
+Data is extracted from paper with claude pdf extraction:
   1. Go to https://spo.nmfs.noaa.gov/content/emptying-oceans-summary-industrial-whaling-catches-20th-century
-  2. Download the PDF file and save it locally.
-  3. Run: python snapshots/biodiversity/2014/historic_whaling_rocha_et_al.py --path-to-file <path>
+  2. Extract tables on page 4, 6, 7, 8, 9 as xlsx file.
 """
 
 import click
@@ -25,7 +24,3 @@ def run(upload: bool = True, path_to_file: str | None = None) -> None:
     """
     snap = paths.init_snapshot()
     snap.create_snapshot(filename=path_to_file, upload=upload)
-
-
-if __name__ == "__main__":
-    run()

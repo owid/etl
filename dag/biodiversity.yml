@@ -76,7 +76,7 @@ steps:
             - data://meadow/biodiversity/2024-10-30/fish_stocks:
                 - snapshot://biodiversity/2024-10-30/fish_stocks.csv
 
-  # Whaling catches (IWC)
+  # Whaling catches (IWC) (recent)
   data://meadow/iwc/2026-05-29/whaling_total_catches:
     - snapshot://iwc/2026-05-29/whaling_total_catches.xlsx
   data://garden/iwc/2026-05-29/whaling_total_catches:
@@ -84,8 +84,16 @@ steps:
   data://grapher/iwc/2026-05-29/whaling_total_catches:
     - data://garden/iwc/2026-05-29/whaling_total_catches
 
-  #Whaling by decade
-  data://grapher/biodiversity/2026-05-29/whaling_total_catches_by_decade:
-  data://garden/biodiversity/2026-05-29/whaling_total_catches_by_decade:
-        - data://garden/iwc/2026-05-29/whaling_total_catches
-           - data
+  #Historic whaling catches (Rocha et al)
+  data://garden/biodiversity/2026-05-29/historic_whaling:
+    - data://meadow/biodiversity/2026-05-29/historic_whaling
+  data://meadow/biodiversity/2026-05-29/historic_whaling:
+    - snapshot://biodiversity/2026-05-29/historic_whaling_rocha_et_al.xlsx
+
+
+  # Long run whaling data (Rocha + IWC)
+  data://grapher/biodiversity/2026-05-29/long_run_whaling:
+    - data://garden/biodiversity/2026-05-29/long_run_whaling
+  data://garden/biodiversity/2026-05-29/long_run_whaling:
+    - data://garden/biodiversity/2026-05-29/historic_whaling
+    - data://garden/iwc/2026-05-29/whaling_total_catches

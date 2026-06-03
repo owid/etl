@@ -7,21 +7,22 @@ meta:
     date_published: "2014"
 
     # Citation
-    producer: National Marine Fisheries Service
+    producer: Rocha, Clapham & Ivashchenko
     citation_full: |-
       Rocha, R. C., Clapham, P. J., & Ivashchenko, Y. V. (2014). Emptying the oceans: a summary of industrial whaling catches in the 20th century. Marine Fisheries Review, 76(4), 37-48.
-    attribution_short: NMFS
+    attribution_short: Rocha et al.
 
     # Files
     url_main: https://spo.nmfs.noaa.gov/content/emptying-oceans-summary-industrial-whaling-catches-20th-century
-    date_accessed: 2026-05-29
+    date_accessed: '2026-05-29'
 
     # License
     license:
       name: Public domain
       url: https://repository.library.noaa.gov/Content%20and%20Copyright
 
+
 outs:
-  - md5: ""
-    size: 0
-    path: historic_whaling_rocha_et_al.pdf
+  - md5: 5f4cac41db71dd7baa8559e36d83ef98
+    size: 22321
+    path: historic_whaling_rocha_et_al.xlsx
