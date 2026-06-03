@@ -35,6 +35,7 @@ definitions:
 
 dataset:
   update_period_days: 365
+  title: "Long run whaling data (Rocha + IWC)"
 
 
 tables:
@@ -51,6 +52,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#002858"
+        presentation:
+          title_public: Blue whales
       brydes:
         title: Number of Bryde's Whales caught per decade
         description_short: Number of Bryde's Whales caught per decade
@@ -62,6 +67,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#BF5933"
+        presentation:
+          title_public: Bryde's whales
       fin:
         title: Number of Fin Whales caught per decade
         description_short: Number of Fin Whales caught per decade
@@ -73,6 +82,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#A2559C"
+        presentation:
+          title_public: Fin whales
       gray:
         title: Number of Gray Whales caught per decade
         description_short: Number of Gray Whales caught per decade
@@ -84,6 +97,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#996D39"
+        presentation:
+          title_public: Gray whales
       humpback:
         title: Number of Humpback Whales caught per decade
         description_short: Number of Humpback Whales caught per decade
@@ -95,6 +112,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#954E28"
+        presentation:
+          title_public: Humpback whales
       minke:
         title: Number of Minke Whales caught per decade
         description_short: Number of Minke Whales caught per decade
@@ -106,6 +127,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#318769"
+        presentation:
+          title_public: Minke whales
       right:
         title: Number of Right Whales caught per decade
         description_short: Number of Right Whales caught per decade
@@ -117,6 +142,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#148B99"
+        presentation:
+          title_public: Right whales
       sei:
         title: Number of Sei Whales caught per decade
         description_short: Number of Sei Whales caught per decade
@@ -128,6 +157,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#8C66A8"
+        presentation:
+          title_public: Sei whales
       sperm:
         title: Number of Sperm Whales caught per decade
         description_short: Number of Sperm Whales caught per decade
@@ -139,6 +172,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#970046"
+        presentation:
+          title_public: Sperm whales
       total:
         title: Total number of whales caught per decade
         description_short: Total number of whales caught per decade
@@ -150,6 +187,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#4C6A9C"
+        presentation:
+          title_public: All whale species
       unspecified_other:
         title: Number of whales caught per decade where species is unspecified or other
         description_short: Number of whales caught per decade, where the species is unspecified or other
@@ -161,6 +202,10 @@ tables:
           - {definitions.source_iwc_decade}
           - {definitions.source_rocha_decade}
           - {definitions.combining_whales}
+        display:
+          color: "#883039"
+        presentation:
+          title_public: Unspecified/ other species
 
   long_run_whaling_annual:
     variables:
@@ -175,6 +220,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#002858"
+        presentation:
+          title_public: Blue whales
       brydes:
         title: Number of Bryde's Whales caught annually
         description_short: Number of Bryde's Whales caught annually
@@ -186,6 +235,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#BF5933"
+        presentation:
+          title_public: Bryde's whales
       fin:
         title: Number of Fin Whales caught annually
         description_short: Number of Fin Whales caught annually
@@ -197,6 +250,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#A2559C"
+        presentation:
+          title_public: Fin whales
       gray:
         title: Number of Gray Whales caught annually
         description_short: Number of Gray Whales caught annually
@@ -208,6 +265,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#996D39"
+        presentation:
+          title_public: Gray whales
       humpback:
         title: Number of Humpback Whales caught annually
         description_short: Number of Humpback Whales caught annually
@@ -219,6 +280,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#954E28"
+        presentation:
+          title_public: Humpback whales
       minke:
         title: Number of Minke Whales caught annually
         description_short: Number of Minke Whales caught annually. This includes both common and Antarctic minke whales.
@@ -230,6 +295,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#318769"
+        presentation:
+          title_public: Minke whales
       right:
         title: Number of Right Whales caught annually
         description_short: Number of Right Whales caught annually
@@ -241,6 +310,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#148B99"
+        presentation:
+          title_public: Right whales
       sei:
         title: Number of Sei Whales caught annually
         description_short: Number of Sei Whales caught annually
@@ -252,6 +325,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#8C66A8"
+        presentation:
+          title_public: Sei whales
       sperm:
         title: Number of Sperm Whales caught annually
         description_short: Number of Sperm Whales caught annually
@@ -263,6 +340,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#970046"
+        presentation:
+          title_public: Sperm whales
       total:
         title: Total number of whales caught annually
         description_short: Total number of whales caught annually
@@ -274,6 +355,10 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#4C6A9C"
+        presentation:
+          title_public: All whale species
       unspecified_other:
         title: Number of whales caught annually, where species is unspecified or other
         description_short: Number of whales caught annually where the species is unspecified or other
@@ -285,3 +370,7 @@ tables:
           - {definitions.source_iwc}
           - {definitions.source_rocha}
           - {definitions.combining_whales}
+        display:
+          color: "#883039"
+        presentation:
+          title_public: Unspecified/ other species
