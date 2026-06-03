@@ -68,6 +68,15 @@ definitions:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+  topic_tags_trust_religion: &topic_tags_trust_religion
+    - Trust
+    - Religion
+  topic_tags_democracy_religion: &topic_tags_democracy_religion
+    - Democracy
+    - Religion
+  topic_tags_technological_change_religion: &topic_tags_technological_change_religion
+    - Technological Change
+    - Religion
 dataset:
   update_period_days: 365
 
@@ -156,7 +165,7 @@ tables:
           name: Agree "Trust in people of another religion"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_trust
+          topic_tags: *topic_tags_trust_religion
 
       trust_another_nationality:
         title: Agree "Trust in people of another nationality"
@@ -183,7 +192,7 @@ tables:
           name: "Trust: Confidence in the churches"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_trust
+          topic_tags: *topic_tags_trust_religion
 
       confidence_armed_forces:
         title: "Trust: Confidence in the armed forces"
@@ -462,7 +471,7 @@ tables:
           name: "Trust: Confidence in the Organization of the Islamic World"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_trust
+          topic_tags: *topic_tags_trust_religion
 
       confidence_cooperation_council_for_the_arab_states_of_gulf__gcc:
         title: "Trust: Confidence in the Cooperation Council for the Arab States of Gulf (GCC)"
@@ -766,6 +775,8 @@ tables:
         display:
           name: "Important in life: Religion"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       not_important_in_life_religion:
         title: "Not important in life: Religion"
@@ -773,6 +784,8 @@ tables:
         display:
           name: "Not important in life: Religion"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       very_important_in_life_religion:
         title: "Very important in life: Religion"
@@ -780,6 +793,8 @@ tables:
         display:
           name: "Very important in life: Religion"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       rather_important_in_life_religion:
         title: "Rather important in life: Religion"
@@ -787,6 +802,8 @@ tables:
         display:
           name: "Rather important in life: Religion"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       not_very_important_in_life_religion:
         title: "Not very important in life: Religion"
@@ -794,6 +811,8 @@ tables:
         display:
           name: "Not very important in life: Religion"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       notatall_important_in_life_religion:
         title: "Not at all important in life: Religion"
@@ -801,6 +820,8 @@ tables:
         display:
           name: "Not at all important in life: Religion"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       dont_know_important_in_life_religion:
         title: "Don't know: Important in life: Religion"
@@ -808,6 +829,8 @@ tables:
         display:
           name: "Don't know: Important in life: Religion"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       no_answer_important_in_life_religion:
         title: "No answer: Important in life: Religion"
@@ -815,6 +838,8 @@ tables:
         display:
           name: "No answer: Important in life: Religion"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
 
       interested_politics:
@@ -4005,6 +4030,8 @@ tables:
         display:
           name: "Neighbors being homosexuals: Not mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_lgbt_rights
 
       mentioned_neighbors_homosexuals:
         title: "Neighbors being homosexuals: Mentioned"
@@ -4012,18 +4039,24 @@ tables:
         display:
           name: "Neighbors being homosexuals: Mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_lgbt_rights
       dont_know_neighbors_homosexuals:
         title: "Neighbors being homosexuals: Don't know"
         description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Homosexuals".'
         display:
           name: "Neighbors being homosexuals: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_lgbt_rights
       no_answer_neighbors_homosexuals:
         title: "Neighbors being homosexuals: No answer"
         description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Homosexuals".'
         display:
           name: "Neighbors being homosexuals: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_lgbt_rights
 
 
       notmentioned_neighbors_different_religion:
@@ -4032,6 +4065,8 @@ tables:
         display:
           name: "Neighbors of a different religion: Not mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       mentioned_neighbors_different_religion:
         title: "Neighbors of a different religion: Mentioned"
@@ -4039,6 +4074,8 @@ tables:
         display:
           name: "Neighbors of a different religion: Mentioned"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       dont_know_neighbors_different_religion:
         title: "Neighbors of a different religion: Don't know"
@@ -4046,6 +4083,8 @@ tables:
         display:
           name: "Neighbors of a different religion: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
       no_answer_neighbors_different_religion:
         title: "Neighbors of a different religion: No answer"
@@ -4053,6 +4092,8 @@ tables:
         display:
           name: "Neighbors of a different religion: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_religion
 
 
       notmentioned_neighbors_gypsies:
@@ -4589,7 +4630,7 @@ tables:
           name: "Religious authorities interpret the laws: Not essential for democracy"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_democracy
+          topic_tags: *topic_tags_democracy_religion
       essential_dem_agg_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Essential (aggregate)"
         description_short: '% of respondents replying 7 to 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
@@ -4597,7 +4638,7 @@ tables:
           name: "Religious authorities interpret the laws: Essential for democracy"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_democracy
+          topic_tags: *topic_tags_democracy_religion
       not_essential_dem_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Not essential"
         description_short: '% of respondents replying 1 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
@@ -4605,7 +4646,7 @@ tables:
           name: "Religious authorities interpret the laws: Not essential for democracy"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_democracy
+          topic_tags: *topic_tags_democracy_religion
       essential_dem_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Essential"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
@@ -4613,7 +4654,7 @@ tables:
           name: "Religious authorities interpret the laws: Essential for democracy"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_democracy
+          topic_tags: *topic_tags_democracy_religion
       neutral_essential_dem_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Neutral"
         description_short: '% of respondents replying 5 or 6 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
@@ -4621,7 +4662,7 @@ tables:
           name: "Religious authorities interpret the laws: Neutral"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_democracy
+          topic_tags: *topic_tags_democracy_religion
       dont_know_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Don't know"
         description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
@@ -4629,7 +4670,7 @@ tables:
           name: "Religious authorities interpret the laws: Don't know"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_democracy
+          topic_tags: *topic_tags_democracy_religion
       no_answer_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: No answer"
         description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
@@ -4637,7 +4678,7 @@ tables:
           name: "Religious authorities interpret the laws: No answer"
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_democracy
+          topic_tags: *topic_tags_democracy_religion
       avg_score_religious_authorities_interpret_the_laws:
         title: "Democracy - Religious authorities interpret the laws: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "Religious authorities interpret the laws".'
@@ -4648,7 +4689,7 @@ tables:
         short_unit: ""
 
         presentation:
-          topic_tags: *topic_tags_democracy
+          topic_tags: *topic_tags_democracy_religion
       not_essential_dem_agg_people_choose_their_leaders_in_free_elections:
         title: "Democracy - People choose their leaders in free elections: Not essential (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following things how essential you think it is as a characteristic of democracy. Use this scale where 1 means “not at all an essential characteristic of democracy” and 10 means it definitely is “an essential characteristic of democracy" when the characteristic is "People choose their leaders in free elections". It also includes the answer "It is against democracy", spontaneously given by some respondents.'
@@ -7496,7 +7537,7 @@ tables:
           name: 'Agree: We depend too much on science, not faith'
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_technological_change
+          topic_tags: *topic_tags_technological_change_religion
       neutral_we_depend_too_much_on_science_and_not_enough_on_faith:
         title: 'Neutral: We depend too much on science, not faith'
         description_short: '% of respondents who place themselves at 5 or 6 (neutral) when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
@@ -7504,7 +7545,7 @@ tables:
           name: 'Neutral: We depend too much on science, not faith'
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_technological_change
+          topic_tags: *topic_tags_technological_change_religion
       disagree_we_depend_too_much_on_science_and_not_enough_on_faith:
         title: 'Disagree: We depend too much on science, not faith'
         description_short: '% of respondents who place themselves between 1 and 4 (disagreement) when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
@@ -7512,7 +7553,7 @@ tables:
           name: 'Disagree: We depend too much on science, not faith'
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_technological_change
+          topic_tags: *topic_tags_technological_change_religion
       dont_know_we_depend_too_much_on_science_and_not_enough_on_faith:
         title: 'We depend too much on science, not faith: Don''t know'
         description_short: '% of respondents replying "Don''t know" when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
@@ -7520,7 +7561,7 @@ tables:
           name: 'We depend too much on science, not faith: Don''t know'
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_technological_change
+          topic_tags: *topic_tags_technological_change_religion
       no_answer_we_depend_too_much_on_science_and_not_enough_on_faith:
         title: 'We depend too much on science, not faith: No answer'
         description_short: '% of answers classified as "No answer" when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
@@ -7528,7 +7569,7 @@ tables:
           name: 'We depend too much on science, not faith: No answer'
           <<: *common-display
         presentation:
-          topic_tags: *topic_tags_technological_change
+          topic_tags: *topic_tags_technological_change_religion
       avg_score_we_depend_too_much_on_science_and_not_enough_on_faith:
         title: 'We depend too much on science, not faith: average score'
         description_short: 'Average score when asked how much they agree or disagree with the statement "We depend too much on science and not enough on faith", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
@@ -7539,7 +7580,7 @@ tables:
         unit: ""
         short_unit: ""
         presentation:
-          topic_tags: *topic_tags_technological_change
+          topic_tags: *topic_tags_technological_change_religion
       agree_science_breaks_down_ideas_of_right_and_wrong:
         title: 'Agree: Science breaks down ideas of right and wrong'
         description_short: '% of respondents who place themselves between 7 and 10 (agreement) when asked how much they agree or disagree with the statement "One of the bad effects of science is that it breaks down people''s ideas of right and wrong", on a scale where 1 means "completely disagree" and 10 means "completely agree".'
