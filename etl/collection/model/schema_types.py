@@ -70,6 +70,23 @@ class ComparisonLinesConfig(TypedDict, total=False):
     yEquals: str
 
 
+class DumbbellConfig(TypedDict, total=False):
+    """Nested configuration for DumbbellConfig."""
+
+    # How the connector between dumbbell heads is drawn.
+    # - arrow: draw an arrow pointing from start to end
+    # - line: draw a simple line (only respected when two indicators are plotted)
+    connectorStyle: Literal["arrow", "line"]
+    # Custom colors for the time-range encoding, with keys "increase" and "decrease"
+    trendColorMap: dict[str, str]
+    # What to display as value labels next to each dumbbell.
+    # - absolute: show the raw values at the start and end
+    # - change: show the absolute change (e.g. +50)
+    # - percentChange: show the percentage change (e.g. +33%)
+    # - none: hide value labels
+    valueLabelMode: Literal["absolute", "change", "percentChange", "none"]
+
+
 class HideAnnotationFieldsInTitleConfig(TypedDict, total=False):
     """Nested configuration for HideAnnotationFieldsInTitleConfig."""
 
@@ -255,11 +272,13 @@ class _ViewConfigBase(TypedDict, total=False):
             "SlopeChart",
             "StackedBar",
             "Marimekko",
+            "Dumbbell",
         ]
     ]
     colorScale: dict[str, Any]
     compareEndPointsOnly: bool
     comparisonLines: list[ComparisonLinesConfig]
+    dumbbell: DumbbellConfig
     entityType: str
     entityTypePlural: str
     excludedEntityNames: list[str]
