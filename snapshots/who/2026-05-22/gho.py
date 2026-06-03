@@ -476,19 +476,27 @@ def fetch_and_process_data(ind_code: str) -> pd.DataFrame:
 
     dimensions = fetch_dimensions()
 
-    # Turn dimensions into columns
+    # Turn dimensions into columns.
+    #
+    # Each row's `Dim{k}Type` says which dimension (SEX / AGEGROUP / ENVCAUSE / …)
+    # `Dim{k}` belongs to, and the SAME dim type can land in different `k`
+    # positions across rows of one indicator (e.g. AIR_17 ships some rows with
+    # Dim2=ENVCAUSE/Dim3=null and others with Dim2=AGEGROUP/Dim3=ENVCAUSE).
+    # Use a mask so we only write to rows whose `Dim{k}Type` matches dim_code —
+    # a whole-column assignment would let a later iteration overwrite values
+    # populated by an earlier one with NaN.
     for k in (1, 2, 3):
         dim_type = f"Dim{k}Type"
         dim_col = f"Dim{k}"
 
-        for dim_code in set(df[dim_type]):
-            # Add dimension
-            if not pd.isnull(dim_code):
-                dim_title = dimensions[dimensions.Code == dim_code].Title.iloc[0]
-                dim_values = fetch_dimension_values(dim_code)
+        for dim_code in set(df[dim_type].dropna()):
+            dim_title = dimensions[dimensions.Code == dim_code].Title.iloc[0]
+            dim_values = fetch_dimension_values(dim_code)
 
-                # Map codes to values
-                df[dim_title] = df[dim_col].map(dim_values)
+            mask = df[dim_type] == dim_code
+            if dim_title not in df.columns:
+                df[dim_title] = pd.NA
+            df.loc[mask, dim_title] = df.loc[mask, dim_col].map(dim_values)
 
         # Drop dimension columns
         df = df.drop(columns=[dim_col, dim_type])
