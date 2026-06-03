@@ -30,7 +30,6 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("internal_displacement.xlsx")
-    ds_pop = paths.load_dataset("population")
 
     # Load data from snapshot.
     tb = snap.read(safe_types=False)
@@ -45,7 +44,7 @@ def run(dest_dir: str) -> None:
     )
 
     # calculate population averages
-    tb = geo.add_population_to_table(tb, ds_pop)
+    tb = paths.regions.add_population(tb)
 
     tb["total_stock_displacement"] = tb["conflict_stock_displacement"] + tb["disaster_stock_displacement"]
     tb["total_internal_displacements"] = tb["conflict_internal_displacements"] + tb["disaster_internal_displacements"]

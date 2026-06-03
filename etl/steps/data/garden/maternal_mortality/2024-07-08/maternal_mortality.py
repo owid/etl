@@ -162,7 +162,7 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=["maternal_deaths", "mmr", "mm_rate"], how="all")
 
     # calculate regional aggregates - population is needed for filtering out all regions that are not sufficiently covered by our data
-    tb = geo.add_population_to_table(tb, ds_pop)
+    tb = paths.regions.add_population(tb)
 
     aggr = {"maternal_deaths": "sum", "live_births": "sum", "female_population": "sum", "population": "sum"}
 

@@ -76,7 +76,6 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("child_migration")
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("child_migration")
@@ -105,7 +104,7 @@ def run(dest_dir: str) -> None:
     )
 
     # calculate shares per population
-    tb = geo.add_population_to_table(tb, ds_population)
+    tb = paths.regions.add_population(tb)
 
     tb["refugees_under_18_asylum_per_1000"] = tb["refugees_under_18_asylum"] / tb["population"] * 1000
     tb["refugees_under_18_origin_per_1000"] = tb["refugees_under_18_origin"] / tb["population"] * 1000
