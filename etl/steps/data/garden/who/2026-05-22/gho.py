@@ -4,6 +4,7 @@ import json
 import re
 from typing import Any
 
+import html2text
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -368,24 +369,39 @@ def merge_identical_tables(tables: list[Table]) -> list[Table]:
     return new_tables
 
 
-def _normalize_text(s: str) -> str:
-    """Normalize whitespace and strip raw HTML in GHO source text.
+def _html_to_markdown(s: str) -> str:
+    """Convert HTML embedded in WHO source text into Markdown.
 
-    The metadata-registry API returns text with CRLF line breaks, occasional
-    double spaces, and stray HTML tags (`<br>`, `</br>`, `<p>`, `<u>`, …) that
-    leak into rendered descriptions on the public site. We collapse CRLF to LF,
-    squash runs of spaces, strip leading/trailing whitespace on each line, and
-    remove HTML tags. Inequality patterns like "<5 years" or "<2 SD" are
-    preserved (the strip regex requires a letter after `<` to count as a tag).
+    WHO's metadata-registry API ships descriptions with real HTML structure:
+    lists (`<ul><li>…`), paragraphs (`<p>…`), bold/italic (`<b>`, `<strong>`,
+    `<i>`, `<em>`), underline (`<u>`), and line breaks (`<br>`). We delegate
+    to `html2text` so this structure becomes proper Markdown (`* item` for
+    lists, `**x**` for bold, etc.) on the indicator's metadata page —
+    stripping the tags with a regex would flatten lists to indistinguishable
+    line-broken text. `body_width=0` disables hard-wrapping.
+    """
+    if not isinstance(s, str) or "<" not in s:
+        return s
+    h = html2text.HTML2Text()
+    h.body_width = 0
+    h.ignore_links = False
+    return h.handle(s)
+
+
+def _normalize_text(s: str) -> str:
+    """Normalize WHO source text for use in indicator metadata.
+
+    Two passes: convert HTML to Markdown (delegated to `_html_to_markdown`),
+    then clean up whitespace — collapse CRLF to LF, squash runs of spaces,
+    strip leading/trailing whitespace on each line, and collapse runs of
+    blank lines that the HTML-to-Markdown step may have left behind.
     """
     if not isinstance(s, str):
         return s
-    # Strip HTML tags (but leave "<5 years"-style comparisons alone).
-    s = re.sub(r"<\s*/?[a-zA-Z][^>]*>", "", s)
+    s = _html_to_markdown(s)
     s = s.replace("\r\n", "\n").replace("\r", "\n")
     s = re.sub(r"[ \t]+", " ", s)
     s = "\n".join(line.strip() for line in s.split("\n"))
-    # Collapse runs of blank lines that the HTML strip may have left behind.
     s = re.sub(r"\n{3,}", "\n\n", s)
     return s.strip()
 
