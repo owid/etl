@@ -9,6 +9,7 @@ ETL re-pushes by construction (ETL and admin write to different columns).
 from typing import TYPE_CHECKING, Any
 
 import structlog
+from sqlalchemy import bindparam, text
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -67,14 +68,23 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
         log.info("collection.chart.create", slug=slug)
         result = admin_api.create_chart(chart_config=bootstrap)
         chart_id = result["chartId"]
+        is_new = True
     else:
         chart_id = existing.id
         log.info("collection.chart.update", slug=slug, chart_id=chart_id)
+        is_new = False
 
     # Write the chart's ETL-authored config. This recomputes `full` server-side
     # as merge(variableETL, etlConfig, existing patch); any admin patches
     # already in chart_configs.patch are preserved.
     admin_api.put_chart_etl_config(chart_id=chart_id, grapher_config=chart_config)
+
+    # Set topic tags on freshly created charts only — once a chart exists,
+    # tags are admin-managed and ETL must not stomp on them.
+    if is_new and collection.topic_tags:
+        tags = _resolve_topic_tags(owid_env, collection.topic_tags)
+        if tags:
+            admin_api.set_tags(chart_id=chart_id, tags=tags)
 
     log.info(
         "collection.chart.upsert_success",
@@ -119,3 +129,19 @@ def _axis_entries(view: "View", axis: str) -> list:
     if value is None:
         return []
     return value if isinstance(value, list) else [value]
+
+
+def _resolve_topic_tags(owid_env: OWIDEnv, tag_names: list[str]) -> list[dict[str, Any]]:
+    """Resolve tag names to the dict shape `AdminAPI.set_tags` expects."""
+    stmt = text("SELECT id, name FROM tags WHERE name IN :names").bindparams(bindparam("names", expanding=True))
+    with Session(owid_env.engine) as session:
+        rows = session.execute(stmt, {"names": tag_names}).mappings().all()
+    by_name = {row["name"]: row["id"] for row in rows}
+    missing = [n for n in tag_names if n not in by_name]
+    if missing:
+        log.warning("collection.chart.unknown_topic_tags", tags=missing)
+    return [
+        {"id": by_name[name], "name": name, "isApproved": True, "keyChartLevel": 0}
+        for name in tag_names
+        if name in by_name
+    ]
