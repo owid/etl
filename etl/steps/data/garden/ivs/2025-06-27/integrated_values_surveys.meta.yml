@@ -725,7 +725,6 @@ tables:
           name: "Important in life: Politics"
           <<: *common-display
         presentation:
-          title_public: "Important in life: Politics"
           topic_tags: *topic_tags_democracy
       not_important_in_life_politics:
         title: "Not important in life: Politics"
