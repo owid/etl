@@ -77,6 +77,8 @@ definitions:
   topic_tags_technological_change_religion: &topic_tags_technological_change_religion
     - Technological Change
     - Religion
+  topic_tags_suicides: &topic_tags_suicides
+    - Suicides
 dataset:
   update_period_days: 365
 
@@ -2997,6 +2999,8 @@ tables:
         display:
           name: "Suicide: Not justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_suicides
 
       always_just_agg_suicide:
         title: "Suicide: Justifiable (aggregate)"
@@ -3004,6 +3008,8 @@ tables:
         display:
           name: "Suicide: Justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_suicides
 
       never_just_suicide:
         title: "Suicide: Never justifiable"
@@ -3011,6 +3017,8 @@ tables:
         display:
           name: "Suicide: Never justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_suicides
 
       always_just_suicide:
         title: "Suicide: Always justifiable"
@@ -3018,6 +3026,8 @@ tables:
         display:
           name: "Suicide: Always justifiable"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_suicides
 
       neutral_suicide:
         title: "Suicide: Neutral"
@@ -3025,6 +3035,8 @@ tables:
         display:
           name: "Suicide: Neutral"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_suicides
 
       dont_know_suicide:
         title: "Suicide: Don't know"
@@ -3032,6 +3044,8 @@ tables:
         display:
           name: "Suicide: Don't know"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_suicides
 
       no_answer_suicide:
         title: "Suicide: No answer"
@@ -3039,6 +3053,8 @@ tables:
         display:
           name: "Suicide: No answer"
           <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_suicides
 
       avg_score_suicide:
         title: "Suicide: Average score"
@@ -3050,6 +3066,8 @@ tables:
         short_unit: ""
 
 
+        presentation:
+          topic_tags: *topic_tags_suicides
       never_just_agg_having_casual_sex:
         title: "Having casual sex: Not justifiable (aggregate)"
         description_short: '% of respondents replying 1 to 4 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Having casual sex". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
