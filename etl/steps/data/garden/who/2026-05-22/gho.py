@@ -156,6 +156,10 @@ def run() -> None:
     # Create OOMs
     create_omms(tables_dict, paths)
 
+    # Apply per-indicator data fixes (moved here from the grapher step so the
+    # garden is the canonical place for data cleaning).
+    apply_indicator_fixes(tables_dict)
+
     #
     # Save outputs.
     #
@@ -169,6 +173,72 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def apply_indicator_fixes(tables_dict: dict[str, Table]) -> None:
+    """Per-indicator data fixes.
+
+    These previously lived in the grapher step but they're data-cleaning, not
+    grapher-specific, so the canonical place for them is here. The grapher is
+    left thin: skip empty tables, drop the `comments` ferry column, upload.
+    """
+    for title, tb in list(tables_dict.items()):
+        # 1. Stunting source-data unit error: WHO labels the column "in millions"
+        #    but the underlying values are in thousands. Divide by 1000 so the
+        #    unit matches reality.
+        col = "stunting_numbers_among_children_under_5_years_of_age__millions__model_based_estimates"
+        if col in tb.columns:
+            for c in [col, col + "_low", col + "_high"]:
+                if c in tb.columns:
+                    tb[c] /= 1000
+
+        # 2. Road-traffic alcohol attribution ships some non-numeric placeholder
+        #    values in NumericValue. Coerce to NaN so downstream code sees floats.
+        col = "attribution_of_road_traffic_deaths_to_alcohol__pct"
+        if col in tb.columns:
+            tb[col] = pd.to_numeric(tb[col], errors="coerce").copy_metadata(tb[col])
+
+        # 3. Drop noisy DHS/MICS subnational-region dimension entirely (we don't
+        #    surface subnational breakdowns in charts).
+        if "dhs_mics_subnational_regions__health_equity_monitor" in tb.index.names:
+            tb = tb.query("dhs_mics_subnational_regions__health_equity_monitor.isnull()")
+            tb = tb.reset_index(["dhs_mics_subnational_regions__health_equity_monitor"], drop=True)
+            tables_dict[title] = tb
+
+        # 4. Drop `ghe_cause_of_death_codes*` label columns — they're lookup
+        #    metadata, not indicators, and lack unit/title/origins.
+        drop_cols = [c for c in tb.columns if c.startswith("ghe_cause_of_death_codes")]
+        if drop_cols:
+            tables_dict[title] = tb.drop(columns=drop_cols)
+            tb = tables_dict[title]
+
+        # 5. Fix typos that WHO ships in description_from_producer across many
+        #    indicators. Assert the canonical occurrences still contain the typo
+        #    so we notice when WHO fixes them upstream and we can drop the patch.
+        error = "Expected typo in description from producer. It may have been fixed, so, remove this patch."
+        if "deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population" in tb.columns:
+            assert (
+                "Millenium"
+                in tb[
+                    "deaths_due_to_tuberculosis_among_hiv_negative_people__per_100_000_population"
+                ].metadata.description_from_producer
+            ), error
+        if (
+            "measles_containing_vaccine_second_dose__mcv2__immunization_coverage_by_the_nationally_recommended_age__pct"
+            in tb.columns
+        ):
+            assert (
+                "patters"
+                in tb[
+                    "measles_containing_vaccine_second_dose__mcv2__immunization_coverage_by_the_nationally_recommended_age__pct"
+                ].metadata.description_from_producer
+            ), error
+        for column in tb.columns:
+            dfp = tb[column].metadata.description_from_producer
+            if dfp and "Millenium" in dfp:
+                tb[column].metadata.description_from_producer = dfp.replace("Millenium", "Millennium")
+            if dfp and "patters" in dfp:
+                tb[column].metadata.description_from_producer = dfp.replace("patters", "patterns")
 
 
 def add_region_source_suffix(tb: Table) -> Table:

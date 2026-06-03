@@ -3,12 +3,13 @@
 ## Development & debugging:
 
 Processing all datasets in this step can take a long time. For debugging it is recommended
-to use `SUBSET` env to process only a subset of the datasets. Look up label of your
-indicator in https://apps.who.int/gho/athena/api/GHO?format=json.
+to use `SUBSET` env to process only a subset of the datasets. Look up the IndicatorCode of
+your indicator in the GHO OData API: https://ghoapi.azureedge.net/api/Indicator (the
+`IndicatorCode` field is the SUBSET value to pass).
 
-Then run the following ETL command to process it
+Then run the following ETL command to process it:
 ```
-SUBSET=AIR_11 etl run who/2025-05-19/gho --grapher
+SUBSET=AIR_11 etlr who/2026-05-22/gho --grapher
 ```
 This will upsert the indicator to MySQL and don't delete other indicators that are already in MySQL,
 making it useful for adding new / updating indicators.
