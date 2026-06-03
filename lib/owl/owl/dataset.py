@@ -186,6 +186,11 @@ def _prepare_table(df: pd.DataFrame | Table, name: str, meta: dict[str, Any]) ->
     else:
         tb = Table(df, short_name=name)
 
+    origins = [origin for col in tb.all_columns for origin in tb.get_column_or_index(col).metadata.origins]
+    if origins:
+        tb.metadata.title = tb.metadata.title or origins[0].title
+        tb.metadata.description = tb.metadata.description or origins[0].description
+
     columns_meta = meta.get("columns", {})
     for col_name, col_meta in columns_meta.items():
         if col_name in tb.columns:
@@ -403,17 +408,12 @@ class Dataset:
         info = parse_step_file(self._source_file)
         project = load_project(pathlib.Path(self._source_file).parent)
 
-        if self._uses_catalog_metadata:
-            dataset_meta = CatalogDatasetMeta()
-        else:
-            dataset_meta = _dataset_meta_from_dict(merged)
-            if not dataset_meta.title:
-                origins = [
-                    origin for col in table.all_columns for origin in table.get_column_or_index(col).metadata.origins
-                ]
-                if origins:
-                    dataset_meta.title = origins[0].title
-                    dataset_meta.description = dataset_meta.description or origins[0].description
+        dataset_meta = CatalogDatasetMeta() if self._uses_catalog_metadata else _dataset_meta_from_dict(merged)
+        if not dataset_meta.title:
+            origins = [origin for col in table.all_columns for origin in table.get_column_or_index(col).metadata.origins]
+            if origins:
+                dataset_meta.title = origins[0].title
+                dataset_meta.description = dataset_meta.description or origins[0].description
         dataset_meta.channel = self.channel or project.default_channel
         dataset_meta.namespace = info.namespace
         dataset_meta.version = info.version
