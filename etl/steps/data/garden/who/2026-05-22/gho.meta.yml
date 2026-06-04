@@ -10,6 +10,8 @@ dataset:
   # title: WHO Global Health Observatory
   title: Global Health Observatory - World Health Organization
   update_period_days: 365
+  owners:
+    - Mojmir Vinkler
 
 tables:
   # Custom OOMs
