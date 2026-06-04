@@ -9,6 +9,8 @@ ETL re-pushes by construction (ETL and admin write to different columns).
 from typing import TYPE_CHECKING, Any
 
 import structlog
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 from sqlalchemy import bindparam, text
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
@@ -16,7 +18,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from apps.chart_sync.admin_api import AdminAPI
 from etl.collection.utils import map_indicator_path_to_id
 from etl.config import DEFAULT_GRAPHER_SCHEMA, OWIDEnv
+from etl.files import read_json_schema
 from etl.grapher.model import Chart
+from etl.paths import SCHEMAS_DIR
 
 if TYPE_CHECKING:
     from etl.collection.model.core import Collection
@@ -43,6 +47,7 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
     # Grapher slugs are dash-separated; mdim short_names are snake_case.
     slug = collection.short_name.replace("_", "-")
     chart_config = _build_chart_config(view, slug)
+    _validate_chart_config(chart_config, slug)
 
     admin_api = AdminAPI(owid_env)
 
@@ -122,6 +127,24 @@ def _build_chart_config(view: "View", slug: str) -> dict[str, Any]:
         config["map"]["columnSlug"] = str(map_indicator_path_to_id(config["map"]["columnSlug"]))
 
     return config
+
+
+def _validate_chart_config(config: dict[str, Any], slug: str) -> None:
+    """Validate the built config against the local grapher schema before pushing.
+
+    The admin `etlConfig` endpoint only checks the schema *version*, not the
+    config's structure, so a typo'd field or wrong type would be stored and just
+    render wrong. We catch it here, with an error pointing at the offending field.
+    Skips if the config's schema version isn't vendored locally.
+    """
+    schema_file = SCHEMAS_DIR / str(config.get("$schema", "")).rsplit("/", 1)[-1]
+    if not schema_file.exists():
+        return
+    try:
+        validate(config, read_json_schema(schema_file))
+    except ValidationError as e:
+        location = "/".join(str(p) for p in e.absolute_path) or "(root)"
+        raise ValueError(f"Invalid chart config for slug '{slug}' at `{location}`: {e.message}") from e
 
 
 def _axis_entries(view: "View", axis: str) -> list:
