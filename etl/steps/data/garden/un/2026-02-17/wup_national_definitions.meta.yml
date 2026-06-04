@@ -8,7 +8,7 @@ definitions:
     processing_level: major
   description_key_common: &description_key_common
     - Countries define "urban" differently — some use a population threshold, others use density, administrative status, or the type of work people do. This makes these figures most useful for tracking change within a single country over time. Cross-country comparisons should be treated with caution.
-    - For comparisons across countries, the UN's 2025 revision adopted the [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php) framework, which applies the same density and settlement-size thresholds everywhere. Our charts using [DEGURBA data](https://ourworldindata.org/search?datasetProducts=Global+Human+Settlement+Layer+Dataset) are a better choice for cross-country comparisons.
+    - The UN now publishes these national-definitions estimates mainly for continuity with earlier statistics. For cross-country comparisons, a better choice is the [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php) framework, which applies the same density and settlement-size thresholds everywhere. Our charts using [DEGURBA data](https://ourworldindata.org/search?datasetProducts=Global+Human+Settlement+Layer+Dataset) use this harmonized standard.
 dataset:
   update_period_days: 1825
   title: World Urbanization Prospects - National Definitions
@@ -81,7 +81,7 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: |-
-          Average annual growth rate of the <% if area_type == "urban" %>urban<% elif area_type == "rural" %>rural<% else %>total<% endif %> population, based on each country's national definition. Positive values indicate growth; negative values indicate decline.
+          The average annual rate of change of the <% if area_type == "urban" %>urban<% elif area_type == "rural" %>rural<% else %>total<% endif %> population, based on each country's national definition.
         description_key:
           - Each value covers a five-year period — for example, the figure for 2015 is the average annual rate of change between 2010 and 2015.
           - |-
@@ -111,7 +111,7 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: |-
-          How quickly the share of people living in <% if area_type == "urban" %>urban<% elif area_type == "rural" %>rural<% else %>urban or rural<% endif %> areas is changing each year, based on each country's national definition.
+          The average annual rate of change of the share of the population living in <% if area_type == "urban" %>urban<% elif area_type == "rural" %>rural<% else %>urban or rural<% endif %> areas, based on each country's national definition.
         description_key:
           - This measures the momentum of <% if area_type == "urban" %>urbanization<% elif area_type == "rural" %>rural population change<% else %>urban–rural population shift<% endif %> — not how urban a country is, but how fast that is changing. Each value is the average annual change over the preceding five years.
           - |-
