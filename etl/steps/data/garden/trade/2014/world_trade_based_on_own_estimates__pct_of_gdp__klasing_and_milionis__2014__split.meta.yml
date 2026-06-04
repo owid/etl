@@ -1,5 +1,7 @@
 dataset:
   title: World trade based on own estimates (% of GDP) (Klasing and Milionis (2014))  (split)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   world_trade_based_on_own_estimates__pct_of_gdp__klasing_and_milionis__2014__split:
     variables:

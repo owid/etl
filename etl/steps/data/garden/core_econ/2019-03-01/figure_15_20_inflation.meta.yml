@@ -1,5 +1,7 @@
 dataset:
   title: Figure 15.20_Inflation
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   figure_15_20_inflation:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Incidence of managerial or professional jobs and collective-bargaining by gender - Blau and Kahn (2017)
+  owners:
+    - Sandra Tzvetkova  # backport
 tables:
   incidence_of_managerial_or_professional_jobs_and_collective_bargaining_by_gender__blau_and_kahn__2017:
     variables:

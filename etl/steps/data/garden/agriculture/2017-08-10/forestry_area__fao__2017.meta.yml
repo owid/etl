@@ -1,5 +1,7 @@
 dataset:
   title: Forestry area - FAO (2017)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   forestry_area__fao__2017:
     variables:

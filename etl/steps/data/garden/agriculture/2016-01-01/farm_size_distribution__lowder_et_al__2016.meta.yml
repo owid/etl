@@ -1,5 +1,7 @@
 dataset:
   title: Farm size distribution (Lowder et al. 2016)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   farm_size_distribution__lowder_et_al__2016:
     variables:

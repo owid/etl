@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   daily_calories_per_person:
     title: Daily calorie supply per person

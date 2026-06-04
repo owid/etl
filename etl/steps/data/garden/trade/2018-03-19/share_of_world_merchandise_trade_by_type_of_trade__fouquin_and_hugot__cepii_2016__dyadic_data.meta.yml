@@ -1,5 +1,7 @@
 dataset:
   title: Share of world merchandise trade by type of trade - Fouquin and Hugot (CEPII 2016, Dyadic data)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data:
     variables:

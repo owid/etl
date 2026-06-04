@@ -1,5 +1,7 @@
 dataset:
   title: Figure1.10
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   figure1_10:
     variables:

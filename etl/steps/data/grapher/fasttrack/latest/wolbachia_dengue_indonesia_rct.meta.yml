@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Fiona Spooner  # fasttrack
 tables:
   wolbachia_dengue_indonesia_rct:
     variables:

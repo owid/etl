@@ -1,5 +1,7 @@
 dataset:
   title: Whale catch by decade (Rocha et al. & IWC)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   whale_catch_by_decade__rocha_et_al__and__iwc:
     variables:

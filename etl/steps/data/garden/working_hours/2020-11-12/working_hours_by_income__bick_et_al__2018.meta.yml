@@ -1,5 +1,7 @@
 dataset:
   title: Working Hours by Income – Bick et al (2018)
+  owners:
+    - Charlie Giattino  # backport
 tables:
   working_hours_by_income__bick_et_al__2018:
     variables:
@@ -8,8 +10,7 @@ tables:
         unit: ''
         display:
           name: Country income level
-        description: Country income level (1 = Low; 2 = Medium; 3 = High) (Separate 1–10 numbering does not apply to this
-          variable)
+        description: Country income level (1 = Low; 2 = Medium; 3 = High) (Separate 1–10 numbering does not apply to this variable)
       hours_all:
         title: hours_all
         unit: hour

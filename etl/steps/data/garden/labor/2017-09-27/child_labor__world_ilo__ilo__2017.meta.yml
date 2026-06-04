@@ -1,5 +1,7 @@
 dataset:
   title: Child Labor (World ILO) - ILO (2017)
+  owners:
+    - Max Roser  # backport
 tables:
   child_labor__world_ilo__ilo__2017:
     variables:

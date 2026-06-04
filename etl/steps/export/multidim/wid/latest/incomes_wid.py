@@ -141,7 +141,11 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": ["LineChart", "Dumbbell"],
+                    # Sort the dumbbell (and table) entities by the after-tax value, lowest first
+                    "sortBy": "column",
+                    "sortColumnSlug": _after_tax_catalog_path,
+                    "sortOrder": "asc",
                 },
                 "view_metadata": {
                     "description_short": lambda view: _get_before_vs_after_metadata(tb, view)["description_short"],
@@ -188,6 +192,11 @@ def _get_grouped_quantile_subtitle(view):
     """Return subtitle for grouped quantile views."""
     welfare_type = view.dimensions.get("welfare_type")
     return f"The share of income received by each decile (tenth of the population). Income here is measured {welfare_type}es and benefits."
+
+
+def _after_tax_catalog_path(view):
+    """Return the after-tax indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
+    return next((i.catalogPath for i in view.indicators.y if "after_tax" in i.catalogPath), None)
 
 
 def _get_before_vs_after_metadata(tb, view):

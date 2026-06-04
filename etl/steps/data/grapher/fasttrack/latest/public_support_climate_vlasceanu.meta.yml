@@ -3,6 +3,8 @@ dataset:
   description: The share of populations across the world that support climate action.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   public_support_climate_vlasceanu:
     variables:

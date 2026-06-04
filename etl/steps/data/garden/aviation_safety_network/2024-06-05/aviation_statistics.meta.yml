@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Pablo Rosado
 definitions:
   common:
     description_key:
@@ -43,7 +46,7 @@ tables:
         unit: fatalities
       hijacking_fatalities:
         title: Hijacking fatalities
-        short_unit:  ''
+        short_unit: ''
         unit: fatalities
       hijacking_incidents:
         title: Hijacking incidents
@@ -63,5 +66,5 @@ tables:
           - Calculated by dividing the number of worldwide passengers, from the World Bank's World Development Indicators, by the number of fatalities, from the Aviation Safety Network, and multiplying by 1,000,000.
       passengers_carried:
         title: Passengers per year
-        short_unit:  ''
+        short_unit: ''
         unit: passengers

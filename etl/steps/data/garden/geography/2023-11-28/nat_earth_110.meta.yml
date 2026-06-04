@@ -14,6 +14,9 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Fiona Spooner
+    - Lucas Rodés-Guirao
 tables:
   nat_earth_110:
     # Learn more about the available fields:

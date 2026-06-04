@@ -1,5 +1,7 @@
 dataset:
   title: Gini Coefficient, Equivalized Income After Tax and Transfers – Chartbook of Economic Inequality (2017)
+  owners:
+    - Joe Hasell  # backport
 tables:
   gini_coefficient__equivalized_income_after_tax_and_transfers__chartbook_of_economic_inequality__2017:
     variables:

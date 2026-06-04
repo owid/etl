@@ -106,10 +106,7 @@ definitions:
     Wealth
     <%- endif %>
 
-  concept_welfare_type_for_title:
-    <% if welfare_type != "wealth" %>
-     (<<welfare_type>>)
-    <%- endif %>
+  concept_welfare_type_for_title: <% if welfare_type != "wealth" %> (<<welfare_type>>) <%- endif %>
 
   description_short_welfare_type_inequality: |-
     <% if welfare_type == "before tax" %>
@@ -229,26 +226,11 @@ definitions:
     {definitions.note_ppp}
     <%- endif %>
 
-  map_brackets_gini: &map_brackets_gini
-    <% if welfare_type in ["after tax", "after tax disposable"] %>
-    [1, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.1]
-    <%- elif welfare_type == "before tax" %>
-    [1, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.1]
-    <%- endif %>
+  map_brackets_gini: &map_brackets_gini <% if welfare_type in ["after tax", "after tax disposable"] %> [1, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.1] <%- elif welfare_type == "before tax" %> [1, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.1] <%- endif %>
 
-  map_brackets_palma_ratio: &map_brackets_palma_ratio
-    <% if welfare_type in ["after tax", "after tax disposable"] %>
-    [0, 1, 2, 3, 4, 5, 6, 7, 1]
-    <%- elif welfare_type == "before tax" %>
-    [0, 2, 4, 6, 8, 10, 12, 14, 16, 1]
-    <%- endif %>
+  map_brackets_palma_ratio: &map_brackets_palma_ratio <% if welfare_type in ["after tax", "after tax disposable"] %> [0, 1, 2, 3, 4, 5, 6, 7, 1] <%- elif welfare_type == "before tax" %> [0, 2, 4, 6, 8, 10, 12, 14, 16, 1] <%- endif %>
 
-  map_brackets_share_bottom_50: &map_brackets_share_bottom_50
-    <% if welfare_type in ["after tax", "after tax disposable"] %>
-    [100, 10, 15, 20, 25, 30, 1]
-    <%- elif welfare_type == "before tax" %>
-    [100, 10, 15, 20, 25, 1]
-    <%- endif %>
+  map_brackets_share_bottom_50: &map_brackets_share_bottom_50 <% if welfare_type in ["after tax", "after tax disposable"] %> [100, 10, 15, 20, 25, 30, 1] <%- elif welfare_type == "before tax" %> [100, 10, 15, 20, 25, 1] <%- endif %>
 
   map_brackets_relative_poverty: &map_brackets_relative_poverty |-
     <% if poverty_line in ["40% of the median"] and welfare_type in ["after tax", "after tax disposable"] %>
@@ -265,265 +247,13 @@ definitions:
     [1000, 20, 25, 30, 35, 40, 1]
     <%- endif %>
 
-  map_brackets_mean_median: &map_brackets_mean_median
-    <% if period == "year" %>
-    [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
-    <%- elif period == "month" %>
-    [0, 100, 200, 500, 1000, 2000, 5000, 1]
-    <%- elif period == "day" %>
-    [0, 10, 20, 50, 100, 200, 1]
-    <%- endif %>
+  map_brackets_mean_median: &map_brackets_mean_median <% if period == "year" %> [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1] <%- elif period == "month" %> [0, 100, 200, 500, 1000, 2000, 5000, 1] <%- elif period == "day" %> [0, 10, 20, 50, 100, 200, 1] <%- endif %>
 
-  map_brackets_avg: &map_brackets_avg
-    <% if period == "year" %>
-      <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if quantile in ["1"] %>
-        [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
-        <%- elif quantile in ["2"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif quantile in ["3", "4", "5", "6", "7", "8"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
-        <%- elif quantile in ["9"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif quantile in ["10"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 100_000, 200_000, 500_000, 1_000_000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 1]
-        <%- endif %>
-      <% elif welfare_type == "before tax" %>
-        <% if quantile in ["1"] %>
-        [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
-        <%- elif quantile in ["2", "3"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif quantile in ["4", "5", "6", "7", "8"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
-        <%- elif quantile in ["9"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif quantile in ["10"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000,1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, 1]
-        <%- endif %>
-      <%- endif %>
-    <% elif period == "month" %>
-      <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if quantile in ["1"] %>
-        [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
-        <%- elif quantile in ["2", "3"] %>
-        [0, 100, 200, 500, 1000, 2000, 1]
-        <%- elif quantile in ["4", "5", "6", "7"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- elif quantile in ["8", "9"] %>
-        [0, 1000, 2000, 5000, 10_000, 1]
-        <%- elif quantile in ["10"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1]
-        <%- endif %>
-      <% elif welfare_type == "before tax" %>
-        <% if quantile in ["1"] %>
-        [0, 1, 2, 5, 10, 20, 50, 100, 1]
-        <%- elif quantile in ["2"] %>
-        [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
-        <%- elif quantile in ["3", "4", "5", "6"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- elif quantile in ["7", "8"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
-        <%- elif quantile in ["9"] %>
-        [0, 1000, 2000, 5000, 10_000, 1]
-        <%- elif quantile in ["10"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1]
-        <%- endif %>
-      <%- endif %>
-    <% elif period == "day" %>
-      <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if quantile in ["1"] %>
-        [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 1]
-        <%- elif quantile in ["2"] %>
-        [0, 10, 20, 50, 100, 1]
-        <%- elif quantile in ["3", "4", "5", "6", "7", "8", "9"] %>
-        [0, 10, 20, 50, 100, 200, 1]
-        <%- elif quantile in ["10"] %>
-        [0, 10, 20, 50, 100, 200, 500, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 100, 200, 500, 1000, 2000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
-        <%- endif %>
-      <% elif welfare_type == "before tax" %>
-        <% if quantile in ["1"] %>
-        [0, 0.1, 0.2, 0.5, 1, 2, 5, 1]
-        <%- elif quantile in ["2", "3"] %>
-        [0, 1, 2, 5, 10, 20, 50, 100, 1]
-        <%- elif quantile in ["4", "5", "6", "7", "8", "9"] %>
-        [0, 10, 20, 50, 100, 200, 1]
-        <%- elif quantile in ["10"] %>
-        [0, 10, 20, 50, 100, 200, 500, 1000, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- endif %>
-      <%- endif %>
-    <%- endif %>
+  map_brackets_avg: &map_brackets_avg <% if period == "year" %> <% if welfare_type in ["after tax", "after tax disposable"] %> <% if quantile in ["1"] %> [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1] <%- elif quantile in ["2"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 1] <%- elif quantile in ["3", "4", "5", "6", "7", "8"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1] <%- elif quantile in ["9"] %> [0, 10_000, 20_000, 50_000, 100_000, 1] <%- elif quantile in ["10"] %> [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1] <%- elif quantile in ["Richest 1%"] %> [0, 100_000, 200_000, 500_000, 1_000_000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 1] <%- endif %> <% elif welfare_type == "before tax" %> <% if quantile in ["1"] %> [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1] <%- elif quantile in ["2", "3"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 1] <%- elif quantile in ["4", "5", "6", "7", "8"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1] <%- elif quantile in ["9"] %> [0, 10_000, 20_000, 50_000, 100_000, 1] <%- elif quantile in ["10"] %> [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1] <%- elif quantile in ["Richest 1%"] %> [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000,1] <%- elif quantile in ["Richest 0.1%"] %> [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, 1] <%- endif %> <%- endif %> <% elif period == "month" %> <% if welfare_type in ["after tax", "after tax disposable"] %> <% if quantile in ["1"] %> [0, 1, 2, 5, 10, 20, 50, 100, 200, 1] <%- elif quantile in ["2", "3"] %> [0, 100, 200, 500, 1000, 2000, 1] <%- elif quantile in ["4", "5", "6", "7"] %> [0, 100, 200, 500, 1000, 2000, 5000, 1] <%- elif quantile in ["8", "9"] %> [0, 1000, 2000, 5000, 10_000, 1] <%- elif quantile in ["10"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 1] <%- elif quantile in ["Richest 1%"] %> [0, 10_000, 20_000, 50_000, 100_000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1] <%- endif %> <% elif welfare_type == "before tax" %> <% if quantile in ["1"] %> [0, 1, 2, 5, 10, 20, 50, 100, 1] <%- elif quantile in ["2"] %> [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1] <%- elif quantile in ["3", "4", "5", "6"] %> [0, 100, 200, 500, 1000, 2000, 5000, 1] <%- elif quantile in ["7", "8"] %> [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1] <%- elif quantile in ["9"] %> [0, 1000, 2000, 5000, 10_000, 1] <%- elif quantile in ["10"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 1] <%- elif quantile in ["Richest 1%"] %> [0, 10_000, 20_000, 50_000, 100_000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1] <%- endif %> <%- endif %> <% elif period == "day" %> <% if welfare_type in ["after tax", "after tax disposable"] %> <% if quantile in ["1"] %> [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 1] <%- elif quantile in ["2"] %> [0, 10, 20, 50, 100, 1] <%- elif quantile in ["3", "4", "5", "6", "7", "8", "9"] %> [0, 10, 20, 50, 100, 200, 1] <%- elif quantile in ["10"] %> [0, 10, 20, 50, 100, 200, 500, 1] <%- elif quantile in ["Richest 1%"] %> [0, 100, 200, 500, 1000, 2000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1] <%- endif %> <% elif welfare_type == "before tax" %> <% if quantile in ["1"] %> [0, 0.1, 0.2, 0.5, 1, 2, 5, 1] <%- elif quantile in ["2", "3"] %> [0, 1, 2, 5, 10, 20, 50, 100, 1] <%- elif quantile in ["4", "5", "6", "7", "8", "9"] %> [0, 10, 20, 50, 100, 200, 1] <%- elif quantile in ["10"] %> [0, 10, 20, 50, 100, 200, 500, 1000, 1] <%- elif quantile in ["Richest 1%"] %> [0, 100, 200, 500, 1000, 2000, 5000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 1] <%- endif %> <%- endif %> <%- endif %>
 
-  map_brackets_share: &map_brackets_share
-    <% if welfare_type in ["after tax", "after tax disposable"] %>
-      <% if quantile in ["1"] %>
-      [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 1]
-      <%- elif quantile in ["2"] %>
-      [0, 1, 2, 3, 4, 5, 6, 1]
-      <%- elif quantile in ["3"] %>
-      [0, 1, 2, 3, 4, 5, 6, 7, 1]
-      <%- elif quantile in ["4"] %>
-      [100, 2, 3, 4, 5, 6, 7, 8, 1]
-      <%- elif quantile in ["5"] %>
-      [100, 3, 4, 5, 6, 7, 8, 9, 1]
-      <%- elif quantile in ["6"] %>
-      [100, 4, 5, 6, 7, 8, 9, 10, 1]
-      <%- elif quantile in ["7"] %>
-      [100, 5, 6, 7, 8, 9, 10, 11, 1]
-      <%- elif quantile in ["8"] %>
-      [100, 8, 9, 10, 11, 12, 1]
-      <%- elif quantile in ["9"] %>
-      [100, 10, 12, 14, 16, 1]
-      <%- elif quantile in ["10"] %>
-      [100, 20, 25, 30, 35, 40, 45, 50, 55, 1]
-      <%- elif quantile in ["Richest 1%"] %>
-      [0, 5, 10, 15, 20, 1]
-      <%- elif quantile in ["Richest 0.1%"] %>
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
-      <%- endif %>
-    <% elif welfare_type == "before tax" %>
-      <% if quantile in ["1"] %>
-      [0, 0.5, 1, 1.5, 2, 2.5, 3, 1]
-      <%- elif quantile in ["2"] %>
-      [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 1]
-      <%- elif quantile in ["3"] %>
-      [100, 2, 3, 4, 5, 1]
-      <%- elif quantile in ["4"] %>
-      [100, 2, 3, 4, 5, 6, 1]
-      <%- elif quantile in ["5"] %>
-      [100, 3, 4, 5, 6, 7, 8, 1]
-      <%- elif quantile in ["6"] %>
-      [100, 3, 4, 5, 6, 7, 8, 9, 1]
-      <%- elif quantile in ["7"] %>
-      [100, 6, 7, 8, 9, 10, 1]
-      <%- elif quantile in ["8"] %>
-      [100, 8, 9, 10, 11, 12, 1]
-      <%- elif quantile in ["9"] %>
-      [100, 10, 12, 14, 16, 1]
-      <%- elif quantile in ["10"] %>
-      [100, 30, 35, 40, 45, 50, 55, 60, 1]
-      <%- elif quantile in ["Richest 1%"] %>
-      [0, 5, 10, 15, 20, 25, 1]
-      <%- elif quantile in ["Richest 0.1%"] %>
-      [0, 2, 4 , 6, 8, 10, 12, 1]
-      <%- endif %>
-    <%- endif %>
+  map_brackets_share: &map_brackets_share <% if welfare_type in ["after tax", "after tax disposable"] %> <% if quantile in ["1"] %> [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 1] <%- elif quantile in ["2"] %> [0, 1, 2, 3, 4, 5, 6, 1] <%- elif quantile in ["3"] %> [0, 1, 2, 3, 4, 5, 6, 7, 1] <%- elif quantile in ["4"] %> [100, 2, 3, 4, 5, 6, 7, 8, 1] <%- elif quantile in ["5"] %> [100, 3, 4, 5, 6, 7, 8, 9, 1] <%- elif quantile in ["6"] %> [100, 4, 5, 6, 7, 8, 9, 10, 1] <%- elif quantile in ["7"] %> [100, 5, 6, 7, 8, 9, 10, 11, 1] <%- elif quantile in ["8"] %> [100, 8, 9, 10, 11, 12, 1] <%- elif quantile in ["9"] %> [100, 10, 12, 14, 16, 1] <%- elif quantile in ["10"] %> [100, 20, 25, 30, 35, 40, 45, 50, 55, 1] <%- elif quantile in ["Richest 1%"] %> [0, 5, 10, 15, 20, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 1, 2, 3, 4, 5, 6, 7, 8, 1] <%- endif %> <% elif welfare_type == "before tax" %> <% if quantile in ["1"] %> [0, 0.5, 1, 1.5, 2, 2.5, 3, 1] <%- elif quantile in ["2"] %> [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 1] <%- elif quantile in ["3"] %> [100, 2, 3, 4, 5, 1] <%- elif quantile in ["4"] %> [100, 2, 3, 4, 5, 6, 1] <%- elif quantile in ["5"] %> [100, 3, 4, 5, 6, 7, 8, 1] <%- elif quantile in ["6"] %> [100, 3, 4, 5, 6, 7, 8, 9, 1] <%- elif quantile in ["7"] %> [100, 6, 7, 8, 9, 10, 1] <%- elif quantile in ["8"] %> [100, 8, 9, 10, 11, 12, 1] <%- elif quantile in ["9"] %> [100, 10, 12, 14, 16, 1] <%- elif quantile in ["10"] %> [100, 30, 35, 40, 45, 50, 55, 60, 1] <%- elif quantile in ["Richest 1%"] %> [0, 5, 10, 15, 20, 25, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 2, 4 , 6, 8, 10, 12, 1] <%- endif %> <%- endif %>
 
-  map_brackets_thr: &map_brackets_thr
-    <% if period == "year" %>
-      <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if quantile in ["1"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif quantile in ["2", "3", "4"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
-        <%- elif quantile in ["5", "6", "7", "8"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif quantile in ["9"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 100_000, 200_000, 500_000, 1_000_000, 1]
-        <%- endif %>
-      <% elif welfare_type == "before tax" %>
-        <% if quantile in ["1"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif quantile in ["2", "3", "4", "5"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1]
-        <%- elif quantile in ["6", "7"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif quantile in ["8"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- elif quantile in ["9"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000, 1]
-        <%- endif %>
-      <%- endif %>
-    <% elif period == "month" %>
-      <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if quantile in ["1"] %>
-        [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1]
-        <%- elif quantile in ["2", "3", "4", "5", "6"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- elif quantile in ["7", "8"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
-        <%- elif quantile in ["9"] %>
-        [0, 1000, 2000, 5000, 10_000, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 1]
-        <%- endif %>
-      <% elif welfare_type == "before tax" %>
-        <% if quantile in ["1"] %>
-        [0, 10, 20, 50, 100, 200, 500, 1000, 1]
-        <%- elif quantile in ["2", "3", "4", "5", "6"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- elif quantile in ["7", "8"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1]
-        <%- elif quantile in ["9"] %>
-        [0, 1000, 2000, 5000, 10_000, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 1000, 2000, 5000, 10_000, 20_000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1]
-        <%- endif %>
-      <%- endif %>
-    <% elif period == "day" %>
-      <% if welfare_type in ["after tax", "after tax disposable"] %>
-        <% if quantile in ["1"] %>
-        [0, 1, 2, 5, 10, 20, 50, 100, 1]
-        <%- elif quantile in ["2", "3", "4", "5", "6", "7"] %>
-        [0, 10, 20, 50, 100, 200, 1]
-        <%- elif quantile in ["8", "9"] %>
-        [0, 10, 20, 50, 100, 200, 500, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 100, 200, 500, 1000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- endif %>
-      <% elif welfare_type == "before tax" %>
-        <% if quantile in ["1"] %>
-        [0, 1, 2, 5, 10, 20, 50, 1]
-        <%- elif quantile in ["2"] %>
-        [0, 1, 2, 5, 10, 20, 50, 100, 1]
-        <%- elif quantile in ["3", "4", "5", "6", "7", "8"] %>
-        [0, 10, 20, 50, 100, 200, 1]
-        <%- elif quantile in ["9"] %>
-        [0, 10, 20, 50, 100, 200, 500, 1]
-        <%- elif quantile in ["Richest 1%"] %>
-        [0, 100, 200, 500, 1000, 1]
-        <%- elif quantile in ["Richest 0.1%"] %>
-        [0, 100, 200, 500, 1000, 2000, 5000, 1]
-        <%- endif %>
-      <%- endif %>
-    <%- endif %>
+  map_brackets_thr: &map_brackets_thr <% if period == "year" %> <% if welfare_type in ["after tax", "after tax disposable"] %> <% if quantile in ["1"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 1] <%- elif quantile in ["2", "3", "4"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1] <%- elif quantile in ["5", "6", "7", "8"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000, 1] <%- elif quantile in ["9"] %> [0, 10_000, 20_000, 50_000, 100_000, 1] <%- elif quantile in ["Richest 1%"] %> [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 100_000, 200_000, 500_000, 1_000_000, 1] <%- endif %> <% elif welfare_type == "before tax" %> <% if quantile in ["1"] %> [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 1] <%- elif quantile in ["2", "3", "4", "5"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 1] <%- elif quantile in ["6", "7"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000, 1] <%- elif quantile in ["8"] %> [0, 10_000, 20_000, 50_000, 100_000, 1] <%- elif quantile in ["9"] %> [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1] <%- elif quantile in ["Richest 1%"] %> [0, 10_000, 20_000, 50_000, 100_000, 200_000, 500_000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 100_000, 200_000, 500_000, 1_000_000, 2_000_000, 1] <%- endif %> <%- endif %> <% elif period == "month" %> <% if welfare_type in ["after tax", "after tax disposable"] %> <% if quantile in ["1"] %> [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1] <%- elif quantile in ["2", "3", "4", "5", "6"] %> [0, 100, 200, 500, 1000, 2000, 5000, 1] <%- elif quantile in ["7", "8"] %> [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1] <%- elif quantile in ["9"] %> [0, 1000, 2000, 5000, 10_000, 1] <%- elif quantile in ["Richest 1%"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 10_000, 20_000, 50_000, 100_000, 1] <%- endif %> <% elif welfare_type == "before tax" %> <% if quantile in ["1"] %> [0, 10, 20, 50, 100, 200, 500, 1000, 1] <%- elif quantile in ["2", "3", "4", "5", "6"] %> [0, 100, 200, 500, 1000, 2000, 5000, 1] <%- elif quantile in ["7", "8"] %> [0, 100, 200, 500, 1000, 2000, 5000, 10_000, 1] <%- elif quantile in ["9"] %> [0, 1000, 2000, 5000, 10_000, 1] <%- elif quantile in ["Richest 1%"] %> [0, 1000, 2000, 5000, 10_000, 20_000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 10_000, 20_000, 50_000, 100_000, 200_000, 1] <%- endif %> <%- endif %> <% elif period == "day" %> <% if welfare_type in ["after tax", "after tax disposable"] %> <% if quantile in ["1"] %> [0, 1, 2, 5, 10, 20, 50, 100, 1] <%- elif quantile in ["2", "3", "4", "5", "6", "7"] %> [0, 10, 20, 50, 100, 200, 1] <%- elif quantile in ["8", "9"] %> [0, 10, 20, 50, 100, 200, 500, 1] <%- elif quantile in ["Richest 1%"] %> [0, 100, 200, 500, 1000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 100, 200, 500, 1000, 2000, 5000, 1] <%- endif %> <% elif welfare_type == "before tax" %> <% if quantile in ["1"] %> [0, 1, 2, 5, 10, 20, 50, 1] <%- elif quantile in ["2"] %> [0, 1, 2, 5, 10, 20, 50, 100, 1] <%- elif quantile in ["3", "4", "5", "6", "7", "8"] %> [0, 10, 20, 50, 100, 200, 1] <%- elif quantile in ["9"] %> [0, 10, 20, 50, 100, 200, 500, 1] <%- elif quantile in ["Richest 1%"] %> [0, 100, 200, 500, 1000, 1] <%- elif quantile in ["Richest 0.1%"] %> [0, 100, 200, 500, 1000, 2000, 5000, 1] <%- endif %> <%- endif %> <%- endif %>
 
   entity_names_inequality: &entity_names_inequality
     - Chile
@@ -541,6 +271,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   inequality:
     variables:

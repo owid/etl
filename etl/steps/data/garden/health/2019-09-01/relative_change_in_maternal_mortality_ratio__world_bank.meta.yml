@@ -1,5 +1,7 @@
 dataset:
   title: Relative change in maternal mortality ratio (World Bank)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   relative_change_in_maternal_mortality_ratio__world_bank:
     variables:

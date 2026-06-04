@@ -1,5 +1,7 @@
 dataset:
   title: Child Labor in US - Long (1958)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   child_labor_in_us__long__1958:
     variables:

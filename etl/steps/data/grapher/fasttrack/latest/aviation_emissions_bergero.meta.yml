@@ -3,6 +3,8 @@ dataset:
   description: Global trends in aviation demand, energy use, and carbon emissions from 1990 onwards.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   aviation_emissions_bergero:
     variables:

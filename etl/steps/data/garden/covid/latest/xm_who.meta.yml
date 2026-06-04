@@ -14,6 +14,8 @@ dataset:
   update_period_days: 365
   title: Global excess deaths associated with COVID-19 (modelled estimates)
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   xm_who:
     variables:

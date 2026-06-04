@@ -1,5 +1,7 @@
 dataset:
   title: Corporal Punishment in Schools - Longitudinal Evidence from Ethiopia, India, Peru and Vietnam (UNICEF 2015)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   corporal_punishment_in_schools__longitudinal_evidence_from_ethiopia__india__peru_and_vietnam__unicef_2015:
     variables:

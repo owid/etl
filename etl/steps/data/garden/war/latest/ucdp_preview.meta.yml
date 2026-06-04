@@ -77,8 +77,7 @@ definitions:
       The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
-    description_short_per_capita: <% set per_capita = ", per 100,000 people" %>
-      {definitions.number_deaths.description_short}
+    description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths.description_short}
     key_point_1: |-
       This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [non-state conflicts](#dod:nonstate-ucdp), [violence against civilians](#dod:onesided-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
     key_point_2: |-
@@ -133,8 +132,7 @@ definitions:
       The best estimate of the number of deaths of << people_type >> in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
-    description_short_per_capita: <% set per_capita = ", per 100,000 people" %>
-      {definitions.number_deaths_type.description_short}
+    description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths_type.description_short}
     description_key: &description_key_deaths_type
       - "{definitions.all.conflict_type}"
 
@@ -343,20 +341,20 @@ tables:
                   - 10000
                 customNumericLabels:
                   - "0"
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
                 customNumericColorsActive: true
                 customNumericColors:
                   - "#e8f4ea"
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -565,3 +563,5 @@ dataset:
     You can find more information about the data in our article: [To be published]
 
     This dataset contains information on armed conflicts - state, non-state and one-sided conflicts, in the period of 1989 and 2022.
+  owners:
+    - Lucas Rodés-Guirao

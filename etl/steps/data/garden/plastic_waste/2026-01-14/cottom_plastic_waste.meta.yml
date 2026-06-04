@@ -5,50 +5,35 @@ definitions:
       topic_tags:
         - Plastic Pollution
 
-  text_spot_model_principles: &text_spot_model_principles
-    Cottom et al. (2024) developed the [SPOT model](https://www.nature.com/articles/s41586-024-07758-6) model, which first fills gaps in municipal waste data using statistical predictions. It then estimates how plastic flows through the waste system and quantifies the uncertainty in those estimates. The model produces results for around 50,700 municipalities, which are subsequently aggregated to country and regional totals.
+  text_spot_model_principles: &text_spot_model_principles Cottom et al. (2024) developed the [SPOT model](https://www.nature.com/articles/s41586-024-07758-6) model, which first fills gaps in municipal waste data using statistical predictions. It then estimates how plastic flows through the waste system and quantifies the uncertainty in those estimates. The model produces results for around 50,700 municipalities, which are subsequently aggregated to country and regional totals.
 
-  text_scope_exclusions: &text_scope_exclusions
-    This data covers plastic that comes from land-based municipal solid waste (everyday waste from households and similar sources). It does not include pollution from making plastic, textiles, sea-based sources (like fishing gear), electronic waste, or plastic that is exported as waste and then lost elsewhere.
+  text_scope_exclusions: &text_scope_exclusions This data covers plastic that comes from land-based municipal solid waste (everyday waste from households and similar sources). It does not include pollution from making plastic, textiles, sea-based sources (like fishing gear), electronic waste, or plastic that is exported as waste and then lost elsewhere.
 
-  text_msw_definition: &text_msw_definition
-    Municipal solid waste is everyday non-hazardous waste from households and other municipal sources such as shops, offices and institutions. It does not include industrial, construction or hazardous waste.
+  text_msw_definition: &text_msw_definition Municipal solid waste is everyday non-hazardous waste from households and other municipal sources such as shops, offices and institutions. It does not include industrial, construction or hazardous waste.
 
-  text_plastic_waste_definition: &text_plastic_waste_definition
-    Municipal plastic waste is the plastic fraction of municipal solid waste (for example, packaging and consumer products discarded with household waste).
+  text_plastic_waste_definition: &text_plastic_waste_definition Municipal plastic waste is the plastic fraction of municipal solid waste (for example, packaging and consumer products discarded with household waste).
 
-  text_model_uncertainty: &text_model_uncertainty
-    Values are model-based estimates and come with uncertainty. They should be interpreted as approximate estimates rather than exact measurements.
+  text_model_uncertainty: &text_model_uncertainty Values are model-based estimates and come with uncertainty. They should be interpreted as approximate estimates rather than exact measurements.
 
-  text_per_capita_calculation: &text_per_capita_calculation
-    Per-capita values are calculated by dividing the total annual value by the relevant population (for example, the population of a country, region or income group).
+  text_per_capita_calculation: &text_per_capita_calculation Per-capita values are calculated by dividing the total annual value by the relevant population (for example, the population of a country, region or income group).
 
-  text_macroplastic_definition: &text_macroplastic_definition
-    This data covers only macroplastics, which are plastic pieces larger than 5 millimetres.
+  text_macroplastic_definition: &text_macroplastic_definition This data covers only macroplastics, which are plastic pieces larger than 5 millimetres.
 
-  text_pollution_definition: &text_pollution_definition
-    Plastic pollution is plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.
+  text_pollution_definition: &text_pollution_definition Plastic pollution is plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.
 
-  text_plastic_debris_definition: &text_plastic_debris_definition
-    Debris pollution is unburned macroplastic items that escape from the waste system into the environment as intact items.
+  text_plastic_debris_definition: &text_plastic_debris_definition Debris pollution is unburned macroplastic items that escape from the waste system into the environment as intact items.
 
-  text_emission_sources: &text_emission_sources
-    "Plastic pollution is attributed to five land-based sources: uncollected waste, littering, losses during collection and transport, uncontrolled disposal sites (open dumps), and rejects from sorting and reprocessing."
+  text_emission_sources: &text_emission_sources "Plastic pollution is attributed to five land-based sources: uncollected waste, littering, losses during collection and transport, uncontrolled disposal sites (open dumps), and rejects from sorting and reprocessing."
 
-  text_open_burning_definition: &text_open_burning_definition
-   This indicator measures how much macroplastic waste is burned in open, uncontrolled fires.
+  text_open_burning_definition: &text_open_burning_definition This indicator measures how much macroplastic waste is burned in open, uncontrolled fires.
 
-  text_controlled_vs_uncontrolled: &text_controlled_vs_uncontrolled
-    This is different from controlled incineration in engineered facilities, which is counted as managed treatment rather than pollution.
+  text_controlled_vs_uncontrolled: &text_controlled_vs_uncontrolled This is different from controlled incineration in engineered facilities, which is counted as managed treatment rather than pollution.
 
-  text_burning_clarification: &text_burning_clarification
-    The values refer to the mass of plastic subjected to open burning, not to the gaseous pollutants released by the fires.
+  text_burning_clarification: &text_burning_clarification The values refer to the mass of plastic subjected to open burning, not to the gaseous pollutants released by the fires.
 
-  text_total_pollution_definition: &text_total_pollution_definition
-    Total plastic pollution is the sum of debris (unburned plastic that escapes into the environment as physical items) and plastic burned in open, uncontrolled fires.
+  text_total_pollution_definition: &text_total_pollution_definition Total plastic pollution is the sum of debris (unburned plastic that escapes into the environment as physical items) and plastic burned in open, uncontrolled fires.
 
-  text_dumpsite_working_face: &text_dumpsite_working_face
-    For open dumps, pollution refers to plastic that escapes from exposed waste, not plastic that stays buried in the dump.
+  text_dumpsite_working_face: &text_dumpsite_working_face For open dumps, pollution refers to plastic that escapes from exposed waste, not plastic that stays buried in the dump.
 
   desc_key_msw_generation: &desc_key_msw_generation
     - *text_msw_definition
@@ -72,14 +57,11 @@ definitions:
     - *text_scope_exclusions
     - *text_per_capita_calculation
 
-  text_properly_managed_definition: &text_properly_managed_definition
-    Managed and controlled waste is collected and treated in controlled facilities such as sanitary landfills, engineered incinerators and formal recycling plants.
+  text_properly_managed_definition: &text_properly_managed_definition Managed and controlled waste is collected and treated in controlled facilities such as sanitary landfills, engineered incinerators and formal recycling plants.
 
-  text_properly_managed_exclusions: &text_properly_managed_exclusions
-    It does not include waste that is left uncollected, dumped in open sites, burned in the open or emitted into the unmanaged environment.
+  text_properly_managed_exclusions: &text_properly_managed_exclusions It does not include waste that is left uncollected, dumped in open sites, burned in the open or emitted into the unmanaged environment.
 
-  text_properly_managed_context: &text_properly_managed_context
-    These values describe how much municipal waste remains within a controlled system instead of becoming pollution.
+  text_properly_managed_context: &text_properly_managed_context These values describe how much municipal waste remains within a controlled system instead of becoming pollution.
 
   desc_key_properly_managed_msw: &desc_key_properly_managed_msw
     - *text_msw_definition
@@ -144,20 +126,15 @@ definitions:
     - *text_model_uncertainty
 
   # Individual pathway descriptions
-  text_litter_pathway: &text_litter_pathway
-    This pathway captures macroplastic discarded directly into the environment by people (littering), rather than placed in waste collection systems.
+  text_litter_pathway: &text_litter_pathway This pathway captures macroplastic discarded directly into the environment by people (littering), rather than placed in waste collection systems.
 
-  text_uncollected_pathway: &text_uncollected_pathway
-    This pathway captures macroplastic waste generated in areas without collection services (or not collected in practice), which is left unmanaged or handled informally and can escape into the environment.
+  text_uncollected_pathway: &text_uncollected_pathway This pathway captures macroplastic waste generated in areas without collection services (or not collected in practice), which is left unmanaged or handled informally and can escape into the environment.
 
-  text_collection_pathway: &text_collection_pathway
-    This pathway captures macroplastic that escapes during collection and transport to disposal or treatment facilities.
+  text_collection_pathway: &text_collection_pathway This pathway captures macroplastic that escapes during collection and transport to disposal or treatment facilities.
 
-  text_disposal_pathway: &text_disposal_pathway
-    This pathway captures macroplastic that escapes from uncontrolled disposal sites such as open dumps.
+  text_disposal_pathway: &text_disposal_pathway This pathway captures macroplastic that escapes from uncontrolled disposal sites such as open dumps.
 
-  text_recycling_pathway: &text_recycling_pathway
-    This pathway captures macroplastic that escapes during sorting and reprocessing operations, including rejected materials and processing losses.
+  text_recycling_pathway: &text_recycling_pathway This pathway captures macroplastic that escapes during sorting and reprocessing operations, including rejected materials and processing losses.
 
   desc_key_litter_pathway: &desc_key_litter_pathway
     - *text_pollution_definition
@@ -237,17 +214,13 @@ definitions:
     - *text_model_uncertainty
 
 
-  text_share_global_interpretation: &text_share_global_interpretation
-    Because they are shares of a global total, they show each country or region's contribution regardless of population size.
+  text_share_global_interpretation: &text_share_global_interpretation Because they are shares of a global total, they show each country or region's contribution regardless of population size.
 
-  text_collection_coverage_interpretation: &text_collection_coverage_interpretation
-    Lower collection coverage is often associated with higher pollution from uncollected waste, because more waste remains outside formal systems.
+  text_collection_coverage_interpretation: &text_collection_coverage_interpretation Lower collection coverage is often associated with higher pollution from uncollected waste, because more waste remains outside formal systems.
 
-  text_collection_delivery_interpretation: &text_collection_delivery_interpretation
-    Low delivery rates can indicate limited capacity or unreliable service, even where collection services exist.
+  text_collection_delivery_interpretation: &text_collection_delivery_interpretation Low delivery rates can indicate limited capacity or unreliable service, even where collection services exist.
 
-  text_no_collection_derived: &text_no_collection_derived
-    It is derived from the modelled collection coverage and population estimates produced by the [SPOT model](https://www.nature.com/articles/s41586-024-07758-6), which first fills gaps in municipal waste data using statistical predictions, then simulates how plastic flows through waste systems and quantifies uncertainty in those estimates. The model generates results for around 50,700 municipalities, which are then aggregated to country and regional totals.
+  text_no_collection_derived: &text_no_collection_derived It is derived from the modelled collection coverage and population estimates produced by the [SPOT model](https://www.nature.com/articles/s41586-024-07758-6), which first fills gaps in municipal waste data using statistical predictions, then simulates how plastic flows through waste systems and quantifies uncertainty in those estimates. The model generates results for around 50,700 municipalities, which are then aggregated to country and regional totals.
 
   desc_key_plastic_pollution_shares_burn: &desc_key_plastic_pollution_shares_burn
     - This indicator shows the estimated share of global plastic waste emitted via open burning from municipal sources such as households, shops, and offices, attributed to each country or region.
@@ -318,38 +291,31 @@ definitions:
     short_unit: "%"
 
   # Processing descriptions
-  processing_per_cap_litter: &processing_per_cap_litter
-    We calculated per capita pollution by dividing total plastic litter pollution by the population of each country or region.
+  processing_per_cap_litter: &processing_per_cap_litter We calculated per capita pollution by dividing total plastic litter pollution by the population of each country or region.
 
-  processing_per_cap_uncollected: &processing_per_cap_uncollected
-    We calculated per capita pollution by dividing total plastic pollution from uncollected waste by the population of each country or region.
+  processing_per_cap_uncollected: &processing_per_cap_uncollected We calculated per capita pollution by dividing total plastic pollution from uncollected waste by the population of each country or region.
 
-  processing_per_cap_collection: &processing_per_cap_collection
-    We calculated per capita pollution by dividing total plastic pollution from collection losses by the population of each country or region.
+  processing_per_cap_collection: &processing_per_cap_collection We calculated per capita pollution by dividing total plastic pollution from collection losses by the population of each country or region.
 
-  processing_per_cap_disposal: &processing_per_cap_disposal
-    We calculated per capita pollution by dividing total plastic pollution from disposal sites by the population of each country or region.
+  processing_per_cap_disposal: &processing_per_cap_disposal We calculated per capita pollution by dividing total plastic pollution from disposal sites by the population of each country or region.
 
-  processing_per_cap_pwg: &processing_per_cap_pwg
-    We calculated per capita plastic waste generation by dividing total plastic waste generation by the population of each country or region.
+  processing_per_cap_pwg: &processing_per_cap_pwg We calculated per capita plastic waste generation by dividing total plastic waste generation by the population of each country or region.
 
-  processing_per_cap_recycling: &processing_per_cap_recycling
-    We calculated per capita pollution by dividing total plastic pollution from recycling losses by the population of each country or region.
+  processing_per_cap_recycling: &processing_per_cap_recycling We calculated per capita pollution by dividing total plastic pollution from recycling losses by the population of each country or region.
 
-  processing_share_global: &processing_share_global
-    We calculated this share by dividing plastic pollution for each country or region by the global total, then multiplying by 100.
+  processing_share_global: &processing_share_global We calculated this share by dividing plastic pollution for each country or region by the global total, then multiplying by 100.
 
-  processing_share_global_burn: &processing_share_global_burn
-    We calculated this share by dividing plastic burn pollution for each country or region by the global total, then multiplying by 100.
+  processing_share_global_burn: &processing_share_global_burn We calculated this share by dividing plastic burn pollution for each country or region by the global total, then multiplying by 100.
 
-  processing_share_global_debris: &processing_share_global_debris
-    We calculated this share by dividing plastic debris pollution for each country or region by the global total, then multiplying by 100.
+  processing_share_global_debris: &processing_share_global_debris We calculated this share by dividing plastic debris pollution for each country or region by the global total, then multiplying by 100.
 
 
 dataset:
   title: Plastic Waste and Emissions (SPOT) - Cottom et al. (2024)
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   cottom_plastic_waste:
     variables:

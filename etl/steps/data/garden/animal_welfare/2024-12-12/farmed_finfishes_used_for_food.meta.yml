@@ -1,10 +1,13 @@
+dataset:
+  owners:
+    - Pablo Rosado
 definitions:
   common:
     processing_level: minor
     presentation:
       topic_tags:
-      - Animal Welfare
-      - Fish & Overfishing
+        - Animal Welfare
+        - Fish & Overfishing
       grapher_config:
         hasMapTab: false
 

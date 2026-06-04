@@ -1,5 +1,7 @@
 dataset:
   title: Environmental impacts of seafood (Gephart et al. 2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   environmental_impacts_of_seafood__gephart_et_al__2021:
     variables:
@@ -31,16 +33,14 @@ tables:
         short_unit: kg
         display:
           name: Nitrogen emissions per tonne of seafood
-        description: The amount of nitrogen pollution generated per tonne of seafood production. This is measured by edible
-          weight.
+        description: The amount of nitrogen pollution generated per tonne of seafood production. This is measured by edible weight.
       phosphorous__kgp__t_edible_weight:
         title: Phosphorous (kgP / t edible weight)
         unit: kilograms of phosphorous per tonne
         short_unit: kg
         display:
           name: Phosphorous emissions per tonne of seafood
-        description: The amount of phosphorous pollution generated per tonne of seafood production. This is measured by edible
-          weight.
+        description: The amount of phosphorous pollution generated per tonne of seafood production. This is measured by edible weight.
     dimensions:
       - name: year
         slug: year

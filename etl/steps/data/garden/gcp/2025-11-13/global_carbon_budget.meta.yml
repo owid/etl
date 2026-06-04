@@ -26,13 +26,15 @@ definitions:
       - *international_aviation_description_key
     presentation:
       topic_tags:
-      - CO2 & Greenhouse Gas Emissions
+        - CO2 & Greenhouse Gas Emissions
     processing_level: major
 
 dataset:
   title: Global Carbon Budget
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   global_carbon_budget:
     variables:
@@ -108,8 +110,8 @@ tables:
                   - 20
                   - 50
                 customNumericColors:
-                  - null
-                  - null
+                  - 
+                  - 
             selectedEntityNames:
               - United States
               - United Kingdom
@@ -471,7 +473,7 @@ tables:
         title: "GDP"
         unit: "2011 international-$"
         short_unit: "$"
-        description_short:  >-
+        description_short: >-
           Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation)
           and price differences between countries.
       growth_emissions_total:

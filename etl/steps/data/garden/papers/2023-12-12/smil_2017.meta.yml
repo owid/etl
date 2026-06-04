@@ -12,6 +12,8 @@ dataset:
   title: Global Primary Energy
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   smil_2017:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Number and percentage of current smokers, by sex (American Lung Association (2011))
+  owners:
+    - Diana Beltekian  # backport
 tables:
   number_and_percentage_of_current_smokers__by_sex__american_lung_association__2011:
     variables:

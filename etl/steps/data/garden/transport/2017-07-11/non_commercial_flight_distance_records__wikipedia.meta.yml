@@ -1,5 +1,7 @@
 dataset:
   title: Non-commercial flight distance records - Wikipedia
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   non_commercial_flight_distance_records__wikipedia:
     variables:

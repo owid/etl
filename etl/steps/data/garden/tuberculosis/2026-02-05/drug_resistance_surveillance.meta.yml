@@ -10,6 +10,8 @@ definitions:
     processing_level: major
 dataset:
   title: Global Tuberculosis Report - Drug resistance testing in TB patients
+  owners:
+    - Fiona Spooner
 tables:
   drug_resistance_surveillance:
     variables:

@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   broadberry_et_al_2015:
     variables:

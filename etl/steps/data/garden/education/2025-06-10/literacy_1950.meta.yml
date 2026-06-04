@@ -7,13 +7,15 @@ definitions:
     unit: "%"
     short_unit: "%"
     display:
-        numDecimalPlaces: 1
+      numDecimalPlaces: 1
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
 
+  owners:
+    - Veronika Samborska
 tables:
   literacy_1950:
     variables:
