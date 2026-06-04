@@ -575,6 +575,10 @@ class Collection(MDIMBase):
 
     def validate_title(self):
         """`title.title` is required for mdim collections (the data page renders empty `<h1>` otherwise)."""
+        # Only multidims render a data page that needs a top-level title. Explorers manage their
+        # own title, and single-chart collections (`dimensions: []`) have no data page.
+        if self._collection_type != "multidim":
+            return
         if not self.dimensions:
             return
         if not self.title or not self.title.get("title"):
@@ -590,6 +594,9 @@ class Collection(MDIMBase):
         fallbacks; a view is only ill-defined when neither is set AND the view actually
         renders a chart tab (line/bar/scatter/etc.) where the selection matters.
         """
+        # Explorers manage their own entity selection; this fallback check is mdim-only.
+        if self._collection_type != "multidim":
+            return
         if not self.dimensions:
             return
         if self.default_selection:
