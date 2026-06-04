@@ -1344,7 +1344,16 @@
                               "enum": [
                                 "chart",
                                 "map",
-                                "table"
+                                "table",
+                                "line",
+                                "slope",
+                                "discrete-bar",
+                                "marimekko",
+                                "scatter",
+                                "stacked-area",
+                                "stacked-bar",
+                                "stacked-discrete-bar",
+                                "dumbbell"
                               ]
                             },
                             {
@@ -1820,13 +1829,16 @@
                         },
                         "sortBy": {
                           "type": "string",
-                          "description": "Sort criterium (used by stacked bar charts and marimekko)",
+                          "description": "Sort criterion (used by discrete bar, stacked discrete bar, marimekko, and dumbbell charts).\n- column: sort by the value of a specific column, identified by sortColumnSlug\n- total: sort by the total across all columns\n- entityName: sort alphabetically by entity name\n- custom: preserve the specified entity order\n- change: sort by the change between the start and end values (dumbbell charts only)\n- startValue: sort by the start value (dumbbell charts only)\n- endValue: sort by the end value (dumbbell charts only)\n",
                           "default": "total",
                           "enum": [
                             "column",
                             "total",
                             "entityName",
-                            "custom"
+                            "custom",
+                            "change",
+                            "startValue",
+                            "endValue"
                           ]
                         },
                         "sortOrder": {
