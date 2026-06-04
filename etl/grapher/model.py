@@ -435,6 +435,8 @@ class Chart(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
+    # ETL step that authored this chart (mirrors multi_dim_data_pages.catalogPath); NULL for hand-authored charts.
+    catalogPath: Mapped[str | None] = mapped_column(VARCHAR(767), init=False)
     isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     forceDatapage: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
@@ -478,14 +480,22 @@ class Chart(Base):
         return select(ChartConfig.slug).where(ChartConfig.id == cls.configId).scalar_subquery()
 
     @classmethod
-    def load_chart(cls, session: Session, chart_id: int | None = None, slug: str | None = None) -> "Chart":
-        """Load chart with id `chart_id`."""
+    def load_chart(
+        cls,
+        session: Session,
+        chart_id: int | None = None,
+        slug: str | None = None,
+        catalog_path: str | None = None,
+    ) -> "Chart":
+        """Load a chart by `chart_id`, `slug`, or `catalog_path`."""
         if chart_id:
             cond = cls.id == chart_id
         elif slug:
             cond = cls.slug == slug
+        elif catalog_path:
+            cond = cls.catalogPath == catalog_path
         else:
-            raise ValueError("Either chart_id or slug must be provided")
+            raise ValueError("One of chart_id, slug, or catalog_path must be provided")
         charts = session.scalars(select(cls).where(cond)).all()
 
         # there can be multiple charts with the same slug, pick the published one
