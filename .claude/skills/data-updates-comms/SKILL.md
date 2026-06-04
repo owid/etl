@@ -53,7 +53,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 | Caveats                      | seeded from indicator `description_key` bullets, sanity-check workarounds (`notes_to_check.md` from update-dataset workbench), `meta.origin.description` paragraphs that mention "limitations" / "caution" | **prompt** with extracted snippets — user rewrites           |
 | Anything interesting         | seeded from PR commit messages, `notes_to_check.md` resolutions, snapshot diff summary if available in `workbench/<short_name>/`                                                                           | **prompt** — user rewrites                                   |
 | Chart views (1–3)            | `update-context.yml` candidates OR query staging directly using the criteria below                                                                                                                         | filled with rationale, user confirms                         |
-| Search URL                   | `https://ourworldindata.org/search?datasetProducts=<urlquote(producer)>`                                                                                                                                   | filled                                                       |
+| Search URL                   | `https://ourworldindata.org/search?datasetProducts=<urlquote(datasets.name)>` — value is the grapher `datasets.name` field (= garden `dataset.title` override when set, else snapshot `meta.origin.title`); see step 6 | filled                                                       |
 
 **The editorial fields are deliberately not auto-prosed.** Slack posts in the editorial voice ("Why we have this dataset on OWID") read flat when LLM-written; the value is in the human framing. The skill's job is to surface the relevant snippets so the user doesn't have to grep for them.
 
@@ -163,8 +163,29 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    The bare `/admin/charts/<id>` path takes the reader to a non-existent route on production; `/edit` opens the chart editor where they can verify the change. If the chart already existed before this PR (published earlier than the branch was cut — `c.publishedAt` is older than the first branch commit), link to production. If the chart was first published on this branch, link to staging.
 
 6. **Build the search URL.**
-   - `producer` from snapshot origin → `urllib.parse.quote_plus(producer)` → `https://ourworldindata.org/search?datasetProducts=<encoded>`.
-   - Always include this — even if it returns zero results today, it'll resolve once the new version is deployed.
+
+   The `datasetProducts` query parameter matches against the grapher **`datasets.name`** field (the dataset row's `name` column in MySQL — same value visible in the OWID admin's dataset list). When garden's `gho.meta.yml` sets a `dataset.title` override, that becomes `datasets.name` on upload. Otherwise it falls through to the snapshot origin's title.
+
+   So the resolution order is:
+
+   1. Garden `.meta.yml` → `dataset.title` (if set as override). **This is the most common case** — most large datasets carry a curated title like `Global Health Observatory - World Health Organization` or `World Bank Poverty and Inequality Platform (PIP)`.
+   2. Snapshot `.dvc` → `meta.origin.title` (fallback).
+
+   Resolve the value programmatically rather than guessing — query the grapher DB or read the garden YAML directly:
+
+   ```python
+   # Most reliable: grab the literal value from the prod-mirror grapher DB
+   make query SQL="SELECT name FROM datasets WHERE catalogPath = 'grapher/<ns>/<v>/<short>'"
+
+   # Or from the garden YAML
+   from etl.files import ruamel_load
+   meta = ruamel_load("etl/steps/data/garden/<ns>/<v>/<short>.meta.yml")
+   title = (meta.get("dataset") or {}).get("title")  # falls through if missing
+   ```
+
+   Build the URL with `urllib.parse.quote_plus(title)` so spaces become `+` and parens become `%28`/`%29`. NOT the bare `producer` field — that mismatches the index. And don't put the producer's homepage URL here, even as a fallback — the Slack template specifically wants this search URL form.
+
+   **Important caveat: the search index bakes asynchronously after a PR merge.** A correctly-formed URL can still return zero results for a few hours post-merge while the index re-bakes. If the user reports "no results", double-check the URL value against `datasets.name` first; if it matches, tell them to retry in a couple of hours.
 
 7. **Best-effort next-release date.**
    - Fetch `url_main` (WebFetch) and extract any phrase like "next release", "annual update", "updated yearly" near the page header. Tag the answer `[verify]` so the user knows to confirm.
