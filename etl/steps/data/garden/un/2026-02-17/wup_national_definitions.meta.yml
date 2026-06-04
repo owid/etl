@@ -56,7 +56,7 @@ tables:
         short_unit: '%'
         description_short: <% if area_type == "urban" %>Share of total population living in urban areas, based on each country's national definition<% elif area_type == "rural" %>Share of total population living in rural areas, based on each country's national definition<% else %>Percentage of total population, based on each country's national definition<% endif %>.
         description_key:
-          - <% if area_type == "urban" %>The share of a country's population living in areas that are officially classified as urban — a simple measure of how urbanized a country is at a given point in time.<% elif area_type == "rural" %>The share of a country's population living in areas that are officially classified as rural.<% else %>The percentage of a country's population across all areas, urban and rural combined.<% endif %>
+          - <% if area_type == "urban" %>The percentage of a country's population living in areas classified as urban, according to that country's own definition.<% elif area_type == "rural" %>The percentage of a country's population living in areas classified as rural, according to that country's own definition.<% else %>The percentage of a country's population across all areas, urban and rural combined.<% endif %>
           - *description_key_common
         display:
           numDecimalPlaces: 1
