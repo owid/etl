@@ -11,6 +11,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   food_expenditure_in_us:
     title: Food expenditure in the US

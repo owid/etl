@@ -9,6 +9,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   renewable_energy_statistics:
     title: Renewable electricity capacity

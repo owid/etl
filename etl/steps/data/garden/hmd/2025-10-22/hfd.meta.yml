@@ -54,6 +54,8 @@ dataset:
   update_period_days: 365
   title: Human Fertility Database
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   period:
     variables:

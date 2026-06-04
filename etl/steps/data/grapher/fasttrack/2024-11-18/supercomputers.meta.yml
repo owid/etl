@@ -4,6 +4,8 @@ dataset:
   licenses:
     - {}
   update_period_days: 365
+  owners:
+    - Edouard Mathieu  # fasttrack
 tables:
   supercomputers:
     variables:

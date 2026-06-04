@@ -13,7 +13,7 @@ definitions:
       topic_tags:
         - Famines
   footnote_decadal: |-
-     Decadal figures represent data averaged over each ten-year period (e.g., 1990–1999 for the 1990s). The 2020s figure is provisional and includes data only up to and including 2023.
+    Decadal figures represent data averaged over each ten-year period (e.g., 1990–1999 for the 1990s). The 2020s figure is provisional and includes data only up to and including 2023.
 
 
 # Learn more about the available fields:
@@ -22,10 +22,12 @@ dataset:
   update_period_days: 365
   title: Deaths from famines by top countries and by decade
 
+  owners:
+    - Veronika Samborska
 tables:
   famines_by_place:
     variables:
-     decadal_famine_deaths:
+      decadal_famine_deaths:
         title: Deaths from famines by top countries by decade
         display:
           numDecimalPlaces: 0

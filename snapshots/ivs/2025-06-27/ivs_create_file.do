@@ -106,9 +106,47 @@ global religion_how_often_services F028
 global religion_how_often_pray F028B
 global religion_god_important F063
 
+* Jobs scarce questions (3-point agree/disagree/neither)
+global jobs_scarce_questions C001 C002
+
+* Gender roles questions (4-point agree, no neutral)
+global gender_roles_questions D057 D059 D060 D061 D078
+
+* Neighborhood frequency questions (4-point: very/quite/not/not at all frequently)
+global neighborhood_frequency_questions H002_01 H002_03 H002_04 H002_05
+
+* Security actions and crime victim questions (binary yes/no, same structure as neighbors)
+global security_actions_questions H003_01 H003_02 H003_03 H004 H005
+
+* Single-question blocks
+global neighborhood_security_question H001
+global human_rights_respect_question E124
+global felt_unsafe_question H008_02
+global welzel_equality_question Y022
+
+* Media information source questions (5-point frequency: daily/weekly/monthly/less than monthly/never)
+global media_questions E248B E254B E258B E259B E260B E261B E262B
+
+* How close you feel questions (4-point: very close/close/not very close/not close at all)
+global closeness_questions G062 G063 G255 G256 G257
+
+* Science and technology agreement questions (10-point: completely disagree to completely agree)
+global tech_questions E217 E218 E220 I001
+
+* Science and technology: world better or worse off (10-point: a lot worse off to a lot better off)
+global science_world_question E234
+
+* Aims of country / respondent / most important goal (multinomial: one choice out of four named options)
+global aims_country_questions E001 E002
+global aims_respondent_questions E003 E004
+global most_important_questions E005 E006
+
+* Feel concerned about humankind (5-point: very much/much/to a certain extent/not so much/not at all)
+global humankind_concern_question E158
+
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_very_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff $religion_how_often $religion_god_important $religion_how_often_services $religion_how_often_pray
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_very_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff $religion_how_often $religion_god_important $religion_how_often_services $religion_how_often_pray $jobs_scarce_questions $gender_roles_questions $neighborhood_frequency_questions $security_actions_questions $neighborhood_security_question $human_rights_respect_question $felt_unsafe_question $welzel_equality_question $media_questions $closeness_questions $tech_questions $science_world_question $aims_country_questions $aims_respondent_questions $most_important_questions $humankind_concern_question
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -1539,6 +1577,754 @@ restore
 preserve
 
 
+* Processing "jobs scarce" questions
+/*
+           1 Agree
+           2 Disagree
+           3 Neither
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $jobs_scarce_questions {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen agree_`var' = 0
+	replace agree_`var' = 1 if `var' == 1
+
+	gen disagree_`var' = 0
+	replace disagree_`var' = 1 if `var' == 2
+
+	gen neither_`var' = 0
+	replace neither_`var' = 1 if `var' == 3
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	collapse (mean) agree_`var' disagree_`var' neither_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	tempfile jobs_scarce_`var'_file
+	save "`jobs_scarce_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing gender roles questions
+/*
+           1 Agree strongly
+           2 Agree
+           3 Disagree
+           4 Strongly disagree
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $gender_roles_questions {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen agree_agg_`var' = 0
+	replace agree_agg_`var' = 1 if `var' == 1 | `var' == 2
+
+	gen disagree_agg_`var' = 0
+	replace disagree_agg_`var' = 1 if `var' == 3 | `var' == 4
+
+	gen strongly_agree_`var' = 0
+	replace strongly_agree_`var' = 1 if `var' == 1
+
+	gen agree_`var' = 0
+	replace agree_`var' = 1 if `var' == 2
+
+	gen disagree_`var' = 0
+	replace disagree_`var' = 1 if `var' == 3
+
+	gen strongly_disagree_`var' = 0
+	replace strongly_disagree_`var' = 1 if `var' == 4
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	collapse (mean) agree_agg_`var' disagree_agg_`var' strongly_agree_`var' agree_`var' disagree_`var' strongly_disagree_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	tempfile gender_roles_`var'_file
+	save "`gender_roles_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing neighborhood frequency questions
+/*
+           1 Very frequently
+           2 Quite frequently
+           3 Not frequently
+           4 Not at all frequently
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $neighborhood_frequency_questions {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen frequently_agg_`var' = 0
+	replace frequently_agg_`var' = 1 if `var' == 1 | `var' == 2
+
+	gen not_frequently_agg_`var' = 0
+	replace not_frequently_agg_`var' = 1 if `var' == 3 | `var' == 4
+
+	gen very_frequently_`var' = 0
+	replace very_frequently_`var' = 1 if `var' == 1
+
+	gen quite_frequently_`var' = 0
+	replace quite_frequently_`var' = 1 if `var' == 2
+
+	gen not_frequently_`var' = 0
+	replace not_frequently_`var' = 1 if `var' == 3
+
+	gen not_at_all_frequently_`var' = 0
+	replace not_at_all_frequently_`var' = 1 if `var' == 4
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	gen avg_score_`var' = `var'
+
+	collapse (mean) frequently_agg_`var' not_frequently_agg_`var' very_frequently_`var' quite_frequently_`var' not_frequently_`var' not_at_all_frequently_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
+	tempfile nbhd_freq_`var'_file
+	save "`nbhd_freq_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing security actions and crime victim questions
+/*
+           0 No
+           1 Yes
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $security_actions_questions {
+	keep if `var' >= 0
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen yes_`var' = 0
+	replace yes_`var' = 1 if `var' == 1
+
+	gen no_`var' = 0
+	replace no_`var' = 1 if `var' == 0
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	collapse (mean) yes_`var' no_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	tempfile security_actions_`var'_file
+	save "`security_actions_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing "secure in neighborhood" question
+/*
+           1 Very secure
+           2 Quite secure
+           3 Not very secure
+           4 Not at all secure
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+keep if $neighborhood_security_question >= 1
+keep if $neighborhood_security_question != .c
+keep if $neighborhood_security_question != .d
+keep if $neighborhood_security_question != .e
+
+gen secure_neighborhood = 0
+replace secure_neighborhood = 1 if $neighborhood_security_question == 1 | $neighborhood_security_question == 2
+
+gen not_secure_neighborhood = 0
+replace not_secure_neighborhood = 1 if $neighborhood_security_question == 3 | $neighborhood_security_question == 4
+
+gen very_secure_neighborhood = 0
+replace very_secure_neighborhood = 1 if $neighborhood_security_question == 1
+
+gen quite_secure_neighborhood = 0
+replace quite_secure_neighborhood = 1 if $neighborhood_security_question == 2
+
+gen not_very_secure_neighborhood = 0
+replace not_very_secure_neighborhood = 1 if $neighborhood_security_question == 3
+
+gen not_at_all_secure_neighborhood = 0
+replace not_at_all_secure_neighborhood = 1 if $neighborhood_security_question == 4
+
+gen dont_know_secure_neighborhood = 0
+replace dont_know_secure_neighborhood = 1 if $neighborhood_security_question == .a
+
+gen no_answer_secure_neighborhood = 0
+replace no_answer_secure_neighborhood = 1 if $neighborhood_security_question == .b
+
+collapse (mean) secure_neighborhood not_secure_neighborhood very_secure_neighborhood quite_secure_neighborhood not_very_secure_neighborhood not_at_all_secure_neighborhood dont_know_secure_neighborhood no_answer_secure_neighborhood [w=S017], by (year country)
+tempfile secure_neighborhood_file
+save "`secure_neighborhood_file'"
+
+restore
+preserve
+
+* Processing "respect for individual human rights" question
+/*
+           1 A great deal of respect
+           2 Some respect
+           3 Not much respect
+           4 No respect at all
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+keep if $human_rights_respect_question >= 1
+keep if $human_rights_respect_question != .c
+keep if $human_rights_respect_question != .d
+keep if $human_rights_respect_question != .e
+
+gen respect_human_rights = 0
+replace respect_human_rights = 1 if $human_rights_respect_question == 1 | $human_rights_respect_question == 2
+
+gen not_respect_human_rights = 0
+replace not_respect_human_rights = 1 if $human_rights_respect_question == 3 | $human_rights_respect_question == 4
+
+gen great_deal_respect_human_rights = 0
+replace great_deal_respect_human_rights = 1 if $human_rights_respect_question == 1
+
+gen some_respect_human_rights = 0
+replace some_respect_human_rights = 1 if $human_rights_respect_question == 2
+
+gen not_much_respect_human_rights = 0
+replace not_much_respect_human_rights = 1 if $human_rights_respect_question == 3
+
+gen none_at_all_respect_human_rights = 0
+replace none_at_all_respect_human_rights = 1 if $human_rights_respect_question == 4
+
+gen dont_know_respect_human_rights = 0
+replace dont_know_respect_human_rights = 1 if $human_rights_respect_question == .a
+
+gen no_answer_respect_human_rights = 0
+replace no_answer_respect_human_rights = 1 if $human_rights_respect_question == .b
+
+collapse (mean) respect_human_rights not_respect_human_rights great_deal_respect_human_rights some_respect_human_rights not_much_respect_human_rights none_at_all_respect_human_rights dont_know_respect_human_rights no_answer_respect_human_rights [w=S017], by (year country)
+tempfile respect_human_rights_file
+save "`respect_human_rights_file'"
+
+restore
+preserve
+
+* Processing "felt unsafe from crime at home" question
+/*
+           1 Often
+           2 Sometimes
+           3 Rarely
+           4 Never
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+keep if $felt_unsafe_question >= 1
+keep if $felt_unsafe_question != .c
+keep if $felt_unsafe_question != .d
+keep if $felt_unsafe_question != .e
+
+gen felt_unsafe_at_home = 0
+replace felt_unsafe_at_home = 1 if $felt_unsafe_question == 1 | $felt_unsafe_question == 2
+
+gen not_felt_unsafe_at_home = 0
+replace not_felt_unsafe_at_home = 1 if $felt_unsafe_question == 3 | $felt_unsafe_question == 4
+
+gen often_felt_unsafe_at_home = 0
+replace often_felt_unsafe_at_home = 1 if $felt_unsafe_question == 1
+
+gen sometimes_felt_unsafe_at_home = 0
+replace sometimes_felt_unsafe_at_home = 1 if $felt_unsafe_question == 2
+
+gen rarely_felt_unsafe_at_home = 0
+replace rarely_felt_unsafe_at_home = 1 if $felt_unsafe_question == 3
+
+gen never_felt_unsafe_at_home = 0
+replace never_felt_unsafe_at_home = 1 if $felt_unsafe_question == 4
+
+gen dont_know_felt_unsafe_at_home = 0
+replace dont_know_felt_unsafe_at_home = 1 if $felt_unsafe_question == .a
+
+gen no_answer_felt_unsafe_at_home = 0
+replace no_answer_felt_unsafe_at_home = 1 if $felt_unsafe_question == .b
+
+collapse (mean) felt_unsafe_at_home not_felt_unsafe_at_home often_felt_unsafe_at_home sometimes_felt_unsafe_at_home rarely_felt_unsafe_at_home never_felt_unsafe_at_home dont_know_felt_unsafe_at_home no_answer_felt_unsafe_at_home [w=S017], by (year country)
+tempfile felt_unsafe_file
+save "`felt_unsafe_file'"
+
+restore
+preserve
+
+* Processing Welzel equality sub-index (continuous 0-1 index)
+/*
+Y022 is the Welzel equality sub-index, a continuous index ranging from 0 to 1.
+The only missing values are . (system missing) and .c (not applicable); `keep if Y022 < .`
+retains all real values. This index is kept on its native 0-1 scale (named avg_score_*
+so it is excluded from the x100 step below).
+*/
+
+keep if $welzel_equality_question < .
+
+gen avg_score_welzel_equality = $welzel_equality_question
+
+collapse (mean) avg_score_welzel_equality [w=S017], by (year country)
+tempfile welzel_equality_file
+save "`welzel_equality_file'"
+
+restore
+preserve
+
+
+* Processing media information source questions
+/*
+           1 Daily
+           2 Weekly
+           3 Monthly
+           4 Less than monthly
+           5 Never
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $media_questions {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen at_least_weekly_`var' = 0
+	replace at_least_weekly_`var' = 1 if `var' == 1 | `var' == 2
+
+	gen less_than_weekly_`var' = 0
+	replace less_than_weekly_`var' = 1 if `var' >= 3 & `var' <= 5
+
+	gen daily_`var' = 0
+	replace daily_`var' = 1 if `var' == 1
+
+	gen weekly_`var' = 0
+	replace weekly_`var' = 1 if `var' == 2
+
+	gen monthly_`var' = 0
+	replace monthly_`var' = 1 if `var' == 3
+
+	gen less_than_monthly_`var' = 0
+	replace less_than_monthly_`var' = 1 if `var' == 4
+
+	gen never_`var' = 0
+	replace never_`var' = 1 if `var' == 5
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	gen avg_score_`var' = `var'
+
+	collapse (mean) at_least_weekly_`var' less_than_weekly_`var' daily_`var' weekly_`var' monthly_`var' less_than_monthly_`var' never_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
+	tempfile media_`var'_file
+	save "`media_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing how close you feel questions
+/*
+           1 Very close
+           2 Close
+           3 Not very close
+           4 Not close at all
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $closeness_questions {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen feel_close_`var' = 0
+	replace feel_close_`var' = 1 if `var' == 1 | `var' == 2
+
+	gen not_close_`var' = 0
+	replace not_close_`var' = 1 if `var' == 3 | `var' == 4
+
+	gen very_close_`var' = 0
+	replace very_close_`var' = 1 if `var' == 1
+
+	gen close_`var' = 0
+	replace close_`var' = 1 if `var' == 2
+
+	gen not_very_close_`var' = 0
+	replace not_very_close_`var' = 1 if `var' == 3
+
+	gen not_close_at_all_`var' = 0
+	replace not_close_at_all_`var' = 1 if `var' == 4
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	gen avg_score_`var' = `var'
+
+	collapse (mean) feel_close_`var' not_close_`var' very_close_`var' close_`var' not_very_close_`var' not_close_at_all_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
+	tempfile close_`var'_file
+	save "`close_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing science and technology agreement questions
+/*
+           1 Completely disagree
+           2 2
+           3 3
+           4 4
+           5 5
+           6 6
+           7 7
+           8 8
+           9 9
+          10 Completely agree
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $tech_questions {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen agree_`var' = 0
+	replace agree_`var' = 1 if `var' >= 7 & `var' <= 10
+
+	gen neutral_`var' = 0
+	replace neutral_`var' = 1 if `var' == 5 | `var' == 6
+
+	gen disagree_`var' = 0
+	replace disagree_`var' = 1 if `var' >= 1 & `var' <= 4
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	gen avg_score_`var' = `var'
+
+	collapse (mean) agree_`var' neutral_`var' disagree_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
+	tempfile tech_`var'_file
+	save "`tech_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing science and technology: world better or worse off question
+/*
+           1 A lot worse off
+           2 2
+           3 3
+           4 4
+           5 5
+           6 6
+           7 7
+           8 8
+           9 9
+          10 A lot better off
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+keep if $science_world_question >= 1
+keep if $science_world_question != .c
+keep if $science_world_question != .d
+keep if $science_world_question != .e
+
+gen better_off_science_world = 0
+replace better_off_science_world = 1 if $science_world_question >= 7 & $science_world_question <= 10
+
+gen neutral_science_world = 0
+replace neutral_science_world = 1 if $science_world_question == 5 | $science_world_question == 6
+
+gen worse_off_science_world = 0
+replace worse_off_science_world = 1 if $science_world_question >= 1 & $science_world_question <= 4
+
+gen dont_know_science_world = 0
+replace dont_know_science_world = 1 if $science_world_question == .a
+
+gen no_answer_science_world = 0
+replace no_answer_science_world = 1 if $science_world_question == .b
+
+gen avg_score_science_world = $science_world_question
+
+collapse (mean) better_off_science_world neutral_science_world worse_off_science_world dont_know_science_world no_answer_science_world avg_score_science_world [w=S017], by (year country)
+tempfile science_world_file
+save "`science_world_file'"
+
+restore
+preserve
+
+* Processing aims of country questions (most important goal for the country)
+/*
+           1 A high level of economic growth
+           2 Strong defence forces
+           3 People have more say about how things are done
+           4 Trying to make our cities and countryside more beautiful
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $aims_country_questions {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen economic_growth_`var' = 0
+	replace economic_growth_`var' = 1 if `var' == 1
+
+	gen strong_defence_`var' = 0
+	replace strong_defence_`var' = 1 if `var' == 2
+
+	gen more_say_`var' = 0
+	replace more_say_`var' = 1 if `var' == 3
+
+	gen beautiful_cities_`var' = 0
+	replace beautiful_cities_`var' = 1 if `var' == 4
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	collapse (mean) economic_growth_`var' strong_defence_`var' more_say_`var' beautiful_cities_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	tempfile aims_country_`var'_file
+	save "`aims_country_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing aims of respondent questions (most important goal for the respondent)
+/*
+           1 Maintaining order in the nation
+           2 Giving people more say in important government decisions
+           3 Fighting rising prices
+           4 Protecting freedom of speech
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $aims_respondent_questions {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen maintaining_order_`var' = 0
+	replace maintaining_order_`var' = 1 if `var' == 1
+
+	gen give_people_say_`var' = 0
+	replace give_people_say_`var' = 1 if `var' == 2
+
+	gen fighting_prices_`var' = 0
+	replace fighting_prices_`var' = 1 if `var' == 3
+
+	gen freedom_of_speech_`var' = 0
+	replace freedom_of_speech_`var' = 1 if `var' == 4
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	collapse (mean) maintaining_order_`var' give_people_say_`var' fighting_prices_`var' freedom_of_speech_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	tempfile aims_resp_`var'_file
+	save "`aims_resp_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing most important goal questions (stable economy vs humane society vs ideas vs crime)
+/*
+           1 A stable economy
+           2 Progress toward a less impersonal and more humane society
+           3 Progress toward a society in which ideas count more than money
+           4 The fight against crime
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+foreach var in $most_important_questions {
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen stable_economy_`var' = 0
+	replace stable_economy_`var' = 1 if `var' == 1
+
+	gen humane_society_`var' = 0
+	replace humane_society_`var' = 1 if `var' == 2
+
+	gen ideas_over_money_`var' = 0
+	replace ideas_over_money_`var' = 1 if `var' == 3
+
+	gen fight_crime_`var' = 0
+	replace fight_crime_`var' = 1 if `var' == 4
+
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
+
+	collapse (mean) stable_economy_`var' humane_society_`var' ideas_over_money_`var' fight_crime_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	tempfile most_important_`var'_file
+	save "`most_important_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing feel concerned about humankind question
+/*
+           1 Very much
+           2 Much
+           3 To a certain extent
+           4 Not so much
+           5 Not at all
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+keep if $humankind_concern_question >= 1
+keep if $humankind_concern_question != .c
+keep if $humankind_concern_question != .d
+keep if $humankind_concern_question != .e
+
+gen concerned_humankind = 0
+replace concerned_humankind = 1 if $humankind_concern_question == 1 | $humankind_concern_question == 2
+
+gen not_concerned_humankind = 0
+replace not_concerned_humankind = 1 if $humankind_concern_question == 4 | $humankind_concern_question == 5
+
+gen very_much_humankind = 0
+replace very_much_humankind = 1 if $humankind_concern_question == 1
+
+gen much_humankind = 0
+replace much_humankind = 1 if $humankind_concern_question == 2
+
+gen to_a_certain_extent_humankind = 0
+replace to_a_certain_extent_humankind = 1 if $humankind_concern_question == 3
+
+gen not_so_much_humankind = 0
+replace not_so_much_humankind = 1 if $humankind_concern_question == 4
+
+gen not_at_all_humankind = 0
+replace not_at_all_humankind = 1 if $humankind_concern_question == 5
+
+gen dont_know_humankind = 0
+replace dont_know_humankind = 1 if $humankind_concern_question == .a
+
+gen no_answer_humankind = 0
+replace no_answer_humankind = 1 if $humankind_concern_question == .b
+
+gen avg_score_humankind = $humankind_concern_question
+
+collapse (mean) concerned_humankind not_concerned_humankind very_much_humankind much_humankind to_a_certain_extent_humankind not_so_much_humankind not_at_all_humankind dont_know_humankind no_answer_humankind avg_score_humankind [w=S017], by (year country)
+tempfile humankind_concern_file
+save "`humankind_concern_file'"
+
+restore
+preserve
+
+
 * Combine all the saved datasets
 use "`trust_file'", clear
 
@@ -1619,7 +2405,56 @@ foreach var in $religion_how_often_pray {
 
 qui merge 1:1 year country using "`god_important_file'", nogenerate // keep(master match)
 
-* Get a list of variables excluding country and year (and avg_score_eq_ineq to not multiply it by 100)
+foreach var in $jobs_scarce_questions {
+	qui merge 1:1 year country using "`jobs_scarce_`var'_file'", nogenerate // keep(master match)
+}
+
+foreach var in $gender_roles_questions {
+	qui merge 1:1 year country using "`gender_roles_`var'_file'", nogenerate // keep(master match)
+}
+
+foreach var in $neighborhood_frequency_questions {
+	qui merge 1:1 year country using "`nbhd_freq_`var'_file'", nogenerate // keep(master match)
+}
+
+foreach var in $security_actions_questions {
+	qui merge 1:1 year country using "`security_actions_`var'_file'", nogenerate // keep(master match)
+}
+
+qui merge 1:1 year country using "`secure_neighborhood_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`respect_human_rights_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`felt_unsafe_file'", nogenerate // keep(master match)
+qui merge 1:1 year country using "`welzel_equality_file'", nogenerate // keep(master match)
+
+foreach var in $media_questions {
+	qui merge 1:1 year country using "`media_`var'_file'", nogenerate // keep(master match)
+}
+
+foreach var in $closeness_questions {
+	qui merge 1:1 year country using "`close_`var'_file'", nogenerate // keep(master match)
+}
+
+foreach var in $tech_questions {
+	qui merge 1:1 year country using "`tech_`var'_file'", nogenerate // keep(master match)
+}
+
+qui merge 1:1 year country using "`science_world_file'", nogenerate // keep(master match)
+
+foreach var in $aims_country_questions {
+	qui merge 1:1 year country using "`aims_country_`var'_file'", nogenerate // keep(master match)
+}
+
+foreach var in $aims_respondent_questions {
+	qui merge 1:1 year country using "`aims_resp_`var'_file'", nogenerate // keep(master match)
+}
+
+foreach var in $most_important_questions {
+	qui merge 1:1 year country using "`most_important_`var'_file'", nogenerate // keep(master match)
+}
+
+qui merge 1:1 year country using "`humankind_concern_file'", nogenerate // keep(master match)
+
+* Get a list of variables excluding country and year (and all avg_score_* columns, which stay on their native scales and must not be multiplied by 100)
 ds country year avg_score*, not
 
 * Multiply variables by 100 to get percentages

@@ -1,5 +1,7 @@
 dataset:
   title: Output of key industrial sectors in England - Bank of England (2017)
+  owners:
+    - Ruby Mittal  # backport
 tables:
   output_of_key_industrial_sectors_in_england__bank_of_england__2017:
     variables:

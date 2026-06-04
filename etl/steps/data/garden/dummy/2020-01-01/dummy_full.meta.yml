@@ -1,8 +1,11 @@
+dataset:
+  owners:
+    - Pablo Rosado
 definitions:
   common:
     presentation:
       topic_tags:
-      - Uncategorized
+        - Uncategorized
 
 tables:
   dummy_full:
@@ -36,16 +39,16 @@ tables:
             subtitle: "[grapher-config.subtitle > indicator.description-short]"
             hasMapTab: true
             selectedEntityNames:
-            - Germany
-            - Italy
-            - France
+              - Germany
+              - Italy
+              - France
           title_public: "[presentation.title-public > indicator.title]"
           title_variant: "[presentation.title-variant]"
           attribution_short: "[presentation.attribution-short]"
           attribution: "[presentation.attribution > origin.attribution > origin.producer (year)]"
           topic_tags:
-          - "Internet"
-          - "[presentation.topic-tags example 2]"
+            - "Internet"
+            - "[presentation.topic-tags example 2]"
           faqs:
-          - fragment_id: cherries
-            gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE
+            - fragment_id: cherries
+              gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE

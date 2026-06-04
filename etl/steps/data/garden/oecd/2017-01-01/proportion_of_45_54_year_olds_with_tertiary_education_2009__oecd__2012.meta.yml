@@ -1,5 +1,7 @@
 dataset:
   title: Proportion of 45-54 year-olds with tertiary education 2009 - OECD (2012)
+  owners:
+    - Max Roser  # backport
 tables:
   proportion_of_45_54_year_olds_with_tertiary_education_2009__oecd__2012:
     variables:

@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Fiona Spooner
 tables:
   under_five_mortality:
     title: Child Mortality Rate (Gapminder)

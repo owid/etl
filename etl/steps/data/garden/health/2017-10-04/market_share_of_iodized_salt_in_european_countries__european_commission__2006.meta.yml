@@ -1,5 +1,7 @@
 dataset:
   title: Market share of iodized salt in European countries - European Commission (2006)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   market_share_of_iodized_salt_in_european_countries__european_commission__2006:
     variables:

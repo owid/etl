@@ -1,5 +1,7 @@
 dataset:
   title: Plastic bag substitute comparisons (Danish EPA, 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   plastic_bag_substitute_comparisons__danish_epa__2018:
     variables:

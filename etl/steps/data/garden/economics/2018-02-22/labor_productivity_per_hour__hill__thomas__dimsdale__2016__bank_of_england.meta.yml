@@ -1,5 +1,7 @@
 dataset:
   title: Labor productivity per hour (Hill, Thomas, Dimsdale (2016), Bank of England)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   labor_productivity_per_hour__hill__thomas__dimsdale__2016__bank_of_england:
     variables:

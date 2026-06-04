@@ -1,5 +1,7 @@
 dataset:
   title: Depression prevalence by education - OECD
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   depression_prevalence_by_education__oecd:
     variables:

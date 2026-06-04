@@ -179,7 +179,7 @@ definitions:
     <%- elif ppp_version == 2021 %>
     $28
     <%- endif %>
-  description_key_prosperity_gap : The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as {definitions.prosperity_gap_threshold} per person per day. This gives a sense of how far global incomes are from a basic prosperity standard.
+  description_key_prosperity_gap: The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as {definitions.prosperity_gap_threshold} per person per day. This gives a sense of how far global incomes are from a basic prosperity standard.
 
   description_processing_main: |-
     <% if welfare_type in ["income", "consumption"] %>
@@ -434,135 +434,21 @@ definitions:
     Purples
     <%- endif %>
 
-  map_brackets_headcount_ratio: &map_brackets_headcount_ratio
-    <% if poverty_line in ["190", "215"] %>
-    [0, 3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    <%- elif poverty_line in ["40% of the median"] %>
-    [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
-    <%- elif poverty_line in ["50% of the median"] %>
-    [0, 3, 6, 9, 12, 15, 18, 21, 24, 1]
-    <%- elif poverty_line in ["60% of the median"] %>
-    [0, 5, 10, 15, 20, 25, 30, 1]
-    <%- else %>
-    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    <%- endif %>
+  map_brackets_headcount_ratio: &map_brackets_headcount_ratio <% if poverty_line in ["190", "215"] %> [0, 3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] <%- elif poverty_line in ["40% of the median"] %> [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 1] <%- elif poverty_line in ["50% of the median"] %> [0, 3, 6, 9, 12, 15, 18, 21, 24, 1] <%- elif poverty_line in ["60% of the median"] %> [0, 5, 10, 15, 20, 25, 30, 1] <%- else %> [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] <%- endif %>
 
-  map_brackets_headcount: &map_brackets_headcount
-    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 1]
-    <%- else %>
-    [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1]
-    <%- endif %>
+  map_brackets_headcount: &map_brackets_headcount <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %> [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 1] <%- else %> [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1] <%- endif %>
 
-  map_brackets_total_shortfall: &map_brackets_total_shortfall
-    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    [0, 100000000,300000000,1000000000,3000000000,10000000000,30000000000, 1]
-    <%- elif poverty_line in ["100"] %>
-    [0, 1000000,3000000,10000000,30000000,100000000,300000000,1]
-    <%- elif poverty_line in ["190", "215"] %>
-    [0, 1000000,3000000,10000000,30000000,100000000,300000000,1000000000,3000000000,1]
-    <%- elif poverty_line in ["320", "365"] %>
-    [0, 10000000,30000000,100000000,300000000,1000000000,3000000000,10000000000,1]
-    <%- elif poverty_line in ["550", "685"] %>
-    [0, 100000000,300000000,1000000000,3000000000,10000000000,30000000000,100000000000,1]
-    <%- elif poverty_line in ["1000"] %>
-    [0, 1000000000,3000000000,10000000000,30000000000,100000000000,300000000000,1000000000000]
-    <%- elif poverty_line in ["2000"] %>
-    [0, 10000000000,30000000000,100000000000,300000000000,1]
-    <%- elif poverty_line in ["3000"] %>
-    [0, 10000000000,30000000000,100000000000,300000000000,1000000000000,1]
-    <%- elif poverty_line in ["4000"] %>
-    [0, 10000000000,30000000000,100000000000,300000000000,1000000000000,3000000000000,10000000000000,1]
-    <%- endif %>
+  map_brackets_total_shortfall: &map_brackets_total_shortfall <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %> [0, 100000000,300000000,1000000000,3000000000,10000000000,30000000000, 1] <%- elif poverty_line in ["100"] %> [0, 1000000,3000000,10000000,30000000,100000000,300000000,1] <%- elif poverty_line in ["190", "215"] %> [0, 1000000,3000000,10000000,30000000,100000000,300000000,1000000000,3000000000,1] <%- elif poverty_line in ["320", "365"] %> [0, 10000000,30000000,100000000,300000000,1000000000,3000000000,10000000000,1] <%- elif poverty_line in ["550", "685"] %> [0, 100000000,300000000,1000000000,3000000000,10000000000,30000000000,100000000000,1] <%- elif poverty_line in ["1000"] %> [0, 1000000000,3000000000,10000000000,30000000000,100000000000,300000000000,1000000000000] <%- elif poverty_line in ["2000"] %> [0, 10000000000,30000000000,100000000000,300000000000,1] <%- elif poverty_line in ["3000"] %> [0, 10000000000,30000000000,100000000000,300000000000,1000000000000,1] <%- elif poverty_line in ["4000"] %> [0, 10000000000,30000000000,100000000000,300000000000,1000000000000,3000000000000,10000000000000,1] <%- endif %>
 
-  map_brackets_avg_shortfall: &map_brackets_avg_shortfall
-    <% if poverty_line in ["40% of the median"] %>
-    [0, 1, 2, 3, 4, 5, 6, 1]
-    <%- elif poverty_line in ["50% of the median"] %>
-    [0, 1, 2, 3, 4, 5, 6, 7, 1]
-    <%- elif poverty_line in ["60% of the median"] %>
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif poverty_line in ["100"] %>
-    [0, 0.2, 0.4, 0.6, 0.8, 1]
-    <%- elif poverty_line in ["190", "215"] %>
-    [0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, <<poverty_line|float/100>>]
-    <%- elif poverty_line in ["320", "365"] %>
-    [0, 0.5, 1, 1.5, 2, 2.5, 3, <<poverty_line|float/100>>]
-    <%- elif poverty_line in ["550", "685"] %>
-    [0, 1, 2, 3, 4, 5, <<poverty_line|float/100>>]
-    <%- elif poverty_line in ["1000"] %>
-    [0, 2, 4 ,6, 8, 10]
-    <%- elif poverty_line in ["2000"] %>
-    [0, 2, 4 ,6, 8, 10, 12, 14, 16, 18, 20]
-    <%- elif poverty_line in ["3000"] %>
-    [0, 5, 10 , 15, 20, 25, 30]
-    <%- elif poverty_line in ["4000"] %>
-    [0, 5, 10 , 15, 20, 25, 30, 35, 40]
-    <%- endif %>
+  map_brackets_avg_shortfall: &map_brackets_avg_shortfall <% if poverty_line in ["40% of the median"] %> [0, 1, 2, 3, 4, 5, 6, 1] <%- elif poverty_line in ["50% of the median"] %> [0, 1, 2, 3, 4, 5, 6, 7, 1] <%- elif poverty_line in ["60% of the median"] %> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1] <%- elif poverty_line in ["100"] %> [0, 0.2, 0.4, 0.6, 0.8, 1] <%- elif poverty_line in ["190", "215"] %> [0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, <<poverty_line|float/100>>] <%- elif poverty_line in ["320", "365"] %> [0, 0.5, 1, 1.5, 2, 2.5, 3, <<poverty_line|float/100>>] <%- elif poverty_line in ["550", "685"] %> [0, 1, 2, 3, 4, 5, <<poverty_line|float/100>>] <%- elif poverty_line in ["1000"] %> [0, 2, 4 ,6, 8, 10] <%- elif poverty_line in ["2000"] %> [0, 2, 4 ,6, 8, 10, 12, 14, 16, 18, 20] <%- elif poverty_line in ["3000"] %> [0, 5, 10 , 15, 20, 25, 30] <%- elif poverty_line in ["4000"] %> [0, 5, 10 , 15, 20, 25, 30, 35, 40] <%- endif %>
 
-  map_brackets_poverty_gap_index: &map_brackets_poverty_gap_index
-    <% if poverty_line in ["40% of the median"] %>
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
-    <%- elif poverty_line in ["50% of the median"] %>
-    [0, 2, 4, 6, 8, 10, 1]
-    <%- elif poverty_line in ["60% of the median"] %>
-    [0, 2, 4, 6, 8, 10, 12, 1]
-    <%- elif poverty_line in ["100"] %>
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif poverty_line in ["190", "215"] %>
-    [0, 5, 10, 15, 20, 25, 30, 35, 1]
-    <%- elif poverty_line in ["320", "365"] %>
-    [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
-    <%- elif poverty_line in ["550", "685"] %>
-    [0, 10, 20, 30, 40, 50, 60, 70, 1]
-    <%- elif poverty_line in ["1000"] %>
-    [0, 10, 20, 30, 40, 50, 60, 70, 80, 1]
-    <%- else %>
-    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    <%- endif %>
+  map_brackets_poverty_gap_index: &map_brackets_poverty_gap_index <% if poverty_line in ["40% of the median"] %> [0, 1, 2, 3, 4, 5, 6, 7, 8, 1] <%- elif poverty_line in ["50% of the median"] %> [0, 2, 4, 6, 8, 10, 1] <%- elif poverty_line in ["60% of the median"] %> [0, 2, 4, 6, 8, 10, 12, 1] <%- elif poverty_line in ["100"] %> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1] <%- elif poverty_line in ["190", "215"] %> [0, 5, 10, 15, 20, 25, 30, 35, 1] <%- elif poverty_line in ["320", "365"] %> [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 1] <%- elif poverty_line in ["550", "685"] %> [0, 10, 20, 30, 40, 50, 60, 70, 1] <%- elif poverty_line in ["1000"] %> [0, 10, 20, 30, 40, 50, 60, 70, 80, 1] <%- else %> [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] <%- endif %>
 
-  map_brackets_avg: &map_brackets_avg
-    <% if decile in [1, 2, 3, 4] %>
-    [0, 1, 2, 5, 10, 20, 1]
-    <%- elif decile in [5, 6, 7, 8] %>
-    [0, 1, 2, 5, 10, 20, 50, 1]
-    <%- elif decile in [9] %>
-    [0, 1, 2, 5, 10, 20, 50, 100, 1]
-    <%- elif decile in [10] %>
-    [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
-    <%- endif %>
+  map_brackets_avg: &map_brackets_avg <% if decile in [1, 2, 3, 4] %> [0, 1, 2, 5, 10, 20, 1] <%- elif decile in [5, 6, 7, 8] %> [0, 1, 2, 5, 10, 20, 50, 1] <%- elif decile in [9] %> [0, 1, 2, 5, 10, 20, 50, 100, 1] <%- elif decile in [10] %> [0, 1, 2, 5, 10, 20, 50, 100, 200, 1] <%- endif %>
 
-  map_brackets_share: &map_brackets_share
-    <% if decile in [1] %>
-    [0, 1, 2, 3, 4, 1]
-    <%- elif decile in [2] %>
-    [0, 1, 2, 3, 4, 5, 1]
-    <%- elif decile in [3] %>
-    [100, 2, 3, 4, 5, 6, 1]
-    <%- elif decile in [4] %>
-    [100, 2, 3, 4, 5, 6, 7, 1]
-    <%- elif decile in [5] %>
-    [100, 2, 3, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif decile in [6] %>
-    [100, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif decile in [7] %>
-    [100, 6, 7, 8, 9, 10, 11, 1]
-    <%- elif decile in [8] %>
-    [100, 8, 9, 10, 11, 12, 13, 1]
-    <%- elif decile in [9] %>
-    [100, 8, 10, 12, 14, 16, 1]
-    <%- elif decile in [10] %>
-    [100, 20, 25, 30, 35, 40, 45, 50, 1]
-    <%- endif %>
+  map_brackets_share: &map_brackets_share <% if decile in [1] %> [0, 1, 2, 3, 4, 1] <%- elif decile in [2] %> [0, 1, 2, 3, 4, 5, 1] <%- elif decile in [3] %> [100, 2, 3, 4, 5, 6, 1] <%- elif decile in [4] %> [100, 2, 3, 4, 5, 6, 7, 1] <%- elif decile in [5] %> [100, 2, 3, 4, 5, 6, 7, 8, 9, 1] <%- elif decile in [6] %> [100, 4, 5, 6, 7, 8, 9, 1] <%- elif decile in [7] %> [100, 6, 7, 8, 9, 10, 11, 1] <%- elif decile in [8] %> [100, 8, 9, 10, 11, 12, 13, 1] <%- elif decile in [9] %> [100, 8, 10, 12, 14, 16, 1] <%- elif decile in [10] %> [100, 20, 25, 30, 35, 40, 45, 50, 1] <%- endif %>
 
-  map_brackets_thr: &map_brackets_thr
-    <% if decile in [1, 2, 3] %>
-    [0, 1, 2, 5, 10, 20, 1]
-    <% elif decile in [4, 5, 6, 7] %>
-    [0, 1, 2, 5, 10, 20, 50, 1]
-    <% elif decile in [8, 9] %>
-    [0, 1, 2, 5, 10, 20, 50, 100, 1]
-    <%- endif %>
+  map_brackets_thr: &map_brackets_thr <% if decile in [1, 2, 3] %> [0, 1, 2, 5, 10, 20, 1] <% elif decile in [4, 5, 6, 7] %> [0, 1, 2, 5, 10, 20, 50, 1] <% elif decile in [8, 9] %> [0, 1, 2, 5, 10, 20, 50, 100, 1] <%- endif %>
 
   entity_names_poverty: &entity_names_poverty
     - Mozambique
@@ -621,6 +507,8 @@ dataset:
   update_period_days: 180
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   world_bank_pip:
     variables:
@@ -688,9 +576,9 @@ tables:
         description_from_producer: |-
           Number of people living on less than a day at <<ppp_version>> PPP is calculated by multiplying the poverty rate and the population. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
-            name: Share of population not in poverty (above {definitions.poverty_line_a_day})
-            numDecimalPlaces: 1
-            <<: *common_display
+          name: Share of population not in poverty (above {definitions.poverty_line_a_day})
+          numDecimalPlaces: 1
+          <<: *common_display
 
       headcount_ratio_between:
         title: Share of population in poverty (between {definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}

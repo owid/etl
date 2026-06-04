@@ -1,5 +1,7 @@
 dataset:
   title: Nitrogen efficiency (Lassaletta et al. 2014)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   nitrogen_efficiency__lassaletta_et_al__2014:
     variables:

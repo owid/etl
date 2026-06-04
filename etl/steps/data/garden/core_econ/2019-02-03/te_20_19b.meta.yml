@@ -1,5 +1,7 @@
 dataset:
   title: TE-20.19b
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_20_19b:
     variables:

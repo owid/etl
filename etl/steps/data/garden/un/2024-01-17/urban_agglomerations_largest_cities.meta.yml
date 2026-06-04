@@ -9,6 +9,8 @@ definitions:
 dataset:
   title: World Urbanization Prospects Dataset - Largest Cities in 2018 and Capitals
 
+  owners:
+    - Veronika Samborska
 tables:
   urban_agglomerations_largest_cities:
     # Learn more about the available fields:

@@ -1,5 +1,7 @@
 dataset:
   title: Figure_17.28_interest_rate
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   figure_17_28_interest_rate:
     variables:
@@ -12,8 +14,7 @@ tables:
       real_oil_price_index__1960_5:
         title: Real oil price index (1960=5)
         unit: ''
-        description: The real oil price is calculated by deflating the price per barrel of West Texas Intermediate using the
-          GDP deflator.
+        description: The real oil price is calculated by deflating the price per barrel of West Texas Intermediate using the GDP deflator.
       short_term_nominal_interest_rate__pct:
         title: Short term nominal interest rate (%)
         unit: '%'

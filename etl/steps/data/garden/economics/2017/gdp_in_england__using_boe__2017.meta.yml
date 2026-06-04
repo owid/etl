@@ -1,5 +1,7 @@
 dataset:
   title: GDP in England (using BoE, 2017)
+  owners:
+    - Max Roser  # backport
 tables:
   gdp_in_england__using_boe__2017:
     variables:

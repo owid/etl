@@ -1,5 +1,7 @@
 dataset:
   title: Working Hours – BoE (2016)
+  owners:
+    - Charlie Giattino  # backport
 tables:
   working_hours__boe__2016:
     variables:

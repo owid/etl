@@ -1,5 +1,7 @@
 dataset:
   title: ECI Country Rankings (Observatory of Economic Complexity (2016) and the Atlas of Economic Complexity (2016))
+  owners:
+    - Diana Beltekian  # backport
 tables:
   eci_country_rankings__observatory_of_economic_complexity__2016__and_the_atlas_of_economic_complexity__2016:
     variables:

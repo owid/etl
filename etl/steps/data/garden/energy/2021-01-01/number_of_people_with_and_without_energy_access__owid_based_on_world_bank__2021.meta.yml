@@ -1,5 +1,7 @@
 dataset:
   title: Number of people with and without energy access (OWID based on World Bank, 2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   number_of_people_with_and_without_energy_access__owid_based_on_world_bank__2021:
     variables:

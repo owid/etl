@@ -12,6 +12,8 @@ dataset:
   update_period_days: 365
 
   title: Vaccination schedule for Poliomyelitis
+  owners:
+    - Fiona Spooner
 tables:
   polio_vaccine_schedule:
     variables:

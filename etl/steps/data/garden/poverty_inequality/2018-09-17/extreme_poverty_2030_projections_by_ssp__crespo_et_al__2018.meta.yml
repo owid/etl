@@ -1,5 +1,7 @@
 dataset:
   title: Extreme Poverty 2030 Projections by SSP - Crespo et al. (2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   extreme_poverty_2030_projections_by_ssp__crespo_et_al__2018:
     variables:

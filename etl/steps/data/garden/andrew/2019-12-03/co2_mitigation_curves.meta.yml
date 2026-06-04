@@ -1,6 +1,8 @@
 dataset:
   title: CO2 mitigation curves for 1.5 and 2 Celsius (Andrew & GCP, 2019)
 
+  owners:
+    - Pablo Rosado
 tables:
   co2_mitigation_curves_1p5celsius:
     title: CO2 mitigation curves for 1.5°C

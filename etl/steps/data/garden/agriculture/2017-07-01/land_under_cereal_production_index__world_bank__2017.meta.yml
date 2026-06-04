@@ -1,5 +1,7 @@
 dataset:
   title: Land under cereal production index - World Bank (2017)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   land_under_cereal_production_index__world_bank__2017:
     variables:

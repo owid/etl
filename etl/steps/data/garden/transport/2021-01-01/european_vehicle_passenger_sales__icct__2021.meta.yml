@@ -1,5 +1,7 @@
 dataset:
   title: European vehicle passenger sales (ICCT, 2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   european_vehicle_passenger_sales__icct__2021:
     variables:

@@ -3,6 +3,8 @@ dataset:
   description: Estimates of the infant mortality rates with and without vital vaccinations.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   infant_mortality_vaccination_shattock:
     variables:

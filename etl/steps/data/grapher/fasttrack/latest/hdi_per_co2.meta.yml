@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   hdi_per_co2:
     variables:

@@ -20,6 +20,8 @@ dataset:
   title: Yearly Electricity Data
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   yearly_electricity:
     title: "Yearly electricity"

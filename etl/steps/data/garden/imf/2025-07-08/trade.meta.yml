@@ -17,6 +17,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   trade:
     variables:
@@ -221,7 +223,7 @@ tables:
           numDecimalPlaces: 1
 
       import_rank:
-        title:  << counterpart_country >>´s rank among import partners
+        title: << counterpart_country >>´s rank among import partners
         unit: "rank"
         short_unit: ""
         description_short: The rank of << counterpart_country >> among a country's import partners, based on import values that include the cost of goods, freight, and insurance.  A rank of 1 indicates that the << counterpart_country >> is the country's largest import partner.
@@ -312,11 +314,11 @@ tables:
           - This indicator provides insight into the overall scale of a country’s engagement in global trade and its economic openness.
         presentation:
           title_public: |-
-           <% if counterpart_country == 'Intraregional' %>
-           Total intraregional trade volume
-           <% elif counterpart_country != 'Intraregional' %>
-           Total trade volume with << counterpart_country >>
-           <%- endif -%>
+            <% if counterpart_country == 'Intraregional' %>
+            Total intraregional trade volume
+            <% elif counterpart_country != 'Intraregional' %>
+            Total trade volume with << counterpart_country >>
+            <%- endif -%>
         display:
           numDecimalPlaces: 0
           name: << counterpart_country >>
@@ -336,8 +338,8 @@ tables:
         presentation:
           title_public: Share of country pairs with bilateral trade
         display:
-            numDecimalPlaces: 1
-            name: Bilateral
+          numDecimalPlaces: 1
+          name: Bilateral
 
       share_unilateral:
         title: Share of country pairs with unilateral trade
@@ -354,8 +356,8 @@ tables:
         presentation:
           title_public: Share of country pairs with unilateral trade
         display:
-            numDecimalPlaces: 1
-            name: Unilateral
+          numDecimalPlaces: 1
+          name: Unilateral
 
       share_non_trading:
         title: Share of non-trading partnerships
@@ -372,5 +374,5 @@ tables:
         presentation:
           title_public: Share of non-trading partnerships
         display:
-            numDecimalPlaces: 1
-            name: Non-trading
+          numDecimalPlaces: 1
+          name: Non-trading
