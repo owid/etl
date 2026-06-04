@@ -816,8 +816,15 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2025-05-19/gho:
     - data://garden/who/2025-05-19/gho
+  data://garden/who/2026-05-22/gho:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2026-05-22/gho:
+      - snapshot://who/2026-05-22/gho.zip
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2026-05-22/gho:
+    - data://garden/who/2026-05-22/gho
   #export://multidim/who/latest/share_overweight_adults:
-  #  - data://grapher/who/2025-05-19/gho
+  #  - data://grapher/who/2026-05-22/gho
 
   # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
   data://grapher/health/2025-07-16/drug_approvals:
