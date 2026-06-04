@@ -22,8 +22,8 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.collection.exceptions import DuplicateCollectionViews, DuplicateValuesError
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.dimension import Dimension, DimensionChoice
+from etl.collection.model.params import GroupViewsConfig
 from etl.collection.model.schema_types import (
-    GroupViewsConfig,
     ViewConfig,
     ViewConfigParam,
     ViewMetadata,
