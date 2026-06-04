@@ -140,7 +140,7 @@ tables:
         short_unit: '%'
         description_short: Share of the population living in urban areas, combining UN estimates from 1950 with modelled historical data back to 10,000 BCE.
         description_key:
-          - From 1950 onward, this uses the UN World Urbanization Prospects, based on each country's own definition of urban areas. For earlier years, it draws on HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction of historical settlement patterns.
+          - From 1950 onward, this indicator uses the UN World Urbanization Prospects, based on each country's own definition of urban areas. For earlier years, it draws on HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction of historical settlement patterns.
           - *description_key_common
         description_processing: |-
           We combined two sources to extend the urban share series as far back as possible. For years before 1950, we use urban population share estimates from HYDE v3.3. From 1950 onward, we use each country's national definition from the UN World Urbanization Prospects.
@@ -156,7 +156,7 @@ tables:
         short_unit: ''
         description_short: Number of people living in urban areas, combining UN estimates from 1950 with modelled historical data back to 10,000 BCE.
         description_key:
-          - From 1950 onward, this uses the UN World Urbanization Prospects, based on each country's own definition of urban areas. For earlier years, it draws on HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction of historical settlement patterns.
+          - From 1950 onward, this indicator uses the UN World Urbanization Prospects, based on each country's own definition of urban areas. For earlier years, it draws on HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction of historical settlement patterns.
           - *description_key_common
         description_processing: |-
           We combined two sources to extend the urban population series as far back as possible. For years before 1950, we use urban population estimates from HYDE v3.3. From 1950 onward, we use urban population from the UN World Urbanization Prospects based on each country's national definition. The UN source reports population in thousands; we converted to people to align with HYDE.
@@ -172,7 +172,7 @@ tables:
         short_unit: ''
         description_short: Number of people living in rural areas, combining UN estimates from 1950 with modelled historical data back to 10,000 BCE.
         description_key:
-          - From 1950 onward, this uses the UN World Urbanization Prospects, based on each country's own definition of rural areas. For earlier years, it draws on HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction of historical settlement patterns.
+          - From 1950 onward, this indicator uses the UN World Urbanization Prospects, based on each country's own definition of rural areas. For earlier years, it draws on HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction of historical settlement patterns.
           - *description_key_common
         description_processing: |-
           We combined two sources to extend the rural population series as far back as possible. For years before 1950, we use rural population estimates from HYDE v3.3. From 1950 onward, we use rural population from the UN World Urbanization Prospects based on each country's national definition. The UN source reports population in thousands; we converted to people to align with HYDE.
