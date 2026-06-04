@@ -1,5 +1,7 @@
 dataset:
   title: OWID_21.3
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   owid_21_3:
     variables:

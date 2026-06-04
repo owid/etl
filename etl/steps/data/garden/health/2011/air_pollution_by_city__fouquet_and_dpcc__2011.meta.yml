@@ -1,5 +1,7 @@
 dataset:
   title: Air pollution by city - Fouquet and DPCC (2011)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   air_pollution_by_city__fouquet_and_dpcc__2011:
     variables:

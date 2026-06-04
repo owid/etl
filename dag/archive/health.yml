@@ -232,6 +232,19 @@ steps:
   data://grapher/who/2023-06-30/guinea_worm:
     - data://garden/who/2023-06-29/guinea_worm_certification
 
+    # Guinea worm (2024 update)
+  data://garden/who/2024-06-17/guinea_worm:
+    - data://garden/who/2023-06-29/guinea_worm_certification
+    - snapshot://fasttrack/2024-06-17/guinea_worm.csv
+  data://grapher/who/2024-06-17/guinea_worm:
+    - data://garden/who/2024-06-17/guinea_worm
+
+    # Guinea worm - historical estimates
+  data://meadow/who/2023-06-29/guinea_worm_certification:
+    - snapshot://who/2023-06-29/guinea_worm.csv
+  data://garden/who/2023-06-29/guinea_worm_certification:
+    - data://meadow/who/2023-06-29/guinea_worm_certification
+
   # Polio vaccine schedule - to archive
   data://meadow/who/2024-04-22/polio_vaccine_schedule:
     - snapshot://who/2024-04-22/polio_vaccine_schedule.xlsx
@@ -719,3 +732,11 @@ steps:
     - data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage
   data://grapher/cancer/2024-09-13/diagnosis_routes_by_stage:
     - data://garden/cancer/2024-09-13/diagnosis_routes_by_stage
+  # Global Health Observatory (GHO) from WHO
+  data://garden/who/2025-05-19/gho:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2025-05-19/gho:
+      - snapshot://who/2025-05-19/gho.zip
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2025-05-19/gho:
+    - data://garden/who/2025-05-19/gho

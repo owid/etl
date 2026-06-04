@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   brassley_2000:
     variables:

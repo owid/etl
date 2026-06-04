@@ -12,6 +12,8 @@ dataset:
   update_period_days: 0
   title: COVID-19, vaccinations (by manufacturer)
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   vaccinations_manufacturer:
     variables:

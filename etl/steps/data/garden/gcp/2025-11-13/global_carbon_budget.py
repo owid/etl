@@ -123,8 +123,11 @@ MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2 = 3.664 * 1e6
 # Conversion from million tonnes of CO2 to tonnes of CO2.
 MILLION_TONNES_OF_CO2_TO_TONNES_OF_CO2 = 1e6
 
-# Conversion from tonnes of CO2 to kg of CO2 (used for emissions per GDP and per unit energy).
+# Conversion from tonnes of CO2 to kg of CO2 (used for emissions per GDP).
 TONNES_OF_CO2_TO_KG_OF_CO2 = 1000
+
+# Conversion from tonnes of CO2 to grams of CO2 (used for emissions per unit energy).
+TONNES_OF_CO2_TO_G_OF_CO2 = 1e6
 
 # In order to remove uninformative columns, keep only rows where at least one of the following columns has data.
 # All other columns are either derived variables, or global variables, or auxiliary variables from other datasets.
@@ -721,7 +724,6 @@ def combine_data_and_add_variables(
     tb_land_use: Table,
     tb_energy: Table,
     ds_gdp: Dataset,
-    ds_population: Table,
 ) -> Table:
     """Combine all relevant data into one table, add region aggregates, and add custom variables (e.g. emissions per
     capita).
@@ -774,14 +776,10 @@ def combine_data_and_add_variables(
     tb_co2_with_regions = pr.merge(tb_co2_with_regions, tb_consumption, on=["country", "year"], how="outer")
 
     # Add population to original table.
-    tb_co2_with_regions = geo.add_population_to_table(
-        tb=tb_co2_with_regions, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_co2_with_regions = paths.regions.add_population(tb=tb_co2_with_regions, warn_on_missing_countries=False)
 
     # Add global population to global emissions table.
-    tb_global_emissions = geo.add_population_to_table(
-        tb=tb_global_emissions, ds_population=ds_population, population_col="global_population"
-    )
+    tb_global_emissions = paths.regions.add_population(tb=tb_global_emissions, population_col="global_population")
 
     # Add GDP to main table.
     tb_co2_with_regions = geo.add_gdp_to_table(tb=tb_co2_with_regions, ds_gdp=ds_gdp)
@@ -866,16 +864,16 @@ def combine_data_and_add_variables(
             100 * tb_co2_with_regions[f"cumulative_{column}"] / tb_co2_with_regions[f"global_cumulative_{column}"]
         )
 
-    # Add total emissions per unit energy (in kg of emissions per kWh).
+    # Add total emissions per unit energy (in grams of emissions per kWh).
     tb_co2_with_regions["emissions_total_per_unit_energy"] = (
-        TONNES_OF_CO2_TO_KG_OF_CO2
+        TONNES_OF_CO2_TO_G_OF_CO2
         * tb_co2_with_regions["emissions_total"]
         / (tb_co2_with_regions["primary_energy_consumption"] * TWH_TO_KWH)
     )
 
-    # Add total emissions (including land-use change) per unit energy (in kg of emissions per kWh).
+    # Add total emissions (including land-use change) per unit energy (in grams of emissions per kWh).
     tb_co2_with_regions["emissions_total_including_land_use_change_per_unit_energy"] = (
-        TONNES_OF_CO2_TO_KG_OF_CO2
+        TONNES_OF_CO2_TO_G_OF_CO2
         * tb_co2_with_regions["emissions_total_including_land_use_change"]
         / (tb_co2_with_regions["primary_energy_consumption"] * TWH_TO_KWH)
     )
@@ -1042,7 +1040,6 @@ def run() -> None:
         tb_land_use=tb_land_use,
         tb_energy=tb_energy,
         ds_gdp=ds_gdp,
-        ds_population=ds_population,
     )
 
     ####################################################################################################################

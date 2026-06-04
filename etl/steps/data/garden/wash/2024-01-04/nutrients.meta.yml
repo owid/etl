@@ -76,6 +76,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Fiona Spooner
 tables:
   nutrients:
     # Learn more about the available fields:

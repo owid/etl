@@ -23,7 +23,6 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("co2_air_transport")
     ds_tourism = paths.load_dataset("unwto")
-    ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
@@ -40,7 +39,7 @@ def run() -> None:
     tb = tb[tb["emissions_source"].isin(["TER_DOM", "TER_INT"])]
 
     # Add population before regional aggregation
-    tb = geo.add_population_to_table(tb, ds_population)
+    tb = paths.regions.add_population(tb)
 
     tb = geo.add_regions_to_table(
         tb=tb,

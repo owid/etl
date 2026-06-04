@@ -1,5 +1,7 @@
 dataset:
   title: Revenue shares from tax – Flora (1983) and ICTD (2016)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   revenue_shares_from_tax__flora__1983__and_ictd__2016:
     variables:

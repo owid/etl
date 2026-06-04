@@ -35,6 +35,8 @@ dataset:
 
 
 
+  owners:
+    - Veronika Samborska
 tables:
   diagnosis_routes_survival:
     variables:

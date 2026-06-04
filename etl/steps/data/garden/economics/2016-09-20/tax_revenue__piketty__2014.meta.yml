@@ -1,5 +1,7 @@
 dataset:
   title: Tax Revenue – Piketty (2014)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   tax_revenue__piketty__2014:
     variables:

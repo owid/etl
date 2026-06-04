@@ -1,5 +1,7 @@
 dataset:
   title: Deforestation by commodity (Pendrill et al. (2019))
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   deforestation_by_commodity__pendrill_et_al__2019:
     variables:

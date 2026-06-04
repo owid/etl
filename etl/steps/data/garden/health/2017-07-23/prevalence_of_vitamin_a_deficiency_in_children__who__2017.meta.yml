@@ -1,5 +1,7 @@
 dataset:
   title: Prevalence of Vitamin A deficiency in children - WHO (2017)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   prevalence_of_vitamin_a_deficiency_in_children__who__2017:
     variables:

@@ -2,7 +2,7 @@
 definitions:
   common:
     description_processing: |-
-        For each country the average across all cities available was calculated.
+      For each country the average across all cities available was calculated.
     presentation:
       topic_tags:
         - Urbanization
@@ -18,6 +18,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Veronika Samborska
 tables:
   un_sdg:
     # Learn more about the available fields:

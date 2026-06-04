@@ -1,5 +1,7 @@
 dataset:
   title: GDP growth from previous year, 2020 Q2 (Eurostat, OECD, National sources)
+  owners:
+    - Joe Hasell  # backport
 tables:
   gdp_growth_from_previous_year__2020_q2__eurostat__oecd__national_sources:
     variables:

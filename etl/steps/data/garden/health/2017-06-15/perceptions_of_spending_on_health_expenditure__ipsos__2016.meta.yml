@@ -1,5 +1,7 @@
 dataset:
   title: Perceptions of spending on health expenditure - IPSOS (2016)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   perceptions_of_spending_on_health_expenditure__ipsos__2016:
     variables:

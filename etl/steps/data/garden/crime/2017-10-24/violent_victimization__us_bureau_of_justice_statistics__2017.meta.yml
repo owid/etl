@@ -1,5 +1,7 @@
 dataset:
   title: Violent Victimization - US Bureau of Justice Statistics (2017)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   violent_victimization__us_bureau_of_justice_statistics__2017:
     variables:

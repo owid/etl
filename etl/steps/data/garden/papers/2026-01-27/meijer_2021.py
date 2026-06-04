@@ -1,6 +1,5 @@
 """Garden step for Meijer et al. (2021) - Process and harmonize country data."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -30,7 +29,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb)
 
     # Add population data for per capita calculations
-    tb = geo.add_population_to_table(tb, ds_population=paths.load_dataset("population"))
+    tb = paths.regions.add_population(tb)
 
     # Calculate per capita plastic emissions (kg per person)
     tb["me_tons_per_year_per_capita"] = (tb["me_tons_per_year"] * 1000) / tb["population"]

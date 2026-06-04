@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Pablo Arriagada  # fasttrack
 tables:
   joe_phd_short_period:
     variables:

@@ -14,6 +14,8 @@ dataset:
   update_period_days: 1095
   title: Countdown for Global Mental Health 2030 - WHO Mental Health Atlas 2020
 
+  owners:
+    - Veronika Samborska
 tables:
   gmh_countdown:
     variables:

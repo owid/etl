@@ -1,5 +1,7 @@
 dataset:
   title: Coal production - The SHIFT Project
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   coal_production__the_shift_project:
     variables:

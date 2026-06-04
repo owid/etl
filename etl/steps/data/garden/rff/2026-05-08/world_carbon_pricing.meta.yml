@@ -12,6 +12,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   world_carbon_pricing:
     title: World carbon pricing

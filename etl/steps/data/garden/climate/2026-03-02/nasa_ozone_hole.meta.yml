@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   nasa_ozone_hole:
     variables:

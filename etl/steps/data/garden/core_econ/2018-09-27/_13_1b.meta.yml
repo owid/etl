@@ -1,5 +1,7 @@
 dataset:
   title: 13.1b
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   _13_1b:
     variables:

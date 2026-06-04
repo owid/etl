@@ -1,5 +1,7 @@
 dataset:
   title: Newsworthiness of disasters by disaster type and region - Eisensee and Strömberg (2007)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   newsworthiness_of_disasters_by_disaster_type_and_region__eisensee_and_stromberg__2007:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Male-to-female ratio high school courses in USA - Goldin et al.
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   male_to_female_ratio_high_school_courses_in_usa__goldin_et_al:
     variables:

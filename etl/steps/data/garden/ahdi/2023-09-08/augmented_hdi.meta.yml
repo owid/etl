@@ -2,13 +2,15 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Human Development Index (HDI)
+        - Human Development Index (HDI)
     display: &common-display
       entityAnnotationsMap: "Western offshoots (AHDI): United States, Canada, Australia and New Zealand"
 
 dataset:
   title: Augmented Human Development Index (AHDI)
   update_period_days: 1095
+  owners:
+    - Pablo Arriagada
 tables:
   augmented_hdi:
     variables:
@@ -76,15 +78,15 @@ tables:
                   - 0.8
                   - 0.1
             selectedEntityNames:
-            - East Asia (AHDI)
-            - South Asia (AHDI)
-            - Middle East (AHDI)
-            - North Africa (AHDI)
-            - Latin America (AHDI)
-            - Sub Saharan Africa (AHDI)
-            - Western offshoots (AHDI)
-            - Western Europe (AHDI)
-            - Eastern Europe (AHDI)
+              - East Asia (AHDI)
+              - South Asia (AHDI)
+              - Middle East (AHDI)
+              - North Africa (AHDI)
+              - Latin America (AHDI)
+              - Sub Saharan Africa (AHDI)
+              - Western offshoots (AHDI)
+              - Western Europe (AHDI)
+              - Eastern Europe (AHDI)
           topic_tags:
             - Human Development Index (HDI)
             - Life Expectancy

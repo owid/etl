@@ -1,3 +1,7 @@
+dataset:
+  owners:
+    - Fiona Spooner
+    - Mojmír Vinkler
 tables:
   flunet:
     variables:

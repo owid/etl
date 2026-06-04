@@ -1,6 +1,8 @@
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 definitions:
   common:
     processing_level: major

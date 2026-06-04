@@ -38,7 +38,6 @@ def run() -> None:
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
     # Load population dataset.
-    ds_population = paths.load_dataset("population")
 
     # Load data dictionary from snapshot.
     dd = snap.read(safe_types=False)
@@ -61,7 +60,7 @@ def run() -> None:
         tb
     )
     # Calculate rates for region aggregates.
-    tb_agg = calculate_region_rates(tb_agg, ds_population=ds_population)
+    tb_agg = calculate_region_rates(tb_agg)
     # Combine aggregated and original country-level tables.
     tb = pr.concat([tb, tb_agg], axis=0, ignore_index=True, copy=False)
     # Calculate HIV incidence in TB for region aggregates.
@@ -105,9 +104,9 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
     return tb
 
 
-def calculate_region_rates(tb: Table, ds_population: Dataset) -> Table:
+def calculate_region_rates(tb: Table) -> Table:
     # Add population to table to calculate rate variables
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
+    tb = paths.regions.add_population(tb=tb)
 
     cols = tb.columns.difference(["country", "year", "population"])
     rate_cols = cols.str.replace("num", "100k", regex=True)

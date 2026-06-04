@@ -7,6 +7,8 @@ definitions:
 dataset:
   update_period_days: 364
 
+  owners:
+    - Pablo Rosado
 tables:
   cost_of_space_launches:
     variables:

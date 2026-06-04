@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Skaaning et al.
+    producer: Lexical Index
     title: Lexical Index of Electoral Democracy (LIED)
     description: |-
       LIED is the most comprehensive dataset on democracy in terms of country-years. It covers all independent countries and most semi-sovereign polities and overseas colonies, protectorates, etc. within the 1789 to 2020 timespan. Scores have also been assigned to the units in the case of short- term foreign occupation. Scores for each indicator reflect the status of a country on the last day of the calendar year (31 December) and are not intended to reflect the mean value of an indicator across the previous 364 days. Coding decisions are based on country-specific sources. All original coding has been done by Svend-Erik Skaaning (skaaning@ps.au.dk).
@@ -10,8 +10,8 @@ meta:
       Skaaning, Svend-Erik, 2021, "Lexical Index of Electoral Democracy (LIED) dataset v6.0", https://doi.org/10.7910/DVN/WPKNIT, Harvard Dataverse, V5
     version_producer: v6.9
     url_main: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/WPKNIT
-    date_accessed: '2026-04-02'
-    date_published: '2026-04-01'
+    date_accessed: "2026-04-02"
+    date_published: "2026-04-01"
     license:
       name: CC0
       url: https://creativecommons.org/publicdomain/zero/1.0/

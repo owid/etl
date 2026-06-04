@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   farmer_lafond_2016:
     title: Cost of different technologies

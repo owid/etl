@@ -1,5 +1,7 @@
 dataset:
   title: Intercontinental Trade - Costa, Palma and Reis (2015)
+  owners:
+    - Max Roser  # backport
 tables:
   intercontinental_trade__costa__palma_and_reis__2015:
     variables:

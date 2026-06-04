@@ -14,6 +14,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   statistical_review_of_world_energy:
     variables:
@@ -273,8 +275,7 @@ tables:
         title: 'Gas production - EJ'
         unit: 'exajoules'
         short_unit: 'EJ'
-        description_short:
-          Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        description_short: Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
         presentation:
           title_public: 'Gas production'
       gas_production_twh:  # Added by OWID.

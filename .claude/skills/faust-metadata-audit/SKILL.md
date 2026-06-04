@@ -186,6 +186,24 @@ Then audit:
    - rarely, the indicator's `presentation.grapher_config` block (when the issue is title/subtitle/note rather than description_key)
 8. **After every fix push**, re-run garden + grapher + MDim export and re-verify against the report.
 
+## Regression diff: prove a refactor didn't change user-facing text
+
+When you change an MDim `.py` (reorder indicators, flip a `before_vs_after` choice order, change which y-indicator is primary, rename a helper) and need to prove the rendered FAUST is **unchanged except for the intended diff**, diff two auto-generated reports instead of eyeballing one. This is the right check whenever a change shifts the **primary y-indicator** (`y[0]`), because that's what drives inheritance — the script resolves every `[inherited]` field from `y[0]`, so identical reports prove the inherited text doesn't depend on which variant is primary (e.g. flipping LIS `welfare_type` from `dhi`-first to `mi`-first leaves all six fields byte-identical because `mi`/`dhi` share every inheritable field and the overrides resolve the same).
+
+`config_path` accepts **any** JSON path, not just the live `export/multidim/.../<name>.config.json` — so point two runs at two config snapshots:
+
+1. Build the baseline config (e.g. `git checkout origin/master -- <step>.py && etlr <mdim> --export --grapher`) and copy its `<name>.config.json` to `/tmp/cfg_before/`. Restore your branch (`git checkout HEAD -- <step>.py`), rebuild, copy to `/tmp/cfg_after/`. (Note: `git checkout … -- a.py b.py` won't word-split an unquoted `$files` var in zsh — pass the paths literally or use an array.)
+2. Run the report against each snapshot:
+   ```
+   echo '[{"name":"gini_lis_BEFORE","config_path":"/tmp/cfg_before/gini_lis.json","collapse_dims":[]}]' > /tmp/fb.json
+   echo '[{"name":"gini_lis_AFTER","config_path":"/tmp/cfg_after/gini_lis.json","collapse_dims":[]}]'  > /tmp/fa.json
+   .venv/bin/python .claude/skills/faust-metadata-audit/scripts/generate_mdim_text_report.py --config /tmp/fb.json
+   .venv/bin/python .claude/skills/faust-metadata-audit/scripts/generate_mdim_text_report.py --config /tmp/fa.json
+   ```
+3. Diff, stripping the BEFORE/AFTER name token: `diff <(sed 's/BEFORE//g' ai/gini_lis_BEFORE.md) <(sed 's/AFTER//g' ai/gini_lis_AFTER.md)`. Byte-identical = Title/Subtitle/Footnote/description_short/description_key all render the same.
+
+The FAUST diff only covers user-facing **text**. It will NOT catch indicator-order-only changes (e.g. a Dumbbell arrow direction or a LineChart series-color swap that follows column order) — pair it with a structural diff of the two `.config.json` files when order matters.
+
 ## Things to avoid
 
 - Do NOT fall back to `title` / `title_public` / `display.name` / `description_short` when resolving chart Title / Subtitle / Footnote. Use `grapher_config` only (see inheritance rules above).

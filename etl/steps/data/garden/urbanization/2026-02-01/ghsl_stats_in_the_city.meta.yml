@@ -60,6 +60,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   ghsl_stats_in_the_city:
     variables:

@@ -21,6 +21,8 @@ dataset:
   title: Large-scale AI systems by country
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Veronika Samborska
 tables:
   epoch_compute_intensive_countries:
     variables:

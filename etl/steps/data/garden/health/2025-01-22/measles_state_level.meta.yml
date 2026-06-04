@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: Reported measles cases in the United States - State Level
 
+  owners:
+    - Fiona Spooner
 tables:
   measles:
     variables:

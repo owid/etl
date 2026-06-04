@@ -16,6 +16,8 @@ dataset:
   title: COVID-19, deaths by vaccination status
 
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   us:
     common:

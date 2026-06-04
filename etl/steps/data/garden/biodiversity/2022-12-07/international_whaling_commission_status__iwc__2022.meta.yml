@@ -1,5 +1,7 @@
 dataset:
   title: International Whaling Commission Status (IWC, 2022)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   international_whaling_commission_status__iwc__2022:
     variables:

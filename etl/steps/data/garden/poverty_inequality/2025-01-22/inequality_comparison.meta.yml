@@ -32,6 +32,8 @@ dataset:
   title: Inequality comparisons across time and datasets
   update_period_days: 365
 
+  owners:
+    - Pablo Arriagada
 tables:
   inequality_comparison:
     variables:

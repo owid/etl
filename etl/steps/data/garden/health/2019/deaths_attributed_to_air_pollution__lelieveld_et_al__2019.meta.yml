@@ -1,5 +1,7 @@
 dataset:
   title: Deaths attributed to air pollution (Lelieveld et al. 2019)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   deaths_attributed_to_air_pollution__lelieveld_et_al__2019:
     variables:

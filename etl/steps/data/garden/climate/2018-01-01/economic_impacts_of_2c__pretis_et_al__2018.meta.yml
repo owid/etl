@@ -1,5 +1,7 @@
 dataset:
   title: Economic impacts of 2C - Pretis et al. (2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   economic_impacts_of_2c__pretis_et_al__2018:
     variables:

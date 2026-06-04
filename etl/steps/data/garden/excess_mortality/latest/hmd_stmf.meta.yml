@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   hmd_stmf:
     variables:

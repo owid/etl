@@ -1,5 +1,7 @@
 dataset:
   title: Rotavirus deaths and cases in under-5s (IHME, 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   rotavirus_deaths_and_cases_in_under_5s__ihme__2018:
     variables:
@@ -38,8 +40,7 @@ tables:
         short_unit: cases
         display:
           name: Rotavirus cases in children
-        description: Estimated number of cases of rotavirus (one of the leading forms of diarrheal disease) in children under
-          five years old.
+        description: Estimated number of cases of rotavirus (one of the leading forms of diarrheal disease) in children under five years old.
       rotavirus_incidence_per_1_000_children__ihme__2018:
         title: Rotavirus incidence per 1,000 children (IHME, 2018)
         unit: cases per 1,000

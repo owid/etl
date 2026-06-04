@@ -412,6 +412,56 @@
           "items": {
             "$ref": "definitions.json#/license"
           }
+        },
+        "owners": {
+          "type": "array",
+          "title": "Dataset owners",
+          "description": "Contributors who built or maintain this dataset. The first entry is the accountable owner / point of contact for issues with the data page. Former employees who originally created the data can remain in the list (matches the article-author convention); reorder so a current employee is first.",
+          "guidelines": [
+            "First entry is the accountable owner and will be surfaced as the contact person.",
+            "Use the canonical display name (with diacritics) — entries are validated against the enum below."
+          ],
+          "requirement_level": "optional",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Pablo Rosado",
+              "Pablo Arriagada",
+              "Veronika Samborska",
+              "Mojmír Vinkler",
+              "Lucas Rodés-Guirao",
+              "Tuna Acisu",
+              "Fiona Spooner",
+              "Edouard Mathieu",
+              "Hannah Ritchie",
+              "Max Roser",
+              "Joe Hasell",
+              "Esteban Ortiz-Ospina",
+              "Diana Beltekian",
+              "Sandra Tzvetkova",
+              "Saloni Dattani",
+              "Sophie Ochmann",
+              "Charlie Giattino",
+              "Cameron Appel",
+              "Bastian Herre",
+              "Bobbie Macdonald",
+              "Ruby Mittal",
+              "Daniel Gavrilov",
+              "Aibek Aldabergenov",
+              "Gyorgy Attila Ruzicska",
+              "Marco Molteni",
+              "Jaiden Mispy",
+              "Bernadeta",
+              "Shahid Ahmad",
+              "Breck Yunits",
+              "Choo Yan Min",
+              "Mallika Snyder",
+              "Marcel Gerber",
+              "Bertha Rohenkohl",
+              "Daniel Bachler",
+              "Lars Yencken"
+            ]
+          }
         }
       }
     },
@@ -1294,7 +1344,16 @@
                               "enum": [
                                 "chart",
                                 "map",
-                                "table"
+                                "table",
+                                "line",
+                                "slope",
+                                "discrete-bar",
+                                "marimekko",
+                                "scatter",
+                                "stacked-area",
+                                "stacked-bar",
+                                "stacked-discrete-bar",
+                                "dumbbell"
                               ]
                             },
                             {
@@ -1593,9 +1652,52 @@
                               "SlopeChart",
                               "StackedBar",
                               "WorldMap",
-                              "Marimekko"
+                              "Marimekko",
+                              "Dumbbell"
                             ]
                           }
+                        },
+                        "dumbbell": {
+                          "type": "object",
+                          "description": "Configuration of the dumbbell chart",
+                          "properties": {
+                            "connectorStyle": {
+                              "type": "string",
+                              "default": "arrow",
+                              "description": "How the connector between dumbbell heads is drawn.\n- arrow: draw an arrow pointing from start to end\n- line: draw a simple line (only respected when two indicators are plotted)\n",
+                              "enum": [
+                                "arrow",
+                                "line"
+                              ]
+                            },
+                            "valueLabelMode": {
+                              "type": "string",
+                              "default": "absolute",
+                              "description": "What to display as value labels next to each dumbbell.\n- absolute: show the raw values at the start and end\n- change: show the absolute change (e.g. +50)\n- percentChange: show the percentage change (e.g. +33%)\n- none: hide value labels\n",
+                              "enum": [
+                                "absolute",
+                                "change",
+                                "percentChange",
+                                "none"
+                              ]
+                            },
+                            "trendColorMap": {
+                              "type": "object",
+                              "description": "Custom colors for the time-range encoding",
+                              "properties": {
+                                "increase": {
+                                  "type": "string",
+                                  "description": "Color for dumbbells whose value increased over time"
+                                },
+                                "decrease": {
+                                  "type": "string",
+                                  "description": "Color for dumbbells whose value decreased over time"
+                                }
+                              },
+                              "additionalProperties": false
+                            }
+                          },
+                          "additionalProperties": false
                         },
                         "hasMapTab": {
                           "oneOf": [
@@ -1727,13 +1829,16 @@
                         },
                         "sortBy": {
                           "type": "string",
-                          "description": "Sort criterium (used by stacked bar charts and marimekko)",
+                          "description": "Sort criterion (used by discrete bar, stacked discrete bar, marimekko, and dumbbell charts).\n- column: sort by the value of a specific column, identified by sortColumnSlug\n- total: sort by the total across all columns\n- entityName: sort alphabetically by entity name\n- custom: preserve the specified entity order\n- change: sort by the change between the start and end values (dumbbell charts only)\n- startValue: sort by the start value (dumbbell charts only)\n- endValue: sort by the end value (dumbbell charts only)\n",
                           "default": "total",
                           "enum": [
                             "column",
                             "total",
                             "entityName",
-                            "custom"
+                            "custom",
+                            "change",
+                            "startValue",
+                            "endValue"
                           ]
                         },
                         "sortOrder": {

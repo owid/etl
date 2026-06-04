@@ -2,12 +2,14 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Climate Change
+        - Climate Change
 
 dataset:
   title: Sea Ice Index
   update_period_days: 60
 
+  owners:
+    - Pablo Rosado
 tables:
   sea_ice_index:
     variables:

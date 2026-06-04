@@ -1,5 +1,7 @@
 dataset:
   title: Deforestation emissions embedded in trade (Pendrill et al. 2019)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   deforestation_emissions_embedded_in_trade__pendrill_et_al__2019:
     variables:

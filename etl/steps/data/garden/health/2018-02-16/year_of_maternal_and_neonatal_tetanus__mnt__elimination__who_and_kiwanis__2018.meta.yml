@@ -1,5 +1,7 @@
 dataset:
   title: Year of Maternal and Neonatal Tetanus (MNT) elimination (WHO and KIWANIS, 2018)
+  owners:
+    - Sophie Ochmann  # backport
 tables:
   year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018:
     variables:
