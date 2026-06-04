@@ -84,7 +84,7 @@ tables:
           - <% if area_type == "urban" %>Urban population growth is driven by three factors — natural increase (births minus deaths among urban residents), net migration from rural to urban areas, and the reclassification of previously rural settlements as urban.<% elif area_type == "rural" %>Rural population change reflects the balance between natural increase, net migration to cities, and the reclassification of rural settlements as urban.<% else %>Total population growth reflects the balance of births, deaths, and international migration.<% endif %> The relative importance of these factors varies by country and period.
           - *description_key_common
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
           name: <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
         presentation:
@@ -103,7 +103,7 @@ tables:
           - <% if area_type == "rural" %>A positive value means the rural share is rising — a larger fraction of people are living outside cities than before. A negative value means the rural share is falling as more people move to or are born in urban areas.<% else %>A positive value means a growing share of people are living in urban areas. A negative value means the urban share is shrinking — cities are growing more slowly than the rest of the population, or people are moving away from urban areas.<% endif %>
           - *description_key_common
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 1
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
           name: <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
         presentation:
