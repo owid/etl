@@ -259,10 +259,11 @@ class Collection(MDIMBase):
         self.upsert_to_db(owid_env)
 
     def upsert_to_db(self, owid_env: OWIDEnv):
-        # Degenerate "single chart" case: no dimensions means no multi-dim page —
-        # push to the charts table via the chart admin endpoint instead of
-        # `/multi-dims/`. A zero-dimension collection with multiple views is
-        # not a chart and not a valid MDIM either, so we refuse it explicitly.
+        # Single-chart case: no dimensions means no multi-dim page, so we push to
+        # the charts table via the chart admin endpoint instead of `/multi-dims/`.
+        # The charts/mdims split is legacy — the longer-term goal is one table with
+        # grapher handling both (see #6069). A zero-dimension collection with
+        # multiple views is neither a chart nor a valid mdim, so we refuse it.
         if len(self.dimensions) == 0:
             if len(self.views) != 1:
                 raise ValueError(
