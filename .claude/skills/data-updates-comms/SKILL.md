@@ -100,14 +100,59 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 4. **Seed the editorial fields with snippet bullets.**
    For each of "why it matters", "caveats", "anything interesting": don't write prose, write 2–6 substantive bullets above an empty `text` fenced block. Bullets are clean reader-facing prose — **no `Snapshot description:` / `Garden description:` prefixes** in the output. Use those as internal source pointers only.
 
-5. **Pick chart views.**
-   - Reuse `charts.selected_views` from `update-context.yml` if present.
-   - Otherwise query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab', c.publishedAt, c.createdAt`).
-   - Rank by: `hasMapTab=true` > `type=StackedArea` global views > standalone-headline titles. Skip population-weighted variants and country-specific views.
-   - Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale>**. Hyperlink the title to an admin URL so Charlie (or whoever runs the form) can open the chart directly:
-     - If the chart already exists in production (i.e. it was published _before_ the current PR branch was cut — easiest signal: `c.publishedAt` is older than the branch's first commit), link to production: `https://admin.owid.io/admin/charts/<id>`.
-     - If the chart is **new in this PR** (created/first-published on this branch), link to staging: `http://staging-site-<branch>/admin/charts/<id>`. Don't link new charts to production — the page 404s until the branch merges.
-   - Prefer the most-viewed / most-linked charts (e.g. the `analytics_pageviews` table on staging or the equivalent admin endpoint)
+5. **Pick chart views — rank by *actual data change*, not just our intuitions about which chart is "flagship".**
+
+   The picked views show up in the public announcement under "Here's what changed". If the underlying data didn't actually change between the old and new release, the announcement misrepresents the update. So the primary ranking signal is: **for each published chart on the new dataset, how many of its y-variables have a different `dataChecksum` than the matching variable on the old dataset?** This is the same signal Chart Diff uses.
+
+   Run on staging (which has both old and new variables side-by-side):
+
+   ```python
+   from etl.config import OWID_ENV
+   from sqlalchemy import text
+   import pandas as pd
+
+   sql = """
+   SELECT c.id AS chart_id, cc.slug,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.title'))       AS title,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.hasMapTab'))   AS has_map,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.type'))        AS chart_type,
+          SUM(v_new.dataChecksum <> v_old.dataChecksum)        AS n_changed,
+          COUNT(*)                                             AS n_vars
+   FROM charts c
+   JOIN chart_configs cc        ON cc.id = c.configId
+   JOIN chart_dimensions cd     ON cd.chartId = c.id
+   JOIN variables v_new         ON cd.variableId = v_new.id
+   LEFT JOIN variables v_old    ON v_old.shortName = v_new.shortName
+                                AND v_old.datasetId = :old_dataset_id
+   WHERE v_new.datasetId = :new_dataset_id
+     AND c.publishedAt IS NOT NULL
+     AND cd.property = 'y'
+   GROUP BY c.id
+   HAVING n_changed > 0
+   ORDER BY n_changed DESC, has_map DESC
+   LIMIT 30
+   """
+   with OWID_ENV.engine.connect() as conn:
+       df = pd.read_sql(text(sql), conn, params={"old_dataset_id": OLD_ID, "new_dataset_id": NEW_ID})
+   ```
+
+   Resolve `OLD_ID` / `NEW_ID` from the `datasets` table by catalogPath.
+
+   Then apply secondary criteria *within* the data-changed subset:
+
+   - Prefer `has_map = true` — readers can find their own country.
+   - Prefer broad, headline indicators (life expectancy, mortality, immunisation coverage, SDG indices) over deep-cut survey items.
+   - Skip population-weighted variants and country-specific cuts.
+   - If a chart has many y-vars changed (e.g. `probability-of-dying-by-age` with 18/18), that's a stronger signal than "1 of 1 changed".
+
+   Reuse `charts.selected_views` from `update-context.yml` only if it's already been built using this checksum-ranked process (older runs picked views by intuition and produced misleading recommendations like "life expectancy now updated" when the data was effectively unchanged).
+
+   Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale that names the change>**. Hyperlink each title to the admin **editor** URL, not the bare admin path:
+
+   - Production: `https://admin.owid.io/admin/charts/<id>/edit`
+   - Staging (new charts only): `http://staging-site-<branch>/admin/charts/<id>/edit`
+
+   The bare `/admin/charts/<id>` path takes the reader to a non-existent route on production; `/edit` opens the chart editor where they can verify the change. If the chart already existed before this PR (published earlier than the branch was cut — `c.publishedAt` is older than the first branch commit), link to production. If the chart was first published on this branch, link to staging.
 
 6. **Build the search URL.**
    - `producer` from snapshot origin → `urllib.parse.quote_plus(producer)` → `https://ourworldindata.org/search?datasetProducts=<encoded>`.
