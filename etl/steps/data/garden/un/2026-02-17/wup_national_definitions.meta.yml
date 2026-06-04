@@ -44,8 +44,9 @@ tables:
         title: <% if area_type == "urban" %>Urban population<% elif area_type == "rural" %>Rural population<% else %>Total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
         unit: people
         short_unit: ''
-        description_short: <% if area_type == "urban" %>Population living in areas defined as urban by national criteria<% elif area_type == "rural" %>Population living in areas defined as rural by national criteria<% else %>Total population (sum of urban and rural)<% endif %><% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
+        description_short: <% if area_type == "urban" %>Population living in areas defined as urban, based on each country's national definition<% elif area_type == "rural" %>Population living in areas defined as rural, based on each country's national definition<% else %>Total population (sum of urban and rural), based on each country's national definition<% endif %>.
         description_key:
+          - <% if area_type == "urban" %>The number of people living in areas that a country officially classifies as urban.<% elif area_type == "rural" %>The number of people living in areas that a country officially classifies as rural.<% else %>The total number of people in a country — the sum of those living in urban and rural areas combined.<% endif %>
           - *description_key_common
         display:
           numDecimalPlaces: 0
@@ -60,8 +61,9 @@ tables:
         title: <% if area_type == "urban" %>Percentage of population living in urban areas<% elif area_type == "rural" %>Percentage of population living in rural areas<% else %>Share of total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
         unit: '%'
         short_unit: '%'
-        description_short: <% if area_type == "urban" %>Share of total population living in urban areas, based on each country's national definition<% elif area_type == "rural" %>Share of total population living in rural areas, based on each country's national definition<% else %>Percentage of total population<% endif %><% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
+        description_short: <% if area_type == "urban" %>Share of total population living in urban areas, based on each country's national definition<% elif area_type == "rural" %>Share of total population living in rural areas, based on each country's national definition<% else %>Percentage of total population, based on each country's national definition<% endif %>.
         description_key:
+          - <% if area_type == "urban" %>The share of a country's population living in areas that are officially classified as urban — a simple measure of how urbanised a country is at a given point in time.<% elif area_type == "rural" %>The share of a country's population living in areas that are officially classified as rural.<% else %>The percentage of a country's population across all areas, urban and rural combined.<% endif %>
           - *description_key_common
         display:
           numDecimalPlaces: 1
@@ -75,11 +77,12 @@ tables:
         title: <% if area_type == "urban" %>Average annual rate of change of urban population<% elif area_type == "rural" %>Average annual rate of change of rural population<% else %>Average annual rate of change of total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
         unit: '%'
         short_unit: '%'
-        description_short: Average annual population growth rate as a percentage<% if area_type == "urban" %> for urban areas<% elif area_type == "rural" %> for rural areas<% endif %>. Positive values indicate population growth; negative values indicate decline<% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
+        description_short: Average annual population growth rate as a percentage<% if area_type == "urban" %> for urban areas<% elif area_type == "rural" %> for rural areas<% endif %>, based on each country's national definition. Positive values indicate population growth; negative values indicate decline.
         description_key:
+          - <% if area_type == "urban" %>How fast the urban population is growing each year, expressed as a percentage. A value of 2% means urban residents increased by about 2% per year over the period.<% elif area_type == "rural" %>How fast the rural population is growing each year, expressed as a percentage. A negative value means the number of people in rural areas is declining.<% else %>How fast the total population is growing each year, expressed as a percentage.<% endif %>
+          - Each value covers a five-year period. The figure shown for a given year is the average annual growth rate over the preceding five years — for example, the value for 2015 reflects average annual growth from 2010 to 2015.
+          - <% if area_type == "urban" %>Urban population growth is driven by three factors — natural increase (births minus deaths among urban residents), net migration from rural to urban areas, and the reclassification of previously rural settlements as urban.<% elif area_type == "rural" %>Rural population change reflects the balance between natural increase, net migration to cities, and the reclassification of rural settlements as urban.<% else %>Total population growth reflects the balance of births, deaths, and international migration.<% endif %> The relative importance of these factors varies by country and period.
           - *description_key_common
-          - Growth rates are calculated as the average annual rate of change between census years or projection periods, typically 5-year intervals.
-          - Urban growth rates are typically higher than rural rates due to both natural increase and rural-to-urban migration.
         display:
           numDecimalPlaces: 2
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
@@ -89,14 +92,16 @@ tables:
           title_variant: UN national definitions
 
       share_growth_rate:
-
         title: <% if area_type == "urban" %>Average annual rate of change of percentage urban<% elif area_type == "rural" %>Average annual rate of change of percentage rural<% else %>Average annual rate of change of population share<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
         unit: '%'
         short_unit: '%'
-        description_short: <% if area_type == "urban" %>The average exponential rate of change is the constant annual growth rate (expressed as a percent) that would take the urban population share from its initial value to its final value over a given period. Positive values indicate urbanization (increasing urban share); negative values indicate declining urban share<% elif area_type == "rural" %>The average exponential rate of change is the constant annual growth rate (expressed as a percent) that would take the rural population share from its initial value to its final value over a given period. Positive values indicate an increasing rural share (de-urbanization); negative values indicate declining rural share (urbanization)<% else %>The average exponential rate of change is the constant annual growth rate (expressed as a percent) that would take the population share from its initial value to its final value over a given period<% endif %><% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
+        description_short: The average yearly growth rate of the share of the population living in <% if area_type == "urban" %>urban<% elif area_type == "rural" %>rural<% else %>urban or rural<% endif %> areas, based on each country's national definition. For example, the rate for 2015 represents the average annual growth from 2010 to 2015.
         description_key:
-          - '*description_key_common'
-          - <% if area_type == "rural" %>For rural areas, positive values indicate an increasing rural share (de-urbanization), while negative values indicate declining rural share (urbanization).<% else %>Changes in these shares reflect both differential population growth rates and migration between urban and rural areas.<% endif %>
+          - <% if area_type == "urban" %>How fast the share of people living in urban areas is changing each year — whether urbanisation is speeding up, slowing down, or going into reverse.<% elif area_type == "rural" %>How fast the share of people living in rural areas is changing each year — whether the rural share of the population is growing or shrinking.<% else %>How fast the overall population share is shifting between urban and rural areas each year.<% endif %>
+          - Each value covers a five-year period. For example, the figure shown for 2015 reflects how the share changed on average each year between 2010 and 2015.
+          - This is different from the <% if area_type == "rural" %>rural<% else %>urban<% endif %> population growth rate, which measures how fast the number of <% if area_type == "rural" %>rural<% else %>urban<% endif %> residents is growing in absolute terms. This indicator instead shows whether <% if area_type == "rural" %>rural areas are becoming a larger or smaller share of the total population — that share can shrink even while the rural population keeps growing in absolute numbers.<% else %>cities are claiming a larger or smaller share of the total population — urbanisation can slow even while city populations keep growing in absolute numbers.<% endif %>
+          - <% if area_type == "rural" %>A positive value means the rural share is rising — a larger fraction of people are living outside cities than before. A negative value means the rural share is falling as more people move to or are born in urban areas.<% else %>A positive value means a growing share of people are living in urban areas. A negative value means the urban share is shrinking — cities are growing more slowly than the rest of the population, or people are moving away from urban areas.<% endif %>
+          - *description_key_common
         display:
           numDecimalPlaces: 3
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
@@ -113,11 +118,8 @@ tables:
         short_unit: '%'
         description_short: Share of total population living in urban areas, based on national definitions, with historical estimates extending back to 10,000 BCE.
         description_key:
+          - The share of a country's population living in urban areas. For 1950 onwards, this uses the UN World Urbanization Prospects based on each country's own definition of urban areas. For years before 1950, it uses HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction of historical settlement patterns.
           - *description_key_common
-          - |-
-            For years before 1950, this indicator uses the History Database of the Global Environment (HYDE v3.3), which provides consistent estimates of urban and rural population back to 10,000 BCE. HYDE derives urban population shares from historical population reconstructions combined with estimates of built-up area and settlement patterns.
-          - |-
-            HYDE and the UN World Urbanization Prospects use different methodologies to classify urban population, so there may be a discontinuity at the join point in 1950. The UN data reflects each country's own official definition of urban areas, while HYDE applies a modelled, historically consistent approach.
         description_processing: |-
           We combined two sources to extend the urban share series as far back as possible. For years before 1950, we use urban population share estimates from HYDE v3.3 (History Database of the Global Environment). From 1950 onward, we use the urban share based on each country's national definition of urban areas from the UN World Urbanization Prospects.
         display:
@@ -132,11 +134,8 @@ tables:
         short_unit: ''
         description_short: Number of people living in urban areas, based on national definitions, with historical estimates extending back to 10,000 BCE.
         description_key:
+          - The number of people living in urban areas. For 1950 onwards, this uses the UN World Urbanization Prospects based on each country's own definition of urban areas. For years before 1950, it uses HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction of historical settlement patterns.
           - *description_key_common
-          - |-
-            For years before 1950, this indicator uses the History Database of the Global Environment (HYDE v3.3), which provides consistent estimates of urban and rural population back to 10,000 BCE.
-          - |-
-            HYDE and the UN World Urbanization Prospects use different methodologies to classify urban population, so there may be a discontinuity at the join point in 1950.
         description_processing: |-
           We combined two sources to extend the urban population series as far back as possible. For years before 1950, we use urban population estimates from HYDE v3.3. From 1950 onward, we use urban population from the UN World Urbanization Prospects based on each country's national definition. The UN source reports population in thousands; we converted to people to align with HYDE.
         display:
@@ -151,11 +150,8 @@ tables:
         short_unit: ''
         description_short: Number of people living in rural areas, based on national definitions, with historical estimates extending back to 10,000 BCE.
         description_key:
+          - The number of people living in rural areas. For 1950 onwards, this uses the UN World Urbanization Prospects based on each country's own definition of rural areas. For years before 1950, it uses HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction of historical settlement patterns.
           - *description_key_common
-          - |-
-            For years before 1950, this indicator uses the History Database of the Global Environment (HYDE v3.3), which provides consistent estimates of urban and rural population back to 10,000 BCE.
-          - |-
-            HYDE and the UN World Urbanization Prospects use different methodologies to classify rural population, so there may be a discontinuity at the join point in 1950.
         description_processing: |-
           We combined two sources to extend the rural population series as far back as possible. For years before 1950, we use rural population estimates from HYDE v3.3. From 1950 onward, we use rural population from the UN World Urbanization Prospects based on each country's national definition. The UN source reports population in thousands; we converted to people to align with HYDE.
         display:
