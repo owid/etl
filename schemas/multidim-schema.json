@@ -824,6 +824,9 @@
                             "chartTypes": {
                                 "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.010.json#/properties/chartTypes"
                             },
+                            "dumbbell": {
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.010.json#/properties/dumbbell"
+                            },
                             "hasMapTab": {
                                 "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.010.json#/properties/hasMapTab"
                             },

@@ -312,13 +312,26 @@ class _ViewConfigBase(TypedDict, total=False):
     selectedFacetStrategy: Literal["none", "entity", "metric"]
     showNoDataArea: bool
     showYearLabels: bool
-    sortBy: Literal["column", "total", "entityName", "custom"]
+    sortBy: Literal["column", "total", "entityName", "custom", "change", "startValue", "endValue"]
     sortColumnSlug: str
     sortOrder: Literal["desc", "asc"]
     sourceDesc: str
     stackMode: Literal["absolute", "relative", "grouped", "stacked"]
     subtitle: str
-    tab: Literal["chart", "map", "table", "line", "slope"]
+    tab: Literal[
+        "chart",
+        "map",
+        "table",
+        "line",
+        "slope",
+        "discrete-bar",
+        "marimekko",
+        "scatter",
+        "stacked-area",
+        "stacked-bar",
+        "stacked-discrete-bar",
+        "dumbbell",
+    ]
     timelineMaxTime: dict[str, Any]
     timelineMinTime: dict[str, Any]
     title: str
