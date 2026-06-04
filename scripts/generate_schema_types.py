@@ -8,8 +8,14 @@ static TypedDict classes that provide autocompletion and type checking.
 Usage:
     python scripts/generate_schema_types.py            # regenerate the file
     python scripts/generate_schema_types.py --check    # fail if the file is out of date
+    python scripts/generate_schema_types.py --refresh  # re-download the vendored grapher schema, then regenerate
 
 This will update etl/collection/model/schema_types.py with the latest types.
+
+The grapher schema is read from a vendored copy in `schemas/` (committed to the repo) so that
+generation is deterministic and offline. The upstream schema is mutated in place by the web team
+(e.g. dumbbell plots landed in grapher-schema.010.json without a version bump), so run `--refresh`
+to pull in upstream changes — the resulting diff of the vendored file is reviewable in the PR.
 
 NOTE: hand-written types that are not derived from any JSON schema belong in
 `etl/collection/model/params.py`, NOT in the generated file (they would be lost on
@@ -27,10 +33,12 @@ from pathlib import Path
 from typing import Any
 
 from etl.config import DEFAULT_GRAPHER_SCHEMA
-from etl.files import get_schema_from_url
 from etl.paths import SCHEMAS_DIR
 
 OUTPUT_PATH = Path(__file__).parent.parent / "etl" / "collection" / "model" / "schema_types.py"
+
+# Vendored copy of the grapher schema (DEFAULT_GRAPHER_SCHEMA), refreshed with --refresh.
+VENDORED_GRAPHER_SCHEMA_PATH = SCHEMAS_DIR / DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[-1]
 
 # Extra fields injected into ViewConfig that are not part of the multidim schema.
 # TODO: remove once we are done with explorers
@@ -308,7 +316,13 @@ class TypedDictGenerator:
         with open(dataset_schema_path) as f:
             dataset_schema = json.load(f)
 
-        grapher_schema = get_schema_from_url(DEFAULT_GRAPHER_SCHEMA)
+        if not VENDORED_GRAPHER_SCHEMA_PATH.exists():
+            raise SystemExit(
+                f"Vendored grapher schema not found at {VENDORED_GRAPHER_SCHEMA_PATH}. "
+                "Run `python scripts/generate_schema_types.py --refresh` to download it."
+            )
+        with open(VENDORED_GRAPHER_SCHEMA_PATH) as f:
+            grapher_schema = json.load(f)
 
         # Extract properties
         view_config_props = self.extract_view_config_properties(multidim_schema)
@@ -395,8 +409,8 @@ class TypedDictGenerator:
             "Run `python scripts/generate_schema_types.py` to regenerate.",
             "",
             "Provides strongly-typed interfaces for:",
-            "- View configuration (based on multidim-schema.json, resolving $refs against",
-            f"  {DEFAULT_GRAPHER_SCHEMA})",
+            "- View configuration (based on multidim-schema.json, resolving $refs against the",
+            f"  vendored schemas/{VENDORED_GRAPHER_SCHEMA_PATH.name} — refresh it with --refresh)",
             "- View metadata (based on dataset-schema.json)",
             '"""',
             "",
@@ -467,6 +481,18 @@ class TypedDictGenerator:
         return "\n".join(lines)
 
 
+def refresh_vendored_schema() -> None:
+    """Re-download the vendored grapher schema from the upstream URL."""
+    from etl.http import session
+
+    resp = session.get(DEFAULT_GRAPHER_SCHEMA, timeout=30)
+    resp.raise_for_status()
+    with open(VENDORED_GRAPHER_SCHEMA_PATH, "w") as f:
+        json.dump(resp.json(), f, indent=2)
+        f.write("\n")
+    print(f"Refreshed {VENDORED_GRAPHER_SCHEMA_PATH} from {DEFAULT_GRAPHER_SCHEMA}")
+
+
 def format_content(content: str) -> str:
     """Run ruff format on the generated content so it matches repo style."""
     with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as f:
@@ -494,7 +520,15 @@ def main():
         action="store_true",
         help="Don't write; exit with code 1 if the generated content differs from the file on disk.",
     )
+    parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help=f"Re-download the vendored grapher schema from {DEFAULT_GRAPHER_SCHEMA} before generating.",
+    )
     args = parser.parse_args()
+
+    if args.refresh:
+        refresh_vendored_schema()
 
     generator = TypedDictGenerator()
     content = format_content(generator.generate_file_content())
