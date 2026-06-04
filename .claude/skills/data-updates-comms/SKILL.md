@@ -138,14 +138,22 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
    Resolve `OLD_ID` / `NEW_ID` from the `datasets` table by catalogPath.
 
-   Then apply secondary criteria *within* the data-changed subset:
+   Then rank the data-changed subset by **chart views**. Among the charts whose data actually changed, prefer the ones readers actually look at — a chart with 246 views/day and 1 changed variable is a far better announcement candidate than a chart with 3 views/day and 18 changed variables:
+
+   ```python
+   from etl.analytics.data import get_chart_views_last_n_days
+   views = get_chart_views_last_n_days(chart_ids=df["chart_id"].astype(int).tolist(), n_days=30)
+   df = df.merge(views[["chart_id", "views_daily"]], on="chart_id", how="left").fillna({"views_daily": 0})
+   df = df.sort_values(["views_daily", "n_changed"], ascending=[False, False])
+   ```
+
+   Apply secondary tie-breakers *within* the top of that ranked list:
 
    - Prefer `has_map = true` — readers can find their own country.
-   - Prefer broad, headline indicators (life expectancy, mortality, immunisation coverage, SDG indices) over deep-cut survey items.
    - Skip population-weighted variants and country-specific cuts.
-   - If a chart has many y-vars changed (e.g. `probability-of-dying-by-age` with 18/18), that's a stronger signal than "1 of 1 changed".
+   - If two charts tie on views but one has many y-vars changed (e.g. `probability-of-dying-by-age` with 18/18), that's a slightly stronger signal than "1 of 1 changed".
 
-   Reuse `charts.selected_views` from `update-context.yml` only if it's already been built using this checksum-ranked process (older runs picked views by intuition and produced misleading recommendations like "life expectancy now updated" when the data was effectively unchanged).
+   Reuse `charts.selected_views` from `update-context.yml` only if it's already been built using this views-then-checksum process (older runs picked views by intuition and produced misleading recommendations like "life expectancy now updated" when the data was effectively unchanged, or "malaria deaths" when the chart gets ~3 views a day).
 
    Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale that names the change>**. Hyperlink each title to the admin **editor** URL, not the bare admin path:
 
