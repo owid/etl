@@ -1,12 +1,14 @@
 ---
 name: sync-grapher-schema
-description: Sync upstream grapher schema changes (new chart types, config fields, enum values) into the ETL repo — vendored schema, multidim-schema, dataset-schema, and regenerated Python types. Use when the web team announces a grapher schema change ("new chart type in Grapher", "I added a field to the grapher config"), when someone asks to "sync the grapher schema", or when grapher configs fail ETL validation on fields that work fine in the grapher admin.
+description: Sync upstream grapher schema changes (new chart types, config fields, enum values) into the ETL repo — vendored schema, multidim-schema, dataset-schema, and regenerated Python types. Use when the scheduled sync workflow opened a draft PR or issue that needs completing, when the web team announces a grapher schema change ("new chart type in Grapher", "I added a field to the grapher config"), when someone asks to "sync the grapher schema", or when grapher configs fail ETL validation on fields that work fine in the grapher admin.
 triggers:
   - sync grapher schema
   - grapher schema changed
   - new chart type in grapher
   - update schemas from upstream
   - new grapher config field
+  - finish the auto-sync schema PR
+  - complete the bot schema PR
 metadata:
   internal: true
 ---
@@ -18,19 +20,34 @@ The grapher chart-config schema is owned by the web team in [`owid-grapher`](htt
 | File | Role | Sync mechanism |
 |---|---|---|
 | `schemas/grapher-schema.NNN.json` | Vendored copy of upstream | automatic (`--refresh`) |
-| `schemas/multidim-schema.json` | View config `$ref`s into the grapher schema | manual: add `$ref` for **new** properties |
+| `schemas/multidim-schema.json` + `schemas/explorer-schema.json` | View config `$ref`s into the grapher schema | manual: add `$ref` for **new** properties |
 | `schemas/dataset-schema.json` | Embedded `grapher_config` block (validates garden `.meta.yml`) | manual: mirror changes, preserve deviations |
 | `etl/collection/model/schema_types.py` | Generated Python TypedDicts | automatic (regenerate) |
 
-A unit test (`tests/test_schema_types_generation.py`) enforces consistency between the schemas and the generated types, so partial syncs fail CI. It can NOT detect upstream changes that haven't been pulled yet — that's what this skill is for.
+Unit tests enforce consistency between all of these (`tests/test_schema_types_generation.py`, `test_grapher_config_schema_sync` in `tests/test_metadata_schemas.py`), so partial syncs fail CI. Full background: `docs/guides/grapher-schema-sync.md`.
+
+## Entry points
+
+**A. Completing a bot PR** (the common case). The scheduled workflow (`.github/workflows/sync-grapher-schema.yml`) detected an upstream change and opened a draft PR on the `auto-sync-grapher-schema` branch with the automatic part (refreshed vendored copy + regenerated types) already committed.
+
+- Check out that branch — do NOT create a new PR (skip step 0; step 1's refresh is already done, just read the committed vendored diff).
+- The PR's failing `test_grapher_config_schema_sync` output is the todo list — usually just steps 2-3 below.
+- ⚠️ If upstream changes again before this PR merges, the workflow **force-updates the branch and clobbers manual commits**. Finish promptly; if the sync needs longer, move the work to your own branch (`git checkout -b <new>` + close the bot PR).
+- When done: push, mark the PR ready for review.
+
+**B. Ad-hoc / from scratch.** Someone announced a change and you're not waiting for the cron (alternatively, trigger the workflow manually: `gh workflow run sync-grapher-schema.yml`). Follow all steps below.
+
+**C. Version bump.** The workflow opened a "New grapher schema version published upstream" issue → see the "Version bump" section at the bottom.
 
 ## Workflow
 
 ### 0. Branch + PR
 
-Use the standard flow: `.venv/bin/etl pr "sync grapher schema (<short summary>)" chore`, unless the user wants the changes on the current branch.
+(Entry point B only.) Use the standard flow: `.venv/bin/etl pr "sync grapher schema (<short summary>)" chore`, unless the user wants the changes on the current branch.
 
 ### 1. Refresh the vendored schema
+
+(Entry point A: already committed by the workflow — just read the diff with `git show` on the bot commit, then continue at step 2.)
 
 ```bash
 .venv/bin/python scripts/generate_schema_types.py --refresh
@@ -85,13 +102,15 @@ Hand-written types (e.g. `GroupViewsConfig`) live in `etl/collection/model/param
 ### 5. Validate
 
 ```bash
-.venv/bin/pytest tests/test_schema_types_generation.py tests -k "collection or schema" -m "not integration" -q
+.venv/bin/pytest tests/test_schema_types_generation.py tests/test_metadata_schemas.py tests -k "collection or schema" -m "not integration" -q
 make check
 ```
 
+`test_grapher_config_schema_sync` pinpoints any enum value or property still missing from the embedded block (exact JSON path in the failure message) — iterate on step 3 until green.
+
 ### 6. Commit & PR description
 
-Commit with `✨🤖`. In the PR body, list the upstream changes synced (link the Slack announcement if there is one) and which of the four files each change touched.
+Commit with `✨🤖`. In the PR body, list the upstream changes synced (link the Slack announcement if there is one) and which of the four files each change touched. For entry point A, mark the bot PR ready for review instead of writing a new body — just add a comment summarizing the manual propagation you did.
 
 ## Version bump (upstream publishes grapher-schema.NNN+1)
 
