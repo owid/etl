@@ -17,7 +17,7 @@ import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Origin, Table
 
-from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
+from etl.data_helpers.geo import add_gdp_to_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -158,12 +158,7 @@ COLUMNS = {
 }
 
 
-def combine_tables_data_and_metadata(
-    tables: dict[str, Table],
-    ds_population: Dataset,
-    ds_regions: Dataset,
-    ds_gdp: Dataset,
-) -> Table:
+def combine_tables_data_and_metadata(tables: dict[str, Table], ds_regions: Dataset, ds_gdp: Dataset) -> Table:
     """Combine data and metadata of a list of tables, map variable names and add variables metadata.
 
     Parameters
@@ -209,7 +204,7 @@ def combine_tables_data_and_metadata(
     tb_combined["iso_alpha3"].metadata.unit = ""
 
     # Add population and gdp of countries (except for dataset-specific regions e.g. those ending in "(EI)").
-    tb_combined = add_population_to_table(tb=tb_combined, ds_population=ds_population, warn_on_missing_countries=False)
+    tb_combined = paths.regions.add_population(tb=tb_combined, warn_on_missing_countries=False)
     tb_combined = add_gdp_to_table(tb=tb_combined, ds_gdp=ds_gdp)
 
     # Check that there were no repetition in column names.
@@ -332,7 +327,6 @@ def run() -> None:
     ds_fossil_fuels = paths.load_dataset("fossil_fuel_production")
     ds_primary_energy = paths.load_dataset("primary_energy_consumption")
     ds_electricity_mix = paths.load_dataset("electricity_mix")
-    ds_population = paths.load_dataset("population")
     ds_gdp = paths.load_dataset("maddison_project_database")
     ds_regions = paths.load_dataset("regions")
 
@@ -354,12 +348,7 @@ def run() -> None:
             columns=["population", "primary_energy_consumption__twh"], errors="raise"
         ),
     }
-    tb = combine_tables_data_and_metadata(
-        tables=tables,
-        ds_population=ds_population,
-        ds_regions=ds_regions,
-        ds_gdp=ds_gdp,
-    )
+    tb = combine_tables_data_and_metadata(tables=tables, ds_regions=ds_regions, ds_gdp=ds_gdp)
 
     # Improve table metadata.
     improve_metadata(tb=tb, ds_regions=ds_regions)

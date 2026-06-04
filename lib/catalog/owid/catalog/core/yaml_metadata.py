@@ -216,16 +216,29 @@ def _validate_variables_all_miss(t_annot: dict, tb: Table) -> None:
     Used when `extra_variables="ignore"` is in effect (e.g. after long_to_wide).
     Partial misses are still tolerated — only a 100% miss rate is treated as a
     typo, since the user has clearly written an override block that does nothing.
+
+    A YAML key also counts as a match when it's the long-format base name of a
+    pivoted column (wide names are `{base}__{dim}_{value}`): such keys were
+    already applied to the long table before long_to_wide, so missing the wide
+    columns is expected, not a typo.
     """
     yaml_variable_names = set((t_annot.get("variables") or {}).keys())
     if not yaml_variable_names:
         return
     table_variable_names = set(tb.columns)
-    if yaml_variable_names.isdisjoint(table_variable_names):
+
+    def _matches(name: str) -> bool:
+        if name in table_variable_names:
+            return True
+        prefix = name + "__"
+        return any(col.startswith(prefix) for col in table_variable_names)
+
+    if not any(_matches(name) for name in yaml_variable_names):
         raise ValueError(
             f"Table {tb.metadata.short_name} has variables in YAML "
             f"{sorted(yaml_variable_names)} but none match any column in the table "
-            f"({len(table_variable_names)} columns: e.g. {sorted(table_variable_names)[:3]}…). "
+            f"({len(table_variable_names)} columns: e.g. {sorted(table_variable_names)[:3]}…), "
+            f"neither exactly nor as a long-format prefix of a pivoted column. "
             f"This usually means the YAML keys are wrong — for grapher overrides, "
             f"remember that long_to_wide adds dimension suffixes like `__sex_both_sexes`."
         )

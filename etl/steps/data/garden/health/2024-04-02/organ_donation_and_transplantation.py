@@ -74,9 +74,6 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("organ_donation_and_transplantation")
     tb = ds_meadow["organ_donation_and_transplantation"].reset_index()
 
-    # Load population dataset and read its main table.
-    ds_population = paths.load_dataset("population")
-
     #
     # Process data.
     #
@@ -87,7 +84,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Add population to main table.
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
+    tb = paths.regions.add_population(tb=tb)
 
     # Add indicators per million people.
     for column in tb.drop(columns=["country", "year", "population"]).columns:

@@ -582,7 +582,6 @@ def run() -> None:
     # Load auxiliary dataset of regions, income groups, and population.
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
-    ds_population = paths.load_dataset("population")
 
     # Read tables from meadow dataset.
     # The "detailed" table contains emissions for each pollutant, country, sector, fuel, and year (a column for each year). There is an additional column for units, but they are always the same for each pollutant.
@@ -715,7 +714,7 @@ def run() -> None:
     )
 
     # Add per capita variables.
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
     tb["emissions_per_capita"] = tb["emissions"] / tb["population"]
     tb = tb.drop(columns=["population"])
 
