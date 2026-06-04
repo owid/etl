@@ -44,11 +44,11 @@ git diff schemas/grapher-schema.*.json
 
 Only needed for **new top-level properties** (new chart-type config objects like `dumbbell`, new view-level fields). Existing `$ref`s resolve against the live schema automatically.
 
-For each new upstream property that makes sense in a multidim/explorer view, add a `$ref` entry to the view config properties block (search for `"chartTypes"` to find it):
+For each new upstream property that makes sense in a multidim/explorer view, add a `$ref` entry to the view config properties block (search for `"chartTypes"` to find it). The same applies to `schemas/explorer-schema.json`. Refs are **local relative refs** to the vendored copy (resolved offline by `Collection.validate_schema`):
 
 ```json
 "<newProp>": {
-    "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.NNN.json#/properties/<newProp>"
+    "$ref": "grapher-schema.NNN.json#/properties/<newProp>"
 },
 ```
 
@@ -95,9 +95,9 @@ Commit with `✨🤖`. In the PR body, list the upstream changes synced (link th
 
 ## Version bump (upstream publishes grapher-schema.NNN+1)
 
-Rarer case — when the web team publishes a new schema version instead of mutating in place:
+Rarer case — when the web team publishes a new schema version instead of mutating in place. Detected by the integration test `test_no_newer_grapher_schema_version` (compares the `$id` of upstream `grapher-schema.latest.json` against `DEFAULT_GRAPHER_SCHEMA`).
 
-1. Bump `DEFAULT_GRAPHER_SCHEMA` in `etl/config.py`.
-2. Update every `$ref` URL in `schemas/multidim-schema.json`: `sed -i 's/grapher-schema.NNN.json/grapher-schema.MMM.json/g' schemas/multidim-schema.json`.
+1. Bump `DEFAULT_GRAPHER_SCHEMA` in `etl/config.py`. (Keep it a concrete version, never `latest` — it is written into chart configs as `$schema`, and grapher's config migrations are keyed on the version.)
+2. Update every `$ref` in `schemas/multidim-schema.json` and `schemas/explorer-schema.json`: `sed -i 's/grapher-schema.NNN.json/grapher-schema.MMM.json/g' schemas/multidim-schema.json schemas/explorer-schema.json`.
 3. `.venv/bin/python scripts/generate_schema_types.py --refresh` (vendors the new version — the filename follows `DEFAULT_GRAPHER_SCHEMA`), then `git rm` the old vendored file.
 4. Continue from step 1's diff review above (diff old vendored vs new: `git diff --no-index schemas/grapher-schema.NNN.json schemas/grapher-schema.MMM.json`).

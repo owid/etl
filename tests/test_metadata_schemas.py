@@ -398,3 +398,24 @@ def test_vendored_grapher_schema_is_current():
         f"Vendored {VENDORED_GRAPHER_SCHEMA.name} is stale vs {DEFAULT_GRAPHER_SCHEMA}.\n"
         "Run `python scripts/generate_schema_types.py --refresh` and follow /sync-grapher-schema."
     )
+
+
+@pytest.mark.integration
+def test_no_newer_grapher_schema_version():
+    """Detect when upstream publishes a NEW grapher schema version.
+
+    `grapher-schema.latest.json` carries an `$id` naming the concrete version it points to;
+    when that moves past DEFAULT_GRAPHER_SCHEMA, we should consider bumping. See the
+    "Version bump" section of the /sync-grapher-schema skill.
+    """
+    from etl.http import session
+
+    latest_url = DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[0] + "/grapher-schema.latest.json"
+    resp = session.get(latest_url, timeout=30)
+    resp.raise_for_status()
+    latest_id = resp.json().get("$id")
+    assert latest_id == DEFAULT_GRAPHER_SCHEMA, (
+        f"Upstream published a newer grapher schema: {latest_id} "
+        f"(we pin {DEFAULT_GRAPHER_SCHEMA}).\n"
+        "Follow the 'Version bump' section of the /sync-grapher-schema skill to upgrade."
+    )

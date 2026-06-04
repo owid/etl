@@ -421,6 +421,8 @@ class Collection(MDIMBase):
             # support file references out of the box
             s = s.replace("dataset-schema.json#", "file://dataset-schema.json#")
             s = s.replace("definitions.json#", "file://definitions.json#")
+            # Same for $refs to the vendored grapher schema (any version), e.g. "grapher-schema.010.json#/..."
+            s = re.sub(r'"(grapher-schema\.[\w.]+\.json)#', r'"file://\1#', s)
 
             schema = json.loads(s)
 
