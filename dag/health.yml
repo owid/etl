@@ -805,13 +805,6 @@ steps:
         - snapshot://cdc/2025-05-19/tuberculosis.csv
 
   # Global Health Observatory (GHO) from WHO
-  data://garden/who/2025-05-19/gho:
-    - data://garden/regions/2023-01-01/regions
-    - data://meadow/who/2025-05-19/gho:
-      - snapshot://who/2025-05-19/gho.zip
-    - data://garden/demography/2024-07-15/population
-  data://grapher/who/2025-05-19/gho:
-    - data://garden/who/2025-05-19/gho
   data://garden/who/2026-05-22/gho:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/who/2026-05-22/gho:

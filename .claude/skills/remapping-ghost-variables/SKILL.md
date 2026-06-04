@@ -79,9 +79,26 @@ Compare old vs new shortNames to confirm the mapping. Common rename patterns:
 - Prefix/suffix changes
 - Restructured naming conventions
 
-### Step 5: Remap the chart via Admin API
+### Step 5: Remap via the indicator upgrader (preferred)
 
-Use the `AdminAPI` to update the chart config on staging:
+Insert the mappings, then run the upgrader — it updates dimensions, map configs, sortBy, and narrative charts, and records the mapping in `wiz__variable_mapping` so chart diff picks it up:
+
+```bash
+STAGING=<branch> .venv/bin/python -c "
+from apps.wizard.utils.db import WizardDB
+WizardDB.add_variable_mapping(
+    mapping={<old_id>: <new_id>},
+    dataset_id_old=<old_ds_id>, dataset_id_new=<new_ds_id>,
+    comments='<why>')"
+STAGING=<branch> .venv/bin/python -m apps.indicator_upgrade.cli upgrade --dry-run
+STAGING=<branch> .venv/bin/python -m apps.indicator_upgrade.cli upgrade
+```
+
+**Check `WizardDB.get_variable_mapping_raw()` first** — `upgrade` applies *all* stored mappings, not just yours.
+
+### Step 5 (fallback): Remap the chart via Admin API
+
+If the indicator upgrader can't be used, update the chart config manually on staging with `AdminAPI`:
 
 ```python
 from apps.chart_sync.admin_api import AdminAPI
