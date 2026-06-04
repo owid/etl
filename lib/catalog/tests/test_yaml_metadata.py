@@ -108,19 +108,47 @@ def test_update_metadata_from_yaml_extra_variables_ignore_all_miss(tmp_path):
 tables:
   test:
     variables:
-      stunting_prev_model_estimates:
-        title: Wrong key — actual column is `…__sex_both_sexes`
+      stunting_prev_model_estimatse:
+        title: Typo'd key — neither a column nor a long-format prefix of one
 """.strip()
 
     path = tmp_path / "test.yaml"
     with open(path, "w") as f:
         f.write(yaml_text)
 
-    # Table has the pivoted variable name, not the bare one in the YAML.
     t = Table({"stunting_prev_model_estimates__sex_both_sexes": [1, 2, 3]})
 
     with pytest.raises(ValueError, match="none match any column"):
         ym.update_metadata_from_yaml(t, path, "test", extra_variables="ignore")
+
+
+def test_update_metadata_from_yaml_extra_variables_ignore_long_format_prefix(tmp_path):
+    """A YAML key that is the long-format base name of a pivoted column must NOT
+    raise: such metadata was already applied to the long table before
+    long_to_wide, so missing the wide columns in the second pass is expected.
+    """
+    yaml_text = """
+tables:
+  test:
+    variables:
+      n_animals_killed:
+        title: Long-format key, applied pre-pivot
+""".strip()
+
+    path = tmp_path / "test.yaml"
+    with open(path, "w") as f:
+        f.write(yaml_text)
+
+    # Table has only pivoted variable names with `__{dim}_{value}` suffixes.
+    t = Table(
+        {
+            "n_animals_killed__animal_cattle": [1, 2, 3],
+            "n_animals_killed__animal_chickens": [4, 5, 6],
+        }
+    )
+
+    # Should not raise.
+    ym.update_metadata_from_yaml(t, path, "test", extra_variables="ignore")
 
 
 def test_update_metadata_from_yaml_extra_variables_ignore_partial_miss(tmp_path):
