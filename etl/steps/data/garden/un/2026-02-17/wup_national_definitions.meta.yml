@@ -9,23 +9,16 @@ definitions:
     processing_level: major
   description_key_common: &description_key_common
   - |-
-    Countries classify their territory into urban and rural areas using their
-    own criteria. Some base this on administrative status; others use
-    population thresholds, density, employment structure, or some combination.
-    Because these criteria vary so widely, similar places can be classified
-    differently from one country to the next.
+    Countries use their own criteria to classify areas as urban or rural —
+    some base this on administrative status, others on population size,
+    density, or employment patterns. Because definitions vary so widely,
+    these figures are most reliable for tracking change within a single
+    country over time. Cross-country comparisons should be treated with caution.
   - |-
-    The UN has historically collected data using each country's own definition,
-    which reflects how governments plan and maintain continuity with earlier
-    statistics. But it means the figures do not always measure the same thing
-    across countries.
-  - |-
-    For international comparisons, the UN's 2025 revision adopted the
+    For more consistent international comparisons, the UN's 2025 revision adopted the
     [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php)
-    framework alongside its traditional national-definitions estimates. DEGURBA
-    applies the same population density and settlement size thresholds
-    everywhere, so that similar places are classified consistently regardless
-    of which country they are in. Our charts using
+    framework, which applies the same population density and settlement size
+    thresholds everywhere. Our charts using
     [DEGURBA data](https://ourworldindata.org/search?datasetProducts=Global+Human+Settlement+Layer+Dataset)
     are a better choice when comparing across countries.
 # Learn more about the available fields:
@@ -63,7 +56,7 @@ tables:
         short_unit: '%'
         description_short: <% if area_type == "urban" %>Share of total population living in urban areas, based on each country's national definition<% elif area_type == "rural" %>Share of total population living in rural areas, based on each country's national definition<% else %>Percentage of total population, based on each country's national definition<% endif %>.
         description_key:
-          - <% if area_type == "urban" %>The share of a country's population living in areas that are officially classified as urban — a simple measure of how urbanised a country is at a given point in time.<% elif area_type == "rural" %>The share of a country's population living in areas that are officially classified as rural.<% else %>The percentage of a country's population across all areas, urban and rural combined.<% endif %>
+          - <% if area_type == "urban" %>The share of a country's population living in areas that are officially classified as urban — a simple measure of how urbanized a country is at a given point in time.<% elif area_type == "rural" %>The share of a country's population living in areas that are officially classified as rural.<% else %>The percentage of a country's population across all areas, urban and rural combined.<% endif %>
           - *description_key_common
         display:
           numDecimalPlaces: 1
@@ -79,7 +72,7 @@ tables:
         short_unit: '%'
         description_short: Average annual population growth rate as a percentage<% if area_type == "urban" %> for urban areas<% elif area_type == "rural" %> for rural areas<% endif %>, based on each country's national definition. Positive values indicate population growth; negative values indicate decline.
         description_key:
-          - <% if area_type == "urban" %>How fast the urban population is growing each year, expressed as a percentage. A value of 2% means urban residents increased by about 2% per year over the period.<% elif area_type == "rural" %>How fast the rural population is growing each year, expressed as a percentage. A negative value means the number of people in rural areas is declining.<% else %>How fast the total population is growing each year, expressed as a percentage.<% endif %>
+          - <% if area_type == "urban" %>How fast the urban population is growing each year, expressed as a percentage. A value of 2% means the number of urban residents grew by about 2% per year over the period.<% elif area_type == "rural" %>How fast the rural population is growing or shrinking each year, expressed as a percentage. A value of −1% means the number of rural residents fell by about 1% per year over the period.<% else %>How fast the total population is growing each year, expressed as a percentage.<% endif %>
           - Each value covers a five-year period. The figure shown for a given year is the average annual growth rate over the preceding five years — for example, the value for 2015 reflects average annual growth from 2010 to 2015.
           - <% if area_type == "urban" %>Urban population growth is driven by three factors — natural increase (births minus deaths among urban residents), net migration from rural to urban areas, and the reclassification of previously rural settlements as urban.<% elif area_type == "rural" %>Rural population change reflects the balance between natural increase, net migration to cities, and the reclassification of rural settlements as urban.<% else %>Total population growth reflects the balance of births, deaths, and international migration.<% endif %> The relative importance of these factors varies by country and period.
           - *description_key_common
@@ -97,10 +90,8 @@ tables:
         short_unit: '%'
         description_short: The average yearly growth rate of the share of the population living in <% if area_type == "urban" %>urban<% elif area_type == "rural" %>rural<% else %>urban or rural<% endif %> areas, based on each country's national definition. For example, the rate for 2015 represents the average annual growth from 2010 to 2015.
         description_key:
-          - <% if area_type == "urban" %>How fast the share of people living in urban areas is changing each year — whether urbanisation is speeding up, slowing down, or going into reverse.<% elif area_type == "rural" %>How fast the share of people living in rural areas is changing each year — whether the rural share of the population is growing or shrinking.<% else %>How fast the overall population share is shifting between urban and rural areas each year.<% endif %>
-          - Each value covers a five-year period. For example, the figure shown for 2015 reflects how the share changed on average each year between 2010 and 2015.
-          - This is different from the <% if area_type == "rural" %>rural<% else %>urban<% endif %> population growth rate, which measures how fast the number of <% if area_type == "rural" %>rural<% else %>urban<% endif %> residents is growing in absolute terms. This indicator instead shows whether <% if area_type == "rural" %>rural areas are becoming a larger or smaller share of the total population — that share can shrink even while the rural population keeps growing in absolute numbers.<% else %>cities are claiming a larger or smaller share of the total population — urbanisation can slow even while city populations keep growing in absolute numbers.<% endif %>
-          - <% if area_type == "rural" %>A positive value means the rural share is rising — a larger fraction of people are living outside cities than before. A negative value means the rural share is falling as more people move to or are born in urban areas.<% else %>A positive value means a growing share of people are living in urban areas. A negative value means the urban share is shrinking — cities are growing more slowly than the rest of the population, or people are moving away from urban areas.<% endif %>
+          - <% if area_type == "urban" %>How fast the share of people living in urban areas is changing — whether urbanization is speeding up, slowing down, or going into reverse. Each value is the average annual change over the preceding five years.<% elif area_type == "rural" %>How fast the share of people living in rural areas is changing — whether it is growing or shrinking. Each value is the average annual change over the preceding five years.<% else %>How fast the overall balance between urban and rural population shares is shifting. Each value is the average annual change over the preceding five years.<% endif %>
+          - <% if area_type == "rural" %>A positive value means the rural share is rising; a negative value means it is falling as more people move to or are born in urban areas.<% else %>A positive value means a growing share of people are living in urban areas; a negative value means the urban share is shrinking.<% endif %>
           - *description_key_common
         display:
           numDecimalPlaces: 1
