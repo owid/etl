@@ -149,6 +149,7 @@ GROUPS = (
                 "update": "apps.step_update.cli.cli",
                 "archive": "apps.step_update.cli.archive_cli",
                 "pr": "apps.pr.cli.cli",
+                "pr-clean": "apps.pr.cli.clean_cli",
             },
         },
         {
