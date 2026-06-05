@@ -37,6 +37,7 @@ definitions:
   common:
     processing_level: minor
     presentation:
+      attribution_short: Luxembourg Income Study
       topic_tags:
         - Poverty
         - Economic Inequality
