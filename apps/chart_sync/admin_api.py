@@ -156,8 +156,9 @@ class AdminAPI:
     ) -> dict:
         """Insert or update the chart's ETL-authored grapher config.
 
-        Writes to `chart_configs.etlConfig`. Admin patches are preserved; the
-        rendered `full` is recomputed as merge(variableETL, etlConfig, patch).
+        Writes the ETL config to its own `chart_configs` row, pointed to by
+        `charts.configIdETL`. Admin patches are preserved; the rendered `full`
+        is recomputed as merge(variableETL, etlConfig, patch).
         When `catalog_path` is given, it's stored on `charts.catalogPath` as the
         chart's ETL identity (mirrors `multi_dim_data_pages.catalogPath`).
         """
