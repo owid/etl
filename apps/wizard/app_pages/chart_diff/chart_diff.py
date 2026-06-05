@@ -568,7 +568,10 @@ class ChartDiff:
             approval = gm.ChartDiffApprovals(
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
-                targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # ty: ignore
+                # Must match the lookup in `_get_approvals`: catalog-path twins
+                # key on a NULL target timestamp (prod minted its own row), so
+                # record the same NULL here rather than the twin's updatedAt.
+                targetUpdatedAt=_target_updated_at_for_review(self.source_chart, self.target_chart),  # ty: ignore
                 status=status,  # ty: ignore
             )
             session.add(approval)
