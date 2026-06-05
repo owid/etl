@@ -724,7 +724,6 @@ def combine_data_and_add_variables(
     tb_land_use: Table,
     tb_energy: Table,
     ds_gdp: Dataset,
-    ds_population: Table,
 ) -> Table:
     """Combine all relevant data into one table, add region aggregates, and add custom variables (e.g. emissions per
     capita).
@@ -777,14 +776,10 @@ def combine_data_and_add_variables(
     tb_co2_with_regions = pr.merge(tb_co2_with_regions, tb_consumption, on=["country", "year"], how="outer")
 
     # Add population to original table.
-    tb_co2_with_regions = geo.add_population_to_table(
-        tb=tb_co2_with_regions, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_co2_with_regions = paths.regions.add_population(tb=tb_co2_with_regions, warn_on_missing_countries=False)
 
     # Add global population to global emissions table.
-    tb_global_emissions = geo.add_population_to_table(
-        tb=tb_global_emissions, ds_population=ds_population, population_col="global_population"
-    )
+    tb_global_emissions = paths.regions.add_population(tb=tb_global_emissions, population_col="global_population")
 
     # Add GDP to main table.
     tb_co2_with_regions = geo.add_gdp_to_table(tb=tb_co2_with_regions, ds_gdp=ds_gdp)
@@ -1045,7 +1040,6 @@ def run() -> None:
         tb_land_use=tb_land_use,
         tb_energy=tb_energy,
         ds_gdp=ds_gdp,
-        ds_population=ds_population,
     )
 
     ####################################################################################################################

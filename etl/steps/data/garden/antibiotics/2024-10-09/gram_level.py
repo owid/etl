@@ -4,7 +4,7 @@ from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
-from etl.data_helpers.geo import add_population_to_table, list_members_of_region
+from etl.data_helpers.geo import list_members_of_region
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -18,8 +18,6 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("gram_level")
-    # Add population dataset
-    ds_population = paths.load_dataset("population")
     # Add regions dataset
     ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
@@ -32,7 +30,7 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
     # Add population to the table
-    tb = add_population_to_table(tb, ds_population)
+    tb = paths.regions.add_population(tb)
     # Calculate total DDDs
     tb = add_regional_totals(tb, ds_regions)
     tb = tb.format(["country", "year", "atc_level_3_class"])

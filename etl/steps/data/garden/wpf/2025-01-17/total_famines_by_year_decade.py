@@ -5,7 +5,6 @@ import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -23,9 +22,6 @@ def run() -> None:
 
     # Read table from the dataset.
     tb = ds_garden.read("famines")
-
-    # Load the population dataset.
-    ds_population = paths.load_dataset("population")
 
     origins = tb["famine_name"].metadata.origins
 
@@ -95,7 +91,7 @@ def run() -> None:
     tb = tb.rename(columns={"region": "country"})
 
     # Calculate the rate of famine deaths per 100,000 people
-    tb = geo.add_population_to_table(tb, ds_population)
+    tb = paths.regions.add_population(tb)
 
     # The World total population doesn't include a value for each year but every region does so calculate it for each year based on the regional sums instead
     filtered_tb = tb[tb["country"].isin(REGIONS)]

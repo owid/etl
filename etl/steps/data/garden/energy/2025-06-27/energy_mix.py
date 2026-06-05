@@ -1,9 +1,8 @@
 """Generate the energy mix dataset using data from the Energy Institute Statistical Review of World Energy."""
 
 import numpy as np
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.data_helpers.geo import add_population_to_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -320,7 +319,7 @@ def calculate_primary_energy_annual_change(
     return primary_energy
 
 
-def add_per_capita_variables(primary_energy: Table, ds_population: Dataset) -> Table:
+def add_per_capita_variables(primary_energy: Table) -> Table:
     """Add per-capita variables.
 
     Parameters
@@ -338,11 +337,7 @@ def add_per_capita_variables(primary_energy: Table, ds_population: Dataset) -> T
     """
     primary_energy = primary_energy.copy()
 
-    primary_energy = add_population_to_table(
-        tb=primary_energy,
-        ds_population=ds_population,
-        warn_on_missing_countries=False,
-    )
+    primary_energy = paths.regions.add_population(tb=primary_energy, warn_on_missing_countries=False)
     for source in ONLY_DIRECT_ENERGY:
         primary_energy[f"{source} per capita (kWh)"] = (
             primary_energy[f"{source} (TWh)"] / primary_energy["population"] * TWH_TO_KWH
@@ -396,7 +391,6 @@ def run() -> None:
     tb_review = ds_review.read("statistical_review_of_world_energy", reset_index=False)
 
     # Load the population dataset.
-    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -415,7 +409,7 @@ def run() -> None:
     tb = calculate_primary_energy_annual_change(tb)
 
     # Add per-capita variables.
-    tb = add_per_capita_variables(primary_energy=tb, ds_population=ds_population)
+    tb = add_per_capita_variables(primary_energy=tb)
 
     # Prepare output data in a convenient way.
     table = prepare_output_table(tb)

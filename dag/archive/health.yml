@@ -732,3 +732,11 @@ steps:
     - data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage
   data://grapher/cancer/2024-09-13/diagnosis_routes_by_stage:
     - data://garden/cancer/2024-09-13/diagnosis_routes_by_stage
+  # Global Health Observatory (GHO) from WHO
+  data://garden/who/2025-05-19/gho:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2025-05-19/gho:
+      - snapshot://who/2025-05-19/gho.zip
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2025-05-19/gho:
+    - data://garden/who/2025-05-19/gho

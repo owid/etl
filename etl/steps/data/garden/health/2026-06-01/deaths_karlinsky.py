@@ -18,7 +18,6 @@ def run() -> None:
     tb = ds_meadow.read("deaths_karlinsky")
 
     # Load population
-    ds_pop = paths.load_dataset("population")
 
     #
     # Process data.
@@ -37,7 +36,7 @@ def run() -> None:
     tb = tb.format(["country", "year"])
 
     # sanity checks
-    _sanity_checks(tb, ds_pop)
+    _sanity_checks(tb)
 
     #
     # Save outputs.
@@ -49,7 +48,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def _sanity_checks(tb: Table, ds_pop) -> None:
+def _sanity_checks(tb: Table) -> None:
     # check columns
     columns_expected = {
         "death_comp",
@@ -73,7 +72,7 @@ def _sanity_checks(tb: Table, ds_pop) -> None:
     # Add population to table for sanity check
     columns_absolute = [col for col in tb.columns if col not in columns_perc]
     tb_ = tb.reset_index()
-    tb_ = geo.add_population_to_table(tb_, ds_population=ds_pop)
+    tb_ = paths.regions.add_population(tb_)
 
     # Check NAs in population only for Micronesia
     mask = tb_["population"].isna()
