@@ -74,17 +74,17 @@ steps:
         - snapshot://lis/2026-03-16/lis_incomes.csv
         - snapshot://lis/2026-03-16/lis_relative_poverty.csv
   export://explorers/lis/latest/poverty_lis:
-    - data://grapher/lis/2026-03-16/luxembourg_income_study
+    - data://grapher/lis/2026-06-05/luxembourg_income_study
   export://explorers/lis/latest/inequality_lis:
-    - data://grapher/lis/2026-03-16/luxembourg_income_study
+    - data://grapher/lis/2026-06-05/luxembourg_income_study
   export://explorers/lis/latest/incomes_lis:
-    - data://grapher/lis/2026-03-16/luxembourg_income_study
+    - data://grapher/lis/2026-06-05/luxembourg_income_study
   export://multidim/lis/latest/gini_lis:
-    - data://grapher/lis/2026-03-16/luxembourg_income_study
+    - data://grapher/lis/2026-06-05/luxembourg_income_study
   export://multidim/lis/latest/relative_poverty_lis:
-    - data://grapher/lis/2026-03-16/luxembourg_income_study
+    - data://grapher/lis/2026-06-05/luxembourg_income_study
   export://multidim/lis/latest/incomes_lis:
-    - data://grapher/lis/2026-03-16/luxembourg_income_study
+    - data://grapher/lis/2026-06-05/luxembourg_income_study
 
   # Inequality comparison data
   data://grapher/poverty_inequality/2025-01-22/inequality_comparison:
@@ -190,3 +190,14 @@ steps:
     - data://garden/worldbank_icp/2024-05-30/icp_2021_currencies:
       - snapshot://worldbank_icp/2024-05-30/icp_2021_currencies.json:
       - data://garden/regions/2023-01-01/regions
+  data://meadow/lis/2026-06-05/luxembourg_income_study:
+    - snapshot://lis/2026-06-05/lis_incomes.csv
+    - snapshot://lis/2026-06-05/lis_relative_poverty.csv
+    - snapshot://lis/2026-06-05/lis_absolute_poverty.csv
+    - snapshot://lis/2026-06-05/lis_inequality.csv
+  data://garden/lis/2026-06-05/luxembourg_income_study:
+    - data://meadow/lis/2026-06-05/luxembourg_income_study
+
+  # Luxembourg Income Study
+  data://grapher/lis/2026-06-05/luxembourg_income_study:
+    - data://garden/lis/2026-06-05/luxembourg_income_study
