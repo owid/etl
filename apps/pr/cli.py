@@ -61,7 +61,7 @@ etl pr "some title for the PR" -t --share-data
 
 This makes the new worktree's `data/` a shortcut (symlink) to the original repo's `data/`, so both worktrees share the same ETL outputs and you don't have to recompute them. Note that data/ is a symlink to the original repo's data/, so:
 - If you run the same steps in both worktrees, they may overwrite each other's output.
-- DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.
+- DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree.
 
 After the command finishes, `uv sync` has already run inside the worktree, so its `.venv/` is ready to use. With a `chpwd` hook in your `~/.zshrc` that sources `.venv/bin/activate` whenever present, `cd ../etl-BRANCH` is all that's needed — activation is automatic. Without the hook, also run `source .venv/bin/activate` after the cd. Skipping activation silently routes `etl`/`etlr` to the original repo's source code.
 
@@ -505,7 +505,9 @@ def print_worktree_hint(
         print("WARNING: data/ is a symlink to the original repo's data/, so:")
         print("  - If you run the same steps in both worktrees, they may overwrite each other's output.")
         print("  - DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. ")
-        print("    Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.")
+        print(
+            "    Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree."
+        )
 
 
 def create_pr(repo, work_branch, base_branch, pr_title):
@@ -750,9 +752,11 @@ def list_worktrees(repo) -> dict[str, Path]:
 
 
 def fetch_pr_state(branch: str) -> str | None:
-    """Return the GitHub PR state for a branch: 'open', 'merged', 'closed', or None if no PR exists.
+    """Return the GitHub PR state for a branch: 'open', 'merged', 'closed', or None.
 
-    Uses GitHub's PR state rather than git ancestry so squash-merged PRs are correctly seen as merged.
+    None means either no PR exists for the branch or the GitHub request failed (logged as a warning);
+    in both cases the branch is treated as not-cleanable and left alone. Uses GitHub's PR state rather
+    than git ancestry so squash-merged PRs are correctly seen as merged.
     """
     headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
     params = {"state": "all", "head": f"owid:{branch}", "per_page": 50}
@@ -797,8 +801,8 @@ def claude_project_dir(repo_path: Path) -> Path:
 def copy_sessions(worktree_path: Path, main_project_dir: Path) -> int:
     """Copy a worktree's Claude sessions into the main repo's project dir. Returns the number of items copied.
 
-    Session UUIDs are globally unique, so this never collides with the main repo's own sessions. Existing
-    files are left untouched (idempotent re-runs).
+    Session UUIDs are globally unique, so this never collides with the main repo's own sessions. Anything
+    that already exists at the destination (file or dir) is skipped, so re-runs are idempotent.
     """
     src = claude_project_dir(worktree_path)
     if not src.exists():
@@ -811,11 +815,11 @@ def copy_sessions(worktree_path: Path, main_project_dir: Path) -> int:
         if item.name == ".DS_Store":
             continue
         dest = main_project_dir / item.name
+        if dest.exists():
+            continue
         if item.is_dir():
-            shutil.copytree(item, dest, dirs_exist_ok=True)
+            shutil.copytree(item, dest)
         else:
-            if dest.exists():
-                continue
             shutil.copy2(item, dest)
         copied += 1
     log.info(f"Copied {copied} session item(s) from '{src}' to '{main_project_dir}'.")
