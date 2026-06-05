@@ -51,12 +51,13 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
 
     admin_api = AdminAPI(owid_env)
 
-    # Look up the chart by slug. If it already exists, we keep it; otherwise
-    # we create a new one with a minimal bootstrap config and then write the
-    # full config into chart_configs.etlConfig.
+    # Look up the chart by its ETL catalog path (the stable ETL identity, like
+    # multi_dim_data_pages.catalogPath) — not by slug, which is a mutable public
+    # URL. If it exists, we keep it; otherwise we create a new one with a minimal
+    # bootstrap config and then write the full config into chart_configs.etlConfig.
     with Session(owid_env.engine) as session:
         try:
-            existing = Chart.load_chart(session, slug=slug)
+            existing = Chart.load_chart(session, catalog_path=collection.catalog_path)
         except NoResultFound:
             existing = None
 
@@ -82,7 +83,7 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
     # Write the chart's ETL-authored config. This recomputes `full` server-side
     # as merge(variableETL, etlConfig, existing patch); any admin patches
     # already in chart_configs.patch are preserved.
-    admin_api.put_chart_etl_config(chart_id=chart_id, grapher_config=chart_config)
+    admin_api.put_chart_etl_config(chart_id=chart_id, grapher_config=chart_config, catalog_path=collection.catalog_path)
 
     # Set topic tags on freshly created charts only — once a chart exists,
     # tags are admin-managed and ETL must not stomp on them.
