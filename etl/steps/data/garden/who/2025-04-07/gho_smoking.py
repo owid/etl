@@ -1,6 +1,7 @@
 """Loads relevant smoking indicators from the GHO database and harmonizes them.
 This step includes both smoking prevalence estimates and the MPOWER indicators on tobacco control policies."""
 
+from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -14,11 +15,17 @@ REGIONS = [r for r in geo.REGIONS.keys() if r != "European Union (27)"] + ["Worl
 LAST_YEAR = 2022
 
 # short table names
-afford_gdp = "affordability_of_cigarettes__percentage_of_gdp_per_capita_required_to_purchase_2000_cigarettes_of_the_most_sold_brand"
+afford_gdp = "affordability__percentage_of_gdp_per_capita_required_to_purchase_2000_cigarettes_of_the_most_sold_brand"
 taxes = "taxes_as_a_pct_of_price__total_tax"
-ad_bans = "enforce_bans_on_tobacco_advertising"
-help_quit = "offer_help_to_quit_tobacco_use"
-smoke_free = "number_of_places_smoke_free__national_legislation"
+ad_bans = "enforcing_bans_on_tobacco_advertising__promotion_and_sponsorship"
+help_quit = "offering_help_to_quit_tobacco_use"
+smoke_free = "national_smoking_ban__number_of_places_smoke_free"
+
+
+def read_indicator(ds_meadow: Dataset, short_name: str) -> Table:
+    """Read an indicator table and drop the low/high confidence bounds and comments columns."""
+    tb = ds_meadow.read(short_name)
+    return tb.drop(columns=[f"{short_name}_low", f"{short_name}_high", "comments"], errors="raise")
 
 
 def run() -> None:
@@ -36,22 +43,20 @@ def run() -> None:
         c for c in ds_meadow.table_names if (("smok" in c.lower()) or ("tobac" in c.lower()) or "tax" in c.lower())
     ]
 
-    smoking_estimates = [ind for ind in all_rel_indicators if "estimate" in ind.lower()]
+    # prevalence estimates only (exclude `number_of_current_*__estimate` tables)
+    smoking_estimates = [ind for ind in all_rel_indicators if ind.startswith("estimate_of_current")]
 
     # read tables for policy indicators
-    tb_taxes = ds_meadow.read(taxes)
-    tb_ads = ds_meadow.read(ad_bans)
-    tb_quit = ds_meadow.read(help_quit)
-    tb_afford = ds_meadow.read(afford_gdp)
-    tb_smoke_free = ds_meadow.read(smoke_free)
+    tb_taxes = read_indicator(ds_meadow, taxes)
+    tb_ads = read_indicator(ds_meadow, ad_bans)
+    tb_quit = read_indicator(ds_meadow, help_quit)
+    tb_afford = read_indicator(ds_meadow, afford_gdp)
+    tb_smoke_free = read_indicator(ds_meadow, smoke_free)
 
     ### clean up policy indicators
     # taxes
     tb_taxes = tb_taxes[tb_taxes["tobacco_and_nicotine_product"] == "Most sold brand of cigarettes (20 sticks)"]
-    tb_taxes = tb_taxes.drop(columns=["tobacco_and_nicotine_product", "comments"], errors="raise")
-
-    # smoke free
-    tb_smoke_free = tb_smoke_free.drop(columns=["comments"], errors="raise")
+    tb_taxes = tb_taxes.drop(columns=["tobacco_and_nicotine_product"], errors="raise")
 
     # support to quit
     # 1 means no data available, so should be dropped
@@ -79,9 +84,7 @@ def run() -> None:
     # Load all smoking estimates
 
     for tb_name in smoking_estimates:
-        tb = ds_meadow.read(tb_name)
-
-        tb = tb.drop(columns=["comments"], errors="raise")
+        tb = read_indicator(ds_meadow, tb_name)
 
         # Add to list of tables.
         tbs.append(tb)
@@ -93,11 +96,11 @@ def run() -> None:
     tb = tb.rename(
         columns={
             "estimate_of_current_cigarette_smoking_prevalence__pct": "cig_smoking_pct",
-            "estimate_of_current_cigarette_smoking_prevalence__pct__age_standardized_rate": "cig_smoking_pct_age_std",
+            "estimate_of_current_cigarette_smoking_prevalence__pct__age_standardized": "cig_smoking_pct_age_std",
             "estimate_of_current_tobacco_smoking_prevalence__pct": "tobacco_smoking_pct",
-            "estimate_of_current_tobacco_smoking_prevalence__pct__age_standardized_rate": "tobacco_smoking_pct_age_std",
+            "estimate_of_current_tobacco_smoking_prevalence__pct__age_standardized": "tobacco_smoking_pct_age_std",
             "estimate_of_current_tobacco_use_prevalence__pct": "tobacco_use_pct",
-            "estimate_of_current_tobacco_use_prevalence__pct__age_standardized_rate": "tobacco_use_pct_age_std",
+            "estimate_of_current_tobacco_use_prevalence__pct__age_standardized": "tobacco_use_pct_age_std",
         },
         errors="raise",
     )

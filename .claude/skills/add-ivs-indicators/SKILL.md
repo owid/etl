@@ -454,8 +454,13 @@ It works in three moves, all auto-derived:
    longest column suffix, so `family_victim_of_a_crime` beats `victim_of_a_crime`). Custom single-question
    blocks (no `VARS_DICT` entry, so the column carries no code) are clustered by stripping a generic IVS
    recode-prefix vocabulary and keyed by their column **suffix**; their label is derived from the variable
-   `name`s. Link text = the option prefix (`agree`, `dont_know`, `no_answer`, `avg_score`, `*_agg`…).
-3. **Emit** `| IVS code | Question | option links |` rows — one flat table by default.
+   `name`s.
+3. **Label and order each option link.** Link text is the option's **real category name** (strip the
+   per-question shared prefix / a parenthetical suffix from the variable `name`; fixed text for
+   dk/na/avg; humanised recode key as last resort) — so e.g. E124 shows "Fairly much respect", not the
+   terse key `some`. Order within a question: **aggregates first** (positive rollup before negative),
+   **Yes before No**, then the remaining categories, then Don't know / No answer / average score.
+4. **Emit** `| IVS code | Question | option links |` rows — one flat table by default.
 
 Three **optional** dicts in CONFIG add editorial polish without reintroducing hardcoded indicators:
 `TOPICS = {"Human Rights": ["E124", ...], ...}` (group/order rows), `LABELS = {code_or_suffix: "…"}`
@@ -470,11 +475,15 @@ output used all three; with them empty you still get a complete, correct table.
   **directly**. The `datasets.catalogPath` has **no** `grapher/` prefix (e.g.
   `ivs/<v>/integrated_values_surveys`) even though `variables.catalogPath` does — filter on the dataset row
   accordingly.
-- **Production** (`ENV="production"`): admin base is `https://admin.owid.io/admin` (from
-  `OWIDEnv().indicators_admin_site`). The indicators exist in production **only after the PR is merged and
-  the dataset re-published**, and **production variable ids differ from staging** — always re-query the prod
-  DB (don't reuse staging ids). The script asserts all expected columns matched, which doubles as a
-  "is it published yet?" check.
+- **Production** (`ENV="production"`): admin base is `https://admin.owid.io/admin`. Reach the prod grapher
+  DB **directly over Tailscale** at host **`prod-db`, port 3306** (check `tailscale status` for it) with the
+  `live_grapher` creds from `.env`/`.env.live` — this is far more reliable than `.env`'s `127.0.0.1:3310`
+  local SSH tunnel, which is usually down (`Connection refused`). Build the engine with
+  `sqlalchemy.engine.URL.create(...)` so the special-char password is encoded correctly. The indicators
+  exist in production **only after the PR is merged and the dataset is deployed**, and **production variable
+  ids differ from staging** — always re-query prod (don't reuse staging ids). After merge, the
+  branch-vs-`master` diff is empty, so set `NEW_COLS_FILE` (e.g. the saved `ai/ivs_pr_new_cols.txt`) or
+  `BASE_REF` to the merge base. The `len(v) == len(NEW)` assert doubles as an "is it deployed yet?" check.
 
 ## Worked example
 

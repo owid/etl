@@ -56,7 +56,6 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("comtrade_pandemics")
     # Load population dataset
-    ds_population = paths.load_dataset("population")
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
@@ -136,7 +135,7 @@ def run(dest_dir: str) -> None:
 
     # Add per capita metrics
     paths.log.info("add per capita")
-    tb = add_per_capita_variables(tb, ds_population)
+    tb = add_per_capita_variables(tb)
 
     # Set index
     paths.log.info("set index")
@@ -240,7 +239,7 @@ def add_world(tb: Table) -> Table:
     return tb
 
 
-def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
+def add_per_capita_variables(tb: Table) -> Table:
     """Add per-capita variables.
 
     Parameters
@@ -258,7 +257,7 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
 
     # Estimate per-capita variables.
     ## Add population variable
-    tb = geo.add_population_to_table(tb, ds_population, expected_countries_without_population=[])
+    tb = paths.regions.add_population(tb, expected_countries_without_population=[])
     ## Estimate ratio
     for col in tb.columns:
         if col not in ["population", "year", "country"]:

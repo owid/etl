@@ -10,7 +10,7 @@ NOTES:
 """
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.data_helpers import geo
@@ -122,8 +122,8 @@ def sanity_check_inputs_from_2020(tb_from_2020: Table) -> None:
         assert (tb_from_2020[column] < 1e12).all(), error
 
 
-def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
-    tb = geo.add_population_to_table(tb, ds_population=ds_population, warn_on_missing_countries=False)
+def add_per_capita_variables(tb: Table) -> Table:
+    tb = paths.regions.add_population(tb, warn_on_missing_countries=False)
     tb["n_farmed_fish_low_per_capita"] = tb["n_farmed_fish_low"] / tb["population"]
     tb["n_farmed_fish_per_capita"] = tb["n_farmed_fish"] / tb["population"]
     tb["n_farmed_fish_high_per_capita"] = tb["n_farmed_fish_high"] / tb["population"]
@@ -169,7 +169,6 @@ def run(dest_dir: str) -> None:
     ds_income_groups = paths.load_dataset("income_groups")
 
     # Load population dataset.
-    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -248,7 +247,7 @@ def run(dest_dir: str) -> None:
     tb = combine_two_overlapping_dataframes(df1=tb_historical, df2=tb, index_columns=["country", "year"])
 
     # Add per capita number of farmed fish.
-    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
+    tb = add_per_capita_variables(tb=tb)
 
     # Run sanity checks on outputs.
     sanity_check_outputs(tb=tb)

@@ -53,7 +53,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 | Caveats                      | seeded from indicator `description_key` bullets, sanity-check workarounds (`notes_to_check.md` from update-dataset workbench), `meta.origin.description` paragraphs that mention "limitations" / "caution" | **prompt** with extracted snippets — user rewrites           |
 | Anything interesting         | seeded from PR commit messages, `notes_to_check.md` resolutions, snapshot diff summary if available in `workbench/<short_name>/`                                                                           | **prompt** — user rewrites                                   |
 | Chart views (1–3)            | `update-context.yml` candidates OR query staging directly using the criteria below                                                                                                                         | filled with rationale, user confirms                         |
-| Search URL                   | `https://ourworldindata.org/search?datasetProducts=<urlquote(producer)>`                                                                                                                                   | filled                                                       |
+| Search URL                   | `https://ourworldindata.org/search?datasetProducts=<urlquote(datasets.name)>` — value is the grapher `datasets.name` field (= garden `dataset.title` override when set, else snapshot `meta.origin.title`); see step 6 | filled                                                       |
 
 **The editorial fields are deliberately not auto-prosed.** Slack posts in the editorial voice ("Why we have this dataset on OWID") read flat when LLM-written; the value is in the human framing. The skill's job is to surface the relevant snippets so the user doesn't have to grep for them.
 
@@ -100,18 +100,92 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 4. **Seed the editorial fields with snippet bullets.**
    For each of "why it matters", "caveats", "anything interesting": don't write prose, write 2–6 substantive bullets above an empty `text` fenced block. Bullets are clean reader-facing prose — **no `Snapshot description:` / `Garden description:` prefixes** in the output. Use those as internal source pointers only.
 
-5. **Pick chart views.**
-   - Reuse `charts.selected_views` from `update-context.yml` if present.
-   - Otherwise query published charts on staging (same SQL as step 3 but selecting `c.id, cc.slug, cc.full->>'$.title', cc.full->>'$.type', cc.full->>'$.hasMapTab', c.publishedAt, c.createdAt`).
-   - Rank by: `hasMapTab=true` > `type=StackedArea` global views > standalone-headline titles. Skip population-weighted variants and country-specific views.
-   - Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale>**. Hyperlink the title to an admin URL so Charlie (or whoever runs the form) can open the chart directly:
-     - If the chart already exists in production (i.e. it was published _before_ the current PR branch was cut — easiest signal: `c.publishedAt` is older than the branch's first commit), link to production: `https://admin.owid.io/admin/charts/<id>`.
-     - If the chart is **new in this PR** (created/first-published on this branch), link to staging: `http://staging-site-<branch>/admin/charts/<id>`. Don't link new charts to production — the page 404s until the branch merges.
-   - Prefer the most-viewed / most-linked charts (e.g. the `analytics_pageviews` table on staging or the equivalent admin endpoint)
+5. **Pick chart views — rank by *actual data change*, not just our intuitions about which chart is "flagship".**
+
+   The picked views show up in the public announcement under "Here's what changed". If the underlying data didn't actually change between the old and new release, the announcement misrepresents the update. So the primary ranking signal is: **for each published chart on the new dataset, how many of its y-variables have a different `dataChecksum` than the matching variable on the old dataset?** This is the same signal Chart Diff uses.
+
+   Run on staging (which has both old and new variables side-by-side):
+
+   ```python
+   from etl.config import OWID_ENV
+   from sqlalchemy import text
+   import pandas as pd
+
+   sql = """
+   SELECT c.id AS chart_id, cc.slug,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.title'))       AS title,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.hasMapTab'))   AS has_map,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.type'))        AS chart_type,
+          SUM(v_new.dataChecksum <> v_old.dataChecksum)        AS n_changed,
+          COUNT(*)                                             AS n_vars
+   FROM charts c
+   JOIN chart_configs cc        ON cc.id = c.configId
+   JOIN chart_dimensions cd     ON cd.chartId = c.id
+   JOIN variables v_new         ON cd.variableId = v_new.id
+   LEFT JOIN variables v_old    ON v_old.shortName = v_new.shortName
+                                AND v_old.datasetId = :old_dataset_id
+   WHERE v_new.datasetId = :new_dataset_id
+     AND c.publishedAt IS NOT NULL
+     AND cd.property = 'y'
+   GROUP BY c.id
+   HAVING n_changed > 0
+   ORDER BY n_changed DESC, has_map DESC
+   LIMIT 30
+   """
+   with OWID_ENV.engine.connect() as conn:
+       df = pd.read_sql(text(sql), conn, params={"old_dataset_id": OLD_ID, "new_dataset_id": NEW_ID})
+   ```
+
+   Resolve `OLD_ID` / `NEW_ID` from the `datasets` table by catalogPath.
+
+   Then rank the data-changed subset by **chart views**. Among the charts whose data actually changed, prefer the ones readers actually look at — a chart with 246 views/day and 1 changed variable is a far better announcement candidate than a chart with 3 views/day and 18 changed variables:
+
+   ```python
+   from etl.analytics.data import get_chart_views_last_n_days
+   views = get_chart_views_last_n_days(chart_ids=df["chart_id"].astype(int).tolist(), n_days=30)
+   df = df.merge(views[["chart_id", "views_daily"]], on="chart_id", how="left").fillna({"views_daily": 0})
+   df = df.sort_values(["views_daily", "n_changed"], ascending=[False, False])
+   ```
+
+   Apply secondary tie-breakers *within* the top of that ranked list:
+
+   - Prefer `has_map = true` — readers can find their own country.
+   - Skip population-weighted variants and country-specific cuts.
+   - If two charts tie on views but one has many y-vars changed (e.g. `probability-of-dying-by-age` with 18/18), that's a slightly stronger signal than "1 of 1 changed".
+
+   Reuse `charts.selected_views` from `update-context.yml` only if it's already been built using this views-then-checksum process (older runs picked views by intuition and produced misleading recommendations like "life expectancy now updated" when the data was effectively unchanged, or "malaria deaths" when the chart gets ~3 views a day).
+
+   Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale that names the change>**. Hyperlink each title to the admin **editor** URL, not the bare admin path:
+
+   - Production: `https://admin.owid.io/admin/charts/<id>/edit`
+   - Staging (new charts only): `http://staging-site-<branch>/admin/charts/<id>/edit`
+
+   The bare `/admin/charts/<id>` path takes the reader to a non-existent route on production; `/edit` opens the chart editor where they can verify the change. If the chart already existed before this PR (published earlier than the branch was cut — `c.publishedAt` is older than the first branch commit), link to production. If the chart was first published on this branch, link to staging.
 
 6. **Build the search URL.**
-   - `producer` from snapshot origin → `urllib.parse.quote_plus(producer)` → `https://ourworldindata.org/search?datasetProducts=<encoded>`.
-   - Always include this — even if it returns zero results today, it'll resolve once the new version is deployed.
+
+   The `datasetProducts` query parameter matches against the grapher **`datasets.name`** field (the dataset row's `name` column in MySQL — same value visible in the OWID admin's dataset list). When garden's `gho.meta.yml` sets a `dataset.title` override, that becomes `datasets.name` on upload. Otherwise it falls through to the snapshot origin's title.
+
+   So the resolution order is:
+
+   1. Garden `.meta.yml` → `dataset.title` (if set as override). **This is the most common case** — most large datasets carry a curated title like `Global Health Observatory - World Health Organization` or `World Bank Poverty and Inequality Platform (PIP)`.
+   2. Snapshot `.dvc` → `meta.origin.title` (fallback).
+
+   Resolve the value programmatically rather than guessing — query the grapher DB or read the garden YAML directly:
+
+   ```python
+   # Most reliable: grab the literal value from the prod-mirror grapher DB
+   make query SQL="SELECT name FROM datasets WHERE catalogPath = 'grapher/<ns>/<v>/<short>'"
+
+   # Or from the garden YAML
+   from etl.files import ruamel_load
+   meta = ruamel_load("etl/steps/data/garden/<ns>/<v>/<short>.meta.yml")
+   title = (meta.get("dataset") or {}).get("title")  # falls through if missing
+   ```
+
+   Build the URL with `urllib.parse.quote_plus(title)` so spaces become `+` and parens become `%28`/`%29`. NOT the bare `producer` field — that mismatches the index. And don't put the producer's homepage URL here, even as a fallback — the Slack template specifically wants this search URL form.
+
+   **Important caveat: the search index bakes asynchronously after a PR merge.** A correctly-formed URL can still return zero results for a few hours post-merge while the index re-bakes. If the user reports "no results", double-check the URL value against `datasets.name` first; if it matches, tell them to retry in a couple of hours.
 
 7. **Best-effort next-release date.**
    - Fetch `url_main` (WebFetch) and extract any phrase like "next release", "annual update", "updated yearly" near the page header. Tag the answer `[verify]` so the user knows to confirm.

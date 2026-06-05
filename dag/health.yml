@@ -80,7 +80,7 @@ steps:
   # Cholera
   data://grapher/who/2023-06-01/cholera:
     - data://garden/who/2023-06-01/cholera:
-      - data://garden/who/2025-05-19/gho
+      - data://garden/who/2026-05-22/gho
       - snapshot://fasttrack/2023-05-31/cholera.csv
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2021-07-01/wb_income
@@ -783,11 +783,7 @@ steps:
   data://grapher/who/2025-04-07/gho_smoking:
     - data://garden/who/2025-04-07/gho_smoking:
       # Global Health Observatory (GHO) from WHO
-      - data://garden/who/2024-01-03/gho:
-        - data://meadow/who/2024-01-03/gho:
-          - snapshot://who/2024-01-03/gho.zip
-        - data://garden/demography/2023-03-31/population
-        - data://garden/regions/2023-01-01/regions
+      - data://garden/who/2026-05-22/gho
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2025-07-01/income_groups
       - data://garden/un/2024-07-12/un_wpp
@@ -809,15 +805,15 @@ steps:
         - snapshot://cdc/2025-05-19/tuberculosis.csv
 
   # Global Health Observatory (GHO) from WHO
-  data://garden/who/2025-05-19/gho:
+  data://garden/who/2026-05-22/gho:
     - data://garden/regions/2023-01-01/regions
-    - data://meadow/who/2025-05-19/gho:
-      - snapshot://who/2025-05-19/gho.zip
+    - data://meadow/who/2026-05-22/gho:
+      - snapshot://who/2026-05-22/gho.zip
     - data://garden/demography/2024-07-15/population
-  data://grapher/who/2025-05-19/gho:
-    - data://garden/who/2025-05-19/gho
+  data://grapher/who/2026-05-22/gho:
+    - data://garden/who/2026-05-22/gho
   #export://multidim/who/latest/share_overweight_adults:
-  #  - data://grapher/who/2025-05-19/gho
+  #  - data://grapher/who/2026-05-22/gho
 
   # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
   data://grapher/health/2025-07-16/drug_approvals:

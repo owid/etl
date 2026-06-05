@@ -58,7 +58,15 @@ cd ../etl-<branch>
 
 Otherwise also run `source .venv/bin/activate`. Or, even better, set up auto-activation once (see below) — then `cd` alone is enough.
 
-When you're done with the worktree (typically after the PR is merged), clean up:
+When you're done with the worktree (typically after the PR is merged), clean up with:
+
+```bash
+etl pr-clean
+```
+
+`etl pr-clean` lists every local branch whose GitHub PR was merged or closed (it queries the PR state, so squash-merges are detected), flags the ones that have a worktree, and lets you remove a single branch or all of them at once. For each worktree branch it also copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir, so they stay resumable with `claude --resume` after the worktree is gone — otherwise those sessions are effectively lost.
+
+If you'd rather clean up by hand:
 
 ```bash
 git worktree remove ../etl-<branch>
@@ -99,4 +107,4 @@ etl pr "Update dataset" data --worktree --share-data
 ```
 
 !!! warning
-    Never run `rm -rf data/` in a shared worktree — the trailing slash makes `rm` follow the symlink and wipe the **original** `data/`. Use `git worktree remove ../etl-<branch>` to clean up instead.
+    Never run `rm -rf data/` in a shared worktree — the trailing slash makes `rm` follow the symlink and wipe the **original** `data/`. Use `etl pr-clean` (or `git worktree remove ../etl-<branch>`) to clean up instead.
