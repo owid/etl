@@ -6,10 +6,14 @@ Stitching:
     - Federico-Tena V2 (1991 borders)   for 1800-1938                 (replaces Gapminder v7)
     - linear interpolation              for 1939-1949 per country     (between F-T(1938) & WPP(1950))
     - UN WPP (2024)                     for >= 1950                   (unchanged)
-    - Gapminder Systema Globalis        for former states (USSR, Czechoslovakia, …) — unchanged
 
 Notes:
-    - "Gapminder SG" stands for "Gapminder Systema Globalis".
+    - Unlike 2024-07-15, this step does NOT use Gapminder Systema Globalis. Consequences:
+        - Former states sourced from it (Czechoslovakia, Yugoslavia, East/West Germany,
+          Yemen Arab Republic, Yemen People's Republic, Ethiopia (former)) are no longer
+          in the dataset. USSR is unaffected (built by aggregating successors).
+        - Small territories lose the few gap-fill points SG provided where no other source
+          has data (e.g. Guernsey, Jersey, Kosovo 1800/1820; Bermuda 1730; Macao 1555/1640).
     - On regional estimates:
         - Continents: re-estimated for WPP and F-T; HYDE uses original values.
         - Income groups: TODO
@@ -26,9 +30,6 @@ from utils import (
     COUNTRIES_FORMER_EQUIVALENTS,
     GAP_HI,
     GAP_LO,
-    GAPMINDER_SG_COUNTRIES,
-    GAPMINDER_SG_COUNTRIES_FORMER,
-    GAPMINDER_SG_ORIGINS,
     SOURCES_NAMES,
     YEAR_END_FT,
     YEAR_END_WPP,
@@ -73,9 +74,6 @@ def run() -> None:
     # Load Federico-Tena dataset (replaces Gapminder for 1800-1938)
     ds_ft = paths.load_dataset("federico_tena_population")
     tb_ft = ds_ft.read("federico_tena_population")
-    # Load Gapminder SG dataset
-    ds_gapminder_sg = paths.load_dataset(short_name="gapminder__systema_globalis", channel="open_numbers")
-    tb_gapminder_sg = ds_gapminder_sg.read("total_population_with_projections")
 
     # Load auxiliary datasets:
     # * Regions
@@ -95,14 +93,13 @@ def run() -> None:
     tb_ft = format_ft(tb_ft)
     tb_un = format_wpp(tb_un, "population", "uint64")
     tb_un_gr = format_wpp(tb_un_gr, "growth_rate", "float32")
-    tb_gapminder_sg, tb_gapminder_sg_former = format_gapminder_sg(tb_gapminder_sg)
 
     # Build the 1939-1949 interpolation rows for every F-T country that also has a 1950 UN WPP value.
     tb_ft_interp = make_ft_interp(tb_ft, tb_un)
 
     # Concat tables
     tb = pr.concat(
-        [tb_hyde, tb_ft, tb_ft_interp, tb_un, tb_gapminder_sg],
+        [tb_hyde, tb_ft, tb_ft_interp, tb_un],
         ignore_index=True,
     )
 
@@ -121,7 +118,7 @@ def run() -> None:
 
     tb = (
         tb.pipe(add_world)
-        .pipe(add_historical_regions, tb_gapminder_sg_former, tb_regions)
+        .pipe(add_historical_regions, tb_regions)
         .pipe(fix_anomalies)
         .astype(
             {
@@ -326,55 +323,6 @@ def format_wpp(tb: Table, column_indicator: str, indicator_dtype: str) -> Table:
     assert tb.groupby(["country", "year"])[column_indicator].count().max() == 1
 
     return tb
-
-
-######################
-# Gapminder SG #######
-######################
-def format_gapminder_sg(tb: Table) -> tuple[Table, Table]:
-    """Format Gapminder Systema Globalis table."""
-    columns_rename = {
-        "country": "country",
-        "time": "year",
-        "total_population_with_projections": "population",
-    }
-
-    def _core_formatting(tb: Table, country_rename: dict[str, str]) -> Table:
-        ## rename countries
-        tb["country"] = tb["geo"].map(country_rename)
-        ## rename columns
-        tb = tb.rename(columns=columns_rename, errors="raise").loc[:, COLUMS_RELEVANT_POP]
-        # Set source identifier
-        tb["source"] = "gapminder_sg"
-        # add origins
-        tb["population"].metadata.origins = GAPMINDER_SG_ORIGINS
-        return tb
-
-    # Data on former countries
-    ## only keep former country data
-    tb_former: Table = tb.loc[tb["geo"].isin(GAPMINDER_SG_COUNTRIES_FORMER)].copy()
-
-    # core formatting: column and country rename, add source, metadata
-    tb_former = _core_formatting(
-        tb=tb_former,
-        country_rename={code: data["name"] for code, data in GAPMINDER_SG_COUNTRIES_FORMER.items()},
-    )
-
-    ## filter years: only keep former countries until they disappear
-    for _, data in GAPMINDER_SG_COUNTRIES_FORMER.items():
-        tb_former = tb_former.loc[~((tb_former["country"] == data["name"]) & (tb_former["year"] > data["end"]))]
-
-    # Complement
-    ## filter countries
-    tb = tb.loc[tb["geo"].isin(GAPMINDER_SG_COUNTRIES)]
-
-    # core formatting: column and country rename, add source, metadata
-    tb = _core_formatting(
-        tb=tb,
-        country_rename=GAPMINDER_SG_COUNTRIES,
-    )
-
-    return tb, tb_former
 
 
 #############################################################################################
@@ -622,30 +570,20 @@ def add_world(tb: Table) -> Table:
 
 
 ## Add historical regions
-def add_historical_regions(tb: Table, tb_gm: Table, tb_regions: Table) -> Table:
-    """Add historical regions.
+def add_historical_regions(tb: Table, tb_regions: Table) -> Table:
+    """Add historical regions by grouping and summing current countries.
 
-    Historical regions are added using different techniques:
-
-    1. Systema Globalis from Gapminder contains historical regions. We add them to the data. These include
-    Yugoslavia, USSR, etc. Note that this is added after regions and world regions have been obtained, to avoid double counting.
-    2. Add historical regions by grouping and summing current countries.
+    NOTE: Unlike the 2024-07-15 step, historical regions are no longer sourced from Gapminder
+    Systema Globalis — only successor-aggregation (currently USSR) remains. This is added after
+    regions and world aggregates have been obtained, to avoid double counting.
     """
-    # 1. Add from Systema Globalis
-    paths.log.info("loading data (Gapminder Systema Globalis)")
-    # Add to main table
-    tb_gm["source"] = SOURCES_NAMES["gapminder_sg"]
-    tb = pr.concat([tb, tb_gm], ignore_index=True)
-
-    # 2. Add historical regions by grouping and summing current countries.
+    # Add historical regions by grouping and summing current countries.
     for code in COUNTRIES_FORMER_EQUIVALENTS:
         # Get former country name and end year (dissolution)
         former_country_name = tb_regions.loc[code, "name"]
         end_year = tb_regions.loc[code, "end_year"]
         # Sanity check: former country not already in table! remember that we are creating it now
-        assert former_country_name not in set(tb["country"]), (
-            f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
-        )
+        assert former_country_name not in set(tb["country"]), f"{former_country_name} already in table!"
         # Get list of country successors (equivalent of former state with nowadays' countries) and end year (dissolution of former state)
         codes_successors = json.loads(tb_regions.loc[code, "successors"])
         countries_successors = tb_regions.loc[codes_successors, "name"].tolist()
