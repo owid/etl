@@ -9,7 +9,7 @@ meta:
     title_snapshot: Luxembourg Income Study (LIS) - Absolute poverty
     description_snapshot: Absolute poverty estimates by LIS.
     citation_full: 'Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org (multiple countries; June 2026). Luxembourg: LIS.'
-    attribution_short: LIS
+    attribution_short: Luxembourg Income Study
     url_main: https://www.lisdatacenter.org/our-data/lis-database/
     date_accessed: '2026-06-05'
     date_published: '2026-06-05'
