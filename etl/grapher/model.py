@@ -435,6 +435,7 @@ class Chart(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
+    configIdETL: Mapped[bytes | None] = mapped_column(CHAR(36), init=False)
     # ETL step that authored this chart (mirrors multi_dim_data_pages.catalogPath); NULL for hand-authored charts.
     catalogPath: Mapped[str | None] = mapped_column(VARCHAR(767), init=False)
     isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
@@ -555,6 +556,14 @@ class Chart(Base):
 
         return variables
 
+    def load_etl_config(self, session: Session) -> dict[str, Any] | None:
+        """Load the chart's ETL-authored config layer, if it has one."""
+        assert self.id, "Chart must come from a database"
+        etl_config = session.scalar(
+            select(ChartConfig.full).join(Chart, ChartConfig.id == Chart.configIdETL).where(Chart.id == self.id)
+        )
+        return copy.deepcopy(etl_config) if etl_config else None
+
     @classmethod
     def load_variables_checksums(cls, session: Session, chart_ids: list[int]) -> pd.DataFrame:
         """Load checksums for all variables from the chart and return them as a list of dicts."""
@@ -592,7 +601,51 @@ class Chart(Base):
         chart config.
         """
         assert self.id, "Chart must come from a database"
-        source_variables = self.load_chart_variables(source_session)
+        remap_ids = self._variable_id_remap(source_session, target_session)
+
+        # copy chart as a new object
+        config = copy.deepcopy(self.config)
+        try:
+            config = _remap_variable_ids(config, remap_ids)
+        except KeyError as e:
+            # This should not be happening - it means that there's a chart with a variable that doesn't exist in
+            # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
+            # only because it is cached.
+            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
+
+        return config
+
+    def migrate_etl_config(self, source_session: Session, target_session: Session) -> dict[str, Any] | None:
+        """Remap variable ids in the chart's ETL-authored config layer."""
+        etl_config = self.load_etl_config(source_session)
+        if etl_config is None:
+            return None
+
+        remap_ids = self._variable_id_remap(
+            source_session,
+            target_session,
+            source_variable_ids=_extract_variable_ids_from_config(etl_config),
+        )
+        try:
+            return _remap_variable_ids(etl_config, remap_ids)
+        except KeyError as e:
+            raise ValueError(f"Issue with chart {self.id} - variable id not found while remapping ETL config: {e}")
+
+    def _variable_id_remap(
+        self,
+        source_session: Session,
+        target_session: Session,
+        source_variable_ids: set[int] | None = None,
+    ) -> dict[int, int]:
+        if source_variable_ids is None:
+            source_variables = self.load_chart_variables(source_session)
+        else:
+            source_variables_list = Variable.from_id(source_session, list(source_variable_ids))
+            assert isinstance(source_variables_list, list)
+            source_variables = {v.id: v for v in source_variables_list}
+            missing = source_variable_ids - set(source_variables)
+            if missing:
+                raise ValueError(f"variables.id not found in source: {sorted(missing)}")
 
         remap_ids = {}
         for source_var_id, source_var in source_variables.items():
@@ -618,17 +671,7 @@ class Chart(Base):
             # log.debug("remap_variables", old_name=source_var.name, new_name=target_var.name)
             remap_ids[source_var_id] = target_var.id
 
-        # copy chart as a new object
-        config = copy.deepcopy(self.config)
-        try:
-            config = _remap_variable_ids(config, remap_ids)
-        except KeyError as e:
-            # This should not be happening - it means that there's a chart with a variable that doesn't exist in
-            # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
-            # only because it is cached.
-            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
-
-        return config
+        return remap_ids
 
     def tags(self, session: Session) -> list[dict[str, Any]]:
         """Return tags in a format suitable for Admin API."""
@@ -2237,6 +2280,23 @@ def _remap_variable_ids(config: list | dict[str, Any] | Any, remap_ids: dict[int
         return [_remap_variable_ids(item, remap_ids) for item in config]
     else:
         return config
+
+
+def _extract_variable_ids_from_config(config: list | dict[str, Any] | Any) -> set[int]:
+    """Extract known variable-id references from a Grapher config."""
+    variable_ids: set[int] = set()
+    if isinstance(config, dict):
+        for k, v in config.items():
+            if k == "variableId":
+                variable_ids.add(int(v))
+            elif k in ("columnSlug", "sortColumnSlug") and str(v).isdigit():
+                variable_ids.add(int(v))
+            else:
+                variable_ids |= _extract_variable_ids_from_config(v)
+    elif isinstance(config, list):
+        for item in config:
+            variable_ids |= _extract_variable_ids_from_config(item)
+    return variable_ids
 
 
 def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:

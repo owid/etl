@@ -35,6 +35,20 @@ def test_remap_variable_ids():
     assert new_config["unknownIntColumnSlug"] == 123456
 
 
+def test_extract_variable_ids_from_config():
+    config = {
+        "dimensions": [
+            {"variableId": 988133, "property": "y"},
+            {"variableId": "988134", "property": "x"},
+        ],
+        "sortColumnSlug": "988135",
+        "map": {"columnSlug": "988136"},
+        "minTime": 1950,
+    }
+
+    assert gm._extract_variable_ids_from_config(config) == {988133, 988134, 988135, 988136}
+
+
 def test_chart_config_includes_chart_level_flags():
     class ChartConfigStub:
         full = {"slug": "test-chart"}
