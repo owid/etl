@@ -1020,7 +1020,7 @@
                       "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
                         [
-                          "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](http://analytics/private?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name) (requires Tailscale)."
+                          "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](https://datasette-public.owid.io/owid?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name)."
                         ],
                         [
                           "The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."
@@ -1344,7 +1344,16 @@
                               "enum": [
                                 "chart",
                                 "map",
-                                "table"
+                                "table",
+                                "line",
+                                "slope",
+                                "discrete-bar",
+                                "marimekko",
+                                "scatter",
+                                "stacked-area",
+                                "stacked-bar",
+                                "stacked-discrete-bar",
+                                "dumbbell"
                               ]
                             },
                             {
@@ -1820,13 +1829,16 @@
                         },
                         "sortBy": {
                           "type": "string",
-                          "description": "Sort criterium (used by stacked bar charts and marimekko)",
+                          "description": "Sort criterion (used by discrete bar, stacked discrete bar, marimekko, and dumbbell charts).\n- column: sort by the value of a specific column, identified by sortColumnSlug\n- total: sort by the total across all columns\n- entityName: sort alphabetically by entity name\n- custom: preserve the specified entity order\n- change: sort by the change between the start and end values (dumbbell charts only)\n- startValue: sort by the start value (dumbbell charts only)\n- endValue: sort by the end value (dumbbell charts only)\n",
                           "default": "total",
                           "enum": [
                             "column",
                             "total",
                             "entityName",
-                            "custom"
+                            "custom",
+                            "change",
+                            "startValue",
+                            "endValue"
                           ]
                         },
                         "sortOrder": {

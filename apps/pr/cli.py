@@ -61,7 +61,7 @@ etl pr "some title for the PR" -t --share-data
 
 This makes the new worktree's `data/` a shortcut (symlink) to the original repo's `data/`, so both worktrees share the same ETL outputs and you don't have to recompute them. Note that data/ is a symlink to the original repo's data/, so:
 - If you run the same steps in both worktrees, they may overwrite each other's output.
-- DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.
+- DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree.
 
 After the command finishes, `uv sync` has already run inside the worktree, so its `.venv/` is ready to use. With a `chpwd` hook in your `~/.zshrc` that sources `.venv/bin/activate` whenever present, `cd ../etl-BRANCH` is all that's needed — activation is automatic. Without the hook, also run `source .venv/bin/activate` after the cd. Skipping activation silently routes `etl`/`etlr` to the original repo's source code.
 
@@ -74,6 +74,7 @@ import re
 import shutil
 import subprocess
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import cast
 
@@ -86,7 +87,7 @@ from structlog import get_logger
 
 from apps.pr.categories import PR_CATEGORIES, PR_CATEGORIES_CHOICES
 from apps.utils.llms.gpt import OpenAIWrapper
-from etl.config import GITHUB_API_URL, GITHUB_TOKEN
+from etl.config import GITHUB_API_BASE, GITHUB_API_URL, GITHUB_TOKEN
 from etl.paths import BASE_DIR
 
 # Initialize logger.
@@ -495,15 +496,18 @@ def print_worktree_hint(
         print("  make check")
         print("  source .venv/bin/activate")
     print()
-    print("When you're done with this worktree, clean up with:")
-    print(f"  git worktree remove {display_path}")
-    print(f"  git branch -D {work_branch}")
+    print("When you're done (PR merged or closed), clean up worktrees and branches with:")
+    print("  etl pr-clean")
+    print("It removes the worktree, deletes the branch, and copies this worktree's Claude")
+    print("sessions back into the main repo so they're still resumable from there.")
     if shared_data:
         print()
         print("WARNING: data/ is a symlink to the original repo's data/, so:")
         print("  - If you run the same steps in both worktrees, they may overwrite each other's output.")
         print("  - DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. ")
-        print("    Instead, use `git worktree remove ../etl-[whatever-branch]` to remove a worktree.")
+        print(
+            "    Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree."
+        )
 
 
 def create_pr(repo, work_branch, base_branch, pr_title):
@@ -636,3 +640,227 @@ def summarize_title_llm(title) -> str:
     log.info("Querying GPT!")
     response = api.query_gpt_fast(title, sys_prompt, model=MODEL_DEFAULT)
     return response
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# etl pr-clean
+# ----------------------------------------------------------------------------------------------------------------------
+
+CLEAN_HELP = """Clean up local branches whose pull request was merged or closed on GitHub.
+
+Lists every local branch whose latest GitHub PR is **merged** or **closed** (using GitHub's PR
+state, not `git branch --merged`, so squash-merges are detected). Branches that have a git worktree
+are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool will:
+
+1. (Worktree branches only) Copy that worktree's Claude sessions — the `<uuid>.jsonl` transcripts and
+   their `<uuid>/` subfolders under `~/.claude/projects/<encoded-worktree-path>/` — into the main
+   repo's project dir, so they stay resumable with `claude --resume` after the worktree is gone.
+2. Remove the git worktree (skipped with a warning if it has uncommitted changes).
+3. Delete the local branch.
+
+Each branch is tagged `[merged]` or `[closed]` so you can see its PR outcome before selecting.
+
+```shell
+etl pr-clean
+```
+"""
+
+
+@click.command(
+    name="pr-clean",
+    cls=RichCommand,
+    help=CLEAN_HELP,
+)
+def clean_cli() -> None:
+    check_gh_token()
+
+    repo = Repo(BASE_DIR)
+    main_worktree_path = get_main_worktree_path(repo)
+    worktrees = list_worktrees(repo)  # branch name -> worktree path
+    current_worktree_path = Path(repo.working_tree_dir).resolve()  # ty: ignore
+
+    # Candidate branches: every local branch except master.
+    candidate_branches = [b.name for b in repo.branches if b.name != "master"]
+    if not candidate_branches:
+        print("No local branches to clean (only 'master' found).")
+        return
+
+    # Resolve each branch's PR state from GitHub (parallelised — one API call per branch).
+    log.info(f"Checking GitHub PR state for {len(candidate_branches)} local branch(es)...")
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        states = dict(zip(candidate_branches, executor.map(fetch_pr_state, candidate_branches)))
+
+    # Keep only branches whose PR was merged or closed; active (open / no-PR) branches are left alone.
+    cleanable = {b: s for b, s in states.items() if s in ("merged", "closed")}
+    if not cleanable:
+        print("Nothing to clean: no local branch has a merged or closed PR.")
+        return
+
+    # Build the selection list ('all' first, then one entry per branch).
+    choices = [questionary.Choice(title="all", value="__all__")]
+    for branch in sorted(cleanable):
+        choices.append(questionary.Choice(title=_branch_label(branch, cleanable[branch], worktrees), value=branch))
+
+    selected = questionary.select(
+        message="Select a branch to clean (or 'all')",
+        choices=choices,
+        style=SHELL_FORM_STYLE,
+        instruction="(Use arrow keys, Enter to confirm)",
+    ).unsafe_ask()
+
+    if selected is None:
+        return
+
+    branches_to_clean = sorted(cleanable) if selected == "__all__" else [selected]
+
+    main_project_dir = claude_project_dir(main_worktree_path)
+
+    for branch in branches_to_clean:
+        clean_branch(
+            repo=repo,
+            branch=branch,
+            worktree_path=worktrees.get(branch),
+            main_project_dir=main_project_dir,
+            main_worktree_path=main_worktree_path,
+            current_worktree_path=current_worktree_path,
+        )
+
+
+def get_main_worktree_path(repo) -> Path:
+    """Return the path of the primary (main) worktree, the first entry of `git worktree list`."""
+    porcelain = repo.git.worktree("list", "--porcelain")
+    for line in porcelain.splitlines():
+        if line.startswith("worktree "):
+            return Path(line[len("worktree ") :]).resolve()
+    # Fallback: the repo we were initialised from.
+    return Path(repo.working_tree_dir).resolve()
+
+
+def list_worktrees(repo) -> dict[str, Path]:
+    """Map each checked-out branch name to its worktree path, parsing `git worktree list --porcelain`."""
+    porcelain = repo.git.worktree("list", "--porcelain")
+    result: dict[str, Path] = {}
+    current_path: Path | None = None
+    for line in porcelain.splitlines():
+        if line.startswith("worktree "):
+            current_path = Path(line[len("worktree ") :]).resolve()
+        elif line.startswith("branch ") and current_path is not None:
+            # e.g. "branch refs/heads/data-foo" -> "data-foo".
+            branch = line[len("branch ") :].removeprefix("refs/heads/")
+            result[branch] = current_path
+    return result
+
+
+def fetch_pr_state(branch: str) -> str | None:
+    """Return the GitHub PR state for a branch: 'open', 'merged', 'closed', or None.
+
+    None means either no PR exists for the branch or the GitHub request failed (logged as a warning);
+    in both cases the branch is treated as not-cleanable and left alone. Uses GitHub's PR state rather
+    than git ancestry so squash-merged PRs are correctly seen as merged.
+    """
+    headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+    params = {"state": "all", "head": f"owid:{branch}", "per_page": 50}
+    try:
+        response = requests.get(f"{GITHUB_API_BASE}/pulls", params=params, headers=headers, timeout=30)
+    except requests.RequestException as e:
+        log.warning(f"Could not fetch PR state for '{branch}': {e}")
+        return None
+    if response.status_code != 200:
+        log.warning(f"Could not fetch PR state for '{branch}' (HTTP {response.status_code}).")
+        return None
+    prs = response.json()
+    if not prs:
+        return None
+    # An open PR means the branch is still active. A merged PR (state 'closed' with merged_at set)
+    # wins over a plain closed one. Otherwise the branch's PRs were closed without merging.
+    if any(pr.get("state") == "open" for pr in prs):
+        return "open"
+    if any(pr.get("merged_at") for pr in prs):
+        return "merged"
+    return "closed"
+
+
+def _branch_label(branch: str, state: str, worktrees: dict[str, Path]) -> str:
+    """Build the questionary label for a branch, e.g. 'data-foo  [merged]  <- worktree'."""
+    label = f"{branch}  [{state}]"
+    if branch in worktrees:
+        label += "  <- worktree"
+    return label
+
+
+def claude_project_dir(repo_path: Path) -> Path:
+    """Return the `~/.claude/projects/<encoded-path>` dir where Claude stores sessions for a repo path.
+
+    Claude encodes the absolute path by replacing every non-alphanumeric character with '-', so
+    '/Users/me/repos/etl-foo' becomes '-Users-me-repos-etl-foo'.
+    """
+    encoded = re.sub(r"[^a-zA-Z0-9]", "-", str(repo_path))
+    return Path.home() / ".claude" / "projects" / encoded
+
+
+def copy_sessions(worktree_path: Path, main_project_dir: Path) -> int:
+    """Copy a worktree's Claude sessions into the main repo's project dir. Returns the number of items copied.
+
+    Session UUIDs are globally unique, so this never collides with the main repo's own sessions. Anything
+    that already exists at the destination (file or dir) is skipped, so re-runs are idempotent.
+    """
+    src = claude_project_dir(worktree_path)
+    if not src.exists():
+        log.info(f"No Claude sessions found at '{src}', nothing to copy.")
+        return 0
+
+    main_project_dir.mkdir(parents=True, exist_ok=True)
+    copied = 0
+    for item in src.iterdir():
+        if item.name == ".DS_Store":
+            continue
+        dest = main_project_dir / item.name
+        if dest.exists():
+            continue
+        if item.is_dir():
+            shutil.copytree(item, dest)
+        else:
+            shutil.copy2(item, dest)
+        copied += 1
+    log.info(f"Copied {copied} session item(s) from '{src}' to '{main_project_dir}'.")
+    return copied
+
+
+def clean_branch(
+    repo,
+    branch: str,
+    worktree_path: Path | None,
+    main_project_dir: Path,
+    main_worktree_path: Path,
+    current_worktree_path: Path,
+) -> None:
+    """Copy sessions (if a worktree), remove the worktree, and delete the local branch."""
+    # A branch checked out in the current or the main worktree can't be cleaned from here.
+    if worktree_path is not None and worktree_path == current_worktree_path:
+        log.warning(f"Skipping '{branch}': it's the worktree you're currently in. cd to the main repo and re-run.")
+        return
+    if worktree_path is not None and worktree_path == main_worktree_path:
+        log.warning(
+            f"Skipping '{branch}': it's checked out in the main repo. Switch the main repo to another branch first."
+        )
+        return
+
+    if worktree_path is not None:
+        # Copy sessions first, then drop the worktree. The session dir lives outside the worktree,
+        # so removing the worktree never touches it — but copy first on principle.
+        copy_sessions(worktree_path, main_project_dir)
+        try:
+            repo.git.worktree("remove", str(worktree_path))
+            log.info(f"Removed worktree '{worktree_path}'.")
+        except GitCommandError as e:
+            log.warning(
+                f"Could not remove worktree '{worktree_path}' (uncommitted changes?). "
+                f"Leaving branch '{branch}' in place.\n{e}"
+            )
+            return
+
+    try:
+        repo.git.branch("-D", branch)
+        log.info(f"Deleted local branch '{branch}'.")
+    except GitCommandError as e:
+        log.warning(f"Could not delete branch '{branch}':\n{e}")

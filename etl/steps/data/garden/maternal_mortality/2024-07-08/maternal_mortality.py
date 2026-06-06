@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
@@ -86,7 +86,6 @@ def run(dest_dir: str) -> None:
     ds_income = paths.load_dataset("income_groups")
     ds_who_mortality = paths.load_dataset("mortality_database")
     ds_wpp = paths.load_dataset("un_wpp")
-    ds_pop = paths.load_dataset("population")
 
     # Read tables from input datasets, preserving their metadata and origins from snapshots.
     # Use safe_types=False to match the previous ds[...].reset_index() behavior.
@@ -162,7 +161,7 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=["maternal_deaths", "mmr", "mm_rate"], how="all")
 
     # calculate regional aggregates - population is needed for filtering out all regions that are not sufficiently covered by our data
-    tb = geo.add_population_to_table(tb, ds_pop)
+    tb = paths.regions.add_population(tb)
 
     aggr = {"maternal_deaths": "sum", "live_births": "sum", "female_population": "sum", "population": "sum"}
 
@@ -176,7 +175,7 @@ def run(dest_dir: str) -> None:
     )
 
     # remove all regions that are less than 90% covered by our data
-    tb = check_region_share_population(tb, REGIONS, ds_pop, 0.9)
+    tb = check_region_share_population(tb, REGIONS, 0.9)
 
     # calculate aggregated maternal mortality ratio and rate for regions
     tb["mmr"] = tb.apply(lambda x: calc_mmr(x), axis=1)
@@ -229,14 +228,14 @@ def calc_mmrate(tb_row):
     return tb_row["mm_rate"]
 
 
-def check_region_share_population(tb: Table, regions: list, ds_population: Dataset, threshold: float) -> Table:
+def check_region_share_population(tb: Table, regions: list, threshold: float) -> Table:
     """
     Check the share of population covered by the regions in the table.
     """
     msk = tb["country"].isin(regions)
     tb_region = tb[msk]
     tb_no_regions = tb[~msk]
-    tb_region = geo.add_population_to_table(tb_region, ds_population, population_col="total_population")
+    tb_region = paths.regions.add_population(tb_region, population_col="total_population")
     tb_region["share_population"] = tb_region["population"] / tb_region["total_population"]
     tb_region = tb_region[tb_region["share_population"] >= threshold]
 

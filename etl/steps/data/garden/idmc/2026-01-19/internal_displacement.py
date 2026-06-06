@@ -4,7 +4,6 @@ import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -32,7 +31,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("internal_displacement")
-    ds_pop = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("internal_displacement")
@@ -47,7 +45,7 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
-    tb = geo.add_population_to_table(tb, ds_pop)
+    tb = paths.regions.add_population(tb)
 
     # fill rounded columns with non-rounded values where rounded values are na
     tb[C_T_D_R] = tb[C_T_D_R].fillna(tb[C_T_D])
