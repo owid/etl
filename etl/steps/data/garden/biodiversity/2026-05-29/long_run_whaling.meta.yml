@@ -24,7 +24,7 @@ definitions:
   decade:
     The year shown is the start year of the decade. For example, 1950 represents the decade from 1950-1959.
   combining_whales:  |-
-    For continuity with the Rocha data, we combine common minke and Antarctic minke into a single 'minke' category, and blue and pygmy blue whales into a single 'blue' category. We also add bowhead whales to the "other/ unspecified" category in the Rocha data, as they are included in the IWC data but not in Rocha's.
+    For continuity with the Rocha data, we combine common minke and Antarctic minke into a single 'minke' category, and blue and pygmy blue whales into a single 'blue' category. We also add bowhead whales to the "other/unspecified" category in the Rocha data, as they are included in the IWC data but not in Rocha's.
   subsistence_whaling: |-
     Data pre-1985 does not include aboriginal subsistence whaling as it focusses on industrial whaling. Data after 1985 from the IWC includes subsistence whaling.
   subsistence_whaling_decades: |-
@@ -205,7 +205,7 @@ tables:
         display:
           color: "#883039"
         presentation:
-          title_public: Unspecified/ other species
+          title_public: Unspecified/other species
 
   long_run_whaling_annual:
     variables:
@@ -373,4 +373,4 @@ tables:
         display:
           color: "#883039"
         presentation:
-          title_public: Unspecified/ other species
+          title_public: Unspecified/other species
