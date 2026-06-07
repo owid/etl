@@ -1,0 +1,37 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Biodiversity
+        - Fish & Overfishing
+
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  iwc_members:
+    variables:
+      member:
+        title: Was the country a member of the IWC in that year?
+        description_short: Whether the country was a member of the IWC in that year.
+        unit: ""
+      former_member:
+        title: Was the country a former member of the IWC in that year?
+        description_short: Whether the country had joined and left the IWC by that year.
+        unit: ""
+      year_joined:
+        title: Year the country joined the IWC.
+        description_short: The year the country joined the IWC.
+        unit: year
+      year_left:
+        title: Year the country left the IWC.
+        description_short: The year the country left the IWC, if applicable.
+        unit: year
+

@@ -91,7 +91,7 @@ async def process_tool_call(
     #     message_type="markdown",
     #     text=f"**:material/compare_arrows: MCP**: Querying OWID MCP, method `{name}`",
     # )
-    return await call_tool(name, tool_args, {"deps": ctx.deps})
+    return await call_tool(name, tool_args, metadata={"deps": ctx.deps})
 
 
 ## Trying to tweak the settings for OpenAI responses
