@@ -49,6 +49,29 @@ def test_download_retries_with_plain_ua_on_bot_challenge(tmp_path):
     assert out.read_bytes() == data
 
 
+def test_download_uses_custom_user_agent(tmp_path):
+    data = b"hello world"
+    out = tmp_path / "f.bin"
+    with patch.object(
+        download_helpers.requests, "get", side_effect=[_file_response(data, content_type="application/octet-stream")]
+    ) as mock_get:
+        download_helpers.download("http://example.test/f.bin", str(out), quiet=True, user_agent="my-agent/1.0")
+
+    assert mock_get.call_count == 1
+    assert mock_get.call_args_list[0].kwargs["headers"]["User-Agent"] == "my-agent/1.0"
+    assert out.read_bytes() == data
+
+
+def test_download_defaults_to_browser_user_agent(tmp_path):
+    out = tmp_path / "f.bin"
+    with patch.object(
+        download_helpers.requests, "get", side_effect=[_file_response(b"x", content_type="application/octet-stream")]
+    ) as mock_get:
+        download_helpers.download("http://example.test/f.bin", str(out), quiet=True)
+
+    assert mock_get.call_args_list[0].kwargs["headers"]["User-Agent"] == download_helpers.DEFAULT_USER_AGENT
+
+
 def test_download_raises_when_both_user_agents_are_walled(tmp_path):
     out = tmp_path / "f.zip"
     with patch.object(download_helpers.requests, "get", side_effect=[_challenge_response(), _challenge_response()]):

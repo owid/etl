@@ -89,9 +89,12 @@ def _stream_to_file(
     return md5.hexdigest()
 
 
-# Browser-like User-Agent, used to avoid "403 Client Error: Forbidden" errors when accessing data
-# files on hosts that block non-browser clients.
-BROWSER_USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7"
+# Default browser-like User-Agent, used to avoid "403 Client Error: Forbidden" errors when accessing
+# data files on hosts that block non-browser clients. Kept as a recent, real browser string — a stale
+# UA is more likely to be rejected or flagged by modern bot-protection. Callers can override it via the
+# `user_agent` argument of `download()` (threaded through `Snapshot.download_from_source` /
+# `Snapshot.create_snapshot`) when a specific source expects a particular UA.
+DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0"
 
 
 def _is_bot_challenge(response: requests.Response) -> bool:
@@ -107,14 +110,26 @@ def _is_bot_challenge(response: requests.Response) -> bool:
     return "anubis" in (response.headers.get("set-cookie") or "").lower()
 
 
-def download(url: str, filename: str, expected_md5: str | None = None, quiet: bool = False, **kwargs) -> None:
-    "Download the file at the URL to the given local filename."
+def download(
+    url: str,
+    filename: str,
+    expected_md5: str | None = None,
+    quiet: bool = False,
+    user_agent: str | None = None,
+    **kwargs,
+) -> None:
+    """Download the file at the URL to the given local filename.
+
+    :param user_agent: User-Agent header to send. Defaults to a browser-like UA (``DEFAULT_USER_AGENT``)
+        to avoid 403s on hosts that block non-browser clients. If a bot-wall (e.g. Anubis) challenges
+        the browser UA, the download retries once with the default (non-browser) ``requests`` UA.
+    """
     # NOTE: we are not streaming to a NamedTemporaryFile because it was causing weird
     # issues one some systems, it's safer to stream directly to the file and remove it
     # if md5 doesn't match
     tmp_filename = filename + ".tmp"
 
-    response = requests.get(url, stream=True, headers={"User-Agent": BROWSER_USER_AGENT})
+    response = requests.get(url, stream=True, headers={"User-Agent": user_agent or DEFAULT_USER_AGENT})
     if _is_bot_challenge(response):
         # The browser-like UA tripped a bot-wall; retry once with the default (non-browser) UA, which
         # such walls typically let through.
