@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
@@ -24,7 +25,6 @@ GAPS_AND_LEFT = [
     {"country": "Uruguay", "withdrawal_year": 1991, "rejoining_year": 2007},
     {"country": "Iceland", "withdrawal_year": 1992, "rejoining_year": 2002},
     # left without rejoining
-    {"country": "Panama", "withdrawal_year": 1980, "rejoining_year": None},
     {"country": "Canada", "withdrawal_year": 1982, "rejoining_year": None},
     {"country": "Jamaica", "withdrawal_year": 1984, "rejoining_year": None},
     {"country": "Egypt", "withdrawal_year": 1989, "rejoining_year": None},
@@ -42,7 +42,7 @@ def adherence_to_joined_year(tb):
     """Add a column with the year of joining the IWC.
     The adherence day is given as dd/mm/yy, so we extract the year from it. Years >48 are in the 1900s, while years <=48 are in the 2000s.
 
-    For countries who have withdrawn and rejoined the year should be the original joining year. These are:
+    For countries who have withdrawn the year should be the original joining year. These are:
 
     - Netherlands: 1948
     - Norway: 1948
@@ -56,7 +56,6 @@ def adherence_to_joined_year(tb):
     - Uruguay: 1981
     - Iceland: 1947
     - Ecuador: 1991
-
     """
     og_joining_years = {
         "Netherlands": 1948,
@@ -78,13 +77,36 @@ def adherence_to_joined_year(tb):
         if adherence_day is not None:
             day, month, year = adherence_day.split("/")
             year = int(year)
-            if year > 48:
+            if year >= 30:
                 year += 1900
+                if year < 1948:
+                    # some countries signed before 1948, but the IWC was established in 1948, so we set the joining year to 1948 for these countries
+                    year = 1948
             else:
                 year += 2000
             if row["country"] in og_joining_years:
                 year = og_joining_years[row["country"]]
             tb.at[_, "year_joined"] = year
+    return tb
+
+
+def add_former_members(tb):
+    left_countries = [
+        {"country": "Canada", "year_joined": 1949},
+        {"country": "Jamaica", "year_joined": 1981},
+        {"country": "Egypt", "year_joined": 1981},
+        {"country": "Mauritius", "year_joined": 1983},
+        {"country": "Philippines", "year_joined": 1981},
+        {"country": "Seychelles", "year_joined": 1979},
+        {"country": "Venezuela", "year_joined": 1991},
+        {"country": "Japan", "year_joined": 1951},
+        {"country": "Greece", "year_joined": 2007},
+        {"country": "Guatemala", "year_joined": 2006},
+    ]
+    tb = pr.concat(
+        [tb, Table(left_countries)],
+        ignore_index=True,
+    )
 
     return tb
 
@@ -130,50 +152,21 @@ def add_gaps_and_left_periods(tb):
 def create_member_tb(tb):
     """Create a table with one row per country and year, indicating whether the country was a member of the IWC in that year."""
     tb_rows = []
-    for year in range(1946, 2026):
+    for year in range(1948, 2026):
         for _, row in tb.iterrows():
             country = row["country"]
             year_joined = row["year_joined"]
-            year_left = row["year_left"]
-            gaps = row["gaps"] if "gaps" in row.index else []
             member = False
-            former_member = False
-            effective_year_joined = year_joined
-            effective_year_left = year_left
-
             if year_joined is not None and year_joined <= year:
-                # Walk through gaps chronologically to find effective join/leave years.
-                # If a rejoining year is passed, it becomes the new effective_year_joined
-                # and clears any permanent leaving year that predates it.
-                in_gap = False
-                for withdrawal_year, rejoining_year in sorted(gaps):
-                    if year < withdrawal_year:
-                        break
-                    elif withdrawal_year <= year < rejoining_year:
-                        in_gap = True
-                        effective_year_left = withdrawal_year
-                        break
-                    else:  # year >= rejoining_year
-                        effective_year_joined = rejoining_year
-                        # Country rejoined after a gap — reset any earlier permanent leaving year
-                        if effective_year_left is not None and effective_year_left <= rejoining_year:
-                            effective_year_left = None
-
-                if in_gap:
-                    former_member = True
-                elif effective_year_left is not None and year >= effective_year_left:
-                    former_member = True
-                else:
-                    member = True
-
+                member = True
             tb_rows.append(
                 {
                     "country": country,
                     "year": year,
                     "member": member,
-                    "former_member": former_member,
-                    "year_joined": effective_year_joined if member else None,
-                    "year_left": effective_year_left if former_member else None,
+                    "former_member": False,
+                    "year_joined": year_joined if member else None,
+                    "year_left": None,
                 }
             )
 
@@ -204,6 +197,9 @@ def run() -> None:
     # drop adherence column
     tb = tb.drop(columns=["adherence"])
 
+    # add former members that are not in the original table (countries that left without rejoining)
+    tb = add_former_members(tb)
+
     # Add year_left (will be filled in add_gaps_and_left_periods)
     tb["year_left"] = None
 
@@ -212,9 +208,6 @@ def run() -> None:
 
     # Create member table.
     tb_members = create_member_tb(tb)
-    tb_members.metadata = tb_metadata
-    for col in tb_members.columns:
-        tb_members[col].m.origins = tb_origins
 
     # Add gaps and leaving periods.
     tb_members = add_gaps_and_left_periods(tb_members)
@@ -228,6 +221,10 @@ def run() -> None:
     tb_members["year"] = tb_members["year"].astype(int)
     tb_members["year_joined"] = tb_members["year_joined"].astype("Int64")
     tb_members["year_left"] = tb_members["year_left"].astype("Int64")
+
+    tb_members.metadata = tb_metadata
+    for col in tb_members.columns:
+        tb_members[col].m.origins = tb_origins
 
     # Improve table format.
     tb_members = tb_members.format(["country", "year"])
