@@ -81,7 +81,7 @@ from typing import cast
 import click
 import questionary
 import requests
-from git import GitCommandError, Repo
+from git import GitCommandError, InvalidGitRepositoryError, Repo
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
@@ -680,7 +680,16 @@ def clean_cli() -> None:
     repo = Repo(BASE_DIR)
     main_worktree_path = get_main_worktree_path(repo)
     worktrees = list_worktrees(repo)  # branch name -> worktree path
-    current_worktree_path = Path(repo.working_tree_dir).resolve()  # ty: ignore
+
+    # Resolve the worktree the user is actually standing in from cwd, not from Repo(BASE_DIR).
+    # BASE_DIR is the package location, so when etl runs from the main repo's venv while the shell
+    # is inside a secondary worktree (that worktree's venv not activated), Repo(BASE_DIR) still
+    # points at the main repo — comparing its working_tree_dir would wrongly pass the guard below.
+    try:
+        cwd_repo = Repo(Path.cwd(), search_parent_directories=True)
+        current_worktree_path = Path(cwd_repo.working_tree_dir).resolve()  # ty: ignore
+    except InvalidGitRepositoryError:
+        current_worktree_path = Path(repo.working_tree_dir).resolve()  # ty: ignore
 
     # pr-clean must run from the main repo, never from a secondary worktree. From a worktree it
     # could try to remove the working tree you're standing in, or — if that worktree was switched
