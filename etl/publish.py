@@ -71,6 +71,12 @@ class CannotPublish(Exception):
     default="https://catalog.ourworldindata.org",
     help="Base URL to use in generated JSON-LD and sitemap URLs.",
 )
+@click.option(
+    "--jsonld-only",
+    multiple=True,
+    help="Restrict JSON-LD generation to these datasets, as '<namespace>/<dataset>' "
+    "(repeatable). Default: all eligible garden datasets.",
+)
 def publish_cli(
     dry_run: bool,
     private: bool,
@@ -78,6 +84,7 @@ def publish_cli(
     channel: Iterable[CHANNEL],
     jsonld: bool,
     jsonld_base_url: str,
+    jsonld_only: tuple[str, ...],
 ) -> None:
     """Publish the generated data catalog to S3."""
     return publish(
@@ -87,6 +94,7 @@ def publish_cli(
         channel=channel,
         jsonld=jsonld,
         jsonld_base_url=jsonld_base_url,
+        jsonld_only=jsonld_only,
     )
 
 
@@ -97,6 +105,7 @@ def publish(
     channel: Iterable[CHANNEL] = CHANNEL.__args__,
     jsonld: bool = False,
     jsonld_base_url: str = "https://catalog.ourworldindata.org",
+    jsonld_only: Iterable[str] = (),
 ) -> None:
     catalog = Path(DATA_DIR)
     if not dry_run and not private:
@@ -112,6 +121,7 @@ def publish(
     if jsonld:
         from etl.catalog_jsonld.publish import build_and_publish_catalog_jsonld
 
+        jsonld_allowlist = set(jsonld_only) or None
         for c in channel:
             if c == "garden":
                 build_and_publish_catalog_jsonld(
@@ -120,6 +130,7 @@ def publish(
                     channel=c,
                     dry_run=dry_run,
                     base_url=jsonld_base_url,
+                    only=jsonld_allowlist,
                 )
 
 

@@ -15,10 +15,13 @@ from owid.catalog.api.legacy import CHANNEL, LocalCatalog
 from owid.catalog.core.datasets import SUPPORTED_FORMATS, Dataset
 from owid.catalog.core.meta import TableMeta, VariableMeta
 from owid.catalog.schema_org import DEFAULT_CATALOG_BASE_URL, TableSchemaInput, dataset_to_schema_org
+from structlog import get_logger
 
 from etl.catalog_jsonld.quality import DatasetQualityResult, assess_dataset_quality
 from etl.catalog_jsonld.sitemap import sitemap_xml
 from etl.paths import DATA_DIR
+
+log = get_logger()
 
 QUALITY_REPORT_FILENAME = "jsonld_quality_report.json"
 SITEMAP_FILENAME = "sitemap.xml"
@@ -38,10 +41,15 @@ def build_catalog_jsonld_artifacts(
     channel: CHANNEL = "garden",
     base_url: str = DEFAULT_CATALOG_BASE_URL,
     dry_run: bool = False,
+    only: set[str] | None = None,
 ) -> JsonLdBuildResult:
-    """Generate dataset JSON-LD files, sitemap, and quality report locally."""
+    """Generate dataset JSON-LD files, sitemap, and quality report locally.
+
+    When ``only`` is given, restrict generation to datasets whose
+    ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
+    """
     catalog = LocalCatalog(catalog_dir, channels=(channel,))
-    latest_paths = latest_dataset_paths(catalog.frame, channel=channel)
+    latest_paths = latest_dataset_paths(catalog.frame, channel=channel, only=only)
     result = JsonLdBuildResult()
     sitemap_urls = []
 
@@ -80,14 +88,33 @@ def build_catalog_jsonld_artifacts(
     return result
 
 
-def latest_dataset_paths(frame: pd.DataFrame, *, channel: CHANNEL = "garden") -> list[str]:
-    """Return latest public dataset-folder paths for a catalog channel."""
+def latest_dataset_paths(
+    frame: pd.DataFrame, *, channel: CHANNEL = "garden", only: set[str] | None = None
+) -> list[str]:
+    """Return latest public dataset-folder paths for a catalog channel.
+
+    Private datasets are always excluded (``is_public == True`` filter). When ``only`` is
+    provided, the result is further restricted to datasets whose ``"<namespace>/<dataset>"``
+    is in the set. Matching is version-agnostic so it survives data re-versioning. Allowlist
+    entries that match no dataset are logged as a warning (typo / renamed dataset).
+    """
     df = frame.loc[(frame["channel"] == channel) & (frame["is_public"] == True)].copy()  # noqa: E712
     if df.empty:
+        if only:
+            for dataset_key in sorted(only):
+                log.warning("catalog_jsonld.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
         return []
     df["dataset_path"] = df["path"].map(lambda p: str(p).rsplit("/", 1)[0])
     df = df.sort_values("version")
     latest = df.drop_duplicates(["channel", "namespace", "dataset"], keep="last")
+
+    if only is not None:
+        latest = latest.copy()
+        latest["dataset_key"] = latest["namespace"].astype(str).str.cat(latest["dataset"].astype(str), sep="/")
+        for dataset_key in sorted(only - set(latest["dataset_key"])):
+            log.warning("catalog_jsonld.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
+        latest = latest[latest["dataset_key"].isin(only)]
+
     return sorted(latest["dataset_path"].unique().tolist())
 
 

@@ -27,13 +27,19 @@ def build_and_publish_catalog_jsonld(
     channel: CHANNEL = "garden",
     dry_run: bool = False,
     base_url: str = "https://catalog.ourworldindata.org",
+    only: set[str] | None = None,
 ) -> None:
-    """Build catalog JSON-LD artifacts locally and sync them to R2."""
+    """Build catalog JSON-LD artifacts locally and sync them to R2.
+
+    When ``only`` is given, restrict generation to datasets whose
+    ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
+    """
     result = build_catalog_jsonld_artifacts(
         catalog_dir=catalog_dir,
         channel=channel,
         dry_run=dry_run,
         base_url=base_url,
+        only=only,
     )
     if dry_run:
         print(

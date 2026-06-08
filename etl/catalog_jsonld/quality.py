@@ -31,6 +31,9 @@ def assess_dataset_quality(
     if not dataset_meta.is_public:
         result.blockers.append("private_dataset")
 
+    if dataset_meta.non_redistributable:
+        result.blockers.append("non_redistributable")
+
     if not _has_title(dataset_meta, tables):
         result.blockers.append("missing_title")
 
