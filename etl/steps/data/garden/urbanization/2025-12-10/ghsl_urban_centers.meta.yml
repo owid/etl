@@ -1099,7 +1099,7 @@ tables:
         description_processing: *desc_processing_cagr
         display:
           name: 300,000 or more
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
         presentation:
           title_public: Annual growth rate of the share of population in cities with 300,000 or more people
 
@@ -1115,7 +1115,7 @@ tables:
         description_processing: *desc_processing_cagr
         display:
           name: 300,000 or more
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           isProjection: true
         presentation:
           title_public: Annual growth rate of the share of population in cities with 300,000 or more people (projected)
