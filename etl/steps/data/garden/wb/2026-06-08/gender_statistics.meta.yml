@@ -366,6 +366,109 @@ tables:
           tolerance: 5
 
 
+      gd_wbl_par_law_patleave:
+        title: Paid paternity leave score
+        description_short: Score measuring the comprehensiveness of paid paternity leave, from 0 (no paid leave for fathers) to 1 (at least 14 calendar days of paid paternity leave).
+        description_key:
+          - A score of 1 means the law provides at least 14 calendar days of paid leave for fathers.
+          - A score of 0 means no paid paternity leave exists in law.
+          - Partial scores reflect leave entitlements shorter than 14 days; the score increases linearly with the length of leave.
+          - *desc_standardized_assumptions
+        unit: "score (0–1)"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 5
+
+      gd_wbl_par_sfr_incentfathers:
+        title: Are incentives in place to encourage fathers to take paternity leave?
+        description_short: Indicates whether fathers are entitled to paid paternity leave and whether additional incentives exist to promote its uptake.
+        description_key:
+          - Equals 1 if fathers are entitled to paid paternity or parental leave AND incentives are in place to encourage them to take it.
+          - Equals 0 if no paid leave for fathers exists or no incentives are in place.
+          - *desc_standardized_assumptions
+        unit: "(1=yes; 0=no)"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
+      sh_fpl_wntd_zs:
+        title: Share of births that were planned pregnancies
+        description_short: The share of women aged 15–49 who reported that their last birth in the five years preceding the survey was planned.
+        description_key:
+          - Measures the proportion of births that were wanted at the time of conception.
+          - Based on women's self-report from household surveys.
+          - Unplanned pregnancies can limit women's education, employment, and health outcomes.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 10
+
+      sh_mmr_risk_zs:
+        title: Lifetime risk of maternal death
+        description_short: The probability that a 15-year-old girl will eventually die from a maternal cause, given current levels of fertility and maternal mortality.
+        description_key:
+          - Combines both the risk of dying during any single pregnancy and the number of pregnancies a woman is expected to have over her lifetime.
+          - A higher value means a greater chance of dying from pregnancy- or childbirth-related causes over the course of a woman's life.
+          - Declines both when maternal mortality rates fall and when fertility rates fall.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 5
+
+      sl_tlf_cact_fm_ne_zs:
+        title: Female-to-male labor force participation ratio (national estimate)
+        description_short: The ratio of women's to men's labor force participation rates, based on national labor force surveys.
+        description_key:
+          - Compares the share of women and men aged 15+ who are working or actively seeking work, using data from national surveys.
+          - A value of 100 means equal participation; values below 100 mean women participate less than men.
+          - Unlike the modeled estimate, this uses country-reported survey data directly.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sh_svr_wast_zs:
+        title: Prevalence of severe wasting in children under 5
+        description_short: The share of children under 5 whose weight-for-height is more than three standard deviations below the international reference median.
+        description_key:
+          - Severe wasting is an indicator of acute malnutrition and a strong predictor of child mortality.
+          - Measured using the WHO Child Growth Standards.
+          - Affected children face significantly elevated risk of death from common infections.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sh_sta_ob18_fe_zs:
+        title: Prevalence of obesity among women
+        description_short: The share of women aged 18 and over with a Body Mass Index (BMI) of 30 kg/m² or higher.
+        description_key:
+          - BMI is calculated as weight in kilograms divided by height in metres squared.
+          - A BMI of 30 or above is classified as obese by the World Health Organization.
+          - Obesity raises the risk of cardiovascular disease, diabetes, and other chronic conditions.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      sh_sta_ob18_ma_zs:
+        title: Prevalence of obesity among men
+        description_short: The share of men aged 18 and over with a Body Mass Index (BMI) of 30 kg/m² or higher.
+        description_key:
+          - BMI is calculated as weight in kilograms divided by height in metres squared.
+          - A BMI of 30 or above is classified as obese by the World Health Organization.
+          - Obesity raises the risk of cardiovascular disease, diabetes, and other chronic conditions.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       se_sch_life:
         title: Expected years of schooling
         description_short: The number of years a child of school entrance age is expected to spend in school or university, including years repeated.
