@@ -338,6 +338,7 @@ tables:
                   - 100000000
                   - 300000000
                   - 1000000000
+                  - 1
       cumulative_emissions_from_flaring_as_share_of_global:
         title: "Share of global cumulative CO₂ emissions from flaring"
         unit: "%"

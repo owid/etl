@@ -638,7 +638,6 @@ tables:
                   - 6
                   - 7
                   - 8
-                  - 9
                   - 1
       annual_emissions_n2o_total_co2eq_per_capita:
         title: Per capita nitrous oxide emissions in CO₂ equivalents
