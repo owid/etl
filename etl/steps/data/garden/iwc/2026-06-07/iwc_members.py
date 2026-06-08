@@ -214,7 +214,7 @@ def run() -> None:
 
     # add member/ former member column
     tb_members["current_status"] = tb_members.apply(
-        lambda row: "Member" if row["member"] else ("Former Member" if row["former_member"] else "Non-Member"), axis=1
+        lambda row: "Member" if row["member"] else ("Former member" if row["former_member"] else "Not a member"), axis=1
     )
 
     # make years integers
@@ -225,6 +225,11 @@ def run() -> None:
     tb_members.metadata = tb_metadata
     for col in tb_members.columns:
         tb_members[col].m.origins = tb_origins
+
+    # add greenland with same data as denmark (as it is a member of the IWC through Denmark)
+    greenland_tb = tb_members[tb_members["country"] == "Denmark"].copy()
+    greenland_tb["country"] = "Greenland"
+    tb_members = pr.concat([tb_members, greenland_tb], ignore_index=True)
 
     # Improve table format.
     tb_members = tb_members.format(["country", "year"])

@@ -38,12 +38,12 @@ tables:
         unit: ""
         description_processing: If the country has left during the year it is considered a former member for that year.
       year_joined:
-        title: Year the country joined the IWC.
+        title: Year the country joined the IWC
         description_short: The year the country joined the IWC.
         unit: year
         description_processing: If the country has joined, left and rejoined the IWC, this refers to the latest joining year.
       year_left:
-        title: Year the country left the IWC.
+        title: Year the country left the IWC
         description_short: The year the country left the IWC, if applicable.
         unit: year
         description_processing: If the country previously has withdrawn and rejoined the IWC, this refers to the latest withdrawal year.
