@@ -438,6 +438,17 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
      ```
      If the count is 0, the upgrade did not run — re-run it.
+   - **The auto-upgrader only remaps grapher charts — NOT ETL-defined explorers or MDims.** Explorers (`export://explorers/...`) and multidims (`export://multidim/...`) reference indicators by catalog path and are rebuilt by running their **export steps**, which the indicator-upgrader never touches. If the dataset has any (check the DAG: `rg "export://(explorers|multidim)/.*/<short_name>" dag/ -g "*.yml"`), they'll still point at the **old** variables on staging until you re-run them:
+     ```bash
+     STAGING=<branch> .venv/bin/etlr export://explorers/<ns>/latest/<short> export://multidim/<ns>/latest/<short> ... --export --private
+     ```
+     Verify none still reference the old version (both queries should return empty):
+     ```bash
+     # explorers
+     mysql -h "staging-site-<branch>" -u owid -P 3306 -D owid -e "SELECT DISTINCT ev.explorerSlug FROM explorer_variables ev JOIN variables v ON ev.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<old_version>%'"
+     # mdims
+     mysql -h "staging-site-<branch>" -u owid -P 3306 -D owid -e "SELECT DISTINCT mdp.slug FROM multi_dim_x_chart_configs mx JOIN variables v ON mx.variableId=v.id JOIN multi_dim_data_pages mdp ON mdp.id=mx.multiDimId WHERE v.catalogPath LIKE '%<ns>/<old_version>%'"
+     ```
 
 8) Update context for public announcement
    - Maintain `workbench/<short_name>/update-context.yml` as the canonical record of facts discovered during the update. Do not wait until the end if a fact is already known; append/update as each step completes.
@@ -464,6 +475,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      charts:
        published_count: <published chart count>
        size_qualifier: <handful|moderate|large|massive>
+       explorers: <list of published explorer slugs using this data, or []>
+       mdims: <list of MDim slugs using this data, with published flag, or []>
        selected_views:
          - title: <chart title>
            slug: <chart slug>
@@ -491,7 +504,24 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        AND c.publishedAt IS NOT NULL
      GROUP BY c.id
      ```
-   - Map the published count to `size_qualifier`: 1–9 = `handful`, 10–49 = `moderate`, 50–199 = `large`, 200+ = `massive`.
+   - **Charts are not the only surface — also count the explorers and MDims that use this data.** Many datasets feed published OWID explorers and multi-dimensional collections, which the grapher-`charts` query above misses entirely. Run the export steps first (step 7) so these point at the new variables, then query both:
+     ```sql
+     -- Explorers (note isPublished — only published ones count for the announcement)
+     SELECT DISTINCT ev.explorerSlug, e.isPublished
+     FROM explorer_variables ev
+     JOIN variables v ON ev.variableId = v.id
+     JOIN explorers e ON e.slug = ev.explorerSlug
+     WHERE v.catalogPath LIKE '%<namespace>/<new_version>%';
+
+     -- MDims (note published flag — drafts are published=0)
+     SELECT DISTINCT mdp.slug, mdp.published
+     FROM multi_dim_x_chart_configs mx
+     JOIN variables v ON mx.variableId = v.id
+     JOIN multi_dim_data_pages mdp ON mdp.id = mx.multiDimId
+     WHERE v.catalogPath LIKE '%<namespace>/<new_version>%';
+     ```
+     Chart-based explorers can also attach via `explorer_charts.chartId` (join through `chart_dimensions`) rather than `explorer_variables` — check that table too if the variable-based query comes up empty but the DAG shows an explorer step. Record published explorers/MDims under `charts.explorers` / `charts.mdims` in `update-context.yml`, and fold them into the "How many charts did this update affect?" answer (e.g. "10 published charts, 3 explorers, plus 3 draft MDims"). **Only count published surfaces** (`isPublished=1` / `published=1`) toward the public announcement; note unpublished ones for QA.
+   - Map the published **chart** count to `size_qualifier`: 1–9 = `handful`, 10–49 = `moderate`, 50–199 = `large`, 200+ = `massive`.
    - Pick 1–3 `selected_views` using these criteria (in order of preference):
      - **Map views** — immediately visual, readers can find their own country
      - **Charts with punchy, standalone headlines** — titles that make a clear claim work best for social sharing
