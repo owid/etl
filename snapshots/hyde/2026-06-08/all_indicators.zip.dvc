@@ -1,0 +1,29 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: History Database of the Global Environment
+    description: |-
+      This database presents an update and expansion of the History Database of the Global Environment (HYDE, v 3.5) and replaces the former HYDE 3.4 version. HYDE is an internally consistent combination of updated historical population estimates and land use. Categories include cropland, with a distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area. The period covered is 10,000 BCE to 2024 CE. Spatial resolution is 5 arc minutes (approx. 85 km2 at the equator), the files are in ArcMap ASCII grid format (netCDF added as an additional output format).
+
+      Major updates in HYDE 3.5 include: new radiocarbon data from the IMSET project providing estimates for Eurasia of the onset of agriculture; new archaeological expertise from the ArchaeoGlobe Project for the onset of agriculture outside Eurasia; use of European Space Agency (ESA) satellite land-cover information for the spatial land-use allocation on a yearly basis from 1992–2018; use of MODIS imagery and MapBiomas statistics for Brazil (1985–2023), Indonesia (2000–2023) and China (1900–2019); updated FAO data for 1961–2022 (2023–2025 extrapolated); extension of the database to year 2025; and more sub-national input for cropland and grazing land.
+    date_published: 2025-06-11
+    version_producer: 3.5
+
+    # Citation
+    producer: PBL Netherlands Environmental Assessment Agency
+    citation_full: |-
+      Utrecht University/PBL Netherlands Environmental Assessment Agency - History Database of the Global Environment (HYDE v 3.5, 2025).
+      Klein Goldewijk, C.G.M., Beusen, A., Doelman, J., Stehfest, E., 2017, Anthropogenic land use estimates for the Holocene – HYDE 3.2, Earth Syst. Sci. Data, 9, 927–953
+    attribution: HYDE (2025)
+    attribution_short: HYDE
+
+    # Files
+    url_main: https://doi.org/10.24416/UU01-F45D44
+    date_accessed: 2026-06-08
+
+    # License
+    license:
+      name: CC BY-NC 4.0
+      url: https://creativecommons.org/licenses/by-nc/4.0/
+
+wdir: ../../../data/snapshots/hyde/2026-06-08
