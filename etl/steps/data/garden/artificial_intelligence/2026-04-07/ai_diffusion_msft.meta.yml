@@ -6,7 +6,7 @@ definitions:
         - Artificial Intelligence
 
 dataset:
-  update_period_days: 183
+  update_period_days: 92
 
   owners:
     - Veronika Samborska
