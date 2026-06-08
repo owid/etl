@@ -18,6 +18,9 @@ definitions:
   text_small_territory_caveat: &text_small_territory_caveat |-
     For small countries, values can change sharply when an entire area shifts from one classification to another.
 
+  text_footnote: &text_footnote |-
+    Settlements are classified by population density and size, using harmonized definitions across countries ([Degree of Urbanization Framework](https://human-settlement.emergency.copernicus.eu/degurba.php)).
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -208,6 +211,7 @@ tables:
         presentation:
           title_public: *title_template
           grapher_config:
+            note: *text_footnote
             map:
               colorScale:
                 baseColorScheme: |
@@ -275,6 +279,7 @@ tables:
 
         presentation:
           grapher_config:
+            note: *text_footnote
             map:
               colorScale:
                 baseColorScheme: OwidCategoricalC
