@@ -233,11 +233,9 @@ def extract_nvidia_revenue() -> pd.DataFrame:
     log.info("starting_extraction", total_pdfs=len(PDF_URLS))
     rows: list[dict] = []
     for source, url in PDF_URLS.items():
-        try:
-            pdf_bytes = _download_pdf(url)
-        except Exception as e:
-            log.error("download_failed", source=source, error=str(e))
-            continue
+        # Let any download error propagate — partial-source snapshots silently
+        # publish missing data, which is worse than failing the whole update.
+        pdf_bytes = _download_pdf(url)
         if _uses_new_presentation(source):
             rows.extend(_extract_new_format(pdf_bytes, source))
         else:
@@ -247,6 +245,13 @@ def extract_nvidia_revenue() -> pd.DataFrame:
         raise ValueError("No data extracted from any PDF")
 
     df = pd.DataFrame(rows).sort_values(["source_pdf", "quarter", "segment"]).reset_index(drop=True)
+
+    # Defensive check: every PDF in PDF_URLS should contribute at least one row.
+    # Catches the case where the PDF was reachable (no download error) but the
+    # extractor silently returned no records (e.g. table layout changed).
+    missing = sorted(set(PDF_URLS) - set(df["source_pdf"].unique()))
+    if missing:
+        raise ValueError(f"Snapshot would be missing data from these source PDFs: {missing}")
     log.info("extraction_complete", rows=len(df), sources=df["source_pdf"].nunique(), segments=df["segment"].nunique())
     return df
 
