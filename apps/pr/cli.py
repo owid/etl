@@ -689,7 +689,9 @@ def clean_cli() -> None:
         cwd_repo = Repo(Path.cwd(), search_parent_directories=True)
         current_worktree_path = Path(cwd_repo.working_tree_dir).resolve()  # ty: ignore
     except InvalidGitRepositoryError:
-        current_worktree_path = Path(repo.working_tree_dir).resolve()  # ty: ignore
+        # cwd isn't inside any git repo — keep the raw cwd so the guard still errors out (it can't
+        # equal the main worktree), rather than falling back to BASE_DIR's repo and passing.
+        current_worktree_path = Path.cwd().resolve()
 
     # pr-clean must run from the main repo, never from a secondary worktree. From a worktree it
     # could try to remove the working tree you're standing in, or — if that worktree was switched
