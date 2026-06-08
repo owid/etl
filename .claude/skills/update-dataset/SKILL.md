@@ -540,6 +540,12 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      ```bash
      gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool
      ```
+   - **Codex posts in one of two places — always check both.** When it finds issues, it leaves *inline review comments* (the endpoint above) with resolvable threads. When it finds **nothing**, it posts a single top-level **PR (issue) comment** instead — no inline comments, no threads — e.g. "Codex Review: Didn't find any major issues. Keep it up!". So if the inline-comments endpoint is empty, check the issue comments before concluding Codex hasn't run yet:
+     ```bash
+     gh api repos/owid/etl/issues/<pr_number>/comments \
+       --jq '.[] | select(.user.login | test("codex";"i")) | .body'
+     ```
+     A "no issues" / 👍 comment from `chatgpt-codex-connector[bot]` means the review is done and there's nothing to address — don't keep polling for inline comments that will never come.
    - Fetch open review thread IDs via GraphQL:
      ```bash
      gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<pr_number>) { reviewThreads(first:20) { nodes { id isResolved comments(first:1) { nodes { body } } } } } } }'
@@ -554,7 +560,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        gh api repos/owid/etl/pulls/<pr_number>/comments/<comment_id>/replies -f body="<explanation>"
        gh api graphql -f query='mutation { resolveReviewThread(input:{threadId:"<thread_id>"}) { thread { id isResolved } } }'
        ```
-   - If Codex hasn't posted yet after 60 s, wait another 60 s and retry (up to ~5 min total).
+   - If neither the inline-comments endpoint nor the issue-comments endpoint shows a Codex post after 60 s, wait another 60 s and retry (up to ~5 min total). Codex can take 5–10 min — a clean review often arrives only as the top-level "no issues" comment.
 
 ## Committing and pushing
 
