@@ -482,6 +482,32 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+      gd_wbl_par_law_matbene:
+        title: Are maternity leave benefits paid by the government?
+        description_short: Indicates whether maternity leave benefits are paid or administered by the government rather than the employer alone.
+        description_key:
+          - Equals 1 if leave benefits are fully paid or administered by the government (including compulsory social insurance schemes or public funds).
+          - Equals 0.5 if payment is shared between the government and the employer.
+          - Equals 0 if leave benefits are paid solely by the employer.
+          - Government-funded benefits are more reliable and cover workers regardless of employer size or financial situation.
+          - *desc_standardized_assumptions
+        unit: "(1=yes; 0=no)"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 5
+
+      gd_wbl_par_law_nondismpreg:
+        title: Is dismissal of pregnant workers prohibited?
+        description_short: Indicates whether the law explicitly prohibits dismissing women during pregnancy and after childbirth, without restriction to specific periods.
+        description_key:
+          - Equals 1 if the law explicitly prohibits dismissal of pregnant workers and does not limit this protection to specific periods (e.g., only during maternity leave).
+          - Equals 0 if no such prohibition exists or if protections are narrowly defined.
+          - *desc_standardized_assumptions
+        unit: "(1=yes; 0=no)"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5
+
       gd_wbl_par_law_matleave:
         title: Paid maternity leave score
         description_short: Score measuring the comprehensiveness of paid maternity leave, from 0 (no paid leave) to 1 (at least 98 calendar days of paid leave for mothers).
