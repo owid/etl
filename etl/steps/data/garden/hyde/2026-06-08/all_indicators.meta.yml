@@ -15,9 +15,8 @@ definitions:
 dataset:
   update_period_days: 2000
 
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  # Learn more about the available fields:
+  # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   title: History Database of the Global Environment
   owners:
     - Lucas Rodés-Guirao
@@ -28,7 +27,7 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     title: History Database of the Global Environment
     description: |-
-      This database presents an update and expansion of the History Database of the Global Environment (HYDE, v 3.5) and replaces the former HYDE 3.4 version. HYDE is an internally consistent combination of updated historical population estimates and land use. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area. The period covered is 10,000 BCE to 2024 CE. Spatial resolution is 5 arc minutes (approx. 85 km2 at the equator), the files are in ArcMap ASCII grid format (netCDF added as an additional output format).
+      This database presents an update and expansion of the History Database of the Global Environment (HYDE, v 3.5) and replaces the former HYDE 3.4 version. HYDE is an internally consistent combination of updated historical population estimates and land use. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area. The period covered is 10,000 BCE to 2025 CE. Spatial resolution is 5 arc minutes (approx. 85 km2 at the equator), the files are in ArcMap ASCII grid format (netCDF added as an additional output format).
     variables:
       # Population and population density
       popc_c:
