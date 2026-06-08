@@ -14,7 +14,7 @@ definitions:
     The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
 
   text_degurba_caveat: &text_degurba_caveat |-
-    Different countries use different definitions and criteria to define urban and rural areas, such as population size, population density, infrastructure, employment patterns, or official city status. The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard using population density grids, meaning its classifications won’t always match official city boundaries and therefore urbanization rates may differ from country-reported figures.
+    The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard, so urbanization rates may differ from country-reported figures, which use varying national definitions.
   text_small_territory_caveat: &text_small_territory_caveat |-
     For small countries, values can change sharply when an entire area shifts from one classification to another.
 
@@ -51,16 +51,14 @@ tables:
 
           - |-
             <% if data_type == 'estimates' %>
-            For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN.
-
-            From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
+            For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
             <% else %>
-            From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+            Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
             <% endif %>
 
           - |-
             <% if metric == 'popshare_change' %>
-            To measure how quickly urbanization is happening, we calculate the average annual rate at which the share of people living in <% if location_type == 'urban_centre' %>cities<% elif location_type == 'urban_cluster' %>towns and suburbs<% elif location_type == 'rural_total' %>rural areas<% else %>urban areas<% endif %> has grown or shrunk over a 5-year period. <% if location_type == 'urban_centre' or location_type == 'urban_cluster' or location_type == 'urban_total' %>A positive value means a larger share of the population was living in <% if location_type == 'urban_centre' %>cities<% elif location_type == 'urban_cluster' %>towns and suburbs<% else %>urban areas<% endif %> by the end of the period — in other words, urbanization was happening. A negative value means the opposite: the share living in <% if location_type == 'urban_centre' %>cities<% elif location_type == 'urban_cluster' %>towns and suburbs<% else %>urban areas<% endif %> shrank.<% else %>A positive value means the rural share grew, while a negative value means it fell (indicating urbanization).<% endif %>
+            The average annual rate at which the share of people living in <% if location_type == 'urban_centre' %>cities<% elif location_type == 'urban_cluster' %>towns and suburbs<% elif location_type == 'rural_total' %>rural areas<% else %>urban areas<% endif %> changed over a 5-year period. Positive values indicate a growing share; negative values indicate a shrinking share.
             <% endif %>
 
           - *text_degurba_caveat
@@ -264,11 +262,9 @@ tables:
 
           - |-
             <% if data_type == 'estimates' %>
-            For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN.
-
-            From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
+            For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
             <% else %>
-            From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+            Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
             <% endif %>
 
           - *text_degurba_caveat
