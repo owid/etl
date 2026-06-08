@@ -49,7 +49,6 @@ tables:
         presentation:
           grapher_config:
             title: Consumption-based CO₂ emissions
-            subtitle: '[Consumption-based emissions](#dod:consumptionbasedemissions) include those from [fossil fuels and industry](#dod:fossilemissions). [Land-use change emissions](#dod:land-use-change-emissions) are not included.'
             tab: map
       consumption_emissions_as_share_of_global:
         title: "Share of global annual CO₂ consumption-based emissions"
@@ -113,8 +112,8 @@ tables:
                   - 20
                   - 50
                 customNumericColors:
-                  - 
-                  - 
+                  -
+                  -
             selectedEntityNames:
               - United States
               - United Kingdom
@@ -150,7 +149,7 @@ tables:
           {definitions.common.description_processing}{definitions.per_capita_description_processing}
         presentation:
           title_public: CO₂ emissions per capita
-      ##################################################################################################################
+          ##################################################################################################################
           grapher_config:
             title: CO₂ emissions per capita
       consumption_emissions_per_gdp:
@@ -598,7 +597,7 @@ tables:
         description_short: "Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in kilograms per dollar of GDP (2011 international-$)."
         presentation:
           grapher_config:
-            title: 'Carbon intensity: CO₂ emissions per dollar of GDP'
+            title: "Carbon intensity: CO₂ emissions per dollar of GDP"
             subtitle: Kilograms of CO₂ emitted per dollar of GDP. [Fossil fuel and industry emissions](#dod:fossilemissions) are included. [Land-use change emissions](#dod:land-use-change-emissions) are not included. GDP data is adjusted for inflation and differences in living costs between countries.
             note: GDP data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.
             tab: map
@@ -615,8 +614,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            title: Carbon intensity of energy production
-            subtitle: Amount of carbon dioxide emitted per unit of energy production, measured in grams of CO₂ per kilowatt-hour.
+            title: Carbon intensity of energy
             tab: map
             map:
               colorScale:
