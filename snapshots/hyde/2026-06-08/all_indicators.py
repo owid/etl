@@ -16,6 +16,7 @@ from urllib.parse import urljoin
 
 import click
 import requests
+from owid.catalog import Origin
 
 from etl.helpers import PathFinder
 
@@ -30,6 +31,7 @@ def main(upload: bool) -> None:
     snap = paths.init_snapshot()
 
     # URL of the directory that holds one .txt file per indicator.
+    assert isinstance(snap.metadata.origin, Origin)
     dir_url = snap.metadata.origin.url_download
     assert dir_url is not None, "url_download (the txt/ directory URL) must be set in the .dvc metadata."
 
@@ -46,6 +48,10 @@ def main(upload: bool) -> None:
             for fname in filenames:
                 r = requests.get(urljoin(dir_url, fname), timeout=120)
                 r.raise_for_status()
+                # Guard against silently zipping an Anubis bot-challenge page instead of the data.
+                assert not r.content.lstrip().startswith(b"<"), (
+                    f"Expected a text file but got HTML for {fname} (likely an Anubis bot-challenge page)."
+                )
                 zf.writestr(fname, r.content)
 
         # Copy the bundled zip to the snapshot, add to DVC and upload to S3.
