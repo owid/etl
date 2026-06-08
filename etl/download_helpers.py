@@ -89,18 +89,46 @@ def _stream_to_file(
     return md5.hexdigest()
 
 
+# Browser-like User-Agent, used to avoid "403 Client Error: Forbidden" errors when accessing data
+# files on hosts that block non-browser clients.
+BROWSER_USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7"
+
+
+def _is_bot_challenge(response: requests.Response) -> bool:
+    """Return True if `response` looks like an interstitial bot-challenge page served instead of the file.
+
+    Some hosts (e.g. behind an Anubis proof-of-work wall) serve a challenge HTML page to browser-like
+    User-Agents while letting plain, honestly-identified clients through. We detect this from the
+    response headers (without consuming the streamed body) so the caller can retry with another UA.
+    """
+    if not response.headers.get("content-type", "").lower().startswith("text/html"):
+        return False
+    # Anubis (the wall we've hit, e.g. on Utrecht University's Yoda host) sets a distinctive cookie.
+    return "anubis" in (response.headers.get("set-cookie") or "").lower()
+
+
 def download(url: str, filename: str, expected_md5: str | None = None, quiet: bool = False, **kwargs) -> None:
     "Download the file at the URL to the given local filename."
     # NOTE: we are not streaming to a NamedTemporaryFile because it was causing weird
     # issues one some systems, it's safer to stream directly to the file and remove it
     # if md5 doesn't match
     tmp_filename = filename + ".tmp"
-    # Add a header to the request, to avoid a "requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: ..."
-    # error when accessing data files in certain URLs.
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7"
-    }
-    with open(tmp_filename, "wb") as f, requests.get(url, stream=True, headers=headers) as r:
+
+    response = requests.get(url, stream=True, headers={"User-Agent": BROWSER_USER_AGENT})
+    if _is_bot_challenge(response):
+        # The browser-like UA tripped a bot-wall; retry once with the default (non-browser) UA, which
+        # such walls typically let through.
+        response.close()
+        response = requests.get(url, stream=True)
+        if _is_bot_challenge(response):
+            response.close()
+            raise DownloadCorrupted(
+                f"Download from {url} was blocked by a bot-challenge wall (e.g. Anubis) for both a "
+                "browser and a plain User-Agent. Download the file manually in a browser and pass it "
+                "to the snapshot via `--path-to-file` (i.e. `snap.create_snapshot(filename=...)`)."
+            )
+
+    with open(tmp_filename, "wb") as f, response as r:
         r.raise_for_status()
 
         md5 = _stream_to_file(r, f, **kwargs)
