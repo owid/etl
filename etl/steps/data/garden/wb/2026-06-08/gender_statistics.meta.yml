@@ -67,17 +67,15 @@ tables:
           tolerance: 10
 
       gd_wbl_saf_law_domviol:
-        title: Strength of domestic violence legislation
-        description_short: Score measuring how comprehensively the law addresses domestic violence, from 0 (no legislation) to 1 (full coverage across all key dimensions).
+        title: Is there legislation on domestic violence?
+        description_short: Indicates whether the country has domestic violence legislation covering criminal penalties, protection orders, broad forms of abuse (including marital rape), and a specific domestic violence law.
         description_key:
-          - This score assesses four dimensions of domestic violence law, each worth 0.25 — a country scores 1.0 if all four are in place.
-          - The four dimensions assessed are whether the law establishes criminal penalties for domestic violence; whether it provides protection orders for victims; whether it covers physical, psychological, financial, and sexual violence (including marital rape); and whether there is specific domestic violence legislation.
-          - A score of 0 means no domestic violence legislation exists; a score of 1 means the law addresses all four dimensions.
-          - Partial scores (0.25, 0.50, 0.75) indicate some but not all dimensions are covered.
+          - "Equals 1 if the law addresses all four key dimensions of domestic violence legislation: criminal penalties, protection orders, broad scope of abuse, and a specific domestic violence law."
+          - Equals 0 if no domestic violence legislation exists.
           - *desc_standardized_assumptions
-        unit: "score (0–1)"
+        unit: "(1=yes; 0=no)"
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       ic_frm_femm_zs:
@@ -94,16 +92,15 @@ tables:
           tolerance: 5
 
       gd_wbl_mar_law_obedience:
-        title: Legal equality in marriage — freedom from obedience requirements
-        description_short: Score measuring whether the law treats spouses as equals, from 0 (law requires wives to obey husbands) to 1 (no obedience requirement).
+        title: Is there no legal requirement for wives to obey their husbands?
+        description_short: Indicates whether the law does not require a married woman to obey her husband.
         description_key:
-          - A score of 1 means there is no legal provision requiring a married woman to obey her husband, or the law explicitly grants spouses equal rights and duties.
-          - A score of 0 means family law explicitly requires wives to obey husbands, or imposes legal penalties for disobedience such as loss of maintenance rights.
-          - Obedience requirements restrict women’s autonomy and reinforce unequal treatment within marriage.
+          - Equals 1 if there is no legal provision requiring a married woman to obey her husband, or if the law explicitly grants spouses equal rights and duties.
+          - Equals 0 if family law explicitly requires wives to obey husbands, or imposes penalties such as loss of maintenance rights for disobedience.
           - *desc_standardized_assumptions
-        unit: "score (0–1)"
+        unit: "(1=yes; 0=no)"
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       sg_gen_mnst_zs:
@@ -121,29 +118,27 @@ tables:
           tolerance: 5
 
       gd_wbl_wrk_law_nondiscemp:
-        title: Strength of anti-discrimination protections in employment
-        description_short: Score measuring how comprehensively the law prohibits gender-based discrimination in employment, from 0 (no protection) to 1 (full protection across all employment aspects).
+        title: Does the law prohibit gender-based discrimination in employment?
+        description_short: Indicates whether the law prohibits gender discrimination broadly across employment — not only in one aspect such as pay or dismissal.
         description_key:
-          - A higher score means the law more comprehensively prohibits employers from discriminating based on gender.
-          - A score of 1 requires that the law prohibits discrimination broadly across employment (not only in one aspect such as pay or dismissal) and mandates equal treatment.
-          - A score of 0 means no gender anti-discrimination protections in employment exist.
+          - Equals 1 if the law prohibits gender-based discrimination broadly across employment and mandates equal treatment.
+          - Equals 0 if no gender anti-discrimination protections in employment exist.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       gd_wbl_wrk_law_getjob:
-        title: Legal freedom to work — absence of barriers to women's employment
-        description_short: Score measuring whether women face legal barriers to getting a job, from 0 (significant legal restrictions) to 1 (no legal barriers relative to men).
+        title: Can women get a job in the same way as men?
+        description_short: Indicates whether the law allows women to seek and obtain employment without restrictions that don't apply to men.
         description_key:
-          - A score of 1 means women face no legal restrictions on working — no husband's consent is required, no extra documentation, and working is not penalized as disobedience.
-          - A score of 0 means the law imposes significant barriers, such as requiring a husband's or guardian's approval for women to work.
-          - Legal barriers to employment reduce women's economic participation and financial independence.
+          - Equals 1 if women face no legal barriers to working — no husband's consent is required, no extra documentation, and working is not penalized as disobedience.
+          - Equals 0 if the law imposes barriers such as requiring a husband's or guardian's approval for women to work.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       gd_wbl_saf_law_sexharass:
@@ -176,17 +171,15 @@ tables:
           tolerance: 5
 
       gd_wbl_ast_law_ownership:
-        title: Legal equality in property ownership rights
-        description_short: Score measuring whether the law grants women equal rights over immovable property, from 0 (no equal rights) to 1 (full legal equality in property ownership).
+        title: Do women and men have equal ownership rights to immovable property?
+        description_short: Indicates whether the law grants women and men equal ownership rights and administrative authority over immovable property, including land.
         description_key:
-          - A score of 1 means the law grants women and men equal ownership rights and administrative authority over immovable property, including land.
-          - A score of 0 means the law does not grant women equal property rights, or gives husbands special authority over marital property.
-          - Equal property rights allow women to own, buy, sell, and manage land and real estate in their own name.
-          - Property rights are a foundation of economic independence and security for women.
+          - Equals 1 if the law grants women and men equal ownership rights and administrative authority over immovable property, including land.
+          - Equals 0 if the law does not grant women equal property rights, or gives husbands special authority over marital property.
           - *desc_standardized_assumptions
-        unit: "score (0–1)"
+        unit: "(1=yes; 0=no)"
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       sl_uem_neet_fe_zs:
@@ -235,83 +228,75 @@ tables:
           tolerance: 5
 
       gd_wbl_ast_law_inherchld:
-        title: Legal equality in inheritance rights for sons and daughters
-        description_short: Score measuring whether the law grants sons and daughters equal inheritance rights from their parents, from 0 (no equal rights) to 1 (full legal equality).
+        title: Do sons and daughters have equal inheritance rights?
+        description_short: Indicates whether the law grants sons and daughters equal inheritance rights from their parents.
         description_key:
-          - A score of 1 means the law explicitly grants sons and daughters equal inheritance rights, mandates equal shares, or does not distinguish between boys and girls in inheritance.
-          - A score of 0 means the law grants sons and daughters unequal inheritance rights when no will is left.
-          - Unequal inheritance reduces daughters' access to family wealth and economic security.
+          - Equals 1 if the law explicitly grants sons and daughters equal inheritance rights, mandates equal shares, or does not distinguish between boys and girls in inheritance.
+          - Equals 0 if the law grants sons and daughters unequal inheritance rights when no will is left.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       gd_wbl_mob_sfr_passport:
-        title: Equal passport application processes for women and men
-        description_short: Score measuring whether passport application procedures are the same for women and men, from 0 (significant barriers for women) to 1 (fully equal process).
+        title: Are passport application procedures the same for women and men?
+        description_short: Indicates whether passport application procedures are the same for women and men.
         description_key:
-          - A score of 1 means application forms and procedures are uniform for both sexes, with no additional document requirements or procedural barriers for women.
-          - A score of 0 means women face extra requirements — such as a husband’s or guardian’s permission — not required of men.
-          - Equal access to passports is essential for women’s freedom of movement, ability to work abroad, and independent travel.
-          - This indicator sits in the Supportive Framework (SFR) dimension, capturing practical administrative equality beyond what the law formally requires.
+          - Equals 1 if application forms and procedures are uniform for both sexes, with no additional document requirements or procedural barriers for women.
+          - Equals 0 if women face extra requirements — such as a husband’s or guardian’s permission — not required of men.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       gd_wbl_ent_law_credisc:
-        title: Legal protection against gender discrimination in access to credit
-        description_short: Score measuring whether the law prohibits gender-based discrimination in access to credit and financial services, from 0 (no protection) to 1 (full legal protection).
+        title: Does the law prohibit gender discrimination in access to credit?
+        description_short: Indicates whether the law explicitly prohibits gender-based discrimination in access to credit and financial services.
         description_key:
-          - A score of 1 means the law explicitly prohibits gender-based discrimination in credit and financial services, or mandates equal access for women and men.
-          - A score of 0 means no such legal protection exists, allowing lenders to discriminate by gender.
-          - Equal legal access to credit allows women to borrow, invest, and grow businesses on the same terms as men.
+          - Equals 1 if the law explicitly prohibits gender-based discrimination in credit and financial services, or mandates equal access for women and men.
+          - Equals 0 if no such legal protection exists, allowing lenders to discriminate by gender.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       gd_wbl_ent_law_entactv:
-        title: Legal freedom to start and run a business — equality for women
-        description_short: Score measuring whether the law allows women to undertake entrepreneurial activities on equal terms with men, from 0 (significant legal restrictions) to 1 (full legal equality).
+        title: Can women sign contracts and register businesses in the same way as men?
+        description_short: Indicates whether the law allows women to undertake entrepreneurial activities on equal legal terms as men.
         description_key:
-          - A score of 1 means women have the same legal capacity as men to sign contracts, register a business, and operate a business without gender-based restrictions.
-          - A score of 0 means women face legal barriers to entrepreneurship, such as requiring a husband’s consent to register or run a business.
-          - Equal entrepreneurial rights support women’s participation in the economy and their ability to build economic independence.
+          - Equals 1 if women have the same legal capacity as men to sign contracts, register a business, and operate a business without gender-based restrictions.
+          - Equals 0 if women face legal barriers to entrepreneurship, such as requiring a husband’s consent to register or run a business.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       gd_wbl_mar_law_divorce:
-        title: Legal equality in divorce rights
-        description_short: Score measuring whether the law allows women to obtain a divorce on the same terms as men, from 0 (significant legal barriers for women) to 1 (full legal equality).
+        title: Can women obtain a divorce in the same way as men?
+        description_short: Indicates whether the law allows women to initiate and obtain a divorce on the same terms as men.
         description_key:
-          - A score of 1 means either spouse can initiate divorce proceedings under equal conditions, with the same evidentiary rules and process for women and men.
-          - A score of 0 means women face additional legal barriers to divorce, such as requiring a husband’s consent, unequal evidentiary rules, or prohibition from filing.
-          - Protections specifically for women — such as preventing a husband from filing during pregnancy — do not reduce the score if women otherwise have equal rights.
-          - Equal divorce rights are central to women’s autonomy and ability to leave a marriage.
+          - Equals 1 if either spouse can initiate divorce proceedings under equal conditions, with the same evidentiary rules and process for women and men.
+          - Equals 0 if women face additional legal barriers to divorce, such as requiring a husband’s consent, unequal evidentiary rules, or prohibition from filing.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       gd_wbl_mar_law_remarry:
-        title: Legal equality in the right to remarry
-        description_short: Score measuring whether the law grants women the same right to remarry as men, from 0 (significant legal restrictions on women) to 1 (full legal equality).
+        title: Do women and men have the same right to remarry?
+        description_short: Indicates whether the law grants women the same right to remarry as men.
         description_key:
-          - A score of 1 means women and men can remarry under the same conditions, with no waiting periods or other restrictions applied only to women.
-          - A score of 0 means women face legal restrictions on remarriage that do not apply to men, such as mandatory waiting periods, pregnancy certification requirements, or bans on remarriage.
-          - Restrictions on women's right to remarry often reflect discriminatory legal norms that limit personal freedom after the end of a marriage.
+          - Equals 1 if women and men can remarry under the same conditions, with no waiting periods or other restrictions applied only to women.
+          - Equals 0 if women face legal restrictions on remarriage that do not apply to men, such as mandatory waiting periods, pregnancy certification requirements, or bans on remarriage.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       sg_dmk_prch_fn_zs:
@@ -330,29 +315,27 @@ tables:
           tolerance: 10
 
       gd_wbl_mob_law_chooselive:
-        title: Legal freedom to choose where to live — equality for women
-        description_short: Score measuring whether the law allows women to choose where to live on the same terms as men, from 0 (significant legal restrictions) to 1 (full legal freedom).
+        title: Can women choose where to live in the same way as men?
+        description_short: Indicates whether the law allows women to choose where to live on the same terms as men.
         description_key:
-          - A score of 1 means women face no legal restrictions on choosing their residence, or the law explicitly recognizes women’s right to freely decide where to live.
-          - A score of 0 means the law gives husbands greater authority over the family’s place of residence, limiting women’s freedom of movement within the country.
-          - Equal rights to choose one’s residence reflect personal autonomy and equality within marriage.
+          - Equals 1 if women face no legal restrictions on choosing their residence, or the law explicitly recognizes women’s right to freely decide where to live.
+          - Equals 0 if the law gives husbands greater authority over the family’s place of residence, limiting women’s freedom of movement.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       gd_wbl_ast_law_nonmoncon:
-        title: Legal recognition of nonmonetary contributions upon divorce
-        description_short: Score measuring whether the law recognizes nonmonetary contributions — such as caregiving and household work — when dividing assets at the end of a marriage, from 0 (no recognition) to 1 (full recognition).
+        title: Does the law recognize nonmonetary contributions in property division upon divorce?
+        description_short: Indicates whether the law recognizes nonmonetary contributions — such as caregiving and household work — when dividing assets at the end of a marriage.
         description_key:
-          - A score of 1 means the law explicitly recognizes nonmonetary contributions when dividing marital assets, either through equal or equitable property division, transfer of a lump sum, or a community property regime.
-          - A score of 0 means the law does not recognize unpaid contributions such as caregiving or household work when dividing assets at divorce.
-          - This provision particularly benefits women who reduced paid work to care for children or family members and who would otherwise leave a marriage with fewer assets.
+          - Equals 1 if the law explicitly recognizes nonmonetary contributions when dividing marital assets, through equal or equitable property division, a lump sum, or a community property regime.
+          - Equals 0 if the law does not recognize unpaid contributions such as caregiving or household work when dividing assets at divorce.
           - *desc_standardized_assumptions
-        unit: “score (0–1)”
+        unit: “(1=yes; 0=no)”
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
       sg_dmk_hlth_wf_zs:
@@ -371,17 +354,15 @@ tables:
           tolerance: 10
 
       gd_wbl_pay_law_eqremeqval:
-        title: Strength of equal pay legislation for work of equal value
-        description_short: Score measuring whether the law mandates equal pay for work of equal value — covering different jobs that are comparable in skill, effort, and responsibility — from 0 (no such law) to 1 (full legal mandate meeting ILO standards).
+        title: Does the law mandate equal pay for work of equal value?
+        description_short: Indicates whether the law requires equal remuneration for work of equal value in line with ILO definitions — covering different jobs of comparable skill, effort, and responsibility.
         description_key:
-          - A score of 1 means the law mandates equal remuneration for work of equal value in line with ILO definitions, going beyond equal pay for the same job to cover different jobs of comparable worth.
-          - A score of 0 means no such law exists, or the law only requires equal pay for the same or similar work (not work of equal value).
-          - Pay equity laws are designed to address gender wage gaps that persist even when women and men hold different but comparably demanding jobs.
-          - The ILO standard requires comparing jobs across sectors and occupations based on skill, effort, responsibility, and working conditions — not just job title.
+          - Equals 1 if the law mandates equal pay for work of equal value in line with ILO definitions, going beyond equal pay for the same job to cover different but comparably demanding jobs.
+          - Equals 0 if no such law exists, or the law only requires equal pay for the same or similar work (not work of equal value).
           - *desc_standardized_assumptions
-        unit: "score (0–1)"
+        unit: "(1=yes; 0=no)"
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
           tolerance: 5
 
 
