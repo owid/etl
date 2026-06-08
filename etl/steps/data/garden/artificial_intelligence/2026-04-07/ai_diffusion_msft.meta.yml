@@ -26,8 +26,7 @@ tables:
           - This indicator counts anyone who visited one of 19 tracked AI tools during the period, from a single visit to daily use. It does not distinguish between occasional and frequent users.
           - "The 19 tracked platforms are: Alice, ChatGPT, Character.ai, Claude, CLOVA X, DeepSeek, ERNIE Bot (Yiyan.baidu), GigaChat, Google Gemini, Grok, Khanmigo.ai, Meta.ai, Microsoft Copilot, Midjourney, Mistral.ai, NanoSemantics AI Assistant, Perplexity, Tongyi Qianwen, and Xiaowei."
           - Users with less than 90 minutes of total activity observed through Microsoft telemetry per month are excluded, to reduce the influence of very infrequent users. This threshold applies to overall tracked activity, not to time spent on AI tools.
-          - Some countries do not have enough data for their own estimate and are assigned a regional average instead.
-          - The source notes that coverage is limited in some countries, especially Russia, Iran, and parts of China, so estimates for these places carry greater uncertainty.
+          - For some countries, Microsoft doesn't have enough data to estimate the AI user share directly. These countries are assigned the average value of their region instead. This affects many countries in Sub-Saharan Africa, where several appear with identical values in the data.
 
         display:
           numDecimalPlaces: 1
