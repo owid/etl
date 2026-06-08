@@ -18,7 +18,13 @@ def _chart(chart_id: int, created_at: datetime, catalog_path: str | None = None)
     )
 
 
-def test_catalog_path_identifies_etl_chart_twins():
+def test_catalog_path_identifies_etl_chart_twins(monkeypatch):
+    # The catalogPath matching is gated off until prod has the columns
+    # (PROD_HAS_ETL_CHART_COLUMNS); enable it here to exercise the logic.
+    monkeypatch.setattr(
+        "apps.wizard.app_pages.chart_diff.chart_diff.PROD_HAS_ETL_CHART_COLUMNS",
+        True,
+    )
     source = _chart(100, datetime(2026, 1, 1), "animal_welfare/latest/chart#chart")
     target = _chart(200, datetime(2026, 1, 2), "animal_welfare/latest/chart#chart")
 

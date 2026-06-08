@@ -128,16 +128,30 @@ class ArticleRef:
             return "0"
 
 
+# TODO: Remove this flag (and the defer() in _get_target_charts) once
+# owid-grapher #6553 — which adds charts.catalogPath and charts.configIdETL — is
+# merged to master. Until then PRODUCTION's charts table lacks those columns, so
+# chart-diff (which queries prod) must not select or match on them. While False,
+# chart-diff falls back to id+createdAt matching, which makes no practical
+# difference yet because prod has no ETL-authored (catalogPath) charts. Flip to
+# True (and drop the defer()) once the columns exist in prod.
+PROD_HAS_ETL_CHART_COLUMNS = False
+
+
 def _same_chart_across_envs(source_chart: gm.Chart, target_chart: gm.Chart) -> bool:
     """Return true when source and target refer to the same logical chart."""
-    if source_chart.catalogPath and source_chart.catalogPath == target_chart.catalogPath:
+    if (
+        PROD_HAS_ETL_CHART_COLUMNS
+        and source_chart.catalogPath
+        and source_chart.catalogPath == target_chart.catalogPath
+    ):
         return True
     return source_chart.id == target_chart.id and source_chart.createdAt == target_chart.createdAt
 
 
 def _is_catalog_path_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) -> bool:
     """True when production minted its own row for an ETL-authored staging chart."""
-    if target_chart is None:
+    if not PROD_HAS_ETL_CHART_COLUMNS or target_chart is None:
         return False
     return bool(
         source_chart.catalogPath
@@ -653,7 +667,21 @@ class ChartDiff:
 
         if target_session is not None:
             try:
-                target_charts_list = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
+                # TODO: drop the defer() once owid-grapher #6553 lands and prod has
+                # charts.catalogPath/configIdETL — until then selecting them from
+                # prod raises "Unknown column". See PROD_HAS_ETL_CHART_COLUMNS.
+                from sqlalchemy import select
+                from sqlalchemy.orm import defer
+
+                target_charts_list = list(
+                    target_session.scalars(
+                        select(gm.Chart)
+                        .where(gm.Chart.id.in_(list(chart_ids)))
+                        .options(defer(gm.Chart.catalogPath), defer(gm.Chart.configIdETL))
+                    ).all()
+                )
+                if not target_charts_list:
+                    raise NoResultFound()
             except NoResultFound:
                 target_charts = {}
             else:
@@ -664,15 +692,16 @@ class ChartDiff:
             # New ETL-authored charts are created independently on staging and
             # production. Their numeric IDs/createdAt differ, but catalogPath is
             # the stable identity we should use for review and sync.
-            for source_chart_id, source_chart in source_charts.items():
-                if target_charts.get(source_chart_id) is not None or not source_chart.catalogPath:
-                    continue
-                try:
-                    target_charts[source_chart_id] = gm.Chart.load_chart(
-                        target_session, catalog_path=source_chart.catalogPath
-                    )
-                except NoResultFound:
-                    pass
+            if PROD_HAS_ETL_CHART_COLUMNS:
+                for source_chart_id, source_chart in source_charts.items():
+                    if target_charts.get(source_chart_id) is not None or not source_chart.catalogPath:
+                        continue
+                    try:
+                        target_charts[source_chart_id] = gm.Chart.load_chart(
+                            target_session, catalog_path=source_chart.catalogPath
+                        )
+                    except NoResultFound:
+                        pass
         else:
             target_charts = {}
         return target_charts
