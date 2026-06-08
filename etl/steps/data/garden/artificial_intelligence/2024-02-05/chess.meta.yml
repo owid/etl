@@ -9,6 +9,8 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 360
+  owners:
+    - Veronika Samborska
 tables:
   chess:
     variables:

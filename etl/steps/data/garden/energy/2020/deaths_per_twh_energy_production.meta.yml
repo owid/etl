@@ -1,5 +1,7 @@
 dataset:
   title: Deaths per TWh energy production
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   deaths_per_twh_energy_production:
     variables:

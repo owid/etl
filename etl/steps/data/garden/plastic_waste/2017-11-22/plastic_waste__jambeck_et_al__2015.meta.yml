@@ -5,6 +5,8 @@ definitions:
 
 dataset:
   title: Plastic Waste - Jambeck et al. (2015)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   plastic_waste__jambeck_et_al__2015:
     variables:

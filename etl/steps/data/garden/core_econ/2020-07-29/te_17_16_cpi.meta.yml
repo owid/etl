@@ -1,5 +1,7 @@
 dataset:
   title: TE-17.16_CPI
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_17_16_cpi:
     variables:

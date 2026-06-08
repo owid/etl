@@ -1,5 +1,7 @@
 dataset:
   title: Patents awarded in England, Scotland and Wales - Bottomley
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   patents_awarded_in_england__scotland_and_wales__bottomley:
     variables:

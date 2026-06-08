@@ -1,5 +1,7 @@
 dataset:
   title: Coal Phase Out (PPCA, BeyondCoal and other sources)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   coal_phase_out__ppca__beyondcoal_and_other_sources:
     variables:

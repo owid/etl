@@ -12,6 +12,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Veronika Samborska
 tables:
   epoch:
     variables:
@@ -32,17 +34,17 @@ tables:
         short_unit: ''
         description_short: Describes the sector where the authors of an AI model have their primary affiliations.
         description_from_producer: |-
-            Systems are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
+          Systems are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
 
       parameters:
         title: Number of parameters
         unit: ''
         description_short: Total number of learnable variables or weights that the model contains. Parameters are adjusted during the training process to optimize the model's performance.
         description_key:
-            - Parameters are internal variables that machine learning models adjust during their training process to improve their ability to make accurate predictions. They act as the model's "knobs" that are fine-tuned based on the provided data. In deep learning, a subset of artificial intelligence (AI), parameters primarily consist of the weights assigned to the connections between the small processing units called neurons. Picture a vast network of interconnected neurons where the strength of each connection represents a parameter.
-            - The total number of parameters in a model is influenced by various factors. The model's structure and the number of “layers” of neurons play a significant role. Generally, more complex models with additional layers tend to have a higher number of parameters. Special components of specific deep learning architectures can further contribute to the overall parameter count.
-            - Understanding the number of parameters in a model is crucial to design effective models. More parameters can help the model understand complex data patterns, potentially leading to higher accuracy. However, there's a fine balance to strike. If a model has too many parameters, it risks memorizing the specific examples in its training data rather than learning their underlying patterns. Consequently, it may perform poorly when presented with new, unseen data. Achieving the right balance of parameters is a critical consideration in model development.
-            - In recent times, the AI community has witnessed the emergence of what are often referred to as "giant models." These models boast an astounding number of parameters, reaching into the billions or even trillions. While these huge models have achieved remarkable performance, they have a significant computational cost. Effectively managing and training such large-scale models has become a prominent and active area of research and discussion within the AI field.
+          - Parameters are internal variables that machine learning models adjust during their training process to improve their ability to make accurate predictions. They act as the model's "knobs" that are fine-tuned based on the provided data. In deep learning, a subset of artificial intelligence (AI), parameters primarily consist of the weights assigned to the connections between the small processing units called neurons. Picture a vast network of interconnected neurons where the strength of each connection represents a parameter.
+          - The total number of parameters in a model is influenced by various factors. The model's structure and the number of “layers” of neurons play a significant role. Generally, more complex models with additional layers tend to have a higher number of parameters. Special components of specific deep learning architectures can further contribute to the overall parameter count.
+          - Understanding the number of parameters in a model is crucial to design effective models. More parameters can help the model understand complex data patterns, potentially leading to higher accuracy. However, there's a fine balance to strike. If a model has too many parameters, it risks memorizing the specific examples in its training data rather than learning their underlying patterns. Consequently, it may perform poorly when presented with new, unseen data. Achieving the right balance of parameters is a critical consideration in model development.
+          - In recent times, the AI community has witnessed the emergence of what are often referred to as "giant models." These models boast an astounding number of parameters, reaching into the billions or even trillions. While these huge models have achieved remarkable performance, they have a significant computational cost. Effectively managing and training such large-scale models has become a prominent and active area of research and discussion within the AI field.
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
@@ -53,10 +55,10 @@ tables:
         unit: 'unique datapoints'
         description_short: The number of unique data points used to train the model. Each domain has a specific data point unit; for example, for vision it is images, for language it is words, and for games it is timesteps. This means systems can only be compared directly within the same domain.
         description_key:
-         - Training data size measures the volume of unique examples used to train an AI model during its learning phase. It represents the total number of distinct data points the model learns from, counted only once regardless of how many times they're seen during training.
-         - To understand this concept, imagine teaching someone to identify different bird species. Each unique bird photo you show them is one piece of training data. If you show 100 different photos, your training data size is 100, even if you review those same photos multiple times.
-         - Since datasets vary by domain, there's no universal unit for measuring size. Text models might count tokens, image models count pictures, and video models count clips. Epoch AI typically uses the smallest unit that triggers a model update during training. For language models that predict the next word, this would be individual tokens.
-         - Training data size directly impacts model performance. Larger datasets enable deeper learning and more nuanced pattern recognition, allowing models to identify subtle distinctions and handle diverse real-world scenarios more effectively.
+          - Training data size measures the volume of unique examples used to train an AI model during its learning phase. It represents the total number of distinct data points the model learns from, counted only once regardless of how many times they're seen during training.
+          - To understand this concept, imagine teaching someone to identify different bird species. Each unique bird photo you show them is one piece of training data. If you show 100 different photos, your training data size is 100, even if you review those same photos multiple times.
+          - Since datasets vary by domain, there's no universal unit for measuring size. Text models might count tokens, image models count pictures, and video models count clips. Epoch AI typically uses the smallest unit that triggers a model update during training. For language models that predict the next word, this would be individual tokens.
+          - Training data size directly impacts model performance. Larger datasets enable deeper learning and more nuanced pattern recognition, allowing models to identify subtle distinctions and handle diverse real-world scenarios more effectively.
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
@@ -80,10 +82,10 @@ tables:
             title: Training computation
 
       publication_date:
-          title: Publication date
-          unit: ''
-          description_short: The date when the AI model was first published.
-          description_from_producer: The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
+        title: Publication date
+        unit: ''
+        description_short: The date when the AI model was first published.
+        description_from_producer: The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
 
 
 

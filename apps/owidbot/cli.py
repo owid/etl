@@ -155,8 +155,8 @@ def create_comment_body(branch: str, services: dict[str, str], start_time: float
 
     body = f"""
 <b>Quick links (staging server)</b>:
-[Site Dev](http://{container_name}/) | [Site Preview](https://{cloudflare_subdomain}.owid.pages.dev/) | [Admin](http://{container_name}/admin) | [Wizard](http://{container_name}/etl/wizard/) | [Docs](http://{container_name}/etl/docs/)
-|--------------------------------|----------------------------------|---|---|---|
+[Site Dev](http://{container_name}/) | [Site Preview](https://{cloudflare_subdomain}.owid.pages.dev/) | [Admin](http://{container_name}/admin) | [Wizard](http://{container_name}/etl/wizard/) | [Docs](http://{container_name}/etl/docs/) | [Docs Preview](https://{cloudflare_subdomain}.owid-etl-docs.pages.dev/projects/etl/)
+|--------------------------------|----------------------------------|---|---|---|---|
 
 **Login**: `ssh owid@{container_name}`
 

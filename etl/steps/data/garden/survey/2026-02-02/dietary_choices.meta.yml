@@ -7,13 +7,15 @@ definitions:
         - Diet Compositions
         - Animal Welfare
         - Food Supply
-    display:  &common-display
+    display: &common-display
       numDecimalPlaces: 0
 
 dataset:
   title: Dietary choices of Brits and Americans
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   dietary_choices:
     variables:

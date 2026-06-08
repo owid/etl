@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   # NOTE: Some metadata fields are filled out programmatically in the garden step.
   photovoltaic_cost_and_capacity:

@@ -23,6 +23,8 @@ dataset:
   title: Minerals
 
 
+  owners:
+    - Pablo Rosado
 tables:
   minerals:
     title: Minerals

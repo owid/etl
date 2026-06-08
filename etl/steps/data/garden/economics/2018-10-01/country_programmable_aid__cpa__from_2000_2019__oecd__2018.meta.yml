@@ -1,5 +1,7 @@
 dataset:
   title: Country programmable aid (CPA) from 2000-2019 (OECD, 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   country_programmable_aid__cpa__from_2000_2019__oecd__2018:
     variables:

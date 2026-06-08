@@ -13,6 +13,8 @@ dataset:
   update_period_days: 365
   non_redistributable: true
 
+  owners:
+    - Fiona Spooner
 tables:
   microbe_amr:
     variables:

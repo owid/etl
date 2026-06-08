@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Fiona Spooner
 tables:
   diarrhea:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Absolute deaths from ambient PM2.5 air pollution- State of Global Air
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Total merchandise trade as share of GDP (Fouquin and Hugot (CEPII 2016)) (split)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   total_merchandise_trade_as_share_of_gdp__fouquin_and_hugot__cepii_2016__split:
     variables:

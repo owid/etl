@@ -269,10 +269,18 @@ class HighLevelDiff:
             self.df2[self.df2.index.duplicated()].index.values
         )
 
+        duplicate_index_values_in_either_df = self.df1.index[self.df1.index.duplicated(keep=False)].union(
+            self.df2.index[self.df2.index.duplicated(keep=False)]
+        )
+        comparable_index_values = self.index_values_shared.difference(duplicate_index_values_in_either_df)
+
         # Now we calculate the value differences in the intersection of the two dataframes.
-        if self.columns_shared and not self.index_values_shared.empty:
-            df1_intersected = self.df1.loc[self.index_values_shared, list(self.columns_shared)]
-            df2_intersected = self.df2.loc[self.index_values_shared, list(self.columns_shared)]
+        # If an index value is duplicated in either dataframe, `.loc` would expand it to a different number of rows on
+        # each side. Those duplicate rows are already reported as structural differences, so compare values only for
+        # shared index values that are unique in both dataframes.
+        if self.columns_shared and not comparable_index_values.empty:
+            df1_intersected = self.df1.loc[comparable_index_values, list(self.columns_shared)]
+            df2_intersected = self.df2.loc[comparable_index_values, list(self.columns_shared)]
 
             diffs = df_equals(
                 df1_intersected,

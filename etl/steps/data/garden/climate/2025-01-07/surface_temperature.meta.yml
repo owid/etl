@@ -1,11 +1,10 @@
-
 definitions:
   common:
     unit: °C
     short_unit: °C
     presentation:
       topic_tags:
-      - Climate Change
+        - Climate Change
     display:
       numDecimalPlaces: 2
     processing_level: major
@@ -31,6 +30,8 @@ definitions:
 dataset:
   title: Monthly surface temperature by country
 
+  owners:
+    - Veronika Samborska
 tables:
   surface_temperature:
     variables:
@@ -49,23 +50,23 @@ tables:
         description_short: |-
           The difference of a specific month's average surface temperature from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
-            {definitions.common_processing}
-            {definitions.temperature_anomaly}
+          {definitions.common_processing}
+          {definitions.temperature_anomaly}
 
       anomaly_below_0:
         title: Anomaly below 0
         description_short: |-
           The difference of a specific month's average surface temperature when it falls below the historical average from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
-            {definitions.common_processing}
-            {definitions.temperature_anomaly}
-            - {definitions.temperature_anomaly_below}
+          {definitions.common_processing}
+          {definitions.temperature_anomaly}
+          - {definitions.temperature_anomaly_below}
 
       anomaly_above_0:
         title: Anomaly above 0
         description_short: |-
           The difference of a specific month's average surface temperature when it exceeds the historical average from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
-            {definitions.common_processing}
-            {definitions.temperature_anomaly}
-            - {definitions.temperature_anomaly_above}
+          {definitions.common_processing}
+          {definitions.temperature_anomaly}
+          - {definitions.temperature_anomaly_above}

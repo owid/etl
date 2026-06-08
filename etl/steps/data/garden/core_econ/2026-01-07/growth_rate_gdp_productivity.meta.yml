@@ -13,7 +13,6 @@ dataset:
   title: "CORE Econ - Growth rate of GDP per capita and labor productivity"
   update_period_days: 365
 
-
 tables:
   growth_rate_gdp_pc:
     variables:

@@ -45,3 +45,32 @@ steps:
     - data://garden/wb/2024-06-10/gender_statistics
   data://grapher/wb/2024-06-10/gender_statistics_country_counts:
     - data://garden/wb/2024-06-10/gender_statistics_country_counts
+
+  # LGBTI Policy Index (Velasco, 2020)
+  data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
+    - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
+  data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
+    - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
+    - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
+
+  # Equaldex dataset
+  data://grapher/lgbt_rights/2025-04-07/equaldex:
+    - data://garden/lgbt_rights/2025-04-07/equaldex:
+      - data://meadow/lgbt_rights/2025-04-07/equaldex:
+        - snapshot://lgbt_rights/2025-04-07/equaldex.csv
+        - snapshot://lgbt_rights/2025-04-07/equaldex_indices.csv
+        - snapshot://lgbt_rights/2025-04-07/equaldex_current.csv
+      - data://garden/demography/2024-07-15/population
+      - data://garden/countries/2023-09-25/isd
+      - data://garden/regions/2023-01-01/regions
+
+  # Same-Sex Marriage Around the World from Pew Research Center
+  data://grapher/pew/2025-06-27/same_sex_marriage:
+    - data://garden/pew/2025-06-27/same_sex_marriage:
+      - data://garden/demography/2024-07-15/population
+      - data://meadow/pew/2025-06-27/same_sex_marriage:
+        - snapshot://pew/2025-06-27/same_sex_marriage.csv
+      - data://garden/regions/2023-01-01/regions

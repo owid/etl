@@ -51,6 +51,9 @@ dataset:
   update_period_days: 31
   title: COVID-19, confirmed cases and deaths
 
+  owners:
+    - Lucas Rodés-Guirao
+    - Lars Yencken
 tables:
   cases_deaths:
     variables:

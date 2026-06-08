@@ -39,6 +39,7 @@ nav = [
         { "Other tasks" = [
             { "Harmonize names" = "guides/harmonize-countries.md" },
             { "Auto data updates" = "guides/autoupdate-cli.md" },
+            { "Grapher schema sync" = "guides/grapher-schema-sync.md" },
             { "Access archived data" = "guides/data-work/access-archived-data.md" },
             # { "Regular updates" = "guides/auto-regular-updates.md" },
             { "Pull requests" = "guides/pull-requests.md" },

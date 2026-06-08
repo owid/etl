@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   air_traffic:
     variables:

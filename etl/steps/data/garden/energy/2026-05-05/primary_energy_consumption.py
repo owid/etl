@@ -7,7 +7,7 @@ import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
-from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
+from etl.data_helpers.geo import add_gdp_to_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -147,7 +147,7 @@ def add_annual_change(tb: Table) -> Table:
     return combined
 
 
-def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
+def add_per_capita_variables(tb: Table) -> Table:
     """Add a population column and add per-capita variables.
 
     Parameters
@@ -166,11 +166,8 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
     tb_with_population = tb.copy()
 
     # Add population to data.
-    tb_with_population = add_population_to_table(
-        tb=tb_with_population,
-        ds_population=ds_population,
-        population_col="Population",
-        warn_on_missing_countries=False,
+    tb_with_population = paths.regions.add_population(
+        tb=tb_with_population, population_col="Population", warn_on_missing_countries=False
     )
 
     # Calculate consumption per capita.
@@ -251,7 +248,6 @@ def run() -> None:
     ds_gdp = paths.load_dataset("maddison_project_database")
 
     # Load population dataset.
-    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -269,7 +265,7 @@ def run() -> None:
     tb = add_annual_change(tb=tb)
 
     # Add per-capita variables.
-    tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
+    tb = add_per_capita_variables(tb=tb)
 
     # Add per-GDP variables.
     tb = add_per_gdp_variables(tb=tb, ds_gdp=ds_gdp)

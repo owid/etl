@@ -24,6 +24,8 @@ dataset:
   update_period_days: 0
   title: COVID-19, donations to COVAX
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   covax:
     variables:

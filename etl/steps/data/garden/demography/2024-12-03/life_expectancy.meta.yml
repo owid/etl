@@ -79,6 +79,10 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Lucas Rodés-Guirao
+    - Fiona Spooner
+    - Edouard Mathieu
 tables:
   # HISTORICAL VALUES (until today)
   life_expectancy:
@@ -87,7 +91,7 @@ tables:
       life_expectancy:
         title: |-
           {definitions.global.title_base}
-        display: &display_hist
+        display:
           numDecimalPlaces: 1
           name: |-
             {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>

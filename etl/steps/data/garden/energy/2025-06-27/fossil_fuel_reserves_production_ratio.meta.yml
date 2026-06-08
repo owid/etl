@@ -16,6 +16,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   fossil_fuel_reserves_production_ratio:
     title: Fossil fuel reserves/production ratio

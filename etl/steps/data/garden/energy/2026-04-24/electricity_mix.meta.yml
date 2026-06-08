@@ -32,6 +32,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   electricity_mix:
     title: Electricity mix

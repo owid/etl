@@ -1,5 +1,7 @@
 dataset:
   title: World Press Freedom Index - Reporters sans Frontieres (2022)
+  owners:
+    - Cameron Appel  # backport
 tables:
   world_press_freedom_index__reporters_sans_frontieres__2022:
     variables:

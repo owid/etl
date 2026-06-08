@@ -90,11 +90,12 @@ def load_data_from_csv(uploaded_file):
         st.write("Parsing data...")
         data = parse_data_from_csv(csv_df)
 
-        # Obtain dataset and other objects
+        # Obtain dataset and other objects. Use the parsed data's columns (which exclude
+        # fully-empty trailing columns) so metadata stays aligned with the data.
         st.write("Parsing metadata...")
         dataset_meta, variables_meta_dict, origin = parse_metadata_from_csv(
             uploaded_file.name,
-            csv_df.columns,
+            data.columns,
         )
     except ValidationError as e:
         st.exception(e)
@@ -251,6 +252,9 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
     # drop empty rows
     data_df = data_df.dropna(how="all")
 
+    # drop fully empty columns (e.g. pandas-named `Unnamed: N` from a stray trailing comma)
+    data_df = data_df.dropna(axis=1, how="all")
+
     # lowercase columns names
     for col in data_df.columns:
         if col.lower() in ("entity", "year", "country"):
@@ -269,7 +273,27 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
     if data_df.year.dtype not in INT_TYPES and not _is_valid_date(data_df.year):
         raise ValidationError("Column 'year' should be integer or date")
 
+    _validate_unique_keys(data_df)
+
     return data_df.set_index(["country", "year"])
+
+
+def _validate_unique_keys(data_df: pd.DataFrame) -> None:
+    key_columns = ["country", "year"] + [col for col in data_df.columns if col.startswith("dim_")]
+    duplicated_keys = data_df.loc[data_df.duplicated(subset=key_columns, keep=False), key_columns]
+
+    if duplicated_keys.empty:
+        return
+
+    sample = duplicated_keys.drop_duplicates().head(20)
+    sample_text = sample.to_string(index=False)
+    extra = (
+        "" if len(duplicated_keys) <= 20 else f"\n\nShowing the first 20 duplicated rows out of {len(duplicated_keys)}."
+    )
+    raise ValidationError(
+        "Duplicate keys found in the incoming data. Each row must have a unique "
+        f"combination of {', '.join(key_columns)}.\n\n{sample_text}{extra}"
+    )
 
 
 def _is_valid_date(series: pd.Series) -> bool:

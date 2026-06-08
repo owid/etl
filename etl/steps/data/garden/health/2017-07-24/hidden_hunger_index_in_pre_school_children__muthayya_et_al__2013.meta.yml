@@ -1,5 +1,7 @@
 dataset:
   title: Hidden Hunger Index in pre-school children - Muthayya et al. (2013)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   hidden_hunger_index_in_pre_school_children__muthayya_et_al__2013:
     variables:

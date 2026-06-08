@@ -257,6 +257,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   ilostat:
     variables:
@@ -476,8 +478,8 @@ tables:
           {definitions.description_processing_avg_earnings_outliers}
         presentation:
           faqs:
-          - fragment_id: poverty-international-dollars
-            gdoc_id: "{definitions.gdoc_id}"
+            - fragment_id: poverty-international-dollars
+              gdoc_id: "{definitions.gdoc_id}"
         display:
           name: Average hourly earnings of employees - <<sex>>
           numDecimalPlaces: 1

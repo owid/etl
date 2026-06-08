@@ -1,5 +1,7 @@
 dataset:
   title: Young people opinions climate change (Hickman et al. 2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   young_people_opinions_climate_change__hickman_et_al__2021:
     variables:

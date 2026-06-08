@@ -8,14 +8,7 @@ definitions:
       numSignificantFigures: 3
       name: << pathogen >>
 
-  pathogen_type:
-    <% if pathogen_type == "Fungi" %>
-    fungus
-    <% elif pathogen_type == "Viruses" %>
-    virus
-    <% else  %>
-    << pathogen_type.lower() >>
-    <% endif %>
+  pathogen_type: <% if pathogen_type == "Fungi" %> fungus <% elif pathogen_type == "Viruses" %> virus <% else  %> << pathogen_type.lower() >> <% endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -23,6 +16,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Fiona Spooner
 tables:
   pathogen_bloodstream:
     variables:

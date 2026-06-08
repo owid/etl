@@ -1,5 +1,7 @@
 dataset:
   title: International Whaling Commissions Members by Year (2022)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   international_whaling_commissions_members_by_year__2022:
     variables:

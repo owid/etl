@@ -1,5 +1,7 @@
 dataset:
   title: Distribution of bilateral and unilateral trade partnerships - Fouquin and Hugot (CEPII 2016)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   distribution_of_bilateral_and_unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016:
     variables:

@@ -3,6 +3,8 @@ dataset:
   description: Weather and climate indicators such as temperature, precipitation, and droughts in the United States.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   usa_weather_climate_noaa:
     variables:

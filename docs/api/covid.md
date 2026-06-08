@@ -11,7 +11,7 @@ Our World in Data (OWID) has collected COVID-19 data from various domains since 
 
 ### Legacy data work
 
-We started working on COVID-19 data in early 2020, developing and implementing several data pipelines to process and publish the data. All this work has been live and shared with the public via our GitHub repository [:fontawesome-brands-github: https://github.com/owid/covid-19-data](https://github.com/owid/covid-19-data) and our [:octicons-link-external-16: old COVID documentation](https://docs.owid.io/projects/covid/en/latest/). We have complemented our data work with extensive research articles, which we have shared on our [:octicons-link-external-16: topic page](https://ourworldindata.org/coronavirus).
+We started working on COVID-19 data in early 2020, developing and implementing several data pipelines to process and publish the data. All this work has been live and shared with the public via our GitHub repository [:fontawesome-brands-github: https://github.com/owid/covid-19-data](https://github.com/owid/covid-19-data) and our [:octicons-link-external-16: old COVID documentation](https://owidcovid-19-data.readthedocs.io/en/latest/). We have complemented our data work with extensive research articles, which we have shared on our [:octicons-link-external-16: topic page](https://ourworldindata.org/coronavirus).
 
 ### Publications
 

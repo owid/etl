@@ -3,6 +3,8 @@ dataset:
   description: The environmental and animal welfare footprint of different pig production systems in the UK and Brazil.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   pig_production_bartlett:
     variables:

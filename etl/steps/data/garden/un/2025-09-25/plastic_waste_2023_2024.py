@@ -102,13 +102,9 @@ def add_per_capita_variables(tb: Table) -> Table:
     """
     tb_with_per_capita = tb.copy()
 
-    ds_population = paths.load_dataset("population")
     # Estimate per-capita variables.
     ## Add population variable
-    tb_with_per_capita = geo.add_population_to_table(
-        tb_with_per_capita,
-        ds_population,
-    )
+    tb_with_per_capita = paths.regions.add_population(tb_with_per_capita)
     ## Calculate per capita indicators
     for col in tb_with_per_capita.columns:
         if col in ["Import_TOTAL MOT", "Export_TOTAL MOT", "net_export"]:

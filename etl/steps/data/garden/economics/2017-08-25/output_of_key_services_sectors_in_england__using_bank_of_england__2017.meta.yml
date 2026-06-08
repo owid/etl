@@ -1,5 +1,7 @@
 dataset:
   title: Output of key services sectors in England - using Bank of England (2017)
+  owners:
+    - Ruby Mittal  # backport
 tables:
   output_of_key_services_sectors_in_england__using_bank_of_england__2017:
     variables:
