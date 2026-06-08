@@ -19,6 +19,10 @@ meta:
 
     # Files
     url_main: https://doi.org/10.24416/UU01-F45D44
+    # HYDE 3.5 no longer ships a single all_indicators.zip; the per-indicator country/region
+    # `*.txt` files live in the baseline scenario's txt/ directory. The snapshot script lists this
+    # directory, downloads every `.txt` file and bundles them into a single all_indicators.zip.
+    url_download: https://geo.public.data.uu.nl/vault-hyde/hyde35_c9_apr2025%5B1749214444%5D/original/gbc2025_7apr_base/txt/
     date_accessed: 2026-06-08
 
     # License
