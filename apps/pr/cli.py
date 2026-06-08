@@ -660,6 +660,9 @@ are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool wil
 
 Each branch is tagged `[merged]` or `[closed]` so you can see its PR outcome before selecting.
 
+Must be run from the main repo, not from a secondary worktree (it errors out otherwise). The main
+repo can clean every worktree anyway, so just `cd` there first.
+
 ```shell
 etl pr-clean
 ```
@@ -678,6 +681,17 @@ def clean_cli() -> None:
     main_worktree_path = get_main_worktree_path(repo)
     worktrees = list_worktrees(repo)  # branch name -> worktree path
     current_worktree_path = Path(repo.working_tree_dir).resolve()  # ty: ignore
+
+    # pr-clean must run from the main repo, never from a secondary worktree. From a worktree it
+    # could try to remove the working tree you're standing in, or — if that worktree was switched
+    # off its branch (e.g. to master) — delete the branch while leaving the now-unlinked worktree
+    # orphaned. The main repo can clean every worktree anyway, so just bail and point there.
+    if current_worktree_path != main_worktree_path:
+        raise click.ClickException(
+            "pr-clean must be run from the main repo, not a worktree.\n"
+            f"  You're in:     {current_worktree_path}\n"
+            f"  cd to main and re-run:\n    cd {main_worktree_path}"
+        )
 
     # Candidate branches: every local branch except master.
     candidate_branches = [b.name for b in repo.branches if b.name != "master"]
@@ -722,7 +736,6 @@ def clean_cli() -> None:
             worktree_path=worktrees.get(branch),
             main_project_dir=main_project_dir,
             main_worktree_path=main_worktree_path,
-            current_worktree_path=current_worktree_path,
         )
 
 
@@ -832,13 +845,9 @@ def clean_branch(
     worktree_path: Path | None,
     main_project_dir: Path,
     main_worktree_path: Path,
-    current_worktree_path: Path,
 ) -> None:
     """Copy sessions (if a worktree), remove the worktree, and delete the local branch."""
-    # A branch checked out in the current or the main worktree can't be cleaned from here.
-    if worktree_path is not None and worktree_path == current_worktree_path:
-        log.warning(f"Skipping '{branch}': it's the worktree you're currently in. cd to the main repo and re-run.")
-        return
+    # The branch checked out in the main repo (where pr-clean runs) can't be cleaned from here.
     if worktree_path is not None and worktree_path == main_worktree_path:
         log.warning(
             f"Skipping '{branch}': it's checked out in the main repo. Switch the main repo to another branch first."
