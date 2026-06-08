@@ -366,6 +366,45 @@ tables:
           tolerance: 5
 
 
+      se_sch_life:
+        title: Expected years of schooling
+        description_short: The number of years a child of school entrance age is expected to spend in school or university, including years repeated.
+        description_key:
+          - Calculated as the sum of age-specific enrolment ratios for primary, secondary, post-secondary non-tertiary, and tertiary education.
+          - Includes years spent on grade repetition.
+          - This is not the same as actual educational attainment — it reflects the education system's current capacity and enrolment rates applied to a child entering school today.
+        unit: years
+        short_unit: years
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      gd_wbl_par_law_matleave:
+        title: Paid maternity leave score
+        description_short: Score measuring the comprehensiveness of paid maternity leave, from 0 (no paid leave) to 1 (at least 98 calendar days of paid leave for mothers).
+        description_key:
+          - A score of 1 means the law provides at least 98 calendar days of paid maternity leave — the ILO standard.
+          - A score of 0 means no paid maternity leave exists in law.
+          - Partial scores reflect leave entitlements shorter than 98 days; the score increases linearly with the length of leave.
+          - *desc_standardized_assumptions
+        unit: "score (0–1)"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 5
+
+      se_ter_grad_fe_si_zs:
+        title: Female share of graduates from STEM programmes, tertiary
+        description_short: The share of women among all graduates from tertiary Science, Technology, Engineering and Mathematics (STEM) programmes.
+        description_key:
+          - Measures the number of female graduates in STEM as a percentage of all graduates in STEM at the tertiary level.
+          - A value of 50% would mean equal numbers of men and women graduating from STEM programmes.
+          - Tracking this share helps identify gender gaps in fields that often lead to higher-paying careers.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+
       gd_wbl_ovl_law:
         title: "Women, Business and the Law: Legal Framework Index"
         description_short: "The index measures how laws and regulations affect women’s economic opportunity on a scale from 0 to 100, where 100 means full legal equality for women and men. It is the unweighted average of ten topic scores: safety, mobility, work, pay, marriage, parenthood, childcare, entrepreneurship, assets, and pension."
