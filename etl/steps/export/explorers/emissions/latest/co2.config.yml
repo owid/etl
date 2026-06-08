@@ -18,7 +18,7 @@ config:
   originUrl: /co2-and-greenhouse-gas-emissions
 dimensions:
   - slug: gas
-    name: Gas or warming impact
+    name: Gas or warming
     presentation:
       type: dropdown
     choices:
@@ -53,7 +53,7 @@ dimensions:
       - slug: fossil_plus_land_use
         name: Fossil + land use change
       - slug: na
-        name: ''
+        name: ""
       - slug: coal
         name: Coal
       - slug: oil
@@ -88,7 +88,7 @@ dimensions:
       choice_slug_true: relative
     choices:
       - slug: total
-        name: ''
+        name: ""
       - slug: relative
         name: Relative to world total
 views: []

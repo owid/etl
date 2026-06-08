@@ -1179,7 +1179,7 @@ tables:
             tab: map
             map:
               colorScale:
-                baseColorScheme: YlGnBu
+                baseColorScheme: YlOrBr
                 binningStrategy: manual
                 customNumericValues:
                   - 0
