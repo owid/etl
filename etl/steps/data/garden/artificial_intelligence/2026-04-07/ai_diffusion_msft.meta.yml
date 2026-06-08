@@ -10,6 +10,7 @@ dataset:
 
   owners:
     - Veronika Samborska
+    - Edouard Mathieu
 tables:
   ai_diffusion_msft:
     variables:
