@@ -9,7 +9,6 @@ dataset:
   update_period_days: 92
 
   owners:
-    - Veronika Samborska
     - Edouard Mathieu
 tables:
   ai_diffusion_msft:
