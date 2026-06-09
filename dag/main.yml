@@ -653,6 +653,29 @@ steps:
     - data://garden/itopf/2026-05-06/oil_spills:
       - data://meadow/itopf/2026-05-06/oil_spills:
         - snapshot://itopf/2026-05-06/oil_spills.pdf
+  data://meadow/un/2026-06-09/igme:
+    - snapshot://un/2026-06-09/igme.zip
+  # Child Mortality Estimates - UN IGME
+  data://garden/un/2026-06-09/igme:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2018/igme
+    - data://meadow/un/2026-06-09/igme
+  data://grapher/un/2026-06-09/igme:
+    - data://garden/un/2026-06-09/igme
+  # Long-run child mortality, Gapminder + UN IGME - to update
+  data://garden/un/2026-06-09/long_run_child_mortality:
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+    - data://garden/un/2026-06-09/igme
+  data://garden/gapminder/2026-06-09/total_fertility_rate:
+    - data://garden/un/2026-06-09/long_run_child_mortality
+    - data://garden/un/2024-07-12/un_wpp
+    - data://meadow/gapminder/2023-09-22/total_fertility_rate
+  data://grapher/un/2026-06-09/long_run_child_mortality:
+    - data://garden/un/2026-06-09/long_run_child_mortality
+  # Fertility rate, Gapminder
+  data://grapher/gapminder/2026-06-09/total_fertility_rate:
+    - data://garden/gapminder/2026-06-09/total_fertility_rate
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
