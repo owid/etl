@@ -2,198 +2,198 @@ steps:
   #
   # FAOSTAT meadow steps for version 2023-06-12
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_cahd:
     - snapshot://faostat/2023-06-12/faostat_cahd.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_ef:
     - snapshot://faostat/2023-02-22/faostat_ef.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_ei:
     - snapshot://faostat/2023-02-22/faostat_ei.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_ek:
     - snapshot://faostat/2023-02-22/faostat_ek.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_el:
     - snapshot://faostat/2023-06-12/faostat_el.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_emn:
     - snapshot://faostat/2023-02-22/faostat_emn.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_ep:
     - snapshot://faostat/2023-02-22/faostat_ep.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_esb:
     - snapshot://faostat/2023-02-22/faostat_esb.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_fa:
     - snapshot://faostat/2023-02-22/faostat_fa.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_fbs:
     - snapshot://faostat/2023-06-12/faostat_fbs.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_fbsh:
     - snapshot://faostat/2023-06-12/faostat_fbsh.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_fo:
     - snapshot://faostat/2023-02-22/faostat_fo.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_fs:
     - snapshot://faostat/2023-06-12/faostat_fs.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_gn:
     - snapshot://faostat/2023-06-12/faostat_gn.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_ic:
     - snapshot://faostat/2023-06-12/faostat_ic.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_lc:
     - snapshot://faostat/2023-06-12/faostat_lc.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_metadata:
     - snapshot://faostat/2023-06-12/faostat_metadata.json
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_qcl:
     - snapshot://faostat/2023-06-12/faostat_qcl.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_qi:
     - snapshot://faostat/2023-06-12/faostat_qi.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_qv:
     - snapshot://faostat/2023-06-12/faostat_qv.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_rfb:
     - snapshot://faostat/2023-02-22/faostat_rfb.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_rfn:
     - snapshot://faostat/2023-02-22/faostat_rfn.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_rl:
     - snapshot://faostat/2023-02-22/faostat_rl.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_rp:
     - snapshot://faostat/2023-02-22/faostat_rp.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_rt:
     - snapshot://faostat/2023-06-12/faostat_rt.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_scl:
     - snapshot://faostat/2023-06-12/faostat_scl.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_sdgb:
     - snapshot://faostat/2023-06-12/faostat_sdgb.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_tcl:
     - snapshot://faostat/2023-06-12/faostat_tcl.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_ti:
     - snapshot://faostat/2023-06-12/faostat_ti.zip
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/faostat/2023-06-12/faostat_wcad:
     - snapshot://faostat/2023-06-12/faostat_wcad.zip
   #
   # FAOSTAT garden steps for version 2023-06-12
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_cahd:
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
     - data://garden/faostat/2023-06-12/faostat_metadata
     - data://meadow/faostat/2023-06-12/faostat_cahd
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_ef:
     - data://meadow/faostat/2023-06-12/faostat_ef
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_ei:
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
     - data://meadow/faostat/2023-06-12/faostat_ei
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_ek:
     - data://meadow/faostat/2023-06-12/faostat_ek
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_el:
     - data://meadow/faostat/2023-06-12/faostat_el
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_emn:
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
     - data://meadow/faostat/2023-06-12/faostat_emn
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_ep:
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
     - data://meadow/faostat/2023-06-12/faostat_ep
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_esb:
     - data://meadow/faostat/2023-06-12/faostat_esb
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_fa:
     - data://meadow/faostat/2023-06-12/faostat_fa
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_fbsc:
     - data://garden/faostat/2023-06-12/faostat_metadata
     - data://meadow/faostat/2023-06-12/faostat_fbsh
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
     - data://meadow/faostat/2023-06-12/faostat_fbs
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_fo:
     - data://meadow/faostat/2023-06-12/faostat_fo
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_food_explorer:
     - data://garden/faostat/2023-06-12/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
     - data://garden/faostat/2023-06-12/faostat_qcl
     - data://garden/faostat/2023-06-12/faostat_fbsc
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_fs:
     - data://meadow/faostat/2023-06-12/faostat_fs
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_gn:
     - data://meadow/faostat/2023-06-12/faostat_gn
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_ic:
     - data://meadow/faostat/2023-06-12/faostat_ic
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_lc:
     - data://meadow/faostat/2023-06-12/faostat_lc
     - data://garden/owid/latest/key_indicators
     - data://garden/faostat/2023-06-12/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_metadata:
     - data://meadow/faostat/2023-06-12/faostat_cahd
     - data://meadow/faostat/2023-06-12/faostat_ep
@@ -225,79 +225,79 @@ steps:
     - data://meadow/faostat/2023-06-12/faostat_gn
     - data://meadow/faostat/2023-06-12/faostat_ti
     - data://meadow/faostat/2023-06-12/faostat_rt
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_qcl:
     - data://meadow/faostat/2023-06-12/faostat_qcl
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_qi:
     - data://meadow/faostat/2023-06-12/faostat_qi
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_qv:
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
     - data://meadow/faostat/2023-06-12/faostat_qv
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_rfb:
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-06-12/faostat_rfb
     - data://garden/owid/latest/key_indicators
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_rfn:
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
     - data://meadow/faostat/2023-06-12/faostat_rfn
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_rl:
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-06-12/faostat_rl
     - data://garden/owid/latest/key_indicators
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_rp:
     - data://garden/faostat/2023-06-12/faostat_metadata
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-06-12/faostat_rp
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_rt:
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
     - data://meadow/faostat/2023-06-12/faostat_rt
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_scl:
     - data://meadow/faostat/2023-06-12/faostat_scl
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_sdgb:
     - data://meadow/faostat/2023-06-12/faostat_sdgb
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_tcl:
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-06-12/faostat_metadata
     - data://meadow/faostat/2023-06-12/faostat_tcl
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_ti:
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-06-12/faostat_ti
     - data://garden/owid/latest/key_indicators
     - data://garden/faostat/2023-06-12/faostat_metadata
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/faostat_wcad:
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-06-12/faostat_wcad
@@ -306,88 +306,88 @@ steps:
   #
   # FAOSTAT grapher steps for version 2023-06-12
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_cahd:
     - data://garden/faostat/2023-06-12/faostat_cahd
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_ef:
     - data://garden/faostat/2023-06-12/faostat_ef
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_ei:
     - data://garden/faostat/2023-06-12/faostat_ei
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_ek:
     - data://garden/faostat/2023-06-12/faostat_ek
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_el:
     - data://garden/faostat/2023-06-12/faostat_el
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_emn:
     - data://garden/faostat/2023-06-12/faostat_emn
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_ep:
     - data://garden/faostat/2023-06-12/faostat_ep
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_esb:
     - data://garden/faostat/2023-06-12/faostat_esb
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_fa:
     - data://garden/faostat/2023-06-12/faostat_fa
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_fbsc:
     - data://garden/faostat/2023-06-12/faostat_fbsc
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_fo:
     - data://garden/faostat/2023-06-12/faostat_fo
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_fs:
     - data://garden/faostat/2023-06-12/faostat_fs
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_gn:
     - data://garden/faostat/2023-06-12/faostat_gn
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_ic:
     - data://garden/faostat/2023-06-12/faostat_ic
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_lc:
     - data://garden/faostat/2023-06-12/faostat_lc
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_qcl:
     - data://garden/faostat/2023-06-12/faostat_qcl
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_qi:
     - data://garden/faostat/2023-06-12/faostat_qi
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_qv:
     - data://garden/faostat/2023-06-12/faostat_qv
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_rfb:
     - data://garden/faostat/2023-06-12/faostat_rfb
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_rfn:
     - data://garden/faostat/2023-06-12/faostat_rfn
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_rl:
     - data://garden/faostat/2023-06-12/faostat_rl
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_rp:
     - data://garden/faostat/2023-06-12/faostat_rp
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_rt:
     - data://garden/faostat/2023-06-12/faostat_rt
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_scl:
     - data://garden/faostat/2023-06-12/faostat_scl
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_sdgb:
     - data://garden/faostat/2023-06-12/faostat_sdgb
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_tcl:
     - data://garden/faostat/2023-06-12/faostat_tcl
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_ti:
     - data://garden/faostat/2023-06-12/faostat_ti
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/faostat_wcad:
     - data://garden/faostat/2023-06-12/faostat_wcad
   #
@@ -398,7 +398,7 @@ steps:
   #
   # FAOSTAT garden step for additional variables for version 2023-06-12
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/faostat/2023-06-12/additional_variables:
     - data://garden/faostat/2023-06-12/faostat_rl
     - data://garden/faostat/2023-06-12/faostat_qi
@@ -410,52 +410,52 @@ steps:
   #
   # FAOSTAT grapher step for additional variables for version 2023-06-12
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/faostat/2023-06-12/additional_variables:
     - data://garden/faostat/2023-06-12/additional_variables
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_emn:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://meadow/faostat/2024-03-14/faostat_emn
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_qv:
     - data://meadow/faostat/2024-03-14/faostat_qv
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_rp:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://meadow/faostat/2024-03-14/faostat_rp
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_fa:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://meadow/faostat/2024-03-14/faostat_fa
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_qi:
     - data://meadow/faostat/2024-03-14/faostat_qi
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_ti:
     - data://meadow/faostat/2024-03-14/faostat_ti
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_fbsc:
     - data://meadow/faostat/2024-03-14/faostat_fbs
     - data://garden/faostat/2024-03-14/faostat_metadata
@@ -463,7 +463,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/faostat/2024-03-14/faostat_fbsh
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_tcl:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
@@ -473,108 +473,108 @@ steps:
   #
   # FAOSTAT garden steps (2024-03-14).
   #
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_cahd:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
     - data://meadow/faostat/2024-03-14/faostat_cahd
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_fo:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://meadow/faostat/2024-03-14/faostat_fo
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_ei:
     - data://meadow/faostat/2024-03-14/faostat_ei
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_rfn:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://meadow/faostat/2024-03-14/faostat_rfn
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_rfb:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://meadow/faostat/2024-03-14/faostat_rfb
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_scl:
     - data://meadow/faostat/2024-03-14/faostat_scl
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_ek:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://meadow/faostat/2024-03-14/faostat_ek
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_fs:
     - data://meadow/faostat/2024-03-14/faostat_fs
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_rt:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://meadow/faostat/2024-03-14/faostat_rt
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_esb:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://meadow/faostat/2024-03-14/faostat_esb
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_rl:
     - data://garden/faostat/2024-03-14/faostat_rl
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_lc:
     - data://meadow/faostat/2024-03-14/faostat_lc
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_sdgb:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
     - data://meadow/faostat/2024-03-14/faostat_sdgb
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_ic:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
     - data://meadow/faostat/2024-03-14/faostat_ic
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_qcl:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
     - data://meadow/faostat/2024-03-14/faostat_qcl
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/faostat_food_explorer:
     - data://garden/faostat/2024-03-14/faostat_fbsc
     - data://grapher/demography/2023-03-31/population
@@ -585,76 +585,76 @@ steps:
   #
   # FAOSTAT grapher steps (2024-03-14).
   #
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_emn:
     - data://garden/faostat/2024-03-14/faostat_emn
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_qv:
     - data://garden/faostat/2024-03-14/faostat_qv
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_rp:
     - data://garden/faostat/2024-03-14/faostat_rp
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_fa:
     - data://garden/faostat/2024-03-14/faostat_fa
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_qi:
     - data://garden/faostat/2024-03-14/faostat_qi
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_ti:
     - data://garden/faostat/2024-03-14/faostat_ti
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_fbsc:
     - data://garden/faostat/2024-03-14/faostat_fbsc
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_tcl:
     - data://garden/faostat/2024-03-14/faostat_tcl
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_cahd:
     - data://garden/faostat/2024-03-14/faostat_cahd
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_fo:
     - data://garden/faostat/2024-03-14/faostat_fo
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_ei:
     - data://garden/faostat/2024-03-14/faostat_ei
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_rfn:
     - data://garden/faostat/2024-03-14/faostat_rfn
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_rfb:
     - data://garden/faostat/2024-03-14/faostat_rfb
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_scl:
     - data://garden/faostat/2024-03-14/faostat_scl
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_ek:
     - data://garden/faostat/2024-03-14/faostat_ek
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_fs:
     - data://garden/faostat/2024-03-14/faostat_fs
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_rt:
     - data://garden/faostat/2024-03-14/faostat_rt
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_esb:
     - data://garden/faostat/2024-03-14/faostat_esb
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_lc:
     - data://garden/faostat/2024-03-14/faostat_lc
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_sdgb:
     - data://garden/faostat/2024-03-14/faostat_sdgb
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_ic:
     - data://garden/faostat/2024-03-14/faostat_ic
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/faostat_qcl:
     - data://garden/faostat/2024-03-14/faostat_qcl
   #
   # FAOSTAT garden step for additional variables (2024-03-14).
   #
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2024-03-14/additional_variables:
     - data://garden/faostat/2024-03-14/faostat_rl
     - data://garden/faostat/2024-03-14/faostat_fbsc
@@ -665,91 +665,91 @@ steps:
   #
   # FAOSTAT grapher step for additional variables (2024-03-14).
   #
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2024-03-14/additional_variables:
     - data://garden/faostat/2024-03-14/additional_variables
   #
   # FAOSTAT meadow steps (2024-03-14).
   #
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_cahd:
     - snapshot://faostat/2024-03-14/faostat_cahd.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_ei:
     - snapshot://faostat/2024-03-14/faostat_ei.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_ek:
     - snapshot://faostat/2024-03-14/faostat_ek.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_emn:
     - snapshot://faostat/2024-03-14/faostat_emn.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_esb:
     - snapshot://faostat/2024-03-14/faostat_esb.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_fa:
     - snapshot://faostat/2024-03-14/faostat_fa.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_fbs:
     - snapshot://faostat/2024-03-14/faostat_fbs.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_fbsh:
     - snapshot://faostat/2024-03-14/faostat_fbsh.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_fo:
     - snapshot://faostat/2024-03-14/faostat_fo.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_fs:
     - snapshot://faostat/2024-03-14/faostat_fs.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_ic:
     - snapshot://faostat/2024-03-14/faostat_ic.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_lc:
     - snapshot://faostat/2024-03-14/faostat_lc.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_metadata:
     - snapshot://faostat/2024-03-14/faostat_metadata.json
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_qcl:
     - snapshot://faostat/2024-03-14/faostat_qcl.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_qi:
     - snapshot://faostat/2024-03-14/faostat_qi.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_qv:
     - snapshot://faostat/2024-03-14/faostat_qv.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_rfb:
     - snapshot://faostat/2024-03-14/faostat_rfb.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_rfn:
     - snapshot://faostat/2024-03-14/faostat_rfn.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_rl:
     - snapshot://faostat/2024-03-14/faostat_rl.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_rp:
     - snapshot://faostat/2024-03-14/faostat_rp.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_rt:
     - snapshot://faostat/2024-03-14/faostat_rt.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_scl:
     - snapshot://faostat/2024-03-14/faostat_scl.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_sdgb:
     - snapshot://faostat/2024-03-14/faostat_sdgb.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_tcl:
     - snapshot://faostat/2024-03-14/faostat_tcl.zip
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://meadow/faostat/2024-03-14/faostat_ti:
     - snapshot://faostat/2024-03-14/faostat_ti.zip
   #
   # FAOSTAT garden steps (2024-03-14).
   #
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://garden/faostat/2024-03-14/faostat_metadata:
     - data://meadow/faostat/2024-03-14/faostat_rt
     - data://meadow/faostat/2024-03-14/faostat_scl
@@ -776,7 +776,7 @@ steps:
     - data://meadow/faostat/2024-03-14/faostat_cahd
     - data://meadow/faostat/2024-03-14/faostat_fbs
     - data://meadow/faostat/2024-03-14/faostat_ti
-  # archived; last active in e34bbe1ff0fc on 2025-06-20
+  # archived; last active in b0396c34f071 on 2025-06-23
   data://garden/faostat/2024-03-14/faostat_rl:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://meadow/faostat/2024-03-14/faostat_rl
@@ -786,7 +786,7 @@ steps:
   #
   # FAOSTAT garden step for additional variables for version 2025-03-17
   #
-  # archived; last active in 3d504b0937a7 on 2026-03-02
+  # archived; last active in 658f72e1d5e0 on 2026-03-03
   data://garden/faostat/2025-03-17/additional_variables:
     - data://garden/faostat/2025-03-17/faostat_qi
     - data://garden/faostat/2025-03-17/faostat_rfn
@@ -797,7 +797,7 @@ steps:
   #
   # FAOSTAT grapher step for additional variables for version 2025-03-17
   #
-  # archived; last active in 3d504b0937a7 on 2026-03-02
+  # archived; last active in 658f72e1d5e0 on 2026-03-03
   data://grapher/faostat/2025-03-17/additional_variables:
     - data://garden/faostat/2025-03-17/additional_variables
   #
@@ -1238,186 +1238,186 @@ steps:
   # archived; last active in 9b10f171b059 on 2023-04-10
   data://explorers/owid/latest/food_explorer:
     - data://garden/faostat/2022-05-17/faostat_food_explorer
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_ef:
     - snapshot://faostat/2023-02-22/faostat_ef.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_ei:
     - snapshot://faostat/2023-02-22/faostat_ei.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_ek:
     - snapshot://faostat/2023-02-22/faostat_ek.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_el:
     - snapshot://faostat/2023-02-22/faostat_el.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_emn:
     - snapshot://faostat/2023-02-22/faostat_emn.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_ep:
     - snapshot://faostat/2023-02-22/faostat_ep.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_esb:
     - snapshot://faostat/2023-02-22/faostat_esb.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_fa:
     - snapshot://faostat/2023-02-22/faostat_fa.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_fbs:
     - snapshot://faostat/2023-02-22/faostat_fbs.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_fbsh:
     - snapshot://faostat/2023-02-22/faostat_fbsh.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_fo:
     - snapshot://faostat/2023-02-22/faostat_fo.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_fs:
     - snapshot://faostat/2023-02-22/faostat_fs.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_gn:
     - snapshot://faostat/2023-02-22/faostat_gn.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_ic:
     - snapshot://faostat/2023-02-22/faostat_ic.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_lc:
     - snapshot://faostat/2023-02-22/faostat_lc.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_metadata:
     - snapshot://faostat/2023-02-22/faostat_metadata.json
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_qcl:
     - snapshot://faostat/2023-02-22/faostat_qcl.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_qi:
     - snapshot://faostat/2023-02-22/faostat_qi.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_qv:
     - snapshot://faostat/2023-02-22/faostat_qv.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_rfb:
     - snapshot://faostat/2023-02-22/faostat_rfb.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_rfn:
     - snapshot://faostat/2023-02-22/faostat_rfn.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_rl:
     - snapshot://faostat/2023-02-22/faostat_rl.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_rp:
     - snapshot://faostat/2023-02-22/faostat_rp.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_rt:
     - snapshot://faostat/2023-02-22/faostat_rt.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_scl:
     - snapshot://faostat/2023-02-22/faostat_scl.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_sdgb:
     - snapshot://faostat/2023-02-22/faostat_sdgb.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_tcl:
     - snapshot://faostat/2023-02-22/faostat_tcl.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_ti:
     - snapshot://faostat/2023-02-22/faostat_ti.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://meadow/faostat/2023-02-22/faostat_wcad:
     - snapshot://faostat/2023-02-22/faostat_wcad.zip
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_ef:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_ef
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_ei:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_ei
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_ek:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_ek
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_el:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://meadow/faostat/2023-02-22/faostat_el
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_emn:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_emn
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_ep:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_ep
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_esb:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_esb
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_fa:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_fa
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_fbsc:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/owid/latest/key_indicators
     - data://meadow/faostat/2023-02-22/faostat_fbsh
     - data://meadow/faostat/2023-02-22/faostat_fbs
     - data://garden/wb/2021-07-01/wb_income
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_fo:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_fo
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_food_explorer:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/owid/latest/key_indicators
     - data://garden/faostat/2023-02-22/faostat_qcl
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-02-22/faostat_fbsc
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_fs:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_fs
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_gn:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_gn
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_ic:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_ic
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_lc:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_lc
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_metadata:
     - data://meadow/faostat/2023-02-22/faostat_ek
     - data://meadow/faostat/2023-02-22/faostat_rp
@@ -1448,259 +1448,259 @@ steps:
     - data://meadow/faostat/2023-02-22/faostat_fs
     - data://meadow/faostat/2023-02-22/faostat_emn
     - data://meadow/faostat/2023-02-22/faostat_lc
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_qcl:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
     - data://meadow/faostat/2023-02-22/faostat_qcl
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_qi:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_qi
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_qv:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_qv
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_rfb:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_rfb
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_rfn:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_rfn
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_rl:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_rl
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_rp:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_rp
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_rt:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://meadow/faostat/2023-02-22/faostat_rt
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_scl:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_scl
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_sdgb:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_sdgb
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_tcl:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/owid/latest/key_indicators
     - data://meadow/faostat/2023-02-22/faostat_tcl
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_ti:
     - data://meadow/faostat/2023-02-22/faostat_ti
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/owid/latest/key_indicators
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/faostat_wcad:
     - data://garden/faostat/2023-02-22/faostat_metadata
     - data://garden/wb/2021-07-01/wb_income
     - data://meadow/faostat/2023-02-22/faostat_wcad
     - data://garden/owid/latest/key_indicators
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_ef:
     - data://garden/faostat/2023-02-22/faostat_ef
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_ei:
     - data://garden/faostat/2023-02-22/faostat_ei
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_ek:
     - data://garden/faostat/2023-02-22/faostat_ek
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_el:
     - data://garden/faostat/2023-02-22/faostat_el
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_emn:
     - data://garden/faostat/2023-02-22/faostat_emn
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_ep:
     - data://garden/faostat/2023-02-22/faostat_ep
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_esb:
     - data://garden/faostat/2023-02-22/faostat_esb
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_fa:
     - data://garden/faostat/2023-02-22/faostat_fa
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_fbsc:
     - data://garden/faostat/2023-02-22/faostat_fbsc
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_fo:
     - data://garden/faostat/2023-02-22/faostat_fo
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_fs:
     - data://garden/faostat/2023-02-22/faostat_fs
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_lc:
     - data://garden/faostat/2023-02-22/faostat_lc
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_qcl:
     - data://garden/faostat/2023-02-22/faostat_qcl
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_qi:
     - data://garden/faostat/2023-02-22/faostat_qi
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_qv:
     - data://garden/faostat/2023-02-22/faostat_qv
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_rfb:
     - data://garden/faostat/2023-02-22/faostat_rfb
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_rfn:
     - data://garden/faostat/2023-02-22/faostat_rfn
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_rl:
     - data://garden/faostat/2023-02-22/faostat_rl
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_rp:
     - data://garden/faostat/2023-02-22/faostat_rp
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_rt:
     - data://garden/faostat/2023-02-22/faostat_rt
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_scl:
     - data://garden/faostat/2023-02-22/faostat_scl
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_sdgb:
     - data://garden/faostat/2023-02-22/faostat_sdgb
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_tcl:
     - data://garden/faostat/2023-02-22/faostat_tcl
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   data://grapher/faostat/2022-02-22/faostat_ti:
     - data://garden/faostat/2023-02-22/faostat_ti
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   grapher://faostat/2022-02-22/faostat_gn:
     - data://garden/faostat/2023-02-22/faostat_gn
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   grapher://faostat/2022-02-22/faostat_ic:
     - data://garden/faostat/2023-02-22/faostat_ic
-  # archived; last active in b41e26c92c38 on 2023-03-27
+  # archived; last active in 699c29ddc25e on 2023-03-27
   grapher://faostat/2022-02-22/faostat_wcad:
     - data://garden/faostat/2023-02-22/faostat_wcad
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_ef:
     - data://garden/faostat/2023-02-22/faostat_ef
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_ei:
     - data://garden/faostat/2023-02-22/faostat_ei
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_ek:
     - data://garden/faostat/2023-02-22/faostat_ek
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_el:
     - data://garden/faostat/2023-02-22/faostat_el
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_emn:
     - data://garden/faostat/2023-02-22/faostat_emn
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_ep:
     - data://garden/faostat/2023-02-22/faostat_ep
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_esb:
     - data://garden/faostat/2023-02-22/faostat_esb
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_fa:
     - data://garden/faostat/2023-02-22/faostat_fa
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_fbsc:
     - data://garden/faostat/2023-02-22/faostat_fbsc
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_fo:
     - data://garden/faostat/2023-02-22/faostat_fo
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_fs:
     - data://garden/faostat/2023-02-22/faostat_fs
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_lc:
     - data://garden/faostat/2023-02-22/faostat_lc
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_qcl:
     - data://garden/faostat/2023-02-22/faostat_qcl
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_qi:
     - data://garden/faostat/2023-02-22/faostat_qi
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_qv:
     - data://garden/faostat/2023-02-22/faostat_qv
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_rfb:
     - data://garden/faostat/2023-02-22/faostat_rfb
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_rfn:
     - data://garden/faostat/2023-02-22/faostat_rfn
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_rl:
     - data://garden/faostat/2023-02-22/faostat_rl
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_rp:
     - data://garden/faostat/2023-02-22/faostat_rp
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_rt:
     - data://garden/faostat/2023-02-22/faostat_rt
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_scl:
     - data://garden/faostat/2023-02-22/faostat_scl
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_sdgb:
     - data://garden/faostat/2023-02-22/faostat_sdgb
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_tcl:
     - data://garden/faostat/2023-02-22/faostat_tcl
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_ti:
     - data://garden/faostat/2023-02-22/faostat_ti
-  # archived; last active in 66dfb12562f2 on 2023-03-27
+  # archived; last active in b6d9f5125fbe on 2023-03-27
   grapher://faostat/2023-02-22/faostat_gn:
     - data://garden/faostat/2023-02-22/faostat_gn
-  # archived; last active in 66dfb12562f2 on 2023-03-27
+  # archived; last active in b6d9f5125fbe on 2023-03-27
   grapher://faostat/2023-02-22/faostat_ic:
     - data://garden/faostat/2023-02-22/faostat_ic
-  # archived; last active in 66dfb12562f2 on 2023-03-27
+  # archived; last active in b6d9f5125fbe on 2023-03-27
   grapher://faostat/2023-02-22/faostat_wcad:
     - data://garden/faostat/2023-02-22/faostat_wcad
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_gn:
     - data://garden/faostat/2023-02-22/faostat_gn
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_ic:
     - data://garden/faostat/2023-02-22/faostat_ic
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/faostat_wcad:
     - data://garden/faostat/2023-02-22/faostat_wcad
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://explorers/faostat/2023-02-22/food_explorer:
     - data://garden/faostat/2023-02-22/faostat_food_explorer
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/faostat/2023-02-22/additional_variables:
     - data://garden/faostat/2023-02-22/faostat_ef
     - data://garden/faostat/2023-02-22/faostat_qi
@@ -1709,19 +1709,19 @@ steps:
     - data://garden/faostat/2023-02-22/faostat_rfn
     - data://garden/faostat/2023-02-22/faostat_sdgb
     - data://garden/faostat/2023-02-22/faostat_fbsc
-  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://grapher/faostat/2023-02-22/additional_variables:
     - data://garden/faostat/2023-02-22/additional_variables
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://explorers/faostat/2023-06-12/food_explorer:
     - data://garden/faostat/2023-06-12/faostat_food_explorer
-  # archived; last active in aaa40b8ca4e0 on 2025-04-07
+  # archived; last active in ab7ce9e0d1ee on 2025-04-07
   data://explorers/faostat/latest/food_explorer:
     - data://garden/faostat/2025-03-17/faostat_food_explorer
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://meadow/faostat/2025-03-17/faostat_ic:
     - snapshot://faostat/2025-03-17/faostat_ic.zip
-  # archived; last active in aaa40b8ca4e0 on 2025-04-07
+  # archived; last active in ab7ce9e0d1ee on 2025-04-07
   data://garden/faostat/2025-03-17/faostat_food_explorer:
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/faostat/2025-03-17/faostat_metadata
@@ -1729,17 +1729,17 @@ steps:
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_fbsc
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://garden/faostat/2025-03-17/faostat_ic:
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/faostat/2025-03-17/faostat_metadata
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
     - data://meadow/faostat/2025-03-17/faostat_ic
-  # archived; last active in 2679e231cf3c on 2025-03-31
+  # archived; last active in 502a778b3917 on 2025-03-31
   data://grapher/faostat/2025-03-17/faostat_ic:
     - data://garden/faostat/2025-03-17/faostat_ic
-  # archived; last active in c8577a86e525 on 2025-04-22
+  # archived; last active in 9fdd488e7703 on 2025-04-24
   data://garden/faostat/latest/food_explorer:
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/faostat/2025-03-17/faostat_metadata

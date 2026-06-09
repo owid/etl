@@ -1,13 +1,13 @@
 steps:
 # Dominant Driver of Forest Loss
-  # archived; last active in 1015964158f5 on 2025-08-26
+  # archived; last active in 41425883c653 on 2025-08-27
   data://meadow/forests/2024-07-10/tree_cover_loss_by_driver:
     - snapshot://forests/2024-08-07/dominant_driver.xlsx
-  # archived; last active in 1015964158f5 on 2025-08-26
+  # archived; last active in 41425883c653 on 2025-08-27
   data://garden/forests/2024-07-10/tree_cover_loss_by_driver:
     - data://meadow/forests/2024-07-10/tree_cover_loss_by_driver
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
-  # archived; last active in 1015964158f5 on 2025-08-26
+  # archived; last active in 41425883c653 on 2025-08-27
   data://grapher/forests/2024-07-10/tree_cover_loss_by_driver:
     - data://garden/forests/2024-07-10/tree_cover_loss_by_driver

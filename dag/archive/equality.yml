@@ -1,11 +1,11 @@
 steps:
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://meadow/wb/2022-10-29/wb_gender:
     - walden://wb/2022-10-29/wb_gender
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://garden/wb/2022-10-29/wb_gender:
     - data://meadow/wb/2022-10-29/wb_gender
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://grapher/wb/2022-10-29/wb_gender:
     - data://garden/wb/2022-10-29/wb_gender
 
@@ -42,34 +42,34 @@ steps:
     - data://garden/lgbt_rights/2024-06-11/criminalization_mignot
 
 # World Bank GenderStats
-  # archived; last active in a20b08bb5886 on 2025-09-13
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://meadow/wb/2024-06-10/gender_statistics:
     - snapshot://wb/2024-06-10/gender_statistics.feather
-  # archived; last active in a20b08bb5886 on 2025-09-13
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://garden/wb/2024-06-10/gender_statistics:
     - data://meadow/wb/2024-06-10/gender_statistics
-  # archived; last active in a20b08bb5886 on 2025-09-13
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://garden/wb/2024-06-10/gender_statistics_country_counts:
     - data://garden/wb/2024-06-10/gender_statistics
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
-  # archived; last active in a20b08bb5886 on 2025-09-13
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://grapher/wb/2024-06-10/gender_statistics:
     - data://garden/wb/2024-06-10/gender_statistics
-  # archived; last active in a20b08bb5886 on 2025-09-13
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://grapher/wb/2024-06-10/gender_statistics_country_counts:
     - data://garden/wb/2024-06-10/gender_statistics_country_counts
 
   # LGBTI Policy Index (Velasco, 2020)
-  # archived; last active in 862fb32c2cf5 on 2026-05-20
+  # archived; last active in f53e73a90f9f on 2026-05-20
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
     - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
-  # archived; last active in 862fb32c2cf5 on 2026-05-20
+  # archived; last active in f53e73a90f9f on 2026-05-20
   data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
     - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
-  # archived; last active in 862fb32c2cf5 on 2026-05-20
+  # archived; last active in f53e73a90f9f on 2026-05-20
   data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
     - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
 

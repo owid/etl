@@ -2,82 +2,82 @@ steps:
   #
   # Farmer & Lafond (2016).
   #
-  # archived; last active in 94deef1247d0 on 2023-12-21
+  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/papers/2023-07-10/farmer_lafond_2016:
     - snapshot://papers/2023-01-04/farmer_lafond_2016.csv
-  # archived; last active in 94deef1247d0 on 2023-12-21
+  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/papers/2023-07-10/farmer_lafond_2016:
     - data://meadow/papers/2023-07-10/farmer_lafond_2016
-  # archived; last active in 94deef1247d0 on 2023-12-21
+  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/papers/2023-07-10/farmer_lafond_2016:
     - data://garden/papers/2023-07-10/farmer_lafond_2016
   #
   # Nemet (2009).
   #
-  # archived; last active in 94deef1247d0 on 2023-12-21
+  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/papers/2023-07-10/nemet_2009:
     - snapshot://papers/2023-01-04/nemet_2009.csv
-  # archived; last active in 94deef1247d0 on 2023-12-21
+  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/papers/2023-07-10/nemet_2009:
     - data://meadow/papers/2023-07-10/nemet_2009
   #
   # Bayliss-Smith & Wanmali (1984). Data on long-term wheat yields.
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/papers/2023-04-20/bayliss_smith_wanmali_1984:
     - snapshot://papers/2023-04-20/bayliss_smith_wanmali_1984.csv
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984:
     - data://meadow/papers/2023-04-20/bayliss_smith_wanmali_1984
   #
   # Broadberry et al. (2015). Data on long-term yields in United Kingdom.
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/papers/2023-04-21/broadberry_et_al_2015:
     - snapshot://papers/2023-04-21/broadberry_et_al_2015.csv
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/papers/2023-04-21/broadberry_et_al_2015:
     - data://meadow/papers/2023-04-21/broadberry_et_al_2015
   #
   # Brassley et al. (2000). Data on long-term yields in United Kingdom.
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/papers/2023-04-21/brassley_2000:
     - snapshot://papers/2023-04-21/brassley_2000.csv
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/papers/2023-04-21/brassley_2000:
     - data://meadow/papers/2023-04-21/brassley_2000
   #
   # Wuepper et al. (2020). Data on crop yields and nitrogen pollution.
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/papers/2023-05-26/wuepper_et_al_2020:
     - snapshot://papers/2023-05-26/wuepper_et_al_2020.xlsx
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/papers/2023-05-26/wuepper_et_al_2020:
     - data://meadow/papers/2023-05-26/wuepper_et_al_2020
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/papers/2023-05-26/wuepper_et_al_2020:
     - data://garden/papers/2023-05-26/wuepper_et_al_2020
   #
   # Ray et al. (2019). Climate impact on crop yields.
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/papers/2023-05-26/ray_et_al_2019:
     - snapshot://papers/2023-05-26/ray_et_al_2019.xlsx
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/papers/2023-05-26/ray_et_al_2019:
     - data://meadow/papers/2023-05-26/ray_et_al_2019
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://grapher/papers/2023-05-26/ray_et_al_2019:
     - data://garden/papers/2023-05-26/ray_et_al_2019
   #
   # Mueller et al. (2012). Attainable yields.
   #
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://meadow/papers/2023-05-26/mueller_et_al_2012:
     - snapshot://papers/2023-05-26/mueller_et_al_2012.xls
-  # archived; last active in 78112106fbc4 on 2024-03-29
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://garden/papers/2023-05-26/mueller_et_al_2012:
     - data://meadow/papers/2023-05-26/mueller_et_al_2012
   #
@@ -91,34 +91,34 @@ steps:
     - data://garden/papers/2024-03-26/ray_et_al_2019
 
   # Ipsos perils of perception, prejudice, and conspiracy theories.
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://meadow/papers/2024-10-25/ipsos:
     - snapshot://papers/2024-10-25/ipsos.csv
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://garden/papers/2024-10-25/ipsos:
     - data://meadow/papers/2024-10-25/ipsos
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://grapher/papers/2024-10-25/ipsos:
     - data://garden/papers/2024-10-25/ipsos
-  # archived; last active in fcf6d7869d6f on 2023-02-13
+  # archived; last active in 0e649f3a1e65 on 2023-02-15
   data://meadow/papers/2022-11-04/riley_2005:
     - walden://papers/2022-11-01/riley_2005
-  # archived; last active in fcf6d7869d6f on 2023-02-13
+  # archived; last active in 0e649f3a1e65 on 2023-02-15
   data://garden/papers/2022-11-04/riley_2005:
     - data://meadow/papers/2022-11-04/riley_2005
-  # archived; last active in 0afc5ab58a26 on 2023-07-20
+  # archived; last active in e80dbf7b9f13 on 2023-07-20
   data://meadow/papers/2023-01-04/farmer_lafond_2016:
     - snapshot://papers/2023-01-04/farmer_lafond_2016.csv
-  # archived; last active in 0afc5ab58a26 on 2023-07-20
+  # archived; last active in e80dbf7b9f13 on 2023-07-20
   data://garden/papers/2023-01-04/farmer_lafond_2016:
     - data://meadow/papers/2023-01-04/farmer_lafond_2016
-  # archived; last active in 0afc5ab58a26 on 2023-07-20
+  # archived; last active in e80dbf7b9f13 on 2023-07-20
   data://grapher/papers/2023-01-04/farmer_lafond_2016:
     - data://garden/papers/2023-01-04/farmer_lafond_2016
-  # archived; last active in 0afc5ab58a26 on 2023-07-20
+  # archived; last active in e80dbf7b9f13 on 2023-07-20
   data://meadow/papers/2023-01-04/nemet_2009:
     - snapshot://papers/2023-01-04/nemet_2009.csv
-  # archived; last active in 0afc5ab58a26 on 2023-07-20
+  # archived; last active in e80dbf7b9f13 on 2023-07-20
   data://garden/papers/2023-01-04/nemet_2009:
     - data://meadow/papers/2023-01-04/nemet_2009
   # archived; last active in f16b53d4044f on 2023-06-13

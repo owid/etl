@@ -1,13 +1,13 @@
 steps:
   # WHO Avian Influenza H5N1
-  # archived; last active in 25844602a410 on 2024-04-29
+  # archived; last active in b4643b7095c8 on 2024-04-29
   data://meadow/who/2023-08-14/avian_influenza_ah5n1:
     - snapshot://who/2023-08-14/avian_influenza_ah5n1.csv
-  # archived; last active in 25844602a410 on 2024-04-29
+  # archived; last active in b4643b7095c8 on 2024-04-29
   data://garden/who/2023-08-14/avian_influenza_ah5n1:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/who/2023-08-14/avian_influenza_ah5n1
-  # archived; last active in 25844602a410 on 2024-04-29
+  # archived; last active in b4643b7095c8 on 2024-04-29
   data://grapher/who/2023-08-14/avian_influenza_ah5n1:
     - data://garden/who/2023-08-14/avian_influenza_ah5n1
   # archived; last active in 917942d759bb on 2024-05-28
@@ -21,25 +21,25 @@ steps:
   data://grapher/who/2024-04-26/avian_influenza_ah5n1:
     - data://garden/who/2024-04-26/avian_influenza_ah5n1
 
-  # archived; last active in b50b146613dc on 2025-05-27
+  # archived; last active in 6c2d5807de88 on 2025-05-27
   data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
     - snapshot://health/2023-08-14/avian_influenza_h5n1_kucharski.xlsx
-  # archived; last active in b50b146613dc on 2025-05-27
+  # archived; last active in 6c2d5807de88 on 2025-05-27
   data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski:
     - data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in b50b146613dc on 2025-05-27
+  # archived; last active in 6c2d5807de88 on 2025-05-27
   data://grapher/health/2023-08-14/avian_influenza_h5n1_kucharski:
     - data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski
 
   # OECD Road Accidents
-  # archived; last active in d4a6314a5450 on 2024-07-03
+  # archived; last active in c04057a9229e on 2024-07-05
   data://grapher/oecd/2023-08-11/road_accidents:
     - data://garden/oecd/2023-08-11/road_accidents
-  # archived; last active in d4a6314a5450 on 2024-07-03
+  # archived; last active in c04057a9229e on 2024-07-05
   data://meadow/oecd/2023-08-11/road_accidents:
     - snapshot://oecd/2023-08-11/road_accidents.csv
-  # archived; last active in d4a6314a5450 on 2024-07-03
+  # archived; last active in c04057a9229e on 2024-07-05
   data://garden/oecd/2023-08-11/road_accidents:
     - data://meadow/oecd/2023-08-11/road_accidents
     - data://garden/oecd/2018-03-11/road_deaths_and_injuries
@@ -123,13 +123,13 @@ steps:
     - data://garden/ihme_gbd/2019/gbd_mental_health
 
   # IHME Global Burden of Disease - Risk factors
-  # archived; last active in 3a529ec5969b on 2024-12-22
+  # archived; last active in d974ced0c6ba on 2024-12-23
   data://meadow/ihme_gbd/2019/gbd_risk:
     - walden://ihme_gbd/2019/gbd_risk
-  # archived; last active in 3a529ec5969b on 2024-12-22
+  # archived; last active in d974ced0c6ba on 2024-12-23
   data://garden/ihme_gbd/2019/gbd_risk:
     - data://meadow/ihme_gbd/2019/gbd_risk
-  # archived; last active in 3a529ec5969b on 2024-12-22
+  # archived; last active in d974ced0c6ba on 2024-12-23
   data://grapher/ihme_gbd/2019/gbd_risk:
     - data://garden/ihme_gbd/2019/gbd_risk
 
@@ -167,29 +167,29 @@ steps:
     - data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream
 
   # Suicides based on GHO dataset
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://garden/who/2024-02-14/gho_suicides:
     - data://garden/who/2024-01-03/gho
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://grapher/who/2024-02-14/gho_suicides:
     - data://garden/who/2024-02-14/gho_suicides
 
   # WHO - Global Health Observatory (only suicides variable)
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://meadow/who/2023-03-09/gho_suicides:
     - snapshot://who/2023-03-09/gho_suicides.json
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://garden/who/2023-03-09/gho_suicides:
     - data://meadow/who/2023-03-09/gho_suicides
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://grapher/who/2023-03-09/gho_suicides:
     - data://garden/who/2023-03-09/gho_suicides
 
   # Malnutrition
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://grapher/malnutrition/2022-10-18/malnutrition:
     - data://garden/malnutrition/2022-10-18/malnutrition
-  # archived; last active in 48cfbd427db3 on 2024-12-23
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/un/2022-07-11/un_wpp
@@ -209,87 +209,87 @@ steps:
     - data://garden/who/2022-09-30/ghe
 
   # ISAPS: Surgery
-  # archived; last active in 85130a25eb39 on 2024-12-27
+  # archived; last active in cd05b55a949f on 2024-12-29
   data://meadow/health/2024-06-11/isaps_plastic_surgery:
     - snapshot://health/2024-06-11/isaps_plastic_surgery.xlsx
-  # archived; last active in 85130a25eb39 on 2024-12-27
+  # archived; last active in cd05b55a949f on 2024-12-29
   data://garden/health/2024-06-11/isaps_plastic_surgery:
     - data://meadow/health/2024-06-11/isaps_plastic_surgery
-  # archived; last active in 85130a25eb39 on 2024-12-27
+  # archived; last active in cd05b55a949f on 2024-12-29
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
 
   # Missing Data - Neuropsychiatric Conditions
-  # archived; last active in 1f664f1cdf5d on 2024-12-29
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
   data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions:
     - data://garden/who/2024-07-26/mortality_database
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
-  # archived; last active in 1f664f1cdf5d on 2024-12-29
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
   data://grapher/missing_data/2024-03-26/who_neuropsychiatric_conditions:
     - data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions
 
   # Antibiotic resistance data - WHO GLASS
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://meadow/antibiotics/2024-10-18/who_glass:
     - snapshot://antibiotics/2024-10-18/who_glass.zip
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://garden/antibiotics/2024-10-18/who_glass:
     - data://meadow/antibiotics/2024-10-18/who_glass
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://grapher/antibiotics/2024-10-18/who_glass:
     - data://garden/antibiotics/2024-10-18/who_glass
 
   # Soil-transmitted helminthiases
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
     - snapshot://neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases.xlsx
 
     # Flu testing data
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://garden/who/2024-09-09/flu_test:
     - data://meadow/who/latest/flunet
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://grapher/who/2024-09-09/flu_test:
     - data://garden/who/2024-09-09/flu_test
 
   # Tuberculosis notifications - WHO
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://meadow/tuberculosis/2023-12-11/notifications:
     - snapshot://tuberculosis/2023-12-11/notifications.csv
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://garden/tuberculosis/2023-11-27/notifications:
     - data://meadow/tuberculosis/2023-12-11/notifications
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://grapher/tuberculosis/2023-11-27/notifications:
     - data://garden/tuberculosis/2023-11-27/notifications
 
   # Tuberculosis outcomes disaggregated - WHO
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://meadow/tuberculosis/2023-12-12/outcomes_disagg:
     - snapshot://tuberculosis/2023-12-12/outcomes_disagg.csv
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://garden/tuberculosis/2023-11-27/outcomes_disagg:
     - data://meadow/tuberculosis/2023-12-12/outcomes_disagg
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  # archived; last active in 7ce2811498df on 2024-12-31
+  # archived; last active in 9aede0030c0c on 2025-01-06
   data://grapher/tuberculosis/2023-11-27/outcomes_disagg:
     - data://garden/tuberculosis/2023-11-27/outcomes_disagg
 
   # MICROBE - neonatal deaths by pathogen and amr resistance
-  # archived; last active in c239fc5260d9 on 2025-01-06
+  # archived; last active in e9bb4b36263b on 2025-01-07
   data-private://meadow/antibiotics/2024-12-05/microbe_neonatal_total_amr:
     - snapshot-private://antibiotics/2024-12-05/microbe_neonatal_total_amr.csv
-  # archived; last active in c239fc5260d9 on 2025-01-06
+  # archived; last active in e9bb4b36263b on 2025-01-07
   data-private://garden/antibiotics/2024-12-05/microbe_neonatal_total_amr:
     - data-private://meadow/antibiotics/2024-12-05/microbe_neonatal_total_amr
     - data-private://garden/antibiotics/2024-11-20/microbe
-  # archived; last active in c239fc5260d9 on 2025-01-06
+  # archived; last active in e9bb4b36263b on 2025-01-07
   data-private://grapher/antibiotics/2024-12-05/microbe_neonatal_total_amr:
     - data-private://garden/antibiotics/2024-12-05/microbe_neonatal_total_amr
 
@@ -306,58 +306,58 @@ steps:
     - data://garden/who/2022-07-17/who_vaccination
 
   # Guinea Worm Eradication Program
-  # archived; last active in a94d1b671f0e on 2025-01-13
+  # archived; last active in 10b2129ddfc2 on 2025-01-14
   data://grapher/who/2023-06-30/guinea_worm:
     - data://garden/who/2023-06-29/guinea_worm_certification
 
     # Guinea worm (2024 update)
-  # archived; last active in 4f22e3322973 on 2026-06-01
+  # archived; last active in d9e42c81b331 on 2026-06-03
   data://garden/who/2024-06-17/guinea_worm:
     - data://garden/who/2023-06-29/guinea_worm_certification
     - snapshot://fasttrack/2024-06-17/guinea_worm.csv
-  # archived; last active in 4f22e3322973 on 2026-06-01
+  # archived; last active in d9e42c81b331 on 2026-06-03
   data://grapher/who/2024-06-17/guinea_worm:
     - data://garden/who/2024-06-17/guinea_worm
 
     # Guinea worm - historical estimates
-  # archived; last active in 4f22e3322973 on 2026-06-01
+  # archived; last active in d9e42c81b331 on 2026-06-03
   data://meadow/who/2023-06-29/guinea_worm_certification:
     - snapshot://who/2023-06-29/guinea_worm.csv
-  # archived; last active in 4f22e3322973 on 2026-06-01
+  # archived; last active in d9e42c81b331 on 2026-06-03
   data://garden/who/2023-06-29/guinea_worm_certification:
     - data://meadow/who/2023-06-29/guinea_worm_certification
 
   # Polio vaccine schedule - to archive
-  # archived; last active in 9f23de4c6d10 on 2025-01-13
+  # archived; last active in dd55515650b7 on 2025-01-13
   data://meadow/who/2024-04-22/polio_vaccine_schedule:
     - snapshot://who/2024-04-22/polio_vaccine_schedule.xlsx
-  # archived; last active in 9f23de4c6d10 on 2025-01-13
+  # archived; last active in dd55515650b7 on 2025-01-13
   data://garden/who/2024-04-22/polio_vaccine_schedule:
     - data://meadow/who/2024-04-22/polio_vaccine_schedule
-  # archived; last active in 9f23de4c6d10 on 2025-01-13
+  # archived; last active in dd55515650b7 on 2025-01-13
   data://grapher/who/2024-04-22/polio_vaccine_schedule:
     - data://garden/who/2024-04-22/polio_vaccine_schedule
 
   # Wellbeing
-  # archived; last active in c4f9478ae06d on 2025-03-18
+  # archived; last active in 37724248da9e on 2025-03-19
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
 
   # UNAIDS 2023
-  # archived; last active in b18cdbdb836c on 2025-02-21
+  # archived; last active in 13a906cd1b7a on 2025-02-24
   data://meadow/health/2023-08-09/unaids:
     - snapshot://health/2023-08-09/unaids.csv
-  # archived; last active in b18cdbdb836c on 2025-02-21
+  # archived; last active in 13a906cd1b7a on 2025-02-24
   data://meadow/health/2023-08-11/unaids_hiv_children:
     - snapshot://health/2023-08-11/unaids_hiv_children.xlsx
-  # archived; last active in b18cdbdb836c on 2025-02-21
+  # archived; last active in 13a906cd1b7a on 2025-02-24
   data://meadow/health/2023-08-22/unaids_gap_art:
     - snapshot://health/2023-08-22/unaids_gap_art.xlsx
-  # archived; last active in b18cdbdb836c on 2025-02-21
+  # archived; last active in 13a906cd1b7a on 2025-02-24
   data://meadow/health/2023-08-22/unaids_condom_msm:
     - snapshot://health/2023-08-22/unaids_condom_msm.xlsx
 
-  # archived; last active in b18cdbdb836c on 2025-02-21
+  # archived; last active in 13a906cd1b7a on 2025-02-24
   data://garden/health/2023-08-09/unaids:
     - data://meadow/health/2023-08-09/unaids
     - data://meadow/health/2023-08-11/unaids_hiv_children
@@ -368,54 +368,54 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
 
-  # archived; last active in b18cdbdb836c on 2025-02-21
+  # archived; last active in 13a906cd1b7a on 2025-02-24
   data://grapher/health/2023-08-09/unaids:
     - data://garden/health/2023-08-09/unaids
 
   # UNAIDS 2025
-  # archived; last active in 328aba119679 on 2026-01-23
+  # archived; last active in 1d129eb249b4 on 2026-01-23
   data://meadow/health/2025-12-15/unaids:
     - snapshot://health/2025-12-15/unaids_epi.zip
     - snapshot://health/2025-12-15/unaids_gam.zip
     - snapshot://health/2025-12-15/unaids_kpa.zip
     - snapshot://health/2025-12-15/unaids_ncpi.zip
-  # archived; last active in 328aba119679 on 2026-01-23
+  # archived; last active in 1d129eb249b4 on 2026-01-23
   data://garden/health/2025-12-15/unaids:
     - data://meadow/health/2025-12-15/unaids
     - data://garden/regions/2023-01-01/regions
     - data://meadow/health/2023-08-22/unaids_deaths_averted_art
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
-  # archived; last active in 328aba119679 on 2026-01-23
+  # archived; last active in 1d129eb249b4 on 2026-01-23
   data://grapher/health/2025-12-15/unaids:
     - data://garden/health/2025-12-15/unaids
 
   # Mpox
-  # archived; last active in c4f9478ae06d on 2025-03-18
+  # archived; last active in 37724248da9e on 2025-03-19
   data://explorers/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
 
   # Death completion (Karlinsky,2023)
-  # archived; last active in 509b5959a870 on 2025-04-18
+  # archived; last active in fc5ecd77f972 on 2025-04-18
   data://meadow/health/2023-08-16/deaths_karlinsky:
     - snapshot://health/2023-08-16/deaths_karlinsky.csv
-  # archived; last active in 509b5959a870 on 2025-04-18
+  # archived; last active in fc5ecd77f972 on 2025-04-18
   data://garden/health/2023-08-16/deaths_karlinsky:
     - data://meadow/health/2023-08-16/deaths_karlinsky
     - data://garden/demography/2023-03-31/population
-  # archived; last active in 509b5959a870 on 2025-04-18
+  # archived; last active in fc5ecd77f972 on 2025-04-18
   data://grapher/health/2023-08-16/deaths_karlinsky:
     - data://garden/health/2023-08-16/deaths_karlinsky
-  # archived; last active in dda9a9e6ba4f on 2025-06-10
+  # archived; last active in 0de76e0617db on 2025-06-10
   data://grapher/who/2024-01-03/gho:
     - data://garden/who/2024-01-03/gho
 
   # Registered vehicles per 1000 people
-  # archived; last active in dda9a9e6ba4f on 2025-06-10
+  # archived; last active in 0de76e0617db on 2025-06-10
   data://garden/who/2024-05-20/vehicles:
     - data://garden/who/2025-05-19/gho
     - data://garden/demography/2024-07-15/population
-  # archived; last active in dda9a9e6ba4f on 2025-06-10
+  # archived; last active in 0de76e0617db on 2025-06-10
   data://grapher/who/2024-05-20/vehicles:
     - data://garden/who/2024-05-20/vehicles
 
@@ -443,39 +443,39 @@ steps:
     - data://garden/tuberculosis/2023-11-27/latent
 
   # Tuberculosis burden estimates - WHO
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://meadow/tuberculosis/2023-11-27/burden_estimates:
     - snapshot://tuberculosis/2023-11-27/burden_estimates.csv
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://garden/tuberculosis/2023-11-27/burden_estimates:
     - data://meadow/tuberculosis/2023-11-27/burden_estimates
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/demography/2023-03-31/population
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://grapher/tuberculosis/2023-11-27/burden_estimates:
     - data://garden/tuberculosis/2023-11-27/burden_estimates
 
   # Tuberculosis budget - WHO
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://meadow/tuberculosis/2023-12-01/budget:
     - snapshot://tuberculosis/2023-12-01/budget.csv
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://garden/tuberculosis/2023-11-27/budget:
     - data://meadow/tuberculosis/2023-12-01/budget
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://grapher/tuberculosis/2023-11-27/budget:
     - data://garden/tuberculosis/2023-11-27/budget
 
   # Tuberculosis burden disaggregated - WHO
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://meadow/tuberculosis/2023-12-04/burden_disaggregated:
     - snapshot://tuberculosis/2023-12-04/burden_disaggregated.csv
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://garden/tuberculosis/2023-11-27/burden_disaggregated:
     - data://meadow/tuberculosis/2023-12-04/burden_disaggregated
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
@@ -483,84 +483,84 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/demography/2023-03-31/population
     - data://garden/un/2022-07-11/un_wpp
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://grapher/tuberculosis/2023-11-27/burden_disaggregated:
     - data://garden/tuberculosis/2023-11-27/burden_disaggregated
 
   # Tuberculosis laboratories - WHO
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://meadow/tuberculosis/2023-12-06/laboratories:
     - snapshot://tuberculosis/2023-12-06/laboratories.csv
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://garden/tuberculosis/2023-11-27/laboratories:
     - data://meadow/tuberculosis/2023-12-06/laboratories
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/un/2022-07-11/un_wpp
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://grapher/tuberculosis/2023-11-27/laboratories:
     - data://garden/tuberculosis/2023-11-27/laboratories
 
   # Tuberculosis resistance surveillance - WHO
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance:
     - snapshot://tuberculosis/2023-12-04/drug_resistance_surveillance.csv
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance:
     - data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://grapher/tuberculosis/2023-11-27/drug_resistance_surveillance:
     - data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance
 
   # Tuberculosis outcomes - WHO
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://meadow/tuberculosis/2023-12-11/outcomes:
     - snapshot://tuberculosis/2023-12-11/outcomes.csv
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://garden/tuberculosis/2023-11-27/outcomes:
     - data://meadow/tuberculosis/2023-12-11/outcomes
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://grapher/tuberculosis/2023-11-27/outcomes:
     - data://garden/tuberculosis/2023-11-27/outcomes
 
   # Tuberculosis expenditure - WHO
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://meadow/tuberculosis/2023-12-05/expenditure:
     - snapshot://tuberculosis/2023-12-05/expenditure.csv
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://garden/tuberculosis/2023-11-27/expenditure:
     - data://meadow/tuberculosis/2023-12-05/expenditure
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
-  # archived; last active in e3de59df4f11 on 2025-06-16
+  # archived; last active in 9a6dae2bf23c on 2025-06-17
   data://grapher/tuberculosis/2023-11-27/expenditure:
     - data://garden/tuberculosis/2023-11-27/expenditure
 
   #
   # Vaccine confidence - to archive
   #
-  # archived; last active in 6948a8ebeb17 on 2025-06-18
+  # archived; last active in 5fe4d7bc38b7 on 2025-06-19
   data://meadow/health/2025-02-13/vaccine_confidence:
     - snapshot://health/2025-02-13/vaccine_confidence.csv
-  # archived; last active in 6948a8ebeb17 on 2025-06-18
+  # archived; last active in 5fe4d7bc38b7 on 2025-06-19
   data://garden/health/2025-02-13/vaccine_confidence:
     - data://meadow/health/2025-02-13/vaccine_confidence
-  # archived; last active in 6948a8ebeb17 on 2025-06-18
+  # archived; last active in 5fe4d7bc38b7 on 2025-06-19
   data://grapher/health/2025-02-13/vaccine_confidence:
     - data://garden/health/2025-02-13/vaccine_confidence
 
   # WHO Statins (moved to main GHPO script)
-  # archived; last active in d4a3d1d5c498 on 2025-07-04
+  # archived; last active in ca09f37572a5 on 2025-07-07
   data://meadow/who/2023-11-01/who_statins:
     - snapshot://who/2023-11-01/who_statins.csv
-  # archived; last active in d4a3d1d5c498 on 2025-07-04
+  # archived; last active in ca09f37572a5 on 2025-07-07
   data://garden/who/2023-11-01/who_statins:
     - data://meadow/who/2023-11-01/who_statins
-  # archived; last active in d4a3d1d5c498 on 2025-07-04
+  # archived; last active in ca09f37572a5 on 2025-07-07
   data://grapher/who/2023-11-01/who_statins:
     - data://garden/who/2023-11-01/who_statins
 
@@ -588,47 +588,47 @@ steps:
     - data://garden/who/2025-01-09/vaccination_introductions
 
     # WHO Mortality Database - to archive
-  # archived; last active in 98afaf9ff53f on 2025-08-05
+  # archived; last active in fb9972b4d8d3 on 2025-08-06
   data://meadow/who/2024-07-26/mortality_database:
     - snapshot://who/2024-07-26/mortality_database.feather
-  # archived; last active in 98afaf9ff53f on 2025-08-05
+  # archived; last active in fb9972b4d8d3 on 2025-08-06
   data://garden/who/2024-07-26/mortality_database:
     - data://meadow/who/2024-07-26/mortality_database
-  # archived; last active in 98afaf9ff53f on 2025-08-05
+  # archived; last active in fb9972b4d8d3 on 2025-08-06
   data://grapher/who/2024-07-26/mortality_database:
     - data://garden/who/2024-07-26/mortality_database
 
   # WHO ICD codes
-  # archived; last active in 98afaf9ff53f on 2025-08-05
+  # archived; last active in fb9972b4d8d3 on 2025-08-06
   data://meadow/who/2024-07-29/icd_codes:
     - snapshot://who/2024-07-29/icd_codes.zip
-  # archived; last active in 98afaf9ff53f on 2025-08-05
+  # archived; last active in fb9972b4d8d3 on 2025-08-06
   data://garden/who/2024-07-29/icd_codes:
     - data://meadow/who/2024-07-29/icd_codes
-  # archived; last active in 98afaf9ff53f on 2025-08-05
+  # archived; last active in fb9972b4d8d3 on 2025-08-06
   data://grapher/who/2024-07-29/icd_codes:
     - data://garden/who/2024-07-29/icd_codes
 
   # WHO Mortality Database - Cancer specific
-  # archived; last active in 98afaf9ff53f on 2025-08-05
+  # archived; last active in fb9972b4d8d3 on 2025-08-06
   data://meadow/who/2024-08-06/mortality_database_cancer:
     - snapshot://who/2024-08-06/mortality_database_cancer.csv
-  # archived; last active in 98afaf9ff53f on 2025-08-05
+  # archived; last active in fb9972b4d8d3 on 2025-08-06
   data://garden/who/2024-08-06/mortality_database_cancer:
     - data://meadow/who/2024-08-06/mortality_database_cancer
-  # archived; last active in 98afaf9ff53f on 2025-08-05
+  # archived; last active in fb9972b4d8d3 on 2025-08-06
   data://grapher/who/2024-08-06/mortality_database_cancer:
     - data://garden/who/2024-08-06/mortality_database_cancer
 
   # WHO Mort DB Homicides
-  # archived; last active in dbc6698efaa3 on 2025-08-06
+  # archived; last active in ac719eb1412b on 2025-08-06
   data://meadow/homicide/2024-07-30/who_mort_db:
     - snapshot://homicide/2024-07-30/who_mort_db.csv
-  # archived; last active in dbc6698efaa3 on 2025-08-06
+  # archived; last active in ac719eb1412b on 2025-08-06
   data://garden/homicide/2024-07-30/who_mort_db:
     - data://meadow/homicide/2024-07-30/who_mort_db
     - data://garden/un/2022-07-11/un_wpp
-  # archived; last active in dbc6698efaa3 on 2025-08-06
+  # archived; last active in ac719eb1412b on 2025-08-06
   data://grapher/homicide/2024-07-30/who_mort_db:
     - data://garden/homicide/2024-07-30/who_mort_db
 
@@ -646,42 +646,42 @@ steps:
 
   # WHO Preventive Chemotherapy - Neglected Tropical Diseases
   # Lymphatic filariasis
-  # archived; last active in 7878495e6708 on 2025-08-19
+  # archived; last active in 41ad047aabca on 2025-08-20
   data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
     - snapshot://neglected_tropical_diseases/2024-05-02/lymphatic_filariasis.xlsx
-  # archived; last active in 7878495e6708 on 2025-08-19
+  # archived; last active in 41ad047aabca on 2025-08-20
   data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
     - data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in 7878495e6708 on 2025-08-19
+  # archived; last active in 41ad047aabca on 2025-08-20
   data://grapher/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
     - data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
     # Schistosomiasis
-  # archived; last active in 7878495e6708 on 2025-08-19
+  # archived; last active in 41ad047aabca on 2025-08-20
   data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis:
     - snapshot://neglected_tropical_diseases/2024-05-02/schistosomiasis.xlsx
-  # archived; last active in 7878495e6708 on 2025-08-19
+  # archived; last active in 41ad047aabca on 2025-08-20
   data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis:
     - data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in 7878495e6708 on 2025-08-19
+  # archived; last active in 41ad047aabca on 2025-08-20
   data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
     - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis
 
   # UN MMEIG Maternal Mortality (1985-2023)
-  # archived; last active in 6d3ca1e311b3 on 2025-12-01
+  # archived; last active in bdc8580c3665 on 2025-12-02
   data://meadow/un/2025-08-29/maternal_mortality:
     - snapshot://un/2025-08-29/maternal_mortality.zip
-  # archived; last active in 6d3ca1e311b3 on 2025-12-01
+  # archived; last active in bdc8580c3665 on 2025-12-02
   data://garden/un/2025-08-29/maternal_mortality:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/un/2025-08-29/maternal_mortality
-  # archived; last active in 6d3ca1e311b3 on 2025-12-01
+  # archived; last active in bdc8580c3665 on 2025-12-02
   data://grapher/un/2025-08-29/maternal_mortality:
     - data://garden/un/2025-08-29/maternal_mortality
 
   # Maternal Mortality long run data set (OWID OMM)
-  # archived; last active in 6d3ca1e311b3 on 2025-12-01
+  # archived; last active in bdc8580c3665 on 2025-12-02
   data://garden/maternal_mortality/2025-09-02/maternal_mortality:
     - data://garden/gapminder/2024-07-08/maternal_mortality
     - data://garden/demography/2024-07-15/population
@@ -690,40 +690,40 @@ steps:
     - data://garden/who/2025-04-17/mortality_database
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/wb/2025-07-01/income_groups
-  # archived; last active in 6d3ca1e311b3 on 2025-12-01
+  # archived; last active in bdc8580c3665 on 2025-12-02
   data://grapher/maternal_mortality/2025-09-02/maternal_mortality:
     - data://garden/maternal_mortality/2025-09-02/maternal_mortality
 
   # Tuberculosis burden estimates - WHO
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://meadow/tuberculosis/2025-06-06/burden_estimates:
     - snapshot://tuberculosis/2025-06-06/burden_estimates.csv
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://garden/tuberculosis/2025-06-06/burden_estimates:
     - data://meadow/tuberculosis/2025-06-06/burden_estimates
     - data://garden/demography/2024-07-15/population
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://grapher/tuberculosis/2025-06-06/burden_estimates:
     - data://garden/tuberculosis/2025-06-06/burden_estimates
   # Tuberculosis expenditure - WHO
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://meadow/tuberculosis/2025-06-16/expenditure:
     - snapshot://tuberculosis/2025-06-16/expenditure.csv
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://garden/tuberculosis/2025-06-16/expenditure:
     - data://meadow/tuberculosis/2025-06-16/expenditure
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://grapher/tuberculosis/2025-06-16/expenditure:
     - data://garden/tuberculosis/2025-06-16/expenditure
   # Tuberculosis burden disaggregated - WHO
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://meadow/tuberculosis/2025-06-16/burden_disaggregated:
     - snapshot://tuberculosis/2025-06-16/burden_disaggregated.csv
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://garden/tuberculosis/2025-06-16/burden_disaggregated:
     - data://meadow/tuberculosis/2025-06-16/burden_disaggregated
     - data://garden/demography/2024-07-15/population
@@ -731,62 +731,62 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/un/2022-07-11/un_wpp
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://grapher/tuberculosis/2025-06-16/burden_disaggregated:
     - data://garden/tuberculosis/2025-06-16/burden_disaggregated
 
     # Tuberculosis outcomes - WHO
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://meadow/tuberculosis/2025-06-16/outcomes:
     - snapshot://tuberculosis/2025-06-16/outcomes.csv
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://garden/tuberculosis/2025-06-16/outcomes:
     - data://meadow/tuberculosis/2025-06-16/outcomes
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://grapher/tuberculosis/2025-06-16/outcomes:
     - data://garden/tuberculosis/2025-06-16/outcomes
 
   # Tuberculosis resistance surveillance - WHO
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://meadow/tuberculosis/2025-06-16/drug_resistance_surveillance:
     - snapshot://tuberculosis/2025-06-16/drug_resistance_surveillance.csv
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://garden/tuberculosis/2025-06-16/drug_resistance_surveillance:
     - data://meadow/tuberculosis/2025-06-16/drug_resistance_surveillance
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://grapher/tuberculosis/2025-06-16/drug_resistance_surveillance:
     - data://garden/tuberculosis/2025-06-16/drug_resistance_surveillance
 
   # Tuberculosis budget - WHO
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://meadow/tuberculosis/2025-06-16/budget:
     - snapshot://tuberculosis/2025-06-16/budget.csv
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://garden/tuberculosis/2025-06-16/budget:
     - data://meadow/tuberculosis/2025-06-16/budget
     - data://garden/regions/2023-01-01/regions
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
     - data://garden/wb/2025-07-01/income_groups
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://grapher/tuberculosis/2025-06-16/budget:
     - data://garden/tuberculosis/2025-06-16/budget
 
   # Tuberculosis laboratories - WHO
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://meadow/tuberculosis/2025-06-16/laboratories:
     - snapshot://tuberculosis/2025-06-16/laboratories.csv
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://garden/tuberculosis/2025-06-16/laboratories:
     - data://meadow/tuberculosis/2025-06-16/laboratories
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
-  # archived; last active in 1c44485aeef3 on 2026-02-05
+  # archived; last active in 8045ca2471b3 on 2026-02-06
   data://grapher/tuberculosis/2025-06-16/laboratories:
     - data://garden/tuberculosis/2025-06-16/laboratories
 
@@ -831,72 +831,72 @@ steps:
   data-private://grapher/ihme_gbd/2024-05-20/gbd_child_mortality:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_child_mortality
   # GBD 2021 - GBD Prevalence
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence:
     - snapshot-private://ihme_gbd/2024-05-20/gbd_prevalence.feather
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence
     - data://garden/regions/2023-01-01/regions
     - data://garden/un/2022-07-11/un_wpp
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://grapher/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://grapher/ihme_gbd/2024-05-20/gbd_incidence:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
 
   # GBD 2021 - GBD Deaths and DALYs
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://meadow/ihme_gbd/2024-05-20/gbd_cause:
     - snapshot-private://ihme_gbd/2024-05-20/gbd_cause.feather
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://garden/ihme_gbd/2024-05-20/gbd_cause:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_cause
     - data://garden/regions/2023-01-01/regions
     - data://garden/un/2022-07-11/un_wpp
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://grapher/ihme_gbd/2024-05-20/gbd_cause:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://grapher/ihme_gbd/2024-05-20/gbd_cause_dalys:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
 
   # GBD 2021 - GBD Mental Health
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health:
     - snapshot-private://ihme_gbd/2024-05-20/gbd_mental_health.feather
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health
     - data://garden/regions/2023-01-01/regions
     - data://garden/un/2022-07-11/un_wpp
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health
 
   # GBD 2021 - GBD Risk Factors - Drugs (downloaded separately due errors in the source that were fixed after initial gbd_risk import)
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://meadow/ihme_gbd/2024-05-20/gbd_drug_risk:
     - snapshot-private://ihme_gbd/2024-05-20/gbd_drug_risk.feather
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://garden/ihme_gbd/2024-05-20/gbd_drug_risk:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_drug_risk
     - data://garden/regions/2023-01-01/regions
     - data://garden/un/2022-07-11/un_wpp
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://grapher/ihme_gbd/2024-05-20/gbd_drug_risk:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_drug_risk
   # GBD 2021 - GBD Risk Factors cancer specific
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://meadow/ihme_gbd/2024-08-26/gbd_risk_cancer:
     - snapshot-private://ihme_gbd/2024-08-26/gbd_risk_cancer.feather
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://garden/ihme_gbd/2024-08-26/gbd_risk_cancer:
     - data-private://meadow/ihme_gbd/2024-08-26/gbd_risk_cancer
     - data://garden/regions/2023-01-01/regions
     - data://garden/un/2022-07-11/un_wpp
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   data-private://grapher/ihme_gbd/2024-08-26/gbd_risk_cancer:
     - data-private://garden/ihme_gbd/2024-08-26/gbd_risk_cancer
 
@@ -939,80 +939,80 @@ steps:
     - data://garden/neglected_tropical_diseases/2024-05-18/funding
 
   # GBD 2021 - GBD Health-adjusted Life Expectancy and Life Expectancy
-  # archived; last active in 25583eccabb1 on 2026-02-13
+  # archived; last active in 405958c592b8 on 2026-02-13
   data-private://meadow/ihme_gbd/2024-07-02/gbd_life_expectancy:
     - snapshot-private://ihme_gbd/2024-07-02/gbd_life_expectancy.zip
-  # archived; last active in 25583eccabb1 on 2026-02-13
+  # archived; last active in 405958c592b8 on 2026-02-13
   data-private://meadow/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
     - snapshot-private://ihme_gbd/2024-07-02/gbd_healthy_life_expectancy.zip
-  # archived; last active in 25583eccabb1 on 2026-02-13
+  # archived; last active in 405958c592b8 on 2026-02-13
   data-private://garden/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
     - data-private://meadow/ihme_gbd/2024-07-02/gbd_life_expectancy
     - data-private://meadow/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy
-  # archived; last active in 25583eccabb1 on 2026-02-13
+  # archived; last active in 405958c592b8 on 2026-02-13
   data-private://grapher/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
     - data-private://garden/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy
 
 # Cancer diagnosis routes and survival NHS
-  # archived; last active in 28dce06301d2 on 2026-04-07
+  # archived; last active in 8c291df45d13 on 2026-04-08
   data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage:
     - snapshot://cancer/2024-09-13/diagnosis_routes_by_stage.csv
-  # archived; last active in 28dce06301d2 on 2026-04-07
+  # archived; last active in 8c291df45d13 on 2026-04-08
   data://garden/cancer/2024-09-13/diagnosis_routes_by_stage:
     - data://meadow/cancer/2024-09-13/diagnosis_routes_by_stage
-  # archived; last active in 28dce06301d2 on 2026-04-07
+  # archived; last active in 8c291df45d13 on 2026-04-08
   data://grapher/cancer/2024-09-13/diagnosis_routes_by_stage:
     - data://garden/cancer/2024-09-13/diagnosis_routes_by_stage
   # Global Health Observatory (GHO) from WHO
-  # archived; last active in 8ee1c16f1fb1 on 2026-06-04
+  # archived; last active in 9e949ea0595e on 2026-06-04
   data://garden/who/2025-05-19/gho:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/who/2025-05-19/gho:
       - snapshot://who/2025-05-19/gho.zip
     - data://garden/demography/2024-07-15/population
-  # archived; last active in 8ee1c16f1fb1 on 2026-06-04
+  # archived; last active in 9e949ea0595e on 2026-06-04
   data://grapher/who/2025-05-19/gho:
     - data://garden/who/2025-05-19/gho
-  # archived; last active in bc44532579ec on 2024-06-06
+  # archived; last active in 132f41a4ac6b on 2024-06-07
   data://garden/who/2021-07-01/ghe:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/who/2021-07-01/ghe:
       - walden://who/2021-07-01/ghe
-  # archived; last active in bc44532579ec on 2024-06-06
+  # archived; last active in 132f41a4ac6b on 2024-06-07
   data://meadow/who/2021-07-01/gho:
     - walden://who/2021-07-01/gho
-  # archived; last active in 58f752d0e911 on 2023-08-16
+  # archived; last active in 3db1a976017b on 2023-08-17
   data://grapher/health/2022-12-28/deaths_karlinsky:
     - data://garden/health/2022-12-28/deaths_karlinsky:
       - data://meadow/health/2022-12-28/deaths_karlinsky:
         - snapshot://health/2022-12-28/deaths_karlinsky.csv
       - data://garden/owid/latest/key_indicators
-  # archived; last active in c314aa38b110 on 2025-04-02
+  # archived; last active in 7dcaf843ece1 on 2025-04-02
   data://explorers/who/latest/flu:
     - data://garden/who/latest/flunet
     - data://garden/who/latest/fluid
-  # archived; last active in c3205745ffc6 on 2024-05-20
+  # archived; last active in f0d07266689b on 2024-05-20
   data://grapher/who/2023-03-13/vehicles:
     - data://garden/who/2023-03-13/vehicles:
       - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
       - data://garden/owid/latest/key_indicators
-  # archived; last active in 5a6a921297d6 on 2023-07-14
+  # archived; last active in 96a210c8482e on 2023-07-14
   data-private://grapher/ihme_gbd/2023-03-29/gbd_drug_disorders:
     - data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders:
       - data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
         - snapshot-private://ihme_gbd/2023-03-29/gbd_drug_disorders.csv
-  # archived; last active in a94d1b671f0e on 2025-01-13
+  # archived; last active in 10b2129ddfc2 on 2025-01-14
   data://garden/who/2023-06-29/guinea_worm:
     - data://meadow/who/2023-06-29/guinea_worm:
       - snapshot://who/2023-06-29/guinea_worm.csv
     - data://grapher/fasttrack/2023-06-28/guinea_worm
-  # archived; last active in 8ee1c16f1fb1 on 2026-06-04
+  # archived; last active in 9e949ea0595e on 2026-06-04
   data://garden/who/2024-01-03/gho:
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
     - data://meadow/who/2024-01-03/gho:
       - snapshot://who/2024-01-03/gho.zip
-  # archived; last active in 7d0ee839c418 on 2024-06-26
+  # archived; last active in ceab57da18d9 on 2024-06-28
   data://grapher/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
     - data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
       - data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
@@ -1023,23 +1023,23 @@ steps:
       - data://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
         - snapshot://ihme_gbd/2024-06-10/cause_hierarchy.csv
       - data://garden/ihme_gbd/2024-05-20/gbd_cause
-  # archived; last active in 221e50af4098 on 2024-08-19
+  # archived; last active in 03b36b43af40 on 2024-08-20
   data://grapher/who/2024-08-07/monkeypox:
     - data://garden/who/2024-08-07/monkeypox:
       - data://meadow/who/2024-08-07/monkeypox:
         - snapshot://who/2024-08-07/monkeypox.csv
       - data://garden/demography/2023-03-31/population
       - data://garden/regions/2023-01-01/regions
-  # archived; last active in 90ebc8ed4fbe on 2026-02-12
+  # archived; last active in cc250b2627db on 2026-02-13
   export://multidim/health/latest/causes_of_death:
     - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
-  # archived; last active in 24cf5b434887 on 2024-10-16
+  # archived; last active in ca3497f8d9ae on 2024-10-17
   data://grapher/cancer/2024-10-13/gco_cervical_cancer:
     - data://garden/cancer/2024-10-13/gco_cervical_cancer:
       - data://meadow/cancer/2024-10-13/gco_cancer_over_time_cervical:
         - snapshot://cancer/2024-10-13/gco_cancer_over_time_cervical.csv
       - data://meadow/cancer/2024-10-13/gco_cancer_today_cervical
-  # archived; last active in 1f664f1cdf5d on 2024-12-29
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
   data://grapher/cancer/2024-10-13/gco_cancer_over_time_cervical:
     - data://garden/cancer/2024-10-13/gco_cancer_over_time_cervical:
       - data://meadow/cancer/2024-10-13/gco_cancer_over_time_cervical
@@ -1048,16 +1048,16 @@ steps:
     - data-private://garden/antibiotics/2024-11-20/bloodstream_amr:
       - data-private://meadow/antibiotics/2024-11-20/bloodstream_amr:
         - snapshot-private://antibiotics/2024-11-20/bloodstream_amr.csv
-  # archived; last active in acc4d3024227 on 2024-12-02
+  # archived; last active in 9477e5c97cdf on 2024-12-02
   data-private://grapher/antibiotics/2024-11-24/total_syndrome:
     - data-private://garden/antibiotics/2024-11-24/total_syndrome:
       - data-private://meadow/antibiotics/2024-11-24/total_syndrome
-  # archived; last active in c314aa38b110 on 2025-04-02
+  # archived; last active in 7dcaf843ece1 on 2025-04-02
   data://grapher/who/2025-01-09/vaccination_schedules:
     - data://garden/who/2025-01-09/vaccination_schedules:
       - data://meadow/who/2025-01-09/vaccination_schedules:
         - snapshot://who/2025-01-09/vaccination_schedules.xlsx
-  # archived; last active in 455ce78a7619 on 2025-02-19
+  # archived; last active in 1fd0c127a84f on 2025-02-20
   data://garden/cdc/2025-02-18/measles_cases:
     - data://meadow/cdc/2025-02-18/measles_cases:
       - snapshot://cdc/2025-02-18/measles_cases.json

@@ -1,18 +1,18 @@
 steps:
-  # archived; last active in 5e092e074759 on 2026-01-15
+  # archived; last active in e4f7d2612282 on 2026-01-16
   data://meadow/wash/2024-01-06/who:
     - snapshot://wash/2024-02-04/who_regions.csv
     - snapshot://wash/2024-02-04/who.csv
-  # archived; last active in 5e092e074759 on 2026-01-15
+  # archived; last active in e4f7d2612282 on 2026-01-16
   data://garden/wash/2024-01-06/who:
     - data://meadow/wash/2024-01-06/who
     - data://garden/demography/2023-03-31/population
-  # archived; last active in 5e092e074759 on 2026-01-15
+  # archived; last active in e4f7d2612282 on 2026-01-16
   data://grapher/wash/2024-01-06/who:
     - data://garden/wash/2024-01-06/who
-  # archived; last active in a684fcf17f85 on 2024-02-12
+  # archived; last active in d0b98376ec45 on 2024-02-12
   data://explorers/wash/2024-01-06/wash:
     - data://garden/wash/2024-01-06/who
-  # archived; last active in 68f6f72d2c7c on 2025-04-15
+  # archived; last active in 43a0a88d0468 on 2025-04-16
   data://explorers/wash/2024-01-06/who:
     - data://garden/wash/2024-01-06/who

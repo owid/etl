@@ -67,7 +67,13 @@ MARKER_RE = re.compile(r"#\s*archived;\s*last active in\s+([0-9a-f]{7,40})\b")
 
 @dataclass
 class LastSeen:
-    """Where and when a step was last seen as an active step."""
+    """The recovery point for an archived step: the last commit at which it was active.
+
+    ``sha`` is the parent of the commit that removed the step from the active DAG —
+    i.e. the last commit where the step was still active, with all its code, metadata
+    and snapshot edits in place (including those made in commits that didn't touch the
+    DAG). ``git checkout <sha>`` recovers the final working version of the step.
+    """
 
     sha: str
     timestamp: int
@@ -104,7 +110,7 @@ def _run_git(*args: str) -> str:
 def _active_dag_commits(since: str | None) -> list[tuple[str, int]]:
     """Return ``(sha, unix_timestamp)`` for every commit that touched an active DAG file.
 
-    Ordered oldest → newest so that the last write of ``last_seen`` wins.
+    Ordered oldest → newest so removals are detected in the order they happened.
     """
     rev_range = [f"{since}..HEAD"] if since else []
     pathspec = ["dag", ":(exclude)dag/archive/*", ":(exclude)dag/temp.yml"]
@@ -114,6 +120,21 @@ def _active_dag_commits(since: str | None) -> list[tuple[str, int]]:
         sha, ct = line.split()
         commits.append((sha, int(ct)))
     return commits
+
+
+def _commit_parent(sha: str, cache: dict[str, tuple[str, int]]) -> tuple[str, int]:
+    """Return ``(first_parent_sha, parent_unix_timestamp)`` for ``sha`` (cached).
+
+    The first parent of the removal commit is the last commit where the step was
+    still active — the recovery point. Falls back to the commit itself for a root
+    commit with no parent.
+    """
+    if sha not in cache:
+        parents = _run_git("rev-list", "-1", "--parents", sha).split()
+        parent = parents[1] if len(parents) > 1 else parents[0]
+        ts = int(_run_git("show", "-s", "--format=%ct", parent).strip())
+        cache[sha] = (parent, ts)
+    return cache[sha]
 
 
 class _BlobReader:
@@ -263,25 +284,46 @@ def _active_dag_at(sha: str, blobs: dict[str, str], reader: _BlobReader) -> dict
 
 
 def _build_last_seen(since: str | None, limit: int | None) -> dict[str, LastSeen]:
-    """Walk active-DAG history and return the last active appearance of every step."""
+    """Walk active-DAG history and return the recovery point of every removed step.
+
+    Detects *removals*: a step that was an active key at commit N-1 but not at commit
+    N was removed at N, so its recovery point is N's parent (the last commit where it
+    was still active, with all non-DAG code/metadata edits in place). Steps re-added
+    later are dropped from the result. The returned dict therefore contains exactly the
+    steps that are removed-and-not-restored over the walked range, each mapped to its
+    recovery commit, final dependencies, and the DAG file it last lived in.
+    """
     commits = _active_dag_commits(since)
     if limit:
         commits = commits[-limit:]
     log.info("archive_dag.history", n_commits=len(commits))
 
     reader = _BlobReader()
-    last_seen: dict[str, LastSeen] = {}
+    parent_cache: dict[str, tuple[str, int]] = {}
+    removed: dict[str, LastSeen] = {}
     try:
+        # Seed the previous state from the baseline (the ``since`` commit) so a removal
+        # in the very first walked commit is detected. Without this, ``since..HEAD``
+        # omits the baseline and a step deleted just after ``since`` would be missed.
+        prev: dict[str, tuple[set[str], str]] = {}
+        if since:
+            prev = _active_dag_at(since, _tree_blob_map(since), reader)
+
         for i, (sha, ts) in enumerate(commits):
-            blobs = _tree_blob_map(sha)
-            dag = _active_dag_at(sha, blobs, reader)
-            for step, (deps, dag_file) in dag.items():
-                last_seen[step] = LastSeen(sha=sha, timestamp=ts, deps=deps, dag_file=dag_file)
+            dag = _active_dag_at(sha, _tree_blob_map(sha), reader)
+            cur_keys = set(dag)
+            for step in set(prev) - cur_keys:
+                deps, dag_file = prev[step]
+                rec_sha, rec_ts = _commit_parent(sha, parent_cache)
+                removed[step] = LastSeen(sha=rec_sha, timestamp=rec_ts, deps=deps, dag_file=dag_file)
+            for step in cur_keys:
+                removed.pop(step, None)  # re-added → no longer archived
+            prev = dag
             if (i + 1) % 250 == 0:
-                log.info("archive_dag.progress", processed=i + 1, total=len(commits), steps_seen=len(last_seen))
+                log.info("archive_dag.progress", processed=i + 1, total=len(commits), removed=len(removed))
     finally:
         reader.close()
-    return last_seen
+    return removed
 
 
 # --------------------------------------------------------------------------- #
@@ -314,17 +356,17 @@ def _current_archive_keys_by_file() -> dict[Path, set[str]]:
 # Writing
 # --------------------------------------------------------------------------- #
 def _backfill_markers(dag_file: Path, hashes: dict[str, LastSeen], dry_run: bool) -> int:
-    """Insert a ``# archived; ...`` marker above each step in ``dag_file`` that lacks one.
+    """Insert or refresh a ``# archived; ...`` marker above each step in ``dag_file``.
 
-    Line-based and surgical: existing steps, dependencies, comments and ordering
-    are preserved; only marker comment lines are added. Returns the number of
-    markers inserted.
+    Line-based and surgical: existing steps, dependencies, comments and ordering are
+    preserved. If a step already has an archived-marker in the contiguous comment block
+    directly above it, the marker is replaced when the recovery hash changed; otherwise
+    a new marker is inserted. This makes the command idempotent and self-correcting.
+    Returns the number of markers inserted or updated.
     """
     lines = dag_file.read_text().splitlines(keepends=True)
     out: list[str] = []
-    inserted = 0
-    # Track the comment lines immediately preceding the current line.
-    preceding_markers: list[int] = []  # indices into `out` that are archived-markers
+    changed = 0
     for line in lines:
         stripped = line.strip()
         # Top-level step declaration: ``  data://...:`` (indent 2, ends with ':', not a dep).
@@ -336,23 +378,28 @@ def _backfill_markers(dag_file: Path, hashes: dict[str, LastSeen], dry_run: bool
             and not stripped.startswith("#")
             and stripped not in ("steps:", "include:")
         )
-        if is_step:
-            step = stripped[:-1]
-            already_marked = bool(preceding_markers)
-            if step in hashes and not already_marked:
-                out.append(f"  {hashes[step].marker}\n")
-                inserted += 1
+        if is_step and stripped[:-1] in hashes:
+            marker_line = f"  {hashes[stripped[:-1]].marker}\n"
+            # Look back over the contiguous comment block directly above for an
+            # existing marker to replace (stop at the first non-comment line).
+            k = len(out) - 1
+            existing_idx = None
+            while k >= 0 and out[k].lstrip().startswith("#"):
+                if MARKER_RE.search(out[k]):
+                    existing_idx = k
+                    break
+                k -= 1
+            if existing_idx is not None:
+                if out[existing_idx] != marker_line:
+                    out[existing_idx] = marker_line
+                    changed += 1
+            else:
+                out.append(marker_line)
+                changed += 1
         out.append(line)
-        # Maintain preceding-marker state for the *next* line.
-        if MARKER_RE.search(line):
-            preceding_markers.append(len(out) - 1)
-        elif stripped == "" or not stripped.startswith("#"):
-            # Reset once we leave the contiguous comment block above a step.
-            if not (stripped.startswith("#")):
-                preceding_markers = []
-    if inserted and not dry_run:
+    if changed and not dry_run:
         dag_file.write_text("".join(out))
-    return inserted
+    return changed
 
 
 def _append_new_steps(new_steps: dict[str, LastSeen], dry_run: bool) -> dict[str, int]:
@@ -406,26 +453,26 @@ def _append_new_steps(new_steps: dict[str, LastSeen], dry_run: bool) -> dict[str
     help="Report what would change without editing any files.",
 )
 def cli(since: str | None, limit: int | None, backfill_hashes: bool, dry_run: bool) -> None:
-    last_seen = _build_last_seen(since=since, limit=limit)
+    removed = _build_last_seen(since=since, limit=limit)
 
     current_active = _current_active_keys()
     archive_by_file = _current_archive_keys_by_file()
     current_archive = set().union(*archive_by_file.values()) if archive_by_file else set()
 
-    # Steps active in history but neither active nor already archived now.
+    # Steps removed from the active DAG but not yet recorded in the archive DAG.
     new_steps = {
-        step: info for step, info in last_seen.items() if step not in current_active and step not in current_archive
+        step: info for step, info in removed.items() if step not in current_active and step not in current_archive
     }
     # Existing archive steps for which we found a recovery hash in history.
     backfillable = {
-        step: last_seen[step] for file_keys in archive_by_file.values() for step in file_keys if step in last_seen
+        step: removed[step] for file_keys in archive_by_file.values() for step in file_keys if step in removed
     }
-    # Existing archive steps with no recovery hash found (active before recorded history, etc.).
-    no_hash = current_archive - set(last_seen)
+    # Existing archive steps with no recovery hash found (removed before recorded history, etc.).
+    no_hash = current_archive - set(removed)
 
     log.info(
         "archive_dag.summary",
-        steps_ever_active=len(last_seen),
+        steps_removed_in_history=len(removed),
         current_active=len(current_active),
         current_archive=len(current_archive),
         new_to_archive=len(new_steps),
@@ -442,7 +489,7 @@ def cli(since: str | None, limit: int | None, backfill_hashes: bool, dry_run: bo
     if backfill_hashes:
         total_markers = 0
         for dag_file, keys in archive_by_file.items():
-            hashes = {step: last_seen[step] for step in keys if step in last_seen}
+            hashes = {step: removed[step] for step in keys if step in removed}
             if not hashes:
                 continue
             total_markers += _backfill_markers(dag_file, hashes, dry_run=dry_run)

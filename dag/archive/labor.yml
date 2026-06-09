@@ -43,5 +43,6 @@ steps:
     - data://meadow/un/2025-12-16/ilostat
   data://grapher/un/2025-12-16/ilostat:
     - data://garden/un/2025-12-16/ilostat  # archived; last active in 8a823ded8ed7 on 2025-12-15
+  # archived; last active in f9999c6a2e61 on 2025-12-16
   export://multidim/worldbank_wdi/latest/wdi:
     - data://grapher/worldbank_wdi/2025-09-08/wdi

@@ -15,14 +15,14 @@ steps:
     - data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation
 
   # GHSL urban centers.
-  # archived; last active in 3775e8bd640e on 2025-12-11
+  # archived; last active in b4cb5554e777 on 2025-12-12
   data://meadow/urbanization/2024-12-02/ghsl_urban_centers:
     - snapshot://urbanization/2024-12-02/ghsl_urban_centers.xlsx
-  # archived; last active in 3775e8bd640e on 2025-12-11
+  # archived; last active in b4cb5554e777 on 2025-12-12
   data://garden/urbanization/2024-12-02/ghsl_urban_centers:
     - data://meadow/urbanization/2024-12-02/ghsl_urban_centers
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in 3775e8bd640e on 2025-12-11
+  # archived; last active in b4cb5554e777 on 2025-12-12
   data://grapher/urbanization/2024-12-02/ghsl_urban_centers:
     - data://garden/urbanization/2024-12-02/ghsl_urban_centers

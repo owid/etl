@@ -32,11 +32,11 @@ steps:
   #
   # EM-DAT Natural disasters.
   #
-  # archived; last active in 498e61f18978 on 2026-04-30
+  # archived; last active in 2854e91beab8 on 2026-04-30
   data://meadow/emdat/2025-10-29/natural_disasters:
     - snapshot://emdat/2025-10-29/natural_disasters.xlsx
   # The following dataset has a table for yearly data and another for decadal data.
-  # archived; last active in 498e61f18978 on 2026-04-30
+  # archived; last active in 2854e91beab8 on 2026-04-30
   data://garden/emdat/2025-10-29/natural_disasters:
     - data://meadow/emdat/2025-10-29/natural_disasters
     - data://garden/worldbank_wdi/2025-09-08/wdi
@@ -44,19 +44,19 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
   # The following dataset has only global yearly data, and entity corresponds to the threshold of deaths.
-  # archived; last active in 498e61f18978 on 2026-04-30
+  # archived; last active in 2854e91beab8 on 2026-04-30
   data://grapher/emdat/2025-10-29/natural_disasters_global_by_deaths:
     - data://garden/emdat/2025-10-29/natural_disasters
   # The following dataset has all (yearly and decadal) variables together.
-  # archived; last active in 498e61f18978 on 2026-04-30
+  # archived; last active in 2854e91beab8 on 2026-04-30
   data://grapher/emdat/2025-10-29/natural_disasters:
     - data://garden/emdat/2025-10-29/natural_disasters
   # The following dataset has yearly and decadal count (and share) of events by impacts.
-  # archived; last active in 498e61f18978 on 2026-04-30
+  # archived; last active in 2854e91beab8 on 2026-04-30
   data://grapher/emdat/2025-10-29/natural_disasters_impact:
     - data://garden/emdat/2025-10-29/natural_disasters
   # The following dataset has only global yearly data, and entity corresponds to the type of disaster.
-  # archived; last active in 498e61f18978 on 2026-04-30
+  # archived; last active in 2854e91beab8 on 2026-04-30
   data://grapher/emdat/2025-10-29/natural_disasters_global_by_type:
     - data://garden/emdat/2025-10-29/natural_disasters
   #

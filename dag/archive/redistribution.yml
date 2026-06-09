@@ -2,52 +2,52 @@
 
 steps:
   # OECD Health Expenditure and Financing Database
-  # archived; last active in c4f9478ae06d on 2025-03-18
+  # archived; last active in 37724248da9e on 2025-03-19
   data://meadow/oecd/2024-02-23/health_expenditure:
     - snapshot://oecd/2024-02-23/health_expenditure.csv
-  # archived; last active in c4f9478ae06d on 2025-03-18
+  # archived; last active in 37724248da9e on 2025-03-19
   data://garden/oecd/2024-02-23/health_expenditure:
     - data://meadow/oecd/2024-02-23/health_expenditure
-  # archived; last active in c4f9478ae06d on 2025-03-18
+  # archived; last active in 37724248da9e on 2025-03-19
   data://grapher/oecd/2024-02-23/health_expenditure:
     - data://garden/oecd/2024-02-23/health_expenditure
 
   # Public Finances in Modern History dataset (IMF)
-  # archived; last active in 7dcaf843ece1 on 2025-04-02
+  # archived; last active in 16bb73b2ff53 on 2025-04-02
   data://meadow/imf/2024-06-12/public_finances_modern_history:
     - snapshot://imf/2024-06-12/public_finances_modern_history.xlsx
-  # archived; last active in 7dcaf843ece1 on 2025-04-02
+  # archived; last active in 16bb73b2ff53 on 2025-04-02
   data://garden/imf/2024-06-12/public_finances_modern_history:
     - data://meadow/imf/2024-06-12/public_finances_modern_history
-  # archived; last active in 7dcaf843ece1 on 2025-04-02
+  # archived; last active in 16bb73b2ff53 on 2025-04-02
   data://grapher/imf/2024-06-12/public_finances_modern_history:
     - data://garden/imf/2024-06-12/public_finances_modern_history
 
   # SIPRI Military Expenditure Database
-  # archived; last active in 7467e8b51d02 on 2025-04-29
+  # archived; last active in b89538f0d7b1 on 2025-05-05
   data://meadow/sipri/2024-07-08/military_expenditure:
     - snapshot://sipri/2024-07-08/military_expenditure.xlsx
-  # archived; last active in 7467e8b51d02 on 2025-04-29
+  # archived; last active in b89538f0d7b1 on 2025-05-05
   data://garden/sipri/2024-07-08/military_expenditure:
     - data://meadow/sipri/2024-07-08/military_expenditure
     - data://garden/worldbank_wdi/2024-05-20/wdi
-  # archived; last active in 7467e8b51d02 on 2025-04-29
+  # archived; last active in b89538f0d7b1 on 2025-05-05
   data://grapher/sipri/2024-07-08/military_expenditure:
     - data://garden/sipri/2024-07-08/military_expenditure
 
 
   # Global Military Spending Dataset
-  # archived; last active in 7467e8b51d02 on 2025-04-29
+  # archived; last active in b89538f0d7b1 on 2025-05-05
   data://meadow/harvard/2024-11-26/global_military_spending_dataset:
     - snapshot://harvard/2024-07-22/global_military_spending_dataset.rds
     - snapshot://harvard/2024-11-26/global_military_spending_dataset_burden.rds
-  # archived; last active in 7467e8b51d02 on 2025-04-29
+  # archived; last active in b89538f0d7b1 on 2025-05-05
   data://garden/harvard/2024-11-26/global_military_spending_dataset:
     - data://meadow/harvard/2024-11-26/global_military_spending_dataset
     - data://garden/demography/2024-07-15/population
     - data://garden/countries/2024-08-27/gleditsch
     - data://garden/cow/2024-07-26/national_material_capabilities
-  # archived; last active in 7467e8b51d02 on 2025-04-29
+  # archived; last active in b89538f0d7b1 on 2025-05-05
   data://grapher/harvard/2024-11-26/global_military_spending_dataset:
     - data://garden/harvard/2024-11-26/global_military_spending_dataset
 
@@ -55,50 +55,50 @@ steps:
   # OECD Government at a Glance
   #
 
-  # archived; last active in 98296dbe206c on 2025-07-11
+  # archived; last active in 5d6bc7a2369c on 2025-07-11
   data://meadow/oecd/2025-03-26/government_at_a_glance:
     - snapshot://oecd/2025-03-26/govt_glance_public_finance.csv
     - snapshot://oecd/2025-03-26/govt_glance_size_public_procurement.csv
     - snapshot://oecd/2025-03-26/govt_glance_public_finance_economic_transaction.csv
     - snapshot://oecd/2025-03-26/govt_glance_public_finance_by_function.csv
-  # archived; last active in 98296dbe206c on 2025-07-11
+  # archived; last active in 5d6bc7a2369c on 2025-07-11
   data://garden/oecd/2025-03-26/government_at_a_glance:
     - data://meadow/oecd/2025-03-26/government_at_a_glance
-  # archived; last active in 98296dbe206c on 2025-07-11
+  # archived; last active in 5d6bc7a2369c on 2025-07-11
   data://grapher/oecd/2025-03-26/government_at_a_glance:
     - data://garden/oecd/2025-03-26/government_at_a_glance
 
     # OECD Health Expenditure and Financing Database
-  # archived; last active in 35e003fe4df2 on 2025-07-11
+  # archived; last active in bf07fc2918c2 on 2025-07-11
   data://meadow/oecd/2025-02-25/health_expenditure:
     - snapshot://oecd/2025-02-25/health_expenditure.csv
-  # archived; last active in 35e003fe4df2 on 2025-07-11
+  # archived; last active in bf07fc2918c2 on 2025-07-11
   data://garden/oecd/2025-02-25/health_expenditure:
     - data://meadow/oecd/2025-02-25/health_expenditure
-  # archived; last active in 35e003fe4df2 on 2025-07-11
+  # archived; last active in bf07fc2918c2 on 2025-07-11
   data://grapher/oecd/2025-02-25/health_expenditure:
     - data://garden/oecd/2025-02-25/health_expenditure
 
   #
   # Health expenditure as a share of GDP (OMM)
   #
-  # archived; last active in 35e003fe4df2 on 2025-07-11
+  # archived; last active in bf07fc2918c2 on 2025-07-11
   data://garden/health_expenditure/2025-03-04/health_expenditure_omm:
     - data://garden/oecd/2025-02-25/health_expenditure
     - data://garden/oecd/2025-03-04/health_expenditure_1993
     - data://garden/health_expenditure/2025-03-04/lindert
-  # archived; last active in 35e003fe4df2 on 2025-07-11
+  # archived; last active in bf07fc2918c2 on 2025-07-11
   data://grapher/health_expenditure/2025-03-04/health_expenditure_omm:
     - data://garden/health_expenditure/2025-03-04/health_expenditure_omm
 
     # OECD Social Expenditure Database
-  # archived; last active in 5167796ea022 on 2025-12-10
+  # archived; last active in a5e0a1b9a19e on 2025-12-11
   data://meadow/oecd/2025-02-25/social_expenditure:
     - snapshot://oecd/2025-02-25/social_expenditure.csv
-  # archived; last active in 5167796ea022 on 2025-12-10
+  # archived; last active in a5e0a1b9a19e on 2025-12-11
   data://garden/oecd/2025-02-25/social_expenditure:
     - data://meadow/oecd/2025-02-25/social_expenditure
-  # archived; last active in 5167796ea022 on 2025-12-10
+  # archived; last active in a5e0a1b9a19e on 2025-12-11
   data://grapher/oecd/2025-02-25/social_expenditure:
     - data://garden/oecd/2025-02-25/social_expenditure
 
@@ -114,51 +114,51 @@ steps:
     - data://garden/oecd/2025-07-10/health_expenditure
 
   # UNU-WIDER Government Revenue Dataset
-  # archived; last active in 0a1af53d5c91 on 2026-03-24
+  # archived; last active in fe5e72f1cce9 on 2026-03-24
   data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
     - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
-  # archived; last active in 0a1af53d5c91 on 2026-03-24
+  # archived; last active in fe5e72f1cce9 on 2026-03-24
   data://garden/unu_wider/2023-11-01/government_revenue_dataset:
     - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
-  # archived; last active in 0a1af53d5c91 on 2026-03-24
+  # archived; last active in fe5e72f1cce9 on 2026-03-24
   data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
     - data://garden/unu_wider/2023-11-01/government_revenue_dataset
 
   #
   # OECD Government at a Glance
   #
-  # archived; last active in 06f082460fe2 on 2026-03-31
+  # archived; last active in 576cc4275449 on 2026-04-01
   data://meadow/oecd/2025-06-30/government_at_a_glance:
     - snapshot://oecd/2025-06-30/govt_glance_public_finance_by_function.csv
     - snapshot://oecd/2025-06-30/govt_glance_size_public_procurement.csv
     - snapshot://oecd/2025-06-30/govt_glance_public_finance.csv
     - snapshot://oecd/2025-06-30/govt_glance_public_finance_economic_transaction.csv
-  # archived; last active in 06f082460fe2 on 2026-03-31
+  # archived; last active in 576cc4275449 on 2026-04-01
   data://garden/oecd/2025-06-30/government_at_a_glance:
     - data://meadow/oecd/2025-06-30/government_at_a_glance
-  # archived; last active in 06f082460fe2 on 2026-03-31
+  # archived; last active in 576cc4275449 on 2026-04-01
   data://grapher/oecd/2025-06-30/government_at_a_glance:
     - data://garden/oecd/2025-06-30/government_at_a_glance
 
   # SIPRI Military Expenditure Database
-  # archived; last active in 3a61f5df7383 on 2026-04-28
+  # archived; last active in 59bb1fe5a9fb on 2026-04-28
   data://meadow/sipri/2025-04-28/military_expenditure:
     - snapshot://sipri/2025-04-28/military_expenditure.xlsx
-  # archived; last active in 3a61f5df7383 on 2026-04-28
+  # archived; last active in 59bb1fe5a9fb on 2026-04-28
   data://garden/sipri/2025-04-28/military_expenditure:
     - data://meadow/sipri/2025-04-28/military_expenditure
     - data://garden/worldbank_wdi/2026-02-27/wdi
-  # archived; last active in 3a61f5df7383 on 2026-04-28
+  # archived; last active in 59bb1fe5a9fb on 2026-04-28
   data://grapher/sipri/2025-04-28/military_expenditure:
     - data://garden/sipri/2025-04-28/military_expenditure
 
 
-  # archived; last active in 43cedfcb3fc0 on 2025-03-26
+  # archived; last active in ffedce560955 on 2025-03-27
   data://meadow/oecd/2025-03-26/govt_glance_public_finance:
     - snapshot://oecd/2025-03-26/govt_glance_public_finance.csv
-  # archived; last active in 43cedfcb3fc0 on 2025-03-26
+  # archived; last active in ffedce560955 on 2025-03-27
   data://garden/oecd/2025-03-26/govt_glance_public_finance:
     - data://meadow/oecd/2025-03-26/govt_glance_public_finance
-  # archived; last active in 43cedfcb3fc0 on 2025-03-26
+  # archived; last active in ffedce560955 on 2025-03-27
   data://grapher/oecd/2025-03-26/govt_glance_public_finance:
     - data://garden/oecd/2025-03-26/govt_glance_public_finance
