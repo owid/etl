@@ -70,6 +70,10 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
             "slug": slug,
             "dimensions": chart_config["dimensions"],
             "isPublished": False,
+            # Enable indicator-to-chart config inheritance for ETL-authored charts,
+            # so grapher_config set on an indicator flows into every chart built on
+            # it. Set only at creation, so existing charts are never touched.
+            "isInheritanceEnabled": True,
         }
         log.info("collection.chart.create", slug=slug)
         result = admin_api.create_chart(chart_config=bootstrap)
