@@ -1,0 +1,40 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+      attribution_short: NVIDIA
+
+dataset:
+  update_period_days: 91
+  owners:
+    - Edouard Mathieu
+    - Veronika Samborska
+tables:
+  nvidia_revenue:
+    variables:
+      revenue:
+        title: NVIDIA's revenue by market segment
+        unit: "US dollars"
+        short_unit: "$"
+        description_short: NVIDIA's self-reported quarterly revenue across its main market segments, in US dollars. This data is not adjusted for inflation.
+        description_key:
+          - This indicator splits NVIDIA's quarterly revenue between its data center & AI business and everything else, which covers gaming graphics cards, professional workstations, automotive chips, and chips sold to other manufacturers.
+          - Figures are self-reported by NVIDIA in its quarterly financial disclosures, shown in US dollars, and not adjusted for inflation.
+          - In April 2026, NVIDIA changed how it groups its market segments. Until then, it reported four separate non-data-center segments ("Gaming", "Professional Visualization", "Auto", and "OEM & Other"); from then on, it reports them as a single combined segment. We use the combined version throughout, summing the four older segments for earlier quarters so the time series stays consistent.
+        description_processing: |-
+          NVIDIA publishes its quarterly revenue split by market segment. We combine all of its historical disclosures (covering fiscal years 2016 through 2027) into a single time series with two main categories — "Data centers and AI" and "Gaming, devices, automotive" — alongside the overall total.
+
+          In the first quarter of fiscal 2027 (the quarter ending April 26, 2026), NVIDIA changed the structure of these disclosures. Until Q4 FY26 (the quarter ending January 25, 2026), NVIDIA reported five market segments: "Data Center", "Gaming", "Professional Visualization", "Auto", and "OEM & Other". From Q1 FY27 onward, it reports just two segments — "Data Center" (further broken down into "Hyperscale" and "AI Clouds, Industrial & Enterprise") and "Edge Computing". Reconciling the eight quarters that appear in both presentations confirms that NVIDIA's new "Edge Computing" segment equals the sum of the previous categories labeled as "Gaming", "Professional Visualization", "Auto", and "OEM & Other".
+
+          To keep the time series consistent over the full period, we sum the four older non-data-center segments ("Gaming", "Professional Visualization", "Auto", and "OEM & Other") into a single bucket for quarters before Q1 FY27, and we use NVIDIA's combined value from Q1 FY27 onward. We label this bucket "Gaming, devices, automotive" rather than NVIDIA's own term ("Edge Computing") to more plainly describe what's in it. Data center revenue is taken as reported in both presentations.
+
+          Each data point is dated by NVIDIA's reported fiscal-quarter end — the last Sunday of April, July, October, or January (for example, Q4 FY26 is dated January 25, 2026).
+        processing_level: major
+        presentation:
+          title_public: NVIDIA's quarterly revenue by market segment
+          grapher_config:
+            note: '"Gaming, devices, automotive" combines NVIDIA''s revenue from gaming graphics cards, workstations, automotive chips, and chips sold to other manufacturers.'
+        display:
+          name: NVIDIA's quarterly revenue
+          numDecimalPlaces: 0
