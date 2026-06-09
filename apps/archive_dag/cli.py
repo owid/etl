@@ -52,8 +52,24 @@ from etl.dag_helpers import (
     load_single_dag_file,
     write_to_dag_file,
 )
+from etl.steps import extract_step_attributes
 
 log = get_logger()
+
+
+def _is_parseable_step(step: str) -> bool:
+    """True if ``step`` is a well-formed step URI that downstream tooling can parse.
+
+    History contains a few malformed legacy URIs (e.g. a fasttrack step with a
+    slash-dated version ``.../22/01/11/...``) that ``extract_step_attributes`` —
+    and therefore ``VersionTracker`` — chokes on. We must not record those in the
+    archive DAG, so we validate with the same parser the rest of the codebase uses.
+    """
+    try:
+        extract_step_attributes(step)
+        return True
+    except (ValueError, IndexError):
+        return False
 
 # DAG files that are not part of the "active" DAG and must be skipped when
 # reconstructing the active DAG at a historical commit.
@@ -313,7 +329,15 @@ def _build_last_seen(since: str | None, limit: int | None) -> dict[str, LastSeen
             dag = _active_dag_at(sha, _tree_blob_map(sha), reader)
             cur_keys = set(dag)
             for step in set(prev) - cur_keys:
+                if not _is_parseable_step(step):
+                    # Skip malformed legacy URIs that VersionTracker can't parse.
+                    continue
                 deps, dag_file = prev[step]
+                # Drop dependencies VersionTracker would choke on. It tolerates
+                # ``walden://`` (filtered by prefix) and any parseable URI; anything
+                # else (e.g. the legacy ``data://garden/reference`` or 3-segment
+                # ``grapher://`` steps) must not enter the archive graph.
+                deps = {d for d in deps if d.startswith("walden") or _is_parseable_step(d)}
                 rec_sha, rec_ts = _commit_parent(sha, parent_cache)
                 removed[step] = LastSeen(sha=rec_sha, timestamp=rec_ts, deps=deps, dag_file=dag_file)
             for step in cur_keys:

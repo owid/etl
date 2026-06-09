@@ -973,6 +973,22 @@ steps:
   # archived; last active in 9e949ea0595e on 2026-06-04
   data://grapher/who/2025-05-19/gho:
     - data://garden/who/2025-05-19/gho
+  # archived; last active in 96a210c8482e on 2023-07-14
+  data-private://grapher/ihme_gbd/2023-03-29/gbd_drug_disorders:
+    - data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders:
+      - data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
+        - snapshot-private://ihme_gbd/2023-03-29/gbd_drug_disorders.csv
+  # archived; last active in 3db1a976017b on 2023-08-17
+  data://grapher/health/2022-12-28/deaths_karlinsky:
+    - data://garden/health/2022-12-28/deaths_karlinsky:
+      - data://meadow/health/2022-12-28/deaths_karlinsky:
+        - snapshot://health/2022-12-28/deaths_karlinsky.csv
+      - data://garden/owid/latest/key_indicators
+  # archived; last active in f0d07266689b on 2024-05-20
+  data://grapher/who/2023-03-13/vehicles:
+    - data://garden/who/2023-03-13/vehicles:
+      - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
+      - data://garden/owid/latest/key_indicators
   # archived; last active in 132f41a4ac6b on 2024-06-07
   data://garden/who/2021-07-01/ghe:
     - data://garden/regions/2023-01-01/regions
@@ -981,48 +997,17 @@ steps:
   # archived; last active in 132f41a4ac6b on 2024-06-07
   data://meadow/who/2021-07-01/gho:
     - walden://who/2021-07-01/gho
-  # archived; last active in 3db1a976017b on 2023-08-17
-  data://grapher/health/2022-12-28/deaths_karlinsky:
-    - data://garden/health/2022-12-28/deaths_karlinsky:
-      - data://meadow/health/2022-12-28/deaths_karlinsky:
-        - snapshot://health/2022-12-28/deaths_karlinsky.csv
-      - data://garden/owid/latest/key_indicators
-  # archived; last active in 7dcaf843ece1 on 2025-04-02
-  data://explorers/who/latest/flu:
-    - data://garden/who/latest/flunet
-    - data://garden/who/latest/fluid
-  # archived; last active in f0d07266689b on 2024-05-20
-  data://grapher/who/2023-03-13/vehicles:
-    - data://garden/who/2023-03-13/vehicles:
-      - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
-      - data://garden/owid/latest/key_indicators
-  # archived; last active in 96a210c8482e on 2023-07-14
-  data-private://grapher/ihme_gbd/2023-03-29/gbd_drug_disorders:
-    - data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders:
-      - data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
-        - snapshot-private://ihme_gbd/2023-03-29/gbd_drug_disorders.csv
-  # archived; last active in 10b2129ddfc2 on 2025-01-14
-  data://garden/who/2023-06-29/guinea_worm:
-    - data://meadow/who/2023-06-29/guinea_worm:
-      - snapshot://who/2023-06-29/guinea_worm.csv
-    - data://grapher/fasttrack/2023-06-28/guinea_worm
-  # archived; last active in 9e949ea0595e on 2026-06-04
-  data://garden/who/2024-01-03/gho:
-    - data://garden/demography/2023-03-31/population
-    - data://garden/regions/2023-01-01/regions
-    - data://meadow/who/2024-01-03/gho:
-      - snapshot://who/2024-01-03/gho.zip
-  # archived; last active in ceab57da18d9 on 2024-06-28
-  data://grapher/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
-    - data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
-      - data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
-      - data://garden/regions/2023-01-01/regions
   # archived; last active in 6d016807459a on 2024-06-12
   data://grapher/ihme_gbd/2024-06-10/leading_causes_deaths:
     - data://garden/ihme_gbd/2024-06-10/leading_causes_deaths:
+      - data://garden/ihme_gbd/2024-05-20/gbd_cause
       - data://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
         - snapshot://ihme_gbd/2024-06-10/cause_hierarchy.csv
-      - data://garden/ihme_gbd/2024-05-20/gbd_cause
+  # archived; last active in ceab57da18d9 on 2024-06-28
+  data://grapher/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
+    - data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
+      - data://garden/regions/2023-01-01/regions
+      - data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
   # archived; last active in 03b36b43af40 on 2024-08-20
   data://grapher/who/2024-08-07/monkeypox:
     - data://garden/who/2024-08-07/monkeypox:
@@ -1030,52 +1015,67 @@ steps:
         - snapshot://who/2024-08-07/monkeypox.csv
       - data://garden/demography/2023-03-31/population
       - data://garden/regions/2023-01-01/regions
-  # archived; last active in cc250b2627db on 2026-02-13
-  export://multidim/health/latest/causes_of_death:
-    - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
   # archived; last active in ca3497f8d9ae on 2024-10-17
   data://grapher/cancer/2024-10-13/gco_cervical_cancer:
     - data://garden/cancer/2024-10-13/gco_cervical_cancer:
+      - data://meadow/cancer/2024-10-13/gco_cancer_today_cervical
       - data://meadow/cancer/2024-10-13/gco_cancer_over_time_cervical:
         - snapshot://cancer/2024-10-13/gco_cancer_over_time_cervical.csv
-      - data://meadow/cancer/2024-10-13/gco_cancer_today_cervical
-  # archived; last active in 6c9a63a399c6 on 2024-12-30
-  data://grapher/cancer/2024-10-13/gco_cancer_over_time_cervical:
-    - data://garden/cancer/2024-10-13/gco_cancer_over_time_cervical:
-      - data://meadow/cancer/2024-10-13/gco_cancer_over_time_cervical
+  # archived; last active in 9477e5c97cdf on 2024-12-02
+  data-private://grapher/antibiotics/2024-11-24/total_syndrome:
+    - data-private://garden/antibiotics/2024-11-24/total_syndrome:
+      - data-private://meadow/antibiotics/2024-11-24/total_syndrome
   # archived; last active in e5e16f96884d on 2024-12-02
   data-private://grapher/antibiotics/2024-11-20/bloodstream_amr:
     - data-private://garden/antibiotics/2024-11-20/bloodstream_amr:
       - data-private://meadow/antibiotics/2024-11-20/bloodstream_amr:
         - snapshot-private://antibiotics/2024-11-20/bloodstream_amr.csv
-  # archived; last active in 9477e5c97cdf on 2024-12-02
-  data-private://grapher/antibiotics/2024-11-24/total_syndrome:
-    - data-private://garden/antibiotics/2024-11-24/total_syndrome:
-      - data-private://meadow/antibiotics/2024-11-24/total_syndrome
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
+  data://grapher/cancer/2024-10-13/gco_cancer_over_time_cervical:
+    - data://garden/cancer/2024-10-13/gco_cancer_over_time_cervical:
+      - data://meadow/cancer/2024-10-13/gco_cancer_over_time_cervical
+  # archived; last active in 10b2129ddfc2 on 2025-01-14
+  data://garden/who/2023-06-29/guinea_worm:
+    - data://meadow/who/2023-06-29/guinea_worm:
+      - snapshot://who/2023-06-29/guinea_worm.csv
+    - data://grapher/fasttrack/2023-06-28/guinea_worm
+  # archived; last active in 1fd0c127a84f on 2025-02-20
+  data://garden/cdc/2025-02-18/measles_cases:
+    - data://meadow/cdc/2025-02-18/measles_cases:
+      - snapshot://cdc/2025-02-18/measles_cases.json
   # archived; last active in 7dcaf843ece1 on 2025-04-02
   data://grapher/who/2025-01-09/vaccination_schedules:
     - data://garden/who/2025-01-09/vaccination_schedules:
       - data://meadow/who/2025-01-09/vaccination_schedules:
         - snapshot://who/2025-01-09/vaccination_schedules.xlsx
-  # archived; last active in 1fd0c127a84f on 2025-02-20
-  data://garden/cdc/2025-02-18/measles_cases:
-    - data://meadow/cdc/2025-02-18/measles_cases:
-      - snapshot://cdc/2025-02-18/measles_cases.json
+  # archived; last active in 7dcaf843ece1 on 2025-04-02
+  data://explorers/who/latest/flu:
+    - data://garden/who/latest/flunet
+    - data://garden/who/latest/fluid
   # archived; last active in 2f5578838610 on 2025-12-16
   data://grapher/health/2025-01-22/unaids:
     - data://garden/health/2025-01-22/unaids:
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/regions/2023-01-01/regions
       - data://meadow/health/2025-01-22/unaids:
         - snapshot://health/2025-01-22/unaids_kpa.csv
         - snapshot://health/2025-01-22/unaids_epi.csv
         - snapshot://health/2025-01-22/unaids_ncpi.csv
         - snapshot://health/2025-01-22/unaids_gam.csv
-      - data://garden/regions/2023-01-01/regions
       - data://meadow/health/2023-08-22/unaids_deaths_averted_art
+      - data://garden/wb/2025-07-01/income_groups
+  # archived; last active in cc250b2627db on 2026-02-13
+  export://multidim/health/latest/causes_of_death:
+    - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
   # archived; last active in 7275d3131826 on 2026-02-13
   data-private://grapher/ihme_gbd/2026-02-07/impairments:
     - data-private://garden/ihme_gbd/2026-02-07/impairments:
-      - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
       - data-private://meadow/ihme_gbd/2026-02-07/impairments:
         - snapshot-private://ihme_gbd/2026-02-07/impairments.feather
+      - data://garden/demography/2024-07-15/population
+  # archived; last active in 9e949ea0595e on 2026-06-04
+  data://garden/who/2024-01-03/gho:
+    - data://garden/demography/2023-03-31/population
+    - data://meadow/who/2024-01-03/gho:
+      - snapshot://who/2024-01-03/gho.zip
+    - data://garden/regions/2023-01-01/regions

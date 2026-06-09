@@ -145,24 +145,24 @@ steps:
   data://grapher/democracy/2025-06-26/lexical_index:
     - data://garden/democracy/2025-06-26/lexical_index
   # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://grapher/democracy/2025-05-05/ert:
+    - data://garden/democracy/2025-05-05/ert
+  # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://grapher/democracy/2024-05-21/bti:
+    - data://garden/democracy/2024-03-07/bti
+  # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://garden/democracy/2025-05-05/ert:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/democracy/2025-05-05/ert
+  # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://meadow/democracy/2025-05-05/ert:
+    - snapshot://democracy/2025-05-05/ert.csv
+  # archived; last active in 44d59b9fb58e on 2026-03-27
   data://meadow/democracy/2024-05-21/bti:
     - snapshot://democracy/2024-05-21/bti.xlsx
   # archived; last active in 44d59b9fb58e on 2026-03-27
   data://garden/democracy/2024-03-07/bti:
     - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
     - data://meadow/democracy/2024-05-21/bti
-    - data://garden/regions/2023-01-01/regions
-  # archived; last active in 44d59b9fb58e on 2026-03-27
-  data://grapher/democracy/2024-05-21/bti:
-    - data://garden/democracy/2024-03-07/bti
-  # archived; last active in 44d59b9fb58e on 2026-03-27
-  data://meadow/democracy/2025-05-05/ert:
-    - snapshot://democracy/2025-05-05/ert.csv
-  # archived; last active in 44d59b9fb58e on 2026-03-27
-  data://garden/democracy/2025-05-05/ert:
-    - data://garden/demography/2024-07-15/population
-    - data://garden/regions/2023-01-01/regions
-    - data://meadow/democracy/2025-05-05/ert
-  # archived; last active in 44d59b9fb58e on 2026-03-27
-  data://grapher/democracy/2025-05-05/ert:
-    - data://garden/democracy/2025-05-05/ert

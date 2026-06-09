@@ -30,11 +30,11 @@ steps:
   data://grapher/survey/2025-03-04/dietary_choices_uk:
     - data://garden/survey/2025-03-04/dietary_choices_uk
   # archived; last active in 0f5d03f6f6a7 on 2026-02-28
-  data://meadow/survey/2026-02-02/dietary_choices_uk:
-    - snapshot://survey/2026-02-02/dietary_choices_uk.xlsx
-  # archived; last active in 0f5d03f6f6a7 on 2026-02-28
   data://garden/survey/2026-02-02/dietary_choices_uk:
     - data://meadow/survey/2026-02-02/dietary_choices_uk
+  # archived; last active in 0f5d03f6f6a7 on 2026-02-28
+  data://meadow/survey/2026-02-02/dietary_choices_uk:
+    - snapshot://survey/2026-02-02/dietary_choices_uk.xlsx
   # archived; last active in 0f5d03f6f6a7 on 2026-02-28
   data://grapher/survey/2026-02-02/dietary_choices_uk:
     - data://garden/survey/2026-02-02/dietary_choices_uk

@@ -983,153 +983,127 @@ steps:
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
 
+  # archived; last active in defc1f95706f on 2023-01-09
+  data://meadow/farmer_lafond/2022-10-20/technology_cost:
+    - walden://farmer_lafond/2022-10-20/technology_cost
   # archived; last active in 85884ace842b on 2023-01-26
   data://garden/un/2019/un_wpp:
     - data://meadow/un/2019/un_wpp
   # archived; last active in 85884ace842b on 2023-01-26
   data://meadow/un/2019/un_wpp:
     - walden://wpp/2019/standard_projections
-  # archived; last active in 132f41a4ac6b on 2024-06-07
-  data://grapher/who/2021-07-01/ghe:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/who/2021-07-01/ghe
-  # archived; last active in 8af126de660f on 2023-02-24
-  data://meadow/un_sdg/2022-07-07/un_sdg:
-    - walden://un_sdg/2022-07-07/un_sdg
-  # archived; last active in 8af126de660f on 2023-02-24
-  data://garden/un_sdg/2022-07-07/un_sdg:
-    - data://meadow/un_sdg/2022-07-07/un_sdg
-  # archived; last active in 3fff891b9570 on 2023-04-18
-  data://garden/sdg/latest/sdg:
-    - backport://backport/owid/latest/dataset_5941_investment__credit_to_agriculture__fao__2023_02_22
-    - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
-    - backport://backport/owid/latest/dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02
-    - backport://backport/owid/latest/dataset_3093_economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018
-    - backport://backport/owid/latest/dataset_5782_who_immunization_data__2022
-    - backport://backport/owid/latest/dataset_5201_forest_land__deforestation_and_change__fao__2020
-    - backport://backport/owid/latest/dataset_5939_food_security__suite_of_food_security_indicators__fao__2023_02_22
-    - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
-    - backport://backport/owid/latest/dataset_5821_gender_statistics__world_bank__2022_10_29
-    - backport://backport/owid/latest/dataset_5895_united_nations_sustainable_development_goals__2023
-    - backport://backport/owid/latest/dataset_5855_united_nations_office_on_drugs_and_crime__intentional_homicides
-    - backport://backport/owid/latest/dataset_1047_world_bank_gender_statistics__gender
-    - backport://backport/owid/latest/dataset_5332_water_and_sanitation__who_wash__2021
-    - backport://backport/owid/latest/dataset_5839_international_completeness_of_death_registration_2015_2019__karlinsky__2021
-    - backport://backport/owid/latest/dataset_829_food_security__suite_of_food_security_indicators__fao__2017
-    - backport://backport/owid/latest/dataset_5362_world_bank_edstats_2020
-    - backport://backport/owid/latest/dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity
-    - backport://backport/owid/latest/dataset_5963_population__various_sources__2023_1
-    - backport://backport/owid/latest/dataset_1861_earnings_and_labour_cost
-    - backport://backport/owid/latest/dataset_5942_sdg_indicators__sdg_indicators__fao__2023_02_22
-    - backport://backport/owid/latest/dataset_5790_global_health_estimates__world_health_organization__2020
-    - backport://backport/owid/latest/dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-    - backport://backport/owid/latest/dataset_5637_world_development_indicators__world_bank__2022_05_26
-    - backport://backport/owid/latest/dataset_5546_democracy__lexical_index
-    - backport://backport/owid/latest/dataset_115_countries_continents
-    - backport://backport/owid/latest/dataset_1857_employment
-    - backport://backport/owid/latest/dataset_5575_united_nations_sustainable_development_goals__united_nations__2022_04
-    - backport://backport/owid/latest/dataset_5593_ihme__global_burden_of_disease__risk_factors__institute_for_health_metrics_and_evaluation__2022_04
+  # archived; last active in 9bf07632b3bb on 2023-01-31
+  data://grapher/homicide/2023-01-04/unodc:
+    - data://garden/homicide/2023-01-04/unodc
+  # archived; last active in 363dd16735f6 on 2023-02-02
+  data://garden/homicide/2023-01-04/unodc:
+    - data://meadow/homicide/2023-01-04/unodc
+  # archived; last active in 363dd16735f6 on 2023-02-02
+  data://meadow/homicide/2023-01-04/unodc:
+    - snapshot://homicide/2023-01-04/unodc.xlsx
   # archived; last active in 8af126de660f on 2023-02-24
   data://grapher/un_sdg/2022-07-07/un_sdg:
     - data://garden/un_sdg/2022-07-07/un_sdg
-  # archived; last active in defc1f95706f on 2023-01-09
-  data://meadow/farmer_lafond/2022-10-20/technology_cost:
-    - walden://farmer_lafond/2022-10-20/technology_cost
-  # archived; last active in 5b3815d3d87f on 2023-10-20
-  data://meadow/hmd/2022-11-04/life_tables:
-    - walden://hmd/2022-11-04/life_tables
-  # archived; last active in 5b3815d3d87f on 2023-10-20
-  data://garden/hmd/2022-11-04/life_tables:
-    - data://meadow/hmd/2022-11-04/life_tables
-  # archived; last active in 691e6f09d48d on 2023-09-28
-  data://meadow/emdat/2022-11-24/natural_disasters:
-    - snapshot://emdat/2022-11-24/natural_disasters.xlsx
-  # archived; last active in 691e6f09d48d on 2023-09-28
-  data://garden/emdat/2022-11-24/natural_disasters:
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/owid/latest/key_indicators
-    - data://meadow/emdat/2022-11-24/natural_disasters
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-  # archived; last active in 691e6f09d48d on 2023-09-28
-  data://grapher/emdat/2022-11-24/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
-  # archived; last active in 691e6f09d48d on 2023-09-28
-  data://grapher/emdat/2022-11-24/natural_disasters_global_by_type:
-    - data://garden/emdat/2022-11-24/natural_disasters
-  # archived; last active in 691e6f09d48d on 2023-09-28
-  data://explorers/emdat/2022-12-07/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
-  # archived; last active in 0dfc9a129274 on 2023-07-14
-  data://meadow/ophi/2022-12-13/multidimensional_poverty_index:
-    - snapshot://ophi/2022-12-13/multidimensional_poverty_index.csv
-  # archived; last active in 0dfc9a129274 on 2023-07-14
-  data://garden/ophi/2022-12-13/multidimensional_poverty_index:
-    - data://meadow/ophi/2022-12-13/multidimensional_poverty_index
-  # archived; last active in 0dfc9a129274 on 2023-07-14
-  data://grapher/ophi/2022-12-13/multidimensional_poverty_index:
-    - data://garden/ophi/2022-12-13/multidimensional_poverty_index
-  # archived; last active in 37e480682d06 on 2023-04-10
-  data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_global.csv
+  # archived; last active in 8af126de660f on 2023-02-24
+  data://garden/un_sdg/2022-07-07/un_sdg:
+    - data://meadow/un_sdg/2022-07-07/un_sdg
+  # archived; last active in 8af126de660f on 2023-02-24
+  data://meadow/un_sdg/2022-07-07/un_sdg:
+    - walden://un_sdg/2022-07-07/un_sdg
+  # archived; last active in e7420ae4d6c3 on 2023-03-08
+  data://grapher/owid/2023-03-02/vdem:
+    - data://garden/owid/2023-03-02/vdem
+  # archived; last active in e7420ae4d6c3 on 2023-03-08
+  data://meadow/owid/2023-03-02/vdem:
+    - snapshot://owid/2023-03-02/vdem.csv
+  # archived; last active in e7420ae4d6c3 on 2023-03-08
+  data://garden/owid/2023-03-02/vdem:
+    - data://meadow/owid/2023-03-02/vdem
   # archived; last active in 37e480682d06 on 2023-04-10
   data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature:
     - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
   # archived; last active in 37e480682d06 on 2023-04-10
   data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
-  # archived; last active in eb2fb5b948e3 on 2024-01-11
-  data://garden/growth/2022-12-19/gdp_historical:
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/ggdc/2022-12-23/maddison_database
+  # archived; last active in 37e480682d06 on 2023-04-10
+  data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_northern_hemisphere.csv
+  # archived; last active in 3fff891b9570 on 2023-04-18
+  data://garden/sdg/latest/sdg:
+    - backport://backport/owid/latest/dataset_5201_forest_land__deforestation_and_change__fao__2020
+    - backport://backport/owid/latest/dataset_5941_investment__credit_to_agriculture__fao__2023_02_22
+    - backport://backport/owid/latest/dataset_829_food_security__suite_of_food_security_indicators__fao__2017
+    - backport://backport/owid/latest/dataset_5546_democracy__lexical_index
+    - backport://backport/owid/latest/dataset_3093_economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018
+    - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
     - data://garden/worldbank_wdi/2022-05-26/wdi
-  # archived; last active in eb2fb5b948e3 on 2024-01-11
-  data://grapher/growth/2022-12-19/gdp_historical:
-    - data://garden/growth/2022-12-19/gdp_historical
-  # archived; last active in 363dd16735f6 on 2023-02-02
-  data://meadow/homicide/2023-01-04/unodc:
-    - snapshot://homicide/2023-01-04/unodc.xlsx
-  # archived; last active in 363dd16735f6 on 2023-02-02
-  data://garden/homicide/2023-01-04/unodc:
-    - data://meadow/homicide/2023-01-04/unodc
-  # archived; last active in 9bf07632b3bb on 2023-01-31
-  data://grapher/homicide/2023-01-04/unodc:
-    - data://garden/homicide/2023-01-04/unodc
-  # archived; last active in 5b3815d3d87f on 2023-10-20
-  data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
-  # archived; last active in 5b3815d3d87f on 2023-10-20
-  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
-  # archived; last active in 5b3815d3d87f on 2023-10-20
-  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
+    - backport://backport/owid/latest/dataset_1047_world_bank_gender_statistics__gender
+    - backport://backport/owid/latest/dataset_5520_united_nations_sustainable_development_goals__united_nations__2022_02
+    - backport://backport/owid/latest/dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
+    - backport://backport/owid/latest/dataset_5332_water_and_sanitation__who_wash__2021
+    - backport://backport/owid/latest/dataset_5637_world_development_indicators__world_bank__2022_05_26
+    - backport://backport/owid/latest/dataset_5855_united_nations_office_on_drugs_and_crime__intentional_homicides
+    - backport://backport/owid/latest/dataset_5942_sdg_indicators__sdg_indicators__fao__2023_02_22
+    - backport://backport/owid/latest/dataset_1857_employment
+    - backport://backport/owid/latest/dataset_5782_who_immunization_data__2022
+    - backport://backport/owid/latest/dataset_5939_food_security__suite_of_food_security_indicators__fao__2023_02_22
+    - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
+    - backport://backport/owid/latest/dataset_5362_world_bank_edstats_2020
+    - backport://backport/owid/latest/dataset_5575_united_nations_sustainable_development_goals__united_nations__2022_04
+    - backport://backport/owid/latest/dataset_5839_international_completeness_of_death_registration_2015_2019__karlinsky__2021
+    - backport://backport/owid/latest/dataset_5821_gender_statistics__world_bank__2022_10_29
+    - backport://backport/owid/latest/dataset_5963_population__various_sources__2023_1
+    - backport://backport/owid/latest/dataset_5593_ihme__global_burden_of_disease__risk_factors__institute_for_health_metrics_and_evaluation__2022_04
+    - backport://backport/owid/latest/dataset_5895_united_nations_sustainable_development_goals__2023
+    - backport://backport/owid/latest/dataset_1861_earnings_and_labour_cost
+    - backport://backport/owid/latest/dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity
+    - backport://backport/owid/latest/dataset_115_countries_continents
+    - backport://backport/owid/latest/dataset_5790_global_health_estimates__world_health_organization__2020
   # archived; last active in 945a01af281b on 2023-07-06
   data://meadow/homicide/2023-01-27/unodc:
     - snapshot://homicide/2023-01-27/unodc.xlsx
   # archived; last active in 945a01af281b on 2023-07-06
-  data://garden/homicide/2023-01-27/unodc:
-    - data://meadow/homicide/2023-01-27/unodc
-  # archived; last active in 945a01af281b on 2023-07-06
   data://grapher/homicide/2023-01-27/unodc:
     - data://garden/homicide/2023-01-27/unodc
+  # archived; last active in 945a01af281b on 2023-07-06
+  data://garden/homicide/2023-01-27/unodc:
+    - data://meadow/homicide/2023-01-27/unodc
+  # archived; last active in 0dfc9a129274 on 2023-07-14
+  data://grapher/ophi/2022-12-13/multidimensional_poverty_index:
+    - data://garden/ophi/2022-12-13/multidimensional_poverty_index
+  # archived; last active in 0dfc9a129274 on 2023-07-14
+  data://garden/ophi/2022-12-13/multidimensional_poverty_index:
+    - data://meadow/ophi/2022-12-13/multidimensional_poverty_index
+  # archived; last active in 0dfc9a129274 on 2023-07-14
+  data://meadow/ophi/2022-12-13/multidimensional_poverty_index:
+    - snapshot://ophi/2022-12-13/multidimensional_poverty_index.csv
+  # archived; last active in f5fa9dea97d3 on 2023-09-05
+  data://grapher/lis/2023-01-18/luxembourg_income_study:
+    - data://garden/lis/2023-01-18/luxembourg_income_study
+  # archived; last active in f5fa9dea97d3 on 2023-09-05
+  data://explorers/lis/2023-01-18/luxembourg_income_study:
+    - data://garden/lis/2023-01-18/luxembourg_income_study
+  # archived; last active in f5fa9dea97d3 on 2023-09-05
+  data://explorers/poverty_inequality/2023-03-01/poverty_inequality:
+    - data://explorers/lis/2023-01-18/luxembourg_income_study
+    - data://explorers/wid/2023-01-27/world_inequality_database
+  # archived; last active in f5fa9dea97d3 on 2023-09-05
+  data://explorers/wid/2023-01-27/world_inequality_database:
+    - data://garden/wid/2023-01-27/world_inequality_database
   # archived; last active in f5fa9dea97d3 on 2023-09-05
   data://meadow/lis/2023-01-18/luxembourg_income_study:
-    - snapshot://lis/2023-01-18/lis_distribution.csv
-    - data://garden/regions/2023-01-01/regions
-    - snapshot://lis/2023-01-18/lis_abs_poverty.csv
     - snapshot://lis/2023-01-18/lis_keyvars.csv
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://lis/2023-01-18/lis_distribution.csv
+    - snapshot://lis/2023-01-18/lis_abs_poverty.csv
   # archived; last active in f5fa9dea97d3 on 2023-09-05
   data://garden/lis/2023-01-18/luxembourg_income_study:
     - data://meadow/lis/2023-01-18/luxembourg_income_study
   # archived; last active in f5fa9dea97d3 on 2023-09-05
-  data://grapher/lis/2023-01-18/luxembourg_income_study:
-    - data://garden/lis/2023-01-18/luxembourg_income_study
+  data://grapher/wid/2023-01-27/world_inequality_database:
+    - data://garden/wid/2023-01-27/world_inequality_database
   # archived; last active in f5fa9dea97d3 on 2023-09-05
   data://meadow/wid/2023-01-27/world_inequality_database:
     - snapshot://wid/2023-01-27/world_inequality_database.csv
@@ -1138,43 +1112,74 @@ steps:
   # archived; last active in f5fa9dea97d3 on 2023-09-05
   data://garden/wid/2023-01-27/world_inequality_database:
     - data://meadow/wid/2023-01-27/world_inequality_database
-  # archived; last active in f5fa9dea97d3 on 2023-09-05
-  data://grapher/wid/2023-01-27/world_inequality_database:
-    - data://garden/wid/2023-01-27/world_inequality_database
-  # archived; last active in f5fa9dea97d3 on 2023-09-05
-  data://explorers/wid/2023-01-27/world_inequality_database:
-    - data://garden/wid/2023-01-27/world_inequality_database
-  # archived; last active in f5fa9dea97d3 on 2023-09-05
-  data://explorers/lis/2023-01-18/luxembourg_income_study:
-    - data://garden/lis/2023-01-18/luxembourg_income_study
-  # archived; last active in f5fa9dea97d3 on 2023-09-05
-  data://explorers/poverty_inequality/2023-03-01/poverty_inequality:
-    - data://explorers/lis/2023-01-18/luxembourg_income_study
-    - data://explorers/wid/2023-01-27/world_inequality_database
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://meadow/owid/2023-03-02/vdem:
-    - snapshot://owid/2023-03-02/vdem.csv
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://garden/owid/2023-03-02/vdem:
-    - data://meadow/owid/2023-03-02/vdem
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://grapher/owid/2023-03-02/vdem:
-    - data://garden/owid/2023-03-02/vdem
-  # archived; last active in a228dd537c07 on 2024-05-30
-  data://meadow/technology/2023-03-06/mobile_money:
-    - snapshot://technology/2023-03-06/mobile_money.xlsx
-  # archived; last active in a228dd537c07 on 2024-05-30
-  data://garden/technology/2023-03-06/mobile_money:
-    - data://meadow/technology/2023-03-06/mobile_money
-  # archived; last active in a228dd537c07 on 2024-05-30
-  data://grapher/technology/2023-03-06/mobile_money:
-    - data://garden/technology/2023-03-06/mobile_money
-  # archived; last active in 5409dda87c56 on 2024-05-16
-  data://meadow/bls/2023-03-10/us_consumer_prices:
-    - snapshot://bls/2023-03-09/us_consumer_prices.csv
+  # archived; last active in 691e6f09d48d on 2023-09-28
+  data://explorers/emdat/2022-12-07/natural_disasters:
+    - data://garden/emdat/2022-11-24/natural_disasters
+  # archived; last active in 691e6f09d48d on 2023-09-28
+  data://meadow/emdat/2022-11-24/natural_disasters:
+    - snapshot://emdat/2022-11-24/natural_disasters.xlsx
+  # archived; last active in 691e6f09d48d on 2023-09-28
+  data://grapher/emdat/2022-11-24/natural_disasters_global_by_type:
+    - data://garden/emdat/2022-11-24/natural_disasters
+  # archived; last active in 691e6f09d48d on 2023-09-28
+  data://garden/emdat/2022-11-24/natural_disasters:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/owid/latest/key_indicators
+    - data://meadow/emdat/2022-11-24/natural_disasters
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+  # archived; last active in 691e6f09d48d on 2023-09-28
+  data://grapher/emdat/2022-11-24/natural_disasters:
+    - data://garden/emdat/2022-11-24/natural_disasters
+  # archived; last active in 5b3815d3d87f on 2023-10-20
+  data://meadow/hmd/2022-11-04/life_tables:
+    - walden://hmd/2022-11-04/life_tables
+  # archived; last active in 5b3815d3d87f on 2023-10-20
+  data://garden/hmd/2022-11-04/life_tables:
+    - data://meadow/hmd/2022-11-04/life_tables
+  # archived; last active in 5b3815d3d87f on 2023-10-20
+  data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
+  # archived; last active in 5b3815d3d87f on 2023-10-20
+  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
+  # archived; last active in 5b3815d3d87f on 2023-10-20
+  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
+  # archived; last active in eb2fb5b948e3 on 2024-01-11
+  data://grapher/growth/2022-12-19/gdp_historical:
+    - data://garden/growth/2022-12-19/gdp_historical
+  # archived; last active in eb2fb5b948e3 on 2024-01-11
+  data://garden/growth/2022-12-19/gdp_historical:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/ggdc/2022-12-23/maddison_database
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+  # archived; last active in ec9bbf59ad8b on 2024-01-31
+  data://explorers/wid/2023-08-24/world_inequality_database:
+    - data://garden/wid/2023-08-24/world_inequality_database
+  # archived; last active in ec9bbf59ad8b on 2024-01-31
+  data://explorers/poverty_inequality/2023-08-24/poverty_inequality:
+    - data://explorers/wid/2023-08-24/world_inequality_database
+    - data://explorers/lis/2023-08-30/luxembourg_income_study
+  # archived; last active in ec9bbf59ad8b on 2024-01-31
+  data://explorers/lis/2023-08-30/luxembourg_income_study:
+    - data://garden/lis/2023-08-30/luxembourg_income_study
+  # archived; last active in 4bcd5645c910 on 2024-05-02
+  data://grapher/growth/2024-01-04/gdp_historical:
+    - data://garden/growth/2024-01-04/gdp_historical
+  # archived; last active in 4bcd5645c910 on 2024-05-02
+  data://garden/growth/2024-01-04/gdp_historical:
+    - data://grapher/worldbank_wdi/2023-05-29/wdi
+    - data://garden/ggdc/2022-12-23/maddison_database
+    - data://grapher/ggdc/2020-10-01/ggdc_maddison
   # archived; last active in 5409dda87c56 on 2024-05-16
   data://garden/bls/2023-03-10/us_consumer_prices:
     - data://meadow/bls/2023-03-10/us_consumer_prices
+  # archived; last active in 5409dda87c56 on 2024-05-16
+  data://meadow/bls/2023-03-10/us_consumer_prices:
+    - snapshot://bls/2023-03-09/us_consumer_prices.csv
   # archived; last active in 5409dda87c56 on 2024-05-16
   data://grapher/bls/2023-03-10/us_consumer_prices:
     - data://garden/bls/2023-03-10/us_consumer_prices
@@ -1185,40 +1190,35 @@ steps:
   # archived; last active in 10df6d4b0365 on 2024-05-20
   data://grapher/research_development/2023-05-05/patents_articles:
     - data://garden/research_development/2023-05-05/patents_articles
-  # archived; last active in ec9bbf59ad8b on 2024-01-31
-  data://explorers/lis/2023-08-30/luxembourg_income_study:
-    - data://garden/lis/2023-08-30/luxembourg_income_study
-  # archived; last active in ec9bbf59ad8b on 2024-01-31
-  data://explorers/wid/2023-08-24/world_inequality_database:
-    - data://garden/wid/2023-08-24/world_inequality_database
-  # archived; last active in ec9bbf59ad8b on 2024-01-31
-  data://explorers/poverty_inequality/2023-08-24/poverty_inequality:
-    - data://explorers/lis/2023-08-30/luxembourg_income_study
-    - data://explorers/wid/2023-08-24/world_inequality_database
+  # archived; last active in a228dd537c07 on 2024-05-30
+  data://meadow/technology/2023-03-06/mobile_money:
+    - snapshot://technology/2023-03-06/mobile_money.xlsx
+  # archived; last active in a228dd537c07 on 2024-05-30
+  data://grapher/technology/2023-03-06/mobile_money:
+    - data://garden/technology/2023-03-06/mobile_money
+  # archived; last active in a228dd537c07 on 2024-05-30
+  data://garden/technology/2023-03-06/mobile_money:
+    - data://meadow/technology/2023-03-06/mobile_money
+  # archived; last active in 132f41a4ac6b on 2024-06-07
+  data://grapher/who/2021-07-01/ghe:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/who/2021-07-01/ghe
+  # archived; last active in c746e64b393c on 2024-08-23
+  data://explorers/migration/2024-08-05/migration:
+    - data://grapher/un/2024-07-12/un_wpp_full
+    - data://grapher/idmc/2024-08-02/internal_displacement
+    - data://grapher/unicef/2024-07-30/child_migration
+    - data://grapher/un/2024-07-16/migrant_stock
+    - data://grapher/worldbank_wdi/2024-05-20/wdi
+    - data://grapher/un/2024-07-25/refugee_data
   # archived; last active in 920956245eab on 2024-11-18
   data://grapher/ess/2023-08-02/ess_trust:
     - data://garden/ess/2023-08-02/ess_trust
-  # archived; last active in 4bcd5645c910 on 2024-05-02
-  data://garden/growth/2024-01-04/gdp_historical:
-    - data://garden/ggdc/2022-12-23/maddison_database
-    - data://grapher/ggdc/2020-10-01/ggdc_maddison
-    - data://grapher/worldbank_wdi/2023-05-29/wdi
-  # archived; last active in 4bcd5645c910 on 2024-05-02
-  data://grapher/growth/2024-01-04/gdp_historical:
-    - data://garden/growth/2024-01-04/gdp_historical
+  # archived; last active in e9376d3f916f on 2024-11-19
+  data://garden/regions/2024-11-19/regions:
   # archived; last active in 9680cfa4a411 on 2025-01-29
   data://grapher/research_development/2024-05-20/patents_articles:
     - data://garden/research_development/2024-05-20/patents_articles
-  # archived; last active in c746e64b393c on 2024-08-23
-  data://explorers/migration/2024-08-05/migration:
-    - data://grapher/un/2024-07-16/migrant_stock
-    - data://grapher/unicef/2024-07-30/child_migration
-    - data://grapher/idmc/2024-08-02/internal_displacement
-    - data://grapher/worldbank_wdi/2024-05-20/wdi
-    - data://grapher/un/2024-07-25/refugee_data
-    - data://grapher/un/2024-07-12/un_wpp_full
-  # archived; last active in e9376d3f916f on 2024-11-19
-  data://garden/regions/2024-11-19/regions:
 
 include:
   # Include all active steps plus all archive steps.

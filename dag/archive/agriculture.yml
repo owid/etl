@@ -354,52 +354,25 @@ steps:
   # archived; last active in 0aeaf87169fe on 2026-05-07
   data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
     - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
-  # archived; last active in 574d52e444b1 on 2023-06-13
-  data://garden/agriculture/2023-04-20/long_term_wheat_yields:
-    - data://garden/faostat/2023-02-22/faostat_qcl
-    - data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984
-  # archived; last active in 574d52e444b1 on 2023-06-13
-  data://grapher/agriculture/2023-04-20/long_term_wheat_yields:
-    - data://garden/agriculture/2023-04-20/long_term_wheat_yields
-  # archived; last active in 574d52e444b1 on 2023-06-13
-  data://grapher/usda_nass/2023-04-20/us_corn_yields:
-    - data://garden/usda_nass/2023-04-20/us_corn_yields
-  # archived; last active in 574d52e444b1 on 2023-06-13
-  data://garden/agriculture/2023-04-21/uk_long_term_yields:
-    - data://garden/faostat/2023-02-22/faostat_qcl
-    - data://garden/papers/2023-04-21/brassley_2000
-    - data://garden/papers/2023-04-21/broadberry_et_al_2015
-  # archived; last active in 574d52e444b1 on 2023-06-13
-  data://grapher/agriculture/2023-04-21/uk_long_term_yields:
-    - data://garden/agriculture/2023-04-21/uk_long_term_yields
   # archived; last active in 59fdbfa9deef on 2023-06-09
   data://garden/agriculture/2023-05-26/attainable_yields:
-    - data://garden/faostat/2023-02-22/faostat_qcl
     - data://garden/papers/2023-05-26/mueller_et_al_2012
-  # archived; last active in 59fdbfa9deef on 2023-06-09
-  data://grapher/agriculture/2023-05-26/attainable_yields:
-    - data://garden/agriculture/2023-05-26/attainable_yields
+    - data://garden/faostat/2023-02-22/faostat_qcl
   # archived; last active in 59fdbfa9deef on 2023-06-09
   data://explorers/agriculture/2023-05-26/crop_yields:
     - data://grapher/agriculture/2023-05-26/attainable_yields
+  # archived; last active in 59fdbfa9deef on 2023-06-09
+  data://grapher/agriculture/2023-05-26/attainable_yields:
+    - data://garden/agriculture/2023-05-26/attainable_yields
   # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/agriculture/2023-05-30/long_term_crop_yields:
-    - data://garden/faostat/2023-02-22/faostat_qcl
     - data://garden/agriculture/2023-04-20/long_term_wheat_yields
-    - data://garden/agriculture/2023-04-21/uk_long_term_yields
     - data://garden/usda_nass/2023-04-20/us_corn_yields
+    - data://garden/agriculture/2023-04-21/uk_long_term_yields
+    - data://garden/faostat/2023-02-22/faostat_qcl
   # archived; last active in 574d52e444b1 on 2023-06-13
-  data://grapher/agriculture/2023-05-30/long_term_crop_yields:
-    - data://garden/agriculture/2023-05-30/long_term_crop_yields
-  # archived; last active in 552e6ba7ff1c on 2024-04-01
-  data://meadow/usda_ers/2023-06-07/food_expenditure:
-    - snapshot://usda_ers/2023-06-07/food_expenditure.xlsx
-  # archived; last active in 552e6ba7ff1c on 2024-04-01
-  data://garden/usda_ers/2023-06-07/food_expenditure:
-    - data://meadow/usda_ers/2023-06-07/food_expenditure
-  # archived; last active in 552e6ba7ff1c on 2024-04-01
-  data://grapher/usda_ers/2023-06-07/food_expenditure:
-    - data://garden/usda_ers/2023-06-07/food_expenditure
+  data://grapher/usda_nass/2023-04-20/us_corn_yields:
+    - data://garden/usda_nass/2023-04-20/us_corn_yields
   # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/agriculture/2023-05-30/attainable_yields:
     - data://garden/agriculture/2023-05-30/long_term_crop_yields
@@ -408,11 +381,38 @@ steps:
   data://grapher/agriculture/2023-05-30/attainable_yields:
     - data://garden/agriculture/2023-05-30/attainable_yields
   # archived; last active in 574d52e444b1 on 2023-06-13
+  data://garden/agriculture/2023-04-21/uk_long_term_yields:
+    - data://garden/faostat/2023-02-22/faostat_qcl
+    - data://garden/papers/2023-04-21/brassley_2000
+    - data://garden/papers/2023-04-21/broadberry_et_al_2015
+  # archived; last active in 574d52e444b1 on 2023-06-13
+  data://grapher/agriculture/2023-04-21/uk_long_term_yields:
+    - data://garden/agriculture/2023-04-21/uk_long_term_yields
+  # archived; last active in 574d52e444b1 on 2023-06-13
+  data://garden/agriculture/2023-04-20/long_term_wheat_yields:
+    - data://garden/faostat/2023-02-22/faostat_qcl
+    - data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984
+  # archived; last active in 574d52e444b1 on 2023-06-13
+  data://grapher/agriculture/2023-04-20/long_term_wheat_yields:
+    - data://garden/agriculture/2023-04-20/long_term_wheat_yields
+  # archived; last active in 574d52e444b1 on 2023-06-13
   data://explorers/agriculture/2023-05-30/crop_yields:
     - data://grapher/agriculture/2023-05-30/attainable_yields
+  # archived; last active in 574d52e444b1 on 2023-06-13
+  data://grapher/agriculture/2023-05-30/long_term_crop_yields:
+    - data://garden/agriculture/2023-05-30/long_term_crop_yields
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
+  data://garden/usda_ers/2023-06-07/food_expenditure:
+    - data://meadow/usda_ers/2023-06-07/food_expenditure
   # archived; last active in 552e6ba7ff1c on 2024-04-01
   data://explorers/agriculture/2023-06-12/crop_yields:
     - data://garden/agriculture/2023-06-12/attainable_yields
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
+  data://grapher/usda_ers/2023-06-07/food_expenditure:
+    - data://garden/usda_ers/2023-06-07/food_expenditure
+  # archived; last active in 552e6ba7ff1c on 2024-04-01
+  data://meadow/usda_ers/2023-06-07/food_expenditure:
+    - snapshot://usda_ers/2023-06-07/food_expenditure.xlsx
   # archived; last active in 3dc26d4a7b2c on 2025-04-04
   data://explorers/agriculture/latest/crop_yields:
     - data://garden/agriculture/2025-03-26/attainable_yields

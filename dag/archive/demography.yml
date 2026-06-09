@@ -269,85 +269,85 @@ steps:
   # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/demography/2025-01-20/deaths:
     - data://garden/demography/2025-01-20/deaths
-  # archived; last active in d0bfece254a8 on 2023-10-12
-  data://meadow/papers/2022-11-03/zijdeman_et_al_2015:
-    - walden://papers/2022-11-01/zijdeman_et_al_2015
-  # archived; last active in d0bfece254a8 on 2023-10-12
-  data://garden/papers/2022-11-03/zijdeman_et_al_2015:
-    - data://meadow/papers/2022-11-03/zijdeman_et_al_2015
   # archived; last active in 0e649f3a1e65 on 2023-02-15
   data://garden/demography/2022-11-30/life_expectancy:
     - data://garden/un/2022-07-11/un_wpp
+    - data://garden/owid/latest/key_indicators
+    - data://garden/hmd/2022-11-04/life_tables
+    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
     - data://garden/papers/2022-11-04/riley_2005
-    - data://garden/owid/latest/key_indicators
-    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
-    - data://garden/hmd/2022-11-04/life_tables
-  # archived; last active in d0bfece254a8 on 2023-10-12
-  data://grapher/demography/2022-11-30/life_expectancy:
-    - data://garden/demography/2023-02-03/life_expectancy
-  # archived; last active in d0bfece254a8 on 2023-10-12
-  data://meadow/papers/2023-02-03/riley_2005:
-    - walden://papers/2022-11-01/riley_2005
-  # archived; last active in d0bfece254a8 on 2023-10-12
-  data://garden/papers/2023-02-03/riley_2005:
-    - data://meadow/papers/2023-02-03/riley_2005
-  # archived; last active in d0bfece254a8 on 2023-10-12
-  data://garden/demography/2023-02-03/life_expectancy:
-    - data://garden/un/2022-07-11/un_wpp
-    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
-    - data://garden/owid/latest/key_indicators
-    - data://garden/papers/2023-02-03/riley_2005
-    - data://garden/hmd/2022-11-04/life_tables
+  # archived; last active in 574d52e444b1 on 2023-06-13
+  data://grapher/demography/2023-04-14/population_density:
+    - data://garden/demography/2023-04-14/population_density
   # archived; last active in 574d52e444b1 on 2023-06-13
   data://garden/demography/2023-04-14/population_density:
     - data://garden/faostat/2023-02-22/faostat_rl
     - data://garden/demography/2023-03-31/population
-  # archived; last active in 574d52e444b1 on 2023-06-13
-  data://grapher/demography/2023-04-14/population_density:
-    - data://garden/demography/2023-04-14/population_density
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://meadow/papers/2022-11-03/zijdeman_et_al_2015:
+    - walden://papers/2022-11-01/zijdeman_et_al_2015
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://grapher/demography/2022-11-30/life_expectancy:
+    - data://garden/demography/2023-02-03/life_expectancy
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://garden/papers/2022-11-03/zijdeman_et_al_2015:
+    - data://meadow/papers/2022-11-03/zijdeman_et_al_2015
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://garden/demography/2023-02-03/life_expectancy:
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/owid/latest/key_indicators
+    - data://garden/hmd/2022-11-04/life_tables
+    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
+    - data://garden/papers/2023-02-03/riley_2005
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://garden/papers/2023-02-03/riley_2005:
+    - data://meadow/papers/2023-02-03/riley_2005
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://meadow/papers/2023-02-03/riley_2005:
+    - walden://papers/2022-11-01/riley_2005
+  # archived; last active in d96c4ab04627 on 2024-03-07
+  data://garden/demography/2024-01-25/population:
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/ggdc/2024-01-19/maddison_federico_paper
+    - data://garden/hyde/2024-01-02/all_indicators
+  # archived; last active in d96c4ab04627 on 2024-03-07
+  data://grapher/demography/2024-01-25/population:
+    - data://garden/demography/2024-01-25/population
+    - data://garden/demography/2024-01-05/population
+  # archived; last active in d96c4ab04627 on 2024-03-07
+  data://garden/demography/2024-01-05/population:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/hyde/2024-01-02/all_indicators
+    - data://garden/gapminder/2023-03-31/population
+    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
   # archived; last active in dfa519c0aff5 on 2024-07-22
   data://garden/demography/2023-07-03/population_doubling_times:
     - data://garden/demography/2023-03-31/population
   # archived; last active in dfa519c0aff5 on 2024-07-22
   data://grapher/demography/2023-07-03/population_doubling_times:
     - data://garden/demography/2023-07-03/population_doubling_times
-  # archived; last active in d96c4ab04627 on 2024-03-07
-  data://garden/demography/2024-01-05/population:
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/gapminder/2023-03-31/population
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2022-07-11/un_wpp
-    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
-    - data://garden/hyde/2024-01-02/all_indicators
-  # archived; last active in d96c4ab04627 on 2024-03-07
-  data://garden/demography/2024-01-25/population:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/ggdc/2024-01-19/maddison_federico_paper
-    - data://garden/un/2022-07-11/un_wpp
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/hyde/2024-01-02/all_indicators
-  # archived; last active in d96c4ab04627 on 2024-03-07
-  data://grapher/demography/2024-01-25/population:
-    - data://garden/demography/2024-01-25/population
-    - data://garden/demography/2024-01-05/population
   # archived; last active in 275fcdc8c2a1 on 2024-11-29
   data://grapher/migration/2024-11-20/migrant_stock_flows:
     - data://garden/un/2024-07-16/migrant_stock
+  # archived; last active in bdf71c97ea0a on 2024-12-02
+  data://grapher/hmd/2024-11-27/hmd:
+    - data://garden/hmd/2024-11-27/hmd
   # archived; last active in bdf71c97ea0a on 2024-12-02
   data://meadow/hmd/2024-11-27/hmd:
     - snapshot://hmd/2024-11-27/hmd.zip
   # archived; last active in bdf71c97ea0a on 2024-12-02
   data://garden/hmd/2024-11-27/hmd:
     - data://meadow/hmd/2024-11-27/hmd
-  # archived; last active in bdf71c97ea0a on 2024-12-02
-  data://grapher/hmd/2024-11-27/hmd:
-    - data://garden/hmd/2024-11-27/hmd
   # archived; last active in 8555670c40f0 on 2025-10-22
   data://garden/demography/2024-12-02/survivor_percentiles:
     - data://garden/hmd/2024-12-01/hmd
   # archived; last active in 8555670c40f0 on 2025-10-22
-  data://grapher/demography/2024-12-02/survivor_percentiles:
-    - data://garden/demography/2024-12-02/survivor_percentiles
-  # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/hmd/2024-12-01/hmd:
     - data://garden/hmd/2024-12-01/hmd
+  # archived; last active in 8555670c40f0 on 2025-10-22
+  data://grapher/demography/2024-12-02/survivor_percentiles:
+    - data://garden/demography/2024-12-02/survivor_percentiles

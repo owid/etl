@@ -300,56 +300,56 @@ steps:
     - data://garden/war/2025-05-15/nuclear_weapons_inventories:
       - data://meadow/war/2025-05-15/nuclear_weapons_inventories:
         - snapshot://war/2025-05-15/nuclear_weapons_inventories.csv
-  # archived; last active in 74ffc9acb08c on 2023-07-28
-  data://meadow/war/2023-02-03/war_brecke:
-    - snapshot://war/2023-02-03/war_brecke.xlsx
   # archived; last active in 5763a5887c87 on 2023-06-09
   data://garden/war/2023-01-18/orae_1985:
     - data://meadow/war/2023-01-10/orae_1985:
       - snapshot://war/2023-01-09/orae_1985.csv
   # archived; last active in a45ad1ad9208 on 2023-07-13
   data://meadow/war/2023-06-09/war_ucdp:
-    - snapshot://war/2023-03-14/ucdp.non_state.zip
     - snapshot://war/2023-03-14/ucdp.one_sided.zip
     - snapshot://war/2023-03-14/ucdp.battle_related_conflict.zip
     - snapshot://war/2023-03-14/ucdp.battle_related_dyadic.zip
+    - snapshot://war/2023-03-14/ucdp.non_state.zip
   # archived; last active in d7a8e49f553d on 2023-07-18
   data://meadow/war/2023-06-09/war_mars:
     - snapshot://war/2023-06-09/war_mars.xls
+  # archived; last active in 74ffc9acb08c on 2023-07-28
+  data://meadow/war/2023-02-03/war_brecke:
+    - snapshot://war/2023-02-03/war_brecke.xlsx
   # archived; last active in 64c7f771d13f on 2023-09-21
   data://grapher/war/2023-07-26/cow:
     - data://garden/war/2023-07-18/cow:
       - data://meadow/war/2023-06-07/cow
   # archived; last active in 7d22d69e3958 on 2023-10-26
   data://garden/war/2023-10-24/ucdp_prio:
-    - data://garden/war/2023-09-21/ucdp
     - data://garden/war/2023-09-21/prio_v31
+    - data://garden/war/2023-09-21/ucdp
   # archived; last active in 36b9327cc6b9 on 2024-12-12
   data://grapher/harvard/2024-07-22/global_military_spending_dataset:
     - data://garden/harvard/2024-07-22/global_military_spending_dataset:
       - data://meadow/harvard/2024-07-22/global_military_spending_dataset:
-        - snapshot://harvard/2024-07-22/global_military_spending_dataset_burden.rds
         - snapshot://harvard/2024-07-22/global_military_spending_dataset.rds
-      - data://garden/demography/2024-07-15/population
+        - snapshot://harvard/2024-07-22/global_military_spending_dataset_burden.rds
       - data://garden/countries/2024-08-27/gleditsch
+      - data://garden/demography/2024-07-15/population
       - data://garden/cow/2024-07-26/national_material_capabilities
   # archived; last active in ea27f7e92032 on 2025-05-19
   data://grapher/war/2024-11-22/ucdp_preview:
     - data://garden/war/2024-11-22/ucdp_preview:
-      - data://garden/geography/2023-11-28/nat_earth_110
-      - data://garden/countries/2024-08-27/gleditsch
-      - data://garden/demography/2024-07-15/population
       - data://meadow/war/2024-11-22/ucdp_ced:
-        - snapshot://war/2024-11-22/ucdp_ced_v24_0_10.csv
         - snapshot://war/2024-11-22/ucdp_ced_v24_01_24_09.csv
+        - snapshot://war/2024-11-22/ucdp_ced_v24_0_10.csv
+      - data://garden/countries/2024-08-27/gleditsch
       - data://meadow/war/2024-08-26/ucdp
+      - data://garden/demography/2024-07-15/population
+      - data://garden/geography/2023-11-28/nat_earth_110
   # archived; last active in bc9c3e1f8711 on 2025-08-18
   data://grapher/war/2025-05-15/nuclear_weapons_proliferation:
     - data://garden/war/2025-05-15/nuclear_weapons_proliferation:
       - data://garden/war/2025-05-15/nuclear_threat_initiative_overview:
         - data://meadow/war/2025-05-15/nuclear_threat_initiative_overview:
           - snapshot://war/2025-05-15/nuclear_threat_initiative_overview.csv
-      - data://garden/regions/2023-01-01/regions
       - data://garden/war/2025-05-15/spread_of_nuclear_weapons:
         - data://meadow/war/2025-05-15/spread_of_nuclear_weapons:
           - snapshot://war/2025-05-15/spread_of_nuclear_weapons.pdf
+      - data://garden/regions/2023-01-01/regions

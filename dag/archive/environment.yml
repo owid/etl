@@ -30,11 +30,11 @@ steps:
     - data://meadow/living_planet/2020-09-10/lpd
   # archived; last active in 4f7130444e87 on 2026-03-02
   data://meadow/nasa/2025-04-14/ozone_hole_area:
-    - snapshot://nasa/2025-04-14/ozone_hole_area_p2.txt
     - snapshot://nasa/2025-04-14/ozone_hole_area_p1.txt
-  # archived; last active in 4f7130444e87 on 2026-03-02
-  data://garden/nasa/2025-04-14/ozone_hole_area:
-    - data://meadow/nasa/2025-04-14/ozone_hole_area
+    - snapshot://nasa/2025-04-14/ozone_hole_area_p2.txt
   # archived; last active in 4f7130444e87 on 2026-03-02
   data://grapher/nasa/2025-04-14/ozone_hole_area:
     - data://garden/nasa/2025-04-14/ozone_hole_area
+  # archived; last active in 4f7130444e87 on 2026-03-02
+  data://garden/nasa/2025-04-14/ozone_hole_area:
+    - data://meadow/nasa/2025-04-14/ozone_hole_area

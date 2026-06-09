@@ -2274,9 +2274,9 @@ steps:
   # archived; last active in c586d941a0ec on 2026-05-14
   data://grapher/climate/2026-01-14/climate_change_impacts_monthly:
     - data://garden/climate/2026-01-14/climate_change_impacts
-  # archived; last active in 37724248da9e on 2025-03-19
-  data://explorers/climate/latest/climate_change_impacts:
-    - data://garden/climate/2025-01-21/climate_change_impacts
   # archived; last active in a82d0653899f on 2025-03-11
   data://garden/climate/2025-01-21/sea_surface_temperature_annual:
     - data://garden/climate/2025-01-21/sea_surface_temperature
+  # archived; last active in 37724248da9e on 2025-03-19
+  data://explorers/climate/latest/climate_change_impacts:
+    - data://garden/climate/2025-01-21/climate_change_impacts

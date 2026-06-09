@@ -155,75 +155,66 @@ steps:
   # archived; last active in e1d7020d0d0c on 2026-03-02
   data://grapher/fasttrack/latest/sentience_institute:
     - snapshot://fasttrack/latest/sentience_institute.csv
-  # archived; last active in 46687f881b37 on 2024-01-09
-  data-private://grapher/fasttrack/2022-02-28/nuclear_warhead_inventories:
-    - snapshot-private://fasttrack/2022-02-28/nuclear_warhead_inventories.csv
-  # archived; last active in 33b7c7d8950d on 2023-01-20
-  data-private://grapher/fasttrack/22/01/11/lighting_efficiency_uk:
-    - snapshot-private://fasttrack/22/01/11/lighting_efficiency_uk.csv
-  # archived; last active in 8c9288c5cfc4 on 2023-06-08
-  data-private://grapher/fasttrack/2023-01-19/food_expenditures_by_country:
-    - snapshot-private://fasttrack/2023-01-19/food_expenditures_by_country.csv
-  # archived; last active in 114c003b45b7 on 2023-10-17
-  data-private://grapher/fasttrack/latest/test_co2_emissions:
-    - snapshot-private://fasttrack/latest/test_co2_emissions.csv
-  # archived; last active in ba1a3f28968d on 2023-12-21
-  data-private://grapher/fasttrack/latest/test_electricity_projections:
-    - snapshot-private://fasttrack/latest/test_electricity_projections.csv
   # archived; last active in 7e6235480285 on 2023-03-06
   data-private://grapher/fasttrack/latest/vdem_row_final:
     - snapshot-private://fasttrack/latest/vdem_row_final.csv
   # archived; last active in 8e9cd030135d on 2023-05-10
   data-private://grapher/fasttrack/2023-03-27/global_warming_contributions:
     - snapshot-private://fasttrack/2023-03-27/global_warming_contributions.csv
-  # archived; last active in 6ff64eed33b6 on 2024-03-27
-  data-private://grapher/fasttrack/2023-05-02/tomitaka_2018:
-    - snapshot-private://fasttrack/2023-05-02/tomitaka_2018.csv
-  # archived; last active in 98275f2eed1d on 2024-02-19
-  data-private://grapher/fasttrack/2023-05-03/qubits:
-    - snapshot-private://fasttrack/2023-05-03/qubits.csv
   # archived; last active in 2c2ed772865e on 2023-06-01
   data-private://grapher/fasttrack/2023-05-31/cholera:
     - snapshot-private://fasttrack/2023-05-31/cholera.csv
+  # archived; last active in 8c9288c5cfc4 on 2023-06-08
+  data-private://grapher/fasttrack/2023-01-19/food_expenditures_by_country:
+    - snapshot-private://fasttrack/2023-01-19/food_expenditures_by_country.csv
   # archived; last active in 2ea9c67118eb on 2023-06-16
   data-private://grapher/fasttrack/2023-06-16/guinea_worm:
     - snapshot-private://fasttrack/2023-06-16/guinea_worm.csv
   # archived; last active in 2f79c596dafd on 2023-06-19
   data-private://grapher/fasttrack/latest/world_population_comparison:
     - snapshot-private://fasttrack/latest/world_population_comparison.csv
-  # archived; last active in 1f8ccd00dee7 on 2023-07-03
-  data-private://grapher/fasttrack/2023-06-19/world_population_comparison:
-    - snapshot-private://fasttrack/2023-06-19/world_population_comparison.csv
   # archived; last active in 268d129304ad on 2023-06-29
   data-private://grapher/fasttrack/2023-06-28/guinea_worm:
     - snapshot-private://fasttrack/2023-06-28/guinea_worm.csv
-  # archived; last active in b7124fcbbc81 on 2024-02-06
-  data://grapher/fasttrack/latest/monadic_strategic_nuclear_forces:
-    - snapshot://fasttrack/latest/monadic_strategic_nuclear_forces.csv
+  # archived; last active in 1f8ccd00dee7 on 2023-07-03
+  data-private://grapher/fasttrack/2023-06-19/world_population_comparison:
+    - snapshot-private://fasttrack/2023-06-19/world_population_comparison.csv
   # archived; last active in cc57defe18d3 on 2023-07-13
   data-private://grapher/fasttrack/2023-04-30/paratz:
     - snapshot-private://fasttrack/2023-04-30/paratz.csv
-  # archived; last active in 709f47df803f on 2024-12-06
-  data-private://grapher/fasttrack/latest/antimicrobial_usage_livestock:
-    - snapshot-private://fasttrack/latest/antimicrobial_usage_livestock.csv
-  # archived; last active in e027dd1c717a on 2023-10-24
-  data://grapher/fasttrack/latest/net_zero_tracker:
-    - snapshot://fasttrack/latest/net_zero_tracker.csv
   # archived; last active in 768aa62aa367 on 2023-08-21
   data://grapher/fasttrack/latest/survey_livestock_oklahoma:
     - snapshot://fasttrack/latest/survey_livestock_oklahoma.csv
   # archived; last active in fe024675d56c on 2023-08-21
   data://grapher/fasttrack/2023-08-21/sentience_institute:
     - snapshot://fasttrack/2023-08-21/sentience_institute.csv
-  # archived; last active in a76aff4118a6 on 2024-02-07
-  data://grapher/fasttrack/latest/nuclear_warhead_stockpiles:
-    - snapshot://fasttrack/latest/nuclear_warhead_stockpiles.csv
-  # archived; last active in a76aff4118a6 on 2024-02-07
-  data://grapher/fasttrack/latest/nuclear_warhead_inventories:
-    - snapshot://fasttrack/latest/nuclear_warhead_inventories.csv
+  # archived; last active in 114c003b45b7 on 2023-10-17
+  data-private://grapher/fasttrack/latest/test_co2_emissions:
+    - snapshot-private://fasttrack/latest/test_co2_emissions.csv
+  # archived; last active in e027dd1c717a on 2023-10-24
+  data://grapher/fasttrack/latest/net_zero_tracker:
+    - snapshot://fasttrack/latest/net_zero_tracker.csv
+  # archived; last active in ba1a3f28968d on 2023-12-21
+  data-private://grapher/fasttrack/latest/test_electricity_projections:
+    - snapshot-private://fasttrack/latest/test_electricity_projections.csv
+  # archived; last active in 46687f881b37 on 2024-01-09
+  data-private://grapher/fasttrack/2022-02-28/nuclear_warhead_inventories:
+    - snapshot-private://fasttrack/2022-02-28/nuclear_warhead_inventories.csv
   # archived; last active in 6421451c0dfc on 2024-01-29
   data-private://grapher/fasttrack/latest/war_deaths_by_war_mars:
     - snapshot-private://fasttrack/latest/war_deaths_by_war_mars.csv
+  # archived; last active in b7124fcbbc81 on 2024-02-06
+  data://grapher/fasttrack/latest/monadic_strategic_nuclear_forces:
+    - snapshot://fasttrack/latest/monadic_strategic_nuclear_forces.csv
+  # archived; last active in a76aff4118a6 on 2024-02-07
+  data://grapher/fasttrack/latest/nuclear_warhead_inventories:
+    - snapshot://fasttrack/latest/nuclear_warhead_inventories.csv
+  # archived; last active in a76aff4118a6 on 2024-02-07
+  data://grapher/fasttrack/latest/nuclear_warhead_stockpiles:
+    - snapshot://fasttrack/latest/nuclear_warhead_stockpiles.csv
+  # archived; last active in 98275f2eed1d on 2024-02-19
+  data-private://grapher/fasttrack/2023-05-03/qubits:
+    - snapshot-private://fasttrack/2023-05-03/qubits.csv
   # archived; last active in e0ac61407155 on 2024-02-23
   data://grapher/fasttrack/latest/joe_test_please_delete:
     - snapshot://fasttrack/latest/joe_test_please_delete.csv
@@ -233,18 +224,24 @@ steps:
   # archived; last active in 31adfb04d63f on 2024-03-11
   data://grapher/fasttrack/latest/vdem_women_executives:
     - snapshot://fasttrack/latest/vdem_women_executives.csv
-  # archived; last active in f2579d73b42a on 2024-06-17
-  data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1980_2018:
-    - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1980_2018.csv
+  # archived; last active in 6ff64eed33b6 on 2024-03-27
+  data-private://grapher/fasttrack/2023-05-02/tomitaka_2018:
+    - snapshot-private://fasttrack/2023-05-02/tomitaka_2018.csv
   # archived; last active in f2579d73b42a on 2024-06-17
   data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1980_2018_take2:
     - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1980_2018_take2.csv
   # archived; last active in f2579d73b42a on 2024-06-17
   data-private://grapher/fasttrack/latest/draft_joe_top1share_diff_1980_2018:
     - snapshot-private://fasttrack/latest/draft_joe_top1share_diff_1980_2018.csv
+  # archived; last active in f2579d73b42a on 2024-06-17
+  data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1980_2018:
+    - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1980_2018.csv
   # archived; last active in 5f492eae7e2f on 2024-08-20
   data-private://grapher/fasttrack/latest/africa_cdc:
     - snapshot-private://fasttrack/latest/africa_cdc.csv
+  # archived; last active in 709f47df803f on 2024-12-06
+  data-private://grapher/fasttrack/latest/antimicrobial_usage_livestock:
+    - snapshot-private://fasttrack/latest/antimicrobial_usage_livestock.csv
   # archived; last active in 502a778b3917 on 2025-03-31
   data-private://grapher/fasttrack/latest/test:
     - snapshot-private://fasttrack/latest/test.csv

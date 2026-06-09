@@ -157,11 +157,11 @@ steps:
   data://meadow/space/2023-06-09/exoplanets:
     - snapshot://space/2023-06-09/exoplanets.csv
   # archived; last active in e6462011113e on 2024-08-16
-  data://garden/space/2023-06-09/exoplanets:
-    - data://meadow/space/2023-06-09/exoplanets
-  # archived; last active in e6462011113e on 2024-08-16
   data://grapher/space/2023-06-09/exoplanets:
     - data://garden/space/2023-06-09/exoplanets
+  # archived; last active in e6462011113e on 2024-08-16
+  data://garden/space/2023-06-09/exoplanets:
+    - data://meadow/space/2023-06-09/exoplanets
   # archived; last active in 38cc5685d1ef on 2024-08-16
   data://meadow/space/2023-06-09/space_track:
     - snapshot://space/2023-06-09/space_track.csv

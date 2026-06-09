@@ -121,33 +121,33 @@ steps:
   # archived; last active in 6747e359db57 on 2024-09-13
   data://grapher/covid/latest/john_hopkins_university:
     - data://garden/covid/latest/john_hopkins_university
-  # archived; last active in 9fc92c3066e5 on 2024-08-08
-  data-private://grapher/covid/latest/vaccinations_us:
-    - data-private://garden/covid/latest/vaccinations_us
-  # archived; last active in 9fc92c3066e5 on 2024-08-08
-  data-private://garden/covid/latest/vaccinations_us:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20United%20States%20vaccinations.csv
   # archived; last active in 45e3c521c08f on 2024-07-30
   data-private://grapher/covid/latest/john_hopkins_university:
     - data-private://garden/covid/latest/john_hopkins_university
   # archived; last active in 45e3c521c08f on 2024-07-30
   data-private://garden/covid/latest/john_hopkins_university:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/jhu/COVID-19%20-%20Johns%20Hopkins%20University.csv
-  # archived; last active in c746e64b393c on 2024-08-23
-  data-private://explorers/covid/latest/covid:
-    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
-    - data://grapher/covid/latest/hospital
-    - data://grapher/covid/latest/oxcgrt_policy
-    - data://grapher/covid/latest/tracking_r
-    - data://grapher/covid/latest/cases_deaths
-    - data-private://grapher/covid/latest/sequence
-    - data://grapher/covid/latest/combined
-    - data://grapher/excess_mortality/latest/excess_mortality
-    - data://grapher/covid/latest/vaccinations_global
-    - data://grapher/covid/latest/testing
+  # archived; last active in 9fc92c3066e5 on 2024-08-08
+  data-private://grapher/covid/latest/vaccinations_us:
+    - data-private://garden/covid/latest/vaccinations_us
+  # archived; last active in 9fc92c3066e5 on 2024-08-08
+  data-private://garden/covid/latest/vaccinations_us:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20United%20States%20vaccinations.csv
   # archived; last active in 787aeef958a7 on 2024-08-23
   data-private://garden/covid/latest/combined:
-    - data://garden/covid/latest/cases_deaths
+    - data://garden/covid/latest/testing
     - data-private://garden/covid/latest/sequence
     - data://garden/demography/2024-07-15/population
-    - data://garden/covid/latest/testing
+    - data://garden/covid/latest/cases_deaths
+  # archived; last active in c746e64b393c on 2024-08-23
+  data-private://explorers/covid/latest/covid:
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/hospital
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/combined
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/covid/latest/tracking_r
+    - data://grapher/covid/latest/testing
+    - data://grapher/excess_mortality/latest/excess_mortality

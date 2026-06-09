@@ -1179,30 +1179,9 @@ steps:
   # archived; last active in d85798e63a19 on 2026-04-27
   data://grapher/artificial_intelligence/2025-11-07/energy_ai:
     - data://garden/artificial_intelligence/2025-11-07/energy_ai
-  # archived; last active in 243fd7990345 on 2024-02-02
-  data://meadow/artificial_intelligence/2023-06-08/yougov_robots:
-    - snapshot://artificial_intelligence/2023-06-08/yougov_robots.xlsx
-  # archived; last active in 243fd7990345 on 2024-02-02
-  data://garden/artificial_intelligence/2023-06-08/yougov_robots:
-    - data://meadow/artificial_intelligence/2023-06-08/yougov_robots
-  # archived; last active in 243fd7990345 on 2024-02-02
-  data://grapher/artificial_intelligence/2023-06-08/yougov_robots:
-    - data://garden/artificial_intelligence/2023-06-08/yougov_robots
-  # archived; last active in 243fd7990345 on 2024-02-02
-  data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation:
-    - snapshot://artificial_intelligence/2023-06-08/yougov_job_automation.xlsx
-  # archived; last active in 243fd7990345 on 2024-02-02
-  data://garden/artificial_intelligence/2023-06-08/yougov_job_automation:
-    - data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation
-  # archived; last active in 243fd7990345 on 2024-02-02
-  data://grapher/artificial_intelligence/2023-06-08/yougov_job_automation:
-    - data://garden/artificial_intelligence/2023-06-08/yougov_job_automation
   # archived; last active in 9497c8d7e536 on 2023-07-03
   data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
-  # archived; last active in 9497c8d7e536 on 2023-07-03
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet
   # archived; last active in 9497c8d7e536 on 2023-07-03
   data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
     - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
@@ -1210,23 +1189,41 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
   # archived; last active in 9497c8d7e536 on 2023-07-03
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari:
-    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
-  # archived; last active in 9497c8d7e536 on 2023-07-03
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_atari:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari
-  # archived; last active in 29c127a6cba8 on 2024-07-03
-  data://grapher/artificial_intelligence/2023-06-14/ai_companies:
-    - data://garden/artificial_intelligence/2023-06-14/ai_companies
+  # archived; last active in 9497c8d7e536 on 2023-07-03
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_imagenet
+  # archived; last active in 9497c8d7e536 on 2023-07-03
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_atari:
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
+  # archived; last active in 243fd7990345 on 2024-02-02
+  data://grapher/artificial_intelligence/2023-06-08/yougov_job_automation:
+    - data://garden/artificial_intelligence/2023-06-08/yougov_job_automation
+  # archived; last active in 243fd7990345 on 2024-02-02
+  data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation:
+    - snapshot://artificial_intelligence/2023-06-08/yougov_job_automation.xlsx
+  # archived; last active in 243fd7990345 on 2024-02-02
+  data://garden/artificial_intelligence/2023-06-08/yougov_job_automation:
+    - data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation
+  # archived; last active in 243fd7990345 on 2024-02-02
+  data://meadow/artificial_intelligence/2023-06-08/yougov_robots:
+    - snapshot://artificial_intelligence/2023-06-08/yougov_robots.xlsx
+  # archived; last active in 243fd7990345 on 2024-02-02
+  data://grapher/artificial_intelligence/2023-06-08/yougov_robots:
+    - data://garden/artificial_intelligence/2023-06-08/yougov_robots
+  # archived; last active in 243fd7990345 on 2024-02-02
+  data://garden/artificial_intelligence/2023-06-08/yougov_robots:
+    - data://meadow/artificial_intelligence/2023-06-08/yougov_robots
   # archived; last active in d452ae8c291d on 2024-02-15
-  data://meadow/artificial_intelligence/2023-06-21/epoch:
-    - snapshot://artificial_intelligence/2023-06-21/epoch.csv
+  data://grapher/artificial_intelligence/2023-06-21/epoch:
+    - data://garden/artificial_intelligence/2023-06-21/epoch
   # archived; last active in d452ae8c291d on 2024-02-15
   data://garden/artificial_intelligence/2023-06-21/epoch:
     - data://meadow/artificial_intelligence/2023-06-21/epoch
   # archived; last active in d452ae8c291d on 2024-02-15
-  data://grapher/artificial_intelligence/2023-06-21/epoch:
-    - data://garden/artificial_intelligence/2023-06-21/epoch
+  data://grapher/artificial_intelligence/2023-07-12/epoch_llms:
+    - data://garden/artificial_intelligence/2023-07-12/epoch_llms
   # archived; last active in d452ae8c291d on 2024-02-15
   data://garden/artificial_intelligence/2023-06-21/epoch_aggregates:
     - data://garden/artificial_intelligence/2023-06-21/epoch
@@ -1237,11 +1234,14 @@ steps:
   data://garden/artificial_intelligence/2023-07-12/epoch_llms:
     - snapshot://artificial_intelligence/2023-07-12/epoch_llms.csv
   # archived; last active in d452ae8c291d on 2024-02-15
-  data://grapher/artificial_intelligence/2023-07-12/epoch_llms:
-    - data://garden/artificial_intelligence/2023-07-12/epoch_llms
-  # archived; last active in a56145d0a32b on 2024-06-20
-  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
-    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://meadow/artificial_intelligence/2023-06-21/epoch:
+    - snapshot://artificial_intelligence/2023-06-21/epoch.csv
   # archived; last active in a56145d0a32b on 2024-06-20
   data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
     - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations
+  # archived; last active in a56145d0a32b on 2024-06-20
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  # archived; last active in 29c127a6cba8 on 2024-07-03
+  data://grapher/artificial_intelligence/2023-06-14/ai_companies:
+    - data://garden/artificial_intelligence/2023-06-14/ai_companies
