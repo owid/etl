@@ -174,7 +174,7 @@
   "Syrian Arab Republic": "Syria",
   "Tajikistan": "Tajikistan",
   "Thailand": "Thailand",
-  "Republic of T\u00fcrkiye": "Turkey",
+  "The Republic of T\u00fcrkiye": "Turkey",
   "Timor-Leste": "East Timor",
   "Togo": "Togo",
   "Tonga": "Tonga",
@@ -203,5 +203,8 @@
   "World Bank High Income Economies": "High-income countries",
   "World Bank Low Income Economies": "Low-income countries",
   "World Bank Lower-Middle Income Economies": "Lower-middle-income countries",
-  "World Bank Upper-Middle Income Economies": "Upper-middle-income countries"
+  "World Bank Upper-Middle Income Economies": "Upper-middle-income countries",
+  "Landlocked developing countries": "Landlocked developing countries",
+  "Least developed countries": "Least developed countries",
+  "Republic of T\u00fcrkiye": "Turkey"
 }
