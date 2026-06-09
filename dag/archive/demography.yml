@@ -6,10 +6,12 @@ steps:
     - data://garden/demography/2023-09-29/gini_le
 
   # Population OMM
+  # archived; last active in 3d09335a8ec8 on 2024-07-17
   data://grapher/demography/2023-03-30/population:
     - data://garden/demography/2022-12-08/population
 
   # 2022-12-08: HYDE 3.2 + Gapminder + UN WPP 2022
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://garden/demography/2022-12-08/population:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2019-12-10/population
@@ -17,6 +19,7 @@ steps:
     - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
 
   # WPP (2024) [under embargo]
+  # archived; last active in 3d09335a8ec8 on 2024-07-17
   data-private://meadow/un/2024-07-11/un_wpp:
     ## Population
     - snapshot-private://un/2024-07-11/un_wpp_population.csv
@@ -52,132 +55,176 @@ steps:
     - snapshot-private://un/2024-07-11/un_wpp_le.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_le_f.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_le_m.xlsx
+  # archived; last active in 3d09335a8ec8 on 2024-07-17
   data-private://garden/un/2024-07-11/un_wpp:
     - data-private://meadow/un/2024-07-11/un_wpp
+  # archived; last active in 3d09335a8ec8 on 2024-07-17
   data-private://grapher/un/2024-07-11/un_wpp:
     - data-private://garden/un/2024-07-11/un_wpp
+  # archived; last active in 3d09335a8ec8 on 2024-07-17
   data-private://grapher/un/2024-07-11/un_wpp_full:
     - data-private://garden/un/2024-07-11/un_wpp
 
   # Population density
+  # archived; last active in bf760c4505e9 on 2024-07-17
   data://garden/demography/2023-06-12/population_density:
     - data://garden/demography/2023-03-31/population
     - data://garden/faostat/2024-03-14/faostat_rl
+  # archived; last active in bf760c4505e9 on 2024-07-17
   data://grapher/demography/2023-06-12/population_density:
     - data://garden/demography/2023-06-12/population_density
 
   # HMD
+  # archived; last active in e0b76f9b5038 on 2024-12-02
   data://meadow/hmd/2022-12-07/life_tables:
     - snapshot://hmd/2022-12-07/hmd.zip
+  # archived; last active in e0b76f9b5038 on 2024-12-02
   data://garden/hmd/2022-12-07/life_tables:
     - data://meadow/hmd/2022-12-07/life_tables
 
   # Survivorship ages (HMD-derived)
+  # archived; last active in e0b76f9b5038 on 2024-12-02
   data://garden/demography/2023-09-27/survivor_percentiles:
     - data://garden/hmd/2023-09-19/hmd
+  # archived; last active in e0b76f9b5038 on 2024-12-02
   data://grapher/demography/2023-09-27/survivor_percentiles:
     - data://garden/demography/2023-09-27/survivor_percentiles
 
   # Phi-gender life expectancy inequality
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://garden/demography/2023-10-03/phi_gender_le:
     - data://garden/demography/2023-10-03/life_tables
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://grapher/demography/2023-10-03/phi_gender_le:
     - data://garden/demography/2023-10-03/phi_gender_le
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://garden/demography/2024-12-03/phi_gender_le:
     - data://garden/demography/2024-12-03/life_tables
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/demography/2024-12-03/phi_gender_le:
     - data://garden/demography/2024-12-03/phi_gender_le
 
   # Broken limits of Life Expectancy
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://garden/demography/2023-10-20/broken_limits_le:
     - data://garden/demography/2023-10-03/life_tables
     - data://garden/hmd/2023-09-19/hmd
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://grapher/demography/2023-10-20/broken_limits_le:
     - data://garden/demography/2023-10-20/broken_limits_le
 
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://garden/demography/2024-12-03/broken_limits_le:
     - data://garden/hmd/2024-12-01/hmd
     - data://garden/demography/2024-12-03/life_tables
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/demography/2024-12-03/broken_limits_le:
     - data://garden/demography/2024-12-03/broken_limits_le
 
   # Gini Life Expectancy Inequality
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://garden/demography/2023-10-04/gini_le:
     - data://garden/demography/2023-10-03/life_tables
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://grapher/demography/2023-10-04/gini_le:
     - data://garden/demography/2023-10-04/gini_le
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://garden/demography/2024-12-03/gini_le:
     - data://garden/demography/2024-12-03/life_tables
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/demography/2024-12-03/gini_le:
     - data://garden/demography/2024-12-03/gini_le
 
   # HMD
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://meadow/hmd/2023-09-19/hmd:
     - snapshot://hmd/2023-09-18/hmd.zip
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://garden/hmd/2023-09-19/hmd:
     - data://meadow/hmd/2023-09-19/hmd
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://grapher/hmd/2023-09-19/hmd:
     - data://garden/hmd/2023-09-19/hmd
   # HMD country data
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://meadow/hmd/2024-12-03/hmd_country:
     - snapshot://hmd/2024-12-01/hmd_country.zip
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://garden/hmd/2024-12-03/hmd_country:
     - data://meadow/hmd/2024-12-03/hmd_country
     - data://garden/hmd/2024-12-01/hmd
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/hmd/2024-12-03/hmd_country:
     - data://garden/hmd/2024-12-03/hmd_country
   # Life Tables (HMD)
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/demography/2024-12-03/life_tables:
     - data://garden/demography/2024-12-03/life_tables
   # UN WPP Life Tables
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://meadow/un/2023-10-02/un_wpp_lt:
     - snapshot://un/2023-10-02/un_wpp_lt_all.zip
     - snapshot://un/2023-10-02/un_wpp_lt_f.zip
     - snapshot://un/2023-10-02/un_wpp_lt_m.zip
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://garden/un/2023-10-02/un_wpp_lt:
     - data://meadow/un/2023-10-02/un_wpp_lt
   # UN WPP + HMD Life Tables
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://garden/demography/2023-10-03/life_tables:
     - data://garden/hmd/2023-09-19/hmd
     - data://garden/un/2023-10-02/un_wpp_lt
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://grapher/demography/2023-10-04/life_tables:
     - data://garden/demography/2023-10-03/life_tables
   # OMM: Birth rate -- HMD + UN WPP
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://garden/demography/2024-12-03/birth_rate:
     - data://garden/hmd/2024-12-01/hmd
     - data://garden/un/2024-07-12/un_wpp
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/demography/2024-12-03/birth_rate:
     - data://garden/demography/2024-12-03/birth_rate
   # Effective Fertility Rate (Malani & Jacob)
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://garden/demography/2024-12-17/efr_malani_jacob:
     - data://garden/un/2024-12-02/un_wpp_lt
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/hmd/2024-12-01/hmd
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/demography/2024-12-17/efr_malani_jacob:
     - data://garden/demography/2024-12-17/efr_malani_jacob
   # OMM: Life Expectancy
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://garden/demography/2023-10-09/life_expectancy:
     - data://garden/demography/2023-10-03/life_tables
     - data://garden/demography/2023-10-10/zijdeman_et_al_2015
     - data://garden/demography/2023-10-10/riley_2005
     - data://garden/un/2022-07-11/un_wpp
+  # archived; last active in f9d9a421fd80 on 2024-12-03
   data://grapher/demography/2023-10-10/life_expectancy:
     - data://garden/demography/2023-10-09/life_expectancy
+  # archived; last active in 8555670c40f0 on 2025-10-22
   data://grapher/demography/2024-12-03/life_expectancy:
     - data://garden/demography/2024-12-03/life_expectancy
 
   ## Population by education group (Wittgenstein centre)
+  # archived; last active in b8d4a0cc44fc on 2024-12-11
   data://meadow/demography/2023-04-07/population_education_wittgenstein:
     - snapshot://demography/2023-04-07/population_education_wittgenstein.csv
+  # archived; last active in b8d4a0cc44fc on 2024-12-11
   data://garden/demography/2023-04-07/population_education_wittgenstein:
     - data://meadow/demography/2023-04-07/population_education_wittgenstein
+  # archived; last active in b8d4a0cc44fc on 2024-12-11
   data://grapher/demography/2023-04-07/population_education_wittgenstein:
     - data://garden/demography/2023-04-07/population_education_wittgenstein
 
+  # archived; last active in 37724248da9e on 2025-03-19
   data://explorers/un/2022/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
   # Fariss
+  # archived; last active in 6c2d5807de88 on 2025-05-27
   data://grapher/demography/2023-12-20/population_fariss:
     - data://garden/demography/2023-12-20/population_fariss
 
@@ -185,31 +232,122 @@ steps:
   # Fertility
   #
   # HFD
+  # archived; last active in 55ad1fd0e200 on 2025-10-22
   data://meadow/hmd/2024-11-19/hfd:
     - snapshot://hmd/2024-11-19/hfd.zip
+  # archived; last active in 55ad1fd0e200 on 2025-10-22
   data://garden/hmd/2024-11-19/hfd:
     - data://meadow/hmd/2024-11-19/hfd
+  # archived; last active in 55ad1fd0e200 on 2025-10-22
   data://grapher/hmd/2024-11-19/hfd:
     - data://garden/hmd/2024-11-19/hfd
   # OMM: Fertility Rate -- HFD + UN WPP
+  # archived; last active in 55ad1fd0e200 on 2025-10-22
   data://garden/demography/2024-12-03/fertility_rate:
     - data://garden/hmd/2024-11-19/hfd
     - data://garden/un/2024-07-12/un_wpp
+  # archived; last active in 55ad1fd0e200 on 2025-10-22
   data://grapher/demography/2024-12-03/fertility_rate:
     - data://garden/demography/2024-12-03/fertility_rate
   # Mean Age at childbirth (HFD + UN WPP)
+  # archived; last active in 55ad1fd0e200 on 2025-10-22
   data://garden/demography/2024-12-18/mean_age_childbearing:
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/hmd/2024-11-19/hfd
+  # archived; last active in 55ad1fd0e200 on 2025-10-22
   data://grapher/demography/2024-12-18/mean_age_childbearing:
     - data://garden/demography/2024-12-18/mean_age_childbearing
 
 #
 # MORTALITY
 #
-data://garden/demography/2025-01-20/deaths:
-  - data://garden/un/2024-07-12/un_wpp
-  - data://garden/un/2024-12-02/un_wpp_lt
-  - data://garden/hmd/2024-12-01/hmd
-data://grapher/demography/2025-01-20/deaths:
-  - data://garden/demography/2025-01-20/deaths
+  # archived; last active in 8555670c40f0 on 2025-10-22
+  data://garden/demography/2025-01-20/deaths:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2024-12-02/un_wpp_lt
+    - data://garden/hmd/2024-12-01/hmd
+  # archived; last active in 8555670c40f0 on 2025-10-22
+  data://grapher/demography/2025-01-20/deaths:
+    - data://garden/demography/2025-01-20/deaths
+  # archived; last active in 0e649f3a1e65 on 2023-02-15
+  data://garden/demography/2022-11-30/life_expectancy:
+    - data://garden/papers/2022-11-04/riley_2005
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/hmd/2022-11-04/life_tables
+    - data://garden/owid/latest/key_indicators
+    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
+  # archived; last active in 574d52e444b1 on 2023-06-13
+  data://grapher/demography/2023-04-14/population_density:
+    - data://garden/demography/2023-04-14/population_density
+  # archived; last active in 574d52e444b1 on 2023-06-13
+  data://garden/demography/2023-04-14/population_density:
+    - data://garden/faostat/2023-02-22/faostat_rl
+    - data://garden/demography/2023-03-31/population
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://garden/papers/2022-11-03/zijdeman_et_al_2015:
+    - data://meadow/papers/2022-11-03/zijdeman_et_al_2015
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://garden/papers/2023-02-03/riley_2005:
+    - data://meadow/papers/2023-02-03/riley_2005
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://grapher/demography/2022-11-30/life_expectancy:
+    - data://garden/demography/2023-02-03/life_expectancy
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://garden/demography/2023-02-03/life_expectancy:
+    - data://garden/papers/2023-02-03/riley_2005
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/hmd/2022-11-04/life_tables
+    - data://garden/owid/latest/key_indicators
+    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://meadow/papers/2022-11-03/zijdeman_et_al_2015:
+    - walden://papers/2022-11-01/zijdeman_et_al_2015
+  # archived; last active in d0bfece254a8 on 2023-10-12
+  data://meadow/papers/2023-02-03/riley_2005:
+    - walden://papers/2022-11-01/riley_2005
+  # archived; last active in d96c4ab04627 on 2024-03-07
+  data://garden/demography/2024-01-25/population:
+    - data://garden/hyde/2024-01-02/all_indicators
+    - data://garden/ggdc/2024-01-19/maddison_federico_paper
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/un/2022-07-11/un_wpp
+  # archived; last active in d96c4ab04627 on 2024-03-07
+  data://grapher/demography/2024-01-25/population:
+    - data://garden/demography/2024-01-25/population
+    - data://garden/demography/2024-01-05/population
+  # archived; last active in d96c4ab04627 on 2024-03-07
+  data://garden/demography/2024-01-05/population:
+    - data://garden/hyde/2024-01-02/all_indicators
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/gapminder/2023-03-31/population
+    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
+    - data://garden/un/2022-07-11/un_wpp
+  # archived; last active in dfa519c0aff5 on 2024-07-22
+  data://grapher/demography/2023-07-03/population_doubling_times:
+    - data://garden/demography/2023-07-03/population_doubling_times
+  # archived; last active in dfa519c0aff5 on 2024-07-22
+  data://garden/demography/2023-07-03/population_doubling_times:
+    - data://garden/demography/2023-03-31/population
+  # archived; last active in 275fcdc8c2a1 on 2024-11-29
+  data://grapher/migration/2024-11-20/migrant_stock_flows:
+    - data://garden/un/2024-07-16/migrant_stock
+  # archived; last active in bdf71c97ea0a on 2024-12-02
+  data://grapher/hmd/2024-11-27/hmd:
+    - data://garden/hmd/2024-11-27/hmd
+  # archived; last active in bdf71c97ea0a on 2024-12-02
+  data://garden/hmd/2024-11-27/hmd:
+    - data://meadow/hmd/2024-11-27/hmd
+  # archived; last active in bdf71c97ea0a on 2024-12-02
+  data://meadow/hmd/2024-11-27/hmd:
+    - snapshot://hmd/2024-11-27/hmd.zip
+  # archived; last active in 8555670c40f0 on 2025-10-22
+  data://grapher/hmd/2024-12-01/hmd:
+    - data://garden/hmd/2024-12-01/hmd
+  # archived; last active in 8555670c40f0 on 2025-10-22
+  data://grapher/demography/2024-12-02/survivor_percentiles:
+    - data://garden/demography/2024-12-02/survivor_percentiles
+  # archived; last active in 8555670c40f0 on 2025-10-22
+  data://garden/demography/2024-12-02/survivor_percentiles:
+    - data://garden/hmd/2024-12-01/hmd
