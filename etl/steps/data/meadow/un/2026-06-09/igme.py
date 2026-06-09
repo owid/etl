@@ -19,7 +19,11 @@ def run() -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.rename(columns={"Geographic area": "country", "Reference Date": "year"}, errors="raise")
+    # Note: The 2025 release renamed several columns to SDMX-style uppercase names.
+    tb = tb.rename(
+        columns={"Geographic area": "country", "REF_DATE": "year", "OBS_VALUE": "observation_value"},
+        errors="raise",
+    )
     # There are some duplicated values in the UNICEF regions - so let's remove those. I wrote to UN IGME to report this 2024-09-12.
     tb = tb[tb["Regional group"] != "UNICEF"]
     # Only grab the UN IGME estimates (not the input raw data)

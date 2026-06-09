@@ -31,7 +31,10 @@ def run() -> None:
     # Process data.
     #
     tb = paths.regions.harmonize_names(
-        tb, country_col="country", countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        tb,
+        country_col="country",
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
     )
 
     # Filter out just the bits of the data we want
@@ -42,6 +45,11 @@ def run() -> None:
     tb_counts_regions = regional_aggregates_counts(tb, threshold=0.8)
     # get regional population weighted averages for rate variables
     tb_rates_regions = population_weighted_regional_averages(tb, threshold=0.8)
+
+    # Remove any OWID region rows from the country-level data before adding back
+    # our own regional aggregates (source data may contain regional entries from UN
+    # that collide with OWID region names, e.g. income groups).
+    tb = tb[~tb["country"].isin(REGIONS)]
 
     # Adding regional aggregates to table
     tb = pr.concat([tb, tb_counts_regions, tb_rates_regions])

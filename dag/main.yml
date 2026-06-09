@@ -659,6 +659,7 @@ steps:
   data://garden/un/2026-06-09/igme:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2025-07-01/income_groups
     - data://garden/un/2018/igme
     - data://meadow/un/2026-06-09/igme
   data://grapher/un/2026-06-09/igme:
