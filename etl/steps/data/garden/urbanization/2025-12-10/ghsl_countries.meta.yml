@@ -2,6 +2,7 @@
 definitions:
   common:
     presentation:
+      title_variant: DEGURBA
       topic_tags:
         - Urbanization
     processing_level: major
