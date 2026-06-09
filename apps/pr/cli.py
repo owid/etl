@@ -515,7 +515,12 @@ def create_pr(repo, work_branch, base_branch, pr_title):
     pr_title_str = str(pr_title)
 
     log.info("Creating an empty commit.")
-    repo.git.commit("--allow-empty", "-m", pr_title_str or f"Start a new staging server for branch '{work_branch}'")
+    # Skip pre-commit hooks on this seeding commit: it's empty (nothing to check), and the
+    # hooks run `make check` which needs an installed `.venv`. In a fresh worktree the venv
+    # isn't set up yet (install_worktree_venv runs later), so the hooks would fail here.
+    repo.git.commit(
+        "--allow-empty", "--no-verify", "-m", pr_title_str or f"Start a new staging server for branch '{work_branch}'"
+    )
 
     log.info("Pushing the new branch to remote.")
     repo.git.push("origin", work_branch)
