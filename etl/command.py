@@ -239,7 +239,12 @@ def main_cli(
 
     # Restrict to steps modified vs origin/master (and their downstream steps).
     if modified:
-        if _is_on_master_branch():
+        current_branch = _current_branch_name()
+        if current_branch is None:
+            # Detached HEAD: get_changed_files() can't resolve a branch to diff against, so bail
+            # with a clear message instead of a confusing TypeError deeper down.
+            raise click.ClickException("--modified requires a named branch, but HEAD is detached.")
+        elif current_branch == "master":
             # On master there's nothing to diff against, so don't filter: run all selected steps.
             # This lets staging-site-master do a full build with the same command as feature branches.
             click.echo("On master branch: --modified runs all selected steps (no diff filter).")
@@ -303,8 +308,8 @@ def main_cli(
                 print("--- Dataset rebuild complete", flush=True)
 
 
-def _is_on_master_branch() -> bool:
-    """Return True if the repo is currently on the master branch.
+def _current_branch_name() -> str | None:
+    """Return the current branch name, or None if HEAD is detached.
 
     Used to decide whether `--modified` should filter (feature branch) or run everything (master,
     where there's nothing to diff against).
@@ -312,10 +317,10 @@ def _is_on_master_branch() -> bool:
     import git
 
     try:
-        return git.Repo(paths.BASE_DIR).active_branch.name == "master"
+        return git.Repo(paths.BASE_DIR).active_branch.name
     except TypeError:
-        # Detached HEAD (e.g. some CI checkouts) - treat as not-master so we still filter.
-        return False
+        # Detached HEAD (e.g. some CI checkouts) - no branch name available.
+        return None
 
 
 def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]:
@@ -334,7 +339,10 @@ def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]
     # Narrow to those also matching the explicit STEPS arguments.
     if includes:
         if exact_match:
-            changed_paths = [p for p in changed_paths if p in set(includes)]
+            # changed_paths are URI-less catalog paths (e.g. "garden/foo/bar"), while exact-match
+            # includes are full step URIs (e.g. "data://garden/foo/bar"); compare on the path part.
+            wanted = {i.split("://", 1)[-1] for i in includes}
+            changed_paths = [p for p in changed_paths if p in wanted]
         else:
             patterns = [re.compile(p) for p in includes]
             changed_paths = [p for p in changed_paths if any(pat.search(p) for pat in patterns)]
