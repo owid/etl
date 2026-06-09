@@ -2,7 +2,7 @@ import streamlit.components.v1 as components
 from st_aggrid import AgGrid, ColumnsAutoSizeMode, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
-from apps.step_update.cli import UpdateState
+from etl.version_tracker import UpdateState
 
 # Custom JS code
 JSCODE_UPDATE_DAYS = JsCode(

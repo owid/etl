@@ -11,15 +11,13 @@ from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
 from etl.dag_helpers import (
-    create_dag_archive_file,
     get_comments_above_step_in_dag,
-    remove_steps_from_dag_file,
     write_to_dag_file,
 )
-from etl.paths import BASE_DIR, DAG_ARCHIVE_FILE, DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
 from etl.steps import filter_to_subgraph, to_dependency_order
-from etl.version_tracker import DAG_TEMP_STEP, UpdateState, VersionTracker
+from etl.version_tracker import DAG_TEMP_STEP, VersionTracker
 
 log = structlog.get_logger()
 
@@ -370,102 +368,6 @@ class StepUpdater:
                     log.error(f"Stopped because of a failure on step {step}.")
                     break
 
-    def _archive_step(self, step: str) -> None:
-        # Move a certain step from its active dag to its corresponding archive dag.
-
-        # Get info for step to be updated.
-        step_info = self.get_step_info(step=step)
-
-        # Skip non-archivable steps.
-        if step_info["update_state"] != UpdateState.ARCHIVABLE.value:
-            log.info(f"Skipping non-archivable step: {step}")
-            return
-
-        # Skip snapshots (since they do not appear as steps in the dag).
-        if step_info["channel"] in ["snapshot"]:
-            log.info(f"Skipping snapshot: {step}")
-            return
-
-        # Get active dag file for this step.
-        dag_file_active = step_info["dag_file_path"]
-
-        # Get archive dag file for this step.
-        dag_file_archive = Path(
-            dag_file_active.as_posix().replace(
-                DAG_DIR.relative_to(BASE_DIR).as_posix(), DAG_ARCHIVE_FILE.parent.relative_to(BASE_DIR).as_posix()
-            )
-        )
-
-        # If the archive dag file does not exist, create it.
-        if not dag_file_archive.exists():
-            create_dag_archive_file(dag_file_archive=dag_file_archive)
-
-        # Get header from the comment lines right above the current step in the dag.
-        step_header = get_comments_above_step_in_dag(step=step, dag_file=dag_file_active)
-
-        # Create the dag_part that needs to be written to the archive file.
-        dag_part = {step: set(step_info["direct_dependencies"])}
-
-        log.info(f"Archiving step: {step}")
-        if not self.dry_run:
-            # Add the new step and its dependencies to the archive dag.
-            write_to_dag_file(dag_file=dag_file_archive, dag_part=dag_part, comments={step: step_header})
-
-            # Delete the step from the active dag.
-            remove_steps_from_dag_file(dag_file=dag_file_active, steps_to_remove=[step])
-
-            # Reload steps dataframe.
-            self._load_version_tracker()
-
-    def archive_steps(self, steps: str | list[str], include_usages: bool = False) -> None:
-        """Move one or more steps from their active to their archive dag."""
-
-        # If a single step is given, convert it to a list.
-        if isinstance(steps, str):
-            steps = [steps]
-        elif isinstance(steps, tuple):
-            steps = list(steps)
-
-        for step in steps:
-            if self.steps_df[self.steps_df["step"] == step].empty:
-                log.error(f"Step {step} not found in active dag.")
-                continue
-
-            usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
-            if include_usages:
-                steps += [usage for usage in usages if usage not in steps]
-            else:
-                blocking = [u for u in usages if u not in steps]
-                if blocking:
-                    blocking_list = "\n  ".join(blocking)
-                    raise click.ClickException(
-                        f"Cannot archive '{step}' because it is used by active steps:\n  {blocking_list}\n"
-                        f"Use --include-usages to archive dependent steps as well."
-                    )
-
-        # Sort steps in dependency order (i.e. snapshots first). This avoids an error in the following situation:
-        # You attempt to archive [meadow_1, snapshot_1] (where snapshot_1 is a dependency of meadow_1).
-        # In this case, if you archive meadow_1 first, the snapshot_1 is also removed from the active dag, and
-        # when attempting to archive snapshot_1 afterwards, an error is raised. To avoid this, first archive snapshot_1.
-        filtered_dag = filter_to_subgraph(
-            graph=self.tracker.dag_active,
-            includes=steps,
-            excludes=[],
-            only=True,
-        )
-        steps = to_dependency_order(filtered_dag)
-
-        if self.interactive:
-            message = "The following steps will be archived:"
-            for step in steps:
-                message += f"\n  {step}"
-            log.info(message)
-            if self.interactive:
-                input("Press enter to continue.")
-
-        for step in steps:
-            self._archive_step(step=step)
-
 
 def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
     # The temporary step in the temporary dag depends on the latest version of each newly created snapshot, before
@@ -705,60 +607,4 @@ def cli(
         include_dependencies=include_dependencies,
         include_usages=include_usages,
         direct_only=direct_only,
-    )
-
-
-@click.command(name="archive", cls=RichCommand, help=__doc__)
-@click.argument("steps", type=str or list[str], nargs=-1)
-@click.option(
-    "--include-usages",
-    is_flag=True,
-    default=False,
-    type=bool,
-    help="Archive also steps that are directly using the given steps. Default: False.",
-)
-@click.option(
-    "--dry-run",
-    is_flag=True,
-    default=False,
-    type=bool,
-    help="Do not write to dag. Default: False.",
-)
-@click.option(
-    "--interactive/--non-interactive",
-    is_flag=True,
-    default=False,
-    type=bool,
-    help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
-)
-def archive_cli(
-    steps: str | list[str],
-    include_usages: bool = False,
-    dry_run: bool = False,
-    interactive: bool = True,
-) -> None:
-    """Archive one or more steps.
-
-    This tool lets you move one or more data steps from their active to their archive dag.
-
-    **Examples:**
-
-    **Note:** Remove the --dry-run if you want to actually write to the dag.
-
-    * To archive a single step:
-        ```
-        $ etl archive data://meadow/aviation_safety_network/2022-10-12/aviation_statistics --dry-run
-        ```
-
-        Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
-
-    * To archive not only that step, but also the steps that use it:
-        ```
-        $ etl archive data://meadow/aviation_safety_network/2022-10-12/aviation_statistics --include-usages --dry-run
-        ```
-    """
-    # Initialize step updater and run update.
-    StepUpdater(dry_run=dry_run, interactive=interactive).archive_steps(
-        steps=steps,
-        include_usages=include_usages,
     )
