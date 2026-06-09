@@ -20,3 +20,10 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/urbanization/2024-12-02/ghsl_urban_centers:
     - data://garden/urbanization/2024-12-02/ghsl_urban_centers
+
+  # Stats in the city - socioeconomic and environmental indicators.
+  #
+  data://grapher/urbanization/2026-02-01/ghsl_stats_in_the_city:
+    - data://garden/urbanization/2026-02-01/ghsl_stats_in_the_city:
+      - data://meadow/urbanization/2026-02-01/ghsl_stats_in_the_city:
+        - snapshot://urbanization/2026-02-01/ghsl_stats_in_the_city.zip
