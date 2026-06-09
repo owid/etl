@@ -49,6 +49,13 @@ definitions:
     on HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction
     of historical settlement patterns rather than direct observations.
 
+  hyde_combined_with_projections_key: &hyde_combined_with_projections_key >-
+    From 1950 to 2025, this indicator uses estimates from the UN World Urbanization
+    Prospects, based on each country's own definition of urban and rural areas. From
+    2025 onward, it uses UN projections. For years before 1950, it draws on HYDE v3.3
+    (History Database of the Global Environment), a modelled reconstruction of
+    historical settlement patterns rather than direct observations.
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -240,3 +247,59 @@ tables:
         presentation:
           title_public: Rural population
           title_variant: UN national definitions, HYDE
+
+  urban_share_with_hyde_and_projections:
+    variables:
+      share:
+        title: Share of population living in urban areas - HYDE, UN national definitions, and projections combined
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of the population living in areas classified as urban, combining UN estimates and projections with modelled historical data back to 10,000 BCE.
+        description_key:
+          - *hyde_combined_with_projections_key
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *degurba_comparison_key
+        description_processing: |-
+          We combined three sources to extend the urban share series through 2100. For years before 1950, we use urban population share estimates from HYDE v3.3. From 1950 to 2025, we use the urban population share from the UN World Urbanization Prospects, based on each country's national definition. From 2026 onward, we use UN projections.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of population living in urban areas
+          title_variant: UN national definitions, HYDE, with projections
+
+      urban_population:
+        title: Urban population - HYDE, UN national definitions, and projections combined
+        unit: people
+        short_unit: ''
+        description_short: Number of people living in areas classified as urban, combining UN estimates and projections with modelled historical data back to 10,000 BCE.
+        description_key:
+          - *hyde_combined_with_projections_key
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *degurba_comparison_key
+        description_processing: |-
+          We combined three sources to extend the urban population series through 2100. For years before 1950, we use urban population estimates from HYDE v3.3. From 1950 to 2025, we use urban population from the UN World Urbanization Prospects, based on each country's national definition. From 2026 onward, we use UN projections. The UN source reports population in thousands; we converted these values to people to align with HYDE.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Urban population
+          title_variant: UN national definitions, HYDE, with projections
+
+      rural_population:
+        title: Rural population - HYDE, UN national definitions, and projections combined
+        unit: people
+        short_unit: ''
+        description_short: Number of people living in areas classified as rural, combining UN estimates and projections with modelled historical data back to 10,000 BCE.
+        description_key:
+          - *hyde_combined_with_projections_key
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *degurba_comparison_key
+        description_processing: |-
+          We combined three sources to extend the rural population series through 2100. For years before 1950, we use rural population estimates from HYDE v3.3. From 1950 to 2025, we use rural population from the UN World Urbanization Prospects, based on each country's national definition. From 2026 onward, we use UN projections. The UN source reports population in thousands; we converted these values to people to align with HYDE.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Rural population
+          title_variant: UN national definitions, HYDE, with projections
