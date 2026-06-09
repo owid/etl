@@ -2,41 +2,30 @@ steps:
   #
   # OECD Family Database - Mean age at first marriage
   #
-  # archived; last active in 4cfed3bb0553 on 2025-10-08
   data://meadow/oecd/2025-01-11/mean_age_at_marriage:
     - snapshot://oecd/2025-01-11/mean_age_at_marriage.xls
-  # archived; last active in 4cfed3bb0553 on 2025-10-08
   data://garden/oecd/2025-01-11/mean_age_at_marriage:
     - data://meadow/oecd/2025-01-11/mean_age_at_marriage
-  # archived; last active in 4cfed3bb0553 on 2025-10-08
   data://grapher/oecd/2025-01-11/mean_age_at_marriage:
     - data://garden/oecd/2025-01-11/mean_age_at_marriage
 
-  # archived; last active in b355f2bc3c66 on 2025-10-08
   data://grapher/oecd/2024-12-30/family_database:
     - data://garden/oecd/2024-12-30/family_database
 #
 #  # ONS Marriages and Divorces in England and Wales
 #
-  # archived; last active in 3192f39c94d1 on 2026-01-26
   data://meadow/ons/2025-01-21/marriages:
     - snapshot://ons/2025-01-21/marriages.xlsx
-  # archived; last active in 3192f39c94d1 on 2026-01-26
   data://garden/ons/2025-01-21/marriages:
     - data://meadow/ons/2025-01-21/marriages
-  # archived; last active in 3192f39c94d1 on 2026-01-26
   data://grapher/ons/2025-01-21/marriages:
     - data://garden/ons/2025-01-21/marriages
 
-  # archived; last active in 3192f39c94d1 on 2026-01-26
   data://meadow/ons/2025-01-12/divorces:
     - snapshot://ons/2025-01-12/divorces.xlsx
-  # archived; last active in 3192f39c94d1 on 2026-01-26
   data://garden/ons/2025-01-12/divorces:
     - data://meadow/ons/2025-01-12/divorces
-  # archived; last active in 3192f39c94d1 on 2026-01-26
   data://grapher/ons/2025-01-12/divorces:
     - data://garden/ons/2025-01-12/divorces
-  # archived; last active in 3192f39c94d1 on 2026-01-26
   data://grapher/ons/2025-01-12/divorces_by_year:
     - data://garden/ons/2025-01-12/divorces

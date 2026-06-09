@@ -71,6 +71,7 @@ def _is_parseable_step(step: str) -> bool:
     except (ValueError, IndexError):
         return False
 
+
 # DAG files that are not part of the "active" DAG and must be skipped when
 # reconstructing the active DAG at a historical commit.
 SKIP_INCLUDES = ("dag/archive/", "dag/temp.yml")

@@ -1,44 +1,32 @@
 steps:
   # Decoupling
-  # archived; last active in 3fa2f56e7804 on 2024-07-31
   data-private://grapher/covid/latest/decoupling_metrics:
     - data-private://garden/covid/latest/decoupling_metrics
-  # archived; last active in 3fa2f56e7804 on 2024-07-31
   data-private://garden/covid/latest/decoupling_metrics:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Decoupling%20of%20metrics.csv
   # Mobility
-  # archived; last active in e4b720e936b1 on 2024-08-01
   data://grapher/covid/latest/google_mobility_trends:
     - data://garden/covid/latest/google_mobility_trends
-  # archived; last active in e4b720e936b1 on 2024-08-01
   data://garden/covid/latest/google_mobility_trends:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/Google%20Mobility%20Trends%20(2020).csv
   # YouGov behaviour
-  # archived; last active in 120ce83991f6 on 2024-08-08
   data-private://grapher/covid/latest/yougov_imperial_behavior_tracker_composite:
     - data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite
-  # archived; last active in 120ce83991f6 on 2024-08-08
   data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/YouGov-Imperial%20COVID-19%20Behavior%20Tracker,%20composite%20variables.csv
   # Policy
-  # archived; last active in ec891eaf1a0f on 2024-08-10
   data://grapher/covid/latest/government_response_oxbsg:
     - data://garden/covid/latest/government_response_oxbsg
-  # archived; last active in ec891eaf1a0f on 2024-08-10
   data://garden/covid/latest/government_response_oxbsg:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20Government%20Response%20(OxBSG).csv
   # Variants
-  # archived; last active in ec891eaf1a0f on 2024-08-10
   data-private://grapher/covid/latest/variants:
     - data-private://garden/covid/latest/variants
-  # archived; last active in ec891eaf1a0f on 2024-08-10
   data-private://garden/covid/latest/variants:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Variants.csv
   # Sequencing
-  # archived; last active in ec891eaf1a0f on 2024-08-10
   data-private://grapher/covid/latest/sequencing:
     - data-private://garden/covid/latest/sequencing
-  # archived; last active in ec891eaf1a0f on 2024-08-10
   data-private://garden/covid/latest/sequencing:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Sequencing.csv
   # Vaccinations us
@@ -47,107 +35,56 @@ steps:
   # data-private://garden/covid/latest/vaccinations_us:
   #   - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20United%20States%20vaccinations.csv
   # Cases and deaths
-  # archived; last active in 64e1a6710a10 on 2024-08-10
   data-private://grapher/covid/latest/cases_and_deaths_who:
     - data-private://garden/covid/latest/cases_and_deaths_who
-  # archived; last active in 64e1a6710a10 on 2024-08-10
   data-private://garden/covid/latest/cases_and_deaths_who:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/cases_deaths/COVID-19%20Cases%20and%20deaths%20-%20WHO.csv
   # Testing
-  # archived; last active in 64e1a6710a10 on 2024-08-10
   data://grapher/covid/latest/testing_time_series:
     - data://garden/covid/latest/testing_time_series
-  # archived; last active in 64e1a6710a10 on 2024-08-10
   data://garden/covid/latest/testing_time_series:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20testing%20time%20series%20data.csv
   # Sweden
-  # archived; last active in 2f640888a84d on 2024-08-12
   data-private://grapher/covid/latest/sweden:
     - data-private://garden/covid/latest/sweden
-  # archived; last active in 2f640888a84d on 2024-08-12
   data-private://garden/covid/latest/sweden:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Swedish%20Public%20Health%20Agency.csv
   # UK
-  # archived; last active in fc5c745fd551 on 2024-08-13
   data-private://grapher/covid/latest/uk_covid_data:
     - data-private://garden/covid/latest/uk_covid_data
-  # archived; last active in fc5c745fd551 on 2024-08-13
   data-private://garden/covid/latest/uk_covid_data:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/uk_covid_data.csv
   # Hospitalisations
-  # archived; last active in 34ad319e8115 on 2024-08-13
   data://grapher/covid/latest/hospital_and_icu:
     - data://garden/covid/latest/hospital_and_icu
-  # archived; last active in 34ad319e8115 on 2024-08-13
   data://garden/covid/latest/hospital_and_icu:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-2019%20-%20Hospital%20%26%20ICU.csv
   # Vaccinations
-  # archived; last active in 750695692ca4 on 2024-08-15
   data-private://grapher/covid/latest/vaccinations:
     - data-private://garden/covid/latest/vaccinations
-  # archived; last active in 750695692ca4 on 2024-08-15
   data-private://garden/covid/latest/vaccinations:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations.csv
   # Vaccinations by manufacturer
-  # archived; last active in 49911dee4bea on 2024-08-23
   data-private://grapher/covid/latest/vaccinations_by_manufacturer:
     - data-private://garden/covid/latest/vaccinations_by_manufacturer
-  # archived; last active in 49911dee4bea on 2024-08-23
   data-private://garden/covid/latest/vaccinations_by_manufacturer:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20manufacturer.csv
   # Vaccinations by age
-  # archived; last active in 49911dee4bea on 2024-08-23
   data-private://grapher/covid/latest/vaccinations_by_age_group:
     - data-private://garden/covid/latest/vaccinations_by_age_group
-  # archived; last active in 49911dee4bea on 2024-08-23
   data-private://garden/covid/latest/vaccinations_by_age_group:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20age%20group.csv
 
   # ECDC
-  # archived; last active in 6747e359db57 on 2024-09-13
   data://grapher/covid/latest/ecdc:
     - data://garden/covid/latest/ecdc
-  # archived; last active in 6747e359db57 on 2024-09-13
   data://garden/covid/latest/ecdc:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/archived/ecdc/COVID-2019%20-%20ECDC%20(2020).csv
 
   # JHU - cases and deaths
-  # archived; last active in 6747e359db57 on 2024-09-13
   data://meadow/covid/latest/john_hopkins_university:
     - snapshot://covid/latest/john_hopkins_university.csv
-  # archived; last active in 6747e359db57 on 2024-09-13
   data://garden/covid/latest/john_hopkins_university:
     - data://meadow/covid/latest/john_hopkins_university
-  # archived; last active in 6747e359db57 on 2024-09-13
   data://grapher/covid/latest/john_hopkins_university:
     - data://garden/covid/latest/john_hopkins_university
-  # archived; last active in 45e3c521c08f on 2024-07-30
-  data-private://grapher/covid/latest/john_hopkins_university:
-    - data-private://garden/covid/latest/john_hopkins_university
-  # archived; last active in 45e3c521c08f on 2024-07-30
-  data-private://garden/covid/latest/john_hopkins_university:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/jhu/COVID-19%20-%20Johns%20Hopkins%20University.csv
-  # archived; last active in 9fc92c3066e5 on 2024-08-08
-  data-private://grapher/covid/latest/vaccinations_us:
-    - data-private://garden/covid/latest/vaccinations_us
-  # archived; last active in 9fc92c3066e5 on 2024-08-08
-  data-private://garden/covid/latest/vaccinations_us:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20United%20States%20vaccinations.csv
-  # archived; last active in 787aeef958a7 on 2024-08-23
-  data-private://garden/covid/latest/combined:
-    - data://garden/covid/latest/testing
-    - data-private://garden/covid/latest/sequence
-    - data://garden/demography/2024-07-15/population
-    - data://garden/covid/latest/cases_deaths
-  # archived; last active in c746e64b393c on 2024-08-23
-  data-private://explorers/covid/latest/covid:
-    - data-private://grapher/covid/latest/sequence
-    - data://grapher/covid/latest/vaccinations_global
-    - data://grapher/covid/latest/hospital
-    - data://grapher/covid/latest/oxcgrt_policy
-    - data://grapher/covid/latest/cases_deaths
-    - data://grapher/covid/latest/combined
-    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
-    - data://grapher/covid/latest/tracking_r
-    - data://grapher/covid/latest/testing
-    - data://grapher/excess_mortality/latest/excess_mortality

@@ -2,39 +2,24 @@ steps:
   #
   # YouGov - Dietary choices of Brits.
   #
-  # archived; last active in 37724248da9e on 2025-03-19
   data://meadow/survey/2024-04-01/dietary_choices_uk:
     - snapshot://survey/2024-04-01/dietary_choices_uk.xlsx
-  # archived; last active in 37724248da9e on 2025-03-19
   data://garden/survey/2024-04-01/dietary_choices_uk:
     - data://meadow/survey/2024-04-01/dietary_choices_uk
-  # archived; last active in 37724248da9e on 2025-03-19
   data://grapher/survey/2024-04-01/dietary_choices_uk:
     - data://garden/survey/2024-04-01/dietary_choices_uk
   #
   # YouGov - Dietary choices of Brits.
   #
-  # archived; last active in 0540728165c5 on 2026-02-02
   data://meadow/survey/2025-03-04/dietary_choices_uk:
     - snapshot://survey/2025-03-04/dietary_choices_uk.xlsx
   #
   # YouGov - Dietary choices of Brits.
   #
-  # archived; last active in 0540728165c5 on 2026-02-02
   data://garden/survey/2025-03-04/dietary_choices_uk:
     - data://meadow/survey/2025-03-04/dietary_choices_uk
   #
   # YouGov - Dietary choices of Brits.
   #
-  # archived; last active in 0540728165c5 on 2026-02-02
   data://grapher/survey/2025-03-04/dietary_choices_uk:
     - data://garden/survey/2025-03-04/dietary_choices_uk
-  # archived; last active in 0f5d03f6f6a7 on 2026-02-28
-  data://garden/survey/2026-02-02/dietary_choices_uk:
-    - data://meadow/survey/2026-02-02/dietary_choices_uk
-  # archived; last active in 0f5d03f6f6a7 on 2026-02-28
-  data://meadow/survey/2026-02-02/dietary_choices_uk:
-    - snapshot://survey/2026-02-02/dietary_choices_uk.xlsx
-  # archived; last active in 0f5d03f6f6a7 on 2026-02-28
-  data://grapher/survey/2026-02-02/dietary_choices_uk:
-    - data://garden/survey/2026-02-02/dietary_choices_uk

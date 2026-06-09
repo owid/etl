@@ -1,29 +1,23 @@
 steps:
   # Migration UN DESA (2020 data)
-  # archived; last active in 37724248da9e on 2025-03-19
   data://meadow/un/2024-07-16/migrant_stock:
     - snapshot://un/2024-07-16/migrant_stock_dest_origin.xlsx
     - snapshot://un/2024-07-16/migrant_stock_origin.xlsx
     - snapshot://un/2024-07-16/migrant_stock_dest.xlsx
     - snapshot://un/2024-07-16/migrant_stock_age_sex.xlsx
-  # archived; last active in 37724248da9e on 2025-03-19
   data://garden/un/2024-07-16/migrant_stock:
     - data://meadow/un/2024-07-16/migrant_stock
-  # archived; last active in 37724248da9e on 2025-03-19
   data://grapher/un/2024-07-16/migrant_stock:
     - data://garden/un/2024-07-16/migrant_stock
 
       # Migration distances
-  # archived; last active in 27d9a7f6ba70 on 2025-08-06
   data://garden/migration/2024-11-19/migration_distance:
     - data://garden/un/2025-03-12/migrant_stock
     - data://garden/geography/2023-11-28/nat_earth_110
-  # archived; last active in 27d9a7f6ba70 on 2025-08-06
   data://grapher/migration/2024-11-19/migration_distance:
     - data://garden/migration/2024-11-19/migration_distance
 
      # Refugee, Asylum and Migration Explorer:
-  # archived; last active in ecddb64ce433 on 2026-03-16
   export://explorers/migration/2024-08-05/migration:
     - data://grapher/unicef/2024-07-30/child_migration
     - data://grapher/un/2024-07-25/refugee_data

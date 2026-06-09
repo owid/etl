@@ -1,120 +1,89 @@
 # TO archive
 steps:
-  # archived; last active in 9aede0030c0c on 2025-01-06
   data://meadow/biodiversity/2023-01-11/cherry_blossom:
     - snapshot://biodiversity/2023-01-11/cherry_blossom.csv
-  # archived; last active in 9aede0030c0c on 2025-01-06
   data://garden/biodiversity/2023-01-11/cherry_blossom:
     - data://meadow/biodiversity/2023-01-11/cherry_blossom
-  # archived; last active in 9aede0030c0c on 2025-01-06
   data://grapher/biodiversity/2023-01-11/cherry_blossom:
     - data://garden/biodiversity/2023-01-11/cherry_blossom
   # Cherry blossom - to archive
-  # archived; last active in 10029e7f2125 on 2025-01-29
   data://meadow/biodiversity/2024-01-25/cherry_blossom:
     - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
     - snapshot://biodiversity/2024-01-31/cherry_blossom.csv
-  # archived; last active in 10029e7f2125 on 2025-01-29
   data://garden/biodiversity/2024-01-25/cherry_blossom:
     - data://meadow/biodiversity/2024-01-25/cherry_blossom
-  # archived; last active in 10029e7f2125 on 2025-01-29
   data://grapher/biodiversity/2024-01-25/cherry_blossom:
     - data://garden/biodiversity/2024-01-25/cherry_blossom
     # Cherry blossom - to archive
-  # archived; last active in 22e37a8980e4 on 2025-04-07
   data://meadow/biodiversity/2025-01-29/cherry_blossom:
     - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
     - snapshot://biodiversity/2025-01-29/cherry_blossom.csv
-  # archived; last active in 22e37a8980e4 on 2025-04-07
   data://garden/biodiversity/2025-01-29/cherry_blossom:
     - data://meadow/biodiversity/2025-01-29/cherry_blossom
-  # archived; last active in 22e37a8980e4 on 2025-04-07
   data://grapher/biodiversity/2025-01-29/cherry_blossom:
     - data://garden/biodiversity/2025-01-29/cherry_blossom
       # Cherry blossom - 2025 data
-  # archived; last active in 21fee682a358 on 2026-04-20
   data://meadow/biodiversity/2025-04-07/cherry_blossom:
     - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
     - snapshot://biodiversity/2025-04-07/cherry_blossom.csv
-  # archived; last active in 21fee682a358 on 2026-04-20
   data://garden/biodiversity/2025-04-07/cherry_blossom:
     - data://meadow/biodiversity/2025-04-07/cherry_blossom
-  # archived; last active in 21fee682a358 on 2026-04-20
   data://grapher/biodiversity/2025-04-07/cherry_blossom:
     - data://garden/biodiversity/2025-04-07/cherry_blossom
 
     # IUCN Red List dataset
-  # archived; last active in 9aede0030c0c on 2025-01-06
   data://meadow/biodiversity/2023-08-14/iucn_animal:
     - snapshot://biodiversity/2023-08-14/iucn_animal.csv
-  # archived; last active in 9aede0030c0c on 2025-01-06
   data://garden/biodiversity/2023-08-14/iucn_animal:
     - data://meadow/biodiversity/2023-08-14/iucn_animal
-  # archived; last active in 9aede0030c0c on 2025-01-06
   data://grapher/biodiversity/2023-08-14/iucn_animal:
     - data://garden/biodiversity/2023-08-14/iucn_animal
 
   # IUCN Number of species in each extinction risk category
   #
-  # archived; last active in fc54db96077b on 2025-09-09
   data://meadow/biodiversity/2024-12-23/iucn_number_each_status:
     - snapshot://biodiversity/2024-12-23/iucn_number_each_status.csv
-  # archived; last active in fc54db96077b on 2025-09-09
   data://garden/biodiversity/2024-12-23/iucn_number_each_status:
     - data://meadow/biodiversity/2024-12-23/iucn_number_each_status
-  # archived; last active in fc54db96077b on 2025-09-09
   data://grapher/biodiversity/2024-12-23/iucn_number_each_status:
     - data://garden/biodiversity/2024-12-23/iucn_number_each_status
 
   # IUCN Threatened and Evaluated species
 
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://meadow/iucn/2025-09-05/threatened_and_evaluated_species:
     - snapshot://iucn/2025-09-05/threatened_and_evaluated_species.csv
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://garden/iucn/2025-09-05/threatened_and_evaluated_species:
     - data://meadow/iucn/2025-09-05/threatened_and_evaluated_species
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://grapher/iucn/2025-09-05/threatened_and_evaluated_species:
     - data://garden/iucn/2025-09-05/threatened_and_evaluated_species
 
   # IUCN Endemic vertebrate species
 
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://meadow/iucn/2025-09-08/endemic_vertebrates:
     - snapshot://iucn/2025-09-08/endemic_vertebrates.csv
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://garden/iucn/2025-09-08/endemic_vertebrates:
     - data://meadow/iucn/2025-09-08/endemic_vertebrates
     - data://meadow/iucn/2025-09-08/endemic_fish
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://grapher/iucn/2025-09-08/endemic_vertebrates:
     - data://garden/iucn/2025-09-08/endemic_vertebrates
   # Endemic fish species
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://meadow/iucn/2025-09-08/endemic_fish:
     - snapshot://iucn/2025-09-08/endemic_fish.csv
 
   # IUCN Endemic invertebrate species
 
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://meadow/iucn/2025-09-09/endemic_invertebrates:
     - snapshot://iucn/2025-09-09/endemic_invertebrates.csv
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://garden/iucn/2025-09-09/endemic_invertebrates:
     - data://meadow/iucn/2025-09-09/endemic_invertebrates
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://grapher/iucn/2025-09-09/endemic_invertebrates:
     - data://garden/iucn/2025-09-09/endemic_invertebrates
   #
   # IUCN Number of species in each extinction risk category
   #
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://meadow/iucn/2025-09-09/iucn_number_each_status:
     - snapshot://iucn/2025-09-09/iucn_number_each_status.csv
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://garden/iucn/2025-09-09/iucn_number_each_status:
     - data://meadow/iucn/2025-09-09/iucn_number_each_status
-  # archived; last active in 38c04a5ca908 on 2026-01-06
   data://grapher/iucn/2025-09-09/iucn_number_each_status:
     - data://garden/iucn/2025-09-09/iucn_number_each_status

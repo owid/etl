@@ -1,65 +1,50 @@
 steps:
   # World Bank EdStats
-  # archived; last active in 8da527b976a1 on 2024-11-21
   data://meadow/wb/2023-07-10/education:
     - snapshot://wb/2023-07-10/education.csv
 
-  # archived; last active in 8da527b976a1 on 2024-11-21
   data://garden/wb/2023-07-10/education:
     - data://meadow/wb/2023-07-10/education
     - data://garden/education/2017-09-30/public_expenditure
     - data://garden/education/2018-04-18/literacy_rates
 
-  # archived; last active in 8da527b976a1 on 2024-11-21
   data://grapher/wb/2023-07-10/education:
     - data://garden/wb/2023-07-10/education
 
   # Wittgenstein Center Population and Human Capital Projections - Educational Attainment
-  # archived; last active in b8d4a0cc44fc on 2024-12-11
   data://meadow/education/2023-12-15/wittgenstein_center:
     - snapshot://education/2023-12-15/wittgenstein_center_data.csv
     - snapshot://education/2023-12-15/wittgenstein_center_dictionary.csv
-  # archived; last active in b8d4a0cc44fc on 2024-12-11
   data://garden/education/2023-12-15/wittgenstein_center:
     - data://meadow/education/2023-12-15/wittgenstein_center
     - data://garden/education/2023-08-14/oecd_education
-  # archived; last active in b8d4a0cc44fc on 2024-12-11
   data://grapher/education/2023-12-15/wittgenstein_center:
     - data://garden/education/2023-12-15/wittgenstein_center
 
   # UNESCO data on other policy related education indicators
-  # archived; last active in 7e0a5cfe010a on 2025-05-14
   data://meadow/unesco/2024-06-16/education_opri:
     - snapshot://unesco/2024-06-16/education_opri.zip
-  # archived; last active in 7e0a5cfe010a on 2025-05-14
   data://garden/unesco/2024-06-16/education_opri:
     - data://meadow/unesco/2024-06-16/education_opri
     - snapshot://wb/2024-06-18/edstats_metadata.xls
-  # archived; last active in 7e0a5cfe010a on 2025-05-14
   data://grapher/unesco/2024-06-16/education_opri:
     - data://garden/unesco/2024-06-16/education_opri
 
   # UNESCO data on SDG education indicators
-  # archived; last active in 7e0a5cfe010a on 2025-05-14
   data://meadow/unesco/2024-06-25/education_sdgs:
     - snapshot://unesco/2024-06-25/education_sdgs.zip
-  # archived; last active in 7e0a5cfe010a on 2025-05-14
   data://garden/unesco/2024-06-25/education_sdgs:
     - data://meadow/unesco/2024-06-25/education_sdgs
     - snapshot://wb/2024-06-18/edstats_metadata.xls
-  # archived; last active in 7e0a5cfe010a on 2025-05-14
   data://grapher/unesco/2024-06-25/education_sdgs:
     - data://garden/unesco/2024-06-25/education_sdgs
 
 
   # UNESCO data on other policy related education indicators
-  # archived; last active in 7e0a5cfe010a on 2025-05-14
   data://meadow/unesco/2024-11-21/enrolment_rates:
     - snapshot://unesco/2024-11-21/enrolment_rates.csv
-  # archived; last active in 7e0a5cfe010a on 2025-05-14
   data://garden/unesco/2024-11-21/enrolment_rates:
     - data://meadow/unesco/2024-11-21/enrolment_rates
     - snapshot://wb/2024-06-18/edstats_metadata.xls
-  # archived; last active in 7e0a5cfe010a on 2025-05-14
   data://grapher/unesco/2024-11-21/enrolment_rates:
     - data://garden/unesco/2024-11-21/enrolment_rates

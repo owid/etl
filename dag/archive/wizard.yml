@@ -1,10 +1,5 @@
 steps:
-  # archived; last active in 6c2d5807de88 on 2025-05-27
   data://grapher/dummy/2020-01-01/dummy_full:
     - data://garden/dummy/2020-01-01/dummy_full
-  # archived; last active in 6c2d5807de88 on 2025-05-27
   data://grapher/dummy/2023-10-12/dummy_monster:
     - data://garden/dummy/2023-10-12/dummy_monster
-  # archived; last active in dda6a2c02e08 on 2026-02-18
-  export://multidim/dummy/latest/dummy:
-    - export://multidim/covid/latest/covid

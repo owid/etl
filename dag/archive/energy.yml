@@ -2,41 +2,32 @@ steps:
   #
   # UNEP - Global trends in renewable energy investment (2019).
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/unep/2023-01-03/renewable_energy_investments:
     - snapshot://unep/2023-01-03/global_trends_in_renewable_energy_investment.pdf
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/unep/2023-01-03/renewable_energy_investments:
     - data://meadow/unep/2023-01-03/renewable_energy_investments
-  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/unep/2023-01-03/renewable_energy_investments:
     - data://garden/unep/2023-01-03/renewable_energy_investments
   #
   # Energy - Fossil fuel reserves/production ratio (2023).
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
     - data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio
   #
   # Ember - European electricity review 2023.
   #
   # Currently these steps are not used.
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/ember/2023-02-20/european_electricity_review:
     - snapshot://ember/2023-02-20/european_electricity_review.xlsx
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/ember/2023-02-20/european_electricity_review:
     - data://meadow/ember/2023-02-20/european_electricity_review
   #
   # Shift - Energy production from fossil fuels 2023.
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels:
     - snapshot://shift/2023-07-10/energy_production_from_fossil_fuels.csv
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/shift/2023-07-10/energy_production_from_fossil_fuels:
     - data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels
     - data://garden/wb/2023-04-30/income_groups
@@ -44,78 +35,61 @@ steps:
   #
   # Energy - Fossil Fuel Production 2023.
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/energy/2023-07-10/fossil_fuel_production:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
     - data://garden/shift/2023-07-10/energy_production_from_fossil_fuels
     - data://garden/demography/2023-03-31/population
-  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/energy/2023-07-10/fossil_fuel_production:
     - data://garden/energy/2023-07-10/fossil_fuel_production
   #
   # IRENA - Renewable power generation costs (2022).
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/irena/2023-06-26/renewable_power_generation_costs:
     - snapshot://irena/2023-06-26/renewable_power_generation_costs.xlsx
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/irena/2023-06-26/renewable_power_generation_costs:
     - data://meadow/irena/2023-06-26/renewable_power_generation_costs
-  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/irena/2023-06-26/renewable_power_generation_costs:
     - data://garden/irena/2023-06-26/renewable_power_generation_costs
   #
   # IRENA - Renewable electricity capacity (2023).
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/irena/2023-06-26/renewable_electricity_capacity:
     - snapshot://irena/2023-06-26/renewable_electricity_capacity_and_generation.xlsm
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/irena/2023-06-26/renewable_electricity_capacity:
     - data://meadow/irena/2023-06-26/renewable_electricity_capacity
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/irena/2023-06-26/renewable_electricity_capacity_by_technology:
     - data://garden/irena/2023-06-26/renewable_electricity_capacity
-  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/irena/2023-06-26/renewable_electricity_capacity:
     - data://garden/irena/2023-06-26/renewable_electricity_capacity
   #
   # Energy - Global primary energy (2023).
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/energy/2023-07-10/global_primary_energy:
     - data://garden/papers/2023-07-10/smil_2017
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/energy/2023-07-10/global_primary_energy:
     - data://garden/energy/2023-07-10/global_primary_energy
   #
   # UK BEIS - UK historical electricity (2023).
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/uk_beis/2023-07-10/uk_historical_electricity:
     - snapshot://uk_beis/2023-07-10/uk_historical_electricity.xls
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/uk_beis/2023-07-10/uk_historical_electricity:
     - data://meadow/uk_beis/2023-07-10/uk_historical_electricity
   #
   # Smil - Global primary energy (2017).
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/papers/2023-07-10/smil_2017:
     - snapshot://papers/2023-07-10/smil_2017.csv
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/papers/2023-07-10/smil_2017:
     - data://meadow/papers/2023-07-10/smil_2017
   #
   # Ember - Yearly electricity data 2023.
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/ember/2023-07-10/yearly_electricity:
     - snapshot://ember/2023-07-10/yearly_electricity.csv
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/ember/2023-07-10/yearly_electricity:
     - data://meadow/ember/2023-07-10/yearly_electricity
     - data://garden/demography/2023-03-31/population
@@ -124,7 +98,6 @@ steps:
   #
   # Energy - Energy mix (2023).
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/energy/2023-07-10/energy_mix:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
@@ -132,37 +105,30 @@ steps:
   #
   # Energy - Primary energy consumption 2023.
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/energy/2023-07-10/primary_energy_consumption:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
     - data://garden/eia/2023-07-10/energy_consumption
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/demography/2023-03-31/population
-  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/energy/2023-07-10/primary_energy_consumption:
     - data://garden/energy/2023-07-10/primary_energy_consumption
   #
   # Energy Institute - Statistical Review of World Energy (2023).
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy:
     - snapshot://energy_institute/2023-06-26/statistical_review_of_world_energy.csv
     - snapshot://energy_institute/2023-06-26/statistical_review_of_world_energy.xlsx
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy:
     - data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  # archived; last active in 325aff97266b on 2023-12-28
   data://grapher/energy_institute/2023-06-26/statistical_review_of_world_energy:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
   #
   # EIA - Energy consumption 2023.
   #
-  # archived; last active in 325aff97266b on 2023-12-28
   data://meadow/eia/2023-07-10/energy_consumption:
     - snapshot://eia/2023-07-10/international_energy_data.zip
-  # archived; last active in 325aff97266b on 2023-12-28
   data://garden/eia/2023-07-10/energy_consumption:
     - data://meadow/eia/2023-07-10/energy_consumption
     - data://garden/wb/2023-04-30/income_groups
@@ -170,49 +136,40 @@ steps:
   #
   # Energy - Fossil Fuel Production.
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/energy/2023-12-12/fossil_fuel_production:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels
     - data://garden/demography/2023-03-31/population
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://grapher/energy/2023-12-12/fossil_fuel_production:
     - data://garden/energy/2023-12-12/fossil_fuel_production
   #
   # Energy - Global primary energy.
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/energy/2023-12-12/global_primary_energy:
     - data://garden/papers/2023-12-12/smil_2017
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://grapher/energy/2023-12-12/global_primary_energy:
     - data://garden/energy/2023-12-12/global_primary_energy
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/energy/2023-12-12/electricity_mix:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/ember/2023-12-12/combined_electricity
     - data://garden/demography/2023-03-31/population
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://grapher/energy/2023-12-12/electricity_mix:
     - data://garden/energy/2023-12-12/electricity_mix
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/energy/2023-12-12/uk_historical_electricity:
     - data://garden/uk_beis/2023-12-12/uk_historical_electricity
     - data://garden/energy/2023-12-12/electricity_mix
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://grapher/energy/2023-12-12/uk_historical_electricity:
     - data://garden/energy/2023-12-12/uk_historical_electricity
   #
   # Energy - Energy mix.
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/energy/2023-12-12/energy_mix:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
@@ -220,7 +177,6 @@ steps:
   #
   # Energy - OWID Energy dataset.
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/energy/2023-12-12/owid_energy:
     - data://garden/energy/2023-12-12/energy_mix
     - data://garden/energy/2023-12-12/fossil_fuel_production
@@ -233,20 +189,16 @@ steps:
   # Ember - European electricity review 2022.
   #
   # We still use this 2022 version for data from 1990-1999, which is not included in the 2023 version.
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://meadow/ember/2023-12-12/european_electricity_review:
     - snapshot://ember/2023-12-12/european_electricity_review.zip
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/ember/2023-12-12/european_electricity_review:
       - data://meadow/ember/2023-12-12/european_electricity_review
       - data://garden/regions/2023-01-01/regions
   #
   # Ember - Yearly electricity data 2023.
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://meadow/ember/2023-12-12/yearly_electricity:
     - snapshot://ember/2023-12-12/yearly_electricity.csv
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/ember/2023-12-12/yearly_electricity:
     - data://meadow/ember/2023-12-12/yearly_electricity
     - data://garden/demography/2023-03-31/population
@@ -256,51 +208,42 @@ steps:
   # Ember - Combined electricity 2023.
   #
   # We still use EER 2022 for data from 1990-1999, which is not included in EER 2023.
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/ember/2023-12-12/combined_electricity:
     - data://garden/ember/2023-12-12/european_electricity_review
     - data://garden/ember/2023-12-12/yearly_electricity
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/energy/2023-12-12/photovoltaic_cost_and_capacity:
     - data://garden/papers/2023-12-12/nemet_2009
     - data://garden/papers/2023-12-12/farmer_lafond_2016
     - data://garden/irena/2023-12-12/renewable_electricity_capacity
     - data://garden/irena/2023-12-12/renewable_power_generation_costs
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://grapher/energy/2023-12-12/photovoltaic_cost_and_capacity:
     - data://garden/energy/2023-12-12/photovoltaic_cost_and_capacity
   #
   # Energy - Fossil fuel reserves/production ratio.
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/energy/2023-12-12/fossil_fuel_reserves_production_ratio:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://grapher/energy/2023-12-12/fossil_fuel_reserves_production_ratio:
     - data://garden/energy/2023-12-12/fossil_fuel_reserves_production_ratio
   #
   # Energy - Primary energy consumption.
   #
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://garden/energy/2023-12-12/primary_energy_consumption:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/eia/2023-12-12/energy_consumption
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/demography/2023-03-31/population
-  # archived; last active in a2efb55cfc27 on 2024-05-08
   data://grapher/energy/2023-12-12/primary_energy_consumption:
     - data://garden/energy/2023-12-12/primary_energy_consumption
   #
   # Energy Institute - Statistical Review of World Energy.
   #
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://meadow/energy_institute/2023-12-12/statistical_review_of_world_energy:
     - snapshot://energy_institute/2023-12-12/statistical_review_of_world_energy.csv
     - snapshot://energy_institute/2023-12-12/statistical_review_of_world_energy.xlsx
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy:
     - data://meadow/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/wb/2023-04-30/income_groups
@@ -308,7 +251,6 @@ steps:
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/energy/2024-05-08/electricity_mix:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
@@ -316,17 +258,14 @@ steps:
   #
   # Energy - Global primary energy.
   #
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/energy/2024-05-08/global_primary_energy:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/papers/2023-12-12/smil_2017
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://grapher/energy_institute/2023-12-12/statistical_review_of_world_energy:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
   #
   # Energy - Primary energy consumption.
   #
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/energy/2024-05-08/primary_energy_consumption:
     - data://garden/eia/2023-12-12/energy_consumption
     - data://garden/ggdc/2024-04-26/maddison_project_database
@@ -335,7 +274,6 @@ steps:
   #
   # Energy - Fossil Fuel Production.
   #
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/energy/2024-05-08/fossil_fuel_production:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
@@ -343,7 +281,6 @@ steps:
   #
   # Energy - Energy mix.
   #
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/energy/2024-05-08/energy_mix:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/wb/2024-03-11/income_groups
@@ -351,62 +288,48 @@ steps:
   #
   # Energy - Fossil fuel reserves/production ratio.
   #
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/energy/2024-05-08/fossil_fuel_reserves_production_ratio:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/energy/2024-05-08/uk_historical_electricity:
     - data://garden/uk_beis/2023-12-12/uk_historical_electricity
     - data://garden/energy/2024-05-08/electricity_mix
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://grapher/energy/2024-05-08/electricity_mix:
     - data://garden/energy/2024-05-08/electricity_mix
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://grapher/energy/2024-05-08/global_primary_energy:
     - data://garden/energy/2024-05-08/global_primary_energy
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://grapher/energy/2024-05-08/primary_energy_consumption:
     - data://garden/energy/2024-05-08/primary_energy_consumption
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://grapher/energy/2024-05-08/fossil_fuel_production:
     - data://garden/energy/2024-05-08/fossil_fuel_production
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://grapher/energy/2024-05-08/fossil_fuel_reserves_production_ratio:
     - data://garden/energy/2024-05-08/fossil_fuel_reserves_production_ratio
-  # archived; last active in e915d8542d95 on 2024-06-25
   data://grapher/energy/2024-05-08/uk_historical_electricity:
     - data://garden/energy/2024-05-08/uk_historical_electricity
   #
   # IRENA - Renewable power generation costs.
   #
-  # archived; last active in fe7f4b6a3324 on 2024-10-31
   data://meadow/irena/2023-12-12/renewable_power_generation_costs:
     - snapshot://irena/2023-12-12/renewable_power_generation_costs.xlsx
-  # archived; last active in fe7f4b6a3324 on 2024-10-31
   data://garden/irena/2023-12-12/renewable_power_generation_costs:
     - data://meadow/irena/2023-12-12/renewable_power_generation_costs
-  # archived; last active in fe7f4b6a3324 on 2024-10-31
   data://grapher/irena/2023-12-12/renewable_power_generation_costs:
     - data://garden/irena/2023-12-12/renewable_power_generation_costs
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  # archived; last active in fe7f4b6a3324 on 2024-10-31
   data://garden/energy/2024-05-08/photovoltaic_cost_and_capacity:
     - data://garden/papers/2023-12-12/farmer_lafond_2016
     - data://garden/papers/2023-12-12/nemet_2009
     - data://garden/irena/2023-12-12/renewable_electricity_capacity
     - data://garden/irena/2023-12-12/renewable_power_generation_costs
-  # archived; last active in fe7f4b6a3324 on 2024-10-31
   data://grapher/energy/2024-05-08/photovoltaic_cost_and_capacity:
     - data://garden/energy/2024-05-08/photovoltaic_cost_and_capacity
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  # archived; last active in fb95ef2b2063 on 2024-11-05
   data://garden/energy/2024-10-30/photovoltaic_cost_and_capacity:
     - data://garden/papers/2023-12-12/farmer_lafond_2016
     - data://garden/irena/2023-12-12/renewable_electricity_capacity
@@ -415,42 +338,34 @@ steps:
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  # archived; last active in fb95ef2b2063 on 2024-11-05
   data://grapher/energy/2024-10-30/photovoltaic_cost_and_capacity:
     - data://garden/energy/2024-10-30/photovoltaic_cost_and_capacity
   #
   # IRENA - Renewable electricity capacity.
   #
-  # archived; last active in fb95ef2b2063 on 2024-11-05
   data://meadow/irena/2023-12-12/renewable_electricity_capacity:
     - snapshot://irena/2023-12-12/renewable_electricity_capacity_and_generation.xlsm
-  # archived; last active in fb95ef2b2063 on 2024-11-05
   data://garden/irena/2023-12-12/renewable_electricity_capacity:
     - data://meadow/irena/2023-12-12/renewable_electricity_capacity
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  # archived; last active in fb95ef2b2063 on 2024-11-05
   data://grapher/irena/2023-12-12/renewable_electricity_capacity_by_technology:
     - data://garden/irena/2023-12-12/renewable_electricity_capacity
-  # archived; last active in fb95ef2b2063 on 2024-11-05
   data://grapher/irena/2023-12-12/renewable_electricity_capacity:
     - data://garden/irena/2023-12-12/renewable_electricity_capacity
   #
   # IRENA - Renewable power generation costs.
   #
-  # archived; last active in 018766bf8304 on 2024-11-15
   data://meadow/irena/2024-10-29/renewable_power_generation_costs:
     - snapshot://irena/2024-10-29/renewable_power_generation_costs.xlsx
   #
   # IRENA - Renewable power generation costs.
   #
-  # archived; last active in 018766bf8304 on 2024-11-15
   data://garden/irena/2024-10-29/renewable_power_generation_costs:
     - data://meadow/irena/2024-10-29/renewable_power_generation_costs
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  # archived; last active in 018766bf8304 on 2024-11-15
   data://garden/energy/2024-11-01/photovoltaic_cost_and_capacity:
     - data://garden/irena/2024-11-01/renewable_capacity_statistics
     - data://garden/papers/2023-12-12/nemet_2009
@@ -459,59 +374,49 @@ steps:
   #
   # IRENA - Renewable power generation costs.
   #
-  # archived; last active in 018766bf8304 on 2024-11-15
   data://grapher/irena/2024-10-29/renewable_power_generation_costs:
     - data://garden/irena/2024-10-29/renewable_power_generation_costs
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  # archived; last active in 018766bf8304 on 2024-11-15
   data://grapher/energy/2024-11-01/photovoltaic_cost_and_capacity:
     - data://garden/energy/2024-11-01/photovoltaic_cost_and_capacity
   #
   # Eurostat - Energy statistics, prices of natural gas and electricity
   #
-  # archived; last active in 7d87b406d25d on 2025-02-11
   data://meadow/eurostat/2024-11-05/gas_and_electricity_prices:
     - snapshot://eurostat/2024-11-05/gas_and_electricity_prices.zip
   #
   # Ember - European wholesale electricity prices
   #
-  # archived; last active in 7d87b406d25d on 2025-02-11
   data://meadow/ember/2024-11-20/european_wholesale_electricity_prices:
     - snapshot://ember/2024-11-20/european_wholesale_electricity_prices.csv
   #
   # Eurostat - Energy statistics, prices of natural gas and electricity
   #
-  # archived; last active in 7d87b406d25d on 2025-02-11
   data://garden/eurostat/2024-11-05/gas_and_electricity_prices:
     - data://meadow/eurostat/2024-11-05/gas_and_electricity_prices
   #
   # Ember - European wholesale electricity prices
   #
-  # archived; last active in 7d87b406d25d on 2025-02-11
   data://garden/ember/2024-11-20/european_wholesale_electricity_prices:
     - data://meadow/ember/2024-11-20/european_wholesale_electricity_prices
   #
   # Energy prices
   #
-  # archived; last active in 7d87b406d25d on 2025-02-11
   data://garden/energy/2024-11-20/energy_prices:
     - data://garden/ember/2024-11-20/european_wholesale_electricity_prices
     - data://garden/eurostat/2024-11-05/gas_and_electricity_prices
   #
   # Energy prices
   #
-  # archived; last active in 7d87b406d25d on 2025-02-11
   data://grapher/energy/2024-11-20/energy_prices:
     - data://garden/energy/2024-11-20/energy_prices
   #
   # Ember - Yearly electricity data.
   #
-  # archived; last active in 1aeb9459c6b4 on 2025-05-20
   data://meadow/ember/2024-05-08/yearly_electricity:
     - snapshot://ember/2024-05-08/yearly_electricity.csv
-  # archived; last active in 1aeb9459c6b4 on 2025-05-20
   data://garden/ember/2024-05-08/yearly_electricity:
     - data://meadow/ember/2024-05-08/yearly_electricity
     - data://garden/demography/2023-03-31/population
@@ -520,7 +425,6 @@ steps:
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in 1aeb9459c6b4 on 2025-05-20
   data://garden/energy/2024-06-20/electricity_mix:
     - data://garden/ember/2024-05-08/yearly_electricity
     - data://garden/demography/2023-03-31/population
@@ -528,46 +432,38 @@ steps:
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in 1aeb9459c6b4 on 2025-05-20
   data://garden/energy/2024-06-20/uk_historical_electricity:
     - data://garden/energy/2024-06-20/electricity_mix
     - data://garden/uk_beis/2023-12-12/uk_historical_electricity
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in 1aeb9459c6b4 on 2025-05-20
   data://grapher/energy/2024-06-20/electricity_mix:
     - data://garden/energy/2024-06-20/electricity_mix
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in 1aeb9459c6b4 on 2025-05-20
   data://grapher/energy/2024-06-20/uk_historical_electricity:
     - data://garden/energy/2024-06-20/uk_historical_electricity
   #
   # IRENA - Renewable energy patents.
   #
-  # archived; last active in e75f50f66052 on 2025-06-25
   data://meadow/irena/2023-12-12/renewable_energy_patents:
     - snapshot://irena/2023-12-12/renewable_energy_patents.xlsx
-  # archived; last active in e75f50f66052 on 2025-06-25
   data://garden/irena/2023-12-12/renewable_energy_patents:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/irena/2023-12-12/renewable_energy_patents
     - data://garden/wb/2023-04-30/income_groups
-  # archived; last active in e75f50f66052 on 2025-06-25
   data://grapher/irena/2023-12-12/renewable_energy_patents:
     - data://garden/irena/2023-12-12/renewable_energy_patents
   #
   # Energy - Fossil fuel reserves/production ratio.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://garden/energy/2024-06-20/fossil_fuel_reserves_production_ratio:
     - data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://garden/energy/2025-05-12/electricity_mix:
     - data://garden/ember/2025-05-12/yearly_electricity
     - data://garden/demography/2024-07-15/population
@@ -575,26 +471,22 @@ steps:
   #
   # Energy - Energy mix.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://garden/energy/2024-06-20/energy_mix:
     - data://garden/demography/2023-03-31/population
     - data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy
   #
   # Energy Institute - Statistical Review of World Energy.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://grapher/energy_institute/2024-06-20/statistical_review_of_world_energy:
     - data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy
   #
   # Energy - Primary energy consumption.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://grapher/energy/2024-06-20/primary_energy_consumption:
     - data://garden/energy/2024-06-20/primary_energy_consumption
   #
   # Energy - Fossil Fuel Production.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://garden/energy/2024-06-20/fossil_fuel_production:
     - data://garden/demography/2023-03-31/population
     - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels
@@ -602,64 +494,54 @@ steps:
   #
   # Energy - Global primary energy.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://garden/energy/2024-06-20/global_primary_energy:
     - data://garden/papers/2023-12-12/smil_2017
     - data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy
   #
   # Energy - Fossil fuel reserves/production ratio.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://grapher/energy/2024-06-20/fossil_fuel_reserves_production_ratio:
     - data://garden/energy/2024-06-20/fossil_fuel_reserves_production_ratio
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://garden/energy/2025-05-12/uk_historical_electricity:
     - data://garden/uk_beis/2023-12-12/uk_historical_electricity
     - data://garden/energy/2025-05-12/electricity_mix
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://grapher/energy/2025-05-12/electricity_mix:
     - data://garden/energy/2025-05-12/electricity_mix
   #
   # Energy - Energy mix.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://grapher/energy/2024-06-20/energy_mix:
     - data://garden/energy/2024-06-20/energy_mix
   #
   # Energy - Fossil Fuel Production.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://grapher/energy/2024-06-20/fossil_fuel_production:
     - data://garden/energy/2024-06-20/fossil_fuel_production
   #
   # Energy - Global primary energy.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://grapher/energy/2024-06-20/global_primary_energy:
     - data://garden/energy/2024-06-20/global_primary_energy
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://grapher/energy/2025-05-12/uk_historical_electricity:
     - data://garden/energy/2025-05-12/uk_historical_electricity
   #
   # Energy Institute - Statistical Review of World Energy.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://meadow/energy_institute/2024-06-20/statistical_review_of_world_energy:
     - snapshot://energy_institute/2024-06-20/statistical_review_of_world_energy.csv
     - snapshot://energy_institute/2024-06-20/statistical_review_of_world_energy.xlsx
   #
   # Energy Institute - Statistical Review of World Energy.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
@@ -667,7 +549,6 @@ steps:
   #
   # Energy - Primary energy consumption.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://garden/energy/2024-06-20/primary_energy_consumption:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/eia/2023-12-12/energy_consumption
@@ -676,10 +557,8 @@ steps:
   #
   # EIA - Energy consumption.
   #
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://meadow/eia/2023-12-12/energy_consumption:
     - snapshot://eia/2023-12-12/international_energy_data.zip
-  # archived; last active in a52eb90759d0 on 2025-07-17
   data://garden/eia/2023-12-12/energy_consumption:
     - data://meadow/eia/2023-12-12/energy_consumption
     - data://garden/wb/2025-07-01/income_groups
@@ -687,19 +566,16 @@ steps:
   #
   # IRENA - Renewable power generation costs.
   #
-  # archived; last active in 710037ebca74 on 2025-08-28
   data://garden/irena/2024-11-15/renewable_power_generation_costs:
     - data://meadow/irena/2024-11-15/renewable_power_generation_costs
   #
   # IRENA - Renewable power generation costs.
   #
-  # archived; last active in 710037ebca74 on 2025-08-28
   data://grapher/irena/2024-11-15/renewable_power_generation_costs:
     - data://garden/irena/2024-11-15/renewable_power_generation_costs
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  # archived; last active in 710037ebca74 on 2025-08-28
   data://garden/energy/2024-11-15/photovoltaic_cost_and_capacity:
     - data://garden/irena/2024-11-01/renewable_capacity_statistics
     - data://garden/papers/2023-12-12/nemet_2009
@@ -708,7 +584,6 @@ steps:
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  # archived; last active in 710037ebca74 on 2025-08-28
   data://grapher/energy/2024-11-15/photovoltaic_cost_and_capacity:
     - data://garden/energy/2024-11-15/photovoltaic_cost_and_capacity
   ######################################################################################################################
@@ -717,13 +592,11 @@ steps:
   #
   # IRENA - Renewable electricity capacity.
   #
-  # archived; last active in 710037ebca74 on 2025-08-28
   data://meadow/irena/2024-11-01/renewable_capacity_statistics:
     - snapshot://irena/2024-11-01/renewable_capacity_statistics.xlsx
   #
   # IRENA - Renewable electricity capacity.
   #
-  # archived; last active in 710037ebca74 on 2025-08-28
   data://garden/irena/2024-11-01/renewable_capacity_statistics:
     - data://meadow/irena/2024-11-01/renewable_capacity_statistics
     - data://garden/regions/2023-01-01/regions
@@ -731,64 +604,54 @@ steps:
   #
   # IRENA - Renewable electricity capacity.
   #
-  # archived; last active in 710037ebca74 on 2025-08-28
   data://grapher/irena/2024-11-01/renewable_capacity_statistics_by_technology:
     - data://garden/irena/2024-11-01/renewable_capacity_statistics
   #
   # IRENA - Renewable electricity capacity.
   #
-  # archived; last active in 710037ebca74 on 2025-08-28
   data://grapher/irena/2024-11-01/renewable_capacity_statistics:
     - data://garden/irena/2024-11-01/renewable_capacity_statistics
   #
   # Lazard - Levelized Cost of Energy
   #
-  # archived; last active in 57d22d75bdd7 on 2025-10-13
   data://meadow/lazard/2025-02-25/levelized_cost_of_energy:
     - snapshot://lazard/2025-02-25/levelized_cost_of_energy.csv
   #
   # Lazard - Levelized Cost of Energy+
   #
-  # archived; last active in 57d22d75bdd7 on 2025-10-13
   data://garden/lazard/2025-02-25/levelized_cost_of_energy:
     - data://meadow/lazard/2025-02-25/levelized_cost_of_energy
     - data://garden/worldbank_wdi/2025-01-24/wdi
   #
   # Lazard - Levelized Cost of Energy+
   #
-  # archived; last active in 57d22d75bdd7 on 2025-10-13
   data://grapher/lazard/2025-02-25/levelized_cost_of_energy:
     - data://garden/lazard/2025-02-25/levelized_cost_of_energy
   #
   # Benchmark Mineral Intelligence - Battery cell prices.
   #
-  # archived; last active in e732ad0dbb8f on 2025-12-02
   data-private://meadow/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
     - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx
     - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices_by_chemistry.xlsx
   #
   # Benchmark Mineral Intelligence - Battery cell prices.
   #
-  # archived; last active in e732ad0dbb8f on 2025-12-02
   data-private://garden/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
     - data-private://meadow/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices
   #
   # Benchmark Mineral Intelligence - Battery cell prices.
   #
-  # archived; last active in e732ad0dbb8f on 2025-12-02
   data-private://grapher/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
     - data-private://garden/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices
   #
   # Ember - Yearly electricity data.
   #
-  # archived; last active in 51c75e7584c8 on 2026-01-09
   data://meadow/ember/2025-05-12/yearly_electricity:
     - snapshot://ember/2025-05-12/yearly_electricity__europe.csv
     - snapshot://ember/2025-05-12/yearly_electricity__global.csv
   #
   # Ember - Yearly electricity data (Global and Europe).
   #
-  # archived; last active in 51c75e7584c8 on 2026-01-09
   data://garden/ember/2025-05-12/yearly_electricity:
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/demography/2024-07-15/population
@@ -797,7 +660,6 @@ steps:
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in 51c75e7584c8 on 2026-01-09
   data://garden/energy/2025-06-27/electricity_mix:
     - data://garden/demography/2024-07-15/population
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
@@ -805,7 +667,6 @@ steps:
   #
   # Energy - OWID Energy dataset.
   #
-  # archived; last active in 51c75e7584c8 on 2026-01-09
   data://garden/energy_data/2025-11-11/owid_energy:
     - data://garden/demography/2024-07-15/population
     - data://garden/energy/2025-06-27/energy_mix
@@ -817,33 +678,28 @@ steps:
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in 51c75e7584c8 on 2026-01-09
   data://garden/energy/2025-06-27/uk_historical_electricity:
     - data://garden/uk_beis/2023-12-12/uk_historical_electricity
     - data://garden/energy/2025-06-27/electricity_mix
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in 51c75e7584c8 on 2026-01-09
   data://grapher/energy/2025-06-27/electricity_mix:
     - data://garden/energy/2025-06-27/electricity_mix
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in 51c75e7584c8 on 2026-01-09
   data://grapher/energy/2025-06-27/uk_historical_electricity:
     - data://garden/energy/2025-06-27/uk_historical_electricity
   #
   # Ember - Yearly electricity data.
   #
-  # archived; last active in 550c441b8e24 on 2026-01-28
   data://meadow/ember/2026-01-09/yearly_electricity:
     - snapshot://ember/2026-01-09/yearly_electricity__europe.csv
     - snapshot://ember/2026-01-09/yearly_electricity__global.csv
   #
   # Ember - Yearly electricity data.
   #
-  # archived; last active in 550c441b8e24 on 2026-01-28
   data://garden/ember/2026-01-09/yearly_electricity:
     - data://garden/demography/2024-07-15/population
     - data://garden/wb/2025-07-01/income_groups
@@ -852,7 +708,6 @@ steps:
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in 550c441b8e24 on 2026-01-28
   data://garden/energy/2026-01-09/electricity_mix:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
@@ -860,20 +715,17 @@ steps:
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in 550c441b8e24 on 2026-01-28
   data://grapher/energy/2026-01-09/electricity_mix:
     - data://garden/energy/2026-01-09/electricity_mix
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in 550c441b8e24 on 2026-01-28
   data://garden/energy/2026-01-09/uk_historical_electricity:
     - data://garden/uk_beis/2023-12-12/uk_historical_electricity
     - data://garden/energy/2026-01-09/electricity_mix
   #
   # Energy - OWID Energy dataset.
   #
-  # archived; last active in 550c441b8e24 on 2026-01-28
   data://garden/energy_data/2026-01-09/owid_energy:
     - data://garden/regions/2023-01-01/regions
     - data://garden/energy/2025-06-27/energy_mix
@@ -885,20 +737,17 @@ steps:
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in 550c441b8e24 on 2026-01-28
   data://grapher/energy/2026-01-09/uk_historical_electricity:
     - data://garden/energy/2026-01-09/uk_historical_electricity
   #
   # Ember - Yearly electricity data.
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://meadow/ember/2026-01-26/yearly_electricity:
     - snapshot://ember/2026-01-26/yearly_electricity__europe.csv
     - snapshot://ember/2026-01-09/yearly_electricity__global.csv
   #
   # Ember - Yearly electricity data.
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://garden/ember/2026-01-26/yearly_electricity:
     - data://garden/demography/2024-07-15/population
     - data://garden/wb/2025-07-01/income_groups
@@ -907,14 +756,12 @@ steps:
   #
   # Energy: global historical electricity from Pinto et al. (2023).
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://garden/energy/2026-02-06/global_historical_electricity:
     - data://garden/ember/2026-01-26/yearly_electricity
     - data://meadow/energy/2026-02-06/global_historical_electricity
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://garden/energy/2026-01-26/electricity_mix:
     - data://garden/ember/2026-01-26/yearly_electricity
     - data://garden/demography/2024-07-15/population
@@ -922,19 +769,16 @@ steps:
   #
   # Energy: global historical electricity scaling.
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://garden/energy/2026-02-06/global_historical_electricity_scaling:
     - data://garden/energy/2026-02-06/global_historical_electricity
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://grapher/energy/2026-01-26/electricity_mix:
     - data://garden/energy/2026-01-26/electricity_mix
   #
   # Energy - OWID Energy dataset.
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://garden/energy_data/2026-01-26/owid_energy:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
@@ -946,26 +790,22 @@ steps:
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://garden/energy/2026-01-26/uk_historical_electricity:
     - data://garden/uk_beis/2023-12-12/uk_historical_electricity
     - data://garden/energy/2026-01-26/electricity_mix
   #
   # Energy: global historical electricity scaling.
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://grapher/energy/2026-02-06/global_historical_electricity_scaling:
     - data://garden/energy/2026-02-06/global_historical_electricity_scaling
   #
   # Energy - UK historical electricity.
   #
-  # archived; last active in d85798e63a19 on 2026-04-27
   data://grapher/energy/2026-01-26/uk_historical_electricity:
     - data://garden/energy/2026-01-26/uk_historical_electricity
   #
   # EIA - Energy consumption.
   #
-  # archived; last active in aafae2a6029a on 2026-05-08
   data://garden/eia/2025-07-08/energy_consumption:
     - data://garden/wb/2025-07-01/income_groups
     - data://meadow/eia/2025-07-08/energy_consumption
@@ -973,7 +813,6 @@ steps:
   #
   # Energy - Primary energy consumption.
   #
-  # archived; last active in aafae2a6029a on 2026-05-08
   data://garden/energy/2025-06-27/primary_energy_consumption:
     - data://garden/eia/2025-07-08/energy_consumption
     - data://garden/demography/2024-07-15/population
@@ -982,467 +821,11 @@ steps:
   #
   # Energy - Primary energy consumption.
   #
-  # archived; last active in aafae2a6029a on 2026-05-08
   data://grapher/energy/2025-06-27/primary_energy_consumption:
     - data://garden/energy/2025-06-27/primary_energy_consumption
   #
   # EIA - Energy consumption.
   #
   # TODO: To be archived once dependencies are updated.
-  # archived; last active in aafae2a6029a on 2026-05-08
   data://meadow/eia/2025-07-08/energy_consumption:
     - snapshot://eia/2025-07-08/international_energy_data.zip
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://garden/energy/2022-09-09/global_primary_energy:
-    - data://garden/smil/2017-01-01/global_primary_energy
-    - data://garden/bp/2022-07-14/statistical_review
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/bp/2022-07-14/statistical_review:
-    - data://garden/bp/2022-07-14/statistical_review
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://garden/energy/2022-12-13/uk_historical_electricity:
-    - data://garden/energy/2022-12-13/electricity_mix
-    - data://garden/uk_beis/2022-07-28/uk_historical_electricity
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://garden/irena/2022-10-20/renewable_power_generation_costs:
-    - data://meadow/irena/2022-10-20/renewable_power_generation_costs
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-07-14/statistical_review
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://garden/irena/2022-10-20/renewable_electricity_capacity:
-    - data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://meadow/irena/2022-10-20/renewable_power_generation_costs:
-    - walden://irena/2022-10-07/renewable_power_generation_costs
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/energy/2022-12-13/uk_historical_electricity:
-    - data://garden/energy/2022-12-13/uk_historical_electricity
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/irena/2022-10-20/renewable_electricity_capacity_by_technology:
-    - data://garden/irena/2022-10-20/renewable_electricity_capacity
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/energy/2022-09-09/global_primary_energy:
-    - data://garden/energy/2022-09-09/global_primary_energy
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/energy/2022-07-29/primary_energy_consumption:
-    - data://garden/energy/2022-07-29/primary_energy_consumption
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://garden/energy/2022-07-20/fossil_fuel_production:
-    - data://garden/shift/2022-07-18/fossil_fuel_production
-    - data://garden/owid/latest/key_indicators
-    - data://garden/bp/2022-07-14/statistical_review
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://garden/energy/2022-12-13/electricity_mix:
-    - data://garden/ember/2022-12-13/combined_electricity
-    - data://garden/owid/latest/key_indicators
-    - data://garden/bp/2022-07-14/statistical_review
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/irena/2022-10-20/renewable_power_generation_costs:
-    - data://garden/irena/2022-10-20/renewable_power_generation_costs
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/energy/2022-07-20/fossil_fuel_production:
-    - data://garden/energy/2022-07-20/fossil_fuel_production
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://garden/energy/2022-12-13/owid_energy:
-    - data://garden/energy/2022-07-29/primary_energy_consumption
-    - data://garden/owid/latest/key_indicators
-    - data://garden/energy/2022-07-20/fossil_fuel_production
-    - data://garden/energy/2022-12-13/electricity_mix
-    - data://garden/bp/2022-07-14/energy_mix
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/energy/2022-12-13/electricity_mix:
-    - data://garden/energy/2022-12-13/electricity_mix
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://grapher/bp/2022-07-14/energy_mix:
-    - data://garden/bp/2022-07-14/energy_mix
-  # archived; last active in f66697bcd927 on 2023-01-26
-  data://meadow/irena/2022-10-20/renewable_electricity_capacity_and_generation:
-    - walden://irena/2022-10-07/renewable_electricity_capacity_and_generation
-  # archived; last active in 557d2553ebb5 on 2023-03-06
-  data://garden/energy/2022-12-28/owid_energy:
-    - data://garden/owid/latest/key_indicators
-    - data://garden/energy/2022-12-28/primary_energy_consumption
-    - data://garden/energy/2022-12-28/fossil_fuel_production
-    - data://garden/energy/2022-12-28/electricity_mix
-    - data://garden/bp/2022-12-28/energy_mix
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://grapher/energy/2022-12-28/electricity_mix:
-    - data://garden/energy/2022-12-28/electricity_mix
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://garden/energy/2022-12-28/primary_energy_consumption:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/eia/2022-07-27/energy_consumption
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/owid/latest/key_indicators
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://grapher/energy/2022-12-28/global_primary_energy:
-    - data://garden/energy/2022-12-28/global_primary_energy
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://garden/energy/2022-12-28/uk_historical_electricity:
-    - data://garden/uk_beis/2022-07-28/uk_historical_electricity
-    - data://garden/energy/2022-12-28/electricity_mix
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://grapher/bp/2022-12-28/energy_mix:
-    - data://garden/bp/2022-12-28/energy_mix
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://grapher/energy/2022-12-28/uk_historical_electricity:
-    - data://garden/energy/2022-12-28/uk_historical_electricity
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://garden/bp/2022-12-28/energy_mix:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/owid/latest/key_indicators
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://garden/ember/2022-12-13/yearly_electricity:
-    - data://meadow/ember/2022-12-13/yearly_electricity
-    - data://garden/owid/latest/key_indicators
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://grapher/energy/2022-12-28/primary_energy_consumption:
-    - data://garden/energy/2022-12-28/primary_energy_consumption
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://grapher/energy/2022-12-28/fossil_fuel_production:
-    - data://garden/energy/2022-12-28/fossil_fuel_production
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://garden/energy/2022-12-28/electricity_mix:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/ember/2022-12-13/combined_electricity
-    - data://garden/owid/latest/key_indicators
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://garden/energy/2022-12-28/global_primary_energy:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/smil/2017-01-01/global_primary_energy
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://meadow/ember/2022-12-13/yearly_electricity:
-    - snapshot://ember/2022-12-13/yearly_electricity.csv
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://garden/energy/2022-12-28/fossil_fuel_production:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/shift/2022-07-18/fossil_fuel_production
-    - data://garden/owid/latest/key_indicators
-  # archived; last active in e7420ae4d6c3 on 2023-03-08
-  data://garden/ember/2022-12-13/combined_electricity:
-    - data://garden/ember/2022-08-01/european_electricity_review
-    - data://garden/ember/2022-12-13/yearly_electricity
-  # archived; last active in 8e9cd030135d on 2023-05-10
-  data://garden/energy/2022-07-29/primary_energy_consumption:
-    - data://garden/eia/2022-07-27/energy_consumption
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/owid/latest/key_indicators
-    - data://garden/bp/2022-07-14/statistical_review
-  # archived; last active in ed2f7e82029a on 2023-06-01
-  data://garden/energy/2023-02-20/owid_energy:
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/demography/2022-12-08/population
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/energy/2023-02-20/fossil_fuel_production
-    - data://garden/bp/2023-02-20/energy_mix
-    - data://garden/energy/2023-02-20/electricity_mix
-    - data://garden/energy/2023-02-20/primary_energy_consumption
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://grapher/energy/2023-02-20/global_primary_energy:
-    - data://garden/energy/2023-02-20/global_primary_energy
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://garden/ember/2023-02-20/combined_electricity:
-    - data://garden/ember/2023-02-20/yearly_electricity
-    - data://garden/ember/2022-08-01/european_electricity_review
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://grapher/energy/2023-02-20/primary_energy_consumption:
-    - data://garden/energy/2023-02-20/primary_energy_consumption
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://garden/energy/2023-02-20/uk_historical_electricity:
-    - data://garden/uk_beis/2022-07-28/uk_historical_electricity
-    - data://garden/energy/2023-02-20/electricity_mix
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://garden/energy/2023-02-20/fossil_fuel_production:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/demography/2022-12-08/population
-    - data://garden/shift/2022-07-18/fossil_fuel_production
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://garden/energy/2023-02-20/electricity_mix:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/demography/2022-12-08/population
-    - data://garden/ember/2023-02-20/combined_electricity
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://garden/ember/2023-02-20/yearly_electricity:
-    - data://meadow/ember/2023-02-20/yearly_electricity
-    - data://garden/demography/2022-12-08/population
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://grapher/energy/2023-02-20/uk_historical_electricity:
-    - data://garden/energy/2023-02-20/uk_historical_electricity
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://meadow/ember/2023-02-20/yearly_electricity:
-    - snapshot://ember/2023-02-20/yearly_electricity.csv
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://garden/energy/2023-02-20/global_primary_energy:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/smil/2017-01-01/global_primary_energy
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://garden/bp/2022-07-14/statistical_review:
-    - data://garden/bp/2022-07-11/statistical_review
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/owid/latest/key_indicators
-    - backport://backport/owid/latest/dataset_5650_statistical_review_of_world_energy__bp__2022
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://garden/energy/2023-02-20/primary_energy_consumption:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/eia/2022-07-27/energy_consumption
-    - data://garden/demography/2022-12-08/population
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://garden/bp/2022-07-14/energy_mix:
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/owid/latest/key_indicators
-    - data://garden/bp/2022-07-14/statistical_review
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://grapher/energy/2023-02-20/fossil_fuel_production:
-    - data://garden/energy/2023-02-20/fossil_fuel_production
-  # archived; last active in b9a11a28b990 on 2023-06-05
-  data://grapher/energy/2023-02-20/electricity_mix:
-    - data://garden/energy/2023-02-20/electricity_mix
-  # archived; last active in 5d429204c7ee on 2023-07-17
-  data://garden/energy/2023-06-01/owid_energy:
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-    - data://garden/bp/2023-02-20/energy_mix
-    - data://garden/energy/2023-06-01/primary_energy_consumption
-    - data://garden/energy/2023-06-01/fossil_fuel_production
-    - data://garden/energy/2023-06-01/electricity_mix
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/energy/2023-06-01/fossil_fuel_production:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/demography/2023-03-31/population
-    - data://garden/shift/2022-07-18/fossil_fuel_production
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/uk_beis/2022-07-28/uk_historical_electricity:
-    - data://meadow/uk_beis/2022-07-28/uk_historical_electricity
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/energy/2023-06-01/global_primary_energy:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/smil/2017-01-01/global_primary_energy
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/shift/2022-07-18/fossil_fuel_production:
-    - data://meadow/shift/2022-07-18/fossil_fuel_production
-    - data://garden/regions/2023-01-01/regions
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/bp/2022-12-28/statistical_review:
-    - data://garden/bp/2022-07-11/statistical_review
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/owid/latest/key_indicators
-    - backport://backport/owid/latest/dataset_5650_statistical_review_of_world_energy__bp__2022
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/irena/2023-01-04/renewable_electricity_capacity_by_technology:
-    - data://garden/irena/2023-01-04/renewable_electricity_capacity
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://meadow/eia/2022-07-27/energy_consumption:
-    - walden://eia/2022-07-27/international_energy_data
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/energy/2023-06-01/primary_energy_consumption:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/demography/2023-03-31/population
-    - data://garden/eia/2022-07-27/energy_consumption
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/bp/2023-02-20/energy_mix:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/demography/2022-12-08/population
-    - data://garden/wb/2021-07-01/wb_income
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/energy/2023-06-01/electricity_mix:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/demography/2023-03-31/population
-    - data://garden/ember/2023-06-01/combined_electricity
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/ember/2023-06-01/yearly_electricity:
-    - data://meadow/ember/2023-06-01/yearly_electricity
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/demography/2023-03-31/population
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/energy/2023-06-01/uk_historical_electricity:
-    - data://garden/energy/2023-06-01/uk_historical_electricity
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://meadow/uk_beis/2022-07-28/uk_historical_electricity:
-    - walden://uk_beis/2022-07-28/uk_historical_electricity
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-12-28/statistical_review
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/energy/2023-06-01/fossil_fuel_production:
-    - data://garden/energy/2023-06-01/fossil_fuel_production
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/eia/2022-07-27/energy_consumption:
-    - data://meadow/eia/2022-07-27/energy_consumption
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/owid/latest/key_indicators
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/energy/2023-06-01/global_primary_energy:
-    - data://garden/energy/2023-06-01/global_primary_energy
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://meadow/irena/2023-01-04/renewable_power_generation_costs:
-    - walden://irena/2022-10-07/renewable_power_generation_costs
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://meadow/ember/2023-06-01/yearly_electricity:
-    - snapshot://ember/2023-06-01/yearly_electricity.csv
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/irena/2023-01-04/renewable_power_generation_costs:
-    - data://garden/irena/2023-01-04/renewable_power_generation_costs
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/energy/2023-01-04/photovoltaic_cost_and_capacity:
-    - data://garden/irena/2023-01-04/renewable_electricity_capacity
-    - data://garden/irena/2023-01-04/renewable_power_generation_costs
-    - data://garden/papers/2023-01-04/farmer_lafond_2016
-    - data://garden/papers/2023-01-04/nemet_2009
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/energy/2023-06-01/uk_historical_electricity:
-    - data://garden/uk_beis/2022-07-28/uk_historical_electricity
-    - data://garden/energy/2023-06-01/electricity_mix
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/bp/2023-02-20/energy_mix:
-    - data://garden/bp/2023-02-20/energy_mix
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://meadow/smil/2017-01-01/global_primary_energy:
-    - walden://smil/2017-01-01/global_primary_energy
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/irena/2023-01-04/renewable_electricity_capacity:
-    - data://meadow/irena/2023-01-04/renewable_electricity_capacity_and_generation
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/energy/2023-01-04/photovoltaic_cost_and_capacity:
-    - data://garden/energy/2023-01-04/photovoltaic_cost_and_capacity
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/energy/2023-06-01/electricity_mix:
-    - data://garden/energy/2023-06-01/electricity_mix
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/bp/2022-07-11/statistical_review:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/owid/latest/key_indicators
-    - backport://backport/owid/latest/dataset_5347_statistical_review_of_world_energy__bp__2021
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/irena/2023-01-04/renewable_power_generation_costs:
-    - data://meadow/irena/2023-01-04/renewable_power_generation_costs
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/smil/2017-01-01/global_primary_energy:
-    - data://meadow/smil/2017-01-01/global_primary_energy
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://garden/ember/2023-06-01/combined_electricity:
-    - data://garden/ember/2022-08-01/european_electricity_review
-    - data://garden/ember/2023-06-01/yearly_electricity
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/energy/2023-06-01/primary_energy_consumption:
-    - data://garden/energy/2023-06-01/primary_energy_consumption
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://meadow/irena/2023-01-04/renewable_electricity_capacity_and_generation:
-    - walden://irena/2022-10-07/renewable_electricity_capacity_and_generation
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://meadow/shift/2022-07-18/fossil_fuel_production:
-    - walden://shift/2022-07-18/fossil_fuel_production
-  # archived; last active in e80dbf7b9f13 on 2023-07-20
-  data://grapher/bp/2022-12-28/statistical_review:
-    - data://garden/bp/2022-12-28/statistical_review
-  # archived; last active in 5b369cbec892 on 2023-12-20
-  data://grapher/energy/2023-07-10/photovoltaic_cost_and_capacity:
-    - data://garden/energy/2023-07-10/photovoltaic_cost_and_capacity
-  # archived; last active in 5b369cbec892 on 2023-12-20
-  data://garden/energy/2023-07-10/photovoltaic_cost_and_capacity:
-    - data://garden/papers/2023-07-10/farmer_lafond_2016
-    - data://garden/papers/2023-07-10/nemet_2009
-    - data://garden/irena/2023-06-26/renewable_electricity_capacity
-    - data://garden/irena/2023-06-26/renewable_power_generation_costs
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://garden/ember/2023-07-10/combined_electricity:
-    - data://garden/ember/2023-07-10/yearly_electricity
-    - data://garden/ember/2022-08-01/european_electricity_review
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://garden/energy/2023-07-10/owid_energy:
-    - data://garden/energy/2023-07-10/electricity_mix
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-    - data://garden/energy/2023-07-10/fossil_fuel_production
-    - data://garden/energy/2023-07-10/energy_mix
-    - data://garden/energy/2023-07-10/primary_energy_consumption
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://garden/irena/2022-10-25/renewable_energy_patents:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2021-07-01/wb_income
-    - data://meadow/irena/2022-10-25/renewable_energy_patents
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://garden/energy/2023-07-10/uk_historical_electricity:
-    - data://garden/energy/2023-07-10/electricity_mix
-    - data://garden/uk_beis/2023-07-10/uk_historical_electricity
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://grapher/energy/2023-07-10/uk_historical_electricity:
-    - data://garden/energy/2023-07-10/uk_historical_electricity
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://grapher/energy/2023-07-10/energy_mix:
-    - data://garden/energy/2023-07-10/energy_mix
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://grapher/irena/2022-10-25/renewable_energy_patents:
-    - data://garden/irena/2022-10-25/renewable_energy_patents
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://garden/ember/2022-08-01/european_electricity_review:
-    - data://meadow/ember/2022-08-01/european_electricity_review
-    - data://garden/regions/2023-01-01/regions
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://meadow/irena/2022-10-25/renewable_energy_patents:
-    - walden://irena/2022-10-25/renewable_energy_patents
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://garden/energy/2023-07-10/electricity_mix:
-    - data://garden/demography/2023-03-31/population
-    - data://garden/ember/2023-07-10/combined_electricity
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://grapher/energy/2023-07-10/electricity_mix:
-    - data://garden/energy/2023-07-10/electricity_mix
-  # archived; last active in 325aff97266b on 2023-12-28
-  data://meadow/ember/2022-08-01/european_electricity_review:
-    - walden://ember/2022-02-01/european_electricity_review
-  # archived; last active in a2efb55cfc27 on 2024-05-08
-  data://grapher/energy/2023-12-12/energy_mix:
-    - data://garden/energy/2023-12-12/energy_mix
-  # archived; last active in e915d8542d95 on 2024-06-25
-  data://grapher/energy/2024-05-08/energy_mix:
-    - data://garden/energy/2024-05-08/energy_mix
-  # archived; last active in 2d215d1139d0 on 2024-06-25
-  data://garden/energy/latest/owid_energy:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/demography/2023-03-31/population
-    - data://garden/energy/2024-06-20/fossil_fuel_production
-    - data://garden/energy/2024-06-20/electricity_mix
-    - data://garden/energy/2024-06-20/primary_energy_consumption
-    - data://garden/energy/2024-06-20/energy_mix
-  # archived; last active in 73c0612c83db on 2025-02-17
-  export://multidim/energy/latest/energy:
-    - data://grapher/energy/2024-06-20/primary_energy_consumption
-    - data://grapher/energy/2024-06-20/energy_mix
-  # archived; last active in 3591875fdc0a on 2025-11-14
-  data://external/energy_data/latest/owid_energy:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/energy/2025-06-27/fossil_fuel_production
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2025-06-27/electricity_mix
-    - data://garden/demography/2024-07-15/population
-    - data://garden/energy/2025-06-27/energy_mix
-    - data://garden/energy/2025-06-27/primary_energy_consumption
-  # archived; last active in 2d1bc62c69d3 on 2026-01-08
-  data-private://meadow/energy/2025-11-19/historical_battery_costs:
-    - snapshot-private://energy/2025-11-19/historical_battery_costs.xlsx
-  # archived; last active in 2d1bc62c69d3 on 2026-01-08
-  data-private://grapher/energy/2025-11-19/historical_battery_costs:
-    - data-private://garden/energy/2025-11-19/historical_battery_costs
-  # archived; last active in 2d1bc62c69d3 on 2026-01-08
-  data-private://garden/energy/2025-11-19/historical_battery_costs:
-    - data-private://meadow/energy/2025-11-19/historical_battery_costs
