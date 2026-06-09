@@ -5,12 +5,11 @@
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.data_helpers.geo import add_population_to_table
 from etl.helpers import PathFinder
 
 # Initialize logger.
@@ -253,7 +252,7 @@ def combine_ei_and_ember_data(tb_review, tb_ember):
     return combined
 
 
-def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
+def add_per_capita_variables(combined: Table) -> Table:
     """Add per capita variables (in kWh per person) to the combined EI and Ember table.
 
     The list of variables to make per capita are given in this function. The new variable names will be 'per_capita_'
@@ -294,7 +293,7 @@ def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
         "solar_and_wind_generation__twh",
     ]
     # Add a column for population (only for harmonized countries).
-    combined = add_population_to_table(tb=combined, ds_population=ds_population, warn_on_missing_countries=False)
+    combined = paths.regions.add_population(tb=combined, warn_on_missing_countries=False)
 
     for variable in per_capita_variables:
         assert "twh" in variable, f"Variables are assumed to be in TWh, but {variable} is not."
@@ -535,7 +534,6 @@ def run() -> None:
     tb_ember = ds_ember.read("yearly_electricity", reset_index=False)
 
     # Load population dataset.
-    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -603,7 +601,7 @@ def run() -> None:
     check_carbon_intensity(combined=combined)
 
     # Add per capita variables.
-    combined = add_per_capita_variables(combined=combined, ds_population=ds_population)
+    combined = add_per_capita_variables(combined=combined)
 
     # Add "share" variables.
     combined = add_share_variables(combined=combined)

@@ -15,6 +15,8 @@ dataset:
   update_period_days: 1460
   non_redistributable: true
   title: Global Burden of Disease (GBD) - Causes of Death - Cancer
+  owners:
+    - Fiona Spooner
 tables:
   gbd_cancers_deaths:
     variables:

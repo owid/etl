@@ -8,7 +8,7 @@ definitions:
     display:
       numDecimalPlaces: 0
   footnote_decadal: |-
-   Decadal figures are measured as the annual average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
+    Decadal figures are measured as the annual average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
 
 
 # Learn more about the available fields:
@@ -16,6 +16,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   oil_spills:
     variables:

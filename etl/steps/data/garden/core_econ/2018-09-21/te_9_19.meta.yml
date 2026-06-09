@@ -1,5 +1,7 @@
 dataset:
   title: TE-9.19
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_9_19:
     variables:

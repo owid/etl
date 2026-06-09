@@ -1,5 +1,7 @@
 dataset:
   title: Number of deaths in England and Wales by age - ONS
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   number_of_deaths_in_england_and_wales_by_age__ons:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Figure_17.8_nominal_ir
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   figure_17_8_nominal_ir:
     variables:

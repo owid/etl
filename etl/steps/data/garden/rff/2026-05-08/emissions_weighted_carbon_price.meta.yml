@@ -24,6 +24,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   emissions_weighted_carbon_price:
     title: Emissions-weighted carbon price

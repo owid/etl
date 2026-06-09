@@ -5,19 +5,19 @@ definitions:
       topic_tags:
         - Antibiotics & Antibiotic Resistance
   description_key_ast_bloodstream: &description_key_ast_bloodstream
-      - Acinetobacter spp. infections are tested for their susceptibility to carbapanem antibiotics.
-      - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.
-      - Staphylococcus aureus infections are tested for their susceptibility to methicillin antibiotics.
-      - Escheria coli and Klebsiella pneumoniae infections are tested for their susceptibility to third-generation cephalosporin antibiotics and carbapanem antibiotics.
-      - Streptococcus pneumoniae infections are tested for their susceptibility to penicillin antibiotics.
+    - Acinetobacter spp. infections are tested for their susceptibility to carbapanem antibiotics.
+    - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.
+    - Staphylococcus aureus infections are tested for their susceptibility to methicillin antibiotics.
+    - Escheria coli and Klebsiella pneumoniae infections are tested for their susceptibility to third-generation cephalosporin antibiotics and carbapanem antibiotics.
+    - Streptococcus pneumoniae infections are tested for their susceptibility to penicillin antibiotics.
   description_key_ast_stool: &description_key_ast_stool
-      - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.
-      - Shigella spp. infections are tested for their susceptibility to third-generation cephalosporin antibiotics.
+    - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.
+    - Shigella spp. infections are tested for their susceptibility to third-generation cephalosporin antibiotics.
   description_key_ast_urinary_tract: &description_key_ast_urinary_tract
-      - Escheria coli infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
-      - Klebsiella pneumoniae infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
+    - Escheria coli infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
+    - Klebsiella pneumoniae infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
   description_key_ast_gonorrhea: &description_key_ast_gonorrhea
-      - Neisseria gonorrhoeae infections are tested for their susceptibility to macrolide antibiotics and third-generation cephalosporin antibiotics.
+    - Neisseria gonorrhoeae infections are tested for their susceptibility to macrolide antibiotics and third-generation cephalosporin antibiotics.
 
 
 
@@ -27,6 +27,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Fiona Spooner
 tables:
   testing_coverage:
     variables:

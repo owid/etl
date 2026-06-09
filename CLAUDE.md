@@ -53,6 +53,15 @@ When generating user-facing prose (PR descriptions, Slack messages, PR comments,
 | garden | `etl/steps/data/garden/` | Business logic, harmonization |
 | grapher | `etl/steps/data/grapher/` | MySQL ingestion |
 
+**Snapshot is raw passthrough only.** It downloads the source files and writes them out using the source's own row labels, column labels, and period labels. That's it. The following all belong in **garden**, not in the snapshot script:
+
+- Summing or merging rows from different source categories into one bucket
+- Picking the most recent value when several source files report the same period
+- Converting a source's period labels (fiscal quarters, season codes, week numbers) into dates
+- Renaming source categories for the chart
+
+If you find yourself doing any of these in the snapshot, move them to garden.
+
 ## Running ETL Steps
 
 ```bash
@@ -96,6 +105,8 @@ git push
 # 4. Add PR description
 gh pr edit <number> --body "..."
 ```
+
+**Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
 
 **Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
 
@@ -189,6 +200,15 @@ data['key'] = new_value
 with open(file_path, 'w') as f:
     f.write(ruamel_dump(data))
 ```
+
+### Description fields: `.dvc` vs garden `description_processing`
+
+Two different descriptions, two different jobs. Don't mix them:
+
+- **`.dvc` `meta.origin.description`** describes what **the producer** publishes — the source's schema, calendar, structure, and any context the producer themselves gives about the data.
+- **Garden `description_processing`** describes what **OWID** does to that data — aggregation, relabeling, deduplication, derivations, date conversion.
+
+If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
 
 ## Querying MySQL
 

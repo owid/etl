@@ -13,6 +13,8 @@ dataset:
   title: Social expenditure in the long run
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   social_expenditure_omm:
     variables:

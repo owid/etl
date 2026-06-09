@@ -2,7 +2,7 @@
 definitions:
   common:
     topic_tags:
-    - Uncategorized
+      - Uncategorized
   # Random long text to be used in different places of the metadata.
   long_text: &long_text |-
     Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph.
@@ -90,6 +90,8 @@ dataset:
 
     {definitions.long_text}
 
+  owners:
+    - Pablo Rosado
 tables:
   dummy_monster:
     title: "Dummy monster"

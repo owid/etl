@@ -68,7 +68,7 @@ definitions:
   key_net_disbursements_base: |-
     is reported as net disbursements. This refers to aid ultimately given and is different from commitments, which is only aid that has been pledged. These are net amounts because any money coming in (like loan repayments or interest) has been subtracted from money going out (like new grants or loans).
   key_grant_equivalents_base: |-
-     is reported as [grant-equivalent](#dod:grant-equivalents) disbursements. They better estimate how favorable a loan is and the extent to which it constitutes a grant.
+    is reported as [grant-equivalent](#dod:grant-equivalents) disbursements. They better estimate how favorable a loan is and the extent to which it constitutes a grant.
 
   key_net_disbursements: |-
     The data {definitions.key_net_disbursements_base}
@@ -251,6 +251,8 @@ dataset:
   title: OECD Official Development Assistance (ODA)
   update_period_days: 365
 
+  owners:
+    - Pablo Arriagada
 tables:
   official_development_assistance:
     variables:
@@ -1251,55 +1253,55 @@ tables:
           <<: *common_display
 
       i_a_7_administrative_costs_not_included_elsewhere_grant_equivalents_share_oda:
-          title: ODA by donor - Administrative costs not included elsewhere (% of ODA) - Grant equivalents
-          unit: "%"
-          short_unit: "%"
-          description_short: "[Official development assistance](#dod:oda) component that represents administrative costs not included elsewhere, expressed as a percentage of ODA. {definitions.short_grant_equivalents}"
-          description_key:
-            - "{definitions.key_oda}"
-            - "{definitions.key_oda_coverage_limits}"
-            - "{definitions.key_grant_equivalents}"
-          description_processing: "{definitions.processing_share_oda}"
-          presentation:
-            title_variant: Grant equivalents
-          display:
-            name: ODA by donor - Administrative costs not included elsewhere (% of ODA)
-            numDecimalPlaces: 1
-            <<: *common_display
+        title: ODA by donor - Administrative costs not included elsewhere (% of ODA) - Grant equivalents
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents administrative costs not included elsewhere, expressed as a percentage of ODA. {definitions.short_grant_equivalents}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Administrative costs not included elsewhere (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
 
       i_a_8_1_development_awareness_grant_equivalents_share_oda:
-          title: ODA by donor - Development awareness (% of ODA) - Grant equivalents
-          unit: "%"
-          short_unit: "%"
-          description_short: "[Official development assistance](#dod:oda) component that represents development awareness, expressed as a percentage of ODA. {definitions.short_grant_equivalents}"
-          description_key:
-            - "{definitions.key_oda}"
-            - "{definitions.key_oda_coverage_limits}"
-            - "{definitions.key_grant_equivalents}"
-          description_processing: "{definitions.processing_share_oda}"
-          presentation:
-            title_variant: Grant equivalents
-          display:
-            name: ODA by donor - Development awareness (% of ODA)
-            numDecimalPlaces: 1
-            <<: *common_display
+        title: ODA by donor - Development awareness (% of ODA) - Grant equivalents
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents development awareness, expressed as a percentage of ODA. {definitions.short_grant_equivalents}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Development awareness (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
 
       i_a_8_2_refugees_in_donor_countries_grant_equivalents_share_oda:
-          title: ODA by donor - Refugees in donor countries (% of ODA) - Grant equivalents
-          unit: "%"
-          short_unit: "%"
-          description_short: "[Official development assistance](#dod:oda) component that represents refugees in donor countries, expressed as a percentage of ODA. {definitions.short_grant_equivalents}"
-          description_key:
-            - "{definitions.key_oda}"
-            - "{definitions.key_oda_coverage_limits}"
-            - "{definitions.key_grant_equivalents}"
-          description_processing: "{definitions.processing_share_oda}"
-          presentation:
-            title_variant: Grant equivalents
-          display:
-            name: ODA by donor - Refugees in donor countries (% of ODA)
-            numDecimalPlaces: 1
-            <<: *common_display
+        title: ODA by donor - Refugees in donor countries (% of ODA) - Grant equivalents
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents refugees in donor countries, expressed as a percentage of ODA. {definitions.short_grant_equivalents}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Refugees in donor countries (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
 
       oda_indonor_grant_equivalents_share_oda:
         title: ODA by donor - In-donor aid (% of ODA) - Grant equivalents
@@ -1338,72 +1340,72 @@ tables:
           <<: *common_display
 
       i_a_5_scholarships_student_costs_donor_countries_net_disbursements_share_oda:
-          title: ODA by donor - Scholarships and student costs in donor countries (% of ODA) - Net disbursements
-          unit: "%"
-          short_unit: "%"
-          description_short: "[Official development assistance](#dod:oda) component that represents scholarships and student costs in donor countries, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
-          description_key:
-            - "{definitions.key_oda}"
-            - "{definitions.key_oda_coverage_limits}"
-            - "{definitions.key_net_disbursements}"
-          description_processing: "{definitions.processing_share_oda}"
-          presentation:
-            title_variant: Net disbursements
-          display:
-            name: ODA by donor - Scholarships and student costs in donor countries (% of ODA)
-            numDecimalPlaces: 1
-            <<: *common_display
+        title: ODA by donor - Scholarships and student costs in donor countries (% of ODA) - Net disbursements
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents scholarships and student costs in donor countries, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Scholarships and student costs in donor countries (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
 
       i_a_7_administrative_costs_not_included_elsewhere_net_disbursements_share_oda:
-          title: ODA by donor - Administrative costs not included elsewhere (% of ODA) - Net disbursements
-          unit: "%"
-          short_unit: "%"
-          description_short: "[Official development assistance](#dod:oda) component that represents administrative costs not included elsewhere, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
-          description_key:
-            - "{definitions.key_oda}"
-            - "{definitions.key_oda_coverage_limits}"
-            - "{definitions.key_net_disbursements}"
-          description_processing: "{definitions.processing_share_oda}"
-          presentation:
-            title_variant: Net disbursements
-          display:
-            name: ODA by donor - Administrative costs not included elsewhere (% of ODA)
-            numDecimalPlaces: 1
-            <<: *common_display
+        title: ODA by donor - Administrative costs not included elsewhere (% of ODA) - Net disbursements
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents administrative costs not included elsewhere, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Administrative costs not included elsewhere (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
 
       i_a_8_1_development_awareness_net_disbursements_share_oda:
-          title: ODA by donor - Development awareness (% of ODA) - Net disbursements
-          unit: "%"
-          short_unit: "%"
-          description_short: "[Official development assistance](#dod:oda) component that represents development awareness, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
-          description_key:
-            - "{definitions.key_oda}"
-            - "{definitions.key_oda_coverage_limits}"
-            - "{definitions.key_net_disbursements}"
-          description_processing: "{definitions.processing_share_oda}"
-          presentation:
-            title_variant: Net disbursements
-          display:
-            name: ODA by donor - Development awareness (% of ODA)
-            numDecimalPlaces: 1
-            <<: *common_display
+        title: ODA by donor - Development awareness (% of ODA) - Net disbursements
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents development awareness, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Development awareness (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
 
       i_a_8_2_refugees_in_donor_countries_net_disbursements_share_oda:
-          title: ODA by donor - Refugees in donor countries (% of ODA) - Net disbursements
-          unit: "%"
-          short_unit: "%"
-          description_short: "[Official development assistance](#dod:oda) component that represents refugees in donor countries, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
-          description_key:
-            - "{definitions.key_oda}"
-            - "{definitions.key_oda_coverage_limits}"
-            - "{definitions.key_net_disbursements}"
-          description_processing: "{definitions.processing_share_oda}"
-          presentation:
-            title_variant: Net disbursements
-          display:
-            name: ODA by donor - Refugees in donor countries (% of ODA)
-            numDecimalPlaces: 1
-            <<: *common_display
+        title: ODA by donor - Refugees in donor countries (% of ODA) - Net disbursements
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents refugees in donor countries, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Refugees in donor countries (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
 
       oda_indonor_net_disbursements_share_oda:
         title: ODA by donor - In-donor aid (% of ODA) - Net disbursements

@@ -1,5 +1,7 @@
 dataset:
   title: Number of parties to multilateral environmental agreements - UNCTAD
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   number_of_parties_to_multilateral_environmental_agreements__unctad:
     variables:

@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Fiona Spooner
 tables:
   under_five_mortality:
     title: Under-five Mortality
@@ -68,10 +71,10 @@ tables:
               But we still dare to combine data that hasn't been combined, as we find it extremely important to visualize
               the big picture, which people otherwise tend to get absolutely wrong. Before using our data for any other purpose
               though, please read the documentation to make sure you are aware of our levels of doubts in the data.
-            title_snapshot: null
-            description_snapshot: null
+            title_snapshot:
+            description_snapshot:
             citation_full: Under-five Mortality Dataset v11, Gapminder (2020)
-            attribution: null
+            attribution:
             attribution_short: Gapminder
             version_producer: v11
             url_main: https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/edit#gid=501532268

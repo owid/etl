@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: Human Height (Blum and Baten)
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   height:
     variables:

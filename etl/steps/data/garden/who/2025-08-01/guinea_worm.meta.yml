@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Fiona Spooner
 tables:
   guinea_worm:
     variables:

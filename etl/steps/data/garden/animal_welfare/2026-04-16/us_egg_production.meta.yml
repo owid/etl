@@ -2,13 +2,15 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Animal Welfare
+        - Animal Welfare
     unit: hens
     short_unit: ""
 
 dataset:
   title: "US egg production"
 
+  owners:
+    - Pablo Rosado
 tables:
   us_egg_production:
     variables:

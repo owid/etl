@@ -1,5 +1,7 @@
 dataset:
   title: Terrain Ruggedness Index - Nunn and Puga (2012)
+  owners:
+    - Jaiden Mispy  # backport
 tables:
   terrain_ruggedness_index__nunn_and_puga__2012:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Air pollution sources in the UK - DEFRA
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   air_pollution_sources_in_the_uk__defra:
     variables:

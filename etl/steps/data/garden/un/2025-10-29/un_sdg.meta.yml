@@ -21,7 +21,10 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Mojmír Vinkler
+    - Tuna Acisu
+    - Pablo Arriagada
 tables:
   un_sdg:
-    variables:
-      {}
+    variables: {}

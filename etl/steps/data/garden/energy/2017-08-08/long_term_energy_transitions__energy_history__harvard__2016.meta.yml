@@ -1,5 +1,7 @@
 dataset:
   title: Long-term energy transitions - Energy History, Harvard (2016)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   long_term_energy_transitions__energy_history__harvard__2016:
     variables:

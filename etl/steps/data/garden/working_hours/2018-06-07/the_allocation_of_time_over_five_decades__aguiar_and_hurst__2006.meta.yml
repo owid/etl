@@ -1,5 +1,7 @@
 dataset:
   title: The allocation of time over five decades - Aguiar and Hurst (2006)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   the_allocation_of_time_over_five_decades__aguiar_and_hurst__2006:
     variables:

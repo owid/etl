@@ -30,13 +30,15 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Tuna Acisu
 tables:
   child_migration:
     variables:
       idps_under_18_conflict_violence:
         title: Internally displaced children due to conflict and violence
         description_short: |-
-         [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to conflict and violence but remain within their country's borders. This counts all children who are currently displaced, regardless of how many times they have been displaced.
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to conflict and violence but remain within their country's borders. This counts all children who are currently displaced, regardless of how many times they have been displaced.
         description_from_producer: *internally_displaced
       idps_under_18_disaster:
         title: Internally displaced children due to disasters

@@ -17,6 +17,8 @@ dataset:
   update_period_days: 30
   title: TSMC Revenue Data
 
+  owners:
+    - Veronika Samborska
 tables:
   tsmc_monthly_revenue:
     variables:

@@ -75,6 +75,8 @@ dataset:
   title: COVID-19, Government Response Tracker (OxCGRT)
   update_period_days: 0
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   oxcgrt_policy:
     variables:

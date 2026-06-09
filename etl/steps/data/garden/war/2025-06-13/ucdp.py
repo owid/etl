@@ -39,7 +39,6 @@ from shared import (
 )
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.data_helpers.misc import expand_time_column
 from etl.helpers import PathFinder
 
@@ -834,10 +833,7 @@ def estimate_metrics_locations(
     # Add rates
     ###################
     # Add population column
-    tb_locations_country = geo.add_population_to_table(
-        tb=tb_locations_country,
-        ds_population=ds_population,
-    )
+    tb_locations_country = paths.regions.add_population(tb=tb_locations_country)
     # Divide and obtain rates
     factor = 100_000
     suffix = [c.replace(INDICATOR_BASE_NAME, "") for c in cols_num_deaths]

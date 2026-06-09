@@ -26,6 +26,8 @@ dataset:
   licenses:
     - name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
+  owners:
+    - Fiona Spooner  # fasttrack
 tables:
   guinea_worm_cases:
     variables:

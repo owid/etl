@@ -27,6 +27,7 @@ Assumptions:
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
 - [ ] Run ETL update workflow via `etl-update` subagent (help → dry run → approval → real run)
+- [ ] Add yourself to `dataset.owners` in the new garden `.meta.yml` (don't reorder; preserve existing names and markers)
 - [ ] Catalog `# NOTE:` / `# TODO:` comments carried over from the old step files into `notes_to_check.md`
 - [ ] Detect any `sanity_checks` functions and their log-control flags; append to `notes_to_check.md`
 - [ ] Create or reuse draft PR and work branch
@@ -38,13 +39,14 @@ Assumptions:
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
-- [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, and that all URLs resolve (HEAD-check)
+- [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim — bump to the producer's real release date / year, or to `date_accessed` / current year if the source doesn't publish one), and that all URLs resolve (HEAD-check)
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
 - [ ] Render Slack announcement via `data-updates-comms`, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Draft public-facing "Data update" post for OWID /latest, add to PR description, hand to user for review and publication
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
+- [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
 - [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
 - [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
 
@@ -104,13 +106,27 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
 1) Run ETL update command (etl-update subagent)
    - Inputs: `<namespace>/<old_version>/<short_name>` plus any required flags
-   - **CRITICAL**: Run `etl update` ONCE for the full step URI (e.g., `data://garden/namespace/old_version/short_name`). Do NOT run it separately per channel (snapshot, meadow, garden, grapher). Running it once ensures all cross-step DAG dependencies are updated together. Running it per-channel leaves stale version references in `dag/main.yml` (e.g., garden pointing to old meadow version).
+   - **Pick the URI that matches what's actually changing:**
+     - If the source data is changing — new source files, modified extractor, anything that affects the snapshot output — run from the **snapshot URI** with `--include-usages`. This bumps the whole chain (snapshot → meadow → garden → grapher) to the new version together:
+       ```
+       etl update snapshot://<ns>/<old_v>/<short>.<ext> --include-usages
+       ```
+     - If only garden logic / metadata is changing and the source data is unchanged, run from the **garden URI**. This bumps garden and grapher only; snapshot and meadow stay on the old version.
+   - Either way, run `etl update` **once**. Don't call it separately per channel — that leaves stale version references in the DAG (e.g., new garden pointing to old meadow).
    - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
    - After running, **always verify `dag/main.yml`**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow).
 
+1a-bis) Add yourself to `dataset.owners` in the new garden `.meta.yml`
+
+   You've just become a contributor to this dataset, so add your canonical OWID name to its `owners:` list. Don't reorder — keep the existing primary first; append yourself at the end. Skip if you're already there.
+
+   Your canonical name must match an entry in the schema enum (`schemas/dataset-schema.json`). Resolve it from `git config user.name` via `etl.owners.resolve_owner`; if that returns `None`, add a mapping in `etl/owners.py` and a row in the schema enum before continuing.
+
+   Edit the YAML in place, preserving comments and the existing `# review` / `# backport` / `# fasttrack` markers on other entries.
+
 1b) Check for outdated practices (check-outdated-practices skill)
-   - After `etl update` creates new step files, run the `/check-outdated-practices` skill on the newly created files
-   - This catches patterns like `if __name__ == "__main__"`, `geo.harmonize_countries()`, `dest_dir`, `paths.load_dependency()`, etc. that were copied from old versions
+   - After `etl update` creates new step files, run the `/check-outdated-practices` skill on **every** new step file — including helper modules that `etl update` doesn't generate but you copied by hand (e.g. `*_omms.py`), since those carry legacy patterns too
+   - The skill reads the extension as the source of truth for the full pattern set (the `geo.add_*` aggregation/population helpers are flagged, not just `geo.harmonize_countries`) — don't rely on a remembered subset
    - Fix any findings before proceeding — this avoids propagating legacy patterns into new versions
 
 1c) Catalog `# NOTE:` / `# TODO:` comments in the copied step files (don't resolve yet)
@@ -355,6 +371,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 6c) Indicator metadata coverage, dataset block, and link verification
    The other quality checks catch *content* issues; this step catches *missing fields* and *broken URLs* before they reach review.
 
+   **Snapshot DVC freshness.** `etl update` clones the previous snapshot's `.dvc` content verbatim except for `date_accessed`. Always re-check `date_published` and the year in `citation_full` / `attribution` under `snapshots/<ns>/<new_version>/*.dvc` — they will otherwise silently ship the old version's values. Set `date_published` to the producer's real release date when discoverable; otherwise copy `date_accessed`. Bump the year in `citation_full` and `attribution` to match.
+
    **Mandatory fields per indicator.** For every indicator in the garden `.meta.yml`, confirm these are set (either on `definitions.common` or per-indicator):
 
    | Field | Notes |
@@ -551,7 +569,7 @@ Commit and push incrementally as you go — after each step that produces code c
 At the end of the workflow, update the PR description with:
 - A **tracking-issue link** as the first line of the Summary — e.g. `Tracks: [owid/owid-issues#NNNN](https://github.com/owid/owid-issues/issues/NNNN)`. Most data updates have a corresponding `owid-issues` ticket; try to find it by searching the title or `<short_name>` first, and **ask the user for the issue number if you can't locate one** rather than skipping the link silently.
 - A summary of key changes at the top
-- Collapsed sections for each pipeline step (Snapshot, Meadow, Garden, Grapher)
+- Collapsed `<details>` sections **only for the pipeline steps that changed in a non-obvious way**. Skip any step that's just the boilerplate generated by `etl update` — don't add a placeholder like "unchanged from boilerplate". The Summary already explains the why; per-step sections are only for the how, when the how isn't obvious from the diff.
 - A collapsed section for the Slack announcement
 
 ## Downstream dependency check

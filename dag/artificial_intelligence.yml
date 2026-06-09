@@ -170,10 +170,10 @@ steps:
         - snapshot://artificial_intelligence/2026-03-30/robotaxis.csv
 
   # NVIDIA quarterly revenue dataset
-  data://grapher/artificial_intelligence/2026-04-02/nvidia_revenue:
-    - data://garden/artificial_intelligence/2026-04-02/nvidia_revenue:
-      - data://meadow/artificial_intelligence/2026-04-02/nvidia_revenue:
-        - snapshot://artificial_intelligence/2026-04-02/nvidia_revenue.csv
+  data://grapher/artificial_intelligence/2026-06-08/nvidia_revenue:
+    - data://garden/artificial_intelligence/2026-06-08/nvidia_revenue:
+      - data://meadow/artificial_intelligence/2026-06-08/nvidia_revenue:
+        - snapshot://artificial_intelligence/2026-06-08/nvidia_revenue.csv
 
   # Microsoft AI Diffusion — Global AI adoption estimates
   data://grapher/artificial_intelligence/2026-04-07/ai_diffusion_msft:

@@ -1,9 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -22,7 +21,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("global_military_spending_dataset")
-    ds_population = paths.load_dataset("population")
     ds_gleditsch = paths.load_dataset("gleditsch")
     ds_nmc = paths.load_dataset("national_material_capabilities")
 
@@ -52,7 +50,7 @@ def run() -> None:
 
     tb = harmonize_country_names(tb=tb, tb_gw=tb_gleditsch)
 
-    tb = calculate_milex_per_capita(tb=tb, ds_population=ds_population)
+    tb = calculate_milex_per_capita(tb=tb)
 
     tb = calculate_milex_per_military_personnel(tb=tb, tb_nmc=tb_nmc)
 
@@ -153,12 +151,12 @@ def harmonize_country_names(tb: Table, tb_gw: Table) -> Table:
     return tb
 
 
-def calculate_milex_per_capita(tb: Table, ds_population: Dataset) -> Table:
+def calculate_milex_per_capita(tb: Table) -> Table:
     """
     Calculate military spending per capita.
     """
 
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
 
     # Calculate military spending per capita
     tb["milex_estimate_per_capita"] = tb["milex_estimate"] / tb["population"]

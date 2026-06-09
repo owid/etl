@@ -8,6 +8,8 @@ dataset:
     You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
   licenses:
     - {}
+  owners:
+    - Saloni Dattani  # fasttrack
 tables:
   democracy_freedom_house:
     variables:
@@ -113,8 +115,7 @@ tables:
       pop_free_fh:
         title: pop_free_fh
         unit: ''
-        description: The variable identifies the number of people living in free countries, based on Freedom House's Freedom
-          in the World.
+        description: The variable identifies the number of people living in free countries, based on Freedom House's Freedom in the World.
       pop_missreg_fh:
         title: pop_missreg_fh
         unit: ''
@@ -123,8 +124,7 @@ tables:
       pop_nonelectdem_fh:
         title: pop_nonelectdem_fh
         unit: ''
-        description: The variable identifies the number of people living in non-democracies, based on Freedom House's Freedom
-          in the World.
+        description: The variable identifies the number of people living in non-democracies, based on Freedom House's Freedom in the World.
       pop_electdem_fh:
         title: pop_electdem_fh
         unit: ''

@@ -22,8 +22,8 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.collection.exceptions import DuplicateCollectionViews, DuplicateValuesError
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.dimension import Dimension, DimensionChoice
+from etl.collection.model.params import GroupViewsConfig
 from etl.collection.model.schema_types import (
-    GroupViewsConfig,
     ViewConfig,
     ViewConfigParam,
     ViewMetadata,
@@ -421,6 +421,8 @@ class Collection(MDIMBase):
             # support file references out of the box
             s = s.replace("dataset-schema.json#", "file://dataset-schema.json#")
             s = s.replace("definitions.json#", "file://definitions.json#")
+            # Same for $refs to the vendored grapher schema (any version), e.g. "grapher-schema.010.json#/..."
+            s = re.sub(r'"(grapher-schema\.[\w.]+\.json)#', r'"file://\1#', s)
 
             schema = json.loads(s)
 
@@ -431,13 +433,29 @@ class Collection(MDIMBase):
             with local_file.open() as f:
                 return json.load(f)
 
+        # https handler: resolve $refs to published OWID schemas (e.g. the grapher schema) from the
+        # vendored copies in SCHEMAS_DIR instead of fetching them over the network. This keeps
+        # validation offline and deterministic, and consistent with the generated
+        # etl/collection/model/schema_types.py (which is built from the same vendored copy).
+        def https_handler(uri):
+            local_file = SCHEMAS_DIR / Path(uri.split("://", 1)[1]).name
+            if not local_file.exists():
+                raise FileNotFoundError(
+                    f"Schema $ref {uri} has no vendored copy at {local_file}. "
+                    "Run `python scripts/generate_schema_types.py --refresh` to vendor it."
+                )
+            with local_file.open() as f:
+                return json.load(f)
+
         # Pass custom format for date validation
         # NOTE: we use fastjsonschema because schema uses multiple $ref to an external schema.
         #   python-jsonschema doesn't cache external resources and is extremely slow. It should be
         #   possible to speed it up by pre-loading schema and inserting it dynamically if
         #   fastjsonschema becomes hard to maintain.
         validator = fastjsonschema.compile(
-            schema, handlers={"file": file_handler}, formats={"date": r"^\d{4}-\d{2}-\d{2}$"}
+            schema,
+            handlers={"file": file_handler, "https": https_handler},
+            formats={"date": r"^\d{4}-\d{2}-\d{2}$"},
         )
 
         try:

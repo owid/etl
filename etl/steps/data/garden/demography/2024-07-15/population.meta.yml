@@ -257,3 +257,7 @@ dataset:
     Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on various sources.
 
     You can find more information on these sources and how our time series is constructed on this page: https://ourworldindata.org/population-sources
+  owners:
+    - Lucas Rodés-Guirao
+    - Fiona Spooner
+    - Pablo Rosado

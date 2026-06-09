@@ -1,5 +1,7 @@
 dataset:
   title: Calories lost by food group and region (WRI, 2013)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   calories_lost_by_food_group_and_region__wri__2013:
     variables:

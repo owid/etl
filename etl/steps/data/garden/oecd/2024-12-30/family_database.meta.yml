@@ -7,8 +7,7 @@ definitions:
     display:
       numDecimalPlaces: 1
 
-  description_producer_empl:  &description_producer_empl
-    Employment rates for women (15–64-year-olds) with at least one child aged 0-14,  with ‘children’ defined as any children aged 0-14 inclusivewho live in the same household as the woman and who are reported as the child of the woman (including both biological children and step or adoptive children). Women with children who do not live in the same household are generally not included, nor are women with children aged 15 and over regardless of whether or not the child lives in the same household and/or is dependent on the mother. Exceptions to this definition are Canada, Korea and the United States, were children aged 0-17 are included. For Australia and Japan, data cover all women aged 15 and over, and for Korea married women aged 15-54.
+  description_producer_empl: &description_producer_empl Employment rates for women (15–64-year-olds) with at least one child aged 0-14,  with ‘children’ defined as any children aged 0-14 inclusivewho live in the same household as the woman and who are reported as the child of the woman (including both biological children and step or adoptive children). Women with children who do not live in the same household are generally not included, nor are women with children aged 15 and over regardless of whether or not the child lives in the same household and/or is dependent on the mother. Exceptions to this definition are Canada, Korea and the United States, were children aged 0-17 are included. For Australia and Japan, data cover all women aged 15 and over, and for Korea married women aged 15-54.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -16,11 +15,13 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Veronika Samborska
 tables:
   family_database:
     variables:
       child_poverty_rate:
-        title:  Child poverty rate
+        title: Child poverty rate
         unit: "%"
         short_unit: "%"
         description_short: The percentage of children under 18 living in households with incomes below the poverty line.
@@ -33,8 +34,8 @@ tables:
         description_short: Number of divorces during a given year per 1,000 people.
         description_from_producer: The crude divorce rate is defined as the number of divorces during a given year per 1,000 people.
         display:
-            entityAnnotationsMap: |-
-              Ireland: Legalized divorce in 1996
+          entityAnnotationsMap: |-
+            Ireland: Legalized divorce in 1996
       marriage_rate:
         title: Crude marriage rate (marriages per 1,000 people)
         unit: "per 1,000 people"
@@ -125,17 +126,17 @@ tables:
         description_short: The percentage of births that occur outside of marriage.
 
       total_public_social_expenditure_on_families_as_a_pct_of_gdp:
-       title: Total public social expenditure on families as a % of GDP
-       unit: "%"
-       short_unit: "%"
-       description_short: Public spending on family benefits, measured as a percentage of GDP, covers cash transfers, childcare and family support services, and tax-based benefits, all designed to support families and children.
+        title: Total public social expenditure on families as a % of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Public spending on family benefits, measured as a percentage of GDP, covers cash transfers, childcare and family support services, and tax-based benefits, all designed to support families and children.
 
       public_social_expenditure_on_services_and_in_kind_benefits_for_families_as_a_pct_of_gdp:
         title: Public social expenditure on services and in-kind benefits for families as a % of GDP
         unit: "%"
         short_unit: "%"
         description_short: Includes funding for childcare, early education, youth assistance, residential facilities, and family services like center-based care and home help.
-        description_from_producer:  Includes the direct financing or subsidisation of childcare and early childhood education facilities, public childcare support through earmarked payments to parents, public spending on assistance for young people and residential facilities, and public spending on family services, including centre-based facilities and home help services for families in need.
+        description_from_producer: Includes the direct financing or subsidisation of childcare and early childhood education facilities, public childcare support through earmarked payments to parents, public spending on assistance for young people and residential facilities, and public spending on family services, including centre-based facilities and home help services for families in need.
         presentation:
           title_public: Services and in-kind benefits for families as a % of GDP
         display:

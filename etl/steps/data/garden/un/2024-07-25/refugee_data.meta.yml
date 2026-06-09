@@ -27,7 +27,7 @@ definitions:
   description_host_community: |-
     Host community refers to a community that hosts large populations of refugees or internally displaced persons, whether in camps, integrated into households, or independently. UNHCR reports on host communities in countries with substantive programmes focusing on sharing the burden of hosting large refugee populations, as set out in the Global Compact on Refugees.
   description_other_concern: |-
-   Other groups or persons of concern refers to individuals who do not necessarily fall directly into any of the other groups (refugees, asylum-seekers, stateless persons, internally displaced persons) but to whom UNHCR has extended its protection and/or assistance services, based on humanitarian or other special grounds.
+    Other groups or persons of concern refers to individuals who do not necessarily fall directly into any of the other groups (refugees, asylum-seekers, stateless persons, internally displaced persons) but to whom UNHCR has extended its protection and/or assistance services, based on humanitarian or other special grounds.
 
   description_return: |-
     Returned [refugees](#dod:refugee) are former refugees who have returned to their countries of origin, either spontaneously or in an organized fashion, but are yet to be fully integrated. Such returns would ideally take place only under conditions of safety and dignity. For the purpose of UNHCR's statistics, only refugees who returned during the calendar year are included, although in practice, operations may assist returnees for longer periods.
@@ -49,6 +49,8 @@ dataset:
   update_period_days: 180
 
 
+  owners:
+    - Tuna Acisu
 tables:
   refugee_data:
     variables:

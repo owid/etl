@@ -1,5 +1,7 @@
 dataset:
   title: Total merchandise trade as a share of GDP (OECD (2016)) (split)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   total_merchandise_trade_as_a_share_of_gdp__oecd__2016__split:
     variables:

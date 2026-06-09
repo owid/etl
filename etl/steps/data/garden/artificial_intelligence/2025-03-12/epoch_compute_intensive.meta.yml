@@ -14,6 +14,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Veronika Samborska
 tables:
   epoch_compute_intensive:
     variables:
@@ -32,13 +34,13 @@ tables:
         unit: ''
         description_short: Total number of learnable variables or weights that the model contains. Parameters are adjusted during the training process to optimize the model's performance.
         description_key:
-            - Parameters are internal variables that machine learning models adjust during their training process to improve their ability to make accurate predictions. They act as the model's "knobs" that are fine-tuned based on the provided data. In deep learning, a subset of artificial intelligence (AI), parameters primarily consist of the weights assigned to the connections between the small processing units called neurons. Picture a vast network of interconnected neurons where the strength of each connection represents a parameter.
+          - Parameters are internal variables that machine learning models adjust during their training process to improve their ability to make accurate predictions. They act as the model's "knobs" that are fine-tuned based on the provided data. In deep learning, a subset of artificial intelligence (AI), parameters primarily consist of the weights assigned to the connections between the small processing units called neurons. Picture a vast network of interconnected neurons where the strength of each connection represents a parameter.
 
-            - The total number of parameters in a model is influenced by various factors. The model's structure and the number of “layers” of neurons play a significant role. Generally, more complex models with additional layers tend to have a higher number of parameters. Special components of specific deep learning architectures can further contribute to the overall parameter count.
+          - The total number of parameters in a model is influenced by various factors. The model's structure and the number of “layers” of neurons play a significant role. Generally, more complex models with additional layers tend to have a higher number of parameters. Special components of specific deep learning architectures can further contribute to the overall parameter count.
 
-            - Understanding the number of parameters in a model is crucial to design effective models. More parameters can help the model understand complex data patterns, potentially leading to higher accuracy. However, there's a fine balance to strike. If a model has too many parameters, it risks memorizing the specific examples in its training data rather than learning their underlying patterns. Consequently, it may perform poorly when presented with new, unseen data. Achieving the right balance of parameters is a critical consideration in model development.
+          - Understanding the number of parameters in a model is crucial to design effective models. More parameters can help the model understand complex data patterns, potentially leading to higher accuracy. However, there's a fine balance to strike. If a model has too many parameters, it risks memorizing the specific examples in its training data rather than learning their underlying patterns. Consequently, it may perform poorly when presented with new, unseen data. Achieving the right balance of parameters is a critical consideration in model development.
 
-            - In recent times, the AI community has witnessed the emergence of what are often referred to as "giant models." These models boast an astounding number of parameters, reaching into the billions or even trillions. While these huge models have achieved remarkable performance, they have a significant computational cost. Effectively managing and training such large-scale models has become a prominent and active area of research and discussion within the AI field.
+          - In recent times, the AI community has witnessed the emergence of what are often referred to as "giant models." These models boast an astounding number of parameters, reaching into the billions or even trillions. While these huge models have achieved remarkable performance, they have a significant computational cost. Effectively managing and training such large-scale models has become a prominent and active area of research and discussion within the AI field.
 
         display:
           numDecimalPlaces: 0
@@ -66,10 +68,10 @@ tables:
             title: Training computation
 
       publication_date:
-          title: Publication date
-          unit: ''
-          description_short: The date when the AI model was first published.
-          description_from_producer:  The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
+        title: Publication date
+        unit: ''
+        description_short: The date when the AI model was first published.
+        description_from_producer: The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
 
 
 
