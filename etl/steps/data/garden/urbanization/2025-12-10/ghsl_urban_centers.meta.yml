@@ -414,7 +414,7 @@ tables:
           entityAnnotationsMap: *entityAnnotationsMapCapitals
           isProjection: true
         presentation:
-          title_public: Population density of the capital city
+          title_public: Projected population density of the capital city
           grapher_config:
             note: Where a country has multiple capital cities, the density shown is for the administrative capital.
 
@@ -448,7 +448,7 @@ tables:
           entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
         presentation:
-          title_public: Population of the top 100 most populous cities
+          title_public: Projected population of the top 100 most populous cities
 
       # -----------------------------------------------------------------------
       # TOP 100 CITIES — DENSITY
@@ -484,7 +484,7 @@ tables:
           entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
         presentation:
-          title_public: Population density of the top 100 most populous cities
+          title_public: Projected population density of the top 100 most populous cities
 
       # -----------------------------------------------------------------------
       # SHARE OF URBAN/TOTAL POPULATION IN CAPITAL CITY
@@ -525,7 +525,7 @@ tables:
           isProjection: true
           entityAnnotationsMap: *entityAnnotationsMapCapitals
         presentation:
-          title_public: Share of urban population living in the capital city
+          title_public: Projected share of urban population living in the capital city
 
       total_pop_share_capital_estimates:
         title: Share of total population living in the capital city
@@ -560,7 +560,7 @@ tables:
           isProjection: true
           entityAnnotationsMap: *entityAnnotationsMapCapitals
         presentation:
-          title_public: Share of total population living in the capital city
+          title_public: Projected share of total population living in the capital city
 
       # -----------------------------------------------------------------------
       # SHARE OF URBAN/TOTAL POPULATION IN LARGEST CITY
@@ -595,7 +595,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in the largest city
+          title_public: Projected share of urban population living in the largest city
 
       total_pop_share_largest_city_estimates:
         title: Share of total population living in the largest city
@@ -626,7 +626,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of total population living in the largest city
+          title_public: Projected share of total population living in the largest city
 
       # -----------------------------------------------------------------------
       # CITY SIZE — ABSOLUTE POPULATION
@@ -660,7 +660,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 50,000 to 300,000 people
+          title_public: Projected population living in cities with 50,000 to 300,000 people
 
       pop_citysize_50k_1m_estimates:
         title: Population living in cities with 50,000 to 1 million people
@@ -691,7 +691,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 50,000 to 1 million people
+          title_public: Projected population living in cities with 50,000 to 1 million people
 
       pop_citysize_1m_5m_estimates:
         title: Population living in cities with 1 to 5 million people
@@ -720,7 +720,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 1 to 5 million people
+          title_public: Projected population living in cities with 1 to 5 million people
 
       pop_citysize_5m_10m_estimates:
         title: Population living in cities with 5 to 10 million people
@@ -749,7 +749,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 5 to 10 million people
+          title_public: Projected population living in cities with 5 to 10 million people
 
       pop_citysize_above_10m_estimates:
         title: Population living in cities with more than 10 million people
@@ -778,7 +778,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with more than 10 million people
+          title_public: Projected population living in cities with more than 10 million people
 
       pop_citysize_above_1m_estimates:
         title: Population living in cities with 1 million or more people
@@ -807,7 +807,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 1 million or more people
+          title_public: Projected population living in cities with 1 million or more people
 
       # CITY SIZE — POPULATION SHARES
       # -----------------------------------------------------------------------
@@ -841,7 +841,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 50,000 to 300,000 people
+          title_public: Projected share of urban population living in cities with 50,000 to 300,000 people
 
       popshare_citysize_50k_1m_estimates:
         title: Share of urban population living in cities with 50,000 to 1 million people
@@ -873,7 +873,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 50,000 to 1 million people
+          title_public: Projected share of urban population living in cities with 50,000 to 1 million people
 
       popshare_citysize_1m_5m_estimates:
         title: Share of urban population living in cities with 1 to 5 million people
@@ -904,7 +904,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 1 to 5 million people
+          title_public: Projected share of urban population living in cities with 1 to 5 million people
 
       popshare_citysize_5m_10m_estimates:
         title: Share of urban population living in cities with 5 to 10 million people
@@ -935,7 +935,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 5 to 10 million people
+          title_public: Projected share of urban population living in cities with 5 to 10 million people
 
       popshare_citysize_above_10m_estimates:
         title: Share of urban population living in cities with more than 10 million people
@@ -966,7 +966,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with more than 10 million people
+          title_public: Projected share of urban population living in cities with more than 10 million people
 
       popshare_citysize_above_1m_estimates:
         title: Share of urban population living in cities with 1 million or more people
@@ -997,7 +997,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 1 million or more people
+          title_public: Projected share of urban population living in cities with 1 million or more people
 
       totalshare_citysize_above_1m_estimates:
         title: Share of total population living in cities with 1 million or more people
@@ -1032,7 +1032,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of total population living in cities with 1 million or more people
+          title_public: Projected share of total population living in cities with 1 million or more people
 
       # AGGREGATES — CITIES 300K+
       # -----------------------------------------------------------------------
@@ -1066,7 +1066,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 300,000 or more people
+          title_public: Projected population living in cities with 300,000 or more people
 
       popshare_citysize_above_300k_estimates:
         title: Share of population living in cities with 300,000 or more people
@@ -1099,7 +1099,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of population living in cities with 300,000 or more people
+          title_public: Projected share of population living in cities with 300,000 or more people
 
       popshare_citysize_above_300k_growth_estimates:
         title: Annual growth rate of the share of population in cities with 300,000 or more people
@@ -1132,7 +1132,7 @@ tables:
           numDecimalPlaces: 2
           isProjection: true
         presentation:
-          title_public: Annual growth rate of the share of population in cities with 300,000 or more people
+          title_public: Projected annual growth rate of the share of population in cities with 300,000 or more people
 
       pop_citysize_below_50k_estimates:
         title: Population living in towns and suburbs with fewer than 50,000 people
@@ -1168,7 +1168,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in urban clusters with fewer than 50,000 people
+          title_public: Projected population living in urban clusters with fewer than 50,000 people
 
       popshare_citysize_below_50k_estimates:
         title: Share of urban population living in towns and suburbs with fewer than 50,000 people
@@ -1206,4 +1206,4 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in towns and suburbs with fewer than 50,000 people
+          title_public: Projected share of urban population living in towns and suburbs with fewer than 50,000 people
