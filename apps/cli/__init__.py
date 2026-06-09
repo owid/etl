@@ -148,6 +148,7 @@ GROUPS = (
                 "compare": "etl.compare.cli",
                 "update": "apps.step_update.cli.cli",
                 "archive": "apps.step_update.cli.archive_cli",
+                "archive-dag": "apps.archive_dag.cli.cli",
                 "pr": "apps.pr.cli.cli",
                 "pr-clean": "apps.pr.cli.clean_cli",
             },
