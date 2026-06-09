@@ -145,6 +145,12 @@ LIMIT_NOFILE = 4096
     "--subset",
     help="Filter to speed up development - works as regex for both data processing and grapher upload.",
 )
+@click.option(
+    "--modified",
+    "-m",
+    is_flag=True,
+    help="Only run steps whose files changed vs origin/master (committed or not), plus their downstream steps. Combine with STEPS to further narrow by pattern. On the master branch there's nothing to diff against, so this runs all selected steps (i.e. a no-op filter).",
+)
 @click.argument(
     "steps",
     nargs=-1,
@@ -170,6 +176,7 @@ def main_cli(
     force_upload: bool = False,
     prefer_download: bool = False,
     subset: str | None = None,
+    modified: bool = False,
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
@@ -230,6 +237,21 @@ def main_cli(
     if subset:
         config.SUBSET = subset
 
+    # Restrict to steps modified vs origin/master (and their downstream steps).
+    if modified:
+        if _is_on_master_branch():
+            # On master there's nothing to diff against, so don't filter: run all selected steps.
+            # This lets staging-site-master do a full build with the same command as feature branches.
+            click.echo("On master branch: --modified runs all selected steps (no diff filter).")
+        else:
+            steps = _modified_steps(includes=steps, exact_match=exact_match)
+            if not steps:
+                click.echo("No steps modified relative to origin/master.")
+                return
+            click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
+            # We matched modified catalog paths as substrings, so disable exact matching downstream.
+            exact_match = False
+
     kwargs = dict(
         includes=steps,
         dry_run=dry_run,
@@ -279,6 +301,45 @@ def main_cli(
                 continue
             if watch:
                 print("--- Dataset rebuild complete", flush=True)
+
+
+def _is_on_master_branch() -> bool:
+    """Return True if the repo is currently on the master branch.
+
+    Used to decide whether `--modified` should filter (feature branch) or run everything (master,
+    where there's nothing to diff against).
+    """
+    import git
+
+    try:
+        return git.Repo(paths.BASE_DIR).active_branch.name == "master"
+    except TypeError:
+        # Detached HEAD (e.g. some CI checkouts) - treat as not-master so we still filter.
+        return False
+
+
+def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]:
+    """Return catalog paths of steps that changed vs origin/master, plus their downstream steps.
+
+    Reuses the same machinery as chart-diff (`get_changed_files` + `get_all_changed_catalog_paths`),
+    so the selection matches what chart-diff considers affected. If `includes` is non-empty, the
+    result is narrowed to changed paths that also match one of those patterns.
+    """
+    from etl.git_helpers import get_changed_files
+    from etl.io import get_all_changed_catalog_paths
+
+    # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
+    changed_paths = get_all_changed_catalog_paths(get_changed_files(include_diff=False))
+
+    # Narrow to those also matching the explicit STEPS arguments.
+    if includes:
+        if exact_match:
+            changed_paths = [p for p in changed_paths if p in set(includes)]
+        else:
+            patterns = [re.compile(p) for p in includes]
+            changed_paths = [p for p in changed_paths if any(pat.search(p) for pat in patterns)]
+
+    return changed_paths
 
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:
