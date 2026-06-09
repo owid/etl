@@ -11,8 +11,8 @@ meta:
     citation_full: 'Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org (multiple countries; June 2026). Luxembourg: LIS.'
     attribution_short: Luxembourg Income Study
     url_main: https://www.lisdatacenter.org/our-data/lis-database/
-    date_accessed: '2026-06-05'
-    date_published: '2026-06-05'
+    date_accessed: '2026-06-12'
+    date_published: '2026-06-12'
     license:
       name: LIS Privacy Policy
       url: https://www.lisdatacenter.org/about-lis/terms-of-use/
