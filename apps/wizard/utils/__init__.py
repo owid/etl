@@ -635,13 +635,12 @@ def _canon(x):
 
 
 def cache_all(f):
-    """A caching decorator that works for unhashable types (lists, dicts).
+    """A caching decorator that works for unhashable types (lists, dicts)."""
 
-    The canonical form of the arguments is only used as the cache key; `f` is
-    always called with the original arguments. (Calling `f` with the canonical
-    key instead turns e.g. a DataFrame into a tuple and breaks the function.)
-    """
-    store: dict = {}
+    @cache
+    def _cached(key):
+        args_c, kwargs_c = key
+        return f(*args_c, **dict(kwargs_c))
 
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -649,9 +648,7 @@ def cache_all(f):
             tuple(_canon(a) for a in args),
             tuple(sorted((k, _canon(v)) for k, v in kwargs.items())),
         )
-        if key not in store:
-            store[key] = f(*args, **kwargs)
-        return store[key]
+        return _cached(key)
 
     return wrapper
 
