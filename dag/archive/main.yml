@@ -796,3 +796,32 @@ include:
   - dag/archive/chartbook.yml
   - dag/archive/corruption.yml
   - dag/archive/geography.yml
+  # Child Mortality Estimates - UN IGME
+  data://garden/un/2025-03-25/igme:
+    - data://meadow/un/2025-03-25/igme:
+      - snapshot://un/2025-03-25/igme.zip
+    - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/un/2025-03-25/igme:
+    - data://garden/un/2025-03-25/igme
+
+  # Long-run child mortality, Gapminder + UN IGME
+  data://garden/un/2025-04-25/long_run_child_mortality:
+    - data://garden/un/2025-03-25/igme
+    # Gapminder - Under five mortality v7
+    - data://garden/gapminder/2023-09-18/under_five_mortality:
+      - data://meadow/gapminder/2023-09-18/under_five_mortality:
+        - snapshot://gapminder/2023-09-18/under_five_mortality.xlsx
+    # Gapminder - Under five mortality v11
+    - data://garden/gapminder/2023-09-21/under_five_mortality:
+      - data://meadow/gapminder/2023-09-21/under_five_mortality:
+        - snapshot://gapminder/2023-09-21/under_five_mortality.xlsx
+  data://grapher/un/2025-04-25/long_run_child_mortality:
+    - data://garden/un/2025-04-25/long_run_child_mortality
+
+  # Fertility rate, Gapminder
+  data://grapher/gapminder/2023-09-22/total_fertility_rate:
+    - data://garden/gapminder/2023-09-22/total_fertility_rate:
+      - data://meadow/gapminder/2023-09-22/total_fertility_rate:
+        - snapshot://gapminder/2023-09-22/total_fertility_rate.xlsx
