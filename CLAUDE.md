@@ -7,7 +7,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`)
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
-- **Only edit live steps** — when fixing or improving metadata, code, or configs, only touch files that are in the active DAG (`dag/*.yml`), not archived ones (`dag/archive/*.yml`), unless explicitly asked to
+- **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
 - **Never push/commit** unless explicitly told to
 - **Ask the user** if unsure - don't guess
 - **Always run `make check` before committing**
