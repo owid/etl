@@ -278,9 +278,14 @@ steps:
 
   # Long-run child mortality, Gapminder + UN IGME
   data://garden/un/2026-06-09/long_run_child_mortality:
-    - data://garden/gapminder/2023-09-18/under_five_mortality
-    - data://garden/gapminder/2023-09-21/under_five_mortality
-    - data://garden/un/2026-06-09/igme
+  - data://garden/gapminder/2023-09-18/under_five_mortality:
+    - data://meadow/gapminder/2023-09-18/under_five_mortality:
+        - snapshot://gapminder/2023-09-18/under_five_mortality.xlsx
+    #  Gapminder  - Under five mortality v11
+  - data://garden/gapminder/2023-09-21/under_five_mortality:
+    - data://meadow/gapminder/2023-09-21/under_five_mortality:
+        - snapshot://gapminder/2023-09-21/under_five_mortality.xlsx
+  - data://garden/un/2026-06-09/igme
   data://grapher/un/2026-06-09/long_run_child_mortality:
     - data://garden/un/2026-06-09/long_run_child_mortality
 
