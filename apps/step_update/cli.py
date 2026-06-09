@@ -40,7 +40,7 @@ class StepUpdater:
         # It can be used when initializing StepUpdater, but also to reload steps_df after making changes to the dag.
 
         # Initialize version tracker.
-        self.tracker = VersionTracker(ignore_archive=True)
+        self.tracker = VersionTracker()
 
         # Update the temporary dag.
         _update_temporary_dag(dag_active=self.tracker.dag_active, dag_all_reverse=self.tracker.dag_all_reverse)
