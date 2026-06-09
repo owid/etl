@@ -1,22 +1,40 @@
 steps:
   # NASA Ozone Watch
+  # archived; last active in bc44532579ec on 2024-06-06
   data://meadow/nasa/2023-03-06/ozone_hole_area:
     - snapshot://nasa/2023-03-06/ozone_hole_area_p2.txt
     - snapshot://nasa/2023-03-06/ozone_hole_area_p1.txt
+  # archived; last active in bc44532579ec on 2024-06-06
   data://garden/nasa/2023-03-06/ozone_hole_area:
     - data://meadow/nasa/2023-03-06/ozone_hole_area
+  # archived; last active in bc44532579ec on 2024-06-06
   data://grapher/nasa/2023-03-06/ozone_hole_area:
     - data://garden/nasa/2023-03-06/ozone_hole_area
+  # archived; last active in 04dad0f2d087 on 2025-04-14
   data://meadow/nasa/2024-05-31/ozone_hole_area:
     - snapshot://nasa/2024-05-31/ozone_hole_area_p2.txt
     - snapshot://nasa/2024-05-31/ozone_hole_area_p1.txt
+  # archived; last active in 04dad0f2d087 on 2025-04-14
   data://garden/nasa/2024-05-31/ozone_hole_area:
     - data://meadow/nasa/2024-05-31/ozone_hole_area
+  # archived; last active in 04dad0f2d087 on 2025-04-14
   data://grapher/nasa/2024-05-31/ozone_hole_area:
     - data://garden/nasa/2024-05-31/ozone_hole_area
 
   # Living planet
+  # archived; last active in 48cfbd427db3 on 2024-12-23
   data://meadow/living_planet/2020-09-10/lpd:
     - walden://living_planet/2020-09-10/lpd
+  # archived; last active in 48cfbd427db3 on 2024-12-23
   data://garden/living_planet/2020-09-10/lpd:
     - data://meadow/living_planet/2020-09-10/lpd
+  # archived; last active in 4f7130444e87 on 2026-03-02
+  data://meadow/nasa/2025-04-14/ozone_hole_area:
+    - snapshot://nasa/2025-04-14/ozone_hole_area_p2.txt
+    - snapshot://nasa/2025-04-14/ozone_hole_area_p1.txt
+  # archived; last active in 4f7130444e87 on 2026-03-02
+  data://garden/nasa/2025-04-14/ozone_hole_area:
+    - data://meadow/nasa/2025-04-14/ozone_hole_area
+  # archived; last active in 4f7130444e87 on 2026-03-02
+  data://grapher/nasa/2025-04-14/ozone_hole_area:
+    - data://garden/nasa/2025-04-14/ozone_hole_area

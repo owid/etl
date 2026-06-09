@@ -2,19 +2,23 @@ steps:
   #
   # Long-term wheat yields in Europe.
   #
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://garden/agriculture/2023-06-12/long_term_wheat_yields:
     - data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984
     - data://garden/faostat/2023-06-12/faostat_qcl
   #
   # Long-term corn yields in United States.
   #
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://meadow/usda_nass/2023-04-20/us_corn_yields:
     - snapshot://usda_nass/2023-04-20/us_corn_yields.csv
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://garden/usda_nass/2023-04-20/us_corn_yields:
     - data://meadow/usda_nass/2023-04-20/us_corn_yields
   #
   # Long-term yields in the United Kingdom.
   #
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://garden/agriculture/2023-06-12/uk_long_term_yields:
     - data://garden/papers/2023-04-21/broadberry_et_al_2015
     - data://garden/papers/2023-04-21/brassley_2000
@@ -22,46 +26,58 @@ steps:
   #
   # Food expenditure in US - USDA
   #
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive:
     - snapshot://usda_ers/2023-06-07/food_expenditure_in_us_archive.xlsx
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://meadow/usda_ers/2023-06-07/food_expenditure_in_us:
     - snapshot://usda_ers/2023-06-07/food_expenditure_in_us.xlsx
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://garden/usda_ers/2023-06-07/food_expenditure_in_us:
     - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive
     - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://grapher/usda_ers/2023-06-07/food_expenditure_in_us:
     - data://garden/usda_ers/2023-06-07/food_expenditure_in_us
   #
   # Long-run crop yields.
   #
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://garden/agriculture/2023-06-12/long_term_crop_yields:
     - data://garden/faostat/2023-06-12/faostat_qcl
     - data://garden/agriculture/2023-06-12/uk_long_term_yields
     - data://garden/usda_nass/2023-04-20/us_corn_yields
     - data://garden/agriculture/2023-06-12/long_term_wheat_yields
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://grapher/agriculture/2023-06-12/long_term_crop_yields:
     - data://garden/agriculture/2023-06-12/long_term_crop_yields
   #
   # Attainable yields.
   #
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://garden/agriculture/2023-06-12/attainable_yields:
     - data://garden/papers/2023-05-26/mueller_et_al_2012
     - data://garden/agriculture/2023-06-12/long_term_crop_yields
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://grapher/agriculture/2023-06-12/attainable_yields:
     - data://garden/agriculture/2023-06-12/attainable_yields
   #
   # Food prices for nutrition - World Bank based on FAO.
   #
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://meadow/wb/2023-07-24/food_prices_for_nutrition:
     - snapshot://wb/2023-07-24/food_prices_for_nutrition.csv
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://garden/wb/2023-07-24/food_prices_for_nutrition:
     - data://meadow/wb/2023-07-24/food_prices_for_nutrition
+  # archived; last active in 78112106fbc4 on 2024-03-29
   data://grapher/wb/2023-07-24/food_prices_for_nutrition:
     - data://garden/wb/2023-07-24/food_prices_for_nutrition
 
   #
   # Agriculture - Long-run daily calorie supply per person.
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://garden/agriculture/2024-05-23/daily_calories_per_person:
     - data://meadow/agriculture/2024-05-23/floud_et_al_2011
     - data://garden/faostat/2024-03-14/faostat_fbsc
@@ -75,21 +91,25 @@ steps:
   #
   # Long-term wheat yields in Europe.
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://garden/agriculture/2024-03-26/long_term_wheat_yields:
     - data://garden/faostat/2024-03-14/faostat_qcl
     - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
   #
   # Long-term yields in the United Kingdom.
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://garden/agriculture/2024-03-26/uk_long_term_yields:
     - data://garden/faostat/2024-03-14/faostat_qcl
     - data://garden/papers/2024-03-26/brassley_2000
     - data://garden/papers/2024-03-26/broadberry_et_al_2015
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://grapher/agriculture/2024-05-23/daily_calories_per_person:
     - data://garden/agriculture/2024-05-23/daily_calories_per_person
   #
   # Long-term crop yields.
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://garden/agriculture/2024-03-26/long_term_crop_yields:
     - data://garden/faostat/2024-03-14/faostat_qcl
     - data://garden/agriculture/2024-03-26/long_term_wheat_yields
@@ -98,74 +118,94 @@ steps:
   #
   # Attainable yields.
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://garden/agriculture/2024-03-26/attainable_yields:
     - data://garden/papers/2024-03-26/mueller_et_al_2012
     - data://garden/agriculture/2024-03-26/long_term_crop_yields
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://grapher/agriculture/2024-03-26/long_term_crop_yields:
     - data://garden/agriculture/2024-03-26/long_term_crop_yields
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://grapher/agriculture/2024-03-26/attainable_yields:
     - data://garden/agriculture/2024-03-26/attainable_yields
   #
   # Long-term corn yields in United States.
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://meadow/usda_nass/2024-03-26/us_corn_yields:
     - snapshot://usda_nass/2024-03-26/us_corn_yields.csv
   #
   # USDA/ERS - Food availability.
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://meadow/usda_ers/2024-05-23/food_availability:
     - snapshot://usda_ers/2024-05-23/food_availability.xls
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://garden/usda_nass/2024-03-26/us_corn_yields:
     - data://meadow/usda_nass/2024-03-26/us_corn_yields
   #
   # Food expenditure in US - USDA
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://meadow/usda_ers/2024-03-26/food_expenditure_in_us_archive:
     - snapshot://usda_ers/2024-03-26/food_expenditure_in_us_archive.xlsx
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://meadow/usda_ers/2024-03-26/food_expenditure_in_us:
     - snapshot://usda_ers/2024-03-26/food_expenditure_in_us.xlsx
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://garden/usda_ers/2024-03-26/food_expenditure_in_us:
     - data://meadow/usda_ers/2024-03-26/food_expenditure_in_us_archive
     - data://meadow/usda_ers/2024-03-26/food_expenditure_in_us
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://grapher/usda_ers/2024-03-26/food_expenditure_in_us:
     - data://garden/usda_ers/2024-03-26/food_expenditure_in_us
   #
   # Food expenditure - USDA
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://meadow/usda_ers/2024-03-26/food_expenditure:
     - snapshot://usda_ers/2024-03-26/food_expenditure_since_2018.xlsx
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://garden/usda_ers/2024-03-26/food_expenditure:
     - data://meadow/usda_ers/2024-03-26/food_expenditure
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://grapher/usda_ers/2024-03-26/food_expenditure:
     - data://garden/usda_ers/2024-03-26/food_expenditure
   #
   # Food prices for nutrition - World Bank based on FAO.
   #
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://meadow/wb/2024-03-26/food_prices_for_nutrition:
     - snapshot://wb/2024-03-26/food_prices_for_nutrition.csv
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://garden/wb/2024-03-26/food_prices_for_nutrition:
     - data://meadow/wb/2024-03-26/food_prices_for_nutrition
+  # archived; last active in 2679e231cf3c on 2025-03-31
   data://grapher/wb/2024-03-26/food_prices_for_nutrition:
     - data://garden/wb/2024-03-26/food_prices_for_nutrition
   #
   # Food prices for nutrition - World Bank based on FAO.
   #
+  # archived; last active in b5a4efa7209d on 2025-10-13
   data://meadow/wb/2024-09-09/food_prices_for_nutrition:
     - snapshot://wb/2024-09-09/food_prices_for_nutrition.csv
   #
   # Food prices for nutrition - World Bank based on FAO.
   #
+  # archived; last active in b5a4efa7209d on 2025-10-13
   data://garden/wb/2024-09-09/food_prices_for_nutrition:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://meadow/wb/2024-09-09/food_prices_for_nutrition
   #
   # Food prices for nutrition - World Bank based on FAO.
   #
+  # archived; last active in b5a4efa7209d on 2025-10-13
   data://grapher/wb/2024-09-09/food_prices_for_nutrition:
     - data://garden/wb/2024-09-09/food_prices_for_nutrition
   #
   # Agriculture - Long-run daily calorie supply per person.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://garden/agriculture/2025-03-26/daily_calories_per_person:
     - data://meadow/usda_ers/2025-03-26/food_availability
     - data://meadow/agriculture/2024-05-23/fao_2000
@@ -179,11 +219,13 @@ steps:
   #
   # Agriculture - Long-run daily calorie supply per person.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://grapher/agriculture/2025-03-26/daily_calories_per_person:
     - data://garden/agriculture/2025-03-26/daily_calories_per_person
   #
   # Long-term yields in the United Kingdom.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://garden/agriculture/2025-03-26/uk_long_term_yields:
     - data://garden/papers/2024-03-26/brassley_2000
     - data://garden/faostat/2025-03-17/faostat_qcl
@@ -191,6 +233,7 @@ steps:
   #
   # Long-term crop yields.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://garden/agriculture/2025-03-26/long_term_crop_yields:
     - data://garden/agriculture/2025-03-26/long_term_wheat_yields
     - data://garden/faostat/2025-03-17/faostat_qcl
@@ -199,55 +242,65 @@ steps:
   #
   # Attainable yields.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://garden/agriculture/2025-03-26/attainable_yields:
     - data://garden/papers/2024-03-26/mueller_et_al_2012
     - data://garden/agriculture/2025-03-26/long_term_crop_yields
   #
   # Long-term crop yields.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://grapher/agriculture/2025-03-26/long_term_crop_yields:
     - data://garden/agriculture/2025-03-26/long_term_crop_yields
   #
   # Attainable yields.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://grapher/agriculture/2025-03-26/attainable_yields:
     - data://garden/agriculture/2025-03-26/attainable_yields
   #
   # Food expenditure in US archive (2018) - USDA
   # NOTE: Not updateable.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://meadow/usda_ers/2025-03-26/food_expenditure_in_us:
     - snapshot://usda_ers/2025-03-26/food_expenditure_in_us.xlsx
   #
   # Food expenditure in US - USDA
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://garden/usda_ers/2025-03-26/food_expenditure_in_us:
     - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us
     - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive
   #
   # Food expenditure in US - USDA
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://grapher/usda_ers/2025-03-26/food_expenditure_in_us:
     - data://garden/usda_ers/2025-03-26/food_expenditure_in_us
   #
   # Long-term corn yields in United States.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://garden/usda_nass/2025-03-26/us_corn_yields:
     - data://meadow/usda_nass/2025-03-26/us_corn_yields
   #
   # Long-term corn yields in United States.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://meadow/usda_nass/2025-03-26/us_corn_yields:
     - snapshot://usda_nass/2025-03-26/us_corn_yields.csv
   #
   # Long-term wheat yields in Europe.
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://garden/agriculture/2025-03-26/long_term_wheat_yields:
     - data://garden/faostat/2025-03-17/faostat_qcl
     - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
   #
   # Long-term food and agriculture trends
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_rl
@@ -255,22 +308,26 @@ steps:
   #
   # Long-term food and agriculture trends
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://grapher/agriculture/2025-07-30/long_term_food_and_agriculture_trends:
     - data://garden/agriculture/2025-07-30/long_term_food_and_agriculture_trends
   #
   # USDA/FAS - Corn yields
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://meadow/agriculture/2025-10-16/corn_yields:
     - snapshot://agriculture/2025-10-16/corn_yields.xls
   #
   # USDA/FAS - Corn yields
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://garden/agriculture/2025-10-16/corn_yields:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/agriculture/2025-10-16/corn_yields
   #
   # USDA/FAS - Corn yields
   #
+  # archived; last active in 3d504b0937a7 on 2026-03-02
   data://grapher/agriculture/2025-10-16/corn_yields:
     - data://garden/agriculture/2025-10-16/corn_yields
   #
@@ -288,10 +345,77 @@ steps:
   #
   # Decoupling of agricultural production and land use
   #
+  # archived; last active in f663e6246a5e on 2026-05-07
   data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
     - data://garden/faostat/2025-03-17/faostat_rl
     - data://garden/faostat/2025-03-17/faostat_fbsc
+  # archived; last active in f663e6246a5e on 2026-05-07
   data://grapher/agriculture/2025-08-06/decoupling_food_production_and_land_use:
     - data://garden/agriculture/2025-08-06/decoupling_food_production_and_land_use
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://garden/agriculture/2023-04-20/long_term_wheat_yields:
+    - data://garden/faostat/2023-02-22/faostat_qcl
+    - data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://grapher/agriculture/2023-04-20/long_term_wheat_yields:
+    - data://garden/agriculture/2023-04-20/long_term_wheat_yields
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://grapher/usda_nass/2023-04-20/us_corn_yields:
+    - data://garden/usda_nass/2023-04-20/us_corn_yields
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://garden/agriculture/2023-04-21/uk_long_term_yields:
+    - data://garden/faostat/2023-02-22/faostat_qcl
+    - data://garden/papers/2023-04-21/brassley_2000
+    - data://garden/papers/2023-04-21/broadberry_et_al_2015
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://grapher/agriculture/2023-04-21/uk_long_term_yields:
+    - data://garden/agriculture/2023-04-21/uk_long_term_yields
+  # archived; last active in f44f8d026568 on 2023-06-09
+  data://garden/agriculture/2023-05-26/attainable_yields:
+    - data://garden/faostat/2023-02-22/faostat_qcl
+    - data://garden/papers/2023-05-26/mueller_et_al_2012
+  # archived; last active in f44f8d026568 on 2023-06-09
+  data://grapher/agriculture/2023-05-26/attainable_yields:
+    - data://garden/agriculture/2023-05-26/attainable_yields
+  # archived; last active in f44f8d026568 on 2023-06-09
+  data://explorers/agriculture/2023-05-26/crop_yields:
+    - data://grapher/agriculture/2023-05-26/attainable_yields
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://garden/agriculture/2023-05-30/long_term_crop_yields:
+    - data://garden/faostat/2023-02-22/faostat_qcl
+    - data://garden/agriculture/2023-04-20/long_term_wheat_yields
+    - data://garden/agriculture/2023-04-21/uk_long_term_yields
+    - data://garden/usda_nass/2023-04-20/us_corn_yields
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://grapher/agriculture/2023-05-30/long_term_crop_yields:
+    - data://garden/agriculture/2023-05-30/long_term_crop_yields
+  # archived; last active in 78112106fbc4 on 2024-03-29
+  data://meadow/usda_ers/2023-06-07/food_expenditure:
+    - snapshot://usda_ers/2023-06-07/food_expenditure.xlsx
+  # archived; last active in 78112106fbc4 on 2024-03-29
+  data://garden/usda_ers/2023-06-07/food_expenditure:
+    - data://meadow/usda_ers/2023-06-07/food_expenditure
+  # archived; last active in 78112106fbc4 on 2024-03-29
+  data://grapher/usda_ers/2023-06-07/food_expenditure:
+    - data://garden/usda_ers/2023-06-07/food_expenditure
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://garden/agriculture/2023-05-30/attainable_yields:
+    - data://garden/agriculture/2023-05-30/long_term_crop_yields
+    - data://garden/papers/2023-05-26/mueller_et_al_2012
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://grapher/agriculture/2023-05-30/attainable_yields:
+    - data://garden/agriculture/2023-05-30/attainable_yields
+  # archived; last active in 70c1d0e893a6 on 2023-06-13
+  data://explorers/agriculture/2023-05-30/crop_yields:
+    - data://grapher/agriculture/2023-05-30/attainable_yields
+  # archived; last active in 78112106fbc4 on 2024-03-29
+  data://explorers/agriculture/2023-06-12/crop_yields:
+    - data://garden/agriculture/2023-06-12/attainable_yields
+  # archived; last active in fd15e0b34dc9 on 2025-04-03
+  data://explorers/agriculture/latest/crop_yields:
+    - data://garden/agriculture/2025-03-26/attainable_yields
+  # archived; last active in 1b61025df55a on 2026-05-16
+  export://explorers/agriculture/latest/food_prices:
+    - data://grapher/wb/2025-08-04/food_prices_for_nutrition

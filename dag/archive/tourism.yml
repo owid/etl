@@ -1,0 +1,62 @@
+steps:
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://meadow/tourism/2024-08-17/unwto:
+    - snapshot://tourism/2024-08-17/unwto.xlsx
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://garden/tourism/2024-08-17/unwto:
+    - data://garden/bls/2025-04-12/us_consumer_prices
+    - data://garden/oecd/2024-08-19/ppp_exchange_rates
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://meadow/tourism/2024-08-17/unwto
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://grapher/tourism/2024-08-17/unwto:
+    - data://garden/tourism/2024-08-17/unwto
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://meadow/oecd/2024-08-19/ppp_exchange_rates:
+    - snapshot://oecd/2024-08-19/ppp_exchange_rates.csv
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://garden/oecd/2024-08-19/ppp_exchange_rates:
+    - data://meadow/oecd/2024-08-19/ppp_exchange_rates
+  # archived; last active in 2e03261f257b on 2024-12-30
+  data://meadow/oecd/2024-08-21/co2_air_transport:
+    - snapshot://oecd/2024-08-21/co2_air_transport.csv
+  # archived; last active in 2e03261f257b on 2024-12-30
+  data://garden/oecd/2024-08-21/co2_air_transport:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/tourism/2024-08-17/unwto
+    - data://meadow/oecd/2024-08-21/co2_air_transport
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in 2e03261f257b on 2024-12-30
+  data://grapher/oecd/2024-08-21/co2_air_transport:
+    - data://garden/oecd/2024-08-21/co2_air_transport
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://meadow/tourism/2024-08-17/unwto_environment:
+    - snapshot://tourism/2024-08-17/unwto_environment.xlsx
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://garden/tourism/2024-08-17/unwto_environment:
+    - data://meadow/tourism/2024-08-17/unwto_environment
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://grapher/tourism/2024-08-17/unwto_environment:
+    - data://garden/tourism/2024-08-17/unwto_environment
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://meadow/tourism/2024-08-17/unwto_gdp:
+    - snapshot://tourism/2024-08-17/unwto_gdp.xlsx
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://garden/tourism/2024-08-17/unwto_gdp:
+    - data://meadow/tourism/2024-08-17/unwto_gdp
+  # archived; last active in 3b319917ec6a on 2026-02-05
+  data://grapher/tourism/2024-08-17/unwto_gdp:
+    - data://garden/tourism/2024-08-17/unwto_gdp
+  # archived; last active in c4f9478ae06d on 2025-03-18
+  data://meadow/oecd/2024-12-30/co2_air_transport:
+    - snapshot://oecd/2024-12-30/co2_air_transport.csv
+  # archived; last active in c4f9478ae06d on 2025-03-18
+  data://garden/oecd/2024-12-30/co2_air_transport:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/oecd/2024-12-30/co2_air_transport
+    - data://garden/tourism/2024-08-17/unwto
+  # archived; last active in c4f9478ae06d on 2025-03-18
+  data://grapher/oecd/2024-12-30/co2_air_transport:
+    - data://garden/oecd/2024-12-30/co2_air_transport

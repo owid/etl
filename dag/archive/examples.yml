@@ -1,0 +1,18 @@
+steps:
+  # archived; last active in d13769e2ce35 on 2025-03-21
+  data://examples/examples/latest/script_example:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - walden://wb/2021-07-01/wb_income
+  # archived; last active in d13769e2ce35 on 2025-03-21
+  data://examples/examples/latest/jupytext_example:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  # archived; last active in d13769e2ce35 on 2025-03-21
+  data://examples/examples/latest/notebook_example:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  # archived; last active in d13769e2ce35 on 2025-03-21
+  data://examples/examples/latest/vs_code_cells_example:
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+  # archived; last active in d13769e2ce35 on 2025-03-21
+  data-private://examples/examples/latest/private_example:
+    - walden-private://ggdc/2020-10-01/ggdc_maddison

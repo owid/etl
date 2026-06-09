@@ -131,6 +131,11 @@ class _BlobReader:
             stdout=subprocess.PIPE,
         )
         self._cache: dict[str, str | None] = {}
+        # Parsed results keyed by blob sha. A DAG file changes rarely, so the same
+        # blob recurs across thousands of commits — parsing it once collapses ~80k
+        # yaml.safe_load calls to a few thousand.
+        self._parsed: dict[str, dict[str, set[str]]] = {}
+        self._includes: dict[str, list[str]] = {}
 
     def read(self, blob_sha: str) -> str | None:
         if blob_sha in self._cache:
@@ -155,6 +160,24 @@ class _BlobReader:
         text = buf.decode("utf-8", "replace")
         self._cache[blob_sha] = text
         return text
+
+    def parse_steps(self, blob_sha: str) -> dict[str, set[str]]:
+        """Return the parsed ``{step: {deps}}`` for a DAG-file blob (cached by sha)."""
+        if blob_sha not in self._parsed:
+            text = self.read(blob_sha)
+            self._parsed[blob_sha] = _parse_file_steps(text) if text else {}
+        return self._parsed[blob_sha]
+
+    def includes(self, blob_sha: str) -> list[str]:
+        """Return the ``include:`` list of a DAG-file blob (cached by sha)."""
+        if blob_sha not in self._includes:
+            text = self.read(blob_sha)
+            try:
+                inc = (yaml.safe_load(text) or {}).get("include") or [] if text else []
+            except yaml.YAMLError:
+                inc = []
+            self._includes[blob_sha] = inc
+        return self._includes[blob_sha]
 
     def close(self) -> None:
         if self._proc.stdin is not None:
@@ -220,16 +243,9 @@ def _active_dag_at(sha: str, blobs: dict[str, str], reader: _BlobReader) -> dict
     main_blob = blobs.get("dag/main.yml")
     if not main_blob:
         return {}
-    main_text = reader.read(main_blob)
-    if not main_text:
-        return {}
 
     files = ["dag/main.yml"]
-    try:
-        includes = (yaml.safe_load(main_text) or {}).get("include") or []
-    except yaml.YAMLError:
-        includes = []
-    for f in includes:
+    for f in reader.includes(main_blob):
         if isinstance(f, str) and not any(f.startswith(skip) or f == skip for skip in SKIP_INCLUDES):
             files.append(f)
 
@@ -238,10 +254,7 @@ def _active_dag_at(sha: str, blobs: dict[str, str], reader: _BlobReader) -> dict
         blob = blobs.get(f)
         if not blob:
             continue
-        text = main_text if f == "dag/main.yml" else reader.read(blob)
-        if not text:
-            continue
-        for step, deps in _parse_file_steps(text).items():
+        for step, deps in reader.parse_steps(blob).items():
             if step in merged:
                 merged[step][0].update(deps)
             else:
@@ -283,13 +296,17 @@ def _archive_files() -> list[Path]:
 
 
 def _current_archive_keys_by_file() -> dict[Path, set[str]]:
-    """Map each archive DAG file to the set of step keys it declares (no include-following)."""
+    """Map each archive DAG file to the set of step keys it declares (no include-following).
+
+    Note ``dag/archive/main.yml`` both aggregates the other files via ``include:``
+    *and* declares its own steps, so it must be read like any other archive file —
+    otherwise its steps look unarchived and get re-appended as cross-file duplicates.
+    """
     result = {}
     for f in _archive_files():
-        if f == paths.DAG_ARCHIVE_FILE:
-            # main.yml is just an aggregator of includes; it declares no steps of its own.
-            continue
-        result[f] = set(load_single_dag_file(f))
+        keys = set(load_single_dag_file(f))
+        if keys:
+            result[f] = keys
     return result
 
 
