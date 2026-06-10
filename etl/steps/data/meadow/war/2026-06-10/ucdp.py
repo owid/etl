@@ -17,13 +17,17 @@ def run() -> None:
     short_names = {
         "one_sided": {
             "index": ["conflict_id", "dyad_id", "year"],
-            "filename": "OneSided_v25_1.csv",
+            "filename": "OneSided_v26_1.csv",
         },
         "non_state": {
             "index": ["conflict_id", "dyad_id", "year"],
         },
         "battle_related_conflict": {
             "index": ["conflict_id", "year"],
+            # dyad_id, side_a_id, side_b_id are string ID columns that may contain
+            # comma-separated lists (e.g. "411, 412"), so cast to string dtype explicitly
+            # to avoid mixed-type object columns that break feather serialization.
+            "dtype": {"dyad_id": "string", "side_a_id": "string", "side_b_id": "string"},
         },
         "battle_related_dyadic": {
             "index": ["conflict_id", "dyad_id", "year"],
