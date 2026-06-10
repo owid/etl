@@ -75,7 +75,8 @@ REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 LAST_YEAR = 2025
 
 # Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 1214
+# 26.1 update: observed 1296 (was 1214 in 25.1; +82 due to new/revised 2024-2025 events)
+NUM_MISSING_LOCATIONS = 1296
 
 
 def run() -> None:
