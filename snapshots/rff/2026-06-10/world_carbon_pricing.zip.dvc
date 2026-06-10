@@ -7,6 +7,8 @@ meta:
 
       It covers national and sub-national economic mechanisms relating to carbon emissions, and was developed from several key sources: Most notably, policy documents from countries and regions themselves. Secondly, from other sources such as the International Carbon Action Partnership.
     citation_full: |-
+      World Carbon Pricing Database (2026), World Carbon Pricing Dashboard.
+
       Dolphin, G., Merkle, M. Emissions-weighted carbon price: sources and methods. Sci Data 11, 1017 (2024). [https://doi.org/10.1038/s41597-024-03121-6](https://doi.org/10.1038/s41597-024-03121-6).
 
       Dolphin, G., Xiahou, Q. World carbon pricing database: sources and methods. Sci Data 9, 573 (2022). The article is available in Open Access at [https://doi.org/10.1038/s41597-022-01659-x](https://doi.org/10.1038/s41597-022-01659-x).
@@ -14,12 +16,12 @@ meta:
       Supported by Resources for the Future.
     attribution: Dolphin and Merkle (2024)
     attribution_short: RFF
-    url_main: https://worldcarbonpricing.org/developers
+    url_main: https://worldcarbonpricing.org/
     url_download: https://wcpd-dashboard.onrender.com/api/downloads/wcpd
     date_accessed: '2026-06-10'
     date_published: '2026-06-07'
     license:
-      name: CC BY-NC-SA 4.0
+      name: CC BY-NC-SA 4.0 (with additional restrictions on redistribution)
       url: https://worldcarbonpricing.org/licensing
 outs:
   - md5: 6a235fb747737f2aeee0f62b3fd456b6
