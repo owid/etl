@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: Uppsala Conflict Data Program
+    title: Battle-Related Deaths
+    description: |-
+      This file contains a dyad-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2025 that appear in the UCDP/PRIO Armed Conflict Dataset.
+
+      You can find more notes at https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-261.pdf
+    title_snapshot: Battle-Related Deaths (Dyadic version)
+    citation_full: |-
+      Davies, S., Pettersson, T., & Öberg, M. (2026). Organized violence 1989–2025, and violent political protests. Journal of Peace Research. https://doi.org/10.1093/jopres/xjag046
+    attribution_short: UCDP
+    version_producer: version 26.1
+    url_main: https://ucdp.uu.se/downloads/index.html#battlerelated
+    url_download: https://ucdp.uu.se/downloads/brd/ucdp-brd-dyadic-261-csv.zip
+    date_accessed: '2026-06-10'
+    date_published: '2026'
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
