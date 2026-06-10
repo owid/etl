@@ -30,6 +30,7 @@ from utils import (
     COUNTRIES_FORMER_EQUIVALENTS,
     GAP_HI,
     GAP_LO,
+    OPTIONAL_SUCCESSORS,
     SOURCES_NAMES,
     YEAR_END_FT,
     YEAR_END_WPP,
@@ -571,28 +572,38 @@ def add_world(tb: Table) -> Table:
 
 ## Add historical regions
 def add_historical_regions(tb: Table, tb_regions: Table) -> Table:
-    """Add historical regions by grouping and summing current countries.
+    """Add historical regions by summing the population of their present-day successor countries.
 
     NOTE: Unlike the 2024-07-15 step, historical regions are no longer sourced from Gapminder
-    Systema Globalis — only successor-aggregation (currently USSR) remains. This is added after
-    regions and world aggregates have been obtained, to avoid double counting.
+    Systema Globalis — they are rebuilt purely by successor-aggregation (USSR, Czechoslovakia,
+    Yugoslavia, Ethiopia (former); see COUNTRIES_FORMER_EQUIVALENTS). Only states whose territory is
+    the union of whole present-day countries can be reconstructed this way; East/West Germany and the
+    two Yemens cannot and are intentionally absent. This runs after region and world aggregates have
+    been obtained, so these entities never enter those sums (avoids double counting).
+
+    A successor listed in OPTIONAL_SUCCESSORS is summed when it has data but is not required every
+    year (e.g. Kosovo, which only has data from 1950 and is otherwise subsumed in Federico-Tena's
+    Serbia). Years are kept iff every *required* (non-optional) successor has data.
     """
-    # Add historical regions by grouping and summing current countries.
     for code in COUNTRIES_FORMER_EQUIVALENTS:
         # Get former country name and end year (dissolution)
         former_country_name = tb_regions.loc[code, "name"]
         end_year = tb_regions.loc[code, "end_year"]
         # Sanity check: former country not already in table! remember that we are creating it now
         assert former_country_name not in set(tb["country"]), f"{former_country_name} already in table!"
-        # Get list of country successors (equivalent of former state with nowadays' countries) and end year (dissolution of former state)
+        # Get successors (equivalent of the former state with nowadays' countries), splitting out
+        # any optional ones (summed when present, not required to gate the year).
         codes_successors = json.loads(tb_regions.loc[code, "successors"])
-        countries_successors = tb_regions.loc[codes_successors, "name"].tolist()
-        # Filter table accordingly
-        tb_suc = tb[(tb["year"] <= end_year) & (tb["country"].isin(countries_successors))]
-        # Filter rows (only preserve years where all countries have data)
-        year_filter = tb_suc.groupby("year")["country"].nunique() == len(countries_successors)
-        year_filter = year_filter[year_filter].index.tolist()
-        tb_suc = tb_suc[tb_suc["year"].isin(year_filter)]
+        optional_codes = OPTIONAL_SUCCESSORS.get(code, set())
+        required_codes = [c for c in codes_successors if c not in optional_codes]
+        countries_all = tb_regions.loc[codes_successors, "name"].tolist()
+        countries_required = tb_regions.loc[required_codes, "name"].tolist()
+        # Filter to successor rows up to the former state's dissolution year
+        tb_suc = tb[(tb["year"] <= end_year) & (tb["country"].isin(countries_all))]
+        # Keep only years where every required successor has data (optional ones are added if present)
+        n_required = tb_suc[tb_suc["country"].isin(countries_required)].groupby("year")["country"].nunique()
+        valid_years = n_required[n_required == len(countries_required)].index
+        tb_suc = tb_suc[tb_suc["year"].isin(valid_years)]
         # Perform operations
         tb_suc = tb_suc.groupby("year", as_index=False, observed=True).agg(
             {"population": sum, "source": lambda x: "; ".join(sorted(set(x)))}

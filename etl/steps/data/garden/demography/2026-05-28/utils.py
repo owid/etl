@@ -21,8 +21,24 @@ SOURCES_NAMES = {
 }
 
 # Former countries, sourced from our regions dataset.
-## These countries are added by aggregating their successors' values, and using regions.
-## NOTE: Unlike the 2024-07-15 step, no former states are imported from Gapminder Systema
-## Globalis (Czechoslovakia, Yugoslavia, East/West Germany, the Yemens, Ethiopia (former)
-## are therefore no longer in the dataset).
-COUNTRIES_FORMER_EQUIVALENTS = {"OWID_USS"}
+## These former states are rebuilt by summing the population of their present-day successor
+## countries (so they need no Gapminder Systema Globalis import). Only states whose territory is
+## the union of *whole* present-day countries can be reconstructed this way — East/West Germany
+## and the two Yemens cannot (each maps to a single modern country, Germany / Yemen, so summing
+## can't split them) and are therefore intentionally absent.
+COUNTRIES_FORMER_EQUIVALENTS = {
+    "OWID_USS",  # USSR -> 15 post-Soviet republics
+    "OWID_CZS",  # Czechoslovakia -> Czechia + Slovakia
+    "OWID_YGS",  # Yugoslavia -> Bosnia, Croatia, N. Macedonia, Montenegro, Kosovo, Serbia, Slovenia
+    "OWID_ERE",  # Ethiopia (former) -> Ethiopia + Eritrea
+}
+
+# Successors that should be summed when present but NOT required to have data every year.
+## Kosovo only has data from 1950 (UN WPP); before then it is already included in Federico-Tena's
+## "Serbia" (Kosovo was not a separate polity at 1991 borders). Requiring it would either drop all
+## pre-1950 years of Yugoslavia or, if forced, double-count it. Treating it as optional gives the
+## correct sum in both eras: pre-1950 from the 6 core successors (Serbia already covers Kosovo),
+## 1950+ with Kosovo added (UN WPP's Serbia excludes it).
+OPTIONAL_SUCCESSORS = {
+    "OWID_YGS": {"OWID_KOS"},  # Kosovo
+}
