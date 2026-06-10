@@ -95,3 +95,29 @@ The source charts are scatter-vs-GDP charts, so their title/subtitle/footnote de
 
 - Open `OWID_ENV.chart_site(slug)` for one of the targets and switch to the Scatter tab.
 - Re-run the same input. The script is idempotent — all changes are guarded by "if absent" / "if not equal" checks; a second run should print `OK` with empty / minimal notes.
+
+## Part 2: redirect old standalone scatter charts to the new scatter tab
+
+Once the targets have their scatter view, the old standalone "X vs. GDP per capita" charts can be retired and redirected to `/grapher/<target-slug>?tab=scatter`. Use `scripts/redirect_to_scatter.py`.
+
+Input: JSON list of `{grapher_url, target_chart_url}` (public `ourworldindata.org/grapher/<slug>` URLs).
+
+```bash
+# Audit only (default) — reports what references each OLD chart, never mutates:
+echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py
+# Apply — create site redirect + unpublish each source:
+echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py --apply
+```
+
+What it does per pair:
+- Resolves both slugs to chart ids (`chart_configs.slug`).
+- **References audit** of the OLD chart via `get_chart_references`. Counts `wp/gdoc/expl/narr/ins/sviz`; flags `MANUAL` when any of explorers / narrativeCharts / dataInsights / staticViz is non-zero — **a redirect alone does not fix those** (they embed the old chart's config directly). WordPress/Gdoc links are handled by the 302. **Review the audit and skip any MANUAL row** (e.g. pull it out of the input) unless its dependents have been re-pointed first.
+- **Pre-flight guards** (under `--apply`): the target must have `ScatterPlot` in `chartTypes` and be `isPublished` — otherwise the row is `SKIPPED`. This is what protects charts we couldn't generate a scatter for (e.g. StackedArea), and what catches running against the wrong staging server (see branch note below).
+- Creates the site redirect via `AdminAPI.create_site_redirect` (the site `redirects` table — supports the `?tab=scatter` query string; `chart_slug_redirects` does not). Duplicate/chained sources are reported, not fatal.
+- Unpublishes the source chart (`isPublished: false`).
+
+**Mechanism / environment notes:**
+- `?tab=scatter` is the valid scatter tab query param (`GRAPHER_TAB_CONFIG_OPTIONS.scatter`).
+- The site `redirects` table is **per-environment** and is **not** synced staging→production by chart-diff. So: run on staging to test, then re-run `--apply` against production `admin.owid.io` once the scatter views are live on prod.
+- `OWID_ENV` (hence the admin host) is derived from the current git branch — be on the branch whose staging holds the scatter views before running.
+- The live 302 only appears after the static `_redirects` file rebakes; the unpublish triggers that build, but allow a few minutes on staging.
