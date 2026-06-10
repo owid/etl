@@ -580,8 +580,13 @@ function getLineStart(document: vscode.TextDocument, position: vscode.Position):
 
   context.subscriptions.push(
     vscode.commands.registerCommand('clickable-dag-steps.openStepFile', async (fsPath: string) => {
-      const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(fsPath));
-      await vscode.window.showTextDocument(doc, { preview: false });
+      try {
+        const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(fsPath));
+        await vscode.window.showTextDocument(doc, { preview: false });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        vscode.window.showErrorMessage(`Could not open step file ${fsPath}: ${msg}`);
+      }
     }),
     vscode.languages.registerDocumentLinkProvider({ language: 'yaml', scheme: 'file' }, linkProvider)
   );
