@@ -5,12 +5,12 @@ topic_tags:
   - Economic Inequality
 
 default_selection:
-  - Netherlands
   - Brazil
   - South Africa
   - United States
   - France
   - China
+  - Netherlands
 
 default_dimensions:
   quantile: Richest 1%
