@@ -28,6 +28,9 @@ from etl.http import session as http_session
 SLUG_RE = re.compile(r"/grapher/([^/?#]+)")
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
+# Query string appended to the redirect target: open the scatter tab on the latest year.
+TARGET_QUERY = "tab=scatter&time=latest"
+
 # Reference categories a redirect alone does NOT fix — flag for manual follow-up.
 MANUAL_REF_KEYS = ["explorers", "narrativeCharts", "dataInsights", "staticViz"]
 ALL_REF_KEYS = ["postsWordpress", "postsGdocs", *MANUAL_REF_KEYS]
@@ -60,11 +63,11 @@ def chart_id_for_slug(slug: str) -> int | None:
     return int(df.iloc[0]["id"]) if not df.empty else None
 
 
-def existing_redirect_sources() -> dict[str, str]:
-    """Map of existing site-redirect source -> target (to skip duplicates)."""
+def existing_redirects() -> dict[str, dict]:
+    """Map of existing site-redirect source -> {id, target}."""
     resp = http_session.get(f"{OWID_ENV.admin_api}/site-redirects.json", headers=AdminAPI(OWID_ENV)._headers())
     resp.raise_for_status()
-    return {r["source"]: r["target"] for r in resp.json().get("redirects", [])}
+    return {r["source"]: {"id": r["id"], "target": r["target"]} for r in resp.json().get("redirects", [])}
 
 
 def ref_counts(references: dict) -> dict[str, int]:
@@ -85,7 +88,7 @@ def main() -> int:
     host = short_admin_host()
     print(f"Target admin: {host}   mode: {'APPLY' if args.apply else 'AUDIT (dry-run)'}")
 
-    existing = existing_redirect_sources() if args.apply else {}
+    existing = existing_redirects() if args.apply else {}
 
     audit_rows = []
     action_rows = []
@@ -124,27 +127,32 @@ def main() -> int:
             continue
 
         source = f"/grapher/{src_slug}"
-        target = f"/grapher/{tgt_slug}?tab=scatter"
+        target = f"/grapher/{tgt_slug}?{TARGET_QUERY}"
 
-        # Create the site redirect (skip if one already exists for this source).
-        if source in existing:
-            status, note = "EXISTS", f"-> {existing[source]}"
-        else:
-            try:
+        # Create the site redirect. If one already exists for this source: leave it
+        # if the target already matches, otherwise replace it (delete + recreate,
+        # since there's no update endpoint).
+        prior = existing.get(source)
+        try:
+            if prior and prior["target"] == target:
+                status, note = "EXISTS", f"-> {target}"
+            else:
+                if prior:
+                    api.delete_site_redirect(prior["id"])
                 api.create_site_redirect(source, target)
-                status, note = "CREATED", f"-> {target}"
-            except Exception as e:
-                msg = str(getattr(getattr(e, "response", None), "text", "") or e)
-                if "chained" in msg.lower():
-                    status, note = "CHAINED", msg[:100]
-                elif "already exists" in msg.lower():
-                    status, note = "EXISTS", f"-> {target}"
-                else:
-                    status, note = "ERROR", msg[:120]
+                status, note = ("UPDATED" if prior else "CREATED"), f"-> {target}"
+        except Exception as e:
+            msg = str(getattr(getattr(e, "response", None), "text", "") or e)
+            if "chained" in msg.lower():
+                status, note = "CHAINED", msg[:100]
+            elif "already exists" in msg.lower():
+                status, note = "EXISTS", f"-> {target}"
+            else:
+                status, note = "ERROR", msg[:120]
 
         # Unpublish the source chart.
         unpub = ""
-        if status in ("CREATED", "EXISTS"):
+        if status in ("CREATED", "UPDATED", "EXISTS"):
             try:
                 src_cfg = api.get_chart_config(src_id)
                 if src_cfg.get("isPublished"):

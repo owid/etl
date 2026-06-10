@@ -98,7 +98,7 @@ The source charts are scatter-vs-GDP charts, so their title/subtitle/footnote de
 
 ## Part 2: redirect old standalone scatter charts to the new scatter tab
 
-Once the targets have their scatter view, the old standalone "X vs. GDP per capita" charts can be retired and redirected to `/grapher/<target-slug>?tab=scatter`. Use `scripts/redirect_to_scatter.py`.
+Once the targets have their scatter view, the old standalone "X vs. GDP per capita" charts can be retired and redirected to `/grapher/<target-slug>?tab=scatter&time=latest` (the scatter tab on the latest year). Use `scripts/redirect_to_scatter.py`.
 
 Input: JSON list of `{grapher_url, target_chart_url}` (public `ourworldindata.org/grapher/<slug>` URLs).
 

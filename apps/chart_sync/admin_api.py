@@ -139,6 +139,15 @@ class AdminAPI:
             raise AdminAPIError({"error": js.get("error"), "source": source, "target": target})
         return js
 
+    def delete_site_redirect(self, redirect_id: int, user_id: int | None = None) -> dict:
+        """Delete a site-wide URL redirect by id (there is no update endpoint, so
+        callers change a target by deleting then re-creating)."""
+        resp = http_session.delete(
+            f"{self.owid_env.admin_api}/site-redirects/{redirect_id}",
+            headers=self._headers(user_id),
+        )
+        return self._json_from_response(resp)
+
     def put_grapher_config(self, variable_id: int, grapher_config: dict[str, Any]) -> dict:
         # If schema is missing, use the default one
         grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
