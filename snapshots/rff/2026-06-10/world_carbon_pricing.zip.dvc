@@ -21,7 +21,7 @@ meta:
     date_accessed: '2026-06-10'
     date_published: '2026-06-07'
     license:
-      name: CC BY-NC-SA 4.0 (with additional restrictions on redistribution)
+      name: CC BY-NC-SA 4.0
       url: https://worldcarbonpricing.org/licensing
 outs:
   - md5: 6a235fb747737f2aeee0f62b3fd456b6
