@@ -23,6 +23,10 @@ COMMON_CONFIG = {
     "chartTypes": ["StackedBar"],
 }
 
+# Expected years for sanity checks
+EXPECTED_YEAR_MAX = 2025
+EXPECTED_YEAR_PREVIEW_MAX = 2026
+
 
 def run() -> None:
     #
@@ -38,7 +42,9 @@ def run() -> None:
     tb_pre = ds_pre.read("ucdp_preview")
 
     # Check years
-    assert tb["year"].max() == 2024
+    assert tb["year"].max() == EXPECTED_YEAR_MAX, (
+        f"Latest year not expected! Expected {EXPECTED_YEAR_MAX}, got {tb['year'].max()}"
+    )
     assert tb_pre["year"].max() == 2026
 
     # Filter unnecessary columns
