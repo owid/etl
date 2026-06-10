@@ -19,3 +19,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 3478a4c704b12b8a94f426f0d8671727
+    size: 75556
+    path: ucdp_non_state.zip

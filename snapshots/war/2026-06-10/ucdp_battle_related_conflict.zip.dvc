@@ -18,3 +18,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 677d2fbfffaa0e7cb92cc9833c8e05a8
+    size: 39816
+    path: ucdp_battle_related_conflict.zip

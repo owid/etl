@@ -18,3 +18,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 3f1194c1d729c16eb7c37952a807a979
+    size: 43607
+    path: ucdp_battle_related_dyadic.zip

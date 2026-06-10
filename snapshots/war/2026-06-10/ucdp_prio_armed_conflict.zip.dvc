@@ -19,3 +19,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 718865fee1b573c6d4ab244b4984ebf9
+    size: 45955
+    path: ucdp_prio_armed_conflict.zip

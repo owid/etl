@@ -19,3 +19,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 303cdf23967a54056b76be318fae1de0
+    size: 28884
+    path: ucdp_one_sided.zip
