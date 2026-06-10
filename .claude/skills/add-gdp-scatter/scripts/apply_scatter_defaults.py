@@ -10,7 +10,8 @@ stdin and, for each row:
   instead of the admin default.
 - Sets `matchingEntitiesOnly: true`.
 - Sets `xAxis` to log scale with `canChangeScaleType: true`.
-- Mirrors the source's `yAxis.scaleType: log` if present.
+- Enables the y-axis log *toggle* (canChangeScaleType) if the source scatter is
+  log — but leaves the default linear, since yAxis is shared with the line/bar views.
 - Mirrors the source's explicit `yAxis` min/max bounds if set.
 - Mirrors the source's manually-set y `display.name` if present.
 - Emits warnings (no action) for: source `excludedEntityNames`; GDP-coverage
@@ -268,15 +269,17 @@ def process_row(
         cfg["xAxis"] = xa
         notes.append("xAxis: log + canChangeScaleType")
 
-    # 5) yAxis log mirror
+    # 5) yAxis log option (NOT forced). yAxis is shared across all views, so forcing
+    # scaleType=log would also flip the line/bar views to log. Instead, when the source
+    # scatter is log, we only enable the toggle (canChangeScaleType=True) and leave the
+    # default linear — users can switch the scatter to log, line/bar stay linear.
     src_ya = src_cfg.get("yAxis") or {}
     if src_ya.get("scaleType") == "log":
         ya = dict(cfg.get("yAxis") or {})
-        if ya.get("scaleType") != "log":
-            ya["scaleType"] = "log"
+        if not ya.get("canChangeScaleType"):
             ya["canChangeScaleType"] = True
             cfg["yAxis"] = ya
-            notes.append("yAxis: log + canChangeScaleType (mirrored from source)")
+            notes.append("yAxis: enabled log toggle (canChangeScaleType; default stays linear)")
 
     # 6) yAxis bounds mirror — copy each of min/max the source explicitly sets,
     # preserving other target yAxis keys. Note: affects ALL views, not just scatter.
