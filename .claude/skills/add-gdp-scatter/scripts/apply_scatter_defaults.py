@@ -29,10 +29,10 @@ import re
 import sys
 from typing import Any
 
+from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
 from etl.db import get_engine
 from etl.grapher.io import variable_data_df_from_s3
-from apps.chart_sync.admin_api import AdminAPI
 
 GDP_SOURCES = {
     "world bank": 1204826,
