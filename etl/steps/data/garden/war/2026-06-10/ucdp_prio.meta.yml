@@ -82,7 +82,9 @@ definitions:
         We show here the "best" death estimates as identified by UCDP and PRIO. They also report high and low estimates.
 
   common:
+    short_unit: ""
     presentation:
+      attribution_short: UCDP/PRIO
       topic_tags:
         - War & Peace
       grapher_config:

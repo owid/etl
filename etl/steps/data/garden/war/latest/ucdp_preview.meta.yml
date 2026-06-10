@@ -1,6 +1,8 @@
 definitions:
   common:
+    short_unit: ""
     presentation:
+      attribution_short: UCDP
       topic_tags:
         - War & Peace
       grapher_config:
@@ -139,13 +141,13 @@ definitions:
   number_ongoing_conflicts:
     description_short: |-
       <%- if conflict_type == "all" -%>
-      Included are armed conflicts that were ongoing a year.
+      Included are armed conflicts that were ongoing that year.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      Included are internationalized intrastate conflicts that were ongoing a year.
+      Included are internationalized intrastate conflicts that were ongoing that year.
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      Included are non-internationalized intrastate conflicts that were ongoing a year.
+      Included are non-internationalized intrastate conflicts that were ongoing that year.
 
       <%- elif conflict_type == "non-state conflict" -%>
       Included are non-state conflicts that were ongoing that year.
@@ -157,7 +159,7 @@ definitions:
       Included are interstate, intrastate, and extrasystemic conflicts that were ongoing that year.
 
       <%- else -%>
-      Included are << conflict_type >> conflicts that were ongoing a year.
+      Included are << conflict_type >> conflicts that were ongoing that year.
 
       <%- endif -%>
     description_key: &description_key_ongoing
