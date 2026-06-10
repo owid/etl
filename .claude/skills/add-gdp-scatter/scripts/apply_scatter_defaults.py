@@ -58,6 +58,9 @@ POPULATION_ID = 953899  # "Population" — the default sizing indicator (-10000.
 
 LINE_FAMILY = {"LineChart", "SlopeChart", "DiscreteBar", "Marimekko", "ScatterPlot"}
 STACKED_FAMILY = {"StackedArea", "StackedBar", "StackedDiscreteBar"}
+# Chart types that draw bars/areas from a baseline — they need a ZERO y-axis min,
+# so a non-zero min tuned for the scatter must not be mirrored onto them.
+BAR_AREA_FAMILY = {"DiscreteBar", "Marimekko", "StackedArea", "StackedBar", "StackedDiscreteBar"}
 SCHEMA_DEFAULT_CHART_TYPES = ["LineChart", "DiscreteBar"]
 
 CHART_ID_RE = re.compile(r"/charts/(\d+)")
@@ -285,10 +288,17 @@ def process_row(
     # preserving other target yAxis keys. Note: affects ALL views, not just scatter.
     # A `max: 0` paired with `min: 0` is a degenerate (collapsed) axis — junk we
     # neither replicate from the source nor leave on the target.
+    # Bar/area views need a ZERO baseline, so never mirror a non-zero `min` onto a
+    # target that has one (the source's non-zero min is a scatter-only zoom and would
+    # make bars start above zero — misleading).
+    bar_area_present = bool(set(cfg.get("chartTypes") or []) & BAR_AREA_FAMILY)
     bound_changes = []
     ya = dict(cfg.get("yAxis") or {})
     for bound in ("min", "max"):
         if bound in src_ya and src_ya[bound] != ya.get(bound):
+            if bound == "min" and src_ya[bound] != 0 and bar_area_present:
+                bound_changes.append(f"min={src_ya[bound]} NOT mirrored (bar/area needs zero baseline)")
+                continue
             prev = ya.get(bound, "unset")
             ya[bound] = src_ya[bound]
             bound_changes.append(f"{bound}: {prev}→{src_ya[bound]}")
