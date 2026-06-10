@@ -208,7 +208,7 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 | Item | Verify by |
 |---|---|
 | Indicator upgrade ran (§7) | `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'"` — non-zero |
-| Explorers / MDims re-exported (§7) | Only if the DAG has `export://explorers/...` or `export://multidim/...` steps for this dataset (`rg "export://(explorers\|multidim)/.*/<short_name>" dag/ -g "*.yml"`). The indicator-upgrader never touches these, so run the two staging queries from `/update-dataset` §7 (old-version references in `explorer_variables` / `multi_dim_x_chart_configs`) — both must return empty. A hit = 🔴, the export step wasn't re-run. |
+| Explorers / MDims re-exported (§7) | Only if the DAG has `export://explorers/...` or `export://multidim/...` steps for this dataset (`rg -e "export://explorers/.*/<short_name>" -e "export://multidim/.*/<short_name>" dag/ -g "*.yml"`). The indicator-upgrader never touches these, so run the two staging queries from `/update-dataset` §7 (old-version references in `explorer_variables` / `multi_dim_x_chart_configs`) — both must return empty. A hit = 🔴, the export step wasn't re-run. |
 | Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅ |
 | `@codex review` posted (§9) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
 | Codex threads resolved (§10) | `gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<num>) { reviewThreads(first:20) { nodes { isResolved } } } } }'` — all `isResolved: true` |
