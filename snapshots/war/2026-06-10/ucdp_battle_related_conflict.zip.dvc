@@ -3,7 +3,7 @@ meta:
     producer: Uppsala Conflict Data Program
     title: Battle-Related Deaths
     description: |-
-      This file contains a dyad-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2025 that appear in the UCDP/PRIO Armed Conflict Dataset.
+      This file contains a conflict-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2025 that appear in the UCDP/PRIO Armed Conflict Dataset.
 
       You can find more notes at https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-261.pdf
     title_snapshot: Battle-Related Deaths (Conflict version)

@@ -211,6 +211,32 @@ def _sanity_checks(ds: Dataset) -> None:
         [16009],
     )
 
+    # Conflict-level `type_of_conflict` must equal the dyad-derived value, where a conflict-year
+    # with both non-internationalized (3) and internationalized (4) intrastate dyads is promoted
+    # to internationalized (4). UCDP applies this promotion upstream as of release 26.1 — we used
+    # to rebuild the column from the dyadic table ourselves. If this ever fails, the source's
+    # conflict-level coding has drifted and the column must be derived from dyads again.
+    tb_dyadic = ds.read("ucdp_battle_related_dyadic")
+
+    def _promote_types(types) -> int:
+        if len(types) == 1:
+            return int(types[0])
+        assert set(int(t) for t in types) == {3, 4}, (
+            f"Only the intrastate 3/4 combination is expected within a conflict-year, got {types}!"
+        )
+        return 4
+
+    tb_types = tb_dyadic.groupby(["conflict_id", "year"], as_index=False)["type_of_conflict"].unique()
+    tb_types["type_derived"] = tb_types["type_of_conflict"].apply(_promote_types)
+    merged = tb_conflict[["conflict_id", "year", "type_of_conflict"]].merge(
+        tb_types[["conflict_id", "year", "type_derived"]], on=["conflict_id", "year"], validate="1:1"
+    )
+    mismatch = merged[merged["type_of_conflict"].astype(int) != merged["type_derived"].astype(int)]
+    assert mismatch.empty, (
+        f"`type_of_conflict` in the conflict-level table diverges from the dyad-derived value "
+        f"for {len(mismatch)} conflict-years:\n{mismatch.head(20)}"
+    )
+
 
 def run_pipeline(
     tb_ged: Table,
