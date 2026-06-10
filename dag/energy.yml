@@ -283,3 +283,22 @@ steps:
         - data://meadow/uk_beis/2023-12-12/uk_historical_electricity:
           - snapshot://uk_beis/2023-12-12/uk_historical_electricity.xls
       - data://garden/energy/2026-04-24/electricity_mix
+  #
+  # IEA - Energy and AI.
+  #
+  data://grapher/energy/2026-04-27/energy_ai:
+    - data://garden/energy/2026-04-27/energy_ai:
+      - data://garden/regions/2023-01-01/regions
+      # Older IEA release, kept to backfill pre-2023 history in the garden.
+      - data://meadow/energy/2025-11-07/energy_ai:
+        - snapshot://energy/2025-11-07/energy_ai.xlsx
+      - data://meadow/energy/2026-04-27/energy_ai:
+        - snapshot://energy/2026-04-27/energy_ai.xlsx
+      - data://garden/energy/2026-04-24/electricity_mix
+  #
+  # CSO Ireland - Data centres metered electricity consumption.
+  #
+  data://grapher/energy/2025-11-10/ireland_metered_consumption:
+    - data://garden/energy/2025-11-10/ireland_metered_consumption:
+      - data://meadow/energy/2025-11-10/ireland_metered_consumption:
+        - snapshot://energy/2025-11-10/ireland_metered_consumption.csv
