@@ -101,13 +101,13 @@ definitions:
       numDecimalPlaces: 0
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
   title: UCDP+PRIO, History of war
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
   owners:
     - Lucas Rodés-Guirao
 tables:

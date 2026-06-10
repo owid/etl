@@ -146,7 +146,7 @@ definitions:
       The best estimate of the number of deaths of << people_type >> in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "one-sided violence" -%>
-      The << estimate | default('') >> estimate of the number of deaths of << people_type >> from one-sided violence that was ongoing that year<< per_capita >>.
+      The best estimate of the number of deaths of << people_type >> from one-sided violence that was ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "non-state conflict" -%>
       The best estimate of the number of deaths of << people_type >> in non-state conflicts that were ongoing that year<< per_capita >>.
@@ -229,16 +229,16 @@ tables:
           State was a primary participant in at least one interstate, intrastate, or extrasystemic conflict that year.
 
           <%- elif conflict_type == "intrastate (internationalized)" -%>
-          State was a primary participants in at least one internationalized intrastate conflict that year.
+          State was a primary participant in at least one internationalized intrastate conflict that year.
 
           <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-          State was a primary participants in at least one non-internationalized intrastate conflict that year.
+          State was a primary participant in at least one non-internationalized intrastate conflict that year.
 
           <%- elif conflict_type == "one-sided violence" -%>
-          State was a primary participants in at least one instance of one-sided violence that year.
+          State was a primary participant in at least one instance of one-sided violence that year.
 
           <% else -%>
-          State was a primary participants in at least one << conflict_type >> conflict that year.
+          State was a primary participant in at least one << conflict_type >> conflict that year.
 
           <%- endif -%>
         description_key:
@@ -283,7 +283,7 @@ tables:
           At least one interstate, intrastate, or extrasystemic conflict event took place in this country in a given year.
 
           <%- elif conflict_type == "intrastate (internationalized)" -%>
-          At least one internationalised intrastate conflict event took place in this country in a given year.
+          At least one internationalized intrastate conflict event took place in this country in a given year.
 
           <%- elif conflict_type == "intrastate (non-internationalized)" -%>
           At least one non-internationalized intrastate conflict event took place in this country in a given year.
