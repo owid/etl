@@ -95,6 +95,34 @@ definitions:
     owned
     <%- endif %>
 
+  verb_welfare_type_present: |-
+    <% if welfare_type != "wealth" %>
+    receives
+    <%- else %>
+    owns
+    <%- endif %>
+
+  verb_welfare_type_present_plural: |-
+    <% if welfare_type != "wealth" %>
+    receive
+    <%- else %>
+    own
+    <%- endif %>
+
+  verb_welfare_type_goes_to: |-
+    <% if welfare_type != "wealth" %>
+    that goes to
+    <%- else %>
+    owned by
+    <%- endif %>
+
+  concept_welfare_type_subject: |-
+    <% if welfare_type != "wealth" %>
+    Incomes are
+    <%- else %>
+    Wealth is
+    <%- endif %>
+
   concept_welfare_type: |-
     <% if welfare_type != "wealth" %>
     income
@@ -157,19 +185,23 @@ definitions:
     This is a measure of _relative_ poverty — it captures the share of people whose {definitions.concept_welfare_type} is low by the standards typical in their own country.
 
   intro_unequal_distribution: |-
-    <% if welfare_type != "wealth" %>Incomes are<%- else %>Wealth is<%- endif %> distributed very unequally, both between countries and within them.
+    {definitions.concept_welfare_type_subject} distributed very unequally, both between countries and within them.
+
+  # NOTE: Renders empty for income, so it carries its own leading space — glue it directly after a word.
+  description_key_gini_wealth_note: |-
+    <% if welfare_type == "wealth" %> Because some people have negative net wealth — their debts are larger than their assets — the Gini coefficient for wealth can be higher than 1.<% endif %>
 
   description_key_top_incomes: |-
     {definitions.intro_unequal_distribution} A large share of total {definitions.concept_welfare_type} is concentrated among the very richest, making the top of the distribution important to understand. Read more in our topic page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_gini: |-
-    {definitions.intro_unequal_distribution} The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality.<% if welfare_type == "wealth" %> Because some people have negative net wealth — their debts are larger than their assets — the Gini coefficient for wealth can be higher than 1.<%- endif %> We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss {definitions.concept_welfare_type} inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    {definitions.intro_unequal_distribution} The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality.{definitions.description_key_gini_wealth_note} We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss {definitions.concept_welfare_type} inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_palma_ratio: |-
-    {definitions.intro_unequal_distribution} The Palma ratio captures this by comparing the {definitions.concept_welfare_type} share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% <% if welfare_type != "wealth" %>receive<%- else %>own<%- endif %> twice as much as the poorest 40%. We discuss {definitions.concept_welfare_type} inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    {definitions.intro_unequal_distribution} The Palma ratio captures this by comparing the {definitions.concept_welfare_type} share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% {definitions.verb_welfare_type_present_plural} twice as much as the poorest 40%. We discuss {definitions.concept_welfare_type} inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_share: |-
-    This data shows the share of total {definitions.concept_welfare_type} <% if welfare_type != "wealth" %>that goes to<%- else %>owned by<%- endif %> specific groups of the population. For example, if the richest decile <% if welfare_type != "wealth" %>receives<%- else %>owns<%- endif %> 40% of total {definitions.concept_welfare_type}, it means the richest 10% of people share 40% of all {definitions.concept_welfare_type} between them.
+    This data shows the share of total {definitions.concept_welfare_type} {definitions.verb_welfare_type_goes_to} specific groups of the population. For example, if the richest decile {definitions.verb_welfare_type_present} 40% of total {definitions.concept_welfare_type}, it means the richest 10% of people share 40% of all {definitions.concept_welfare_type} between them.
 
   description_key_avg: |-
     This data shows the mean (average) {definitions.concept_welfare_type} per person within specific groups of the population, ranked by {definitions.concept_welfare_type}. For example, the poorest decile is the poorest 10% of people in a country.
