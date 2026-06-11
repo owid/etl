@@ -4,7 +4,7 @@ import re
 
 import owid.catalog.processing as pr
 import pandas as pd
-import PyPDF2
+import pypdf
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -15,7 +15,7 @@ paths = PathFinder(__file__)
 def extract_text_from_pdf(pdf_path: str) -> str:
     text = ""
     with open(pdf_path, "rb") as file:
-        pdf_reader = PyPDF2.PdfReader(file)
+        pdf_reader = pypdf.PdfReader(file)
         for page_num in range(len(pdf_reader.pages)):
             page = pdf_reader.pages[page_num]
             text += page.extract_text()
@@ -55,15 +55,19 @@ def run(dest_dir: str) -> None:
 
     # Extract relevant rows from each page.
     # Fix poor extractions at ends of pages.
+    # NOTE: Line numbers are tuned to pypdf's text extraction of this exact PDF; the column headers of the second page
+    # get extracted in the middle of the data, merged with the first data row of that page (Guinea), and the last row
+    # of the second page (Hungary) gets merged with the first row of the third page (Belgium).
+    lines_by_country = text_by_country.split("\n")
     text_by_country_rows = (
-        [row for row in text_by_country.split("\n")[3:77]]
-        + [text_by_country.split("\n")[77].split("Top")[0]]
-        + [text_by_country.split("\n")[92].split("(by tonnage)")[1]]
-        + [row for row in text_by_country.split("\n")[93:174]]
-        + [text_by_country.split("\n")[174].split("Belgium")[0]]
-        + [text_by_country.split("\n")[174].split("Cyprinids nei")[1]]
-        + [row for row in text_by_country.split("\n")[175:254]]
+        [row for row in lines_by_country[3:78]]
+        + [lines_by_country[96].split("(by tonnage)")[1]]
+        + [row for row in lines_by_country[97:178]]
+        + [lines_by_country[178].split("Belgium")[0]]
+        + [lines_by_country[178].split("Cyprinids nei")[1]]
+        + [row for row in lines_by_country[179:258]]
     )
+    assert len(text_by_country_rows) == 238, "Unexpected number of rows extracted from the by-country PDF."
 
     # Remove spurious spaces.
     text_by_country_rows = [re.sub(r"\s+", " ", row) for row in text_by_country_rows]

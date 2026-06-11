@@ -54,5 +54,8 @@
   },
   "dependencies": {
     "ignore": "^6.0.2"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.5"
   }
 }

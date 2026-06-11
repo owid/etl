@@ -11,7 +11,7 @@ import yaml
 from pydantic_ai import Agent
 
 # from pydantic_ai.agent import CallToolsNode
-from pydantic_ai.mcp import CallToolFunc, MCPServerStreamableHTTP, ToolResult
+from pydantic_ai.mcp import CallToolFunc, MCPToolset, ToolResult
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
@@ -91,7 +91,7 @@ async def process_tool_call(
     #     message_type="markdown",
     #     text=f"**:material/compare_arrows: MCP**: Querying OWID MCP, method `{name}`",
     # )
-    return await call_tool(name, tool_args, {"deps": ctx.deps})
+    return await call_tool(name, tool_args, metadata={"deps": ctx.deps})
 
 
 ## Trying to tweak the settings for OpenAI responses
@@ -106,11 +106,12 @@ settings = OpenAIResponsesModelSettings(
 def get_toolsets():
     # if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
     # Create MCP server instance inside function to avoid event loop binding issues
-    mcp_server_prod = MCPServerStreamableHTTP(
-        url=OWID_MCP_SERVER_URL,
+    # NOTE: The trailing underscore in the prefix is kept for backwards compatibility with the old
+    # `MCPServerStreamableHTTP(tool_prefix="owid_data_")`, which joined prefix and tool name with "_" too.
+    mcp_server_prod = MCPToolset(
+        OWID_MCP_SERVER_URL,
         process_tool_call=process_tool_call,
-        tool_prefix="owid_data_",
-    )
+    ).prefixed("owid_data_")
     return [mcp_server_prod]
 
 
