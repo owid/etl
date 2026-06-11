@@ -8,7 +8,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
 - **Only edit live steps** — when fixing or improving metadata, code, or configs, only touch files that are in the active DAG (`dag/*.yml`), not archived ones (`dag/archive/*.yml`), unless explicitly asked to
-- **Never push/commit** unless explicitly told to
+- **Never push, commit, or open PRs** unless explicitly told to
 - **Ask the user** if unsure - don't guess
 - **Always run `make check` before committing**
 - If not told otherwise, save outputs to `ai/` directory.
