@@ -45,6 +45,14 @@ def run() -> None:
     assert len(belgium_2025) == 1, error
     assert (belgium_2025["barn"] == belgium_2025["free_range"]).all(), error
     tb = tb.drop(index=belgium_2025.index).reset_index(drop=True)
+
+    # The Greece 2013 row reports a total of just 23,166 hens, whereas Greece's other years are
+    # around 4-5 million; it is most likely an incomplete notification, so we remove it.
+    error = "Greece 2013 row may have been fixed in the source file; remove this workaround."
+    greece_2013 = tb[(tb["country"] == "Greece") & (tb["year"] == 2013)]
+    assert len(greece_2013) == 1, error
+    assert (greece_2013["total"] < 100_000).all(), error
+    tb = tb.drop(index=greece_2013.index).reset_index(drop=True)
     ####################################################################################################################
 
     # Run sanity checks on outputs.
