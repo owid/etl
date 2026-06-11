@@ -46,6 +46,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   global_military_spending_dataset:
     variables:

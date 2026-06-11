@@ -1,5 +1,7 @@
 dataset:
   title: Alcohol expenditure in the USA long-term (USDA, 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   alcohol_expenditure_in_the_usa_long_term__usda__2018:
     variables:

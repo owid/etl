@@ -1,5 +1,7 @@
 dataset:
   title: US Maternal Mortality and FLFP Index - OWID (2017)
+  owners:
+    - Sandra Tzvetkova  # backport
 tables:
   us_maternal_mortality_and_flfp_index__owid__2017:
     variables:

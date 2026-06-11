@@ -16,6 +16,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Rosado
 tables:
   global_historical_electricity_scaling:
     variables:

@@ -14,6 +14,8 @@ definitions:
 dataset:
   title: World Bank's income classification
   update_period_days: 365
+  owners:
+    - Pablo Arriagada
 
 tables:
   income_groups_aggregations:

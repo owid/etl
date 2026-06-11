@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   kaye_1985:
     variables: {}

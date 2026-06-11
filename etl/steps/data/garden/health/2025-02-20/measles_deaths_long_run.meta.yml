@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: Long-run deaths from measles in the United States
 
+  owners:
+    - Fiona Spooner
 tables:
   measles_deaths_long_run:
     variables:

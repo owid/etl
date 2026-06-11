@@ -1,5 +1,7 @@
 dataset:
   title: Drinking habits in Great Britain - UK ONS
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   drinking_habits_in_great_britain__uk_ons:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Historical employment and output by sector – OWID (2017)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   historical_employment_and_output_by_sector__owid__2017:
     variables:

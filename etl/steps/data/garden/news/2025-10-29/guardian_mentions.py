@@ -35,7 +35,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("guardian_mentions")
-    ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
@@ -78,7 +77,7 @@ def run() -> None:
     )
 
     ## Add per-capita indicators
-    tb = geo.add_population_to_table(tb, ds_population)
+    tb = paths.regions.add_population(tb)
     tb["num_pages_per_million"] = tb["num_pages"] / tb["population"] * 1_000_000
     tb = tb.drop(columns="population")
 

@@ -6,7 +6,6 @@ import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -66,8 +65,6 @@ def run() -> None:
 
     tb_gdp = tb_gdp.loc[:, ["year", "country", "gdp_per_capita"]]
 
-    ds_population = paths.load_dataset("population")
-
     # Split the 'date' column into separate rows for each year.
     tb_famines = (
         tb_famines.assign(date=tb_famines["date"].str.split(","))
@@ -86,7 +83,7 @@ def run() -> None:
     tb = add_gdp(tb, tb_gdp)
 
     # Add population growth data.
-    tb = add_population_growth(tb, ds_population)
+    tb = add_population_growth(tb)
 
     #  Add midpoint date for Bastian and code democracy as 1 and autocracy as 0
     tb["midpoint_year"] = tb["famine_name"].apply(extract_years)
@@ -271,7 +268,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
     return tb
 
 
-def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
+def add_population_growth(tb: Table) -> Table:
     """
     Add population growth rate 20 years before the famine.
 
@@ -333,7 +330,7 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
     tb_ext["country"] = tb_ext["original_country"].replace(country_mapping)
 
     # Add population data to the extended table
-    tb_ext = geo.add_population_to_table(tb_ext, ds_population)
+    tb_ext = paths.regions.add_population(tb_ext)
 
     # Special handling for Austria, Hungary - add Hungary and Poland populations and average with Austria
     austria_hungary_rows = tb_ext["original_country"] == "Austria, Hungary"
@@ -342,13 +339,13 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
         tb_hungary = tb_ext[austria_hungary_rows].copy()
         tb_hungary["country"] = "Hungary"
         tb_hungary = tb_hungary.drop(columns=["population"])
-        tb_hungary = geo.add_population_to_table(tb_hungary, ds_population)
+        tb_hungary = paths.regions.add_population(tb_hungary)
 
         # Get Poland population for the same years/famines
         tb_poland = tb_ext[austria_hungary_rows].copy()
         tb_poland["country"] = "Poland"
         tb_poland = tb_poland.drop(columns=["population"])
-        tb_poland = geo.add_population_to_table(tb_poland, ds_population)
+        tb_poland = paths.regions.add_population(tb_poland)
 
         # Average Austria (already in tb_ext), Hungary, and Poland populations
         austria_pop = tb_ext.loc[austria_hungary_rows, "population"]

@@ -1,5 +1,7 @@
 dataset:
   title: Global fish catch by end use (FishStat via SeaAroundUs)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   global_fish_catch_by_end_use__fishstat_via_seaaroundus:
     variables:

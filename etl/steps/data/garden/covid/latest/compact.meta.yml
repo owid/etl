@@ -10,7 +10,9 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 14
-
+  owners:
+    - Lucas Rodés-Guirao
+    - Tuna Acisu
 
 tables:
   compact:
@@ -54,5 +56,5 @@ tables:
       #     roundingMode:
       #     numSignificantFigures:
       #
-      {}
+        {}
 

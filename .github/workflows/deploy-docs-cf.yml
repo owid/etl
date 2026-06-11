@@ -33,7 +33,7 @@ jobs:
 
       - name: Override site_url for the Cloudflare build
         run: |
-          sed -i 's|^site_url = .*|site_url = "https://docs-cf.owid.io/projects/etl/"|' zensical.toml
+          sed -i 's|^site_url = .*|site_url = "https://docs.owid.io/projects/etl/"|' zensical.toml
 
       - name: Build docs
         env:

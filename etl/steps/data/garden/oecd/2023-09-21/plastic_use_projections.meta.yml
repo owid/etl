@@ -1,4 +1,6 @@
-
+dataset:
+  owners:
+    - Veronika Samborska
 tables:
   plastic_use_projections:
     variables:

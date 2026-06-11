@@ -1,3 +1,7 @@
+dataset:
+  owners:
+    - Lucas Rodés-Guirao
+    - Fiona Spooner
 definitions:
   global:
     projections: |-

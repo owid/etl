@@ -1,5 +1,7 @@
 dataset:
   title: Corporate income tax (CIT) - Corporate Tax Statistics Database (CTSD) - OECD (2019)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019:
     variables:

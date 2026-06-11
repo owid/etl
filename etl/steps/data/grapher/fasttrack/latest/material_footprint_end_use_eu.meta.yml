@@ -3,6 +3,8 @@ dataset:
   description: Raw material consumption in the EU-27, broken down by the end use of the final products.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   material_footprint_end_use_eu:
     variables:

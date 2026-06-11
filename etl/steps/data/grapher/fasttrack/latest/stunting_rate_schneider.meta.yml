@@ -3,6 +3,8 @@ dataset:
   description: Long-run estimates of childhood stunting rates
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   stunting_rate_schneider:
     variables:

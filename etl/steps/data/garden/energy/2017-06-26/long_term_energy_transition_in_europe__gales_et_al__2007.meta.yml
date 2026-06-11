@@ -1,5 +1,7 @@
 dataset:
   title: Long-term energy transition in Europe - Gales et al. (2007)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   long_term_energy_transition_in_europe__gales_et_al__2007:
     variables:

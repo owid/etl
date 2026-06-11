@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 90
 
+  owners:
+    - Veronika Samborska
 tables:
   nvidia_revenue:
     variables:

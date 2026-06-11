@@ -1,5 +1,7 @@
 dataset:
   title: Mental health as risk factor for substance use - Swendsen et al. (2010)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010:
     variables:

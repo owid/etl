@@ -1,5 +1,7 @@
 dataset:
   title: Child Labor Italy (historic) - Toniolo, G., & Vecchi, G. (2007)
+  owners:
+    - Max Roser  # backport
 tables:
   child_labor_italy__historic__toniolo__g__and__vecchi__g__2007:
     variables:

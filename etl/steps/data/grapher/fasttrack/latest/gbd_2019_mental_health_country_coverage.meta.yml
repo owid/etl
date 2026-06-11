@@ -6,6 +6,8 @@ dataset:
     'The GBD inclusion criteria stipulated that: (1) the diagnostic criteria must be from 1980 onward; (2) “caseness” must be based on clinical threshold as established by the DSM, ICD, Chinese Classification of Mental Disorders (CCMD), or diagnosed by a clinician using established tools; (3) sufficient information must be provided on study method and sample characteristics to assess the quality of the study; and (4) study samples must be representative of the general population (i.e., case studies, veterans, or refugee samples were excluded). No limitation was set on the language of publication.'
   licenses:
     - url: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(20)30925-9/fulltext
+  owners:
+    - Saloni Dattani  # fasttrack
 tables:
   gbd_2019_mental_health_country_coverage:
     variables:

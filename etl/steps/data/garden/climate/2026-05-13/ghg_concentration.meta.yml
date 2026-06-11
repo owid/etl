@@ -2,11 +2,13 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Climate Change
+        - Climate Change
 
 dataset:
   update_period_days: 60
 
+  owners:
+    - Pablo Rosado
 tables:
   ghg_concentration:
     title: Monthly greenhouse gas concentration

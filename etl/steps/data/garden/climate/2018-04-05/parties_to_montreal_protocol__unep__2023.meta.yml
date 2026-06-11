@@ -1,5 +1,7 @@
 dataset:
   title: Parties to Montreal Protocol (UNEP, 2023)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   parties_to_montreal_protocol__unep__2023:
     variables:

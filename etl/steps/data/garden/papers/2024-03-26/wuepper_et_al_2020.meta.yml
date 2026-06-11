@@ -1,6 +1,8 @@
 dataset:
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   wuepper_et_al_2020:
     title: Yield gaps versus nitrogen pollution

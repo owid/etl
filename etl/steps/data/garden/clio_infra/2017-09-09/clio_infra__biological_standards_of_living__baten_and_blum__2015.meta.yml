@@ -1,5 +1,7 @@
 dataset:
   title: Clio-Infra - Biological Standards of Living - Baten and Blum (2015)
+  owners:
+    - Aibek Aldabergenov  # backport
 tables:
   clio_infra__biological_standards_of_living__baten_and_blum__2015:
     variables:

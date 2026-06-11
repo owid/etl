@@ -27,7 +27,6 @@ def run() -> None:
     # Load meadow dataset, regions and population
     ds_meadow = paths.load_dataset("same_sex_marriage")
     ds_regions = paths.load_dataset("regions")
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("same_sex_marriage")
@@ -43,12 +42,7 @@ def run() -> None:
     tb = explode_country_years(tb=tb)
 
     tb = add_country_counts_and_population_by_status(
-        tb=tb,
-        columns=["legal_status"],
-        ds_regions=ds_regions,
-        ds_population=ds_population,
-        regions=REGIONS,
-        missing_data_on_columns=False,
+        tb=tb, columns=["legal_status"], ds_regions=ds_regions, regions=REGIONS, missing_data_on_columns=False
     )
 
     # Redefine legal_status_not_legal_pop as legal_status_not_legal_pop + legal_status_missing_pop
@@ -103,12 +97,7 @@ def explode_country_years(tb: Table) -> Table:
 
 
 def add_country_counts_and_population_by_status(
-    tb: Table,
-    columns: list[str],
-    ds_regions: Dataset,
-    ds_population: Dataset,
-    regions: list[str],
-    missing_data_on_columns: bool = False,
+    tb: Table, columns: list[str], ds_regions: Dataset, regions: list[str], missing_data_on_columns: bool = False
 ) -> Table:
     """
     Add country counts and population by status of the columns in the list
@@ -116,9 +105,7 @@ def add_country_counts_and_population_by_status(
 
     tb_regions = tb.copy()
 
-    tb_regions = geo.add_population_to_table(
-        tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_regions = paths.regions.add_population(tb=tb_regions, warn_on_missing_countries=False)
 
     # Define empty dictionaries for each of the columns
     columns_count_dict = {columns[i]: [] for i in range(len(columns))}
@@ -159,9 +146,7 @@ def add_country_counts_and_population_by_status(
     tb_regions = tb_regions.drop(columns=["population"])
 
     # Add population again
-    tb_regions = geo.add_population_to_table(
-        tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_regions = paths.regions.add_population(tb=tb_regions, warn_on_missing_countries=False)
 
     # Calculate the missing population for each region
     for col in columns:

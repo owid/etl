@@ -1,5 +1,7 @@
 dataset:
   title: Surface ocean plastic by particle count - Eriksen et al. (2014)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   surface_ocean_plastic_by_particle_count__eriksen_et_al__2014:
     variables:

@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   avian_influenza_ah5n1_month:
     variables:

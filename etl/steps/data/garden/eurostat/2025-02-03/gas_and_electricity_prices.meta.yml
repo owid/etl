@@ -94,6 +94,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Rosado
 tables:
   gas_and_electricity_prices:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: GHG emissions from food by life-cycle stage (Crippa et al. 2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   ghg_emissions_from_food_by_life_cycle_stage__crippa_et_al__2021:
     variables:

@@ -9,6 +9,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Rosado
 tables:
   producer_prices_in_industry:
     variables:

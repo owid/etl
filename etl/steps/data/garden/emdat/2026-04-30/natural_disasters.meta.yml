@@ -4,7 +4,7 @@ definitions:
     presentation:
       attribution_short: EM-DAT
       topic_tags:
-      - Natural Disasters
+        - Natural Disasters
 
   # General definitions.
   definition_disaster: &definition-disaster |-
@@ -162,6 +162,8 @@ dataset:
   title: Natural disasters
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   natural_disasters_decadal:
     title: Natural disasters, decadal average

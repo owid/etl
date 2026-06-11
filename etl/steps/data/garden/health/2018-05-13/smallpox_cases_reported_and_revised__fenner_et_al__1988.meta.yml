@@ -1,5 +1,7 @@
 dataset:
   title: Smallpox cases reported and revised - Fenner et al. (1988)
+  owners:
+    - Sophie Ochmann  # backport
 tables:
   smallpox_cases_reported_and_revised__fenner_et_al__1988:
     variables:

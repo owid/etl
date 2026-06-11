@@ -13,6 +13,8 @@ dataset:
   update_period_days: 1
 
 
+  owners:
+    - Fiona Spooner
 tables:
   global_health_mpox:
     variables:

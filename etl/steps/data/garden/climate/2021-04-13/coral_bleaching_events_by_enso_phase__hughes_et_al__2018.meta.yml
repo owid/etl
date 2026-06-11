@@ -1,5 +1,7 @@
 dataset:
   title: Coral bleaching events by ENSO phase (Hughes et al. 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   coral_bleaching_events_by_enso_phase__hughes_et_al__2018:
     variables:

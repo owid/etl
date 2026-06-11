@@ -1,5 +1,7 @@
 dataset:
   title: HALF Index (Land Use) - Alexander et al. (2016)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   half_index__land_use__alexander_et_al__2016:
     variables:
