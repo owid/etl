@@ -116,13 +116,6 @@ definitions:
     owned by
     <%- endif %>
 
-  concept_welfare_type_subject: |-
-    <% if welfare_type != "wealth" %>
-    Incomes are
-    <%- else %>
-    Wealth is
-    <%- endif %>
-
   concept_welfare_type: |-
     <% if welfare_type != "wealth" %>
     income
@@ -185,7 +178,11 @@ definitions:
     This is a measure of _relative_ poverty — it captures the share of people whose {definitions.concept_welfare_type} is low by the standards typical in their own country.
 
   intro_unequal_distribution: |-
-    {definitions.concept_welfare_type_subject} distributed very unequally, both between countries and within them.
+    <% if welfare_type != "wealth" %>
+    Incomes are distributed very unequally, both between countries and within them.
+    <%- else %>
+    Wealth is distributed very unequally, both between countries and within them — typically even more unequally than income.
+    <%- endif %>
 
   description_key_gini_wealth_note: |-
     <% if welfare_type == "wealth" %>
