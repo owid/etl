@@ -666,8 +666,11 @@ are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool wil
 1. (Worktree branches only) Copy that worktree's Claude sessions — the `<uuid>.jsonl` transcripts and
    their `<uuid>/` subfolders under `~/.claude/projects/<encoded-worktree-path>/` — into the main
    repo's project dir, so they stay resumable with `claude --resume` after the worktree is gone.
-2. Remove the git worktree (skipped with a warning if it has uncommitted changes).
-3. Delete the local branch.
+2. (Worktree branches only) Copy the worktree's gitignored `workbench/` and `ai/` scratch dirs into
+   `workbench/<branch>/` and `ai/<branch>/` in the main repo (suffixed `-1`, `-2`... on the rare name
+   clash), so the working notes/outputs survive the worktree removal without overwriting anything.
+3. Remove the git worktree (skipped with a warning if it has uncommitted changes).
+4. Delete the local branch.
 
 Each branch is tagged `[merged]` or `[closed]` so you can see its PR outcome before selecting.
 
@@ -861,6 +864,28 @@ def copy_sessions(worktree_path: Path, main_project_dir: Path) -> int:
     return copied
 
 
+def copy_dir_namespaced(src: Path, dst_parent: Path, branch: str) -> Path | None:
+    """Copy a worktree's `src` dir into `dst_parent/<branch>`, suffixing -1, -2... on collision.
+
+    Returns the destination path, or None if `src` is missing or empty. Unlike Claude sessions
+    (UUID-named, collision-free), these dirs use task/human names, so the whole tree lands under a
+    branch-named (and, on collision, suffixed) folder. Nothing already in `dst_parent` is overwritten.
+    """
+    if not src.exists() or not any(p.name != ".DS_Store" for p in src.iterdir()):
+        return None
+
+    dest = dst_parent / branch
+    i = 1
+    while dest.exists():
+        dest = dst_parent / f"{branch}-{i}"
+        i += 1
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, dest, ignore=shutil.ignore_patterns(".DS_Store"))
+    log.info(f"Copied '{src}' to '{dest}'.")
+    return dest
+
+
 def clean_branch(
     repo,
     branch: str,
@@ -877,9 +902,12 @@ def clean_branch(
         return
 
     if worktree_path is not None:
-        # Copy sessions first, then drop the worktree. The session dir lives outside the worktree,
-        # so removing the worktree never touches it — but copy first on principle.
+        # Salvage anything the worktree holds but that's gitignored (so `git worktree remove` would
+        # destroy it for good): the Claude sessions, plus the workbench/ and ai/ scratch dirs.
+        # The session dir lives outside the worktree, but copy everything before removal on principle.
         copy_sessions(worktree_path, main_project_dir)
+        for name in ("workbench", "ai"):
+            copy_dir_namespaced(worktree_path / name, main_worktree_path / name, branch)
         try:
             repo.git.worktree("remove", str(worktree_path))
             log.info(f"Removed worktree '{worktree_path}'.")
