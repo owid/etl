@@ -83,9 +83,7 @@ def match_cities_with_ghsl(tb_sdg: Table, tb_ghsl: pd.DataFrame, ghsl_years: lis
     unmatched_mask = merged["pop"].isna()
     for idx, row in merged[unmatched_mask & merged["city_normalized"].str.contains("|", regex=False)].iterrows():
         for part in row["city_normalized"].split("|"):
-            ghsl_match = tb_ghsl[
-                (tb_ghsl["city_normalized"] == part.strip()) & (tb_ghsl["year"] == row["ghsl_year"])
-            ]
+            ghsl_match = tb_ghsl[(tb_ghsl["city_normalized"] == part.strip()) & (tb_ghsl["year"] == row["ghsl_year"])]
             if len(ghsl_match) > 0:
                 merged.loc[idx, "pop"] = ghsl_match.iloc[0]["pop"]
                 break
