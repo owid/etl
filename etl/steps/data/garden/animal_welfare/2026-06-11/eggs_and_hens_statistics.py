@@ -150,6 +150,11 @@ def prepare_wfi_data(tb: Table) -> Table:
     return tb[HEN_COLUMNS]
 
 
+def sanity_check_outputs(tb: Table) -> None:
+    for column in SHARE_OF_HENS_COLUMNS:
+        assert tb[column].dropna().between(0, 100).all(), f"Column {column} has values outside [0, 100]."
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -180,6 +185,9 @@ def run() -> None:
     # Combine sources, taking the first non-null value per column for each (country, year). The European Commission data is listed first (so it appears first in inherited origins) because it covers most of the data; UK and US follow; and WFI fills in the rest. None of these sources overlap on (country, year) pairs, so the order only affects the order of origins in metadata, not the values.
     tb_hens = pr.concat([tb_eu, tb_uk[HEN_COLUMNS], tb_us, tb_wfi], ignore_index=True, short_name="hen_statistics")
     tb_hens = tb_hens.groupby(["country", "year"], as_index=False, observed=True).first()
+
+    # Run sanity checks on outputs.
+    sanity_check_outputs(tb_hens)
 
     # Improve table format.
     tb_eggs = tb_eggs.format(short_name="egg_statistics")
