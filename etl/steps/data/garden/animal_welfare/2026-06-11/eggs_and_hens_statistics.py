@@ -104,11 +104,11 @@ def prepare_us_data(tb: Table) -> Table:
 def prepare_eu_data(tb: Table) -> Table:
     """EU: compute hen-housing shares from European Commission flock data.
 
-    Conventional cages were banned EU-wide in 2012, so cage counts here are enriched cages only.
+    Cage counts include both conventional cages (reported until their EU-wide ban in 2012) and enriched cages.
     """
     tb = tb.copy()
     tb["number_of_hens_all"] = tb["total"]
-    tb["number_of_hens_in_cages"] = tb["enriched_cage"]
+    tb["number_of_hens_in_cages"] = tb["enriched_cage"] + tb["not_enriched_cage"].fillna(0)
     tb["number_of_hens_in_barns"] = tb["barn"]
     tb["number_of_hens_free_range_not_organic"] = tb["free_range"]
     tb["number_of_hens_free_range_organic"] = tb["organic"]
