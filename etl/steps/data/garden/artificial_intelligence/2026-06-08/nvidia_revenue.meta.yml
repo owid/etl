@@ -19,7 +19,7 @@ tables:
         short_unit: "$"
         description_short: Quarterly revenue of NVIDIA Corporation across its main market segments, reported in US dollars. NVIDIA designs graphics processing units (GPUs), originally built for gaming and now also widely used to train and run AI models. This data is not adjusted for inflation.
         description_key:
-          - This indicator splits NVIDIA's quarterly revenue into two parts: its data centers and AI business, and everything else — gaming graphics cards, professional workstations, automotive chips, and chips and technology sold or licensed to other companies.
+          - "This indicator splits NVIDIA's quarterly revenue into two parts: its data centers and AI business, and everything else — gaming graphics cards, professional workstations, automotive chips, and chips and technology sold or licensed to other companies."
           - Figures are self-reported by NVIDIA in its quarterly financial disclosures, shown in US dollars, and not adjusted for inflation.
           - In April 2026, NVIDIA changed how it groups its market segments. Until then, it reported four separate non-data-center segments ("Gaming", "Professional Visualization", "Auto", and "OEM & Other"); from then on, it reports them as a single combined segment. We use the combined version throughout, summing the four older segments for earlier quarters so the time series stays consistent.
         description_processing: |-
