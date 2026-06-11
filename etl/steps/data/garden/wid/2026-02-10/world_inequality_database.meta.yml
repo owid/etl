@@ -80,10 +80,13 @@ definitions:
     with extrapolations
     <%- endif %>
 
+  # NOTE: Wealth is a stock, so it has no period dimension in the text. Both snippets render empty
+  # for wealth; per_period carries its own leading space so usage sites glue it directly after a word.
   per_period: |-
-    <% if period in ["day", "month", "year"] %>
-    per <<period>>
-    <%- endif %>
+    <% if welfare_type != "wealth" and period in ["day", "month", "year"] %> per <<period>><% endif %>
+
+  title_period_part: |-
+    <% if welfare_type != "wealth" and period in ["day", "month", "year"] %>per <<period>>, <% endif %>
 
   verb_welfare_type: |-
     <% if welfare_type != "wealth" %>
@@ -125,7 +128,7 @@ definitions:
     <%- elif welfare_type == "after tax disposable" %>
     Income is measured after taxes have been paid and most government benefits have been received. It does not include public services like health and education, or collective spending such as defense and infrastructure, so it does not add up to national income.
     <%- elif welfare_type == "wealth" %>
-    This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
+    This measure is related to household net wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
     <%- endif %>
 
   description_key_ppp: |-
@@ -153,23 +156,26 @@ definitions:
   description_key_relative_poverty: |-
     This is a measure of _relative_ poverty — it captures the share of people whose {definitions.concept_welfare_type} is low by the standards typical in their own country.
 
+  intro_unequal_distribution: |-
+    <% if welfare_type != "wealth" %>Incomes are<%- else %>Wealth is<%- endif %> distributed very unequally, both between countries and within them.
+
   description_key_top_incomes: |-
-    Incomes are distributed very unequally, both between countries and within them. A large share of total income is concentrated among the very richest, making the top of the distribution important to understand. Read more in our topic page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    {definitions.intro_unequal_distribution} A large share of total {definitions.concept_welfare_type} is concentrated among the very richest, making the top of the distribution important to understand. Read more in our topic page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_gini: |-
-    Incomes are distributed very unequally, both between countries and within them. The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality. We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss income inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    {definitions.intro_unequal_distribution} The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality.<% if welfare_type == "wealth" %> Because some people have negative net wealth — their debts are larger than their assets — the Gini coefficient for wealth can be higher than 1.<%- endif %> We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss {definitions.concept_welfare_type} inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_palma_ratio: |-
-    Incomes are distributed very unequally, both between countries and within them. The Palma ratio captures this by comparing the income share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% receive twice as much as the poorest 40%. We discuss income inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    {definitions.intro_unequal_distribution} The Palma ratio captures this by comparing the {definitions.concept_welfare_type} share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% <% if welfare_type != "wealth" %>receive<%- else %>own<%- endif %> twice as much as the poorest 40%. We discuss {definitions.concept_welfare_type} inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_share: |-
-    This data shows the share of total income that goes to specific groups of the population. For example, if the richest decile receives 40% of total income, it means the richest 10% of people share 40% of all income between them.
+    This data shows the share of total {definitions.concept_welfare_type} <% if welfare_type != "wealth" %>that goes to<%- else %>owned by<%- endif %> specific groups of the population. For example, if the richest decile <% if welfare_type != "wealth" %>receives<%- else %>owns<%- endif %> 40% of total {definitions.concept_welfare_type}, it means the richest 10% of people share 40% of all {definitions.concept_welfare_type} between them.
 
   description_key_avg: |-
-    This data shows the mean (average) income per person within specific groups of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country.
+    This data shows the mean (average) {definitions.concept_welfare_type} per person within specific groups of the population, ranked by {definitions.concept_welfare_type}. For example, the poorest decile is the poorest 10% of people in a country.
 
   description_key_thr: |-
-    This data shows the income threshold for a specific group of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.
+    This data shows the {definitions.concept_welfare_type} threshold for a specific group of the population. The "poorest decile" threshold, for example, is the {definitions.concept_welfare_type} level below which the poorest 10% of people in a country fall.
 
   description_processing_general: |-
     We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
@@ -194,9 +200,9 @@ definitions:
   title_threshold: |-
     {macros}
     <% if quantile == "p50p60" %>
-    Median {definitions.concept_welfare_type} {definitions.per_period}{definitions.concept_welfare_type_for_title}
+    Median {definitions.concept_welfare_type}{definitions.per_period}{definitions.concept_welfare_type_for_title}
     <%- else %>
-    Threshold {definitions.concept_welfare_type} {definitions.per_period} marking the <<quantiles_thr(quantile) | lower>>{definitions.concept_welfare_type_for_title}
+    Threshold {definitions.concept_welfare_type}{definitions.per_period} marking the <<quantiles_thr(quantile) | lower>>{definitions.concept_welfare_type_for_title}
     <%- endif %>
 
   subtitle_welfare_type: |-
@@ -633,10 +639,10 @@ tables:
   incomes:
     variables:
       mean:
-        title: Mean ({definitions.per_period}, <<welfare_type>>){definitions.title_extrapolated}
+        title: Mean ({definitions.title_period_part}<<welfare_type>>){definitions.title_extrapolated}
         unit: "international-$ in {definitions.ppp_year} prices"
         short_unit: "$"
-        description_short: Average {definitions.concept_welfare_type} {definitions.per_period}. {definitions.subtitle_welfare_type}
+        description_short: Average {definitions.concept_welfare_type}{definitions.per_period}. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -649,7 +655,7 @@ tables:
           <<: *common_display
         presentation:
           grapher_config:
-            title: "Mean {definitions.concept_welfare_type} {definitions.per_period}{definitions.concept_welfare_type_for_title}"
+            title: "Mean {definitions.concept_welfare_type}{definitions.per_period}{definitions.concept_welfare_type_for_title}"
             subtitle: |-
               {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
             note: "{definitions.note_ppp_before_tax}"
@@ -665,10 +671,10 @@ tables:
             selectedEntityNames: *entity_names_inequality
 
       median:
-        title: Median ({definitions.per_period}, <<welfare_type>>){definitions.title_extrapolated}
+        title: Median ({definitions.title_period_part}<<welfare_type>>){definitions.title_extrapolated}
         unit: "international-$ in {definitions.ppp_year} prices"
         short_unit: "$"
-        description_short: Value of {definitions.concept_welfare_type} {definitions.per_period} below which 50% of the population live. {definitions.subtitle_welfare_type}
+        description_short: Value of {definitions.concept_welfare_type}{definitions.per_period} below which 50% of the population live. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -681,7 +687,7 @@ tables:
           <<: *common_display
         presentation:
           grapher_config:
-            title: "Median {definitions.concept_welfare_type} {definitions.per_period}{definitions.concept_welfare_type_for_title}"
+            title: "Median {definitions.concept_welfare_type}{definitions.per_period}{definitions.concept_welfare_type_for_title}"
             subtitle: |-
               {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
             note: "{definitions.note_ppp_before_tax}"
@@ -699,12 +705,12 @@ tables:
       avg:
         title: |-
           {macros}
-          Average ({definitions.per_period}, <<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
+          Average ({definitions.title_period_part}<<quantiles_avg_share(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
         unit: "international-$ in {definitions.ppp_year} prices"
         short_unit: "$"
         description_short: |-
           {macros}
-          The mean {definitions.concept_welfare_type} {definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+          The mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_avg}"
           - "{definitions.description_key_ppp}"
@@ -722,10 +728,10 @@ tables:
           grapher_config:
             title: |-
               {macros}
-              Mean {definitions.concept_welfare_type} {definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>>{definitions.concept_welfare_type_for_title}
+              Mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>>{definitions.concept_welfare_type_for_title}
             subtitle: |-
               {macros}
-              The mean {definitions.concept_welfare_type} {definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+              The mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
             note: "{definitions.note_ppp_before_tax}"
             hasMapTab: true
             tab: map
@@ -783,12 +789,12 @@ tables:
       thr:
         title: |-
           {macros}
-          Threshold ({definitions.per_period}, <<quantiles_thr(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
+          Threshold ({definitions.title_period_part}<<quantiles_thr(quantile) | lower>>, <<welfare_type>>){definitions.title_extrapolated}
         unit: "international-$ in {definitions.ppp_year} prices"
         short_unit: "$"
         description_short: |-
           {macros}
-          The level of {definitions.concept_welfare_type} {definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
+          The level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_thr}"
           - "{definitions.description_key_ppp}"
@@ -808,7 +814,7 @@ tables:
               {definitions.title_threshold}
             subtitle: |-
               {macros}
-              The level of {definitions.concept_welfare_type} {definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+              The level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
             note: "{definitions.note_ppp_before_tax}"
             hasMapTab: true
             tab: map

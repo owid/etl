@@ -131,6 +131,14 @@ def run() -> None:
     # Add period dimension to incomes table
     tb_incomes = add_period_dimension(tb=tb_incomes)
 
+    # Wealth is a stock: it must not have day/month variants, nor relative poverty estimations.
+    assert not ((tb_incomes["welfare_type"] == "wealth") & tb_incomes["period"].isin(["day", "month"])).any(), (
+        "Wealth rows must not have day/month period variants."
+    )
+    assert not (tb_relative_poverty["welfare_type"] == "wealth").any(), (
+        "Wealth must not be included in relative poverty estimations."
+    )
+
     # Sanity checks
     sanity_checks(
         tb_inequality=tb_inequality,
@@ -297,8 +305,10 @@ def add_period_dimension(tb: Table) -> Table:
     tb_non_period = tb[["country", "year", "welfare_type", "quantile", "extrapolated", "share"]].copy()
 
     # Create two copies of tb_period, one for "day" and another for "month"
-    tb_day = tb_period.copy()
-    tb_month = tb_period.copy()
+    # NOTE: Wealth is a stock, not a flow — per-day/per-month values are not meaningful for it,
+    # so only income welfare types get day/month variants. Wealth keeps a single "year" period.
+    tb_day = tb_period[tb_period["welfare_type"] != "wealth"].copy()
+    tb_month = tb_period[tb_period["welfare_type"] != "wealth"].copy()
 
     for col in ["mean", "median", "avg", "thr"]:
         tb_day[col] = tb_day[col] / 365
@@ -344,6 +354,10 @@ def add_relative_poverty(tb_inequality: Table, tb_incomes: Table, tb_distributio
     tb_incomes = tb_incomes.copy()
     tb_distribution = tb_distribution.copy()
     tb_inequality = tb_inequality.copy()
+
+    # NOTE: Relative poverty is an income concept (the poverty line is a share of the median income),
+    # so wealth is excluded from these estimations.
+    tb_distribution = tb_distribution[tb_distribution["welfare_type"] != "wealth"].reset_index(drop=True)
 
     # Filter tb_incomes to only include median values
     tb_median = tb_incomes[tb_incomes["quantile"].isnull()][
