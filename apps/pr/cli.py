@@ -1,5 +1,9 @@
 """This script creates a new draft pull request in GitHub, which starts a new staging server.
 
+The new branch is seeded with an empty commit (enough to open the draft PR and start the
+staging server). This commit is always empty: it never stages or commits your local changes,
+whether or not you have anything staged.
+
 Arguments:
 
 `TITLE`: The title of the PR. This must be given.
@@ -515,12 +519,14 @@ def create_pr(repo, work_branch, base_branch, pr_title):
     pr_title_str = str(pr_title)
 
     log.info("Creating an empty commit.")
-    # Skip pre-commit hooks on this seeding commit: it's empty (nothing to check), and the
-    # format/lint/check-typing hooks need an installed `.venv`. In a fresh worktree the venv
-    # isn't set up yet (install_worktree_venv runs later), so the hooks would fail here.
-    repo.git.commit(
-        "--allow-empty", "--no-verify", "-m", pr_title_str or f"Start a new staging server for branch '{work_branch}'"
-    )
+    # Build the seeding commit with `git commit-tree` rather than `git commit`. It reuses
+    # HEAD's own tree, so the commit is always truly empty: it never reads the index, hence
+    # it can't accidentally commit changes you'd already staged, and it runs no pre-commit
+    # hooks (so it won't fail on formatting/typing, and needs no `.venv` in a fresh worktree).
+    head = repo.head.commit
+    commit_msg = pr_title_str or f"Start a new staging server for branch '{work_branch}'"
+    new_commit = repo.git.commit_tree(head.tree.hexsha, "-p", head.hexsha, "-m", commit_msg)
+    repo.git.update_ref("HEAD", new_commit)
 
     log.info("Pushing the new branch to remote.")
     repo.git.push("origin", work_branch)
