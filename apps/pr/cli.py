@@ -867,17 +867,19 @@ def copy_sessions(worktree_path: Path, main_project_dir: Path) -> int:
 def copy_dir_namespaced(src: Path, dst_parent: Path, branch: str) -> Path | None:
     """Copy a worktree's `src` dir into `dst_parent/<branch>`, suffixing -1, -2... on collision.
 
-    Returns the destination path, or None if `src` is missing or empty. Unlike Claude sessions
-    (UUID-named, collision-free), these dirs use task/human names, so the whole tree lands under a
-    branch-named (and, on collision, suffixed) folder. Nothing already in `dst_parent` is overwritten.
+    Returns the destination path, or None if `src` is missing, not a directory, or empty. Unlike
+    Claude sessions (UUID-named, collision-free), these dirs use task/human names, so the whole tree
+    lands under a branch-named (and, on collision, suffixed) folder. Slashes in the branch name are
+    flattened to '-' so the result stays a single folder. Nothing already in `dst_parent` is overwritten.
     """
-    if not src.exists() or not any(p.name != ".DS_Store" for p in src.iterdir()):
+    if not src.is_dir() or not any(p.name != ".DS_Store" for p in src.iterdir()):
         return None
 
-    dest = dst_parent / branch
+    safe_branch = branch.replace("/", "-")
+    dest = dst_parent / safe_branch
     i = 1
     while dest.exists():
-        dest = dst_parent / f"{branch}-{i}"
+        dest = dst_parent / f"{safe_branch}-{i}"
         i += 1
 
     dest.parent.mkdir(parents=True, exist_ok=True)
