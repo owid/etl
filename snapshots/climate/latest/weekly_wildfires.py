@@ -1,7 +1,7 @@
 """
 Script to create a snapshot of dataset.
 Loads data from the EFFIS API and creates a snapshot of the dataset with weekly wildfire numbers, area burnt and emissions.
-This script generates data for the years 2024 and above. Historical data (2003–2023) is processed separately.
+This script generates data from 2003 up to and including the current year.
 """
 
 import datetime as dt
@@ -33,7 +33,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 CURRENT_YEAR = datetime.now().year
 
 # Define a range of years including a starting year and all years up to the current year
-START_YEAR = 2024  # Define the starting year
+START_YEAR = 2003  # Define the starting year
 YEARS = list(range(START_YEAR, CURRENT_YEAR + 1))
 
 
