@@ -1,0 +1,30 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+        - Transport
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+  description: |-
+    This dataset provides data on SDG Indicator 9.1.1 - the proportion of the rural population who live within 2 km of an all-season road.
+
+  owners:
+    - Veronika Samborska
+
+tables:
+  sdg_9_1_1:
+    variables:
+      rural_road_access:
+        title: Share of rural population living within 2 km of an all-season road
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the rural population who live within 2 km of an all-season road — a road that can be used year-round by the prevailing means of rural transport.
+        description_key:
+          - An all-season road is passable year-round by the prevailing means of rural transport (typically a motorized vehicle) without being impassably impeded by seasonal conditions such as rain, snow, or flooding.
+          - The indicator captures physical access — it does not measure the quality, safety, or condition of roads beyond all-season passability.
+          - Data coverage is limited — many countries report for only one or a few years, and coverage is particularly sparse in high-income countries.
+        display:
+          numDecimalPlaces: 1

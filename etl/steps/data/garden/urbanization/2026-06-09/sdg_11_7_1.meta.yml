@@ -1,0 +1,34 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+
+dataset:
+  update_period_days: 365
+  description: |-
+    This dataset provides data on SDG Indicator 11.7.1 - the average share of the built-up area of cities that is open space for public use.
+
+    Country-level values are population-weighted averages across cities, using city population data from the Global Human Settlement Layer (GHSL) Urban Centers database.
+
+  owners:
+    - Veronika Samborska
+
+tables:
+  sdg_11_7_1_country:
+    variables:
+      open_space_share:
+        title: Share of built-up area in cities that is open space for public use (population-weighted)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the built-up area of [cities](#dod:cities-degurba) that is open space — including streets, squares, parks, and other publicly accessible areas — averaged across cities and weighted by population.
+        description_key:
+          - Open space includes all outdoor areas that are publicly accessible, such as streets, squares, parks, playgrounds, and green spaces. It excludes private gardens and restricted areas.
+          - Country figures are averages across cities, weighted by population. Larger cities count for more, which better reflects where most people actually live.
+          - City boundaries follow the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php) standard and may not match official administrative boundaries.
+          - Data coverage is limited — many countries report only for a single year, and coverage is uneven across regions.
+        description_processing: |-
+          Country values are calculated as population-weighted averages across all cities with available population data. City populations are sourced from the Global Human Settlement Layer (GHSL) Urban Centers database, using the nearest available 5-year data point to each SDG reporting year. City names are parsed from UN SDG city codes (e.g. "BG_SOFIJA" → "Sofija") and matched to GHSL using multiple strategies: normalized name matching (strips diacritics), substring matching, compound name handling, prefix matching, and manual overrides for cities with transliteration differences.
+        display:
+          numDecimalPlaces: 1
