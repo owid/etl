@@ -212,7 +212,7 @@ If the same sentence could fit in both, it belongs in garden — not in `.dvc`. 
 
 ## Sanity checks
 
-Silent data corruption is the worst kind of bug. A step that runs cleanly, passes type checks, and ships to staging — but produces wrong numbers — wastes everyone downstream. By the time someone notices on a chart, the bad data may already be live. Sanity checks are how we catch that at build time instead.
+Silent data corruption is one of the easier bugs to miss. A step can run cleanly, pass type checks, and ship to staging while producing wrong numbers — and by the time someone notices on a chart, the bad data may already be live. Sanity checks are how we catch that at build time instead.
 
 **Write them. Make them strict.** Every garden step that does anything more than a straight load-and-format should assert its assumptions about both the input it received and the output it produced. The bar isn't "would I notice this on a chart" — it's "could this go wrong, and if it did, would the step still finish without complaining?". If yes, that's a check.
 
