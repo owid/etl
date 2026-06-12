@@ -1,5 +1,8 @@
 """CLI functions for upgrading indicators and charts."""
 
+import difflib
+import json
+import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import click
@@ -72,6 +75,100 @@ def get_affected_narrative_charts_cli(charts: list[gm.Chart]) -> list[gm.Narrati
     return narrative_charts
 
 
+# User-facing text fields (FAUST: Footnote, Axis titles, Units, Subtitle, Title) checked for stale
+# overrides in narrative charts, as config paths.
+FAUST_FIELDS = {
+    "title": ("title",),
+    "subtitle": ("subtitle",),
+    "note": ("note",),
+    "y-axis label": ("yAxis", "label"),
+    "x-axis label": ("xAxis", "label"),
+}
+# Similarity (difflib ratio) above which a differing override is treated as a stale copy of the
+# parent's text rather than an intentional rewrite.
+FAUST_STALE_SIMILARITY = 0.8
+
+
+def _get_nested(config: dict, path: tuple[str, ...]):
+    value = config
+    for key in path:
+        if not isinstance(value, dict):
+            return None
+        value = value.get(key)
+    return value
+
+
+def _normalize_chart_text(text: str) -> str:
+    """Normalize chart text for staleness comparison: strip markdown links (keep anchor text) and
+    collapse whitespace, so e.g. a parent note that gained detail-on-demand links still matches a
+    narrative override that froze the older, link-less wording."""
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
+    return " ".join(text.split())
+
+
+def _find_stale_faust_overrides(patch_config: dict, parent_config: dict) -> list[tuple[str, str, str]]:
+    """Find user-facing text overrides in a narrative chart that look like stale copies of the parent.
+
+    A narrative chart pins in its patch any field it overrides. Overriding the title or subtitle is
+    usually an intentional rewrite (that's what narrative charts are for), but an override that is
+    *nearly identical* to the parent's current text is the signature of a stale copy: the narrative
+    chart froze the parent's text at creation time and the parent has since evolved (e.g. gained
+    detail-on-demand links in its note). Texts are compared after stripping markdown link syntax;
+    equal-after-normalization or highly similar values are reported as stale. Returns
+    (field_label, narrative_value, parent_value) for each such field; identical raw values and
+    substantially different overrides are not reported.
+    """
+    stale = []
+    for label, path in FAUST_FIELDS.items():
+        narrative_value = _get_nested(patch_config, path)
+        parent_value = _get_nested(parent_config, path)
+        if not isinstance(narrative_value, str) or not isinstance(parent_value, str):
+            continue
+        if narrative_value == parent_value:
+            continue
+        narrative_norm = _normalize_chart_text(narrative_value)
+        parent_norm = _normalize_chart_text(parent_value)
+        if (
+            narrative_norm == parent_norm
+            or difflib.SequenceMatcher(None, narrative_norm, parent_norm).ratio() >= FAUST_STALE_SIMILARITY
+        ):
+            stale.append((label, narrative_value, parent_value))
+    return stale
+
+
+def _load_patches_and_parent_configs(
+    narrative_charts: list[gm.NarrativeChart],
+) -> tuple[dict[int, dict], dict[int, dict]]:
+    """Load each narrative chart's config patch and each parent chart's full config."""
+
+    def to_dict(value) -> dict:
+        if isinstance(value, dict):
+            return value
+        if isinstance(value, (str, bytes)):
+            return json.loads(value)
+        return {}
+
+    nc_ids = sorted({nc.id for nc in narrative_charts if nc.id})
+    parent_ids = sorted({nc.parentChartId for nc in narrative_charts if nc.parentChartId})
+    patches: dict[int, dict] = {}
+    parent_configs: dict[int, dict] = {}
+    if nc_ids:
+        df = read_sql(
+            "SELECT nc.id, cc.patch FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId "
+            f"WHERE nc.id IN ({','.join(str(int(i)) for i in nc_ids)})",
+            engine=get_engine(),
+        )
+        patches = {int(row["id"]): to_dict(row["patch"]) for _, row in df.iterrows()}
+    if parent_ids:
+        df = read_sql(
+            "SELECT c.id, cc.full FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
+            f"WHERE c.id IN ({','.join(str(int(i)) for i in parent_ids)})",
+            engine=get_engine(),
+        )
+        parent_configs = {int(row["id"]): to_dict(row["full"]) for _, row in df.iterrows()}
+    return patches, parent_configs
+
+
 def _find_stale_lineage_variables(referenced_ids: set[int], indicator_mapping: dict[int, int]) -> dict[int, str]:
     """Find referenced indicators that belong to a different version of an upgraded dataset.
 
@@ -140,6 +237,9 @@ def push_new_narrative_charts_cli(
     # API to interact with the admin tool
     api = AdminAPI(OWID_ENV)
 
+    # Load patches and parent configs to check for stale user-facing text overrides (FAUST).
+    patches, parent_configs = _load_patches_and_parent_configs(narrative_charts)
+
     # Update narrative charts sequentially
     successful_updates = 0
     skipped = 0
@@ -147,6 +247,21 @@ def push_new_narrative_charts_cli(
 
     for nc in narrative_charts:
         try:
+            # Warn when the narrative chart pins user-facing text that is nearly identical to the
+            # parent's current text — likely frozen at creation time and stale since.
+            stale_faust = _find_stale_faust_overrides(patches.get(nc.id, {}), parent_configs.get(nc.parentChartId, {}))
+            if stale_faust:
+                details = "; ".join(
+                    f"{field}: narrative={narrative_value!r} vs parent={parent_value!r}"
+                    for field, narrative_value, parent_value in stale_faust
+                )
+                log.warning(
+                    f"Narrative chart {nc.id} ({nc.name}) overrides user-facing text that is nearly "
+                    f"identical to its parent chart {nc.parentChartId} — likely a stale copy of older "
+                    f"parent text rather than an intentional rewrite: {details}. Setting the field to "
+                    "the parent's exact text restores inheritance (identical values drop out of the patch)."
+                )
+
             # Get full config via API (full config = parent + patch merged)
             response = api.get_narrative_chart(nc.id)
             full_config = response["configFull"]
