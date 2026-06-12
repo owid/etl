@@ -46,6 +46,10 @@ EXPENDITURE_OVER_100_EXPECTED: dict[str, range | None] = {
     "Equatorial Guinea": range(1985, 1996),
     "Kiribati": None,
 }
+# Kiribati's open-ended exception is magnitude-capped: the IMF reports expenditure peaking at 143% of
+# GDP (2018, Country Report 19/26), so values above this ceiling are likely data errors rather than
+# the structural pattern.
+EXPENDITURE_CEILING_KIRIBATI = 150
 
 # Coverage floors from the Dec 2025 release: 153 source country labels (151 after harmonization, since
 # the source ships duplicate labels for Congo and Bahamas). A drop below these in a future release is
@@ -124,3 +128,7 @@ def sanity_check_outputs(tb: Table) -> None:
         or (EXPENDITURE_OVER_100_EXPECTED[country] is not None and year not in EXPENDITURE_OVER_100_EXPECTED[country])
     )
     assert not unexpected_over_100, f"Expenditure above 100% of GDP outside the known exceptions: {unexpected_over_100}"
+    kiribati_expenditure = tb[tb.index.get_level_values("country") == "Kiribati"]["expenditure"]
+    assert kiribati_expenditure.max() < EXPENDITURE_CEILING_KIRIBATI, (
+        f"Kiribati expenditure above its plausible ceiling (max: {kiribati_expenditure.max()})."
+    )
