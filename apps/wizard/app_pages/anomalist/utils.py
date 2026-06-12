@@ -6,6 +6,7 @@ from enum import Enum
 import pandas as pd
 import streamlit as st
 from sqlalchemy import select
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
@@ -28,8 +29,8 @@ class AnomalyTypeEnum(Enum):
     # AI = "ai"  # Uncomment if needed
 
 
-def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int) -> dict[int, int]:
-    engine = get_engine()
+def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int, engine: Engine | None = None) -> dict[int, int]:
+    engine = engine or get_engine()
     with Session(engine) as session:
         variables_new = gm.Variable.load_variables_in_datasets(session=session, dataset_ids=[dataset_id_new])
         variables_old = gm.Variable.load_variables_in_datasets(session=session, dataset_ids=[dataset_id_old])
@@ -87,7 +88,9 @@ def get_datasets_and_mapping_inputs() -> tuple[dict[int, str], dict[int, str], d
 
 
 def load_variable_mapping(
-    datasets_new_ids: list[int], dataset_new_and_old: dict[int, int | None] | None = None
+    datasets_new_ids: list[int],
+    dataset_new_and_old: dict[int, int | None] | None = None,
+    engine: Engine | None = None,
 ) -> dict[int, int]:
     # Infer a mapping by shortName for each new dataset and its previous version (if known).
     # This is combined with the indicator upgrader's mapping below: the upgrader only persists
@@ -99,7 +102,7 @@ def load_variable_mapping(
             if dataset_id_old is None:
                 continue
             # Infer (assuming no names have changed).
-            inferred_mapping.update(infer_variable_mapping(dataset_id_new, dataset_id_old))
+            inferred_mapping.update(infer_variable_mapping(dataset_id_new, dataset_id_old, engine=engine))
 
     mapping = WizardDB.get_variable_mapping_raw()
     if len(mapping) > 0:

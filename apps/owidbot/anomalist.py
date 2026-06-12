@@ -53,7 +53,7 @@ def run(branch: str) -> None:
     # Load variable mapping. Pass the new->old dataset pairs so the mapping can be inferred (or
     # enriched) by shortName — the indicator upgrader only persists mappings for charted
     # indicators, which on its own would restrict upgrade detectors to those indicators.
-    variable_mapping_dict = load_variable_mapping(datasets_new_ids, dataset_new_and_old)
+    variable_mapping_dict = load_variable_mapping(datasets_new_ids, dataset_new_and_old, engine=source_engine)
 
     log.info("owidbot.anomalist.start", n_variables=len(variable_ids))
     t = time.time()
