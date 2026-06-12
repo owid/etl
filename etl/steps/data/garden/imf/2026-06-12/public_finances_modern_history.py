@@ -33,6 +33,12 @@ EXPECTED_INPUT_COLUMNS = {"country", "year", "isocode", "ifscode"} | set(INDICAT
 NON_NEGATIVE_COLUMNS = ["revenue", "expenditure", "interest_expense", "primary_expenditure", "gross_debt"]
 SHARE_OF_GDP_CEILING = 1000
 
+# Countries whose expenditure legitimately exceeds 100% of GDP, all driven by tiny or collapsed GDP
+# denominators: Equatorial Guinea's aid-financed pre-oil-boom budgets (1985-1995, up to 595%), Kuwait
+# during the Gulf War (1990-1991), and Kiribati, where fishing-license and sovereign-fund revenue
+# routinely exceeds GDP. Any other country above 100% should be reviewed before being added here.
+EXPENDITURE_OVER_100_COUNTRIES = {"Equatorial Guinea", "Kuwait", "Kiribati"}
+
 # Coverage floors from the Dec 2025 release: 153 source country labels (151 after harmonization, since
 # the source ships duplicate labels for Congo and Bahamas). A drop below these in a future release is
 # usually a parsing or mapping regression, not a real change — re-audit before bumping.
@@ -66,6 +72,12 @@ def sanity_check_outputs(tb: Table) -> None:
         assert tb[col].max() < SHARE_OF_GDP_CEILING, (
             f"Implausibly large value in {col} (max: {tb[col].max()}) — likely a unit mistake."
         )
+    # Expenditure should stay below 100% of GDP outside the known exceptions.
+    countries_over_100 = set(tb[tb["expenditure"] > 100].index.get_level_values("country"))
+    unexpected_over_100 = sorted(countries_over_100 - EXPENDITURE_OVER_100_COUNTRIES)
+    assert not unexpected_over_100, (
+        f"Expenditure above 100% of GDP for countries outside the known exceptions: {unexpected_over_100}"
+    )
 
 
 def run() -> None:
