@@ -1,6 +1,7 @@
 """Reshape Microsoft AI Diffusion data from wide to long format for time series."""
 
-from owid.catalog import Table, processing as pr
+from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
