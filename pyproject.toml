@@ -24,7 +24,7 @@ dependencies = [
     "tenacity>=8.0.1",
     "simplejson>=3.17.6",
     "xlrd>=2.0.1",
-    "PyPDF2>=2.11.1",
+    "pypdf>=3.9.0",
     "ruamel.yaml>=0.17.21",
     "gitpython>=3.1.50",
     "rapidfuzz>=2.13.7",
@@ -68,7 +68,7 @@ dependencies = [
     # Upgraded to FastMCP 3.0 beta for new component/provider architecture, timeouts, versioning
     "fastmcp>=3.2.0",
     "pyproj>=3.7.1",
-    "pydantic-ai-slim[anthropic,fastmcp,google,mcp,openai]>=1.40.0",
+    "pydantic-ai-slim[anthropic,fastmcp,google,mcp,openai]>=1.99.0",
     "metabase-api>=3.5.2",
     "codespell>=2.4.1",
     "zensical>=0.0.15",

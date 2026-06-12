@@ -1,13 +1,14 @@
 """
 Script to create a snapshot of dataset.
 Loads data from the EFFIS API and creates a snapshot of the dataset with weekly wildfire numbers, area burnt and emissions.
-This script generates data for the years 2024 and above. Historical data (2003–2023) is processed separately.
+This script generates data from 2003 up to and including the current year.
 """
 
 import datetime as dt
 import json
 import subprocess
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
@@ -33,7 +34,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 CURRENT_YEAR = datetime.now().year
 
 # Define a range of years including a starting year and all years up to the current year
-START_YEAR = 2024  # Define the starting year
+START_YEAR = 2003  # Define the starting year
 YEARS = list(range(START_YEAR, CURRENT_YEAR + 1))
 
 
@@ -58,6 +59,14 @@ COUNTRIES = {
 }
 
 TIMEOUT = 300  # seconds
+
+# Number of parallel requests to the EFFIS API. The full 2003+ fetch is ~12k requests;
+# at 8 workers the API serves them in a few minutes without rate limiting.
+MAX_WORKERS = 8
+
+# Shared session with a connection pool sized for the thread pool.
+_session = requests.Session()
+_session.mount("https://", requests.adapters.HTTPAdapter(pool_connections=MAX_WORKERS, pool_maxsize=MAX_WORKERS))
 
 
 def fetch_with_curl(url: str) -> dict:
@@ -98,7 +107,7 @@ def fetch_with_retry(url: str, max_retries: int = 3, timeout: int = TIMEOUT) -> 
     # First try with requests
     for attempt in range(max_retries):
         try:
-            response = requests.get(url, headers=headers, timeout=timeout)
+            response = _session.get(url, headers=headers, timeout=timeout)
             response.raise_for_status()
             data = response.json()
             return data
@@ -137,8 +146,103 @@ def fetch_with_retry(url: str, max_retries: int = 3, timeout: int = TIMEOUT) -> 
         return fetch_with_curl(url)
     except Exception as e:
         log.error(f"Both requests and curl failed for {url}: {e}")
-        # Exit script if we can't fetch data after all retries and fallback
-        exit(1)
+        # Raise instead of exit(1): fetches run in worker threads, where exit() would
+        # not stop the process. The exception propagates through executor.map in main().
+        raise RuntimeError(f"Both requests and curl failed for {url}: {e}")
+
+
+def fetch_fires(country: str, year: int) -> pd.DataFrame | None:
+    """Fetch and reshape weekly + cumulative fires data for one country-year."""
+    # Format the API request URL for weekly wildfire data with current country and year.
+    base_url = "https://api2.effis.emergency.copernicus.eu/statistics/v2/gwis/weekly?country={country_code}&year={year}"
+    url = base_url.format(country_code=country, year=year)
+
+    data = fetch_with_retry(url)
+    if not data:  # Empty dict returned for 404s
+        log.info(f"No fires data available for {country} {year}")
+        return None
+
+    # Extract the weekly wildfire data.
+    banfweekly = data["banfweekly"]
+    # Convert the weekly data into a pandas DataFrame.
+    df = pd.DataFrame(banfweekly)
+    # Select and rename relevant columns, and calculate the 'month_day' column.
+    df = df[["mddate", "events", "area_ha"]]
+    df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["mddate"]]
+
+    # Add 'year' and 'country' columns with the current iteration values.
+    df["year"] = year
+    df["country"] = COUNTRIES[country]
+
+    # Reshape the DataFrame to have a consistent format for analysis, separating 'events' and 'area_ha' into separate rows.
+    df_melted = pd.melt(
+        df,
+        id_vars=["country", "year", "month_day"],
+        value_vars=["events", "area_ha"],
+        var_name="indicator",
+        value_name="value",
+    )
+
+    # Extract the cumulative wildfire data.
+    banfcumulative = data["banfcumulative"]
+    # Convert the cumulative data into a pandas DataFrame.
+    df_cum = pd.DataFrame(banfcumulative)
+    # Similar processing as above for the cumulative data.
+    df_cum = df_cum[["mddate", "events", "area_ha"]]
+    df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["mddate"]]
+    df_cum["year"] = year
+    df_cum["country"] = COUNTRIES[country]
+
+    # Reshape the cumulative DataFrame to match the format of the weekly data, marking indicators as cumulative.
+    df_melted_cum = pd.melt(
+        df_cum,
+        id_vars=["country", "year", "month_day"],
+        value_vars=["events", "area_ha"],
+        var_name="indicator",
+        value_name="value",
+    )
+    df_melted_cum["indicator"] = df_melted_cum["indicator"].apply(lambda x: x + "_cumulative")
+
+    # Concatenate the weekly and cumulative data into a single DataFrame.
+    return pd.concat([df_melted, df_melted_cum])
+
+
+def fetch_emissions(country: str, year: int) -> pd.DataFrame | None:
+    """Fetch and reshape weekly + cumulative emissions data for one country-year."""
+    # Format the API request URL for weekly emissions data.
+    base_url = (
+        "https://api2.effis.emergency.copernicus.eu/statistics/v2/emissions/weekly?country={country_code}&year={year}"
+    )
+    url = base_url.format(country_code=country, year=year)
+
+    data = fetch_with_retry(url)
+    if not data:  # Empty dict returned for 404s
+        log.info(f"No emissions data available for {country} {year}")
+        return None
+
+    # Extract and process the weekly emissions data.
+    emiss_weekly = data["emissionsweekly"]
+    df = pd.DataFrame(emiss_weekly)
+    df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["dt"]]
+
+    # Select relevant columns and rename for consistency.
+    df = df[["plt", "month_day", "curv"]]
+    df["year"] = year
+    df["country"] = COUNTRIES[country]
+    df = df.rename(columns={"plt": "indicator", "curv": "value"})
+
+    # Process cumulative emissions data similarly.
+    emiss_cumulative = data["emissionsweeklycum"]
+    df_cum = pd.DataFrame(emiss_cumulative)
+    df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["dt"]]
+    df_cum = df_cum[["plt", "month_day", "curv"]]
+    df_cum["year"] = year
+    df_cum["country"] = COUNTRIES[country]
+    df_cum = df_cum.rename(columns={"plt": "indicator", "curv": "value"})
+    df_cum["indicator"] = df_cum["indicator"].apply(lambda x: x + "_cumulative")
+
+    # Concatenate weekly and cumulative emissions data.
+    return pd.concat([df, df_cum])
 
 
 @click.command()
@@ -153,71 +257,20 @@ def main(upload: bool) -> None:
     except FileNotFoundError:
         orig_snapshot_df = None
 
-    # Initialize an empty list to hold DataFrames for wildfire data.
-    dfs_fires = []
-    for YEAR in YEARS:
-        # Iterate through each country in the COUNTRIES dictionary.
-        for country, _ in tqdm(
-            COUNTRIES.items(), desc=f"Processing number of fires and area burnt data for countries {YEAR}"
-        ):
-            # Format the API request URL for weekly wildfire data with current country and year.
-            base_url = "https://api2.effis.emergency.copernicus.eu/statistics/v2/gwis/weekly?country={country_code}&year={year}"
-            url = base_url.format(country_code=country, year=YEAR)
+    # All (country, year) pairs to fetch, in a deterministic order.
+    pairs = [(country, year) for year in YEARS for country in COUNTRIES]
 
-            data = fetch_with_retry(url)
-            if not data:  # Empty dict returned for 404s
-                log.info(f"No fires data available for {country} {YEAR}")
-                continue
-
-            # Extract the weekly wildfire data.
-            banfweekly = data["banfweekly"]
-            # Convert the weekly data into a pandas DataFrame.
-            df = pd.DataFrame(banfweekly)
-            # Select and rename relevant columns, and calculate the 'month_day' column.
-            df = df[["mddate", "events", "area_ha"]]
-            df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["mddate"]]
-
-            # Add 'year' and 'country' columns with the current iteration values.
-            df["year"] = YEAR
-            df["country"] = COUNTRIES[country]
-
-            # Reshape the DataFrame to have a consistent format for analysis, separating 'events' and 'area_ha' into separate rows.
-            df_melted = pd.melt(
-                df,
-                id_vars=["country", "year", "month_day"],
-                value_vars=["events", "area_ha"],
-                var_name="indicator",
-                value_name="value",
+    # Fetch fires data for all pairs in parallel. executor.map preserves input order,
+    # so the resulting snapshot has a stable row order.
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        results = list(
+            tqdm(
+                executor.map(lambda pair: fetch_fires(*pair), pairs),
+                total=len(pairs),
+                desc="Processing number of fires and area burnt data",
             )
-
-            # Extract the cumulative wildfire data.
-            banfcumulative = data["banfcumulative"]
-            # Convert the cumulative data into a pandas DataFrame.
-            df_cum = pd.DataFrame(banfcumulative)
-            # Similar processing as above for the cumulative data.
-            df_cum = df_cum[["mddate", "events", "area_ha"]]
-            df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["mddate"]]
-            df_cum["year"] = YEAR
-            df_cum["country"] = COUNTRIES[country]
-
-            # Reshape the cumulative DataFrame to match the format of the weekly data, marking indicators as cumulative.
-            df_melted_cum = pd.melt(
-                df_cum,
-                id_vars=["country", "year", "month_day"],
-                value_vars=["events", "area_ha"],
-                var_name="indicator",
-                value_name="value",
-            )
-            df_melted_cum["indicator"] = df_melted_cum["indicator"].apply(lambda x: x + "_cumulative")
-
-            # Concatenate the weekly and cumulative data into a single DataFrame.
-            df_all = pd.concat([df_melted, df_melted_cum])
-
-            # Append the processed DataFrame to the list of fire DataFrames.
-            dfs_fires.append(df_all)
-
-            # Short delay between requests to avoid rate limiting
-            time.sleep(0.5)
+        )
+    dfs_fires = [df for df in results if df is not None]
 
     # Combine all individual fire DataFrames into one.
     if not dfs_fires:
@@ -226,44 +279,15 @@ def main(upload: bool) -> None:
     log.info(f"Successfully fetched fires data for {len(dfs_fires)} records")
 
     # Similar process as above is repeated for emissions data, stored in `dfs_emissions`.
-    dfs_emissions = []
-    for YEAR in YEARS:
-        # Iterate through each country for emission data.
-        for country, _ in tqdm(COUNTRIES.items(), desc=f"Processing emissions data for countries for year {YEAR}"):
-            # Format the API request URL for weekly emissions data.
-            base_url = "https://api2.effis.emergency.copernicus.eu/statistics/v2/emissions/weekly?country={country_code}&year={year}"
-            url = base_url.format(country_code=country, year=YEAR)
-
-            data = fetch_with_retry(url)
-            if not data:  # Empty dict returned for 404s
-                log.info(f"No emissions data available for {country} {YEAR}")
-                continue
-
-            # Extract and process the weekly emissions data.
-            emiss_weekly = data["emissionsweekly"]
-            df = pd.DataFrame(emiss_weekly)
-            df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["dt"]]
-
-            # Select relevant columns and rename for consistency.
-            df = df[["plt", "month_day", "curv"]]
-            df["year"] = YEAR
-            df["country"] = COUNTRIES[country]
-            df = df.rename(columns={"plt": "indicator", "curv": "value"})
-
-            # Process cumulative emissions data similarly.
-            emiss_cumulative = data["emissionsweeklycum"]
-            df_cum = pd.DataFrame(emiss_cumulative)
-            df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["dt"]]
-            df_cum = df_cum[["plt", "month_day", "curv"]]
-            df_cum["year"] = YEAR
-            df_cum["country"] = COUNTRIES[country]
-            df_cum = df_cum.rename(columns={"plt": "indicator", "curv": "value"})
-            df_cum["indicator"] = df_cum["indicator"].apply(lambda x: x + "_cumulative")
-
-            # Concatenate weekly and cumulative emissions data.
-            df_all = pd.concat([df, df_cum])
-            # Append to the list of emissions DataFrames.
-            dfs_emissions.append(df_all)
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        results = list(
+            tqdm(
+                executor.map(lambda pair: fetch_emissions(*pair), pairs),
+                total=len(pairs),
+                desc="Processing emissions data",
+            )
+        )
+    dfs_emissions = [df for df in results if df is not None]
 
     # Combine all emissions DataFrames into one.
     if not dfs_emissions:
