@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -20,6 +22,48 @@ INDICATOR_COLUMNS = {
     "gg_debt": "gg_debt",
 }
 
+# Expected columns in the meadow table (catches source schema changes, like the Dec 2025 debt -> d rename).
+EXPECTED_INPUT_COLUMNS = {"country", "year", "isocode", "ifscode"} | set(INDICATOR_COLUMNS)
+
+# Indicators measured as a (non-negative) share of GDP; primary_balance, real_long_term_interest_rate,
+# and real_growth_rate can legitimately be negative.
+NON_NEGATIVE_COLUMNS = ["revenue", "expenditure", "interest_expense", "primary_expenditure", "gross_debt"]
+
+# Coverage floors from the Dec 2025 release: 153 source country labels (151 after harmonization, since
+# the source ships duplicate labels for Congo and Bahamas) and years 1800-2024. A drop below these in a
+# future release is usually a parsing or mapping regression, not a real change — re-audit before bumping.
+EXPECTED_INPUT_COUNTRIES = 153
+EXPECTED_OUTPUT_COUNTRIES = 151
+EXPECTED_YEAR_MIN = 1800
+EXPECTED_YEAR_MAX = 2024
+
+
+def sanity_check_inputs(tb: Table) -> None:
+    assert set(tb.columns) == EXPECTED_INPUT_COLUMNS, (
+        f"IMF file schema changed — unexpected column difference: {set(tb.columns) ^ EXPECTED_INPUT_COLUMNS}"
+    )
+    assert tb["year"].min() == EXPECTED_YEAR_MIN, f"Earliest year changed: {tb['year'].min()}"
+    assert tb["year"].max() >= EXPECTED_YEAR_MAX, f"Latest year shrank: {tb['year'].max()}"
+    assert tb["country"].nunique() >= EXPECTED_INPUT_COUNTRIES, (
+        f"Source country coverage shrank: {tb['country'].nunique()} < {EXPECTED_INPUT_COUNTRIES}"
+    )
+    for col in ["gg_budg", "gg_debt"]:
+        assert not tb[col].isna().any(), f"Sector coverage flag {col} has missing values."
+        assert set(tb[col].unique()) <= {0, 1}, f"Sector coverage flag {col} has values outside {{0, 1}}."
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    assert set(tb.columns) == set(INDICATOR_COLUMNS.values()), (
+        f"Unexpected output columns: {set(tb.columns) ^ set(INDICATOR_COLUMNS.values())}"
+    )
+    assert tb.columns[tb.isna().all()].empty, "Output has a fully-NaN column."
+    assert tb.index.get_level_values("country").nunique() >= EXPECTED_OUTPUT_COUNTRIES, (
+        "Harmonized country coverage shrank: "
+        f"{tb.index.get_level_values('country').nunique()} < {EXPECTED_OUTPUT_COUNTRIES}"
+    )
+    for col in NON_NEGATIVE_COLUMNS:
+        assert tb[col].min() >= 0, f"Negative value in {col} (min: {tb[col].min()}) — source error or unit mistake."
+
 
 def run() -> None:
     #
@@ -30,6 +74,8 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["public_finances_modern_history"].reset_index()
+
+    sanity_check_inputs(tb)
 
     #
     # Process data.
@@ -42,7 +88,11 @@ def run() -> None:
     # Rename columns
     tb = tb.rename(columns=INDICATOR_COLUMNS, errors="raise")
 
+    # NOTE: format() also asserts (country, year) uniqueness — the source ships duplicate labels for
+    # Congo and Bahamas, which must not overlap in years once harmonized to the same name.
     tb = tb.format(["country", "year"])
+
+    sanity_check_outputs(tb)
 
     #
     # Save outputs.
