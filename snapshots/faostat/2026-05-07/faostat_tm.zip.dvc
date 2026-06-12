@@ -6,7 +6,7 @@ meta:
       The food and agricultural trade dataset is collected, processed and disseminated by FAO according to the standard International Merchandise Trade Statistics (IMTS) Methodology. The data is mainly provided by UNSD, Eurostat, and other national authorities as needed. The source data is checked for outliers, trade partner data is used for non-reporting countries or missing cells, and data on food aid is added to take total cross-border trade flows into account. The trade database includes the following variables: export quantity, export value, import quantity, and import value. It includes all food and agricultural products imported/exported annually by all the countries in the world.
     citation_full: 'Food and Agriculture Organization of the United Nations - Detailed trade matrix (2026).'
     attribution: Food and Agriculture Organization of the United Nations (2026)
-    attribution_short: UN FAO
+    attribution_short: FAOSTAT
     url_main: https://www.fao.org/faostat/en/#data/TM
     url_download: https://bulks-faostat.fao.org/production/Trade_DetailedTradeMatrix_E_All_Data_(Normalized).zip
     date_accessed: '2026-05-07'
