@@ -3,7 +3,7 @@
 meta:
   origin:
     title: Microsoft AI Diffusion Report
-    date_published: "2026-04-08"
+    date_published: "2026-05-06"
     description: |-
       Microsoft measures AI diffusion as the share of working-age adults worldwide who have used a generative AI product during the reported period. This measure is derived from aggregated and anonymized Microsoft telemetry and then adjusted to reflect differences in OS and device-market share, internet penetration, and country population. Additional details on the methodology are available in their [AI Diffusion technical paper](https://arxiv.org/abs/2511.02781).
 
@@ -24,7 +24,7 @@ meta:
 
     license:
       name: MIT License
-      url: https://github.com/microsoft/ai-diffusion-report/blob/main/LICENSE
+      url: https://github.com/microsoft/ai-diffusion-report/blob/main/LICENSE.md
 outs:
   - md5: 3786e4c45f3fff04b85a02220ae8da5b
     size: 4468

@@ -1,5 +1,7 @@
 """Reshape Microsoft AI Diffusion data from wide to long format for time series."""
 
+from owid.catalog import Table, processing as pr
+
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
@@ -11,6 +13,15 @@ WAVE_TO_DATE = {
     "ai_diffusion_h1_2025": "2025-06-30",
     "ai_diffusion_h2_2025": "2025-12-31",
     "ai_diffusion_q1_2026": "2026-03-31",
+}
+
+# World aggregate values reported on p. 5 of the Q1 2026 report PDF.
+# These are population-weighted and cannot be reproduced from a simple average
+# of country-level data (some countries use regional imputation).
+WORLD_VALUES = {
+    "ai_diffusion_h1_2025": 15.1,
+    "ai_diffusion_h2_2025": 16.3,
+    "ai_diffusion_q1_2026": 17.8,
 }
 
 
@@ -37,6 +48,16 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
+    # Add world aggregate from the report.
+    world_rows = Table(
+        {
+            "country": ["World"] * len(WAVE_TO_DATE),
+            "date": [WAVE_TO_DATE[w] for w in WAVE_TO_DATE],
+            "ai_user_share": [WORLD_VALUES[w] for w in WAVE_TO_DATE],
+        }
+    )
+    tb = pr.concat([tb, world_rows], ignore_index=True)
+
     # Sanity checks.
     sanity_check_outputs(tb)
 
@@ -52,9 +73,11 @@ def run() -> None:
 
 def sanity_check_outputs(tb):
     """Check output data quality."""
-    # We expect 3 waves per country.
+    # We expect one row per wave per country.
+    n_waves = len(WAVE_TO_DATE)
     counts = tb.groupby("country").size()
-    assert (counts == 3).all(), f"Some countries don't have exactly 3 waves: {counts[counts != 3].to_dict()}"
+    bad = counts[counts != n_waves]
+    assert bad.empty, f"Some countries do not have exactly {n_waves} waves: {bad.to_dict()}"
 
     # Values should be in 0-100 range.
     assert tb["ai_user_share"].between(0, 100).all(), "Out-of-range values found"

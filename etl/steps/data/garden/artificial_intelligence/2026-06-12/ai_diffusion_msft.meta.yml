@@ -2,6 +2,7 @@ definitions:
   common:
     processing_level: minor
     presentation:
+      attribution_short: Microsoft
       topic_tags:
         - Artificial Intelligence
 
@@ -18,7 +19,7 @@ tables:
         title: Estimated share of working-age adults who use generative AI
         unit: "%"
         short_unit: "%"
-        description_short: Share of the population aged 15-64 who used a [generative AI](#dod:generative-ai) website or app during the reported period. Estimated from anonymized usage data on Microsoft platforms, scaled up to represent each country's working-age population.
+        description_short: Share of the population aged 15–64 who used a [generative AI](#dod:generative-ai) website or app during the reported period. Estimated from anonymized usage data on Microsoft platforms, scaled up to represent each country's working-age population.
 
         description_key:
           - These are modeled estimates, not survey data. They are derived from anonymized usage signals collected by Microsoft's software and services, which log whether users visited a [generative AI](#dod:generative-ai) platform.
@@ -27,8 +28,10 @@ tables:
           - This indicator counts anyone who visited one of 19 tracked AI tools during the period, from a single visit to daily use. It does not distinguish between occasional and frequent users.
           - "The 19 tracked platforms are: Alice, ChatGPT, Character.ai, Claude, CLOVA X, DeepSeek, ERNIE Bot (Yiyan.baidu), GigaChat, Google Gemini, Grok, Khanmigo.ai, Meta.ai, Microsoft Copilot, Midjourney, Mistral.ai, NanoSemantics AI Assistant, Perplexity, Tongyi Qianwen, and Xiaowei."
           - Users with less than 90 minutes of total activity observed through Microsoft telemetry per month are excluded, to reduce the influence of very infrequent users. This threshold applies to overall tracked activity, not to time spent on AI tools.
-          - For some countries, Microsoft doesn't have enough data to estimate the AI user share directly. These countries are assigned the average value of their region instead. This affects many countries in Sub-Saharan Africa, where several appear with identical values in the data.
-          - The data contains three waves so far, covering H1 2025 (January-June 2025), H2 2025 (July-December 2025), and Q1 2026 (January-March 2026). Each data point is timestamped at the end of its reporting period.
+          - For some countries, Microsoft doesn't have enough data to estimate the AI user share directly. These countries are assigned the average value of their region instead. This affects many countries in sub-Saharan Africa, where several appear with identical values in the data.
+          - The data contains three waves so far, covering H1 2025 (January–June 2025), H2 2025 (July–December 2025), and Q1 2026 (January–March 2026). Each data point is timestamped at the end of its reporting period.
+
+        description_processing: The world aggregate is taken directly from Microsoft's Q1 2026 report (p. 5), where it is reported as a population-weighted global figure. It cannot be reproduced from a simple average of country-level values because some countries use regional imputation.
 
         display:
           numDecimalPlaces: 1
