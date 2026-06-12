@@ -559,7 +559,7 @@ def edit_indicator_displays(view):
             "expected": {
                 "name": "Expected years",
                 "color": COLOR_EXPECTED_YEARS,
-                "patterns": ["eys", "school_life_expectancy"],
+                "patterns": ["eys", "school_life_expectancy", "se_sch_life"],
             },
             "average": {"name": "Average years", "color": COLOR_AVERAGE_YEARS, "patterns": ["mys"]},
             "learning_adjusted": {
