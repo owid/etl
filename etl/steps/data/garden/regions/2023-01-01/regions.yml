@@ -3735,3 +3735,216 @@
     - TJK
     - TKM
     - UZB
+
+##########
+# Maddison Project Database
+##########
+- code: MADDISON_EA
+  name: "East Asia (Maddison)"
+  region_type: "aggregate"
+  defined_by: maddison
+  members:
+    - CHN
+    - HKG
+    - JPN
+    - KOR
+    - PRK
+    - TWN
+- code: MADDISON_EE
+  name: "Eastern Europe (Maddison)"
+  region_type: "aggregate"
+  defined_by: maddison
+  members:
+    - ALB
+    - ARM
+    - AZE
+    - BGR
+    - BIH
+    - BLR
+    - CYP
+    - CZE
+    - EST
+    - GEO
+    - HRV
+    - HUN
+    - KAZ
+    - KGZ
+    - LTU
+    - LVA
+    - MDA
+    - MKD
+    - MNE
+    - OWID_CZS
+    - OWID_USS
+    - OWID_YGS
+    - POL
+    - ROU
+    - RUS
+    - SRB
+    - SVK
+    - SVN
+    - TJK
+    - TKM
+    - UKR
+    - UZB
+- code: MADDISON_LA
+  name: "Latin America (Maddison)"
+  region_type: "aggregate"
+  defined_by: maddison
+  members:
+    - ARG
+    - BOL
+    - BRA
+    - BRB
+    - CHL
+    - COL
+    - CRI
+    - CUB
+    - DMA
+    - DOM
+    - ECU
+    - GTM
+    - HND
+    - HTI
+    - JAM
+    - LCA
+    - MEX
+    - NIC
+    - PAN
+    - PER
+    - PRI
+    - PRY
+    - SLV
+    - TTO
+    - URY
+    - VEN
+- code: MADDISON_MENA
+  name: "Middle East and North Africa (Maddison)"
+  region_type: "aggregate"
+  defined_by: maddison
+  members:
+    - ARE
+    - BHR
+    - DZA
+    - EGY
+    - IRN
+    - IRQ
+    - ISR
+    - JOR
+    - KWT
+    - LBN
+    - LBY
+    - MAR
+    - OMN
+    - PSE
+    - QAT
+    - SAU
+    - SYR
+    - TUN
+    - TUR
+    - YEM
+- code: MADDISON_SSEA
+  name: "South and South East Asia (Maddison)"
+  region_type: "aggregate"
+  defined_by: maddison
+  members:
+    - AFG
+    - BGD
+    - IDN
+    - IND
+    - KHM
+    - LAO
+    - LKA
+    - MMR
+    - MNG
+    - MYS
+    - NPL
+    - PAK
+    - PHL
+    - SGP
+    - THA
+    - VNM
+- code: MADDISON_SSA
+  name: "Sub Saharan Africa (Maddison)"
+  region_type: "aggregate"
+  defined_by: maddison
+  members:
+    - AGO
+    - BDI
+    - BEN
+    - BFA
+    - BWA
+    - CAF
+    - CIV
+    - CMR
+    - COD
+    - COG
+    - COM
+    - CPV
+    - DJI
+    - ETH
+    - GAB
+    - GHA
+    - GIN
+    - GMB
+    - GNB
+    - GNQ
+    - KEN
+    - LBR
+    - LSO
+    - MDG
+    - MLI
+    - MOZ
+    - MRT
+    - MUS
+    - MWI
+    - NAM
+    - NER
+    - NGA
+    - OWID_SDN
+    - RWA
+    - SEN
+    - SLE
+    - STP
+    - SWZ
+    - SYC
+    - TCD
+    - TGO
+    - TZA
+    - UGA
+    - ZAF
+    - ZMB
+    - ZWE
+- code: MADDISON_WE
+  name: "Western Europe (Maddison)"
+  region_type: "aggregate"
+  defined_by: maddison
+  members:
+    - AUT
+    - BEL
+    - CHE
+    - DEU
+    - DNK
+    - ESP
+    - FIN
+    - FRA
+    - GBR
+    - GRC
+    - IRL
+    - ISL
+    - ITA
+    - LUX
+    - MLT
+    - NLD
+    - NOR
+    - PRT
+    - SWE
+- code: MADDISON_WO
+  name: "Western offshoots (Maddison)"
+  region_type: "aggregate"
+  defined_by: maddison
+  members:
+    - AUS
+    - CAN
+    - NZL
+    - USA
