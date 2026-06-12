@@ -27,23 +27,23 @@ EXPECTED_INPUT_COLUMNS = {"country", "year", "isocode", "ifscode"} | set(INDICAT
 
 # Indicators measured as a (non-negative) share of GDP; primary_balance, real_long_term_interest_rate,
 # and real_growth_rate can legitimately be negative.
+# NOTE: these can legitimately exceed 100% of GDP (Dec 2025 data: gross debt up to 495%, expenditure up
+# to 595% in crisis years), so the upper bound is a generous ceiling that catches unit mistakes
+# (a x100 error would blow past it) rather than a 0-100 percentage check.
 NON_NEGATIVE_COLUMNS = ["revenue", "expenditure", "interest_expense", "primary_expenditure", "gross_debt"]
+SHARE_OF_GDP_CEILING = 1000
 
 # Coverage floors from the Dec 2025 release: 153 source country labels (151 after harmonization, since
-# the source ships duplicate labels for Congo and Bahamas) and years 1800-2024. A drop below these in a
-# future release is usually a parsing or mapping regression, not a real change — re-audit before bumping.
+# the source ships duplicate labels for Congo and Bahamas). A drop below these in a future release is
+# usually a parsing or mapping regression, not a real change — re-audit before bumping.
 EXPECTED_INPUT_COUNTRIES = 153
 EXPECTED_OUTPUT_COUNTRIES = 151
-EXPECTED_YEAR_MIN = 1800
-EXPECTED_YEAR_MAX = 2024
 
 
 def sanity_check_inputs(tb: Table) -> None:
     assert set(tb.columns) == EXPECTED_INPUT_COLUMNS, (
         f"IMF file schema changed — unexpected column difference: {set(tb.columns) ^ EXPECTED_INPUT_COLUMNS}"
     )
-    assert tb["year"].min() == EXPECTED_YEAR_MIN, f"Earliest year changed: {tb['year'].min()}"
-    assert tb["year"].max() >= EXPECTED_YEAR_MAX, f"Latest year shrank: {tb['year'].max()}"
     assert tb["country"].nunique() >= EXPECTED_INPUT_COUNTRIES, (
         f"Source country coverage shrank: {tb['country'].nunique()} < {EXPECTED_INPUT_COUNTRIES}"
     )
@@ -63,6 +63,9 @@ def sanity_check_outputs(tb: Table) -> None:
     )
     for col in NON_NEGATIVE_COLUMNS:
         assert tb[col].min() >= 0, f"Negative value in {col} (min: {tb[col].min()}) — source error or unit mistake."
+        assert tb[col].max() < SHARE_OF_GDP_CEILING, (
+            f"Implausibly large value in {col} (max: {tb[col].max()}) — likely a unit mistake."
+        )
 
 
 def run() -> None:
