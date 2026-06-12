@@ -12,9 +12,10 @@ from apps.chart_sync.admin_api import AdminAPI, AdminAPIError
 from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
-from etl.db import get_engine
+from etl.db import get_engine, read_sql
 from etl.files import get_schema_from_url
 from etl.indicator_upgrade.indicator_update import (
+    collect_variable_ids_from_narrative_config,
     find_charts_from_variable_ids,
     update_chart_config,
     update_narrative_chart_config,
@@ -71,6 +72,41 @@ def get_affected_narrative_charts_cli(charts: list[gm.Chart]) -> list[gm.Narrati
     return narrative_charts
 
 
+def _find_stale_lineage_variables(referenced_ids: set[int], indicator_mapping: dict[int, int]) -> dict[int, str]:
+    """Find referenced indicators that belong to a different version of an upgraded dataset.
+
+    `update_narrative_chart_config` only rewrites IDs present in `indicator_mapping`
+    (old_version -> new_version). A narrative chart can still pin an ID from an even older
+    version of the same dataset — left behind by a previous upgrade cycle — which the mapping
+    cannot cover. Returns {variable_id: catalogPath} for such IDs so the caller can warn.
+    """
+    candidate_ids = referenced_ids - set(indicator_mapping) - set(indicator_mapping.values())
+    if not candidate_ids:
+        return {}
+
+    def lineage(catalog_path: str) -> tuple[str, str] | None:
+        # catalogPath format: grapher/<namespace>/<version>/<dataset>/<table>#<column>
+        parts = catalog_path.split("/")
+        if len(parts) < 4:
+            return None
+        return parts[1], parts[3]
+
+    all_ids = candidate_ids | set(indicator_mapping.values())
+    df = read_sql(
+        f"SELECT id, catalogPath FROM variables WHERE id IN ({','.join(str(int(i)) for i in sorted(all_ids))})",
+        engine=get_engine(),
+    ).dropna(subset=["catalogPath"])
+    paths = dict(zip(df["id"], df["catalogPath"]))
+
+    upgraded_lineages = {lineage(paths[new_id]) for new_id in indicator_mapping.values() if new_id in paths} - {None}
+
+    return {
+        var_id: paths[var_id]
+        for var_id in sorted(candidate_ids)
+        if var_id in paths and lineage(paths[var_id]) in upgraded_lineages
+    }
+
+
 def push_new_narrative_charts_cli(
     narrative_charts: list[gm.NarrativeChart],
     indicator_mapping: dict[int, int],
@@ -106,6 +142,7 @@ def push_new_narrative_charts_cli(
 
     # Update narrative charts sequentially
     successful_updates = 0
+    skipped = 0
     errors: list[dict] = []
 
     for nc in narrative_charts:
@@ -116,6 +153,24 @@ def push_new_narrative_charts_cli(
 
             # Update variable IDs in the full config
             config_new = update_narrative_chart_config(full_config, indicator_mapping)
+
+            if config_new == full_config:
+                # Nothing in this config matched the mapping. PUTting an identical config would only
+                # bump updatedAt and make the log claim a remap that never happened.
+                stale = _find_stale_lineage_variables(
+                    collect_variable_ids_from_narrative_config(full_config), indicator_mapping
+                )
+                if stale:
+                    log.warning(
+                        f"Narrative chart {nc.id} ({nc.name}) was NOT remapped: it pins indicators from a "
+                        f"version of the upgraded dataset that the mapping does not cover: {stale}. These were "
+                        "likely left behind by a previous upgrade cycle — remap them with an explicit mapping "
+                        "(WizardDB.add_variable_mapping + push_new_narrative_charts_cli)."
+                    )
+                else:
+                    log.info(f"Narrative chart {nc.id} ({nc.name}) references no mapped indicators — left unchanged.")
+                skipped += 1
+                continue
 
             # PUT the updated full config - backend will recalculate the patch
             api.update_narrative_chart(narrative_chart_id=nc.id, config=config_new, user_id=user_id)
@@ -131,12 +186,14 @@ def push_new_narrative_charts_cli(
                 }
             )
 
+    unchanged_note = f" ({skipped} left unchanged)" if skipped else ""
     if errors:
         log.warning(
             f"Updated {successful_updates}/{len(narrative_charts)} narrative charts with {len(errors)} failures"
+            + unchanged_note
         )
     else:
-        log.info(f"Successfully updated all {len(narrative_charts)} narrative charts")
+        log.info(f"Updated {successful_updates}/{len(narrative_charts)} narrative charts{unchanged_note}")
 
     return errors
 
