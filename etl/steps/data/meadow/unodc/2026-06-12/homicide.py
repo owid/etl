@@ -26,13 +26,17 @@ def run() -> None:
 
     tb = clean_data(tb)
     # The regional data has camel_case column names, so we need to convert them to snake_case.
-    for col in tb.columns:
-        new_col = underscore(col)
-        tb = tb.rename(columns={col: new_col})
+    tb = tb.rename(columns={col: underscore(col) for col in tb.columns})
     tb_region = clean_data_regional(tb_region)
 
     tb = pr.concat([tb, tb_region], ignore_index=True)
-    # Improve tables format.
+
+    # Use categoricals for low-cardinality string columns to reduce feather size.
+    cat_cols = ["country", "indicator", "dimension", "category", "sex", "age", "unit_of_measurement", "source"]
+    for col in cat_cols:
+        if col in tb.columns:
+            tb[col] = tb[col].astype("category")
+
     tables = [tb.format(["country", "year", "indicator", "dimension", "category", "sex", "age", "unit_of_measurement"])]
 
     #

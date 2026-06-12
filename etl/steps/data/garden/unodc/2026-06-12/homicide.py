@@ -16,8 +16,7 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("homicide")
-    # Load population dataset only goes up to 2023
-    # Load full population dataset including projections to calculate rates for 2024
+    # Load full population dataset including projections to calculate rates
     ds_pop_full = paths.load_dataset("un_wpp")
     tb_pop_full = ds_pop_full.read("population")
     # Format the population table
@@ -31,6 +30,7 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb)
 
+    sanity_check_inputs(tb)
     tb = clean_up_categories(tb)
     tb = calculate_united_kingdom(tb)
     # Calculate rates for any country-year with counts but no source-provided rate
@@ -38,7 +38,7 @@ def run() -> None:
     # Clean up variable names.
     tb = clean_up_variables(tb)
     tables = clean_data(tb)
-    # Improve table format.
+    sanity_check_outputs(tables)
 
     #
     # Save outputs.
@@ -48,6 +48,22 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def sanity_check_inputs(tb: Table) -> None:
+    assert not tb.empty, "Meadow table is empty."
+    expected_dims = {"Total", "by mechanisms", "by relationship to perpetrator", "by situational context"}
+    assert expected_dims == set(tb["dimension"].unique()), f"Unexpected dimensions: {set(tb['dimension'].unique())}"
+    assert tb["year"].min() <= 1990, f"Expected data back to at least 1990, got {tb['year'].min()}"
+    assert tb["year"].max() >= 2023, f"Expected data up to at least 2023, got {tb['year'].max()}"
+    assert tb["country"].nunique() >= 200, f"Expected at least 200 countries, got {tb['country'].nunique()}"
+
+
+def sanity_check_outputs(tables: list[Table]) -> None:
+    assert len(tables) == 4, f"Expected 4 output tables, got {len(tables)}"
+    for t in tables:
+        assert not t.empty, f"Output table {t.metadata.short_name} is empty."
+        assert t.columns[t.isna().all()].empty, f"Output table {t.metadata.short_name} has a fully-NaN column."
 
 
 def clean_up_variables(tb: Table) -> Table:
@@ -183,7 +199,7 @@ def clean_up_categories(tb: Table) -> Table:
         "Unknown types of homicide": "Unknown situational context",
     }
 
-    for key in category_dict.keys():
+    for key in category_dict:
         assert key in tb["category"].values, f"{key} not in table"
     tb["category"] = tb["category"].replace(category_dict)
 
