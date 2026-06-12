@@ -34,12 +34,15 @@ def run() -> None:
         if col in tb.columns:
             tb[col] = (tb[col] == 1).astype("Int64").where(tb[col].notna())
 
+    # Only keep years where at least one WBL indicator has data
+    wbl_cols = [c for c in WBL_INDICATORS if c in tb.columns]
+    tb = tb[tb[wbl_cols].notna().any(axis=1)]
+
     tb = add_country_counts_and_population_by_status(tb)
 
     # Remove the raw indicator columns
     columns_to_keep = [col for col in tb.columns if col not in WBL_INDICATORS]
     tb = tb[columns_to_keep]
-    tb = tb[tb["year"] >= MIN_YEAR]
     tb = tb.format(["country", "year"])
 
     ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True)
