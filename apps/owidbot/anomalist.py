@@ -30,9 +30,8 @@ def run(branch: str) -> None:
 
     # Append datasets with changed local files. This is done to be compatible with the Anomalist streamlit app.
     with Session(source_engine) as session:
-        datasets_new_ids = list(
-            set(datasets_new_ids) | set(get_new_grapher_datasets_and_their_previous_versions(session=session))
-        )
+        dataset_new_and_old = get_new_grapher_datasets_and_their_previous_versions(session=session)
+    datasets_new_ids = list(set(datasets_new_ids) | set(dataset_new_and_old))
 
     if not datasets_new_ids:
         log.info("No new datasets found.")
@@ -51,8 +50,10 @@ def run(branch: str) -> None:
         variable_ids = variable_ids_sorted[:MAX_VARIABLES]
         log.info(f"Limited to {MAX_VARIABLES} variables from {len(variable_ids_sorted)} total variables")
 
-    # Load variable mapping
-    variable_mapping_dict = load_variable_mapping(datasets_new_ids)
+    # Load variable mapping. Pass the new->old dataset pairs so the mapping can be inferred (or
+    # enriched) by shortName — the indicator upgrader only persists mappings for charted
+    # indicators, which on its own would restrict upgrade detectors to those indicators.
+    variable_mapping_dict = load_variable_mapping(datasets_new_ids, dataset_new_and_old)
 
     log.info("owidbot.anomalist.start", n_variables=len(variable_ids))
     t = time.time()

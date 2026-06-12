@@ -89,6 +89,18 @@ def get_datasets_and_mapping_inputs() -> tuple[dict[int, str], dict[int, str], d
 def load_variable_mapping(
     datasets_new_ids: list[int], dataset_new_and_old: dict[int, int | None] | None = None
 ) -> dict[int, int]:
+    # Infer a mapping by shortName for each new dataset and its previous version (if known).
+    # This is combined with the indicator upgrader's mapping below: the upgrader only persists
+    # mappings for indicators used in charts, so on its own it can silently restrict the upgrade
+    # detectors (upgrade_missing / upgrade_change) to a fraction of the dataset's indicators.
+    inferred_mapping: dict[int, int] = dict()
+    if dataset_new_and_old:
+        for dataset_id_new, dataset_id_old in dataset_new_and_old.items():
+            if dataset_id_old is None:
+                continue
+            # Infer (assuming no names have changed).
+            inferred_mapping.update(infer_variable_mapping(dataset_id_new, dataset_id_old))
+
     mapping = WizardDB.get_variable_mapping_raw()
     if len(mapping) > 0:
         log.info("Using variable mapping created by indicator upgrader.")
@@ -101,17 +113,16 @@ def load_variable_mapping(
             log.error(
                 f"Indicator upgrader mapped indicators to new datasets ({datasets_new_mapped}) that are not among the datasets detected as new in the code ({datasets_new_expected}). Look into this."
             )
-        # Create a mapping dictionary.
-        variable_mapping = mapping.set_index("id_old")["id_new"].to_dict()
-    elif dataset_new_and_old:
+        # Create a mapping dictionary, enriched with inferred pairs for indicators the upgrader
+        # didn't map (explicit upgrader entries take precedence over inferred ones).
+        explicit_mapping = mapping.set_index("id_old")["id_new"].to_dict()
+        n_enriched = len(set(inferred_mapping) - set(explicit_mapping))
+        if n_enriched > 0:
+            log.info(f"Enriching indicator-upgrader mapping with {n_enriched} pairs inferred by shortName.")
+        variable_mapping = {**inferred_mapping, **explicit_mapping}
+    elif inferred_mapping:
         log.info("Inferring variable mapping (since no mapping was created by indicator upgrader).")
-        # Infer the mapping of the new datasets (assuming no names have changed).
-        variable_mapping = dict()
-        for dataset_id_new, dataset_id_old in dataset_new_and_old.items():
-            if dataset_id_old is None:
-                continue
-            # Infer
-            variable_mapping.update(infer_variable_mapping(dataset_id_new, dataset_id_old))
+        variable_mapping = inferred_mapping
     else:
         # No mapping available.
         variable_mapping = dict()
