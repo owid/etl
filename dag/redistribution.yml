@@ -23,10 +23,10 @@ steps:
         - snapshot://unu_wider/2026-03-24/government_revenue_dataset.dta
 
   # Public Finances in Modern History dataset (IMF)
-  data://grapher/imf/2025-04-02/public_finances_modern_history:
-    - data://garden/imf/2025-04-02/public_finances_modern_history:
-      - data://meadow/imf/2025-04-02/public_finances_modern_history:
-        - snapshot://imf/2025-04-02/public_finances_modern_history.xlsx
+  data://grapher/imf/2026-06-12/public_finances_modern_history:
+    - data://garden/imf/2026-06-12/public_finances_modern_history:
+      - data://meadow/imf/2026-06-12/public_finances_modern_history:
+        - snapshot://imf/2026-06-12/public_finances_modern_history.xlsx
 
     # OECD Social Expenditure Database
   data://garden/oecd/2025-12-11/social_expenditure:
@@ -104,10 +104,3 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/cow/2024-07-26/national_material_capabilities:
     - data://garden/cow/2024-07-26/national_material_capabilities
-  data://meadow/imf/2026-06-12/public_finances_modern_history:
-    - snapshot://imf/2026-06-12/public_finances_modern_history.xlsx
-  data://garden/imf/2026-06-12/public_finances_modern_history:
-    - data://meadow/imf/2026-06-12/public_finances_modern_history
-  # Public Finances in Modern History dataset (IMF)
-  data://grapher/imf/2026-06-12/public_finances_modern_history:
-    - data://garden/imf/2026-06-12/public_finances_modern_history
