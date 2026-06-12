@@ -47,6 +47,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
@@ -128,7 +129,7 @@ def _assert_year_is_latest_well_covered(tb: Table, year: int) -> None:
     )
 
 
-def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> pd.DataFrame:
+def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> Table:
     """Return SCL-derived Production and Domestic Supply for `year`, keyed on (country, item_code).
 
     Domestic Supply follows the FAOSTAT Food Balance Sheet identity:
@@ -159,13 +160,15 @@ def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> pd.DataFrame:
     sub["country"] = sub["country"].astype(str)
     sub["element"] = sub["element"].astype(str)
 
-    wide = pd.DataFrame(
+    wide = (
         sub.groupby(["country", "item_code", "element"], observed=True)["value"].sum().unstack("element").reset_index()
     )
-    # Ensure all four element columns exist even if SCL didn't have any rows for one.
+    # Ensure all four element columns exist even if SCL didn't have any rows for one,
+    # and restore the value metadata that unstack drops from the element columns.
     for elem in elements:
         if elem not in wide.columns:
             wide[elem] = pd.NA
+        wide[elem] = wide[elem].copy_metadata(sub["value"])
 
     wide["supply"] = (
         wide["Production"].fillna(0)
@@ -233,25 +236,19 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
         qty["element"] == "Import quantity", ["reporter_country", "partner_country", "item", "value"]
     ].rename(columns={"reporter_country": "importer", "partner_country": "exporter", "value": "value_importer"})
 
-    merged = exp_side.merge(imp_side, on=["exporter", "importer", "item"], how="outer")
+    merged = pr.merge(exp_side, imp_side, on=["exporter", "importer", "item"], how="outer")
     # Default to the importer-reported value; fall back to the exporter-reported value
     # only when the importer doesn't report. See docstring for the rationale.
     merged["value"] = merged["value_importer"].fillna(merged["value_exporter"])
     merged = merged.dropna(subset=["value"])
     merged = merged[merged["value"] > 0]
 
-    out = pd.DataFrame(merged[["exporter", "importer", "item", "value"]])
-    out = out.merge(exporter_production, on=["exporter", "item"], how="left")
-    out = out.merge(supply, on=["importer", "item"], how="left")
+    out = merged[["exporter", "importer", "item", "value"]]
+    out = pr.merge(out, exporter_production, on=["exporter", "item"], how="left")
+    out = pr.merge(out, supply, on=["importer", "item"], how="left")
     out = out.sort_values(["exporter", "importer", "item"]).reset_index(drop=True)
 
-    # Wrap as an owid Table and propagate origins to the numeric columns
-    # (pandas merges and arithmetic above strip Variable metadata).
-    tb_out = Table(out, short_name=paths.short_name, underscore=False)
-    tb_out["value"] = tb_out["value"].copy_metadata(tb_tm["value"])
-    tb_out["exporter_production"] = tb_out["exporter_production"].copy_metadata(tb_scl["value"])
-    tb_out["importer_supply"] = tb_out["importer_supply"].copy_metadata(tb_scl["value"])
-    tb_out = tb_out.format(keys=["exporter", "importer", "item"], short_name=paths.short_name)
+    tb_out = out.format(keys=["exporter", "importer", "item"], short_name=paths.short_name)
     return tb_out
 
 

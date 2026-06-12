@@ -57,7 +57,7 @@ def sanity_check_inputs(tb: Table) -> None:
     assert tb["value"].notna().all(), "Found null values in 'value' column."
     assert (tb["value"] >= 0).all(), "Found negative values in 'value' column."
 
-    # FAOSTAT TM contains a small but non-zero number of self-trade rows (reporter == partner).
+    # FAOSTAT TM contains a small but non-zero number of self-trade rows (where reporter == partner).
     assert _count_self_trade(tb) / len(tb) < 0.01, "Unexpectedly high percentage of self-trade rows."
 
     # Year range is sensible.
@@ -92,9 +92,6 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb, country_col="partner_country", warn_on_unused_countries=False)
 
     # Sanity check inputs.
-    # Diagnostic plots (year coverage, reporting coverage, quantity-agreement
-    # bands) used to live here as commented-out dev aids; they have moved to
-    # the analysis notebook at docs/analyses/food_trade/food_trade.ipynb.
     sanity_check_inputs(tb=tb)
 
     # Map flags.
