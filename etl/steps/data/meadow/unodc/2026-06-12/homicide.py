@@ -88,9 +88,7 @@ def clean_data_regional(tb_region: Table) -> Table:
     tb_region["category"] = "Total"
     tb_region["age"] = "Total"
     tb_region["unit_of_measurement"] = "Unknown"
-    tb_region.loc[
-        tb_region["series"] == "Number of victims of intentional homicide", "unit_of_measurement"
-    ] = "Counts"
+    tb_region.loc[tb_region["series"] == "Number of victims of intentional homicide", "unit_of_measurement"] = "Counts"
     tb_region.loc[
         tb_region["series"] == "Victims of intentional homicide per 100,000 population",
         "unit_of_measurement",
