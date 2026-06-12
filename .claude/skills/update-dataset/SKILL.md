@@ -328,7 +328,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Identify what the workaround does (read the surrounding code).
    - Load the affected step's output with `owid.catalog.Dataset` (or inspect the raw snapshot) and compare **corrected vs. uncorrected** values. Cross-check the producer's release notes / changelog if available.
    - If the upstream issue is fixed → delete the workaround **and** its `# NOTE:` / `# TODO:` comments **in the same commit**, then re-run the affected step (use `--force --only`, add `--grapher` for grapher) so downstream artifacts pick up the change.
-   - If the workaround is still needed → leave it and add a one-line status under "Phase 2 TODOs" in the PR description (e.g. "Sierra Leone ×1000 correction still required — raw value in the 2026 file is still ~1/1000 of plausible").
+   - If the workaround is still needed → leave it and add a one-line status under a PR-description section titled **"Not covered in this PR"** (e.g. "Sierra Leone ×1000 correction still required — raw value in the 2026 file is still ~1/1000 of plausible"). These are deliberately deferred items the next updater should re-check. Delete the whole section if its last item gets resolved mid-PR.
    - If you're uncertain → keep it, flag it in the PR description, and ask the user.
 
    Do this **before** step 6b (metadata checks) so any re-runs triggered by comment-removal happen before the metadata sweep, not after.
@@ -375,6 +375,9 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    The other quality checks catch *content* issues; this step catches *missing fields* and *broken URLs* before they reach review.
 
    **Snapshot DVC freshness.** `etl update` clones the previous snapshot's `.dvc` content verbatim except for `date_accessed`. Always re-check `date_published` and the year in `citation_full` / `attribution` under `snapshots/<ns>/<new_version>/*.dvc` — they will otherwise silently ship the old version's values. Set `date_published` to the producer's real release date when discoverable; otherwise copy `date_accessed`. Bump the year in `citation_full` and `attribution` to match.
+
+   - **`Last-Modified` header as `date_published` source.** When the producer's page states no release date (common on fully JS-rendered sites like the IMF Datamapper), the download URL's HTTP `Last-Modified` header is a defensible source — it's the server's own timestamp for the file, not an inference. Corroborate it against a release-named filename (e.g. `…Dec 2025.xlsx` + `Last-Modified: Fri, 12 Dec 2025`) and note the provenance when reporting to the user.
+   - **Stale producer description on a JS-rendered page.** If the `.dvc` `meta.origin.description` is producer text that may have changed but the page is an SPA shell (static HTML empty, WebFetch 403s, Wayback archives only the shell), don't burn time probing API endpoints and don't rewrite the producer's text to match the data — the blurb can legitimately lag their own releases (FPP shipped 153 countries while the page said 151). **Ask the user to paste the page text from their browser**, then diff it against the existing `.dvc` text and apply only the substantive changes. Clipboard pastes flatten typography (curly quotes → straight, en-dashes → hyphens) — keep the existing typographic punctuation unless the words themselves changed.
 
    **Mandatory fields per indicator.** For every indicator in the garden `.meta.yml`, confirm these are set (either on `definitions.common` or per-indicator):
 
@@ -545,9 +548,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Data update post drafted at [workbench/<short_name>/data-update.md](workbench/<short_name>/data-update.md) in the Google Docs CMS format. Please create a new Google Doc in /Data updates, paste the draft, attach the chart screenshot, and share for review."` Always render `workbench/<short_name>/data-update.md` as a markdown link `[…](…)` rather than as a bare path or inline-code path — the chat UI renders it as clickable that way.
 
 10) Codex review: address comments and resolve threads
-   - Wait ~60 seconds after posting `@codex review`, then poll for inline review comments:
+   - **The completion signal is an *issue comment*, not a review.** Codex (`chatgpt-codex-connector[bot]`) posts its summary via `gh api repos/owid/etl/issues/<pr_number>/comments` — a clean pass ("Didn't find any major issues") has **zero** inline comments and **no** formal review object, so a watcher polling only `pulls/<pr_number>/comments` or `gh pr view --json reviews` waits forever on a clean review. Poll the issue comments for the bot's summary first; only then look for inline comments.
+   - Wait ~60 seconds after posting `@codex review`, then poll:
      ```bash
-     gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool
+     gh api repos/owid/etl/issues/<pr_number>/comments | python3 -m json.tool   # bot summary lands here
+     gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool    # inline comments, if any
      ```
    - Fetch open review thread IDs via GraphQL:
      ```bash
@@ -633,6 +638,7 @@ These pages need a fresh staging build, so they're only meaningful after the PR'
 
 ## Guardrails and tips
 
+- **Re-test "manual upload" snapshots — the blocking may be inverse-UA.** When a snapshot's docstring says the file is uploaded manually because "the website blocks the download request", verify that claim before carrying it into the new version. Some hosts (e.g. the IMF Datamapper) reject *browser-like* User-Agents with 403 while letting plain, honestly-identified clients through — the inverse of the usual bot-blocking — and the ETL downloader's default UA (`DEFAULT_USER_AGENT` in `etl/download_helpers.py`) is browser-like, so the original author may have misdiagnosed an automatable source. Test both directions (plain `requests` vs. browser UA) against the direct file URL. If the plain UA works: set `url_download` in the `.dvc` and pass `user_agent="owid-etl/1.0 (https://ourworldindata.org)"` (or similar plain UA) to `snap.create_snapshot(...)`. **Keep the snapshot `.py` script in that case** — the script-less `.dvc`-only path (`run_snapshot_dvc_only`) calls `create_snapshot()` without a `user_agent` and would 403 — and say so in the docstring so nobody deletes it as "redundant".
 - **DAG consistency**: After `etl update`, always verify that all new steps in `dag/main.yml` reference each other with the new version. A common bug is garden depending on old meadow or old snapshot — this silently loads stale data.
 - Never return empty tables or comment out logic as a workaround — fix the parsing/transformations instead.
 - Column name changes: update garden processing code and metadata YAMLs (garden/grapher) to match schema changes.
