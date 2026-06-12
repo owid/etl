@@ -104,3 +104,10 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/cow/2024-07-26/national_material_capabilities:
     - data://garden/cow/2024-07-26/national_material_capabilities
+  data://meadow/imf/2026-06-12/public_finances_modern_history:
+    - snapshot://imf/2026-06-12/public_finances_modern_history.xlsx
+  data://garden/imf/2026-06-12/public_finances_modern_history:
+    - data://meadow/imf/2026-06-12/public_finances_modern_history
+  # Public Finances in Modern History dataset (IMF)
+  data://grapher/imf/2026-06-12/public_finances_modern_history:
+    - data://garden/imf/2026-06-12/public_finances_modern_history
