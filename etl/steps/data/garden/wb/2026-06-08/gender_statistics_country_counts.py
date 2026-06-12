@@ -17,7 +17,6 @@ WBL_INDICATORS = [
     "gd_wbl_ent_law_entactv",  # was sg_bus_regt_eq
     "gd_wbl_pay_law_eqremeqval",  # was sg_law_eqrm_wk
     "gd_wbl_wrk_law_nondiscemp",  # was sg_law_nodc_hr
-    "gd_wbl_saf_law_domviol",  # was sg_leg_dvaw
     "gd_wbl_ast_law_ownership",  # was sg_own_prrt_im
 ]
 
