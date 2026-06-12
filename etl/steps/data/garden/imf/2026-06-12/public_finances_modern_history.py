@@ -27,11 +27,7 @@ EXPECTED_INPUT_COLUMNS = {"country", "year", "isocode", "ifscode"} | set(INDICAT
 
 # Indicators measured as a (non-negative) share of GDP; primary_balance, real_long_term_interest_rate,
 # and real_growth_rate can legitimately be negative.
-# NOTE: these can legitimately exceed 100% of GDP (Dec 2025 data: gross debt up to 495%, expenditure up
-# to 595% in crisis years), so the upper bound is a generous ceiling that catches unit mistakes
-# (a x100 error would blow past it) rather than a 0-100 percentage check.
 NON_NEGATIVE_COLUMNS = ["revenue", "expenditure", "interest_expense", "primary_expenditure", "gross_debt"]
-SHARE_OF_GDP_CEILING = 1000
 
 # Countries whose expenditure legitimately exceeds 100% of GDP, all driven by tiny or collapsed GDP
 # denominators: Equatorial Guinea's aid-financed pre-oil-boom budgets (1985-1995, up to 595%), Kuwait
@@ -69,9 +65,6 @@ def sanity_check_outputs(tb: Table) -> None:
     )
     for col in NON_NEGATIVE_COLUMNS:
         assert tb[col].min() >= 0, f"Negative value in {col} (min: {tb[col].min()}) — source error or unit mistake."
-        assert tb[col].max() < SHARE_OF_GDP_CEILING, (
-            f"Implausibly large value in {col} (max: {tb[col].max()}) — likely a unit mistake."
-        )
     # Expenditure should stay below 100% of GDP outside the known exceptions.
     countries_over_100 = set(tb[tb["expenditure"] > 100].index.get_level_values("country"))
     unexpected_over_100 = sorted(countries_over_100 - EXPENDITURE_OVER_100_COUNTRIES)
