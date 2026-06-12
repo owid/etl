@@ -29,10 +29,16 @@ EXPECTED_INPUT_COLUMNS = {"country", "year", "isocode", "ifscode"} | set(INDICAT
 # and real_growth_rate can legitimately be negative.
 NON_NEGATIVE_COLUMNS = ["revenue", "expenditure", "interest_expense", "primary_expenditure", "gross_debt"]
 
-# Countries whose expenditure legitimately exceeds 100% of GDP, all driven by tiny or collapsed GDP
-# denominators: Equatorial Guinea's aid-financed pre-oil-boom budgets (1985-1995, up to 595%), Kuwait
-# during the Gulf War (1990-1991), and Kiribati, where fishing-license and sovereign-fund revenue
-# routinely exceeds GDP. Any other country above 100% should be reviewed before being added here.
+# Countries whose expenditure exceeds 100% of GDP in the source data, all with tiny or collapsed GDP
+# denominators:
+# - Kuwait (1990-1991): GDP roughly halved under the Iraqi occupation while war, welfare, and
+#   coalition-transfer spending soared (documented in IMF/academic Gulf War accounts).
+# - Kiribati: IMF Article IV consultations report public expenditure of 119% of GDP (2017) and 143%
+#   (2018), funded mainly by fishing-license revenue (~72% of GDP) and development partners.
+# - Equatorial Guinea (1985-1995, up to 595%): the pre-oil economy was tiny, aid-dependent, and badly
+#   measured; the extreme ratios are as shipped by the IMF source and may partly reflect the GDP
+#   denominator rather than a verified economic event. Kept as published.
+# Any other country above 100% should be reviewed before being added here.
 EXPENDITURE_OVER_100_COUNTRIES = {"Equatorial Guinea", "Kuwait", "Kiribati"}
 
 # Coverage floors from the Dec 2025 release: 153 source country labels (151 after harmonization, since
