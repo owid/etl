@@ -154,20 +154,24 @@ def push_new_narrative_charts_cli(
             # Update variable IDs in the full config
             config_new = update_narrative_chart_config(full_config, indicator_mapping)
 
+            # Check on every chart, not only unchanged ones: a config can mix a mappable indicator
+            # with a stale pin from an even older dataset version, so a partial remap would
+            # otherwise PUT the stale ID back silently.
+            stale = _find_stale_lineage_variables(
+                collect_variable_ids_from_narrative_config(full_config), indicator_mapping
+            )
+            if stale:
+                log.warning(
+                    f"Narrative chart {nc.id} ({nc.name}) pins indicators from a version of the upgraded "
+                    f"dataset that the mapping does not cover: {stale}. These were likely left behind by a "
+                    "previous upgrade cycle — remap them with an explicit mapping "
+                    "(WizardDB.add_variable_mapping + push_new_narrative_charts_cli)."
+                )
+
             if config_new == full_config:
                 # Nothing in this config matched the mapping. PUTting an identical config would only
                 # bump updatedAt and make the log claim a remap that never happened.
-                stale = _find_stale_lineage_variables(
-                    collect_variable_ids_from_narrative_config(full_config), indicator_mapping
-                )
-                if stale:
-                    log.warning(
-                        f"Narrative chart {nc.id} ({nc.name}) was NOT remapped: it pins indicators from a "
-                        f"version of the upgraded dataset that the mapping does not cover: {stale}. These were "
-                        "likely left behind by a previous upgrade cycle — remap them with an explicit mapping "
-                        "(WizardDB.add_variable_mapping + push_new_narrative_charts_cli)."
-                    )
-                else:
+                if not stale:
                     log.info(f"Narrative chart {nc.id} ({nc.name}) references no mapped indicators — left unchanged.")
                 skipped += 1
                 continue
