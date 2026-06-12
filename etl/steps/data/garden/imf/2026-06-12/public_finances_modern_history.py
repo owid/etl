@@ -42,37 +42,6 @@ EXPECTED_INPUT_COUNTRIES = 153
 EXPECTED_OUTPUT_COUNTRIES = 151
 
 
-def sanity_check_inputs(tb: Table) -> None:
-    assert set(tb.columns) == EXPECTED_INPUT_COLUMNS, (
-        f"IMF file schema changed — unexpected column difference: {set(tb.columns) ^ EXPECTED_INPUT_COLUMNS}"
-    )
-    assert tb["country"].nunique() >= EXPECTED_INPUT_COUNTRIES, (
-        f"Source country coverage shrank: {tb['country'].nunique()} < {EXPECTED_INPUT_COUNTRIES}"
-    )
-    for col in ["gg_budg", "gg_debt"]:
-        assert not tb[col].isna().any(), f"Sector coverage flag {col} has missing values."
-        assert set(tb[col].unique()) <= {0, 1}, f"Sector coverage flag {col} has values outside {{0, 1}}."
-
-
-def sanity_check_outputs(tb: Table) -> None:
-    assert set(tb.columns) == set(INDICATOR_COLUMNS.values()), (
-        f"Unexpected output columns: {set(tb.columns) ^ set(INDICATOR_COLUMNS.values())}"
-    )
-    assert tb.columns[tb.isna().all()].empty, "Output has a fully-NaN column."
-    assert tb.index.get_level_values("country").nunique() >= EXPECTED_OUTPUT_COUNTRIES, (
-        "Harmonized country coverage shrank: "
-        f"{tb.index.get_level_values('country').nunique()} < {EXPECTED_OUTPUT_COUNTRIES}"
-    )
-    for col in NON_NEGATIVE_COLUMNS:
-        assert tb[col].min() >= 0, f"Negative value in {col} (min: {tb[col].min()}) — source error or unit mistake."
-    # Expenditure should stay below 100% of GDP outside the known exceptions.
-    countries_over_100 = set(tb[tb["expenditure"] > 100].index.get_level_values("country"))
-    unexpected_over_100 = sorted(countries_over_100 - EXPENDITURE_OVER_100_COUNTRIES)
-    assert not unexpected_over_100, (
-        f"Expenditure above 100% of GDP for countries outside the known exceptions: {unexpected_over_100}"
-    )
-
-
 def run() -> None:
     #
     # Load inputs.
@@ -110,3 +79,34 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def sanity_check_inputs(tb: Table) -> None:
+    assert set(tb.columns) == EXPECTED_INPUT_COLUMNS, (
+        f"IMF file schema changed — unexpected column difference: {set(tb.columns) ^ EXPECTED_INPUT_COLUMNS}"
+    )
+    assert tb["country"].nunique() >= EXPECTED_INPUT_COUNTRIES, (
+        f"Source country coverage shrank: {tb['country'].nunique()} < {EXPECTED_INPUT_COUNTRIES}"
+    )
+    for col in ["gg_budg", "gg_debt"]:
+        assert not tb[col].isna().any(), f"Sector coverage flag {col} has missing values."
+        assert set(tb[col].unique()) <= {0, 1}, f"Sector coverage flag {col} has values outside {{0, 1}}."
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    assert set(tb.columns) == set(INDICATOR_COLUMNS.values()), (
+        f"Unexpected output columns: {set(tb.columns) ^ set(INDICATOR_COLUMNS.values())}"
+    )
+    assert tb.columns[tb.isna().all()].empty, "Output has a fully-NaN column."
+    assert tb.index.get_level_values("country").nunique() >= EXPECTED_OUTPUT_COUNTRIES, (
+        "Harmonized country coverage shrank: "
+        f"{tb.index.get_level_values('country').nunique()} < {EXPECTED_OUTPUT_COUNTRIES}"
+    )
+    for col in NON_NEGATIVE_COLUMNS:
+        assert tb[col].min() >= 0, f"Negative value in {col} (min: {tb[col].min()}) — source error or unit mistake."
+    # Expenditure should stay below 100% of GDP outside the known exceptions.
+    countries_over_100 = set(tb[tb["expenditure"] > 100].index.get_level_values("country"))
+    unexpected_over_100 = sorted(countries_over_100 - EXPENDITURE_OVER_100_COUNTRIES)
+    assert not unexpected_over_100, (
+        f"Expenditure above 100% of GDP for countries outside the known exceptions: {unexpected_over_100}"
+    )
