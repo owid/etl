@@ -473,6 +473,17 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
      ```
      If the count is 0, the upgrade did not run — re-run it.
+   - **The auto-upgrader only remaps grapher charts — NOT ETL-defined explorers or MDims.** Explorers (`export://explorers/...`) and multidims (`export://multidim/...`) reference indicators by catalog path and are rebuilt by running their **export steps**, which the indicator-upgrader never touches. If the dataset has any (check the DAG: `rg "export://(explorers|multidim)/.*/<short_name>" dag/ -g "*.yml"`), they'll still point at the **old** variables on staging until you re-run them:
+     ```bash
+     STAGING=<branch> .venv/bin/etlr export://explorers/<ns>/latest/<short> export://multidim/<ns>/latest/<short> ... --export --private
+     ```
+     Verify none still reference the old version (both queries should return empty):
+     ```bash
+     # explorers
+     mysql -h "staging-site-<branch>" -u owid -P 3306 -D owid -e "SELECT DISTINCT ev.explorerSlug FROM explorer_variables ev JOIN variables v ON ev.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<old_version>%'"
+     # mdims
+     mysql -h "staging-site-<branch>" -u owid -P 3306 -D owid -e "SELECT DISTINCT mdp.slug FROM multi_dim_x_chart_configs mx JOIN variables v ON mx.variableId=v.id JOIN multi_dim_data_pages mdp ON mdp.id=mx.multiDimId WHERE v.catalogPath LIKE '%<ns>/<old_version>%'"
+     ```
    - **Also verify narrative charts.** Narrative-chart configs can pin a `variableId` in their own patch (not inherited from the parent chart), and that id can date from a version *older* than the one this update started from — left stale by a previous cycle. The auto-upgrader only carries `old_version → new_version` mappings, so it can never remap those, and the `chart_dimensions` count above can't catch them either: narrative-chart variable ids live only inside `chart_configs`. The upgrader **warns** about this case ("was NOT remapped: it pins indicators from a version of the upgraded dataset that the mapping does not cover") — watch its output for that warning. But the upgrader only visits narrative charts whose **parent chart was affected** by the mapping; a stale narrative chart whose parent no longer uses any mapped indicator is never visited and stays silent. So always run this catch-all scan over all narrative-chart configs:
      ```python
      # STAGING=<branch> .venv/bin/python — scan narrative chart configs for variables on ANY old version
@@ -526,6 +537,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      charts:
        published_count: <published chart count>
        size_qualifier: <handful|moderate|large|massive>
+       explorers: <list of published explorer slugs using this data, or []>
+       mdims: <list of MDim slugs using this data, with published flag, or []>
        selected_views:
          - title: <chart title>
            slug: <chart slug>
@@ -553,7 +566,24 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        AND c.publishedAt IS NOT NULL
      GROUP BY c.id
      ```
-   - Map the published count to `size_qualifier`: 1–9 = `handful`, 10–49 = `moderate`, 50–199 = `large`, 200+ = `massive`.
+   - **Charts are not the only surface — also count the explorers and MDims that use this data.** Many datasets feed published OWID explorers and multi-dimensional collections, which the grapher-`charts` query above misses entirely. Run the export steps first (step 7) so these point at the new variables, then query both:
+     ```sql
+     -- Explorers (note isPublished — only published ones count for the announcement)
+     SELECT DISTINCT ev.explorerSlug, e.isPublished
+     FROM explorer_variables ev
+     JOIN variables v ON ev.variableId = v.id
+     JOIN explorers e ON e.slug = ev.explorerSlug
+     WHERE v.catalogPath LIKE '%<namespace>/<new_version>%';
+
+     -- MDims (note published flag — drafts are published=0)
+     SELECT DISTINCT mdp.slug, mdp.published
+     FROM multi_dim_x_chart_configs mx
+     JOIN variables v ON mx.variableId = v.id
+     JOIN multi_dim_data_pages mdp ON mdp.id = mx.multiDimId
+     WHERE v.catalogPath LIKE '%<namespace>/<new_version>%';
+     ```
+     Chart-based explorers can also attach via `explorer_charts.chartId` (join through `chart_dimensions`) rather than `explorer_variables` — check that table too if the variable-based query comes up empty but the DAG shows an explorer step. Record published explorers/MDims under `charts.explorers` / `charts.mdims` in `update-context.yml`, and fold them into the "How many charts did this update affect?" answer (e.g. "10 published charts, 3 explorers, plus 3 draft MDims"). **Only count published surfaces** (`isPublished=1` / `published=1`) toward the public announcement; note unpublished ones for QA.
+   - Map the published **chart** count to `size_qualifier`: 1–9 = `handful`, 10–49 = `moderate`, 50–199 = `large`, 200+ = `massive`.
    - Pick 1–3 `selected_views` using these criteria (in order of preference):
      - **Map views** — immediately visual, readers can find their own country
      - **Charts with punchy, standalone headlines** — titles that make a clear claim work best for social sharing
@@ -604,6 +634,12 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      gh api repos/owid/etl/issues/<pr_number>/comments | python3 -m json.tool   # clean-pass summary lands here
      gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool    # findings land here as inline comments
      ```
+   - **Codex posts in one of two places — always check both.** When it finds issues, it leaves *inline review comments* (the endpoint above) with resolvable threads. When it finds **nothing**, it posts a single top-level **PR (issue) comment** instead — no inline comments, no threads — e.g. "Codex Review: Didn't find any major issues. Keep it up!". So if the inline-comments endpoint is empty, check the issue comments before concluding Codex hasn't run yet:
+     ```bash
+     gh api repos/owid/etl/issues/<pr_number>/comments \
+       --jq '.[] | select(.user.login | test("codex";"i")) | .body'
+     ```
+     A "no issues" / 👍 comment from `chatgpt-codex-connector[bot]` means the review is done and there's nothing to address — don't keep polling for inline comments that will never come.
    - Fetch open review thread IDs via GraphQL:
      ```bash
      gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<pr_number>) { reviewThreads(first:20) { nodes { id isResolved comments(first:1) { nodes { body } } } } } } }'
@@ -618,7 +654,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        gh api repos/owid/etl/pulls/<pr_number>/comments/<comment_id>/replies -f body="<explanation>"
        gh api graphql -f query='mutation { resolveReviewThread(input:{threadId:"<thread_id>"}) { thread { id isResolved } } }'
        ```
-   - If Codex hasn't posted yet after 60 s, wait another 60 s and retry (up to ~5 min total).
+   - If neither the inline-comments endpoint nor the issue-comments endpoint shows a Codex post after 60 s, wait another 60 s and retry (up to ~5 min total). Codex can take 5–10 min — a clean review often arrives only as the top-level "no issues" comment.
 
 ## Committing and pushing
 
