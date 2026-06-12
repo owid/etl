@@ -75,14 +75,17 @@ def get_affected_narrative_charts_cli(charts: list[gm.Chart]) -> list[gm.Narrati
     return narrative_charts
 
 
-# User-facing text fields (FAUST: Footnote, Axis titles, Units, Subtitle, Title) checked for stale
-# overrides in narrative charts, as config paths.
+# User-facing text fields (FAUST) checked for stale overrides in narrative charts, as config paths.
 FAUST_FIELDS = {
     "title": ("title",),
     "subtitle": ("subtitle",),
     "note": ("note",),
-    "y-axis label": ("yAxis", "label"),
-    "x-axis label": ("xAxis", "label"),
+}
+# Per-dimension display fields checked for stale overrides (under dimensions[].display).
+FAUST_DISPLAY_TEXT_FIELDS = {
+    "display.name": "name",
+    "unit": "unit",
+    "short unit": "shortUnit",
 }
 # Similarity (difflib ratio) above which a differing override is treated as a stale copy of the
 # parent's text rather than an intentional rewrite.
@@ -106,7 +109,20 @@ def _normalize_chart_text(text: str) -> str:
     return " ".join(text.split())
 
 
-def _find_stale_faust_overrides(patch_config: dict, parent_config: dict) -> list[tuple[str, str, str]]:
+def _texts_look_stale(narrative_value: str, parent_value: str) -> bool:
+    """True when two differing texts are similar enough that the narrative one looks like a stale
+    copy of the parent's (rather than an intentional rewrite)."""
+    narrative_norm = _normalize_chart_text(narrative_value)
+    parent_norm = _normalize_chart_text(parent_value)
+    return (
+        narrative_norm == parent_norm
+        or difflib.SequenceMatcher(None, narrative_norm, parent_norm).ratio() >= FAUST_STALE_SIMILARITY
+    )
+
+
+def _find_stale_faust_overrides(
+    patch_config: dict, parent_config: dict, indicator_mapping: dict[int, int] | None = None
+) -> list[tuple[str, str, str]]:
     """Find user-facing text overrides in a narrative chart that look like stale copies of the parent.
 
     A narrative chart pins in its patch any field it overrides. Overriding the title or subtitle is
@@ -114,25 +130,47 @@ def _find_stale_faust_overrides(patch_config: dict, parent_config: dict) -> list
     *nearly identical* to the parent's current text is the signature of a stale copy: the narrative
     chart froze the parent's text at creation time and the parent has since evolved (e.g. gained
     detail-on-demand links in its note). Texts are compared after stripping markdown link syntax;
-    equal-after-normalization or highly similar values are reported as stale. Returns
-    (field_label, narrative_value, parent_value) for each such field; identical raw values and
-    substantially different overrides are not reported.
+    equal-after-normalization or highly similar values are reported as stale. Checked fields:
+    title, subtitle, note, and — per dimension, matched to the parent by (mapped) variable id —
+    display.name, unit, shortUnit, and tolerance (numeric: any pinned difference is reported).
+    Returns (field_label, narrative_value, parent_value) for each such field; identical raw values
+    and substantially different text overrides are not reported.
     """
     stale = []
+
+    # Top-level text fields.
     for label, path in FAUST_FIELDS.items():
         narrative_value = _get_nested(patch_config, path)
         parent_value = _get_nested(parent_config, path)
         if not isinstance(narrative_value, str) or not isinstance(parent_value, str):
             continue
-        if narrative_value == parent_value:
-            continue
-        narrative_norm = _normalize_chart_text(narrative_value)
-        parent_norm = _normalize_chart_text(parent_value)
-        if (
-            narrative_norm == parent_norm
-            or difflib.SequenceMatcher(None, narrative_norm, parent_norm).ratio() >= FAUST_STALE_SIMILARITY
-        ):
+        if narrative_value != parent_value and _texts_look_stale(narrative_value, parent_value):
             stale.append((label, narrative_value, parent_value))
+
+    # Per-dimension display fields, matched to the parent dimension by variable id (translating
+    # the narrative chart's pinned id through the mapping, since the patch may predate the remap).
+    parent_displays = {dim.get("variableId"): dim.get("display") or {} for dim in parent_config.get("dimensions", [])}
+    for dim in patch_config.get("dimensions", []):
+        variable_id = dim.get("variableId")
+        if indicator_mapping and variable_id in indicator_mapping:
+            variable_id = indicator_mapping[variable_id]
+        parent_display = parent_displays.get(variable_id)
+        if parent_display is None:
+            continue
+        display = dim.get("display") or {}
+        for label, key in FAUST_DISPLAY_TEXT_FIELDS.items():
+            narrative_value = display.get(key)
+            parent_value = parent_display.get(key)
+            if not isinstance(narrative_value, str) or not isinstance(parent_value, str):
+                continue
+            if narrative_value != parent_value and _texts_look_stale(narrative_value, parent_value):
+                stale.append((f"{label} (indicator {variable_id})", narrative_value, parent_value))
+        # Tolerance is numeric — no similarity notion; any pinned difference is worth review.
+        narrative_tolerance = display.get("tolerance")
+        parent_tolerance = parent_display.get("tolerance")
+        if narrative_tolerance is not None and parent_tolerance is not None and narrative_tolerance != parent_tolerance:
+            stale.append((f"tolerance (indicator {variable_id})", str(narrative_tolerance), str(parent_tolerance)))
+
     return stale
 
 
@@ -249,7 +287,9 @@ def push_new_narrative_charts_cli(
         try:
             # Warn when the narrative chart pins user-facing text that is nearly identical to the
             # parent's current text — likely frozen at creation time and stale since.
-            stale_faust = _find_stale_faust_overrides(patches.get(nc.id, {}), parent_configs.get(nc.parentChartId, {}))
+            stale_faust = _find_stale_faust_overrides(
+                patches.get(nc.id, {}), parent_configs.get(nc.parentChartId, {}), indicator_mapping
+            )
             if stale_faust:
                 details = "; ".join(
                     f"{field}: narrative={narrative_value!r} vs parent={parent_value!r}"
