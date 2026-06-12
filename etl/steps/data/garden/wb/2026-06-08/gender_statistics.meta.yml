@@ -67,15 +67,17 @@ tables:
           tolerance: 10
 
       gd_wbl_saf_law_domviol:
-        title: Is there legislation on domestic violence?
-        description_short: Indicates whether the country has domestic violence legislation covering criminal penalties, protection orders, broad forms of abuse (including marital rape), and a specific domestic violence law.
+        title: Comprehensiveness of domestic violence legislation
+        description_short: Score measuring how comprehensively the law addresses domestic violence, from 0 (no legislation) to 1 (full coverage across all key dimensions).
         description_key:
-          - "Equals 1 if the law addresses all four key dimensions of domestic violence legislation: criminal penalties, protection orders, broad scope of abuse, and a specific domestic violence law."
-          - Equals 0 if no domestic violence legislation exists.
+          - "This score assesses four dimensions of domestic violence legislation, each worth 0.25 — a country scores 1.0 if all four are in place."
+          - "The four dimensions are: criminal penalties, protection orders, broad scope of abuse (including marital rape), and a specific domestic violence law."
+          - A score of 0 means no domestic violence legislation exists; a score of 1 means the law covers all four dimensions.
+          - Partial scores reflect coverage of some but not all dimensions.
           - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+        unit: "score (0–1)"
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           tolerance: 5
 
       ic_frm_femm_zs:
@@ -483,17 +485,17 @@ tables:
           tolerance: 5
 
       gd_wbl_par_law_matbene:
-        title: Are maternity leave benefits paid by the government?
-        description_short: Indicates whether maternity leave benefits are paid or administered by the government rather than the employer alone.
+        title: Government funding of maternity leave benefits
+        description_short: Score measuring the extent to which maternity leave benefits are paid by the government, from 0 (employer only) to 1 (fully government-funded).
         description_key:
-          - Equals 1 if leave benefits are fully paid or administered by the government (including compulsory social insurance schemes or public funds).
-          - Equals 0.5 if payment is shared between the government and the employer.
-          - Equals 0 if leave benefits are paid solely by the employer.
+          - A score of 1 means leave benefits are fully paid or administered by the government (including compulsory social insurance schemes or public funds).
+          - A score of 0 means leave benefits are paid solely by the employer.
+          - Partial scores reflect shared payment between the government and the employer.
           - Government-funded benefits are more reliable and cover workers regardless of employer size or financial situation.
           - *desc_standardized_assumptions
-        unit: "(1=yes; 0=no)"
+        unit: "score (0–1)"
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           tolerance: 5
 
       gd_wbl_par_law_nondismpreg:
