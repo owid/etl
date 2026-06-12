@@ -4213,3 +4213,412 @@
     - ZAF
     - ZMB
     - ZWE
+
+##########
+# International Labour Organization (ILOSTAT)
+##########
+- code: ILO_AFR
+  name: "Africa (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ILO_NAF
+    - ILO_SSA
+- code: ILO_NAF
+  name: "Northern Africa (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - DZA
+    - EGY
+    - ESH
+    - LBY
+    - MAR
+    - SDN
+    - TUN
+- code: ILO_SSA
+  name: "Sub-Saharan Africa (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ILO_CAF
+    - ILO_EAF
+    - ILO_SAF
+    - ILO_WAF
+- code: ILO_CAF
+  name: "Central Africa (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - AGO
+    - CAF
+    - CMR
+    - COD
+    - COG
+    - GAB
+    - GNQ
+    - STP
+    - TCD
+- code: ILO_EAF
+  name: "Eastern Africa (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - BDI
+    - COM
+    - DJI
+    - ERI
+    - ETH
+    - KEN
+    - MDG
+    - MOZ
+    - MUS
+    - MWI
+    - REU
+    - RWA
+    - SOM
+    - SSD
+    - SYC
+    - TZA
+    - UGA
+    - ZMB
+    - ZWE
+- code: ILO_SAF
+  name: "Southern Africa (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - BWA
+    - LSO
+    - NAM
+    - SWZ
+    - ZAF
+- code: ILO_WAF
+  name: "Western Africa (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - BEN
+    - BFA
+    - CIV
+    - CPV
+    - GHA
+    - GIN
+    - GMB
+    - GNB
+    - LBR
+    - MLI
+    - MRT
+    - NER
+    - NGA
+    - SEN
+    - SHN
+    - SLE
+    - TGO
+- code: ILO_AMR
+  name: "Americas (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ILO_LAC
+    - ILO_NAM
+- code: ILO_LAC
+  name: "Latin America and the Caribbean (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ILO_CAR
+    - ILO_CAM
+    - ILO_SAM
+- code: ILO_CAR
+  name: "Caribbean (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ABW
+    - AIA
+    - ANT
+    - ATG
+    - BHS
+    - BRB
+    - CUB
+    - CUW
+    - CYM
+    - DMA
+    - DOM
+    - GLP
+    - GRD
+    - HTI
+    - JAM
+    - KNA
+    - LCA
+    - MSR
+    - MTQ
+    - PRI
+    - TCA
+    - TTO
+    - VCT
+    - VGB
+    - VIR
+- code: ILO_CAM
+  name: "Central America (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - BLZ
+    - CRI
+    - GTM
+    - HND
+    - MEX
+    - NIC
+    - PAN
+    - SLV
+- code: ILO_SAM
+  name: "South America (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ARG
+    - BOL
+    - BRA
+    - CHL
+    - COL
+    - ECU
+    - FLK
+    - GUF
+    - GUY
+    - PER
+    - PRY
+    - SUR
+    - URY
+    - VEN
+- code: ILO_NAM
+  name: "Northern America (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - BMU
+    - CAN
+    - GRL
+    - SPM
+    - USA
+- code: ILO_ARB
+  name: "Arab States (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ARE
+    - BHR
+    - IRQ
+    - JOR
+    - KWT
+    - LBN
+    - OMN
+    - PSE
+    - QAT
+    - SAU
+    - SYR
+    - YEM
+- code: ILO_ASP
+  name: "Asia and the Pacific (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ILO_EAS
+    - ILO_SEAP
+    - ILO_SAS
+- code: ILO_EAS
+  name: "Eastern Asia (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - CHN
+    - HKG
+    - JPN
+    - KOR
+    - MAC
+    - MNG
+    - PRK
+    - TWN
+- code: ILO_SEAP
+  name: "South-Eastern Asia and the Pacific (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ILO_SEA
+    - ILO_PAC
+- code: ILO_SEA
+  name: "South-Eastern Asia (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - BRN
+    - IDN
+    - KHM
+    - LAO
+    - MMR
+    - MYS
+    - PHL
+    - SGP
+    - THA
+    - TLS
+    - VNM
+- code: ILO_PAC
+  name: "Pacific Islands (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ASM
+    - AUS
+    - COK
+    - FJI
+    - FSM
+    - GUM
+    - KIR
+    - MHL
+    - MNP
+    - NCL
+    - NFK
+    - NIU
+    - NRU
+    - NZL
+    - PLW
+    - PNG
+    - PYF
+    - SLB
+    - TKL
+    - TON
+    - TUV
+    - VUT
+    - WLF
+    - WSM
+- code: ILO_SAS
+  name: "Southern Asia (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - AFG
+    - BGD
+    - BTN
+    - IND
+    - IRN
+    - LKA
+    - MDV
+    - NPL
+    - PAK
+- code: ILO_ECA
+  name: "Europe and Central Asia (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ILO_NSWE
+    - ILO_EEU
+    - ILO_CWA
+- code: ILO_NSWE
+  name: "Northern, Southern and Western Europe (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ILO_NEU
+    - ILO_SEU
+    - ILO_WEU
+- code: ILO_NEU
+  name: "Northern Europe (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - DNK
+    - EST
+    - FIN
+    - FRO
+    - GBR
+    - IMN
+    - IRL
+    - ISL
+    - LTU
+    - LVA
+    - NOR
+    - OWID_CIS
+    - SWE
+- code: ILO_SEU
+  name: "Southern Europe (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ALB
+    - AND
+    - BIH
+    - ESP
+    - GIB
+    - GRC
+    - HRV
+    - ITA
+    - MKD
+    - MLT
+    - MNE
+    - OWID_KOS
+    - PRT
+    - SMR
+    - SRB
+    - SVN
+# NOTE: ILOSTAT lists Guernsey and Jersey under Western Europe, while also listing Channel Islands
+# (which OWID defines as Guernsey + Jersey) under Northern Europe. To avoid duplicating Guernsey and
+# Jersey across subregions, they are kept only via Channel Islands in Northern Europe, where the bulk
+# of ILOSTAT's data for these territories is reported.
+- code: ILO_WEU
+  name: "Western Europe (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - AUT
+    - BEL
+    - CHE
+    - DEU
+    - FRA
+    - LIE
+    - LUX
+    - MCO
+    - NLD
+- code: ILO_EEU
+  name: "Eastern Europe (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - BGR
+    - BLR
+    - CZE
+    - HUN
+    - MDA
+    - POL
+    - ROU
+    - RUS
+    - SVK
+    - UKR
+- code: ILO_CWA
+  name: "Central and Western Asia (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ILO_CAS
+    - ILO_WAS
+- code: ILO_CAS
+  name: "Central Asia (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - KAZ
+    - KGZ
+    - TJK
+    - TKM
+    - UZB
+- code: ILO_WAS
+  name: "Western Asia (ILO)"
+  region_type: "aggregate"
+  defined_by: ilo
+  members:
+    - ARM
+    - AZE
+    - CYP
+    - GEO
+    - ISR
+    - TUR
