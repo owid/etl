@@ -33,8 +33,8 @@ def run() -> None:
 
     tb = clean_up_categories(tb)
     tb = calculate_united_kingdom(tb)
-    # Calculate rates for 2024 using counts from UNODC and medium population projections from UN WPP
-    tb = calculate_rates_for_most_recent_year(tb, tb_pop_full)
+    # Calculate rates for any country-year with counts but no source-provided rate
+    tb = calculate_rates_for_missing_years(tb, tb_pop_full)
     # Clean up variable names.
     tb = clean_up_variables(tb)
     tables = clean_data(tb)
@@ -71,32 +71,38 @@ def format_pop_full(tb_pop_full: Table) -> Table:
     return tb_pop_full
 
 
-def calculate_rates_for_most_recent_year(tb: Table, tb_pop_full: Table) -> Table:
+def calculate_rates_for_missing_years(tb: Table, tb_pop_full: Table) -> Table:
     """
-    Calculate rates for the most recent year in the dataset using the full population dataset, with projections included.
+    Calculate rates for any country-year that has counts but no source-provided rate,
+    using counts from UNODC and population from UN WPP.
     """
-    # Get the most recent year in the table for counts
+    key_cols = ["country", "year", "indicator", "dimension", "category", "sex", "age"]
+
     tb_counts = tb[tb["unit_of_measurement"] == "Counts"]
     tb_rates = tb[tb["unit_of_measurement"] == "Rate per 100,000 population"]
-    if tb_rates.empty:
-        most_recent_year_rates = None
-        print("No rates found in the table, check spelling.")
-    else:
-        most_recent_year_rates = tb_rates["year"].max()
-    most_recent_year_counts = tb_counts["year"].max()
 
-    if most_recent_year_rates is not None and most_recent_year_counts > most_recent_year_rates:
-        tb_recent = tb_counts[tb_counts["year"] == most_recent_year_counts]
-        tb_pop_recent = tb_pop_full[tb_pop_full["year"] == most_recent_year_counts]
-        tb_merge = pr.merge(left=tb_recent, right=tb_pop_recent, on=["country", "year", "sex"])
-        tb_merge["value_new"] = tb_merge["value"] / tb_merge["population"] * 100000
+    if tb_counts.empty:
+        return tb
 
-        tb_merge["unit_of_measurement"] = "Rate per 100,000 population"
-        tb_merge = tb_merge.drop(columns=["population", "value"])
+    # Find (key) combos that have counts but no rate
+    counts_keys = tb_counts[key_cols].drop_duplicates()
+    rates_keys = tb_rates[key_cols].drop_duplicates()
+    missing = pr.merge(counts_keys, rates_keys, on=key_cols, how="left", indicator=True)
+    missing = missing[missing["_merge"] == "left_only"].drop(columns=["_merge"])
 
-        tb_merge = tb_merge.rename(columns={"value_new": "value"})
-        tb = pr.concat([tb, tb_merge])
+    if missing.empty:
+        return tb
 
+    # Keep only the count rows that need a rate
+    tb_need_rate = pr.merge(tb_counts, missing, on=key_cols, how="inner")
+
+    # Merge with population to compute rate
+    tb_merged = pr.merge(tb_need_rate, tb_pop_full, on=["country", "year", "sex"], how="inner")
+    tb_merged["value"] = tb_merged["value"] / tb_merged["population"] * 100000
+    tb_merged["unit_of_measurement"] = "Rate per 100,000 population"
+    tb_merged = tb_merged.drop(columns=["population"])
+
+    tb = pr.concat([tb, tb_merged])
     return tb
 
 
