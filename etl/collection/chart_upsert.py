@@ -52,14 +52,29 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
     admin_api = AdminAPI(owid_env)
 
     # Look up the chart by its ETL catalog path (the stable ETL identity, like
-    # multi_dim_data_pages.catalogPath) — not by slug, which is a mutable public
-    # URL. If it exists, we keep it; otherwise we create a new one with a minimal
-    # bootstrap config and then write the full config into chart_configs.etlConfig.
+    # multi_dim_data_pages.catalogPath). Charts that pre-date ETL authorship have
+    # no catalogPath yet, so fall back to the slug: a match there is adopted (the
+    # put_chart_etl_config call below stamps the catalog path onto the chart, so
+    # subsequent runs find it by catalog path directly). If neither matches, we
+    # create a new chart with a minimal bootstrap config and then write the full
+    # config into the chart's ETL config row.
     with Session(owid_env.engine) as session:
         try:
             existing = Chart.load_chart(session, catalog_path=collection.catalog_path)
         except NoResultFound:
-            existing = None
+            try:
+                existing = Chart.load_chart(session, slug=slug)
+            except NoResultFound:
+                existing = None
+            if existing is not None and existing.catalogPath:
+                # The slug-matched chart is already owned by a different ETL step
+                # (its catalogPath can't equal ours, or the lookup above would have
+                # found it). Refuse to adopt rather than steal it.
+                raise ValueError(
+                    f"Chart with slug '{slug}' already belongs to ETL step '{existing.catalogPath}' "
+                    f"(this step is '{collection.catalog_path}'). Rename this step's short_name "
+                    "or remove the conflicting step."
+                )
 
     if existing is None:
         # Minimal bootstrap so the chart row exists. We deliberately keep the
@@ -81,7 +96,11 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
         is_new = True
     else:
         chart_id = existing.id
-        log.info("collection.chart.update", slug=slug, chart_id=chart_id)
+        if existing.catalogPath is None:
+            # First ETL push for a chart that already existed in the admin.
+            log.info("collection.chart.adopt", slug=slug, chart_id=chart_id)
+        else:
+            log.info("collection.chart.update", slug=slug, chart_id=chart_id)
         is_new = False
 
     # Write the chart's ETL-authored config. This recomputes `full` server-side
