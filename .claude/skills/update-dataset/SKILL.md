@@ -575,11 +575,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Data update post drafted at [workbench/<short_name>/data-update.md](workbench/<short_name>/data-update.md) in the Google Docs CMS format. Please create a new Google Doc in /Data updates, paste the draft, attach the chart screenshot, and share for review."` Always render `workbench/<short_name>/data-update.md` as a markdown link `[…](…)` rather than as a bare path or inline-code path — the chat UI renders it as clickable that way.
 
 10) Codex review: address comments and resolve threads
-   - **The completion signal is an *issue comment*, not a review.** Codex (`chatgpt-codex-connector[bot]`) posts its summary via `gh api repos/owid/etl/issues/<pr_number>/comments` — a clean pass ("Didn't find any major issues") has **zero** inline comments and **no** formal review object, so a watcher polling only `pulls/<pr_number>/comments` or `gh pr view --json reviews` waits forever on a clean review. Poll the issue comments for the bot's summary first; only then look for inline comments.
-   - Wait ~60 seconds after posting `@codex review`, then poll:
+   - **Codex's delivery channel depends on the verdict — poll both.** A **clean pass** arrives as an *issue comment* ("Didn't find any major issues") from `chatgpt-codex-connector[bot]`, with zero inline comments and no formal review object. A review **with findings** arrives as a formal review ("💡 Codex Review") with inline comments, and *no* issue comment. A watcher polling only one channel waits forever on the other outcome — treat a hit on either as completion.
+   - Wait ~60 seconds after posting `@codex review`, then poll both channels:
      ```bash
-     gh api repos/owid/etl/issues/<pr_number>/comments | python3 -m json.tool   # bot summary lands here
-     gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool    # inline comments, if any
+     gh api repos/owid/etl/issues/<pr_number>/comments | python3 -m json.tool   # clean-pass summary lands here
+     gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool    # findings land here as inline comments
      ```
    - Fetch open review thread IDs via GraphQL:
      ```bash
