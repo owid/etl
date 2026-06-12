@@ -334,3 +334,14 @@ steps:
     - data://meadow/oecd/2025-04-16/income_distribution_database
   data://grapher/oecd/2025-04-16/income_distribution_database:
     - data://garden/oecd/2025-04-16/income_distribution_database
+
+  # Luxembourg Income Study
+  data://meadow/lis/2026-03-16/luxembourg_income_study:
+    - snapshot://lis/2026-03-16/lis_incomes.csv
+    - snapshot://lis/2026-03-16/lis_relative_poverty.csv
+    - snapshot://lis/2026-03-16/lis_absolute_poverty.csv
+    - snapshot://lis/2026-03-16/lis_inequality.csv
+  data://garden/lis/2026-03-16/luxembourg_income_study:
+    - data://meadow/lis/2026-03-16/luxembourg_income_study
+  data://grapher/lis/2026-03-16/luxembourg_income_study:
+    - data://garden/lis/2026-03-16/luxembourg_income_study
