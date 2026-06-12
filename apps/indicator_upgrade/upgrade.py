@@ -87,6 +87,12 @@ FAUST_DISPLAY_TEXT_FIELDS = {
     "unit": "unit",
     "short unit": "shortUnit",
 }
+# Numeric display fields — no similarity notion; any pinned difference is reported.
+FAUST_DISPLAY_NUMERIC_FIELDS = {
+    "tolerance": "tolerance",
+    "decimal places": "numDecimalPlaces",
+    "significant figures": "numSignificantFigures",
+}
 # Similarity (difflib ratio) above which a differing override is treated as a stale copy of the
 # parent's text rather than an intentional rewrite.
 FAUST_STALE_SIMILARITY = 0.8
@@ -132,7 +138,8 @@ def _find_stale_faust_overrides(
     detail-on-demand links in its note). Texts are compared after stripping markdown link syntax;
     equal-after-normalization or highly similar values are reported as stale. Checked fields:
     title, subtitle, note, and — per dimension, matched to the parent by (mapped) variable id —
-    display.name, unit, shortUnit, and tolerance (numeric: any pinned difference is reported).
+    display.name, unit, shortUnit, and the numeric fields tolerance, numDecimalPlaces, and
+    numSignificantFigures (numeric: any pinned difference is reported).
     Returns (field_label, narrative_value, parent_value) for each such field; identical raw values
     and substantially different text overrides are not reported.
     """
@@ -165,11 +172,13 @@ def _find_stale_faust_overrides(
                 continue
             if narrative_value != parent_value and _texts_look_stale(narrative_value, parent_value):
                 stale.append((f"{label} (indicator {variable_id})", narrative_value, parent_value))
-        # Tolerance is numeric — no similarity notion; any pinned difference is worth review.
-        narrative_tolerance = display.get("tolerance")
-        parent_tolerance = parent_display.get("tolerance")
-        if narrative_tolerance is not None and parent_tolerance is not None and narrative_tolerance != parent_tolerance:
-            stale.append((f"tolerance (indicator {variable_id})", str(narrative_tolerance), str(parent_tolerance)))
+        # Numeric fields (tolerance, decimal places, significant figures) — no similarity notion;
+        # any pinned difference is worth review.
+        for label, key in FAUST_DISPLAY_NUMERIC_FIELDS.items():
+            narrative_value = display.get(key)
+            parent_value = parent_display.get(key)
+            if narrative_value is not None and parent_value is not None and narrative_value != parent_value:
+                stale.append((f"{label} (indicator {variable_id})", str(narrative_value), str(parent_value)))
 
     return stale
 
