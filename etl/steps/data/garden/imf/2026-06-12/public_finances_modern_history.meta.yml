@@ -3,7 +3,7 @@ definitions:
   common:
     processing_level: minor
     description_key:
-      - The Public Finances in Modern History database is compiled by the International Monetary Fund from a wide range of historical sources and documents 200 years of budget deficits and government debt.
+      - The Public Finances in Modern History database is compiled by the International Monetary Fund from a wide range of historical sources and documents 200 years of government revenue, spending, deficits, and debt.
       - Depending on the country and year, the data may cover the central government only or the general government, which also includes state and local governments. Companion indicators in the dataset flag which coverage applies to each observation.
     presentation:
       attribution_short: IMF
@@ -94,6 +94,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The long-term interest rate adjusted for inflation.
+        description_key:
+          - The Public Finances in Modern History database is compiled by the International Monetary Fund from a wide range of historical sources and documents 200 years of government revenue, spending, deficits, and debt.
         display:
           name: Real long-term interest rate
           numDecimalPlaces: 1
@@ -104,6 +106,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The rate of change of the GDP, adjusted for inflation.
+        description_key:
+          - The Public Finances in Modern History database is compiled by the International Monetary Fund from a wide range of historical sources and documents 200 years of government revenue, spending, deficits, and debt.
         display:
           name: Real GDP growth rate
           numDecimalPlaces: 1
