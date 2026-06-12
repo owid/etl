@@ -122,13 +122,8 @@ def run() -> None:
     ds_opri = paths.load_dataset("education_opri")
     tb_opri = ds_opri.read("education_opri")
 
-    # New gender_statistics for expected years of schooling (se_sch_life)
-    ds_gender_stats_new = paths.load_dataset("gender_statistics", version="2026-06-08")
-    tb_gender_stats_new = ds_gender_stats_new.read("gender_statistics")
-
-    # Old gender_statistics for learning-adjusted years of schooling (hd_hci_lays)
-    ds_gender_stats_old = paths.load_dataset("gender_statistics", version="2025-09-08")
-    tb_gender_stats_old = ds_gender_stats_old.read("gender_statistics")
+    ds_gender_stats = paths.load_dataset("gender_statistics")
+    tb_gender_stats = ds_gender_stats.read("gender_statistics")
 
     # UNDP expected years of schooling columns
     cols_undp = tb_undp.filter(regex=r"(eys|mys)__sex_").columns
@@ -150,15 +145,8 @@ def run() -> None:
         "school_life_expectancy__tertiary__male__years",
     ]
 
-    # Expected years of schooling from new gender_statistics
-    cols_expected = [
-        "se_sch_life",
-        "se_sch_life_fe",
-        "se_sch_life_ma",
-    ]
-
-    # Learning-adjusted years of schooling from old gender_statistics
-    cols_learning_adjusted = [
+    # Gender statistics columns
+    cols_gender_stats = [
         "hd_hci_lays",
         "hd_hci_lays_fe",
         "hd_hci_lays_ma",
@@ -167,22 +155,20 @@ def run() -> None:
     # Select only the relevant columns
     tb_undp = tb_undp.loc[:, ["country", "year"] + list(cols_undp)]
     tb_opri = tb_opri.loc[:, ["country", "year"] + list(cols_opri)]
-    tb_gender_stats_new = tb_gender_stats_new.loc[:, ["country", "year"] + cols_expected]
-    tb_gender_stats_old = tb_gender_stats_old.loc[:, ["country", "year"] + cols_learning_adjusted]
+    tb_gender_stats = tb_gender_stats.loc[:, ["country", "year"] + cols_gender_stats]
 
     #
     # Adjust dimensions
     #
     tb_undp = adjust_dimensions_schooling(tb_undp)
     tb_opri = adjust_dimensions_schooling(tb_opri)
-    tb_gender_stats_new = adjust_dimensions_schooling(tb_gender_stats_new)
-    tb_gender_stats_old = adjust_dimensions_schooling(tb_gender_stats_old)
+    tb_gender_stats = adjust_dimensions_schooling(tb_gender_stats)
 
     #
     # Create collection object
     #
     collections = []
-    for tb in [tb_undp, tb_opri, tb_gender_stats_new, tb_gender_stats_old]:
+    for tb in [tb_undp, tb_opri, tb_gender_stats]:
         c_ = paths.create_collection(
             config=config,
             tb=tb,
@@ -334,7 +320,6 @@ def adjust_dimensions_schooling(tb):
         "eys": "expected_years_schooling",
         "mys": "average_years_schooling",
         "school_life_expectancy": "expected_years_schooling",
-        "se_sch_life": "expected_years_schooling",
         "hd_hci_lays": "learning_adjusted_years_schooling",
     }
     cols_to_add_dimensions = [col for col in tb.columns if col not in ["country", "year"]]
@@ -349,7 +334,7 @@ def adjust_dimensions_schooling(tb):
                 break
 
         # Default to "all" for aggregate measures
-        if level is None and any(x in col for x in ["eys", "mys", "hd_hci_lays", "se_sch_life"]):
+        if level is None and any(x in col for x in ["eys", "mys", "hd_hci_lays"]):
             level = "all"
 
         # --- Metric Type ---
@@ -559,7 +544,7 @@ def edit_indicator_displays(view):
             "expected": {
                 "name": "Expected years",
                 "color": COLOR_EXPECTED_YEARS,
-                "patterns": ["eys", "school_life_expectancy", "se_sch_life"],
+                "patterns": ["eys", "school_life_expectancy"],
             },
             "average": {"name": "Average years", "color": COLOR_AVERAGE_YEARS, "patterns": ["mys"]},
             "learning_adjusted": {
