@@ -207,6 +207,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    | Percentage of a whole | values in [0, 100] |
    | "% of GDP" and similar ratios | non-negative for levels (revenue, spending, debt); can exceed 100 — verify against data before capping. Where a ≤100 bound *mostly* holds, enforce it with a **documented exception set** (e.g. PFMH expenditure ≤ 100 outside `{Equatorial Guinea, Kuwait, Kiribati}` — each with a comment explaining why it's legitimate) so a new country crossing the line fails for review |
    | Balances, growth rates, interest rates | can legitimately be negative — do NOT impose ≥ 0 |
+   | Mutually exclusive share categories | components sum to 100% (or 1) per (country, year), within a small rounding tolerance (e.g. `abs(sum - 100) < 0.1`) — first verify against the data that the source's categories are actually exhaustive (some breakdowns ship without an "other" remainder, or only for a subset of rows) |
    | Categorical flags / codes | exact value set (e.g. `<= {0, 1}`) and non-null |
    | Input schema | set-equality on expected columns — catches the next source rename (PFMH: `debt` → `d`) with a clear message |
    | Coverage | country-count floors (≥ previous version); a drop is usually a parsing/mapping regression — re-audit before bumping the constant |
