@@ -903,3 +903,9 @@ steps:
     - data://garden/artificial_intelligence/2026-04-02/nvidia_revenue:
       - data://meadow/artificial_intelligence/2026-04-02/nvidia_revenue:
         - snapshot://artificial_intelligence/2026-04-02/nvidia_revenue.csv
+
+  # Microsoft AI Diffusion — Global AI adoption estimates (old PDF-based version)
+  data://grapher/artificial_intelligence/2026-04-07/ai_diffusion_msft:
+    - data://garden/artificial_intelligence/2026-04-07/ai_diffusion_msft:
+      - data://meadow/artificial_intelligence/2026-04-07/ai_diffusion_msft:
+        - snapshot://artificial_intelligence/2026-04-07/ai_diffusion_msft.pdf
