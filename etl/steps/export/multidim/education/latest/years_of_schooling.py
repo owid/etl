@@ -334,6 +334,7 @@ def adjust_dimensions_schooling(tb):
         "eys": "expected_years_schooling",
         "mys": "average_years_schooling",
         "school_life_expectancy": "expected_years_schooling",
+        "se_sch_life": "expected_years_schooling",
         "hd_hci_lays": "learning_adjusted_years_schooling",
     }
     cols_to_add_dimensions = [col for col in tb.columns if col not in ["country", "year"]]
@@ -348,7 +349,7 @@ def adjust_dimensions_schooling(tb):
                 break
 
         # Default to "all" for aggregate measures
-        if level is None and any(x in col for x in ["eys", "mys", "hd_hci_lays"]):
+        if level is None and any(x in col for x in ["eys", "mys", "hd_hci_lays", "se_sch_life"]):
             level = "all"
 
         # --- Metric Type ---

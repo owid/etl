@@ -77,7 +77,9 @@ def add_country_counts_and_population_by_status(tb: Table) -> Table:
 
             new_columns[count_col] = {
                 "data": count_data,
-                "metadata": _make_metadata(column_title, description_from_producer, status, "count", count_data.m.origins),
+                "metadata": _make_metadata(
+                    column_title, description_from_producer, status, "count", count_data.m.origins
+                ),
             }
             new_columns[pop_col] = {
                 "data": pop_data,
