@@ -22,7 +22,7 @@ steps:
     - data://meadow/war/2023-01-10/sutton_1971:
         - snapshot://war/2023-01-09/sutton_1971.csv
 
-  # UCDP
+  # UCDP (old version, to be archived after the 2026-06-10 update is live)
   data://meadow/war/2025-06-13/ucdp:
     - snapshot://war/2025-06-13/ucdp_battle_related_conflict.zip
     - snapshot://war/2025-06-13/ucdp_non_state.zip
@@ -38,18 +38,33 @@ steps:
   data://grapher/war/2025-06-13/ucdp:
     - data://garden/war/2025-06-13/ucdp
 
+  # UCDP
+  data://meadow/war/2026-06-10/ucdp:
+    - snapshot://war/2026-06-10/ucdp_battle_related_conflict.zip
+    - snapshot://war/2026-06-10/ucdp_non_state.zip
+    - snapshot://war/2026-06-10/ucdp_prio_armed_conflict.zip
+    - snapshot://war/2026-06-10/ucdp_battle_related_dyadic.zip
+    - snapshot://war/2026-06-10/ucdp_ged.zip
+    - snapshot://war/2026-06-10/ucdp_one_sided.zip
+  data://garden/war/2026-06-10/ucdp:
+    - data://meadow/war/2026-06-10/ucdp
+    - data://garden/demography/2024-07-15/population
+    - data://garden/geography/2025-06-26/geoboundaries_cgaz
+    - data://garden/countries/2024-08-27/gleditsch
+  data://grapher/war/2026-06-10/ucdp:
+    - data://garden/war/2026-06-10/ucdp
+
   # UCDP (+preview)
   export://multidim/war/latest/ucdp:
-    - data://grapher/war/2025-06-13/ucdp
+    - data://grapher/war/2026-06-10/ucdp
     - data://grapher/war/latest/ucdp_preview:
         - data://garden/war/latest/ucdp_preview:
-            - data://meadow/war/2025-06-13/ucdp
-            - data://garden/war/2025-06-13/ucdp
+            - data://meadow/war/2026-06-10/ucdp
+            - data://garden/war/2026-06-10/ucdp
             - data://garden/geography/2025-06-26/geoboundaries_cgaz
             - data://garden/demography/2024-07-15/population
             - data://garden/countries/2024-08-27/gleditsch
             - data://meadow/war/latest/ucdp_ced:
-                - snapshot://war/latest/ucdp_ced_v25_01_25_12.csv
                 - snapshot://war/latest/ucdp_ced_v26_01_26_03.csv
 
   # PRIO v3.1
@@ -60,14 +75,22 @@ steps:
   data://grapher/war/2023-09-21/prio_v31:
     - data://garden/war/2023-09-21/prio_v31
 
+  # UCDP/PRIO (old version, to be archived after the 2026-06-10 update is live)
+  data://garden/war/2025-06-16/ucdp_prio:
+    - data://garden/war/2025-06-13/ucdp
+    - data://garden/countries/2024-08-27/gleditsch
+    - data://garden/war/2023-09-21/prio_v31
+  data://grapher/war/2025-06-16/ucdp_prio:
+    - data://garden/war/2025-06-16/ucdp_prio
+
   # UCDP/PRIO
   export://multidim/war/latest/ucdp_prio:
-    - data://grapher/war/2025-06-16/ucdp_prio:
-        - data://garden/war/2025-06-16/ucdp_prio:
-            - data://garden/war/2025-06-13/ucdp
+    - data://grapher/war/2026-06-10/ucdp_prio:
+        - data://garden/war/2026-06-10/ucdp_prio:
+            - data://garden/war/2026-06-10/ucdp
             - data://garden/countries/2024-08-27/gleditsch
             - data://garden/war/2023-09-21/prio_v31
-    - data://grapher/war/2025-06-13/ucdp
+    - data://grapher/war/2026-06-10/ucdp
 
   # COW - Wars
   data://grapher/war/2023-09-21/cow:
@@ -175,7 +198,7 @@ steps:
 
   # Countries in Conflict explorer.
   export://explorers/war/latest/countries_in_conflict_data:
-    - data://grapher/war/2025-06-13/ucdp
+    - data://grapher/war/2026-06-10/ucdp
 
   # Conflict Data Source explorer — single config covering all seven data sources
   # via a leading `data_source` dropdown.
@@ -185,8 +208,8 @@ steps:
     - data://grapher/war/2023-09-21/mars
     - data://grapher/war/2023-09-21/mie
     - data://grapher/war/2023-09-21/prio_v31
-    - data://grapher/war/2025-06-13/ucdp
-    - data://grapher/war/2025-06-16/ucdp_prio
+    - data://grapher/war/2026-06-10/ucdp
+    - data://grapher/war/2026-06-10/ucdp_prio
 
   # Conflict explorer — same view set as conflict_data_source, re-ordered with
   # `conflict_type` as the primary dropdown and `data_source` demoted.
@@ -197,5 +220,5 @@ steps:
     - data://grapher/war/2023-09-21/mars
     - data://grapher/war/2023-09-21/mie
     - data://grapher/war/2023-09-21/prio_v31
-    - data://grapher/war/2025-06-13/ucdp
-    - data://grapher/war/2025-06-16/ucdp_prio
+    - data://grapher/war/2026-06-10/ucdp
+    - data://grapher/war/2026-06-10/ucdp_prio

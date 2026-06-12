@@ -1,5 +1,9 @@
 """This script creates a new draft pull request in GitHub, which starts a new staging server.
 
+The new branch is seeded with an empty commit (enough to open the draft PR and start the
+staging server). This commit is always empty: it never stages or commits your local changes,
+whether or not you have anything staged.
+
 Arguments:
 
 `TITLE`: The title of the PR. This must be given.
@@ -515,12 +519,14 @@ def create_pr(repo, work_branch, base_branch, pr_title):
     pr_title_str = str(pr_title)
 
     log.info("Creating an empty commit.")
-    # Skip pre-commit hooks on this seeding commit: it's empty (nothing to check), and the
-    # format/lint/check-typing hooks need an installed `.venv`. In a fresh worktree the venv
-    # isn't set up yet (install_worktree_venv runs later), so the hooks would fail here.
-    repo.git.commit(
-        "--allow-empty", "--no-verify", "-m", pr_title_str or f"Start a new staging server for branch '{work_branch}'"
-    )
+    # Build the seeding commit with `git commit-tree` rather than `git commit`. It reuses
+    # HEAD's own tree, so the commit is always truly empty: it never reads the index, hence
+    # it can't accidentally commit changes you'd already staged, and it runs no pre-commit
+    # hooks (so it won't fail on formatting/typing, and needs no `.venv` in a fresh worktree).
+    head = repo.head.commit
+    commit_msg = pr_title_str or f"Start a new staging server for branch '{work_branch}'"
+    new_commit = repo.git.commit_tree(head.tree.hexsha, "-p", head.hexsha, "-m", commit_msg)
+    repo.git.update_ref("HEAD", new_commit)
 
     log.info("Pushing the new branch to remote.")
     repo.git.push("origin", work_branch)
@@ -660,8 +666,11 @@ are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool wil
 1. (Worktree branches only) Copy that worktree's Claude sessions — the `<uuid>.jsonl` transcripts and
    their `<uuid>/` subfolders under `~/.claude/projects/<encoded-worktree-path>/` — into the main
    repo's project dir, so they stay resumable with `claude --resume` after the worktree is gone.
-2. Remove the git worktree (skipped with a warning if it has uncommitted changes).
-3. Delete the local branch.
+2. (Worktree branches only) Copy the worktree's gitignored `workbench/` and `ai/` scratch dirs into
+   `workbench/<branch>/` and `ai/<branch>/` in the main repo (suffixed `-1`, `-2`... on the rare name
+   clash), so the working notes/outputs survive the worktree removal without overwriting anything.
+3. Remove the git worktree (skipped with a warning if it has uncommitted changes).
+4. Delete the local branch.
 
 Each branch is tagged `[merged]` or `[closed]` so you can see its PR outcome before selecting.
 
@@ -855,6 +864,30 @@ def copy_sessions(worktree_path: Path, main_project_dir: Path) -> int:
     return copied
 
 
+def copy_dir_namespaced(src: Path, dst_parent: Path, branch: str) -> Path | None:
+    """Copy a worktree's `src` dir into `dst_parent/<branch>`, suffixing -1, -2... on collision.
+
+    Returns the destination path, or None if `src` is missing, not a directory, or empty. Unlike
+    Claude sessions (UUID-named, collision-free), these dirs use task/human names, so the whole tree
+    lands under a branch-named (and, on collision, suffixed) folder. Slashes in the branch name are
+    flattened to '-' so the result stays a single folder. Nothing already in `dst_parent` is overwritten.
+    """
+    if not src.is_dir() or not any(p.name != ".DS_Store" for p in src.iterdir()):
+        return None
+
+    safe_branch = branch.replace("/", "-")
+    dest = dst_parent / safe_branch
+    i = 1
+    while dest.exists():
+        dest = dst_parent / f"{safe_branch}-{i}"
+        i += 1
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, dest, ignore=shutil.ignore_patterns(".DS_Store"))
+    log.info(f"Copied '{src}' to '{dest}'.")
+    return dest
+
+
 def clean_branch(
     repo,
     branch: str,
@@ -871,9 +904,12 @@ def clean_branch(
         return
 
     if worktree_path is not None:
-        # Copy sessions first, then drop the worktree. The session dir lives outside the worktree,
-        # so removing the worktree never touches it — but copy first on principle.
+        # Salvage anything the worktree holds but that's gitignored (so `git worktree remove` would
+        # destroy it for good): the Claude sessions, plus the workbench/ and ai/ scratch dirs.
+        # The session dir lives outside the worktree, but copy everything before removal on principle.
         copy_sessions(worktree_path, main_project_dir)
+        for name in ("workbench", "ai"):
+            copy_dir_namespaced(worktree_path / name, main_worktree_path / name, branch)
         try:
             repo.git.worktree("remove", str(worktree_path))
             log.info(f"Removed worktree '{worktree_path}'.")
