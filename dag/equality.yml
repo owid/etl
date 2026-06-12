@@ -64,3 +64,9 @@ steps:
     - snapshot://wb/2026-06-08/gender_statistics.zip
   data://grapher/wb/2026-06-08/gender_statistics:
     - data://garden/wb/2026-06-08/gender_statistics
+  data://garden/wb/2026-06-08/gender_statistics_country_counts:
+    - data://garden/wb/2026-06-08/gender_statistics
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wb/2026-06-08/gender_statistics_country_counts:
+    - data://garden/wb/2026-06-08/gender_statistics_country_counts

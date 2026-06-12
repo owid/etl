@@ -122,8 +122,13 @@ def run() -> None:
     ds_opri = paths.load_dataset("education_opri")
     tb_opri = ds_opri.read("education_opri")
 
-    ds_gender_stats = paths.load_dataset("gender_statistics")
-    tb_gender_stats = ds_gender_stats.read("gender_statistics")
+    # New gender_statistics for expected years of schooling (se_sch_life)
+    ds_gender_stats_new = paths.load_dataset("gender_statistics", version="2026-06-08")
+    tb_gender_stats_new = ds_gender_stats_new.read("gender_statistics")
+
+    # Old gender_statistics for learning-adjusted years of schooling (hd_hci_lays)
+    ds_gender_stats_old = paths.load_dataset("gender_statistics", version="2025-09-08")
+    tb_gender_stats_old = ds_gender_stats_old.read("gender_statistics")
 
     # UNDP expected years of schooling columns
     cols_undp = tb_undp.filter(regex=r"(eys|mys)__sex_").columns
@@ -145,8 +150,15 @@ def run() -> None:
         "school_life_expectancy__tertiary__male__years",
     ]
 
-    # Gender statistics columns
-    cols_gender_stats = [
+    # Expected years of schooling from new gender_statistics
+    cols_expected = [
+        "se_sch_life",
+        "se_sch_life_fe",
+        "se_sch_life_ma",
+    ]
+
+    # Learning-adjusted years of schooling from old gender_statistics
+    cols_learning_adjusted = [
         "hd_hci_lays",
         "hd_hci_lays_fe",
         "hd_hci_lays_ma",
@@ -155,20 +167,22 @@ def run() -> None:
     # Select only the relevant columns
     tb_undp = tb_undp.loc[:, ["country", "year"] + list(cols_undp)]
     tb_opri = tb_opri.loc[:, ["country", "year"] + list(cols_opri)]
-    tb_gender_stats = tb_gender_stats.loc[:, ["country", "year"] + cols_gender_stats]
+    tb_gender_stats_new = tb_gender_stats_new.loc[:, ["country", "year"] + cols_expected]
+    tb_gender_stats_old = tb_gender_stats_old.loc[:, ["country", "year"] + cols_learning_adjusted]
 
     #
     # Adjust dimensions
     #
     tb_undp = adjust_dimensions_schooling(tb_undp)
     tb_opri = adjust_dimensions_schooling(tb_opri)
-    tb_gender_stats = adjust_dimensions_schooling(tb_gender_stats)
+    tb_gender_stats_new = adjust_dimensions_schooling(tb_gender_stats_new)
+    tb_gender_stats_old = adjust_dimensions_schooling(tb_gender_stats_old)
 
     #
     # Create collection object
     #
     collections = []
-    for tb in [tb_undp, tb_opri, tb_gender_stats]:
+    for tb in [tb_undp, tb_opri, tb_gender_stats_new, tb_gender_stats_old]:
         c_ = paths.create_collection(
             config=config,
             tb=tb,

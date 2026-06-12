@@ -1,0 +1,28 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Women's Rights
+
+  description_key_equal_pay: &description_key_equal_pay
+    - '"Equal pay for work of equal value" means that employees should be paid the same by their employer if their jobs require similar skills, effort, responsibility, and working conditions, even if the jobs themselves are different. This is also called "pay equity."'
+    - '"Pay equity" goes further than "equal pay for equal work," which only ensures that employees in the same job get the same pay.'
+    - The value of different jobs can be measured by looking at factors like skills, effort, responsibility, and working conditions. However, proving that jobs are of equal value can be difficult because different roles may require different expertise, take place in different environments, or have historically been valued unequally.
+
+dataset:
+  title: World Bank Gender Statistics (country counts)
+  owners:
+    - Veronika Samborska
+
+tables:
+  gender_statistics:
+    variables:
+      gd_wbl_pay_law_eqremeqval_missing_pop:
+        description_key: *description_key_equal_pay
+
+      gd_wbl_pay_law_eqremeqval_no_pop:
+        description_key: *description_key_equal_pay
+
+      gd_wbl_pay_law_eqremeqval_yes_pop:
+        description_key: *description_key_equal_pay
