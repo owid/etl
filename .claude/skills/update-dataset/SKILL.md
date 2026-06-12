@@ -641,6 +641,13 @@ This is the **last step**, after the DAG archive has been committed. Don't auto-
   ```
   http://staging-site-<container_branch>/etl/wizard/anomalist
   ```
+
+  **Check the upgrade detectors' coverage before handing off.** Anomalist's `upgrade_missing` / `upgrade_change` detectors only compare old→new variable pairs from the wizard's variable-mapping table — and the indicator upgrader persists mappings **only for charted indicators**. If only some of the dataset's indicators are used in charts (the common case), the upgrade detectors silently skip the rest, and a partial mapping suppresses the shortName-inference fallback that would otherwise cover everything. Verify with `WizardDB.get_variable_mapping_raw()`: if it has fewer pairs than the dataset has indicators, rebuild the full mapping by shortName (old vs. new `variables` rows by `datasetId`) and re-run:
+  ```bash
+  STAGING=<branch> .venv/bin/etl anomalist --anomaly-types upgrade_missing --anomaly-types upgrade_change \
+      --dataset-ids <new_dataset_id> --variable-mapping '<full json mapping>' --force
+  ```
+  Then spot-check the stored `anomalies.dfReduced` rows include indicators beyond the charted ones.
 - **Chart Diff** — shows side-by-side before/after thumbnails for every chart that uses an upgraded indicator. Catches visual regressions the schema-level checks miss (axis ranges, color steps, legend changes).
   ```
   http://staging-site-<container_branch>/etl/wizard/chart-diff
