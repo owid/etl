@@ -36,7 +36,7 @@ Assumptions:
 - [ ] Update snapshot and compare to previous version; capture summary
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
-- [ ] Review `sanity_checks` output (enable log flag, re-run, scan log, revert flag) — skip if none found
+- [ ] Review `sanity_checks` output (enable log flag, re-run, scan log, revert flag) — if none found and the garden step does non-trivial logic, recommend adding them; if present but missing value bounds (positive / [0,1] / [0,100] per indicator type), suggest those too (see 5b-bis)
 - [ ] Country harmonization audit: validate `.countries.json` against canonical regions, audit `.excluded_countries.json`, scan garden log for missing/unused/unknown warnings
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
@@ -192,6 +192,28 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    In either form: if sanity_checks raise `AssertionError` on the new data, stop and decide with the user whether the assertion needs a threshold bump, whether upstream data genuinely broke, or whether the invariant is obsolete. If the check only *logs*, treat a new/expanding set of warnings the same way — they're the signal the sanity check was written to produce.
 
    **Watch for silent-delete patterns.** Some sanity_checks functions also mutate the table — e.g. `world_bank_pip`'s `sanity_checks` drops rows that fail invariants and reports the count via the log-control flag. With the flag off the deletions still happen; the reviewer just never learns which rows disappeared. When reading a sanity_checks function, scan for `drop`, `filter`, `tb = tb[...]` — anything that removes rows — and list every deletion in the PR body, not just the warning counts. If the deletion seems newly applicable to upstream fixes (e.g. the row should no longer be anomalous in the new release), that's a candidate for removing the workaround entirely.
+
+5b-bis) Recommend sanity checks when the garden step lacks them (or lacks value bounds)
+   Runs after the garden step is built. Two triggers:
+   - Step 1d catalogued **no** sanity checks and the garden step does more than a straight load-and-format (harmonization, column drops/renames, aggregations, derivations) — recommend adding `sanity_check_inputs` / `sanity_check_outputs`. A Codex review will flag this anyway; better to handle it during the update.
+   - The step **has** checks but you can spot missing value-bound coverage of the kinds below — suggest the additions.
+
+   **Ground every threshold in the built data before writing it.** Run `min`/`max`/`nunique`/`value_counts` per indicator on the built garden table first — never write plausible-sounding bounds. The classic trap: "% of GDP" indicators look like percentages but legitimately exceed 100 (IMF PFMH: gross debt up to 495%, expenditure 595% in crisis years; UK's post-Napoleonic 260% debt is on a published chart). A blind 0–100 assert fails the build on day one.
+
+   **Suggested checks by indicator type** (propose the applicable ones, not all):
+   | Indicator type | Check |
+   |---|---|
+   | Share / proportion | values in [0, 1] |
+   | Percentage of a whole | values in [0, 100] |
+   | "% of GDP" and similar ratios | non-negative for levels (revenue, spending, debt); can exceed 100 — verify against data before capping. Where a ≤100 bound *mostly* holds, enforce it with a **documented exception set** (e.g. PFMH expenditure ≤ 100 outside `{Equatorial Guinea, Kuwait, Kiribati}` — each with a comment explaining why it's legitimate) so a new country crossing the line fails for review |
+   | Balances, growth rates, interest rates | can legitimately be negative — do NOT impose ≥ 0 |
+   | Categorical flags / codes | exact value set (e.g. `<= {0, 1}`) and non-null |
+   | Input schema | set-equality on expected columns — catches the next source rename (PFMH: `debt` → `d`) with a clear message |
+   | Coverage | country-count floors (≥ previous version); a drop is usually a parsing/mapping regression — re-audit before bumping the constant |
+
+   Implementation conventions: constants at the top, `run()` first, check functions **below** `run()`; `sanity_check_inputs(tb)` right after loading meadow, `sanity_check_outputs(tb)` right before `paths.create_dataset(...)`; plain `assert` with messages that name the offending values. Reference example: [`imf/2026-06-12/public_finances_modern_history.py`](../../../etl/steps/data/garden/imf/2026-06-12/public_finances_modern_history.py).
+
+   **Negative-test the checks**: after the step passes on real data, simulate each failure mode (rename a column, corrupt a flag, push a value out of bounds) and confirm the matching assertion fires — a check that never trips is untested code.
 
 5c) Country harmonization audit
    Run after the garden step completes (and after 5b if it ran). Verifies that the country entities reaching the garden output are canonical, and that the mappings/exclusions consumed by `paths.regions.harmonize_names(...)` are well-formed. Output: `workbench/<short_name>/harmonization_audit.md`.
