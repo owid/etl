@@ -29,17 +29,23 @@ EXPECTED_INPUT_COLUMNS = {"country", "year", "isocode", "ifscode"} | set(INDICAT
 # and real_growth_rate can legitimately be negative.
 NON_NEGATIVE_COLUMNS = ["revenue", "expenditure", "interest_expense", "primary_expenditure", "gross_debt"]
 
-# Countries whose expenditure exceeds 100% of GDP in the source data, all with tiny or collapsed GDP
-# denominators:
+# Expected cases of expenditure above 100% of GDP in the source data, all with tiny or collapsed GDP
+# denominators. The two event-driven cases are bounded to their years; Kiribati's is a recurring
+# structural pattern, so any year is allowed (None):
 # - Kuwait (1990-1991): GDP roughly halved under the Iraqi occupation while war, welfare, and
 #   coalition-transfer spending soared (documented in IMF/academic Gulf War accounts).
-# - Kiribati: IMF Article IV consultations report public expenditure of 119% of GDP (2017) and 143%
-#   (2018), funded mainly by fishing-license revenue (~72% of GDP) and development partners.
 # - Equatorial Guinea (1985-1995, up to 595%): the pre-oil economy was tiny, aid-dependent, and badly
 #   measured; the extreme ratios are as shipped by the IMF source and may partly reflect the GDP
 #   denominator rather than a verified economic event. Kept as published.
-# Any other country above 100% should be reviewed before being added here.
-EXPENDITURE_OVER_100_COUNTRIES = {"Equatorial Guinea", "Kuwait", "Kiribati"}
+# - Kiribati: IMF Article IV consultations report public expenditure of 119% of GDP (2017) and 143%
+#   (2018), funded mainly by fishing-license revenue (~72% of GDP) and development partners — new
+#   years above 100% are expected, not a regression.
+# Any other (country, year) above 100% should be reviewed before being added here.
+EXPENDITURE_OVER_100_EXPECTED: dict[str, range | None] = {
+    "Kuwait": range(1990, 1992),
+    "Equatorial Guinea": range(1985, 1996),
+    "Kiribati": None,
+}
 
 # Coverage floors from the Dec 2025 release: 153 source country labels (151 after harmonization, since
 # the source ships duplicate labels for Congo and Bahamas). A drop below these in a future release is
@@ -110,9 +116,11 @@ def sanity_check_outputs(tb: Table) -> None:
     )
     for col in NON_NEGATIVE_COLUMNS:
         assert tb[col].min() >= 0, f"Negative value in {col} (min: {tb[col].min()}) — source error or unit mistake."
-    # Expenditure should stay below 100% of GDP outside the known exceptions.
-    countries_over_100 = set(tb[tb["expenditure"] > 100].index.get_level_values("country"))
-    unexpected_over_100 = sorted(countries_over_100 - EXPENDITURE_OVER_100_COUNTRIES)
-    assert not unexpected_over_100, (
-        f"Expenditure above 100% of GDP for countries outside the known exceptions: {unexpected_over_100}"
+    # Expenditure should stay below 100% of GDP outside the known (country, year) exceptions.
+    unexpected_over_100 = sorted(
+        (country, year)
+        for country, year in tb[tb["expenditure"] > 100].index
+        if country not in EXPENDITURE_OVER_100_EXPECTED
+        or (EXPENDITURE_OVER_100_EXPECTED[country] is not None and year not in EXPENDITURE_OVER_100_EXPECTED[country])
     )
+    assert not unexpected_over_100, f"Expenditure above 100% of GDP outside the known exceptions: {unexpected_over_100}"
