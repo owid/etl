@@ -5,9 +5,10 @@ https://www.imf.org/external/datamapper/datasets/FPP (set as `url_download` in t
 The link's filename carries the release month (e.g. "Public Finances in Modern History Dec 2025.xlsx"),
 so on each update copy the fresh link from that page into `url_download`.
 
-NOTE: The IMF site rejects browser-like User-Agents (403) while letting plain, honestly-identified
-clients through — the inverse of the usual bot-blocking. The downloader's default UA is browser-like,
-so we pass a plain custom UA explicitly.
+NOTE: This script exists only to pass a custom User-Agent. The IMF site rejects browser-like
+User-Agents (403) while letting plain, honestly-identified clients through — the inverse of the
+usual bot-blocking. The downloader's default UA is browser-like, so a script-less (.dvc-only)
+snapshot would fail; don't delete this file unless the IMF lifts that restriction.
 """
 
 import click

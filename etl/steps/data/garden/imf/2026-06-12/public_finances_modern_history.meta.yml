@@ -2,7 +2,11 @@
 definitions:
   common:
     processing_level: minor
+    description_key:
+      - The Public Finances in Modern History database is compiled by the International Monetary Fund from a wide range of historical sources and documents 200 years of budget deficits and government debt.
+      - Depending on the country and year, the data may cover the central government only or the general government, which also includes state and local governments. Companion indicators in the dataset flag which coverage applies to each observation.
     presentation:
+      attribution_short: IMF
       topic_tags:
         - Government Spending
 
@@ -58,7 +62,7 @@ tables:
         title: Government primary expenditure (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: The sum of all the money spent by the government on goods and services, as a percentage of GDP. It excludes the government's interest expense.
+        description_short: The sum of all the money spent by the government on goods and services, as a percentage of GDP. It excludes the government’s interest expense.
         display:
           name: Government primary expenditure (% of GDP)
           numDecimalPlaces: 1
@@ -106,12 +110,12 @@ tables:
           tolerance: 5
 
       gg_budg:
-        title: Sector coverage indicator for revenue, expenditure and interest expense
+        title: Sector coverage indicator for revenue, expenditure, and interest expense
         unit: ""
         short_unit: ""
         description_short: Indicates if the data represents the central government (0) or the general government (1).
         display:
-          name: Sector coverage indicator for revenue, expenditure and interest expense
+          name: Sector coverage indicator for revenue, expenditure, and interest expense
           numDecimalPlaces: 0
           tolerance: 0
 
