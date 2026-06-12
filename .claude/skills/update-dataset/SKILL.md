@@ -450,6 +450,33 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
      ```
      If the count is 0, the upgrade did not run — re-run it.
+   - **Also verify narrative charts — the upgrader's success log lies by omission.** Narrative-chart configs can pin a `variableId` in their own patch (not inherited from the parent chart), and that id can date from a version *older* than the one this update started from — left stale by a previous cycle. The auto-upgrader only carries `old_version → new_version` mappings and PUTs every affected narrative chart's config whether or not anything matched, so "Successfully updated narrative chart N" does **not** mean its variable was remapped. The `chart_dimensions` count above can't catch this either: narrative-chart variable ids live only inside `chart_configs`, not in `chart_dimensions`. Scan for stragglers on any old version of the dataset:
+     ```python
+     # STAGING=<branch> .venv/bin/python — scan narrative chart configs for variables on ANY old version
+     import json
+     from etl.config import OWID_ENV
+     old_vars = set(OWID_ENV.read_sql(
+         "SELECT v.id FROM variables v JOIN datasets d ON d.id = v.datasetId "
+         "WHERE d.catalogPath LIKE %(p)s AND d.catalogPath NOT LIKE %(new)s",
+         params={"p": "%/<short_name>", "new": "%<new_version>%"})["id"])
+     df = OWID_ENV.read_sql("SELECT nc.id, nc.name, nc.parentChartId, JSON_EXTRACT(cc.full, '$.dimensions') AS dims "
+                            "FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId")
+     stale = [(r["id"], r["name"], d["variableId"]) for _, r in df.iterrows() if r["dims"]
+              for d in json.loads(r["dims"]) if d.get("variableId") in old_vars]
+     print(stale)  # must be empty
+     ```
+     If any are found, remap them with an explicit mapping via the upgrader's own CLI helpers (load by parent chart id; `cli_upgrade_indicators` won't reach them because it finds charts via `chart_dimensions`):
+     ```python
+     from sqlalchemy.orm import Session
+     import etl.grapher.model as gm
+     from apps.indicator_upgrade.upgrade import push_new_narrative_charts_cli
+     from etl.config import OWID_ENV
+     with Session(OWID_ENV.engine) as session:
+         ncs = gm.NarrativeChart.load_narrative_charts_by_parent_chart_ids(session, [<parent_chart_id>])
+     ncs = [nc for nc in ncs if nc.id in {<stale_nc_ids>}]
+     errors = push_new_narrative_charts_cli(ncs, {<old_var_id>: <new_var_id>})
+     ```
+     Then re-run the scan and confirm it's empty.
 
 8) Update context for public announcement
    - Maintain `workbench/<short_name>/update-context.yml` as the canonical record of facts discovered during the update. Do not wait until the end if a fact is already known; append/update as each step completes.
