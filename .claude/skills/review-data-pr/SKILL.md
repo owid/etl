@@ -95,7 +95,7 @@ For each step file, check:
 - **Snapshot script (if present)**: docstring explains source choice; no hidden hardcoded year/date constants without `--cli-flag` parametrization (or at minimum a clear update comment). Note: a `.py` upload script is optional — many snapshots ship with only the `.dvc` and a `url_download`. Don't flag the absence of a script.
 - **Meadow / garden / grapher**: clear top-level docstrings; no commented-out code; no silent exception handlers
 - **Garden**: harmonization uses `paths.regions.harmonize_names(tb, ...)` (the new API), not the legacy `geo.harmonize_countries`
-- **Garden assertions**: sanity checks present and not overly brittle (e.g. avoid hard-coded "X must always exceed Y" if it's not a true invariant)
+- **Garden assertions**: sanity checks present when the step does non-trivial logic (harmonization, renames, aggregations, derivations) and not overly brittle (e.g. avoid hard-coded "X must always exceed Y" if it's not a true invariant). Check value-bound coverage per indicator type (shares in [0,1], percentages-of-a-whole in [0,100], non-negativity for level indicators, mutually exclusive share categories summing to 100 within rounding tolerance, exception sets for documented outliers) — but verify any bound against the actual data before suggesting it: "% of GDP" indicators legitimately exceed 100 (see `/update-dataset` §5b-bis)
 - **Grapher meta.yml**: drop it if it only duplicates the garden values — the grapher step inherits via `default_metadata=ds_garden.metadata`
 
 ### 8. Outdated practices
@@ -212,6 +212,8 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 | Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅ |
 | `@codex review` posted (§9) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
 | Codex threads resolved (§10) | `gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<num>) { reviewThreads(first:20) { nodes { isResolved } } } } }'` — all `isResolved: true` |
+
+A **clean Codex review has a different shape**: no inline comments and zero review threads — just a single top-level "no issues" comment from `chatgpt-codex-connector[bot]` in the issue comments. That counts as reviewed (the threads row passes vacuously); don't flag the absence of inline threads as "review missing".
 
 **Out of scope for review:** Slack announcement and Anomalist + Chart Diff hand-off are author-side concerns, not reviewer checks.
 
