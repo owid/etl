@@ -1,6 +1,7 @@
 """Utilities for fetching and processing LXC staging server data."""
 
 import json
+import re
 import subprocess
 from datetime import datetime, timezone
 from typing import Any
@@ -18,6 +19,11 @@ log = get_logger()
 # LXC host that staging servers live on. The fetch/destroy/stop/start commands all
 # target this host (matching ops/templates/lxc-manager/*), so keep it in one place.
 LXC_HOST = "gaia-1"
+
+# Graphite (graphite.dev) creates transient `graphite-base-<PR-number>` base branches when
+# stacking PRs. A push to one spins up a staging server, but the base branch has no PR of its
+# own, so the owner must be looked up from owid-grapher PR #<number> instead.
+GRAPHITE_BASE_RE = re.compile(r"^graphite-base-(\d+)$")
 
 
 @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
@@ -704,3 +710,42 @@ def fetch_server_owners() -> dict[str, str]:
             log.warning("Could not fetch PR owners from GitHub", repo=repo_name, error=str(e))
 
     return owners
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def fetch_graphite_owners(pr_numbers: tuple[int, ...]) -> dict[int, str]:
+    """
+    Resolve the owner of ``graphite-base-<N>`` servers to the author of owid-grapher PR #N.
+
+    These transient Graphite base branches have no PR of their own, so they're never matched
+    by :func:`fetch_server_owners`. We look up PR #N directly. Best-effort: silently skips any
+    number that can't be resolved.
+
+    Args:
+        pr_numbers: PR numbers to resolve (the ``<N>`` from each ``graphite-base-<N>`` server).
+
+    Returns:
+        Dict mapping PR number to GitHub login.
+    """
+    out: dict[int, str] = {}
+    headers = {"Authorization": f"token {OWIDBOT_ACCESS_TOKEN}"} if OWIDBOT_ACCESS_TOKEN else {}
+    for number in pr_numbers:
+        # Graphite is used on owid-grapher; check it first, fall back to etl just in case.
+        for repo_name in ("owid-grapher", "etl"):
+            try:
+                response = requests.get(
+                    f"https://api.github.com/repos/owid/{repo_name}/issues/{number}", headers=headers, timeout=30
+                )
+                if response.status_code != 200:
+                    continue
+                issue = response.json()
+                # issues endpoint also returns issues; only PRs have this key.
+                if "pull_request" not in issue:
+                    continue
+                login = (issue.get("user") or {}).get("login")
+                if login:
+                    out[number] = login
+                    break
+            except requests.RequestException as e:
+                log.warning("Could not resolve graphite-base owner", repo=repo_name, pr=number, error=str(e))
+    return out

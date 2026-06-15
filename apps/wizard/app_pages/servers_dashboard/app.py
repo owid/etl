@@ -5,8 +5,10 @@ import streamlit as st
 from structlog import get_logger
 
 from apps.wizard.app_pages.servers_dashboard.utils import (
+    GRAPHITE_BASE_RE,
     build_quick_links,
     destroy_server,
+    fetch_graphite_owners,
     fetch_host_memory_stats,
     fetch_lxc_servers_data,
     fetch_server_owners,
@@ -196,6 +198,24 @@ with st.container(horizontal=True, border=True):
 
 # Enrich with owner derived from the GitHub PR author (best-effort, may be blank)
 servers_df["owner"] = servers_df["name"].map(owners).fillna("")
+
+# Resolve graphite-base-<N> servers (transient Graphite base branches with no PR of their own)
+# to the author of owid-grapher PR #N.
+graphite_numbers = tuple(
+    sorted(
+        {
+            int(m.group(1))
+            for branch, owner in zip(servers_df["branch"], servers_df["owner"])
+            if not owner and (m := GRAPHITE_BASE_RE.match(branch))
+        }
+    )
+)
+if graphite_numbers:
+    graphite_owners = fetch_graphite_owners(graphite_numbers)
+    needs_owner = servers_df["owner"] == ""
+    servers_df.loc[needs_owner, "owner"] = servers_df.loc[needs_owner, "branch"].map(
+        lambda b: graphite_owners.get(int(m.group(1)), "") if (m := GRAPHITE_BASE_RE.match(b)) else ""
+    )
 
 # Filter controls
 st.subheader("🖥️ Staging Servers")
