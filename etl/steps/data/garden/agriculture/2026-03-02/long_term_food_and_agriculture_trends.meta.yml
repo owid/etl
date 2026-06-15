@@ -20,6 +20,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   long_term_food_and_agriculture_trends:
     title: Long-term food and agriculture trends

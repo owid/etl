@@ -1,4 +1,3 @@
-
 definitions:
   common:
     processing_level: major
@@ -19,6 +18,8 @@ dataset:
     It includes indicators relating to historic data and more recent data on average years of education and educational attainment, specifically share of people with no education.
 
 
+  owners:
+    - Veronika Samborska
 tables:
   education_barro_lee_projections:
     variables:

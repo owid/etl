@@ -1,5 +1,7 @@
 dataset:
   title: Hubbert's Peak - Cavallo & EIA
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   hubberts_peak__cavallo__and__eia:
     variables:

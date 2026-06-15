@@ -1,5 +1,7 @@
 dataset:
   title: Plastic imports by China & impact of ban - Brooks et al. (2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   plastic_imports_by_china__and__impact_of_ban__brooks_et_al__2018:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: US Opinion on wives working 1936-1998 - OWID compilation
+  owners:
+    - Sandra Tzvetkova  # backport
 tables:
   us_opinion_on_wives_working_1936_1998__owid_compilation:
     variables:

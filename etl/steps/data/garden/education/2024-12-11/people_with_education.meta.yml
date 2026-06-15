@@ -18,6 +18,8 @@ dataset:
   update_period_days: 365
   title: People with formal basic education (Wittgenstein Centre, OECD)
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   people_with_education:
     variables:

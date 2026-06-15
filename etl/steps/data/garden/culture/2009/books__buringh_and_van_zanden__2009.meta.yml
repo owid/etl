@@ -1,5 +1,7 @@
 dataset:
   title: Books - Buringh and Van Zanden (2009)
+  owners:
+    - Edouard Mathieu  # backport
 tables:
   books__buringh_and_van_zanden__2009:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: TE-16.12_Wage
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_16_12_wage:
     variables:

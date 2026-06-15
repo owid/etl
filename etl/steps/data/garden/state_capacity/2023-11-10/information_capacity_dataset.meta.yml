@@ -18,6 +18,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Pablo Arriagada
 tables:
   information_capacity_dataset:
     # Learn more about the available fields:

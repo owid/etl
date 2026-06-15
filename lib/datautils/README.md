@@ -3,7 +3,7 @@
 ![version](https://img.shields.io/badge/version-0.6.0-blue)
 ![version](https://img.shields.io/badge/python-3.10|3.11|3.12|3.13-blue.svg?&logo=python&logoColor=yellow)
 [![Build status](https://badge.buildkite.com/caba621fb64f2c7dcc692a474e68f4ead21e6ba6ee151fe3b6.svg)](https://buildkite.com/our-world-in-data/owid-datautils-unit-tests)
-[![Documentation Status](https://readthedocs.org/projects/owid-datautils/badge/?version=latest)](https://docs.owid.io/projects/owid-datautils/en/latest/?badge=latest)
+[![Docs](https://img.shields.io/badge/docs-docs.owid.io-blue)](https://docs.owid.io/projects/etl/libraries/datautils/)
 
 **owid-datautils** is a library to support the work of the Data Team at Our World in Data.
 

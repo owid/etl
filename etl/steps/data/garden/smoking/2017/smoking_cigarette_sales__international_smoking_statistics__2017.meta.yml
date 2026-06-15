@@ -1,5 +1,7 @@
 dataset:
   title: Smoking cigarette sales (International Smoking Statistics (2017))
+  owners:
+    - Diana Beltekian  # backport
 tables:
   smoking_cigarette_sales__international_smoking_statistics__2017:
     variables:

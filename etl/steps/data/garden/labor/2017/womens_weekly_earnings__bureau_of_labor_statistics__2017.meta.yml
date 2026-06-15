@@ -1,5 +1,7 @@
 dataset:
   title: Women's weekly earnings as a percentage of men's - Bureau of Labor Statistics (2017)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   womens_weekly_earnings__bureau_of_labor_statistics__2017:
     variables:

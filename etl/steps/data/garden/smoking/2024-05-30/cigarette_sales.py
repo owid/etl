@@ -68,7 +68,7 @@ def standardize_years(df):
     return pd.DataFrame(list_rows)
 
 
-def include_split_germany(tb, ds_population):
+def include_split_germany(tb):
     """Include data for Germany 1945-1990 in the table by taking weighted average of East and West Germany data"""
 
     col_manufactured = "manufactured_cigarettes_per_adult_per_day"
@@ -77,7 +77,7 @@ def include_split_germany(tb, ds_population):
     col_all_tobacco = "all_tobacco_products_grams_per_adult_per_day"
 
     germany_tb = tb[tb["country"].isin(["West Germany", "East Germany"])]
-    germany_tb = geo.add_population_to_table(germany_tb, ds_population, interpolate_missing_population=True)
+    germany_tb = paths.regions.add_population(germany_tb, interpolate_missing_population=True)
 
     # calculate share of population for each year
     added_pop = germany_tb[["year", "population"]].groupby("year").sum().reset_index()
@@ -105,7 +105,6 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("cigarette_sales")
     # load population data
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["cigarette_sales"].reset_index()
@@ -129,7 +128,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Calculate weighted average for Germany 1950-1990
-    germany_tb = include_split_germany(tb, ds_population)
+    germany_tb = include_split_germany(tb)
 
     # include data for Germany 1950-1990
     tb = pr.concat([tb, germany_tb])

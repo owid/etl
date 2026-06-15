@@ -1,13 +1,14 @@
 dataset:
   title: Inheritance for women - How Was Life? (2014)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   inheritance_for_women__how_was_life__2014:
     variables:
       gender_equal_inheritance_for_women__how_was_life__2014:
         title: Gender-equal inheritance for women (How Was Life (2014))
         unit: 1=yes, 0=no
-        description: Measure of institutional inequality, where 1 corresponds to gender-equal inheritance for women, and 0
-          otherwise.
+        description: Measure of institutional inequality, where 1 corresponds to gender-equal inheritance for women, and 0 otherwise.
     dimensions:
       - name: year
         slug: year

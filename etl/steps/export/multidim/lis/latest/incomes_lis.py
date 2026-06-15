@@ -105,6 +105,35 @@ def run() -> None:
         },
     )
 
+    # Group deciles 1, 5, 9 as P10/P50/P90 — only used for thr indicator
+    c.group_views(
+        groups=[
+            {
+                "dimension": "decile",
+                "choices": ["1", "5", "9"],
+                "choice_new_slug": "p10_p50_p90",
+                "view_config": {
+                    "hideRelativeToggle": False,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart", "DiscreteBar"],
+                    "hideTotalValueLabel": True,
+                    "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
+                },
+            },
+        ],
+        params={
+            "title": _get_p10_p50_p90_title,
+            "subtitle": _get_p10_p50_p90_subtitle,
+        },
+    )
+
     # Filter decile views: keep only relevant deciles per indicator
     non_share = [i for i in c.dimension_choices["indicator"] if i != "share"]
     non_thr = [i for i in c.dimension_choices["indicator"] if i != "thr"]
@@ -113,6 +142,7 @@ def run() -> None:
             {"decile": ["2", "3", "4", "6", "7", "8"]},
             {"decile": ["10_40_50"], "indicator": non_share},
             {"decile": ["5", "9"], "indicator": non_thr},
+            {"decile": ["p10_p50_p90"], "indicator": non_thr},
         ]
     )
 
@@ -121,7 +151,7 @@ def run() -> None:
 
     # Customize grouped decile views: sort indicators and set display names
     for view in c.views:
-        if view.matches(decile="all") and view.indicators.y:
+        if view.matches(decile=["all", "p10_p50_p90"]) and view.indicators.y:
             # Sort indicators by decile number
             reverse_order = view.matches(indicator="share")
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
@@ -155,15 +185,19 @@ def run() -> None:
         groups=[
             {
                 "dimension": "welfare_type",
-                "choices": ["dhi", "mi"],
+                "choices": ["mi", "dhi"],
                 "choice_new_slug": "before_vs_after",
                 "view_config": {
                     "hideRelativeToggle": True,
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": ["LineChart", "Dumbbell"],
                     "missingDataStrategy": "hide",
+                    # Sort the dumbbell (and table) entities by the after-tax value, lowest first
+                    "sortBy": "column",
+                    "sortColumnSlug": _after_tax_catalog_path,
+                    "sortOrder": "asc",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
                     "note": "",
@@ -185,7 +219,7 @@ def run() -> None:
         [
             {
                 "welfare_type": ["before_vs_after"],
-                "decile": ["all", "10_40_50"],
+                "decile": ["all", "10_40_50", "p10_p50_p90"],
             }
         ]
     )
@@ -226,6 +260,28 @@ def _get_grouped_decile_subtitle(view):
     return subtitles.get(view.dimensions.get("indicator"), "")
 
 
+def _get_p10_p50_p90_title(view):
+    """Return title for the P10/P50/P90 grouped threshold view."""
+    period = view.dimensions.get("period")
+    wt_label = "after tax" if view.dimensions.get("welfare_type") == "dhi" else "before tax"
+    return f"Threshold income per {period} marking the poorest decile, the median, and the richest decile ({wt_label})"
+
+
+def _get_p10_p50_p90_subtitle(view):
+    """Return subtitle for the P10/P50/P90 grouped threshold view."""
+    period = view.dimensions.get("period")
+    wt_label = "after tax" if view.dimensions.get("welfare_type") == "dhi" else "before tax"
+    return (
+        f"The level of income per person per {period} below which 10%, 50% and 90% of the population falls. "
+        f"Income here is measured {wt_label}es and benefits. {PPP_ADJUSTMENT_SUBTITLE}"
+    )
+
+
+def _after_tax_catalog_path(view):
+    """Return the after-tax (dhi) indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
+    return next((i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None)
+
+
 def _get_before_vs_after_metadata(tb, view):
     """Extract and transform metadata from grapher_config for before_vs_after views.
 
@@ -234,7 +290,9 @@ def _get_before_vs_after_metadata(tb, view):
     if not view.indicators.y:
         return {"title": "", "subtitle": "", "description_key": []}
 
-    first_ind = view.indicators.y[0]
+    # Build the combined title/subtitle from the before-tax (mi) indicator, so it doesn't
+    # depend on the order of indicators in the view (mirrors the WID before_vs_after logic).
+    first_ind = next((i for i in view.indicators.y if "_mi_" in i.catalogPath), view.indicators.y[0])
     col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
 
     if col_name and col_name in tb.columns:
@@ -242,11 +300,11 @@ def _get_before_vs_after_metadata(tb, view):
         grapher_config = meta.presentation.grapher_config if meta.presentation else {}
 
         title = _assert_and_replace(
-            grapher_config.get("title", ""), "after tax", "before vs. after tax", "grapher_config.title", col_name
+            grapher_config.get("title", ""), "before tax", "before vs. after tax", "grapher_config.title", col_name
         )
         subtitle = _assert_and_replace(
             grapher_config.get("subtitle", ""),
-            " Income here is measured after taxes and benefits.",
+            " Income here is measured before taxes and benefits.",
             "",
             "grapher_config.subtitle",
             col_name,

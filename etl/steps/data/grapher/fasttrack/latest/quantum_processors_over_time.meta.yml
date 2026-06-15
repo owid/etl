@@ -1,5 +1,7 @@
 dataset:
   title: DRAFT Quantum processors over time
+  owners:
+    - Edouard Mathieu  # fasttrack
 tables:
   quantum_processors_over_time:
     variables:

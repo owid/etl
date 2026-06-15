@@ -1,5 +1,7 @@
 dataset:
   title: Share of women in top income groups – Atkinson, Casarico & Voitchovsky (2018)
+  owners:
+    - Joe Hasell  # backport
 tables:
   share_of_women_in_top_income_groups__atkinson__casarico__and__voitchovsky__2018:
     variables:

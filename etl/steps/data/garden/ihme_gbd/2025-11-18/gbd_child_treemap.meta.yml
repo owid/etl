@@ -13,6 +13,8 @@ definitions:
 
 dataset:
   update_period_days: 1460
+  owners:
+    - Fiona Spooner
 tables:
   gbd_child_treemap:
     dimensions:

@@ -1,4 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
+dataset:
+  owners:
+    - Veronika Samborska
 definitions:
   common:
     processing_level: minor
@@ -19,10 +22,10 @@ tables:
           yearIsDay: true
 
       publication_date:
-          title: Publication date
-          unit: ''
-          description_short: The date when the AI system was first published.
-          description_from_producer:  The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
+        title: Publication date
+        unit: ''
+        description_short: The date when the AI system was first published.
+        description_from_producer: The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
 
       cost__inflation_adjusted:
         title: Cost (inflation-adjusted)

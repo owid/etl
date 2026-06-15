@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: Reported diphtheria cases in the United States
 
+  owners:
+    - Fiona Spooner
 tables:
   diphtheria_cases:
     variables:

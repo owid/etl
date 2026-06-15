@@ -1,5 +1,7 @@
 dataset:
   title: Extreme Poverty Share to 2030 - Crespo-Cuaresma (2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   extreme_poverty_share_to_2030__crespo_cuaresma__2018:
     variables:

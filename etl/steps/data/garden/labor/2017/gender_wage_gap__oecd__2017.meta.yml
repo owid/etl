@@ -1,5 +1,7 @@
 dataset:
   title: Gender Wage Gap – OECD (2017)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   gender_wage_gap__oecd__2017:
     variables:

@@ -329,6 +329,8 @@ tables:
 
 
 dataset:
+  owners:
+    - Lucas Rodés-Guirao
   title: History of war (Gibler and Miller, 2020)
   description: |-
       This dataset provides information on militarized interstate confrontations, using Douglas Gibler and Steven Miller's Militarized Interstate Events dataset (version 1.0).

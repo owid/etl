@@ -1,5 +1,7 @@
 dataset:
   title: Long-term per capita fossil fuels - OWID based on UN, Gapminder, BP, Etemad & Luciana
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   long_term_per_capita_fossil_fuels__owid_based_on_un__gapminder__bp__etemad__and__luciana:
     variables:

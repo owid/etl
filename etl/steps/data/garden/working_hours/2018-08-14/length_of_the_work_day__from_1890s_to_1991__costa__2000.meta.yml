@@ -1,5 +1,7 @@
 dataset:
   title: 'Length of the work day: from 1890s to 1991 - Costa (2000)'
+  owners:
+    - Diana Beltekian  # backport
 tables:
   length_of_the_work_day__from_1890s_to_1991__costa__2000:
     variables:

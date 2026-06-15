@@ -1,6 +1,8 @@
 dataset:
   title: Global hen inventory
 
+  owners:
+    - Pablo Rosado
 tables:
   global_hen_inventory:
     title: Global hen inventory

@@ -51,7 +51,6 @@ from owid.catalog import Table
 from shared import add_indicators_extra, expand_observations
 from structlog import get_logger
 
-from etl.data_helpers.geo import add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -89,9 +88,6 @@ def run(dest_dir: str) -> None:
     # Read table from COW codes
     ds_isd = paths.load_dataset("isd")
     tb_regions = ds_isd["isd_regions"].reset_index()
-
-    # Read population table
-    ds_pop = paths.load_dataset("population")
 
     #
     # Process data.
@@ -163,9 +159,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Add rates
-    tb = add_population_to_table(
+    tb = paths.regions.add_population(
         tb,
-        ds_pop,
         country_col="region",
         interpolate_missing_population=True,
     )

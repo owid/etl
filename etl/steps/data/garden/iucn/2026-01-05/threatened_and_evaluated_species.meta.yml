@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Fiona Spooner
 definitions:
   common:
     processing_level: minor
@@ -83,6 +86,4 @@ tables:
         short_unit: "%"
         presentation:
           title_public: Share of species threatened with extinction
-        description_short:
-          The share of known species threatened with extinction is only available for a few taxonomic groups where
-          more than 80% of species have been assessed.
+        description_short: The share of known species threatened with extinction is only available for a few taxonomic groups where more than 80% of species have been assessed.

@@ -1,5 +1,7 @@
 dataset:
   title: Historical numeracy and years of schooling estimates (Clio Infra)
+  owners:
+    - Veronika Samborska
 tables:
   clio_infra_education:
     variables:
@@ -43,7 +45,7 @@ tables:
           numDecimalPlaces: 1
 
       numeracy:
-        title:  Historical numeracy estimates
+        title: Historical numeracy estimates
         description_short: >-
           Age heaping is observed in age data collection, where people tend to report their ages in rounded figures, often ending in 0 or 5, rather than their exact age.
           For example, individiauals might state their age as 30, 35, or 40 and avoid being precise with figures like 31, 36, or 39. This is believed to happen more often in populations that lack basic numeracy skills.
@@ -61,20 +63,20 @@ tables:
       numeracy_gender:
         title: Historical numeracy estimates, gender differences
         description_short: >-
-            Age heaping is observed in age data collection, where people tend to report their ages in rounded figures, often ending in 0 or 5, rather than their exact age.
-            For example, individiauals might state their age as 30, 35, or 40 and avoid being precise with figures like 31, 36, or 39. This is believed to happen more often in populations that lack basic numeracy skills.
+          Age heaping is observed in age data collection, where people tend to report their ages in rounded figures, often ending in 0 or 5, rather than their exact age.
+          For example, individiauals might state their age as 30, 35, or 40 and avoid being precise with figures like 31, 36, or 39. This is believed to happen more often in populations that lack basic numeracy skills.
 
 
-            Age heaping can therefore be used to estimate historic data on basic numeracy across different regions and timeframes.
+          Age heaping can therefore be used to estimate historic data on basic numeracy across different regions and timeframes.
 
 
-            To estimate age heaping (also known as Whipple index) the authors of this dataset divide the number of people who report their ages to end in 0 or 5 by the expected real age distribution if ages were evenly distributed, meaning ages ending in 0 or 5 would appear about one-fifth of the time.
-            If all individuals in a population report ages ending in 0 or 5, the score is 500. If half of individuals report such ages, the score is 250. If one fifth of the population which is approximate number of people whose age in fact ends on 0 or 5 report age-heaping, the score would be 100, indicating no age heaping.
+          To estimate age heaping (also known as Whipple index) the authors of this dataset divide the number of people who report their ages to end in 0 or 5 by the expected real age distribution if ages were evenly distributed, meaning ages ending in 0 or 5 would appear about one-fifth of the time.
+          If all individuals in a population report ages ending in 0 or 5, the score is 500. If half of individuals report such ages, the score is 250. If one fifth of the population which is approximate number of people whose age in fact ends on 0 or 5 report age-heaping, the score would be 100, indicating no age heaping.
 
 
-            To estimate gender inequality in numeracy the male age-heaping index is subtracted from the female one, divided by the male one and multiplied by -100.
-            A higher score suggests fewer women are rounding their ages compared to men in a specific region. Positive indices indicates women have an advantage in numeracy and negative indicates men have an advantage in numeracy.
-            The index isn't proportional. E.g., a 50% heaping in women (score 250) against perfect reporting by men (score 100) gives a gender equality index of -150, but if roles are reversed, the index becomes 60.
+          To estimate gender inequality in numeracy the male age-heaping index is subtracted from the female one, divided by the male one and multiplied by -100.
+          A higher score suggests fewer women are rounding their ages compared to men in a specific region. Positive indices indicates women have an advantage in numeracy and negative indicates men have an advantage in numeracy.
+          The index isn't proportional. E.g., a 50% heaping in women (score 250) against perfect reporting by men (score 100) gives a gender equality index of -150, but if roles are reversed, the index becomes 60.
         unit: '%'
         short_unit: '%'
         display:

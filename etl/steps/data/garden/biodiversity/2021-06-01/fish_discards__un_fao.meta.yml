@@ -1,5 +1,7 @@
 dataset:
   title: Fish discards (UN FAO)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   fish_discards__un_fao:
     variables:

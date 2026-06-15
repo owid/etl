@@ -37,7 +37,7 @@ definitions:
   # VALUE RANGES (BINS) FOR PISA SCORES
   # ============================================================================
 
-  pisa_score_bins: &pisa_score_bins [340,380,420,460,500,500]
+  pisa_score_bins: &pisa_score_bins [340, 380, 420, 460, 500, 500]
 
   # ============================================================================
   # PISA SCORE CONFIGURATIONS
@@ -77,6 +77,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   pisa_math_boys_girls:
     variables:

@@ -3,6 +3,8 @@ dataset:
   description: Trends in religiosity, and participation in public services in the United States.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   religiosity_united_states_gallup:
     variables:

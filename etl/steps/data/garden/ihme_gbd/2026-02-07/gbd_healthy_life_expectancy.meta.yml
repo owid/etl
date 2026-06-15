@@ -11,6 +11,8 @@ definitions:
 
 dataset:
   non_redistributable: true
+  owners:
+    - Fiona Spooner
 tables:
   gbd_healthy_life_expectancy:
     variables:

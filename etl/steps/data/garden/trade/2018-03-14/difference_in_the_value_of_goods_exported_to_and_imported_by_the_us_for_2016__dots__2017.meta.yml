@@ -1,5 +1,7 @@
 dataset:
   title: Difference in the value of goods exported to and imported by the US for 2016 (DOTS (2017))
+  owners:
+    - Diana Beltekian  # backport
 tables:
   difference_in_the_value_of_goods_exported_to_and_imported_by_the_us_for_2016__dots__2017:
     variables:

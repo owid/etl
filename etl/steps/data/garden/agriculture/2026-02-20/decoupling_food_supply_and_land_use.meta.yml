@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: "Decoupling of food supply and land use"
 
+  owners:
+    - Pablo Rosado
 tables:
   decoupling_food_supply_and_land_use:
     title: "Decoupling of food supply and land use"

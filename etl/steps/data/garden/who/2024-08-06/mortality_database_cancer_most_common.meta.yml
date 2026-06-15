@@ -13,6 +13,8 @@ dataset:
   update_period_days: 365
   title: WHO Mortality Database - Leading cancer types causing death
 
+  owners:
+    - Veronika Samborska
 tables:
   mortality_database_cancer:
     variables:

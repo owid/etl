@@ -1,4 +1,6 @@
-dataset: {}
+dataset:
+  owners:
+    - Edouard Mathieu
 
 tables:
   hcctad:

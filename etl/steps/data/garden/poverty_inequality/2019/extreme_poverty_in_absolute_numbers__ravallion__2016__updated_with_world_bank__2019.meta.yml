@@ -1,5 +1,7 @@
 dataset:
   title: Extreme Poverty in absolute numbers - Ravallion (2016) updated with World Bank (2019)
+  owners:
+    - Max Roser  # backport
 tables:
   extreme_poverty_in_absolute_numbers__ravallion__2016__updated_with_world_bank__2019:
     variables:

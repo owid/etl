@@ -1,5 +1,7 @@
 dataset:
   title: Lead blood concentrations in LMIC (Ericson et al. 2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   lead_blood_concentrations_in_lmic__ericson_et_al__2021:
     variables:

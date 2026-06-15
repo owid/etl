@@ -9,6 +9,9 @@ dataset:
   title: Births by age of mother (UN WPP)
 
 # this metadata file is not used in garden step, but in grapher step
+  owners:
+    - Lucas Rodés-Guirao
+    - Fiona Spooner
 tables:
   births_by_age:
     variables:

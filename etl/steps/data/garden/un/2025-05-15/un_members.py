@@ -91,16 +91,14 @@ def add_missing_countries(tb: Table) -> Table:
     return tb
 
 
-def create_region_members_table(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Table:
+def create_region_members_table(tb: Table, ds_regions: Dataset) -> Table:
     """
     Add regional aggregations refered to the number of members and non-member, and also the population living in those regions.
     """
     tb_with_regions = tb.copy()
 
     # Add population to table (before adding regions).
-    tb_with_regions = geo.add_population_to_table(
-        tb=tb_with_regions, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_with_regions = paths.regions.add_population(tb=tb_with_regions, warn_on_missing_countries=False)
 
     # Add regions (continents and income groups) with the number of members and non-members, as well as the population of members and non-members.
     # To do that, create a column "membership_number" that is 1 for a member, and 0 otherwise.
@@ -134,11 +132,8 @@ def create_region_members_table(tb: Table, ds_regions: Dataset, ds_population: D
     tb_with_regions = tb_with_regions[tb_with_regions["country"].isin(REGIONS)].reset_index(drop=True)
 
     # Since we are not considering all countries (we are missing some contested and overseas territories), add now the true total population of the regions.
-    tb_with_regions = geo.add_population_to_table(
-        tb=tb_with_regions,
-        ds_population=ds_population,
-        warn_on_missing_countries=False,
-        population_col="population_region",
+    tb_with_regions = paths.regions.add_population(
+        tb=tb_with_regions, warn_on_missing_countries=False, population_col="population_region"
     )
 
     # Add missing_pop column.
@@ -178,7 +173,6 @@ def run() -> None:
     ds_regions = paths.load_dataset("regions")
 
     # Load population data.
-    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -193,7 +187,7 @@ def run() -> None:
     tb = add_missing_countries(tb=tb)
 
     # Add regional aggregations
-    tb_regions = create_region_members_table(tb=tb, ds_regions=ds_regions, ds_population=ds_population)
+    tb_regions = create_region_members_table(tb=tb, ds_regions=ds_regions)
 
     # Improve table formats.
     tb = tb.format(["country", "year"])
