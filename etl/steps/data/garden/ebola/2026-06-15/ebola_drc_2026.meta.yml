@@ -1,0 +1,73 @@
+# NOTE: dataset block omitted — inherited from the snapshot origin.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Pandemics
+    processing_level: minor
+    description_processing: |-
+      The source publishes one CSV file per indicator, with values labelled by health zone (and aggregated to the national level). We stack these per-indicator files into a single table, parse the source's "ND" ("no data") and "NA" markers to missing values, and convert the source's daily labels into dates. National figures are attributed to the Democratic Republic of Congo; health-zone figures are kept at their original subnational resolution.
+
+tables:
+  ebola_drc_2026:
+    title: 2026 Bundibugyo Ebola outbreak — national indicators (DRC)
+    variables:
+      cumulative_confirmed_cases:
+        title: Cumulative confirmed Ebola cases
+        unit: cases
+        short_unit: ""
+        description_short: Total number of laboratory-confirmed cases of Ebola disease (Bundibugyo virus) reported in the Democratic Republic of the Congo since the start of the 2026 outbreak.
+      cumulative_confirmed_deaths:
+        title: Cumulative confirmed Ebola deaths
+        unit: deaths
+        short_unit: ""
+        description_short: Total number of deaths among laboratory-confirmed Ebola cases (Bundibugyo virus) reported in the Democratic Republic of the Congo since the start of the 2026 outbreak.
+      cumulative_suspected_cases:
+        title: Cumulative suspected Ebola cases
+        unit: cases
+        short_unit: ""
+        description_short: Total number of suspected cases of Ebola disease (Bundibugyo virus) reported in the Democratic Republic of the Congo since the start of the 2026 outbreak.
+      cumulative_suspected_deaths:
+        title: Cumulative suspected Ebola deaths
+        unit: deaths
+        short_unit: ""
+        description_short: Total number of deaths among suspected Ebola cases (Bundibugyo virus) reported in the Democratic Republic of the Congo since the start of the 2026 outbreak.
+
+  ebola_drc_2026_by_health_zone:
+    title: 2026 Bundibugyo Ebola outbreak — indicators by health zone
+    variables:
+      cumulative_confirmed_cases:
+        title: Cumulative confirmed Ebola cases, by health zone
+        unit: cases
+        short_unit: ""
+        description_short: Total laboratory-confirmed cases of Ebola disease (Bundibugyo virus) reported in each health zone since the start of the 2026 outbreak.
+      cumulative_confirmed_deaths:
+        title: Cumulative confirmed Ebola deaths, by health zone
+        unit: deaths
+        short_unit: ""
+        description_short: Total deaths among laboratory-confirmed Ebola cases (Bundibugyo virus) reported in each health zone since the start of the 2026 outbreak.
+      cumulative_suspected_cases:
+        title: Cumulative suspected Ebola cases, by health zone
+        unit: cases
+        short_unit: ""
+        description_short: Total suspected cases of Ebola disease (Bundibugyo virus) reported in each health zone since the start of the 2026 outbreak.
+      cumulative_suspected_deaths:
+        title: Cumulative suspected Ebola deaths, by health zone
+        unit: deaths
+        short_unit: ""
+        description_short: Total deaths among suspected Ebola cases (Bundibugyo virus) reported in each health zone since the start of the 2026 outbreak.
+      new_confirmed_cases:
+        title: New confirmed Ebola cases, by health zone
+        unit: cases
+        short_unit: ""
+        description_short: Newly reported laboratory-confirmed cases of Ebola disease (Bundibugyo virus) in each health zone.
+      new_suspected_cases:
+        title: New suspected Ebola cases, by health zone
+        unit: cases
+        short_unit: ""
+        description_short: Newly reported suspected cases of Ebola disease (Bundibugyo virus) in each health zone.
+      new_suspected_deaths:
+        title: New suspected Ebola deaths, by health zone
+        unit: deaths
+        short_unit: ""
+        description_short: Newly reported deaths among suspected Ebola cases (Bundibugyo virus) in each health zone.

@@ -1,0 +1,26 @@
+meta:
+  origin:
+    producer: Institut National de Santé Publique (Democratic Republic of the Congo)
+    title: 2026 Bundibugyo Ebola outbreak in the Democratic Republic of the Congo and Uganda
+    description: |-
+      Epidemiological surveillance data for the 2026 outbreak of Ebola disease caused by Bundibugyo virus (Orthoebolavirus bundibugyoense) in the Democratic Republic of the Congo and Uganda. The outbreak was confirmed in May 2026 and declared a Public Health Emergency of International Concern by the World Health Organization on 17 May 2026.
+
+      The DRC Institut National de Santé Publique (INSP) publishes daily Situation Reports (SitRep MVE series) as PDFs. These report confirmed and suspected cases and deaths, contacts traced, hospitalisations and point-of-entry screening, broken down by health zone and aggregated to the national level.
+
+      This snapshot covers the core epidemiological indicators only — confirmed and suspected cases and deaths (cumulative and newly reported) — at the national (DRC) and health-zone levels.
+    title_snapshot: 2026 Bundibugyo Ebola outbreak — core case and death indicators
+    description_snapshot: |-
+      Compiled from the INSP SitRep MVE series by the Kraemer Lab (University of Oxford), which transcribes the source PDFs into tidy per-metric CSV files. We download only the core case/death layer and stack the individual metric files into a single long-format table; mobility, conflict and demographic layers in the upstream repository are excluded.
+    citation_full: |-
+      Institut National de Santé Publique (INSP), Democratic Republic of the Congo. Situation Reports on the 2026 Bundibugyo Ebola outbreak (SitRep MVE series). Compiled and transcribed by the Kraemer Lab, University of Oxford (INRB-UMIE/Ebola_DRC_2026, https://github.com/INRB-UMIE/Ebola_DRC_2026).
+    attribution_short: INSP (via Kraemer Lab)
+    url_main: https://github.com/INRB-UMIE/Ebola_DRC_2026
+    date_accessed: "2026-06-15"
+    date_published: "2026-06-14"
+    license:
+      name: INSP SitReps; reuse with attribution
+      url: https://github.com/INRB-UMIE/Ebola_DRC_2026/blob/main/LICENSE.md
+outs:
+  - md5: 6a7d96319b43747a6b2cbd3d943eb2b0
+    size: 116157
+    path: ebola_drc_2026.csv

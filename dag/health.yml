@@ -4,6 +4,22 @@ steps:
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
 
+  # 2026 Bundibugyo Ebola outbreak (DRC + Uganda), via Kraemer Lab / INSP SitReps
+  data://meadow/ebola/2026-06-15/ebola_drc_2026:
+    - snapshot://ebola/2026-06-15/ebola_drc_2026.csv
+  data://garden/ebola/2026-06-15/ebola_drc_2026:
+    - data://meadow/ebola/2026-06-15/ebola_drc_2026
+  data://grapher/ebola/2026-06-15/ebola_drc_2026:
+    - data://garden/ebola/2026-06-15/ebola_drc_2026
+
+  # Historical Ebola outbreak chronology (CDC), 1976-present
+  data://meadow/ebola/2026-06-15/ebola_outbreaks:
+    - snapshot://ebola/2026-06-15/ebola_outbreaks.html
+  data://garden/ebola/2026-06-15/ebola_outbreaks:
+    - data://meadow/ebola/2026-06-15/ebola_outbreaks
+  data://grapher/ebola/2026-06-15/ebola_outbreaks:
+    - data://garden/ebola/2026-06-15/ebola_outbreaks
+
   # Death completion (Karlinsky, 2024)
   data://grapher/health/2025-04-18/deaths_karlinsky:
     - data://garden/health/2025-04-18/deaths_karlinsky:

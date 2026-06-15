@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: U.S. Centers for Disease Control and Prevention
+    title: History of Ebola disease outbreaks
+    description: |-
+      A chronology, maintained by the U.S. Centers for Disease Control and Prevention (CDC), of known Ebola disease outbreaks since the virus was first identified in 1976. For each outbreak the CDC reports the year, the country (or countries) affected, the Ebola virus species, the reported number of cases, and the reported number of deaths with the corresponding case fatality rate.
+
+      Figures are compiled by the CDC from its own field investigations, the World Health Organization, and national government reports, and reflect the totals reported at the time each outbreak was declared over.
+    title_snapshot: History of Ebola disease outbreaks — outbreak chronology page
+    description_snapshot: |-
+      The CDC publishes this chronology as an HTML page with one expandable section per year, each listing one or more outbreaks. We archive the page and extract the per-outbreak figures from it.
+    citation_full: |-
+      U.S. Centers for Disease Control and Prevention (CDC). History of Ebola Disease Outbreaks. https://www.cdc.gov/ebola/outbreaks/index.html
+    attribution_short: CDC
+    url_main: https://www.cdc.gov/ebola/outbreaks/index.html
+    url_download: https://www.cdc.gov/ebola/outbreaks/index.html
+    date_accessed: "2026-06-15"
+    date_published: "2025-12-18"
+    license:
+      name: Public domain (U.S. Government work)
+      url: https://www.cdc.gov/other/agencymaterials.html
+outs:
+  - md5: f628993adf1d9c72c17b79cd463de9e0
+    size: 124986
+    path: ebola_outbreaks.html

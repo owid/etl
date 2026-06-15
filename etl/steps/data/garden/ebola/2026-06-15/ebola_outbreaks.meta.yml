@@ -1,0 +1,39 @@
+# NOTE: dataset block omitted — inherited from the snapshot origin.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Pandemics
+    processing_level: major
+    description_processing: |-
+      We extracted one record per outbreak from the CDC's outbreak chronology. A small number of country-years contain two separate outbreaks; for those we summed the reported cases and deaths and recomputed the case fatality rate from the totals. Country names were harmonized; the 2014–2016 West African epidemic (Guinea, Liberia and Sierra Leone) and the ongoing 2026 outbreak (DRC and Uganda) are reported by the CDC as multi-country outbreaks and are kept as combined entities.
+
+tables:
+  ebola_outbreaks:
+    title: History of Ebola disease outbreaks
+    variables:
+      cases:
+        title: Reported Ebola cases
+        unit: cases
+        short_unit: ""
+        description_short: Reported number of cases of Ebola disease in each outbreak, as totalled when the outbreak was declared over.
+      deaths:
+        title: Reported Ebola deaths
+        unit: deaths
+        short_unit: ""
+        description_short: Reported number of deaths from Ebola disease in each outbreak, as totalled when the outbreak was declared over.
+      case_fatality_rate:
+        title: Ebola case fatality rate
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of reported Ebola cases that resulted in death, computed from the reported cases and deaths.
+      outbreaks:
+        title: Number of reported Ebola outbreaks
+        unit: outbreaks
+        short_unit: ""
+        description_short: Number of distinct Ebola outbreaks reported by the CDC for the country and year.
+      species:
+        title: Ebola virus species
+        unit: ""
+        short_unit: ""
+        description_short: The Ebola virus species responsible for the outbreak(s) reported for the country and year.
