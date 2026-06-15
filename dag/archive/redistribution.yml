@@ -118,3 +118,9 @@ steps:
     - data://garden/sipri/2025-04-28/military_expenditure
 
 
+
+  # Public Finances in Modern History dataset (IMF)
+  data://grapher/imf/2025-04-02/public_finances_modern_history:
+    - data://garden/imf/2025-04-02/public_finances_modern_history:
+      - data://meadow/imf/2025-04-02/public_finances_modern_history:
+        - snapshot://imf/2025-04-02/public_finances_modern_history.xlsx

@@ -156,11 +156,14 @@ def get_changed_files(
     repo_path: Path | str = BASE_DIR,
     only_committed: bool = False,
     fetch: bool = False,
+    include_diff: bool = True,
 ) -> dict[str, dict[str, str]]:
     """Return files that are different between the current branch and the specified base branch. This can
     be really slow if the number of files is large.
 
     :param fetch: If True, fetch the latest changes from the remote repository. This can be slow.
+    :param include_diff: If True, also fetch the per-file diff content (the "diff" value). This requires one
+        extra git call per changed file, so set to False when only file paths/statuses are needed.
     """
     repo = Repo(repo_path)
 
@@ -199,8 +202,10 @@ def get_changed_files(
             parts = line.split("\t")
             if len(parts) == 2:
                 status, file_path = parts
-                # Fetch diff content.
-                diff_content = repo.git.diff(f"{merge_base}...{current_branch}", "--", file_path, p=True)
+                # Fetch diff content (skip when not needed, it's one git call per file).
+                diff_content = (
+                    repo.git.diff(f"{merge_base}...{current_branch}", "--", file_path, p=True) if include_diff else ""
+                )
                 changes[file_path] = {"status": status, "diff": diff_content}
             else:
                 # Not sure if this could happen.
@@ -214,7 +219,7 @@ def get_changed_files(
                 parts = line.split("\t")
                 if len(parts) == 2:
                     status, file_path = parts
-                    diff_content = repo.git.diff("--", file_path, p=True)
+                    diff_content = repo.git.diff("--", file_path, p=True) if include_diff else ""
                     changes[file_path] = {"status": status, "diff": diff_content}
 
         # Add untracked files.

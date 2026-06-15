@@ -309,8 +309,12 @@ class Snapshot:
         if self.metadata_path.exists():
             self.metadata_path.unlink()
 
-    def download_from_source(self) -> None:
-        """Download file from origin.url_download."""
+    def download_from_source(self, user_agent: str | None = None) -> None:
+        """Download file from origin.url_download.
+
+        :param user_agent: Optional User-Agent header to use for HTTP(S) downloads (ignored for
+            s3://r2:// sources). See `download_helpers.download` for the default and bot-wall fallback.
+        """
         assert self.metadata.origin, "origin is not set"
         assert self.metadata.origin.url_download, "url_download is not set"
         download_url = self.metadata.origin.url_download
@@ -318,7 +322,7 @@ class Snapshot:
         if download_url.startswith("s3://") or download_url.startswith("r2://"):
             s3_utils.download(download_url, str(self.path))
         else:
-            download_helpers.download(download_url, str(self.path))
+            download_helpers.download(download_url, str(self.path), user_agent=user_agent)
 
     def dvc_add(self, upload: bool) -> None:
         """Add a file to DVC and upload it to S3.
@@ -364,6 +368,7 @@ class Snapshot:
         data: Table | pd.DataFrame | None = None,
         upload: bool = False,
         download_retries: int = 1,
+        user_agent: str | None = None,
     ) -> None:
         """Create a new snapshot from a local file, or from data in memory, or from a download link.
         Then upload it to S3. This is the recommended way to create a snapshot.
@@ -375,6 +380,8 @@ class Snapshot:
             data (Table or pd.DataFrame or None): Data to upload (if filename is not given).
             upload (bool): True to upload data to bucket.
             download_retries (int): Number of retries for downloading from source (default: 1, no retries).
+            user_agent (str or None): User-Agent to use when downloading from `url_download` (only relevant
+                for HTTP(S) sources). Defaults to a browser-like UA with a non-browser fallback for bot-walls.
         """
         assert not (filename is not None and data is not None), "Pass either a filename or data, but not both."
 
@@ -391,7 +398,7 @@ class Snapshot:
             # Create snapshot by downloading data from a URL with retry logic.
             for attempt in range(1, download_retries + 1):
                 try:
-                    self.download_from_source()
+                    self.download_from_source(user_agent=user_agent)
                     break
                 except DownloadCorrupted as e:
                     log.warning(

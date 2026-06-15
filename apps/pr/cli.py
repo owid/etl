@@ -1,5 +1,9 @@
 """This script creates a new draft pull request in GitHub, which starts a new staging server.
 
+The new branch is seeded with an empty commit (enough to open the draft PR and start the
+staging server). This commit is always empty: it never stages or commits your local changes,
+whether or not you have anything staged.
+
 Arguments:
 
 `TITLE`: The title of the PR. This must be given.
@@ -81,7 +85,7 @@ from typing import cast
 import click
 import questionary
 import requests
-from git import GitCommandError, Repo
+from git import GitCommandError, InvalidGitRepositoryError, Repo
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
@@ -515,7 +519,14 @@ def create_pr(repo, work_branch, base_branch, pr_title):
     pr_title_str = str(pr_title)
 
     log.info("Creating an empty commit.")
-    repo.git.commit("--allow-empty", "-m", pr_title_str or f"Start a new staging server for branch '{work_branch}'")
+    # Build the seeding commit with `git commit-tree` rather than `git commit`. It reuses
+    # HEAD's own tree, so the commit is always truly empty: it never reads the index, hence
+    # it can't accidentally commit changes you'd already staged, and it runs no pre-commit
+    # hooks (so it won't fail on formatting/typing, and needs no `.venv` in a fresh worktree).
+    head = repo.head.commit
+    commit_msg = pr_title_str or f"Start a new staging server for branch '{work_branch}'"
+    new_commit = repo.git.commit_tree(head.tree.hexsha, "-p", head.hexsha, "-m", commit_msg)
+    repo.git.update_ref("HEAD", new_commit)
 
     log.info("Pushing the new branch to remote.")
     repo.git.push("origin", work_branch)
@@ -655,10 +666,16 @@ are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool wil
 1. (Worktree branches only) Copy that worktree's Claude sessions — the `<uuid>.jsonl` transcripts and
    their `<uuid>/` subfolders under `~/.claude/projects/<encoded-worktree-path>/` — into the main
    repo's project dir, so they stay resumable with `claude --resume` after the worktree is gone.
-2. Remove the git worktree (skipped with a warning if it has uncommitted changes).
-3. Delete the local branch.
+2. (Worktree branches only) Copy the worktree's gitignored `workbench/` and `ai/` scratch dirs into
+   `workbench/<branch>/` and `ai/<branch>/` in the main repo (suffixed `-1`, `-2`... on the rare name
+   clash), so the working notes/outputs survive the worktree removal without overwriting anything.
+3. Remove the git worktree (skipped with a warning if it has uncommitted changes).
+4. Delete the local branch.
 
 Each branch is tagged `[merged]` or `[closed]` so you can see its PR outcome before selecting.
+
+Must be run from the main repo, not from a secondary worktree (it errors out otherwise). The main
+repo can clean every worktree anyway, so just `cd` there first.
 
 ```shell
 etl pr-clean
@@ -677,7 +694,29 @@ def clean_cli() -> None:
     repo = Repo(BASE_DIR)
     main_worktree_path = get_main_worktree_path(repo)
     worktrees = list_worktrees(repo)  # branch name -> worktree path
-    current_worktree_path = Path(repo.working_tree_dir).resolve()  # ty: ignore
+
+    # Resolve the worktree the user is actually standing in from cwd, not from Repo(BASE_DIR).
+    # BASE_DIR is the package location, so when etl runs from the main repo's venv while the shell
+    # is inside a secondary worktree (that worktree's venv not activated), Repo(BASE_DIR) still
+    # points at the main repo — comparing its working_tree_dir would wrongly pass the guard below.
+    try:
+        cwd_repo = Repo(Path.cwd(), search_parent_directories=True)
+        current_worktree_path = Path(cwd_repo.working_tree_dir).resolve()  # ty: ignore
+    except InvalidGitRepositoryError:
+        # cwd isn't inside any git repo — keep the raw cwd so the guard still errors out (it can't
+        # equal the main worktree), rather than falling back to BASE_DIR's repo and passing.
+        current_worktree_path = Path.cwd().resolve()
+
+    # pr-clean must run from the main repo, never from a secondary worktree. From a worktree it
+    # could try to remove the working tree you're standing in, or — if that worktree was switched
+    # off its branch (e.g. to master) — delete the branch while leaving the now-unlinked worktree
+    # orphaned. The main repo can clean every worktree anyway, so just bail and point there.
+    if current_worktree_path != main_worktree_path:
+        raise click.ClickException(
+            "pr-clean must be run from the main repo, not a worktree.\n"
+            f"  You're in:     {current_worktree_path}\n"
+            f"  cd to main and re-run:\n    cd {main_worktree_path}"
+        )
 
     # Candidate branches: every local branch except master.
     candidate_branches = [b.name for b in repo.branches if b.name != "master"]
@@ -722,7 +761,6 @@ def clean_cli() -> None:
             worktree_path=worktrees.get(branch),
             main_project_dir=main_project_dir,
             main_worktree_path=main_worktree_path,
-            current_worktree_path=current_worktree_path,
         )
 
 
@@ -826,19 +864,39 @@ def copy_sessions(worktree_path: Path, main_project_dir: Path) -> int:
     return copied
 
 
+def copy_dir_namespaced(src: Path, dst_parent: Path, branch: str) -> Path | None:
+    """Copy a worktree's `src` dir into `dst_parent/<branch>`, suffixing -1, -2... on collision.
+
+    Returns the destination path, or None if `src` is missing, not a directory, or empty. Unlike
+    Claude sessions (UUID-named, collision-free), these dirs use task/human names, so the whole tree
+    lands under a branch-named (and, on collision, suffixed) folder. Slashes in the branch name are
+    flattened to '-' so the result stays a single folder. Nothing already in `dst_parent` is overwritten.
+    """
+    if not src.is_dir() or not any(p.name != ".DS_Store" for p in src.iterdir()):
+        return None
+
+    safe_branch = branch.replace("/", "-")
+    dest = dst_parent / safe_branch
+    i = 1
+    while dest.exists():
+        dest = dst_parent / f"{safe_branch}-{i}"
+        i += 1
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, dest, ignore=shutil.ignore_patterns(".DS_Store"))
+    log.info(f"Copied '{src}' to '{dest}'.")
+    return dest
+
+
 def clean_branch(
     repo,
     branch: str,
     worktree_path: Path | None,
     main_project_dir: Path,
     main_worktree_path: Path,
-    current_worktree_path: Path,
 ) -> None:
     """Copy sessions (if a worktree), remove the worktree, and delete the local branch."""
-    # A branch checked out in the current or the main worktree can't be cleaned from here.
-    if worktree_path is not None and worktree_path == current_worktree_path:
-        log.warning(f"Skipping '{branch}': it's the worktree you're currently in. cd to the main repo and re-run.")
-        return
+    # The branch checked out in the main repo (where pr-clean runs) can't be cleaned from here.
     if worktree_path is not None and worktree_path == main_worktree_path:
         log.warning(
             f"Skipping '{branch}': it's checked out in the main repo. Switch the main repo to another branch first."
@@ -846,9 +904,12 @@ def clean_branch(
         return
 
     if worktree_path is not None:
-        # Copy sessions first, then drop the worktree. The session dir lives outside the worktree,
-        # so removing the worktree never touches it — but copy first on principle.
+        # Salvage anything the worktree holds but that's gitignored (so `git worktree remove` would
+        # destroy it for good): the Claude sessions, plus the workbench/ and ai/ scratch dirs.
+        # The session dir lives outside the worktree, but copy everything before removal on principle.
         copy_sessions(worktree_path, main_project_dir)
+        for name in ("workbench", "ai"):
+            copy_dir_namespaced(worktree_path / name, main_worktree_path / name, branch)
         try:
             repo.git.worktree("remove", str(worktree_path))
             log.info(f"Removed worktree '{worktree_path}'.")

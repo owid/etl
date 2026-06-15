@@ -9,6 +9,8 @@ metadata:
 
 End-to-end review of a dataset-update PR. Goes deeper than `/review`: actually runs the steps, compares to the previous version, audits metadata coverage against a fixed checklist, and reports on `/update-dataset` workflow status (Slack draft, Codex review, indicator upgrade, downstream deps).
 
+> **Paired skill — keep in sync.** [`/update-dataset`](../update-dataset/SKILL.md) is the author-side counterpart of this skill: the steps it defines are the outcomes verified here. Whenever you add, remove, or change a check in this file, check whether `update-dataset/SKILL.md` needs a matching author-side step (and add it in the same commit if so). The reverse also holds — see the mirror note there.
+
 ## Inputs
 
 - Optional PR number. If omitted, derive it from the current branch via `gh pr list --head <branch>`.
@@ -22,6 +24,8 @@ gh pr view <num> --json title,body,isDraft,mergeable,statusCheckRollup,comments,
 ```
 
 Flag if **PR description is empty** (per user's standing rule: keep PR body in sync with substantial changes).
+
+Flag 🟡 if the Summary doesn't open with a **tracking-issue link** (`Tracks: owid/owid-issues#NNNN`) — `/update-dataset` requires it as the first line; most data updates have a corresponding `owid-issues` ticket.
 
 ### 2. Diff and changed files
 
@@ -76,13 +80,14 @@ Read both `.dvc` files (old and new) and produce a side-by-side table for these 
 | `date_published` | **Must differ from `date_accessed`** — source from `url_main` or the file. If unsure, ask. |
 | `date_accessed` | Updated to today (or run-date) |
 | `producer` / `attribution_short` | Same source, same values (unless changed deliberately) |
+| `citation_full` / `attribution` | **Year bumped to the new release year** — `etl update` copies both verbatim from the old `.dvc`, so a stale year ships silently. 🔴 if still the old version's year. |
 | `url_main` | Status check — see step 6 |
 | `url_download` | Status check; OK to remove if data is now fetched via API |
 | `license.url` | Status check |
 
 ### 6. Verify all links
 
-Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.dvc` and `.meta.yml` files. Anything non-2xx is a 🔴 blocker.
+Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.dvc` and `.meta.yml` files. A curl non-2xx is a *signal*, not proof — Cloudflare-fronted hosts return false 404s to curl. Apply the same escalation as `/update-dataset` § 6c: re-check with `WebFetch`, then the Wayback Machine. Only a URL that fails **all three** is a 🔴 blocker; a curl-only failure that WebFetch resolves is 🟢 informational.
 
 ### 7. Code clarity & docs
 
@@ -90,7 +95,7 @@ For each step file, check:
 - **Snapshot script (if present)**: docstring explains source choice; no hidden hardcoded year/date constants without `--cli-flag` parametrization (or at minimum a clear update comment). Note: a `.py` upload script is optional — many snapshots ship with only the `.dvc` and a `url_download`. Don't flag the absence of a script.
 - **Meadow / garden / grapher**: clear top-level docstrings; no commented-out code; no silent exception handlers
 - **Garden**: harmonization uses `paths.regions.harmonize_names(tb, ...)` (the new API), not the legacy `geo.harmonize_countries`
-- **Garden assertions**: sanity checks present and not overly brittle (e.g. avoid hard-coded "X must always exceed Y" if it's not a true invariant)
+- **Garden assertions**: sanity checks present when the step does non-trivial logic (harmonization, renames, aggregations, derivations) and not overly brittle (e.g. avoid hard-coded "X must always exceed Y" if it's not a true invariant). Check value-bound coverage per indicator type (shares in [0,1], percentages-of-a-whole in [0,100], non-negativity for level indicators, mutually exclusive share categories summing to 100 within rounding tolerance, exception sets for documented outliers) — but verify any bound against the actual data before suggesting it: "% of GDP" indicators legitimately exceed 100 (see `/update-dataset` §5b-bis)
 - **Grapher meta.yml**: drop it if it only duplicates the garden values — the grapher step inherits via `default_metadata=ds_garden.metadata`
 
 ### 8. Outdated practices
@@ -141,6 +146,7 @@ Any `NULL` row is a 🔴.
 
 **Additional reviewer-side metadata checks:**
 
+- **`dataset.owners` includes the PR author.** `/update-dataset` step 1a-bis requires the author to append their canonical OWID name (an entry in the `schemas/dataset-schema.json` enum) to the garden `.meta.yml` `owners:` list, preserving the existing order and any `# review` / `# backport` / `# fasttrack` markers. Author missing from the list = 🟡; existing owners reordered or dropped = 🔴.
 - **`processing_level: major` must come with `description_processing`.** Grep the new garden meta.yml for `processing_level: major`. Each occurrence (whether on `definitions.common` or per-indicator) requires a `description_processing` field on that same scope. 🟡 mismatch.
 - **Per-indicator `description_processing` should describe the indicator's own derivation, not just point at a shared generic note.** When every aggregate indicator's `description_processing` is the exact same string (e.g. all four region indicators just reference `{definitions.description_regions_processing}` with no per-indicator detail), 🟡 flag — author should compose per-indicator sentences.
 - **Long-format-with-dimensions Jinja coverage.** When variables are keyed by a long-column name (e.g. `proportion`) with `<% if <dim> == "X" %>...<% endif %>` blocks for `title`, `description_short`, `display.name`, verify every active `(dim1, dim2)` cell renders a non-empty value. Easiest check: read every column from the grapher dataset and assert `metadata.title` is non-empty.
@@ -202,9 +208,12 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 | Item | Verify by |
 |---|---|
 | Indicator upgrade ran (§7) | `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'"` — non-zero |
+| Explorers / MDims re-exported (§7) | Only if the DAG has `export://explorers/...` or `export://multidim/...` steps for this dataset (`rg -e "export://explorers/.*/<short_name>" -e "export://multidim/.*/<short_name>" dag/ -g "*.yml"`). The indicator-upgrader never touches these, so run the two staging queries from `/update-dataset` §7 (old-version references in `explorer_variables` / `multi_dim_x_chart_configs`) — both must return empty. A hit = 🔴, the export step wasn't re-run. |
 | Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅ |
 | `@codex review` posted (§9) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
 | Codex threads resolved (§10) | `gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<num>) { reviewThreads(first:20) { nodes { isResolved } } } } }'` — all `isResolved: true` |
+
+A **clean Codex review has a different shape**: no inline comments and zero review threads — just a single top-level "no issues" comment from `chatgpt-codex-connector[bot]` in the issue comments. That counts as reviewed (the threads row passes vacuously); don't flag the absence of inline threads as "review missing".
 
 **Out of scope for review:** Slack announcement and Anomalist + Chart Diff hand-off are author-side concerns, not reviewer checks.
 
@@ -225,8 +234,8 @@ Structure the review with:
 
 ## Severity rubric
 
-- 🔴 **Blocker**: missing mandatory metadata field, broken link, failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data
-- 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues, undocumented sanity-check findings, phantom `sort:` labels with no backing value, over-exclusion of a canonical region, undocumented `missing values in mapping` countries
+- 🔴 **Blocker**: missing mandatory metadata field, genuinely broken link (fails curl + WebFetch + Wayback), failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, stale year in `citation_full`/`attribution`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, explorer/MDim still referencing old-version variables on staging, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data
+- 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues, undocumented sanity-check findings, phantom `sort:` labels with no backing value, over-exclusion of a canonical region, undocumented `missing values in mapping` countries, PR author missing from `dataset.owners`, missing tracking-issue link in the PR body
 - 🟢 **Informational**: things to be aware of but not action items
 
 ## Notes

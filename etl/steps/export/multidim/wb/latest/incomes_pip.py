@@ -174,6 +174,7 @@ def run() -> None:
                     "chartTypes": ["LineChart", "DiscreteBar"],
                     "hideTotalValueLabel": True,
                     "baseColorScheme": "OwidCategoricalE",
+                    "yAxis": {"facetDomain": "independent"},
                     "title": "{title}",
                     "subtitle": "{subtitle}",
                 },
