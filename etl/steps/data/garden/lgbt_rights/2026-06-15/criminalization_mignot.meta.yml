@@ -6,7 +6,7 @@ definitions:
       tolerance: 0
     processing_level: major
     description_processing: |-
-      From the original table, we constructed a new dataset with data for all countries between 1760 and 2025.
+      From the original table, we constructed a new dataset with data for all countries between 1760 and 2026. Each country's most recent legal status is carried forward to 2026; the latest changes recorded in the data occurred in 2025.
 
       For countries where criminalization was implemented at different points in time across their regions, we considered the earliest year of the change as the year of criminalization. This is the case for the United States (1610-1948).
 
