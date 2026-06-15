@@ -190,6 +190,7 @@ Visual inspection of the diff for:
 - Indentation consistent (` #` vs `  #` is a frequent typo)
 - Trailing newline on the archive YAML
 - New entries placed in the old block's slot, not orphaned at the bottom (🟡 if at the bottom)
+- **Both the flat and nested (compact) DAG forms are valid** (the loader accepts either). The nested form (chain declared inline, grapher → garden → meadow → snapshot) is the preferred style — don't flag a nested block as wrong, and don't flag the archive edit itself (archiving is the explicitly-requested workflow step; Codex's "don't edit archived DAG" warning is a known false-positive here).
 
 ### 12. Downstream dependency check
 
@@ -209,7 +210,7 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 |---|---|
 | Indicator upgrade ran (§7) | `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'"` — non-zero |
 | Explorers / MDims re-exported (§7) | Only if the DAG has `export://explorers/...` or `export://multidim/...` steps for this dataset (`rg -e "export://explorers/.*/<short_name>" -e "export://multidim/.*/<short_name>" dag/ -g "*.yml"`). The indicator-upgrader never touches these, so run the two staging queries from `/update-dataset` §7 (old-version references in `explorer_variables` / `multi_dim_x_chart_configs`) — both must return empty. A hit = 🔴, the export step wasn't re-run. |
-| Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅ |
+| Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅. A diff that shifts **every** historical year/region by a tiny amount is usually **upstream-dataset drift** (the live data was built against an older population/regions/income_groups snapshot), not a regression — don't flag it as a 🔴; the real change should be isolable by rebuilding the old version on the current catalog (see `/update-dataset` §5). |
 | `@codex review` posted (§9) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
 | Codex threads resolved (§10) | `gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<num>) { reviewThreads(first:20) { nodes { isResolved } } } } }'` — all `isResolved: true` |
 
