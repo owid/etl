@@ -6,10 +6,18 @@ from datetime import datetime, timezone
 from typing import Any
 
 import pandas as pd
+import requests
 import streamlit as st
 from structlog import get_logger
 
+from apps.owidbot.cli import get_cloudflare_subdomain
+from etl.config import OWIDBOT_ACCESS_TOKEN, get_container_name
+
 log = get_logger()
+
+# LXC host that staging servers live on. The fetch/destroy/stop/start commands all
+# target this host (matching ops/templates/lxc-manager/*), so keep it in one place.
+LXC_HOST = "gaia-1"
 
 
 @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
@@ -176,13 +184,23 @@ def _process_server_data(df: pd.DataFrame) -> pd.DataFrame:
     df["etl_days_old"] = _calculate_days_since_commit(df["etl_commit_parsed"])
     df["grapher_days_old"] = _calculate_days_since_commit(df["grapher_commit_parsed"])
 
-    # Add status indicators
+    # Add status indicators. "Stopped" containers are idle: their data is preserved and
+    # they can be woken with `owid-lxc start`, so we surface them as "Idle" to the team.
     df["status_indicator"] = df["status"].map(
         {
             "Running": "🟢",
-            "Stopped": "🔴",
+            "Stopped": "⏸️",
         }
     )
+    df["status_label"] = df["status"].map(
+        {
+            "Running": "Running",
+            "Stopped": "Idle",
+        }
+    )
+
+    # Build a single "last commit" column based on origin (used in the server list)
+    df["unified_commit"] = df.apply(_get_unified_commit_info, axis=1)
 
     # Sort by status (running first) then by creation date (newest first)
     df = df.sort_values(
@@ -312,95 +330,45 @@ def format_commit_info(commit_timestamp: str, days_old: int | None) -> str:
         return f"❌ {int(days_old)} days ago"
 
 
-def get_display_columns() -> dict[str, str]:
-    """
-    Get the column mapping for display in the table.
+def _get_unified_commit_info(row: pd.Series) -> str:
+    """Create a single human-readable "last commit" string based on the server origin."""
+    origin = (row.get("origin") or "").lower()
 
-    Returns:
-        Dictionary mapping internal column names to display names
-    """
-    return {
-        "status_indicator": "Status",
-        "origin": "Origin",
-        "branch": "Branch",
-        "memory_display": "Memory",
-        "days_old": "Age (days)",
-        "unified_commit": "Last Commit",
-    }
+    if origin == "etl":
+        # Use ETL commit for ETL-only servers
+        return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
+    elif origin == "owid-grapher":
+        # Use Grapher commit for Grapher-only servers
+        return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
+    elif "owid-grapher" in origin and "etl" in origin:
+        # For mixed origins (e.g., "owid-grapher,etl"), use the latest commit
+        etl_date = row["etl_commit_parsed"]
+        grapher_date = row["grapher_commit_parsed"]
 
-
-def prepare_display_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Prepare the dataframe for display in Streamlit.
-
-    Args:
-        df: Processed server DataFrame
-
-    Returns:
-        DataFrame ready for display
-    """
-    if df.empty:
-        return df
-
-    display_df = df.copy()
-
-    # Create unified commit column based on origin
-    def get_unified_commit_info(row):
-        origin = row.get("origin", "").lower()
-
-        if origin == "etl":
-            # Use ETL commit for ETL-only servers
-            return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
-        elif origin == "owid-grapher":
-            # Use Grapher commit for Grapher-only servers
+        # Handle NaT/None values
+        if pd.isna(etl_date) and pd.isna(grapher_date):
+            return "❓ No commits found"
+        elif pd.isna(etl_date):
             return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
-        elif "owid-grapher" in origin and "etl" in origin:
-            # For mixed origins (e.g., "owid-grapher,etl"), use the latest commit
-            etl_date = row["etl_commit_parsed"]
-            grapher_date = row["grapher_commit_parsed"]
-
-            # Handle NaT/None values
-            if pd.isna(etl_date) and pd.isna(grapher_date):
-                return "❓ No commits found"
-            elif pd.isna(etl_date):
-                return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
-            elif pd.isna(grapher_date):
-                return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
-            else:
-                # Compare dates and use the latest
-                if etl_date >= grapher_date:
-                    return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
-                else:
-                    return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
+        elif pd.isna(grapher_date):
+            return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
         else:
-            # Default fallback - try ETL first, then Grapher
-            etl_commit = row["etl_last_commit"]
-            if not pd.isna(etl_commit) and etl_commit not in [
-                "Container not running",
-                "Unable to retrieve",
-                "No git repository found",
-            ]:
+            # Compare dates and use the latest
+            if etl_date >= grapher_date:
                 return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
             else:
                 return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
-
-    display_df["unified_commit"] = display_df.apply(get_unified_commit_info, axis=1)
-
-    # For progress bar, we need the actual GB values
-    # The ProgressColumn will show the bar based on value/max_value ratio, but display the actual GB value
-    display_df["memory_display"] = display_df["memory_used_gb"].fillna(0)
-
-    # Round memory values for internal use
-    display_df["memory_used_gb"] = display_df["memory_used_gb"].round(2)
-    display_df["memory_usage_pct"] = display_df["memory_usage_pct"].round(1)
-
-    # Select and order columns for display
-    column_mapping = get_display_columns()
-    display_columns = list(column_mapping.keys())
-
-    display_df = display_df[display_columns].rename(columns=column_mapping)
-
-    return display_df
+    else:
+        # Default fallback - try ETL first, then Grapher
+        etl_commit = row["etl_last_commit"]
+        if not pd.isna(etl_commit) and etl_commit not in [
+            "Container not running",
+            "Unable to retrieve",
+            "No git repository found",
+        ]:
+            return format_commit_info(row["etl_last_commit"], row["etl_days_old"])
+        else:
+            return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
 
 
 def reset_mysql_database(server_name: str) -> tuple[bool, str]:
@@ -523,6 +491,99 @@ def reset_mysql_database(server_name: str) -> tuple[bool, str]:
         return False, error_msg
 
 
+def start_server(server_name: str) -> tuple[bool, str]:
+    """
+    Wake up an idle (stopped) staging server with ``owid-lxc start``.
+
+    The container's data is preserved while it's stopped, so starting it brings the
+    server back in seconds — no commit or rebuild needed. This replaces the obscure
+    "push an empty commit" trick for idle servers.
+
+    Args:
+        server_name: Full server name (e.g., staging-site-branch-name)
+
+    Returns:
+        Tuple of (success, message)
+    """
+    cmd = f"LXC_HOST={LXC_HOST} owid-lxc start {server_name}"
+    # Starting also runs a tailscale login and a short readiness delay, so allow time.
+    return _run_lxc_command(cmd, server_name, action="start", timeout=180)
+
+
+def stop_server(server_name: str) -> tuple[bool, str]:
+    """
+    Put a running staging server to sleep (make it idle).
+
+    Mirrors the ops cron (``stop_staging_containers.py``): take a ``pre-stop`` snapshot
+    first so the state can be recovered, then stop the container. The data is preserved
+    and the server can be woken later with :func:`start_server`.
+
+    Args:
+        server_name: Full server name (e.g., staging-site-branch-name)
+
+    Returns:
+        Tuple of (success, message)
+    """
+    # Snapshot first (best-effort safety net), then stop — same order as the cron.
+    snapshot_ok, snapshot_msg = _run_lxc_command(
+        f"LXC_HOST={LXC_HOST} owid-lxc snapshot {server_name} pre-stop",
+        server_name,
+        action="snapshot",
+        timeout=120,
+    )
+    if not snapshot_ok:
+        return False, f"Could not take pre-stop snapshot, aborting stop: {snapshot_msg}"
+
+    return _run_lxc_command(
+        f"LXC_HOST={LXC_HOST} owid-lxc stop {server_name}",
+        server_name,
+        action="stop",
+        timeout=120,
+    )
+
+
+def restart_server(server_name: str) -> tuple[bool, str]:
+    """
+    Restart a running staging server (stop, then start).
+
+    Args:
+        server_name: Full server name (e.g., staging-site-branch-name)
+
+    Returns:
+        Tuple of (success, message)
+    """
+    stop_ok, stop_msg = _run_lxc_command(
+        f"LXC_HOST={LXC_HOST} owid-lxc stop {server_name}",
+        server_name,
+        action="stop",
+        timeout=120,
+    )
+    if not stop_ok:
+        return False, f"Could not stop server before restart: {stop_msg}"
+
+    return start_server(server_name)
+
+
+def _run_lxc_command(cmd: str, server_name: str, action: str, timeout: int) -> tuple[bool, str]:
+    """Run a simple ``owid-lxc`` action command and return (success, message)."""
+    try:
+        log.info(f"Running owid-lxc {action}", command=cmd, server=server_name)
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+
+        if result.returncode != 0:
+            error_msg = f"`owid-lxc {action}` failed with return code {result.returncode}: {result.stderr.strip()}"
+            log.error("owid-lxc command failed", error=error_msg, server=server_name, stdout=result.stdout)
+            return False, error_msg
+
+        log.info(f"owid-lxc {action} completed", server=server_name)
+        return True, f"Server {server_name} {action} completed successfully"
+
+    except subprocess.TimeoutExpired:
+        error_msg = f"`owid-lxc {action}` timed out after {timeout} seconds"
+        log.error("owid-lxc command timeout", server=server_name, action=action)
+        return False, error_msg
+
+
 def destroy_server(server_name: str) -> tuple[bool, str]:
     """
     Destroy a staging server completely.
@@ -535,7 +596,7 @@ def destroy_server(server_name: str) -> tuple[bool, str]:
     """
     try:
         # Command to destroy the LXC container
-        cmd = f"LXC_HOST=gaia-1 owid-lxc destroy {server_name}"
+        cmd = f"LXC_HOST={LXC_HOST} owid-lxc destroy {server_name}"
         log.info("Destroying server", command=cmd, server=server_name)
 
         result = subprocess.run(
@@ -563,3 +624,68 @@ def destroy_server(server_name: str) -> tuple[bool, str]:
         error_msg = f"Unexpected error during server destruction: {str(e)}"
         log.error("Server destruction error", error=error_msg, server=server_name)
         return False, error_msg
+
+
+def build_quick_links(branch: str) -> dict[str, str]:
+    """
+    Build the quick-access links for a staging server.
+
+    These mirror the links that owidbot posts on every ETL PR (see
+    ``apps/owidbot/cli.py:create_comment_body``), so they can be accessed from the
+    dashboard without hunting through GitHub.
+
+    Args:
+        branch: Branch name (without the ``staging-site-`` prefix)
+
+    Returns:
+        Ordered dict of {label: url}
+    """
+    container_name = get_container_name(branch)
+    cloudflare_subdomain = get_cloudflare_subdomain(branch)
+
+    return {
+        "Site Dev": f"http://{container_name}/",
+        "Site Preview": f"https://{cloudflare_subdomain}.owid.pages.dev/",
+        "Admin": f"http://{container_name}/admin",
+        "Wizard": f"http://{container_name}/etl/wizard/",
+        "Chart Diff": f"http://{container_name}/etl/wizard/chart-diff",
+        "Docs": f"http://{container_name}/etl/docs/",
+    }
+
+
+@st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes alongside the server data
+def fetch_server_owners() -> dict[str, str]:
+    """
+    Map each staging server's container name to the GitHub login of its PR author.
+
+    Staging servers don't record who created them, so we derive the owner from the
+    open PRs on the etl and owid-grapher repos. Best-effort: returns an empty mapping
+    if GitHub is unreachable or no token is configured, so the dashboard never breaks.
+
+    Returns:
+        Dict mapping container name (e.g. ``staging-site-my-branch``) to GitHub login.
+    """
+    owners: dict[str, str] = {}
+    headers = {"Authorization": f"token {OWIDBOT_ACCESS_TOKEN}"} if OWIDBOT_ACCESS_TOKEN else {}
+
+    for repo_name in ("etl", "owid-grapher"):
+        url = f"https://api.github.com/repos/owid/{repo_name}/pulls?per_page=100&state=open"
+        try:
+            while url:
+                response = requests.get(url, headers=headers, timeout=30)
+                response.raise_for_status()
+                for pr in response.json():
+                    # Only OWID branches (exclude forks), and skip if author missing.
+                    if not pr["head"]["label"].startswith("owid:"):
+                        continue
+                    login = (pr.get("user") or {}).get("login")
+                    if not login:
+                        continue
+                    container_name = get_container_name(pr["head"]["ref"])
+                    # First PR wins; both repos map to the same container name.
+                    owners.setdefault(container_name, login)
+                url = response.links.get("next", {}).get("url")
+        except requests.RequestException as e:
+            log.warning("Could not fetch PR owners from GitHub", repo=repo_name, error=str(e))
+
+    return owners

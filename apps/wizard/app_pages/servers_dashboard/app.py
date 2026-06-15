@@ -1,15 +1,20 @@
 """Staging Servers Dashboard - Monitor all LXC staging servers with real-time metrics."""
 
+import pandas as pd
 import streamlit as st
 from structlog import get_logger
 
 from apps.wizard.app_pages.servers_dashboard.utils import (
+    build_quick_links,
     destroy_server,
     fetch_host_memory_stats,
     fetch_lxc_servers_data,
+    fetch_server_owners,
     get_server_summary_stats,
-    prepare_display_dataframe,
     reset_mysql_database,
+    restart_server,
+    start_server,
+    stop_server,
 )
 from apps.wizard.utils.components import st_title_with_expert
 
@@ -106,7 +111,7 @@ with st.container(horizontal=True, vertical_alignment="bottom", horizontal_align
 
         **Status Indicators**:
         - 🟢 **Running**: Container is active and operational
-        - 🔴 **Stopped**: Container is stopped or inactive
+        - ⏸️ **Idle**: Container is stopped to save resources, but its **data is preserved**. Wake it instantly with the **Wake** button (no commit needed) — staging servers are stopped automatically after 14 days without a commit.
 
         **Commit Status**:
         - ✅ **Today/Recent**: Commits within the last week
@@ -127,6 +132,7 @@ with st.container(horizontal=True, vertical_alignment="bottom", horizontal_align
 with st.spinner("Fetching staging server data...", show_time=True):
     servers_df, error = fetch_lxc_servers_data()
     host_memory_stats, host_memory_error = fetch_host_memory_stats()
+    owners = fetch_server_owners()  # {container_name: github_login}, best-effort
 
 # Handle errors
 if error:
@@ -158,10 +164,10 @@ with st.container(horizontal=True, border=True):
         label="Running",
         value_key="running_servers",
     )
-    # Number of stopped servers
+    # Number of idle (stopped) servers
     st_metric_int(
         stats=stats,
-        label="Stopped",
+        label="Idle",
         value_key="stopped_servers",
         delta_color="inverse",
     )
@@ -188,193 +194,207 @@ with st.container(horizontal=True, border=True):
         last_stat_key="servers_metric_swap",
     )
 
-# Prepare data for display
-display_df = prepare_display_dataframe(servers_df)
+# Enrich with owner derived from the GitHub PR author (best-effort, may be blank)
+servers_df["owner"] = servers_df["name"].map(owners).fillna("")
 
 # Filter controls
 st.subheader("🖥️ Staging Servers")
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    status_filter = st.selectbox("Status", options=["All", "Running", "Stopped"], index=0)
+    status_filter = st.selectbox("Status", options=["All", "Running", "Idle"], index=0)
 
 with col2:
-    # Extract unique origins for filter
-    all_origins = servers_df["origin"].unique()
-    origin_filter = st.multiselect("Origins", options=sorted(all_origins), default=[])
+    all_owners = [o for o in servers_df["owner"].unique() if o]
+    owner_filter = st.multiselect("Owners", options=sorted(all_owners), default=[])
 
 with col3:
-    # Extract unique branches for filter (excluding full container names)
-    all_branches = servers_df["branch"].unique()
-    branch_filter = st.multiselect("Branches", options=sorted(all_branches), default=[])
+    all_origins = [o for o in servers_df["origin"].unique() if isinstance(o, str)]
+    origin_filter = st.multiselect("Origins", options=sorted(set(all_origins)), default=[])
+
+with col4:
+    branch_query = st.text_input("Search branch", placeholder="filter by branch name…")
 
 # Apply filters
-filtered_df = display_df.copy()
+filtered_df = servers_df.copy()
 
-# Status filter
 if status_filter != "All":
-    status_symbol = "🟢" if status_filter == "Running" else "🔴"
-    filtered_df = filtered_df[filtered_df["Status"] == status_symbol]
+    filtered_df = filtered_df[filtered_df["status_label"] == status_filter]
 
-# Origin filter
+if owner_filter:
+    filtered_df = filtered_df[filtered_df["owner"].isin(owner_filter)]
+
 if origin_filter:
-    # Map back to original server data for filtering
-    origin_mask = servers_df["origin"].isin(origin_filter)
-    filtered_df = filtered_df[origin_mask]
+    filtered_df = filtered_df[filtered_df["origin"].isin(origin_filter)]
 
-# Branch filter
-if branch_filter:
-    # Map back to original server data for filtering
-    branch_mask = servers_df["branch"].isin(branch_filter)
-    filtered_df = filtered_df[branch_mask]
+if branch_query:
+    filtered_df = filtered_df[filtered_df["branch"].str.contains(branch_query, case=False, na=False)]
 
 # Display filtered results count
-if len(filtered_df) != len(display_df):
-    st.info(f"Showing {len(filtered_df)} of {len(display_df)} servers")
+if len(filtered_df) != len(servers_df):
+    st.caption(f"Showing {len(filtered_df)} of {len(servers_df)} servers")
 
-# Display data table
+
+def _run_action(label: str, action_fn, server_name: str, spinner_msg: str) -> None:
+    """Run a (non-destructive) server action with a spinner, then refresh the dashboard."""
+    with st.spinner(spinner_msg, show_time=True):
+        success, message = action_fn(server_name)
+    if success:
+        st.toast(f"✅ {message}", icon="✅")
+        st.cache_data.clear()
+        st.rerun()
+    else:
+        st.error(f"❌ {label} failed: {message}")
+
+
+def _confirm_destructive_action(
+    title: str, bullets: list[str], warning: str, button_label: str, action_fn, server_name: str, spinner_msg: str
+) -> None:
+    """Open a confirmation dialog for a destructive action (Reset MySQL / Destroy)."""
+
+    @st.dialog(title)
+    def _dialog():
+        st.markdown(f"**Server:** `{server_name}`")
+        st.markdown("**This will:**")
+        for bullet in bullets:
+            st.markdown(f"- {bullet}")
+        st.warning(warning)
+
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("❌ Cancel", width="stretch", key=f"cancel_{title}_{server_name}"):
+                st.rerun()
+        with c2:
+            if st.button(button_label, type="primary", width="stretch", key=f"go_{title}_{server_name}"):
+                with st.spinner(spinner_msg, show_time=True):
+                    success, message = action_fn(server_name)
+                if success:
+                    st.success(f"✅ {message}")
+                    st.cache_data.clear()
+                else:
+                    st.error(f"❌ {message}")
+
+    _dialog()
+
+
+def render_server(server) -> None:
+    """Render one staging server as an expander with metadata, links and actions."""
+    branch = server["branch"]
+    server_name = server["name"]
+    status_label = server["status_label"]
+    is_running = server["status"] == "Running"
+    owner = server["owner"] or "—"
+
+    memory = server["memory_used_gb"]
+    memory_str = f"{memory:.1f} GB" if pd.notna(memory) else "—"
+    age = server["days_old"]
+    age_str = f"{int(age)}d" if pd.notna(age) else "—"
+
+    header = f"{server['status_indicator']} **{branch}** · {status_label} · 👤 {owner} · 💾 {memory_str} · 🕒 {age_str}"
+    with st.expander(header):
+        # Metadata line
+        st.markdown(
+            f"**Owner:** {owner} &nbsp;|&nbsp; **Origin:** {server['origin']} &nbsp;|&nbsp; "
+            f"**Last commit:** {server['unified_commit']} &nbsp;|&nbsp; **Age:** {age_str}"
+        )
+
+        # Quick links (same set owidbot posts on each PR)
+        links = build_quick_links(branch)
+        st.markdown(" · ".join(f"[{label}]({url})" for label, url in links.items()))
+        st.code(f"ssh owid@{server_name}", language="bash")
+
+        # Actions
+        if is_running:
+            c1, c2, c3, c4 = st.columns(4)
+            with c1:
+                if st.button(
+                    "⏸️ Make idle",
+                    width="stretch",
+                    key=f"idle_{server_name}",
+                    help="Snapshot, then stop the server to free resources. Data is preserved; wake it anytime.",
+                ):
+                    _run_action("Make idle", stop_server, server_name, "Snapshotting and stopping server…")
+            with c2:
+                if st.button(
+                    "🔄 Restart", width="stretch", key=f"restart_{server_name}", help="Stop and start the server again."
+                ):
+                    _run_action("Restart", restart_server, server_name, "Restarting server…")
+            with c3:
+                if st.button(
+                    "🗄️ Reset MySQL",
+                    width="stretch",
+                    key=f"mysql_{server_name}",
+                    help="Drop and reimport the staging database from master (~5 min).",
+                ):
+                    _confirm_destructive_action(
+                        title=f"Reset MySQL: {branch}",
+                        bullets=[
+                            "Purge R2 files for this server from owid-api-staging",
+                            "Run `make refresh` in the owid-grapher directory",
+                            "Drop and recreate the MySQL database",
+                            "Import the latest data from staging",
+                        ],
+                        warning="⏱️ Takes ~5 minutes. All current DB data including charts and indicators will be lost!",
+                        button_label="🗄️ Reset MySQL",
+                        action_fn=reset_mysql_database,
+                        server_name=server_name,
+                        spinner_msg="Resetting MySQL database… This may take 5 minutes",
+                    )
+            with c4:
+                if st.button(
+                    "💥 Destroy",
+                    width="stretch",
+                    key=f"destroy_{server_name}",
+                    help="Delete the container entirely. Recreated on the next commit to this branch.",
+                ):
+                    _confirm_destructive_action(
+                        title=f"Destroy server: {branch}",
+                        bullets=[
+                            "**DELETE** the entire container including all data",
+                            "Pushing a new commit triggers server recreation",
+                        ],
+                        warning="💥 This destroys the container and all its data!",
+                        button_label="💥 Destroy server",
+                        action_fn=destroy_server,
+                        server_name=server_name,
+                        spinner_msg="Destroying server…",
+                    )
+        else:
+            # Idle server: the key action is waking it up (no commit needed).
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button(
+                    "☀️ Wake up",
+                    type="primary",
+                    width="stretch",
+                    key=f"wake_{server_name}",
+                    help="Start the server again. Data is preserved — this takes seconds, no commit required.",
+                ):
+                    _run_action("Wake up", start_server, server_name, "Waking server up…")
+            with c2:
+                if st.button(
+                    "💥 Destroy",
+                    width="stretch",
+                    key=f"destroy_{server_name}",
+                    help="Delete the container entirely. Recreated on the next commit to this branch.",
+                ):
+                    _confirm_destructive_action(
+                        title=f"Destroy server: {branch}",
+                        bullets=[
+                            "**DELETE** the entire container including all data",
+                            "Pushing a new commit triggers server recreation",
+                        ],
+                        warning="💥 This destroys the container and all its data!",
+                        button_label="💥 Destroy server",
+                        action_fn=destroy_server,
+                        server_name=server_name,
+                        spinner_msg="Destroying server…",
+                    )
+
+
+# Display servers as expandable rows
 if filtered_df.empty:
     st.warning("No servers match the current filters.")
 else:
-    # Display the table with custom column configuration
-    st.dataframe(
-        filtered_df,
-        width="stretch",
-        column_config={
-            "Status": st.column_config.TextColumn("Status", help="Server running status", width="small"),
-            "Origin": st.column_config.TextColumn("Origin", help="Server origin (etl, grapher, etc.)", width="small"),
-            "Branch": st.column_config.TextColumn(
-                "Branch", help="Git branch name (staging-site- prefix removed)", width="medium"
-            ),
-            "Memory": st.column_config.ProgressColumn(
-                "Memory",
-                help="Memory usage with progress bar showing GB values",
-                min_value=0,
-                max_value=20,  # Set reasonable max for progress bar visualization
-                format="%.1f GB",
-                width="medium",
-            ),
-            "Age (days)": st.column_config.NumberColumn(
-                "Age (days)", help="Days since container was created", format="%d days", width="small"
-            ),
-            "Last Commit": st.column_config.TextColumn(
-                "Last Commit", help="Most recent relevant commit based on server origin", width="medium"
-            ),
-        },
-        hide_index=True,
-        height=600,
-    )
-
-    # Server Management section
-    st.subheader("🔧 Server Management")
-
-    # Server selection
-    server_options = ["Select a server..."] + filtered_df["Branch"].tolist()
-    selected_server_branch = st.selectbox("Select server:", options=server_options, key="server_select")
-
-    if selected_server_branch != "Select a server...":
-        selected_server = filtered_df[filtered_df["Branch"] == selected_server_branch].iloc[0]
-        server_name = f"staging-site-{selected_server['Branch']}"
-
-        # Server info
-        st.info(f"**Selected:** `{selected_server['Branch']}` ({selected_server['Status']})")
-
-        # Action buttons
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            if st.button("🗄️ Reset MySQL", width="stretch"):
-
-                @st.dialog(f"Reset MySQL: {selected_server['Branch']}")
-                def show_mysql_reset_modal():
-                    st.markdown("⚠️ **You are about to reset the MySQL database:**")
-                    st.markdown(f"**Server:** `{server_name}`")
-
-                    st.markdown("---")
-                    st.markdown("**This will:**")
-                    st.markdown("- Purge R2 files for this server from owid-api-staging")
-                    st.markdown("- Run `make refresh` in the owid-grapher directory")
-                    st.markdown("- Drop and recreate the MySQL database")
-                    st.markdown("- Import the latest data from staging")
-
-                    st.warning("⏱️ **This process takes about 5 minutes to complete!**")
-                    st.error("⚠️ **All current database data including charts and indicators will be lost!**")
-
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button("❌ Cancel", width="stretch"):
-                            st.rerun()
-                    with col2:
-                        if st.button("🗄️ Reset MySQL", type="primary", width="stretch"):
-                            with st.spinner("Resetting MySQL database... This may take 5 minutes", show_time=True):
-                                success, message = reset_mysql_database(server_name)
-
-                            if success:
-                                st.success(f"✅ {message}")
-                                st.info("🎉 MySQL database has been refreshed with the latest data!")
-                                # Clear cache to refresh data on next load
-                                st.cache_data.clear()
-                            else:
-                                st.error(f"❌ MySQL reset failed: {message}")
-                                st.info("Please check the server logs or try again later.")
-
-                show_mysql_reset_modal()
-
-        with col2:
-            if st.button("💥 Destroy Server", type="secondary", width="stretch"):
-
-                @st.dialog(f"Destroy Server: {selected_server['Branch']}")
-                def show_destroy_modal():
-                    st.markdown("💥 **You are about to DESTROY the staging server:**")
-                    st.markdown(f"**Server:** `{server_name}`")
-
-                    st.markdown("---")
-                    st.markdown("**This will:**")
-                    st.markdown("- **DELETE** the entire container including all data")
-                    st.markdown("- Pushing a new commit triggers server recreation")
-
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button("❌ Cancel", width="stretch"):
-                            st.rerun()
-                    with col2:
-                        if st.button("💥 DESTROY SERVER", type="primary", width="stretch"):
-                            with st.spinner("Destroying server...", show_time=True):
-                                success, message = destroy_server(server_name)
-
-                            if success:
-                                st.success(f"✅ {message}")
-                                st.info(
-                                    "Server has been completely destroyed. It will be recreated on the next commit to this branch."
-                                )
-                                # Clear cache to refresh data on next load
-                                st.cache_data.clear()
-                                # Wait a moment then refresh the page
-                                import time
-
-                                time.sleep(2)
-                                st.rerun()
-                            else:
-                                st.error(f"❌ Server destruction failed: {message}")
-                                st.info("Please check the server status or try again later.")
-
-                show_destroy_modal()
-
-        with col3:
-            # st.markdown("**Quick Access:**")
-            pass
-
-        # Connection info
-        st.markdown("---")
-        st.markdown("**🔗 Connection Commands:**")
-
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("**MySQL Access:**")
-            mysql_cmd = f"mysql -h {server_name} -u owid --port 3306 -D owid"
-            st.code(mysql_cmd, language="bash")
-
-        with col2:
-            st.markdown("**SSH Access:**")
-            ssh_cmd = f"ssh owid@{server_name}"
-            st.code(ssh_cmd, language="bash")
+    for _, server in filtered_df.iterrows():
+        render_server(server)
