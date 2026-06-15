@@ -1,7 +1,6 @@
 """Utilities for fetching and processing LXC staging server data."""
 
 import json
-import re
 import subprocess
 from datetime import datetime, timezone
 from typing import Any
@@ -19,11 +18,6 @@ log = get_logger()
 # LXC host that staging servers live on. The fetch/destroy/stop/start commands all
 # target this host (matching ops/templates/lxc-manager/*), so keep it in one place.
 LXC_HOST = "gaia-1"
-
-# Graphite (graphite.dev) creates transient `graphite-base-<PR-number>` base branches when
-# stacking PRs. A push to one spins up a staging server, but the base branch has no PR of its
-# own, so the owner must be looked up from owid-grapher PR #<number> instead.
-GRAPHITE_BASE_RE = re.compile(r"^graphite-base-(\d+)$")
 
 
 @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
@@ -173,10 +167,8 @@ def _process_server_data(df: pd.DataFrame) -> pd.DataFrame:
     # Extract branch name from container name (remove 'staging-site-' prefix)
     df["branch"] = df["name"].str.replace("staging-site-", "", regex=False)
 
-    # Parse memory information
+    # Parse memory information (only "used" is shown in the table)
     df["memory_used_gb"] = df["memory"].apply(_extract_memory_used_gb)
-    df["memory_total_gb"] = df["memory"].apply(_extract_memory_total_gb)
-    df["memory_usage_pct"] = df.apply(_calculate_memory_usage_pct, axis=1)
 
     # Parse creation time
     df["created_parsed"] = pd.to_datetime(df["created"], errors="coerce")
@@ -231,26 +223,6 @@ def _extract_memory_used_gb(memory_info: dict) -> float | None:
         return None
 
 
-def _extract_memory_total_gb(memory_info: dict) -> float | None:
-    """Extract total memory in GB from memory info dict."""
-    try:
-        if isinstance(memory_info, dict) and "total_mb" in memory_info:
-            return round(memory_info["total_mb"] / 1024, 2)
-        return None
-    except (TypeError, KeyError):
-        return None
-
-
-def _calculate_memory_usage_pct(row: pd.Series) -> float | None:
-    """Calculate memory usage percentage."""
-    try:
-        if pd.isna(row["memory_used_gb"]) or pd.isna(row["memory_total_gb"]) or row["memory_total_gb"] == 0:
-            return None
-        return round((row["memory_used_gb"] / row["memory_total_gb"]) * 100, 1)
-    except (TypeError, ZeroDivisionError):
-        return None
-
-
 def _calculate_days_since_commit(commit_series: pd.Series) -> pd.Series:
     """Calculate days since commit for a series of commit timestamps."""
     now = datetime.now(timezone.utc)
@@ -284,17 +256,13 @@ def get_server_summary_stats(df: pd.DataFrame, host_memory_stats: dict | None = 
             "total_servers": 0,
             "running_servers": 0,
             "stopped_servers": 0,
-            "total_memory_gb": 0,
-            "host_memory_usage_pct": None,
+            "host_memory_stats": host_memory_stats,
         }
-
-    running_servers = df[df["status"] == "Running"]
 
     return {
         "total_servers": len(df),
-        "running_servers": len(running_servers),
+        "running_servers": len(df[df["status"] == "Running"]),
         "stopped_servers": len(df[df["status"] == "Stopped"]),
-        "total_memory_gb": running_servers["memory_used_gb"].sum() if not running_servers.empty else 0,
         "host_memory_stats": host_memory_stats,
     }
 
@@ -710,42 +678,3 @@ def fetch_server_owners() -> dict[str, str]:
             log.warning("Could not fetch PR owners from GitHub", repo=repo_name, error=str(e))
 
     return owners
-
-
-@st.cache_data(ttl=300, show_spinner=False)
-def fetch_graphite_owners(pr_numbers: tuple[int, ...]) -> dict[int, str]:
-    """
-    Resolve the owner of ``graphite-base-<N>`` servers to the author of owid-grapher PR #N.
-
-    These transient Graphite base branches have no PR of their own, so they're never matched
-    by :func:`fetch_server_owners`. We look up PR #N directly. Best-effort: silently skips any
-    number that can't be resolved.
-
-    Args:
-        pr_numbers: PR numbers to resolve (the ``<N>`` from each ``graphite-base-<N>`` server).
-
-    Returns:
-        Dict mapping PR number to GitHub login.
-    """
-    out: dict[int, str] = {}
-    headers = {"Authorization": f"token {OWIDBOT_ACCESS_TOKEN}"} if OWIDBOT_ACCESS_TOKEN else {}
-    for number in pr_numbers:
-        # Graphite is used on owid-grapher; check it first, fall back to etl just in case.
-        for repo_name in ("owid-grapher", "etl"):
-            try:
-                response = requests.get(
-                    f"https://api.github.com/repos/owid/{repo_name}/issues/{number}", headers=headers, timeout=30
-                )
-                if response.status_code != 200:
-                    continue
-                issue = response.json()
-                # issues endpoint also returns issues; only PRs have this key.
-                if "pull_request" not in issue:
-                    continue
-                login = (issue.get("user") or {}).get("login")
-                if login:
-                    out[number] = login
-                    break
-            except requests.RequestException as e:
-                log.warning("Could not resolve graphite-base owner", repo=repo_name, pr=number, error=str(e))
-    return out
