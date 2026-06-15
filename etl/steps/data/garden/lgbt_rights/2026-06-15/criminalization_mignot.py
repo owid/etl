@@ -26,7 +26,7 @@ DATA_COLUMNS = [
 
 # Define years
 START_YEAR = 1760
-END_YEAR = 2026  # Status reported through 2026 (release year); each country's latest status is carried forward. Most recent events are from 2025.
+END_YEAR = 2025  # Latest year in the data; the status is current as of the June 2026 release
 
 
 def run() -> None:
