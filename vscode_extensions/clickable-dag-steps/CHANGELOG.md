@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.0.6] – 2026-06-15
+- Open clicked step files as pinned tabs instead of preview tabs.
+
 ## [0.0.5] – 2026-06-01
 - Support YAML-only export steps by linking DAG entries to adjacent `.config.yml` files when no `.py` file exists.
 

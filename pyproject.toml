@@ -5,6 +5,7 @@ description = ""
 authors = [{ name = "Our World in Data", email = "tech@ourworldindata.org" }]
 requires-python = ">=3.10, <3.14"
 dependencies = [
+    "owid-owl",
     "click>=8.0.1",
     "PyYAML>=6.0.1",
     "jupyterlab>=3.1.13",
@@ -24,7 +25,7 @@ dependencies = [
     "tenacity>=8.0.1",
     "simplejson>=3.17.6",
     "xlrd>=2.0.1",
-    "PyPDF2>=2.11.1",
+    "pypdf>=3.9.0",
     "ruamel.yaml>=0.17.21",
     "gitpython>=3.1.50",
     "rapidfuzz>=2.13.7",
@@ -68,7 +69,7 @@ dependencies = [
     # Upgraded to FastMCP 3.0 beta for new component/provider architecture, timeouts, versioning
     "fastmcp>=3.2.0",
     "pyproj>=3.7.1",
-    "pydantic-ai-slim[anthropic,fastmcp,google,mcp,openai]>=1.40.0",
+    "pydantic-ai-slim[anthropic,fastmcp,google,mcp,openai]>=1.99.0",
     "metabase-api>=3.5.2",
     "codespell>=2.4.1",
     "zensical>=0.0.15",
@@ -89,6 +90,7 @@ dependencies = [
 exclude-newer = "3 days"
 
 [tool.uv.sources]
+owid-owl = { path = "lib/owl", editable = true }
 owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
 owid-repack = { path = "lib/repack", editable = true }
@@ -162,6 +164,7 @@ wizard = [
 
 [project.scripts]
 etl = 'apps.cli:cli'
+owl = 'owl.cli:cli'
 etlwiz = 'apps.wizard.cli:cli'
 etlr = 'etl.command:main_cli'
 etls = 'etl.snapshot_command:snapshot_cli'
@@ -212,6 +215,13 @@ unused-type-ignore-comment = "ignore"
 unused-ignore-comment = "ignore"
 call-top-callable = "ignore"
 possibly-missing-submodule = "ignore"
+
+[tool.owl]
+steps-dir = "owl_steps"
+snapshots-dir = "data/snapshots"
+snapshots-r2-remote = "r2:owid-snapshots"
+data-dir = "data"
+default-channel = "garden"
 
 [tool.pytest.ini_options]
 markers = [

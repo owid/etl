@@ -320,7 +320,11 @@ export function activate(context: vscode.ExtensionContext) {
         const link = new vscode.DocumentLink(range);
 
         if (fullPath) {
-          link.target = vscode.Uri.file(fullPath);
+          // Route through our own command so the file opens as a normal
+          // (pinned) tab instead of a preview tab.
+          link.target = vscode.Uri.parse(
+            `command:clickable-dag-steps.openStepFile?${encodeURIComponent(JSON.stringify([fullPath]))}`
+          );
         }
 
         // Build tooltip with status information based on the exact same rules
@@ -577,6 +581,15 @@ function getLineStart(document: vscode.TextDocument, position: vscode.Position):
 }
 
   context.subscriptions.push(
+    vscode.commands.registerCommand('clickable-dag-steps.openStepFile', async (fsPath: string) => {
+      try {
+        const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(fsPath));
+        await vscode.window.showTextDocument(doc, { preview: false });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        vscode.window.showErrorMessage(`Could not open step file ${fsPath}: ${msg}`);
+      }
+    }),
     vscode.languages.registerDocumentLinkProvider({ language: 'yaml', scheme: 'file' }, linkProvider)
   );
 

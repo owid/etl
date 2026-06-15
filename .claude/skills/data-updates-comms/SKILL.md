@@ -257,7 +257,7 @@ Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if a
 
 ## How many charts did this update affect?
 
-<N> published charts (<size qualifier>).
+<N> published charts (<size qualifier>)<; if update-context.yml lists published explorers/MDims, fold them in too — e.g. "10 published charts (moderate), plus 3 explorers and 1 MDim">.
 
 ## What does this dataset help our users understand about the world, and why is it important they know that?
 
@@ -305,7 +305,7 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 ## Critical rules
 
 - **Never invent dates, producer names, or chart counts.** If the source is missing or stale, mark `[missing]` and stop on that line — don't paper over a gap.
-- **Published charts only** for the chart count. Same rule as `update-dataset` step 8.
+- **Published charts only** for the chart count. Same rule as `update-dataset` step 8 — and the same for the other surfaces it records: only explorers with `isPublished=1` and MDims with `published=1` (from `charts.explorers` / `charts.mdims` in `update-context.yml`) count toward the announcement. Note unpublished/draft ones under `## Pending mechanical follow-ups`, not in the answer.
 - **Don't write the editorial fields as prose.** The user explicitly does not want LLM-voiced "Why we have this data" text — that's exactly the part the human wants to write themselves. Output snippets, not prose.
 - **Don't post to Slack from the skill.** Output a Markdown file and stop. Posting is a human action.
 - **Use `urllib.parse.quote_plus`** (not `quote`) for the search URL — Slack's input expects `+` for spaces in `datasetProducts`.

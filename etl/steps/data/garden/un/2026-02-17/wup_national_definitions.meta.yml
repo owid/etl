@@ -1,4 +1,3 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     presentation:
@@ -6,120 +5,207 @@ definitions:
         note: Because the estimates of city and metropolitan areas are based on national definitions of what constitutes a city or metropolitan area, cross-country comparisons should be made with caution.
       topic_tags:
         - Urbanization
-    processing_level: major
-  description_key_common: &description_key_common
-  - |-
-    Countries classify their territory into urban and rural areas using their
-    own criteria. Some base this on administrative status; others use
-    population thresholds, density, employment structure, or some combination.
-    Because these criteria vary so widely, similar places can be classified
-    differently from one country to the next.
-  - |-
-    The UN has historically collected data using each country's own definition,
-    which reflects how governments plan and maintain continuity with earlier
-    statistics. But it means the figures do not always measure the same thing
-    across countries.
-  - |-
-    For international comparisons, the UN's 2025 revision adopted the
-    [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php)
-    framework alongside its traditional national-definitions estimates. DEGURBA
-    applies the same population density and settlement size thresholds
-    everywhere, so that similar places are classified consistently regardless
-    of which country they are in. Our charts using
+    processing_level: minor
+
+  national_definition_key: &national_definition_key >-
+    Countries classify areas as urban or rural using their own criteria, such as
+    administrative boundaries, population size or density, economic activity, or some
+    combination of these. As a result, similar settlements can be classified
+    differently across countries.
+
+  national_definition_breaks_key: &national_definition_breaks_key >-
+    Definitions can also change within a country over time, creating breaks in the
+    series that reflect reclassification rather than real changes in where people live.
+
+  wup_estimation_key: &wup_estimation_key >-
+    Values are reported for every year, but the underlying censuses occur roughly once a
+    decade; intervening years are interpolated rather than directly observed.
+
+  degurba_comparison_key: &degurba_comparison_key >-
+    The [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php)
+    classifies settlements by population density and size using harmonized definitions
+    across countries, making it better suited for cross-country comparisons. Our charts using
     [DEGURBA data](https://ourworldindata.org/search?datasetProducts=Global+Human+Settlement+Layer+Dataset)
-    are a better choice when comparing across countries.
+    use this harmonized standard.
+
+  wup_method_projections_key: &wup_method_projections_key |-
+    <% if data_type == "projections" %>The UN produces these projections by applying its modelled urban population share to medium-variant total population projections; rural population is the remainder.<% endif %>
+
+  wup_population_growth_key: &wup_population_growth_key |-
+    <% if area_type == "urban" %>Urban population growth can reflect births and deaths among urban residents, rural-to-urban migration, and the reclassification of settlements from rural to urban. This indicator does not separate these factors.
+    <% elif area_type == "rural" %>Rural population change can reflect births and deaths among rural residents, rural-to-urban migration, and the reclassification of settlements from rural to urban. This indicator does not separate these factors.
+    <% else %>Total population growth reflects births, deaths, and international migration. This indicator does not separate these factors.
+    <% endif %>
+
+  wup_share_growth_key: &wup_share_growth_key |-
+    <% if area_type == "urban" %>A positive value means the share of the population living in urban areas is increasing; a negative value means it is declining.
+    <% elif area_type == "rural" %>A positive value means the share of the population living in rural areas is increasing; a negative value means it is declining.
+    <% else %>A positive value means this population share is increasing; a negative value means it is declining.
+    <% endif %>
+
+  hyde_combined_key: &hyde_combined_key >-
+    From 1950 onward, this indicator uses the UN World Urbanization Prospects, based on
+    each country's own definition of urban and rural areas. For earlier years, it draws
+    on HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction
+    of historical settlement patterns rather than direct observations.
+
+  hyde_combined_with_projections_key: &hyde_combined_with_projections_key >-
+    From 1950 to 2025, this indicator uses estimates from the UN World Urbanization
+    Prospects, based on each country's own definition of urban and rural areas. From
+    2025 onward, it uses UN projections. For years before 1950, it draws on HYDE v3.3
+    (History Database of the Global Environment), a modelled reconstruction of
+    historical settlement patterns rather than direct observations.
+
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 1825  # Every 5 years (UN WUP is typically updated biennially)
-  title: World Urbanization Prospects - National Definitions
-
-
+  update_period_days: 365
   owners:
     - Veronika Samborska
+
 tables:
   wup_urban_rural_population:
     variables:
       population:
-        title: <% if area_type == "urban" %>Urban population<% elif area_type == "rural" %>Rural population<% else %>Total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
+        title: |-
+          <% if area_type == "urban" %>Urban population by national definition
+          <% elif area_type == "rural" %>Rural population by national definition
+          <% else %>Total population
+          <% endif %><% if data_type == "projections" %> (projections)<% endif %>
         unit: people
         short_unit: ''
-        description_short: <% if area_type == "urban" %>Population living in areas defined as urban by national criteria<% elif area_type == "rural" %>Population living in areas defined as rural by national criteria<% else %>Total population (sum of urban and rural)<% endif %><% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
+        description_short: |-
+          <% if area_type == "urban" %><% if data_type == "projections" %>Projected number of people living in areas classified as urban, based on each country's national definition.
+          <% else %>Number of people living in areas classified as urban, based on each country's national definition.
+          <% endif %><% elif area_type == "rural" %><% if data_type == "projections" %>Projected number of people living in areas classified as rural, based on each country's national definition.
+          <% else %>Number of people living in areas classified as rural, based on each country's national definition.
+          <% endif %><% else %><% if data_type == "projections" %>Projected total population, as reported by the UN World Urbanization Prospects.
+          <% else %>Total population, as reported by the UN World Urbanization Prospects.
+          <% endif %><% endif %>
         description_key:
-          - *description_key_common
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *wup_method_projections_key
+          - *degurba_comparison_key
+        description_processing: |-
+          The UN source reports population in thousands. We converted these values to people. These estimates follow national definitions to preserve continuity with official statistics and earlier editions of the UN World Urbanization Prospects.
         display:
           numDecimalPlaces: 0
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
-          name: <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
+          name: <% if area_type == "urban" %>Urban<% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
         presentation:
-          title_public: <% if area_type == "urban" %>Urban population<% elif area_type == "rural" %>Rural population<% else %>Total population<% endif %>
+          title_public: |-
+            <% if area_type == "urban" %>Urban population
+            <% elif area_type == "rural" %>Rural population
+            <% else %>Total population
+            <% endif %>
           title_variant: UN national definitions
 
-
       share:
-        title: <% if area_type == "urban" %>Percentage of population living in urban areas<% elif area_type == "rural" %>Percentage of population living in rural areas<% else %>Share of total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
+        title: |-
+          <% if area_type == "urban" %>Share of the population living in urban areas by national definition
+          <% elif area_type == "rural" %>Share of the population living in rural areas by national definition
+          <% else %>Population share
+          <% endif %><% if data_type == "projections" %> (projections)<% endif %>
         unit: '%'
         short_unit: '%'
-        description_short: <% if area_type == "urban" %>Share of total population living in urban areas, based on each country's national definition<% elif area_type == "rural" %>Share of total population living in rural areas, based on each country's national definition<% else %>Percentage of total population<% endif %><% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
+        description_short: |-
+          <% if area_type == "urban" %><% if data_type == "projections" %>Projected share of the population living in areas classified as urban, based on each country's national definition.
+          <% else %>Share of the population living in areas classified as urban, based on each country's national definition.
+          <% endif %><% elif area_type == "rural" %><% if data_type == "projections" %>Projected share of the population living in areas classified as rural, based on each country's national definition.
+          <% else %>Share of the population living in areas classified as rural, based on each country's national definition.
+          <% endif %><% else %><% if data_type == "projections" %>Projected share of the total population in this area category, as reported by the UN World Urbanization Prospects.
+          <% else %>Share of the total population in this area category, as reported by the UN World Urbanization Prospects.
+          <% endif %><% endif %>
         description_key:
-          - *description_key_common
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *wup_method_projections_key
+          - *degurba_comparison_key
         display:
           numDecimalPlaces: 1
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
-          name: <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
+          name: <% if area_type == "urban" %>Urban<% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
         presentation:
-          title_public: <% if area_type == "urban" %>Share of population living in urban areas<% elif area_type == "rural" %>Share of population living in rural areas<% else %>Share of total population<% endif %>
+          title_public: |-
+            <% if area_type == "urban" %>Share of population living in urban areas
+            <% elif area_type == "rural" %>Share of population living in rural areas
+            <% else %>Share of total population
+            <% endif %>
           title_variant: UN national definitions
 
       growth_rate:
-        title: <% if area_type == "urban" %>Average annual rate of change of urban population<% elif area_type == "rural" %>Average annual rate of change of rural population<% else %>Average annual rate of change of total population<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
+        title: |-
+          <% if area_type == "urban" %>Average annual rate of change of the urban population by national definition
+          <% elif area_type == "rural" %>Average annual rate of change of the rural population by national definition
+          <% else %>Average annual rate of change of the total population
+          <% endif %><% if data_type == "projections" %> (projections)<% endif %>
         unit: '%'
         short_unit: '%'
-        description_short: Average annual population growth rate as a percentage<% if area_type == "urban" %> for urban areas<% elif area_type == "rural" %> for rural areas<% endif %>. Positive values indicate population growth; negative values indicate decline<% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
+        description_short: |-
+          <% if data_type == "projections" %>Projected average annual rate of change of the <% else %>Average annual rate of change of the <% endif %><% if area_type == "urban" %>urban<% elif area_type == "rural" %>rural<% else %>total<% endif %> population.
         description_key:
-          - *description_key_common
-          - Growth rates are calculated as the average annual rate of change between census years or projection periods, typically 5-year intervals.
-          - Urban growth rates are typically higher than rural rates due to both natural increase and rural-to-urban migration.
+          - Each value is the average annual rate of change over the preceding five-year period. For example, the value shown for 2015 covers 2010 to 2015.
+          - *wup_population_growth_key
+          - *national_definition_key
+          - *wup_estimation_key
+          - *wup_method_projections_key
+          - *degurba_comparison_key
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
-          name: <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
+          name: <% if area_type == "urban" %>Urban<% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
         presentation:
-          title_public: <% if area_type == "urban" %>Average annual rate of change of urban population<% elif area_type == "rural" %>Average annual rate of change of rural population<% else %>Average annual rate of change of total population<% endif %>
+          title_public: |-
+            <% if area_type == "urban" %>Average annual rate of change of the urban population
+            <% elif area_type == "rural" %>Average annual rate of change of the rural population
+            <% else %>Average annual rate of change of the total population
+            <% endif %>
           title_variant: UN national definitions
 
       share_growth_rate:
-
-        title: <% if area_type == "urban" %>Average annual rate of change of percentage urban<% elif area_type == "rural" %>Average annual rate of change of percentage rural<% else %>Average annual rate of change of population share<% endif %><% if data_type == "projections" %> (projections)<% elif data_type == "estimates" %> (estimates)<% endif %> by national definition
+        title: |-
+          <% if area_type == "urban" %>Average annual rate of change of the urban share by national definition
+          <% elif area_type == "rural" %>Average annual rate of change of the rural share by national definition
+          <% else %>Average annual rate of change of the population share
+          <% endif %><% if data_type == "projections" %> (projections)<% endif %>
         unit: '%'
         short_unit: '%'
-        description_short: <% if area_type == "urban" %>The average exponential rate of change is the constant annual growth rate (expressed as a percent) that would take the urban population share from its initial value to its final value over a given period. Positive values indicate urbanization (increasing urban share); negative values indicate declining urban share<% elif area_type == "rural" %>The average exponential rate of change is the constant annual growth rate (expressed as a percent) that would take the rural population share from its initial value to its final value over a given period. Positive values indicate an increasing rural share (de-urbanization); negative values indicate declining rural share (urbanization)<% else %>The average exponential rate of change is the constant annual growth rate (expressed as a percent) that would take the population share from its initial value to its final value over a given period<% endif %><% if data_type == "projections" %> (projected values)<% elif data_type == "estimates" %> (historical estimates)<% endif %>.
+        description_short: |-
+          <% if data_type == "projections" %>Projected average annual rate of change of the <% else %>Average annual rate of change of the <% endif %><% if area_type == "urban" %>share of the population living in areas classified as urban<% elif area_type == "rural" %>share of the population living in areas classified as rural<% else %>population share<% endif %>.
         description_key:
-          - '*description_key_common'
-          - <% if area_type == "rural" %>For rural areas, positive values indicate an increasing rural share (de-urbanization), while negative values indicate declining rural share (urbanization).<% else %>Changes in these shares reflect both differential population growth rates and migration between urban and rural areas.<% endif %>
+          - This indicator captures the pace at which the <% if area_type == "urban" %>urban<% elif area_type == "rural" %>rural<% else %>population<% endif %> share is shifting. Each value is the average annual change over the preceding five-year period.
+          - *wup_share_growth_key
+          - *national_definition_key
+          - *wup_method_projections_key
+          - *degurba_comparison_key
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 1
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
-          name: <% if area_type == "urban" %>Urban <% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
+          name: <% if area_type == "urban" %>Urban<% elif area_type == "rural" %>Rural<% else %>Total<% endif %>
         presentation:
-          title_public: <% if area_type == "urban" %>Average annual rate of change of percentage urban<% elif area_type == "rural" %>Average annual rate of change of percentage rural<% else %>Average annual rate of change of population share<% endif %>
+          title_public: |-
+            <% if area_type == "urban" %>Average annual rate of change of the urban share
+            <% elif area_type == "rural" %>Average annual rate of change of the rural share
+            <% else %>Average annual rate of change of the population share
+            <% endif %>
           title_variant: UN national definitions
 
   urban_share_with_hyde:
     variables:
       share:
-        title: Share of population living in urban areas – HYDE and UN national definitions combined
+        title: Share of population living in urban areas - HYDE and UN national definitions combined
         unit: '%'
         short_unit: '%'
-        description_short: Share of total population living in urban areas, based on national definitions, with historical estimates extending back to 10,000 BCE.
+        description_short: Share of the population living in areas classified as urban, combining UN estimates from 1950 onward with modelled historical data back to 10,000 BCE.
         description_key:
-          - *description_key_common
-          - |-
-            For years before 1950, this indicator uses the History Database of the Global Environment (HYDE v3.3), which provides consistent estimates of urban and rural population back to 10,000 BCE. HYDE derives urban population shares from historical population reconstructions combined with estimates of built-up area and settlement patterns.
-          - |-
-            HYDE and the UN World Urbanization Prospects use different methodologies to classify urban population, so there may be a discontinuity at the join point in 1950. The UN data reflects each country's own official definition of urban areas, while HYDE applies a modelled, historically consistent approach.
+          - *hyde_combined_key
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *degurba_comparison_key
         description_processing: |-
-          We combined two sources to extend the urban share series as far back as possible. For years before 1950, we use urban population share estimates from HYDE v3.3 (History Database of the Global Environment). From 1950 onward, we use the urban share based on each country's national definition of urban areas from the UN World Urbanization Prospects.
+          We combined two sources to extend the urban share series as far back as possible. For years before 1950, we use urban population share estimates from HYDE v3.3. From 1950 onward, we use the urban population share from the UN World Urbanization Prospects, based on each country's national definition.
         display:
           numDecimalPlaces: 1
         presentation:
@@ -127,18 +213,17 @@ tables:
           title_variant: UN national definitions, HYDE
 
       urban_population:
-        title: Urban population – HYDE and UN national definitions combined
+        title: Urban population - HYDE and UN national definitions combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in urban areas, based on national definitions, with historical estimates extending back to 10,000 BCE.
+        description_short: Number of people living in areas classified as urban, combining UN estimates from 1950 onward with modelled historical data back to 10,000 BCE.
         description_key:
-          - *description_key_common
-          - |-
-            For years before 1950, this indicator uses the History Database of the Global Environment (HYDE v3.3), which provides consistent estimates of urban and rural population back to 10,000 BCE.
-          - |-
-            HYDE and the UN World Urbanization Prospects use different methodologies to classify urban population, so there may be a discontinuity at the join point in 1950.
+          - *hyde_combined_key
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *degurba_comparison_key
         description_processing: |-
-          We combined two sources to extend the urban population series as far back as possible. For years before 1950, we use urban population estimates from HYDE v3.3. From 1950 onward, we use urban population from the UN World Urbanization Prospects based on each country's national definition. The UN source reports population in thousands; we converted to people to align with HYDE.
+          We combined two sources to extend the urban population series as far back as possible. For years before 1950, we use urban population estimates from HYDE v3.3. From 1950 onward, we use urban population from the UN World Urbanization Prospects, based on each country's national definition. The UN source reports population in thousands; we converted these values to people to align with HYDE.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -146,20 +231,75 @@ tables:
           title_variant: UN national definitions, HYDE
 
       rural_population:
-        title: Rural population – HYDE and UN national definitions combined
+        title: Rural population - HYDE and UN national definitions combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in rural areas, based on national definitions, with historical estimates extending back to 10,000 BCE.
+        description_short: Number of people living in areas classified as rural, combining UN estimates from 1950 onward with modelled historical data back to 10,000 BCE.
         description_key:
-          - *description_key_common
-          - |-
-            For years before 1950, this indicator uses the History Database of the Global Environment (HYDE v3.3), which provides consistent estimates of urban and rural population back to 10,000 BCE.
-          - |-
-            HYDE and the UN World Urbanization Prospects use different methodologies to classify rural population, so there may be a discontinuity at the join point in 1950.
+          - *hyde_combined_key
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *degurba_comparison_key
         description_processing: |-
-          We combined two sources to extend the rural population series as far back as possible. For years before 1950, we use rural population estimates from HYDE v3.3. From 1950 onward, we use rural population from the UN World Urbanization Prospects based on each country's national definition. The UN source reports population in thousands; we converted to people to align with HYDE.
+          We combined two sources to extend the rural population series as far back as possible. For years before 1950, we use rural population estimates from HYDE v3.3. From 1950 onward, we use rural population from the UN World Urbanization Prospects, based on each country's national definition. The UN source reports population in thousands; we converted these values to people to align with HYDE.
         display:
           numDecimalPlaces: 0
         presentation:
           title_public: Rural population
           title_variant: UN national definitions, HYDE
+
+  urban_share_with_hyde_and_projections:
+    variables:
+      share:
+        title: Share of population living in urban areas - HYDE, UN national definitions, and projections combined
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of the population living in areas classified as urban, combining UN estimates and projections with modelled historical data back to 10,000 BCE.
+        description_key:
+          - *hyde_combined_with_projections_key
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *degurba_comparison_key
+        description_processing: |-
+          We combined three sources to extend the urban share series through 2100. For years before 1950, we use urban population share estimates from HYDE v3.3. From 1950 to 2025, we use the urban population share from the UN World Urbanization Prospects, based on each country's national definition. From 2026 onward, we use UN projections.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of population living in urban areas
+          title_variant: UN national definitions, HYDE, with projections
+
+      urban_population:
+        title: Urban population - HYDE, UN national definitions, and projections combined
+        unit: people
+        short_unit: ''
+        description_short: Number of people living in areas classified as urban, combining UN estimates and projections with modelled historical data back to 10,000 BCE.
+        description_key:
+          - *hyde_combined_with_projections_key
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *degurba_comparison_key
+        description_processing: |-
+          We combined three sources to extend the urban population series through 2100. For years before 1950, we use urban population estimates from HYDE v3.3. From 1950 to 2025, we use urban population from the UN World Urbanization Prospects, based on each country's national definition. From 2026 onward, we use UN projections. The UN source reports population in thousands; we converted these values to people to align with HYDE.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Urban population
+          title_variant: UN national definitions, HYDE, with projections
+
+      rural_population:
+        title: Rural population - HYDE, UN national definitions, and projections combined
+        unit: people
+        short_unit: ''
+        description_short: Number of people living in areas classified as rural, combining UN estimates and projections with modelled historical data back to 10,000 BCE.
+        description_key:
+          - *hyde_combined_with_projections_key
+          - *national_definition_key
+          - *national_definition_breaks_key
+          - *degurba_comparison_key
+        description_processing: |-
+          We combined three sources to extend the rural population series through 2100. For years before 1950, we use rural population estimates from HYDE v3.3. From 1950 to 2025, we use rural population from the UN World Urbanization Prospects, based on each country's national definition. From 2026 onward, we use UN projections. The UN source reports population in thousands; we converted these values to people to align with HYDE.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Rural population
+          title_variant: UN national definitions, HYDE, with projections
