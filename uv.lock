@@ -1357,6 +1357,7 @@ dependencies = [
     { name = "openpyxl" },
     { name = "owid-catalog" },
     { name = "owid-datautils" },
+    { name = "owid-owl" },
     { name = "owid-repack" },
     { name = "pandas" },
     { name = "pandas-gbq" },
@@ -1514,6 +1515,7 @@ requires-dist = [
     { name = "openpyxl", specifier = ">=3.0.9" },
     { name = "owid-catalog", editable = "lib/catalog" },
     { name = "owid-datautils", editable = "lib/datautils" },
+    { name = "owid-owl", editable = "lib/owl" },
     { name = "owid-repack", editable = "lib/repack" },
     { name = "pandas", specifier = "==2.2.3" },
     { name = "pandas-gbq", specifier = ">=0.29.2" },
@@ -2136,6 +2138,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b5/c8/f439cffde755cffa462bfbb156278fa6f9d09119719af9814b858fd4f81f/googleapis_common_protos-1.75.0.tar.gz", hash = "sha256:53a062ff3c32552fbd62c11fe23768b78e4ddf0494d5e5fd97d3f4689c75fbbd", size = 151035, upload-time = "2026-05-07T08:04:49.423Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e7/c8/e2645aa8ed02fd4c7a2f59d68783b65b1f3cbdfe39a6308e156509d1fee8/googleapis_common_protos-1.75.0-py3-none-any.whl", hash = "sha256:961ed60399c457ceb0ee8f285a84c870aabc9c6a832b9d37bb281b5bebde43ed", size = 300631, upload-time = "2026-05-07T08:03:30.345Z" },
+]
+
+[[package]]
+name = "graphviz"
+version = "0.21"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/b3/3ac91e9be6b761a4b30d66ff165e54439dcd48b83f4e20d644867215f6ca/graphviz-0.21.tar.gz", hash = "sha256:20743e7183be82aaaa8ad6c93f8893c923bd6658a04c32ee115edb3c8a835f78", size = 200434, upload-time = "2025-06-15T09:35:05.824Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/91/4c/e0ce1ef95d4000ebc1c11801f9b944fa5910ecc15b5e351865763d8657f8/graphviz-0.21-py3-none-any.whl", hash = "sha256:54f33de9f4f911d7e84e4191749cac8cc5653f815b06738c54db9a15ab8b1e42", size = 47300, upload-time = "2025-06-15T09:35:04.433Z" },
 ]
 
 [[package]]
@@ -4840,6 +4851,33 @@ dev = [
     { name = "sphinx", specifier = "==4.5.0" },
     { name = "ty", specifier = "==0.0.26" },
     { name = "watchdog", specifier = ">=2.1.5" },
+]
+
+[[package]]
+name = "owid-owl"
+version = "0.1.0"
+source = { editable = "lib/owl" }
+dependencies = [
+    { name = "click" },
+    { name = "graphviz" },
+    { name = "owid-catalog" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "tomli" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "click", specifier = ">=8.0" },
+    { name = "graphviz", specifier = ">=0.21" },
+    { name = "owid-catalog" },
+    { name = "pandas", specifier = ">=2.2" },
+    { name = "pyarrow", specifier = ">=16.0" },
+    { name = "python-dotenv", specifier = ">=1.0" },
+    { name = "pyyaml", specifier = ">=6.0" },
+    { name = "tomli", specifier = ">=2.0" },
 ]
 
 [[package]]
