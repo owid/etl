@@ -1,5 +1,7 @@
 dataset:
   title: TE-20.25b_env
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_20_25b_env:
     variables:

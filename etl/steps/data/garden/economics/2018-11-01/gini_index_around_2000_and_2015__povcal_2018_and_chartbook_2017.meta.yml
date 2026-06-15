@@ -1,5 +1,7 @@
 dataset:
   title: Gini Index around 2000 and 2015 (Povcal 2018 and Chartbook 2017)
+  owners:
+    - Joe Hasell  # backport
 tables:
   gini_index_around_2000_and_2015__povcal_2018_and_chartbook_2017:
     variables:

@@ -7,18 +7,15 @@ definitions:
         - Marriages & Divorces
     description_from_producer: Women in a union refers to women living with their partner in the same household, including cohabiting unions, consensual unions, unmarried unions, or “living together.”
 
-  projection: &projection
-    <% if dataprocess == "Projection" %>
-    true
-    <% elif dataprocess == "Estimate" %>
-    false
-    <%- endif -%>
+  projection: &projection <% if dataprocess == "Projection" %> true <% elif dataprocess == "Estimate" %> false <%- endif -%>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
 
+  owners:
+    - Veronika Samborska
 tables:
   married_women:
     variables:

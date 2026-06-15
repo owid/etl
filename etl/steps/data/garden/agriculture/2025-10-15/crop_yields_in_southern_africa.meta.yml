@@ -14,6 +14,8 @@ dataset:
   update_period_days: 365
   title: Crop productivity and reported corn yields in Southern Africa
 
+  owners:
+    - Pablo Rosado
 tables:
   crop_yields_in_southern_africa:
     variables:

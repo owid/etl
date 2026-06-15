@@ -1,5 +1,7 @@
 dataset:
   title: Figure 22.17_democracy
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   figure_22_17_democracy:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Polio vaccine costs in low-income countries
+  owners:
+    - Saloni Dattani  # backport
 tables:
   polio_vaccine_costs_in_low_income_countries:
     variables:

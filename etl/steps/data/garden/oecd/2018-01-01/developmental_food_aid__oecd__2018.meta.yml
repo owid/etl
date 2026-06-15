@@ -1,5 +1,7 @@
 dataset:
   title: Developmental Food Aid (OECD, 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   developmental_food_aid__oecd__2018:
     variables:

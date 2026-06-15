@@ -723,6 +723,7 @@ class Dataset(Base):
     sourceChecksum: Mapped[str | None] = mapped_column(VARCHAR(64), default=None)
     catalogPath: Mapped[str | None] = mapped_column(VARCHAR(767), default=None)
     tables: Mapped[list | None] = mapped_column(JSON, default=None)
+    owners: Mapped[list | None] = mapped_column(JSON, default=None)
 
     @property
     def catalog_path(self) -> CatalogPath | None:
@@ -758,6 +759,7 @@ class Dataset(Base):
             ds.nonRedistributable = self.nonRedistributable
             ds.catalogPath = self.catalogPath
             ds.tables = self.tables
+            ds.owners = self.owners
             ds.updatedAt = datetime.now(timezone.utc)
             ds.metadataEditedAt = datetime.now(timezone.utc)
             ds.dataEditedAt = datetime.now(timezone.utc)
@@ -788,6 +790,7 @@ class Dataset(Base):
             nonRedistributable=metadata.non_redistributable,
             catalogPath=f"{namespace}/{metadata.version}/{metadata.short_name}",
             tables=table_names,
+            owners=list(metadata.owners) if metadata.owners else None,
         )
 
     @classmethod

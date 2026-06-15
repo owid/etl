@@ -2,7 +2,9 @@ dataset:
   title: Welfare of broiler chickens (Welfare Footprint)
   description: ''
   licenses:
-  - {}
+    - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   welfare_broiler_chickens:
     variables:
@@ -13,19 +15,16 @@ tables:
         short_unit: seconds
       disabling_pain_days:
         title: disabling_pain_days
-        description_short: The number of waking days that the average broiler chicken spends in disabling pain over its lifespan.
-          A 'waking day' is 17 hours long.
+        description_short: The number of waking days that the average broiler chicken spends in disabling pain over its lifespan. A 'waking day' is 17 hours long.
         unit: days
         short_unit: days
       hurtful_pain_days:
         title: hurtful_pain_days
-        description_short: The number of waking days that the average broiler chicken spends in hurtful pain over its lifespan.
-          A 'waking day' is 17 hours long.
+        description_short: The number of waking days that the average broiler chicken spends in hurtful pain over its lifespan. A 'waking day' is 17 hours long.
         unit: days
         short_unit: days
       annoying_pain_days:
         title: annoying_pain_days
-        description_short: The number of waking days that the average broiler chicken spends in annoying pain over its lifespan.
-          A 'waking day' is 17 hours long.
+        description_short: The number of waking days that the average broiler chicken spends in annoying pain over its lifespan. A 'waking day' is 17 hours long.
         unit: days
         short_unit: days

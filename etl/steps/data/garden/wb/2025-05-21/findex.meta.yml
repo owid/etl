@@ -17,6 +17,9 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Tuna Acisu
+    - Veronika Samborska
 tables:
   findex:
     variables:

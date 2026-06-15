@@ -10,6 +10,8 @@ definitions:
 dataset:
   update_period_days: 0
 
+  owners:
+    - Fiona Spooner
 tables:
   diphtheria_cases:
     variables:

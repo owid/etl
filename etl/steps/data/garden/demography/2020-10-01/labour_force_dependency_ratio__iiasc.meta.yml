@@ -1,5 +1,7 @@
 dataset:
   title: Labour Force Dependency Ratio (IIASC)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   labour_force_dependency_ratio__iiasc:
     variables:

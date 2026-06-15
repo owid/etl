@@ -128,6 +128,9 @@ def run() -> None:
     # Add "Universal right to vote in practice"
     tb = add_suffrage_in_practice(tb)
 
+    # Add "Voting rights in practice" (three categories)
+    tb = add_suffrage_in_practice_trich(tb)
+
     # Add "Recent electoral turnover"
     tb = add_recent_turnover(tb)
 
@@ -385,6 +388,30 @@ def add_suffrage_in_practice(tb: Table) -> Table:
     return tb
 
 
+def add_suffrage_in_practice_trich(tb: Table) -> Table:
+    """Add three-tier classification of voting rights in practice.
+
+    - 2: universal voting rights in practice (universal suffrage for men and women, and elections for both the chief
+      executive and the legislature).
+    - 1: broad voting rights for men in practice (universal suffrage for men but not women, and elections for both the
+      chief executive and the legislature).
+    - 0: no broad voting rights in practice (no elections for the chief executive or the legislature, or no universal
+      suffrage for men).
+    """
+    tb["suffrage_in_practice_trich_lied"] = 0
+    tb.loc[(tb["suffrage_lied"] == 1) & (tb["exe_leg_elec_lied"] == 1), "suffrage_in_practice_trich_lied"] = 1
+    tb.loc[(tb["suffrage_lied"] == 2) & (tb["exe_leg_elec_lied"] == 1), "suffrage_in_practice_trich_lied"] = 2
+    tb["suffrage_in_practice_trich_lied"] = tb["suffrage_in_practice_trich_lied"].astype("Int64")
+    tb["suffrage_in_practice_trich_lied"].metadata = tb["suffrage_lied"].metadata
+
+    # Sanity check: top tier must coincide with the binary "universal right to vote in practice" indicator.
+    assert ((tb["suffrage_in_practice_trich_lied"] == 2) == (tb["suffrage_in_practice_lied"] == 1)).all(), (
+        "Mismatch between `suffrage_in_practice_trich_lied` (== 2) and `suffrage_in_practice_lied` (== 1)!"
+    )
+
+    return tb
+
+
 def add_recent_turnover(tb: Table) -> Table:
     """Add recent electoral turnover indicator.
 
@@ -486,6 +513,15 @@ def get_region_aggregates(
             "values_expected": {
                 "0": "no",
                 "1": "yes",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "suffrage_in_practice_trich_lied",
+            "values_expected": {
+                "0": "no broad voting rights",
+                "1": "broad male voting rights",
+                "2": "universal voting rights",
             },
             "has_na": False,
         },

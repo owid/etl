@@ -15,6 +15,9 @@ definitions:
 dataset:
   update_period_days: 1460
   non_redistributable: true
+  owners:
+    - Tuna Acisu
+    - Fiona Spooner
 tables:
   gbd_cause_deaths:
     dimensions:

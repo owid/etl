@@ -1,5 +1,7 @@
 dataset:
   title: Deaths from smallpox per million population (Edwardes, 1902)
+  owners:
+    - Sophie Ochmann  # backport
 tables:
   deaths_from_smallpox_per_million_population__edwardes__1902:
     variables:

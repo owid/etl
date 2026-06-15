@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   deforestation_by_commodity_singh:
     variables:
@@ -33,8 +35,7 @@ tables:
         short_unit: ha
         display:
           numDecimalPlaces: 0.0
-        description: Estimated deforestation driven by the conversion to managed forest for products such as paper, pulp and
-          wood.
+        description: Estimated deforestation driven by the conversion to managed forest for products such as paper, pulp and wood.
       cereals:
         title: Cereals
         unit: hectares

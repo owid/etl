@@ -80,7 +80,7 @@ steps:
   # Cholera
   data://grapher/who/2023-06-01/cholera:
     - data://garden/who/2023-06-01/cholera:
-      - data://garden/who/2025-05-19/gho
+      - data://garden/who/2026-05-22/gho
       - snapshot://fasttrack/2023-05-31/cholera.csv
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2021-07-01/wb_income
@@ -90,21 +90,6 @@ steps:
     - data://garden/unicef/2023-06-16/diarrhea:
       - data://meadow/unicef/2023-06-16/diarrhea:
         - snapshot://unicef/2023-06-16/diarrhea.xlsx
-
-  # Guinea worm - to archive
-  data://grapher/who/2024-06-17/guinea_worm:
-    - data://garden/who/2024-06-17/guinea_worm:
-      # Guinea worm - historical estimates
-      - data://garden/who/2023-06-29/guinea_worm_certification:
-        - data://meadow/who/2023-06-29/guinea_worm_certification:
-          - snapshot://who/2023-06-29/guinea_worm.csv
-      - snapshot://fasttrack/2024-06-17/guinea_worm.csv
-  # Guinea worm - to update
-  #data://garden/who/2025-04-16/guinea_worm:
-  #  - data://garden/who/2023-06-29/guinea_worm_certification
-  #  - snapshot://fasttrack/2024-06-17/guinea_worm.csv
-  #data://grapher/who/2025-04-16/guinea_worm:
-  #  - data://garden/who/2025-04-16/guinea_worm
 
   # Autopsies WHO-Europe
   data://grapher/who/2023-07-13/autopsy:
@@ -798,11 +783,7 @@ steps:
   data://grapher/who/2025-04-07/gho_smoking:
     - data://garden/who/2025-04-07/gho_smoking:
       # Global Health Observatory (GHO) from WHO
-      - data://garden/who/2024-01-03/gho:
-        - data://meadow/who/2024-01-03/gho:
-          - snapshot://who/2024-01-03/gho.zip
-        - data://garden/demography/2023-03-31/population
-        - data://garden/regions/2023-01-01/regions
+      - data://garden/who/2026-05-22/gho
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2025-07-01/income_groups
       - data://garden/un/2024-07-12/un_wpp
@@ -824,15 +805,15 @@ steps:
         - snapshot://cdc/2025-05-19/tuberculosis.csv
 
   # Global Health Observatory (GHO) from WHO
-  data://garden/who/2025-05-19/gho:
+  data://garden/who/2026-05-22/gho:
     - data://garden/regions/2023-01-01/regions
-    - data://meadow/who/2025-05-19/gho:
-      - snapshot://who/2025-05-19/gho.zip
+    - data://meadow/who/2026-05-22/gho:
+      - snapshot://who/2026-05-22/gho.zip
     - data://garden/demography/2024-07-15/population
-  data://grapher/who/2025-05-19/gho:
-    - data://garden/who/2025-05-19/gho
+  data://grapher/who/2026-05-22/gho:
+    - data://garden/who/2026-05-22/gho
   #export://multidim/who/latest/share_overweight_adults:
-  #  - data://grapher/who/2025-05-19/gho
+  #  - data://grapher/who/2026-05-22/gho
 
   # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
   data://grapher/health/2025-07-16/drug_approvals:
@@ -848,17 +829,31 @@ steps:
 
   # Clinical trials - ClinicalTrials.gov
   # no meadow snapshot, as this is a large dataset
+  data://garden/health/2025-07-28/clinical_trials:
+    - snapshot://health/2025-07-28/clinical_trials.csv
   data://grapher/health/2025-07-28/clinical_trials:
-    - data://garden/health/2025-07-28/clinical_trials:
-      - snapshot://health/2025-07-28/clinical_trials.csv
-  # Guinea worm cases
+    - data://garden/health/2025-07-28/clinical_trials
+
+ # Guinea worm certification
+  data://meadow/who/2025-08-01/guinea_worm_certification:
+    - snapshot://who/2025-08-01/guinea_worm.csv
+  data://garden/who/2025-08-01/guinea_worm_certification:
+    - data://meadow/who/2025-08-01/guinea_worm_certification
+
+    # Guinea worm cases
+  data://garden/who/2025-08-01/guinea_worm:
+    - snapshot://fasttrack/latest/guinea_worm_cases.csv
+    - data://garden/who/2025-08-01/guinea_worm_certification
   data://grapher/who/2025-08-01/guinea_worm:
-    - data://garden/who/2025-08-01/guinea_worm:
-      - snapshot://fasttrack/latest/guinea_worm_cases.csv
-      # Guinea worm certification
-      - data://garden/who/2025-08-01/guinea_worm_certification:
-        - data://meadow/who/2025-08-01/guinea_worm_certification:
-          - snapshot://who/2025-08-01/guinea_worm.csv
+    - data://garden/who/2025-08-01/guinea_worm
+
+  # Guinea worm cases and certification - WHO
+  # uses fasttrack snapshot until 2024 and adds data directly in garden step from 2025 onwards
+  data://garden/who/2026-03-17/guinea_worm:
+    - snapshot://fasttrack/latest/guinea_worm_cases.csv
+    - data://garden/who/2025-08-01/guinea_worm_certification
+  data://grapher/who/2026-03-17/guinea_worm:
+    - data://garden/who/2026-03-17/guinea_worm
 
   # WHO Mortality Database - Cancer specific
   data://garden/who/2025-08-05/mortality_database_cancer:

@@ -1,5 +1,7 @@
 dataset:
   title: Child Labor UK (historic) - Cunningham, H. and Viazzo, P.P. (1996)
+  owners:
+    - Max Roser  # backport
 tables:
   child_labor_uk__historic__cunningham__h__and_viazzo__p_p__1996:
     variables:

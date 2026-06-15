@@ -141,6 +141,11 @@ def run() -> None:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    presentation:
+      topic_tags:
+
 dataset:
   update_period_days: 365
 

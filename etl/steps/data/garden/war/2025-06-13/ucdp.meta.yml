@@ -368,22 +368,22 @@ tables:
                   - 1
                 customNumericLabels:
                   - "0"
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
                 customNumericColorsActive: true
                 customNumericColors:
                   - "#e8f4ea"
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -455,7 +455,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [ 0, 0.1, 0.3, 1, 3, 10, 30, 100, 1 ]
+                customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100, 1]
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Death rate in ongoing conflicts (high estimate)
@@ -497,7 +497,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [ 0, 1, 2, 5, 10, 1 ]
+                customNumericValues: [0, 1, 2, 5, 10, 1]
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); geoBoundaries (2023)
 
       number_ongoing_conflicts_per_country:
@@ -591,3 +591,5 @@ dataset:
     You can find more information about the data in our article: [To be published]
 
     This dataset contains information on armed conflicts - state, non-state and one-sided conflicts, in the period of 1989 and 2022.
+  owners:
+    - Lucas Rodés-Guirao

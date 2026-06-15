@@ -43,6 +43,9 @@ definitions:
 dataset:
   update_period_days: 1091
 
+  owners:
+    - Pablo Arriagada
+    - Lucas Rodés-Guirao
 tables:
   maddison_project_database:
     variables:

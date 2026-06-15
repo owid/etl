@@ -1,5 +1,7 @@
 dataset:
   title: TE-3.2_time
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_3_2_time:
     variables:

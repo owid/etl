@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: World Mineral Statistics
 
+  owners:
+    - Pablo Rosado
 tables:
   world_mineral_statistics:
     title: World Mineral Statistics
@@ -21,4 +23,4 @@ tables:
     title: World Mineral Statistics
     variables:
       # Metadata is filled up programmatically.
-      {}
+        {}

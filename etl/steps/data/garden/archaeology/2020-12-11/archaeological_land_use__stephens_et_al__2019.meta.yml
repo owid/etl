@@ -1,5 +1,7 @@
 dataset:
   title: Archaeological land use (Stephens et al. 2019)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   archaeological_land_use__stephens_et_al__2019:
     variables:

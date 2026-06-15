@@ -1,5 +1,7 @@
 dataset:
   title: Historical gender equality index - How Was Life? (2014)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   historical_gender_equality_index__how_was_life__2014:
     variables:

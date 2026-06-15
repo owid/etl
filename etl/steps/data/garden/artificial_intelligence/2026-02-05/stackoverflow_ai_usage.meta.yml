@@ -20,6 +20,9 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Edouard Mathieu
+    - Veronika Samborska
 tables:
   stackoverflow_ai_usage:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Proportion of unemployed using specific search methods - Bachmann and Baumgarten (2013)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013:
     variables:

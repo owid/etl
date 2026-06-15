@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Pablo Rosado
 definitions:
   attribution: &attribution Fishcount ({publication_year})
   description_key: &description_key
@@ -10,8 +13,8 @@ definitions:
     # - Data at the country level prior to 2020 does not include species without an estimated mean weight (which were an additional 17% of reported global fish production).
   presentation:
     topic_tags:
-    - Animal Welfare
-    - Fish & Overfishing
+      - Animal Welfare
+      - Fish & Overfishing
 
 tables:
   number_of_farmed_fish:

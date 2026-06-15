@@ -2,7 +2,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Climate Change
+        - Climate Change
     unit: pH
     short_unit: pH
 
@@ -10,6 +10,8 @@ dataset:
   title: Ocean pH Levels
   update_period_days: 60
 
+  owners:
+    - Pablo Rosado
 tables:
   ocean_ph_levels:
     title: Ocean pH levels

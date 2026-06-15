@@ -1,9 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -16,7 +15,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("prison_rates")
-    ds_population = paths.load_dataset("population")
     # Read table from meadow dataset.
     tb = ds_meadow.read("prison_rates")
     # Drop rows without a year, since they cannot be used in time-series analysis or aggregated by year.
@@ -35,7 +33,7 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
     # Add UK aggregate
-    tb = calculate_united_kingdom(tb, ds_population)
+    tb = calculate_united_kingdom(tb)
 
     # Improve table format.
     tb = tb.format(["country", "year"])
@@ -50,7 +48,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def calculate_united_kingdom(tb: Table, ds_population: Dataset) -> Table:
+def calculate_united_kingdom(tb: Table) -> Table:
     """
     Calculate data for the UK based on the component countries.
 
@@ -99,7 +97,7 @@ def calculate_united_kingdom(tb: Table, ds_population: Dataset) -> Table:
 
     # Add country label and calculate prison rate
     tb_uk["country"] = "United Kingdom"
-    tb_uk = geo.add_population_to_table(tb_uk, ds_population=ds_population, warn_on_missing_countries=False)
+    tb_uk = paths.regions.add_population(tb_uk, warn_on_missing_countries=False)
     tb_uk["prison_population_rate"] = (tb_uk["prison_population_total"] / tb_uk["population"]) * 100_000
     tb_uk = tb_uk.drop(columns=["population"])
 

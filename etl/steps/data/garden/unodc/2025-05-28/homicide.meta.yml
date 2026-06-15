@@ -21,11 +21,7 @@ definitions:
     <%- elif unit_of_measurement == "Rate per 100,000 population" %>
     [Intentional homicide](#dod:homicide) rate per 100,000 population
     <%- endif %>
-  metric_title: <% if unit_of_measurement == "Counts" %>
-    Homicides
-    <%- elif unit_of_measurement == "Rate per 100,000 population" %>
-    Homicide rate per 100,000 population
-    <%- endif %>
+  metric_title: <% if unit_of_measurement == "Counts" %> Homicides <%- elif unit_of_measurement == "Rate per 100,000 population" %> Homicide rate per 100,000 population <%- endif %>
   sex: |-
     <% if sex == "Total" %>
     <%- elif sex == "Male" -%>
@@ -67,6 +63,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Fiona Spooner
 tables:
   by_mechanisms:
     variables:

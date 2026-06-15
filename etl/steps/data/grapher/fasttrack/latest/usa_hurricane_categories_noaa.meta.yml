@@ -3,6 +3,8 @@ dataset:
   description: The number of landfalling hurricanes in the United States, by category.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   usa_hurricane_categories_noaa:
     variables:

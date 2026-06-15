@@ -69,6 +69,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Tuna Acisu
 tables:
   refugee_data_origin:
     variables:
@@ -82,7 +84,7 @@ tables:
       refugees_per_1000:
         title: Refugees by country of origin per 1,000 people
         description_short: |-
-         [People](#dod:refugee) who fled their country of origin and are in need of international protection. This data is given per 1,000 people in their country of origin and shows how many people fled a country as a proportion of its current population.
+          [People](#dod:refugee) who fled their country of origin and are in need of international protection. This data is given per 1,000 people in their country of origin and shows how many people fled a country as a proportion of its current population.
         description_from_producer: "{definitions.description_unhcr_refugee}"
         display:
           numDecimalPlaces: 1
@@ -127,7 +129,7 @@ tables:
       idps:
         title: Internally displaced people due to conflict
         description_short: |-
-         [People](#dod:internally-displaced) who were forced to leave their homes due to armed conflict or violence.
+          [People](#dod:internally-displaced) who were forced to leave their homes due to armed conflict or violence.
         description_from_producer: "{definitions.description_unhcr_idp}"
         presentation:
           grapher_config:

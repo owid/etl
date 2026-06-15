@@ -23,7 +23,6 @@ def run() -> None:
     # Load the garden gender statistics datasets.
     ds_garden = paths.load_dataset("gender_statistics")
     ds_regions = paths.load_dataset("regions")
-    ds_population = paths.load_dataset("population")
 
     tb = ds_garden.read("gender_statistics")
 
@@ -44,7 +43,7 @@ def run() -> None:
     # Select only the columns of interest
     tb = tb[indicators_for_sums + ["country", "year"]]
 
-    tb = add_country_counts_and_population_by_status(tb, ds_regions, ds_population)
+    tb = add_country_counts_and_population_by_status(tb, ds_regions)
     # Remove columns that are not needed and are in the original dataset
     columns_to_keep = [col for col in tb.columns if col not in indicators_for_sums]
 
@@ -62,16 +61,14 @@ def run() -> None:
     ds_garden.save()
 
 
-def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Table:
+def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset) -> Table:
     """
     Add country counts and population by status for the columns in the list
     """
 
     tb_regions = tb.copy()
 
-    tb_regions = geo.add_population_to_table(
-        tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_regions = paths.regions.add_population(tb=tb_regions, warn_on_missing_countries=False)
     columns = [col for col in tb.columns if col not in ["country", "year"]]
 
     # Remove years where all indicator columns are NaN (no data to aggregate)
@@ -161,9 +158,7 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     tb_regions = tb_regions.drop(columns=["population"])
 
     # Add population again
-    tb_regions = geo.add_population_to_table(
-        tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
-    )
+    tb_regions = paths.regions.add_population(tb=tb_regions, warn_on_missing_countries=False)
     # Calculate the missing population for each region
     for col in columns:
         if col not in ["country", "year"]:

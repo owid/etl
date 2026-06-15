@@ -7,6 +7,8 @@ dataset:
 
     All values of yield have been converted to tonnes per hectare.
 
+  owners:
+    - Pablo Rosado
 tables:
   long_term_wheat_yields:
     title: Long-term wheat yields

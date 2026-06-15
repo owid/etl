@@ -1,4 +1,5 @@
 import re
+import subprocess
 from copy import deepcopy
 from datetime import date
 from datetime import datetime as dt
@@ -16,7 +17,21 @@ from apps.wizard.etl_steps.utils import ADD_DAG_OPTIONS, COOKIE_STEPS, SNAPSHOT_
 from apps.wizard.utils import clean_empty_dict
 from etl.dag_helpers import write_to_dag_file
 from etl.files import ruamel_dump
+from etl.owners import resolve_owner
 from etl.paths import DAG_DIR, STEP_DIR
+
+
+def _current_git_owner() -> str:
+    """Return the canonical OWID owner for the current git user, or empty string.
+
+    Returns "" rather than None so the cookiecutter context stays JSON-serializable
+    and the Jinja conditional `{% if cookiecutter.owner %}` falls through cleanly.
+    """
+    try:
+        name = subprocess.check_output(["git", "config", "user.name"], stderr=subprocess.DEVNULL, text=True).strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return ""
+    return resolve_owner(name) or ""
 
 
 def is_snake(s: str) -> bool:
@@ -315,6 +330,7 @@ class DataForm(StepForm):
                         "update_period_days": self.update_period_days,
                         "topic_tags": self.topic_tags_export,
                         "channel": "garden",
+                        "owner": _current_git_owner(),
                     }
                 )
             case "grapher":

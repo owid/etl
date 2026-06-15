@@ -17,7 +17,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("refugee_data")
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("refugee_data")
@@ -92,8 +91,8 @@ def run() -> None:
     )
 
     # Add population to table
-    tb_asylum = geo.add_population_to_table(tb=tb_asylum, ds_population=ds_population)
-    tb_origin = geo.add_population_to_table(tb=tb_origin, ds_population=ds_population)
+    tb_asylum = paths.regions.add_population(tb=tb_asylum)
+    tb_origin = paths.regions.add_population(tb=tb_origin)
 
     # Calculate shares
     # asylum table

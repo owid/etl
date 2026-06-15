@@ -29,6 +29,9 @@ dataset:
   update_period_days: 365
   non_redistributable: true
 
+  owners:
+    - Veronika Samborska
+    - Edouard Mathieu
 tables:
   dynabench:
     variables:

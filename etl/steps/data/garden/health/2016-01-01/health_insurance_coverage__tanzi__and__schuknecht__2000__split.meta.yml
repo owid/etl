@@ -1,5 +1,7 @@
 dataset:
   title: Health Insurance Coverage (Tanzi & Schuknecht (2000)) (split)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   health_insurance_coverage__tanzi__and__schuknecht__2000__split:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Fertilizer use per hectare of land -FAO & Federico
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   fertilizer_use_per_hectare_of_land__fao__and__federico:
     variables:

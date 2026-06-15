@@ -1,5 +1,7 @@
 dataset:
   title: Tax composition – Todaro and Smith (2014)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   tax_composition__todaro_and_smith__2014:
     variables:

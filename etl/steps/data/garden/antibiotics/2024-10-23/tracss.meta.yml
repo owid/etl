@@ -13,6 +13,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Fiona Spooner
 tables:
   tracss:
     variables:
@@ -25,12 +27,12 @@ tables:
         title: 2.8.3 - Does the country have laws or regulations on prescription and sale of antimicrobials for aquatic animals?
         unit: ""
         display:
-            name: Does the country have laws or regulations on prescription and sale of antimicrobials for aquatic animals?
+          name: Does the country have laws or regulations on prescription and sale of antimicrobials for aquatic animals?
       law_antimicrobials_terrestrial_growth_promotion_2_8_5:
         title: 2.8.5 - Does the country have laws or regulations that prohibits the use of antibiotics for growth promotion in terrestrial animals in the absence of risk analysis?
         unit: ""
         display:
-            name: Does the country have laws or regulations that prohibits the use of antibiotics for growth promotion in terrestrial animals in the absence of risk analysis?
+          name: Does the country have laws or regulations that prohibits the use of antibiotics for growth promotion in terrestrial animals in the absence of risk analysis?
       monitoring_consumption_human_3_2:
         title: 3.2 - National monitoring system for consumption and rational use of antimicrobials in human health
         unit: ""
@@ -38,11 +40,11 @@ tables:
           name: National monitoring system for consumption and rational use of antimicrobials in human health
         type: ordinal
         sort:
-            - "No monitoring system"
-            - "National monitoring of antimicrobial sales and antibiotic use in health services"
-            - "National monitoring of antimicrobial sales and some monitoring of antibiotic use at sub-national level"
-            - "Prescribing practices and appropriate antibiotic use monitored in a sample of healthcare settings"
-            - "Regular data collection and reporting"
+          - "No monitoring system"
+          - "National monitoring of antimicrobial sales and antibiotic use in health services"
+          - "National monitoring of antimicrobial sales and some monitoring of antibiotic use at sub-national level"
+          - "Prescribing practices and appropriate antibiotic use monitored in a sample of healthcare settings"
+          - "Regular data collection and reporting"
       amr_surveillance_human_3_3:
         title: 3.3 - National surveillance system for antimicrobial resistance (AMR) in humans
         unit: ""
@@ -51,11 +53,11 @@ tables:
         description_key: ["'Common' in this context refers to infections that occur most frequently in both hospitalized and community patients and constitute a majority of indications for antimicrobial treatment (such as urinary tract infections, enteric infections, bloodstream infections, respiratory infections etc)."]
         type: ordinal
         sort:
-            - "No capacity for generating data on antibiotic resistance"
-            - "Local collation of AMR data for common bacterial infections"
-            - "National collation of AMR data for common bacterial infections"
-            - "Standardized national AMR surveillance system"
-            - "National AMR surveillance system linked with antimicrobial consumption data"
+          - "No capacity for generating data on antibiotic resistance"
+          - "Local collation of AMR data for common bacterial infections"
+          - "National collation of AMR data for common bacterial infections"
+          - "Standardized national AMR surveillance system"
+          - "National AMR surveillance system linked with antimicrobial consumption data"
       monitoring_sales_use_animals_4_5_a:
         title: 4.5a - Does the country have a national plan or system in place for monitoring sales/use of antimicrobials in animals?
         unit: ""
@@ -78,11 +80,11 @@ tables:
           name: National surveillance system for antimicrobial resistance (AMR) in live terrestrial animals
         type: ordinal
         sort:
-            - "No national plan for AMR surveillance system"
-            - "National plan for AMR surveillance but lacking capacities"
-            - "AMR data collected at local levels but no standardized approach"
-            - "Priority bacterial species identified for surveillance"
-            - "National system of AMR surveillance established for priority animal pathogens, high quality assurance processes"
+          - "No national plan for AMR surveillance system"
+          - "National plan for AMR surveillance but lacking capacities"
+          - "AMR data collected at local levels but no standardized approach"
+          - "Priority bacterial species identified for surveillance"
+          - "National system of AMR surveillance established for priority animal pathogens, high quality assurance processes"
       surveillance_amr_aquatic_4_8:
         title: 4.8 - National surveillance system for antimicrobial resistance (AMR) in live aquatic animals
         unit: ""
@@ -90,11 +92,11 @@ tables:
           name: National surveillance system for antimicrobial resistance (AMR) in live aquatic animals
         type: ordinal
         sort:
-            - "No national plan for AMR surveillance system"
-            - "National plan for AMR surveillance but lacking capacities"
-            - "AMR data collected at local levels but no standardized approach"
-            - "Priority bacterial species identified for surveillance"
-            - "National system of AMR surveillance established for priority animal pathogens, high quality assurance processes"
+          - "No national plan for AMR surveillance system"
+          - "National plan for AMR surveillance but lacking capacities"
+          - "AMR data collected at local levels but no standardized approach"
+          - "Priority bacterial species identified for surveillance"
+          - "National system of AMR surveillance established for priority animal pathogens, high quality assurance processes"
       surveillance_amr_food_5_3:
         title: 5.3 - National surveillance system for antimicrobial resistance (AMR) in food (terrestrial and aquatic animal and plant origin)
         unit: ""
@@ -102,11 +104,11 @@ tables:
           name: National surveillance system for antimicrobial resistance (AMR) in food (terrestrial and aquatic animal and plant origin)
         type: ordinal
         sort:
-            - "No national plan for AMR surveillance system"
-            - "National plan for AMR surveillance but lacking capacities"
-            - "AMR data collected but no standardized approach"
-            - "Priority foodborne pathogens identified for surveillance"
-            - "National system of AMR surveillance established for priority foodborne pathogens, high quality assurance processes"
+          - "No national plan for AMR surveillance system"
+          - "National plan for AMR surveillance but lacking capacities"
+          - "AMR data collected but no standardized approach"
+          - "Priority foodborne pathogens identified for surveillance"
+          - "National system of AMR surveillance established for priority foodborne pathogens, high quality assurance processes"
       monitoring_amr_water_6_3:
         title: 6.3 - Is there a system for regular monitoring (passive surveillance) of antimicrobial compounds and their metabolites (or residues) and resistant bacteria or antimicrobial resistance genes (ARGs) in water quality?
         unit: ""
