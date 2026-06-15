@@ -38,7 +38,7 @@ tables:
         title: Legal status of homosexuality
         unit: ""
         short_unit: ""
-        description_short: Legal status of consensual homosexual acts among adults in public. The categories are "Legal" and "Illegal".
+        description_short: Legal status of consensual homosexual acts among adults in private. The categories are "Legal" and "Illegal".
         display:
           name: Legal status of homosexuality
           <<: *display_common
@@ -51,7 +51,7 @@ tables:
         title: Number of countries where homosexuality is legal
         unit: "countries"
         short_unit: ""
-        description_short: Number of countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        description_short: Number of countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in private.
         display:
           name: Number of countries where homosexuality is legal
           <<: *display_common
@@ -60,7 +60,7 @@ tables:
         title: Number of countries where homosexuality is illegal
         unit: "countries"
         short_unit: ""
-        description_short: Number of countries where homosexuality is illegal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        description_short: Number of countries where homosexuality is illegal. Homosexuality is defined in this case as consensual homosexual acts among adults in private.
         display:
           name: Number of countries where homosexuality is illegal
           <<: *display_common
@@ -78,7 +78,7 @@ tables:
         title: Population in countries where homosexuality is legal
         unit: "people"
         short_unit: ""
-        description_short: Population in countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        description_short: Population in countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in private.
         display:
           name: Population in countries where homosexuality is legal
           <<: *display_common
@@ -87,7 +87,7 @@ tables:
         title: Population in countries where homosexuality is illegal
         unit: "people"
         short_unit: ""
-        description_short: Population in countries where homosexuality is illegal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        description_short: Population in countries where homosexuality is illegal. Homosexuality is defined in this case as consensual homosexual acts among adults in private.
         display:
           name: Population in countries where homosexuality is illegal
           <<: *display_common
@@ -105,7 +105,7 @@ tables:
         title: Year of last decriminalization of homosexuality
         unit: ""
         short_unit: ""
-        description_short: Year of the last decriminalization of homosexuality in each country, for countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        description_short: Year of the last decriminalization of homosexuality in each country, for countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in private.
         display:
           name: Year of last decriminalization of homosexuality
           <<: *display_common
