@@ -277,124 +277,157 @@ def _confirm_destructive_action(
     _dialog()
 
 
-def render_server(server) -> None:
-    """Render one staging server as an expander with metadata, links and actions."""
+def _destroy_dialog(branch: str, server_name: str) -> None:
+    """Shared confirmation dialog for destroying a server."""
+    _confirm_destructive_action(
+        title=f"Destroy server: {branch}",
+        bullets=[
+            "**DELETE** the entire container including all data",
+            "Pushing a new commit triggers server recreation",
+        ],
+        warning="💥 This destroys the container and all its data!",
+        button_label="💥 Destroy server",
+        action_fn=destroy_server,
+        server_name=server_name,
+        spinner_msg="Destroying server…",
+    )
+
+
+def render_server_actions(server) -> None:
+    """Render the action panel (links + buttons) for a single selected server."""
     branch = server["branch"]
     server_name = server["name"]
-    status_label = server["status_label"]
     is_running = server["status"] == "Running"
-    owner = server["owner"] or "—"
 
-    memory = server["memory_used_gb"]
-    memory_str = f"{memory:.1f} GB" if pd.notna(memory) else "—"
-    age = server["days_old"]
-    age_str = f"{int(age)}d" if pd.notna(age) else "—"
+    # Quick links (same set owidbot posts on each PR) + ssh command
+    links = build_quick_links(branch)
+    st.markdown(
+        f"**{server['status_indicator']} {branch}** &nbsp; · &nbsp; "
+        + " · ".join(f"[{label}]({url})" for label, url in links.items())
+    )
+    st.code(f"ssh owid@{server_name}", language="bash")
 
-    header = f"{server['status_indicator']} **{branch}** · {status_label} · 👤 {owner} · 💾 {memory_str} · 🕒 {age_str}"
-    with st.expander(header):
-        # Metadata line
-        st.markdown(
-            f"**Owner:** {owner} &nbsp;|&nbsp; **Origin:** {server['origin']} &nbsp;|&nbsp; "
-            f"**Last commit:** {server['unified_commit']} &nbsp;|&nbsp; **Age:** {age_str}"
-        )
-
-        # Quick links (same set owidbot posts on each PR)
-        links = build_quick_links(branch)
-        st.markdown(" · ".join(f"[{label}]({url})" for label, url in links.items()))
-        st.code(f"ssh owid@{server_name}", language="bash")
-
-        # Actions
-        if is_running:
-            c1, c2, c3, c4 = st.columns(4)
-            with c1:
-                if st.button(
-                    "⏸️ Make idle",
-                    width="stretch",
-                    key=f"idle_{server_name}",
-                    help="Snapshot, then stop the server to free resources. Data is preserved; wake it anytime.",
-                ):
-                    _run_action("Make idle", stop_server, server_name, "Snapshotting and stopping server…")
-            with c2:
-                if st.button(
-                    "🔄 Restart", width="stretch", key=f"restart_{server_name}", help="Stop and start the server again."
-                ):
-                    _run_action("Restart", restart_server, server_name, "Restarting server…")
-            with c3:
-                if st.button(
-                    "🗄️ Reset MySQL",
-                    width="stretch",
-                    key=f"mysql_{server_name}",
-                    help="Drop and reimport the staging database from master (~5 min).",
-                ):
-                    _confirm_destructive_action(
-                        title=f"Reset MySQL: {branch}",
-                        bullets=[
-                            "Purge R2 files for this server from owid-api-staging",
-                            "Run `make refresh` in the owid-grapher directory",
-                            "Drop and recreate the MySQL database",
-                            "Import the latest data from staging",
-                        ],
-                        warning="⏱️ Takes ~5 minutes. All current DB data including charts and indicators will be lost!",
-                        button_label="🗄️ Reset MySQL",
-                        action_fn=reset_mysql_database,
-                        server_name=server_name,
-                        spinner_msg="Resetting MySQL database… This may take 5 minutes",
-                    )
-            with c4:
-                if st.button(
-                    "💥 Destroy",
-                    width="stretch",
-                    key=f"destroy_{server_name}",
-                    help="Delete the container entirely. Recreated on the next commit to this branch.",
-                ):
-                    _confirm_destructive_action(
-                        title=f"Destroy server: {branch}",
-                        bullets=[
-                            "**DELETE** the entire container including all data",
-                            "Pushing a new commit triggers server recreation",
-                        ],
-                        warning="💥 This destroys the container and all its data!",
-                        button_label="💥 Destroy server",
-                        action_fn=destroy_server,
-                        server_name=server_name,
-                        spinner_msg="Destroying server…",
-                    )
-        else:
-            # Idle server: the key action is waking it up (no commit needed).
-            c1, c2 = st.columns(2)
-            with c1:
-                if st.button(
-                    "☀️ Wake up",
-                    type="primary",
-                    width="stretch",
-                    key=f"wake_{server_name}",
-                    help="Start the server again. Data is preserved — this takes seconds, no commit required.",
-                ):
-                    _run_action("Wake up", start_server, server_name, "Waking server up…")
-            with c2:
-                if st.button(
-                    "💥 Destroy",
-                    width="stretch",
-                    key=f"destroy_{server_name}",
-                    help="Delete the container entirely. Recreated on the next commit to this branch.",
-                ):
-                    _confirm_destructive_action(
-                        title=f"Destroy server: {branch}",
-                        bullets=[
-                            "**DELETE** the entire container including all data",
-                            "Pushing a new commit triggers server recreation",
-                        ],
-                        warning="💥 This destroys the container and all its data!",
-                        button_label="💥 Destroy server",
-                        action_fn=destroy_server,
-                        server_name=server_name,
-                        spinner_msg="Destroying server…",
-                    )
+    if is_running:
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
+            if st.button(
+                "⏸️ Make idle",
+                width="stretch",
+                key=f"idle_{server_name}",
+                help="Snapshot, then stop the server to free resources. Data is preserved; wake it anytime.",
+            ):
+                _run_action("Make idle", stop_server, server_name, "Snapshotting and stopping server…")
+        with c2:
+            if st.button(
+                "🔄 Restart", width="stretch", key=f"restart_{server_name}", help="Stop and start the server again."
+            ):
+                _run_action("Restart", restart_server, server_name, "Restarting server…")
+        with c3:
+            if st.button(
+                "🗄️ Reset MySQL",
+                width="stretch",
+                key=f"mysql_{server_name}",
+                help="Drop and reimport the staging database from master (~5 min).",
+            ):
+                _confirm_destructive_action(
+                    title=f"Reset MySQL: {branch}",
+                    bullets=[
+                        "Purge R2 files for this server from owid-api-staging",
+                        "Run `make refresh` in the owid-grapher directory",
+                        "Drop and recreate the MySQL database",
+                        "Import the latest data from staging",
+                    ],
+                    warning="⏱️ Takes ~5 minutes. All current DB data including charts and indicators will be lost!",
+                    button_label="🗄️ Reset MySQL",
+                    action_fn=reset_mysql_database,
+                    server_name=server_name,
+                    spinner_msg="Resetting MySQL database… This may take 5 minutes",
+                )
+        with c4:
+            if st.button(
+                "💥 Destroy",
+                width="stretch",
+                key=f"destroy_{server_name}",
+                help="Delete the container entirely. Recreated on the next commit to this branch.",
+            ):
+                _destroy_dialog(branch, server_name)
+    else:
+        # Idle server: the key action is waking it up (no commit needed).
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button(
+                "☀️ Wake up",
+                type="primary",
+                width="stretch",
+                key=f"wake_{server_name}",
+                help="Start the server again. Data is preserved — this takes seconds, no commit required.",
+            ):
+                _run_action("Wake up", start_server, server_name, "Waking server up…")
+        with c2:
+            if st.button(
+                "💥 Destroy",
+                width="stretch",
+                key=f"destroy_{server_name}",
+                help="Delete the container entirely. Recreated on the next commit to this branch.",
+            ):
+                _destroy_dialog(branch, server_name)
 
 
-# Display servers as expandable rows
+# Display servers in a table; selecting a row reveals its links and actions below.
 if filtered_df.empty:
     st.warning("No servers match the current filters.")
 else:
-    for _, server in filtered_df.iterrows():
-        render_server(server)
+    filtered_df = filtered_df.reset_index(drop=True)
+
+    # Build the display table (memory as numeric GB so the progress bar renders).
+    display_df = pd.DataFrame(
+        {
+            "Status": filtered_df["status_indicator"],
+            "Owner": filtered_df["owner"],
+            "Origin": filtered_df["origin"],
+            "Branch": filtered_df["branch"],
+            "Memory": filtered_df["memory_used_gb"].fillna(0).round(2),
+            "Age (days)": filtered_df["days_old"],
+            "Last Commit": filtered_df["unified_commit"],
+        }
+    )
+
+    selection = st.dataframe(
+        display_df,
+        width="stretch",
+        column_config={
+            "Status": st.column_config.TextColumn("Status", help="🟢 Running · ⏸️ Idle", width="small"),
+            "Owner": st.column_config.TextColumn("Owner", help="GitHub author of the PR", width="small"),
+            "Origin": st.column_config.TextColumn("Origin", help="Server origin (etl, grapher, etc.)", width="small"),
+            "Branch": st.column_config.TextColumn(
+                "Branch", help="Git branch name (staging-site- prefix removed)", width="medium"
+            ),
+            "Memory": st.column_config.ProgressColumn(
+                "Memory",
+                help="Memory usage with progress bar showing GB values",
+                min_value=0,
+                max_value=20,  # Set reasonable max for progress bar visualization
+                format="%.1f GB",
+                width="medium",
+            ),
+            "Age (days)": st.column_config.NumberColumn(
+                "Age (days)", help="Days since container was created", format="%d days", width="small"
+            ),
+            "Last Commit": st.column_config.TextColumn(
+                "Last Commit", help="Most recent relevant commit based on server origin", width="medium"
+            ),
+        },
+        hide_index=True,
+        height=600,
+        on_select="rerun",
+        selection_mode="single-row",
+        key="servers_table",
+    )
+
+    # Action panel for the selected server
+    st.subheader("🔧 Server Management")
+    selected_rows = selection["selection"]["rows"]
+    if selected_rows:
+        render_server_actions(filtered_df.iloc[selected_rows[0]])
+    else:
+        st.caption("👆 Select a server in the table to see its links and management actions.")
