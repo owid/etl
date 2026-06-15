@@ -11,6 +11,6 @@ meta:
   description: Electric car sales and stocks data from the International Energy Agency.
   license: {}
 outs:
-  - md5: 7ffaa57c3e0e59debabf1d717f8b12aa
-    size: 81651
+  - md5: 3d51677c0cba972e9f025d4c0c475c46
+    size: 81755
     path: electric_cars_iea.csv
