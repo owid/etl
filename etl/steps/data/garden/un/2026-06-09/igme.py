@@ -2,6 +2,7 @@
 
 from math import trunc
 
+import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
