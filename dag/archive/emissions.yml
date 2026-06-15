@@ -1,5 +1,25 @@
 steps:
   #
+  # Emissions - Greenhouse gas emissions by custom sector (2025-09-24).
+  #
+  data-private://grapher/emissions/2025-09-24/emissions_by_custom_sector:
+    - data-private://garden/emissions/2025-09-24/emissions_by_custom_sector:
+      - snapshot-private://wri/2025-09-24/emissions_by_detailed_sector.json
+  #
+  # Emissions - Greenhouse gas emissions by custom sector (2026-02-11).
+  #
+  data://grapher/emissions/2026-02-11/emissions_by_custom_sector:
+    - data://garden/emissions/2026-02-11/emissions_by_custom_sector:
+      - data://garden/climate_watch/2026-02-10/emissions_by_sector
+      - data://garden/ember/2026-04-24/yearly_electricity
+  #
+  # Emissions - Greenhouse gas emissions by custom sector (2026-03-04).
+  #
+  data://grapher/emissions/2026-03-04/emissions_by_custom_sector:
+    - data://garden/emissions/2026-03-04/emissions_by_custom_sector:
+      - data://garden/climate_watch/2026-02-10/emissions_by_sector
+      - data://garden/un/2026-02-11/energy_statistics_database
+  #
   # Jones et al. (2023) - National contributions to climate change (2023-05-02).
   #
   data://meadow/emissions/2023-05-02/national_contributions:
