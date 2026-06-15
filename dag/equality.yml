@@ -27,6 +27,7 @@ steps:
   data://garden/lgbt_rights/2026-06-15/criminalization_mignot:
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
     - data://meadow/lgbt_rights/2026-06-15/criminalization_mignot
   data://grapher/lgbt_rights/2026-06-15/criminalization_mignot:
     - data://garden/lgbt_rights/2026-06-15/criminalization_mignot

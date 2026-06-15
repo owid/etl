@@ -2,16 +2,27 @@
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Define regions to aggregate
-REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
+# Define regions to aggregate (continents + World + World Bank income groups)
+REGIONS = [
+    "Europe",
+    "Asia",
+    "North America",
+    "South America",
+    "Africa",
+    "Oceania",
+    "World",
+    "High-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "Low-income countries",
+]
 
 # Define fraction of allowed NaNs per year
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
@@ -33,9 +44,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load meadow and regions datasets.
+    # Load meadow dataset.
     ds_meadow = paths.load_dataset("criminalization_mignot")
-    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("criminalization_mignot")
@@ -55,7 +65,7 @@ def run() -> None:
     tb = calculate_year_of_decriminalization(tb=tb)
 
     tb = add_country_counts_and_population_by_status(
-        tb=tb, columns=["status"], ds_regions=ds_regions, regions=REGIONS, missing_data_on_columns=True
+        tb=tb, columns=["status"], regions=REGIONS, missing_data_on_columns=True
     )
 
     sanity_check_outputs(tb=tb)
@@ -316,7 +326,7 @@ def fill_countries_to_start_year(tb: Table) -> Table:
 
 
 def add_country_counts_and_population_by_status(
-    tb: Table, columns: list[str], ds_regions: Dataset, regions: list[str], missing_data_on_columns: bool = False
+    tb: Table, columns: list[str], regions: list[str], missing_data_on_columns: bool = False
 ) -> Table:
     """
     Add country counts and population by status for the columns in the list
@@ -353,13 +363,10 @@ def add_country_counts_and_population_by_status(
         "sum",
     )
 
-    # NOTE: This uses the deprecated geo.add_regions_to_table rather than paths.regions.add_aggregates
-    # because the two produce different regional population aggregates (they resolve region membership
-    # differently), which would shift the world/region population-share indicators across all years —
-    # unrelated to this data update. Modernize in a separate, validated PR.
-    tb_regions = geo.add_regions_to_table(
+    # add_aggregates auto-resolves the continents/World and the WB income groups from the DAG
+    # (regions and income_groups datasets).
+    tb_regions = paths.regions.add_aggregates(
         tb=tb_regions,
-        ds_regions=ds_regions,
         regions=regions,
         aggregations=aggregations,
         frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
