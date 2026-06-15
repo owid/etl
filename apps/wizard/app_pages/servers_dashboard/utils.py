@@ -652,14 +652,31 @@ def build_quick_links(branch: str) -> dict[str, str]:
     }
 
 
+def _fetch_prs(repo_name: str, params: str, headers: dict, max_pages: int) -> list[dict]:
+    """Fetch up to ``max_pages`` pages of PRs from a repo's pulls endpoint."""
+    url: str | None = f"https://api.github.com/repos/owid/{repo_name}/pulls?{params}"
+    prs: list[dict] = []
+    pages = 0
+    while url and pages < max_pages:
+        response = requests.get(url, headers=headers, timeout=30)
+        response.raise_for_status()
+        prs.extend(response.json())
+        url = response.links.get("next", {}).get("url")
+        pages += 1
+    return prs
+
+
 @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes alongside the server data
 def fetch_server_owners() -> dict[str, str]:
     """
     Map each staging server's container name to the GitHub login of its PR author.
 
-    Staging servers don't record who created them, so we derive the owner from the
-    open PRs on the etl and owid-grapher repos. Best-effort: returns an empty mapping
-    if GitHub is unreachable or no token is configured, so the dashboard never breaks.
+    Staging servers don't record who created them, so we derive the owner from PRs on
+    the etl and owid-grapher repos. We include both open PRs (full list) and the most
+    recently-closed PRs, because a server survives for a few days after its PR is merged
+    — so merged-but-not-yet-pruned servers still need an owner. Best-effort: returns an
+    empty mapping if GitHub is unreachable or no token is configured, so the dashboard
+    never breaks.
 
     Returns:
         Dict mapping container name (e.g. ``staging-site-my-branch``) to GitHub login.
@@ -668,22 +685,21 @@ def fetch_server_owners() -> dict[str, str]:
     headers = {"Authorization": f"token {OWIDBOT_ACCESS_TOKEN}"} if OWIDBOT_ACCESS_TOKEN else {}
 
     for repo_name in ("etl", "owid-grapher"):
-        url = f"https://api.github.com/repos/owid/{repo_name}/pulls?per_page=100&state=open"
         try:
-            while url:
-                response = requests.get(url, headers=headers, timeout=30)
-                response.raise_for_status()
-                for pr in response.json():
-                    # Only OWID branches (exclude forks), and skip if author missing.
-                    if not pr["head"]["label"].startswith("owid:"):
-                        continue
-                    login = (pr.get("user") or {}).get("login")
-                    if not login:
-                        continue
-                    container_name = get_container_name(pr["head"]["ref"])
-                    # First PR wins; both repos map to the same container name.
-                    owners.setdefault(container_name, login)
-                url = response.links.get("next", {}).get("url")
+            # Open PRs first (their author wins on branch reuse), then recently-closed
+            # PRs to cover servers whose PR merged within the prune window (~3 days).
+            prs = _fetch_prs(repo_name, "state=open&per_page=100", headers, max_pages=5)
+            prs += _fetch_prs(repo_name, "state=closed&sort=updated&direction=desc&per_page=100", headers, max_pages=2)
+            for pr in prs:
+                # Only OWID branches (exclude forks), and skip if author missing.
+                if not pr["head"]["label"].startswith("owid:"):
+                    continue
+                login = (pr.get("user") or {}).get("login")
+                if not login:
+                    continue
+                container_name = get_container_name(pr["head"]["ref"])
+                # First occurrence wins (open PRs and most-recently-updated closed PRs first).
+                owners.setdefault(container_name, login)
         except requests.RequestException as e:
             log.warning("Could not fetch PR owners from GitHub", repo=repo_name, error=str(e))
 
