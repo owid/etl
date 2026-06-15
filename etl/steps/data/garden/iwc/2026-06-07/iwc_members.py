@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
@@ -214,7 +215,7 @@ def run() -> None:
 
     # add member/ former member column
     tb_members["current_status"] = tb_members.apply(
-        lambda row: "Member" if row["member"] else ("Former member" if row["former_member"] else "Not a member"), axis=1
+        lambda row: "Member" if row["member"] else ("Former member" if row["former_member"] else pd.NA), axis=1
     )
 
     # make years integers
