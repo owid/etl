@@ -15,6 +15,8 @@ definitions:
       We consider the year of the last decriminalization of homosexuality in Germany to be 1969, the year it was decriminalized in West Germany. East Germany did it in 1968.
 
       We modified the homosexuality status for Russia, Armenia, Azerbaijan, Estonia, Georgia, Kazakhstan, Kyrgyzstan, Latvia, Lithuania, Moldova, Tajikistan, Turkmenistan, and Uzbekistan before 1832 to "Legal" to reflect what it is mentioned on page 8 of the original paper (_[the Russian Empire] have not criminalized these practices since at least the 18th century_).
+    description_key:
+      - The legal status shown for each country reflects the situation as of June 2026.
     presentation:
       attribution_short: Mignot
       topic_tags:
