@@ -156,6 +156,15 @@ steps:
     - data://garden/emissions/2026-06-15/emissions_by_human_activity_splitting_electricity:
       - data://garden/emissions/2026-06-15/emissions_by_human_activity
       - data://garden/un/2026-02-11/energy_statistics_database
+  # As above, but "Growing food" uses gross agriculture-and-land-use emissions from Jones et al. (AR4).
+  data://grapher/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf:
+    - data://garden/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf:
+      - data://garden/emissions/2026-06-15/emissions_by_human_activity
+      - data://garden/emissions/2025-12-04/national_contributions
+  data://grapher/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf_splitting_electricity:
+    - data://garden/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf_splitting_electricity:
+      - data://garden/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf
+      - data://garden/un/2026-02-11/energy_statistics_database
   #
   # RFF - World Carbon Pricing.
   #
