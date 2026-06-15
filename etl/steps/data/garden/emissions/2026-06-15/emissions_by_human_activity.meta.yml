@@ -147,18 +147,6 @@ tables:
         short_unit: "t CO₂e"
         display:
           numSignificantFigures: 3
-      co2_emissions_corrected:
-        title: Global carbon dioxide emissions by human activity (corrected)
-        unit: "tonnes"
-        short_unit: "t"
-        display:
-          numSignificantFigures: 3
-      ghg_emissions_corrected:
-        title: Global greenhouse gas emissions by human activity (corrected)
-        unit: "tonnes of CO₂ equivalent"
-        short_unit: "t CO₂e"
-        display:
-          numSignificantFigures: 3
   # Table where electricity emissions are distributed across the activities that consume them (country-level).
   emissions_by_human_activity_including_electricity:
     title: Emissions by human activity including indirect emissions from electricity
