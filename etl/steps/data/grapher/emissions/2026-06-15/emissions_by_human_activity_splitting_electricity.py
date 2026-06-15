@@ -11,9 +11,9 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset and read both tables (country-level, with the activity as a dimension).
-    ds_garden = paths.load_dataset("emissions_by_human_activity")
-    tb = ds_garden.read("emissions_by_human_activity", reset_index=False)
-    tb_other = ds_garden.read("emissions_by_human_activity_including_other", reset_index=False)
+    ds_garden = paths.load_dataset("emissions_by_human_activity_splitting_electricity")
+    tb = ds_garden.read("emissions_by_human_activity_splitting_electricity", reset_index=False)
+    tb_other = ds_garden.read("emissions_by_human_activity_splitting_electricity_including_other", reset_index=False)
 
     #
     # Save outputs.

@@ -147,9 +147,14 @@ steps:
   #
   # Emissions - Greenhouse gas emissions by human activity.
   #
+  # Electricity shown as its own activity (Climate Watch only).
   data://grapher/emissions/2026-06-15/emissions_by_human_activity:
     - data://garden/emissions/2026-06-15/emissions_by_human_activity:
       - data://garden/climate_watch/2026-02-10/emissions_by_sector
+  # Electricity redistributed into the activities that consume it (adds UN electricity-consumption data).
+  data://grapher/emissions/2026-06-15/emissions_by_human_activity_splitting_electricity:
+    - data://garden/emissions/2026-06-15/emissions_by_human_activity_splitting_electricity:
+      - data://garden/emissions/2026-06-15/emissions_by_human_activity
       - data://garden/un/2026-02-11/energy_statistics_database
   #
   # RFF - World Carbon Pricing.
