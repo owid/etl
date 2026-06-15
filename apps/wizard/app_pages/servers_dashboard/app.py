@@ -228,7 +228,8 @@ if origin_filter:
     filtered_df = filtered_df[filtered_df["origin"].isin(origin_filter)]
 
 if branch_query:
-    filtered_df = filtered_df[filtered_df["branch"].str.contains(branch_query, case=False, na=False)]
+    # regex=False: treat the search box as literal text so metacharacters (e.g. "[") don't crash.
+    filtered_df = filtered_df[filtered_df["branch"].str.contains(branch_query, case=False, na=False, regex=False)]
 
 # Display filtered results count
 if len(filtered_df) != len(servers_df):
