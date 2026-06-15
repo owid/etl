@@ -299,13 +299,12 @@ def render_server_actions(server) -> None:
     server_name = server["name"]
     is_running = server["status"] == "Running"
 
-    # Quick links (same set owidbot posts on each PR) + ssh command
+    # Quick links (same set owidbot posts on each PR)
     links = build_quick_links(branch)
     st.markdown(
         f"**{server['status_indicator']} {branch}** &nbsp; · &nbsp; "
         + " · ".join(f"[{label}]({url})" for label, url in links.items())
     )
-    st.code(f"ssh owid@{server_name}", language="bash")
 
     if is_running:
         c1, c2, c3, c4 = st.columns(4)
@@ -373,11 +372,22 @@ def render_server_actions(server) -> None:
                 _destroy_dialog(branch, server_name)
 
 
-# Display servers in a table; selecting a row reveals its links and actions below.
+# Display the management panel above a selectable table.
 if filtered_df.empty:
     st.warning("No servers match the current filters.")
 else:
     filtered_df = filtered_df.reset_index(drop=True)
+
+    # Read the row selected on the previous run (the table widget is rendered below).
+    table_state = st.session_state.get("servers_table")
+    selected_rows = table_state["selection"]["rows"] if table_state else []
+
+    # Action panel for the selected server (shown above the table).
+    st.subheader("🔧 Server Management")
+    if selected_rows and selected_rows[0] < len(filtered_df):
+        render_server_actions(filtered_df.iloc[selected_rows[0]])
+    else:
+        st.caption("👆 Select a server in the table below to see its links and management actions.")
 
     # Build the display table (memory as numeric GB so the progress bar renders).
     display_df = pd.DataFrame(
@@ -392,7 +402,7 @@ else:
         }
     )
 
-    selection = st.dataframe(
+    st.dataframe(
         display_df,
         width="stretch",
         column_config={
@@ -423,11 +433,3 @@ else:
         selection_mode="single-row",
         key="servers_table",
     )
-
-    # Action panel for the selected server
-    st.subheader("🔧 Server Management")
-    selected_rows = selection["selection"]["rows"]
-    if selected_rows:
-        render_server_actions(filtered_df.iloc[selected_rows[0]])
-    else:
-        st.caption("👆 Select a server in the table to see its links and management actions.")

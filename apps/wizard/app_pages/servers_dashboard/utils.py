@@ -649,7 +649,6 @@ def build_quick_links(branch: str) -> dict[str, str]:
         "Admin": f"http://{container_name}/admin",
         "Wizard": f"http://{container_name}/etl/wizard/",
         "Chart Diff": f"http://{container_name}/etl/wizard/chart-diff",
-        "Docs": f"http://{container_name}/etl/docs/",
     }
 
 
