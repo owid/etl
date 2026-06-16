@@ -25,8 +25,14 @@ if [ "$CLAUDE_CODE_REMOTE" != "true" ]; then
 fi
 
 # Always operate from the repo root (where pyproject.toml / uv.lock live).
+# Prefer $CLAUDE_PROJECT_DIR, but it can be empty depending on how the hook is
+# invoked — fall back to deriving the root from this script's own location
+# (scripts/remote_setup.sh → repo root is one level up).
 if [ -n "$CLAUDE_PROJECT_DIR" ]; then
   cd "$CLAUDE_PROJECT_DIR" || { echo "❌ Could not cd into CLAUDE_PROJECT_DIR ($CLAUDE_PROJECT_DIR)"; exit 0; }
+else
+  SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+  cd "$SCRIPT_DIR/.." || { echo "❌ Could not cd to repo root from $SCRIPT_DIR"; exit 0; }
 fi
 if [ ! -f pyproject.toml ]; then
   echo "❌ pyproject.toml not found in $(pwd) — cannot install dependencies."
@@ -43,12 +49,25 @@ echo ""
 echo "📦 Installing dependencies (uv sync)..."
 INSTALL_START=$(date +%s)
 
-if uv sync --all-extras --group dev; then
-  INSTALL_DURATION=$(($(date +%s) - INSTALL_START))
-  echo "✅ Dependencies installed (${INSTALL_DURATION}s)"
-else
-  echo "❌ uv sync failed — the session may not have a working .venv."
-fi
+# Capture output so a failure shows WHY (uv's own error) instead of a bare
+# "failed". One quick retry rides out a transient boot-time hiccup (e.g. the
+# package index not yet reachable) without slowing the common success path.
+SYNC_LOG=$(mktemp)
+for attempt in 1 2; do
+  if uv sync --all-extras --group dev >"$SYNC_LOG" 2>&1; then
+    INSTALL_DURATION=$(($(date +%s) - INSTALL_START))
+    echo "✅ Dependencies installed (${INSTALL_DURATION}s, attempt ${attempt})"
+    break
+  fi
+  echo "⚠️  uv sync attempt ${attempt} failed:"
+  tail -20 "$SYNC_LOG" | sed 's/^/      /'
+  if [ "$attempt" -lt 2 ]; then
+    sleep 3
+  else
+    echo "❌ uv sync failed — the session may not have a working .venv."
+  fi
+done
+rm -f "$SYNC_LOG"
 
 # --- Optional: install gh CLI (non-critical) --------------------------------
 # Cloud sessions ship built-in GitHub tools that authenticate as the user, so
