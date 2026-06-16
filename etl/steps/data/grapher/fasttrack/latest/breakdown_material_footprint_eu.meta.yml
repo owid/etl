@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Marcel Gerber  # fasttrack
 tables:
   breakdown_material_footprint_eu:
     variables:

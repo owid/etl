@@ -17,6 +17,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Veronika Samborska
 tables:
   medical_devices_atlas:
     variables:
@@ -38,7 +40,7 @@ tables:
           numDecimalPlaces: 0
 
       total_density_per_million_population__magnetic_resonance_imaging:
-        title:  Total density per million population, magnetic resonance imaging
+        title: Total density per million population, magnetic resonance imaging
         unit: units per million population
         short_unit: ""
         description_short: Number of [MRI](#dod:mri-imaging) units, machines that use magnetic fields and radio waves for detailed body imaging, per million people in the population.
@@ -46,7 +48,7 @@ tables:
           numDecimalPlaces: 0
 
       total_density_per_million_population__positron_emission_tomography:
-        title:  Total density per million population, positron emission tomography
+        title: Total density per million population, positron emission tomography
         unit: units per million population
         short_unit: ""
         description_short: Number of [PET](#dod:pet-imaging) units, devices for advanced imaging using radioactive tracers, per million people in the population.

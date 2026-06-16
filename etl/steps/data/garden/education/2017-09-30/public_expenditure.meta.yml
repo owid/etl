@@ -1,5 +1,7 @@
 dataset:
   title: Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   public_expenditure:
     variables:

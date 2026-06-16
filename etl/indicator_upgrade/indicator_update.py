@@ -85,6 +85,34 @@ def update_narrative_chart_config(
     return config_new
 
 
+def collect_variable_ids_from_narrative_config(config: dict[str, Any]) -> set[int]:
+    """Collect the indicator IDs referenced by a narrative chart config.
+
+    Reads the same fields that `update_narrative_chart_config` rewrites (dimensions,
+    map.columnSlug, sortColumnSlug), so callers can tell which referenced indicators a given
+    mapping did *not* cover.
+    """
+    variable_ids: set[int] = set()
+
+    for dimension in config.get("dimensions", []):
+        if isinstance(dimension.get("variableId"), int):
+            variable_ids.add(dimension["variableId"])
+
+    if "map" in config and "columnSlug" in config["map"]:
+        try:
+            variable_ids.add(int(config["map"]["columnSlug"]))
+        except (ValueError, TypeError):
+            pass  # columnSlug might not be a numeric variable ID
+
+    if config.get("sortBy") == "column" and "sortColumnSlug" in config:
+        try:
+            variable_ids.add(int(config["sortColumnSlug"]))
+        except (ValueError, TypeError):
+            pass
+
+    return variable_ids
+
+
 def update_chart_config(
     config: dict[str, Any],
     indicator_mapping: dict[int, int],

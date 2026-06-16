@@ -13,6 +13,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   gdelt_v2:
     variables:

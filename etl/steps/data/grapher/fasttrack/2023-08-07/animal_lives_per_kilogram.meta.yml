@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   animal_lives_per_kilogram:
     variables:

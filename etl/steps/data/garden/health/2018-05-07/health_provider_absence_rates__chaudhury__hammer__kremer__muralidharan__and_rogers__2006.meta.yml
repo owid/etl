@@ -1,5 +1,7 @@
 dataset:
   title: Health provider absence rates - Chaudhury, Hammer, Kremer, Muralidharan, and Rogers (2006)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   health_provider_absence_rates__chaudhury__hammer__kremer__muralidharan__and_rogers__2006:
     variables:

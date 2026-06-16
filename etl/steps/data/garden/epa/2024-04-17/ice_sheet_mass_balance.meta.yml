@@ -2,19 +2,21 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Climate Change
+        - Climate Change
     processing_level: major
     unit: billion tonnes
     short_unit: billion t
     description_key:
-    - Values are centered at zero in 2002 to provide a consistent point of reference.
-    - A downward slope indicates a net loss of ice and snow.
-    - For reference, 1,000 billion metric tons is enough to raise sea level by about 3 millimeters.
+      - Values are centered at zero in 2002 to provide a consistent point of reference.
+      - A downward slope indicates a net loss of ice and snow.
+      - For reference, 1,000 billion metric tons is enough to raise sea level by about 3 millimeters.
 
 dataset:
   title: Ice Sheet Mass Balance
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   ice_sheet_mass_balance:
     title: Ice Sheet Mass Balance

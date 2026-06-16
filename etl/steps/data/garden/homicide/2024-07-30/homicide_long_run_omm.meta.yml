@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Fiona Spooner
 tables:
   homicide_long_run_omm:
     variables:

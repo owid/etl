@@ -6,6 +6,8 @@ dataset:
     More details by the WHO: https://www.who.int/health-topics/smallpox#tab=tab_1.
   licenses:
     - {}
+  owners:
+    - Fiona Spooner  # fasttrack
 tables:
   smallpox_cases:
     variables:

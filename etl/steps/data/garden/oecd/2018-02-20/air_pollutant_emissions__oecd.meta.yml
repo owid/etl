@@ -1,5 +1,7 @@
 dataset:
   title: Air Pollutant Emissions - OECD
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   air_pollutant_emissions__oecd:
     variables:

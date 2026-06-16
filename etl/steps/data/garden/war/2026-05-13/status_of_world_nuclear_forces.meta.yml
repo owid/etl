@@ -16,6 +16,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   status_of_world_nuclear_forces:
     variables:

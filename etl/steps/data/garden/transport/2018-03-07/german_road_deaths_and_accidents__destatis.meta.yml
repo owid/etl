@@ -1,5 +1,7 @@
 dataset:
   title: German road deaths and accidents - destatis
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   german_road_deaths_and_accidents__destatis:
     variables:

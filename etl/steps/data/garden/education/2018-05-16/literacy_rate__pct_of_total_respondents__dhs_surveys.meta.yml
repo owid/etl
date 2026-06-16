@@ -1,5 +1,7 @@
 dataset:
   title: Literacy rate (% of total respondents) - DHS Surveys
+  owners:
+    - Diana Beltekian  # backport
 tables:
   literacy_rate__pct_of_total_respondents__dhs_surveys:
     variables:

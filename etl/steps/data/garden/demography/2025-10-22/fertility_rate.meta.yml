@@ -13,6 +13,8 @@ dataset:
   title: Fertility Rate (UN WPP; HFD)
   update_period_days: 365
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   fertility_rate:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Fishery catch breakdown - Pauly and Zeller (2016)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   fishery_catch_breakdown__pauly_and_zeller__2016:
     variables:

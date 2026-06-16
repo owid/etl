@@ -51,24 +51,25 @@ TITLE_PUBLIC_END = {
     "extreme_temperature": "extreme temperatures",
     "all_disasters_excluding_extreme_temperature": "all disasters excluding extreme temperatures",
 }
-# Map disaster type to their name in the title (singular).
+# Map disaster type to their name shown in chart legends and the catalog title (plural,
+# to stay consistent with the multidim dropdowns and the public titles in TITLE_PUBLIC_END).
 TITLE_DISASTER = {
-    "earthquake": "Earthquake",
+    "earthquake": "Earthquakes",
     "extreme_weather": "Storms",
     "volcanic_activity": "Volcanoes",
-    "flood": "Flood",
+    "flood": "Floods",
     "all_disasters": "All disasters",
     # "glacial_lake_outburst_flood": ...,  # Folded into "Flood" — see EXPECTED_DISASTER_TYPES.
     "all_disasters_excluding_earthquakes": "All disasters excluding earthquakes",
-    "wildfire": "Wildfire",
-    "landslide": "Landslide",
+    "wildfire": "Wildfires",
+    "landslide": "Landslides",
     # Wet/dry mass movements are folded into "Landslide" — see EXPECTED_DISASTER_TYPES in the garden step.
-    # "wet_mass_movement": "Wet mass movement",
-    # "dry_mass_movement": "Dry mass movement",
+    # "wet_mass_movement": "Wet mass movements",
+    # "dry_mass_movement": "Dry mass movements",
     # "fog": "Fog",  # Excluded — see EXPECTED_DISASTER_TYPES in the garden step.
-    "drought": "Drought",
-    "extreme_temperature": "Extreme temperature",
-    "all_disasters_excluding_extreme_temperature": "All disasters excluding extreme temperature",
+    "drought": "Droughts",
+    "extreme_temperature": "Extreme temperatures",
+    "all_disasters_excluding_extreme_temperature": "All disasters excluding extreme temperatures",
 }
 
 

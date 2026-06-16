@@ -537,6 +537,8 @@ class DatasetMeta(MetaBase):
     update_period_days: int | None = None
     # prohibit redistribution (disable chart download)
     non_redistributable: bool = False
+    # OWID team members who maintain this dataset; first entry is the accountable owner
+    owners: list[str] = field(default_factory=list)
 
     # an md5 checksum of the ingredients used to make this dataset
     source_checksum: str | None = None

@@ -1,5 +1,7 @@
 dataset:
   title: Corporate tax revenue - ICTD UNU-WIDER GRD (2019)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   corporate_tax_revenue__ictd_unu_wider_grd__2019:
     variables:

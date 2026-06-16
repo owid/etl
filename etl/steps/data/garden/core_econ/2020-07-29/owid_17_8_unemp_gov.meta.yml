@@ -1,5 +1,7 @@
 dataset:
   title: OWID_17.8_unemp_gov
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   owid_17_8_unemp_gov:
     variables:

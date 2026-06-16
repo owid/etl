@@ -3,6 +3,8 @@ dataset:
   description: The annual number of Demographic and Health Surveys conducted by type of survey
   licenses:
     - {}
+  owners:
+    - Marcel Gerber  # fasttrack
 tables:
   annual_number_dhs_surveys_by_type:
     variables:

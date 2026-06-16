@@ -1,5 +1,7 @@
 dataset:
   title: Cereal yield index - (World Bank (2017) & OWID)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   cereal_yield_index__world_bank__2017__and__owid:
     variables:

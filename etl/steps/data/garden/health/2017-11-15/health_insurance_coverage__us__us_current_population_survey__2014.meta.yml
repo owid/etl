@@ -1,5 +1,7 @@
 dataset:
   title: Health Insurance Coverage (US) - US Current Population Survey (2014)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   health_insurance_coverage__us__us_current_population_survey__2014:
     variables:

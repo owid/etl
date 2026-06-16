@@ -20,7 +20,6 @@ def run(dest_dir: str) -> None:
     ds_passenger = paths.load_dataset("passenger_travel")
     # load old data (includes long-run historical data from national statistic divisions)
     ds_old = paths.load_dataset("road_deaths_and_injuries")
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["road_accidents"].reset_index()
@@ -72,7 +71,7 @@ def run(dest_dir: str) -> None:
     tb["passenger_kms_road"] = tb.apply(lambda x: check_road_passenger_travel(x), axis=1)
 
     # add death per million inhabitants
-    tb = geo.add_population_to_table(tb, ds_population)
+    tb = paths.regions.add_population(tb)
     tb["deaths_per_million_population"] = (tb["accident_deaths"] / tb["population"]) * 1_000_000
     # drop population as well as old death per million and per vehicle (these numbers are wrong)
     tb = tb.drop(

@@ -1,5 +1,7 @@
 dataset:
   title: Global Hunger Index (2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   global_hunger_index__2021:
     variables:

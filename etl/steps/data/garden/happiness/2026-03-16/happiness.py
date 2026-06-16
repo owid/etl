@@ -19,7 +19,6 @@ def run() -> None:
 
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
-    ds_population = paths.load_dataset("population")
 
     # drop unused columns
     tb = tb[["Year", "Rank", "Country name", "Life evaluation (3-year average)"]]
@@ -37,7 +36,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # add population weighted averages
-    tb = geo.add_population_to_table(tb, ds_population)  # ty: ignore
+    tb = paths.regions.add_population(tb)  # ty: ignore
 
     tb["cantril_times_pop"] = tb["ladder_score"] * tb["population"]
     aggr_score = {"cantril_times_pop": "sum", "population": "sum"}

@@ -21,6 +21,8 @@ dataset:
   update_period_days: 365
   title: Pathogens, SFA Study
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   seattle_pathogens:
     variables:

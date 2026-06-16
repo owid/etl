@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   great_pacific_garbage_lebreton:
     variables:
@@ -19,5 +21,4 @@ tables:
         short_unit: '%'
         display:
           numDecimalPlaces: 2
-        description: The share of the mass of hard plastic items, larger than 5 centimetres, found in the Great Pacific Garbage
-          Patch.
+        description: The share of the mass of hard plastic items, larger than 5 centimetres, found in the Great Pacific Garbage Patch.

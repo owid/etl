@@ -1,5 +1,7 @@
 dataset:
   title: Interpersonal Trust - General Social Survey (GSS)
+  owners:
+    - Jaiden Mispy  # backport
 tables:
   interpersonal_trust__general_social_survey__gss:
     variables:

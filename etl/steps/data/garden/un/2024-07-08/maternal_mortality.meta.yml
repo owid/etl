@@ -40,6 +40,9 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Tuna Acisu
+    - Fiona Spooner
 tables:
   maternal_mortality:
     variables:

@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: NVIDIA Corporation
+    title: NVIDIA Quarterly Revenue by Market Segment
+    description: |-
+      Quarterly revenue data for NVIDIA Corporation, broken down by market segment and reported in millions of US dollars per fiscal quarter.
+
+      NVIDIA's fiscal year is a 52/53-week period ending on the last Sunday in January. Each fiscal quarter is named after the fiscal year in which it ends, so fiscal year 2026 covers ~Feb 2025 to Jan 2026, and its quarters end on the last Sunday of April, July, October, and January respectively.
+    title_snapshot: NVIDIA Quarterly Revenue by Market Segment - Q1 FY2027
+    citation_full: NVIDIA Corporation - Quarterly Revenue Trends by Market Platform (2014-2026)
+    attribution_short: NVIDIA
+    url_main: https://investor.nvidia.com/financial-info/financial-reports/default.aspx
+    date_accessed: '2026-06-08'
+    date_published: '2026-05-20'
+    license:
+      name: ©2026 NVIDIA Corporation
+      url: https://www.nvidia.com/en-us/about-nvidia/terms-of-service/
+outs:
+  - md5: c109a9519747ae14568973299cd04962
+    size: 20631
+    path: nvidia_revenue.csv

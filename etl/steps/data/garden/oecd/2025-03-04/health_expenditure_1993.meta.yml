@@ -12,6 +12,8 @@ dataset:
   update_period_days: 0
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   health_expenditure_1993:
     variables:

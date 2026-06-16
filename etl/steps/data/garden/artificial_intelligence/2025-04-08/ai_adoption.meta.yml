@@ -7,7 +7,7 @@ definitions:
         - Artificial Intelligence
 
       grapher_config:
-              note: Companies represent a range of industries, sizes, functional specialties, and tenures. To adjust for differences in response rates, the data are weighted by the contribution of each respondent’s nation to global GDP.
+        note: Companies represent a range of industries, sizes, functional specialties, and tenures. To adjust for differences in response rates, the data are weighted by the contribution of each respondent’s nation to global GDP.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -15,10 +15,12 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Veronika Samborska
 tables:
   ai_adoption:
     variables:
-       pct_of_respondents:
+      pct_of_respondents:
         title: Organizations reporting having adopted AI
         description_short: Share of companies using AI technology (e.g., machine learning, computer vision, or natural language processing) in at least one business function.
         description_key:

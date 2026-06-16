@@ -1,5 +1,7 @@
 dataset:
   title: Economic impacts of 1.5C - Pretis et al.
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   economic_impacts_of_1_5c__pretis_et_al:
     variables:

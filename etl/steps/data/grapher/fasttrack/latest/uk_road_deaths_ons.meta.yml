@@ -3,6 +3,8 @@ dataset:
   description: Road fatality statistics since 1929 in Great Britain from the Office for National Statistics.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   uk_road_deaths_ons:
     variables:

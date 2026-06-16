@@ -18,6 +18,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   european_wholesale_electricity_prices_monthly:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: eat-lancet-diet-composition (grams per capita per day)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   eat_lancet_diet_composition__grams_per_capita_per_day:
     variables:

@@ -26,3 +26,5 @@ dataset:
   title: States in regions (Gleditsch)
   update_period_days: 1800
 
+  owners:
+    - Lucas Rodés-Guirao

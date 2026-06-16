@@ -1,5 +1,7 @@
 dataset:
   title: Daily hours spent with digital media per adult user, US (BOND Internet Trends (2019))
+  owners:
+    - Diana Beltekian  # backport
 tables:
   daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019:
     variables:

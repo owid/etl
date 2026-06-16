@@ -134,6 +134,8 @@ dataset:
   update_period_days: 730
   title: Wittgenstein Centre, Human Capital (Historical data + Projections)
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   main:
     common:

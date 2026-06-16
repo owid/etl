@@ -3,6 +3,8 @@ dataset:
   description: Material footprint of electricity sources, measured with and without waste rock from mining.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   electricity_material_footprint_wang:
     variables:

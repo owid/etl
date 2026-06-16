@@ -1,5 +1,7 @@
 dataset:
   title: Estimated Malaria Deaths
+  owners:
+    - Fiona Spooner  # backport
 tables:
   estimated_malaria_deaths:
     variables:

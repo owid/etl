@@ -19,6 +19,9 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   title: History Database of the Global Environment
+  owners:
+    - Lucas Rodés-Guirao
+    - Veronika Samborska
 tables:
   all_indicators:
     # Learn more about the available fields:

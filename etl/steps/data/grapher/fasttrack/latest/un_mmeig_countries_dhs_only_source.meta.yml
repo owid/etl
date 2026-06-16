@@ -3,6 +3,8 @@ dataset:
   description: Whether the DHS is the only source for maternal mortality data for the UN MMEIG's maternal mortality estimates
   licenses:
     - {}
+  owners:
+    - Marcel Gerber  # fasttrack
 tables:
   un_mmeig_countries_dhs_only_source:
     variables:

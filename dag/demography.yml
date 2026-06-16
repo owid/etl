@@ -87,6 +87,15 @@ steps:
         - data://garden/un/2024-07-12/un_wpp
 
   # HYDE ########################################
+  # HYDE 3.5
+  data://garden/hyde/2026-06-08/all_indicators:
+    - data://meadow/hyde/2026-06-08/all_indicators:
+        - snapshot://hyde/2026-06-08/all_indicators.zip
+        - snapshot://hyde/2026-06-08/general_files.zip
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/hyde/2026-06-08/all_indicators:
+    - data://garden/hyde/2026-06-08/all_indicators
+
   # HYDE 3.3
   data://garden/hyde/2024-01-02/all_indicators:
     - data://meadow/hyde/2024-01-02/all_indicators:

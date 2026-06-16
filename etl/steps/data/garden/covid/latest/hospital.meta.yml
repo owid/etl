@@ -28,6 +28,8 @@ dataset:
   update_period_days: 0
   title: COVID-19, hospitalisations
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   hospital:
     variables:
