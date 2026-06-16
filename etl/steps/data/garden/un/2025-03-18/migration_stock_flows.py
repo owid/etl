@@ -51,22 +51,23 @@ def run() -> None:
     # sum over country destination
     tb = paths.regions.add_aggregates(
         tb,
+        regions=REGIONS,
         aggregations=agg,
         country_col="country_destination",
         index_columns=["country_destination", "country_origin", "year"],
     )
 
-    tb = add_others_to_world(tb, country_col="country_destination")
-
     # sum over country origin
     tb = paths.regions.add_aggregates(
         tb,
+        regions=REGIONS,
         aggregations=agg,
         country_col="country_origin",
-        index_columns=["country_destination", "country_origin", "year"],
+        index_columns=["country_destination", "countr_yorigin", "year"],
     )
 
     tb = add_others_to_world(tb, country_col="country_origin")
+    tb = add_others_to_world(tb, country_col="country_destination")
 
     # make male and female migrants dimensions
     tb = tb.melt(
