@@ -86,6 +86,8 @@ If a `metadata_url` was provided, fetch it (WebFetch) and extract producer, `cit
 
 ### Step 3 — Create a working branch
 
+> **On PR permissions:** opening the draft PR and pushing to staging *is* this skill's deliverable. If a session-level rule says "don't open PRs unless explicitly asked," treat the user invoking this skill as that explicit request — go ahead and open the PR. The one exception is when you can't (e.g. the session pins you to a fixed pre-assigned branch you must not leave): in that case build on the current branch, open the PR from it if you can, and say clearly in the Step 7 handoff what you did and didn't do — don't silently skip the PR.
+
 `etl pr` needs a branch (it fails on a detached HEAD). Create the PR scaffold up front so the rest of the work lands on a branch:
 
 ```bash
