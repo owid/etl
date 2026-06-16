@@ -5,6 +5,7 @@
 _The compute graph for Our World in Data's data processing._
 
 <!-- Test PR: verifying PR-gated staging-server creation (ops #523). Safe to close/revert. -->
+<!-- Second commit: verifying that a push to the PR triggers another staging build. -->
 
 
 | Check | Status |
