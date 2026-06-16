@@ -1,0 +1,47 @@
+title:
+  title: Wealth share of the richest
+  title_variant: World Inequality Database
+topic_tags:
+  - Economic Inequality
+
+default_selection:
+  - Brazil
+  - South Africa
+  - United States
+  - France
+  - China
+  - Netherlands
+
+default_dimensions:
+  quantile: Richest 1%
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/economic-inequality
+        hasMapTab: true
+        chartTypes: ["LineChart"]
+        yAxis:
+          min: 0
+
+dimensions:
+  - name: Group
+    slug: quantile
+    choices:
+      - slug: Richest 1%
+        name: Richest 1%
+      - slug: Richest 10%
+        name: Richest 10%
+
+views:
+  - dimensions:
+      quantile: Richest 1%
+    indicators:
+      y:
+        - catalogPath: inequality#share_top_1__welfare_type_wealth__extrapolated_no
+
+  - dimensions:
+      quantile: Richest 10%
+    indicators:
+      y:
+        - catalogPath: inequality#share_top_10__welfare_type_wealth__extrapolated_no
