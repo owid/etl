@@ -100,70 +100,6 @@ def _latest_well_covered_year(tb: Table) -> int:
     return int(reporters_per_year[reporters_per_year >= threshold].index.max())
 
 
-def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> Table:
-    """Return SCL-derived Production and Domestic Supply for `year`, keyed on (country, item_code).
-
-    Domestic Supply follows the FAOSTAT Food Balance Sheet identity:
-
-        Domestic Supply = Production + Imports - Exports - Stock Variation
-
-    All four components come from SCL (in tonnes). Stock Variation in
-    FAOSTAT SCL is defined as `Closing - Opening` (positive when stocks
-    accumulate during the year, negative when stocks are drawn down) —
-    verified empirically against the `Opening stocks` element. It is
-    therefore *subtracted* from the supply identity: accumulated stocks
-    don't reach domestic use, while drawn-down stocks do.
-
-    Missing components are treated as 0 (a country that didn't report a
-    flow or didn't change stocks for an item simply had none). A
-    (country, item) pair absent from SCL entirely is absent from the
-    output, and will produce NaN in the downstream merge.
-
-    SCL uses the same FAO commodity item codebook as TM, so
-    the join with TM is a direct integer-code lookup."""
-    elements = ["Production", "Import quantity", "Export quantity", "Stock Variation"]
-    components = tb_scl[
-        (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t") & tb_scl["element"].isin(elements)
-    ].copy()
-    # SCL stores `item_code` as a categorical of zero-padded strings ("00000015");
-    # convert via str to int so it joins cleanly with TM's integer item codes.
-    components["item_code"] = components["item_code"].astype(str).astype(int)
-    components["country"] = components["country"].astype(str)
-    components["element"] = components["element"].astype(str)
-
-    supply_by_country_item = (
-        components.groupby(["country", "item_code", "element"], observed=True)["value"]
-        .sum()
-        .unstack("element")
-        .reset_index()
-    )
-    # Ensure all four element columns exist even if SCL didn't have any rows for one,
-    # and restore the value metadata that unstack drops from the element columns.
-    for element in elements:
-        if element not in supply_by_country_item.columns:
-            supply_by_country_item[element] = pd.NA
-        supply_by_country_item[element] = supply_by_country_item[element].copy_metadata(components["value"])
-
-    supply_by_country_item["supply"] = (
-        supply_by_country_item["Production"].fillna(0)
-        + supply_by_country_item["Import quantity"].fillna(0)
-        - supply_by_country_item["Export quantity"].fillna(0)
-        - supply_by_country_item["Stock Variation"].fillna(0)
-    )
-    # Negative supply is not physically meaningful — it signals that FBS components
-    # don't reconcile for that (country, item) (re-exports not fully captured by
-    # Stock Variation, timing mismatches, primary-equivalent aggregation, etc.).
-    # NaN it out rather than clipping to 0, so the downstream "imports as a share
-    # of supply" ratio is undefined for these pairs instead of misleadingly zero.
-    supply_by_country_item.loc[supply_by_country_item["supply"] < 0, "supply"] = pd.NA
-    # The groupby/unstack chain keeps the Table at runtime, but the pandas type stubs
-    # narrow it to a DataFrame; cast back so the annotation holds.
-    supply_by_country_item = cast(Table, supply_by_country_item)
-    return supply_by_country_item[["country", "item_code", "Production", "supply"]].rename(
-        columns={"Production": "production"}
-    )
-
-
 def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     """Reshape the trade matrix into the viz-ready slice with Production and
     apparent domestic supply context."""
@@ -190,20 +126,48 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     trade_flows = trade_flows[trade_flows["item_code"].isin(code_to_display)].copy()
     trade_flows["item"] = trade_flows["item_code"].map(code_to_display)
 
-    # 2) SCL-derived Production and Domestic Supply by (country, item), restricted to
-    #    curated codes. Supply follows the FAOSTAT FBS identity
-    #        Production + Imports − Exports − Stock Variation
-    #    with every component sourced from SCL (see `_scl_supply_by_country_and_code`).
-    supply_context = _scl_supply_by_country_and_code(tb_scl, year)
-    supply_context = supply_context[supply_context["item_code"].isin(code_to_display)].copy()
+    # 2) Build per-(country, item) Production and apparent domestic supply from SCL.
+    #    Supply follows the FBS identity documented in the module docstring; all four
+    #    components are SCL quantities in tonnes, summed over the curated items.
+    components = ["Production", "Import quantity", "Export quantity", "Stock Variation"]
+    scl = tb_scl[
+        (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t") & tb_scl["element"].isin(components)
+    ].copy()
+    # SCL stores item_code as zero-padded strings ("00000015"); convert to int to join with TM.
+    scl["item_code"] = scl["item_code"].astype(str).astype(int)
+    scl["country"] = scl["country"].astype(str)
+    scl["element"] = scl["element"].astype(str)
+    scl = scl[scl["item_code"].isin(code_to_display)]
+
+    supply_context = (
+        scl.groupby(["country", "item_code", "element"], observed=True)["value"].sum().unstack("element").reset_index()
+    )
+    # Ensure all four component columns exist even if SCL had no rows for one, and
+    # restore the value metadata that unstack drops from them.
+    for component in components:
+        if component not in supply_context.columns:
+            supply_context[component] = pd.NA
+        supply_context[component] = supply_context[component].copy_metadata(scl["value"])
+    supply_context["supply"] = (
+        supply_context["Production"].fillna(0)
+        + supply_context["Import quantity"].fillna(0)
+        - supply_context["Export quantity"].fillna(0)
+        - supply_context["Stock Variation"].fillna(0)
+    )
+    # Negative supply signals the FBS components don't reconcile (re-exports not captured by
+    # stock variation, timing mismatches, primary-equivalent aggregation). NaN it out rather
+    # than clipping to 0, so the downstream import-share ratio is undefined, not misleadingly zero.
+    supply_context.loc[supply_context["supply"] < 0, "supply"] = pd.NA
+    # The groupby/unstack chain keeps the Table at runtime, but pandas type stubs narrow it.
+    supply_context = cast(Table, supply_context)
     supply_context["item"] = supply_context["item_code"].map(code_to_display)
 
     # Exporter context column: only emit `exporter_production` for countries with
     # an SCL Production figure (we don't want to imply "0 production" for absent rows).
     exporter_production = (
-        supply_context[["country", "item", "production"]]
-        .dropna(subset=["production"])
-        .rename(columns={"country": "exporter", "production": "exporter_production"})
+        supply_context[["country", "item", "Production"]]
+        .dropna(subset=["Production"])
+        .rename(columns={"country": "exporter", "Production": "exporter_production"})
     )
 
     # Importer context column: use the FBS-identity supply for every (country, item)
@@ -213,7 +177,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
         columns={"country": "importer", "supply": "importer_supply"}
     )
 
-    # 4) Join the directional reports into one row per (exporter, importer, item).
+    # 3) Join the directional reports into one row per (exporter, importer, item).
     export_reports = trade_flows.loc[
         trade_flows["element"] == "Export quantity", ["reporter_country", "partner_country", "item", "value"]
     ].rename(columns={"reporter_country": "exporter", "partner_country": "importer", "value": "value_exporter"})
