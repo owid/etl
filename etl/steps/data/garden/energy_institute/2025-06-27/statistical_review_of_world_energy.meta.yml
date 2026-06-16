@@ -157,6 +157,27 @@ tables:
           name: Coal
         presentation:
           title_public: 'Coal consumption'
+          grapher_config:
+            title: Coal consumption
+            subtitle: Coal consumption by country or region, measured in terawatt-hours (TWh).
+            tab: map
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                customNumericColors:
+                  - 
+                legendDescription: Coal consumption, terrawatt-hours (TWh)
       coal_production_ej:
         title: 'Coal production - EJ'
         unit: 'exajoules'
@@ -255,6 +276,24 @@ tables:
           name: Gas
         presentation:
           title_public: 'Gas consumption'
+          grapher_config:
+            title: Gas consumption
+            subtitle: Natural gas consumption, measured in [terawatt-hours](#dod:watt-hours).
+            tab: map
+            map:
+              colorScale:
+                baseColorScheme: Purples
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 1
+                legendDescription: Natural gas consumption, terrawatt-hours per year
       gas_production_bcfd:
         title: 'Gas production - BCFD'
         unit: 'billion cubic feet per day'
@@ -404,6 +443,23 @@ tables:
           name: Oil
         presentation:
           title_public: 'Oil consumption'
+          grapher_config:
+            title: Oil consumption
+            subtitle: Measured in [terawatt-hours](#dod:watt-hours).
+            tab: map
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 200
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                legendDescription: Oil consumption, terrawatt-hours per year
       oil_consumption_kbd:
         title: 'Oil consumption - kBD'
         unit: 'thousand barrels per day'

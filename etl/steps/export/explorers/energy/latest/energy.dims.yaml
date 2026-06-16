@@ -1,0 +1,503 @@
+# table → column → (view, source, energy_or_electricity, metric).
+# Per-table because `primary_energy_consumption__twh` lives in both electricity_mix
+# and primary_energy_consumption and would otherwise produce a duplicate view.
+# Adding/removing an indicator means editing this map.
+primary_energy_consumption:
+  annual_change_in_primary_energy_consumption__twh:
+    view: total
+    source: na
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  primary_energy_consumption__twh:
+    view: total
+    source: na
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  primary_energy_consumption_per_capita__kwh:
+    view: total
+    source: na
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  annual_change_in_primary_energy_consumption__pct:
+    view: total
+    source: na
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+statistical_review_of_world_energy:
+  coal_consumption_twh:
+    view: breakdown
+    source: coal
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  gas_consumption_twh:
+    view: breakdown
+    source: gas
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  oil_consumption_twh:
+    view: breakdown
+    source: oil
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+electricity_mix:
+  coal_generation__twh:
+    view: breakdown
+    source: coal
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_coal_generation__kwh:
+    view: breakdown
+    source: coal
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  coal_share_of_electricity__pct:
+    view: breakdown
+    source: coal
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  fossil_generation__twh:
+    view: breakdown
+    source: fossil_fuels
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_fossil_generation__kwh:
+    view: breakdown
+    source: fossil_fuels
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  fossil_share_of_electricity__pct:
+    view: breakdown
+    source: fossil_fuels
+    energy_or_electricity: electricity_only
+    metric: share_of_total_generation
+  gas_generation__twh:
+    view: breakdown
+    source: gas
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_gas_generation__kwh:
+    view: breakdown
+    source: gas
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  gas_share_of_electricity__pct:
+    view: breakdown
+    source: gas
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  hydro_generation__twh:
+    view: breakdown
+    source: hydropower
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_hydro_generation__kwh:
+    view: breakdown
+    source: hydropower
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  hydro_share_of_electricity__pct:
+    view: breakdown
+    source: hydropower
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  low_carbon_generation__twh:
+    view: breakdown
+    source: low_carbon
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_low_carbon_generation__kwh:
+    view: breakdown
+    source: low_carbon
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  low_carbon_share_of_electricity__pct:
+    view: breakdown
+    source: low_carbon
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  nuclear_generation__twh:
+    view: breakdown
+    source: nuclear
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_nuclear_generation__kwh:
+    view: breakdown
+    source: nuclear
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  nuclear_share_of_electricity__pct:
+    view: breakdown
+    source: nuclear
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  oil_generation__twh:
+    view: breakdown
+    source: oil
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_oil_generation__kwh:
+    view: breakdown
+    source: oil
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  oil_share_of_electricity__pct:
+    view: breakdown
+    source: oil
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  renewable_generation__twh:
+    view: breakdown
+    source: renewables
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_renewable_generation__kwh:
+    view: breakdown
+    source: renewables
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  renewable_share_of_electricity__pct:
+    view: breakdown
+    source: renewables
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  solar_generation__twh:
+    view: breakdown
+    source: solar
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_solar_generation__kwh:
+    view: breakdown
+    source: solar
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  solar_share_of_electricity__pct:
+    view: breakdown
+    source: solar
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  solar_and_wind_generation__twh:
+    view: breakdown
+    source: solar_and_wind
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_solar_and_wind_generation__kwh:
+    view: breakdown
+    source: solar_and_wind
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  solar_and_wind_share_of_electricity__pct:
+    view: breakdown
+    source: solar_and_wind
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  wind_generation__twh:
+    view: breakdown
+    source: wind
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  per_capita_wind_generation__kwh:
+    view: breakdown
+    source: wind
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  wind_share_of_electricity__pct:
+    view: breakdown
+    source: wind
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+  total_demand__twh:
+    view: total
+    source: na
+    energy_or_electricity: electricity_only
+    metric: annual_demand
+  total_generation__twh:
+    view: total
+    source: na
+    energy_or_electricity: electricity_only
+    metric: annual_generation
+  co2_intensity__gco2_kwh:
+    view: total
+    source: na
+    energy_or_electricity: electricity_only
+    metric: carbon_intensity
+  net_imports_share_of_demand__pct:
+    view: total
+    source: na
+    energy_or_electricity: electricity_only
+    metric: electricity_imports_share_of_demand
+  total_net_imports__twh:
+    view: total
+    source: na
+    energy_or_electricity: electricity_only
+    metric: net_electricity_imports
+  per_capita_total_generation__kwh:
+    view: total
+    source: na
+    energy_or_electricity: electricity_only
+    metric: per_capita_generation
+  total_electricity_share_of_primary_energy__pct:
+    view: total
+    source: na
+    energy_or_electricity: electricity_only
+    metric: share_of_total
+energy_mix:
+  coal__twh_growth:
+    view: breakdown
+    source: coal
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  coal_per_capita__kwh:
+    view: breakdown
+    source: coal
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  coal__pct_growth:
+    view: breakdown
+    source: coal
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  coal__pct_equivalent_primary_energy:
+    view: breakdown
+    source: coal
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  fossil_fuels__twh_growth:
+    view: breakdown
+    source: fossil_fuels
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  fossil_fuels__twh:
+    view: breakdown
+    source: fossil_fuels
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  fossil_fuels_per_capita__kwh:
+    view: breakdown
+    source: fossil_fuels
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  fossil_fuels__pct_growth:
+    view: breakdown
+    source: fossil_fuels
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  fossil_fuels__pct_equivalent_primary_energy:
+    view: breakdown
+    source: fossil_fuels
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  gas__twh_growth:
+    view: breakdown
+    source: gas
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  gas_per_capita__kwh:
+    view: breakdown
+    source: gas
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  gas__pct_growth:
+    view: breakdown
+    source: gas
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  gas__pct_equivalent_primary_energy:
+    view: breakdown
+    source: gas
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  hydro__twh_growth__equivalent:
+    view: breakdown
+    source: hydropower
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  hydro__twh__equivalent:
+    view: breakdown
+    source: hydropower
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  hydro_per_capita__kwh__equivalent:
+    view: breakdown
+    source: hydropower
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  hydro__pct_growth:
+    view: breakdown
+    source: hydropower
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  hydro__pct_equivalent_primary_energy:
+    view: breakdown
+    source: hydropower
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  low_carbon_energy__twh_growth__equivalent:
+    view: breakdown
+    source: low_carbon
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  low_carbon_energy__twh__equivalent:
+    view: breakdown
+    source: low_carbon
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  low_carbon_energy_per_capita__kwh__equivalent:
+    view: breakdown
+    source: low_carbon
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  low_carbon_energy__pct_growth:
+    view: breakdown
+    source: low_carbon
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  low_carbon_energy__pct_equivalent_primary_energy:
+    view: breakdown
+    source: low_carbon
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  nuclear__twh_growth__equivalent:
+    view: breakdown
+    source: nuclear
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  nuclear__twh__equivalent:
+    view: breakdown
+    source: nuclear
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  nuclear_per_capita__kwh__equivalent:
+    view: breakdown
+    source: nuclear
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  nuclear__pct_growth:
+    view: breakdown
+    source: nuclear
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  nuclear__pct_equivalent_primary_energy:
+    view: breakdown
+    source: nuclear
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  oil__twh_growth:
+    view: breakdown
+    source: oil
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  oil_per_capita__kwh:
+    view: breakdown
+    source: oil
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  oil__pct_growth:
+    view: breakdown
+    source: oil
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  oil__pct_equivalent_primary_energy:
+    view: breakdown
+    source: oil
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  renewables__twh_growth__equivalent:
+    view: breakdown
+    source: renewables
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  renewables__twh__equivalent:
+    view: breakdown
+    source: renewables
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  renewables_per_capita__kwh__equivalent:
+    view: breakdown
+    source: renewables
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  renewables__pct_growth:
+    view: breakdown
+    source: renewables
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  renewables__pct_equivalent_primary_energy:
+    view: breakdown
+    source: renewables
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  solar__twh_growth__equivalent:
+    view: breakdown
+    source: solar
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  solar__twh__equivalent:
+    view: breakdown
+    source: solar
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  solar_per_capita__kwh__equivalent:
+    view: breakdown
+    source: solar
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  solar__pct_growth:
+    view: breakdown
+    source: solar
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  solar__pct_equivalent_primary_energy:
+    view: breakdown
+    source: solar
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  solar_and_wind__twh_growth__equivalent:
+    view: breakdown
+    source: solar_and_wind
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  solar_and_wind__twh__equivalent:
+    view: breakdown
+    source: solar_and_wind
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  solar_and_wind_per_capita__kwh__equivalent:
+    view: breakdown
+    source: solar_and_wind
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  solar_and_wind__pct_growth:
+    view: breakdown
+    source: solar_and_wind
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  solar_and_wind__pct_equivalent_primary_energy:
+    view: breakdown
+    source: solar_and_wind
+    energy_or_electricity: primary_energy
+    metric: share_of_total
+  wind__twh_growth__equivalent:
+    view: breakdown
+    source: wind
+    energy_or_electricity: primary_energy
+    metric: abs_change_from_previous_year
+  wind__twh__equivalent:
+    view: breakdown
+    source: wind
+    energy_or_electricity: primary_energy
+    metric: annual_consumption
+  wind_per_capita__kwh__equivalent:
+    view: breakdown
+    source: wind
+    energy_or_electricity: primary_energy
+    metric: per_capita_consumption
+  wind__pct_growth:
+    view: breakdown
+    source: wind
+    energy_or_electricity: primary_energy
+    metric: rel_change_from_previous_year
+  wind__pct_equivalent_primary_energy:
+    view: breakdown
+    source: wind
+    energy_or_electricity: primary_energy
+    metric: share_of_total

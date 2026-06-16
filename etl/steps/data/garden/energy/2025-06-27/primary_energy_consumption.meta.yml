@@ -22,12 +22,59 @@ tables:
         unit: '%'
         presentation:
           title_public: Annual change in primary energy consumption
+          grapher_config:
+            title: Annual change in primary energy consumption
+            subtitle: |-
+              Change in [primary energy](#dod:primaryenergy) consumption as a percentage of the consumption of the previous year, using the [substitution method](#dod:substitutionmethod).
+            map:
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -1
+                  - -15
+                  - -10
+                  - -5
+                  - 0
+                  - 5
+                  - 10
+                  - 15
+                  - 1
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+              timeTolerance: 2
       annual_change_in_primary_energy_consumption__twh:
         title: Annual change in primary energy consumption (TWh)
         short_unit: TWh
         unit: terawatt-hours
         presentation:
           title_public: Annual change in primary energy consumption
+          grapher_config:
+            title: Absolute annual change in primary energy consumption
+            subtitle: |-
+              Annual change in [primary energy](#dod:primaryenergy) consumption in one year, relative to the previous year. Energy is measured in [terawatt-hours](#dod:watt-hours), using the [substitution method](#dod:substitutionmethod).
+            tab: map
+            map:
+              colorScale:
+                baseColorScheme: BrBG
+                binningStrategy: manual
+                colorSchemeInvert: true
+                customNumericValues:
+                  - -300
+                  - -100
+                  - -30
+                  - -10
+                  - 0
+                  - 10
+                  - 30
+                  - 100
+                  - 300
+                customNumericColors:
+                  - 
+              timeTolerance: 3
       gdp:
         title: GDP
         short_unit: $
@@ -49,6 +96,27 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Primary energy consumption
+          grapher_config:
+            title: Primary energy consumption
+            subtitle: |-
+              [Primary energy](#dod:primaryenergy) consumption is measured in [terawatt-hours](#dod:watt-hours), using the [substitution method](#dod:substitutionmethod).
+            note: |-
+              Data includes only commercially-traded fuels (coal, oil, gas), nuclear and modern renewables. It does not include traditional biomass.
+            tab: map
+            map:
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 500
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 1
+              timeTolerance: 3
       primary_energy_consumption_per_gdp__kwh_per_dollar:
         title: Primary energy consumption per GDP (kWh/$)
         short_unit: kWh
@@ -68,6 +136,43 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Primary energy consumption per capita
+          grapher_config:
+            title: Energy use per person
+            subtitle: |-
+              Measured in [kilowatt-hours](#dod:watt-hours) per person. Here, energy refers to [primary energy](#dod:primaryenergy) using the [substitution method](#dod:substitutionmethod).
+            tab: map
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 1000
+                  - 3000
+                  - 10000
+                  - 30000
+                  - 100000
+                  - 300000
+                customNumericColors:
+                  - 
+                  - 
+                  - 
+                  - 
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                legendDescription: Energy use per capita (kg oil equivalent)
+              timeTolerance: 3
       source:
         title: Source of data
         short_unit: ""

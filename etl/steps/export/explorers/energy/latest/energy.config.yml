@@ -1,0 +1,94 @@
+config:
+  explorerTitle: Energy
+  explorerSubtitle: Explore data on energy production and sources.
+  downloadDataLink: https://github.com/owid/energy-data
+  isPublished: true
+  selection:
+    - United States
+    - United Kingdom
+    - China
+    - World
+    - India
+    - Brazil
+    - South Africa
+  subNavId: energy
+  subNavCurrentId: energy-data-explorer
+  thumbnail: https://assets.ourworldindata.org/uploads/2022/12/Energy-data-explorer-Thumbnail.png
+  hideAnnotationFieldsInTitle: true
+dimensions:
+  - slug: view
+    name: Total or breakdown
+    presentation:
+      type: radio
+    choices:
+      - slug: total
+        name: Total
+      - slug: breakdown
+        name: Select a source
+  - slug: source
+    name: Source
+    presentation:
+      type: dropdown
+    choices:
+      - slug: na
+        name: ''
+      - slug: fossil_fuels
+        name: Fossil fuels
+      - slug: coal
+        name: Coal
+      - slug: oil
+        name: Oil
+      - slug: gas
+        name: Gas
+      - slug: low_carbon
+        name: Low-carbon
+      - slug: nuclear
+        name: Nuclear
+      - slug: renewables
+        name: Renewables
+      - slug: hydropower
+        name: Hydropower
+      - slug: solar
+        name: Solar
+      - slug: wind
+        name: Wind
+      - slug: solar_and_wind
+        name: Solar and wind
+  - slug: energy_or_electricity
+    name: Energy or electricity
+    presentation:
+      type: radio
+    choices:
+      - slug: primary_energy
+        name: Primary energy
+      - slug: electricity_only
+        name: Electricity only
+  - slug: metric
+    name: Metric
+    presentation:
+      type: dropdown
+    choices:
+      - slug: annual_consumption
+        name: Annual consumption
+      - slug: per_capita_consumption
+        name: Per capita consumption
+      - slug: rel_change_from_previous_year
+        name: Rel. change from previous year
+      - slug: abs_change_from_previous_year
+        name: Abs. change from previous year
+      - slug: annual_generation
+        name: Annual generation
+      - slug: per_capita_generation
+        name: Per capita generation
+      - slug: net_electricity_imports
+        name: Net electricity imports
+      - slug: annual_demand
+        name: Annual demand
+      - slug: electricity_imports_share_of_demand
+        name: Electricity imports as a share of demand
+      - slug: carbon_intensity
+        name: Carbon intensity
+      - slug: share_of_total
+        name: Share of total
+      - slug: share_of_total_generation
+        name: Share of total generation
