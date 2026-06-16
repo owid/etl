@@ -1,5 +1,7 @@
 dataset:
   title: Wildfire data in the US (NIFC)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   wildfire_data_in_the_us__nifc:
     variables:

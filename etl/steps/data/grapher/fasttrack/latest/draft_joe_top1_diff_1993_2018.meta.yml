@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Joe Hasell  # fasttrack
 tables:
   draft_joe_top1_diff_1993_2018:
     variables:

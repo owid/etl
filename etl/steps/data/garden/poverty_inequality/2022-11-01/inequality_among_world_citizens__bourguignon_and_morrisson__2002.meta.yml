@@ -1,5 +1,7 @@
 dataset:
   title: Inequality Among World Citizens - Bourguignon and Morrisson (2002)
+  owners:
+    - Lucas Rodés-Guirao  # backport
 tables:
   inequality_among_world_citizens__bourguignon_and_morrisson__2002:
     variables:

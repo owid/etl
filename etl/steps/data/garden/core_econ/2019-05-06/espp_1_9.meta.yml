@@ -1,5 +1,7 @@
 dataset:
   title: ESPP_1.9
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   espp_1_9:
     variables:

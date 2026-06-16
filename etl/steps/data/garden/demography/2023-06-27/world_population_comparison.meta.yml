@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   world_population_comparison:
     variables:

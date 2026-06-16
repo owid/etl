@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -48,7 +47,6 @@ def run() -> None:
     # Load meadow dataset.
 
     ds_meadow = paths.load_dataset("child_migration")
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("child_migration")
@@ -81,7 +79,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # calculate shares per population
-    tb = geo.add_population_to_table(tb, ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb, warn_on_missing_countries=False)
 
     tb = calculate_shares(tb)
 

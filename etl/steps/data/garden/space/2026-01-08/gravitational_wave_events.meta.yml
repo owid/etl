@@ -9,6 +9,8 @@ dataset:
   update_period_days: 364
 
 
+  owners:
+    - Pablo Rosado
 tables:
   gravitational_wave_events:
     variables:

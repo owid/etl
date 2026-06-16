@@ -4,6 +4,8 @@ definitions:
       topic_tags:
         - Global Education
 
+  owners:
+    - Veronika Samborska
 tables:
   education_lee_lee:
     variables:

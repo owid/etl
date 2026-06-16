@@ -21,6 +21,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   plastic_waste_2023_2024:
     variables:
@@ -122,8 +124,8 @@ tables:
           - *data_caveat
         description_processing: We calculated this by converting total exports from tonnes to kilograms (multiplying by 1,000) and dividing by the country's population.
         display:
-            tolerance: 5
-            numDecimalPlaces: 1
+          tolerance: 5
+          numDecimalPlaces: 1
         presentation:
           grapher_config:
             map:
@@ -151,7 +153,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: RdYlBu
-                colorSchemeInvert: True
+                colorSchemeInvert: true
 
       import_share:
         title: Share of global plastic waste imports
@@ -207,7 +209,7 @@ tables:
             map:
               colorScale:
                 baseColorScheme: RdYlBu
-                colorSchemeInvert: True
+                colorSchemeInvert: true
 
       export_share_transported_by_air:
         title: Share of plastic waste exports by air

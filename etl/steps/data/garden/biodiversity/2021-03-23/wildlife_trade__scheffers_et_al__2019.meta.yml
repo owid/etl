@@ -1,5 +1,7 @@
 dataset:
   title: Wildlife trade (Scheffers et al. 2019)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   wildlife_trade__scheffers_et_al__2019:
     variables:
@@ -51,16 +53,14 @@ tables:
         short_unit: '%'
         display:
           name: Share of traded species that are traded as products
-        description: Share of traded species that are traded for their products (such as meat, medicines, horns, trunks or
-          other body parts).
+        description: Share of traded species that are traded for their products (such as meat, medicines, horns, trunks or other body parts).
       species_traded_as_products__number:
         title: Species traded as products (number)
         unit: species
         display:
           name: Number of species traded for products
           numDecimalPlaces: 0
-        description: Number of species that are traded for their products (such as meat, medicines, horns, trunks or other
-          body parts).
+        description: Number of species that are traded for their products (such as meat, medicines, horns, trunks or other body parts).
     dimensions:
       - name: year
         slug: year

@@ -1,5 +1,7 @@
 dataset:
   title: ocean_waste_by_item
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   ocean_waste_by_item:
     variables:

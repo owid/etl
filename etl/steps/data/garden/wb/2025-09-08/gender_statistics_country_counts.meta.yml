@@ -12,6 +12,8 @@ dataset:
   title: World Bank Gender Statistics (country counts)
 
 
+  owners:
+    - Veronika Samborska
 tables:
   gender_statistics:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Figure 19.1_ version2
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   figure_19_1__version2:
     variables:

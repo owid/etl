@@ -15,7 +15,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("corruption_barometer")
-    ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
@@ -46,7 +45,7 @@ def run() -> None:
     tb["answer"] = tb["answer"].replace(answer_mapping).str.lower().str.capitalize()
 
     # Add regional aggregates by adding population, multiplying the "share" by the population, adding regions and then dividing by the population.
-    tb = geo.add_population_to_table(tb, ds_population)
+    tb = paths.regions.add_population(tb)
     tb["number"] = tb["value"] * tb["population"]
     tb = geo.add_regions_to_table(
         tb=tb,

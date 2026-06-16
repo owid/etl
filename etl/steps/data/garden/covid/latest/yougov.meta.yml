@@ -84,6 +84,8 @@ dataset:
 
 
   title: COVID-19, Behaviour Tracker Data Hub
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   yougov:
     variables:

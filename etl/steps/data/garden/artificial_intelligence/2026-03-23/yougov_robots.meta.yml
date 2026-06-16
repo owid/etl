@@ -1,4 +1,3 @@
-
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
@@ -7,15 +6,15 @@ definitions:
       topic_tags:
         - Artificial Intelligence
     description_processing: |-
-       In the source data, each response category is stored as a percentage rounded to the nearest whole number.
+      In the source data, each response category is stored as a percentage rounded to the nearest whole number.
 
-       Because each category is rounded separately, the shares across all response options don't always add up to exactly 100% — they can be 99% or 101%.
+      Because each category is rounded separately, the shares across all response options don't always add up to exactly 100% — they can be 99% or 101%.
 
-       We rescaled the values so that response shares sum to exactly 100% within each survey wave.
+      We rescaled the values so that response shares sum to exactly 100% within each survey wave.
     description_key:
-    - Respondents were asked, "Which one, if any, of the following statements do you most agree with?"
-    - 'Possible answers were: "Most robots have already developed higher levels of intelligence than humans", "Robots will be able to develop higher levels of intelligence than humans in the future", "Robots will never be able to develop higher levels of intelligence than humans", "None of these", and "Don''t know"'
-    - Number of respondents ranges between n = 1001 and n = 1085 US adults per survey wave.
+      - Respondents were asked, "Which one, if any, of the following statements do you most agree with?"
+      - 'Possible answers were: "Most robots have already developed higher levels of intelligence than humans", "Robots will be able to develop higher levels of intelligence than humans in the future", "Robots will never be able to develop higher levels of intelligence than humans", "None of these", and "Don''t know"'
+      - Number of respondents ranges between n = 1001 and n = 1085 US adults per survey wave.
     description_short: Survey respondents were asked, "Which one, if any, of the following statements do you most agree with?"
     unit: '%'
     short_unit: '%'
@@ -27,6 +26,8 @@ definitions:
 dataset:
   update_period_days: 180
 
+  owners:
+    - Veronika Samborska
 tables:
   yougov_robots:
     variables:

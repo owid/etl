@@ -1,0 +1,328 @@
+# column → (gas, accounting, fuel, count, relative_to_world) — locked here so we
+# exactly preserve production's dimensional layout. Adding/removing an indicator
+# means editing this map. The two upstream tables don't share column names, so a
+# single map covers both `global_carbon_budget` and `national_contributions`.
+annual_emissions_ch4_total_co2eq:
+  gas: methane
+  accounting: territorial
+  fuel: na
+  count: per_country
+  relative_to_world: total
+annual_emissions_ch4_total_co2eq_per_capita:
+  gas: methane
+  accounting: territorial
+  fuel: na
+  count: per_capita
+  relative_to_world: total
+annual_emissions_ghg_total_co2eq:
+  gas: all_ghg
+  accounting: territorial
+  fuel: na
+  count: per_country
+  relative_to_world: total
+annual_emissions_ghg_total_co2eq_per_capita:
+  gas: all_ghg
+  accounting: territorial
+  fuel: na
+  count: per_capita
+  relative_to_world: total
+annual_emissions_n2o_total_co2eq:
+  gas: nitrous_oxide
+  accounting: territorial
+  fuel: na
+  count: per_country
+  relative_to_world: total
+annual_emissions_n2o_total_co2eq_per_capita:
+  gas: nitrous_oxide
+  accounting: territorial
+  fuel: na
+  count: per_capita
+  relative_to_world: total
+consumption_emissions:
+  gas: co2
+  accounting: consumption_based
+  fuel: na
+  count: per_country
+  relative_to_world: total
+consumption_emissions_per_capita:
+  gas: co2
+  accounting: consumption_based
+  fuel: na
+  count: per_capita
+  relative_to_world: total
+consumption_emissions_per_gdp:
+  gas: co2
+  accounting: consumption_based
+  fuel: na
+  count: per_gdp
+  relative_to_world: total
+cumulative_emissions_from_cement:
+  gas: co2
+  accounting: territorial
+  fuel: cement
+  count: cumulative
+  relative_to_world: total
+cumulative_emissions_from_cement_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: cement
+  count: cumulative
+  relative_to_world: relative
+cumulative_emissions_from_coal:
+  gas: co2
+  accounting: territorial
+  fuel: coal
+  count: cumulative
+  relative_to_world: total
+cumulative_emissions_from_coal_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: coal
+  count: cumulative
+  relative_to_world: relative
+cumulative_emissions_from_flaring:
+  gas: co2
+  accounting: territorial
+  fuel: flaring
+  count: cumulative
+  relative_to_world: total
+cumulative_emissions_from_flaring_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: flaring
+  count: cumulative
+  relative_to_world: relative
+cumulative_emissions_from_gas:
+  gas: co2
+  accounting: territorial
+  fuel: fossil_gas
+  count: cumulative
+  relative_to_world: total
+cumulative_emissions_from_gas_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: fossil_gas
+  count: cumulative
+  relative_to_world: relative
+cumulative_emissions_from_land_use_change:
+  gas: co2
+  accounting: territorial
+  fuel: land_use
+  count: cumulative
+  relative_to_world: total
+cumulative_emissions_from_land_use_change_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: land_use
+  count: cumulative
+  relative_to_world: relative
+cumulative_emissions_from_oil:
+  gas: co2
+  accounting: territorial
+  fuel: oil
+  count: cumulative
+  relative_to_world: total
+cumulative_emissions_from_oil_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: oil
+  count: cumulative
+  relative_to_world: relative
+cumulative_emissions_total:
+  gas: co2
+  accounting: territorial
+  fuel: all_fossil
+  count: cumulative
+  relative_to_world: total
+cumulative_emissions_total_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: all_fossil
+  count: cumulative
+  relative_to_world: relative
+cumulative_emissions_total_including_land_use_change:
+  gas: co2
+  accounting: territorial
+  fuel: fossil_plus_land_use
+  count: cumulative
+  relative_to_world: total
+cumulative_emissions_total_including_land_use_change_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: fossil_plus_land_use
+  count: cumulative
+  relative_to_world: relative
+emissions_from_cement:
+  gas: co2
+  accounting: territorial
+  fuel: cement
+  count: per_country
+  relative_to_world: total
+emissions_from_cement_per_capita:
+  gas: co2
+  accounting: territorial
+  fuel: cement
+  count: per_capita
+  relative_to_world: total
+emissions_from_coal:
+  gas: co2
+  accounting: territorial
+  fuel: coal
+  count: per_country
+  relative_to_world: total
+emissions_from_coal_per_capita:
+  gas: co2
+  accounting: territorial
+  fuel: coal
+  count: per_capita
+  relative_to_world: total
+emissions_from_flaring:
+  gas: co2
+  accounting: territorial
+  fuel: flaring
+  count: per_country
+  relative_to_world: total
+emissions_from_flaring_per_capita:
+  gas: co2
+  accounting: territorial
+  fuel: flaring
+  count: per_capita
+  relative_to_world: total
+emissions_from_gas:
+  gas: co2
+  accounting: territorial
+  fuel: fossil_gas
+  count: per_country
+  relative_to_world: total
+emissions_from_gas_per_capita:
+  gas: co2
+  accounting: territorial
+  fuel: fossil_gas
+  count: per_capita
+  relative_to_world: total
+emissions_from_land_use_change:
+  gas: co2
+  accounting: territorial
+  fuel: land_use
+  count: per_country
+  relative_to_world: total
+emissions_from_land_use_change_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: land_use
+  count: per_country
+  relative_to_world: relative
+emissions_from_land_use_change_per_capita:
+  gas: co2
+  accounting: territorial
+  fuel: land_use
+  count: per_capita
+  relative_to_world: total
+emissions_from_oil:
+  gas: co2
+  accounting: territorial
+  fuel: oil
+  count: per_country
+  relative_to_world: total
+emissions_from_oil_per_capita:
+  gas: co2
+  accounting: territorial
+  fuel: oil
+  count: per_capita
+  relative_to_world: total
+emissions_total:
+  gas: co2
+  accounting: territorial
+  fuel: all_fossil
+  count: per_country
+  relative_to_world: total
+emissions_total_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: all_fossil
+  count: per_country
+  relative_to_world: relative
+emissions_total_including_land_use_change:
+  gas: co2
+  accounting: territorial
+  fuel: fossil_plus_land_use
+  count: per_country
+  relative_to_world: total
+emissions_total_including_land_use_change_as_share_of_global:
+  gas: co2
+  accounting: territorial
+  fuel: fossil_plus_land_use
+  count: per_country
+  relative_to_world: relative
+emissions_total_including_land_use_change_per_capita:
+  gas: co2
+  accounting: territorial
+  fuel: fossil_plus_land_use
+  count: per_capita
+  relative_to_world: total
+emissions_total_per_capita:
+  gas: co2
+  accounting: territorial
+  fuel: all_fossil
+  count: per_capita
+  relative_to_world: total
+emissions_total_per_gdp:
+  gas: co2
+  accounting: territorial
+  fuel: all_fossil
+  count: per_gdp
+  relative_to_world: total
+emissions_total_per_unit_energy:
+  gas: co2
+  accounting: territorial
+  fuel: all_fossil
+  count: per_kwh
+  relative_to_world: total
+pct_traded_emissions:
+  gas: co2
+  accounting: consumption_based
+  fuel: na
+  count: share_embedded_in_trade
+  relative_to_world: total
+share_of_annual_emissions_ch4_total:
+  gas: methane
+  accounting: territorial
+  fuel: na
+  count: per_country
+  relative_to_world: relative
+share_of_annual_emissions_ghg_total:
+  gas: all_ghg
+  accounting: territorial
+  fuel: na
+  count: per_country
+  relative_to_world: relative
+share_of_annual_emissions_n2o_total:
+  gas: nitrous_oxide
+  accounting: territorial
+  fuel: na
+  count: per_country
+  relative_to_world: relative
+share_of_temperature_response_ghg_total:
+  gas: warming_impact
+  accounting: territorial
+  fuel: fossil_plus_land_use
+  count: per_country
+  relative_to_world: relative
+temperature_response_ghg_fossil:
+  gas: warming_impact
+  accounting: territorial
+  fuel: all_fossil
+  count: per_country
+  relative_to_world: total
+temperature_response_ghg_land:
+  gas: warming_impact
+  accounting: territorial
+  fuel: land_use
+  count: per_country
+  relative_to_world: total
+temperature_response_ghg_total:
+  gas: warming_impact
+  accounting: territorial
+  fuel: fossil_plus_land_use
+  count: per_country
+  relative_to_world: total

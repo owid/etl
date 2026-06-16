@@ -84,7 +84,13 @@ class Dimension(MDIMBase):
 
     @property
     def choice_slugs(self) -> list[str]:
-        # if self.choices is not None:
+        """Return this dim's choice slugs in declared order.
+
+        Example:
+
+            >>> dim.choice_slugs
+            ['female', 'male']
+        """
         return [choice.slug for choice in self.choices]
 
     @property

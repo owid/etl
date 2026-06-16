@@ -12,7 +12,7 @@ definitions:
       - Current data from UNESCO and other organizations tends to assess literacy across adults aged 15+, which has become the modern standard.  This shift toward focusing on adults makes sense — by age 15, most people have had the opportunity to complete basic schooling and their literacy skills are more likely to reflect their permanent educational attainment rather than being still in development.
       - Users should be aware of these different methodologies when comparing across years and countries.
     display:
-        numDecimalPlaces: 1
+      numDecimalPlaces: 1
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -20,6 +20,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Veronika Samborska
 tables:
   literacy_1900_1950:
     variables:

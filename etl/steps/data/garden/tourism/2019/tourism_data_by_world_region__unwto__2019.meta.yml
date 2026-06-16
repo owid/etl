@@ -1,5 +1,7 @@
 dataset:
   title: Tourism data by World Region - UNWTO (2019)
+  owners:
+    - Max Roser  # backport
 tables:
   tourism_data_by_world_region__unwto__2019:
     variables:

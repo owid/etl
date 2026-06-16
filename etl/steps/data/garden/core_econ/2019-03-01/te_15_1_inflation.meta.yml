@@ -1,5 +1,7 @@
 dataset:
   title: TE-15.1_inflation
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_15_1_inflation:
     variables:

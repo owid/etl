@@ -14,10 +14,12 @@ The source is long format: one row per (country, year, law, status). We:
 
 from owid.catalog.utils import underscore
 from owid.datautils.dataframes import map_series
+from structlog import get_logger
 
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
+log = get_logger()
 
 # OWID regions to aggregate over: the 6 continents + World, plus the 4 World Bank income groups.
 REGIONS = [
@@ -67,7 +69,11 @@ MARRIAGE_MAP = {
     "equality: 0.5 ban: 1 civil_unions: 0.5": "Varies by region",
     "equality: 0.5 ban: 1 civil_unions: 1": "Varies by region",  # Canada 2003–2004
     "equality: 0 ban: 0.5 civil_unions: 0": "Varies by region",
-    "equality: 0 ban: 1 civil_unions: 1": "Varies by region",
+    # Same-sex marriage banned nationally but civil unions recognized nationally: a national
+    # "civil unions only" regime, not a federal mismatch. The source codes these country-years
+    # with Sub_National_Variation=0 and no fractional proportions (e.g. Bolivia, Croatia,
+    # Hungary, Montenegro, Estonia, Latvia, Ecuador) — so "Varies by region" was wrong.
+    "equality: 0 ban: 1 civil_unions: 1": "Civil unions only",
     "equality: 0 ban: 1 civil_unions: 0.5": "Varies by region",
     "equality: 0 ban: 1 civil_unions: 0": "Banned",
 }
@@ -94,6 +100,13 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
     GAC 2025), and the v2.0+ subnational coverage means most countries with both
     directions populated are real subnational mixes. For both interpretations,
     "Varies by region" is a safer default than picking one direction arbitrarily.
+
+    NOTE (future updates): as of v2.0 the `both = 1` branch fires on ZERO country-years, so no row
+    is currently labelled "Varies by region" without partial data. `_warn_on_simultaneous_legal_illegal`
+    logs a warning (generically, for any law) if a future source version reintroduces `legal: 1
+    illegal: 1` rows, so each can be re-checked by hand: confirm it is a genuine transition-year
+    artefact (and "Varies by region" is right) rather than a stable regime that should map to a
+    decided category.
     """
     m = {
         f"{prog_key}: 0 {reg_key}: 0": neither_label,
@@ -104,7 +117,8 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
         f"{prog_key}: 0.5 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 1 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 0.5 {reg_key}: 1": mixed_label,
-        f"{prog_key}: 1 {reg_key}: 1": mixed_label,  # was prog_label — see docstring
+        # NOTE: transition-year artefact; 0 rows in v2.0 — re-check each occurrence on future updates (see docstring).
+        f"{prog_key}: 1 {reg_key}: 1": mixed_label,
     }
     return m
 
@@ -504,16 +518,21 @@ COMBINED_CONFIGS = [
     },
     # ── Gender-affirming care: adults + minors combined ──────────────
     # 4 source columns (adults covered / restricted, minors covered / restricted) →
-    # one categorical indicator. Of 81 possible 4-tuple patterns, only 12 occur in the
-    # v2 data; we map the 5 most common ones and route everything else to the
-    # "Varies by region or other" default.
+    # one categorical indicator over the adults×minors ∈ {covered, restricted, neither}
+    # grid. To keep the legend legible we consolidate the 8 single-policy states that occur
+    # in the data into 6 categories: the salient cases keep their own label (covered for
+    # both, adults-covered/minors-restricted, restricted for both), while the rarer
+    # one-group-only states are merged symmetrically into "Covered for adults or minors only"
+    # and "Restricted for adults or minors only". All states are still mapped explicitly (so
+    # _warn_on_unmapped_bucket_patterns keeps flagging anything new); nothing is silently
+    # swept into the catch-all.
     #
-    # NOTE: as of v2.0 the only country-year reaching the "or other" part of the
-    # default bucket is Brazil 2025 (a transition-year artefact with both covered=1
-    # and restricted=1 for adults). On each new data release, re-check whether more
-    # transition-year cases appear here and across the two-direction policies — if
-    # the count grows materially, revisit whether to surface them as their own
-    # category or apply the codebook's end-of-year recoding rule.
+    # NOTE: the "Varies by region or other" default holds only (a) genuinely partial/
+    # subnational country-years (e.g. Canada, United States) and (b) the lone Brazil 2025
+    # transition-year artefact (adults covered=1 AND restricted=1). On each new data release,
+    # re-check what reaches the default and what the unmapped-bucket warning surfaces: give a
+    # new stable state its own category, and treat covered+restricted (or legal+illegal)
+    # contradictions via the codebook's end-of-year recoding rule.
     {
         "short_name": "gender_affirming_care",
         "sources": [
@@ -524,9 +543,12 @@ COMBINED_CONFIGS = [
         ],
         "category_map": {
             "ac: 1 ar: 0 mc: 1 mr: 0": "Covered for adults and minors",
-            "ac: 1 ar: 0 mc: 0 mr: 0": "Covered for adults only",
+            "ac: 1 ar: 0 mc: 0 mr: 0": "Covered for adults or minors only",
+            "ac: 0 ar: 0 mc: 1 mr: 0": "Covered for adults or minors only",
             "ac: 1 ar: 0 mc: 0 mr: 1": "Adults covered, minors restricted",
             "ac: 0 ar: 1 mc: 0 mr: 1": "Restricted for both",
+            "ac: 0 ar: 1 mc: 0 mr: 0": "Restricted for adults or minors only",
+            "ac: 0 ar: 0 mc: 0 mr: 1": "Restricted for adults or minors only",
             "ac: 0 ar: 0 mc: 0 mr: 0": "Neither covered nor restricted",
         },
         "default_category": "Varies by region or other",
@@ -597,7 +619,32 @@ def _build_one_combined(wide, config):
         eoe = wide[f"{law}__{status}__eoe"]
         unenforced_mask = (result == refinement["from_label"]) & (eoe == 0)
         result = result.where(~unenforced_mask, refinement["to_label"])
+
+    _warn_on_unmapped_bucket_patterns(config, keys)
     return result.copy_metadata(wide["country"])
+
+
+def _warn_on_unmapped_bucket_patterns(config, keys):
+    """Warn when an all-integer bucket combination is not explicitly mapped to a category.
+
+    For multi-input indicators (e.g. gender_affirming_care, which crosses adults × minors ×
+    {covered, restricted, neither}) an all-integer combination is a *definite* national state. If
+    it isn't in `category_map` it gets swept into the `default_category` catch-all (or, for configs
+    without one, leaks as a raw bucket string) — the gap that hid "Covered for minors only" etc.
+    Surface these so a reviewer can decide whether each deserves its own category. Partial (0.5)
+    combinations are excluded: those legitimately route to "Varies by region".
+    """
+    explicit = set(config["category_map"])
+    unmapped = keys.notna() & ~keys.isin(explicit) & ~keys.fillna("").str.contains("0.5")
+    if unmapped.any():
+        log.warning(
+            "lgbti_national_policy_dataset.unmapped_bucket_pattern",
+            indicator=config["short_name"],
+            patterns=keys[unmapped].value_counts().to_dict(),
+            hint="All-integer (non-partial) bucket combinations with no explicit category — each is a "
+            "definite state routed to the catch-all. Consider giving it its own category, or fix a "
+            "contradictory same-year coding (see gender_affirming_care).",
+        )
 
 
 def run() -> None:
@@ -626,6 +673,9 @@ def run() -> None:
     placeholders = _detect_structural_placeholders(tb)
     mask = tb.set_index(["law", "status"]).index.isin(placeholders)
     tb = tb.loc[~mask].reset_index(drop=True)
+
+    # Warn on country-years coded fully legal AND fully illegal at once (see _binary_map docstring).
+    _warn_on_simultaneous_legal_illegal(tb)
 
     # Country-level table — drop the requirement and enforcement columns here; they're
     # only used to build combined indicators and aren't published as per-row long-table
@@ -686,6 +736,29 @@ def _detect_structural_placeholders(tb):
         f"Expected 18 placeholder (law, status) combos per codebook v2.0 §1.1; found {len(placeholders)}."
     )
     return placeholders
+
+
+def _warn_on_simultaneous_legal_illegal(tb):
+    """Warn for any (country, year, law) coded fully legal AND fully illegal in the same year.
+
+    For two-direction laws this is a contradiction — the codebook's "transition-year artefact"
+    (a mid-year change logged in both directions). It carries no partial/subnational signal yet
+    feeds the combined indicators (folding into "Varies by region" or an unmapped bucket), so it
+    should be re-checked by hand. Generic across every law — no hard-coded list — so future source
+    versions that introduce such rows in any law surface automatically. As of v2.0 there are none.
+    """
+    wide = tb.pivot_table(index=["country", "year", "law"], columns="status", values="proportion", aggfunc="first")
+    if "legal" not in wide.columns or "illegal" not in wide.columns:
+        return
+    both = wide[(wide["legal"] == 1) & (wide["illegal"] == 1)]
+    if not both.empty:
+        log.warning(
+            "lgbti_national_policy_dataset.simultaneous_legal_illegal",
+            n=int(len(both)),
+            cases=both.index.tolist(),
+            hint="Coded fully legal AND illegal in the same year; re-check the classification "
+            "(transition-year artefact — see _binary_map docstring).",
+        )
 
 
 def _build_regional_aggregates(tb):

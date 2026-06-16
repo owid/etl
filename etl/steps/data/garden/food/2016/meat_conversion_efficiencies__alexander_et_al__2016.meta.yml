@@ -1,5 +1,7 @@
 dataset:
   title: Meat conversion efficiencies - Alexander et al. (2016)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   meat_conversion_efficiencies__alexander_et_al__2016:
     variables:

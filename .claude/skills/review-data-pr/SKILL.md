@@ -9,6 +9,8 @@ metadata:
 
 End-to-end review of a dataset-update PR. Goes deeper than `/review`: actually runs the steps, compares to the previous version, audits metadata coverage against a fixed checklist, and reports on `/update-dataset` workflow status (Slack draft, Codex review, indicator upgrade, downstream deps).
 
+> **Paired skill — keep in sync.** [`/update-dataset`](../update-dataset/SKILL.md) is the author-side counterpart of this skill: the steps it defines are the outcomes verified here. Whenever you add, remove, or change a check in this file, check whether `update-dataset/SKILL.md` needs a matching author-side step (and add it in the same commit if so). The reverse also holds — see the mirror note there.
+
 ## Inputs
 
 - Optional PR number. If omitted, derive it from the current branch via `gh pr list --head <branch>`.
@@ -22,6 +24,8 @@ gh pr view <num> --json title,body,isDraft,mergeable,statusCheckRollup,comments,
 ```
 
 Flag if **PR description is empty** (per user's standing rule: keep PR body in sync with substantial changes).
+
+Flag 🟡 if the Summary doesn't open with a **tracking-issue link** (`Tracks: owid/owid-issues#NNNN`) — `/update-dataset` requires it as the first line; most data updates have a corresponding `owid-issues` ticket.
 
 ### 2. Diff and changed files
 
@@ -65,6 +69,10 @@ The `--grapher` upload is required to verify MySQL ingestion and to enable later
 - MySQL upload returns a `dataset id` and shows variable upserts
 - No errors / no empty tables
 
+**Shortcut: read DB checks off the populated staging server.** OWID provisions a `staging-site-<branch>` server (via Buildkite) that runs the ETL chain and uploads to its MySQL. Once it's built, you can read the DB-dependent checks (chart count, `attributionShort`, rendered titles/Jinja coverage, indicator-upgrade, ghost variables) straight off staging instead of re-running `--grapher` locally — which also avoids re-triggering step side-effects (e.g. a grapher step that exports to Google Sheets). **Confirm the staging ETL build actually ran and finished** before trusting it: query `staging-site-<branch>` for the new dataset's variables (they exist) **and** check the `owidbot` PR comment shows a chart-diff block (✅) — that comment is produced *after* the staging build. ⚠️ Do **not** use the GitHub **`build-and-deploy`** check as that signal — it's the *docs* Cloudflare Pages deploy (`.github/workflows/deploy-docs-cf.yml`: `make docs.build` → deploys `site/`), with **no** ETL chain or Grapher upload, so a green `build-and-deploy` says nothing about pipeline correctness or the data DB. Reserve a local build for what the staging DB can't answer — chiefly **entity-level canonicalization (§8c #2)** (data lives outside MySQL). If you can't confirm staging is populated, run the pipeline locally per the steps above, and say in the report whether correctness rests on the staging build or a local run.
+
+**Review the actual PR head, not a stale local checkout.** The local branch can lag `origin` (or carry an in-progress merge). Before reading step files locally, `git fetch` and confirm your tree matches the PR head — `git diff HEAD origin/<branch> --stat` should be empty, and `gh pr view <num> --json headRefOid` should match `git rev-parse HEAD`. `gh pr view --files` / `gh pr diff` and the staging DB always reflect origin; local `Read`s do not. If they diverge, sync (or review via `gh pr diff`) before trusting local files.
+
 ### 5. Snapshot field comparison
 
 Read both `.dvc` files (old and new) and produce a side-by-side table for these fields:
@@ -76,13 +84,18 @@ Read both `.dvc` files (old and new) and produce a side-by-side table for these 
 | `date_published` | **Must differ from `date_accessed`** — source from `url_main` or the file. If unsure, ask. |
 | `date_accessed` | Updated to today (or run-date) |
 | `producer` / `attribution_short` | Same source, same values (unless changed deliberately) |
+| `citation_full` / `attribution` | **Year bumped to the new release year** — `etl update` copies both verbatim from the old `.dvc`, so a stale year ships silently. 🔴 if still the old version's year. |
+| `citation_full` year vs `date_published` year | **Warn (🟡) if they differ.** The year inside `citation_full` (and `attribution`) should normally match `date_published`'s year. A mismatch is sometimes legitimate — the producer labels the release by *edition* rather than publish date (e.g. UN IGME's "2025 report" published `2026-03-17`, so `citation_full` `(2025)` ≠ `date_published` `2026`) — but it's just as often a stale citation the author forgot to bump. Surface it for the author to confirm; don't silently pass it. |
 | `url_main` | Status check — see step 6 |
 | `url_download` | Status check; OK to remove if data is now fetched via API |
 | `license.url` | Status check |
 
 ### 6. Verify all links
 
-Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.dvc` and `.meta.yml` files. Anything non-2xx is a 🔴 blocker.
+Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.dvc` and `.meta.yml` files. A curl non-2xx is a *signal*, not proof — Cloudflare-fronted hosts return false 404s to curl. Apply the same escalation as `/update-dataset` § 6c: re-check with `WebFetch`, then the Wayback Machine. Only a URL that fails **all three** is a 🔴 blocker; a curl-only failure that WebFetch resolves is 🟢 informational.
+
+- **`docs.google.com` 200 ≠ publicly viewable.** Google Sheets/Docs links return HTTP 200 even when they're behind a permission wall (the 200 is the "request access"/sign-in page). When a user-facing `description_key`/`description_processing` links a Google Sheet, confirm real public access with `WebFetch` (ask whether the page shows data or a "you need access"/sign-in wall) — curl status alone will pass a private sheet.
+- **Cross-check the same sheet is cited consistently.** If a dataset links a "source per data point" sheet from more than one field, verify they're the *same* sheet ID — divergent IDs (one current, one stale) is a 🟡.
 
 ### 7. Code clarity & docs
 
@@ -90,18 +103,16 @@ For each step file, check:
 - **Snapshot script (if present)**: docstring explains source choice; no hidden hardcoded year/date constants without `--cli-flag` parametrization (or at minimum a clear update comment). Note: a `.py` upload script is optional — many snapshots ship with only the `.dvc` and a `url_download`. Don't flag the absence of a script.
 - **Meadow / garden / grapher**: clear top-level docstrings; no commented-out code; no silent exception handlers
 - **Garden**: harmonization uses `paths.regions.harmonize_names(tb, ...)` (the new API), not the legacy `geo.harmonize_countries`
-- **Garden assertions**: sanity checks present and not overly brittle (e.g. avoid hard-coded "X must always exceed Y" if it's not a true invariant)
+- **Garden assertions**: sanity checks present when the step does non-trivial logic (harmonization, renames, aggregations, derivations) and not overly brittle (e.g. avoid hard-coded "X must always exceed Y" if it's not a true invariant). Check value-bound coverage per indicator type (shares in [0,1], percentages-of-a-whole in [0,100], non-negativity for level indicators, mutually exclusive share categories summing to 100 within rounding tolerance, exception sets for documented outliers) — but verify any bound against the actual data before suggesting it: "% of GDP" indicators legitimately exceed 100 (see `/update-dataset` §5b-bis)
+- **Unit-branched aggregation — verify every count sums and every rate averages.** When a regional-aggregation step routes rows by a *unit string* — e.g. counts (`unit == "Number of deaths"`) get summed while everything else gets population-weighted-averaged — a count series carrying a *different* unit label silently falls into the averaging branch and produces a meaningless regional "total". (Real case: IGME summed `"Number of deaths"` but `"Number of stillbirths"` fell through to the rates path, so regional stillbirth totals became population-weighted averages — Africa showed ~60k instead of ~1M.) Enumerate the distinct units, confirm each is routed correctly (a region's count value should be ≫ any member country's, not a mid-range average), and prefer a robust predicate (`unit.startswith("Number of")`) over an exact match. Catches a class of bug a green pipeline + Jinja-renders-fine review will miss.
+- **External-write helpers may be env-guarded — read the helper before flagging.** An unconditional call to something like `export_table_to_gsheet(...)` / `get_team_folder_id()` in a garden/grapher step looks like a CI/deploy risk, but several OWID helpers early-return unless `OWID_ENV.env_local == "dev"` (so they no-op on staging/prod). Check the helper's guard before flagging — "unconditional call" ≠ "runs everywhere". If it *is* guarded, it's at most a 🟢/style note (intent could be made explicit at the call site; the dev-only side-effect can leave the exported artifact stale relative to prod), not a blocker.
 - **Grapher meta.yml**: drop it if it only duplicates the garden values — the grapher step inherits via `default_metadata=ds_garden.metadata`
 
 ### 8. Outdated practices
 
-Run the canonical detector. The source of truth is [vscode_extensions/detect-outdated-practices/src/extension.ts](vscode_extensions/detect-outdated-practices/src/extension.ts). Highlights to grep manually if the extension isn't running:
+**Run the `/check-outdated-practices` skill on every new step file** (snapshot, meadow, garden, _and_ any helper modules like `*_omms.py`). It reads [vscode_extensions/detect-outdated-practices/src/extension.ts](vscode_extensions/detect-outdated-practices/src/extension.ts) as the single source of truth and greps the full pattern set — don't hand-maintain a copy of the patterns here, and don't eyeball helper calls and decide they look current (the `geo.add_*` family looks fine but is flagged). Report every hit it returns as 🟡.
 
-- `if __name__ == "__main__":` in **snapshot files** — outdated. Remove it; snapshots run via `etls` / `etl snapshot`.
-- `geo.harmonize_countries(...)` in step files — replaced by `paths.regions.harmonize_names(...)`.
-- `dest_dir` argument, `paths.load_dependency(...)`, `np.where(...)` (strips origins), `index.map(...)` — all flagged.
-
-When in doubt, run the `/check-outdated-practices` skill on the new files.
+Separately, the metadata/origin-stripping patterns from CLAUDE.md (`pd.concat`→`pr.concat`, `pd.to_numeric`/`pd.to_datetime`→`pr.*`, `np.where`, `index.map(...)`, `pd.DataFrame(tb)` re-wrap) are **not** part of the extension — they're covered by the §7 code-clarity pass. Flag them there even when `copy_metadata`/`fillna` appears to mitigate.
 
 ### 8b. Carried-over annotations & sanity_checks (review side)
 
@@ -110,6 +121,27 @@ When in doubt, run the `/check-outdated-practices` skill on the new files.
 - **Annotations**: scan the diff for any `# NOTE:` / `# TODO:` / `# FIXME:` / `# HACK:` / `# XXX:` that are unchanged from the old version. For each, confirm the PR body mentions whether the workaround is still needed, or that it was deleted with its code. Unresolved + undocumented = 🟡.
 - **Sanity-check log flags**: grep the diff for `SHOW_SANITY_CHECK_LOGS`, `DEBUG`, `LONG_FORMAT` set to `True`. If a debug flag was left enabled, that's a 🔴 — must be reverted.
 - **Silent deletes**: in any `sanity_checks` function, scan for `drop`, `filter`, `tb = tb[...]` — row removals that the user might miss. Make sure the PR body lists them.
+- **Findings surfaced, not just flags reverted**: if the step has any sanity-check logic (function or inline `# Sanity check` block), the PR body should carry a "Sanity-check findings" section reporting what the checks said on the new data. A green pipeline run is **not** proof the invariants held — checks that `paths.log.warning(...)`/`.critical(...)` instead of `assert`/`raise` pass silently. If the new garden chain has logging-style checks and the PR body has no findings section, re-run the garden step (`--private --force --only`) and scan stdout/stderr for `warning`, `dropped`, `outlier`, `AssertionError`. Undocumented findings = 🟡; a check that newly raises on the new data = 🔴 (must be triaged with the author per `/update-dataset` §5b).
+
+### 8c. Country harmonization audit (review side)
+
+`/update-dataset` §5c defines the full audit (validate `.countries.json` targets against the canonical regions + income-groups catalogs, audit `.excluded_countries.json`, scan the garden log for the three warnings, and confirm garden-output entities are canonical). As reviewer, verify the **outcome** — every entity reaching Grapher must be canonical, and any that isn't must be documented in the PR body.
+
+Run after the §4 pipeline build. Three checks:
+
+1. **Garden log warnings.** Re-run the garden step capturing output and scan for the three stable warning strings:
+   ```bash
+   .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+       > /tmp/<short_name>_harmon.log 2>&1
+   rg -n "missing values in mapping\.|unused values in mapping\.|Unknown country names in excluded countries file:" /tmp/<short_name>_harmon.log
+   ```
+   `missing values in mapping` (source countries not in `.countries.json`) is the actionable one — 🟡 unless the PR body documents the gap. `unused values in mapping` / `Unknown … excluded` are informational 🟢.
+
+2. **Garden-output entities are canonical.** This is the check that catches inline `tb["country"] = "…"` assignments and post-harmonization mutations the `.countries.json` review can't see. **This one needs a local build** — entity lists aren't in MySQL (modern grapher stores indicator data outside the DB), so `make query` can't answer it; build the garden step and load it with `owid.catalog.Dataset("data/garden/<ns>/<v>/<short>")`. Build the canonical set (regions + latest income groups) and diff against the entities actually in the built garden tables — see the Python snippet in `/update-dataset` §5c (Python checks #3 + #5). Note `geo.REGIONS` already includes the four WB income groups, so an `isin(REGIONS)` filter de-dups them too. Any entity in the garden output that isn't in canonical regions or income groups is 🔴 **unless** it's a legitimately custom source aggregate (e.g. `" (ILO)"`/`" (WB)"`-suffixed regions, BRICS, G7) that the PR body explicitly notes lives outside the canonical system.
+
+3. **Over-exclusion.** If `.excluded_countries.json` exists, flag any entry that *is* a canonical region/aggregate (`/update-dataset` §5c Python check #4) — dropping a real country/region silently is 🟡 unless the PR body says why (e.g. source double-counts "World").
+
+If the garden step doesn't use the harmonizer at all (no `.countries.json`; `country` assigned inline), checks #2 and #3 still apply — #2 is the only thing that catches non-canonical inline values.
 
 ### 9. Indicator metadata coverage & dataset block
 
@@ -122,13 +154,27 @@ make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogP
 ```
 Any `NULL` row is a 🔴.
 
+**Staging query mechanics.** `make query` re-interprets `%` and single quotes via shell+make and breaks on the `LIKE` patterns / quoted strings these checks need. Connect directly instead and feed SQL via stdin or a `.sql` file: `mysql -h staging-site-<normalized-branch> -u owid --port 3306 -D owid < /tmp/q.sql` (host = branch lowercased, `/._` → `-`, `staging-site-` prefix stripped, first 28 chars — see the `query:` target in the `Makefile`). Note **`datasets.catalogPath` has no channel prefix** — it's `<ns>/<v>/<short>` (e.g. `un/2026-06-09/igme`), *not* `grapher/un/...`; match `catalogPath LIKE '<ns>/<v>/%'`. Batch the metadata-gap checks in one file: counts of `name=''`, `name LIKE '%<\%%'`/`'%{definitions%'`/`'%<<%'` (unrendered Jinja), `attributionShort IS NULL`, `descriptionShort IS NULL`, plus a double-space/leading-space scan on `name` and `descriptionShort` (Jinja whitespace artifacts).
+
+**Distinguish regressions from inherited gaps.** Before flagging `update_period_days` / `attributionShort` / `description_short` gaps as 🔴, check the *previous* version's `.meta.yml` — if the gap was already there, it's pre-existing (carried over by `etl update`), not introduced by this PR. Still report it (the fix is cheap and the standing convention wants it), but say so: a pre-existing gap is a 🟡 "worth adding while you're here", not a regression that blocks the update. A field that *was* set and is now missing is the real 🔴.
+
 **Additional reviewer-side metadata checks:**
 
+- **`dataset.owners` lists the PR author.** `/update-dataset` step 1a-bis requires the author — the person who ran the update / opened the PR — to append their canonical OWID name (an entry in the `schemas/dataset-schema.json` enum) to the garden `.meta.yml` `owners:` list, preserving the existing order and any `# review` / `# backport` / `# fasttrack` markers. Running an update makes you a contributor, so the author belongs there *alongside* the original owners (don't drop the originals). Verify the **PR author** is present: missing = 🟡; existing owners reordered or dropped = 🔴. Note the actor running *this review skill* is usually a different person (the reviewer) — the reviewer does **not** add themselves; the check is only that the author is listed. The exception is a self-review (author reviewing their own PR), where reviewer and author are the same person.
 - **`processing_level: major` must come with `description_processing`.** Grep the new garden meta.yml for `processing_level: major`. Each occurrence (whether on `definitions.common` or per-indicator) requires a `description_processing` field on that same scope. 🟡 mismatch.
 - **Per-indicator `description_processing` should describe the indicator's own derivation, not just point at a shared generic note.** When every aggregate indicator's `description_processing` is the exact same string (e.g. all four region indicators just reference `{definitions.description_regions_processing}` with no per-indicator detail), 🟡 flag — author should compose per-indicator sentences.
 - **Long-format-with-dimensions Jinja coverage.** When variables are keyed by a long-column name (e.g. `proportion`) with `<% if <dim> == "X" %>...<% endif %>` blocks for `title`, `description_short`, `display.name`, verify every active `(dim1, dim2)` cell renders a non-empty value. Easiest check: read every column from the grapher dataset and assert `metadata.title` is non-empty.
 - **`paths.regions.add_population(tb)` / `paths.regions.add_aggregates(tb, regions=[...])` auto-resolve their DAG dependencies.** If the garden step loads `population` (or `income_groups`) via `paths.load_dataset(...)` but never passes the dataset to anything, that's dead code — 🟡. The DAG dependency still needs to be declared either way.
 - **WB income groups in regional aggregates.** When the dataset is suitable for cross-country aggregation, check that the four WB income groups (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`) are in the `REGIONS` list, the `income_groups` DAG dep is declared, and `description_regions_processing` references the [income groups article](https://ourworldindata.org/world-bank-income-groups-explained). 🟢 informational if absent — not all datasets need this, but it's worth surfacing.
+- **Phantom-category audit on categorical indicators.** For any categorical/ordinal indicator (one whose meta declares a `sort:` label order or a category map), compare the declared labels against the values that actually appear in the built grapher data. Labels declared in `sort:` (or in a category map) but never produced clutter chart legends with empty buckets. Load each categorical column from the grapher dataset, take its unique values, and diff against the `sort:` list:
+  ```python
+  from owid.catalog import Dataset
+  ds = Dataset("data/grapher/<ns>/<v>/<short_name>")
+  tb = ds["<table>"]
+  present = set(tb["<col>"].dropna().astype(str).unique())
+  # compare `present` against the `sort:` labels in the .meta.yml
+  ```
+  Any `sort:`/map label with no backing value is 🟡 — author should drop it from `sort:`/`description_key` (or from the map if it can never occur). Re-check on every refresh: phantoms reappear when a category drops out upstream.
 
 ### 10. Metadata quality skills
 
@@ -144,11 +190,21 @@ rg "<namespace>/<old_version>/<short_name>" dag/archive/ -g "*.yml"             
 rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"   # should be in old slot, not at bottom
 ```
 
+**Internal version consistency (the silent-stale-data bug).** `etl update` occasionally leaves a new step depending on an *old*-version dep (e.g. new garden still pointing at old meadow or old snapshot), which silently loads stale data. Verify every dep *inside* the new chain's block is on the new version. Read the new chain's DAG block and confirm none of its dependency lines reference `<old_version>`:
+
+```bash
+# Print the new chain's block and eyeball the dependency lines — none should contain <old_version>.
+rg -n -A8 "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml" | rg "<old_version>"   # should be empty
+```
+
+Any hit here is a 🔴 — the new step is wired to a stale dependency.
+
 Visual inspection of the diff for:
 - Comment headers (`# Source — dataset name.`) preserved above both archived and new entries
 - Indentation consistent (` #` vs `  #` is a frequent typo)
 - Trailing newline on the archive YAML
 - New entries placed in the old block's slot, not orphaned at the bottom (🟡 if at the bottom)
+- **Both the flat and nested (compact) DAG forms are valid** (the loader accepts either). The nested form (chain declared inline, grapher → garden → meadow → snapshot) is the preferred style — don't flag a nested block as wrong, and don't flag the archive edit itself (archiving is the explicitly-requested workflow step; Codex's "don't edit archived DAG" warning is a known false-positive here).
 
 ### 12. Downstream dependency check
 
@@ -167,9 +223,17 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 | Item | Verify by |
 |---|---|
 | Indicator upgrade ran (§7) | `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'"` — non-zero |
-| Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅ |
+| Explorers / MDims re-exported (§7) | Only if the DAG has `export://explorers/...` or `export://multidim/...` steps for this dataset (`rg -e "export://explorers/.*/<short_name>" -e "export://multidim/.*/<short_name>" dag/ -g "*.yml"`). The indicator-upgrader never touches these, so run the two staging queries from `/update-dataset` §7 (old-version references in `explorer_variables` / `multi_dim_x_chart_configs`) — both must return empty. A hit = 🔴, the export step wasn't re-run. |
+| Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅. A diff that shifts **every** historical year/region by a tiny amount is usually **upstream-dataset drift** (the live data was built against an older population/regions/income_groups snapshot), not a regression — don't flag it as a 🔴; the real change should be isolable by rebuilding the old version on the current catalog (see `/update-dataset` §5). |
 | `@codex review` posted (§9) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
-| Codex threads resolved (§10) | `gh api graphql -f query='{ repository(owner:"owid", name:"etl") { pullRequest(number:<num>) { reviewThreads(first:20) { nodes { isResolved } } } } }'` — all `isResolved: true` |
+| Codex threads resolved (§10) | Write the query to a file and pass `-F query=@file.graphql` (see GraphQL note below) — list `reviewThreads(first:20){ nodes { isResolved } }`; all `isResolved: true`. |
+
+A **clean Codex review has a different shape**: no inline comments and zero review threads — just a single top-level "no issues" comment from `chatgpt-codex-connector[bot]` in the issue comments. That counts as reviewed (the threads row passes vacuously); don't flag the absence of inline threads as "review missing". Codex review state is `COMMENTED` (not `APPROVED`); fetch its inline notes via `gh api repos/owid/etl/pulls/<num>/comments --paginate --jq '.[] | select(.user.login|test("codex";"i"))'`. After `@codex review`, it usually responds in ~2–5 min — poll with a backgrounded `until` loop rather than blocking.
+
+**GitHub API gotchas (when posting/fetching review comments):**
+- **GraphQL via `gh api graphql -f query='...'` breaks on shell quoting** (the inline query gets truncated → `Expected NAME` parse errors). Write the query/mutation to a file and use `gh api graphql -F query=@/tmp/q.graphql` with variables as separate `-f name=val` (string) / `-F name=val` (typed int/file). Read bodies from a file with `-F body=@/tmp/comment.md`.
+- **Editing/adding comments inside a *pending* review** (the author's in-progress review) needs GraphQL, not REST: REST `PATCH pulls/comments/{id}` 404s on a draft, and `POST pulls/{n}/comments` errors `one pending review per pull request`. Add with `addPullRequestReviewThread(input:{pullRequestReviewId, path, line, side:RIGHT, body})`, edit with `updatePullRequestReviewComment(input:{pullRequestReviewCommentId, body})`. Get the pending review id via `reviews(first:50, states:PENDING)` and a draft comment's node id via that review's `comments`.
+- **Disclosure on review comments.** Open any inline review comment you author with `> _Written by Claude Code — @<handle> at the wheel._` (handle = the human directing the work), same as PR descriptions. Skip it only on genuinely trivial one-liners (an `@codex review` ping).
 
 **Out of scope for review:** Slack announcement and Anomalist + Chart Diff hand-off are author-side concerns, not reviewer checks.
 
@@ -190,8 +254,8 @@ Structure the review with:
 
 ## Severity rubric
 
-- 🔴 **Blocker**: missing mandatory metadata field, broken link, failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived
-- 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues
+- 🔴 **Blocker**: missing mandatory metadata field, genuinely broken link (fails curl + WebFetch + Wayback), failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, stale year in `citation_full`/`attribution`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, explorer/MDim still referencing old-version variables on staging, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data
+- 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues, undocumented sanity-check findings, phantom `sort:` labels with no backing value, over-exclusion of a canonical region, undocumented `missing values in mapping` countries, count series mis-routed into a rate/average aggregation branch, `citation_full` year ≠ `date_published` year (verify), pre-existing inherited metadata gap (`update_period_days`/`attributionShort`/`description_short` already missing in the prior version), PR author missing from `dataset.owners`, missing tracking-issue link in the PR body
 - 🟢 **Informational**: things to be aware of but not action items
 
 ## Notes

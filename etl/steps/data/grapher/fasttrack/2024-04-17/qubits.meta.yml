@@ -5,6 +5,8 @@ dataset:
     - name: Creative Commons Attribution-ShareAlike 3.0
       url: https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License
   update_period_days: '365'
+  owners:
+    - Edouard Mathieu  # fasttrack
 tables:
   qubits:
     variables:

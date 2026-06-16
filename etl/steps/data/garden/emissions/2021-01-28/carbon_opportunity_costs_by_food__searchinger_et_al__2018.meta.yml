@@ -1,5 +1,7 @@
 dataset:
   title: Carbon Opportunity Costs by Food (Searchinger et al. 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   carbon_opportunity_costs_by_food__searchinger_et_al__2018:
     variables:

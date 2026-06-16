@@ -1,5 +1,7 @@
 dataset:
   title: Clinical trial results reporting by country – EU-CTR (Dal-Ré et al., 2021)
+  owners:
+    - Saloni Dattani  # backport
 tables:
   clinical_trial_results_reporting_by_country__eu_ctr__dal_re_et_al__2021:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Clio-Infra - Human Capital
+  owners:
+    - Aibek Aldabergenov  # backport
 tables:
   clio_infra__human_capital:
     variables:
@@ -11,13 +13,11 @@ tables:
         title: Book titles per capita (Fink-Jensen 2015)
         unit: Unique booktitles per million inhabitants
         short_unit: Unique booktitles
-        description_short: The number of new book titles publisher per year, per million inhabitants in a given country for the
-          period 1500 - 2010.
+        description_short: The number of new book titles publisher per year, per million inhabitants in a given country for the period 1500 - 2010.
       composite_wellbeing_index__rijpma_2017:
         title: Composite wellbeing index (Rijpma 2017)
         unit: Composite measure of wellbeing
-        description_short: The composite measure is a linear combination of 9 Clio-Infra variables created through a latent variable
-          model.
+        description_short: The composite measure is a linear combination of 9 Clio-Infra variables created through a latent variable model.
       educational_inequality_gini_coefficient__van_leeuwen_and_van_leeuwen_li_2015:
         title: Educational inequality gini coefficient (van Leeuwen and van Leeuwen-Li 2015)
         unit: Gini

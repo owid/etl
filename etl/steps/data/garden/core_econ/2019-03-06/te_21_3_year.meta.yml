@@ -1,5 +1,7 @@
 dataset:
   title: TE-21.3_year
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_21_3_year:
     variables:

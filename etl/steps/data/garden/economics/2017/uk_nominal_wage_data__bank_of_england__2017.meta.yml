@@ -1,5 +1,7 @@
 dataset:
   title: UK Nominal wage data, price data, and real wage – Bank of England ("Three centuries of macroeconomic data") (2017)
+  owners:
+    - Max Roser  # backport
 tables:
   uk_nominal_wage_data__bank_of_england__2017:
     variables:

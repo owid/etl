@@ -1,5 +1,7 @@
 dataset:
   title: Long-term land use (Taylor and Rising)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   long_term_land_use__taylor_and_rising:
     variables:

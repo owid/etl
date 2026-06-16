@@ -1,5 +1,7 @@
 dataset:
   title: Average effective age of retirement, by gender (OECD, 2018)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   average_effective_age_of_retirement__by_gender__oecd__2018:
     variables:

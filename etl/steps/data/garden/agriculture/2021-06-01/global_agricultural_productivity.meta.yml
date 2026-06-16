@@ -1,5 +1,7 @@
 dataset:
   title: global_agricultural_productivity
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   global_agricultural_productivity:
     variables:

@@ -13,6 +13,8 @@ dataset:
   update_period_days: 365
   title: WHO Mortality Database - Self-inflicted injuries
 
+  owners:
+    - Fiona Spooner
 tables:
   self_inflicted_injuries:
     variables:

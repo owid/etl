@@ -1,5 +1,7 @@
 dataset:
   title: Deforestation in trade (Pendrill)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   deforestation_in_trade__pendrill:
     variables:

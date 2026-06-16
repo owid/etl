@@ -17,6 +17,10 @@ dataset:
 {%- if cookiecutter.is_private %}
   non_redistributable: true
 {%- endif %}
+{%- if cookiecutter.owner %}
+  owners:
+    - {{cookiecutter.owner}}
+{%- endif %}
 
 
 tables:

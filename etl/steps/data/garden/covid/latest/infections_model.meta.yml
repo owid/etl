@@ -35,6 +35,8 @@ dataset:
   update_period_days: 365
   title: COVID-19, infection model estimates
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   infections_model:
     variables:

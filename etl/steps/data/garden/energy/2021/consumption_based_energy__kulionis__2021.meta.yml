@@ -1,5 +1,7 @@
 dataset:
   title: Consumption-based energy (Kulionis, 2021)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   consumption_based_energy__kulionis__2021:
     variables:

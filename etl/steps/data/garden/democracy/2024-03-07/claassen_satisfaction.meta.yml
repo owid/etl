@@ -12,6 +12,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   claassen_satisfaction:
     variables:

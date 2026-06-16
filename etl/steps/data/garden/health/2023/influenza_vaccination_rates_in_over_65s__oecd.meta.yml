@@ -1,5 +1,7 @@
 dataset:
   title: Influenza vaccination rates in over 65s (OECD)
+  owners:
+    - Fiona Spooner  # backport
 tables:
   influenza_vaccination_rates_in_over_65s__oecd:
     variables:

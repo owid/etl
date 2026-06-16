@@ -28,7 +28,7 @@ definitions:
       numDecimalPlaces: 0
       entityAnnotationsMap: |-
         Patent Office of the Cooperation Council for the Arab States of the Gulf: Stopped accepting applications in 2021
-    description_key: &common_description
+    description_key:
       - *patents_general
       - *patents_data
       - *filing_office
@@ -41,6 +41,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Tuna Acisu
 tables:
   patents:
     variables:
