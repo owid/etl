@@ -128,6 +128,16 @@ with st.container(horizontal=True, vertical_alignment="bottom", horizontal_align
         **Branch Names**: The 'staging-site-' prefix is automatically removed for cleaner display.
         """)
 
+# Show the outcome of the last server action (carried across the post-action rerun, so it's
+# displayed alongside the freshly-refreshed server list).
+_action_result = st.session_state.pop("servers_action_result", None)
+if _action_result is not None:
+    _ok, _label, _msg = _action_result
+    if _ok:
+        st.success(f"✅ {_label}: {_msg}")
+    else:
+        st.error(f"❌ {_label} failed: {_msg}")
+
 # Fetch server data and host memory stats
 with st.spinner("Fetching staging server data...", show_time=True):
     servers_df, error = fetch_lxc_servers_data()
@@ -240,12 +250,13 @@ def _run_action(label: str, action_fn, server_name: str, spinner_msg: str) -> No
     """Run a (non-destructive) server action with a spinner, then refresh the dashboard."""
     with st.spinner(spinner_msg, show_time=True):
         success, message = action_fn(server_name)
-    if success:
-        st.toast(f"✅ {message}", icon="✅")
-        st.cache_data.clear()
-        st.rerun()
-    else:
-        st.error(f"❌ {label} failed: {message}")
+    # Always refresh the cached server list and rerun — even on failure the container's state may
+    # have changed (e.g. a wake that started the container but couldn't reach Tailscale), and a
+    # stale Idle row + Wake button would mislead. Carry the outcome across the rerun so it's still
+    # shown once the fresh state is loaded.
+    st.session_state["servers_action_result"] = (success, label, message)
+    st.cache_data.clear()
+    st.rerun()
 
 
 def _confirm_destructive_action(
