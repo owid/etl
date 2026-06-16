@@ -89,17 +89,20 @@
         "title": {
             "type": "object",
             "title": "Collection title",
-            "description": "Title configuration for the collection display.",
-            "requirement_level": "required",
+            "description": "Title configuration for the collection display. Required for multidim collections (with non-empty `dimensions`); ignored for single-chart collections (with `dimensions: []`).",
+            "requirement_level": "conditional",
             "guidelines": [
                 [
-                    "Both `title` and `title_variant` are required."
+                    "Required when the collection has at least one dimension."
+                ],
+                [
+                    "`title_variant` is optional and may be omitted."
                 ],
                 [
                     "The title should be descriptive and user-friendly."
                 ],
                 [
-                    "The title variant should provide additional context or disambiguation."
+                    "The title variant, when present, should provide additional context or disambiguation."
                 ]
             ],
             "properties": {
@@ -147,7 +150,7 @@
                     "type": "string",
                     "title": "Title variant",
                     "description": "Additional context or variant information for the title.",
-                    "requirement_level": "required",
+                    "requirement_level": "optional",
                     "guidelines": [
                         [
                             "Must not end with a period."
@@ -162,19 +165,21 @@
                 }
             },
             "required": [
-                "title",
-                "title_variant"
+                "title"
             ],
             "additionalProperties": false
         },
         "default_selection": {
             "type": "array",
             "title": "Default entity selection",
-            "description": "List of entity names (e.g., countries) selected by default when the collection loads.",
-            "requirement_level": "required",
+            "description": "List of entity names (e.g., countries) selected by default when the collection loads. Conditional: required for multidim collections with at least one view that has chart tabs (line/bar/scatter/etc.) and no per-view `selectedEntityNames` fallback. Optional for single-chart collections (`dimensions: []`) and map-only mdims.",
+            "requirement_level": "conditional",
             "guidelines": [
                 [
-                    "Must contain at least one entity."
+                    "Can be omitted when every view either has its own `selectedEntityNames` or is map-only."
+                ],
+                [
+                    "When present, must contain at least one entity."
                 ],
                 [
                     "Entity names must be harmonized country names from the OWID catalog."
@@ -328,11 +333,11 @@
         "dimensions": {
             "type": "array",
             "title": "Collection dimensions",
-            "description": "Array of dimension objects that define the filter dropdowns available to users.",
+            "description": "Array of dimension objects that define the filter dropdowns available to users. An empty array (and a single view) means the collection is pushed as a regular Grapher chart instead of a multi-dim page.",
             "requirement_level": "required",
             "guidelines": [
                 [
-                    "Must contain at least one dimension."
+                    "Can be empty when the collection is a single chart (no dimension dropdowns)."
                 ],
                 [
                     "Each dimension creates a dropdown filter in the user interface."
@@ -929,8 +934,6 @@
         }
     },
     "required": [
-        "title",
-        "default_selection",
         "dimensions",
         "views"
     ],

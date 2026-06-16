@@ -147,6 +147,47 @@ class AdminAPI:
             raise AdminAPIError({"error": js["error"], "variable_id": variable_id})
         return js
 
+    def put_chart_etl_config(
+        self,
+        chart_id: int,
+        grapher_config: dict[str, Any],
+        catalog_path: str | None = None,
+        user_id: int | None = None,
+    ) -> dict:
+        """Insert or update the chart's ETL-authored grapher config.
+
+        Writes the ETL config to its own `chart_configs` row, pointed to by
+        `charts.configIdETL`. Admin patches are preserved; the rendered `full`
+        is recomputed as merge(variableETL, etlConfig, patch).
+        When `catalog_path` is given, it's stored on `charts.catalogPath` as the
+        chart's ETL identity (mirrors `multi_dim_data_pages.catalogPath`).
+        """
+        # Mirror put_grapher_config: default the schema if missing.
+        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
+
+        # Retry in case we're restarting Admin on staging server
+        resp = requests_with_retry().put(
+            self.owid_env.admin_api + f"/charts/{chart_id}/etlConfig",
+            headers=self._headers(user_id),
+            params={"catalogPath": catalog_path} if catalog_path else None,
+            json=grapher_config,
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "chart_id": chart_id, "grapher_config": grapher_config})
+        return js
+
+    def delete_chart_etl_config(self, chart_id: int, user_id: int | None = None) -> dict:
+        """Clear the chart's ETL-authored grapher config."""
+        resp = http_session.delete(
+            self.owid_env.admin_api + f"/charts/{chart_id}/etlConfig",
+            headers=self._headers(user_id),
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "chart_id": chart_id})
+        return js
+
     def put_mdim_config(self, mdim_catalog_path: str, mdim_config: dict, user_id: int | None = None) -> dict:
         # Retry in case we're restarting Admin on staging server
         url = self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}"
