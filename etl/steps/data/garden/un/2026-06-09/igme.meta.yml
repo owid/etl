@@ -1,4 +1,5 @@
 dataset:
+  update_period_days: 365
   owners:
     - Fiona Spooner
     - Tuna Acisu
@@ -8,6 +9,7 @@ definitions:
       topic_tags:
         - Child & Infant Mortality
       attribution: United Nations Inter-agency Group for Child Mortality Estimation (2025)
+      attribution_short: UN IGME
     unit: << unit_of_measure.lower() >>
     short_unit: <% if 'rate' in indicator  %>%<% else %><%- endif -%>
     description_key:
@@ -54,7 +56,7 @@ definitions:
     The estimated number of stillbirths, per 100 total births.
     <% elif indicator == "Neonatal deaths" %>
     The estimated number of deaths of {definitions.sex} children aged less than 28 days {definitions.wealth_quintile}.
-    <% elif indicator == "Deaths 1-59 months" %>
+    <% elif indicator == "Deaths age 1-59 months" %>
     The estimated number of deaths of {definitions.sex} children aged between 1 and 59 months {definitions.wealth_quintile}.
     <% elif indicator == "Infant deaths" %>
     The estimated number of deaths of {definitions.sex} children aged under 1 {definitions.wealth_quintile}.

@@ -30,12 +30,7 @@ def run() -> None:
 
     # Process data.
     #
-    tb = paths.regions.harmonize_names(
-        tb,
-        country_col="country",
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-    )
+    tb = paths.regions.harmonize_names(tb)
 
     # Filter out just the bits of the data we want
     tb = filter_data(tb)
@@ -111,7 +106,9 @@ def regional_aggregates_counts(tb: Table, threshold: float = 0.8) -> Table:
     """Adds regional aggregates for count variables. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
     Returns: Table with regional aggregates for count variables. ONLY includes regions"""
 
-    tb_counts = tb[tb["unit_of_measure"] == "Number of deaths"]
+    sum_units = ["Number of deaths", "Number of stillbirths"]
+
+    tb_counts = tb[tb["unit_of_measure"].isin(sum_units)]
 
     tb_counts = paths.regions.add_population(tb_counts)
     tb_counts = tb_counts.dropna(subset=["population"])
@@ -142,7 +139,7 @@ def population_weighted_regional_averages(tb: Table, threshold: float = 0.8) -> 
     """Adds population-weighted averages of death rates for the regions. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
     Returns: Table with population-weighted averages of death rates for the regions. ONLY includes regions"""
 
-    tb_rates = tb[tb["unit_of_measure"] != "Number of deaths"]
+    tb_rates = tb[~(tb["unit_of_measure"].isin(["Number of deaths", "Number of stillbirths"]))]
 
     # adding population to the table and dropping rows with missing population
     tb_rates = paths.regions.add_population(tb_rates)

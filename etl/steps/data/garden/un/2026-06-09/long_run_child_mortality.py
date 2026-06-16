@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+import structlog
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -10,6 +11,8 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 REGIONS = geo.REGIONS
+
+LOG = structlog.get_logger()
 
 
 def run() -> None:
@@ -258,7 +261,7 @@ def _validate_regional_data(tb_combined_full: Table, tb_combined_sel: Table) -> 
 
         # Warn about missing regions (not all regions may be present in historical data)
         if missing_regions:
-            print(f"Warning: Missing regions in {name} dataset: {missing_regions}")
+            LOG.warning(f"Missing regions in {name} dataset: {missing_regions}")
 
     # Validate regional mortality rates are reasonable based on historical patterns
     for tb, name in [(tb_combined_full, "full"), (tb_combined_sel, "selected")]:

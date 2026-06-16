@@ -6,6 +6,7 @@ definitions:
       attribution: Gapminder (2015); UN Inter-agency Group for Child Mortality Estimation (2025)
 
 dataset:
+  update_period_days: 365
   title: Long-run data – Gapminder & UN IGME
   owners:
     - Fiona Spooner
@@ -15,6 +16,7 @@ tables:
     variables:
       child_mortality_rate_full:
         title: Child mortality rate (full)
+        description_short: The estimated share of newborns who die before reaching the age of five.
         unit: deaths per 100 live births
         short_unit: "%"
         display:
@@ -22,11 +24,13 @@ tables:
         description_key: []
       share_dying_first_five_years:
         title: Share dying in first five years
+        description_short: The share of children who die before reaching the age of five.
         unit: "%"
         short_unit: "%"
         description_key: []
       share_surviving_first_five_years:
         title: Share surviving first five years
+        description_short: The share of children who survive to reach the age of five.
         short_unit: "%"
         unit: "%"
         description_key: []
