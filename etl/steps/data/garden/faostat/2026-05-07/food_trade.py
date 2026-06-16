@@ -47,16 +47,9 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # YAML config loading & validation
 # ─────────────────────────────────────────────────────────────────────────────
-
-
-def _load_items_config() -> dict:
-    """Load the curated items config from the step's sibling food_trade.items.yaml."""
-    with open(paths.side_file("food_trade.items.yaml")) as f:
-        return yaml.safe_load(f)
 
 
 def _sanity_check_items_config(config: dict, tm_codes_in_data: set[int]) -> None:
@@ -177,7 +170,10 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     qty["item_code"] = qty["item_code"].astype(int)
     qty = qty[qty["reporter_country"] != qty["partner_country"]]
 
-    items_config = _load_items_config()
+    # Curated items config. Its name starts with "food_trade" so ETL change-detection
+    # picks it up automatically (see etl/steps/__init__.py:_step_files).
+    with open(paths.side_file("food_trade.items.yaml")) as f:
+        items_config = yaml.safe_load(f)
     _sanity_check_items_config(items_config, tm_codes_in_data=set(qty["item_code"].unique()))
 
     code_to_display = {int(e["item_code"]): e["display"] for e in items_config["items"]}
