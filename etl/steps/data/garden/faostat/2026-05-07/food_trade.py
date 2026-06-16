@@ -100,26 +100,28 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     reporters_per_year = tb_tm.groupby("year", observed=True)["reporter_country"].nunique()
     year = int(reporters_per_year[reporters_per_year >= 0.9 * reporters_per_year.max()].index.max())
 
-    # 1) Filter TM to physical quantities in tonnes for the chosen year,
-    #    drop self-trade rows, and restrict to the curated item universe.
+    # Load list of curated items.
+    with open(paths.side_file("food_trade.items.yaml")) as f:
+        items_config = yaml.safe_load(f)
+    code_to_display = {int(e["item_code"]): e["display"] for e in items_config["items"]}
+
+    # 1) Filter TM to the curated items, as quantities in tonnes for the chosen year, then
+    #    drop self-trade rows. Restricting to the curated items in the same mask keeps the
+    #    string conversions and the self-trade comparison below on ~1/8 of the rows.
     trade_flows = tb_tm[
-        (tb_tm["year"] == year) & tb_tm["element"].isin(["Export quantity", "Import quantity"]) & (tb_tm["unit"] == "t")
+        (tb_tm["year"] == year)
+        & tb_tm["element"].isin(["Export quantity", "Import quantity"])
+        & (tb_tm["unit"] == "t")
+        & tb_tm["item_code"].isin(code_to_display)
     ].copy()
     trade_flows["reporter_country"] = trade_flows["reporter_country"].astype(str)
     trade_flows["partner_country"] = trade_flows["partner_country"].astype(str)
-    trade_flows["item_code"] = trade_flows["item_code"].astype(int)
     trade_flows = trade_flows[trade_flows["reporter_country"] != trade_flows["partner_country"]]
 
-    # Curated items config. Its name starts with "food_trade" so ETL change-detection
-    # picks it up automatically (see etl/steps/__init__.py:_step_files). Validate it against
-    # the FAO item names in the snapshot (item_code -> name) before trusting the codes.
-    with open(paths.side_file("food_trade.items.yaml")) as f:
-        items_config = yaml.safe_load(f)
+    # Validate the curated config against the FAO item names in the snapshot (item_code -> name).
     tm_items = dict(zip(trade_flows["item_code"], trade_flows["item"].astype(str)))
     sanity_check_items_config(items_config, tm_items=tm_items)
 
-    code_to_display = {int(e["item_code"]): e["display"] for e in items_config["items"]}
-    trade_flows = trade_flows[trade_flows["item_code"].isin(code_to_display)].copy()
     trade_flows["item"] = trade_flows["item_code"].map(code_to_display)
 
     # 2) Build per-(country, item) Production and apparent domestic supply from SCL.
