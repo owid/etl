@@ -33,7 +33,7 @@ log = get_logger()
 S3_BUCKET_NAME = "owid-public"
 S3_DATA_DIR = Path("data/migration/")
 
-# load regions from stocks_regions.yml
+# Region/aggregate names to exclude from the visualization output.
 REGIONS = [
     # UN statistical regions
     "Central Asia (UN)",
@@ -121,7 +121,9 @@ def create_metadata_json(tb: Table, tb_pop: Table) -> tuple[dict, dict]:
     pop_pivot[("Channel Islands", 2020)] = 166235
     pop_pivot[("Channel Islands", 2024)] = 168126
 
-    def _pop_list(entity: str) -> list:
+    def _pop_list(entity: str) -> list[int]:
+        missing_years = [yr for yr in POPULATION_YEARS if (entity, yr) not in pop_pivot]
+        assert not missing_years, f"Missing population for {entity} in years: {missing_years}"
         return [int(pop_pivot[(entity, yr)]) for yr in POPULATION_YEARS]
 
     entities = [{"id": i + 1, "name": e, "population": _pop_list(e)} for i, e in enumerate(all_entities)]
@@ -185,17 +187,13 @@ def save_and_upload_json(data: dict, filename: str) -> None:
     s3_path = S3_DATA_DIR / filename
 
     with open(local_file, "w") as f:
-        json.dump(data, f, separators=(",", ":"))
+        if DRY_RUN:
+            json.dump(data, f, indent=2)
+        else:
+            json.dump(data, f, separators=(",", ":"))
 
     if DRY_RUN:
         tqdm.write(f"[DRY RUN] Would upload {local_file} to s3://{S3_BUCKET_NAME}/{s3_path}")
-        # save locally under temp files on desktop for inspection
-        temp_dir = Path.home() / "Desktop" / "temp_migration_flows_json"
-        temp_dir.mkdir(exist_ok=True)
-        temp_file = temp_dir / filename
-        with open(temp_file, "w") as f:
-            json.dump(data, f, indent=2)
-        tqdm.write(f"[DRY RUN] Also saved a pretty-printed version to {temp_file} for inspection.")
     else:
         s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_path)}", local_file, public=True, downloadable=True)
 
@@ -214,8 +212,7 @@ def run() -> None:
     # filter out regions and World aggregate since they are not included in the visualization
     tb = tb[~tb["country_destination"].isin(REGIONS) & ~tb["country_origin"].isin(REGIONS)]
 
-    # exclude channel islands (null population in population dataset)
-    # tb = tb[~tb["country_destination"].isin(["Channel Islands"]) & ~tb["country_origin"].isin(["Channel Islands"])]
+    # Channel Islands are kept (population is provided via overrides in create_metadata_json).
 
     #
     # Build metadata + entity file.
