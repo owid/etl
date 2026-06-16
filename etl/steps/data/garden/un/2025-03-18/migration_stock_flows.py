@@ -11,10 +11,10 @@ paths = PathFinder(__file__)
 REGIONS = list(geo.REGIONS.keys()) + ["World"]
 
 
-def add_others_to_world(tb, country_col):
+def add_others_to_world(tb, country_col, others_name="Others"):
     """Add "Others" region to "World" totals, as it isn't included automatically when summing over countries."""
     # add "World" as a region by summing over all countries
-    tb_w_o = tb[tb[country_col].isin(["World", "Others"])].copy()
+    tb_w_o = tb[tb[country_col].isin(["World", others_name])].copy()
 
     if country_col == "country_destination":
         tb_world = tb_w_o.groupby(["year", "country_origin"]).sum().reset_index()
@@ -66,8 +66,13 @@ def run() -> None:
         index_columns=["country_destination", "country_origin", "year"],
     )
 
+    # add "others" to "world" totals
     tb = add_others_to_world(tb, country_col="country_origin")
     tb = add_others_to_world(tb, country_col="country_destination")
+
+    # add "channel islands" to "world" totals (so they match world totals in stock data)
+    tb = add_others_to_world(tb, country_col="country_origin", others_name="Channel Islands")
+    tb = add_others_to_world(tb, country_col="country_destination", others_name="Channel Islands")
 
     # make male and female migrants dimensions
     tb = tb.melt(

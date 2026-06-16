@@ -49,22 +49,23 @@ EXCL_REGIONS = [
 ]
 
 
-def add_others_to_world(tb, country_col, others_name="Others"):
+def add_others_to_world(tb, country_col, others_name="Others", rel_columns=None):
     """Add "Others" region to "World" totals, as it isn't included automatically when summing over countries."""
     # add "World" as a region by summing over all countries
     tb_w_o = tb[tb[country_col].isin(["World", others_name])].copy()
 
-    rel_columns = [
-        "immigrants_all",
-        "immigrants_female",
-        "immigrants_male",
-        "emigrants_all",
-        "emigrants_female",
-        "emigrants_male",
-        "total_population",
-        "female_population",
-        "male_population",
-    ]
+    if rel_columns is None:
+        rel_columns = [
+            "immigrants_all",
+            "immigrants_female",
+            "immigrants_male",
+            "emigrants_all",
+            "emigrants_female",
+            "emigrants_male",
+            "total_population",
+            "female_population",
+            "male_population",
+        ]
 
     tb_w_o[rel_columns] = tb_w_o[rel_columns].fillna(0)
 
@@ -139,6 +140,8 @@ def run() -> None:
     )
 
     tb = add_others_to_world(tb, "country")
+    # add channel islands to world totals (so they match world totals in stock data)
+    tb = add_others_to_world(tb, "country", others_name="Channel Islands")
 
     # set column names for readable code
     im_s_all = "immigrant_share_of_dest_population_all"
@@ -262,15 +265,8 @@ def format_table(tb, country_cols, value_name):
         errors="raise",
     )
     # harmonize country names
-    for cnt in country_cols:
-        tb = geo.harmonize_countries(
-            df=tb,
-            countries_file=paths.country_mapping_path,
-            excluded_countries_file=paths.excluded_countries_path,
-            country_col=cnt,
-            warn_on_unused_countries=False,
-            warn_on_unknown_excluded_countries=False,
-        )
+    for country_col in country_cols:
+        tb = paths.regions.harmonize_names(tb, country_col=country_col)
 
     # remove duplicate data
     tb = tb.drop_duplicates()
