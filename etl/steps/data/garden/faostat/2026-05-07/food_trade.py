@@ -105,9 +105,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
         items_config = yaml.safe_load(f)
     code_to_display = {int(e["item_code"]): e["display"] for e in items_config["items"]}
 
-    # 1) Filter TM to the curated items, as quantities in tonnes for the chosen year, then
-    #    drop self-trade rows. Restricting to the curated items in the same mask keeps the
-    #    string conversions and the self-trade comparison below on ~1/8 of the rows.
+    # 1) Filter TM to the curated items, as quantities in tonnes for the chosen year, then drop self-trade rows.
     trade_flows = tb_tm[
         (tb_tm["year"] == year)
         & tb_tm["element"].isin(["Export quantity", "Import quantity"])
@@ -126,7 +124,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
 
     # 2) Build per-(country, item) Production and apparent domestic supply from SCL.
     #    Supply follows the FBS identity documented in the module docstring; all four
-    #    components are SCL quantities in tonnes, summed over the curated items.
+    #    components are SCL quantities in tonnes, restricted to the curated items.
     components = ["Production", "Import quantity", "Export quantity", "Stock Variation"]
     scl = tb_scl[
         (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t") & tb_scl["element"].isin(components)
@@ -137,11 +135,13 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     scl["element"] = scl["element"].astype(str)
     scl = scl[scl["item_code"].isin(code_to_display)]
 
-    supply_context = (
-        scl.groupby(["country", "item_code", "element"], observed=True)["value"].sum().unstack("element").reset_index()
-    )
+    # Pivot the four components into one column each, keyed on (country, item_code). We pivot
+    # rather than groupby-sum so that any duplicate (country, item_code, element) row raises
+    # instead of being silently summed: SCL reports one value per key, so duplicates would be
+    # a data error, not something to aggregate.
+    supply_context = scl.pivot(index=["country", "item_code"], columns="element", values="value").reset_index()
     # Ensure all four component columns exist even if SCL had no rows for one, and
-    # restore the value metadata that unstack drops from them.
+    # restore the value metadata that pivot drops from them.
     for component in components:
         if component not in supply_context.columns:
             supply_context[component] = pd.NA
@@ -156,7 +156,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     # stock variation, timing mismatches, primary-equivalent aggregation). NaN it out rather
     # than clipping to 0, so the downstream import-share ratio is undefined, not misleadingly zero.
     supply_context.loc[supply_context["supply"] < 0, "supply"] = pd.NA
-    # The groupby/unstack chain keeps the Table at runtime, but pandas type stubs narrow it.
+    # The pivot keeps the Table at runtime, but pandas type stubs narrow it.
     supply_context = cast(Table, supply_context)
     supply_context["item"] = supply_context["item_code"].map(code_to_display)
 
