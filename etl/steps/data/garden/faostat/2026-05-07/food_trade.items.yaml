@@ -1,16 +1,12 @@
 # Curated items for the food-trade visualization.
 #
 # Each entry is one option in the visualization dropdown. Each entry references a single
-# FAO commodity item code — the same codebook used by both TM (trade) and SCL
-# (production).
+# FAO commodity item code — the same codebook used by both TM (trade) and SCL (production).
 #
 # Each entry:
 #   display:    name shown in the visualization dropdown
 #   item_code:  FAO commodity item code (TM/SCL codebook, 1-1296 range).
-#   fao_item:   the item's name in the TM snapshot. The garden step asserts this
-#               still matches, so if FAO ever reassigns or renames a code the build
-#               fails loudly instead of silently mislabelling the data.
-#
+#   fao_item:   the item's name in FAOSTAT TM.
 items:
   # ─────────────────────────────────────────────────────────────────────────
   # Cereals
@@ -155,7 +151,7 @@ items:
 
   # ─────────────────────────────────────────────────────────────────────────
   # Eggs, honey, beverages
-  - display: Hen eggs in shell
+  - display: Eggs
     item_code: 1062
     fao_item: Hen eggs in shell, fresh
   - display: Honey

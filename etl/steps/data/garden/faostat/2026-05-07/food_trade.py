@@ -50,7 +50,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def _sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
+def sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
     """Validate the items config structurally and against the TM snapshot.
 
     `tm_items` maps each TM item code to its FAO item name in the current snapshot.
@@ -116,7 +116,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     with open(paths.side_file("food_trade.items.yaml")) as f:
         items_config = yaml.safe_load(f)
     tm_items = dict(zip(trade_flows["item_code"], trade_flows["item"].astype(str)))
-    _sanity_check_items_config(items_config, tm_items=tm_items)
+    sanity_check_items_config(items_config, tm_items=tm_items)
 
     code_to_display = {int(e["item_code"]): e["display"] for e in items_config["items"]}
     trade_flows = trade_flows[trade_flows["item_code"].isin(code_to_display)].copy()
