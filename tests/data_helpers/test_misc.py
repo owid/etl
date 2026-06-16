@@ -304,8 +304,8 @@ def test_expand_time_column_fillna_basic():
         )
 
         # Tag those filled
-        df_tag = df[index_col]
-        df_tag.loc[:, "expand"] = False
+        df_tag = df[index_col].copy()
+        df_tag["expand"] = False
 
         dfx = dfx.merge(df_tag, on=index_col, how="left")
         dfx["expand"] = dfx["expand"].fillna(True).astype(bool)
@@ -328,8 +328,8 @@ def test_expand_time_column_fillna_basic():
 
 def test_expand_time_column_fillna_zero():
     def _add_expand_tag(dfx, df):
-        df_tag = df[index_col]
-        df_tag.loc[:, "expand"] = False
+        df_tag = df[index_col].copy()
+        df_tag["expand"] = False
 
         dfx = dfx.merge(df_tag, on=index_col, how="left")
         dfx["expand"] = dfx["expand"].fillna(True).astype(bool)
@@ -363,8 +363,8 @@ def test_expand_time_column_fillna_zero():
 
 def test_expand_time_column_fillna_ffill():
     def _add_expand_tag(dfx, df):
-        df_tag = df[index_col]
-        df_tag.loc[:, "expand"] = False
+        df_tag = df[index_col].copy()
+        df_tag["expand"] = False
 
         dfx = dfx.merge(df_tag, on=index_col, how="left")
         dfx["expand"] = dfx["expand"].fillna(True).astype(bool)
@@ -442,8 +442,8 @@ def test_expand_time_column_fillna_ffill():
 
 def test_expand_time_column_fillna_bfill():
     def _add_expand_tag(dfx, df):
-        df_tag = df[index_col]
-        df_tag.loc[:, "expand"] = False
+        df_tag = df[index_col].copy()
+        df_tag["expand"] = False
 
         dfx = dfx.merge(df_tag, on=index_col, how="left")
         dfx["expand"] = dfx["expand"].fillna(True).astype(bool)
@@ -521,8 +521,8 @@ def test_expand_time_column_fillna_bfill():
 
 def test_expand_time_column_fillna_interpolate():
     def _add_expand_tag(dfx, df):
-        df_tag = df[index_col]
-        df_tag.loc[:, "expand"] = False
+        df_tag = df[index_col].copy()
+        df_tag["expand"] = False
 
         dfx = dfx.merge(df_tag, on=index_col, how="left")
         dfx["expand"] = dfx["expand"].fillna(True).astype(bool)
@@ -600,8 +600,8 @@ def test_expand_time_column_fillna_interpolate():
 
 def test_expand_time_column_fillna_interpolate_and_zero():
     def _add_expand_tag(dfx, df):
-        df_tag = df[index_col]
-        df_tag.loc[:, "expand"] = False
+        df_tag = df[index_col].copy()
+        df_tag["expand"] = False
 
         dfx = dfx.merge(df_tag, on=index_col, how="left")
         dfx["expand"] = dfx["expand"].fillna(True).astype(bool)
@@ -679,8 +679,8 @@ def test_expand_time_column_fillna_interpolate_and_zero():
 
 def test_expand_time_column_and_extra_years():
     def _add_expand_tag(dfx, df):
-        df_tag = df[index_col]
-        df_tag.loc[:, "expand"] = False
+        df_tag = df[index_col].copy()
+        df_tag["expand"] = False
 
         dfx = dfx.merge(df_tag, on=index_col, how="left")
         dfx["expand"] = dfx["expand"].fillna(True).astype(bool)
@@ -722,8 +722,8 @@ def test_expand_time_complex():
     """
 
     def _add_expand_tag(dfx, df):
-        df_tag = df[index_col]
-        df_tag.loc[:, "expand"] = False
+        df_tag = df[index_col].copy()
+        df_tag["expand"] = False
 
         dfx = dfx.merge(df_tag, on=index_col, how="left")
         dfx["expand"] = dfx["expand"].fillna(True).astype(bool)

@@ -7,6 +7,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   levelized_cost_of_energy:
     variables:

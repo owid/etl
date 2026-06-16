@@ -1,5 +1,7 @@
 dataset:
   title: lead_petrol_banned
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   lead_petrol_banned:
     variables:

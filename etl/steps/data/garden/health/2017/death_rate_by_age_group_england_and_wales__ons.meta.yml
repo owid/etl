@@ -1,5 +1,7 @@
 dataset:
   title: Death rate by age group in England and Wales - ONS
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   death_rate_by_age_group_england_and_wales__ons:
     variables:

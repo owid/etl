@@ -21,6 +21,8 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 180
+  owners:
+    - Veronika Samborska
 tables:
   yougov_job_automation:
     variables:

@@ -1,5 +1,7 @@
 dataset:
   title: Global freshwater use since 1900 - IGB
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   global_freshwater_use_since_1900__igb:
     variables:

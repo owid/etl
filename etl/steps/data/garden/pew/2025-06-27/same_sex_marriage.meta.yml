@@ -27,6 +27,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   same_sex_marriage:
     variables:

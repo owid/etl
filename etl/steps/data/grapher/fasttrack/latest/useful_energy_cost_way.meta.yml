@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   useful_energy_cost_way:
     variables:

@@ -2,7 +2,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-      - Climate Change
+        - Climate Change
     processing_level: major
     description_key:
       - Based on ice core studies of historical concentration of greenhouse gases, and recent air monitoring sites around the world.
@@ -12,6 +12,8 @@ definitions:
 dataset:
   update_period_days: 0
 
+  owners:
+    - Pablo Rosado
 tables:
   ghg_concentration:
     title: Global Atmospheric Concentrations of Greenhouse Gases

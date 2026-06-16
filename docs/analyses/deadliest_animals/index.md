@@ -8,7 +8,7 @@ status: new
 
 ## Introduction and summary
 
-In our article "[What are the world's deadliest animals?](https://ourworldindata.org/worlds-deadliest-animals)", we provide estimates for how many people are killed by various animals in a given year.
+In our article “[What are the world’s deadliest animals?](https://ourworldindata.org/worlds-deadliest-animals)”, we provide estimates for how many people are killed by various animals in a given year.
 
 The purpose of this article is not to give *the* definitive numbers on deaths by animals. As we'll see below, the data quality for many animals is not good enough to do so. But from the research and data available, we can provide a better sense of the relative magnitude of each.
 
@@ -35,7 +35,7 @@ Here is a table of the final figures used in the main visualization in the artic
 | Tsetse flies (Trypanosomiasis) | 1,500 |
 | Elephants | 1,000 |
 | Hippopotamuses | >50 |
-| Bees, wasps and hornets | 500 |
+| Bees, wasps, and hornets | 500 |
 | Big cats | 300 |
 | Crocodiles | >150 |
 | Jellyfish | 100 |
@@ -76,7 +76,7 @@ Our main source was the IHME's [Global Burden of Disease](https://vizhub.healthd
 
 Other sources report similar figures.
 
-The United Nations Office on Drugs and Crime [estimate that](https://ourworldindata.org/grapher/homicides-unodc?tab=line&country=~OWID_WRL) there were between 420,000 and 450,000 homicides per year over the last decade. This is closest in definition to the IHME's "interpersonal violence" (which totaled 436,000).
+The United Nations Office on Drugs and Crime [estimate that](https://ourworldindata.org/grapher/homicides-unodc?tab=line&country=~OWID_WRL) there were between 420,000 and 450,000 homicides per year over the last decade. This is closest in definition to the IHME’s “interpersonal violence” (which totaled 436,000).
 
 The Uppsala Conflict Data Program [estimated that](https://ourworldindata.org/grapher/deaths-in-armed-conflicts-by-region) there were around 160,000 deaths in wars and conflict in 2023; similar to the IHME estimate. Note that in 2022, this figure was much higher (at around 310,000) so the final numbers are sensitive to the year chosen.
 
@@ -102,7 +102,7 @@ It is plausible that deaths from snakebites are as much as 50% higher than our f
 
 In the visualization, we assumed that dogs kill **40,000 people** per year. This is one of our most uncertain estimates.
 
-Most people killed by dogs are killed indirectly through the contraction of rabies, rather than directly from attack wounds. The WHO [states that](https://www.who.int/news-room/fact-sheets/detail/rabies) dogs are responsible for almost all human rabies cases: "Dog bites and scratches cause 99% of the human rabies cases."
+Most people killed by dogs are killed indirectly through the contraction of rabies, rather than directly from attack wounds. The WHO [states that](https://www.who.int/news-room/fact-sheets/detail/rabies) dogs are responsible for almost all human rabies cases: “Dog bites and scratches cause 99% of the human rabies cases.”
 
 The IHME's [Global Burden of Disease](https://vizhub.healthdata.org/gbd-results/) estimated that 15,811 people died from rabies in 2023. However, its lower and upper bound estimates did range from 6,661 to 27,439.
 
@@ -122,7 +122,7 @@ The IHME and WHO estimates for this disease are similar.
 
 The IHME's [Global Burden of Disease](https://vizhub.healthdata.org/gbd-results/) estimated that 13,467 people died from Schistosomiasis in 2023.
 
-The WHO's [Schistosomiasis Factsheet](https://www.who.int/news-room/fact-sheets/detail/schistosomiasis) gives a figure of 11,792, but the WHO also notes that these figures are "likely underestimated and need to be reassessed". Its Global Health Estimates had a figure of 14,133 for 2021.
+The WHO’s [Schistosomiasis Factsheet](https://www.who.int/news-room/fact-sheets/detail/schistosomiasis) gives a figure of 11,792, but the WHO also notes that these figures are “likely underestimated and need to be reassessed”. Its Global Health Estimates had a figure of 14,133 for 2021.
 
 ### Kissing bugs (Chagas disease)
 
@@ -132,7 +132,7 @@ The IHME and WHO estimates for this disease are similar.
 
 The IHME's [Global Burden of Disease](https://vizhub.healthdata.org/gbd-results/) estimated that 8,148 people died from Chagas disease in 2023 (ranging from 7,500 to 9,400).
 
-The WHO's [Chagas Disease Factsheet](https://www.who.int/campaigns/world-chagas-disease-day/2025) stated "approximately 10,000 each year". Its Global Health Estimates had a figure of 6,449 for 2021.
+The WHO’s [Chagas Disease Factsheet](https://www.who.int/campaigns/world-chagas-disease-day/2025) stated “approximately 10,000 each year”. Its Global Health Estimates had a figure of 6,449 for 2021.
 
 Based on these figures, we think 8,000 is a reasonable estimate, but the true figure could be a few thousand higher or lower.
 
@@ -154,7 +154,7 @@ An older [WHO Factsheet from 2017](https://www3.paho.org/hq/dmdocuments/2017/201
 
 In the visualization, we assumed that Ascaris roundworms kill **4,000 people** per year. This is through the spread of the disease *Ascariasis*.
 
-The number of deaths from *Ascariasis* is hard to estimate as it's often misattributed to other factors such as intestinal obstruction and sepsis. Medical manuals — such as [this one](https://www.msdmanuals.com/home/infections/parasitic-infections-roundworms-nematodes/ascariasis) — often give a fairly large range of "\~2,000 to 10,000 deaths each year"
+The number of deaths from *Ascariasis* is hard to estimate as it’s often misattributed to other factors such as intestinal obstruction and sepsis. Medical manuals — such as [this one](https://www.msdmanuals.com/home/infections/parasitic-infections-roundworms-nematodes/ascariasis) — often give a fairly large range of “\~2,000 to 10,000 deaths each year”.
 
 The IHME's [Global Burden of Disease](https://vizhub.healthdata.org/gbd-results/) estimated that 4,973 people died from Ascariasis in 2023.
 
@@ -168,9 +168,9 @@ In the visualization, we assumed that scorpions kill **3,000 people** per year. 
 
 Global estimates on this were hard to find.
 
-This paper by Vasconez-Gonzalez et al. (2025) [cites an estimate](https://www.sciencedirect.com/science/article/pii/S2590171025000050) of "at least 3000 deaths annually worldwide". This is based on earlier work by Jean-Philippe Chippaux.
+This paper by Vasconez-Gonzalez et al. (2025) [cites an estimate](https://www.sciencedirect.com/science/article/pii/S2590171025000050) of “at least 3,000 deaths annually worldwide”. This is based on earlier work by Jean-Philippe Chippaux.
 
-In a [2012 paper](https://pmc.ncbi.nlm.nih.gov/articles/PMC3401053/), Jean-Philippe Chippaux gives a global death toll of around 2,600. [Earlier works](https://www.researchgate.net/profile/Jean-Philippe-Chippaux/publication/5277313_Epidemiology_of_scorpionism_A_global_appraisal/links/6319b436071ea12e3619ae8f/Epidemiology-of-scorpionism-A-global-appraisal.pdf) give even higher figures of more than 3250.
+In a [2012 paper](https://pmc.ncbi.nlm.nih.gov/articles/PMC3401053/), Jean-Philippe Chippaux gives a global death toll of around 2,600. [Earlier works](https://www.researchgate.net/profile/Jean-Philippe-Chippaux/publication/5277313_Epidemiology_of_scorpionism_A_global_appraisal/links/6319b436071ea12e3619ae8f/Epidemiology-of-scorpionism-A-global-appraisal.pdf) give even higher figures of more than 3,250.
 
 Without more recent estimates, we had to rely on these figures which are now around a decade old.
 
@@ -202,7 +202,7 @@ Some literature cites far higher figures (up to as much as 50,000) as it include
 
 In the visualization, we assumed that elephants kill **around 1,000 people** per year. This estimate includes multiple elephant species.
 
-Commonly cited global figures for elephant-related deaths are often much lower. For example, the [National Geographic](https://www.nationalgeographic.com/animals/article/news-elephants-attack-humans-pressure) has previously cited a figure of around 500 deaths per year, but this estimate dates back to 2005 and appears to be outdated. [Encyclopaedia Britannica](https://www.britannica.com/list/9-of-the-worlds-deadliest-mammals) gives a wide range of "about 100 to more than 500 per year", which also seems too low given more recent national data.
+Commonly cited global figures for elephant-related deaths are often much lower. For example, the [National Geographic](https://www.nationalgeographic.com/animals/article/news-elephants-attack-humans-pressure) has previously cited a figure of around 500 deaths per year, but this estimate dates back to 2005 and appears to be outdated. [Encyclopaedia Britannica](https://www.britannica.com/list/9-of-the-worlds-deadliest-mammals) gives a wide range of “about 100 to more than 500 per year”, which also seems too low given more recent national data.
 
 More recent figures suggest substantially higher totals. In India alone, official government statistics [report between](https://www.indiatoday.in/india-today-insight/story/deepening-human-wildlife-crisis-killed-1783-indians-341-elephants-in-3-years-2682489-2025-02-19) 500 and 600 human deaths per year from elephant attacks. According to figures provided by India's Ministry of Environment, Forest and Climate Change, deaths increased from 549 in 2021–22 to 605 in 2022–23, and further to 629 in 2023–24. Sri Lanka also reported [around 176 deaths](https://www.bbc.co.uk/news/world-asia-68090450) from elephant encounters in 2024.
 
@@ -210,17 +210,17 @@ These two countries already account for well over 700 deaths per year. Given tha
 
 This figure remains uncertain. We therefore use a rounded estimate of 1,000 deaths per year to reflect both the available evidence and the uncertainty.
 
-### Bees, wasps and hornets
+### Bees, wasps, and hornets
 
-In the visualization, we assumed that bees, wasps and hornets kill **more than 500 people** per year. This includes multiple species.
+In the visualization, we assumed that bees, wasps, and hornets kill **more than 500 people** per year. This includes multiple species.
 
 Most of these deaths result from anaphylactic shock following stings, rather than from venom toxicity itself. Reliable global estimates are hard to get because deaths are often recorded under general external-cause categories rather than by specific animal species.
 
-High-quality national and regional data suggest that deaths are not rare in countries with good vital registration systems. In the United States, the [Centers for Disease Control and Prevention](https://www.cdc.gov/mmwr/volumes/72/wr/mm7227a6.htm) report an average of around 72 deaths per year from hornet, wasp and bee stings. In Europe, the WHO Mortality Database [data reports](https://platform.who.int/mortality/themes/theme-details/topics/indicator-groups/indicator-group-details/MDB/other-unintentional-injuries) an average of around 74 deaths per year between 1994 and 2016 (using the ICD cause-of-death code X23, "contact with hornets, wasps and bees"). That's more than 140 deaths per year across the US and Europe alone.
+High-quality national and regional data suggest that deaths are not rare in countries with good vital registration systems. In the United States, the [Centers for Disease Control and Prevention](https://www.cdc.gov/mmwr/volumes/72/wr/mm7227a6.htm) report an average of around 72 deaths per year from hornet, wasp, and bee stings. In Europe, the WHO Mortality Database [data reports](https://platform.who.int/mortality/themes/theme-details/topics/indicator-groups/indicator-group-details/MDB/other-unintentional-injuries) an average of around 74 deaths per year between 1994 and 2016 (using the ICD cause-of-death code X23, “contact with hornets, wasps and bees”). That's more than 140 deaths per year across the US and Europe alone.
 
 The WHO Mortality Database includes similar cause-of-death data for a number of other countries with reliable vital statistics; these sum to a global total of just over 500 deaths per year.
 
-This is likely to be an underestimate since some deaths will occur in countries missing from the database. That's why we give a figure of "more than 500" rather than giving a precise estimate.
+This is likely to be an underestimate since some deaths will occur in countries missing from the database. That’s why we give a figure of “more than 500” rather than giving a precise estimate.
 
 ### Big cats
 
@@ -242,7 +242,7 @@ We think that a global estimate of around 100 deaths seems reasonable in most ye
 
 Global estimates were also challenging to find.
 
-Sources typically cite something in the range of around 100 fatalities per year across Africa. For example, [this source](https://biologyinsights.com/how-many-people-have-been-killed-by-lions/) claims: "Estimates suggest 70 to 100 human fatalities annually in Africa, with some sources indicating up to 200 deaths per year."
+Sources typically cite something in the range of around 100 fatalities per year across Africa. For example, [this source](https://biologyinsights.com/how-many-people-have-been-killed-by-lions/) claims: “Estimates suggest 70 to 100 human fatalities annually in Africa, with some sources indicating up to 200 deaths per year.”
 
 [This paper](https://www.cambridge.org/core/journals/oryx/article/humanwildlife-conflict-in-mozambique-a-national-perspective-with-emphasis-on-wildlife-attacks-on-humans/434EEAAF88F3C10E9FA6B55F2C3ACE39) suggests that in Mozambique, there were around a dozen deaths from lions per year.
 
@@ -262,7 +262,7 @@ One main source of data on crocodile attacks — which is used by [the IUCN](htt
 
 [CrocAttack](https://crocattack.org/2015-2024attackstats/) has data from 2015 to 2024 for some countries, totalling around 150 deaths per year. Some countries might be missing, so this could be an underestimate.
 
-That's why we denote the death toll as "more than 150".
+That’s why we denote the death toll as “more than 150”.
 
 ### Jellyfish
 
@@ -270,13 +270,13 @@ In the visualization, we assumed that jellyfish kill **around 100 people** per y
 
 We found it difficult to find a credible, recent global estimate so this comes with significant uncertainty.
 
-A commonly cited source for global deaths is [Encyclopaedia Britannica](https://www.britannica.com/animal/box-jellyfish), which states: "Fatalities from box jellyfish stings range from 40 to more than 100 worldwide annually." It also notes that this estimate is likely too low because some countries with frequent lethal stings — such as the Philippines — do not have official reporting systems.
+A commonly cited source for global deaths is [Encyclopaedia Britannica](https://www.britannica.com/animal/box-jellyfish), which states: “Fatalities from box jellyfish stings range from 40 to more than 100 worldwide annually.” It also notes that this estimate is likely too low because some countries with frequent lethal stings — such as the Philippines — do not have official reporting systems.
 
 Country-level evidence supports the idea that the true global total could be higher than the low end of Britannica's range. For example, multiple sources cite that around [20 to 40 people die](https://pia.gov.ph/news/up-to-40-filipinos-die-annually-from-jellyfish-sting-prompting-research-to-stem-the-tide) each year from jellyfish stings in the Philippines alone.
 
 Older estimates are sometimes much higher. In 1987, an Australian researcher (Peter Fenner) produced a count of around 500 deaths per year, which is still widely quoted. However, this is now several decades old, and we weren't able to find a consistent, modern global dataset that supports such a high figure.
 
-We think that these fatal incidents could be quite highly concentrated in the Philippines, however, it seems unlikely that no other deaths occur elsewhere. Given that the Philippines count is up to 40 deaths per year, we think 100 globally is a reasonable estimate, but again, this is uncertain.
+We think that these fatal incidents could be quite highly concentrated in the Philippines; however, it seems unlikely that no other deaths occur elsewhere. Given that the Philippines count is up to 40 deaths per year, we think 100 globally is a reasonable estimate, but again, this is uncertain.
 
 ### Hippopotamuses
 
@@ -306,7 +306,7 @@ This figure likely underestimates the true number, since many countries with lim
 
 ### Bears
 
-In the visualization, we assumed that bears kill **around 20 people** per year. This includes multiple species: brown bears, sloth bears, polar bears, Asian black bears and American black bears.
+In the visualization, we assumed that bears kill **around 20 people** per year. This includes multiple species: brown bears, sloth bears, polar bears, Asian black bears, and American black bears.
 
 Brown bears and sloth bears are responsible for the majority of fatal attacks globally.
 

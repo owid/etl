@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: Deaths and death rate (HMD; UN WPP)
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   deaths:
     variables:

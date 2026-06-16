@@ -1,5 +1,7 @@
 dataset:
   title: Emissions air pollutants over long-term (DEFRA & EPA)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   emissions_air_pollutants_over_long_term__defra__and__epa:
     variables:

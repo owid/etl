@@ -14,6 +14,8 @@ dataset:
 
     Administrative regions (states, provinces, national averages) have been excluded from the dataset to focus on actual city-level measurements.
 
+  owners:
+    - Veronika Samborska
 tables:
   sdg_11_2_1_country:
     variables:

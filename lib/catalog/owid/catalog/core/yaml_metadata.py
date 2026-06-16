@@ -60,6 +60,23 @@ def update_metadata_from_yaml(
     mtime = (Path(resolved).stat().st_mtime, shared_path.stat().st_mtime if shared_path.exists() else 0.0)
     annot = _load_annot(resolved, tuple(sorted(params.items())), mtime)
 
+    update_metadata_from_dict(
+        tb,
+        annot,
+        table_name,
+        extra_variables=extra_variables,
+        if_origins_exist=if_origins_exist,
+    )
+
+
+def update_metadata_from_dict(
+    tb: Table,
+    annot: dict[str, Any],
+    table_name: str,
+    extra_variables: Literal["raise", "ignore"] = "raise",
+    if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+) -> None:
+    """Update metadata of table and variables from a parsed metadata dictionary."""
     tb.metadata.short_name = table_name
 
     t_annot = annot.get("tables", {}).get(table_name, {})
@@ -67,6 +84,14 @@ def update_metadata_from_yaml(
     # validation
     if extra_variables == "raise":
         _validate_variables(t_annot, tb)
+    else:
+        # `extra_variables="ignore"` is used when long_to_wide expands dimensions
+        # into pivoted variable names that don't exist at the time the YAML is
+        # applied. We still want to catch the case where a YAML section lists
+        # variables and *none* of them match any actual column — that's almost
+        # certainly a key typo (e.g. forgetting a `__sex_both_sexes` suffix),
+        # which silently produced a no-op override otherwise.
+        _validate_variables_all_miss(t_annot, tb)
 
     common_dict = annot.get("definitions", {}).get("common", {})
     table_common_dict = t_annot.get("common", {})
@@ -200,6 +225,40 @@ def _validate_variables(t_annot: dict, tb: Table) -> None:
         if extra_table_variable_names:
             msg += f" and extra variables in table {sorted(list(extra_table_variable_names))}"
         raise ValueError(msg)
+
+
+def _validate_variables_all_miss(t_annot: dict, tb: Table) -> None:
+    """Raise if the YAML section lists variables but *none* match any actual column.
+
+    Used when `extra_variables="ignore"` is in effect (e.g. after long_to_wide).
+    Partial misses are still tolerated — only a 100% miss rate is treated as a
+    typo, since the user has clearly written an override block that does nothing.
+
+    A YAML key also counts as a match when it's the long-format base name of a
+    pivoted column (wide names are `{base}__{dim}_{value}`): such keys were
+    already applied to the long table before long_to_wide, so missing the wide
+    columns is expected, not a typo.
+    """
+    yaml_variable_names = set((t_annot.get("variables") or {}).keys())
+    if not yaml_variable_names:
+        return
+    table_variable_names = set(tb.columns)
+
+    def _matches(name: str) -> bool:
+        if name in table_variable_names:
+            return True
+        prefix = name + "__"
+        return any(col.startswith(prefix) for col in table_variable_names)
+
+    if not any(_matches(name) for name in yaml_variable_names):
+        raise ValueError(
+            f"Table {tb.metadata.short_name} has variables in YAML "
+            f"{sorted(yaml_variable_names)} but none match any column in the table "
+            f"({len(table_variable_names)} columns: e.g. {sorted(table_variable_names)[:3]}…), "
+            f"neither exactly nor as a long-format prefix of a pivoted column. "
+            f"This usually means the YAML keys are wrong — for grapher overrides, "
+            f"remember that long_to_wide adds dimension suffixes like `__sex_both_sexes`."
+        )
 
 
 def _flatten(lst: list[Any]) -> list[str]:

@@ -51,6 +51,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   energy_mix:
     title: Energy mix

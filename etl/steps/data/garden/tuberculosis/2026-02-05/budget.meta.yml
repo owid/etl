@@ -9,6 +9,8 @@ definitions:
       numDecimalPlaces: 0
 dataset:
   title: Global Tuberculosis Report - Budget
+  owners:
+    - Fiona Spooner
 tables:
   budget:
     variables:

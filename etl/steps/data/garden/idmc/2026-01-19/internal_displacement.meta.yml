@@ -55,6 +55,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Tuna Acisu
 tables:
   internal_displacement:
     variables:

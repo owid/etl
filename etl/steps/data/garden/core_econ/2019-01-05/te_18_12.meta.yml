@@ -1,5 +1,7 @@
 dataset:
   title: TE-18.12
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_18_12:
     variables:

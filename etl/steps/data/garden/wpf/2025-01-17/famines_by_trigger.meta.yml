@@ -19,7 +19,7 @@ definitions:
         - Famines
 
   footnote_decadal: |-
-     Decadal figures represent data averaged over each ten-year period (e.g., 1990–1999 for the 1990s). The 2020s figure is provisional and includes data only up to and including 2023.
+    Decadal figures represent data averaged over each ten-year period (e.g., 1990–1999 for the 1990s). The 2020s figure is provisional and includes data only up to and including 2023.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -28,27 +28,29 @@ dataset:
   title: Deaths from famines by main trigger
 
 
+  owners:
+    - Veronika Samborska
 tables:
   famines_by_trigger:
     variables:
-       famine_deaths:
-          title: Deaths from famines where << principal_cause.lower() >> was the main trigger
-          unit: 'deaths'
-          display:
-            name: << principal_cause >>
-            numDecimalPlaces: 0
-          presentation:
-            title_public: Deaths from famines caused by << principal_cause.lower() >>
+      famine_deaths:
+        title: Deaths from famines where << principal_cause.lower() >> was the main trigger
+        unit: 'deaths'
+        display:
+          name: << principal_cause >>
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Deaths from famines caused by << principal_cause.lower() >>
 
 
-       decadal_famine_deaths:
-          title: Deaths from famines by decade where << principal_cause.lower() >> was the main trigger
-          unit: 'deaths'
-          display:
-            name: << principal_cause >>
-            numDecimalPlaces: 0
-          presentation:
-            title_public: Decadal deaths from famines caused by << principal_cause.lower() >>
-            grapher_config:
-             note: |-
-               {definitions.footnote_decadal}
+      decadal_famine_deaths:
+        title: Deaths from famines by decade where << principal_cause.lower() >> was the main trigger
+        unit: 'deaths'
+        display:
+          name: << principal_cause >>
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Decadal deaths from famines caused by << principal_cause.lower() >>
+          grapher_config:
+            note: |-
+              {definitions.footnote_decadal}

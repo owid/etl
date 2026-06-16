@@ -4,6 +4,8 @@ dataset:
     Estimates of the fraction of "warm season" deaths that are attributed to heat from natural forcings, and human-induced climate change over the period from 1991 to 2018.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   heat_deaths_climate_historical:
     variables:

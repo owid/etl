@@ -1,5 +1,7 @@
 dataset:
   title: Government Revenue – Wallis (2000)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   government_revenue__wallis__2000:
     variables:

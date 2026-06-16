@@ -6,6 +6,8 @@ dataset:
     You can find more notes at https://ucdp.uu.se/downloads/ged/ged251.pdf
   licenses:
     - {}
+  owners:
+    - Bastian Herre  # fasttrack
 tables:
   cumulative_conflict_deaths_ucdp:
     variables:

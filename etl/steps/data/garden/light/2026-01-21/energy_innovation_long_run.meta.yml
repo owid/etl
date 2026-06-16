@@ -43,12 +43,14 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   lighting_prices:
     variables:
       lighting_price:
         title: Price of lighting (<<lighting_source>>, <<price_year>> prices)
-        unit: constant <<price_year>> US$ per million lumen-hours
+        unit: constant <<price_year>> British pounds per million lumen-hours
         short_unit: £
         description_short: "{definitions.description_short_price_of_lighting}"
         description_key:
@@ -65,7 +67,7 @@ tables:
 
       lighting_price_rolling_avg:
         title: 5-year rolling average of the price of lighting (<<lighting_source>>, <<price_year>> prices)
-        unit: constant <<price_year>> US$ per million lumen-hours
+        unit: constant <<price_year>> British pounds per million lumen-hours
         short_unit: £
         description_short: "{definitions.description_short_price_of_lighting}"
         description_key:

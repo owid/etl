@@ -42,23 +42,25 @@ definitions:
 
       <%- endif -%>
     # Conflict-type label used in titles/subtitles (e.g. "armed conflicts", "one-sided violence").
+    # Outer trim markers intentionally non-stripping (<% ... %>) so surrounding spaces in the
+    # interpolating template (e.g. title: "Deaths {prep} {label} based...") are preserved.
     conflict_label: |-
-      <%- if conflict_type == "all" -%>armed conflicts
+      <% if conflict_type == "all" -%>armed conflicts
       <%- elif conflict_type == "one-sided violence" -%>one-sided violence
       <%- else -%><< conflict_type >> conflicts
-      <%- endif -%>
+      <%- endif %>
     # Slug for the matching DoD ("details on demand") definition link.
     conflict_dod_slug: |-
-      <%- if conflict_type == "all" -%>armed-conflict-ucdp
+      <% if conflict_type == "all" -%>armed-conflict-ucdp
       <%- elif conflict_type == "one-sided violence" -%>onesided-ucdp
       <%- elif conflict_type == "non-state conflict" -%>nonstate-ucdp
       <%- else -%><< conflict_type >>-ucdp
-      <%- endif -%>
+      <%- endif %>
     # Preposition: "from" for one-sided violence, "in" for everything else.
     conflict_prep: |-
-      <%- if conflict_type == "one-sided violence" -%>from
+      <% if conflict_type == "one-sided violence" -%>from
       <%- else -%>in
-      <%- endif -%>
+      <%- endif %>
     location_conflicts_method: |-
       UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the geoBoundaries dataset.
 
@@ -158,8 +160,10 @@ definitions:
       - "{definitions.all.conflict_type}"
 
   number_ongoing_conflicts:
+    # Outer trim markers intentionally non-stripping (<% ... %>) so a leading space
+    # in the interpolating template (e.g. "...over time. {description_short}") is preserved.
     description_short: |-
-      <%- if conflict_type == "all" -%>
+      <% if conflict_type == "all" -%>
       Included are armed conflicts that were ongoing a year.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
@@ -180,7 +184,7 @@ definitions:
       <%- else -%>
       Included are << conflict_type >> conflicts that were ongoing a year.
 
-      <%- endif -%>
+      <%- endif %>
     description_key: &description_key_ongoing
       - "{definitions.all.conflict_type}"
       # - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
@@ -364,22 +368,22 @@ tables:
                   - 1
                 customNumericLabels:
                   - "0"
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
                 customNumericColorsActive: true
                 customNumericColors:
                   - "#e8f4ea"
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -451,7 +455,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [ 0, 0.1, 0.3, 1, 3, 10, 30, 100, 1 ]
+                customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100, 1]
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Death rate in ongoing conflicts (high estimate)
@@ -493,7 +497,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [ 0, 1, 2, 5, 10, 1 ]
+                customNumericValues: [0, 1, 2, 5, 10, 1]
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); geoBoundaries (2023)
 
       number_ongoing_conflicts_per_country:
@@ -587,3 +591,5 @@ dataset:
     You can find more information about the data in our article: [To be published]
 
     This dataset contains information on armed conflicts - state, non-state and one-sided conflicts, in the period of 1989 and 2022.
+  owners:
+    - Lucas Rodés-Guirao

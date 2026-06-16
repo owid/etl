@@ -1,0 +1,135 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+
+tables:
+  deaths_karlinsky:
+    variables:
+      reg_deaths:
+        title: Registered deaths
+        unit: "deaths"
+        description_short: |-
+          The number of deaths registered in the vital registration system for the country-year.
+        display:
+          numDecimalPlaces: 1
+
+      expected_wpp:
+        title: Expected number of deaths (WPP 2022)
+        unit: deaths
+        description_short: |-
+          The number of deaths expected to occur for the country-year from World Population Prospects 2022.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Expected number of deaths
+          attribution_short: WPP 2022
+
+      expected_gbd:
+        title: Expected number of deaths (GBD 2019)
+        unit: deaths
+        description_short: |-
+          The number of deaths expected to occur for the country-year from Global Burden of Disease 2019.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Expected number of deaths
+          attribution_short: GBD 2019
+
+      expected_ghe:
+        title: Expected number of deaths (GHE 2019)
+        unit: deaths
+        description_short: |-
+          The number of deaths expected to occur for the country-year from Global Health Estimates 2019.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Expected number of deaths
+          attribution_short: GHE 2019
+
+      expected_deaths:
+        title: Expected number of deaths
+        unit: deaths
+        description_short: |-
+          The mean of the expected number of deaths from sources: WPP 2022, GBD 2019 and GHE 2019.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Expected number of deaths
+          attribution_short: WPP 2022; GBD 2019; GHE 2019
+
+      death_comp:
+        title: Share of deaths that are registered
+        short_unit: "%"
+        unit: "%"
+        description_short: |-
+          The number of deaths reported in a country's vital registration system as a share of total expected deaths. Expected deaths are taken as the average of estimates from three international sources: the UN, WHO, and IHME.
+        description_from_producer: |-
+          Death registration completeness, the share of deaths captured by countries’ vital registration systems, vary substantially across countries. Estimates of completeness, even recent ones, are outdated or contradictory for many countries. In this short paper, I utilize the annual amount of deaths registered in 139 vital registration systems around the world to provide the most up-to-date estimates of death-registration completeness from 2015 to 2019.
+
+          \[Text from [Karlinsky (2024)](https://doi.org/10.4054/DemRes.2024.50.38)\]
+        description_key:
+          - The most common way of knowing how many deaths occur in a country is to rely on death certificates registered in national Vital Registry systems. In many countries, however, a large share of deaths are not registered. This is due to factors such as a lack of doctors and nurses to fill in death certificates, or a poorly functioning Vital Registry system.
+          - This indicator estimates the extent of under-registering, given as the share of deaths that were registered, out of the total deaths expected for that year.
+          - "The number of expected deaths is estimated by taking the average number of deaths from three data sources: the UN's World Population Prospects, WHO's Global Health Estimates and IHME's Global Burden of Disease study. These three sources themselves estimate the number of deaths from models based on data from censuses and household surveys. For many countries, the estimates of the three sources are very similar. However, for others, where vital registration systems are lacking or not functional, they tend to differ."
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          attribution_short: Ariel Karlinsky (2024)
+          topic_tags:
+            - Causes of Death
+            - Population Growth
+          faqs:
+            - fragment_id: deaths-estimation
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Share of deaths that are registered
+            subtitle: >-
+              The number of deaths reported in a country's [vital registration
+              system](#dod:cvrs) as a share of total expected deaths. Expected deaths are
+              estimated by three international sources: UN, WHO, and IHME, using data from
+              household surveys and censuses.
+            sourceDesc: Karlinsky, A. (2024)
+            minTime: latest
+            hasMapTab: true
+            tab: map
+            originUrl: https://ourworldindata.org/causes-of-death
+            yAxis:
+              min: 0
+              max: 0
+            map:
+              # variableId:
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+                customNumericColorsActive: true
+            selectedEntityNames:
+              - United States
+              - United Kingdom
+              - China
+              - Russia
+              - Indonesia
+              - Nigeria
+
+      expected_confidence_score:
+        title: "Expected confidence score"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Ratio between min to max death completeness between WPP/GBD/GHE. from 0 (lowest) to 100% (highest confidence) (conditional on having at least 2 sources for expected_deaths).
+        display:
+          numDecimalPlaces: 2

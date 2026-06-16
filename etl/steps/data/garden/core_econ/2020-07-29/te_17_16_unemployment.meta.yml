@@ -1,5 +1,7 @@
 dataset:
   title: TE-17.16_unemployment
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_17_16_unemployment:
     variables:

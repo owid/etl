@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Tuna Acisu
 tables:
   guinea_worm_certification:
     variables:

@@ -9,6 +9,10 @@ dataset:
   title: Global Health Observatory - World Health Organization
   update_period_days: 365
 
+  owners:
+    - Mojmír Vinkler
+    - Fiona Spooner
+    - Tuna Acisu
 tables:
   # Custom OOMs
   neonatal_tetanus__number_of_reported_cases:

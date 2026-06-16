@@ -1,5 +1,7 @@
 dataset:
   title: Female Labor Force Participation Index (OWID (2017)) (split)
+  owners:
+    - Sandra Tzvetkova  # backport
 tables:
   female_labor_force_participation_index__owid__2017__split:
     variables:

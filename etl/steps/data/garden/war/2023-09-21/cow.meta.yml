@@ -101,9 +101,7 @@ definitions:
       Included are deaths of combatants due to fighting, disease, and starvation in << conflict_type.replace("-", "") >> wars that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
-    description_short_per_capita:
-      <% set per_capita = ", per 100,000 people" %>
-      {definitions.number_deaths.description_short}
+    description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths.description_short}
     description_key: &description_key_deaths
       - "{definitions.all.conflict_type}"
       - For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
@@ -337,3 +335,6 @@ dataset:
       • Asia and Oceania: 700-999
 
     You can find more information about the data in our article: [To be published]
+  owners:
+    - Lucas Rodés-Guirao
+    - Pablo Rosado

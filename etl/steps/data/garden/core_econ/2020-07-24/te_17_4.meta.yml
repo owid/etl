@@ -1,5 +1,7 @@
 dataset:
   title: TE-17.4
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
 tables:
   te_17_4:
     variables:

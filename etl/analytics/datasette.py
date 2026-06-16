@@ -1,5 +1,5 @@
+import io
 import re
-import urllib.error
 import urllib.parse
 
 import pandas as pd
@@ -7,6 +7,7 @@ import requests
 
 from etl.analytics.config import ANALYTICS_CSV_URL, ANALYTICS_URL, MAX_DATASETTE_N_ROWS
 from etl.analytics.utils import _safe_concat, clean_sql_query
+from etl.http import session as http_session
 
 
 class DatasetteSQLError(Exception):
@@ -19,7 +20,7 @@ def _get_datasette_error_from_json(sql_url: str) -> str:
     """Get error message from Datasette JSON endpoint."""
     # Convert CSV URL to JSON URL
     json_url = sql_url.replace(".csv?", ".json?")
-    response = requests.get(json_url, timeout=10)
+    response = http_session.get(json_url, timeout=10)
 
     # Try to parse JSON response regardless of status code
     try:
@@ -34,17 +35,16 @@ def _get_datasette_error_from_json(sql_url: str) -> str:
 
 def _try_to_execute_datasette_query(sql_url: str, warn: bool = False) -> pd.DataFrame:
     try:
-        df = pd.read_csv(sql_url)
-        return df
-    except urllib.error.HTTPError as e:
-        if e.code == 414:
+        resp = http_session.get(sql_url)
+        resp.raise_for_status()
+        return pd.read_csv(io.StringIO(resp.text))
+    except requests.HTTPError as e:
+        if e.response is not None and e.response.status_code == 414:
             raise ValueError("HTTP 414: Query too long. Consider simplifying or batching the request.")
         else:
-            # Get better error message from JSON endpoint
             error_msg = _get_datasette_error_from_json(sql_url)
             raise DatasetteSQLError(f"Datasette SQL Error: {error_msg}")
     except pd.errors.EmptyDataError:
-        # Get better error message from JSON endpoint
         error_msg = _get_datasette_error_from_json(sql_url)
         raise DatasetteSQLError(f"Datasette SQL Error: {error_msg}")
 

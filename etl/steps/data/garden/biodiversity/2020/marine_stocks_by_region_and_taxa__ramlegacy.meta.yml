@@ -1,5 +1,7 @@
 dataset:
   title: Marine stocks by region and taxa (ramlegacy)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   marine_stocks_by_region_and_taxa__ramlegacy:
     variables:

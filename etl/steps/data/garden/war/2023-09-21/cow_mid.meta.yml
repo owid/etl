@@ -12,33 +12,7 @@ definitions:
       An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
     force_usage: &force_usage |-
       A threat of force can be unspecified, or entail threatening to declare war or to occupy territory; a display of force can entail shows of force or border violations; a use of force can entail attacks, clashes, or battles.
-    conflict_type:
-      <%- if hostility == "all" -%>
-      <%- if fatality == "all" -%>
-      Included are conflicts between states where force was threatened, displayed, used, or escalated to a war that year
-      <%- elif fatality == "No deaths" -%>
-      Included are conflicts between states with no reported deaths that year
-      <%- elif fatality == "> 999 deaths" -%>
-      Included are conflicts between states in which more than 1,000 deaths were reported that year
-      <%- elif fatality == "Unknown" -%>
-      Included are conflicts between states with an unknown number of reported deaths that year
-      <%- else -%>
-      Included are conflicts between states in which << fatality >> were reported that year
-      <%- endif -%>
-
-      <%- elif hostility == "Threat to use force" -%>
-      Included are conflicts between states where, at most, use of force was threatened that year
-
-      <%- elif hostility == "Display of force" -%>
-      Included are conflicts between states where, at most, force was displayed that year
-
-      <%- elif hostility == "Use of force" -%>
-      Included are conflicts between states where, at most, force was used that year, but there were fewer than 1,000 combatant deaths
-
-      <%- elif hostility == "War" -%>
-      Included are interstate wars that were ongoing that year
-
-      <%- endif -%>
+    conflict_type: "<%- if hostility == \"all\" -%> <%- if fatality == \"all\" -%> Included are conflicts between states where force was threatened, displayed, used, or escalated to a war that year <%- elif fatality == \"No deaths\" -%> Included are conflicts between states with no reported deaths that year <%- elif fatality == \"> 999 deaths\" -%> Included are conflicts between states in which more than 1,000 deaths were reported that year <%- elif fatality == \"Unknown\" -%> Included are conflicts between states with an unknown number of reported deaths that year <%- else -%> Included are conflicts between states in which << fatality >> were reported that year <%- endif -%>\n<%- elif hostility == \"Threat to use force\" -%> Included are conflicts between states where, at most, use of force was threatened that year\n<%- elif hostility == \"Display of force\" -%> Included are conflicts between states where, at most, force was displayed that year\n<%- elif hostility == \"Use of force\" -%> Included are conflicts between states where, at most, force was used that year, but there were fewer than 1,000 combatant deaths\n<%- elif hostility == \"War\" -%> Included are interstate wars that were ongoing that year\n<%- endif -%>"
 
   number_ongoing_disputes:
     description_short: |-
@@ -172,23 +146,25 @@ tables:
 dataset:
   title: History of war (COW MID, 2020)
   description: |-
-      This dataset provides information on militarized interstate disputes, using Correlates of War's Militarized Interstate Disputes dataset (version 5.0).
+    This dataset provides information on militarized interstate disputes, using Correlates of War's Militarized Interstate Disputes dataset (version 5.0).
 
-      The dataset provides information on the number of ongoing and new interstate conflicts and the number of deaths in ongoing interstate conflicts.
+    The dataset provides information on the number of ongoing and new interstate conflicts and the number of deaths in ongoing interstate conflicts.
 
-      Deaths of combatants due to fighting are included.
+    Deaths of combatants due to fighting are included.
 
-      We use the world regions of the participants to code the conflicts' world region(s). The regions are defined based on Gleditsch and Ward codes. Find the complete mapping at
-      https://correlatesofwar.org/wp-content/uploads/states2016.csv:
+    We use the world regions of the participants to code the conflicts' world region(s). The regions are defined based on Gleditsch and Ward codes. Find the complete mapping at
+    https://correlatesofwar.org/wp-content/uploads/states2016.csv:
 
-        • Americas: 2-165
+      • Americas: 2-165
 
-        • Europe: 200-395
+      • Europe: 200-395
 
-        • Africa: 402-626
+      • Africa: 402-626
 
-        • Middle East: 630-698
+      • Middle East: 630-698
 
-        • Asia and Oceania: 700-999
+      • Asia and Oceania: 700-999
 
-      You can find more information about the data in our article: [To be published]
+    You can find more information about the data in our article: [To be published]
+  owners:
+    - Lucas Rodés-Guirao

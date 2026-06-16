@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: Mineral Commodity Summaries
 
+  owners:
+    - Pablo Rosado
 tables:
   mineral_commodity_summaries:
     title: Mineral Commodity Summaries
@@ -31,4 +33,4 @@ tables:
     title: Mineral Commodity Summaries
     variables:
       # Metadata is filled up programmatically.
-      {}
+        {}

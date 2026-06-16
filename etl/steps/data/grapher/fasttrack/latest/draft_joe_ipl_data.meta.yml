@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Joe Hasell  # fasttrack
 tables:
   draft_joe_ipl_data:
     variables:

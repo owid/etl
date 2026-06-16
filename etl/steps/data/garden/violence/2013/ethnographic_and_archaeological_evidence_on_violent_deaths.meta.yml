@@ -1,5 +1,7 @@
 dataset:
   title: Ethnographic and Archaeological Evidence on Violent Deaths
+  owners:
+    - Cameron Appel  # backport
 tables:
   ethnographic_and_archaeological_evidence_on_violent_deaths:
     variables:

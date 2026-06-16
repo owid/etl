@@ -56,9 +56,9 @@ tb_merged = pr.merge(tb1, tb2, on="country")  # Merges metadata
 ## Documentation
 
 For detailed documentation, see:
-- **[API Reference](https://docs.owid.io/projects/etl/en/latest/api/catalog/api/)**: ChartsAPI, IndicatorsAPI, TablesAPI
-- **[Data Structures](https://docs.owid.io/projects/etl/en/latest/api/catalog/structures/)**: Dataset, Table, Variable, metadata handling
-- **[Full Documentation](https://docs.owid.io/projects/etl/en/latest/api/catalog/)**: Complete library documentation
+- **[API Reference](https://docs.owid.io/projects/etl/libraries/catalog/api/)**: ChartsAPI, IndicatorsAPI, TablesAPI
+- **[Data Structures](https://docs.owid.io/projects/etl/libraries/catalog/structures/)**: Dataset, Table, Variable, metadata handling
+- **[Full Documentation](https://docs.owid.io/projects/etl/libraries/catalog/intro/)**: Complete library documentation
 
 ## Architecture
 
@@ -84,6 +84,14 @@ make watch
 ```
 
 ## Changelog
+
+### `v1.2.0`
+- **Remove legacy `Source` metadata (origins only)**
+  - Removed `Source` class from `owid.catalog.core.meta`
+  - Removed `sources` field from `VariableMeta` and `DatasetMeta` (use `origins` instead)
+  - Removed `if_source_exists` parameter from `Dataset.update_metadata` (use `if_origins_exist`)
+  - Removed `get_unique_sources_from_indicators` helper
+  - Removed `sources` aggregation from `combine_indicators_metadata`
 
 ### `v1.1.0`
 - **Remove processing log feature**

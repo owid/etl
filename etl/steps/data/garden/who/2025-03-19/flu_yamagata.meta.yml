@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: Global B Yamagata influenza cases
 
+  owners:
+    - Fiona Spooner
 tables:
   flu_yamagata:
     variables:

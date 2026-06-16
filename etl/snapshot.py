@@ -1,5 +1,3 @@
-import datetime as dt
-import json
 import re
 import tempfile
 import time
@@ -21,7 +19,6 @@ from owid.catalog.core.meta import (
     License,
     MetaBase,
     Origin,
-    Source,
     TableMeta,
     pruned_json,
 )
@@ -312,21 +309,20 @@ class Snapshot:
         if self.metadata_path.exists():
             self.metadata_path.unlink()
 
-    def download_from_source(self) -> None:
-        """Download file from source_data_url."""
-        if self.metadata.origin:
-            assert self.metadata.origin.url_download, "url_download is not set"
-            download_url = self.metadata.origin.url_download
-        elif self.metadata.source:
-            assert self.metadata.source.source_data_url, "source_data_url is not set"
-            download_url = self.metadata.source.source_data_url
-        else:
-            raise ValueError("Neither origin nor source is set")
+    def download_from_source(self, user_agent: str | None = None) -> None:
+        """Download file from origin.url_download.
+
+        :param user_agent: Optional User-Agent header to use for HTTP(S) downloads (ignored for
+            s3://r2:// sources). See `download_helpers.download` for the default and bot-wall fallback.
+        """
+        assert self.metadata.origin, "origin is not set"
+        assert self.metadata.origin.url_download, "url_download is not set"
+        download_url = self.metadata.origin.url_download
         self.path.parent.mkdir(exist_ok=True, parents=True)
         if download_url.startswith("s3://") or download_url.startswith("r2://"):
             s3_utils.download(download_url, str(self.path))
         else:
-            download_helpers.download(download_url, str(self.path))
+            download_helpers.download(download_url, str(self.path), user_agent=user_agent)
 
     def dvc_add(self, upload: bool) -> None:
         """Add a file to DVC and upload it to S3.
@@ -372,6 +368,7 @@ class Snapshot:
         data: Table | pd.DataFrame | None = None,
         upload: bool = False,
         download_retries: int = 1,
+        user_agent: str | None = None,
     ) -> None:
         """Create a new snapshot from a local file, or from data in memory, or from a download link.
         Then upload it to S3. This is the recommended way to create a snapshot.
@@ -383,6 +380,8 @@ class Snapshot:
             data (Table or pd.DataFrame or None): Data to upload (if filename is not given).
             upload (bool): True to upload data to bucket.
             download_retries (int): Number of retries for downloading from source (default: 1, no retries).
+            user_agent (str or None): User-Agent to use when downloading from `url_download` (only relevant
+                for HTTP(S) sources). Defaults to a browser-like UA with a non-browser fallback for bot-walls.
         """
         assert not (filename is not None and data is not None), "Pass either a filename or data, but not both."
 
@@ -399,7 +398,7 @@ class Snapshot:
             # Create snapshot by downloading data from a URL with retry logic.
             for attempt in range(1, download_retries + 1):
                 try:
-                    self.download_from_source()
+                    self.download_from_source(user_agent=user_agent)
                     break
                 except DownloadCorrupted as e:
                     log.warning(
@@ -693,9 +692,8 @@ class SnapshotMeta(MetaBase):
 
     # NOTE: origin should actually never be None, it's here for backward compatibility
     origin: Origin | None = None
-    source: Source | None = None  # source is being slowly deprecated, use origin instead
 
-    # name and description are usually part of origin or source, they are here only for backward compatibility
+    # name and description are usually part of origin, they are here only for backward compatibility
     name: str | None = None
     description: str | None = None
 
@@ -852,22 +850,7 @@ class SnapshotMeta(MetaBase):
             if "origin" in meta:
                 meta["origin"] = Origin.from_dict(meta["origin"])
 
-            if "source" in meta:
-                meta["source"] = Source.from_dict(meta["source"])
-            elif "source_name" in meta:
-                # convert legacy fields to source
-                publication_date = meta.pop("publication_date", None)
-                meta["source"] = Source(
-                    name=meta.pop("source_name", None),
-                    description=meta.get("description", None),
-                    published_by=meta.pop("source_published_by", None),
-                    source_data_url=meta.pop("source_data_url", None),
-                    url=meta.pop("url", None),
-                    date_accessed=meta.pop("date_accessed", None),
-                    publication_date=str(publication_date) if publication_date else None,
-                    publication_year=meta.pop("publication_year", None),
-                )
-            assert meta.get("origin") or meta.get("source"), 'Either "origin" or "source" must be set'
+            assert meta.get("origin"), '"origin" must be set'
 
             if "license" not in meta:
                 if "license_name" in meta or "license_url" in meta:
@@ -887,78 +870,27 @@ class SnapshotMeta(MetaBase):
         assert len(self.outs) == 1
         return self.outs[0]["md5"]
 
-    def fill_from_backport_snapshot(self, snap_config_path: Path) -> None:
-        """Load metadat from backported snapshot.
-
-        Usage:
-            snap_config = Snapshot(
-                "backport/latest/dataset_3222_wheat_prices__long_run__in_england__makridakis_et_al__1997_config.json"
-            )
-            snap_config.pull()
-            meta.fill_from_backport_snapshot(snap_config.path)
-        """
-        with open(snap_config_path) as f:
-            js = json.load(f)
-
-        # NOTE: this is similar to `convert_grapher_source`, DRY it when possible
-        assert len(js["sources"]) >= 1
-        # Use only the first source for snapshot metadata; the garden step
-        # handles per-variable sources from the backport config separately.
-        s = js["sources"][0]
-        self.name = js["dataset"]["name"]
-        self.source = Source(
-            name=s["name"],
-            description=s["description"].get("additionalInfo"),
-            url=s["description"].get("link"),
-            published_by=s["description"].get("dataPublishedBy"),
-            date_accessed=pd.to_datetime(
-                s["description"].get("retrievedDate") or dt.date.today(), dayfirst=True
-            ).date(),
-        )
-
     def to_table_metadata(self):
-        if "origin" in self.to_dict():
-            table_meta = TableMeta.from_dict(
-                {
-                    "short_name": self.short_name,
-                    "title": self.origin.title,  # ty: ignore
-                    "description": self.origin.description,  # ty: ignore
-                    "dataset": DatasetMeta.from_dict(
-                        {
-                            "channel": "snapshots",
-                            "namespace": self.namespace,
-                            "short_name": self.short_name,
-                            "title": self.origin.title,  # ty: ignore
-                            "description": self.origin.description,  # ty: ignore
-                            "licenses": [self.license] if self.license else [],
-                            "is_public": self.is_public,
-                            "version": self.version,
-                        }
-                    ),
-                }
-            )
-        else:
-            table_meta = TableMeta.from_dict(
-                {
-                    "short_name": self.short_name,
-                    "title": self.name,
-                    "description": self.description,
-                    "dataset": DatasetMeta.from_dict(
-                        {
-                            "channel": "snapshots",
-                            "description": self.description,
-                            "is_public": self.is_public,
-                            "namespace": self.namespace,
-                            "short_name": self.short_name,
-                            "title": self.name,
-                            "version": self.version,
-                            "sources": [self.source] if self.source else [],
-                            "licenses": [self.license] if self.license else [],
-                        }
-                    ),
-                }
-            )
-        return table_meta
+        assert self.origin, f"Snapshot {self.uri} must have an origin"
+        return TableMeta.from_dict(
+            {
+                "short_name": self.short_name,
+                "title": self.origin.title,
+                "description": self.origin.description,
+                "dataset": DatasetMeta.from_dict(
+                    {
+                        "channel": "snapshots",
+                        "namespace": self.namespace,
+                        "short_name": self.short_name,
+                        "title": self.origin.title,
+                        "description": self.origin.description,
+                        "licenses": [self.license] if self.license else [],
+                        "is_public": self.is_public,
+                        "version": self.version,
+                    }
+                ),
+            }
+        )
 
 
 def read_table_from_snapshot(

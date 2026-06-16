@@ -1,5 +1,7 @@
 dataset:
   title: Aviation accidents and fatalities by flight phase (ASN, 2019)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   aviation_accidents_and_fatalities_by_flight_phase__asn__2019:
     variables:

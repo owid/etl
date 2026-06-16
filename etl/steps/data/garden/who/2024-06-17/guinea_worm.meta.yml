@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Tuna Acisu
 definitions:
   certification: |-
     The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.

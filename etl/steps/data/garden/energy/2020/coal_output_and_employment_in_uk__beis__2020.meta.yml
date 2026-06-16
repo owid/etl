@@ -1,5 +1,7 @@
 dataset:
   title: Coal output and employment in UK - BEIS (2020)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   coal_output_and_employment_in_uk__beis__2020:
     variables:

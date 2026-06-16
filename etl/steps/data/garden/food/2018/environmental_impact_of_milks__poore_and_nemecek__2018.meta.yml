@@ -1,5 +1,7 @@
 dataset:
   title: Environmental impact of milks (Poore and Nemecek, 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   environmental_impact_of_milks__poore_and_nemecek__2018:
     variables:

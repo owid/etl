@@ -1,5 +1,7 @@
 dataset:
   title: OECD - Trust in government
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   oecd__trust_in_government:
     variables:

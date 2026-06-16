@@ -1150,6 +1150,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   paternal_age:
     variables:

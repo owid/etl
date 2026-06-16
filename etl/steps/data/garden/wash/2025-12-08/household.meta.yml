@@ -18,8 +18,7 @@ definitions:
 
   residence: |-
     <% if residence == "Rural" %>rural <% elif residence == "Urban" %>urban <% elif residence == "Total" %><% endif -%>
-  residence_pop:
-    <% if residence == "Rural" %>Number of people in rural areas <% elif residence == "Urban" %>Number of people in urban areas <% elif residence == "Total" %>Number of people <% endif -%>
+  residence_pop: <% if residence == "Rural" %>Number of people in rural areas <% elif residence == "Urban" %>Number of people in urban areas <% elif residence == "Total" %>Number of people <% endif -%>
   sanitation_rationale: &sanitation_rationale |
     Having access to safe and comfortable sanitation facilities is essential to a healthy and dignified life. Improved sanitation facilities help prevent the spread of diseases such as cholera, dysentery, and typhoid by providing safe separation from human waste.
   basic_sanitation_desc: &basic_sanitation_desc |
@@ -77,6 +76,8 @@ dataset:
   update_period_days: 730
 
 
+  owners:
+    - Tuna Acisu
 tables:
   household:
     variables:

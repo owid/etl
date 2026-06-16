@@ -8,6 +8,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   near_earth_asteroids:
     variables:

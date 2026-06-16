@@ -1,5 +1,7 @@
 dataset:
   title: Drivers of forest loss in Brazil Legal Amazon (Tyukavina et al. 2017)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017:
     variables:
