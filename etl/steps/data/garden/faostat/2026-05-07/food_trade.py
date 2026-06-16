@@ -53,11 +53,6 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# Year exported to the viz. Hard-coded on purpose: when FAOSTAT publishes a
-# new release, the assertion below will fail and force a deliberate bump
-# rather than silently shifting the exported slice forward.
-YEAR = 2023
-
 # Sibling config file. Name starts with "food_trade" so ETL change-detection
 # picks it up automatically (see etl/steps/__init__.py:_step_files).
 ITEMS_CONFIG_PATH = Path(__file__).parent / "food_trade.items.yaml"
@@ -97,9 +92,7 @@ def _sanity_check_items_config(config: dict, tm_codes_in_data: set[int]) -> None
     assert not dupes, f"Duplicate display names in items config: {dupes}"
 
     missing_codes = sorted(int(e["item_code"]) for e in items if int(e["item_code"]) not in tm_codes_in_data)
-    assert not missing_codes, (
-        f"{len(missing_codes)} item_code(s) not found in TM snapshot for {YEAR}: {missing_codes[:10]}"
-    )
+    assert not missing_codes, f"{len(missing_codes)} item_code(s) not found in TM snapshot: {missing_codes[:10]}"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -107,26 +100,19 @@ def _sanity_check_items_config(config: dict, tm_codes_in_data: set[int]) -> None
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def _assert_year_is_latest_well_covered(tb: Table, year: int) -> None:
-    """Assert that `year` is the latest year whose number of distinct reporting
-    countries is at least 90% of the series maximum — i.e. the latest year
-    that is not the partially reported tail year.
+def _latest_well_covered_year(tb: Table) -> int:
+    """Return the latest year whose number of distinct reporting countries is at
+    least 90% of the series maximum — i.e. the latest year that is not the
+    partially reported tail year.
 
     We use distinct reporters rather than row count because row count
     conflates "fewer countries submitted" with "less trade activity"
     (cf. plot_coverage() in the faostat_tm garden step). A real trade
     contraction could spuriously trip a row-count threshold; a reporter
-    headcount drop is unambiguous coverage signal.
-
-    Fails loudly when FAOSTAT extends the matrix so we can update the
-    `YEAR` constant deliberately."""
+    headcount drop is unambiguous coverage signal."""
     reporters_per_year = tb.groupby("year", observed=True)["reporter_country"].nunique()
     threshold = 0.9 * reporters_per_year.max()
-    latest_well_covered = int(reporters_per_year[reporters_per_year >= threshold].index.max())
-    assert latest_well_covered == year, (
-        f"YEAR is hard-coded to {year}, but the latest well-covered year (by reporter "
-        f"count) in the data is {latest_well_covered}. Bump YEAR (and re-run the viz) deliberately."
-    )
+    return int(reporters_per_year[reporters_per_year >= threshold].index.max())
 
 
 def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> Table:
@@ -188,12 +174,13 @@ def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> Table:
 def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     """Reshape the trade matrix into the viz-ready slice with Production and
     apparent domestic supply context."""
-    _assert_year_is_latest_well_covered(tb_tm, YEAR)
+    # Use the latest year that is well covered (not the partially reported tail year).
+    year = _latest_well_covered_year(tb_tm)
 
     # 1) Filter TM to physical quantities in tonnes for the chosen year,
     #    drop self-trade rows, and restrict to the curated item universe.
     qty = tb_tm[
-        (tb_tm["year"] == YEAR) & tb_tm["element"].isin(["Export quantity", "Import quantity"]) & (tb_tm["unit"] == "t")
+        (tb_tm["year"] == year) & tb_tm["element"].isin(["Export quantity", "Import quantity"]) & (tb_tm["unit"] == "t")
     ].copy()
     qty["reporter_country"] = qty["reporter_country"].astype(str)
     qty["partner_country"] = qty["partner_country"].astype(str)
@@ -211,7 +198,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     #    curated codes. Supply follows the FAOSTAT FBS identity
     #        Production + Imports − Exports + Stock Variation
     #    with every component sourced from SCL (see `_scl_supply_by_country_and_code`).
-    scl_ctx = _scl_supply_by_country_and_code(tb_scl, YEAR)
+    scl_ctx = _scl_supply_by_country_and_code(tb_scl, year)
     scl_ctx = scl_ctx[scl_ctx["item_code"].isin(code_to_display)].copy()
     scl_ctx["item"] = scl_ctx["item_code"].map(code_to_display)
 
@@ -247,6 +234,9 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     out = pr.merge(out, exporter_production, on=["exporter", "item"], how="left")
     out = pr.merge(out, supply, on=["importer", "item"], how="left")
     out = out.sort_values(["exporter", "importer", "item"]).reset_index(drop=True)
+    # Carry the year so the data is self-describing and downstream steps don't hard-code it.
+    out["year"] = year
+    out["year"] = out["year"].copy_metadata(out["value"])
 
     tb_out = out.format(keys=["exporter", "importer", "item"], short_name=paths.short_name)
     return tb_out

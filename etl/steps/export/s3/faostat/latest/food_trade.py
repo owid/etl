@@ -43,9 +43,6 @@ S3_BUCKET_NAME = "owid-public"
 S3_DATA_DIR = Path("data/food-trade")
 FILE_SLUG = "food-trade"
 
-# Hard-coded to match the YEAR constant in the garden step. Bump both together.
-YEAR = 2023
-
 # Source of the (item name -> FAO item code) mapping. Same yaml the garden
 # step uses, so the product ids in this export are the canonical FAOSTAT codes
 # (e.g. 15 = Wheat, 56 = Maize (corn), 236 = Soya beans). Stable across
@@ -145,6 +142,11 @@ def run() -> None:
     for col in ("exporter", "importer", "item"):
         df[col] = df[col].astype(str)
 
+    # Year comes from the data itself (the garden step exports a single year).
+    years = df["year"].unique()
+    assert len(years) == 1, f"Expected a single year in the food_trade table, found {sorted(years)}."
+    year = int(years[0])
+
     #
     # Build id mappings.
     # - Entities: no canonical external id (FAO uses country names), so we
@@ -168,7 +170,7 @@ def run() -> None:
     # Write metadata.
     #
     metadata = {
-        "year": YEAR,
+        "year": year,
         "source": source,
         "dimensions": {
             "entities": [{"id": entity_to_id[c], "name": c} for c in countries],
