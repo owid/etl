@@ -36,10 +36,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_migrant_stock = paths.load_dataset("migrant_stock")
-    # Load regions dataset
-    ds_regions = paths.load_dataset("regions")
-    # Load income groups dataset
-    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table from meadow dataset.
     tb = ds_migrant_stock.read("migrant_stock_dest_origin")
@@ -53,11 +49,8 @@ def run() -> None:
     # add regions to data
 
     # sum over country destination
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb,
-        regions=REGIONS,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         aggregations=agg,
         country_col="country_destination",
         index_columns=["country_destination", "country_origin", "year"],
@@ -66,11 +59,8 @@ def run() -> None:
     tb = add_others_to_world(tb, country_col="country_destination")
 
     # sum over country origin
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb,
-        regions=REGIONS,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         aggregations=agg,
         country_col="country_origin",
         index_columns=["country_destination", "country_origin", "year"],
