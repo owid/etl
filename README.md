@@ -4,6 +4,9 @@
 
 _The compute graph for Our World in Data's data processing._
 
+<!-- Test PR: verifying PR-gated staging-server creation (ops #523). Safe to close/revert. -->
+
+
 | Check | Status |
 | --- | --- |
 | Unit tests | [![Build status](https://badge.buildkite.com/061a630a7e2e6e7d64177b58b9915c4361ffef91852e952fe1.svg)](https://buildkite.com/our-world-in-data/etl-unit-tests) |
