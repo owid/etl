@@ -100,6 +100,16 @@ def create_metadata_json(tb: Table, tb_pop: Table) -> tuple[dict, dict]:
     # Build a (country → year → population) lookup in one pass
     pop_pivot = tb_pop[tb_pop["year"].isin(POPULATION_YEARS)].set_index(["country", "year"])["population"].to_dict()
 
+    # add Others with 0 population (since it's not included in the population dataset, but we want it to be included in the visualization)
+    pop_pivot[("Other countries", 1990)] = 0
+    pop_pivot[("Other countries", 1995)] = 0
+    pop_pivot[("Other countries", 2000)] = 0
+    pop_pivot[("Other countries", 2005)] = 0
+    pop_pivot[("Other countries", 2010)] = 0
+    pop_pivot[("Other countries", 2015)] = 0
+    pop_pivot[("Other countries", 2020)] = 0
+    pop_pivot[("Other countries", 2024)] = 0
+
     def _pop_list(entity: str) -> list:
         return [int(pop_pivot[(entity, yr)]) for yr in POPULATION_YEARS]
 
