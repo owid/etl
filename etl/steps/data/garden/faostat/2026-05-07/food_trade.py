@@ -50,20 +50,24 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def _sanity_check_items_config(config: dict, tm_codes_in_data: set[int]) -> None:
+def _sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
     """Validate the items config structurally and against the TM snapshot.
+
+    `tm_items` maps each TM item code to its FAO item name in the current snapshot.
 
     Checks:
       1. Required top-level shape: a single 'items' list.
-      2. Each items entry has required fields (display, item_code).
+      2. Each items entry has required fields (display, item_code, fao_item).
       3. display names are unique.
       4. Each item_code exists in the TM snapshot (catches typos / removed codes).
+      5. Each code's FAO item name still matches the expected `fao_item` (catches FAO
+         silently reassigning or renaming a code to a different commodity).
     """
     assert isinstance(config, dict) and "items" in config, "items config must be a mapping with an 'items' key"
     items = config["items"]
     assert isinstance(items, list) and items, "config['items'] must be a non-empty list"
 
-    required = {"display", "item_code"}
+    required = {"display", "item_code", "fao_item"}
     for entry in items:
         missing = required - entry.keys()
         assert not missing, f"items entry missing keys {sorted(missing)}: {entry}"
@@ -72,8 +76,19 @@ def _sanity_check_items_config(config: dict, tm_codes_in_data: set[int]) -> None
     dupes = sorted({d for d in displays if displays.count(d) > 1})
     assert not dupes, f"Duplicate display names in items config: {dupes}"
 
-    missing_codes = sorted(int(e["item_code"]) for e in items if int(e["item_code"]) not in tm_codes_in_data)
+    missing_codes = sorted(int(e["item_code"]) for e in items if int(e["item_code"]) not in tm_items)
     assert not missing_codes, f"{len(missing_codes)} item_code(s) not found in TM snapshot: {missing_codes[:10]}"
+
+    renamed = [
+        f"{e['item_code']}: expected {e['fao_item']!r}, TM has {tm_items[int(e['item_code'])]!r}"
+        for e in items
+        if tm_items[int(e["item_code"])] != e["fao_item"]
+    ]
+    assert not renamed, (
+        "FAO item name no longer matches `fao_item` for: "
+        + "; ".join(renamed)
+        + ". Verify each code still refers to the intended commodity before updating fao_item."
+    )
 
 
 def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
@@ -96,10 +111,12 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     trade_flows = trade_flows[trade_flows["reporter_country"] != trade_flows["partner_country"]]
 
     # Curated items config. Its name starts with "food_trade" so ETL change-detection
-    # picks it up automatically (see etl/steps/__init__.py:_step_files).
+    # picks it up automatically (see etl/steps/__init__.py:_step_files). Validate it against
+    # the FAO item names in the snapshot (item_code -> name) before trusting the codes.
     with open(paths.side_file("food_trade.items.yaml")) as f:
         items_config = yaml.safe_load(f)
-    _sanity_check_items_config(items_config, tm_codes_in_data=set(trade_flows["item_code"].unique()))
+    tm_items = dict(zip(trade_flows["item_code"], trade_flows["item"].astype(str)))
+    _sanity_check_items_config(items_config, tm_items=tm_items)
 
     code_to_display = {int(e["item_code"]): e["display"] for e in items_config["items"]}
     trade_flows = trade_flows[trade_flows["item_code"].isin(code_to_display)].copy()

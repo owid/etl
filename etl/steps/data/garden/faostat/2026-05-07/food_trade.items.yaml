@@ -5,97 +5,129 @@
 # (production).
 #
 # Each entry:
-#   display:    name shown in the dropdown
+#   display:    name shown in the visualization dropdown
 #   item_code:  FAO commodity item code (TM/SCL codebook, 1-1296 range).
-#               Stable across FAOSTAT releases. The trailing `#` comment is
-#               the current TM item name for human readability only.
+#   fao_item:   the item's name in the TM snapshot. The garden step asserts this
+#               still matches, so if FAO ever reassigns or renames a code the build
+#               fails loudly instead of silently mislabelling the data.
 #
 items:
   # ─────────────────────────────────────────────────────────────────────────
   # Cereals
   - display: Wheat
-    item_code: 15    # Wheat
+    item_code: 15
+    fao_item: Wheat
   - display: Maize
-    item_code: 56    # Maize (corn)
+    item_code: 56
+    fao_item: Maize (corn)
   - display: Rice
-    item_code: 27    # Rice
+    item_code: 27
+    fao_item: Rice
   - display: Barley
-    item_code: 44    # Barley
+    item_code: 44
+    fao_item: Barley
   - display: Rye
-    item_code: 71    # Rye
+    item_code: 71
+    fao_item: Rye
   - display: Oats
-    item_code: 75    # Oats
+    item_code: 75
+    fao_item: Oats
   - display: Millet
-    item_code: 79    # Millet
+    item_code: 79
+    fao_item: Millet
   - display: Sorghum
-    item_code: 83    # Sorghum
+    item_code: 83
+    fao_item: Sorghum
 
   # ─────────────────────────────────────────────────────────────────────────
   # Roots & tubers
   - display: Potatoes
-    item_code: 116   # Potatoes
+    item_code: 116
+    fao_item: Potatoes
   - display: Cassava
-    item_code: 125   # Cassava (raw — TM 125 in the snapshot)
+    item_code: 125
+    fao_item: Cassava, fresh
 
   # ─────────────────────────────────────────────────────────────────────────
   # Pulses
   - display: Dry beans
-    item_code: 176   # Beans, dry
+    item_code: 176
+    fao_item: Beans, dry
   - display: Dry peas
-    item_code: 187   # Peas, dry
+    item_code: 187
+    fao_item: Peas, dry
 
   # ─────────────────────────────────────────────────────────────────────────
   # Sugar crops
   - display: Sugar cane
-    item_code: 156   # Sugar cane
+    item_code: 156
+    fao_item: Sugar cane
   - display: Sugar beet
-    item_code: 157   # Sugar beet
+    item_code: 157
+    fao_item: Sugar beet
 
   # ─────────────────────────────────────────────────────────────────────────
   # Oilcrops (raw seeds)
   - display: Soybeans
-    item_code: 236   # Soya beans
+    item_code: 236
+    fao_item: Soya beans
   - display: Sunflower seed
-    item_code: 267   # Sunflower seed
+    item_code: 267
+    fao_item: Sunflower seed
   - display: Groundnuts
-    item_code: 242   # Groundnuts (with shell)
+    item_code: 242
+    fao_item: Groundnuts, excluding shelled
   - display: Rapeseed
-    item_code: 270   # Rape or colza seed
+    item_code: 270
+    fao_item: Rape or colza seed
   - display: Palm kernels
-    item_code: 256   # Palm kernels
+    item_code: 256
+    fao_item: Palm kernels
 
   # ─────────────────────────────────────────────────────────────────────────
   # Vegetable oils
   - display: Palm oil
-    item_code: 257   # Palm oil
+    item_code: 257
+    fao_item: Palm oil
   - display: Olive oil
-    item_code: 261   # Olive oil
+    item_code: 261
+    fao_item: Olive oil
   - display: Soybean oil
-    item_code: 237   # Soya bean oil
+    item_code: 237
+    fao_item: Soya bean oil
   - display: Sunflower oil
-    item_code: 268   # Sunflower-seed oil, crude
+    item_code: 268
+    fao_item: Sunflower-seed oil, crude
   - display: Coconut oil
-    item_code: 252   # Coconut oil
+    item_code: 252
+    fao_item: Coconut oil
 
   # ─────────────────────────────────────────────────────────────────────────
   # Vegetables
   - display: Tomatoes
-    item_code: 388   # Tomatoes
+    item_code: 388
+    fao_item: Tomatoes
   - display: Onions
-    item_code: 403   # Onions and shallots, dry (excluding dehydrated)
+    item_code: 403
+    fao_item: Onions and shallots, dry (excluding dehydrated)
 
   # ─────────────────────────────────────────────────────────────────────────
   # Fruits
   - display: Bananas
-    item_code: 486   # Bananas
+    item_code: 486
+    fao_item: Bananas
   - display: Apples
-    item_code: 515   # Apples
+    item_code: 515
+    fao_item: Apples
   - display: Oranges
-    item_code: 490   # Oranges
+    item_code: 490
+    fao_item: Oranges
   - display: Pineapples
-    item_code: 574   # Pineapples
+    item_code: 574
+    fao_item: Pineapples
   - display: Grapes
-    item_code: 560   # Grapes
+    item_code: 560
+    fao_item: Grapes
 
   # ─────────────────────────────────────────────────────────────────────────
   # Meat
@@ -106,32 +138,44 @@ items:
   # therefore reads as "fraction of total production exported as fresh bone-in
   # cuts" — partial on the trade side but the denominator is right.
   - display: Beef
-    item_code: 867   # Meat of cattle with the bone, fresh or chilled
+    item_code: 867
+    fao_item: Meat of cattle with the bone, fresh or chilled
   - display: Pork
-    item_code: 1035  # Meat of pig with the bone, fresh or chilled
+    item_code: 1035
+    fao_item: Meat of pig with the bone, fresh or chilled
   - display: Chicken meat
-    item_code: 1058  # Meat of chickens, fresh or chilled
+    item_code: 1058
+    fao_item: Meat of chickens, fresh or chilled
   - display: Sheep meat
-    item_code: 977   # Meat of sheep, fresh or chilled
+    item_code: 977
+    fao_item: Meat of sheep, fresh or chilled
   - display: Goat meat
-    item_code: 1017  # Meat of goat, fresh or chilled
+    item_code: 1017
+    fao_item: Meat of goat, fresh or chilled
 
   # ─────────────────────────────────────────────────────────────────────────
   # Eggs, honey, beverages
   - display: Hen eggs in shell
-    item_code: 1062  # Hen eggs in shell, fresh
+    item_code: 1062
+    fao_item: Hen eggs in shell, fresh
   - display: Honey
-    item_code: 1182  # Natural honey
+    item_code: 1182
+    fao_item: Natural honey
   - display: Wine
-    item_code: 564   # Wine
+    item_code: 564
+    fao_item: Wine
   - display: Beer
-    item_code: 51    # Beer of barley, malted
+    item_code: 51
+    fao_item: Beer of barley, malted
 
   # ─────────────────────────────────────────────────────────────────────────
   # Stimulants
   - display: Green coffee
-    item_code: 656   # Coffee, green
+    item_code: 656
+    fao_item: Coffee, green
   - display: Cocoa beans
-    item_code: 661   # Cocoa beans
+    item_code: 661
+    fao_item: Cocoa beans
   - display: Tea
-    item_code: 667   # Tea leaves
+    item_code: 667
+    fao_item: Tea leaves
