@@ -22,8 +22,8 @@ SOURCE_NAME = "Food and Agriculture Organization of the United Nations"
 # Short attribution.
 ATTRIBUTION_SHORT = "FAOSTAT"
 # Metadata related to license.
-LICENSE_URL = "http://www.fao.org/contact-us/terms/db-terms-of-use/en"
-LICENSE_NAME = "CC BY-NC-SA 3.0 IGO"
+LICENSE_URL = "https://www.fao.org/contact-us/terms/db-terms-of-use/en"
+LICENSE_NAME = "CC BY 4.0"
 # Maximum number of characters for item_code.
 # WARNING: These definitions should coincide with those given in the shared module of the garden step.
 # FAOSTAT "item_code" is usually an integer number, however sometimes it has decimals and sometimes it contains letters.
