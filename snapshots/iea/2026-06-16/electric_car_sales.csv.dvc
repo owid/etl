@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: International Energy Agency
+    title: Global EV Outlook
+    description: |-
+      Electric car sales and stocks data from the International Energy Agency's Global EV Outlook.
+
+      The data covers battery-electric vehicles (BEV) and plug-in hybrid electric vehicles (PHEV), reporting both annual new sales and the total stock of vehicles on the road, along with their shares of the overall car market.
+    citation_full: 'IEA (2026), Global EV Outlook 2026, IEA, Paris https://www.iea.org/reports/global-ev-outlook-2026, Licence: CC BY 4.0'
+    attribution_short: IEA
+    url_main: https://www.iea.org/reports/global-ev-outlook-2026
+    url_download: https://api.iea.org/evs/?parameters=EV%20sales&category=Historical&csv=true
+    date_accessed: '2026-06-16'
+    date_published: '2026'
+    license:
+      name: CC BY 4.0
+      url: https://www.iea.org/terms
+outs:
+  - md5: 2ba57ef32ff7c74cb34a20f2470c1713
+    size: 81659
+    path: electric_car_sales.csv

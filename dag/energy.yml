@@ -7,6 +7,13 @@ steps:
       - data://meadow/unep/2023-12-12/renewable_energy_investments:
         - snapshot://unep/2023-12-12/global_trends_in_renewable_energy_investment.pdf
   #
+  # IEA - Electric car sales (Global EV Outlook)
+  #
+  data://grapher/iea/2026-06-16/electric_car_sales:
+    - data://garden/iea/2026-06-16/electric_car_sales:
+      - data://meadow/iea/2026-06-16/electric_car_sales:
+        - snapshot://iea/2026-06-16/electric_car_sales.csv
+  #
   # IEA - Fossil fuel subsidies
   #
   data://grapher/iea/2024-11-20/fossil_fuel_subsidies:
