@@ -151,10 +151,14 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
         - supply_context["Export quantity"].fillna(0)
         - supply_context["Stock Variation"].fillna(0)
     )
-    # Negative supply signals the FBS components don't reconcile (re-exports not captured by
-    # stock variation, timing mismatches, primary-equivalent aggregation). NaN it out rather
-    # than clipping to 0, so the downstream import-share ratio is undefined, not misleadingly zero.
-    supply_context.loc[supply_context["supply"] < 0, "supply"] = pd.NA
+    # A non-positive supply can't be the denominator of an import share, so treat it as missing:
+    # negative means the FBS components don't reconcile (re-exports not captured by stock
+    # variation, timing mismatches, primary-equivalent aggregation), and zero is the signature of
+    # a (country, item) built entirely from blank components. Either way the ratio should be
+    # undefined, not infinite or misleadingly small. Where SCL omits a positive component (e.g. an
+    # unrecorded import) supply stays positive but understated; we keep SCL's figure as-is rather
+    # than patch it from TM, which we treat as a separate, un-reconciled source.
+    supply_context.loc[supply_context["supply"] <= 0, "supply"] = pd.NA
     supply_context["item"] = supply_context["item_code"].map(code_to_display)
 
     # Exporter context column: only emit `exporter_production` for countries with
