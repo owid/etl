@@ -191,15 +191,14 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     food_trade = pr.merge(food_trade, exporter_production, on=["exporter", "item"], how="left")
     food_trade = pr.merge(food_trade, importer_supply, on=["importer", "item"], how="left")
     food_trade = food_trade.sort_values(["exporter", "importer", "item"]).reset_index(drop=True)
-    # Carry the year so the data is self-describing and downstream steps don't hard-code it.
+    # Carry the year as a dimension so the data is self-describing and downstream steps don't hard-code it.
     food_trade["year"] = year
-    food_trade["year"] = food_trade["year"].copy_metadata(food_trade["value"])
     # Carry the FAO item code as a dimension so downstream steps get the display->code
     # mapping from the data itself, rather than re-reading the curated items config.
     display_to_code = {display: code for code, display in code_to_display.items()}
     food_trade["item_code"] = food_trade["item"].map(display_to_code).astype(int)
 
-    return food_trade.format(keys=["exporter", "importer", "item", "item_code"], short_name=paths.short_name)
+    return food_trade.format(keys=["exporter", "importer", "item", "item_code", "year"], short_name=paths.short_name)
 
 
 def run() -> None:
