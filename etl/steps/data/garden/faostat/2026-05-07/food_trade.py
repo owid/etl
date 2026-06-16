@@ -1,7 +1,6 @@
 """Garden step for the FAOSTAT food-trade Sankey viz.
 
-Builds the slim, viz-ready slice of bilateral trade flows from the trade
-matrix (`faostat_tm`), with two context columns from SCL Production:
+Builds the slice of bilateral trade flows from the trade matrix, with two columns from SCL Production:
 
   exporter (str)               — exporting country (OWID-harmonized)
   importer (str)               — importing country (OWID-harmonized)
@@ -12,17 +11,14 @@ matrix (`faostat_tm`), with two context columns from SCL Production:
   importer_supply (float)      — importer's domestic supply in tonnes,
                                  computed from SCL via the FAOSTAT Food
                                  Balance Sheet identity:
-                                     Production + Imports − Exports − Stock Variation
+                                     Production + Imports - Exports - Stock Variation
                                  All four components come from SCL. Stock
-                                 Variation in SCL is `Closing − Opening`
+                                 Variation in SCL is `Closing - Opening`
                                  (positive when stocks accumulated during
                                  the year, negative when drawn down) — so
                                  it is *subtracted* from the supply, as
                                  accumulated stocks don't reach domestic
-                                 use. NaN when SCL has no row for the
-                                 (importer, item) pair at all, or when the
-                                 FBS identity returns a negative (a
-                                 data-inconsistency signal).
+                                 use.
 
 The display items shown in the dropdown are curated in
 `food_trade.items.yaml`. Each entry names a single FAO commodity item code
@@ -42,8 +38,6 @@ items in `food_trade.items.yaml` that aren't in the TM snapshot raise a
 clear assertion (sanity check below).
 """
 
-from pathlib import Path
-
 import pandas as pd
 import yaml
 from owid.catalog import Table
@@ -53,10 +47,6 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# Sibling config file. Name starts with "food_trade" so ETL change-detection
-# picks it up automatically (see etl/steps/__init__.py:_step_files).
-ITEMS_CONFIG_PATH = Path(__file__).parent / "food_trade.items.yaml"
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # YAML config loading & validation
@@ -64,8 +54,8 @@ ITEMS_CONFIG_PATH = Path(__file__).parent / "food_trade.items.yaml"
 
 
 def _load_items_config() -> dict:
-    """Load the curated items config from food_trade.items.yaml."""
-    with open(ITEMS_CONFIG_PATH) as f:
+    """Load the curated items config from the step's sibling food_trade.items.yaml."""
+    with open(paths.side_file("food_trade.items.yaml")) as f:
         return yaml.safe_load(f)
 
 
