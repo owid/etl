@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-06-08T07:42:20.348827Z"
+exclude-newer = "2026-06-12T15:09:41.814501Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -4865,19 +4865,33 @@ dependencies = [
     { name = "pyarrow" },
     { name = "python-dotenv" },
     { name = "pyyaml" },
+    { name = "rich" },
+    { name = "sqlalchemy" },
     { name = "tomli" },
+    { name = "tqdm" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.0" },
     { name = "graphviz", specifier = ">=0.21" },
-    { name = "owid-catalog" },
+    { name = "owid-catalog", editable = "lib/catalog" },
     { name = "pandas", specifier = ">=2.2" },
     { name = "pyarrow", specifier = ">=16.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "pyyaml", specifier = ">=6.0" },
+    { name = "rich", specifier = ">=12.1.0" },
+    { name = "sqlalchemy", specifier = ">=2.0.30" },
     { name = "tomli", specifier = ">=2.0" },
+    { name = "tqdm", specifier = ">=4.66.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "ipdb", specifier = ">=0.13.13" },
+    { name = "pytest", specifier = ">=9.0.3" },
+    { name = "ruff", specifier = "==0.15.8" },
+    { name = "ty", specifier = "==0.0.26" },
 ]
 
 [[package]]

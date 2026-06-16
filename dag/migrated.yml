@@ -442,9 +442,6 @@ steps:
   data-private://grapher/biodiversity/2021-06-01/north_atlantic_cod_catch__schijns_et_al__2021:
     - data-private://garden/biodiversity/2021-06-01/north_atlantic_cod_catch__schijns_et_al__2021:
       - snapshot-private://biodiversity/2021-06-01/north_atlantic_cod_catch__schijns_et_al__2021.feather
-  data://grapher/biodiversity/2022-12-05/whale_catch__rocha_et_al__iwc:
-    - data://garden/biodiversity/2022-12-05/whale_catch__rocha_et_al__iwc:
-      - snapshot://biodiversity/2022-12-05/whale_catch__rocha_et_al__iwc.feather
   data://grapher/food/2022-03-15/ukraine_russia_contribution_to_global_food:
     - data://garden/food/2022-03-15/ukraine_russia_contribution_to_global_food:
       - snapshot://food/2022-03-15/ukraine_russia_contribution_to_global_food.feather
@@ -652,9 +649,6 @@ steps:
   data-private://grapher/health/2019-11-11/streptococcus_caused_deaths_in_children_under_5__wahl__2018:
     - data-private://garden/health/2019-11-11/streptococcus_caused_deaths_in_children_under_5__wahl__2018:
       - snapshot-private://health/2019-11-11/streptococcus_caused_deaths_in_children_under_5__wahl__2018.feather
-  data-private://grapher/biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022:
-    - data-private://garden/biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022:
-      - snapshot-private://biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022.feather
   data-private://grapher/biodiversity/2022-12-12/drivers_of_recovery_in_european_bird_species__zsl__2022:
     - data-private://garden/biodiversity/2022-12-12/drivers_of_recovery_in_european_bird_species__zsl__2022:
       - snapshot-private://biodiversity/2022-12-12/drivers_of_recovery_in_european_bird_species__zsl__2022.feather
@@ -916,9 +910,6 @@ steps:
   data://grapher/agriculture/2017-01-01/fertilizer_use_per_hectare_of_land__fao__and__federico:
     - data://garden/agriculture/2017-01-01/fertilizer_use_per_hectare_of_land__fao__and__federico:
       - snapshot://agriculture/2017-01-01/fertilizer_use_per_hectare_of_land__fao__and__federico.feather
-  data://grapher/biodiversity/2022-12-05/whale_catch_by_decade__rocha_et_al__and__iwc:
-    - data://garden/biodiversity/2022-12-05/whale_catch_by_decade__rocha_et_al__and__iwc:
-      - snapshot://biodiversity/2022-12-05/whale_catch_by_decade__rocha_et_al__and__iwc.feather
   data://grapher/health/2018-05-12/smallpox_cases_by_country_1920_1977:
     - data://garden/health/2018-05-12/smallpox_cases_by_country_1920_1977:
       - snapshot://health/2018-05-12/smallpox_cases_by_country_1920_1977.feather
@@ -1078,9 +1069,6 @@ steps:
   data-private://grapher/labor/2019-10-02/methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010:
     - data-private://garden/labor/2019-10-02/methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010:
       - snapshot-private://labor/2019-10-02/methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010.feather
-  data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
-    - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
-      - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather
   data-private://grapher/happiness/2021-05-25/gallup_world_poll__someone_to_help_you:
     - data-private://garden/happiness/2021-05-25/gallup_world_poll__someone_to_help_you:
       - snapshot-private://happiness/2021-05-25/gallup_world_poll__someone_to_help_you.feather
