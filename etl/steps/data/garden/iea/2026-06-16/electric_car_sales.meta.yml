@@ -4,7 +4,12 @@ definitions:
     presentation:
       topic_tags:
         - Transport
+      attribution_short: IEA
     processing_level: minor
+  count_display: &count_display
+    numDecimalPlaces: 0
+  share_display: &share_display
+    numDecimalPlaces: 1
 
 dataset:
   update_period_days: 365
@@ -17,69 +22,83 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The share of new cars sold that are electric. This includes plug-in hybrids and battery-electric cars.
+        display: *share_display
       ev_stock_share:
         title: Share of cars in use that are electric
         unit: "%"
         short_unit: "%"
         description_short: The share of cars in use that are electric. This includes plug-in hybrids and battery-electric cars.
+        display: *share_display
       bev_sales:
         title: Battery-electric cars sold
         unit: cars
         short_unit: ""
         description_short: The number of new fully battery-electric cars sold.
+        display: *count_display
       bev_stock:
         title: Battery-electric cars in use
         unit: cars
         short_unit: ""
         description_short: The number of fully battery-electric cars in use.
+        display: *count_display
       phev_sales:
         title: Plug-in hybrid cars sold
         unit: cars
         short_unit: ""
         description_short: The number of new plug-in hybrid cars sold.
+        display: *count_display
       phev_stock:
         title: Plug-in hybrid cars in use
         unit: cars
         short_unit: ""
         description_short: The number of plug-in hybrid cars in use.
+        display: *count_display
       ev_sales:
         title: Electric cars sold
         unit: cars
         short_unit: ""
         description_short: The number of new electric cars sold. This includes plug-in hybrids and battery-electric cars.
+        display: *count_display
       bev_share_ev_cars:
         title: Battery-electric as a share of electric cars sold
         unit: "%"
         short_unit: "%"
         description_short: The share of electric cars sold that are fully battery-electric.
+        display: *share_display
       phev_share_ev_cars:
         title: Plug-in hybrid as a share of electric cars sold
         unit: "%"
         short_unit: "%"
         description_short: The share of electric cars sold that are plug-in hybrids.
+        display: *share_display
       bev_share_car_sales:
         title: Battery-electric as a share of cars sold
         unit: "%"
         short_unit: "%"
         description_short: The share of new cars sold that are fully battery-electric.
+        display: *share_display
       phev_share_car_sales:
         title: Plug-in hybrid as a share of cars sold
         unit: "%"
         short_unit: "%"
         description_short: The share of new cars sold that are plug-in hybrids.
+        display: *share_display
       ev_stock:
         title: Electric cars in use
         unit: cars
         short_unit: ""
         description_short: The number of electric cars in use. This includes plug-in hybrids and battery-electric cars.
+        display: *count_display
       total_cars_sold:
         title: Total new cars sold
         unit: cars
         short_unit: ""
         description_short: The total number of new cars sold.
+        display: *count_display
       non_ev_cars_sold:
         title: Non-electric cars sold
         unit: cars
         short_unit: ""
         description_short: |-
           The total number of new cars sold that are not electric. This includes petrol, diesel and hybrids. It does not include plug-in hybrids.
+        display: *count_display
