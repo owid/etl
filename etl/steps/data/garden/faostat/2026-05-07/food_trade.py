@@ -141,11 +141,10 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     supply_context = scl.pivot(
         index=["country", "item_code"], columns="element", values="value", join_column_levels_with=""
     )
-    # Guard against SCL missing a whole component for the year (the pivot would omit its column).
-    for component in components:
-        if component not in supply_context.columns:
-            supply_context[component] = pd.NA
-            supply_context[component] = supply_context[component].copy_metadata(scl["value"])
+    # Every component should be present for at least some (country, item); a whole component
+    # missing would mean SCL dropped it for the year, which we must not silently treat as 0.
+    missing_components = [c for c in components if c not in supply_context.columns]
+    assert not missing_components, f"SCL is missing entire component(s) {missing_components} in {year}."
     supply_context["supply"] = (
         supply_context["Production"].fillna(0)
         + supply_context["Import quantity"].fillna(0)
