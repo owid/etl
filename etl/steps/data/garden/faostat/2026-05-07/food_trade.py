@@ -49,10 +49,6 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# YAML config loading & validation
-# ─────────────────────────────────────────────────────────────────────────────
-
 
 def _sanity_check_items_config(config: dict, tm_codes_in_data: set[int]) -> None:
     """Validate the items config structurally and against the TM snapshot.
@@ -80,31 +76,14 @@ def _sanity_check_items_config(config: dict, tm_codes_in_data: set[int]) -> None
     assert not missing_codes, f"{len(missing_codes)} item_code(s) not found in TM snapshot: {missing_codes[:10]}"
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Helpers
-# ─────────────────────────────────────────────────────────────────────────────
-
-
-def _latest_well_covered_year(tb: Table) -> int:
-    """Return the latest year whose number of distinct reporting countries is at
-    least 90% of the series maximum — i.e. the latest year that is not the
-    partially reported tail year.
-
-    We use distinct reporters rather than row count because row count
-    conflates "fewer countries submitted" with "less trade activity"
-    (cf. plot_coverage() in the faostat_tm garden step). A real trade
-    contraction could spuriously trip a row-count threshold; a reporter
-    headcount drop is unambiguous coverage signal."""
-    reporters_per_year = tb.groupby("year", observed=True)["reporter_country"].nunique()
-    threshold = 0.9 * reporters_per_year.max()
-    return int(reporters_per_year[reporters_per_year >= threshold].index.max())
-
-
 def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     """Reshape the trade matrix into the viz-ready slice with Production and
     apparent domestic supply context."""
-    # Use the latest year that is well covered (not the partially reported tail year).
-    year = _latest_well_covered_year(tb_tm)
+    # Pick the latest well-covered year: the latest one whose distinct-reporter count is at
+    # least 90% of the series maximum, i.e. not the partially reported tail year. We count
+    # reporters rather than rows so a genuine trade contraction can't look like low coverage.
+    reporters_per_year = tb_tm.groupby("year", observed=True)["reporter_country"].nunique()
+    year = int(reporters_per_year[reporters_per_year >= 0.9 * reporters_per_year.max()].index.max())
 
     # 1) Filter TM to physical quantities in tonnes for the chosen year,
     #    drop self-trade rows, and restrict to the curated item universe.
