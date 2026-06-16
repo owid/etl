@@ -42,10 +42,19 @@ import pandas as pd
 import yaml
 from owid.catalog import Table
 from owid.catalog import processing as pr
+from structlog import get_logger
 
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
+log = get_logger()
+
+# Domestic supply is published only where SCL's imports corroborate the trade we observe: SCL's
+# recorded imports must cover at least this share of the observed inbound flows, otherwise SCL has
+# under-recorded imports and the supply is understated, so we blank it. 0.9 matches the measurement
+# noise floor — well-reporting countries agree with the observed trade within ~10%, so a larger gap
+# signals a real hole rather than normal CIF/FOB / timing / classification wobble.
+MIN_IMPORT_COVERAGE = 0.9
 
 
 def sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
@@ -169,13 +178,6 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
         .rename(columns={"country": "exporter", "Production": "exporter_production"})
     )
 
-    # Importer context column: use the FBS-identity supply for every (country, item)
-    # row SCL knows about. Pairs entirely absent from SCL will fall out as NaN in
-    # the downstream merge.
-    importer_supply = supply_context[["country", "item", "year", "supply"]].rename(
-        columns={"country": "importer", "supply": "importer_supply"}
-    )
-
     # 3) Join the directional reports into one row per (exporter, importer, item, year).
     export_reports = trade_flows.loc[
         trade_flows["element"] == "Export quantity", ["reporter_country", "partner_country", "item", "year", "value"]
@@ -190,6 +192,34 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     bilateral["value"] = bilateral["value_importer"].fillna(bilateral["value_exporter"])
     bilateral = bilateral.dropna(subset=["value"])
     bilateral = bilateral[bilateral["value"] > 0]
+
+    # Importer context column: the FBS-identity supply per (importer, item), kept only where the
+    # trade matrix corroborates it. SCL's import leg is importer-sourced (see module docstring), so
+    # when SCL records far fewer imports than the inbound flows we observe, the supply is understated
+    # and we blank it: keep supply only where SCL's imports cover at least MIN_IMPORT_COVERAGE of the
+    # observed inbound trade (or there is no observed inbound to corroborate). TM only decides whether
+    # to trust SCL's figure here; it never changes it.
+    observed_inbound = (
+        bilateral.groupby(["importer", "item", "year"], observed=True)["value"]
+        .sum()
+        .reset_index()
+        .rename(columns={"value": "observed_inbound"})
+    )
+    importer_supply = supply_context[["country", "item", "year", "supply", "Import quantity"]].rename(
+        columns={"country": "importer", "supply": "importer_supply", "Import quantity": "scl_import"}
+    )
+    importer_supply = pr.merge(importer_supply, observed_inbound, on=["importer", "item", "year"], how="left")
+    scl_import = importer_supply["scl_import"].fillna(0).to_numpy(dtype="float64")
+    observed = importer_supply["observed_inbound"].fillna(0).to_numpy(dtype="float64")
+    uncorroborated = scl_import < MIN_IMPORT_COVERAGE * observed
+    has_supply = importer_supply["importer_supply"].notna().to_numpy()
+    log.info(
+        "food_trade.supply_import_gate",
+        blanked=int((uncorroborated & has_supply).sum()),
+        kept=int((~uncorroborated & has_supply).sum()),
+    )
+    importer_supply.loc[uncorroborated, "importer_supply"] = pd.NA
+    importer_supply = importer_supply[["importer", "item", "year", "importer_supply"]]
 
     food_trade = bilateral[["exporter", "importer", "item", "year", "value"]]
     food_trade = pr.merge(food_trade, exporter_production, on=["exporter", "item", "year"], how="left")
