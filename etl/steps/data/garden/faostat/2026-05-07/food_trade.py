@@ -133,13 +133,13 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     scl["element"] = scl["element"].astype(str)
     scl = scl[scl["item_code"].isin(code_to_display)]
 
-    # Pivot the four components into one column each, keyed on (country, item_code). We pivot
-    # rather than groupby-sum so that a duplicate (country, item_code, element) row raises
-    # instead of being silently summed: SCL reports one value per key, so duplicates would be
-    # a data error, not something to aggregate. join_column_levels_with moves (country,
-    # item_code) back to columns and restores each component column's value metadata.
+    # Pivot the four components into one column each, keyed on (country, item_code, year). We
+    # pivot rather than groupby-sum so that a duplicate (country, item_code, year, element) row
+    # raises instead of being silently summed: SCL reports one value per key, so duplicates
+    # would be a data error, not something to aggregate. join_column_levels_with moves the index
+    # back to columns and restores each component column's value metadata.
     supply_context = scl.pivot(
-        index=["country", "item_code"], columns="element", values="value", join_column_levels_with=""
+        index=["country", "item_code", "year"], columns="element", values="value", join_column_levels_with=""
     )
     # Every component should be present for at least some (country, item); a whole component
     # missing would mean SCL dropped it for the year, which we must not silently treat as 0.
@@ -160,7 +160,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     # Exporter context column: only emit `exporter_production` for countries with
     # an SCL Production figure (we don't want to imply "0 production" for absent rows).
     exporter_production = (
-        supply_context[["country", "item", "Production"]]
+        supply_context[["country", "item", "year", "Production"]]
         .dropna(subset=["Production"])
         .rename(columns={"country": "exporter", "Production": "exporter_production"})
     )
@@ -168,31 +168,29 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     # Importer context column: use the FBS-identity supply for every (country, item)
     # row SCL knows about. Pairs entirely absent from SCL will fall out as NaN in
     # the downstream merge.
-    importer_supply = supply_context[["country", "item", "supply"]].rename(
+    importer_supply = supply_context[["country", "item", "year", "supply"]].rename(
         columns={"country": "importer", "supply": "importer_supply"}
     )
 
-    # 3) Join the directional reports into one row per (exporter, importer, item).
+    # 3) Join the directional reports into one row per (exporter, importer, item, year).
     export_reports = trade_flows.loc[
-        trade_flows["element"] == "Export quantity", ["reporter_country", "partner_country", "item", "value"]
+        trade_flows["element"] == "Export quantity", ["reporter_country", "partner_country", "item", "year", "value"]
     ].rename(columns={"reporter_country": "exporter", "partner_country": "importer", "value": "value_exporter"})
     import_reports = trade_flows.loc[
-        trade_flows["element"] == "Import quantity", ["reporter_country", "partner_country", "item", "value"]
+        trade_flows["element"] == "Import quantity", ["reporter_country", "partner_country", "item", "year", "value"]
     ].rename(columns={"reporter_country": "importer", "partner_country": "exporter", "value": "value_importer"})
 
-    bilateral = pr.merge(export_reports, import_reports, on=["exporter", "importer", "item"], how="outer")
+    bilateral = pr.merge(export_reports, import_reports, on=["exporter", "importer", "item", "year"], how="outer")
     # Default to the importer-reported value; fall back to the exporter-reported value
     # only when the importer doesn't report. See docstring for the rationale.
     bilateral["value"] = bilateral["value_importer"].fillna(bilateral["value_exporter"])
     bilateral = bilateral.dropna(subset=["value"])
     bilateral = bilateral[bilateral["value"] > 0]
 
-    food_trade = bilateral[["exporter", "importer", "item", "value"]]
-    food_trade = pr.merge(food_trade, exporter_production, on=["exporter", "item"], how="left")
-    food_trade = pr.merge(food_trade, importer_supply, on=["importer", "item"], how="left")
-    food_trade = food_trade.sort_values(["exporter", "importer", "item"]).reset_index(drop=True)
-    # Carry the year as a dimension so the data is self-describing and downstream steps don't hard-code it.
-    food_trade["year"] = year
+    food_trade = bilateral[["exporter", "importer", "item", "year", "value"]]
+    food_trade = pr.merge(food_trade, exporter_production, on=["exporter", "item", "year"], how="left")
+    food_trade = pr.merge(food_trade, importer_supply, on=["importer", "item", "year"], how="left")
+    food_trade = food_trade.sort_values(["exporter", "importer", "item", "year"]).reset_index(drop=True)
     # Carry the FAO item code as a dimension so downstream steps get the display->code
     # mapping from the data itself, rather than re-reading the curated items config.
     display_to_code = {display: code for code, display in code_to_display.items()}
