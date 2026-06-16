@@ -26,8 +26,6 @@ EXCL_REGIONS = [
     "Less developed regions",
     "More developed regions",
     "Australia/New Zealand",
-    "Other",
-    "OTHER",
     "AFRICA",
     "ASIA",
     "EUROPE",
@@ -51,6 +49,37 @@ EXCL_REGIONS = [
 ]
 
 
+def add_others_to_world(tb, country_col, others_name="Others", rel_columns=None):
+    """Add "Others" region to "World" totals, as it isn't included automatically when summing over countries."""
+    # add "World" as a region by summing over all countries
+    tb_w_o = tb[tb[country_col].isin(["World", others_name])].copy()
+
+    if rel_columns is None:
+        rel_columns = [
+            "immigrants_all",
+            "immigrants_female",
+            "immigrants_male",
+            "emigrants_all",
+            "emigrants_female",
+            "emigrants_male",
+            "total_population",
+            "female_population",
+            "male_population",
+        ]
+
+    tb_w_o[rel_columns] = tb_w_o[rel_columns].fillna(0)
+
+    tb_world = tb_w_o.groupby("year").sum().reset_index()
+
+    tb_world[country_col] = "World"
+
+    # remove "World" from original table and add the new "World" totals
+    tb = tb[~tb[country_col].isin(["World"])]
+    tb = pr.concat([tb, tb_world], ignore_index=True)
+
+    return tb
+
+
 def run() -> None:
     #
     #
@@ -67,11 +96,6 @@ def run() -> None:
     tb_d_pop = ds_meadow.read("un_desa_total_population")
     # origin table
     tb_o = ds_meadow.read("migrant_stock_origin")
-
-    # Load regions dataset
-    ds_regions = paths.load_dataset("regions")
-    # Load income groups dataset
-    ds_income_groups = paths.load_dataset("income_groups")
 
     # Remove excluded regions from the dataset.
     tb_do = tb_do[~tb_do["country_destination"].isin(EXCL_REGIONS)]
@@ -107,15 +131,17 @@ def run() -> None:
         "male_population": "sum",
     }
 
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         regions=REGIONS,
         frac_allowed_nans_per_year=0.1,
         country_col="country",
         aggregations=agg,
     )
+
+    tb = add_others_to_world(tb, "country")
+    # add channel islands to world totals (so they match world totals in stock data)
+    tb = add_others_to_world(tb, "country", others_name="Channel Islands")
 
     # set column names for readable code
     im_s_all = "immigrant_share_of_dest_population_all"
@@ -239,15 +265,8 @@ def format_table(tb, country_cols, value_name):
         errors="raise",
     )
     # harmonize country names
-    for cnt in country_cols:
-        tb = geo.harmonize_countries(
-            df=tb,
-            countries_file=paths.country_mapping_path,
-            excluded_countries_file=paths.excluded_countries_path,
-            country_col=cnt,
-            warn_on_unused_countries=False,
-            warn_on_unknown_excluded_countries=False,
-        )
+    for country_col in country_cols:
+        tb = paths.regions.harmonize_names(tb, country_col=country_col)
 
     # remove duplicate data
     tb = tb.drop_duplicates()
