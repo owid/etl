@@ -237,8 +237,12 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     # Carry the year so the data is self-describing and downstream steps don't hard-code it.
     out["year"] = year
     out["year"] = out["year"].copy_metadata(out["value"])
+    # Carry the FAO item code as a dimension so downstream steps get the display->code
+    # mapping from the data itself, rather than re-reading the curated items config.
+    display_to_code = {display: code for code, display in code_to_display.items()}
+    out["item_code"] = out["item"].map(display_to_code).astype(int)
 
-    tb_out = out.format(keys=["exporter", "importer", "item"], short_name=paths.short_name)
+    tb_out = out.format(keys=["exporter", "importer", "item", "item_code"], short_name=paths.short_name)
     return tb_out
 
 

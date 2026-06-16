@@ -1,6 +1,6 @@
-# Curated items for the food-trade Sankey viz.
+# Curated items for the food-trade visualization.
 #
-# Each entry is one option in the viz dropdown. Each entry references a single
+# Each entry is one option in the visualization dropdown. Each entry references a single
 # FAO commodity item code — the same codebook used by both TM (trade) and SCL
 # (production).
 #

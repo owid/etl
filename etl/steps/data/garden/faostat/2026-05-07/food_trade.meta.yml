@@ -8,21 +8,20 @@ tables:
         description_short: |-
           Quantity of the item flowing from the exporter to the importer in the export year.
         description_processing: |-
-          - Bilateral trade flow data is sourced from [FAOSTAT's Detailed trade matrix dataset](https://www.fao.org/faostat/en/#data/TM), which compiles data reported from both exporter and importer countries.
           - When only one country reports, we use that country's reported quantity.
           - When both the exporter and the importer country report a value, we use the importer's quantity, because, according to FAOSTAT's [Food Balance Sheets and Supply Utilization Accounts Resource Handbook 2025](https://openknowledge.fao.org/items/30e641b1-6d57-4998-8e8a-395727aa4307), section 6.1, "imports are typically documented more thoroughly and verified more rigorously than exports". This claim cites the United Nations Statistics Division's [International Merchandise Trade Statistics](https://unstats.un.org/unsd/trade/EG-IMTS/IMTS2010-CM%20-%20white%20cover%20version.pdf).
-          - Rows where reporter is identical to partner are dropped.
+          - Rows where reporter country is identical to partner country are dropped.
       exporter_production:
         title: Exporter's production
         unit: tonnes
         short_unit: t
         description_short: |-
-          Total production tonnes of the item in the exporter country, in the export year.
+          Estimated production tonnes of the item in the exporter country, in the export year.
       importer_supply:
         title: Importer's domestic supply
         unit: tonnes
         short_unit: t
         description_short: |-
-          Domestic supply of the item in the importer country.
+          Estimated domestic supply of the item in the importer country.
         description_processing: |-
-          Domestic supply is calculated using the FAOSTAT Food Balance Sheet identity: Production + Imports − Exports − Stock Variation, all sourced from FAOSTAT's Supply Utilization Accounts (SCL). Stock Variation in SCL is defined as Closing − Opening stocks (positive when stocks accumulated), so it is subtracted from supply. Negative results — which signal that FBS components don't reconcile — were removed.
+          Domestic supply is calculated using the FAOSTAT Food Balance Sheet identity: Production + Imports - Exports - Stock Variation, all sourced from FAOSTAT's Supply Utilization Accounts (SCL). Stock Variation in SCL is defined as Closing - Opening stocks (positive when stocks accumulated), so it is subtracted from supply. Negative results, which signal that the Food Balance Sheet components don't reconcile, are treated as missing.
