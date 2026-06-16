@@ -38,6 +38,8 @@ items in `food_trade.items.yaml` that aren't in the TM snapshot raise a
 clear assertion (sanity check below).
 """
 
+from typing import cast
+
 import pandas as pd
 import yaml
 from owid.catalog import Table
@@ -103,10 +105,10 @@ def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> Table:
 
     Domestic Supply follows the FAOSTAT Food Balance Sheet identity:
 
-        Domestic Supply = Production + Imports − Exports − Stock Variation
+        Domestic Supply = Production + Imports - Exports - Stock Variation
 
     All four components come from SCL (in tonnes). Stock Variation in
-    FAOSTAT SCL is defined as `Closing − Opening` (positive when stocks
+    FAOSTAT SCL is defined as `Closing - Opening` (positive when stocks
     accumulate during the year, negative when stocks are drawn down) —
     verified empirically against the `Opening stocks` element. It is
     therefore *subtracted* from the supply identity: accumulated stocks
@@ -117,41 +119,49 @@ def _scl_supply_by_country_and_code(tb_scl: Table, year: int) -> Table:
     (country, item) pair absent from SCL entirely is absent from the
     output, and will produce NaN in the downstream merge.
 
-    SCL uses the same FAO commodity item codebook as TM (codes 1-1296), so
+    SCL uses the same FAO commodity item codebook as TM, so
     the join with TM is a direct integer-code lookup."""
     elements = ["Production", "Import quantity", "Export quantity", "Stock Variation"]
-    sub = tb_scl[
+    components = tb_scl[
         (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t") & tb_scl["element"].isin(elements)
     ].copy()
     # SCL stores `item_code` as a categorical of zero-padded strings ("00000015");
     # convert via str to int so it joins cleanly with TM's integer item codes.
-    sub["item_code"] = sub["item_code"].astype(str).astype(int)
-    sub["country"] = sub["country"].astype(str)
-    sub["element"] = sub["element"].astype(str)
+    components["item_code"] = components["item_code"].astype(str).astype(int)
+    components["country"] = components["country"].astype(str)
+    components["element"] = components["element"].astype(str)
 
-    wide = (
-        sub.groupby(["country", "item_code", "element"], observed=True)["value"].sum().unstack("element").reset_index()
+    supply_by_country_item = (
+        components.groupby(["country", "item_code", "element"], observed=True)["value"]
+        .sum()
+        .unstack("element")
+        .reset_index()
     )
     # Ensure all four element columns exist even if SCL didn't have any rows for one,
     # and restore the value metadata that unstack drops from the element columns.
-    for elem in elements:
-        if elem not in wide.columns:
-            wide[elem] = pd.NA
-        wide[elem] = wide[elem].copy_metadata(sub["value"])
+    for element in elements:
+        if element not in supply_by_country_item.columns:
+            supply_by_country_item[element] = pd.NA
+        supply_by_country_item[element] = supply_by_country_item[element].copy_metadata(components["value"])
 
-    wide["supply"] = (
-        wide["Production"].fillna(0)
-        + wide["Import quantity"].fillna(0)
-        - wide["Export quantity"].fillna(0)
-        - wide["Stock Variation"].fillna(0)
+    supply_by_country_item["supply"] = (
+        supply_by_country_item["Production"].fillna(0)
+        + supply_by_country_item["Import quantity"].fillna(0)
+        - supply_by_country_item["Export quantity"].fillna(0)
+        - supply_by_country_item["Stock Variation"].fillna(0)
     )
     # Negative supply is not physically meaningful — it signals that FBS components
     # don't reconcile for that (country, item) (re-exports not fully captured by
     # Stock Variation, timing mismatches, primary-equivalent aggregation, etc.).
     # NaN it out rather than clipping to 0, so the downstream "imports as a share
     # of supply" ratio is undefined for these pairs instead of misleadingly zero.
-    wide.loc[wide["supply"] < 0, "supply"] = pd.NA
-    return wide[["country", "item_code", "Production", "supply"]].rename(columns={"Production": "production"})
+    supply_by_country_item.loc[supply_by_country_item["supply"] < 0, "supply"] = pd.NA
+    # The groupby/unstack chain keeps the Table at runtime, but the pandas type stubs
+    # narrow it to a DataFrame; cast back so the annotation holds.
+    supply_by_country_item = cast(Table, supply_by_country_item)
+    return supply_by_country_item[["country", "item_code", "Production", "supply"]].rename(
+        columns={"Production": "production"}
+    )
 
 
 def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
@@ -162,36 +172,36 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
 
     # 1) Filter TM to physical quantities in tonnes for the chosen year,
     #    drop self-trade rows, and restrict to the curated item universe.
-    qty = tb_tm[
+    trade_flows = tb_tm[
         (tb_tm["year"] == year) & tb_tm["element"].isin(["Export quantity", "Import quantity"]) & (tb_tm["unit"] == "t")
     ].copy()
-    qty["reporter_country"] = qty["reporter_country"].astype(str)
-    qty["partner_country"] = qty["partner_country"].astype(str)
-    qty["item_code"] = qty["item_code"].astype(int)
-    qty = qty[qty["reporter_country"] != qty["partner_country"]]
+    trade_flows["reporter_country"] = trade_flows["reporter_country"].astype(str)
+    trade_flows["partner_country"] = trade_flows["partner_country"].astype(str)
+    trade_flows["item_code"] = trade_flows["item_code"].astype(int)
+    trade_flows = trade_flows[trade_flows["reporter_country"] != trade_flows["partner_country"]]
 
     # Curated items config. Its name starts with "food_trade" so ETL change-detection
     # picks it up automatically (see etl/steps/__init__.py:_step_files).
     with open(paths.side_file("food_trade.items.yaml")) as f:
         items_config = yaml.safe_load(f)
-    _sanity_check_items_config(items_config, tm_codes_in_data=set(qty["item_code"].unique()))
+    _sanity_check_items_config(items_config, tm_codes_in_data=set(trade_flows["item_code"].unique()))
 
     code_to_display = {int(e["item_code"]): e["display"] for e in items_config["items"]}
-    qty = qty[qty["item_code"].isin(code_to_display)].copy()
-    qty["item"] = qty["item_code"].map(code_to_display)
+    trade_flows = trade_flows[trade_flows["item_code"].isin(code_to_display)].copy()
+    trade_flows["item"] = trade_flows["item_code"].map(code_to_display)
 
     # 2) SCL-derived Production and Domestic Supply by (country, item), restricted to
     #    curated codes. Supply follows the FAOSTAT FBS identity
-    #        Production + Imports − Exports + Stock Variation
+    #        Production + Imports − Exports − Stock Variation
     #    with every component sourced from SCL (see `_scl_supply_by_country_and_code`).
-    scl_ctx = _scl_supply_by_country_and_code(tb_scl, year)
-    scl_ctx = scl_ctx[scl_ctx["item_code"].isin(code_to_display)].copy()
-    scl_ctx["item"] = scl_ctx["item_code"].map(code_to_display)
+    supply_context = _scl_supply_by_country_and_code(tb_scl, year)
+    supply_context = supply_context[supply_context["item_code"].isin(code_to_display)].copy()
+    supply_context["item"] = supply_context["item_code"].map(code_to_display)
 
     # Exporter context column: only emit `exporter_production` for countries with
     # an SCL Production figure (we don't want to imply "0 production" for absent rows).
     exporter_production = (
-        scl_ctx[["country", "item", "production"]]
+        supply_context[["country", "item", "production"]]
         .dropna(subset=["production"])
         .rename(columns={"country": "exporter", "production": "exporter_production"})
     )
@@ -199,37 +209,38 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     # Importer context column: use the FBS-identity supply for every (country, item)
     # row SCL knows about. Pairs entirely absent from SCL will fall out as NaN in
     # the downstream merge.
-    supply = scl_ctx[["country", "item", "supply"]].rename(columns={"country": "importer", "supply": "importer_supply"})
+    importer_supply = supply_context[["country", "item", "supply"]].rename(
+        columns={"country": "importer", "supply": "importer_supply"}
+    )
 
     # 4) Join the directional reports into one row per (exporter, importer, item).
-    exp_side = qty.loc[
-        qty["element"] == "Export quantity", ["reporter_country", "partner_country", "item", "value"]
+    export_reports = trade_flows.loc[
+        trade_flows["element"] == "Export quantity", ["reporter_country", "partner_country", "item", "value"]
     ].rename(columns={"reporter_country": "exporter", "partner_country": "importer", "value": "value_exporter"})
-    imp_side = qty.loc[
-        qty["element"] == "Import quantity", ["reporter_country", "partner_country", "item", "value"]
+    import_reports = trade_flows.loc[
+        trade_flows["element"] == "Import quantity", ["reporter_country", "partner_country", "item", "value"]
     ].rename(columns={"reporter_country": "importer", "partner_country": "exporter", "value": "value_importer"})
 
-    merged = pr.merge(exp_side, imp_side, on=["exporter", "importer", "item"], how="outer")
+    bilateral = pr.merge(export_reports, import_reports, on=["exporter", "importer", "item"], how="outer")
     # Default to the importer-reported value; fall back to the exporter-reported value
     # only when the importer doesn't report. See docstring for the rationale.
-    merged["value"] = merged["value_importer"].fillna(merged["value_exporter"])
-    merged = merged.dropna(subset=["value"])
-    merged = merged[merged["value"] > 0]
+    bilateral["value"] = bilateral["value_importer"].fillna(bilateral["value_exporter"])
+    bilateral = bilateral.dropna(subset=["value"])
+    bilateral = bilateral[bilateral["value"] > 0]
 
-    out = merged[["exporter", "importer", "item", "value"]]
-    out = pr.merge(out, exporter_production, on=["exporter", "item"], how="left")
-    out = pr.merge(out, supply, on=["importer", "item"], how="left")
-    out = out.sort_values(["exporter", "importer", "item"]).reset_index(drop=True)
+    food_trade = bilateral[["exporter", "importer", "item", "value"]]
+    food_trade = pr.merge(food_trade, exporter_production, on=["exporter", "item"], how="left")
+    food_trade = pr.merge(food_trade, importer_supply, on=["importer", "item"], how="left")
+    food_trade = food_trade.sort_values(["exporter", "importer", "item"]).reset_index(drop=True)
     # Carry the year so the data is self-describing and downstream steps don't hard-code it.
-    out["year"] = year
-    out["year"] = out["year"].copy_metadata(out["value"])
+    food_trade["year"] = year
+    food_trade["year"] = food_trade["year"].copy_metadata(food_trade["value"])
     # Carry the FAO item code as a dimension so downstream steps get the display->code
     # mapping from the data itself, rather than re-reading the curated items config.
     display_to_code = {display: code for code, display in code_to_display.items()}
-    out["item_code"] = out["item"].map(display_to_code).astype(int)
+    food_trade["item_code"] = food_trade["item"].map(display_to_code).astype(int)
 
-    tb_out = out.format(keys=["exporter", "importer", "item", "item_code"], short_name=paths.short_name)
-    return tb_out
+    return food_trade.format(keys=["exporter", "importer", "item", "item_code"], short_name=paths.short_name)
 
 
 def run() -> None:
