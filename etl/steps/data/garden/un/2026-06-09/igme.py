@@ -2,11 +2,14 @@
 
 from math import trunc
 
+import structlog
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
+
+LOG = structlog.get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -39,7 +42,8 @@ def run() -> None:
     # get regional data for count variables
     tb_counts_regions = regional_aggregates_counts(tb, threshold=0.8)
     # get regional population weighted averages for rate variables
-    tb_rates_regions = population_weighted_regional_averages(tb, threshold=0.8)
+    # gets weighted averages based on original denominators
+    tb_rates_regions = regional_averages_by_denominator(tb, threshold=0.8)
 
     # Remove any OWID region rows from the country-level data before adding back
     # our own regional aggregates (source data may contain regional entries from UN
@@ -82,7 +86,8 @@ def run() -> None:
     tb = add_post_neonatal_deaths(tb)
     # Remove 'Number of' prefix from "Number of deaths" and "Number of stillbirths"
     tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Number of ", "", regex=False)
-    # tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Stillbirths", "Deaths per 100 live births", regex=False)
+    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Stillbirths", "Deaths per 100 live births", regex=False)
+
     tb["indicator"] = tb["indicator"].str.replace("Under-five mortality rate", "Child mortality rate", regex=False)
     # Drop unused columns
     tb = tb.drop(columns=["source", "lower_bound", "upper_bound"])
@@ -106,9 +111,9 @@ def regional_aggregates_counts(tb: Table, threshold: float = 0.8) -> Table:
     """Adds regional aggregates for count variables. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
     Returns: Table with regional aggregates for count variables. ONLY includes regions"""
 
-    sum_units = ["Number of deaths", "Number of stillbirths"]
+    units_deaths = ["Number of deaths", "Number of stillbirths"]
 
-    tb_counts = tb[tb["unit_of_measure"].isin(sum_units)]
+    tb_counts = tb[tb["unit_of_measure"].isin(units_deaths)]
 
     tb_counts = paths.regions.add_population(tb_counts)
     tb_counts = tb_counts.dropna(subset=["population"])
@@ -135,23 +140,77 @@ def regional_aggregates_counts(tb: Table, threshold: float = 0.8) -> Table:
     return tb_counts
 
 
-def population_weighted_regional_averages(tb: Table, threshold: float = 0.8) -> Table:
-    """Adds population-weighted averages of death rates for the regions. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
-    Returns: Table with population-weighted averages of death rates for the regions. ONLY includes regions"""
+def get_absolute_death_number(death_lookup, rate_indicator, country, year, sex, wealth_quintile, indicator_mapping):
+    death_indicator = indicator_mapping[rate_indicator]
+    death_row = death_lookup.get((country, year, sex, wealth_quintile, death_indicator))
+    if death_row is not None:
+        return death_row
+    else:
+        # LOG.warning(f"No data found for {death_indicator} in {country}, {year}, {sex}, {wealth_quintile}")
+        return None
 
-    tb_rates = tb[~(tb["unit_of_measure"].isin(["Number of deaths", "Number of stillbirths"]))]
+
+def regional_averages_by_denominator(tb: Table, threshold: float = 0.8) -> Table:
+    """Adds averages of death rates (based on original denominators) for the regions.
+
+    Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
+    Returns: Table with death rate averages of death rates for the regions. ONLY includes regions"""
+
+    units_deaths = ["Number of deaths", "Number of stillbirths"]
+
+    tb_deaths = tb[tb["unit_of_measure"].isin(units_deaths)]
+
+    tb_rates = tb[~(tb["unit_of_measure"].isin(units_deaths))]
+
+    unit_to_death_mapping = {
+        "Child Mortality rate age 1-4": "Child deaths age 1 to 4",
+        "Infant mortality rate": "Infant deaths",
+        "Under-five mortality rate": "Under-five deaths",
+        "Mortality rate 1-59 months": "Deaths age 1-59 months",
+        "Mortality rate age 1-11 months": "Deaths age 1-11 months",
+        "Neonatal mortality rate": "Neonatal deaths",
+        "Mortality rate age 10-14": "Deaths age 10 to 14",
+        "Mortality rate age 10-19": "Deaths age 10 to 19",
+        "Mortality rate age 15-19": "Deaths age 15 to 19",
+        "Mortality rate age 15-24": "Deaths age 15 to 24",
+        "Mortality rate age 20-24": "Deaths age 20 to 24",
+        "Mortality rate age 5-14": "Deaths age 5 to 14",
+        "Mortality rate age 5-24": "Deaths age 5 to 24",
+        "Mortality rate age 5-9": "Deaths age 5 to 9",
+        "Stillbirth rate": "Stillbirths",
+    }
+
+    # create a lookup table for the absolute number of deaths based on the rate indicators
+    tb_death_lookup = tb_deaths.set_index(["country", "year", "sex", "wealth_quintile", "indicator"])[
+        "observation_value"
+    ]
+
+    tb_rates["absolute_deaths"] = tb_rates.apply(
+        lambda row: get_absolute_death_number(
+            death_lookup=tb_death_lookup,
+            rate_indicator=row["indicator"],
+            country=row["country"],
+            year=row["year"],
+            sex=row["sex"],
+            wealth_quintile=row["wealth_quintile"],
+            indicator_mapping=unit_to_death_mapping,
+        ),
+        axis=1,
+    )
+
+    tb_rates["inferred_denominator"] = tb_rates["absolute_deaths"] / tb_rates["observation_value"]
 
     # adding population to the table and dropping rows with missing population
     tb_rates = paths.regions.add_population(tb_rates)
     tb_rates = tb_rates.dropna(subset=["population"])
 
     # calculating column for population weighted death rates
-    tb_rates["observation_value_pop"] = tb_rates["observation_value"] * tb_rates["population"]
-    tb_rates["lower_bound_pop"] = tb_rates["lower_bound"] * tb_rates["population"]
-    tb_rates["upper_bound_pop"] = tb_rates["upper_bound"] * tb_rates["population"]
+    tb_rates["observation_value_denom"] = tb_rates["observation_value"] * tb_rates["inferred_denominator"]
+    tb_rates["lower_bound_denom"] = tb_rates["lower_bound"] * tb_rates["inferred_denominator"]
+    tb_rates["upper_bound_denom"] = tb_rates["upper_bound"] * tb_rates["inferred_denominator"]
     tb_rates = tb_rates.drop(columns=["lower_bound", "upper_bound", "observation_value"])
 
-    # adding regions to the table (summing observation_value_pop, observation_value and population)
+    # adding regions to the table (summing observation_value_denom, lower_bound_denom, upper_bound_denom, and population)
     tb_rates = paths.regions.add_aggregates(
         tb_rates,
         index_columns=["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile"],
@@ -165,9 +224,9 @@ def population_weighted_regional_averages(tb: Table, threshold: float = 0.8) -> 
     tb_rates = paths.regions.add_population(tb_rates, population_col="total_population")
 
     # calculating population weighted death rates & share of population covered
-    tb_rates["observation_value"] = tb_rates["observation_value_pop"] / tb_rates["population_covered"]
-    tb_rates["lower_bound"] = tb_rates["lower_bound_pop"] / tb_rates["population_covered"]
-    tb_rates["upper_bound"] = tb_rates["upper_bound_pop"] / tb_rates["population_covered"]
+    tb_rates["observation_value"] = tb_rates["observation_value_denom"] / tb_rates["inferred_denominator"]
+    tb_rates["lower_bound"] = tb_rates["lower_bound_denom"] / tb_rates["inferred_denominator"]
+    tb_rates["upper_bound"] = tb_rates["upper_bound_denom"] / tb_rates["inferred_denominator"]
     tb_rates["share_of_population"] = tb_rates["population_covered"] / tb_rates["total_population"]
 
     # filtering out regions where the share of population covered is below the threshold
@@ -176,12 +235,14 @@ def population_weighted_regional_averages(tb: Table, threshold: float = 0.8) -> 
     # dropping unnecessary columns
     tb_rates = tb_rates.drop(
         columns=[
-            "observation_value_pop",
-            "lower_bound_pop",
-            "upper_bound_pop",
+            "observation_value_denom",
+            "lower_bound_denom",
+            "upper_bound_denom",
             "population_covered",
             "total_population",
             "share_of_population",
+            "inferred_denominator",
+            "absolute_deaths",
         ]
     )
 
