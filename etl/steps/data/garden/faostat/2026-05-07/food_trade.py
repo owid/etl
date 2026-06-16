@@ -38,8 +38,6 @@ items in `food_trade.items.yaml` that aren't in the TM snapshot raise a
 clear assertion (sanity check below).
 """
 
-from typing import cast
-
 import pandas as pd
 import yaml
 from owid.catalog import Table
@@ -136,16 +134,18 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     scl = scl[scl["item_code"].isin(code_to_display)]
 
     # Pivot the four components into one column each, keyed on (country, item_code). We pivot
-    # rather than groupby-sum so that any duplicate (country, item_code, element) row raises
+    # rather than groupby-sum so that a duplicate (country, item_code, element) row raises
     # instead of being silently summed: SCL reports one value per key, so duplicates would be
-    # a data error, not something to aggregate.
-    supply_context = scl.pivot(index=["country", "item_code"], columns="element", values="value").reset_index()
-    # Ensure all four component columns exist even if SCL had no rows for one, and
-    # restore the value metadata that pivot drops from them.
+    # a data error, not something to aggregate. join_column_levels_with moves (country,
+    # item_code) back to columns and restores each component column's value metadata.
+    supply_context = scl.pivot(
+        index=["country", "item_code"], columns="element", values="value", join_column_levels_with=""
+    )
+    # Guard against SCL missing a whole component for the year (the pivot would omit its column).
     for component in components:
         if component not in supply_context.columns:
             supply_context[component] = pd.NA
-        supply_context[component] = supply_context[component].copy_metadata(scl["value"])
+            supply_context[component] = supply_context[component].copy_metadata(scl["value"])
     supply_context["supply"] = (
         supply_context["Production"].fillna(0)
         + supply_context["Import quantity"].fillna(0)
@@ -156,8 +156,6 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     # stock variation, timing mismatches, primary-equivalent aggregation). NaN it out rather
     # than clipping to 0, so the downstream import-share ratio is undefined, not misleadingly zero.
     supply_context.loc[supply_context["supply"] < 0, "supply"] = pd.NA
-    # The pivot keeps the Table at runtime, but pandas type stubs narrow it.
-    supply_context = cast(Table, supply_context)
     supply_context["item"] = supply_context["item_code"].map(code_to_display)
 
     # Exporter context column: only emit `exporter_production` for countries with
