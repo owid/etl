@@ -110,6 +110,17 @@ def create_metadata_json(tb: Table, tb_pop: Table) -> tuple[dict, dict]:
     pop_pivot[("Other countries", 2020)] = 0
     pop_pivot[("Other countries", 2024)] = 0
 
+    # add channel islands with population since it's not included in the population dataset:
+    # source: https://fred.stlouisfed.org/data/SPPOPTOTLCHI
+    pop_pivot[("Channel Islands", 1990)] = 143087
+    pop_pivot[("Channel Islands", 1995)] = 145247
+    pop_pivot[("Channel Islands", 2000)] = 148110
+    pop_pivot[("Channel Islands", 2005)] = 153126
+    pop_pivot[("Channel Islands", 2010)] = 158621
+    pop_pivot[("Channel Islands", 2015)] = 163454
+    pop_pivot[("Channel Islands", 2020)] = 166235
+    pop_pivot[("Channel Islands", 2024)] = 168126
+
     def _pop_list(entity: str) -> list:
         return [int(pop_pivot[(entity, yr)]) for yr in POPULATION_YEARS]
 
@@ -204,7 +215,7 @@ def run() -> None:
     tb = tb[~tb["country_destination"].isin(REGIONS) & ~tb["country_origin"].isin(REGIONS)]
 
     # exclude channel islands (null population in population dataset)
-    tb = tb[~tb["country_destination"].isin(["Channel Islands"]) & ~tb["country_origin"].isin(["Channel Islands"])]
+    # tb = tb[~tb["country_destination"].isin(["Channel Islands"]) & ~tb["country_origin"].isin(["Channel Islands"])]
 
     #
     # Build metadata + entity file.
