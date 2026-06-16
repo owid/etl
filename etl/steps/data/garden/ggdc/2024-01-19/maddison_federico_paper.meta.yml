@@ -8,8 +8,9 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   maddison_federico_paper:
-    variables:
-      {}
+    variables: {}
 

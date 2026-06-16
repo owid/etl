@@ -8,7 +8,7 @@ definitions:
     short_unit: t
     presentation:
       topic_tags:
-      - CO2 & Greenhouse Gas Emissions
+        - CO2 & Greenhouse Gas Emissions
     processing_level: major
     display:
       numSignificantFigures: 3
@@ -185,6 +185,8 @@ dataset:
   title: Greenhouse gas emissions by sector
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   greenhouse_gas_emissions_by_sector:
     variables:

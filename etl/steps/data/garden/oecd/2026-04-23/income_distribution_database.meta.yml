@@ -67,6 +67,8 @@ dataset:
 
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   income_distribution_database:
     variables:

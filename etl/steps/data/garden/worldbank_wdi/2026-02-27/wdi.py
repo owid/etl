@@ -106,7 +106,7 @@ def run() -> None:
         assert tb_garden[col].metadata.title is not None, f'Variable "{col}" has no title'
 
     # add armed personnel as share of population
-    tb_garden = add_armed_personnel_as_share_of_population(tb_garden, ds_population)
+    tb_garden = add_armed_personnel_as_share_of_population(tb_garden)
 
     # add regions to remittance data
     tb_garden = add_regions_to_remittance_data(tb_garden, ds_regions, ds_income_groups)
@@ -645,36 +645,52 @@ def load_clean_source_mapping() -> dict[str, dict[str, str]]:
     return source_mapping
 
 
+# Sections appended to description_from_producer, in display order. Each entry maps a
+# column from the meadow `wdi_metadata` table to the markdown section header rendered
+# in the producer description. The order follows the WB databank metadata glossary
+# layout. `source_meta`/`topic_meta` come from DDH (legacy `source` and `topic` are
+# kept separately for the wdi.sources.json join).
+_PRODUCER_DESCRIPTION_SECTIONS: list[tuple[str, str]] = [
+    # Source: redundant with `origin.producer` / `origin.citation_full`, which are
+    # already surfaced to the reader. Keeping the column in meadow in case it's needed.
+    # ("source_meta", "Source"),
+    # Topic: WB's internal taxonomy (e.g. "Financial Sector: Exchange rates & prices");
+    # the chart's existing topic context covers this for readers.
+    # ("topic_meta", "Topic"),
+    ("periodicity", "Periodicity"),
+    ("base_period", "Base period"),
+    ("aggregation_method", "Aggregation method"),
+    ("statistical_concept_and_methodology", "Statistical concept and methodology"),
+    ("development_relevance", "Development relevance"),
+    ("limitations_and_exceptions", "Limitations and exceptions"),
+    ("general_comments", "General comments"),
+    ("notes_from_original_source", "Notes from original source"),
+    ("other_notes", "Other notes"),
+    ("related_source_links", "Related source links"),
+    ("other_web_links", "Other web links"),
+    ("related_indicators", "Related indicators"),
+    # License type: ~93% of indicators are "CC BY-4.0"; license is already expressed
+    # at the dataset/origin level, so per-indicator repetition is noise.
+    # ("license_type", "License type"),
+]
+
+
 def create_description_from_producer(var: dict[str, Any]) -> str | None:
     desc = ""
-    if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
+    if pd.notnull(var.get("long_definition")) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]
-    elif pd.notnull(var["short_definition"]) and len(var["short_definition"].strip()) > 0:
+    elif pd.notnull(var.get("short_definition")) and len(var["short_definition"].strip()) > 0:
         desc += var["short_definition"]
 
-    if pd.notnull(var["limitations_and_exceptions"]) and len(var["limitations_and_exceptions"].strip()) > 0:
-        desc += f"\n\n### Limitations and exceptions:\n{var['limitations_and_exceptions']}"
-
-    if (
-        pd.notnull(var["statistical_concept_and_methodology"])
-        and len(var["statistical_concept_and_methodology"].strip()) > 0
-    ):
-        desc += f"\n\n### Statistical concept and methodology:\n{var['statistical_concept_and_methodology']}"
-
-    ####################################################################################################################
-    # I think that the development relevance could also be an interesting field to add to the description_from_producer.
-    # For now, I'll include it in this specific indicator (access to electricity), but in the future we can consider adding this field for all indicators.
-    if (
-        (var["indicator_code_original"] in ["EG.ELC.ACCS.ZS"])
-        and pd.notnull(var["development_relevance"])
-        and len(var["development_relevance"].strip()) > 0
-    ):
-        desc += f"\n\n### Development relevance:\n{var['development_relevance']}"
-    ####################################################################################################################
-
-    # retrieves additional source info, if it exists.
-    if pd.notnull(var["notes_from_original_source"]) and len(var["notes_from_original_source"].strip()) > 0:
-        desc += f"\n\n### Notes from original source:\n{var['notes_from_original_source']}"
+    for column, header in _PRODUCER_DESCRIPTION_SECTIONS:
+        value = var.get(column)
+        if pd.notnull(value) and len(value.strip()) > 0:
+            # ~90% of WDI indicators are "Annual", which adds noise next to a yearly
+            # time series — only surface periodicity when it deviates (Triennial,
+            # Biennial, Every two years, Quarterly-represented-as-Annual).
+            if column == "periodicity" and value.strip() == "Annual":
+                continue
+            desc += f"\n\n### {header}:\n{value}"
 
     desc = re.sub(r" *(\n+) *", r"\1", re.sub(r"[ \t]+", " ", desc)).strip()
 
@@ -684,7 +700,7 @@ def create_description_from_producer(var: dict[str, Any]) -> str | None:
     return desc
 
 
-def add_armed_personnel_as_share_of_population(tb: Table, ds_population: Dataset) -> Table:
+def add_armed_personnel_as_share_of_population(tb: Table) -> Table:
     """
     Add armed personnel as share of population.
     Population data is from the OMM population dataset.
@@ -693,7 +709,7 @@ def add_armed_personnel_as_share_of_population(tb: Table, ds_population: Dataset
 
     tb = tb.reset_index()
 
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=True)
+    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=True)
 
     tb["armed_forces_share_population"] = tb["ms_mil_totl_p1"] / tb["population"] * 100
 
@@ -766,10 +782,7 @@ def adjust_current_to_constant_usd(
     )
 
     tb_adjusted = add_population_weighted_aggregations(
-        tb=tb_adjusted,
-        indicator=f"{indicator_current_usd}_adjusted",
-        ds_regions=ds_regions,
-        ds_population=ds_population,
+        tb=tb_adjusted, indicator=f"{indicator_current_usd}_adjusted", ds_regions=ds_regions
     )
 
     # Merge the adjusted indicators back to the original table
@@ -786,9 +799,7 @@ def adjust_current_to_constant_usd(
     return tb
 
 
-def add_population_weighted_aggregations(
-    tb: Table, indicator: str, ds_regions: Dataset, ds_population: Dataset
-) -> Table:
+def add_population_weighted_aggregations(tb: Table, indicator: str, ds_regions: Dataset) -> Table:
     """
     Add population weighted aggregations for the given indicator.
     This is used together with the adjust_current_to_constant_usd function to calculate constant US$ indicators.
@@ -799,7 +810,7 @@ def add_population_weighted_aggregations(
     tb = tb[~tb["country"].isin(REGIONS)].reset_index(drop=True)
 
     # Add population to the table
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
 
     # Multiply the indicator by the population to get the weighted value
     tb[f"{indicator}_weighted"] = tb[indicator] * tb["population"]

@@ -7,7 +7,6 @@ definitions:
         - Economic Inequality
       grapher_config:
         originUrl: https://ourworldindata.org/economic-inequality
-        $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
     processing_level: major
 
 
@@ -19,6 +18,8 @@ dataset:
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Pablo Arriagada
 tables:
   world_inequality_database:
     # Learn more about the available fields:

@@ -1,5 +1,7 @@
 dataset:
   title: USA patents granted - US Patent & Trademark Office
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   usa_patents_granted__us_patent__and__trademark_office:
     variables:
@@ -28,8 +30,7 @@ tables:
         unit: patents granted
         display:
           numDecimalPlaces: 0
-        description: '''Mechanical'' includes materials processing & handling, metalworking, motors, engines, parts, optics,
-          and transportation.'
+        description: '''Mechanical'' includes materials processing & handling, metalworking, motors, engines, parts, optics, and transportation.'
       medical:
         title: Medical
         unit: patents granted

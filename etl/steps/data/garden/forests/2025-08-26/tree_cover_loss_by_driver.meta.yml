@@ -70,6 +70,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Fiona Spooner
 tables:
   tree_cover_loss_by_driver:
     variables:

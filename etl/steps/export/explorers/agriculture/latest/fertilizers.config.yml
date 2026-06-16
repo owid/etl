@@ -1,0 +1,203 @@
+config:
+  explorerTitle: Fertilizers
+  explorerSubtitle: Explore the use and impact of fertilizers across the world.
+  originUrl: https://ourworldindata.org/fertilizers
+  isPublished: true
+  entityType: country
+  selection:
+    - United States
+    - China
+    - Egypt
+    - India
+    - France
+    - Brazil
+  subNavId: explorers
+  subNavCurrentId: fertilizers
+
+dimensions:
+  - slug: input
+    name: Input
+    presentation:
+      type: radio
+    choices:
+      - slug: synthetic
+        name: Synthetic fertilizer
+      - slug: total
+        name: Total nutrients
+  - slug: nutrient
+    name: Nutrient
+    presentation:
+      type: radio
+    choices:
+      - slug: nitrogen
+        name: Nitrogen
+      - slug: phosphorous
+        name: Phosphorous
+      - slug: potassium
+        name: Potassium
+      - slug: all_nutrients
+        name: All nutrients
+  - slug: metric
+    name: Metric
+    presentation:
+      type: dropdown
+    choices:
+      - slug: applied_per_ha
+        name: Applied (per hectare)
+      - slug: applied_total
+        name: Applied (total)
+      - slug: excess_total
+        name: Excess (total)
+      - slug: excess_per_ha
+        name: Excess (per hectare)
+      - slug: nue
+        name: Nutrient use efficiency
+  - slug: share_world
+    name: Share of world total
+    presentation:
+      type: checkbox
+      choice_slug_true: share
+    choices:
+      - slug: absolute
+        name: ""
+      - slug: share
+        name: Share of world total
+
+views:
+  # ===== Synthetic fertilizer (Applied per hectare) =====
+  - dimensions:
+      input: synthetic
+      nutrient: nitrogen
+      metric: applied_per_ha
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: faostat_rfn_flat#nutrient_nitrogen_n__total__00003102__use_per_area_of_cropland__005159__kilograms_per_hectare
+
+  - dimensions:
+      input: synthetic
+      nutrient: phosphorous
+      metric: applied_per_ha
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: faostat_rfn_flat#nutrient_phosphate_p2o5__total__00003103__use_per_area_of_cropland__005159__kilograms_per_hectare
+
+  - dimensions:
+      input: synthetic
+      nutrient: potassium
+      metric: applied_per_ha
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: faostat_rfn_flat#nutrient_potash_k2o__total__00003104__use_per_area_of_cropland__005159__kilograms_per_hectare
+
+  - dimensions:
+      input: synthetic
+      nutrient: all_nutrients
+      metric: applied_per_ha
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: fertilizers#all_fertilizers_per_cropland
+
+  # ===== Total nutrients — Nitrogen =====
+  - dimensions:
+      input: total
+      nutrient: nitrogen
+      metric: applied_total
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#total_applied_nitrogen
+
+  - dimensions:
+      input: total
+      nutrient: nitrogen
+      metric: applied_per_ha
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#nitrogen_applied_per_ha
+
+  - dimensions:
+      input: total
+      nutrient: nitrogen
+      metric: excess_total
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#excess_nitrogen_total
+
+  - dimensions:
+      input: total
+      nutrient: nitrogen
+      metric: excess_per_ha
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#excess_nitrogen_per_ha
+
+  - dimensions:
+      input: total
+      nutrient: nitrogen
+      metric: excess_total
+      share_world: share
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#share_global_excess_nitrogen
+
+  - dimensions:
+      input: total
+      nutrient: nitrogen
+      metric: nue
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: nitrogen_efficiency__lassaletta_et_al__2014#nitrogen_efficiency
+
+  # ===== Total nutrients — Phosphorous =====
+  - dimensions:
+      input: total
+      nutrient: phosphorous
+      metric: applied_total
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#total_applied_phosphorous
+
+  - dimensions:
+      input: total
+      nutrient: phosphorous
+      metric: applied_per_ha
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#phosphorous_applied_rate
+
+  - dimensions:
+      input: total
+      nutrient: phosphorous
+      metric: excess_total
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#excess_phosphorous_total
+
+  - dimensions:
+      input: total
+      nutrient: phosphorous
+      metric: excess_per_ha
+      share_world: absolute
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#excess_phosphorous_per_ha
+
+  - dimensions:
+      input: total
+      nutrient: phosphorous
+      metric: excess_total
+      share_world: share
+    indicators:
+      y:
+        - catalogPath: excess_fertilizers__west_et_al__2014#share_global_excess_phosphorous

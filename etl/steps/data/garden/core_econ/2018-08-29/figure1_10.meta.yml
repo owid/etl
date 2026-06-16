@@ -1,0 +1,20 @@
+dataset:
+  title: Figure1.10
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure1_10:
+    variables:
+      gdp_per_capita__1990_dollar:
+        title: GDP per capita (1990 $)
+        unit: $
+        description_short: 'Units of measurement: 1990 international dollars'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

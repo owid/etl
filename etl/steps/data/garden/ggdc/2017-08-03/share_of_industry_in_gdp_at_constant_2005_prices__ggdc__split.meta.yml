@@ -1,5 +1,7 @@
 dataset:
   title: Share of industry in GDP at constant 2005 prices (GGDC) (split)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split:
     variables:

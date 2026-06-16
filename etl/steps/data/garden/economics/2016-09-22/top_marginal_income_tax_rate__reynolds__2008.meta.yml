@@ -1,5 +1,7 @@
 dataset:
   title: Top marginal income tax rate – Reynolds (2008)
+  owners:
+    - Esteban Ortiz-Ospina  # backport
 tables:
   top_marginal_income_tax_rate__reynolds__2008:
     variables:

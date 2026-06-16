@@ -39,7 +39,7 @@ dimensions:
         description: People affected by flooding
         group: Individual disaster types
       - slug: landslide
-        name: Landslide
+        name: Landslides
         description: People affected by landslides, rockfalls, mudflows, and similar events
         group: Individual disaster types
       # Disabled in shared.py — kept here so the choice is ready if re-enabled.

@@ -1,5 +1,7 @@
 dataset:
   title: Share of food lost by food type and region (FAO, 2019)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   share_of_food_lost_by_food_type_and_region__fao__2019:
     variables:

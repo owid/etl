@@ -1,5 +1,7 @@
 dataset:
   title: Marine protected areas (WDPA)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   marine_protected_areas__wdpa:
     variables:

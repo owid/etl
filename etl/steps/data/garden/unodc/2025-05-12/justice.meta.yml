@@ -21,6 +21,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Veronika Samborska
 tables:
   justice:
     variables:
@@ -48,11 +50,4 @@ tables:
             << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
             <%- endif -%>
         display:
-          name:
-            <% if indicator == "Persons convicted" %>
-            Convictions
-            <% elif indicator == "Persons prosecuted" %>
-            Prosecutions
-            <% elif indicator == "Persons arrested/cautioned/suspected" %>
-            Arrests, cautions or suspicions
-            <%- endif -%>
+          name: <% if indicator == "Persons convicted" %> Convictions <% elif indicator == "Persons prosecuted" %> Prosecutions <% elif indicator == "Persons arrested/cautioned/suspected" %> Arrests, cautions or suspicions <%- endif -%>

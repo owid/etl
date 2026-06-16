@@ -1,0 +1,20 @@
+dataset:
+  title: TE-13.20c
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_13_20c:
+    variables:
+      cpi_inflation__pct:
+        title: CPI Inflation (%)
+        unit: '%'
+        description: Consumer price inflation (2015=100)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

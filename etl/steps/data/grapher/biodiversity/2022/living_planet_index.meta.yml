@@ -1,9 +1,7 @@
 dataset:
   update_period_days: 730
-  sources: []
 definitions:
   common:
-    sources: []
     origins:
       - producer: World Wildlife Fund (WWF) and Zoological Society of London
         title: Zoological Society of London
@@ -92,10 +90,9 @@ tables:
               timeTolerance: 1
               colorScale:
                 baseColorScheme: BuGn
-                binningStrategy: equalInterval
+                binningStrategy: equalSizeBins-normal
                 legendDescription: ""
             selectedEntityNames:
               - World
             selectedEntityColors:
               World: "#adadad"
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

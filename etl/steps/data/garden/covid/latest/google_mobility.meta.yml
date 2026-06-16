@@ -17,6 +17,8 @@ dataset:
   update_period_days: 0
   title: COVID-19, Community Mobility Reports
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   google_mobility:
     variables:

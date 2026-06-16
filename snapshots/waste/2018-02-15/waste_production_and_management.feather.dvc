@@ -1,33 +1,54 @@
 meta:
   origin:
-    producer: UNEP
-    title: Participation in Treaties - Rotterdam Convention
+    producer: United Nations Environment Programme
+    title: Environmental Data Explorer
     description: |-
-      Publication year: 2013-12-01
+      The UNEP Environmental Data Explorer is the authoritative source for data sets used by the United Nations Environment Programme and its partners in the Global Environment Outlook (GEO) report and other integrated environment assessments. Its online database holds national, sub-regional, regional and global statistics and geospatial data sets, covering themes like freshwater, population, forests, emissions, climate, disasters, health and GDP.
+    title_snapshot: Environmental Data Explorer - Waste production and management
+    description_snapshot: |-
+      This snapshot bundles six waste-related indicators from UNEP's Environmental Data Explorer. Each indicator is described below, preserving the originator, abstract, and temporal/geographic extent recorded in the source.
 
-      Unit: Number of Parties Subscribing each Year
+      Amounts of Municipal Waste - Total
 
-      Abstract
+      Publication year: 2007. Unit: Thousand Tons. Originator: Organization for Economic Co-Operation and Development (OECD), env.contact@oecd.org. Temporal extent: 1980-2005. Geographic extent: World.
+
+      Waste collected and treated by or for municipalities. It covers waste from households, including bulky waste, similar waste from commerce and trade, office buildings, institutions and small businesses, yard and garden waste, street sweepings, the contents of litter containers, and market cleansing waste. The definition excludes waste from municipal sewage networks and treatment, as well as municipal construction and demolition waste.
+
+      Municipal Waste Collection
+
+      Publication year: 2009-08-01. Unit: Thousand Tons. Originator: United Nations Statistics Division (UNSD), statistics@un.org. Temporal extent: 1990-2007. Geographic extent: World.
+
+      Municipal waste includes waste originating from: households, commerce and trade, small businesses, office buildings and institutions (schools, hospitals, government buildings). It also includes bulky waste (e.g. white goods, old furniture, mattresses) and waste from selected municipal services, e.g. waste from park and garden maintenance, waste from street cleaning services (street sweepings, the content of litter containers, market cleansing waste), if managed as waste. The definition excludes waste from municipal sewage network and treatment, municipal construction and demolition waste.
+
+      Municipal waste collected refers to waste collected by or on behalf of municipalities, as well as municipal waste collected by the private sector. It includes mixed waste, and fractions collected separately for recovery operations (through door-to-door collection and/or through voluntary deposits). Percentage of total population served by municipal waste collection refers to the percentage proportion of the total population covered by regular municipal waste removal service in relation to the total population of the country.
+
+      Participation in Treaties - Basel Convention
+
+      Publication year: 2013-12-01. Unit: Number of Parties Subscribing each Year. Originator: United Nations Office of Legal Affairs (OLA). Temporal extent: 1989 to 2013-12-01. Geographic extent: World.
+
+      The Basel Convention on the Control of Transboundary Movements of Hazardous Wastes and their Disposal was adopted in 1989 and entered into force on 5 May 1992.
+
+      Participation in Treaties - Rotterdam Convention
+
+      Publication year: 2013-12-01. Unit: Number of Parties Subscribing each Year. Originator: United Nations Office of Legal Affairs (OLA). Temporal extent: 1999 to 2013-12-01. Geographic extent: World.
 
       The Convention establishes the principle that export of a chemical covered by the Convention can only take place with the prior informed consent of the importing party. The Convention establishes a "Prior Informed Consent procedure," a means for formally obtaining and disseminating the decisions of importing countries as to whether they wish to receive future shipments of specified chemicals and for ensuring compliance with these decisions by exporting countries.
 
       The Convention initially covers 22 pesticides (including five severely hazardous pesticide formulations) and 5 industrial chemicals, but many more are expected to be added in the future. The Conference of the Parties will decide on the inclusion of chemicals.
 
-      Point of contact
+      Waste Recycling Rates - Glass
 
-      Role: Originator
-      Person: United Nations Office of Legal Affairs (OLA)
-      Organization: ----
-      Email: ----
+      Publication year: 2007. Unit: Percent of Apparent Consumption. Originator: Organization for Economic Co-Operation and Development (OECD), env.contact@oecd.org. Temporal extent: 1980-2005. Geographic extent: World.
 
-      Temporal extent
+      Recycling is defined as reuse of material in a production process that diverts it from the waste stream, except for recycling within industrial plants and the reuse of material as fuel. "Recycling rates" are the ratios of the quantity collected for recycling to the apparent consumption (economic notion of domestic production of the respective material + imports - exports). It should, however, be noted that definitions may vary from one country to another. In particular, total amounts of waste produced, rather than apparent consumption, may be used in some areas to derive recycling rates.
 
-      Covered time: 1999 - 2013-12-01
+      Waste Recycling Rates - Paper and Cardboard
 
-      Geographic extent
+      Publication year: 2007. Unit: Percent of Apparent Consumption. Originator: Organization for Economic Co-Operation and Development (OECD), env.contact@oecd.org. Temporal extent: 1980-2005. Geographic extent: World.
 
-      Coverage: World
-    citation_full: United Nations Environment Programme (2013). Participation in Treaties - Rotterdam Convention.
+      Recycling is defined as reuse of material in a production process that diverts it from the waste stream, except for recycling within industrial plants and the reuse of material as fuel. "Recycling rates" are the ratios of the quantity collected for recycling to the apparent consumption (economic notion of domestic production of the respective material + imports - exports). It should, however, be noted that definitions may vary from one country to another. In particular, total amounts of waste produced, rather than apparent consumption, may be used in some areas to derive recycling rates.
+    citation_full: United Nations Environment Programme (2013). Environmental Data Explorer - Waste production and management.
+    attribution_short: UNEP
     url_main: http://ede.grid.unep.ch/
     date_accessed: '2018-02-15'
     date_published: '2013-12-01'

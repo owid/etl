@@ -13,6 +13,9 @@ dataset:
   update_period_days: 365
 
   title: COVID-19, Vaccinations (United States)
+  owners:
+    - Lucas Rodés-Guirao
+    - Fiona Spooner
 tables:
   vaccinations_us:
     variables:

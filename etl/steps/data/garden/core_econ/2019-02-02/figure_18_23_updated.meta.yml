@@ -1,0 +1,19 @@
+dataset:
+  title: Figure 18.23_updated
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_18_23_updated:
+    variables:
+      manufacturing_wages_relative_to_the_us__us_100:
+        title: Manufacturing wages relative to the US (US=100)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

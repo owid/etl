@@ -28,6 +28,30 @@ Present a summary table grouped by severity (critical > high > medium > low) wit
 
 Ask the user which severities to fix (e.g. "critical and high only" or "all"). If the user already specified a filter in their request, proceed with that.
 
+## Step 1b: Audit existing Dependabot PRs
+
+Always list open Dependabot PRs, not just open alerts. Dependabot PRs can remain open after the default branch already contains the requested dependency version (especially old/conflicted PRs where automatic rebases have been disabled).
+
+```bash
+gh pr list --repo owid/etl --author app/dependabot --state open \
+  --json number,title,headRefName,mergeStateStatus,files --limit 100 \
+  --jq '.[] | {number,title,mergeStateStatus,files:[.files[].path]}'
+```
+
+For each open PR:
+
+1. Identify the manifest/lockfile and target package/version from the title and changed files.
+2. Compare against the **current default branch** (`origin/master` or `master`), not just your working branch. Check whether the dependency is already at the requested version or newer.
+   - For `uv.lock` files, inspect the relevant package entry in the affected lockfile.
+   - For npm lockfiles, parse `package-lock.json` and check all installed versions of the package in that extension.
+3. If the PR is obsolete, close it with a clear comment, for example:
+   ```bash
+   gh pr close <number> --repo owid/etl --comment \
+     "Closing as obsolete: the current default branch already has this dependency at the requested version or newer, so this stale Dependabot PR is no longer relevant."
+   ```
+4. If you create a replacement PR that batches or supersedes Dependabot PRs, close the superseded PRs and reference the replacement PR in the close comment.
+5. Re-run the PR list and confirm there are no open irrelevant Dependabot PRs before reporting completion.
+
 ## Step 2: Categorize each alert
 
 For each alert to fix, determine:
@@ -107,9 +131,15 @@ For each vulnerable npm package:
 
 ## Step 5: Verify changes
 
-Run `make check` to ensure nothing is broken. This runs linting, formatting, and type checking.
+Run `make check-all` (lint + format + typecheck across the root and every `lib/`). The plain `make check` only covers the top-level codebase, so breaking changes from upgrades to packages used by `lib/` (e.g. gdown's `fuzzy=` removal in `lib/datautils/`) would slip through.
 
-If `make check` fails, fix the issues (commonly: removed imports that type checkers flag). Then re-run until it passes.
+If it fails, fix the issues (commonly: removed/renamed kwargs that type checkers flag) and re-run until it passes.
+
+## Step 5b: Bump lib/ package versions
+
+If you modified any `lib/{catalog,datautils,repack}/pyproject.toml`, also bump that file's `version = "x.y.z"` (patch bump). The `publish-owid-packages.yml` workflow republishes these packages to PyPI on master push and rejects the publish if the version already exists.
+
+After bumping, re-run `uv lock` (top-level and inside each modified `lib/<name>/`) so the lockfiles pick up the new version.
 
 ## Step 6: Create PR
 

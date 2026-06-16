@@ -1,0 +1,44 @@
+dataset:
+  title: TE-13.9a
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_13_9a:
+    variables:
+      growth_rate_of_industry:
+        title: Growth rate of Industry
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Index variables with reference 1700 = 100.
+      growth_rate_of_services:
+        title: Growth rate of Services
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Index variables with reference 1700 = 100.
+      growth_rate_of_agriculture:
+        title: Growth rate of agriculture
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Index variables with reference 1700 = 100.
+      real_gdp_growth:
+        title: Real GDP Growth
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Index variables with reference 1700 = 100.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

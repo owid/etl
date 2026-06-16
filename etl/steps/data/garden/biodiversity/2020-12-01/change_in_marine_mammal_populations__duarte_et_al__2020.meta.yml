@@ -1,5 +1,7 @@
 dataset:
   title: Change in marine mammal populations (Duarte et al. 2020)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   change_in_marine_mammal_populations__duarte_et_al__2020:
     variables:

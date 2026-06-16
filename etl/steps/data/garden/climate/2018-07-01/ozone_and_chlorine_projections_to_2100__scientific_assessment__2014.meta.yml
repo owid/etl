@@ -1,5 +1,7 @@
 dataset:
   title: Ozone and chlorine projections to 2100 (Scientific Assessment, 2014)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   ozone_and_chlorine_projections_to_2100__scientific_assessment__2014:
     variables:

@@ -1,0 +1,25 @@
+dataset:
+  title: TE-13.1
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_13_1:
+    variables:
+      change_in_google_stress_index:
+        title: Change in Google Stress Index
+        unit: ''
+      change_in_unemployment_rate:
+        title: Change in Unemployment Rate
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

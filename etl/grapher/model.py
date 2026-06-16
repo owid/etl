@@ -28,7 +28,6 @@ from typing import Any, Literal, Optional, Union, get_args, overload
 import humps
 import numpy as np
 import pandas as pd
-import requests
 import structlog
 from deprecated import deprecated
 from owid import catalog
@@ -79,6 +78,7 @@ from typing_extensions import Self, TypedDict
 
 from etl import config, paths
 from etl.db import read_sql
+from etl.http import session as http_session
 
 log = structlog.get_logger()
 
@@ -197,7 +197,9 @@ class Entity(Base):
     validated: Mapped[int] = mapped_column(TINYINT(1))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     code: Mapped[str | None] = mapped_column(VARCHAR(255))
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
 
     @classmethod
     def load_entity_mapping(cls, session: Session, entity_ids: list[int] | None = None) -> dict[int, str]:
@@ -246,7 +248,9 @@ class Namespace(Base):
     isArchived: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"), default=0)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     description: Mapped[str | None] = mapped_column(VARCHAR(255), default=None)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
 
     def upsert(self, session: Session) -> "Namespace":
         cls = self.__class__
@@ -276,7 +280,9 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     specialType: Mapped[str | None] = mapped_column(VARCHAR(255))
     slug: Mapped[str | None] = mapped_column(VARCHAR(512))
 
@@ -327,7 +333,9 @@ class User(Base):
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
     githubUsername: Mapped[str] = mapped_column(VARCHAR(255))
     lastLogin: Mapped[datetime | None] = mapped_column(DateTime)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     lastSeen: Mapped[datetime | None] = mapped_column(DateTime)
 
     @classmethod
@@ -355,7 +363,9 @@ class ChartRevisions(Base):
     chartId: Mapped[int | None] = mapped_column(Integer)
     userId: Mapped[int | None] = mapped_column(Integer)
     config: Mapped[dict | None] = mapped_column(JSON)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
 
     @classmethod
     def get_latest(cls, session: Session, chart_id: int, createdAt=None) -> "ChartRevisions":
@@ -392,7 +402,7 @@ class ChartConfig(Base):
         ),
     )
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, onupdate=func.current_timestamp())
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
 
     chartss: Mapped[list["Chart"]] = relationship("Chart", back_populates="chart_config")
     explorer_viewss: Mapped[list["ExplorerView"]] = relationship("ExplorerView", back_populates="chart_config")
@@ -430,7 +440,9 @@ class Chart(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
-    _updatedAt: Mapped[datetime] = mapped_column("updatedAt", DateTime, init=False)
+    _updatedAt: Mapped[datetime] = mapped_column(
+        "updatedAt", DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     publishedAt: Mapped[datetime | None] = mapped_column(DateTime)
     publishedByUserId: Mapped[int | None] = mapped_column(Integer)
 
@@ -699,7 +711,9 @@ class Dataset(Base):
     metadataEditedByUserId: Mapped[int] = mapped_column(Integer)
     dataEditedByUserId: Mapped[int] = mapped_column(Integer)
     nonRedistributable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     shortName: Mapped[str | None] = mapped_column(VARCHAR(255))
     version: Mapped[str | None] = mapped_column(VARCHAR(255))
     updatePeriodDays: Mapped[int | None] = mapped_column(Integer)
@@ -709,6 +723,7 @@ class Dataset(Base):
     sourceChecksum: Mapped[str | None] = mapped_column(VARCHAR(64), default=None)
     catalogPath: Mapped[str | None] = mapped_column(VARCHAR(767), default=None)
     tables: Mapped[list | None] = mapped_column(JSON, default=None)
+    owners: Mapped[list | None] = mapped_column(JSON, default=None)
 
     @property
     def catalog_path(self) -> CatalogPath | None:
@@ -744,6 +759,7 @@ class Dataset(Base):
             ds.nonRedistributable = self.nonRedistributable
             ds.catalogPath = self.catalogPath
             ds.tables = self.tables
+            ds.owners = self.owners
             ds.updatedAt = datetime.now(timezone.utc)
             ds.metadataEditedAt = datetime.now(timezone.utc)
             ds.dataEditedAt = datetime.now(timezone.utc)
@@ -774,6 +790,7 @@ class Dataset(Base):
             nonRedistributable=metadata.non_redistributable,
             catalogPath=f"{namespace}/{metadata.version}/{metadata.short_name}",
             tables=table_names,
+            owners=list(metadata.owners) if metadata.owners else None,
         )
 
     @classmethod
@@ -883,98 +900,10 @@ class Source(Base):
     description: Mapped[SourceDescription] = mapped_column(JSON)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     name: Mapped[str | None] = mapped_column(VARCHAR(512), default=None)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     datasetId: Mapped[int | None] = mapped_column(Integer, default=None)
-
-    @property
-    def _upsert_select(self) -> Select:
-        cls = self.__class__
-        # NOTE: we match on both name and additionalInfo (source's description) so that we can
-        # have sources with the same name, but different descriptions
-        conds = [
-            cls.name == self.name,
-            cls.datasetId == self.datasetId,
-            _json_is(cls.description, "additionalInfo", self.description.get("additionalInfo")),
-            _json_is(cls.description, "dataPublishedBy", self.description.get("dataPublishedBy")),
-        ]
-        return select(cls).where(*conds)
-
-    def upsert(self, session: Session) -> "Source":
-        ds = session.scalars(self._upsert_select).one_or_none()
-
-        if not ds:
-            ds = self
-        else:
-            ds.updatedAt = datetime.now(timezone.utc)
-            ds.description = self.description
-
-        session.add(ds)
-        session.flush()  # Ensure the object is written to the database and its ID is generated
-        return ds
-
-    @classmethod
-    def from_catalog_source(cls, source: catalog.Source, dataset_id: int) -> "Source":
-        if source.name is None:
-            raise ValueError("Source name was None - please fix this in the metadata.")
-
-        return Source(
-            name=source.name,
-            datasetId=dataset_id,
-            description=SourceDescription(
-                link=source.url,
-                retrievedDate=source.date_accessed,
-                # NOTE: published_by should be non-empty as it is shown in the Sources tab in admin
-                dataPublishedBy=source.published_by or source.name,
-                # NOTE: we remap `description` to additionalInfo since that is what is shown as `Description` in
-                # the admin UI. Clean this up with the new data model
-                additionalInfo=source.description,
-            ),
-        )
-
-    @classmethod
-    def load_source(cls, session: Session, source_id: int) -> "Source":
-        return session.scalars(select(cls).where(cls.id == source_id)).one()
-
-    @classmethod
-    def load_sources(
-        cls,
-        session: Session,
-        source_ids: list[int] = [],
-        dataset_id: int | None = None,
-        variable_ids: list[int] = [],
-    ) -> list["Source"]:
-        """Load sources for given dataset & variable ids & source ids."""
-        q = """
-        select distinct * from (
-            select * from sources where datasetId = %(datasetId)s
-            union
-            select * from sources where id in (
-                select sourceId from variables where id in %(variableIds)s
-            ) or id in %(sourceIds)s
-        ) t
-        order by t.id
-        """
-        sources = read_sql(
-            q,
-            session,
-            params={
-                "datasetId": dataset_id,
-                # NOTE: query doesn't work with empty list so we use a dummy value
-                "variableIds": variable_ids or [-1],
-                "sourceIds": source_ids or [-1],
-            },
-        )
-        sources.description = sources.description.map(json.loads)  # ty: ignore[unresolved-attribute]
-
-        # sources are rarely missing datasetId (that is most likely a bug)
-        if sources.datasetId.isnull().any():
-            log.warning(
-                "load_sources.sources_missing_datasetId",
-                source_ids=sources.id[sources.datasetId.isnull()].tolist(),
-            )
-            sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)  # ty: ignore[unresolved-attribute]
-
-        return [cls.from_dict(d) for d in sources.to_dict(orient="records")]  # ty: ignore
 
 
 class DimensionFilter(TypedDict):
@@ -1005,7 +934,9 @@ class PostsGdocs(Base):
         VARCHAR(255), Computed("(json_unquote(json_extract(`content`,_utf8mb4'$.type')))", persisted=False)
     )
     publishedAt: Mapped[datetime | None] = mapped_column(DateTime)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     revisionId: Mapped[str | None] = mapped_column(VARCHAR(255))
     manualBreadcrumbs: Mapped[dict | None] = mapped_column(JSON)
     markdown: Mapped[str | None] = mapped_column(LONGTEXT)
@@ -1199,7 +1130,9 @@ class Variable(Base):
     columnOrder: Mapped[int] = mapped_column(Integer, server_default=text("'0'"), default=0)
     schemaVersion: Mapped[int] = mapped_column(Integer, server_default=text("'1'"), default=1)
     name: Mapped[str | None] = mapped_column(VARCHAR(750), default=None)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
     code: Mapped[str | None] = mapped_column(VARCHAR(255), default=None)
     sourceId: Mapped[int | None] = mapped_column(Integer, default=None)
     shortUnit: Mapped[str | None] = mapped_column(VARCHAR(255), default=None)
@@ -1405,7 +1338,7 @@ class Variable(Base):
         # Multiple path or id
         elif isinstance(id_or_path, list):
             # Filter the list to ensure only integers are passed
-            int_ids = [i for i in id_or_path if isinstance(i, (int, np.integer))]
+            int_ids = [i for i in id_or_path if isinstance(i, int | np.integer)]
             str_ids = [i for i in id_or_path if isinstance(i, str)]
             # Multiple IDs
             if len(int_ids) == len(id_or_path):
@@ -1563,7 +1496,7 @@ class Variable(Base):
 
         If session is given, entity codes are replaced with entity names.
         """
-        data = requests.get(self.s3_data_path(typ="http")).json()
+        data = http_session.get(self.s3_data_path(typ="http")).json()
         df = pd.DataFrame(data)
 
         if session is not None:
@@ -1572,7 +1505,7 @@ class Variable(Base):
         return df
 
     def get_metadata(self) -> dict[str, Any]:
-        metadata = requests.get(self.s3_metadata_path(typ="http")).json()
+        metadata = http_session.get(self.s3_metadata_path(typ="http")).json()
 
         return metadata
 
@@ -1604,7 +1537,9 @@ class ChartDimensions(Base):
     chartId: Mapped[int] = mapped_column(Integer)
     variableId: Mapped[int] = mapped_column(Integer)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
-    updatedAt: Mapped[datetime | None] = mapped_column(DateTime, init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
 
     @classmethod
     def chart_ids_with_indicators(cls, session: Session, indicator_ids: list[int]) -> list[int]:
@@ -2050,8 +1985,8 @@ class Explorer(Base):
     lastEditedByUserId: Mapped[int | None] = mapped_column(Integer)
     lastEditedAt: Mapped[datetime | None] = mapped_column(DateTime)
     commitMessage: Mapped[str | None] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
-    createdAt: Mapped[datetime | None] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    updatedAt: Mapped[datetime | None] = mapped_column(
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[datetime] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     )
     explorer_viewss: Mapped[list["ExplorerView"]] = relationship("ExplorerView", back_populates="explorer")
@@ -2157,8 +2092,8 @@ class NarrativeChart(Base):
     lastEditedByUserId: Mapped[int] = mapped_column(Integer, nullable=False)
     parentChartId: Mapped[int | None] = mapped_column(Integer)
     parentMultiDimXChartConfigId: Mapped[int | None] = mapped_column(Integer)
-    createdAt: Mapped[datetime | None] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    updatedAt: Mapped[datetime | None] = mapped_column(
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[datetime] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     )
 
@@ -2264,14 +2199,6 @@ class NarrativeChart(Base):
 
         # Apply the remapping
         return _remap_variable_ids(copy.deepcopy(merged_config), remap_ids)
-
-
-def _json_is(json_field: Any, key: str, val: Any) -> Any:
-    """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
-    if val is None:
-        return text(f"JSON_VALUE({json_field.key}, '$.{key}') IS NULL")
-    else:
-        return json_field[key] == val
 
 
 def _remap_variable_ids(config: list | dict[str, Any] | Any, remap_ids: dict[int, int]) -> Any:

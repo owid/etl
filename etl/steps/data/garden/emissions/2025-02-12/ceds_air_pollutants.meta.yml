@@ -57,6 +57,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Rosado
 tables:
   ceds_air_pollutants:
     dimensions:

@@ -1,7 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-import pandas as pd
-from owid.catalog import Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -24,12 +23,10 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     # low_memory=False prevents mixed-type inference across CSV chunks (iso_year was inferred as object).
-    df = pd.read_csv(snap.path, low_memory=False)
+    tb = snap.read_csv(low_memory=False, underscore=True)
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
     # Dropping out these columns as they are awkward types and we don't need to use them
     tb = tb.drop(columns=["comments", "geospread_comments"])
 
@@ -37,7 +34,7 @@ def run(dest_dir: str) -> None:
     tb["trend"] = tb["trend"].astype(str)
     tb["isoyw"] = tb["isoyw"].astype(str)
     # Source data has a malformed row with a date in iso_year — coerce to numeric and drop it.
-    iso_year_numeric = pd.to_numeric(tb["iso_year"], errors="coerce")
+    iso_year_numeric = pr.to_numeric(tb["iso_year"], errors="coerce")
     invalid_mask = iso_year_numeric.isna() & tb["iso_year"].notna()
     if invalid_mask.any():
         for _, row in tb[invalid_mask].iterrows():
@@ -71,7 +68,7 @@ def run(dest_dir: str) -> None:
             original_values = tb[col].copy()
 
             # Convert to numeric, coercing errors to NaN
-            tb[col] = pd.to_numeric(tb[col], errors="coerce")
+            tb[col] = pr.to_numeric(tb[col], errors="coerce")
 
             # Check if any values were coerced to NaN (data quality issues)
             after_non_null = tb[col].notna().sum()

@@ -1,0 +1,38 @@
+dataset:
+  title: Figure_17.28_interest_rate
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_17_28_interest_rate:
+    variables:
+      consumer_price_inflation__pct:
+        title: Consumer price inflation (%)
+        unit: '%'
+      cyclically_adjusted_budget_balance__as_a_pct_of_potential_gdp:
+        title: Cyclically-adjusted budget balance (as a % of potential GDP)
+        unit: '%'
+      real_oil_price_index__1960_5:
+        title: Real oil price index (1960=5)
+        unit: ''
+        description: The real oil price is calculated by deflating the price per barrel of West Texas Intermediate using the GDP deflator.
+      short_term_nominal_interest_rate__pct:
+        title: Short term nominal interest rate (%)
+        unit: '%'
+        description: The short-term nominal interest rate is the Effective Federal Funds Rate.
+      short_term_real_interest_rate__pct:
+        title: Short term real interest rate (%)
+        unit: '%'
+        description: |-
+          The short-term real interest rate is calculated by deflating the Effective Federal Funds Rate by consumer price inflation (all urban consumers, all items).
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

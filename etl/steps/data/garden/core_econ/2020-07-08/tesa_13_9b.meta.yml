@@ -1,0 +1,31 @@
+dataset:
+  title: TESA_13.9b
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  tesa_13_9b:
+    variables:
+      growth_rate_of_final_consumption_expenditure__pct:
+        title: Growth rate of Final Consumption Expenditure (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      growth_rate_of_gdp__pct:
+        title: Growth rate of GDP (%)
+        unit: '%'
+      growth_rate_of_gross_fixed_capital_formation__pct:
+        title: Growth rate of Gross Fixed Capital Formation (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

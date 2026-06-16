@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from etl.data_helpers.geo import add_population_to_table, add_regions_to_table
+from etl.data_helpers.geo import add_regions_to_table
 from etl.helpers import PathFinder, create_dataset
 
 CURRENT_DIR = Path(__file__).parent
@@ -33,11 +33,8 @@ def run(dest_dir: str) -> None:
     tb_wdi = ds_wdi.read("wdi", reset_metadata="keep_origins")
     tb_wdi = tb_wdi.loc[:, ["country", "year", "it_net_user_zs"]].dropna()
 
-    # Load population data
-    ds_population = paths.load_dataset("population")
-
     # Add population
-    tb = add_population_to_table(tb_wdi, ds_population)
+    tb = paths.regions.add_population(tb_wdi)
 
     # Rename columns
     tb = tb.rename(columns={"it_net_user_zs": "share_internet_users"})
@@ -58,7 +55,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add population back (for regions was not added)
-    tb = add_population_to_table(tb, ds_population)
+    tb = paths.regions.add_population(tb)
 
     # Estimate relative values for regions
     msk = tb["country"].isin(REGIONS)

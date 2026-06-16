@@ -1,3 +1,8 @@
+dataset:
+  owners:
+    - Fiona Spooner
+    - Lucas Rodés-Guirao
+    - Tuna Acisu
 definitions:
   common:
     presentation:
@@ -149,8 +154,6 @@ tables:
         display:
           name: <<indicator>>
           numDecimalPlaces: <% if 'rate' in indicator %>2<% else %>0<%- endif -%>
-        sources:
-          - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2024)
         presentation:
           attribution: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2024)
           title_public: <<indicator>>

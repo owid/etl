@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/5145
-    date_accessed: 2023-08-10 09:05:31.927120
+    url: https://admin.owid.io/admin/datasets/5145
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Figure_17.28_budget_balance
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5e03db8e6cb76cc443cc0d58dac94b29
-  size: 7330
-  path: dataset_5145_figure_17_28_budget_balance_values.feather
+  - md5: f765fe563451bfd6de790d097e39a5d3
+    size: 7362
+    path: dataset_5145_figure_17_28_budget_balance_values.feather

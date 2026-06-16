@@ -1,0 +1,22 @@
+dataset:
+  title: TE-17.13_union
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_17_13_union:
+    variables:
+      government_revenue__pct_of_gnp:
+        title: Government revenue (% of GNP)
+        unit: '%'
+      trade_union_membership__pct_of_employed:
+        title: Trade union membership (% of employed)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

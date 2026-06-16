@@ -1,0 +1,19 @@
+dataset:
+  title: TE-3.2_GDP
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_3_2_gdp:
+    variables:
+      gdp_per_capita__dollarppp:
+        title: GDP per capita ($PPP)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

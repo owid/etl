@@ -4,11 +4,7 @@ definitions:
       topic_tags:
         - Global Education
   others:
-    description_processing: &description_processing
-      Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank.
-
-
-      For the period before 1985, regional aggregates were computed by Our World in Data through yearly population-weighted averages, where annual values are proportionally adjusted to emphasize the influence of larger populations.
+    description_processing: &description_processing "Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank.\n\nFor the period before 1985, regional aggregates were computed by Our World in Data through yearly population-weighted averages, where annual values are proportionally adjusted to emphasize the influence of larger populations."
 
 dataset:
   title: Human Capital in the Long Run (Lee and Lee 2016), WDI (World Bank) and UNESCO
@@ -16,6 +12,8 @@ dataset:
     This dataset is based on 'Human Capital in the Long Run' by Lee and Lee (2016) and World Development Indicators by the World Bank.
     It includes indicators relating to enrollment rates in various levels of education, historic data on average years of education and educational attainment, specifically share of people with no education.
 
+  owners:
+    - Veronika Samborska
 tables:
   education_lee_lee:
     variables:
@@ -88,7 +86,7 @@ tables:
       mf_tertiary_enrollment_rates_combined_wb:
         title: Combined gross enrolment ratio for tertiary education, both sexes
         description_key:
-         - Total enrolment in tertiary education regardless of age expressed as a percentage of the population in the 5-year age group immediately following upper secondary education.
+          - Total enrolment in tertiary education regardless of age expressed as a percentage of the population in the 5-year age group immediately following upper secondary education.
         description_processing: *description_processing
         unit: '%'
         short_unit: '%'

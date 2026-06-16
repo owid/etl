@@ -8,6 +8,8 @@ definitions:
     processing_level: minor
 dataset:
   title: Global Tuberculosis Report - Laboratory Diagnostic Services
+  owners:
+    - Fiona Spooner
 tables:
   laboratories:
     variables:

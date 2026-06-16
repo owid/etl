@@ -1,27 +1,14 @@
 dataset:
-  namespace: fasttrack
-  version: '2022-11-29'
-  short_name: ai_index
   title: DRAFT AI Index
-  description: ''
-  sources:
-  - name: AI Index report
-    published_by: Stanford University
 tables:
   ai_index:
     variables:
       share_companies_using_ai:
         title: Share of companies using AI
         unit: '%'
-        sources:
-        - name: AI Index report
-          published_by: Stanford University
       number_ai_bills_cumulative:
         title: Number of AI bills cumulative
         unit: ''
-        sources:
-        - name: AI Index report
-          published_by: Stanford University
       growth_ai_hiring:
         title: growth_ai_hiring
         unit: ''

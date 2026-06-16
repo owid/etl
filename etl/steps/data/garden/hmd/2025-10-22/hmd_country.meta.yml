@@ -12,6 +12,8 @@ dataset:
   title: Birth rate by month (HMD)
   update_period_days: 365
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   birth_rate:
     variables:

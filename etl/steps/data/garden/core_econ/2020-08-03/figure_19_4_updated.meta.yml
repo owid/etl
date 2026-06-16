@@ -1,0 +1,19 @@
+dataset:
+  title: Figure_19.4_updated
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_19_4_updated:
+    variables:
+      income_share_of_the_top_1pct__pct:
+        title: Income share of the top 1% (%)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

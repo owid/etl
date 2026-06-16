@@ -1,8 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
-from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -21,7 +18,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("diarrhea"))
+    ds_meadow = paths.load_dataset("diarrhea")
 
     # Read table from meadow dataset.
     tb = ds_meadow["diarrhea"]
@@ -30,11 +27,16 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     log.info("diarrhea.harmonize_countries")
-    tb: Table = geo.harmonize_countries(
+    tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
-    tb = tb.pivot_table(values="value", index=["country", "year"], columns="indicator")
+    # The source data contains a single duplicate (Rwanda 2000 ORS) where one row has a value and another is NaN.
+    # Drop NaN rows so each (country, year, indicator) is unique, then pivot while preserving metadata.
+    tb = tb.dropna(subset=["value"]).drop_duplicates(subset=["country", "year", "indicator"])
+    tb = tb.pivot(index=["country", "year"], columns="indicator", values="value", join_column_levels_with="")
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
+
     #
     # Save outputs.
     #

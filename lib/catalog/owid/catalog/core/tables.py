@@ -30,8 +30,9 @@ from owid.repack import repack_frame
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
+from owid.catalog.api.utils import session, storage_options_for_http
 from owid.catalog.core import indicators, utils, warnings
-from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
+from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, TableMeta, VariableMeta
 
 log = structlog.get_logger()
 
@@ -818,12 +819,10 @@ class Table(pd.DataFrame):
 
     @staticmethod
     def _read_metadata(data_path: str) -> dict[str, Any]:
-        import requests
-
         metadata_path = splitext(data_path)[0] + ".meta.json"
 
         if metadata_path.startswith("http"):
-            return cast(dict[str, Any], requests.get(metadata_path).json())
+            return cast(dict[str, Any], session.get(metadata_path).json())
 
         with open(metadata_path) as istream:
             return cast(dict[str, Any], json.load(istream))
@@ -2437,6 +2436,8 @@ def read_csv(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
+    if so := storage_options_for_http(filepath_or_buffer):
+        kwargs.setdefault("storage_options", so)
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
@@ -2463,6 +2464,8 @@ def read_feather(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
+    if so := storage_options_for_http(filepath):
+        kwargs.setdefault("storage_options", so)
     table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
@@ -2528,6 +2531,8 @@ def read_json(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
+    if so := storage_options_for_http(path_or_buf):
+        kwargs.setdefault("storage_options", so)
     table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
@@ -2647,6 +2652,8 @@ def read_parquet(
     *args: Any,
     **kwargs: Any,
 ) -> Table:
+    if so := storage_options_for_http(filepath_or_buffer):
+        kwargs.setdefault("storage_options", so)
     table = Table(pd.read_parquet(path=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
@@ -2783,16 +2790,6 @@ def copy_metadata(from_table: Table, to_table: Table, deep: bool = False) -> Tab
 
     tab._fields = new_fields
     return tab
-
-
-def get_unique_sources_from_tables(tables: Iterable[Table]) -> list[Source]:
-    # Make a list of all sources of all variables in all tables.
-    sources = []
-    for table in tables:
-        for column in list(table.all_columns):
-            # Get unique array of tuples of source fields (respecting the order).
-            sources += [source for source in table._fields[column].sources if source not in sources]
-    return sources
 
 
 def get_unique_licenses_from_tables(tables: Iterable[Table]) -> list[License]:

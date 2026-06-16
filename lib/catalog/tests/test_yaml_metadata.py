@@ -1,5 +1,7 @@
+import pytest
+
 from owid.catalog.core import yaml_metadata as ym
-from owid.catalog.core.meta import Origin, Source
+from owid.catalog.core.meta import Origin
 from owid.catalog.core.tables import Table
 
 
@@ -29,11 +31,9 @@ tables:
 
 
 def test_update_metadata_from_yaml_common(tmp_path):
-    # delete sources and add origins for all variables
     yaml_text = """
 definitions:
   common:
-    sources: []
     origins:
       - producer: Origin1
         title: Title1
@@ -73,7 +73,6 @@ tables:
 
     t = Table({"a": [1, 2, 3], "b": [1, 2, 3]})
     t.a.metadata.description_short = "Will be overwritten"
-    t.a.metadata.sources = [Source()]
     t.b.metadata.origins = [Origin(producer="Producer", title="Title")]
 
     ym.update_metadata_from_yaml(t, path, "test")
@@ -98,3 +97,79 @@ tables:
         "presentation": {"grapher_config": {"selectedEntityNames": ["France"]}},
         "description_processing": "Processed",
     }
+
+
+def test_update_metadata_from_yaml_extra_variables_ignore_all_miss(tmp_path):
+    """When extra_variables='ignore' (e.g. after long_to_wide pivots), a YAML
+    section whose variable keys ALL miss the table should still raise — that's
+    almost certainly a key typo, not an intentional partial override.
+    """
+    yaml_text = """
+tables:
+  test:
+    variables:
+      stunting_prev_model_estimatse:
+        title: Typo'd key — neither a column nor a long-format prefix of one
+""".strip()
+
+    path = tmp_path / "test.yaml"
+    with open(path, "w") as f:
+        f.write(yaml_text)
+
+    t = Table({"stunting_prev_model_estimates__sex_both_sexes": [1, 2, 3]})
+
+    with pytest.raises(ValueError, match="none match any column"):
+        ym.update_metadata_from_yaml(t, path, "test", extra_variables="ignore")
+
+
+def test_update_metadata_from_yaml_extra_variables_ignore_long_format_prefix(tmp_path):
+    """A YAML key that is the long-format base name of a pivoted column must NOT
+    raise: such metadata was already applied to the long table before
+    long_to_wide, so missing the wide columns in the second pass is expected.
+    """
+    yaml_text = """
+tables:
+  test:
+    variables:
+      n_animals_killed:
+        title: Long-format key, applied pre-pivot
+""".strip()
+
+    path = tmp_path / "test.yaml"
+    with open(path, "w") as f:
+        f.write(yaml_text)
+
+    # Table has only pivoted variable names with `__{dim}_{value}` suffixes.
+    t = Table(
+        {
+            "n_animals_killed__animal_cattle": [1, 2, 3],
+            "n_animals_killed__animal_chickens": [4, 5, 6],
+        }
+    )
+
+    # Should not raise.
+    ym.update_metadata_from_yaml(t, path, "test", extra_variables="ignore")
+
+
+def test_update_metadata_from_yaml_extra_variables_ignore_partial_miss(tmp_path):
+    """A partial miss (some YAML variables match, some don't) is still tolerated
+    when extra_variables='ignore' — the user is selectively documenting.
+    """
+    yaml_text = """
+tables:
+  test:
+    variables:
+      a:
+        title: A
+      not_a_real_column:
+        title: This one is missing — but `a` matches, so don't raise
+""".strip()
+
+    path = tmp_path / "test.yaml"
+    with open(path, "w") as f:
+        f.write(yaml_text)
+
+    t = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+    # Should not raise; `a` matches, the unknown `not_a_real_column` is silently ignored.
+    ym.update_metadata_from_yaml(t, path, "test", extra_variables="ignore")
+    assert t.a.metadata.title == "A"

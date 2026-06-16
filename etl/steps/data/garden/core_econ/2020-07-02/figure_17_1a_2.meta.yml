@@ -1,0 +1,24 @@
+dataset:
+  title: Figure_17.1a-2
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_17_1a_2:
+    variables:
+      industrial_production_excluding_construction__production_weights:
+        title: Industrial production excluding construction, production weights
+        unit: ''
+        description: Index, April 2008 = 100
+      industrial_production__volumes:
+        title: Industrial production, volumes
+        unit: ''
+        description: Index, June 1929 = 100
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

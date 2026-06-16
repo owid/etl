@@ -74,7 +74,7 @@ DISASTER_DESCRIPTIONS = {
         "(when water held back by a glacier or moraine is suddenly released)."
     ),
     "landslide": (
-        "A landslide is a sudden movement of material down a slope. This includes wet mass movements "
+        "Landslides are sudden movements of material down a slope, including wet mass movements "
         "(such as mudflows triggered by heavy rain or melting snow) and dry mass movements (such as rockfalls)."
     ),
     "extreme_weather": (
@@ -83,11 +83,11 @@ DISASTER_DESCRIPTIONS = {
 }
 
 ALL_DISASTERS_SUBTITLE = (
-    "Disasters include events such as earthquakes, volcanoes, drought, wildfires, storms, and flooding."
+    "Disasters include events such as earthquakes, volcanoes, droughts, wildfires, storms, and floods."
 )
 
 ALL_DISASTERS_EXCL_EXTREME_TEMP_SUBTITLE = (
-    "Disasters include events such as earthquakes, volcanoes, drought, wildfires, storms, and flooding."
+    "Disasters include events such as earthquakes, volcanoes, droughts, wildfires, storms, and floods. "
     "Extreme temperatures are not included here because their geographical and time coverage is poor, "
     "making consistent comparisons difficult."
 )

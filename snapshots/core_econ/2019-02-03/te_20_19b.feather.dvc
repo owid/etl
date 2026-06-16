@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: Lazard
+    title: 'Levelized cost of energy analysis 12.0'
+    description: For historical data, previous versions of the analysis had been used.
+    citation_full: Lazard (2018). 'Levelized Cost of Energy Analysis 12.0'. Lazard.com.
+    url_main: https://www.lazard.com/media/450784/lazards-levelized-cost-of-energy-version-120-vfinal.pdf
+    date_accessed: '2019-02-03'
+    date_published: '2018'
+  is_public: false
+outs:
+  - md5: 9c5dd732d912614e84685bf7266635b4
+    size: 3274
+    path: te_20_19b.feather

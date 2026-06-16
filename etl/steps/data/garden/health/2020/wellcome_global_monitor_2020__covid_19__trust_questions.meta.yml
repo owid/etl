@@ -1,5 +1,7 @@
 dataset:
   title: 'Wellcome Global Monitor 2020: Covid-19 - Trust questions'
+  owners:
+    - Cameron Appel  # backport
 tables:
   wellcome_global_monitor_2020__covid_19__trust_questions:
     variables:

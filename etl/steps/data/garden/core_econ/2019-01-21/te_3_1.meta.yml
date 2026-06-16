@@ -1,0 +1,25 @@
+dataset:
+  title: TE-3.1
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_3_1:
+    variables:
+      annual_hours_of_work:
+        title: Annual hours of work
+        unit: ''
+        description: |-
+          For historical records, Huberman and Minns (2007) was used. For the ​most recent years (2001-2017), data was retrieved from OECD Statistics (2019).
+      gdp_per_capita_1990_int_gkdollar:
+        title: GDP per capita 1990 int GK$
+        unit: ''
+        description: 'Units: 1990 international dollars'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

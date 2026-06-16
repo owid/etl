@@ -6,6 +6,8 @@
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Arriagada
 definitions:
   common:
     display: &common-display
@@ -13,7 +15,7 @@ definitions:
       tolerance: 5
     presentation:
       topic_tags:
-      - State Capacity
+        - State Capacity
 
   exp_conversion: The data has been reconverted with the exponential function, to represent meaningful values.
 

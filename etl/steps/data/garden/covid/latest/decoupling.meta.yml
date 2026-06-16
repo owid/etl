@@ -18,6 +18,8 @@ dataset:
   title: COVID-19, decoupling of indicators
 
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   decoupling:
     variables:

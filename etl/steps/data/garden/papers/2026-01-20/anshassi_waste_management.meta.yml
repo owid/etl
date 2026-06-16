@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Veronika Samborska
 definitions:
   common:
     processing_level: minor
@@ -5,59 +8,37 @@ definitions:
       topic_tags:
         - Plastic Pollution
 
-  text_msw_definition: &text_msw_definition
-    Municipal solid waste is everyday, non-hazardous waste from households and similar municipal sources (for example, shops, offices, and institutions).
+  text_msw_definition: &text_msw_definition Municipal solid waste is everyday, non-hazardous waste from households and similar municipal sources (for example, shops, offices, and institutions).
 
-  text_percent_of_generation: &text_percent_of_generation
-    This is expressed as a share of all waste generated in a country (by mass), not just the portion that was collected.
+  text_percent_of_generation: &text_percent_of_generation This is expressed as a share of all waste generated in a country (by mass), not just the portion that was collected.
 
-  text_collection_definition: &text_collection_definition
-    Collected waste is waste that is picked up by organized collection services (such as public, private, or contracted waste collectors) and enters a managed waste system. This is true regardless of how the waste is ultimately disposed of or treated.
+  text_collection_definition: &text_collection_definition Collected waste is waste that is picked up by organized collection services (such as public, private, or contracted waste collectors) and enters a managed waste system. This is true regardless of how the waste is ultimately disposed of or treated.
 
-  text_uncollected_definition: &text_uncollected_definition
-    Uncollected waste is waste that is not picked up by organized collection services and therefore remains outside the formal waste management system. This waste is often dumped, burned, or handled informally by individuals or communities.
+  text_uncollected_definition: &text_uncollected_definition Uncollected waste is waste that is not picked up by organized collection services and therefore remains outside the formal waste management system. This waste is often dumped, burned, or handled informally by individuals or communities.
 
-  text_open_dump_definition: &text_open_dump_definition
-    Open dumps are uncontrolled disposal sites with little or no infrastructure to safely contain waste. For example, they typically have minimal covering of waste, no systems to manage contaminated water (leachate), and no systems to manage landfill gas emissions.
+  text_open_dump_definition: &text_open_dump_definition Open dumps are uncontrolled disposal sites with little or no infrastructure to safely contain waste. For example, they typically have minimal covering of waste, no systems to manage contaminated water (leachate), and no systems to manage landfill gas emissions.
 
-  text_controlled_landfill_definition: &text_controlled_landfill_definition
-    Controlled landfills have some basic operational and pollution controls (such as some covering of waste and site management), but have less advanced infrastructure than sanitary landfills.
+  text_controlled_landfill_definition: &text_controlled_landfill_definition Controlled landfills have some basic operational and pollution controls (such as some covering of waste and site management), but have less advanced infrastructure than sanitary landfills.
 
-  text_sanitary_landfill_definition: &text_sanitary_landfill_definition
-    Sanitary landfills are engineered disposal sites with advanced infrastructure designed to safely contain waste and prevent pollution. They typically have protective liners to prevent contamination of soil and groundwater, systems to manage contaminated water (leachate), and in many cases systems to capture or control landfill gas emissions.
+  text_sanitary_landfill_definition: &text_sanitary_landfill_definition Sanitary landfills are engineered disposal sites with advanced infrastructure designed to safely contain waste and prevent pollution. They typically have protective liners to prevent contamination of soil and groundwater, systems to manage contaminated water (leachate), and in many cases systems to capture or control landfill gas emissions.
 
-  text_open_burning_definition: &text_open_burning_definition
-    Open-air burning is when waste is burned in open, uncontrolled fires (rather than in purpose-built incineration facilities with pollution controls).
+  text_open_burning_definition: &text_open_burning_definition Open-air burning is when waste is burned in open, uncontrolled fires (rather than in purpose-built incineration facilities with pollution controls).
 
-  text_mswi_definition: &text_mswi_definition
-    Municipal solid waste incineration is controlled burning of waste in purpose-built incinerators. These facilities typically have emissions controls to reduce air pollution, and some also recover energy from the burning process.
+  text_mswi_definition: &text_mswi_definition Municipal solid waste incineration is controlled burning of waste in purpose-built incinerators. These facilities typically have emissions controls to reduce air pollution, and some also recover energy from the burning process.
 
-  text_composting_definition: &text_composting_definition
-    Composting is a biological process that breaks down organic waste (such as food scraps and garden waste) to produce compost, which can be used to improve soil quality.
+  text_composting_definition: &text_composting_definition Composting is a biological process that breaks down organic waste (such as food scraps and garden waste) to produce compost, which can be used to improve soil quality.
 
-  text_recycling_definition: &text_recycling_definition
-    Recycling is the process of collecting and reprocessing waste materials (such as paper, plastic, glass, and metals) to create new products.
+  text_recycling_definition: &text_recycling_definition Recycling is the process of collecting and reprocessing waste materials (such as paper, plastic, glass, and metals) to create new products.
 
-  text_classification_definition: &text_classification_definition
-    Each country is assigned to one of four waste management system levels (1 to 4). Level 1 represents the most advanced systems (with more waste treated via recycling, composting, or incineration, and less waste mismanaged). Level 4 represents the least controlled systems (with less waste treated and more waste ending up in open dumps or burned in the open air).
+  text_classification_definition: &text_classification_definition Each country is assigned to one of four waste management system levels (1 to 4). Level 1 represents the most advanced systems (with more waste treated via recycling, composting, or incineration, and less waste mismanaged). Level 4 represents the least controlled systems (with less waste treated and more waste ending up in open dumps or burned in the open air).
 
-  text_classification_criteria: &text_classification_criteria
-    "Levels are assigned using two indicators and fixed thresholds. The ICR rate is defined as the sum of the shares of waste that are incinerated, composted, or recycled. The mismanagement rate is defined as the share of waste that is openly dumped, burned in the open air, or otherwise handled in an uncontrolled way.
+  text_classification_criteria: &text_classification_criteria "Levels are assigned using two indicators and fixed thresholds. The ICR rate is defined as the sum of the shares of waste that are incinerated, composted, or recycled. The mismanagement rate is defined as the share of waste that is openly dumped, burned in the open air, or otherwise handled in an uncontrolled way.\nCountries are classified as follows: - Level 1: ICR rate > 60% AND mismanagement rate < 3%. - Level 2: ICR rate between 20% and 60% (inclusive) AND mismanagement rate < 3%. - Level 3: mismanagement rate between 3% and 80% (inclusive). - Level 4: mismanagement rate > 80%."
 
-    Countries are classified as follows:
-    - Level 1: ICR rate > 60% AND mismanagement rate < 3%.
-    - Level 2: ICR rate between 20% and 60% (inclusive) AND mismanagement rate < 3%.
-    - Level 3: mismanagement rate between 3% and 80% (inclusive).
-    - Level 4: mismanagement rate > 80%."
+  text_classification_caution: &text_classification_caution This level is a simplified categorization intended for comparing countries globally. Countries within the same level can still differ substantially in how they handle waste.
 
-  text_classification_caution: &text_classification_caution
-    This level is a simplified categorization intended for comparing countries globally. Countries within the same level can still differ substantially in how they handle waste.
+  text_data_sources: &text_data_sources The indicator is based on waste generation and management data from the World Bank’s What a Waste 2.0 database, combined with mismanagement rates from Lebreton and Andrady (2019). The authors used World Bank data from 2016, standardised it, and projected the results to 2020.
 
-  text_data_sources: &text_data_sources
-    The indicator is based on waste generation and management data from the World Bank’s What a Waste 2.0 database, combined with mismanagement rates from Lebreton and Andrady (2019). The authors used World Bank data from 2016, standardised it, and projected the results to 2020.
-
-  text_gap_filling: &text_gap_filling
-    For countries with missing data, the authors used proxy countries with similar characteristics (same region, classification level, and income level) to fill gaps in waste composition and management statistics.
+  text_gap_filling: &text_gap_filling For countries with missing data, the authors used proxy countries with similar characteristics (same region, classification level, and income level) to fill gaps in waste composition and management statistics.
 
   desc_key_final_classification: &desc_key_final_classification
     - *text_msw_definition
@@ -136,7 +117,7 @@ tables:
         title: Waste management system level
         unit: "1 (best) - 4 (worst)"
         description_short: Each country is assigned to one of four waste management levels (1–4). Level 1 indicates that most waste is recycled, composted, or incinerated and very little is mismanaged, while Level 4 indicates that little waste is treated and much more is openly dumped or burned in the open air.
-        description_key : *desc_key_final_classification
+        description_key: *desc_key_final_classification
         display:
           numDecimalPlaces: 0
 

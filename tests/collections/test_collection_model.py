@@ -1958,3 +1958,256 @@ def test_group_views_replace_does_not_prune_other_dimensions():
     assert "all_bar" in decile_choices_after, "Choice 'all_bar' was incorrectly pruned from decile dimension"
     assert "1" in decile_choices_after
     assert "10" in decile_choices_after
+
+
+def test_group_views_omit_choices_with_replace_keeps_new_views():
+    """Regression test: omitting `choices` while `replace=True` must NOT delete
+    the newly-created views.
+
+    The docstring promises that omitting `choices` groups every choice on the
+    dim. The bug was that `_ensure_choices` was re-evaluated *after* the new
+    slug was appended to the dim, so the replace pass also dropped the just-
+    created views. Make sure that doesn't happen anymore.
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=[],
+        dimensions=[
+            Dimension(
+                slug="sex",
+                name="Sex",
+                choices=[
+                    DimensionChoice(slug="male", name="Male"),
+                    DimensionChoice(slug="female", name="Female"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"sex": "male"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind_m")]),
+            ),
+            View(
+                dimensions={"sex": "female"},
+                indicators=ViewIndicators(y=[Indicator(catalogPath="table#ind_f")]),
+            ),
+        ],
+        _definitions=Definitions(),
+    )
+
+    # Omit `choices` (≡ "group every choice on the dim") + replace=True.
+    collection.group_views(
+        [{"dimension": "sex", "choice_new_slug": "both", "replace": True}],
+        drop_dimensions_if_single_choice=False,
+    )
+
+    # One stacked view should remain, carrying both original indicators.
+    assert len(collection.views) == 1
+    assert collection.views[0].dimensions["sex"] == "both"
+    ys = collection.views[0].indicators.y
+    assert ys is not None
+    assert {ind.catalogPath for ind in ys} == {"table#ind_m", "table#ind_f"}
+
+
+# ---------------------------------------------------------------------------
+# rename_choice_slug
+# ---------------------------------------------------------------------------
+
+
+def _make_rename_fixture(
+    declared_extra_choices: list[DimensionChoice] | None = None,
+    view_choice_slugs: list[str] | None = None,
+) -> Collection:
+    """One-dim collection — for tests where a rename either succeeds cleanly
+    or fails due to the soft-rule (declared collision)."""
+    choices = [
+        DimensionChoice(slug="old", name="Old", description="old desc", group="g_old"),
+        DimensionChoice(slug="other", name="Other"),
+    ]
+    if declared_extra_choices:
+        choices.extend(declared_extra_choices)
+    views = [
+        View(
+            dimensions={"d": slug},
+            indicators=ViewIndicators(y=[Indicator(catalogPath=f"table#ind_{slug}")]),
+        )
+        for slug in (view_choice_slugs or ["old", "other"])
+    ]
+    return Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=[],
+        dimensions=[Dimension(slug="d", name="D", choices=choices)],
+        views=views,
+        _definitions=Definitions(),
+    )
+
+
+def _make_consolidation_fixture() -> Collection:
+    """Two-dim collection where ``old`` and ``new`` both have views but
+    differ on the second dim, so a consolidation rename is safe."""
+    return Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=[],
+        dimensions=[
+            Dimension(
+                slug="d",
+                name="D",
+                choices=[
+                    DimensionChoice(slug="old", name="Old", description="old desc", group="g_old"),
+                    DimensionChoice(slug="new", name="New existing", description="new desc"),
+                ],
+            ),
+            Dimension(
+                slug="e",
+                name="E",
+                choices=[DimensionChoice(slug="x", name="X"), DimensionChoice(slug="y", name="Y")],
+            ),
+        ],
+        views=[
+            View(dimensions={"d": "old", "e": "x"}, indicators=ViewIndicators(y=[Indicator(catalogPath="t#a")])),
+            View(dimensions={"d": "new", "e": "y"}, indicators=ViewIndicators(y=[Indicator(catalogPath="t#b")])),
+        ],
+        _definitions=Definitions(),
+    )
+
+
+def test_rename_choice_slug_simple_rename_updates_dim_and_views():
+    """New slug not declared at all → rename in both dim.choices and views,
+    preserving the choice's metadata (name/description/group) and position."""
+    c = _make_rename_fixture()
+
+    c.rename_choice_slug("d", "old", "new")
+
+    dim = c.get_dimension("d")
+    assert [ch.slug for ch in dim.choices] == ["new", "other"]  # position preserved
+    renamed = dim.choices[0]
+    assert renamed.name == "Old"  # metadata carried forward
+    assert renamed.description == "old desc"
+    assert renamed.group == "g_old"
+    assert {v.dimensions["d"] for v in c.views} == {"new", "other"}
+
+
+def test_rename_choice_slug_renames_dim_when_no_view_uses_old_slug():
+    """Old slug declared but not used by any view → still renames the dim entry."""
+    c = _make_rename_fixture(view_choice_slugs=["other"])  # no view uses "old"
+
+    c.rename_choice_slug("d", "old", "new")
+
+    assert [ch.slug for ch in c.get_dimension("d").choices] == ["new", "other"]
+    # No view mutated.
+    assert [v.dimensions["d"] for v in c.views] == ["other"]
+
+
+def test_rename_choice_slug_unknown_dimension_raises():
+    c = _make_rename_fixture()
+    with pytest.raises(ValueError, match="Dimension nope not found"):
+        c.rename_choice_slug("nope", "old", "new")
+
+
+def test_rename_choice_slug_unknown_old_slug_raises():
+    c = _make_rename_fixture()
+    with pytest.raises(ValueError, match="not declared on the dim"):
+        c.rename_choice_slug("d", "ghost", "new")
+
+
+def test_rename_choice_slug_noop_when_old_equals_new():
+    c = _make_rename_fixture()
+    c.rename_choice_slug("d", "old", "old")  # no error
+    assert [ch.slug for ch in c.get_dimension("d").choices] == ["old", "other"]
+
+
+def test_rename_choice_slug_hard_rule_rejects_view_coordinate_duplicates():
+    """Hard rule: a rename that would produce two views with identical dim
+    coordinates fails — even with ``dedup_slug`` set."""
+    c = _make_rename_fixture()  # one-dim; "old" and "other" each have one view
+
+    # Renaming "old" → "other" would yield two views with {d: "other"}.
+    with pytest.raises(ValueError, match="duplicate views with dim coordinates"):
+        c.rename_choice_slug("d", "old", "other")
+
+    # ``dedup_slug`` cannot bypass the hard rule.
+    with pytest.raises(ValueError, match="duplicate views with dim coordinates"):
+        c.rename_choice_slug("d", "old", "other", dedup_slug="inherit")
+    with pytest.raises(ValueError, match="duplicate views with dim coordinates"):
+        c.rename_choice_slug("d", "old", "other", dedup_slug="overwrite")
+
+
+def test_rename_choice_slug_collision_without_dedup_raises_with_hint():
+    """New slug declared (whether or not in use) → must opt in via ``dedup_slug``."""
+    # Case 1: declared but not in use.
+    c = _make_rename_fixture(
+        declared_extra_choices=[DimensionChoice(slug="new", name="New existing")],
+        view_choice_slugs=["old"],
+    )
+    with pytest.raises(ValueError, match="`dedup_slug='inherit'`"):
+        c.rename_choice_slug("d", "old", "new")
+
+    # Case 2: declared AND in use by a view (no coord collision because the
+    # other dim distinguishes the views).
+    c2 = _make_consolidation_fixture()
+    with pytest.raises(ValueError, match="`dedup_slug='inherit'`"):
+        c2.rename_choice_slug("d", "old", "new")
+
+
+def test_rename_choice_slug_dedup_inherit_consolidates_views():
+    """``dedup_slug='inherit'`` → merge old views into new, keep new's config."""
+    c = _make_consolidation_fixture()
+
+    c.rename_choice_slug("d", "old", "new", dedup_slug="inherit")
+
+    dim = c.get_dimension("d")
+    slugs = [ch.slug for ch in dim.choices]
+    assert "old" not in slugs
+    assert "new" in slugs
+    new_ch = next(ch for ch in dim.choices if ch.slug == "new")
+    assert new_ch.name == "New existing"  # existing config preserved
+    assert new_ch.description == "new desc"
+    # Both views now point at "new"; they remain distinct via dim "e".
+    assert sorted((v.dimensions["d"], v.dimensions["e"]) for v in c.views) == [("new", "x"), ("new", "y")]
+
+
+def test_rename_choice_slug_dedup_overwrite_consolidates_views_with_old_metadata():
+    """``dedup_slug='overwrite'`` → merge old views into new, take old's config."""
+    c = _make_consolidation_fixture()
+
+    c.rename_choice_slug("d", "old", "new", dedup_slug="overwrite")
+
+    dim = c.get_dimension("d")
+    slugs = [ch.slug for ch in dim.choices]
+    assert "old" not in slugs
+    assert "new" in slugs
+    new_ch = next(ch for ch in dim.choices if ch.slug == "new")
+    assert new_ch.name == "Old"  # overwritten from old
+    assert new_ch.description == "old desc"
+    assert new_ch.group == "g_old"
+
+
+def test_rename_choice_slug_dedup_when_declared_but_unused():
+    """Soft-rule opt-in still works when ``new_slug`` is declared but no view
+    uses it (legacy of the original 3-state behavior)."""
+    c = _make_rename_fixture(
+        declared_extra_choices=[
+            DimensionChoice(slug="new", name="New existing", description="new desc"),
+        ],
+        view_choice_slugs=["old"],
+    )
+
+    c.rename_choice_slug("d", "old", "new", dedup_slug="inherit")
+
+    dim = c.get_dimension("d")
+    assert [ch.slug for ch in dim.choices] == ["other", "new"]  # old dropped, new kept
+    new_ch = next(ch for ch in dim.choices if ch.slug == "new")
+    assert new_ch.name == "New existing"
+    assert [v.dimensions["d"] for v in c.views] == ["new"]
+
+
+def test_rename_choice_slug_invalid_dedup_value_raises():
+    c = _make_rename_fixture(
+        declared_extra_choices=[DimensionChoice(slug="new", name="New existing")],
+        view_choice_slugs=["old"],
+    )
+    with pytest.raises(ValueError, match="must be 'inherit' or 'overwrite'"):
+        c.rename_choice_slug("d", "old", "new", dedup_slug="bogus")  # type: ignore[arg-type]

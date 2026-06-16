@@ -3,6 +3,8 @@ dataset:
   description: Reported measles cases by state from CDC reports. Used to supplement Project Tycho dataset.
   licenses:
     - url: Public resource
+  owners:
+    - Fiona Spooner  # fasttrack
 tables:
   measles_cases:
     variables:

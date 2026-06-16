@@ -16,7 +16,6 @@ from urllib.parse import urlparse
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-import requests
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 from rapidfuzz import fuzz
 
@@ -27,8 +26,10 @@ from owid.catalog.api.utils import (
     PREFERRED_FORMAT,
     S3_OWID_URI,
     S3_OWID_URI_PRIVATE,
+    STORAGE_OPTIONS,
     SUPPORTED_FORMATS,
     _loading_data_from_api,
+    session,
 )
 from owid.catalog.core import CatalogPath
 from owid.catalog.core.paths import VALID_CHANNELS
@@ -86,7 +87,7 @@ def _read_catalog_index(uri: str, *, timeout: int = 30) -> pd.DataFrame:
     """
     # Read metadata to check version
     metadata_url = uri.rstrip("/") + "/catalog.meta.json"
-    resp = requests.get(metadata_url, timeout=timeout)
+    resp = session.get(metadata_url, timeout=timeout)
     resp.raise_for_status()
     metadata = resp.json()
 
@@ -102,7 +103,7 @@ def _read_catalog_index(uri: str, *, timeout: int = 30) -> pd.DataFrame:
     for channel in VALID_CHANNELS:
         index_url = f"{uri.rstrip('/')}/catalog-{channel}.{PREFERRED_FORMAT}"
         try:
-            df = cast(pd.DataFrame, pd.read_feather(index_url))
+            df = cast(pd.DataFrame, pd.read_feather(index_url, storage_options=STORAGE_OPTIONS))
             frames.append(df)
         except Exception:
             # Channel might not exist, skip it

@@ -1,15 +1,12 @@
 meta:
-  source:
-    name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
-    url: https://welfarefootprint.org/research-projects/laying-hens/
-    source_data_url: |-
-      https://docs.google.com/spreadsheets/d/e/2PACX-1vRioMTHFwUUiCe2JWDOAZD7BDur4MSx3o576xfvTROzUY75sxIYqOZuIWQw_lopGkrLQ_lgXxMRgAk2/pub?output=csv
+  origin:
+    producer: Welfare Footprint
+    title: Pain hours and days of hen systems
+    citation_full: Welfare Footprint based on Schuck-Paim, C. and Alonso, W. J. (2021). Quantifying Pain in Laying Hens.
+    url_main: https://welfarefootprint.org/research-projects/laying-hens/
+    url_download: https://docs.google.com/spreadsheets/d/e/2PACX-1vRioMTHFwUUiCe2JWDOAZD7BDur4MSx3o576xfvTROzUY75sxIYqOZuIWQw_lopGkrLQ_lgXxMRgAk2/pub?output=csv
     date_accessed: '2024-11-26'
-    publication_year: 2021
-    published_by: Welfare Footprint
-  name: Pain hours and days of hen systems (Welfare Footprint)
-  description: ''
-  license: {}
+    date_published: '2021'
 outs:
   - md5: 2053ef477157266c201a9c39c46a8df8
     size: 459

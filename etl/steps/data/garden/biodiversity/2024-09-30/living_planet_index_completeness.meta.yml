@@ -11,6 +11,8 @@ dataset:
   update_period_days: 730
 
 
+  owners:
+    - Fiona Spooner
 tables:
   living_planet_index_completeness:
     variables:

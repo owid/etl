@@ -7,10 +7,10 @@ definitions:
     processing_level: minor
 
   desc_key_common: &desc_key_common
-    - The [GHSL Urban Centre Database (GHS-UCDB R2024A)](https://human-settlement.emergency.copernicus.eu/ghs_ucdb2024.php) tracks population and land use for 11,422 [cities](#dod:cities-degurba) around the world. Cities are identified using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php), based on population density and settlement size rather than administrative boundaries. To qualify as a city, an area must have at least 1,500 people per square kilometre and a total population of at least 50,000. The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
-    - City boundaries are fixed at their 2025 extent and held constant across all years. This means historical values reflect conditions within today's city boundary, not the city as it was defined at the time. For density in particular, this can make fast-growing cities appear less dense in the past than they actually were, since the area used in the calculation includes land that wasn't yet part of the city.
+    - "[Cities](#dod:cities-degurba) are defined as areas with at least 1,500 people per km² and a total population of at least 50,000, identified using the [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) framework based on satellite imagery and census data."
+    - City boundaries are fixed at their 2025 extent across all years, so historical values reflect conditions within today's boundaries. This can make fast-growing cities appear less dense in earlier periods.
     - Cities are also split at country borders, so a city that straddles two countries will appear as two separate entries.
-    - City boundaries are model-derived and won't always match official administrative limits. In some countries, what is considered a single city may appear as multiple cities in this data, depending on how built-up areas are distributed. Data quality also varies by region and tends to be less reliable in countries with sparse or outdated census data.
+    - City boundaries are model-derived and may not match official administrative limits. Data quality varies by region and tends to be lower where census data is sparse or outdated.
     - The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals, so country-level numbers are consistent with UN estimates.
 
   desc_processing_density: &desc_processing_density |-
@@ -19,7 +19,7 @@ definitions:
   desc_processing_cagr: &desc_processing_cagr |-
     The annualized exponential growth rate was calculated as: 100 × ln(P_t / P_prev) / (year_t - year_prev), where P_t is the population at time t and P_prev is the population at the previous observation. For five-year intervals, year_t - year_prev = 5. This assumes constant exponential growth between observations.
 
-  desc_cities_definition: "[Cities](#dod:cities-degurba) are identified using satellite imagery and population data, applying the same definitions across countries."
+  desc_cities_definition: "[City boundaries](#dod:cities-degurba) are defined using a consistent global approach based on satellite imagery and population data."
 
   desc_crossborder_exclusion: &desc_crossborder_exclusion |-
     Data is excluded for Gibraltar, Macao, and Monaco because their urban centers are cross-border agglomerations that extend beyond the country's boundaries, making the share calculation invalid.
@@ -35,297 +35,297 @@ definitions:
     The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.
 
   text_degurba_caveat: &text_degurba_caveat |-
-    Different countries use different definitions and criteria to define urban and rural areas, such as population size, population density, infrastructure, employment patterns, or official city status. The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard using population density grids, meaning its classifications won’t always match official city boundaries and therefore urbanization rates may differ from country-reported figures.
+    The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) applies a single global standard, so urbanization rates may differ from country-reported figures, which use varying national definitions.
 
   text_small_territory_caveat: &text_small_territory_caveat |-
     For small countries, values can change sharply when an entire area shifts from one classification to another.
 
   entityAnnotationsMapCapitals: &entityAnnotationsMapCapitals |-
-      Afghanistan: Kabul
-      Albania: Tirana
-      Algeria: Algiers
-      Angola: Luanda
-      Argentina: Buenos Aires
-      Armenia: Yerevan
-      Aruba: Oranjestad
-      Australia: Canberra
-      Austria: Vienna
-      Azerbaijan: Baku
-      Bahamas: Nassau
-      Bahrain: Manama
-      Bangladesh: Dhaka
-      Barbados: Bridgetown
-      Belarus: Minsk
-      Belgium: Brussels
-      Benin: Porto-Novo
-      Bolivia: La Paz
-      Bosnia and Herzegovina: Sarajevo
-      Botswana: Gaborone
-      Brazil: Brasilia
-      Brunei: Bandar Seri Begawan
-      Bulgaria: Sofia
-      Burkina Faso: Ouagadougou
-      Burundi: Gitega
-      Cambodia: Phnom Penh
-      Cameroon: Yaoundé
-      Canada: Ottawa
-      Central African Republic: Bangui
-      Chad: N'Djamena
-      Chile: Santiago
-      China: Beijing
-      Colombia: Bogota
-      Comoros: Moroni
-      Costa Rica: San José
-      Croatia: Zagreb
-      Cuba: Havana
-      Curacao: Willemstad
-      Cyprus: Strovolos [Nicosia]
-      Czechia: Prague
-      Cote d'Ivoire: Yamoussoukro
-      Democratic Republic of Congo: Kinshasa
-      Denmark: Copenhagen
-      Djibouti: Djibouti
-      Dominican Republic: Santo Domingo
-      Ecuador: Quito
-      Egypt: Cairo
-      El Salvador: San Salvador
-      Equatorial Guinea: Malabo
-      Eritrea: Asmara
-      Estonia: Tallinn
-      Ethiopia: Addis Ababa
-      Fiji: Suva
-      Finland: Helsinki
-      France: Paris
-      French Guiana: Cayenne
-      French Polynesia: Papeete
-      Gabon: Libreville
-      Georgia: Tbilisi
-      Germany: Berlin
-      Ghana: Accra
-      Greece: Athens
-      Guatemala: Guatemala City
-      Guinea-Bissau: Bissau
-      Guyana: Georgetown
-      Haiti: Port-au-Prince
-      Honduras: Tegucigalpa
-      Hungary: Budapest
-      Iceland: Reykjavik
-      India: New Delhi
-      Indonesia: Jakarta
-      Iran: Tehran
-      Iraq: Baghdad
-      Ireland: Dublin
-      Israel: Jerusalem
-      Italy: Rome
-      Jamaica: Kingston
-      Japan: Tokyo
-      Jersey: St. Helier
-      Jordan: Amman
-      Kazakhstan: Astana
-      Kenya: Nairobi
-      Kosovo: Pristina
-      Kuwait: Kuwait City
-      Kyrgyzstan: Bishkek
-      Laos: Vientiane
-      Latvia: Riga
-      Lebanon: Beirut
-      Lesotho: Maseru
-      Liberia: Monrovia
-      Libya: Tripoli
-      Lithuania: Vilnius
-      Luxembourg: Luxembourg
-      Madagascar: Antananarivo
-      Malawi: Lilongwe
-      Malaysia: Putrajaya
-      Maldives: Malé
-      Mali: Bamako
-      Malta: Valletta
-      Mauritania: Nouakchott
-      Mauritius: Port Louis
-      Mayotte: Mamoudzou
-      Moldova: Chișinău
-      Mongolia: Ulaanbaatar
-      Montenegro: Podgorica
-      Morocco: Rabat
-      Mozambique: Maputo
-      Myanmar: Pyinmana [Nay Pyi Taw]
-      Mexico: Mexico City
-      Namibia: Windhoek
-      Nepal: Kathmandu
-      Netherlands: The Hague
-      New Caledonia: Nouméa
-      New Zealand: Wellington
-      Nicaragua: Managua
-      Niger: Niamey
-      Nigeria: Abuja
-      North Korea: P'yŏngyang
-      North Macedonia: Skopje
-      Northern Cyprus: Nicosia
-      Norway: Oslo
-      Oman: Muscat
-      Pakistan: Islamabad
-      Palestine: Ramallah
-      Panama: Panama City
-      Papua New Guinea: Port Moresby
-      Paraguay: Asuncion
-      Peru: Lima
-      Philippines: Manila
-      Poland: Warsaw
-      Portugal: Lisbon
-      Puerto Rico: Bayamón [San Juan]
-      Qatar: Doha
-      Congo: Brazzaville
-      Romania: Bucharest
-      Russia: Moscow
-      Rwanda: Kigali
-      Reunion: Saint-Denis
-      Samoa: Apia
-      Saudi Arabia: Riyadh
-      Senegal: Dakar
-      Serbia: Belgrade
-      Sierra Leone: Freetown
-      Singapore: Singapore
-      Slovakia: Bratislava
-      Slovenia: Ljubljana
-      Solomon Islands: Honiara
-      Somalia: Mogadishu
-      South Africa: Pretoria
-      South Korea: Seoul
-      South Sudan: Juba
-      Spain: Madrid
-      Sri Lanka: Colombo [Sri Jayawardenepura Kotte]
-      Sudan: Khartoum
-      Suriname: Paramaribo
-      Sweden: Stockholm
-      Switzerland: Bern
-      Syria: Damascus
-      Sao Tome and Principe: São Tomé
-      Taiwan: Taipei
-      Tajikistan: Dushanbe
-      Tanzania: Dodoma
-      Thailand: Bangkok
-      East Timor: Dili
-      Togo: Lomé
-      Tonga: Nuku'alofa
-      Trinidad and Tobago: Port of Spain
-      Tunisia: Tunis
-      Turkey: Ankara
-      Turkmenistan: Ashgabat
-      Uganda: Kampala
-      Ukraine: Kyiv
-      United Arab Emirates: Abu Dhabi
-      United Kingdom: London
-      United States: Washington
-      Uruguay: Montevideo
-      Uzbekistan: Tashkent
-      Vanuatu: Port Vila
-      Venezuela: Caracas
-      Vietnam: Hanoi
-      Yemen: Sana'a
-      Zambia: Lusaka
-      Zimbabwe: Harare
+    Afghanistan: Kabul
+    Albania: Tirana
+    Algeria: Algiers
+    Angola: Luanda
+    Argentina: Buenos Aires
+    Armenia: Yerevan
+    Aruba: Oranjestad
+    Australia: Canberra
+    Austria: Vienna
+    Azerbaijan: Baku
+    Bahamas: Nassau
+    Bahrain: Manama
+    Bangladesh: Dhaka
+    Barbados: Bridgetown
+    Belarus: Minsk
+    Belgium: Brussels
+    Benin: Porto-Novo
+    Bolivia: La Paz
+    Bosnia and Herzegovina: Sarajevo
+    Botswana: Gaborone
+    Brazil: Brasilia
+    Brunei: Bandar Seri Begawan
+    Bulgaria: Sofia
+    Burkina Faso: Ouagadougou
+    Burundi: Gitega
+    Cambodia: Phnom Penh
+    Cameroon: Yaoundé
+    Canada: Ottawa
+    Central African Republic: Bangui
+    Chad: N'Djamena
+    Chile: Santiago
+    China: Beijing
+    Colombia: Bogota
+    Comoros: Moroni
+    Costa Rica: San José
+    Croatia: Zagreb
+    Cuba: Havana
+    Curacao: Willemstad
+    Cyprus: Strovolos [Nicosia]
+    Czechia: Prague
+    Cote d'Ivoire: Yamoussoukro
+    Democratic Republic of Congo: Kinshasa
+    Denmark: Copenhagen
+    Djibouti: Djibouti
+    Dominican Republic: Santo Domingo
+    Ecuador: Quito
+    Egypt: Cairo
+    El Salvador: San Salvador
+    Equatorial Guinea: Malabo
+    Eritrea: Asmara
+    Estonia: Tallinn
+    Ethiopia: Addis Ababa
+    Fiji: Suva
+    Finland: Helsinki
+    France: Paris
+    French Guiana: Cayenne
+    French Polynesia: Papeete
+    Gabon: Libreville
+    Georgia: Tbilisi
+    Germany: Berlin
+    Ghana: Accra
+    Greece: Athens
+    Guatemala: Guatemala City
+    Guinea-Bissau: Bissau
+    Guyana: Georgetown
+    Haiti: Port-au-Prince
+    Honduras: Tegucigalpa
+    Hungary: Budapest
+    Iceland: Reykjavik
+    India: New Delhi
+    Indonesia: Jakarta
+    Iran: Tehran
+    Iraq: Baghdad
+    Ireland: Dublin
+    Israel: Jerusalem
+    Italy: Rome
+    Jamaica: Kingston
+    Japan: Tokyo
+    Jersey: St. Helier
+    Jordan: Amman
+    Kazakhstan: Astana
+    Kenya: Nairobi
+    Kosovo: Pristina
+    Kuwait: Kuwait City
+    Kyrgyzstan: Bishkek
+    Laos: Vientiane
+    Latvia: Riga
+    Lebanon: Beirut
+    Lesotho: Maseru
+    Liberia: Monrovia
+    Libya: Tripoli
+    Lithuania: Vilnius
+    Luxembourg: Luxembourg
+    Madagascar: Antananarivo
+    Malawi: Lilongwe
+    Malaysia: Putrajaya
+    Maldives: Malé
+    Mali: Bamako
+    Malta: Valletta
+    Mauritania: Nouakchott
+    Mauritius: Port Louis
+    Mayotte: Mamoudzou
+    Moldova: Chișinău
+    Mongolia: Ulaanbaatar
+    Montenegro: Podgorica
+    Morocco: Rabat
+    Mozambique: Maputo
+    Myanmar: Pyinmana [Nay Pyi Taw]
+    Mexico: Mexico City
+    Namibia: Windhoek
+    Nepal: Kathmandu
+    Netherlands: The Hague
+    New Caledonia: Nouméa
+    New Zealand: Wellington
+    Nicaragua: Managua
+    Niger: Niamey
+    Nigeria: Abuja
+    North Korea: P'yŏngyang
+    North Macedonia: Skopje
+    Northern Cyprus: Nicosia
+    Norway: Oslo
+    Oman: Muscat
+    Pakistan: Islamabad
+    Palestine: Ramallah
+    Panama: Panama City
+    Papua New Guinea: Port Moresby
+    Paraguay: Asuncion
+    Peru: Lima
+    Philippines: Manila
+    Poland: Warsaw
+    Portugal: Lisbon
+    Puerto Rico: Bayamón [San Juan]
+    Qatar: Doha
+    Congo: Brazzaville
+    Romania: Bucharest
+    Russia: Moscow
+    Rwanda: Kigali
+    Reunion: Saint-Denis
+    Samoa: Apia
+    Saudi Arabia: Riyadh
+    Senegal: Dakar
+    Serbia: Belgrade
+    Sierra Leone: Freetown
+    Singapore: Singapore
+    Slovakia: Bratislava
+    Slovenia: Ljubljana
+    Solomon Islands: Honiara
+    Somalia: Mogadishu
+    South Africa: Pretoria
+    South Korea: Seoul
+    South Sudan: Juba
+    Spain: Madrid
+    Sri Lanka: Colombo [Sri Jayawardenepura Kotte]
+    Sudan: Khartoum
+    Suriname: Paramaribo
+    Sweden: Stockholm
+    Switzerland: Bern
+    Syria: Damascus
+    Sao Tome and Principe: São Tomé
+    Taiwan: Taipei
+    Tajikistan: Dushanbe
+    Tanzania: Dodoma
+    Thailand: Bangkok
+    East Timor: Dili
+    Togo: Lomé
+    Tonga: Nuku'alofa
+    Trinidad and Tobago: Port of Spain
+    Tunisia: Tunis
+    Turkey: Ankara
+    Turkmenistan: Ashgabat
+    Uganda: Kampala
+    Ukraine: Kyiv
+    United Arab Emirates: Abu Dhabi
+    United Kingdom: London
+    United States: Washington
+    Uruguay: Montevideo
+    Uzbekistan: Tashkent
+    Vanuatu: Port Vila
+    Venezuela: Caracas
+    Vietnam: Hanoi
+    Yemen: Sana'a
+    Zambia: Lusaka
+    Zimbabwe: Harare
 
   entityAnnotationsMapTop100: &entityAnnotationsMapTop100 |-
-      Abidjan: Côte d'Ivoire
-      Accra: Ghana
-      Addis Ababa: Ethiopia
-      Ahmedabad: India
-      Alexandria: Egypt
-      Amman: Jordan
-      Baghdad: Iraq
-      Bandung: Indonesia
-      Bangkok: Thailand
-      Beijing: China
-      Belo Horizonte: Brazil
-      Bengaluru: India
-      Bogota: Colombia
-      Buenos Aires: Argentina
-      Cairo: Egypt
-      Cape Town: South Africa
-      Casablanca: Morocco
-      Chattogram: Bangladesh
-      Chennai: India
-      Chengdu: China
-      Chaozhou: China
-      Chongqing: China
-      Colombo: Sri Lanka
-      Dar es Salaam: Tanzania
-      Dhaka: Bangladesh
-      Dubai: United Arab Emirates
-      Faisalabad: Pakistan
-      Guangzhou: China
-      Hajipur: India
-      Hangzhou: China
-      Hanoi: Vietnam
-      Harbin: China
-      Hefei: China
-      Ho Chi Minh City: Vietnam
-      Hong Kong: China
-      Hyderabad: India
-      Islamabad: Pakistan
-      Istanbul: Turkey
-      Jakarta: Indonesia
-      Johannesburg: South Africa
-      Kabul: Afghanistan
-      Kampala: Uganda
-      Kano: Nigeria
-      Kanpur: India
-      Karachi: Pakistan
-      Khartoum: Sudan
-      Kinshasa: Democratic Republic of Congo
-      Kochi: India
-      Kolkata: India
-      Kozhikode: India
-      Kuala Lumpur: Malaysia
-      Lagos: Nigeria
-      Lahore: Pakistan
-      Lima: Peru
-      London: United Kingdom
-      Los Angeles: United States
-      Luanda: Angola
-      Lucknow: India
-      Madrid: Spain
-      Manila: Philippines
-      Mashhad: Iran
-      Medan: Indonesia
-      Mexico City: Mexico
-      Moscow: Russia
-      Mumbai: India
-      Nagoya: Japan
-      Nairobi: Kenya
-      Nanjing: China
-      New Delhi: India
-      New York City: United States
-      Onitsha: Nigeria
-      Osaka: Japan
-      Paris: France
-      Pune: India
-      Riyadh: Saudi Arabia
-      Rio de Janeiro: Brazil
-      Saint Petersburg: Russia
-      Santiago: Chile
-      Santo Domingo: Dominican Republic
-      Sao Paulo: Brazil
-      Seoul: South Korea
-      Shanghai: China
-      Shenyang: China
-      Shenzhen: China
-      Singapore: Singapore
-      Surat: India
-      Surabaya: Indonesia
-      Suzhou: China
-      Sydney: Australia
-      Taipei: Taiwan
-      Tehran: Iran
-      Tianjin: China
-      Tokyo: Japan
-      Toronto: Canada
-      Wenzhou: China
-      Wuhan: China
-      Xi'an: China
-      Yangon: Myanmar
-      Yaounde: Cameroon
-      Zhengzhou: China
+    Abidjan: Côte d'Ivoire
+    Accra: Ghana
+    Addis Ababa: Ethiopia
+    Ahmedabad: India
+    Alexandria: Egypt
+    Amman: Jordan
+    Baghdad: Iraq
+    Bandung: Indonesia
+    Bangkok: Thailand
+    Beijing: China
+    Belo Horizonte: Brazil
+    Bengaluru: India
+    Bogota: Colombia
+    Buenos Aires: Argentina
+    Cairo: Egypt
+    Cape Town: South Africa
+    Casablanca: Morocco
+    Chattogram: Bangladesh
+    Chennai: India
+    Chengdu: China
+    Chaozhou: China
+    Chongqing: China
+    Colombo: Sri Lanka
+    Dar es Salaam: Tanzania
+    Dhaka: Bangladesh
+    Dubai: United Arab Emirates
+    Faisalabad: Pakistan
+    Guangzhou: China
+    Hajipur: India
+    Hangzhou: China
+    Hanoi: Vietnam
+    Harbin: China
+    Hefei: China
+    Ho Chi Minh City: Vietnam
+    Hong Kong: China
+    Hyderabad: India
+    Islamabad: Pakistan
+    Istanbul: Turkey
+    Jakarta: Indonesia
+    Johannesburg: South Africa
+    Kabul: Afghanistan
+    Kampala: Uganda
+    Kano: Nigeria
+    Kanpur: India
+    Karachi: Pakistan
+    Khartoum: Sudan
+    Kinshasa: Democratic Republic of Congo
+    Kochi: India
+    Kolkata: India
+    Kozhikode: India
+    Kuala Lumpur: Malaysia
+    Lagos: Nigeria
+    Lahore: Pakistan
+    Lima: Peru
+    London: United Kingdom
+    Los Angeles: United States
+    Luanda: Angola
+    Lucknow: India
+    Madrid: Spain
+    Manila: Philippines
+    Mashhad: Iran
+    Medan: Indonesia
+    Mexico City: Mexico
+    Moscow: Russia
+    Mumbai: India
+    Nagoya: Japan
+    Nairobi: Kenya
+    Nanjing: China
+    New Delhi: India
+    New York City: United States
+    Onitsha: Nigeria
+    Osaka: Japan
+    Paris: France
+    Pune: India
+    Riyadh: Saudi Arabia
+    Rio de Janeiro: Brazil
+    Saint Petersburg: Russia
+    Santiago: Chile
+    Santo Domingo: Dominican Republic
+    Sao Paulo: Brazil
+    Seoul: South Korea
+    Shanghai: China
+    Shenyang: China
+    Shenzhen: China
+    Singapore: Singapore
+    Surat: India
+    Surabaya: Indonesia
+    Suzhou: China
+    Sydney: Australia
+    Taipei: Taiwan
+    Tehran: Iran
+    Tianjin: China
+    Tokyo: Japan
+    Toronto: Canada
+    Wenzhou: China
+    Wuhan: China
+    Xi'an: China
+    Yangon: Myanmar
+    Yaounde: Cameroon
+    Zhengzhou: China
 
 
 # Learn more about the available fields:
@@ -334,6 +334,8 @@ dataset:
   title: GHSL Urban Centre Database 2025 (GHS-UCDB R2024A)
   update_period_days: 365
 
+  owners:
+    - Veronika Samborska
 tables:
   ghsl_urban_centers:
     variables:
@@ -348,7 +350,7 @@ tables:
         description_key:
           - Estimated total population living in the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
         display:
           numDecimalPlaces: 0
@@ -364,13 +366,14 @@ tables:
         description_key:
           - Projected total population living in the country's capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
           isProjection: true
         presentation:
+          title_public: Projected population of the capital city
           grapher_config:
             note: Where a country has multiple capital cities, the population shown is for the administrative capital.
 
@@ -385,7 +388,7 @@ tables:
         description_key:
           - Estimated population density of the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - Where a country has multiple capital cities, the density shown is for the administrative capital.
         description_processing: *desc_processing_density
         display:
@@ -403,7 +406,7 @@ tables:
         description_key:
           - Projected population density of the country's capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - Where a country has multiple capital cities, the density shown is for the administrative capital.
         description_processing: *desc_processing_density
         display:
@@ -411,6 +414,7 @@ tables:
           entityAnnotationsMap: *entityAnnotationsMapCapitals
           isProjection: true
         presentation:
+          title_public: Projected population density of the capital city
           grapher_config:
             note: Where a country has multiple capital cities, the density shown is for the administrative capital.
 
@@ -424,7 +428,7 @@ tables:
         description_key:
           - Estimated total population living in each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The ranking of the top 100 cities is fixed based on their population in 2020. Historical values show the population of those same cities across time.
         display:
           numDecimalPlaces: 0
@@ -437,12 +441,14 @@ tables:
         description_key:
           - Projected total population living in each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The ranking of the top 100 cities is fixed based on their population in 2020. Projected values show the population of those same cities in future years.
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
+        presentation:
+          title_public: Projected population of the top 100 most populous cities
 
       # -----------------------------------------------------------------------
       # TOP 100 CITIES — DENSITY
@@ -455,7 +461,7 @@ tables:
         description_key:
           - Estimated population density of each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The ranking of the top 100 cities is fixed based on their population in 2020. Historical values show the density of those same cities across time.
         description_processing: *desc_processing_density
         display:
@@ -470,13 +476,15 @@ tables:
         description_key:
           - Projected population density of each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The ranking of the top 100 cities is fixed based on their population in 2020. Projected values show the density of those same cities in future years.
         description_processing: *desc_processing_density
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
           isProjection: true
+        presentation:
+          title_public: Projected population density of the top 100 most populous cities
 
       # -----------------------------------------------------------------------
       # SHARE OF URBAN/TOTAL POPULATION IN CAPITAL CITY
@@ -490,7 +498,7 @@ tables:
         description_key:
           - Estimated share of a country's urban population living in its capital city, based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_capital_threshold_caveat
@@ -507,7 +515,7 @@ tables:
         description_key:
           - Projected share of a country's urban population living in its capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_capital_threshold_caveat
@@ -516,6 +524,8 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
           entityAnnotationsMap: *entityAnnotationsMapCapitals
+        presentation:
+          title_public: Projected share of urban population living in the capital city
 
       total_pop_share_capital_estimates:
         title: Share of total population living in the capital city
@@ -525,7 +535,7 @@ tables:
         description_key:
           - Estimated share of a country's total population living in its capital city, based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The total population includes both urban and rural populations.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_crossborder_exclusion
@@ -541,7 +551,7 @@ tables:
         description_key:
           - Projected share of a country's total population living in its capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The total population includes both urban and rural populations.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_crossborder_exclusion
@@ -549,6 +559,8 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
           entityAnnotationsMap: *entityAnnotationsMapCapitals
+        presentation:
+          title_public: Projected share of total population living in the capital city
 
       # -----------------------------------------------------------------------
       # SHARE OF URBAN/TOTAL POPULATION IN LARGEST CITY
@@ -562,7 +574,7 @@ tables:
         description_key:
           - Estimated share of a country's urban population living in its largest city (determined by 2020 population), based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
           - *desc_crossborder_exclusion
         display:
@@ -576,12 +588,14 @@ tables:
         description_key:
           - Projected share of a country's urban population living in its largest city (determined by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
           - *desc_crossborder_exclusion
         display:
           numDecimalPlaces: 1
           isProjection: true
+        presentation:
+          title_public: Projected share of urban population living in the largest city
 
       total_pop_share_largest_city_estimates:
         title: Share of total population living in the largest city
@@ -591,7 +605,7 @@ tables:
         description_key:
           - Estimated share of a country's total population living in its largest city (determined by 2020 population), based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The largest city is determined by 2020 population and may differ from the capital city. The total population includes both urban and rural populations.
           - *desc_crossborder_exclusion
         display:
@@ -605,12 +619,14 @@ tables:
         description_key:
           - Projected share of a country's total population living in its largest city (determined by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The largest city is determined by 2020 population and may differ from the capital city. The total population includes both urban and rural populations.
           - *desc_crossborder_exclusion
         display:
           numDecimalPlaces: 1
           isProjection: true
+        presentation:
+          title_public: Projected share of total population living in the largest city
 
       # -----------------------------------------------------------------------
       # CITY SIZE — ABSOLUTE POPULATION
@@ -622,7 +638,7 @@ tables:
         description_key:
           - Estimated total population living in cities with 50,000 to 300,000 people, based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 300,000
@@ -637,14 +653,14 @@ tables:
         description_key:
           - Projected total population living in cities with 50,000 to 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 300,000
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 50,000 to 300,000 people (projected)
+          title_public: Projected population living in cities with 50,000 to 300,000 people
 
       pop_citysize_50k_1m_estimates:
         title: Population living in cities with 50,000 to 1 million people
@@ -653,7 +669,7 @@ tables:
         description_key:
           - Estimated total population living in cities with 50,000 to 1 million people, based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 1 million
@@ -668,14 +684,14 @@ tables:
         description_key:
           - Projected total population living in cities with 50,000 to 1 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 1 million
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 50,000 to 1 million people (projected)
+          title_public: Projected population living in cities with 50,000 to 1 million people
 
       pop_citysize_1m_5m_estimates:
         title: Population living in cities with 1 to 5 million people
@@ -704,7 +720,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 1 to 5 million people (projected)
+          title_public: Projected population living in cities with 1 to 5 million people
 
       pop_citysize_5m_10m_estimates:
         title: Population living in cities with 5 to 10 million people
@@ -733,7 +749,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 5 to 10 million people (projected)
+          title_public: Projected population living in cities with 5 to 10 million people
 
       pop_citysize_above_10m_estimates:
         title: Population living in cities with more than 10 million people
@@ -762,7 +778,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with more than 10 million people (projected)
+          title_public: Projected population living in cities with more than 10 million people
 
       pop_citysize_above_1m_estimates:
         title: Population living in cities with 1 million or more people
@@ -791,7 +807,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 1 million or more people (projected)
+          title_public: Projected population living in cities with 1 million or more people
 
       # CITY SIZE — POPULATION SHARES
       # -----------------------------------------------------------------------
@@ -818,14 +834,14 @@ tables:
         description_key:
           - Projected share of the urban population living in cities with 50,000 to 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 300,000
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 50,000 to 300,000 people (projected)
+          title_public: Projected share of urban population living in cities with 50,000 to 300,000 people
 
       popshare_citysize_50k_1m_estimates:
         title: Share of urban population living in cities with 50,000 to 1 million people
@@ -850,14 +866,14 @@ tables:
         description_key:
           - Projected share of the urban population living in cities with 50,000 to 1 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 50,000 to 1 million
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 50,000 to 1 million people (projected)
+          title_public: Projected share of urban population living in cities with 50,000 to 1 million people
 
       popshare_citysize_1m_5m_estimates:
         title: Share of urban population living in cities with 1 to 5 million people
@@ -888,7 +904,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 1 to 5 million people (projected)
+          title_public: Projected share of urban population living in cities with 1 to 5 million people
 
       popshare_citysize_5m_10m_estimates:
         title: Share of urban population living in cities with 5 to 10 million people
@@ -919,7 +935,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 5 to 10 million people (projected)
+          title_public: Projected share of urban population living in cities with 5 to 10 million people
 
       popshare_citysize_above_10m_estimates:
         title: Share of urban population living in cities with more than 10 million people
@@ -950,7 +966,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with more than 10 million people (projected)
+          title_public: Projected share of urban population living in cities with more than 10 million people
 
       popshare_citysize_above_1m_estimates:
         title: Share of urban population living in cities with 1 million or more people
@@ -981,7 +997,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in cities with 1 million or more people (projected)
+          title_public: Projected share of urban population living in cities with 1 million or more people
 
       totalshare_citysize_above_1m_estimates:
         title: Share of total population living in cities with 1 million or more people
@@ -1016,7 +1032,7 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of total population living in cities with 1 million or more people (projected)
+          title_public: Projected share of total population living in cities with 1 million or more people
 
       # AGGREGATES — CITIES 300K+
       # -----------------------------------------------------------------------
@@ -1027,8 +1043,8 @@ tables:
         description_key:
           - Estimated total population living in cities with 300,000 or more people, based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 or more
@@ -1043,14 +1059,14 @@ tables:
         description_key:
           - Projected total population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 or more
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in cities with 300,000 or more people (projected)
+          title_public: Projected population living in cities with 300,000 or more people
 
       popshare_citysize_above_300k_estimates:
         title: Share of population living in cities with 300,000 or more people
@@ -1060,7 +1076,7 @@ tables:
         description_key:
           - Estimated share of the total population living in cities with 300,000 or more people, based on satellite imagery and census data.
           - *desc_key_common
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN. From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 or more
@@ -1076,14 +1092,14 @@ tables:
         description_key:
           - Projected share of the total population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
           name: 300,000 or more
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of population living in cities with 300,000 or more people (projected)
+          title_public: Projected share of population living in cities with 300,000 or more people
 
       popshare_citysize_above_300k_growth_estimates:
         title: Annual growth rate of the share of population in cities with 300,000 or more people
@@ -1097,7 +1113,7 @@ tables:
         description_processing: *desc_processing_cagr
         display:
           name: 300,000 or more
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
         presentation:
           title_public: Annual growth rate of the share of population in cities with 300,000 or more people
 
@@ -1113,10 +1129,10 @@ tables:
         description_processing: *desc_processing_cagr
         display:
           name: 300,000 or more
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Annual growth rate of the share of population in cities with 300,000 or more people (projected)
+          title_public: Projected annual growth rate of the share of population in cities with 300,000 or more people
 
       pop_citysize_below_50k_estimates:
         title: Population living in towns and suburbs with fewer than 50,000 people
@@ -1126,8 +1142,7 @@ tables:
           - *text_degurba_overview
           - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
           - *text_data_source
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN.
-          - From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
           - *text_degurba_caveat
           - *text_small_territory_caveat
         display:
@@ -1137,15 +1152,14 @@ tables:
           title_public: Population living in towns and suburbs with fewer than 50,000 people
 
       pop_citysize_below_50k_projections:
-        title: Population living in towns and suburbs with fewer than 50,000 people
-          (projected)
+        title: Population living in towns and suburbs with fewer than 50,000 people (projected)
         unit: people
         description_short: Projected total population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:
           - *text_degurba_overview
           - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
           - *text_data_source
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - *text_degurba_caveat
           - *text_small_territory_caveat
         display:
@@ -1153,7 +1167,7 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
         presentation:
-          title_public: Population living in urban clusters with fewer than 50,000 people (projected)
+          title_public: Projected population living in urban clusters with fewer than 50,000 people
 
       popshare_citysize_below_50k_estimates:
         title: Share of urban population living in towns and suburbs with fewer than 50,000 people
@@ -1164,8 +1178,7 @@ tables:
           - *text_degurba_overview
           - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
           - *text_data_source
-          - For the years 1950–1975, there are no detailed maps showing where people lived within countries. So instead of using grid-level or satellite data, the estimates are reconstructed using national statistics from the UN.
-          - From 1975 onwards, population is mapped to 1 km² grid cells by combining census data with satellite imagery of built-up areas from the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
+          - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
           - *text_degurba_caveat
           - *text_small_territory_caveat
         display:
@@ -1183,7 +1196,7 @@ tables:
           - *text_degurba_overview
           - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
           - *text_data_source
-          - From 2020 onwards, population distribution and built-up areas are projected at 1 km² resolution using the [Cities and Rural Integrated Spatial Projections spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence). The projections follow the UN World Population Prospects 2024 medium scenario, and country totals are aligned with UN projections.
+          - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - *text_degurba_caveat
           - *text_small_territory_caveat
         display:
@@ -1191,4 +1204,4 @@ tables:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
-          title_public: Share of urban population living in towns and suburbs with fewer than 50,000 people (projected)
+          title_public: Projected share of urban population living in towns and suburbs with fewer than 50,000 people
