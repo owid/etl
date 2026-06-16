@@ -245,6 +245,12 @@ def run() -> None:
 
     # Early filter: keep only the ~100 indicators we need.
     # This runs before consolidate_world_entries and the pivot, making both much faster.
+    # check that all expected variables are present in the data:
+    assert _VARIABLES_TO_KEEP.issubset(set(tb["indicator_label_en"].unique())), (
+        "Some expected variables are missing from the data"
+    )
+
+    # keep only needed indicators:
     tb = tb[tb["indicator_label_en"].isin(_VARIABLES_TO_KEEP)]
 
     tb = consolidate_world_entries(tb)
@@ -252,7 +258,6 @@ def run() -> None:
 
     # Append indicator_id to label to form unique column names (some labels exist for multiple IDs)
     tb["indicator_label_en"] = tb["indicator_label_en"].astype(str) + ", " + tb["indicator_id"].astype(str)
-
     # Pivot the table to have indicators as columns
     tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
     tb_pivoted = tb_pivoted.reset_index()
@@ -261,6 +266,7 @@ def run() -> None:
     gdp_col = "Government expenditure on education as a percentage of GDP (%), XGDP.FSGOV"
     if gdp_col in tb_pivoted.columns:
         mask = (tb_pivoted["country"] == "Turkey") & (tb_pivoted["year"] == 1998)
+        assert tb_pivoted.loc[mask, gdp_col].iloc[0] == 0, "Turkey 1998 GDP is not zero, investigate before removing"
         tb_pivoted.loc[mask, gdp_col] = None
 
     tb_pivoted = tb_pivoted.format(["country", "year"])

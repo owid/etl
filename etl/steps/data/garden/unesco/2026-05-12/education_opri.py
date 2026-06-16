@@ -490,6 +490,15 @@ def run() -> None:
     # Early filter: keep only the ~80 indicators we need + the enrollment counts needed
     # to compute per-student spending. This runs before consolidate_world_entries and
     # the pivot, making both operations much faster.
+
+    # assert set(_VARIABLES_TO_KEEP).issubset(set(tb["indicator_label_en"].unique())), (
+    #    f"Some expected variables are missing from the data: {set(_VARIABLES_TO_KEEP) - set(tb['indicator_label_en'].unique())}"
+    # )
+
+    assert set(_ENROLLMENT_FOR_DERIVED).issubset(set(tb["indicator_label_en"].unique())), (
+        f"Some enrollment variables needed for derived computations are missing from the data: {set(_ENROLLMENT_FOR_DERIVED) - set(tb['indicator_label_en'].unique())}"
+    )
+
     _vars_to_pivot = set(_VARIABLES_TO_KEEP) | set(_ENROLLMENT_FOR_DERIVED)
     tb = tb[tb["indicator_label_en"].isin(_vars_to_pivot)]
 
