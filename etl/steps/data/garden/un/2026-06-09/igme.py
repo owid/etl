@@ -86,7 +86,7 @@ def run() -> None:
     tb = add_post_neonatal_deaths(tb)
     # Remove 'Number of' prefix from "Number of deaths" and "Number of stillbirths"
     tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Number of ", "", regex=False)
-    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Stillbirths", "Deaths per 100 live births", regex=False)
+    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("stillbirths", "Deaths per 100 live births", regex=False)
 
     tb["indicator"] = tb["indicator"].str.replace("Under-five mortality rate", "Child mortality rate", regex=False)
     # Drop unused columns
