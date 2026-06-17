@@ -454,11 +454,3 @@ items:
   - display: Yoghurt
     item_code: 891
     fao_item: Yoghurt
-
-# Excluded items (uncomment to re-enable):
-#   Anise (a grab-bag of several distinct spices, not a single recognisable item)
-#   - {display: ..., item_code: 711, fao_item: Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw}
-#   Nutmeg (lumps three distinct spices (nutmeg, mace, cardamom) into one item)
-#   - {display: ..., item_code: 702, fao_item: Nutmeg, mace, cardamoms, raw}
-#   Broad beans and horse beans (duplicate of "Broad beans" (the dry form, item 181))
-#   - {display: ..., item_code: 420, fao_item: Broad beans and horse beans, green}
