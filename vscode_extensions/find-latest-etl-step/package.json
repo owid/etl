@@ -55,6 +55,7 @@
     "lodash": "^4.18.1"
   },
   "overrides": {
-    "serialize-javascript": "^7.0.5"
+    "serialize-javascript": "^7.0.5",
+    "js-yaml": "^4.2.0"
   }
 }

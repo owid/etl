@@ -68,6 +68,7 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "serialize-javascript": "^7.0.5"
+    "serialize-javascript": "^7.0.5",
+    "js-yaml": "^4.2.0"
   }
 }
