@@ -1,8 +1,0 @@
-tables:
-  exoplanets:
-    variables:
-      cumulative_exoplanets:
-        title: Cumulative number of exoplanets discovered
-        unit: exoplanets
-        display:
-          numDecimalPlaces: 0
