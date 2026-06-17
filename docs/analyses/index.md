@@ -62,4 +62,5 @@ This is just a sneak peek into some of our data work. But note that all our code
     🚧 *Work in progress* Technical companion to the bespoke food-trade visualization. Documents the data-quality characteristics of FAOSTAT's *Detailed Trade Matrix*: how complete the bilateral coverage is, and how closely the two reports (from the exporting and the importing country) agree when both sides report the same flow.
 
     [:material-notebook: View notebook](food_trade/food_trade.html){ .md-button }
+    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
     [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
