@@ -113,7 +113,7 @@ items:
   - display: Coconuts
     item_code: 249
     fao_item: Coconuts, in shell
-  - display: Corn oil
+  - display: Maize oil
     item_code: 60
     fao_item: Oil of maize
   - display: Cowpeas
