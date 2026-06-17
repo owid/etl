@@ -165,10 +165,10 @@ steps:
         - snapshot://artificial_intelligence/2026-06-08/nvidia_revenue.csv
 
   # Microsoft AI Diffusion — Global AI adoption estimates
-  data://grapher/artificial_intelligence/2026-04-07/ai_diffusion_msft:
-    - data://garden/artificial_intelligence/2026-04-07/ai_diffusion_msft:
-      - data://meadow/artificial_intelligence/2026-04-07/ai_diffusion_msft:
-        - snapshot://artificial_intelligence/2026-04-07/ai_diffusion_msft.pdf
+  data://grapher/artificial_intelligence/2026-06-12/ai_diffusion_msft:
+    - data://garden/artificial_intelligence/2026-06-12/ai_diffusion_msft:
+      - data://meadow/artificial_intelligence/2026-06-12/ai_diffusion_msft:
+        - snapshot://artificial_intelligence/2026-06-12/ai_diffusion_msft.csv
 
   # Eurostat — Use of generative AI tools by individuals
   data://grapher/eurostat/2026-04-07/generative_ai_use:

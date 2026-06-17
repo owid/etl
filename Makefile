@@ -2,13 +2,13 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate vsce-exclude-archived owid_mcp vsce-compile vsce-sync install-hooks
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks
 
 include default.mk
 
-SRC = etl snapshots apps api_search tests docs owid_mcp
+SRC = etl snapshots apps api_search tests docs owid_mcp owl_steps lib/owl/owl
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
-LIBS = lib/*
+LIBS = lib/catalog lib/datautils lib/owl lib/repack
 
 help:
 	@echo 'Available commands:'
@@ -36,7 +36,6 @@ help:
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make check-all 	Format, lint, and typecheck (including for modules in lib/)'
-	@echo '  make vsce-exclude-archived  Exclude archived steps from VSCode user settings'
 	@echo '  make vsce-sync 	Sync VS Code extensions (install missing, upgrade outdated)'
 # 	@echo '  make vsce-compile EXT=name [BUMP=patch|minor|major] [INSTALL=1]  Compile and package VS Code extension'
 	@echo '  make watch     	Run all tests, watching for changes'
@@ -250,10 +249,6 @@ install-hooks:
 
 # Backward-compatible alias
 install-vscode-extensions: vsce-sync
-
-vsce-exclude-archived: .venv
-	@echo '==> Excluding archived steps from VSCode user settings'
-	.venv/bin/python scripts/exclude_archived_steps.py --settings-scope user
 
 # Compile and package a VS Code extension
 # Usage: make vsce-compile EXT=detect-outdated-practices [BUMP=patch|minor|major] [INSTALL=1]

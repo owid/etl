@@ -87,3 +87,9 @@ steps:
         - data://meadow/idmc/2026-01-19/internal_displacement:
           - snapshot://idmc/2026-01-19/internal_displacement.csv
         - data://garden/demography/2024-07-15/population
+
+
+  # UN DESA migration flows S3 JSON export (2024)
+  export://s3/un_migration/latest/migration_stock_flows_json:
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2025-03-18/migration_stock_flows
