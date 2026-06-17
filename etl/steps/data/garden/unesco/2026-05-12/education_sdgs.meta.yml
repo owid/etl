@@ -68,6 +68,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         baseColorScheme: Blues
+        minValue: 0
 
   grapher_config_expenditure_total: &grapher_config_expenditure_total
     <<: *common_grapher_config
