@@ -20,7 +20,7 @@ definitions:
     - config:
         originUrl: ourworldindata.org/economic-inequality
         hasMapTab: true
-        chartTypes: ["LineChart"]
+        chartTypes: ["LineChart", "DiscreteBar"]
         yAxis:
           min: 0
 
