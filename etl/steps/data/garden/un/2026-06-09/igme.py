@@ -98,7 +98,7 @@ def run() -> None:
     # Drop unused columns
     tb = tb.drop(columns=["source", "lower_bound", "upper_bound"])
 
-    # sanity check (uncomment when updating)
+    # sanity check (uncomment when updating), takes around 1hr to run
     # sanity_checks(tb)
 
     tb = tb.format(
@@ -277,6 +277,8 @@ def regional_averages_by_denominator(tb: Table, threshold: float = 0.8) -> Table
         ),
         axis=1,
     )
+    # remove rows where we don't have observed values or death numbers
+    tb_rates = tb_rates.dropna(subset=["observation_value", "absolute_deaths"])
 
     tb_rates["inferred_denominator"] = tb_rates["absolute_deaths"] / tb_rates["observation_value"]
 
