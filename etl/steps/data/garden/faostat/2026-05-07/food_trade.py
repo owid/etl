@@ -42,12 +42,10 @@ import pandas as pd
 import yaml
 from owid.catalog import Table
 from owid.catalog import processing as pr
-from structlog import get_logger
 
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
-log = get_logger()
 
 # Domestic supply is published only where SCL's imports corroborate the trade we observe: SCL's
 # recorded imports must cover at least this share of the observed inbound flows, otherwise SCL has
@@ -55,6 +53,12 @@ log = get_logger()
 # noise floor — well-reporting countries agree with the observed trade within ~10%, so a larger gap
 # signals a real hole rather than normal CIF/FOB / timing / classification wobble.
 MIN_IMPORT_COVERAGE = 0.9
+
+# Regression guard for the import gate: at MIN_IMPORT_COVERAGE the trade matrix corroborates the large
+# majority of supplies (~83% in 2023), so blanking should stay well under this share. A larger share
+# means SCL imports and observed trade have diverged unexpectedly (bad data or a logic slip), and the
+# build should fail rather than ship a hollowed-out supply column.
+MAX_SUPPLY_BLANKED_SHARE = 0.30
 
 
 def sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
@@ -213,10 +217,10 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     observed = importer_supply["observed_inbound"].fillna(0).to_numpy(dtype="float64")
     uncorroborated = scl_import < MIN_IMPORT_COVERAGE * observed
     has_supply = importer_supply["importer_supply"].notna().to_numpy()
-    log.info(
-        "food_trade.supply_import_gate",
-        blanked=int((uncorroborated & has_supply).sum()),
-        kept=int((~uncorroborated & has_supply).sum()),
+    blanked_share = (uncorroborated & has_supply).sum() / has_supply.sum()
+    assert blanked_share <= MAX_SUPPLY_BLANKED_SHARE, (
+        f"Import gate blanked {blanked_share:.0%} of domestic-supply values (> {MAX_SUPPLY_BLANKED_SHARE:.0%}); "
+        "SCL imports and observed trade have diverged unexpectedly — investigate before trusting the output."
     )
     importer_supply.loc[uncorroborated, "importer_supply"] = pd.NA
     importer_supply = importer_supply[["importer", "item", "year", "importer_supply"]]
