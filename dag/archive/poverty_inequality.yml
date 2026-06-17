@@ -1,17 +1,13 @@
 steps:
   # OECD Income Distribution Database
-  # archived; last active in 917387fe5670 on 2024-04-11
   data://meadow/oecd/2023-06-06/income_distribution_database:
     - snapshot://oecd/2023-06-06/income_distribution_database.csv
-  # archived; last active in 917387fe5670 on 2024-04-11
   data://garden/oecd/2023-06-06/income_distribution_database:
     - data://meadow/oecd/2023-06-06/income_distribution_database
-  # archived; last active in 917387fe5670 on 2024-04-11
   data://grapher/oecd/2023-06-06/income_distribution_database:
     - data://garden/oecd/2023-06-06/income_distribution_database
 
   # Luxembourg Income Study
-  # archived; last active in 89eb400dc365 on 2024-06-25
   data://meadow/lis/2023-08-30/luxembourg_income_study:
     - snapshot://lis/2023-08-30/lis_keyvars.csv
     - snapshot://lis/2023-08-30/lis_abs_poverty.csv
@@ -22,14 +18,11 @@ steps:
     - snapshot://lis/2023-08-30/lis_percentiles.csv
     - snapshot://lis/2023-08-30/lis_percentiles_adults.csv
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in 89eb400dc365 on 2024-06-25
   data://garden/lis/2023-08-30/luxembourg_income_study:
     - data://meadow/lis/2023-08-30/luxembourg_income_study
-  # archived; last active in 89eb400dc365 on 2024-06-25
   data://grapher/lis/2023-08-30/luxembourg_income_study:
     - data://garden/lis/2023-08-30/luxembourg_income_study
 
-  # archived; last active in b1194b8a6f7e on 2025-02-05
   data://meadow/lis/2024-06-13/luxembourg_income_study:
     - snapshot://lis/2024-06-13/lis_keyvars.csv
     - snapshot://lis/2024-06-13/lis_distribution_adults.csv
@@ -38,41 +31,31 @@ steps:
     - snapshot://lis/2024-06-13/lis_distribution.csv
     - snapshot://lis/2024-06-13/lis_abs_poverty_adults.csv
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in b1194b8a6f7e on 2025-02-05
   data://garden/lis/2024-06-13/luxembourg_income_study:
     - data://meadow/lis/2024-06-13/luxembourg_income_study
-  # archived; last active in b1194b8a6f7e on 2025-02-05
   data://grapher/lis/2024-06-13/luxembourg_income_study:
     - data://garden/lis/2024-06-13/luxembourg_income_study
 
   # World Bank Poverty and Inequality Platform
-  # archived; last active in c4eb75ab32c5 on 2024-10-07
   data://meadow/wb/2024-03-27/world_bank_pip:
     - snapshot://wb/2024-03-27/world_bank_pip.csv
     - snapshot://wb/2024-03-27/world_bank_pip_percentiles.csv
-  # archived; last active in c4eb75ab32c5 on 2024-10-07
   data://garden/wb/2024-03-27/world_bank_pip:
     - data://meadow/wb/2024-03-27/world_bank_pip
-  # archived; last active in c4eb75ab32c5 on 2024-10-07
   data://grapher/wb/2024-03-27/world_bank_pip_2011ppp:
     - data://garden/wb/2024-03-27/world_bank_pip
-  # archived; last active in c4eb75ab32c5 on 2024-10-07
   data://grapher/wb/2024-03-27/world_bank_pip_2017ppp:
     - data://garden/wb/2024-03-27/world_bank_pip
 
   # Multidimensional Poverty Index
-  # archived; last active in 5bbfb4b8d855 on 2024-11-08
   data://meadow/ophi/2023-07-05/multidimensional_poverty_index:
     - snapshot://ophi/2023-07-05/multidimensional_poverty_index.csv
-  # archived; last active in 5bbfb4b8d855 on 2024-11-08
   data://garden/ophi/2023-07-05/multidimensional_poverty_index:
     - data://meadow/ophi/2023-07-05/multidimensional_poverty_index
-  # archived; last active in 5bbfb4b8d855 on 2024-11-08
   data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
     - data://garden/ophi/2023-07-05/multidimensional_poverty_index
 
   # World Inequality Database
-  # archived; last active in 276c5ccc87ac on 2025-03-19
   data://meadow/wid/2024-05-24/world_inequality_database:
     - data://garden/regions/2023-01-01/regions
     - snapshot://wid/2024-05-24/world_inequality_database.csv
@@ -80,106 +63,80 @@ steps:
     - snapshot://wid/2024-05-24/world_inequality_database_distribution.csv
     - snapshot://wid/2024-05-24/world_inequality_database_distribution_with_extrapolations.csv
     - snapshot://wid/2024-05-24/world_inequality_database_fiscal.csv
-  # archived; last active in 276c5ccc87ac on 2025-03-19
   data://garden/wid/2024-05-24/world_inequality_database:
     - data://meadow/wid/2024-05-24/world_inequality_database
-  # archived; last active in 276c5ccc87ac on 2025-03-19
   data://grapher/wid/2024-05-24/world_inequality_database:
     - data://garden/wid/2024-05-24/world_inequality_database
 
   # Poverty projections from the World Bank
-  # archived; last active in 479c6c43177b on 2024-12-05
   data://meadow/wb/2024-06-26/poverty_projections:
     - snapshot://wb/2024-06-26/poverty_projections_number_global.csv
     - snapshot://wb/2024-06-26/poverty_projections_share_regions.csv
-  # archived; last active in 479c6c43177b on 2024-12-05
   data://garden/wb/2024-06-26/poverty_projections:
     - data://meadow/wb/2024-06-26/poverty_projections
-  # archived; last active in 479c6c43177b on 2024-12-05
   data://grapher/wb/2024-06-26/poverty_projections:
     - data://garden/wb/2024-06-26/poverty_projections
 
   # Poverty projections from the Poverty, Prosperity and Planet Report 2024 (old version)
-  # archived; last active in 7802e2dd46dc on 2025-01-20
   data://meadow/wb/2024-12-03/poverty_projections:
     - snapshot://wb/2024-12-03/reproducibility_package_poverty_prosperity_planet.zip
-  # archived; last active in 7802e2dd46dc on 2025-01-20
   data://garden/wb/2024-12-03/poverty_projections:
     - data://meadow/wb/2024-12-03/poverty_projections
-  # archived; last active in 7802e2dd46dc on 2025-01-20
   data://grapher/wb/2024-12-03/poverty_projections:
     - data://garden/wb/2024-12-03/poverty_projections
 
   # 1000 Binned Global Distribution (Mahler, Yonzan and Lakner 2022)
-  # archived; last active in 37724248da9e on 2025-03-19
   data://meadow/wb/2024-01-22/thousand_bins_distribution:
     - snapshot://wb/2024-01-22/thousand_bins_distribution.dta
-  # archived; last active in 37724248da9e on 2025-03-19
   data://garden/wb/2024-01-22/thousand_bins_distribution:
     - data://meadow/wb/2024-01-22/thousand_bins_distribution
 
   # Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
-  # archived; last active in 7dcaf843ece1 on 2025-04-02
   data://meadow/cedlas/2024-03-08/sedlac:
     - snapshot://cedlas/2024-03-08/sedlac_incomes.xlsx
     - snapshot://cedlas/2024-03-08/sedlac_poverty.xlsx
     - snapshot://cedlas/2024-03-08/sedlac_inequality.xlsx
-  # archived; last active in 7dcaf843ece1 on 2025-04-02
   data://garden/cedlas/2024-03-08/sedlac:
     - data://meadow/cedlas/2024-03-08/sedlac
-  # archived; last active in 7dcaf843ece1 on 2025-04-02
   data://grapher/cedlas/2024-03-08/sedlac:
     - data://garden/cedlas/2024-03-08/sedlac
 
   # World Bank Poverty and Inequality Platform
-  # archived; last active in d7015aaca094 on 2025-05-29
   data://meadow/wb/2024-10-07/world_bank_pip:
     - snapshot://wb/2024-10-07/world_bank_pip.csv
     - snapshot://wb/2024-10-07/world_bank_pip_percentiles.csv
     - snapshot://wb/2024-10-07/world_bank_pip_regions.csv
-  # archived; last active in d7015aaca094 on 2025-05-29
   data://garden/wb/2024-10-07/world_bank_pip:
     - data://meadow/wb/2024-10-07/world_bank_pip
-  # archived; last active in d7015aaca094 on 2025-05-29
   data://grapher/wb/2024-10-07/world_bank_pip_2011ppp:
     - data://garden/wb/2024-10-07/world_bank_pip
-  # archived; last active in d7015aaca094 on 2025-05-29
   data://grapher/wb/2024-10-07/world_bank_pip_2017ppp:
     - data://garden/wb/2024-10-07/world_bank_pip
 
   # # OECD Income Distribution Database
-  # archived; last active in 9d242de7175b on 2025-04-16
   data://meadow/oecd/2024-04-10/income_distribution_database:
     - snapshot://oecd/2024-04-10/income_distribution_database.csv
-  # archived; last active in 9d242de7175b on 2025-04-16
   data://garden/oecd/2024-04-10/income_distribution_database:
     - data://meadow/oecd/2024-04-10/income_distribution_database
-  # archived; last active in 9d242de7175b on 2025-04-16
   data://grapher/oecd/2024-04-10/income_distribution_database:
     - data://garden/oecd/2024-04-10/income_distribution_database
 
   # World Bank Poverty and Inequality Platform
   # Legacy PIP pipeline
-  # archived; last active in c7a013ecd45e on 2025-07-22
   data://garden/wb/2025-04-08/world_bank_pip_legacy:
     - data://meadow/wb/2025-04-08/world_bank_pip
 
     # Poverty projections from the Poverty, Prosperity and Planet Report 2024
-  # archived; last active in ee53daa3533e on 2025-06-18
   data://meadow/wb/2025-01-15/poverty_projections:
     - snapshot://wb/2025-01-15/reproducibility_package_poverty_prosperity_planet.zip
-  # archived; last active in ee53daa3533e on 2025-06-18
   data://garden/wb/2025-01-15/poverty_projections:
     - data://meadow/wb/2025-01-15/poverty_projections
-  # archived; last active in ee53daa3533e on 2025-06-18
   data://grapher/wb/2025-01-15/poverty_projections:
     - data://garden/wb/2025-01-15/poverty_projections
 
   # 1000 Binned Global Distribution (World Bank PIP)
-  # archived; last active in 0cc59731a02d on 2025-06-11
   data://meadow/wb/2025-03-10/thousand_bins_distribution:
     - snapshot://wb/2025-03-10/thousand_bins_distribution.dta
-  # archived; last active in 0cc59731a02d on 2025-06-11
   data://garden/wb/2025-03-10/thousand_bins_distribution:
     - data://meadow/wb/2025-03-10/thousand_bins_distribution
 
@@ -194,7 +151,6 @@ steps:
     - data://garden/wb/2025-06-08/harmonized_national_poverty_lines
 
     # Luxembourg Income Study
-  # archived; last active in 4a2cad1637a9 on 2025-07-24
   data://meadow/lis/2025-01-24/luxembourg_income_study:
     - snapshot://lis/2025-01-24/lis_keyvars.csv
     - snapshot://lis/2025-01-24/lis_abs_poverty.csv
@@ -205,86 +161,67 @@ steps:
     - snapshot://lis/2024-06-13/lis_percentiles.csv
     - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in 4a2cad1637a9 on 2025-07-24
   data://garden/lis/2025-01-24/luxembourg_income_study:
     - data://meadow/lis/2025-01-24/luxembourg_income_study
-  # archived; last active in 4a2cad1637a9 on 2025-07-24
   data://grapher/lis/2025-01-24/luxembourg_income_study:
     - data://garden/lis/2025-01-24/luxembourg_income_study
 
   #
   # Poverty projections from the World Bank's Global Poverty Revisited report (2021 PPPs)
   #
-  # archived; last active in e749e9255f19 on 2025-08-06
   data://meadow/wb/2025-06-18/poverty_projections:
     - snapshot://wb/2025-06-18/poverty_projections.dta
     - snapshot://wb/2025-06-18/poverty_aggregates.dta
-  # archived; last active in e749e9255f19 on 2025-08-06
   data://garden/wb/2025-06-18/poverty_projections:
     - data://meadow/wb/2025-06-18/poverty_projections
-  # archived; last active in e749e9255f19 on 2025-08-06
   data://grapher/wb/2025-06-18/poverty_projections:
     - data://garden/wb/2025-06-18/poverty_projections
 
   # World Bank Poverty and Inequality Platform
-  # archived; last active in 05061302f9bb on 2025-08-08
   data://meadow/wb/2025-06-05/world_bank_pip:
     - snapshot://wb/2025-06-05/world_bank_pip.csv
     - snapshot://wb/2025-06-05/world_bank_pip_percentiles.csv
     - snapshot://wb/2025-06-05/world_bank_pip_regions.csv
   # Dimensional PIP pipeline
-  # archived; last active in 05061302f9bb on 2025-08-08
   data://garden/wb/2025-06-05/world_bank_pip:
     - data://meadow/wb/2025-06-05/world_bank_pip
-  # archived; last active in 05061302f9bb on 2025-08-08
   data://grapher/wb/2025-06-05/world_bank_pip:
     - data://garden/wb/2025-06-05/world_bank_pip
   # Legacy PIP pipeline
-  # archived; last active in 05061302f9bb on 2025-08-08
   data://garden/wb/2025-06-05/world_bank_pip_legacy:
     - data://meadow/wb/2025-06-05/world_bank_pip
 
     # World Bank Poverty and Inequality Platform
-  # archived; last active in 8d7a733722d2 on 2025-10-22
   data://meadow/wb/2025-08-07/world_bank_pip:
     - snapshot://wb/2025-08-07/world_bank_pip.csv
     - snapshot://wb/2025-08-07/world_bank_pip_percentiles.csv
     - snapshot://wb/2025-08-07/world_bank_pip_regions.csv
   # Dimensional PIP pipeline
-  # archived; last active in 8d7a733722d2 on 2025-10-22
   data://garden/wb/2025-08-07/world_bank_pip:
     - data://meadow/wb/2025-08-07/world_bank_pip
-  # archived; last active in 8d7a733722d2 on 2025-10-22
   data://grapher/wb/2025-08-07/world_bank_pip:
     - data://garden/wb/2025-08-07/world_bank_pip
   # Legacy PIP pipeline
-  # archived; last active in 8d7a733722d2 on 2025-10-22
   data://garden/wb/2025-08-07/world_bank_pip_legacy:
     - data://meadow/wb/2025-08-07/world_bank_pip
 
     # 1000 Binned Global Distribution (World Bank PIP)
-  # archived; last active in 88493d4a5b89 on 2025-10-14
   data://meadow/wb/2025-06-11/thousand_bins_distribution:
     - snapshot://wb/2025-06-11/thousand_bins_distribution.dta
-  # archived; last active in 88493d4a5b89 on 2025-10-14
   data://garden/wb/2025-06-11/thousand_bins_distribution:
     - data://meadow/wb/2025-06-11/thousand_bins_distribution
 
   #
   # Poverty projections in 2021 prices up to 2050
   #
-  # archived; last active in 075bd16fcd0c on 2025-11-10
   data://meadow/wb/2025-07-02/poverty_projections:
     - snapshot://wb/2025-07-02/poverty_projections.dta
-  # archived; last active in 075bd16fcd0c on 2025-11-10
   data://garden/wb/2025-07-02/poverty_projections:
     - data://meadow/wb/2025-07-02/poverty_projections
-  # archived; last active in 075bd16fcd0c on 2025-11-10
   data://grapher/wb/2025-07-02/poverty_projections:
     - data://garden/wb/2025-07-02/poverty_projections
 
       # Luxembourg Income Study (legacy)
-  # archived; last active in ef7ae1b10b3f on 2025-12-24
   data://meadow/lis/2025-07-23/luxembourg_income_study:
     - snapshot://lis/2025-07-23/lis_keyvars.csv
     - snapshot://lis/2025-07-23/lis_abs_poverty.csv
@@ -295,30 +232,23 @@ steps:
     - snapshot://lis/2024-06-13/lis_percentiles.csv
     - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in ef7ae1b10b3f on 2025-12-24
   data://garden/lis/2025-07-23/luxembourg_income_study:
     - data://meadow/lis/2025-07-23/luxembourg_income_study
-  # archived; last active in ef7ae1b10b3f on 2025-12-24
   data://grapher/lis/2025-07-23/luxembourg_income_study:
     - data://garden/lis/2025-07-23/luxembourg_income_study
-  # archived; last active in ef7ae1b10b3f on 2025-12-24
   data://explorers/lis/latest/luxembourg_income_study:
     - data://garden/lis/2025-07-23/luxembourg_income_study
 
   # Global Multidimensional Poverty Index
-  # archived; last active in 6c6bd967ee66 on 2025-12-29
   data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
     - snapshot://ophi/2024-10-28/multidimensional_poverty_index_cme.csv
     - snapshot://ophi/2024-10-28/multidimensional_poverty_index_hot.csv
-  # archived; last active in 6c6bd967ee66 on 2025-12-29
   data://garden/ophi/2024-10-28/multidimensional_poverty_index:
     - data://meadow/ophi/2024-10-28/multidimensional_poverty_index
-  # archived; last active in 6c6bd967ee66 on 2025-12-29
   data://grapher/ophi/2024-10-28/multidimensional_poverty_index:
     - data://garden/ophi/2024-10-28/multidimensional_poverty_index
 
       # World Inequality Database
-  # archived; last active in 437fae3a39e0 on 2026-01-20
   data://meadow/wid/2025-03-14/world_inequality_database:
     - snapshot://wid/2025-03-14/world_inequality_database_with_extrapolations.csv
     - snapshot://wid/2025-03-14/world_inequality_database_distribution.csv
@@ -326,46 +256,37 @@ steps:
     - snapshot://wid/2025-03-14/world_inequality_database.csv
     - snapshot://wid/2025-03-14/world_inequality_database_fiscal.csv
     - data://garden/regions/2023-01-01/regions
-  # archived; last active in 437fae3a39e0 on 2026-01-20
   data://garden/wid/2025-03-14/world_inequality_database:
     - data://meadow/wid/2025-03-14/world_inequality_database
-  # archived; last active in 437fae3a39e0 on 2026-01-20
   data://grapher/wid/2025-03-14/world_inequality_database:
     - data://garden/wid/2025-03-14/world_inequality_database
 
     # PIP
       # Dimensional PIP pipeline
-  # archived; last active in c824356bee82 on 2026-01-27
   data://garden/wb/2025-10-09/world_bank_pip:
     # - data://meadow/wb/2025-10-09/world_bank_pip
-  # archived; last active in c824356bee82 on 2026-01-27
   data://grapher/wb/2025-10-09/world_bank_pip:
     - data://garden/wb/2025-10-09/world_bank_pip
 
   #
   # Luxembourg Income Study
   #
-  # archived; last active in 4c4cca6ea64b on 2026-03-16
   data://meadow/lis/2025-12-12/luxembourg_income_study:
     - snapshot://lis/2025-12-12/lis_incomes.csv
     - snapshot://lis/2025-12-12/lis_absolute_poverty.csv
     - snapshot://lis/2025-12-12/lis_inequality.csv
     - snapshot://lis/2025-12-12/lis_relative_poverty.csv
-  # archived; last active in 4c4cca6ea64b on 2026-03-16
   data://garden/lis/2025-12-12/luxembourg_income_study:
     - data://meadow/lis/2025-12-12/luxembourg_income_study
-  # archived; last active in 4c4cca6ea64b on 2026-03-16
   data://grapher/lis/2025-12-12/luxembourg_income_study:
     - data://garden/lis/2025-12-12/luxembourg_income_study
 
   # SEDLAC Grapher step
-  # archived; last active in d97ebec30f1c on 2026-03-16
   data://grapher/cedlas/2025-04-01/sedlac:
     - data://garden/cedlas/2025-04-01/sedlac
 
 
   # WID
-  # archived; last active in 890dd07e5b81 on 2026-03-17
   data://meadow/wid/2026-01-02/world_inequality_database:
     - snapshot://wid/2026-01-02/world_inequality_database_with_extrapolations.csv
     - data://garden/regions/2023-01-01/regions
@@ -373,121 +294,54 @@ steps:
     - snapshot://wid/2026-01-02/world_inequality_database.csv
     - snapshot://wid/2026-01-02/world_inequality_database_distribution.csv
     - snapshot://wid/2026-01-02/world_inequality_database_distribution_with_extrapolations.csv
-  # archived; last active in 890dd07e5b81 on 2026-03-17
   data://garden/wid/2026-01-12/world_inequality_database:
     - data://meadow/wid/2026-01-02/world_inequality_database
-  # archived; last active in 890dd07e5b81 on 2026-03-17
   data://grapher/wid/2026-01-12/world_inequality_database:
     - data://garden/wid/2026-01-12/world_inequality_database
 
-  # archived; last active in 890dd07e5b81 on 2026-03-17
   data://garden/wid/2026-01-02/world_inequality_database_legacy:
     - data://meadow/wid/2026-01-02/world_inequality_database
 
   # PIP
-  # archived; last active in ed23d2616289 on 2026-04-13
   data://meadow/wb/2025-10-09/world_bank_pip:
     - snapshot://wb/2025-10-09/world_bank_pip.csv
     - snapshot://wb/2025-10-09/world_bank_pip_percentiles.csv
-  # archived; last active in ed23d2616289 on 2026-04-13
   data://garden/wb/2026-01-22/world_bank_pip:
     - data://meadow/wb/2025-10-09/world_bank_pip
-  # archived; last active in ed23d2616289 on 2026-04-13
   data://grapher/wb/2026-01-22/world_bank_pip:
     - data://garden/wb/2026-01-22/world_bank_pip
-  # archived; last active in ed23d2616289 on 2026-04-13
   data://garden/wb/2025-10-09/world_bank_pip_legacy:
     - data://meadow/wb/2025-10-09/world_bank_pip
 
   # 1000 Binned Global Distribution (World Bank PIP)
-  # archived; last active in ed23d2616289 on 2026-04-13
   data://meadow/wb/2025-10-13/thousand_bins_distribution:
     - snapshot://wb/2025-10-13/thousand_bins_distribution.dta
-  # archived; last active in ed23d2616289 on 2026-04-13
   data://garden/wb/2025-10-13/thousand_bins_distribution:
     - data://meadow/wb/2025-10-13/thousand_bins_distribution
 
   # Poverty projections in 2021 prices up to 2050
-  # archived; last active in ed23d2616289 on 2026-04-13
   data://meadow/wb/2025-11-10/poverty_projections:
     - snapshot://wb/2025-11-10/poverty_projections.dta
-  # archived; last active in ed23d2616289 on 2026-04-13
   data://garden/wb/2025-11-10/poverty_projections:
     - data://meadow/wb/2025-11-10/poverty_projections
-  # archived; last active in ed23d2616289 on 2026-04-13
   data://grapher/wb/2025-11-10/poverty_projections:
     - data://garden/wb/2025-11-10/poverty_projections
 
   # # OECD Income Distribution Database
-  # archived; last active in 2a4f373a0092 on 2026-04-23
   data://meadow/oecd/2025-04-16/income_distribution_database:
     - snapshot://oecd/2025-04-16/income_distribution_database.csv
-  # archived; last active in 2a4f373a0092 on 2026-04-23
   data://garden/oecd/2025-04-16/income_distribution_database:
     - data://meadow/oecd/2025-04-16/income_distribution_database
-  # archived; last active in 2a4f373a0092 on 2026-04-23
   data://grapher/oecd/2025-04-16/income_distribution_database:
-    - data://garden/oecd/2025-04-16/income_distribution_database  # archived; last active in f99f4cffc495 on 2024-04-15
-  data://grapher/wb/2024-01-17/world_bank_pip_2011ppp:
-    - data://garden/wb/2024-01-17/world_bank_pip
-  # archived; last active in f99f4cffc495 on 2024-04-15
-  data://meadow/wb/2024-01-17/world_bank_pip:
-    - snapshot://wb/2024-01-17/world_bank_pip.csv
-    - snapshot://wb/2024-01-17/world_bank_pip_percentiles.csv
-  # archived; last active in f99f4cffc495 on 2024-04-15
-  data://grapher/wb/2024-01-17/world_bank_pip_2017ppp:
-    - data://garden/wb/2024-01-17/world_bank_pip
-  # archived; last active in f99f4cffc495 on 2024-04-15
-  data://garden/wb/2024-01-17/world_bank_pip:
-    - data://meadow/wb/2024-01-17/world_bank_pip
-  # archived; last active in 85c3dbbd5ee2 on 2024-05-28
-  data://grapher/wid/2023-08-24/world_inequality_database:
-    - data://garden/wid/2023-08-24/world_inequality_database
-  # archived; last active in 85c3dbbd5ee2 on 2024-05-28
-  data://meadow/wid/2023-08-24/world_inequality_database:
-    - snapshot://wid/2023-08-24/world_inequality_database_distribution.csv
-    - snapshot://wid/2023-08-24/world_inequality_database_with_extrapolations.csv
-    - snapshot://wid/2023-08-24/world_inequality_database.csv
-    - snapshot://wid/2023-08-24/world_inequality_database_distribution_with_extrapolations.csv
-    - data://garden/regions/2023-01-01/regions
-  # archived; last active in 85c3dbbd5ee2 on 2024-05-28
-  data://garden/wid/2023-08-24/world_inequality_database:
-    - data://meadow/wid/2023-08-24/world_inequality_database
-  # archived; last active in a499eb5d3940 on 2025-02-06
-  data://explorers/poverty_inequality/latest/poverty_inequality_export:
-    - data://garden/wb/2024-01-22/thousand_bins_distribution
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-    - data://garden/wb/2024-10-07/world_bank_pip
-    - data://garden/wid/2024-05-24/world_inequality_database
-    - data://garden/lis/2025-01-24/luxembourg_income_study
-  # archived; last active in d8781876ce85 on 2025-02-24
-  data://garden/wid/2024-11-19/world_inequality_database:
-    - data://meadow/wid/2024-11-19/world_inequality_database
-  # archived; last active in d8781876ce85 on 2025-02-24
-  data://meadow/wid/2024-11-19/world_inequality_database:
-    - snapshot://wid/2024-11-19/world_inequality_database.csv
-    - snapshot://wid/2024-11-19/world_inequality_database_with_extrapolations.csv
-    - snapshot://wid/2024-11-19/world_inequality_database_distribution.csv
-    - snapshot://wid/2024-11-19/world_inequality_database_distribution_with_extrapolations.csv
-    - snapshot://wid/2024-11-19/world_inequality_database_fiscal.csv
-    - data://garden/regions/2023-01-01/regions
-  # archived; last active in d8781876ce85 on 2025-02-24
-  data://grapher/wid/2024-11-19/world_inequality_database:
-    - data://garden/wid/2024-11-19/world_inequality_database
-  # archived; last active in 4539258403f8 on 2025-02-25
-  data://garden/wid/2025-02-25/world_inequality_database:
-    - data://meadow/wid/2025-02-25/world_inequality_database
-  # archived; last active in 4539258403f8 on 2025-02-25
-  data://meadow/wid/2025-02-25/world_inequality_database:
-    - snapshot://wid/2025-02-25/world_inequality_database_with_extrapolations.csv
-    - snapshot://wid/2025-02-25/world_inequality_database_fiscal.csv
-    - data://garden/regions/2023-01-01/regions
-    - snapshot://wid/2025-02-25/world_inequality_database_distribution_with_extrapolations.csv
-    - snapshot://wid/2025-02-25/world_inequality_database_distribution.csv
-    - snapshot://wid/2025-02-25/world_inequality_database.csv
-  # archived; last active in 4539258403f8 on 2025-02-25
-  data://grapher/wid/2025-02-25/world_inequality_database:
-    - data://garden/wid/2025-02-25/world_inequality_database
-  # archived; last active in 84c142b71404 on 2026-02-11
-  export://multidim/wb/latest/world_bank_pip:
-    - data://grapher/wb/2026-01-22/world_bank_pip
+    - data://garden/oecd/2025-04-16/income_distribution_database
+
+  # Luxembourg Income Study
+  data://meadow/lis/2026-03-16/luxembourg_income_study:
+    - snapshot://lis/2026-03-16/lis_incomes.csv
+    - snapshot://lis/2026-03-16/lis_relative_poverty.csv
+    - snapshot://lis/2026-03-16/lis_absolute_poverty.csv
+    - snapshot://lis/2026-03-16/lis_inequality.csv
+  data://garden/lis/2026-03-16/luxembourg_income_study:
+    - data://meadow/lis/2026-03-16/luxembourg_income_study
+  data://grapher/lis/2026-03-16/luxembourg_income_study:
+    - data://garden/lis/2026-03-16/luxembourg_income_study

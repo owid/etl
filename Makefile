@@ -6,9 +6,9 @@
 
 include default.mk
 
-SRC = etl snapshots apps api_search tests docs owid_mcp
+SRC = etl snapshots apps api_search tests docs owid_mcp owl_steps lib/owl/owl
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
-LIBS = lib/*
+LIBS = lib/catalog lib/datautils lib/owl lib/repack
 
 help:
 	@echo 'Available commands:'

@@ -124,12 +124,16 @@ def _extract_old_format(pdf_bytes: bytes, source: str) -> list[dict]:
         # Some PDFs (Q4 FY21) lose segment names from rows whose label wraps
         # across two lines. Reconstruct by listing the canonical segment order
         # and filling nan rows with the ones missing from the table — skipping
-        # any segments already labelled to avoid double-assignment.
+        # any segments already labelled to avoid double-assignment. A segment
+        # is considered present if every word of its label appears anywhere on
+        # the page text (this handles wrapped labels like
+        # "Professional\n<values>\nVisualization" where the words aren't
+        # adjacent in the rendered text).
         if df.iloc[:, 0].isna().any():
             text = page.extract_text() or ""
             seg_order = ["Gaming", "Professional Visualization", "Data Center", "Auto", "OEM & Other", "TOTAL"]
             already_labelled = {str(s) for s in df.iloc[:, 0].dropna()}
-            pending = [s for s in seg_order if s not in already_labelled and s in text]
+            pending = [s for s in seg_order if s not in already_labelled and all(w in text for w in s.split())]
             for nan_idx, seg in zip(df.index[df.iloc[:, 0].isna()].tolist(), pending):
                 df.iloc[nan_idx, 0] = seg
 
@@ -252,6 +256,32 @@ def extract_nvidia_revenue() -> pd.DataFrame:
     missing = sorted(set(PDF_URLS) - set(df["source_pdf"].unique()))
     if missing:
         raise ValueError(f"Snapshot would be missing data from these source PDFs: {missing}")
+
+    # Sanity check: for each (source_pdf, quarter) two invariants must hold:
+    #   1. Sum of top-level segments equals NVIDIA's published TOTAL.
+    #   2. In the new presentation, Hyperscale + ACIE equals Data Center.
+    # These catch row-shift extraction bugs that mislabel segments without
+    # changing the row count — they would otherwise propagate silently.
+    DC_SUB_ROWS = {"Hyperscale", "AI Clouds, Industrial, & Enterprise"}
+    bad: list[str] = []
+    for (src, q), g in df.groupby(["source_pdf", "quarter"]):
+        seg_values = g.set_index("segment")["revenue_millions"]
+        total_keys = [k for k in ("TOTAL", "Total") if k in seg_values.index]
+        if not total_keys:
+            bad.append(f"{src}/{q}: no TOTAL row")
+            continue
+        reported_total = seg_values[total_keys[0]]
+        summed = seg_values.drop(total_keys + [s for s in DC_SUB_ROWS if s in seg_values.index]).sum()
+        if abs(summed - reported_total) > 0.5:
+            bad.append(f"{src}/{q}: sum of segments = {summed:.0f}, but TOTAL row = {reported_total:.0f}")
+        if DC_SUB_ROWS.issubset(seg_values.index):
+            dc_sub_sum = seg_values[list(DC_SUB_ROWS)].sum()
+            dc_total = seg_values.get("Data Center", float("nan"))
+            if pd.isna(dc_total) or abs(dc_sub_sum - dc_total) > 0.5:
+                bad.append(f"{src}/{q}: Hyperscale + ACIE = {dc_sub_sum:.0f}, but Data Center = {dc_total:.0f}")
+    if bad:
+        raise ValueError("PDF extraction integrity check failed:\n  " + "\n  ".join(bad))
+
     log.info("extraction_complete", rows=len(df), sources=df["source_pdf"].nunique(), segments=df["segment"].nunique())
     return df
 
