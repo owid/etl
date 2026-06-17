@@ -1,8 +1,9 @@
 # Curated items for the food-trade visualization.
 #
 # Selection: FAO 'crops & livestock products' (QCL) commodities that are meaningfully traded
-# (ranked by number of bilateral flows, tonnage and value), excluding non-food items, residual
-# 'n.e.c.' aggregates, and items too obscure to be widely recognised. One form per commodity.
+# (ranked by number of bilateral flows, tonnage and value), plus widely-recognised processed
+# foods (bread, pasta, chocolate, ...). Excludes non-food, residual 'n.e.c.' aggregates, and
+# items too obscure to be widely recognised. One form per commodity.
 #
 # Each entry:
 #   display:    name shown in the visualization dropdown
@@ -12,10 +13,6 @@ items:
   - display: Almonds
     item_code: 221
     fao_item: Almonds, in shell
-  # Commented out: a grab-bag of several distinct spices, not a single recognisable item.
-  # - display: Anise, cumin and similar spices
-  #   item_code: 711
-  #   fao_item: Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw
   - display: Apples
     item_code: 515
     fao_item: Apples
@@ -52,13 +49,15 @@ items:
   - display: Brazil nuts
     item_code: 216
     fao_item: Brazil nuts, in shell
+  - display: Bread
+    item_code: 20
+    fao_item: Bread
+  - display: Breakfast cereals
+    item_code: 41
+    fao_item: Breakfast cereals
   - display: Broad beans
     item_code: 181
     fao_item: Broad beans and horse beans, dry
-  # Commented out: duplicate of "Broad beans" (the dry form, item 181) in a less-traded green form.
-  # - display: Broad beans (green)
-  #   item_code: 420
-  #   fao_item: Broad beans and horse beans, green
   - display: Buckwheat
     item_code: 89
     fao_item: Buckwheat
@@ -98,6 +97,12 @@ items:
   - display: Chillies and peppers
     item_code: 401
     fao_item: Chillies and peppers, green (Capsicum spp. and Pimenta spp.)
+  - display: Chocolate
+    item_code: 666
+    fao_item: Chocolate products nes
+  - display: Cider
+    item_code: 517
+    fao_item: Cider and other fermented beverages
   - display: Cinnamon
     item_code: 693
     fao_item: Cinnamon and cinnamon-tree flowers, raw
@@ -107,15 +112,18 @@ items:
   - display: Cocoa beans
     item_code: 661
     fao_item: Cocoa beans
+  - display: Cocoa powder
+    item_code: 665
+    fao_item: Cocoa powder and cake
   - display: Coconut oil
     item_code: 252
     fao_item: Coconut oil
   - display: Coconuts
     item_code: 249
     fao_item: Coconuts, in shell
-  - display: Maize oil
-    item_code: 60
-    fao_item: Oil of maize
+  - display: Confectionery
+    item_code: 168
+    fao_item: Sugar confectionery
   - display: Cowpeas
     item_code: 195
     fao_item: Cow peas, dry
@@ -173,6 +181,9 @@ items:
   - display: Green coffee
     item_code: 656
     fao_item: Coffee, green
+  - display: Green maize
+    item_code: 446
+    fao_item: Green corn (maize)
   - display: Green peas
     item_code: 417
     fao_item: Peas, green
@@ -188,6 +199,12 @@ items:
   - display: Honey
     item_code: 1182
     fao_item: Natural honey
+  - display: Ice cream
+    item_code: 910
+    fao_item: Ice cream and other edible ice
+  - display: Infant food
+    item_code: 109
+    fao_item: Infant food
   - display: Kiwi
     item_code: 592
     fao_item: Kiwi fruit
@@ -212,6 +229,12 @@ items:
   - display: Maize
     item_code: 56
     fao_item: Maize (corn)
+  - display: Maize flour
+    item_code: 58
+    fao_item: Flour of maize
+  - display: Maize oil
+    item_code: 60
+    fao_item: Oil of maize
   - display: Mangoes
     item_code: 571
     fao_item: Mangoes, guavas and mangosteens
@@ -239,10 +262,6 @@ items:
   - display: Mustard seed
     item_code: 292
     fao_item: Mustard seed
-  # Commented out: lumps three distinct spices (nutmeg, mace, cardamom) into one item.
-  # - display: Nutmeg and cardamom
-  #   item_code: 702
-  #   fao_item: Nutmeg, mace, cardamoms, raw
   - display: Oats
     item_code: 75
     fao_item: Oats
@@ -258,6 +277,9 @@ items:
   - display: Onions
     item_code: 403
     fao_item: Onions and shallots, dry (excluding dehydrated)
+  - display: Orange juice
+    item_code: 491
+    fao_item: Orange juice
   - display: Oranges
     item_code: 490
     fao_item: Oranges
@@ -273,6 +295,9 @@ items:
   - display: Papayas
     item_code: 600
     fao_item: Papayas
+  - display: Pasta
+    item_code: 18
+    fao_item: Uncooked pasta, not stuffed or otherwise prepared
   - display: Peaches and nectarines
     item_code: 534
     fao_item: Peaches and nectarines
@@ -327,6 +352,9 @@ items:
   - display: Rice
     item_code: 27
     fao_item: Rice
+  - display: Roasted coffee
+    item_code: 657
+    fao_item: Coffee, decaffeinated or roasted
   - display: Rye
     item_code: 71
     fao_item: Rye
@@ -357,6 +385,9 @@ items:
   - display: Spinach
     item_code: 373
     fao_item: Spinach
+  - display: Spirits
+    item_code: 634
+    fao_item: Undenatured ethyl alcohol of an alcoholic strength by volume of less than 80% vol; spirits, liqueurs and other spirituous beverages
   - display: Spring onions
     item_code: 402
     fao_item: Onions and shallots, green
@@ -378,9 +409,6 @@ items:
   - display: Sunflower seed
     item_code: 267
     fao_item: Sunflower seed
-  - display: Green maize
-    item_code: 446
-    fao_item: Green corn (maize)
   - display: Sweet potatoes
     item_code: 122
     fao_item: Sweet potatoes
@@ -393,6 +421,9 @@ items:
   - display: Tea
     item_code: 667
     fao_item: Tea leaves
+  - display: Tomato paste
+    item_code: 391
+    fao_item: Paste of tomatoes
   - display: Tomatoes
     item_code: 388
     fao_item: Tomatoes
@@ -411,6 +442,9 @@ items:
   - display: Wheat
     item_code: 15
     fao_item: Wheat
+  - display: Wheat flour
+    item_code: 16
+    fao_item: Wheat and meslin flour
   - display: Wine
     item_code: 564
     fao_item: Wine
@@ -420,3 +454,11 @@ items:
   - display: Yoghurt
     item_code: 891
     fao_item: Yoghurt
+
+# Excluded items (uncomment to re-enable):
+#   Anise (a grab-bag of several distinct spices, not a single recognisable item)
+#   - {display: ..., item_code: 711, fao_item: Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw}
+#   Nutmeg (lumps three distinct spices (nutmeg, mace, cardamom) into one item)
+#   - {display: ..., item_code: 702, fao_item: Nutmeg, mace, cardamoms, raw}
+#   Broad beans and horse beans (duplicate of "Broad beans" (the dry form, item 181))
+#   - {display: ..., item_code: 420, fao_item: Broad beans and horse beans, green}
