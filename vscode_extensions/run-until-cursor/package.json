@@ -8,8 +8,12 @@
   "engines": {
     "vscode": "^1.97.0"
   },
-  "categories": ["Other"],
-  "activationEvents": ["onCommand:extension.runUntilCursor"],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.runUntilCursor"
+  ],
   "contributes": {
     "commands": [
       {
@@ -33,6 +37,6 @@
   },
   "devDependencies": {
     "@types/vscode": "^1.97.0",
-    "esbuild": "^0.27.7"
+    "esbuild": "^0.28.1"
   }
 }
