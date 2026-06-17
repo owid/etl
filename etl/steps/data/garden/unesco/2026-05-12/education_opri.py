@@ -376,7 +376,6 @@ def add_ner_from_oosr(tb_opri: Table, tb_sdgs: Table) -> Table:
     return result
 
 
-
 def drop_outliers(tb):
     """Remove implausible values from the pivoted OPRI table and log each removal.
 
