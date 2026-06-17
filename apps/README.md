@@ -8,7 +8,8 @@ Tooling built around the ETL pipeline. Most are exposed as subcommands of the un
 |---|---|---|
 | [`wizard`](wizard/) | Streamlit UI for browsing data, editing metadata, and running ETL workflows | `etlwiz` |
 | [`browser`](browser/) | Interactive terminal browser for steps and snapshots (the default UI of bare `etl`) | `etl` |
-| [`step_update`](step_update/) | Create new versions of existing steps and archive old ones | `etl update` / `etl archive` |
+| [`step_update`](step_update/) | Create new versions of existing steps | `etl update` |
+| [`archive_dag`](archive_dag/) | Reconstruct the archive DAG from git history of the active DAG | `etl archive-dag` |
 | [`pr`](pr/) | Create a draft PR + staging server for the current branch | `etl pr` |
 | [`chart_sync`](chart_sync/) | Sync chart configs between staging and production | `etl chart-sync` |
 | [`chart_approval`](chart_approval/) | Auto-approve chart diffs where staging matches production | `etl approve` |

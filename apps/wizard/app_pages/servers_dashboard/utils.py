@@ -2,6 +2,7 @@
 
 import json
 import subprocess
+import time
 from datetime import datetime, timezone
 from typing import Any
 
@@ -481,7 +482,48 @@ def start_server(server_name: str) -> tuple[bool, str]:
     """
     cmd = f"LXC_HOST={LXC_HOST} owid-lxc start {server_name}"
     # Starting also runs a tailscale login and a short readiness delay, so allow time.
-    return _run_lxc_command(cmd, server_name, action="start", timeout=180)
+    ok, msg = _run_lxc_command(cmd, server_name, action="start", timeout=180)
+    if not ok:
+        return ok, msg
+
+    # `owid-lxc start` re-authenticates the container to Tailscale, but that step can fail
+    # silently (it's only a warning in owid-lxc). When it does, the container is Running but
+    # logged out of Tailscale, so its hostname doesn't resolve and admin/SSH are unreachable —
+    # the wake looks successful but the server is effectively dead. Verify it actually rejoined
+    # the tailnet and report honestly instead of a misleading success.
+    if _is_on_tailnet(server_name):
+        return True, f"Server {server_name} is awake and on the tailnet."
+    return False, (
+        f"Server {server_name} started, but it is NOT on the Tailscale network, so it's "
+        "unreachable by hostname (admin/SSH won't work). Tailscale failed to re-authenticate on "
+        "wake. Try waking it again; if it keeps failing, Tailscale must be re-authenticated on the host."
+    )
+
+
+def _is_on_tailnet(server_name: str, attempts: int = 3, delay: int = 5) -> bool:
+    """
+    Return True if the container is logged into Tailscale (has a 100.x tailnet IP).
+
+    Uses ``owid-lxc exec`` (host-level ``lxc exec``, which works even when Tailscale is down), so
+    it can distinguish a container that's running-and-on-the-tailnet from one that started but
+    failed its Tailscale login. Retries briefly to absorb the race right after start.
+    """
+    for attempt in range(attempts):
+        try:
+            result = subprocess.run(
+                f"LXC_HOST={LXC_HOST} owid-lxc exec {server_name} -- tailscale ip -4",
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            if result.returncode == 0 and result.stdout.strip().startswith("100."):
+                return True
+        except subprocess.TimeoutExpired:
+            log.warning("Tailscale check timed out", server=server_name, attempt=attempt)
+        if attempt < attempts - 1:
+            time.sleep(delay)
+    return False
 
 
 def stop_server(server_name: str) -> tuple[bool, str]:
