@@ -64,13 +64,15 @@ MAX_SUPPLY_BLANKED_SHARE = 0.20
 def sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
     """Validate the items config structurally and against the TM snapshot.
 
-    `tm_items` maps each TM item code to its FAO item name in the current snapshot.
+    `tm_items` maps each item code present in the year's quantity (tonnes) trade flows to its
+    FAO item name.
 
     Checks:
       1. Required top-level shape: a single 'items' list.
       2. Each items entry has required fields (display, item_code, fao_item).
       3. display names are unique.
-      4. Each item_code exists in the TM snapshot (catches typos / removed codes).
+      4. Each item_code appears among the year's quantity (tonnes) trade flows (catches typos,
+         removed codes, or items with no traded quantity that we couldn't show anyway).
       5. Each code's FAO item name still matches the expected `fao_item` (catches FAO
          silently reassigning or renaming a code to a different commodity).
     """
@@ -80,6 +82,7 @@ def sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
 
     required = {"display", "item_code", "fao_item"}
     for entry in items:
+        assert isinstance(entry, dict), f"items entry must be a mapping, got {entry!r}"
         missing = required - entry.keys()
         assert not missing, f"items entry missing keys {sorted(missing)}: {entry}"
 
@@ -88,7 +91,10 @@ def sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
     assert not dupes, f"Duplicate display names in items config: {dupes}"
 
     missing_codes = sorted(int(e["item_code"]) for e in items if int(e["item_code"]) not in tm_items)
-    assert not missing_codes, f"{len(missing_codes)} item_code(s) not found in TM snapshot: {missing_codes[:10]}"
+    assert not missing_codes, (
+        f"{len(missing_codes)} item_code(s) have no quantity (tonnes) trade in the TM snapshot "
+        f"for the selected year: {missing_codes[:10]}"
+    )
 
     renamed = [
         f"{e['item_code']}: expected {e['fao_item']!r}, TM has {tm_items[int(e['item_code'])]!r}"
@@ -217,7 +223,8 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     observed = importer_supply["observed_inbound"].fillna(0).to_numpy(dtype="float64")
     uncorroborated = scl_import < MIN_IMPORT_COVERAGE * observed
     has_supply = importer_supply["importer_supply"].notna().to_numpy()
-    blanked_share = (uncorroborated & has_supply).sum() / has_supply.sum()
+    n_supply = int(has_supply.sum())
+    blanked_share = int((uncorroborated & has_supply).sum()) / n_supply if n_supply else 0.0
     assert blanked_share <= MAX_SUPPLY_BLANKED_SHARE, (
         f"Import gate blanked {blanked_share:.0%} of domestic-supply values (> {MAX_SUPPLY_BLANKED_SHARE:.0%}); "
         "SCL imports and observed trade have diverged unexpectedly — investigate before trusting the output."

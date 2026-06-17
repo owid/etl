@@ -87,7 +87,6 @@ def run() -> None:
     tb = tb.rename(columns=COLUMN_RENAMES, errors="raise")
 
     # Harmonize reporter and partner country names.
-    # paths.regions.harmonizer(tb=tb, country_col="partner_country", institution="FAO")
     tb = paths.regions.harmonize_names(tb=tb, country_col="reporter_country", warn_on_unused_countries=False)
     tb = paths.regions.harmonize_names(tb=tb, country_col="partner_country", warn_on_unused_countries=False)
 

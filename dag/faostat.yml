@@ -224,8 +224,8 @@ steps:
   data://garden/faostat/2026-05-07/food_trade:
     - data://garden/faostat/2026-05-07/faostat_tm
     - data://garden/faostat/2026-02-25/faostat_scl
-  # Thin S3 export step: load the garden table, rename to the viz-facing CamelCase
-  # schema, write CSV, upload to s3://owid-public/food-trade/trade.csv.
+  # S3 export step: load the garden table and write a metadata JSON plus one JSON per product
+  # under s3://owid-public/data/food-trade/, for the bespoke viz to fetch.
   export://s3/faostat/latest/food_trade:
     - data://garden/faostat/2026-05-07/food_trade
   ######################################################################################################################
