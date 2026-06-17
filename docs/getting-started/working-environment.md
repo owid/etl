@@ -226,6 +226,17 @@ If you need to (re)activate it manually:
 make install-hooks
 ```
 
+## GitHub Actions
+
+We use [:octicons-link-external-16: pinact](https://github.com/suzuki-shunsuke/pinact)
+to manage GitHub Actions and workflow versions. Action references in
+`.github/workflows/*` and `.github/actions/*` should be pinned to immutable commit SHAs
+with a version comment, rather than to a mutable tag like `@v5`. Pinning to a SHA means a
+compromised or retagged action can't silently change what runs in our CI, while the
+trailing comment keeps the human-readable version visible.
+
+Run `pinact run -update` to update and pin every action and workflow in the repository.
+
 ## VSCode setup
 
 ### Recommended extensions
