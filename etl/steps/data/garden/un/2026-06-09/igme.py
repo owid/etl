@@ -99,7 +99,7 @@ def run() -> None:
     tb = tb.drop(columns=["source", "lower_bound", "upper_bound"])
 
     # sanity check (uncomment when updating)
-    sanity_checks(tb)
+    # sanity_checks(tb)
 
     tb = tb.format(
         ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"],

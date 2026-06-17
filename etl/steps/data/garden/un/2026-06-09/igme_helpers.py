@@ -190,6 +190,11 @@ def check_expected_changes(changes, country: str):
         # https://en.wikipedia.org/wiki/Guatemalan_genocide
         changes = changes[~((changes["year"] >= 1982) & (changes["year"] <= 1983))]
 
+    elif country == "Guinea-Bissau":
+        # 1997–2000: Guinea-Bissau Civil War
+        # https://en.wikipedia.org/wiki/Guinea-Bissau_Civil_War
+        changes = changes[~((changes["year"] >= 1997) & (changes["year"] <= 2000))]
+
     elif country == "Haiti":
         # 2010–2011: Haiti earthquake (~100,000–300,000 deaths)
         # https://en.wikipedia.org/wiki/2010_Haiti_earthquake
@@ -446,5 +451,15 @@ def check_expected_changes(changes, country: str):
         # 2015–2022: Yemeni Civil War
         # https://en.wikipedia.org/wiki/Yemeni_Civil_War_(2014%E2%80%93present)
         changes = changes[~((changes["year"] >= 2015) & (changes["year"] <= 2022))]
+
+    elif country == "Botswana":
+        # 2001–2011: Tail end of AIDS epidemic
+        # https://ourworldindata.org/grapher/number-of-children-newly-infected-with-hiv?tab=line&country=SWZ~LSO~BWA&mapSelect=SWZ~LSO~BWA
+        changes = changes[~((changes["year"] >= 2001) & (changes["year"] <= 2011))]
+
+    elif country == "Eswatini":
+        # 2011–2014: Tail end of AIDS epidemic
+        # https://ourworldindata.org/grapher/number-of-children-newly-infected-with-hiv?tab=line&country=SWZ~LSO~BWA&mapSelect=SWZ~LSO~BWA
+        changes = changes[~((changes["year"] >= 2011) & (changes["year"] <= 2014))]
 
     return changes
