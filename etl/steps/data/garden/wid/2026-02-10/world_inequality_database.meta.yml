@@ -395,9 +395,9 @@ definitions:
     <%- endif %>
     <%- endif %>
 
-  # Map color scheme for the top-share indicators (share_top_1, share_top_10): wealth uses Purples,
-  # matching the published wealth-share charts, while the income welfare types keep OrRd.
-  color_scheme_top_share: &color_scheme_top_share <% if welfare_type == "wealth" %>Purples<% else %>OrRd<% endif %>
+  # Map color scheme for the share indicators (share_top_1, share_top_10, and the per-quantile share):
+  # wealth uses Purples, matching the published wealth-share charts, while the income welfare types keep OrRd.
+  color_scheme_share: &color_scheme_share <% if welfare_type == "wealth" %>Purples<% else %>OrRd<% endif %>
 
   map_brackets_thr: &map_brackets_thr |-
     <% if period == "year" %>
@@ -724,7 +724,7 @@ tables:
               min: 0
             map:
               colorScale:
-                baseColorScheme: *color_scheme_top_share
+                baseColorScheme: *color_scheme_share
                 binningStrategy: "manual"
                 customNumericValues: <% set quantile = "10" %> {definitions.map_brackets_share}
             selectedEntityNames: *entity_names_inequality
@@ -756,7 +756,7 @@ tables:
               min: 0
             map:
               colorScale:
-                baseColorScheme: *color_scheme_top_share
+                baseColorScheme: *color_scheme_share
                 binningStrategy: "manual"
                 customNumericValues: <% set quantile = "Richest 1%" %> {definitions.map_brackets_share}
             selectedEntityNames: *entity_names_inequality
@@ -977,7 +977,7 @@ tables:
               min: 0
             map:
               colorScale:
-                baseColorScheme: "OrRd"
+                baseColorScheme: *color_scheme_share
                 binningStrategy: "manual"
                 customNumericValues: *map_brackets_share
             selectedEntityNames: *entity_names_inequality
