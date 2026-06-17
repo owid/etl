@@ -12,9 +12,10 @@ items:
   - display: Almonds
     item_code: 221
     fao_item: Almonds, in shell
-  - display: Anise, cumin and similar spices
-    item_code: 711
-    fao_item: Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw
+  # Commented out: a grab-bag of several distinct spices, not a single recognisable item.
+  # - display: Anise, cumin and similar spices
+  #   item_code: 711
+  #   fao_item: Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw
   - display: Apples
     item_code: 515
     fao_item: Apples
@@ -54,9 +55,10 @@ items:
   - display: Broad beans
     item_code: 181
     fao_item: Broad beans and horse beans, dry
-  - display: Broad beans (green)
-    item_code: 420
-    fao_item: Broad beans and horse beans, green
+  # Commented out: duplicate of "Broad beans" (the dry form, item 181) in a less-traded green form.
+  # - display: Broad beans (green)
+  #   item_code: 420
+  #   fao_item: Broad beans and horse beans, green
   - display: Buckwheat
     item_code: 89
     fao_item: Buckwheat
@@ -201,7 +203,7 @@ items:
   - display: Lettuce
     item_code: 372
     fao_item: Lettuce and chicory
-  - display: Linseed (flax)
+  - display: Linseed
     item_code: 333
     fao_item: Linseed
   - display: Linseed oil
@@ -237,9 +239,10 @@ items:
   - display: Mustard seed
     item_code: 292
     fao_item: Mustard seed
-  - display: Nutmeg and cardamom
-    item_code: 702
-    fao_item: Nutmeg, mace, cardamoms, raw
+  # Commented out: lumps three distinct spices (nutmeg, mace, cardamom) into one item.
+  # - display: Nutmeg and cardamom
+  #   item_code: 702
+  #   fao_item: Nutmeg, mace, cardamoms, raw
   - display: Oats
     item_code: 75
     fao_item: Oats
