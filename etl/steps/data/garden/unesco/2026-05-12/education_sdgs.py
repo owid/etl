@@ -210,9 +210,11 @@ def consolidate_world_entries(tb: Table) -> Table:
     tb_keep_as_is = tb_world[~tb_world["_consolidate"]].drop(columns=["_consolidate"])
 
     if not tb_to_consolidate.empty:
-        # Keep one row per group, preferring non-null values
-        tb_to_consolidate = tb_to_consolidate.sort_values("value", na_position="last")
+        # Keep one row per group, preferring non-null values from the highest-priority source
+        tb_to_consolidate["_priority"] = tb_to_consolidate["country"].map(_WORLD_PRIORITY).fillna(len(_WORLD_VARIANTS))
+        tb_to_consolidate = tb_to_consolidate.sort_values(["_priority", "value"], na_position="last")
         tb_to_consolidate = tb_to_consolidate.drop_duplicates(subset=["year", "indicator_id"], keep="first")
+        tb_to_consolidate = tb_to_consolidate.drop(columns=["_priority"])
         if hasattr(tb_to_consolidate["country"].dtype, "categories"):
             tb_to_consolidate["country"] = tb_to_consolidate["country"].astype(str)
         tb_to_consolidate["country"] = "World"

@@ -7,6 +7,7 @@ from etl.helpers import PathFinder
 
 # World source variants as they appear after country harmonization
 _WORLD_VARIANTS = ["World (UIS)", "World (SDG)", "World (WB)", "World (UNICEF)", "World (MDG)"]
+_WORLD_PRIORITY = {w: i for i, w in enumerate(_WORLD_VARIANTS)}
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -53,9 +54,11 @@ def consolidate_world_entries(tb: Table) -> Table:
     tb_keep_as_is = tb_world[~tb_world["_consolidate"]].drop(columns=["_consolidate"])
 
     if not tb_to_consolidate.empty:
-        # Keep one row per group, preferring non-null values
-        tb_to_consolidate = tb_to_consolidate.sort_values("value", na_position="last")
+        # Keep one row per group, preferring non-null values from the highest-priority source
+        tb_to_consolidate["_priority"] = tb_to_consolidate["country"].map(_WORLD_PRIORITY).fillna(len(_WORLD_VARIANTS))
+        tb_to_consolidate = tb_to_consolidate.sort_values(["_priority", "value"], na_position="last")
         tb_to_consolidate = tb_to_consolidate.drop_duplicates(subset=["year", "indicator_id"], keep="first")
+        tb_to_consolidate = tb_to_consolidate.drop(columns=["_priority"])
         if hasattr(tb_to_consolidate["country"].dtype, "categories"):
             tb_to_consolidate["country"] = tb_to_consolidate["country"].astype(str)
         tb_to_consolidate["country"] = "World"
@@ -160,6 +163,11 @@ _VARIABLES_TO_KEEP = [
     "Government expenditure on tertiary education, constant PPP$ (millions)",
     "Government expenditure on education, constant PPP$ (millions)",
     "Government expenditure on education, PPP$ (millions)",
+]
+
+# Variables that are derived/added later in the pipeline (not in the raw source data).
+# These are NOT used for early filtering but appear in the final output table.
+_DERIVED_VARIABLES = [
     # Derived: per-student spending (computed in run())
     "Government expenditure on education per student, total across all levels (constant PPP$)",
     # Combined historical enrollment series (added by combine_historical_enrollment)
@@ -368,94 +376,40 @@ def add_ner_from_oosr(tb_opri: Table, tb_sdgs: Table) -> Table:
     return result
 
 
-def _drop_if_abnormal(tb, country, year, col, threshold, reason):
-    """Null out a single cell if it exists, exceeds `threshold`, and log the removal.
-
-    If the value is present but NOT above the threshold the data may have been fixed
-    upstream; a warning is logged so the filter can be reviewed.
-    """
-    if col not in tb.columns:
-        return
-    mask = (tb["country"] == country) & (tb["year"] == year)
-    val = tb.loc[mask, col]
-    if val.empty or val.isna().all():
-        return
-    numeric_val = float(val.iloc[0])
-    if numeric_val > threshold:
-        tb.loc[mask, col] = None
-        paths.log.info(
-            "outlier_removed",
-            country=country,
-            year=year,
-            indicator=col,
-            value=round(numeric_val, 4),
-            reason=reason,
-        )
-    else:
-        paths.log.warning(
-            "outlier_check_skipped",
-            country=country,
-            year=year,
-            indicator=col,
-            value=round(numeric_val, 4),
-            note="Value is no longer above threshold — upstream data may have changed. Review this filter.",
-        )
-
 
 def drop_outliers(tb):
-    """Remove known impossible values from the pivoted OPRI table and log each removal.
+    """Remove implausible values from the pivoted OPRI table and log each removal.
 
-    Each entry is checked against a plausibility threshold before removal so that if
-    the source data is corrected the filter raises a warning instead of silently no-oping.
+    Uses a dynamic scan: any "percentage of GDP" column with a value exceeding
+    `_GDP_PCT_THRESHOLD` is automatically nulled out and logged. This catches both
+    known bad data points and any new ones that appear in future updates without
+    requiring manual hard-coding of country+year+column triples.
     """
-    # Sierra Leone 2023: multiple education-level GDP columns report >100 % of GDP (impossible).
-    sl_cols = [
-        "Government expenditure on primary education as a percentage of GDP (%)",
-        "Government expenditure on lower secondary education as a percentage of GDP (%)",
-        "Government expenditure on upper secondary education as a percentage of GDP (%)",
-        "Government expenditure on tertiary education as a percentage of GDP (%)",
-        "Government expenditure on secondary education as a percentage of GDP (%)",
-        "Government expenditure on post-secondary non-tertiary education as a percentage of GDP (%)",
-    ]
-    for col in sl_cols:
-        _drop_if_abnormal(
-            tb,
-            "Sierra Leone",
-            2023,
-            col,
-            threshold=10,
-            reason="value exceeds 10 % of GDP — physically impossible for a single education level",
-        )
+    # Any single education-level spending above this share of GDP is implausible.
+    _GDP_PCT_THRESHOLD = 10
 
-    # Chad 2024: primary education spending reported as ~177 % of GDP.
-    _drop_if_abnormal(
-        tb,
-        "Chad",
-        2024,
-        "Government expenditure on primary education as a percentage of GDP (%)",
-        threshold=10,
-        reason="value of ~177 % of GDP is physically impossible",
-    )
+    gdp_pct_cols = [col for col in tb.columns if "percentage of GDP" in col]
 
-    # Oman 2017 / 2019 / 2021: alternating-year spikes (12–165 % GDP) across all
-    # level-specific columns while adjacent even years are normal (~0–2 % GDP).
-    oman_cols = [
-        "Government expenditure on pre-primary education as a percentage of GDP (%)",
-        "Government expenditure on primary education as a percentage of GDP (%)",
-        "Government expenditure on lower secondary education as a percentage of GDP (%)",
-        "Government expenditure on secondary education as a percentage of GDP (%)",
-        "Government expenditure on upper secondary education as a percentage of GDP (%)",
-    ]
-    for year in [2017, 2019, 2021]:
-        for col in oman_cols:
-            _drop_if_abnormal(
-                tb,
-                "Oman",
-                year,
-                col,
-                threshold=10,
-                reason=f"alternating-year spike pattern ({year}): value far exceeds normal range of ~0–2 % GDP",
+    n_dropped = 0
+    for col in gdp_pct_cols:
+        outlier_mask = tb[col].notna() & (tb[col] > _GDP_PCT_THRESHOLD)
+        if not outlier_mask.any():
+            continue
+        outlier_rows = tb[outlier_mask]
+        for _, row in outlier_rows.iterrows():
+            paths.log.info(
+                "outlier_removed",
+                country=str(row["country"]),
+                year=int(row["year"]),
+                indicator=col,
+                value=round(float(row[col]), 4),
+                reason=f"value exceeds {_GDP_PCT_THRESHOLD} % of GDP — implausible for a single education level",
             )
+        n_dropped += int(outlier_mask.sum())
+        tb.loc[outlier_mask, col] = None
+
+    if n_dropped:
+        paths.log.info("outliers_summary", total_cells_dropped=n_dropped, threshold_pct_gdp=_GDP_PCT_THRESHOLD)
 
     return tb
 
@@ -491,9 +445,9 @@ def run() -> None:
     # to compute per-student spending. This runs before consolidate_world_entries and
     # the pivot, making both operations much faster.
 
-    # assert set(_VARIABLES_TO_KEEP).issubset(set(tb["indicator_label_en"].unique())), (
-    #    f"Some expected variables are missing from the data: {set(_VARIABLES_TO_KEEP) - set(tb['indicator_label_en'].unique())}"
-    # )
+    present = set(tb["indicator_label_en"].unique())
+    missing = sorted(set(_VARIABLES_TO_KEEP) - present)
+    assert not missing, f"Some expected variables are missing from the data: {missing}"
 
     assert set(_ENROLLMENT_FOR_DERIVED).issubset(set(tb["indicator_label_en"].unique())), (
         f"Some enrollment variables needed for derived computations are missing from the data: {set(_ENROLLMENT_FOR_DERIVED) - set(tb['indicator_label_en'].unique())}"

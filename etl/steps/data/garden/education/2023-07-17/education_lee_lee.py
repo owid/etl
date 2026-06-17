@@ -5,7 +5,7 @@ from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -39,7 +39,7 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset) -> Table:
     return tb_with_regions
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load input datasets
     #
@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     # Data Processing
     #
     # Harmonize country names
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
 
     # Replace age group values with descriptive labels
     tb["age_group"] = (
@@ -107,7 +107,7 @@ def run(dest_dir: str) -> None:
     # Save outputs
     #
     # Create a new garden dataset with the same metadata as the meadow dataset
-    ds_garden = create_dataset(dest_dir, tables=[tb_attainment, tb_enrollment], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_attainment, tb_enrollment], check_variables_metadata=True)
 
     # Save the processed data in the new garden dataset
     ds_garden.save()

@@ -54,7 +54,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "yAxis": {"min": 0, "max": 100, "facetDomain": "independent"},  # Percentage scale
     "selectedFacetStrategy": "entity",  # Allow entity selection
     "addCountryMode": "add-country",
-    "sortBy": "custom",  # Allow adding countries for easier comparison
+    "sortBy": "custom",  # Use custom sort order
 }
 
 # --------------------- #
