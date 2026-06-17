@@ -94,6 +94,7 @@ steps:
         - snapshot://pew/2025-06-27/same_sex_marriage.csv
       - data://garden/regions/2023-01-01/regions
   # Homosexuality criminalization data from Mignot (2025)
+  # archived; last active in 631d7de283c2 on 2026-06-15
   data://grapher/lgbt_rights/2025-07-09/criminalization_mignot:
     - data://garden/lgbt_rights/2025-07-09/criminalization_mignot:
       - data://garden/regions/2023-01-01/regions

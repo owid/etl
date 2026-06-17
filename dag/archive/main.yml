@@ -1221,6 +1221,7 @@ steps:
     - data://garden/research_development/2024-05-20/patents_articles
 
   # UNODC Homicide Data
+  # archived; last active in 2818cb9824a0 on 2026-06-16
   data://grapher/unodc/2025-05-28/homicide:
     - data://garden/unodc/2025-05-28/homicide:
       - data://meadow/unodc/2025-05-28/homicide:
