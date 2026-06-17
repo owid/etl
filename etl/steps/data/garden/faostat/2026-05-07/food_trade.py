@@ -58,7 +58,7 @@ MIN_IMPORT_COVERAGE = 0.9
 # majority of supplies (~83% in 2023), so blanking should stay well under this share. A larger share
 # means SCL imports and observed trade have diverged unexpectedly (bad data or a logic slip), and the
 # build should fail rather than ship a hollowed-out supply column.
-MAX_SUPPLY_BLANKED_SHARE = 0.30
+MAX_SUPPLY_BLANKED_SHARE = 0.20
 
 
 def sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
