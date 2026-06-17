@@ -3,8 +3,10 @@
 from math import trunc
 
 import structlog
+from igme_helpers import check_expected_changes
 from owid.catalog import Table
 from owid.catalog import processing as pr
+from tqdm import tqdm
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
@@ -85,12 +87,20 @@ def run() -> None:
     # Calculate post neonatal deaths
     tb = add_post_neonatal_deaths(tb)
     # Remove 'Number of' prefix from "Number of deaths" and "Number of stillbirths"
-    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Number of ", "", regex=False)
-    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("stillbirths", "Deaths per 100 live births", regex=False)
+
+    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Number of deaths", "Deaths", regex=False)
+    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Number of stillbirths", "Stillbirths", regex=False)
+    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace(
+        "Stillbirths per 100 births", "Deaths per 100 births", regex=False
+    )
 
     tb["indicator"] = tb["indicator"].str.replace("Under-five mortality rate", "Child mortality rate", regex=False)
     # Drop unused columns
     tb = tb.drop(columns=["source", "lower_bound", "upper_bound"])
+
+    # sanity check (uncomment when updating)
+    sanity_checks(tb)
+
     tb = tb.format(
         ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"],
     )
@@ -105,6 +115,76 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def check_rapid_changes(tb: Table, country: str, indicator: str, sex, wealth_quintile, threshold) -> None:
+    """
+    Check for rapid increases/ decreases in the observation_value column for a given country and indicator.
+    A rapid increase/ decrease is defined as a change of more than the threshold percentage from one year to the next.
+    """
+
+    tb_country_indicator = tb[
+        (tb["country"] == country)
+        & (tb["indicator"] == indicator)
+        & (tb["sex"] == sex)
+        & (tb["wealth_quintile"] == wealth_quintile)
+    ].sort_values("year")
+
+    if len(tb_country_indicator) < 2:
+        return None
+
+    # if the indicator is total deaths or stillbirths, check that average is over 500, otherwise we might be picking up rapid changes in small populations which are not necessarily errors.
+    # this is the case if the unit is "Deaths" or "Stillbirths"
+    unit = tb_country_indicator["unit_of_measure"].iloc[0]
+    if unit in ["Deaths", "Stillbirths"] and tb_country_indicator["observation_value"].mean() < 100:
+        # LOG.info(
+        #    f"Skipping rapid change check for {indicator} in {country} for {sex} and {wealth_quintile} (small population)"
+        # )
+        return None
+
+    tb_country_indicator["pct_change"] = tb_country_indicator["observation_value"].pct_change()
+    rapid_changes = tb_country_indicator[abs(tb_country_indicator["pct_change"]) > threshold]
+
+    rapid_changes = check_expected_changes(rapid_changes, country)
+
+    if not rapid_changes.empty:
+        LOG.warning(
+            f"Rapid changes found in {indicator} for {country}: {rapid_changes[['year', 'observation_value', 'pct_change']]}"
+        )
+    return None
+
+
+def sanity_checks(tb: Table) -> None:
+    """
+    Perform sanity checks on the data.
+    """
+    # Check that there are no negative values in the observation_value column.
+    assert (tb["observation_value"] >= 0).all(), "Negative values in observation_value column!"
+
+    # Check that the year column is of type int and has reasonable values.
+    assert tb["year"].dtype == int, "Year column is not of type int!"
+    assert (tb["year"] >= 1930).all() and (tb["year"] <= 2025).all(), (
+        f"Year column has values <1930 {tb[tb['year'] < 1930]} or >2025! {tb[tb['year'] > 2025]}"
+    )
+
+    # Check that percentage values are between 0 and 100.
+    percentage_units = [unit for unit in tb["unit_of_measure"].unique() if "per 100" in unit]
+    percentage_rows = tb["unit_of_measure"].isin(percentage_units)
+    msk_per = percentage_rows & ((tb["observation_value"] < 0) | (tb["observation_value"] > 100))
+    assert not msk_per.any(), (
+        f"Percentage values in observation_value column are not between 0 and 100: {tb.loc[msk_per]}"
+    )
+
+    # Check for rapid increases/ decreases in the observation_value column for each country and indicator.
+    # wrap in tqdm to track progress, as this can take a while given the number of combinations of country, indicator
+
+    for country in tqdm(tb["country"].unique()):
+        for indicator in tb["indicator"].unique():
+            for sex in tb["sex"].unique():
+                for wealth_quintile in tb["wealth_quintile"].unique():
+                    check_rapid_changes(tb, country, indicator, sex, wealth_quintile, threshold=0.3)
+
+    return None
 
 
 def regional_aggregates_counts(tb: Table, threshold: float = 0.8) -> Table:
