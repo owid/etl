@@ -10,3 +10,6 @@ This documentation explains our data workflow and tooling — both to help OWID 
 [:material-format-list-bulleted-triangle: Internal guides](guides/){ .md-button }
 
 [:material-book-open-variant: Technical publications](analyses/){ .md-button }
+
+<!-- Test PR to exercise the faster ETL staging-server bake (ops#525): the staging
+     site should come up without the ~17 min full grapher chart bake. No-op doc change. -->
