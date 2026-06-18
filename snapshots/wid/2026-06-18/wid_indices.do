@@ -17,8 +17,10 @@ HOW TO EXECUTE:
    include extrapolations. A single command imports all five as snapshots in the ETL (the script
    world_inequality_database.py maps each generated CSV to its snapshot):
 	etls wid/2026-06-18/world_inequality_database
-3. Delete the csv files by running
-    rm snapshots/wid/2026-06-18/*.csv
+3. Delete the leftover csv files: from the snapshots/wid/2026-06-18/ folder, run
+    rm *.csv
+   (kept on separate lines so the path and the glob never form a "slash-star" token, which
+    Stata would otherwise read as a nested block-comment opener and comment out the whole file)
 
 	(Change the date for future updates)
 
