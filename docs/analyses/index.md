@@ -58,8 +58,10 @@ This is just a sneak peek into some of our data work. But note that all our code
 
 !!! note ""
 
-    ## FAOSTAT food trade
-    🚧 *Work in progress* Technical companion to the bespoke food-trade visualization. Documents the data-quality characteristics of FAOSTAT's *Detailed Trade Matrix*: how complete the bilateral coverage is, and how closely the two reports (from the exporting and the importing country) agree when both sides report the same flow.
+    ## Analysing global food trade data
+    Technical companion to the article ["How does food get traded around the world?"](https://ourworldindata.org/how-does-food-get-traded-around-the-world).
+    It examines FAOSTAT's *Detailed Trade Matrix*, including how complete the bilateral coverage is, and how well the exporting and importing countries' reports agree. It also explains the methodological choices behind our food trade visualization, including how we combine data from different FAOSTAT datasets and how we merge the separate codes that split a single commodity.
+
 
     [:material-notebook: View notebook](food_trade/food_trade.html){ .md-button }
     [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
