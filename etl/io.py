@@ -32,8 +32,13 @@ def get_changed_steps(files_changed: dict[str, dict[str, str]]) -> list[str]:
     return changed_steps
 
 
-def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]]) -> list[str]:
-    """Get all changed steps and their downstream dependencies."""
+def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], include_export: bool = False) -> list[str]:
+    """Get all changed steps and their downstream dependencies.
+
+    :param include_export: If True, also return downstream export steps (e.g. multidim/explorer
+        exports) with their full ``export://`` URI. These have no data:// catalogPath, so they're
+        excluded by default (chart-diff/datadiff only care about data steps).
+    """
     dataset_catalog_paths = []
 
     # Get catalog paths of all datasets with changed files.
@@ -65,5 +70,10 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]]) -> l
     # From data://... extract catalogPath
     # TODO: use StepPath from https://github.com/owid/etl/pull/3165 to refactor this
     catalog_paths = [step.split("://")[1] for step in dag_steps if step.startswith("data://")]
+
+    # Optionally also return downstream export steps, keeping their full URI so callers can match
+    # them with `export://...` include patterns (export steps have no data:// catalogPath).
+    if include_export:
+        catalog_paths += [step for step in dag_steps if step.startswith("export://")]
 
     return catalog_paths
