@@ -66,6 +66,9 @@ global environment_vs_econ_questions B008
 * income equality
 global income_equality_questions E035
 
+* freedom of choice and control over one's life
+global freedom_of_choice_question A173
+
 * Schwartz questions
 global schwartz_questions A189 A190 A191 A192 A193 A194 A195 A196 A197 A198
 
@@ -146,7 +149,7 @@ global humankind_concern_question E158
 
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_very_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff $religion_how_often $religion_god_important $religion_how_often_services $religion_how_often_pray $jobs_scarce_questions $gender_roles_questions $neighborhood_frequency_questions $security_actions_questions $neighborhood_security_question $human_rights_respect_question $felt_unsafe_question $welzel_equality_question $media_questions $closeness_questions $tech_questions $science_world_question $aims_country_questions $aims_respondent_questions $most_important_questions $humankind_concern_question
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $freedom_of_choice_question $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions $democracy_satisfied $democracy_very_good_very_bad $democracy_essential_char $democracy_importance $democracy_democraticness $democracy_elections_makes_diff $religion_how_often $religion_god_important $religion_how_often_services $religion_how_often_pray $jobs_scarce_questions $gender_roles_questions $neighborhood_frequency_questions $security_actions_questions $neighborhood_security_question $human_rights_respect_question $felt_unsafe_question $welzel_equality_question $media_questions $closeness_questions $tech_questions $science_world_question $aims_country_questions $aims_respondent_questions $most_important_questions $humankind_concern_question
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -561,6 +564,58 @@ gen avg_score_eq_ineq = E035
 collapse (mean) equality_eq_ineq neutral_eq_ineq inequality_eq_ineq dont_know_eq_ineq no_answer_eq_ineq avg_score_eq_ineq [w=S017], by (year country)
 tempfile income_equality_file
 save "`income_equality_file'"
+
+restore
+preserve
+
+* Processing freedom of choice and control question
+/*
+           1 None at all
+           2 2
+           3 3
+           4 4
+           5 5
+           6 6
+           7 7
+           8 8
+           9 9
+          10 A great deal
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
+*/
+
+* Keep only answers
+keep if A173 >= 1
+keep if A173 != .c
+keep if A173 != .d
+keep if A173 != .e
+
+*Generate variables
+gen little_freedom_of_choice = 0
+replace little_freedom_of_choice = 1 if A173 <= 4
+
+gen neutral_freedom_of_choice = 0
+replace neutral_freedom_of_choice = 1 if A173 == 5 | A173 == 6
+
+gen great_freedom_of_choice = 0
+replace great_freedom_of_choice = 1 if A173 >= 7 & A173 <= 10
+
+gen dont_know_freedom_of_choice = 0
+replace dont_know_freedom_of_choice = 1 if A173 == .a
+
+gen no_answer_freedom_of_choice = 0
+replace no_answer_freedom_of_choice = 1 if A173 == .b
+
+gen avg_score_freedom_of_choice = A173
+
+* Make dataset of the weighted shares by wave and country
+collapse (mean) little_freedom_of_choice neutral_freedom_of_choice great_freedom_of_choice dont_know_freedom_of_choice no_answer_freedom_of_choice avg_score_freedom_of_choice [w=S017], by (year country)
+tempfile freedom_of_choice_file
+save "`freedom_of_choice_file'"
 
 restore
 preserve
@@ -2349,6 +2404,8 @@ foreach var in $rest_politics_questions {
 qui merge 1:1 year country using "`environment_vs_econ_file'", nogenerate // keep(master match)
 
 qui merge 1:1 year country using "`income_equality_file'", nogenerate // keep(master match)
+
+qui merge 1:1 year country using "`freedom_of_choice_file'", nogenerate // keep(master match)
 
 foreach var in $schwartz_questions {
 	qui merge 1:1 year country using "`schwartz_`var'_file'", nogenerate // keep(master match)

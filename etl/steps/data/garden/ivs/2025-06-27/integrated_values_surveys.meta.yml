@@ -8294,3 +8294,54 @@ tables:
           <<: *common-display
         unit: ""
         short_unit: ""
+      little_freedom_of_choice:
+        title: "Freedom of choice and control: Little freedom of choice and control"
+        description_short: '% of respondents replying in a scale from 1 to 4 when asked "Some people feel they have completely free choice and control over their lives, while other people feel that what they do has no real effect on what happens to them. Please use this scale where 1 means "no choice at all" and 10 means "a great deal of choice" to indicate how much freedom of choice and control you feel you have over the way your life turns out".'
+        display:
+          name: "Little freedom of choice and control"
+          <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
+      neutral_freedom_of_choice:
+        title: "Freedom of choice and control: Neutral"
+        description_short: '% of respondents replying 5 or 6 when asked "Some people feel they have completely free choice and control over their lives, while other people feel that what they do has no real effect on what happens to them. Please use this scale where 1 means "no choice at all" and 10 means "a great deal of choice" to indicate how much freedom of choice and control you feel you have over the way your life turns out".'
+        display:
+          name: "Neutral"
+          <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
+      great_freedom_of_choice:
+        title: "Freedom of choice and control: A great deal of freedom of choice and control"
+        description_short: '% of respondents replying in a scale from 7 to 10 when asked "Some people feel they have completely free choice and control over their lives, while other people feel that what they do has no real effect on what happens to them. Please use this scale where 1 means "no choice at all" and 10 means "a great deal of choice" to indicate how much freedom of choice and control you feel you have over the way your life turns out".'
+        display:
+          name: "A great deal of freedom of choice and control"
+          <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
+      dont_know_freedom_of_choice:
+        title: "Freedom of choice and control: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Some people feel they have completely free choice and control over their lives, while other people feel that what they do has no real effect on what happens to them. Please use this scale where 1 means "no choice at all" and 10 means "a great deal of choice" to indicate how much freedom of choice and control you feel you have over the way your life turns out".'
+        display:
+          name: "Don't know"
+          <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
+      no_answer_freedom_of_choice:
+        title: "Freedom of choice and control: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Some people feel they have completely free choice and control over their lives, while other people feel that what they do has no real effect on what happens to them. Please use this scale where 1 means "no choice at all" and 10 means "a great deal of choice" to indicate how much freedom of choice and control you feel you have over the way your life turns out".'
+        display:
+          name: "No answer"
+          <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_human_rights
+      avg_score_freedom_of_choice:
+        title: "Freedom of choice and control: Average score"
+        description_short: 'Average score of respondents when asked "Some people feel they have completely free choice and control over their lives, while other people feel that what they do has no real effect on what happens to them. Please use this scale where 1 means "no choice at all" and 10 means "a great deal of choice" to indicate how much freedom of choice and control you feel you have over the way your life turns out", on a scale from 1 (no choice at all) to 10 (a great deal of choice).'
+        display:
+          name: "Average score"
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+        presentation:
+          topic_tags: *topic_tags_human_rights

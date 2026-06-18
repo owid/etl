@@ -38,6 +38,8 @@ ENVIRONMENT_VS_ECONOMY_QUESTIONS = ["env_ec"]
 
 INCOME_EQUALITY_QUESTIONS = ["eq_ineq"]
 
+FREEDOM_OF_CHOICE_QUESTIONS = ["freedom_of_choice"]
+
 SCHWARTZ_QUESTIONS = [
     "new_ideas",
     "rich",
@@ -319,6 +321,11 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     # For income equality question
     tb = replace_dont_know_by_null(
         tb=tb, questions=INCOME_EQUALITY_QUESTIONS, answers=["equality", "neutral", "inequality"]
+    )
+
+    # For freedom of choice and control question
+    tb = replace_dont_know_by_null(
+        tb=tb, questions=FREEDOM_OF_CHOICE_QUESTIONS, answers=["little", "neutral", "great"]
     )
 
     # For "Schwartz" questions
@@ -666,6 +673,14 @@ def sanity_checks(tb: Table) -> Table:
         tb=tb,
         questions=INCOME_EQUALITY_QUESTIONS,
         answers=["equality", "neutral", "inequality", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For freedom of choice and control question
+    tb = check_sum_100(
+        tb=tb,
+        questions=FREEDOM_OF_CHOICE_QUESTIONS,
+        answers=["little", "neutral", "great", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
