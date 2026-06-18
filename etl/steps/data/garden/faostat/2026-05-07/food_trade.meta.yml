@@ -17,6 +17,8 @@ tables:
         short_unit: t
         description_short: |-
           Estimated production tonnes of the item in the exporter country, in the export year.
+        description_processing: |-
+          - We leave production blank for items whose trade we sum from several cuts (beef and pork, each combining a bone-in and a boneless code), because their production is reported on a different weight basis (carcass weight) than the traded cuts and the two cannot be compared directly.
       importer_supply:
         title: Importer's domestic supply
         unit: tonnes
@@ -27,3 +29,4 @@ tables:
           - We compute domestic supply from the Supply Utilization Accounts using the Food Balance Sheet identity: production plus imports minus exports minus stock variation.
           - We treat non-positive results (zero or negative) as missing, since they cannot serve as the denominator of an import share.
           - We leave domestic supply blank where the recorded imports cover less than 90% of the bilateral trade we observe flowing into the country, because in those cases imports have been under-recorded and the supply would be understated. The bilateral trade data is only used to decide whether to show the figure, never to change it.
+          - We leave domestic supply blank for items whose trade we sum from several cuts (beef and pork, each combining a bone-in and a boneless code), because their supply is reported on a different weight basis (carcass weight) than the traded cuts and the two cannot be compared directly.

@@ -21,9 +21,19 @@ Builds the slice of bilateral trade flows from the trade matrix, with two column
                                  use.
 
 The display items shown in the dropdown are curated in
-`food_trade.items.yaml`. Each entry names a single FAO commodity item code
+`food_trade.items.yaml`. Most entries name a single FAO commodity item code
 (the same codebook used by both TM and SCL), so the rollup is a direct
 integer-code filter against `item_code`.
+
+Two meats are an exception: FAO splits beef and pork into a bone-in and a
+boneless code (beef = 867 + 870, pork = 1035 + 1038), and the bone-in code
+alone captures only a fraction of the traded weight. We sum the two cuts to
+recover the full bilateral flow (see `MEAT_CUT_AGGREGATES` below). Summing
+the *trade* of the two codes does not double-count (they are distinct
+shipments under distinct HS headings), but their production and supply are
+booked on incompatible weight bases (carcass weight vs. deboned output), so
+we drop the Production and domestic-supply context for these two items
+rather than mix them.
 
 For each (exporter, importer, item) the trade matrix typically has two
 reports — one from each side — that can disagree. We default to the
@@ -59,6 +69,17 @@ MIN_IMPORT_COVERAGE = 0.9
 # means SCL imports and observed trade have diverged unexpectedly (bad data or a logic slip), and the
 # build should fail rather than ship a hollowed-out supply column.
 MAX_SUPPLY_BLANKED_SHARE = 0.20
+
+# FAO splits fresh/chilled beef and pork into a bone-in and a boneless code, and the bone-in code
+# alone captures only a fraction of the traded weight. We sum each boneless cut into its bone-in
+# code so the item shows the full bilateral flow. Summing the trade does not double-count (the two
+# codes are distinct shipments under distinct customs headings), but we drop these items' Production
+# and domestic supply: FAO books production at carcass weight, which is not comparable to the
+# deboned traded cuts. Maps each boneless code -> (bone-in code it folds into, its expected FAO name).
+MEAT_CUT_AGGREGATES = {
+    870: (867, "Meat of cattle boneless, fresh or chilled"),
+    1038: (1035, "Meat of pig boneless, fresh or chilled"),
+}
 
 
 def sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
@@ -121,6 +142,9 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     with open(paths.side_file("food_trade.items.yaml")) as f:
         items_config = yaml.safe_load(f)
     code_to_display = {int(e["item_code"]): e["display"] for e in items_config["items"]}
+    # Fold each boneless meat cut into its bone-in code so their trade is summed (see MEAT_CUT_AGGREGATES).
+    for boneless, (bone_in, _) in MEAT_CUT_AGGREGATES.items():
+        code_to_display[boneless] = code_to_display[bone_in]
 
     # 1) Filter TM to the curated items, as quantities in tonnes for the chosen year, then drop self-trade rows.
     trade_flows = tb_tm[
@@ -136,12 +160,25 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     # Validate the curated config against the FAO item names in the snapshot (item_code -> name).
     tm_items = dict(zip(trade_flows["item_code"], trade_flows["item"].astype(str)))
     sanity_check_items_config(items_config, tm_items=tm_items)
+    # The boneless cuts aren't in the items file, so validate their FAO names here too.
+    for boneless, (_, fao_item) in MEAT_CUT_AGGREGATES.items():
+        assert tm_items.get(boneless) == fao_item, (
+            f"FAO item name for boneless code {boneless} is {tm_items.get(boneless)!r}, expected {fao_item!r}."
+        )
 
     trade_flows["item"] = trade_flows["item_code"].map(code_to_display)
+    # Collapse to one flow per (reporter, partner, item, element): for items that aggregate
+    # several trade codes (beef = 867 + 870, pork = 1035 + 1038) this sums the cuts into a
+    # single bilateral flow; for single-code items it is a no-op.
+    trade_flows = trade_flows.groupby(
+        ["reporter_country", "partner_country", "item", "element", "year"], observed=True, as_index=False
+    )["value"].sum()
 
     # 2) Build per-(country, item) Production and apparent domestic supply from SCL.
     #    Supply follows the FBS identity documented in the module docstring; all four
-    #    components are SCL quantities in tonnes, restricted to the curated items.
+    #    components are SCL quantities in tonnes, restricted to the curated items. The
+    #    aggregated meats (beef, pork) are excluded: their cuts are booked on incompatible
+    #    weight bases, so they carry no Production or supply context (see MEAT_CUT_AGGREGATES).
     components = ["Production", "Import quantity", "Export quantity", "Stock Variation"]
     scl = tb_scl[
         (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t") & tb_scl["element"].isin(components)
@@ -150,7 +187,8 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     scl["item_code"] = scl["item_code"].astype(str).astype(int)
     scl["country"] = scl["country"].astype(str)
     scl["element"] = scl["element"].astype(str)
-    scl = scl[scl["item_code"].isin(code_to_display)]
+    aggregated_codes = set(MEAT_CUT_AGGREGATES) | {bone_in for bone_in, _ in MEAT_CUT_AGGREGATES.values()}
+    scl = scl[scl["item_code"].isin(code_to_display) & ~scl["item_code"].isin(aggregated_codes)]
 
     # Pivot the four components into one column each, keyed on (country, item_code, year). We
     # pivot rather than groupby-sum so that a duplicate (country, item_code, year, element) row
@@ -236,9 +274,10 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     food_trade = pr.merge(food_trade, exporter_production, on=["exporter", "item", "year"], how="left")
     food_trade = pr.merge(food_trade, importer_supply, on=["importer", "item", "year"], how="left")
     food_trade = food_trade.sort_values(["exporter", "importer", "item", "year"]).reset_index(drop=True)
-    # Carry the FAO item code as a dimension so downstream steps get the display->code
-    # mapping from the data itself, rather than re-reading the curated items config.
-    display_to_code = {display: code for code, display in code_to_display.items()}
+    # Carry the FAO item code as a dimension so downstream steps get the display->code mapping
+    # from the data itself, rather than re-reading the curated items config. Aggregated meats use
+    # their bone-in code (the one named in the items file) as the representative id.
+    display_to_code = {e["display"]: int(e["item_code"]) for e in items_config["items"]}
     food_trade["item_code"] = food_trade["item"].map(display_to_code).astype(int)
 
     return food_trade.format(keys=["exporter", "importer", "item", "item_code", "year"], short_name=paths.short_name)

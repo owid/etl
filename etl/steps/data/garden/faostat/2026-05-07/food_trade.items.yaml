@@ -34,6 +34,9 @@ items:
   - display: Barley
     item_code: 44
     fao_item: Barley
+  # Beef trade is summed with its boneless cut (code 870) in the garden step (see
+  # MEAT_CUT_AGGREGATES in food_trade.py); the bone-in code alone misses most of the traded
+  # weight, and these items carry no production/supply context.
   - display: Beef
     item_code: 867
     fao_item: Meat of cattle with the bone, fresh or chilled
@@ -322,6 +325,7 @@ items:
   - display: Poppy seed
     item_code: 296
     fao_item: Poppy seed
+  # See the Beef note above: pork trade is summed with its boneless cut (code 1038) in the garden step.
   - display: Pork
     item_code: 1035
     fao_item: Meat of pig with the bone, fresh or chilled
