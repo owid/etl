@@ -182,11 +182,10 @@ Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` 
 
 ### 11. DAG checks
 
-The archive-and-reorder procedure is in `/update-dataset` § "DAG archiving & reordering". As reviewer, verify the **outcome**:
+The remove-and-reorder procedure is in `/update-dataset` § "Removing the old version & reordering the DAG". As reviewer, verify the **outcome** (the archive dag is regenerated separately by `etl archive-dag`, so don't expect the old version under `dag/archive/` in this PR):
 
 ```bash
-rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"   # should be empty
-rg "<namespace>/<old_version>/<short_name>" dag/archive/ -g "*.yml"                    # should match
+rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"   # should be empty (old version removed from active dag)
 rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"   # should be in old slot, not at bottom
 ```
 
@@ -200,9 +199,8 @@ rg -n -A8 "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml" | rg "<old_ve
 Any hit here is a 🔴 — the new step is wired to a stale dependency.
 
 Visual inspection of the diff for:
-- Comment headers (`# Source — dataset name.`) preserved above both archived and new entries
+- Comment headers (`# Source — dataset name.`) preserved above the new entries
 - Indentation consistent (` #` vs `  #` is a frequent typo)
-- Trailing newline on the archive YAML
 - New entries placed in the old block's slot, not orphaned at the bottom (🟡 if at the bottom)
 - **Both the flat and nested (compact) DAG forms are valid** (the loader accepts either). The nested form (chain declared inline, grapher → garden → meadow → snapshot) is the preferred style — don't flag a nested block as wrong, and don't flag the archive edit itself (archiving is the explicitly-requested workflow step; Codex's "don't edit archived DAG" warning is a known false-positive here).
 

@@ -192,11 +192,7 @@ def create_dataset(
 
 
 def get_metadata_path(dest_dir: str) -> Path:
-    N_archive = PathFinder(str(paths.STEP_DIR / "archive" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
-    if N_archive.metadata_path.exists():
-        N = N_archive
-    else:
-        N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     return N.metadata_path
 
 
@@ -289,10 +285,7 @@ class PathFinder:
     def dag(self):
         """Lazy loading of DAG."""
         if self._dag is None:
-            if "/archive/" in str(self.f):
-                self._dag = load_dag_cached(paths.DAG_ARCHIVE_FILE)
-            else:
-                self._dag = load_dag_cached()
+            self._dag = load_dag_cached()
         return self._dag
 
     @property

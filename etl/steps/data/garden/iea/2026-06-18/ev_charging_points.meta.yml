@@ -1,0 +1,54 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Transport
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+
+tables:
+  ev_charging_points:
+    variables:
+      public_charging_points:
+        title: Public charging points
+        unit: charging points
+        short_unit: ""
+        description_short: Total number of publicly available [electric vehicle](#dod:electric-vehicle) charging points, including both fast and slow chargers.
+        display:
+          name: Public charging points
+          numDecimalPlaces: 0
+      public_fast_charging_points:
+        title: Public fast charging points
+        unit: charging points
+        short_unit: ""
+        description_short: Number of publicly available fast charging points, which deliver higher power and allow electric vehicles to recharge more quickly.
+        display:
+          name: Fast charging points
+          numDecimalPlaces: 0
+      public_slow_charging_points:
+        title: Public slow charging points
+        unit: charging points
+        short_unit: ""
+        description_short: Number of publicly available slow charging points, which deliver lower power and take longer to recharge an electric vehicle.
+        display:
+          name: Slow charging points
+          numDecimalPlaces: 0
+      fast_chargers_share_of_total:
+        title: Share of fast chargers among public charging points
+        unit: "%"
+        short_unit: "%"
+        description_short: Fast charging points as a share of all publicly available charging points.
+        display:
+          name: Share of fast chargers
+          numDecimalPlaces: 1
+      electric_cars_per_charging_point:
+        title: Electric cars per public charging point
+        unit: cars per charging point
+        short_unit: ""
+        description_short: Number of electric cars in use for each publicly available charging point. Higher values indicate fewer charging points relative to the size of the electric car fleet.
+        display:
+          name: Electric cars per charging point
+          numDecimalPlaces: 0

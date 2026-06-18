@@ -329,20 +329,26 @@ def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]
     Reuses the same machinery as chart-diff (`get_changed_files` + `get_all_changed_catalog_paths`),
     so the selection matches what chart-diff considers affected. If `includes` is non-empty, the
     result is narrowed to changed paths that also match one of those patterns.
+
+    Export steps (e.g. `export://multidim/...`) are included too, so `--modified` can pick the
+    multidims/explorers a branch affects via their upstream data steps. Data steps are returned
+    URI-less (e.g. "garden/foo/bar"); export steps keep their full URI so `export://...` patterns
+    match them.
     """
     from etl.git_helpers import get_changed_files
     from etl.io import get_all_changed_catalog_paths
 
     # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
-    changed_paths = get_all_changed_catalog_paths(get_changed_files(include_diff=False))
+    changed_paths = get_all_changed_catalog_paths(get_changed_files(include_diff=False), include_export=True)
 
     # Narrow to those also matching the explicit STEPS arguments.
     if includes:
         if exact_match:
-            # changed_paths are URI-less catalog paths (e.g. "garden/foo/bar"), while exact-match
-            # includes are full step URIs (e.g. "data://garden/foo/bar"); compare on the path part.
+            # changed_paths are URI-less for data steps (e.g. "garden/foo/bar") but full URIs for
+            # export steps; exact-match includes are full step URIs (e.g. "data://garden/foo/bar").
+            # Compare on the scheme-less path part of both sides.
             wanted = {i.split("://", 1)[-1] for i in includes}
-            changed_paths = [p for p in changed_paths if p in wanted]
+            changed_paths = [p for p in changed_paths if p.split("://", 1)[-1] in wanted]
         else:
             patterns = [re.compile(p) for p in includes]
             changed_paths = [p for p in changed_paths if any(pat.search(p) for pat in patterns)]
