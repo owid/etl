@@ -32,9 +32,18 @@ def get_changed_steps(files_changed: dict[str, dict[str, str]]) -> list[str]:
     return changed_steps
 
 
-def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]]) -> list[str]:
-    """Get all changed steps and their downstream dependencies."""
+def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], include_export: bool = False) -> list[str]:
+    """Get all changed steps and their downstream dependencies.
+
+    :param include_export: If True, also return downstream export steps (e.g. multidim/explorer
+        exports) with their full ``export://`` URI. These have no data:// catalogPath, so they're
+        excluded by default (chart-diff/datadiff only care about data steps).
+    """
     dataset_catalog_paths = []
+    # Directly-changed export steps (e.g. a modified multidim/explorer recipe). These live under
+    # etl/steps/export/, not etl/steps/data/, so they aren't data catalog paths; we keep their full
+    # export:// URI and add them to the result when include_export is set.
+    changed_export_uris = []
 
     # Get catalog paths of all datasets with changed files.
     for step_path in get_changed_steps(files_changed):
@@ -47,10 +56,18 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]]) -> l
                 ds_path = abs_step_path.relative_to(STEP_DIR / "data").with_suffix("").with_suffix("").as_posix()
             dataset_catalog_paths.append(ds_path)
         except ValueError:
-            continue
+            # Not a data/snapshot step. It might be an export step (etl/steps/export/...); if so,
+            # record its export:// URI so a branch that only edits an export recipe still selects it.
+            try:
+                export_path = abs_step_path.relative_to(STEP_DIR / "export").with_suffix("").with_suffix("").as_posix()
+            except ValueError:
+                continue
+            changed_export_uris.append(f"export://{export_path}")
 
     if not dataset_catalog_paths:
-        return []
+        # No data steps changed. We can still have directly-changed export steps; return those when
+        # requested (their downstream subgraph is computed from data steps, of which there are none).
+        return changed_export_uris if include_export else []
 
     # NOTE:
     # This is OK, as it filters down the DAG a little bit. But using VersionTracker.steps_df would be much more precise. You could do:
@@ -65,5 +82,17 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]]) -> l
     # From data://... extract catalogPath
     # TODO: use StepPath from https://github.com/owid/etl/pull/3165 to refactor this
     catalog_paths = [step.split("://")[1] for step in dag_steps if step.startswith("data://")]
+
+    # Optionally also return export steps, keeping their full URI so callers can match them with
+    # `export://...` include patterns (export steps have no data:// catalogPath). This covers both
+    # downstream exports (reached via changed data steps) and directly-changed export recipes.
+    if include_export:
+        downstream_export_uris = [step for step in dag_steps if step.startswith("export://")]
+        # Dedupe while preserving order (a directly-changed export can also be a downstream one).
+        seen = set(catalog_paths)
+        for uri in downstream_export_uris + changed_export_uris:
+            if uri not in seen:
+                seen.add(uri)
+                catalog_paths.append(uri)
 
     return catalog_paths
