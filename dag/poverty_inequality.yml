@@ -51,15 +51,15 @@ steps:
     - data://garden/wid/2026-02-10/world_inequality_database:
       - data://meadow/wid/2026-02-10/world_inequality_database
   export://multidim/wid/latest/incomes_wid:
-    - data://grapher/wid/2026-02-10/world_inequality_database
     - data://grapher/demography/2024-07-15/population
     - data://grapher/regions/2023-01-01/regions
+    - data://grapher/wid/2026-06-18/world_inequality_database
   export://multidim/wid/latest/gini_wid:
-    - data://grapher/wid/2026-02-10/world_inequality_database
+    - data://grapher/wid/2026-06-18/world_inequality_database
   export://multidim/wid/latest/palma_ratio_wid:
-    - data://grapher/wid/2026-02-10/world_inequality_database
+    - data://grapher/wid/2026-06-18/world_inequality_database
   export://multidim/wid/latest/wealth_wid:
-    - data://grapher/wid/2026-02-10/world_inequality_database
+    - data://grapher/wid/2026-06-18/world_inequality_database
 
     # Legacy WID pipeline
   data://garden/wid/2026-02-10/world_inequality_database_legacy:
@@ -192,3 +192,16 @@ steps:
     - data://garden/worldbank_icp/2024-05-30/icp_2021_currencies:
       - snapshot://worldbank_icp/2024-05-30/icp_2021_currencies.json:
       - data://garden/regions/2023-01-01/regions
+  # World Inequality Database
+  data://grapher/wid/2026-06-18/world_inequality_database:
+    - data://garden/wid/2026-06-18/world_inequality_database:
+      - data://meadow/wid/2026-06-18/world_inequality_database:
+        - snapshot://wid/2026-06-18/world_inequality_database.csv
+        - snapshot://wid/2026-06-18/world_inequality_database_distribution.csv
+        - snapshot://wid/2026-06-18/world_inequality_database_distribution_with_extrapolations.csv
+        - snapshot://wid/2026-06-18/world_inequality_database_fiscal.csv
+        - snapshot://wid/2026-06-18/world_inequality_database_with_extrapolations.csv
+        - data://garden/regions/2023-01-01/regions
+  # Legacy WID pipeline
+  data://garden/wid/2026-06-18/world_inequality_database_legacy:
+    - data://meadow/wid/2026-06-18/world_inequality_database
