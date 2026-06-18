@@ -58,6 +58,8 @@ steps:
     - data://grapher/wid/2026-02-10/world_inequality_database
   export://multidim/wid/latest/palma_ratio_wid:
     - data://grapher/wid/2026-02-10/world_inequality_database
+  export://multidim/wid/latest/wealth_wid:
+    - data://grapher/wid/2026-02-10/world_inequality_database
 
     # Legacy WID pipeline
   data://garden/wid/2026-02-10/world_inequality_database_legacy:
