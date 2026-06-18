@@ -324,9 +324,7 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     )
 
     # For freedom of choice and control question
-    tb = replace_dont_know_by_null(
-        tb=tb, questions=FREEDOM_OF_CHOICE_QUESTIONS, answers=["little", "neutral", "great"]
-    )
+    tb = replace_dont_know_by_null(tb=tb, questions=FREEDOM_OF_CHOICE_QUESTIONS, answers=["little", "neutral", "great"])
 
     # For "Schwartz" questions
     tb = replace_dont_know_by_null(
