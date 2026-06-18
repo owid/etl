@@ -306,6 +306,12 @@ code --install-extension install/<name>-<version>.vsix --force
 
 Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
 
+## GitHub Actions
+
+When editing anything under `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinning convention below (also enforced for GitHub Copilot via `.github/instructions/github-actions.instructions.md`, which Claude Code does *not* auto-load — hence the import here):
+
+@.github/instructions/github-actions.instructions.md
+
 ## Extended Documentation
 
 See `.claude/docs/` for:
