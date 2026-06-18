@@ -3,458 +3,472 @@
 # Selection: FAO 'crops & livestock products' (QCL) commodities that are meaningfully traded
 # (ranked by number of bilateral flows, tonnage and value), plus widely-recognised processed
 # foods (bread, pasta, chocolate, ...). Excludes non-food, residual 'n.e.c.' aggregates, and
-# items too obscure to be widely recognised. One form per commodity.
+# items too obscure to be widely recognised.
 #
 # Each entry:
-#   display:    name shown in the visualization dropdown
-#   item_code:  FAO commodity item code (TM/SCL codebook)
-#   fao_item:   the item's name in FAOSTAT TM (asserted against the snapshot in the garden step)
+#   display:     name shown in the visualization dropdown.
+#   item_codes:  FAO commodity item code(s) -> the code's name in FAOSTAT TM (asserted against
+#                the snapshot in the garden step). Most items have a single code. A few combine a
+#                primary commodity with a mechanically-derived form that trade is split across
+#                (beef bone-in + boneless, almonds in-shell + shelled, milled + broken rice, raw +
+#                refined sugar). For those, the trade of all codes is summed and the item carries
+#                no production or supply context, because summing those would double-count (the
+#                derived form is processed from the primary). The first code is the item's id;
+#                combined items use 100000 + that code, so the id is never mistaken for a single
+#                FAO commodity.
 items:
   - display: Almonds
-    item_code: 221
-    fao_item: Almonds, in shell
+    item_codes:
+      221: Almonds, in shell
+      231: Almonds, shelled
   - display: Apples
-    item_code: 515
-    fao_item: Apples
+    item_codes:
+      515: Apples
   - display: Apricots
-    item_code: 526
-    fao_item: Apricots
+    item_codes:
+      526: Apricots
   - display: Artichokes
-    item_code: 366
-    fao_item: Artichokes
+    item_codes:
+      366: Artichokes
   - display: Asparagus
-    item_code: 367
-    fao_item: Asparagus
+    item_codes:
+      367: Asparagus
   - display: Avocados
-    item_code: 572
-    fao_item: Avocados
+    item_codes:
+      572: Avocados
   - display: Bananas
-    item_code: 486
-    fao_item: Bananas
+    item_codes:
+      486: Bananas
   - display: Barley
-    item_code: 44
-    fao_item: Barley
-  # Beef trade is summed with its boneless cut (code 870) in the garden step (see
-  # MEAT_CUT_AGGREGATES in food_trade.py); the bone-in code alone misses most of the traded
-  # weight, and these items carry no production/supply context.
+    item_codes:
+      44: Barley
   - display: Beef
-    item_code: 867
-    fao_item: Meat of cattle with the bone, fresh or chilled
+    item_codes:
+      867: Meat of cattle with the bone, fresh or chilled
+      870: Meat of cattle boneless, fresh or chilled
   - display: Beer
-    item_code: 51
-    fao_item: Beer of barley, malted
+    item_codes:
+      51: Beer of barley, malted
   - display: Black pepper
-    item_code: 687
-    fao_item: Pepper (Piper spp.), raw
+    item_codes:
+      687: Pepper (Piper spp.), raw
   - display: Blueberries
-    item_code: 552
-    fao_item: Blueberries
+    item_codes:
+      552: Blueberries
   - display: Brazil nuts
-    item_code: 216
-    fao_item: Brazil nuts, in shell
+    item_codes:
+      216: Brazil nuts, in shell
+      229: Brazil nuts, shelled
   - display: Bread
-    item_code: 20
-    fao_item: Bread
+    item_codes:
+      20: Bread
   - display: Breakfast cereals
-    item_code: 41
-    fao_item: Breakfast cereals
+    item_codes:
+      41: Breakfast cereals
   - display: Broad beans
-    item_code: 181
-    fao_item: Broad beans and horse beans, dry
+    item_codes:
+      181: Broad beans and horse beans, dry
   - display: Buckwheat
-    item_code: 89
-    fao_item: Buckwheat
+    item_codes:
+      89: Buckwheat
   - display: Butter
-    item_code: 886
-    fao_item: Butter of cow milk
+    item_codes:
+      886: Butter of cow milk
   - display: Cabbages
-    item_code: 358
-    fao_item: Cabbages
+    item_codes:
+      358: Cabbages
   - display: Carrots
-    item_code: 426
-    fao_item: Carrots and turnips
+    item_codes:
+      426: Carrots and turnips
   - display: Cashews
-    item_code: 217
-    fao_item: Cashew nuts, in shell
+    item_codes:
+      217: Cashew nuts, in shell
+      230: Cashew nuts, shelled
   - display: Cassava
-    item_code: 125
-    fao_item: Cassava, fresh
+    item_codes:
+      125: Cassava, fresh
   - display: Cauliflower and broccoli
-    item_code: 393
-    fao_item: Cauliflowers and broccoli
+    item_codes:
+      393: Cauliflowers and broccoli
   - display: Cheese
-    item_code: 901
-    fao_item: Cheese from whole cow milk
+    item_codes:
+      901: Cheese from whole cow milk
   - display: Cherries
-    item_code: 531
-    fao_item: Cherries
+    item_codes:
+      531: Cherries
   - display: Chestnuts
-    item_code: 220
-    fao_item: Chestnuts, in shell
+    item_codes:
+      220: Chestnuts, in shell
   - display: Chicken meat
-    item_code: 1058
-    fao_item: Meat of chickens, fresh or chilled
+    item_codes:
+      1058: Meat of chickens, fresh or chilled
   - display: Chickpeas
-    item_code: 191
-    fao_item: Chick peas, dry
+    item_codes:
+      191: Chick peas, dry
   - display: Chillies and peppers
-    item_code: 401
-    fao_item: Chillies and peppers, green (Capsicum spp. and Pimenta spp.)
+    item_codes:
+      401: Chillies and peppers, green (Capsicum spp. and Pimenta spp.)
   - display: Chocolate
-    item_code: 666
-    fao_item: Chocolate products nes
+    item_codes:
+      666: Chocolate products nes
   - display: Cider
-    item_code: 517
-    fao_item: Cider and other fermented beverages
+    item_codes:
+      517: Cider and other fermented beverages
   - display: Cinnamon
-    item_code: 693
-    fao_item: Cinnamon and cinnamon-tree flowers, raw
+    item_codes:
+      693: Cinnamon and cinnamon-tree flowers, raw
   - display: Cloves
-    item_code: 698
-    fao_item: Cloves (whole stems), raw
+    item_codes:
+      698: Cloves (whole stems), raw
   - display: Cocoa beans
-    item_code: 661
-    fao_item: Cocoa beans
+    item_codes:
+      661: Cocoa beans
   - display: Cocoa powder
-    item_code: 665
-    fao_item: Cocoa powder and cake
+    item_codes:
+      665: Cocoa powder and cake
   - display: Coconut oil
-    item_code: 252
-    fao_item: Coconut oil
+    item_codes:
+      252: Coconut oil
   - display: Coconuts
-    item_code: 249
-    fao_item: Coconuts, in shell
+    item_codes:
+      249: Coconuts, in shell
   - display: Confectionery
-    item_code: 168
-    fao_item: Sugar confectionery
+    item_codes:
+      168: Sugar confectionery
   - display: Cowpeas
-    item_code: 195
-    fao_item: Cow peas, dry
+    item_codes:
+      195: Cow peas, dry
   - display: Cranberries
-    item_code: 554
-    fao_item: Cranberries
+    item_codes:
+      554: Cranberries
   - display: Cream
-    item_code: 885
-    fao_item: Cream, fresh
+    item_codes:
+      885: Cream, fresh
   - display: Cucumbers
-    item_code: 397
-    fao_item: Cucumbers and gherkins
+    item_codes:
+      397: Cucumbers and gherkins
   - display: Currants
-    item_code: 550
-    fao_item: Currants
+    item_codes:
+      550: Currants
   - display: Dates
-    item_code: 577
-    fao_item: Dates
+    item_codes:
+      577: Dates
   - display: Dry beans
-    item_code: 176
-    fao_item: Beans, dry
+    item_codes:
+      176: Beans, dry
   - display: Dry peas
-    item_code: 187
-    fao_item: Peas, dry
+    item_codes:
+      187: Peas, dry
   - display: Duck meat
-    item_code: 1069
-    fao_item: Meat of ducks, fresh or chilled
+    item_codes:
+      1069: Meat of ducks, fresh or chilled
   - display: Eggplant
-    item_code: 399
-    fao_item: Eggplants (aubergines)
+    item_codes:
+      399: Eggplants (aubergines)
   - display: Eggs
-    item_code: 1062
-    fao_item: Hen eggs in shell, fresh
+    item_codes:
+      1062: Hen eggs in shell, fresh
   - display: Figs
-    item_code: 569
-    fao_item: Figs
+    item_codes:
+      569: Figs
   - display: Garlic
-    item_code: 406
-    fao_item: Green garlic
+    item_codes:
+      406: Green garlic
   - display: Ginger
-    item_code: 720
-    fao_item: Ginger, raw
+    item_codes:
+      720: Ginger, raw
   - display: Goat meat
-    item_code: 1017
-    fao_item: Meat of goat, fresh or chilled
+    item_codes:
+      1017: Meat of goat, fresh or chilled
   - display: Grapefruit
-    item_code: 507
-    fao_item: Pomelos and grapefruits
+    item_codes:
+      507: Pomelos and grapefruits
   - display: Grapes
-    item_code: 560
-    fao_item: Grapes
+    item_codes:
+      560: Grapes
   - display: Green beans
-    item_code: 414
-    fao_item: Other beans, green
+    item_codes:
+      414: Other beans, green
   - display: Green coffee
-    item_code: 656
-    fao_item: Coffee, green
+    item_codes:
+      656: Coffee, green
   - display: Green maize
-    item_code: 446
-    fao_item: Green corn (maize)
+    item_codes:
+      446: Green corn (maize)
   - display: Green peas
-    item_code: 417
-    fao_item: Peas, green
+    item_codes:
+      417: Peas, green
   - display: Groundnut oil
-    item_code: 244
-    fao_item: Groundnut oil
+    item_codes:
+      244: Groundnut oil
   - display: Groundnuts
-    item_code: 242
-    fao_item: Groundnuts, excluding shelled
+    item_codes:
+      242: Groundnuts, excluding shelled
+      243: Groundnuts, shelled
   - display: Hazelnuts
-    item_code: 225
-    fao_item: Hazelnuts, in shell
+    item_codes:
+      225: Hazelnuts, in shell
+      233: Hazelnuts, shelled
   - display: Honey
-    item_code: 1182
-    fao_item: Natural honey
+    item_codes:
+      1182: Natural honey
   - display: Ice cream
-    item_code: 910
-    fao_item: Ice cream and other edible ice
+    item_codes:
+      910: Ice cream and other edible ice
   - display: Infant food
-    item_code: 109
-    fao_item: Infant food
+    item_codes:
+      109: Infant food
   - display: Kiwi
-    item_code: 592
-    fao_item: Kiwi fruit
+    item_codes:
+      592: Kiwi fruit
   - display: Leeks
-    item_code: 407
-    fao_item: Leeks and other alliaceous vegetables
+    item_codes:
+      407: Leeks and other alliaceous vegetables
   - display: Lemons and limes
-    item_code: 497
-    fao_item: Lemons and limes
+    item_codes:
+      497: Lemons and limes
   - display: Lentils
-    item_code: 201
-    fao_item: Lentils, dry
+    item_codes:
+      201: Lentils, dry
   - display: Lettuce
-    item_code: 372
-    fao_item: Lettuce and chicory
+    item_codes:
+      372: Lettuce and chicory
   - display: Linseed
-    item_code: 333
-    fao_item: Linseed
+    item_codes:
+      333: Linseed
   - display: Linseed oil
-    item_code: 334
-    fao_item: Oil of linseed
+    item_codes:
+      334: Oil of linseed
   - display: Maize
-    item_code: 56
-    fao_item: Maize (corn)
+    item_codes:
+      56: Maize (corn)
   - display: Maize flour
-    item_code: 58
-    fao_item: Flour of maize
+    item_codes:
+      58: Flour of maize
   - display: Maize oil
-    item_code: 60
-    fao_item: Oil of maize
+    item_codes:
+      60: Oil of maize
   - display: Mangoes
-    item_code: 571
-    fao_item: Mangoes, guavas and mangosteens
+    item_codes:
+      571: Mangoes, guavas and mangosteens
   - display: Margarine
-    item_code: 1242
-    fao_item: Margarine and shortening
+    item_codes:
+      1242: Margarine and shortening
   - display: Melons
-    item_code: 568
-    fao_item: Cantaloupes and other melons
+    item_codes:
+      568: Cantaloupes and other melons
   - display: Milk
-    item_code: 882
-    fao_item: Raw milk of cattle
+    item_codes:
+      882: Raw milk of cattle
   - display: Milk powder
-    item_code: 897
-    fao_item: Whole milk powder
+    item_codes:
+      897: Whole milk powder
   - display: Millet
-    item_code: 79
-    fao_item: Millet
+    item_codes:
+      79: Millet
   - display: Molasses
-    item_code: 165
-    fao_item: Molasses
+    item_codes:
+      165: Molasses
   - display: Mushrooms
-    item_code: 449
-    fao_item: Mushrooms and truffles
+    item_codes:
+      449: Mushrooms and truffles
   - display: Mustard seed
-    item_code: 292
-    fao_item: Mustard seed
+    item_codes:
+      292: Mustard seed
   - display: Oats
-    item_code: 75
-    fao_item: Oats
+    item_codes:
+      75: Oats
   - display: Okra
-    item_code: 430
-    fao_item: Okra
+    item_codes:
+      430: Okra
   - display: Olive oil
-    item_code: 261
-    fao_item: Olive oil
+    item_codes:
+      261: Olive oil
   - display: Olives
-    item_code: 260
-    fao_item: Olives
+    item_codes:
+      260: Olives
   - display: Onions
-    item_code: 403
-    fao_item: Onions and shallots, dry (excluding dehydrated)
+    item_codes:
+      403: Onions and shallots, dry (excluding dehydrated)
   - display: Orange juice
-    item_code: 491
-    fao_item: Orange juice
+    item_codes:
+      491: Orange juice
   - display: Oranges
-    item_code: 490
-    fao_item: Oranges
+    item_codes:
+      490: Oranges
   - display: Palm kernel oil
-    item_code: 258
-    fao_item: Oil of palm kernel
+    item_codes:
+      258: Oil of palm kernel
   - display: Palm kernels
-    item_code: 256
-    fao_item: Palm kernels
+    item_codes:
+      256: Palm kernels
   - display: Palm oil
-    item_code: 257
-    fao_item: Palm oil
+    item_codes:
+      257: Palm oil
   - display: Papayas
-    item_code: 600
-    fao_item: Papayas
+    item_codes:
+      600: Papayas
   - display: Pasta
-    item_code: 18
-    fao_item: Uncooked pasta, not stuffed or otherwise prepared
+    item_codes:
+      18: Uncooked pasta, not stuffed or otherwise prepared
   - display: Peaches and nectarines
-    item_code: 534
-    fao_item: Peaches and nectarines
+    item_codes:
+      534: Peaches and nectarines
   - display: Pears
-    item_code: 521
-    fao_item: Pears
+    item_codes:
+      521: Pears
   - display: Persimmons
-    item_code: 587
-    fao_item: Persimmons
+    item_codes:
+      587: Persimmons
   - display: Pineapples
-    item_code: 574
-    fao_item: Pineapples
+    item_codes:
+      574: Pineapples
   - display: Pistachios
-    item_code: 223
-    fao_item: Pistachios, in shell
+    item_codes:
+      223: Pistachios, in shell
   - display: Plantains
-    item_code: 489
-    fao_item: Plantains and cooking bananas
+    item_codes:
+      489: Plantains and cooking bananas
   - display: Plums
-    item_code: 536
-    fao_item: Plums and sloes
+    item_codes:
+      536: Plums and sloes
   - display: Poppy seed
-    item_code: 296
-    fao_item: Poppy seed
-  # See the Beef note above: pork trade is summed with its boneless cut (code 1038) in the garden step.
+    item_codes:
+      296: Poppy seed
   - display: Pork
-    item_code: 1035
-    fao_item: Meat of pig with the bone, fresh or chilled
+    item_codes:
+      1035: Meat of pig with the bone, fresh or chilled
+      1038: Meat of pig boneless, fresh or chilled
   - display: Potatoes
-    item_code: 116
-    fao_item: Potatoes
+    item_codes:
+      116: Potatoes
   - display: Pumpkins and squash
-    item_code: 394
-    fao_item: Pumpkins, squash and gourds
+    item_codes:
+      394: Pumpkins, squash and gourds
   - display: Quinces
-    item_code: 523
-    fao_item: Quinces
+    item_codes:
+      523: Quinces
   - display: Quinoa
-    item_code: 92
-    fao_item: Quinoa
+    item_codes:
+      92: Quinoa
   - display: Rabbit meat
-    item_code: 1141
-    fao_item: Meat of rabbits and hares, fresh or chilled
+    item_codes:
+      1141: Meat of rabbits and hares, fresh or chilled
   - display: Rapeseed
-    item_code: 270
-    fao_item: Rape or colza seed
+    item_codes:
+      270: Rape or colza seed
   - display: Rapeseed oil
-    item_code: 271
-    fao_item: Rapeseed or canola oil, crude
+    item_codes:
+      271: Rapeseed or canola oil, crude
   - display: Raspberries
-    item_code: 547
-    fao_item: Raspberries
+    item_codes:
+      547: Raspberries
   - display: Rice
-    item_code: 27
-    fao_item: Rice
+    item_codes:
+      31: Rice, milled
+      32: Rice, broken
+      28: Husked rice
   - display: Roasted coffee
-    item_code: 657
-    fao_item: Coffee, decaffeinated or roasted
+    item_codes:
+      657: Coffee, decaffeinated or roasted
   - display: Rye
-    item_code: 71
-    fao_item: Rye
+    item_codes:
+      71: Rye
   - display: Safflower oil
-    item_code: 281
-    fao_item: Safflower-seed oil, crude
+    item_codes:
+      281: Safflower-seed oil, crude
   - display: Safflower seed
-    item_code: 280
-    fao_item: Safflower seed
+    item_codes:
+      280: Safflower seed
   - display: Sesame oil
-    item_code: 290
-    fao_item: Oil of sesame seed
+    item_codes:
+      290: Oil of sesame seed
   - display: Sesame seed
-    item_code: 289
-    fao_item: Sesame seed
+    item_codes:
+      289: Sesame seed
   - display: Sheep meat
-    item_code: 977
-    fao_item: Meat of sheep, fresh or chilled
+    item_codes:
+      977: Meat of sheep, fresh or chilled
   - display: Sorghum
-    item_code: 83
-    fao_item: Sorghum
+    item_codes:
+      83: Sorghum
   - display: Soybean oil
-    item_code: 237
-    fao_item: Soya bean oil
+    item_codes:
+      237: Soya bean oil
   - display: Soybeans
-    item_code: 236
-    fao_item: Soya beans
+    item_codes:
+      236: Soya beans
   - display: Spinach
-    item_code: 373
-    fao_item: Spinach
+    item_codes:
+      373: Spinach
   - display: Spirits
-    item_code: 634
-    fao_item: Undenatured ethyl alcohol of an alcoholic strength by volume of less than 80% vol; spirits, liqueurs and other spirituous beverages
+    item_codes:
+      634: Undenatured ethyl alcohol of an alcoholic strength by volume of less than 80% vol; spirits, liqueurs and other spirituous beverages
   - display: Spring onions
-    item_code: 402
-    fao_item: Onions and shallots, green
+    item_codes:
+      402: Onions and shallots, green
   - display: Strawberries
-    item_code: 544
-    fao_item: Strawberries
+    item_codes:
+      544: Strawberries
   - display: Sugar
-    item_code: 162
-    fao_item: Raw cane or beet sugar (centrifugal only)
+    item_codes:
+      162: Raw cane or beet sugar (centrifugal only)
+      164: Refined sugar
   - display: Sugar beet
-    item_code: 157
-    fao_item: Sugar beet
+    item_codes:
+      157: Sugar beet
   - display: Sugar cane
-    item_code: 156
-    fao_item: Sugar cane
+    item_codes:
+      156: Sugar cane
   - display: Sunflower oil
-    item_code: 268
-    fao_item: Sunflower-seed oil, crude
+    item_codes:
+      268: Sunflower-seed oil, crude
   - display: Sunflower seed
-    item_code: 267
-    fao_item: Sunflower seed
+    item_codes:
+      267: Sunflower seed
   - display: Sweet potatoes
-    item_code: 122
-    fao_item: Sweet potatoes
+    item_codes:
+      122: Sweet potatoes
   - display: Tangerines and mandarins
-    item_code: 495
-    fao_item: Tangerines, mandarins, clementines
+    item_codes:
+      495: Tangerines, mandarins, clementines
   - display: Taro
-    item_code: 136
-    fao_item: Taro
+    item_codes:
+      136: Taro
   - display: Tea
-    item_code: 667
-    fao_item: Tea leaves
+    item_codes:
+      667: Tea leaves
   - display: Tomato paste
-    item_code: 391
-    fao_item: Paste of tomatoes
+    item_codes:
+      391: Paste of tomatoes
   - display: Tomatoes
-    item_code: 388
-    fao_item: Tomatoes
+    item_codes:
+      388: Tomatoes
   - display: Turkey meat
-    item_code: 1080
-    fao_item: Meat of turkeys, fresh or chilled
+    item_codes:
+      1080: Meat of turkeys, fresh or chilled
   - display: Vanilla
-    item_code: 692
-    fao_item: Vanilla, raw
+    item_codes:
+      692: Vanilla, raw
   - display: Walnuts
-    item_code: 222
-    fao_item: Walnuts, in shell
+    item_codes:
+      222: Walnuts, in shell
+      232: Walnuts, shelled
   - display: Watermelons
-    item_code: 567
-    fao_item: Watermelons
+    item_codes:
+      567: Watermelons
   - display: Wheat
-    item_code: 15
-    fao_item: Wheat
+    item_codes:
+      15: Wheat
   - display: Wheat flour
-    item_code: 16
-    fao_item: Wheat and meslin flour
+    item_codes:
+      16: Wheat and meslin flour
   - display: Wine
-    item_code: 564
-    fao_item: Wine
+    item_codes:
+      564: Wine
   - display: Yams
-    item_code: 137
-    fao_item: Yams
+    item_codes:
+      137: Yams
   - display: Yoghurt
-    item_code: 891
-    fao_item: Yoghurt
+    item_codes:
+      891: Yoghurt

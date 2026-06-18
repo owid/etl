@@ -21,19 +21,22 @@ Builds the slice of bilateral trade flows from the trade matrix, with two column
                                  use.
 
 The display items shown in the dropdown are curated in
-`food_trade.items.yaml`. Most entries name a single FAO commodity item code
-(the same codebook used by both TM and SCL), so the rollup is a direct
-integer-code filter against `item_code`.
+`food_trade.items.yaml`. Each entry maps one or more FAO commodity item codes
+(the same codebook used by both TM and SCL) to their names. Most items have a
+single code, so the rollup is a direct integer-code filter against `item_code`.
 
-Two meats are an exception: FAO splits beef and pork into a bone-in and a
-boneless code (beef = 867 + 870, pork = 1035 + 1038), and the bone-in code
-alone captures only a fraction of the traded weight. We sum the two cuts to
-recover the full bilateral flow (see `MEAT_CUT_AGGREGATES` below). Summing
-the *trade* of the two codes does not double-count (they are distinct
-shipments under distinct HS headings), but their production and supply are
-booked on incompatible weight bases (carcass weight vs. deboned output), so
-we drop the Production and domestic-supply context for these two items
-rather than mix them.
+A few items combine several codes: FAO splits some commodities into a primary
+product and a mechanically-derived form whose trade is reported separately
+(beef bone-in + boneless, almonds in-shell + shelled, milled + broken rice,
+raw + refined sugar), and the primary code alone captures only a fraction of
+the traded weight. For these we sum the trade of all the item's codes to
+recover the full bilateral flow. Summing the *trade* does not double-count (the
+codes are distinct shipments under distinct customs headings), but we drop the
+Production and domestic-supply context: the derived form is processed from the
+primary, so summing their production would double-count, and the two are on
+incompatible weight bases anyway. A combined item is identified in the output
+by `100000 + its first code`, so its id is never mistaken for a single FAO
+commodity.
 
 For each (exporter, importer, item) the trade matrix typically has two
 reports — one from each side — that can disagree. We default to the
@@ -70,62 +73,79 @@ MIN_IMPORT_COVERAGE = 0.9
 # build should fail rather than ship a hollowed-out supply column.
 MAX_SUPPLY_BLANKED_SHARE = 0.20
 
-# FAO splits fresh/chilled beef and pork into a bone-in and a boneless code, and the bone-in code
-# alone captures only a fraction of the traded weight. We sum each boneless cut into its bone-in
-# code so the item shows the full bilateral flow. Summing the trade does not double-count (the two
-# codes are distinct shipments under distinct customs headings), but we drop these items' Production
-# and domestic supply: FAO books production at carcass weight, which is not comparable to the
-# deboned traded cuts. Maps each boneless code -> (bone-in code it folds into, its expected FAO name).
-MEAT_CUT_AGGREGATES = {
-    870: (867, "Meat of cattle boneless, fresh or chilled"),
-    1038: (1035, "Meat of pig boneless, fresh or chilled"),
-}
+# Offset added to a combined item's first code to form its id (e.g. beef 867 -> 100867). FAO item
+# codes top out in the low thousands, so the 100000+ range can never collide with a real code, and
+# the id stays an integer (no change needed downstream / in the viz). See module docstring.
+COMBINED_ID_OFFSET = 100_000
 
 
-def sanity_check_items_config(config: dict, tm_items: dict[int, str]) -> None:
-    """Validate the items config structurally and against the TM snapshot.
+def parse_items_config(config: dict) -> list[dict]:
+    """Normalise the items config into one dict per item:
+
+        {"display": str, "codes": {code: fao_name, ...}, "id": int, "combined": bool}
+
+    `codes` preserves file order; the first code is the representative one. `id` is that code for
+    single-code items, or `COMBINED_ID_OFFSET + first_code` for combined ones.
+    """
+    assert isinstance(config, dict) and "items" in config, "items config must be a mapping with an 'items' key"
+    raw = config["items"]
+    assert isinstance(raw, list) and raw, "config['items'] must be a non-empty list"
+
+    items = []
+    for entry in raw:
+        assert isinstance(entry, dict) and entry.keys() == {"display", "item_codes"}, (
+            f"items entry must have exactly 'display' and 'item_codes': {entry!r}"
+        )
+        codes = {int(code): name for code, name in entry["item_codes"].items()}
+        assert codes, f"item_codes is empty for {entry['display']!r}"
+        first = next(iter(codes))
+        items.append(
+            {
+                "display": entry["display"],
+                "codes": codes,
+                "id": first + COMBINED_ID_OFFSET if len(codes) > 1 else first,
+                "combined": len(codes) > 1,
+            }
+        )
+    return items
+
+
+def sanity_check_items_config(items: list[dict], tm_items: dict[int, str]) -> None:
+    """Validate the parsed items against the TM snapshot.
 
     `tm_items` maps each item code present in the year's quantity (tonnes) trade flows to its
     FAO item name.
 
     Checks:
-      1. Required top-level shape: a single 'items' list.
-      2. Each items entry has required fields (display, item_code, fao_item).
-      3. display names are unique.
-      4. Each item_code appears among the year's quantity (tonnes) trade flows (catches typos,
-         removed codes, or items with no traded quantity that we couldn't show anyway).
-      5. Each code's FAO item name still matches the expected `fao_item` (catches FAO
-         silently reassigning or renaming a code to a different commodity).
+      1. display names are unique, and no code is reused across items.
+      2. Each code appears among the year's quantity (tonnes) trade flows (catches typos, removed
+         codes, or items with no traded quantity that we couldn't show anyway).
+      3. Each code's FAO item name still matches the curated one (catches FAO silently reassigning
+         or renaming a code to a different commodity).
     """
-    assert isinstance(config, dict) and "items" in config, "items config must be a mapping with an 'items' key"
-    items = config["items"]
-    assert isinstance(items, list) and items, "config['items'] must be a non-empty list"
-
-    required = {"display", "item_code", "fao_item"}
-    for entry in items:
-        assert isinstance(entry, dict), f"items entry must be a mapping, got {entry!r}"
-        missing = required - entry.keys()
-        assert not missing, f"items entry missing keys {sorted(missing)}: {entry}"
-
-    displays = [e["display"] for e in items]
+    displays = [it["display"] for it in items]
     dupes = sorted({d for d in displays if displays.count(d) > 1})
     assert not dupes, f"Duplicate display names in items config: {dupes}"
 
-    missing_codes = sorted(int(e["item_code"]) for e in items if int(e["item_code"]) not in tm_items)
+    code_to_fao = {code: name for it in items for code, name in it["codes"].items()}
+    n_codes = sum(len(it["codes"]) for it in items)
+    assert len(code_to_fao) == n_codes, "An item code is used by more than one item."
+
+    missing_codes = sorted(code for code in code_to_fao if code not in tm_items)
     assert not missing_codes, (
-        f"{len(missing_codes)} item_code(s) have no quantity (tonnes) trade in the TM snapshot "
+        f"{len(missing_codes)} item code(s) have no quantity (tonnes) trade in the TM snapshot "
         f"for the selected year: {missing_codes[:10]}"
     )
 
     renamed = [
-        f"{e['item_code']}: expected {e['fao_item']!r}, TM has {tm_items[int(e['item_code'])]!r}"
-        for e in items
-        if tm_items[int(e["item_code"])] != e["fao_item"]
+        f"{code}: expected {fao!r}, TM has {tm_items[code]!r}"
+        for code, fao in code_to_fao.items()
+        if tm_items[code] != fao
     ]
     assert not renamed, (
-        "FAO item name no longer matches `fao_item` for: "
+        "FAO item name no longer matches the curated name for: "
         + "; ".join(renamed)
-        + ". Verify each code still refers to the intended commodity before updating fao_item."
+        + ". Verify each code still refers to the intended commodity before updating the name."
     )
 
 
@@ -138,13 +158,12 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     reporters_per_year = tb_tm.groupby("year", observed=True)["reporter_country"].nunique()
     year = int(reporters_per_year[reporters_per_year >= 0.9 * reporters_per_year.max()].index.max())
 
-    # Load list of curated items.
+    # Load and normalise the curated items.
     with open(paths.side_file("food_trade.items.yaml")) as f:
-        items_config = yaml.safe_load(f)
-    code_to_display = {int(e["item_code"]): e["display"] for e in items_config["items"]}
-    # Fold each boneless meat cut into its bone-in code so their trade is summed (see MEAT_CUT_AGGREGATES).
-    for boneless, (bone_in, _) in MEAT_CUT_AGGREGATES.items():
-        code_to_display[boneless] = code_to_display[bone_in]
+        items = parse_items_config(yaml.safe_load(f))
+    code_to_display = {code: it["display"] for it in items for code in it["codes"]}
+    # Single-code items carry Production/supply; combined items don't (see module docstring).
+    supply_codes = {code for it in items if not it["combined"] for code in it["codes"]}
 
     # 1) Filter TM to the curated items, as quantities in tonnes for the chosen year, then drop self-trade rows.
     trade_flows = tb_tm[
@@ -159,26 +178,21 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
 
     # Validate the curated config against the FAO item names in the snapshot (item_code -> name).
     tm_items = dict(zip(trade_flows["item_code"], trade_flows["item"].astype(str)))
-    sanity_check_items_config(items_config, tm_items=tm_items)
-    # The boneless cuts aren't in the items file, so validate their FAO names here too.
-    for boneless, (_, fao_item) in MEAT_CUT_AGGREGATES.items():
-        assert tm_items.get(boneless) == fao_item, (
-            f"FAO item name for boneless code {boneless} is {tm_items.get(boneless)!r}, expected {fao_item!r}."
-        )
+    sanity_check_items_config(items, tm_items=tm_items)
 
     trade_flows["item"] = trade_flows["item_code"].map(code_to_display)
-    # Collapse to one flow per (reporter, partner, item, element): for items that aggregate
-    # several trade codes (beef = 867 + 870, pork = 1035 + 1038) this sums the cuts into a
-    # single bilateral flow; for single-code items it is a no-op.
+    # Collapse to one flow per (reporter, partner, item, element): for items that combine several
+    # codes (beef = 867 + 870, rice = 31 + 32 + 28, ...) this sums them into a single bilateral
+    # flow; for single-code items it is a no-op.
     trade_flows = trade_flows.groupby(
         ["reporter_country", "partner_country", "item", "element", "year"], observed=True, as_index=False
     )["value"].sum()
 
     # 2) Build per-(country, item) Production and apparent domestic supply from SCL.
     #    Supply follows the FBS identity documented in the module docstring; all four
-    #    components are SCL quantities in tonnes, restricted to the curated items. The
-    #    aggregated meats (beef, pork) are excluded: their cuts are booked on incompatible
-    #    weight bases, so they carry no Production or supply context (see MEAT_CUT_AGGREGATES).
+    #    components are SCL quantities in tonnes, restricted to the single-code items. Combined
+    #    items are excluded: their codes are on incompatible weight bases and the derived form is
+    #    processed from the primary, so production/supply can't be summed (see module docstring).
     components = ["Production", "Import quantity", "Export quantity", "Stock Variation"]
     scl = tb_scl[
         (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t") & tb_scl["element"].isin(components)
@@ -187,8 +201,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     scl["item_code"] = scl["item_code"].astype(str).astype(int)
     scl["country"] = scl["country"].astype(str)
     scl["element"] = scl["element"].astype(str)
-    aggregated_codes = set(MEAT_CUT_AGGREGATES) | {bone_in for bone_in, _ in MEAT_CUT_AGGREGATES.values()}
-    scl = scl[scl["item_code"].isin(code_to_display) & ~scl["item_code"].isin(aggregated_codes)]
+    scl = scl[scl["item_code"].isin(supply_codes)]
 
     # Pivot the four components into one column each, keyed on (country, item_code, year). We
     # pivot rather than groupby-sum so that a duplicate (country, item_code, year, element) row
@@ -274,11 +287,11 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     food_trade = pr.merge(food_trade, exporter_production, on=["exporter", "item", "year"], how="left")
     food_trade = pr.merge(food_trade, importer_supply, on=["importer", "item", "year"], how="left")
     food_trade = food_trade.sort_values(["exporter", "importer", "item", "year"]).reset_index(drop=True)
-    # Carry the FAO item code as a dimension so downstream steps get the display->code mapping
-    # from the data itself, rather than re-reading the curated items config. Aggregated meats use
-    # their bone-in code (the one named in the items file) as the representative id.
-    display_to_code = {e["display"]: int(e["item_code"]) for e in items_config["items"]}
-    food_trade["item_code"] = food_trade["item"].map(display_to_code).astype(int)
+    # Carry the item id as a dimension so downstream steps get the display->id mapping from the
+    # data itself, rather than re-reading the curated items config. Single-code items use their FAO
+    # code; combined items use 100000 + their first code (see parse_items_config / module docstring).
+    display_to_id = {it["display"]: it["id"] for it in items}
+    food_trade["item_code"] = food_trade["item"].map(display_to_id).astype(int)
 
     return food_trade.format(keys=["exporter", "importer", "item", "item_code", "year"], short_name=paths.short_name)
 

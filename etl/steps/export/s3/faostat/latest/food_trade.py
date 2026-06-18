@@ -147,10 +147,12 @@ def run() -> None:
     # Build id mappings.
     # - Entities: no canonical external id (FAO uses country names), so we
     #   assign 1-based alphabetical ids — matches causes-of-death / migration.
-    # - Products: use the canonical FAO item codes the garden step carries in
-    #   the data. These are stable across FAOSTAT releases and shared with QCL
-    #   and TM, so the per-product URLs `food-trade.<item_code>.json` are
-    #   externally recognisable.
+    # - Products: use the item ids the garden step carries in the data. For most
+    #   items this is the canonical FAO item code (stable across FAOSTAT releases
+    #   and shared with QCL and TM), so the per-product URL `food-trade.<id>.json`
+    #   is externally recognisable. Items that combine several codes use
+    #   100000 + their first code, an out-of-range integer that signals the id is
+    #   not a single FAO commodity (see the garden step).
     #
     countries = sorted(set(df["exporter"]) | set(df["importer"]))
     entity_to_id = {name: i + 1 for i, name in enumerate(countries)}
