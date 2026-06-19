@@ -4241,80 +4241,56 @@
   region_type: "aggregate"
   defined_by: ilo
   members:
-    - ILO_CAF
-    - ILO_EAF
-    - ILO_SAF
-    - ILO_WAF
-- code: ILO_CAF
-  name: "Central Africa (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
     - AGO
+    - BDI
+    - BEN
+    - BFA
+    - BWA
     - CAF
+    - CIV
     - CMR
     - COD
     - COG
-    - GAB
-    - GNQ
-    - STP
-    - TCD
-- code: ILO_EAF
-  name: "Eastern Africa (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
-    - BDI
     - COM
+    - CPV
     - DJI
     - ERI
     - ETH
-    - KEN
-    - MDG
-    - MOZ
-    - MUS
-    - MWI
-    - REU
-    - RWA
-    - SOM
-    - SSD
-    - SYC
-    - TZA
-    - UGA
-    - ZMB
-    - ZWE
-- code: ILO_SAF
-  name: "Southern Africa (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
-    - BWA
-    - LSO
-    - NAM
-    - SWZ
-    - ZAF
-- code: ILO_WAF
-  name: "Western Africa (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
-    - BEN
-    - BFA
-    - CIV
-    - CPV
+    - GAB
     - GHA
     - GIN
     - GMB
     - GNB
+    - GNQ
+    - KEN
     - LBR
+    - LSO
+    - MDG
     - MLI
+    - MOZ
     - MRT
+    - MUS
+    - MWI
+    - NAM
     - NER
     - NGA
+    - REU
+    - RWA
     - SEN
     - SHN
     - SLE
+    - SOM
+    - SSD
+    - STP
+    - SWZ
+    - SYC
+    - TCD
     - TGO
+    - TZA
+    - UGA
+    - ZAF
+    - ZMB
+    - ZWE
 - code: ILO_AMR
   name: "Americas (ILO)"
   region_type: "aggregate"
@@ -4327,71 +4303,53 @@
   region_type: "aggregate"
   defined_by: ilo
   members:
-    - ILO_CAR
-    - ILO_CAM
-    - ILO_SAM
-- code: ILO_CAR
-  name: "Caribbean (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
     - ABW
     - AIA
     - ANT
+    - ARG
     - ATG
     - BHS
+    - BLZ
+    - BOL
+    - BRA
     - BRB
+    - CHL
+    - COL
+    - CRI
     - CUB
     - CUW
     - CYM
     - DMA
     - DOM
+    - ECU
+    - FLK
     - GLP
     - GRD
+    - GTM
+    - GUF
+    - GUY
+    - HND
     - HTI
     - JAM
     - KNA
     - LCA
+    - MEX
     - MSR
     - MTQ
-    - PRI
-    - TCA
-    - TTO
-    - VCT
-    - VGB
-    - VIR
-- code: ILO_CAM
-  name: "Central America (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
-    - BLZ
-    - CRI
-    - GTM
-    - HND
-    - MEX
     - NIC
     - PAN
-    - SLV
-- code: ILO_SAM
-  name: "South America (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
-    - ARG
-    - BOL
-    - BRA
-    - CHL
-    - COL
-    - ECU
-    - FLK
-    - GUF
-    - GUY
     - PER
+    - PRI
     - PRY
+    - SLV
     - SUR
+    - TCA
+    - TTO
     - URY
+    - VCT
     - VEN
+    - VGB
+    - VIR
 - code: ILO_NAM
   name: "Northern America (ILO)"
   region_type: "aggregate"
@@ -4445,50 +4403,38 @@
   region_type: "aggregate"
   defined_by: ilo
   members:
-    - ILO_SEA
-    - ILO_PAC
-- code: ILO_SEA
-  name: "South-Eastern Asia (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
-    - BRN
-    - IDN
-    - KHM
-    - LAO
-    - MMR
-    - MYS
-    - PHL
-    - SGP
-    - THA
-    - TLS
-    - VNM
-- code: ILO_PAC
-  name: "Pacific Islands (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
     - ASM
     - AUS
+    - BRN
     - COK
     - FJI
     - FSM
     - GUM
+    - IDN
+    - KHM
     - KIR
+    - LAO
     - MHL
+    - MMR
     - MNP
+    - MYS
     - NCL
     - NFK
     - NIU
     - NRU
     - NZL
+    - PHL
     - PLW
     - PNG
     - PYF
+    - SGP
     - SLB
+    - THA
     - TKL
+    - TLS
     - TON
     - TUV
+    - VNM
     - VUT
     - WLF
     - WSM
@@ -4514,71 +4460,53 @@
     - ILO_NSWE
     - ILO_EEU
     - ILO_CWA
+# NOTE: ILOSTAT lists Guernsey and Jersey under Western Europe, while also listing Channel Islands
+# (which OWID defines as Guernsey + Jersey) under Northern Europe. To avoid duplicating Guernsey and
+# Jersey across subregions, they are kept only via Channel Islands (OWID_CIS) here, where the bulk
+# of ILOSTAT's data for these territories is reported.
 - code: ILO_NSWE
   name: "Northern, Southern and Western Europe (ILO)"
   region_type: "aggregate"
   defined_by: ilo
   members:
-    - ILO_NEU
-    - ILO_SEU
-    - ILO_WEU
-- code: ILO_NEU
-  name: "Northern Europe (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
-    - DNK
-    - EST
-    - FIN
-    - FRO
-    - GBR
-    - IMN
-    - IRL
-    - ISL
-    - LTU
-    - LVA
-    - NOR
-    - OWID_CIS
-    - SWE
-- code: ILO_SEU
-  name: "Southern Europe (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
     - ALB
     - AND
+    - AUT
+    - BEL
     - BIH
+    - CHE
+    - DEU
+    - DNK
     - ESP
+    - EST
+    - FIN
+    - FRA
+    - FRO
+    - GBR
     - GIB
     - GRC
     - HRV
+    - IMN
+    - IRL
+    - ISL
     - ITA
+    - LIE
+    - LTU
+    - LUX
+    - LVA
+    - MCO
     - MKD
     - MLT
     - MNE
+    - NLD
+    - NOR
+    - OWID_CIS
     - OWID_KOS
     - PRT
     - SMR
     - SRB
     - SVN
-# NOTE: ILOSTAT lists Guernsey and Jersey under Western Europe, while also listing Channel Islands
-# (which OWID defines as Guernsey + Jersey) under Northern Europe. To avoid duplicating Guernsey and
-# Jersey across subregions, they are kept only via Channel Islands in Northern Europe, where the bulk
-# of ILOSTAT's data for these territories is reported.
-- code: ILO_WEU
-  name: "Western Europe (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
-    - AUT
-    - BEL
-    - CHE
-    - DEU
-    - FRA
-    - LIE
-    - LUX
-    - MCO
-    - NLD
+    - SWE
 - code: ILO_EEU
   name: "Eastern Europe (ILO)"
   region_type: "aggregate"
@@ -4599,26 +4527,14 @@
   region_type: "aggregate"
   defined_by: ilo
   members:
-    - ILO_CAS
-    - ILO_WAS
-- code: ILO_CAS
-  name: "Central Asia (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
-    - KAZ
-    - KGZ
-    - TJK
-    - TKM
-    - UZB
-- code: ILO_WAS
-  name: "Western Asia (ILO)"
-  region_type: "aggregate"
-  defined_by: ilo
-  members:
     - ARM
     - AZE
     - CYP
     - GEO
     - ISR
+    - KAZ
+    - KGZ
+    - TJK
+    - TKM
     - TUR
+    - UZB
