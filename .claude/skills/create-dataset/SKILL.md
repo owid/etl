@@ -126,8 +126,6 @@ Run it against the user's file:
 .venv/bin/etls <namespace>/<version>/<short_name> --path-to-file "<path_to_file>"
 ```
 
-**If the upload fails with a credentials / R2 error**, the environment is missing the `R2_*` keys needed to push snapshots to OWID storage (a common gap on fresh Cloud co-work environments). Don't try to work around it — tell the user plainly that the environment needs `R2_ENDPOINT`, `R2_ACCESS_KEY`, and `R2_SECRET_KEY` set, point them to the gear/settings of their environment to add them, and note that after adding the keys they may need to **start a fresh session** (and tell you to continue) for the new env vars to take effect. You can keep building the rest of the chain with `--skip-upload` in the meantime, but the snapshot must be uploaded before the PR is truly complete.
-
 ### Step 5 — Build meadow / garden / grapher steps + DAG
 
 Scaffold the three steps with `/create-etl-steps` (DAG file = the topic that best fits, e.g. `energy`, `health`; ask in Step 2 if unclear). Then adapt:
