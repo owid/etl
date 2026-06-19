@@ -696,6 +696,8 @@ def generate_vegetable_oil_yields(tb_qcl: Table, tb_fbsc: Table) -> Table:
     ELEMENT_CODE_FOR_PRODUCTION_QCL = "005510"
     # Element code for "Production" in faostat_fbsc.
     ELEMENT_CODE_FOR_PRODUCTION_FBSC = "005511"
+    # Element code for "Imports" in faostat_fbsc.
+    ELEMENT_CODE_FOR_IMPORTS_FBSC = "005611"
     # Unit for "Production".
     UNIT_FOR_PRODUCTION = "tonnes"
     # Element code for "Area harvested".
@@ -704,6 +706,23 @@ def generate_vegetable_oil_yields(tb_qcl: Table, tb_fbsc: Table) -> Table:
     UNIT_FOR_AREA = "hectares"
     # Item code for "Vegetable Oils" (required to get the global production of vegetable oils on a given year).
     ITEM_CODE_FOR_VEGETABLE_OILS_TOTAL = "00002914"
+    # FBSC primary-equivalent items used to compute each crop's seed imports/production share.
+    ITEM_CODE_FOR_SEEDS = {
+        "palm": "00002562",
+        "sunflower": "00002557",
+        "rapeseed": "00002558",
+        "soybean": "00002555",
+        "olive": "00002563",
+        "coconut": "00002560",
+        "groundnut": "00002552",
+        "cottonseed": "00002559",
+        "sesame": "00002561",
+    }
+    # A year is flagged as a net-importer year when seed imports exceed this share of local production.
+    MAX_SEED_IMPORT_SHARE = 0.20
+    # If a country exceeds the above in more than this share of its reported years, the entire series
+    # for that (country, crop) is masked; otherwise only the flagged years are masked.
+    PERSISTENT_NET_IMPORTER_YEAR_SHARE = 0.20
     # Item codes in faostat_qcl for the area of the crops (we don't need the production of the crops).
     ITEM_CODE_FOR_EACH_CROP_AREA = {
         # The item "Palm fruit oil" refers to the fruit that contains both the pulp (that leads to palm oil)
@@ -848,10 +867,102 @@ def generate_vegetable_oil_yields(tb_qcl: Table, tb_fbsc: Table) -> Table:
     # Replace infinite values (obtained when dividing by a null area) by nans.
     combined = combined.replace(np.inf, np.nan)
 
+    # Remove per-crop ratios for net seed-importer countries.
+    # World is exempt because FBSC's "Imports" at World level sums all country-level imports.
+    combined = _mask_oil_yields_for_net_seed_importers(
+        combined=combined,
+        tb_fbsc=tb_fbsc,
+        seed_item_codes=ITEM_CODE_FOR_SEEDS,
+        production_element_code=ELEMENT_CODE_FOR_PRODUCTION_FBSC,
+        imports_element_code=ELEMENT_CODE_FOR_IMPORTS_FBSC,
+        max_import_share=MAX_SEED_IMPORT_SHARE,
+        persistent_year_share=PERSISTENT_NET_IMPORTER_YEAR_SHARE,
+    )
+
     # Set an appropriate index and sort conveniently.
     tb_vegetable_oil_yields = combined.format(["country", "year"], short_name="vegetable_oil_yields")
 
     return tb_vegetable_oil_yields
+
+
+def _mask_oil_yields_for_net_seed_importers(
+    combined: Table,
+    tb_fbsc: Table,
+    seed_item_codes: dict,
+    production_element_code: str,
+    imports_element_code: str,
+    max_import_share: float,
+    persistent_year_share: float,
+) -> Table:
+    """Mask per-crop oil-yield ratios for net seed-importer countries. World is exempt.
+
+    A (country, crop) is a persistent net importer when more than `persistent_year_share` of its
+    reported years have seed imports above `max_import_share` of production; the entire series is
+    masked. Otherwise only the individual flagged years are masked.
+    """
+    seed_trade = tb_fbsc[
+        tb_fbsc["item_code"].isin(seed_item_codes.values())
+        & tb_fbsc["element_code"].isin([production_element_code, imports_element_code])
+        & (tb_fbsc["unit"] == "tonnes")
+    ][["country", "year", "item_code", "element_code", "value"]]
+    seed_trade = seed_trade.pivot(
+        index=["country", "year", "item_code"],
+        columns=["element_code"],
+        values=["value"],
+        join_column_levels_with="_",
+    ).rename(
+        columns={
+            f"value_{production_element_code}": "seed_production",
+            f"value_{imports_element_code}": "seed_imports",
+        },
+        errors="raise",
+    )
+    seed_trade["seed_imports"] = seed_trade["seed_imports"].fillna(0)
+    seed_trade["import_share"] = seed_trade["seed_imports"] / seed_trade["seed_production"].replace(0, np.nan)
+    # If production is zero/missing but imports are positive, treat as over the threshold.
+    seed_trade.loc[
+        seed_trade["seed_production"].isin([0, np.nan]) & (seed_trade["seed_imports"] > 0), "import_share"
+    ] = np.inf
+
+    item_code_to_crop = {code: crop for crop, code in seed_item_codes.items()}
+    seed_trade["crop"] = seed_trade["item_code"].map(item_code_to_crop)
+    seed_trade["over"] = seed_trade["import_share"] >= max_import_share
+
+    # Per (country, crop), share of reported years that are over the threshold. Years with no production
+    # and no imports are NaN-masked so they don't count towards either numerator or denominator.
+    has_data = seed_trade["seed_production"].notna() | (seed_trade["seed_imports"] > 0)
+    seed_trade["pair_over_share"] = (
+        seed_trade["over"]
+        .where(has_data)
+        .groupby([seed_trade["country"], seed_trade["crop"]], observed=True)
+        .transform("mean")
+    )
+    seed_trade["mask"] = seed_trade["over"] | (seed_trade["pair_over_share"] > persistent_year_share)
+
+    mask_wide = seed_trade.pivot(
+        index=["country", "year"], columns=["crop"], values=["mask"], join_column_levels_with="_"
+    )
+    mask_wide = mask_wide.rename(
+        columns={col: col.replace("mask_", "") + "_mask" for col in mask_wide.columns if col.startswith("mask_")},
+        errors="raise",
+    )
+
+    combined = combined.merge(mask_wide, on=["country", "year"], how="left")
+
+    is_world = combined["country"] == "World"
+    for crop in seed_item_codes:
+        mask_col = f"{crop}_mask"
+        if mask_col not in combined.columns:
+            continue
+        masked = combined[mask_col].fillna(False) & (~is_world)
+        for metric_suffix in ("_tonnes_per_hectare", "_hectares_per_tonne", "_area_to_meet_global_oil_demand"):
+            col = f"{crop}{metric_suffix}"
+            if col in combined.columns:
+                combined.loc[masked, col] = np.nan
+
+    combined = combined.drop(columns=[c for c in combined.columns if c.endswith("_mask")], errors="ignore")
+
+    return combined
 
 
 def generate_agriculture_land_evolution(tb_rl: Table) -> Table:

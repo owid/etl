@@ -2,8 +2,6 @@ dataset:
   title: Additional FAOSTAT variables
   description: |
     Additional variables created using data from different FAOSTAT datasets.
-  owners:
-    - Pablo Rosado
 
 definitions:
   common:

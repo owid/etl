@@ -146,7 +146,7 @@ steps:
         #
         export://explorers/agriculture/latest/fertilizers:
                 - data://grapher/faostat/2026-02-25/faostat_rfn
-                - data://grapher/faostat/2026-02-25/additional_variables
+                - data://grapher/faostat/2026-05-22/additional_variables
                 - data-private://grapher/agriculture/2014/excess_fertilizers__west_et_al__2014
                 - data-private://grapher/agriculture/2014-01-01/nitrogen_efficiency__lassaletta_et_al__2014
 
