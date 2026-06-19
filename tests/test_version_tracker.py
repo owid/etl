@@ -22,14 +22,12 @@ def create_mock_version_tracker(dag, step_prefix=MOCK_STEP_PREFIX):
     def mock_load_dag(filename=paths.DEFAULT_DAG_FILE):
         # This function mimics load_dag, but using a custom dag.
         _dag = dag["steps"].copy()
-        if filename == paths.DAG_ARCHIVE_FILE:
-            _dag.update(dag["archive"])
         return rename_steps_in_dag(dag=_dag, prefix=step_prefix)
 
     @patch.object(etl.version_tracker, "load_dag", mock_load_dag)
     def mock_version_tracker():
         # This function initializes VersionTracker using a mock dag.
-        return VersionTracker(connect_to_db=False, warn_on_archivable=True)
+        return VersionTracker(connect_to_db=False)
 
     return mock_version_tracker()
 
@@ -42,10 +40,8 @@ def test_get_direct_dependencies_for_step_in_dag(mock_dag):
 
 
 def test_get_direct_usages_for_step_in_dag(mock_dag, mock_expected_direct_usages):
-    mock_dag_all = mock_dag["steps"].copy()
-    mock_dag_all.update(mock_dag["archive"])
     for step in mock_dag["steps"]:
-        usages = etl.version_tracker.get_direct_step_usages(dag=mock_dag_all, step=step)
+        usages = etl.version_tracker.get_direct_step_usages(dag=mock_dag["steps"], step=step)
         assert sorted(usages) == sorted(mock_expected_direct_usages[step])
 
 
@@ -56,11 +52,9 @@ def test_get_all_dependencies_for_step_in_dag(mock_dag, mock_expected_dependenci
 
 
 def test_get_all_usages_for_step_in_dag(mock_dag, mock_expected_usages):
-    mock_dag_all = mock_dag["steps"].copy()
-    mock_dag_all.update(mock_dag["archive"])
-    mock_dag_all_reverse = reverse_graph(mock_dag_all)
+    mock_dag_reverse = reverse_graph(mock_dag["steps"])
     for step in mock_dag["steps"]:
-        usages = etl.version_tracker.get_all_step_usages(dag_reverse=mock_dag_all_reverse, step=step)
+        usages = etl.version_tracker.get_all_step_usages(dag_reverse=mock_dag_reverse, step=step)
         assert sorted(usages) == sorted(mock_expected_usages[step])
 
 
@@ -83,17 +77,6 @@ def test_version_tracker_get_all_usages(mock_dag, mock_expected_usages):
     for step in rename_steps_in_dag(dag=mock_dag["steps"], prefix=MOCK_STEP_PREFIX):
         dependencies = versions.get_all_step_usages(step=step)
         assert sorted(dependencies) == sorted(expected_usages[step])
-
-
-@patch("etl.version_tracker.log")
-def test_version_tracker_raise_error_if_active_step_depends_on_archive_step(mock_log, mock_dag):
-    # Include an archive step as a dependency of an active step.
-    mock_dag["steps"]["a"] = set(["b", "c", "g"])
-    versions = create_mock_version_tracker(dag=mock_dag)
-    versions.check_that_active_dependencies_are_not_archived()
-    mock_log.error.assert_called()
-    # Checks for a specific substring of the logged message.
-    assert "Missing" in mock_log.error.call_args[0][0]
 
 
 @patch("etl.version_tracker.log")

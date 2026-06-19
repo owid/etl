@@ -1,113 +1,168 @@
 steps:
   # EIU (2024)
+  # archived; last active in 37724248da9e on 2025-03-19
   data://meadow/democracy/2024-05-22/eiu:
     - snapshot://democracy/2024-05-22/eiu_gapminder.csv
     - snapshot://democracy/2024-05-22/eiu_2021.csv
     - snapshot://democracy/2024-05-22/eiu_2022.csv
     - snapshot://democracy/2024-05-22/eiu_2023.csv
+  # archived; last active in 37724248da9e on 2025-03-19
   data://garden/democracy/2024-03-07/eiu:
     - data://meadow/democracy/2024-05-22/eiu
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+  # archived; last active in 37724248da9e on 2025-03-19
   data://grapher/democracy/2024-05-22/eiu:
     - data://garden/democracy/2024-03-07/eiu
 
   # Varieties of Democracy (2023)
+  # archived; last active in 37724248da9e on 2025-03-19
   data://meadow/democracy/2023-03-02/vdem:
     - snapshot://democracy/2023-03-02/vdem.csv
+  # archived; last active in 37724248da9e on 2025-03-19
   data://garden/democracy/2023-03-02/vdem:
     - data://meadow/democracy/2023-03-02/vdem
+  # archived; last active in 37724248da9e on 2025-03-19
   data://grapher/democracy/2023-03-02/vdem:
     - data://garden/democracy/2023-03-02/vdem
 
   # Episodes of Regime Transition (2024)
+  # archived; last active in f841ba51da2b on 2025-05-06
   data://meadow/democracy/2024-05-01/ert:
     - snapshot://democracy/2024-05-01/ert.csv
+  # archived; last active in f841ba51da2b on 2025-05-06
   data://garden/democracy/2024-03-07/ert:
     - data://meadow/democracy/2024-05-01/ert
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+  # archived; last active in f841ba51da2b on 2025-05-06
   data://grapher/democracy/2024-05-01/ert:
     - data://garden/democracy/2024-03-07/ert
 
   # Lexical Index (2023)
+  # archived; last active in 3994c0b600e2 on 2025-05-30
   data://meadow/democracy/2024-05-09/lexical_index:
     - snapshot://democracy/2024-05-09/lexical_index.xlsx
+  # archived; last active in 3994c0b600e2 on 2025-05-30
   data://garden/democracy/2024-03-07/lexical_index:
     - data://meadow/democracy/2024-05-09/lexical_index
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+  # archived; last active in 3994c0b600e2 on 2025-05-30
   data://grapher/democracy/2024-05-09/lexical_index:
     - data://garden/democracy/2024-03-07/lexical_index
   # Lexical Index (2024)
+  # archived; last active in 7fca19a73c00 on 2025-06-26
   data://meadow/democracy/2025-05-29/lexical_index:
     - snapshot://democracy/2025-05-29/lexical_index.xlsx
+  # archived; last active in 7fca19a73c00 on 2025-06-26
   data://garden/democracy/2025-05-29/lexical_index:
     - data://garden/demography/2024-07-15/population
     - data://meadow/democracy/2025-05-29/lexical_index
     - data://garden/regions/2023-01-01/regions
+  # archived; last active in 7fca19a73c00 on 2025-06-26
   data://grapher/democracy/2025-05-29/lexical_index:
     - data://garden/democracy/2025-05-29/lexical_index
 
   # Freedom House (2025)
+  # archived; last active in 07c9cf7326f6 on 2026-03-24
   data://meadow/democracy/2025-06-02/fh:
     - snapshot://democracy/2025-06-02/fh_ratings.xlsx
     - snapshot://democracy/2024-05-16/fh_scores.xlsx
     - snapshot://democracy/2025-06-02/fh.xlsx
+  # archived; last active in 07c9cf7326f6 on 2026-03-24
   data://garden/democracy/2025-06-02/fh:
     - data://meadow/democracy/2025-06-02/fh
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
+  # archived; last active in 07c9cf7326f6 on 2026-03-24
   data://grapher/democracy/2025-06-02/fh:
     - data://garden/democracy/2025-06-02/fh
 
   # Freedom House (2024)
+  # archived; last active in a1728fe8e371 on 2025-06-03
   data://meadow/democracy/2024-05-16/fh:
     - snapshot://democracy/2024-05-16/fh_scores.xlsx
     - snapshot://democracy/2024-05-16/fh_ratings.xlsx
+  # archived; last active in a1728fe8e371 on 2025-06-03
   data://garden/democracy/2024-03-07/fh:
     - data://meadow/democracy/2024-05-16/fh
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+  # archived; last active in a1728fe8e371 on 2025-06-03
   data://grapher/democracy/2024-05-16/fh:
     - data://garden/democracy/2024-03-07/fh
 
     # Varieties of Democracy (2024)
+  # archived; last active in ca1b57cbc8e7 on 2025-06-05
   data://meadow/democracy/2024-03-07/vdem:
     - snapshot://democracy/2024-03-18/vdem.zip
+  # archived; last active in ca1b57cbc8e7 on 2025-06-05
   data://garden/democracy/2024-03-07/vdem:
     - data://meadow/democracy/2024-03-07/vdem
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+  # archived; last active in ca1b57cbc8e7 on 2025-06-05
   data://grapher/democracy/2024-03-07/vdem:
     - data://garden/democracy/2024-03-07/vdem
 
   # Varieties of Democracy (2025)
+  # archived; last active in e2603a22f6cd on 2026-03-23
   data://meadow/democracy/2025-03-17/vdem:
     - snapshot://democracy/2025-03-17/vdem.zip
+  # archived; last active in e2603a22f6cd on 2026-03-23
   data://garden/democracy/2025-03-17/vdem:
     - data://meadow/democracy/2025-03-17/vdem
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
+  # archived; last active in e2603a22f6cd on 2026-03-23
   data://grapher/democracy/2025-03-17/vdem:
     - data://garden/democracy/2025-03-17/vdem
 
   # Boix-Miller-Rosato (2013)
+  # archived; last active in 9ae584371654 on 2025-06-03
   data://meadow/democracy/2024-03-07/bmr:
     - snapshot://democracy/2024-03-07/bmr.csv
+  # archived; last active in 9ae584371654 on 2025-06-03
   data://garden/democracy/2024-03-07/bmr:
     - data://meadow/democracy/2024-03-07/bmr
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+  # archived; last active in 9ae584371654 on 2025-06-03
   data://grapher/democracy/2024-03-07/bmr:
     - data://garden/democracy/2024-03-07/bmr
 
   # Lexical index 2025
-data://meadow/democracy/2025-06-26/lexical_index:
-  - snapshot://democracy/2025-06-26/lexical_index.xlsx
-data://garden/democracy/2025-06-26/lexical_index:
-  - data://garden/regions/2023-01-01/regions
-  - data://meadow/democracy/2025-06-26/lexical_index
-  - data://garden/demography/2024-07-15/population
-data://grapher/democracy/2025-06-26/lexical_index:
-  - data://garden/democracy/2025-06-26/lexical_index
+  # archived; last active in 05f126b37784 on 2026-04-02
+  data://meadow/democracy/2025-06-26/lexical_index:
+    - snapshot://democracy/2025-06-26/lexical_index.xlsx
+  # archived; last active in 05f126b37784 on 2026-04-02
+  data://garden/democracy/2025-06-26/lexical_index:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/democracy/2025-06-26/lexical_index
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in 05f126b37784 on 2026-04-02
+  data://grapher/democracy/2025-06-26/lexical_index:
+    - data://garden/democracy/2025-06-26/lexical_index
+  # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://grapher/democracy/2025-05-05/ert:
+    - data://garden/democracy/2025-05-05/ert
+  # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://garden/democracy/2025-05-05/ert:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/democracy/2025-05-05/ert
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://garden/democracy/2024-03-07/bti:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+    - data://meadow/democracy/2024-05-21/bti
+  # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://meadow/democracy/2024-05-21/bti:
+    - snapshot://democracy/2024-05-21/bti.xlsx
+  # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://meadow/democracy/2025-05-05/ert:
+    - snapshot://democracy/2025-05-05/ert.csv
+  # archived; last active in 44d59b9fb58e on 2026-03-27
+  data://grapher/democracy/2024-05-21/bti:
+    - data://garden/democracy/2024-03-07/bti

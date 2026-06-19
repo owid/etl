@@ -335,11 +335,7 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
 15. Update other steps in the `agriculture` namespace that rely on any `faostat_*` step.
 
-16. Archive old steps.
-
-    ```bash
-    etl archive faostat/YYYY-MM-DD --include-usages
-    ```
+16. Remove the old steps from the active dag and delete their files. `etl archive-dag` then records them in the archive dag (with the commit where they were last active, for recovery).
 
 17. After merging all code and once production is up-to-date, archive unnecessary grapher datasets.
 

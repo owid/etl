@@ -14,6 +14,13 @@ steps:
       - data://meadow/iea/2024-11-20/fossil_fuel_subsidies:
         - snapshot://iea/2024-11-20/fossil_fuel_subsidies.xlsx
   #
+  # IEA - Electric vehicle charging points
+  #
+  data://grapher/iea/2026-06-18/ev_charging_points:
+    - data://garden/iea/2026-06-18/ev_charging_points:
+      - data://meadow/iea/2026-06-18/ev_charging_points:
+        - snapshot://iea/2026-06-18/ev_charging_points.csv
+  #
   # Energy prices explorer
   #
   export://multidim/energy/latest/energy_prices:
