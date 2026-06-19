@@ -1336,15 +1336,9 @@ def run() -> None:
     tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
 
     ####################################################################################################################
-    # Corrections to USGS current data.
-    # Zinc mine reserves in Australia in 2022 is unreasonably high, much larger than the world.
-    tb_flat.loc[(tb_flat["country"] == "Australia") & (tb_flat["year"] == 2022), "reserves|Zinc|Mine|tonnes"] = None
-
-    # Asbestos mine production in Kazakhstan 2020, data says "27400", but in BGS, it is "227400", which is much more
-    # reasonable, looking at prior and posterior data. So it looks like an error in the data. Remove that point.
-    tb_flat.loc[(tb_flat["country"] == "Kazakhstan") & (tb_flat["year"] == 2020), "production|Asbestos|Mine|tonnes"] = (
-        None
-    )
+    # Corrections to USGS current data: known upstream data errors, declared in
+    # mineral_commodity_summaries.corrections.yml (Australia zinc reserves 2022, Kazakhstan asbestos 2020).
+    tb_flat = paths.apply_corrections(tb_flat)
 
     # As explained above (in the mapping) Chromium production is in gross weight, but reserves are not.
     tb_flat = tb_flat.rename(

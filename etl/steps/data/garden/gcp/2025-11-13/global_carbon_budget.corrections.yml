@@ -1,7 +1,6 @@
 # Known upstream data errors in the Global Carbon Budget, corrected locally until fixed at the source.
 # See etl/data_corrections.py for the format.
-- id: gcp-panama-negative-consumption
-  indicator: consumption_emissions
+- indicator: consumption_emissions
   entity: Panama
   years: [2006, 2008, 2016]
   action: drop

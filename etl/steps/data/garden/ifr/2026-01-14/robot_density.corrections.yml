@@ -1,0 +1,10 @@
+# Known upstream data errors in IFR robot density, corrected locally until fixed at the source.
+# See etl/data_corrections.py for the format. Values are in robots per 10,000 employees (post the /10 rescale).
+- indicator: robot_density
+  entity: China
+  years: [2023]
+  action: override
+  value: 14.2
+  reason: Source value for China 2023 was incorrect; IFR revised it to 142 robots per 10,000 employees (forwarded to us; the image with the new data is paywalled).
+  provider: International Federation of Robotics
+  status: acknowledged

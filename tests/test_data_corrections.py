@@ -22,7 +22,6 @@ def _make_table() -> Table:
 
 def _correction(**overrides):
     base = {
-        "id": "test-correction",
         "indicator": "value",
         "action": "drop",
         "reason": "Test reason.",
@@ -50,12 +49,14 @@ def test_drop_does_not_mutate_input():
     assert len(tb) == 5
 
 
-def test_years_latest_resolves_per_entity():
+def test_years_latest_resolves_to_global_max():
     tb = _make_table()
     out = apply_corrections(tb, [_correction(entity="Panama", years="latest")])
-    # Panama's latest year is 2016.
+    # The table's latest year is 2016; only Panama's 2016 row is dropped.
     assert (out["country"] == "Panama").sum() == 2
     assert not ((out["country"] == "Panama") & (out["year"] == 2016)).any()
+    # France's 2016 row is untouched (the correction is scoped to Panama).
+    assert ((out["country"] == "France") & (out["year"] == 2016)).any()
 
 
 def test_years_range_from_to():
@@ -76,7 +77,7 @@ def test_override_by_match_value():
     tb = _make_table()
     out = apply_corrections(
         tb,
-        [_correction(id="ovr", action="override", match={"value": 10.0}, value=99.0)],
+        [_correction(action="override", match={"value": 10.0}, value=99.0)],
     )
     # France 2006 had value 10.0 → now 99.0.
     assert out.loc[(out["country"] == "France") & (out["year"] == 2006), "value"].item() == 99.0
@@ -89,12 +90,12 @@ def test_override_requires_value():
     from etl.data_corrections import _validate_correction
 
     with pytest.raises(AssertionError):
-        _validate_correction(_correction(id="bad", action="override", match={"value": 10.0}), "<test>")
+        _validate_correction(_correction(action="override", match={"value": 10.0}), "<test>")
 
 
 def test_flag_is_a_noop_on_data():
     tb = _make_table()
-    out = apply_corrections(tb, [_correction(id="flagged", action="flag", entity="Panama", years=[2006])])
+    out = apply_corrections(tb, [_correction(action="flag", entity="Panama", years=[2006])])
     assert len(out) == len(tb)
 
 
@@ -111,11 +112,10 @@ def test_works_with_country_year_in_index():
     assert len(out) == 4
 
 
-def test_load_corrections_validates_and_dedupes(tmp_path):
+def test_load_corrections_validates(tmp_path):
     p = tmp_path / "x.corrections.yml"
     p.write_text(
-        "- id: a\n"
-        "  indicator: value\n"
+        "- indicator: value\n"
         "  entity: Panama\n"
         "  years: [2006]\n"
         "  action: drop\n"
@@ -124,31 +124,23 @@ def test_load_corrections_validates_and_dedupes(tmp_path):
         "  status: open\n"
     )
     corrections = load_corrections(p)
-    assert corrections[0]["id"] == "a"
+    assert corrections[0]["entity"] == "Panama"
 
 
-def test_load_corrections_rejects_duplicate_ids(tmp_path):
+def test_load_corrections_rejects_missing_required_field(tmp_path):
     p = tmp_path / "x.corrections.yml"
-    entry = (
-        "- id: dup\n"
-        "  indicator: value\n"
-        "  entity: Panama\n"
-        "  years: [2006]\n"
-        "  action: drop\n"
-        "  reason: r\n"
-        "  provider: p\n"
-        "  status: open\n"
+    # Missing 'reason'.
+    p.write_text(
+        "- indicator: value\n  entity: Panama\n  years: [2006]\n  action: drop\n  provider: p\n  status: open\n"
     )
-    p.write_text(entry + entry)
-    with pytest.raises(AssertionError, match="Duplicate correction id"):
+    with pytest.raises(AssertionError, match="missing required 'reason'"):
         load_corrections(p)
 
 
 def test_load_corrections_rejects_both_entity_and_match(tmp_path):
     p = tmp_path / "x.corrections.yml"
     p.write_text(
-        "- id: a\n"
-        "  indicator: value\n"
+        "- indicator: value\n"
         "  entity: Panama\n"
         "  years: [2006]\n"
         "  match: {value: 4.5}\n"

@@ -1,0 +1,20 @@
+# Known upstream data errors in the USGS Mineral Commodity Summaries, blanked locally until fixed at
+# the source. See etl/data_corrections.py for the format. `value: null` blanks the bad cell without
+# dropping the (country, year) row (other minerals for that row are fine).
+- indicator: reserves|Zinc|Mine|tonnes
+  entity: Australia
+  years: [2022]
+  action: override
+  value: null
+  reason: Zinc mine reserves for Australia in 2022 are unreasonably high (much larger than the world total).
+  provider: USGS
+  status: open
+
+- indicator: production|Asbestos|Mine|tonnes
+  entity: Kazakhstan
+  years: [2020]
+  action: override
+  value: null
+  reason: Asbestos mine production for Kazakhstan in 2020 is reported as 27400, but BGS reports 227400, which is consistent with prior and posterior years; the USGS value looks like a data-entry error.
+  provider: USGS
+  status: open
