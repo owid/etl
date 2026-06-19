@@ -930,7 +930,7 @@ def _mask_oil_yields_for_net_seed_importers(
 
     # Per (country, crop), share of reported years that are over the threshold. Years with no production
     # and no imports are NaN-masked so they don't count towards either numerator or denominator.
-    has_data = seed_trade["seed_production"].notna() | (seed_trade["seed_imports"] > 0)
+    has_data = (seed_trade["seed_production"] > 0) | (seed_trade["seed_imports"] > 0)
     seed_trade["pair_over_share"] = (
         seed_trade["over"]
         .where(has_data)
