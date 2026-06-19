@@ -2,7 +2,7 @@ definitions:
   common:
     presentation:
       grapher_config:
-        note: Because the estimates of city and metropolitan areas are based on national definitions of what constitutes a city or metropolitan area, cross-country comparisons should be made with caution.
+        note: Cross-country comparability is limited because of differences in national definitions.
       topic_tags:
         - Urbanization
     processing_level: minor
@@ -16,17 +16,15 @@ definitions:
   national_definition_breaks_key: &national_definition_breaks_key >-
     Definitions can also change within a country over time, creating breaks in the
     series that reflect reclassification rather than real changes in where people live.
+    For cross-country comparisons that avoid these issues, we also publish indicators based on the
+    [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php),
+    a harmonized framework that classifies settlements by population density and size
+    using consistent criteria across countries. You can find
+    [these indicators here](https://ourworldindata.org/search?datasetProducts=Global+Human+Settlement+Layer+Dataset).
 
   wup_estimation_key: &wup_estimation_key >-
     Values are reported for every year, but the underlying censuses occur roughly once a
     decade; intervening years are interpolated rather than directly observed.
-
-  degurba_comparison_key: &degurba_comparison_key >-
-    The [Degree of Urbanization (DEGURBA)](https://human-settlement.emergency.copernicus.eu/degurbaDefinitions.php)
-    classifies settlements by population density and size using harmonized definitions
-    across countries, making it better suited for cross-country comparisons. Our charts using
-    [DEGURBA data](https://ourworldindata.org/search?datasetProducts=Global+Human+Settlement+Layer+Dataset)
-    use this harmonized standard.
 
   wup_method_projections_key: &wup_method_projections_key |-
     <% if data_type == "projections" %>The UN produces these projections by applying its modelled urban population share to medium-variant total population projections; rural population is the remainder.<% endif %>
@@ -76,10 +74,10 @@ tables:
         unit: people
         short_unit: ''
         description_short: |-
-          <% if area_type == "urban" %><% if data_type == "projections" %>Projected number of people living in areas classified as urban, based on each country's national definition.
-          <% else %>Number of people living in areas classified as urban, based on each country's national definition.
-          <% endif %><% elif area_type == "rural" %><% if data_type == "projections" %>Projected number of people living in areas classified as rural, based on each country's national definition.
-          <% else %>Number of people living in areas classified as rural, based on each country's national definition.
+          <% if area_type == "urban" %><% if data_type == "projections" %>Projected number of people living in urban areas, based on each country's national definition.
+          <% else %>Number of people living in urban areas, based on each country's national definition.
+          <% endif %><% elif area_type == "rural" %><% if data_type == "projections" %>Projected number of people living in rural areas, based on each country's national definition.
+          <% else %>Number of people living in rural areas, based on each country's national definition.
           <% endif %><% else %><% if data_type == "projections" %>Projected total population, as reported by the UN World Urbanization Prospects.
           <% else %>Total population, as reported by the UN World Urbanization Prospects.
           <% endif %><% endif %>
@@ -87,7 +85,7 @@ tables:
           - *national_definition_key
           - *national_definition_breaks_key
           - *wup_method_projections_key
-          - *degurba_comparison_key
+
         description_processing: |-
           The UN source reports population in thousands. We converted these values to people. These estimates follow national definitions to preserve continuity with official statistics and earlier editions of the UN World Urbanization Prospects.
         display:
@@ -111,10 +109,10 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: |-
-          <% if area_type == "urban" %><% if data_type == "projections" %>Projected share of the population living in areas classified as urban, based on each country's national definition.
-          <% else %>Share of the population living in areas classified as urban, based on each country's national definition.
-          <% endif %><% elif area_type == "rural" %><% if data_type == "projections" %>Projected share of the population living in areas classified as rural, based on each country's national definition.
-          <% else %>Share of the population living in areas classified as rural, based on each country's national definition.
+          <% if area_type == "urban" %><% if data_type == "projections" %>Projected share of the population living in urban areas, based on each country's national definition.
+          <% else %>Share of the population living in urban areas, based on each country's national definition.
+          <% endif %><% elif area_type == "rural" %><% if data_type == "projections" %>Projected share of the population living in rural areas, based on each country's national definition.
+          <% else %>Share of the population living in rural areas, based on each country's national definition.
           <% endif %><% else %><% if data_type == "projections" %>Projected share of the total population in this area category, as reported by the UN World Urbanization Prospects.
           <% else %>Share of the total population in this area category, as reported by the UN World Urbanization Prospects.
           <% endif %><% endif %>
@@ -122,7 +120,7 @@ tables:
           - *national_definition_key
           - *national_definition_breaks_key
           - *wup_method_projections_key
-          - *degurba_comparison_key
+
         display:
           numDecimalPlaces: 1
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
@@ -151,7 +149,7 @@ tables:
           - *national_definition_key
           - *wup_estimation_key
           - *wup_method_projections_key
-          - *degurba_comparison_key
+
         display:
           numDecimalPlaces: 1
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
@@ -173,13 +171,13 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: |-
-          <% if data_type == "projections" %>Projected average annual rate of change of the <% else %>Average annual rate of change of the <% endif %><% if area_type == "urban" %>share of the population living in areas classified as urban<% elif area_type == "rural" %>share of the population living in areas classified as rural<% else %>population share<% endif %>.
+          <% if data_type == "projections" %>Projected average annual rate of change of the <% else %>Average annual rate of change of the <% endif %><% if area_type == "urban" %>share of the population living in urban areas<% elif area_type == "rural" %>share of the population living in rural areas<% else %>population share<% endif %>.
         description_key:
           - This indicator captures the pace at which the <% if area_type == "urban" %>urban<% elif area_type == "rural" %>rural<% else %>population<% endif %> share is shifting. Each value is the average annual change over the preceding five-year period.
           - *wup_share_growth_key
           - *national_definition_key
           - *wup_method_projections_key
-          - *degurba_comparison_key
+
         display:
           numDecimalPlaces: 1
           isProjection: <% if data_type == "projections" %>True<% else %>False<% endif %>
@@ -198,17 +196,16 @@ tables:
         title: Share of population living in urban areas - HYDE and UN national definitions combined
         unit: '%'
         short_unit: '%'
-        description_short: Share of the population living in areas classified as urban, combining UN estimates from 1950 onward with modelled historical data back to 10,000 BCE.
+        description_short: Share of the population living in urban areas, combining UN estimates with modelled historical data.
         description_key:
           - *hyde_combined_key
-          - *national_definition_key
-          - *national_definition_breaks_key
-          - *degurba_comparison_key
         description_processing: |-
           We combined two sources to extend the urban share series as far back as possible. For years before 1950, we use urban population share estimates from HYDE v3.3. From 1950 onward, we use the urban population share from the UN World Urbanization Prospects, based on each country's national definition.
         display:
           numDecimalPlaces: 1
         presentation:
+          grapher_config:
+            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
           title_public: Share of population living in urban areas
           title_variant: UN national definitions, HYDE
 
@@ -216,17 +213,16 @@ tables:
         title: Urban population - HYDE and UN national definitions combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in areas classified as urban, combining UN estimates from 1950 onward with modelled historical data back to 10,000 BCE.
+        description_short: Number of people living in urban areas, combining UN estimates with modelled historical data.
         description_key:
           - *hyde_combined_key
-          - *national_definition_key
-          - *national_definition_breaks_key
-          - *degurba_comparison_key
         description_processing: |-
           We combined two sources to extend the urban population series as far back as possible. For years before 1950, we use urban population estimates from HYDE v3.3. From 1950 onward, we use urban population from the UN World Urbanization Prospects, based on each country's national definition. The UN source reports population in thousands; we converted these values to people to align with HYDE.
         display:
           numDecimalPlaces: 0
         presentation:
+          grapher_config:
+            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
           title_public: Urban population
           title_variant: UN national definitions, HYDE
 
@@ -234,17 +230,16 @@ tables:
         title: Rural population - HYDE and UN national definitions combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in areas classified as rural, combining UN estimates from 1950 onward with modelled historical data back to 10,000 BCE.
+        description_short: Number of people living in rural areas, combining UN estimates with modelled historical data.
         description_key:
           - *hyde_combined_key
-          - *national_definition_key
-          - *national_definition_breaks_key
-          - *degurba_comparison_key
         description_processing: |-
           We combined two sources to extend the rural population series as far back as possible. For years before 1950, we use rural population estimates from HYDE v3.3. From 1950 onward, we use rural population from the UN World Urbanization Prospects, based on each country's national definition. The UN source reports population in thousands; we converted these values to people to align with HYDE.
         display:
           numDecimalPlaces: 0
         presentation:
+          grapher_config:
+            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
           title_public: Rural population
           title_variant: UN national definitions, HYDE
 
@@ -254,17 +249,16 @@ tables:
         title: Share of population living in urban areas - HYDE, UN national definitions, and projections combined
         unit: '%'
         short_unit: '%'
-        description_short: Share of the population living in areas classified as urban, combining UN estimates and projections with modelled historical data back to 10,000 BCE.
+        description_short: Share of the population living in urban areas, combining UN estimates and projections with modelled historical data.
         description_key:
           - *hyde_combined_with_projections_key
-          - *national_definition_key
-          - *national_definition_breaks_key
-          - *degurba_comparison_key
         description_processing: |-
           We combined three sources to extend the urban share series through 2100. For years before 1950, we use urban population share estimates from HYDE v3.3. From 1950 to 2025, we use the urban population share from the UN World Urbanization Prospects, based on each country's national definition. From 2026 onward, we use UN projections.
         display:
           numDecimalPlaces: 1
         presentation:
+          grapher_config:
+            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
           title_public: Share of population living in urban areas
           title_variant: UN national definitions, HYDE, with projections
 
@@ -272,17 +266,16 @@ tables:
         title: Urban population - HYDE, UN national definitions, and projections combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in areas classified as urban, combining UN estimates and projections with modelled historical data back to 10,000 BCE.
+        description_short: Number of people living in urban areas, combining UN estimates and projections with modelled historical data.
         description_key:
           - *hyde_combined_with_projections_key
-          - *national_definition_key
-          - *national_definition_breaks_key
-          - *degurba_comparison_key
         description_processing: |-
           We combined three sources to extend the urban population series through 2100. For years before 1950, we use urban population estimates from HYDE v3.3. From 1950 to 2025, we use urban population from the UN World Urbanization Prospects, based on each country's national definition. From 2026 onward, we use UN projections. The UN source reports population in thousands; we converted these values to people to align with HYDE.
         display:
           numDecimalPlaces: 0
         presentation:
+          grapher_config:
+            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
           title_public: Urban population
           title_variant: UN national definitions, HYDE, with projections
 
@@ -290,16 +283,15 @@ tables:
         title: Rural population - HYDE, UN national definitions, and projections combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in areas classified as rural, combining UN estimates and projections with modelled historical data back to 10,000 BCE.
+        description_short: Number of people living in rural areas, combining UN estimates and projections with modelled historical data.
         description_key:
           - *hyde_combined_with_projections_key
-          - *national_definition_key
-          - *national_definition_breaks_key
-          - *degurba_comparison_key
         description_processing: |-
           We combined three sources to extend the rural population series through 2100. For years before 1950, we use rural population estimates from HYDE v3.3. From 1950 to 2025, we use rural population from the UN World Urbanization Prospects, based on each country's national definition. From 2026 onward, we use UN projections. The UN source reports population in thousands; we converted these values to people to align with HYDE.
         display:
           numDecimalPlaces: 0
         presentation:
+          grapher_config:
+            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
           title_public: Rural population
           title_variant: UN national definitions, HYDE, with projections
