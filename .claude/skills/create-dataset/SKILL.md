@@ -211,20 +211,28 @@ Confirm the upsert actually succeeded before moving on: it should print the data
 
 The dataset and any charts they build live on the **staging server**, not on ourworldindata.org. Getting them to live is a manual step the user has to take, and the workflow (approve charts in chart-diff, then merge the PR) is unfamiliar to non-experts — they will not discover it on their own. Spell it out explicitly in the handoff, with the real links pasted in:
 
-1. **Charts must be approved in chart-diff before they sync to live.** If the user creates any charts on the staging admin, those charts only reach production if they're **approved** in chart-diff first. Give them the direct link and tell them to click **Approve** on each chart:
+1. **Charts must be approved in chart-diff before they sync to live — and this is a human step, not yours.** If the user creates any charts on the staging admin, those charts only reach production if they're **approved** in chart-diff first. **Never approve charts yourself** (no CLI, no script, no direct DB write) — chart-diff exists so a person eyeballs each chart before it goes live, and that review must stay human. Give them the direct link and tell them to click **Approve** on each chart themselves:
 
    ```
    http://staging-site-<branch>/etl/wizard/chart-diff
    ```
 
-   (Alternatively: charts created directly in the **live** admin don't need this step — but the dataset itself still has to be merged to live first, below. Mention this only if they ask; the staging→approve→merge path is the default.)
+   Creating the charts is also something the user does in the admin — assume they'll need to visit the admin at some point regardless; your job is to make that the *only* thing they have to do there.
 
-2. **Merging the PR is what publishes the dataset to live.** No external review is required for a data PR like this — the user is allowed to merge it themselves. Tell them, in order:
-   - Make sure the PR checks are mostly green.
-   - Click **"Ready for review"**, then **"Squash and merge"** on the PR (link the PR URL).
+2. **Merging the PR is what publishes the dataset to live.** No external review is required for a data PR like this. The user can click **"Ready for review"** then **"Squash and merge"** on the PR themselves (link the PR URL) — but you can also **do the merge for them from the session, if they explicitly ask you to and the checks are green.** This is the one outward-facing action where, given an explicit "merge it" from the user, you should go ahead — it saves a non-expert a trip to GitHub. Do it carefully:
+
+   ```bash
+   gh pr checks <number>          # confirm checks are green first
+   gh pr ready <number>           # take it out of draft
+   gh pr merge <number> --squash  # publish
+   ```
+
+   - **Only merge on an explicit request** from the user ("merge it", "go live", "ship it") — never proactively, and never as the default end of the skill.
+   - **Only merge if checks are green.** If a check is red or still running, say so and don't merge — surface what's failing and let them decide. (Don't merge a red PR just because they asked; tell them what's red first.)
+   - If they'd rather click it themselves, that's fine — point them at the PR.
    - The dataset (and any approved charts) land on ourworldindata.org a few minutes after the merge.
 
-3. Make this a short, plain-language checklist at the end of your handoff — e.g. *"When you're happy: (1) approve your charts here «chart-diff link», (2) merge the PR here «PR link», and it's live in a few minutes."* Paste the real URLs, not placeholders.
+3. Make this a short, plain-language checklist at the end of your handoff — e.g. *"When you're happy: (1) approve your charts here «chart-diff link», (2) then either merge the PR yourself «PR link» or just tell me to merge it and I'll do it once the checks are green — it's live a few minutes later."* Paste the real URLs, not placeholders.
 
 ## Notes & gotchas
 
