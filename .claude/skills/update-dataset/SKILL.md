@@ -37,7 +37,7 @@ Assumptions:
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
 - [ ] Review `sanity_checks` output (enable log flag, re-run, scan log, revert flag) — if none found and the garden step does non-trivial logic, recommend adding them; if present but missing value bounds (positive / [0,1] / [0,100] per indicator type), suggest those too (see 5b-bis)
-- [ ] Country harmonization audit: validate `.countries.json` against canonical regions, audit `.excluded_countries.json`, scan garden log for missing/unused/unknown warnings
+- [ ] Country harmonization audit: validate `.countries.json` against canonical regions (flag provider regions not yet in the regions dataset → `/add-provider-regions`), audit `.excluded_countries.json`, scan garden log for missing/unused/unknown warnings
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
@@ -297,8 +297,16 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
       mapping = json.loads(Path("etl/steps/data/garden/<namespace>/<new_version>/<short_name>.countries.json").read_text())
       not_in_canonical = sorted({v for v in mapping.values() if v and v not in canonical})
       print("Targets not in OWID's canonical regions or income groups:", not_in_canonical)
+
+      # Provider regional groupings the source ships (e.g. "Europe (WB)", "Asia and the Pacific (ILO)")
+      # surface here when OWID hasn't added that provider's regions yet. Flag the "(Provider)"-suffixed ones:
+      import re
+      provider_region_candidates = [v for v in not_in_canonical if re.search(r"\([\w .&-]+\)$", str(v))]
+      print("Look like provider regions not yet in the regions dataset:", provider_region_candidates)
       ```
-      A non-empty `not_in_canonical` list means the mapping points at entities that aren't registered in either the regions catalog or the income-groups dataset. This isn't automatically a bug — it's a heads-up. **Stop and decide with the user before proceeding** — same pattern as the global "Checkpoints — when to pause" section at the top of this skill. Common causes (in order from "fix" to "accept"): typo, retired alias used as canonical, casing/whitespace mismatch, or a legitimately custom aggregate the source defines that OWID has no equivalent for (e.g. ILO's `" (ILO)"`-suffixed regions, World Bank's `" (WB)"`-suffixed sub-Saharan splits, BRICS, G7, G20). For typos/casing — fix the JSON. For legitimately custom aggregates — accept and note in the PR description that those entities live outside the canonical system and won't merge with population/regions infrastructure. For a real new historical region — add an entry to `regions.yml` in a separate PR.
+      A non-empty `not_in_canonical` list means the mapping points at entities that aren't registered in either the regions catalog or the income-groups dataset. This isn't automatically a bug — it's a heads-up. **Stop and decide with the user before proceeding** — same pattern as the global "Checkpoints — when to pause" section at the top of this skill. Common causes (in order from "fix" to "accept"): typo, retired alias used as canonical, casing/whitespace mismatch, or a custom aggregate the source defines that OWID has no equivalent for. For typos/casing — fix the JSON.
+
+      **If the unmatched targets are a provider's regional grouping that OWID doesn't define yet** — the `provider_region_candidates` above (`"(Provider)"`-suffixed names like `"Europe (WB)"`, `"Sub-Saharan Africa (ILO)"`), or the source ships a `region`/`subregion` column feeding these — don't just accept them as outside-the-system. The proper fix is to **add that provider's regions to the regions dataset with the `/add-provider-regions` skill** (separate PR): they then become canonical, merge with regions/population infrastructure, and get a `{provider}_region` map indicator, instead of living outside the system. Surface this to the user and offer to run `/add-provider-regions`. Only for genuinely one-off, non-geographic groupings the regions system shouldn't own (BRICS, G7, G20) — accept and note in the PR description that those live outside the canonical system. For a real new historical region — add an entry to `regions.yml` in a separate PR.
 
    4. **Audit `.excluded_countries.json`.** The file is optional; skip if it doesn't exist:
       ```python
