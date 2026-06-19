@@ -1,0 +1,9 @@
+# Known upstream data errors in UNESCO literacy data, dropped locally until fixed at the source.
+# See etl/data_corrections.py for the format.
+- indicator: literacy_rate
+  entity: Cote d'Ivoire
+  years: [2019]
+  action: drop
+  reason: UNESCO's adult literacy rate for Cote d'Ivoire in 2019 is a likely error (inconsistent with the surrounding series).
+  provider: UNESCO Institute for Statistics
+  status: open

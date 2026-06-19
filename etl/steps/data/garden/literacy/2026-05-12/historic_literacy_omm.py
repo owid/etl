@@ -66,8 +66,9 @@ def run() -> None:
     tb_unesco["source"] = "UNESCO Institute for Statistics"
     tb_unesco["source_url"] = "https://databrowser.uis.unesco.org/resources/bulk"
 
-    # Remove Cote d'Ivoire for 2019 due to likely error
-    tb_unesco = tb_unesco[~((tb_unesco["country"] == "Cote d'Ivoire") & (tb_unesco["year"] == 2019))]
+    # Drop known upstream data errors (e.g. Cote d'Ivoire 2019), declared in
+    # historic_literacy_omm.corrections.yml.
+    tb_unesco = paths.apply_corrections(tb_unesco)
 
     # Remove any rows with missing data to avoid duplicates
     tables = [tb_1950, tb_1900_1950, tb_1451_1800, tb_oecd, tb_unesco]
