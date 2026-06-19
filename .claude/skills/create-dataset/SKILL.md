@@ -73,7 +73,7 @@ Write a one-paragraph internal summary of what you found before moving on.
 
 ### Step 2 — One consolidated confirmation (the only pre-build checkpoint)
 
-Now ask the user **once**, with all your best guesses pre-filled, using `AskUserQuestion` where it fits. Frame it as "here's what I figured out — correct anything that's wrong, otherwise I'll build it." Keep it to the few things that genuinely can't be guessed or that would be expensive to get wrong:
+Now ask the user **once**, with all your best guesses pre-filled, using `AskUserQuestion` where it fits. Frame it as "here's what I figured out — correct anything that's wrong, otherwise I'll build it." Before listing the specifics, set expectations in one plain sentence so the end isn't a surprise — e.g. *"I'll build the dataset and put it on a staging server for you to review; once you're happy you merge the PR and it goes live."* Then keep the questions to the few things that genuinely can't be guessed or that would be expensive to get wrong:
 
 - **Namespace + short_name + dataset title** (show your proposal; let them override).
 - **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). If they give one, fetch it now for citation, license, and column definitions.
@@ -176,6 +176,8 @@ Then build and upload the grapher step to staging — target the `grapher/...` p
 STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --grapher --private
 ```
 
+Confirm the upsert actually succeeded before moving on: it should print the dataset's admin URL / id (`…/admin/datasets/<id>`). **Capture that `<id>`** — you'll hand it to the user in Step 7. If the upsert errored or printed no dataset, fix it now rather than handing over a link that won't resolve.
+
 ### Step 7 — Commit, push, and hand off for review
 
 1. Run `make check`, then commit and push:
@@ -200,8 +202,8 @@ STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --gra
    - Country mapping: `etl/steps/data/garden/<namespace>/<version>/<short_name>.countries.json`
 
    Then give them the **staging links** so they can build charts. Paste the actual URLs directly into the chat — don't tell them to "open the PR" or "go to the staging admin"; non-experts won't know where those are, and they're unlikely to open the PR at all:
-   - **Dataset in staging admin:** the dataset page printed by the grapher upsert, `https://staging-site-<branch>/admin/datasets/<id>`. This is where they create charts from the new indicators.
-   - Tell them the dataset will appear there once the staging server finishes building (a few minutes after push).
+   - **Dataset in staging admin:** the dataset page printed by the grapher upsert (the `<id>` you captured in Step 6), `https://staging-site-<branch>/admin/datasets/<id>`. This is where they create charts from the new indicators.
+   - **Set the right expectation about timing.** The staging server rebuilds for a few minutes after each push, so this link will **404 (or show a "site not found" page) until the build finishes — that's normal, not a broken link**. Tell them to wait ~5 minutes and refresh. Better yet, before you hand the link over, poll it yourself until the staging host responds (e.g. `curl -so /dev/null -w "%{http_code}" https://staging-site-<branch>/admin/` stops returning a connection error / `404` "site not found") so you only give them a link that already works. Handing over a link before the build is ready — with no signal that waiting will fix it — reliably reads as "it's broken / I don't see my dataset."
 
 4. Ask for corrections in plain terms ("anything in the table look wrong? any column you'd describe differently?"). Apply their feedback by editing the `.meta.yml` / `.countries.json` and re-running the affected step (`--grapher` for grapher), then push again.
 
