@@ -296,13 +296,21 @@ git commit -m "📊🤖 Add <Provider> regions to regions dataset"
 
 If not already on a feature branch, create one and a PR with `etl pr "Add <Provider> regions" data`, then push. In the PR body, open with the disclosure blockquote (`> _Written by Claude Code — @<handle> at the wheel._`) and keep any reviewer attribution out of committed code/YAML.
 
+> **Heads-up:** once this merges, the post-merge deploy is **slow** — editing the regions dataset invalidates much of the DAG, so it can take hours for the new regions to reach the production catalog. The owid-grapher follow-up (Step 9) can't start until they do, so don't expect to chain straight into it.
+
 ---
 
 ## Step 9 — Register the provider in owid-grapher (separate repo + PR)
 
 The grapher frontend keeps its own copy of the regions and a few hand-maintained registries. The provider must be added there too, or its `(Provider)` entities won't be grouped/labelled correctly in entity selectors, map tooltips, and admin presets. Reference: [owid/owid-grapher#6465](https://github.com/owid/owid-grapher/pull/6465) (IEA).
 
-**Sequencing:** the frontend's `regions.data.ts` is regenerated from the **production** catalog (`https://catalog.ourworldindata.org/external/owid_grapher/latest/regions/regions.csv`). So do Step 9 **after** the ETL PR (Step 8) is merged and the `data://external/owid_grapher/latest/regions` step has rebuilt on prod. (To preview earlier, you can point the updater at a staging catalog, but the committed PR should be regenerated from prod.)
+**Sequencing — and expect a long wait:** the frontend's `regions.data.ts` is regenerated from the **production** catalog (`https://catalog.ourworldindata.org/external/owid_grapher/latest/regions/regions.csv`). So do Step 9 **after** the ETL PR (Step 8) is merged *and* the `data://external/owid_grapher/latest/regions` step has rebuilt on prod. **That rebuild is slow — often hours, not minutes** — because editing the regions dataset invalidates a huge swath of the DAG (almost everything that aggregates by region or merges population/regions depends on it), so the post-merge deploy has a lot to rebuild before the new regions reach the catalog. Don't run `yarn runRegionsUpdater` until the regions are actually live there, or it'll regenerate from stale data. Verify first:
+
+```bash
+curl -s "https://catalog.ourworldindata.org/external/owid_grapher/latest/regions/regions.csv?nocache" | grep -c "PROVIDER_"
+```
+
+A non-zero count means it's ready. If you're waiting, poll this every few minutes rather than running the updater blind. (To preview earlier you can point the updater at a staging catalog, but the committed PR should be regenerated from prod.)
 
 Work in the `owid-grapher` repo on a new branch. Two paths, depending on how much the frontend should know about the provider:
 
