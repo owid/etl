@@ -45,7 +45,6 @@ definitions:
     title: Maddison Project Database
     url_main: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023
     date_accessed: "2024-04-26"
-    date_published: "2024"
     attribution: Bolt and van Zanden – Maddison Project Database 2023
     attribution_short: Maddison Project Database
   origins_wid: &origins_wid
@@ -53,14 +52,12 @@ definitions:
     title: World Inequality Database (WID)
     url_main: https://wid.world
     date_accessed: "2026-03-17"
-    date_published: "2026"
     attribution_short: WID
   origins_ilo: &origins_ilo
     producer: International Labour Organization
     title: ILOSTAT
     url_main: https://ilostat.ilo.org/
     date_accessed: "2026-02-03"
-    date_published: "2026"
     attribution_short: ILO
 
 tables:
@@ -386,6 +383,8 @@ tables:
           - *origins_maddison
         presentation:
           grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
             map:
               colorScale:
                 customCategoryLabels:
@@ -420,6 +419,8 @@ tables:
           - *origins_wid
         presentation:
           grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
             map:
               colorScale:
                 customCategoryLabels:
@@ -451,6 +452,8 @@ tables:
           - *origins_ilo
         presentation:
           grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
             map:
               colorScale:
                 customCategoryLabels:
@@ -484,6 +487,8 @@ tables:
           - *origins_ilo
         presentation:
           grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
             map:
               colorScale:
                 customCategoryLabels:
