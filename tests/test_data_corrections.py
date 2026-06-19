@@ -137,6 +137,23 @@ def test_load_corrections_rejects_missing_required_field(tmp_path):
         load_corrections(p)
 
 
+def test_validate_rejects_empty_match():
+    # An empty match would build an all-true mask and apply the correction to every row (wiping a table
+    # on drop, or overwriting a whole indicator on override). Validation must reject it.
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="non-empty mapping"):
+        _validate_correction(_correction(action="drop", match={}), "<test>")
+
+
+def test_validate_rejects_match_combined_with_years():
+    # `match` + `years` (without entity) passes the XOR check but `years` would be silently ignored.
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="do not combine 'match'"):
+        _validate_correction(_correction(action="drop", match={"value": 10.0}, years=[2006]), "<test>")
+
+
 def test_load_corrections_rejects_both_entity_and_match(tmp_path):
     p = tmp_path / "x.corrections.yml"
     p.write_text(

@@ -111,6 +111,18 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
     has_match = "match" in correction
     assert has_entity_years ^ has_match, f"Correction [{label}]: specify exactly one of (entity + years) or match."
 
+    if has_match:
+        match = correction["match"]
+        # An empty (or non-dict) match would build an all-true mask and silently apply the correction to
+        # *every* row — wiping a table on drop, or overwriting a whole indicator on override. Reject it.
+        assert isinstance(match, dict) and len(match) > 0, (
+            f"Correction [{label}]: 'match' must be a non-empty mapping of column → value."
+        )
+        # `entity`/`years` only apply to the entity+years form; mixing them with `match` is a mistake
+        # (they would be silently ignored), so reject the combination.
+        mixed = {"entity", "years"} & set(correction)
+        assert not mixed, f"Correction [{label}]: do not combine 'match' with {sorted(mixed)}."
+
     if action == "override":
         assert "value" in correction, f"Correction [{label}]: action 'override' requires a 'value'."
 
