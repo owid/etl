@@ -319,7 +319,7 @@ The provider's regions (with member countries) live in `regions.data.ts`. Use th
 2. **Add the hand-maintained labels** (TypeScript will fail to compile until each `Record<RegionDataProvider, …>` has an entry — that's your checklist):
    - `adminSiteClient/EntityPresets.ts` → `REGION_DATA_PROVIDER_LABELS`: `<provider>: "<Short> regions"` (short, for the admin dropdown).
    - `packages/@ourworldindata/grapher/src/core/RegionGroups.ts` → `regionGroupLabels`: `<provider>: "<Provider full name> regions"` (in the *"we have region definitions"* group).
-   - `packages/@ourworldindata/grapher/src/seriesLabel/RegionTooltipData.ts` → `descriptions`: `<provider>: "The **<Provider>** defines N world regions:"`. Optionally add a left-to-right map order to `customRegionDisplayOrder` (omit → alphabetical).
+   - `packages/@ourworldindata/grapher/src/seriesLabel/RegionTooltipData.ts` → `descriptions`: `<provider>: "The **<Provider>** defines N world regions:"`. Optionally add a left-to-right map order to `customRegionDisplayOrder` (omit → alphabetical). See *"The region hover"* below for exactly what these two edits drive.
 
 ### Path B — suffix-only recognition (what Maddison / WID / ILO did)
 
@@ -331,6 +331,18 @@ The frontend recognizes the provider's entities purely by the `(Provider)` name 
 - No `RegionTooltipData` entry (its `TooltipKey` only covers full-definition providers).
 
 For a **multi-level provider**, the frontend key usually maps to the bare provider slug (suffix matching), even though the ETL uses per-level `defined_by` (`<provider>_1`, `<provider>_2`). Check how `un_m49_1/2/3` vs `ilo` are keyed in `RegionGroups.ts` and mirror the closest precedent.
+
+### The region hover (tooltip) — Path A only, fully data-driven
+
+When a Grapher chart plots a region entity (e.g. `"Africa (IEA)"`) as a series, hovering its label shows a tooltip with a description, a mini world map, and a legend (`RegionTooltip.tsx` → `RegionMap.tsx`). Worth understanding because it surprises people:
+
+- **It is NOT tied to any published chart or to the `world-region-map-definitions` article.** The tooltip is assembled entirely in owid-grapher from `regions.data.ts` + the registries. The `descriptions` text merely *links* to the article (an anchor URL), so that section should exist for the link to land — but the tooltip renders regardless. You do **not** need to publish a chart for hovers to work.
+- **It only exists for Path A providers.** `TooltipKey = RegionDataProvider | "incomeGroups" | "continents"`, so suffix-only (Path B) providers get no tooltip — to give them one, promote to Path A.
+- **The mini-map's configuration is computed in code, not taken from your ETL metadata or the chart's `customCategoryColors`:**
+  - *Membership* (which country → which region) comes from `regions.data.ts` (`getCountriesByRegion`); no-data countries fall back to grey.
+  - *Geometry* is owid-grapher's bundled world geojson (`getGeoFeaturesForMap`).
+  - *Colors* come from a fixed palette in `getRegionsForKey`: continents use `MapContinentColors`; every other provider uses `CategoricalMapPalette17[index]`, where `index` is the region's position in **`customRegionDisplayOrder[<provider>]`** (the hand-maintained order array in `RegionTooltipData.ts`) — or alphabetical if you omit it.
+- **So for a new Path A provider the entire hover is two hand-edits in `RegionTooltipData.ts`** — `descriptions[<provider>]` (text + article link) and optionally `customRegionDisplayOrder[<provider>]` (left-to-right map order, which also fixes the legend order and palette assignment). Colors auto-assign from the palette by that order; you don't (and can't) set them from the ETL side.
 
 ### Verify & open the PR
 
