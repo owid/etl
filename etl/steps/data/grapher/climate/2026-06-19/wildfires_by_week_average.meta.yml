@@ -29,7 +29,7 @@ definitions:
   description_short_wildires_cumulative: &description_short_wildires_cumulative  |-
     The cumulative area burnt by [wildfires](#dod:wildfires) in hectares. {definitions.desc_update}
   description_short_share_wildfires_cumulative: &description_short_share_wildfires_cumulative |-
-    Cumultive share of the total land area burnt by [wildfires](#dod:wildfires). The total area consumed by wildfires is recorded for each fire event, even if fires occur in the same location multiple times. {definitions.desc_update}
+    Cumulative share of the total land area burnt by [wildfires](#dod:wildfires). The total area consumed by wildfires is recorded for each fire event, even if fires occur in the same location multiple times. {definitions.desc_update}
   description_short_co2_cumulative: &description_short_co2_cumulative |-
     Cumulative carbon dioxide released by [wildfires](#dod:wildfires) in tonnes. {definitions.desc_update}
   description_short_pm2_5_cumulative: &description_short_pm2_5_cumulative |-

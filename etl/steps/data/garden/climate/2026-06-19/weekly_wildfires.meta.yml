@@ -50,10 +50,10 @@ tables:
 
 
       share_area_ha_cumulative:
-        title: Cumultive share of the total land area burnt by wildfires
+        title: Cumulative share of the total land area burnt by wildfires
         unit: '%'
         short_unit: '%'
-        description_short: Cumultive share of the total land area burnt by [wildfires](#dod:wildfires).
+        description_short: Cumulative share of the total land area burnt by [wildfires](#dod:wildfires).
         description_processing: The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country.
         description_key: *desc_wildfires
 
