@@ -40,6 +40,24 @@ definitions:
     date_published: 2024-08-19
     citation_full: |-
       Pew Research Center. (2024, August 19). Religious compositions of migrants: Appendix A: Regions. Pew Research Center. https://www.pewresearch.org/religion/2024/08/19/religious-compositions-migrants-appendix-a-regions/#asia-pacific. Appendix A: Regions.
+  origins_maddison: &origins_maddison
+    producer: Bolt and van Zanden
+    title: Maddison Project Database
+    url_main: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023
+    date_accessed: "2024-04-26"
+    date_published: "2024"
+  origins_wid: &origins_wid
+    producer: World Inequality Database (WID.world)
+    title: World Inequality Database (WID)
+    url_main: https://wid.world
+    date_accessed: "2026-03-17"
+    date_published: "2026"
+  origins_ilo: &origins_ilo
+    producer: International Labour Organization
+    title: ILOSTAT
+    url_main: https://ilostat.ilo.org/
+    date_accessed: "2026-02-03"
+    date_published: "2026"
 
 tables:
   regions:
@@ -342,5 +360,139 @@ tables:
                   "Middle East-North Africa (Pew)": "Middle East-North Africa"
                   "Europe (Pew)": "Europe"
                   "Asia-Pacific (Pew)": "Asia-Pacific"
+                customHiddenCategories:
+                  "No data": true
+
+      # Maddison Project Database
+      maddison_region:
+        title: World regions according to Maddison Project Database
+        description_short: |-
+          Regions as defined by the Maddison Project Database.
+        type: ordinal
+        sort:
+          - Western offshoots (Maddison)
+          - Western Europe (Maddison)
+          - Eastern Europe (Maddison)
+          - Latin America (Maddison)
+          - East Asia (Maddison)
+          - South and South East Asia (Maddison)
+          - Middle East and North Africa (Maddison)
+          - Sub Saharan Africa (Maddison)
+        origins:
+          - *origins_maddison
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Western offshoots (Maddison)": "Western offshoots"
+                  "Western Europe (Maddison)": "Western Europe"
+                  "Eastern Europe (Maddison)": "Eastern Europe"
+                  "Latin America (Maddison)": "Latin America"
+                  "East Asia (Maddison)": "East Asia"
+                  "South and South East Asia (Maddison)": "South and South East Asia"
+                  "Middle East and North Africa (Maddison)": "Middle East and North Africa"
+                  "Sub Saharan Africa (Maddison)": "Sub Saharan Africa"
+                customHiddenCategories:
+                  "No data": true
+
+      # World Inequality Database
+      wid_region:
+        title: World regions according to WID
+        description_short: |-
+          Regions as defined by the World Inequality Database (WID).
+        type: ordinal
+        sort:
+          - North America (WID)
+          - Latin America (WID)
+          - Europe (WID)
+          - Russia and Central Asia (WID)
+          - MENA (WID)
+          - Sub-Saharan Africa (WID)
+          - East Asia (WID)
+          - South & South-East Asia (WID)
+          - Oceania (WID)
+        origins:
+          - *origins_wid
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "North America (WID)": "North America"
+                  "Latin America (WID)": "Latin America"
+                  "Europe (WID)": "Europe"
+                  "Russia and Central Asia (WID)": "Russia and Central Asia"
+                  "MENA (WID)": "MENA"
+                  "Sub-Saharan Africa (WID)": "Sub-Saharan Africa"
+                  "East Asia (WID)": "East Asia"
+                  "South & South-East Asia (WID)": "South & South-East Asia"
+                  "Oceania (WID)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
+
+      # ILO (broad regions)
+      ilo_1_region:
+        title: World regions according to ILO
+        description_short: |-
+          Broad regions as defined by the International Labour Organization (ILO).
+        type: ordinal
+        sort:
+          - Africa (ILO)
+          - Americas (ILO)
+          - Arab States (ILO)
+          - Asia and the Pacific (ILO)
+          - Europe and Central Asia (ILO)
+        origins:
+          - *origins_ilo
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Africa (ILO)": "Africa"
+                  "Americas (ILO)": "Americas"
+                  "Arab States (ILO)": "Arab States"
+                  "Asia and the Pacific (ILO)": "Asia and the Pacific"
+                  "Europe and Central Asia (ILO)": "Europe and Central Asia"
+                customHiddenCategories:
+                  "No data": true
+
+      # ILO (subregions)
+      ilo_2_region:
+        title: World subregions according to ILO
+        description_short: |-
+          Subregions as defined by the International Labour Organization (ILO).
+        type: ordinal
+        sort:
+          - Northern Africa (ILO)
+          - Sub-Saharan Africa (ILO)
+          - Latin America and the Caribbean (ILO)
+          - Northern America (ILO)
+          - Arab States (ILO)
+          - Eastern Asia (ILO)
+          - South-Eastern Asia and the Pacific (ILO)
+          - Southern Asia (ILO)
+          - Northern, Southern and Western Europe (ILO)
+          - Eastern Europe (ILO)
+          - Central and Western Asia (ILO)
+        origins:
+          - *origins_ilo
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Northern Africa (ILO)": "Northern Africa"
+                  "Sub-Saharan Africa (ILO)": "Sub-Saharan Africa"
+                  "Latin America and the Caribbean (ILO)": "Latin America and the Caribbean"
+                  "Northern America (ILO)": "Northern America"
+                  "Arab States (ILO)": "Arab States"
+                  "Eastern Asia (ILO)": "Eastern Asia"
+                  "South-Eastern Asia and the Pacific (ILO)": "South-Eastern Asia and the Pacific"
+                  "Southern Asia (ILO)": "Southern Asia"
+                  "Northern, Southern and Western Europe (ILO)": "Northern, Southern and Western Europe"
+                  "Eastern Europe (ILO)": "Eastern Europe"
+                  "Central and Western Asia (ILO)": "Central and Western Asia"
                 customHiddenCategories:
                   "No data": true

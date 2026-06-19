@@ -4220,14 +4220,14 @@
 - code: ILO_AFR
   name: "Africa (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_1
   members:
     - ILO_NAF
     - ILO_SSA
 - code: ILO_NAF
   name: "Northern Africa (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - DZA
     - EGY
@@ -4239,7 +4239,7 @@
 - code: ILO_SSA
   name: "Sub-Saharan Africa (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - AGO
     - BDI
@@ -4294,14 +4294,14 @@
 - code: ILO_AMR
   name: "Americas (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_1
   members:
     - ILO_LAC
     - ILO_NAM
 - code: ILO_LAC
   name: "Latin America and the Caribbean (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - ABW
     - AIA
@@ -4353,7 +4353,7 @@
 - code: ILO_NAM
   name: "Northern America (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - BMU
     - CAN
@@ -4363,7 +4363,7 @@
 - code: ILO_ARB
   name: "Arab States (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_1
   members:
     - ARE
     - BHR
@@ -4380,7 +4380,7 @@
 - code: ILO_ASP
   name: "Asia and the Pacific (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_1
   members:
     - ILO_EAS
     - ILO_SEAP
@@ -4388,7 +4388,7 @@
 - code: ILO_EAS
   name: "Eastern Asia (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - CHN
     - HKG
@@ -4401,7 +4401,7 @@
 - code: ILO_SEAP
   name: "South-Eastern Asia and the Pacific (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - ASM
     - AUS
@@ -4441,7 +4441,7 @@
 - code: ILO_SAS
   name: "Southern Asia (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - AFG
     - BGD
@@ -4455,7 +4455,7 @@
 - code: ILO_ECA
   name: "Europe and Central Asia (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_1
   members:
     - ILO_NSWE
     - ILO_EEU
@@ -4467,7 +4467,7 @@
 - code: ILO_NSWE
   name: "Northern, Southern and Western Europe (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - ALB
     - AND
@@ -4510,7 +4510,7 @@
 - code: ILO_EEU
   name: "Eastern Europe (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - BGR
     - BLR
@@ -4525,7 +4525,7 @@
 - code: ILO_CWA
   name: "Central and Western Asia (ILO)"
   region_type: "aggregate"
-  defined_by: ilo
+  defined_by: ilo_2
   members:
     - ARM
     - AZE
