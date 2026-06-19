@@ -205,7 +205,7 @@ tables:
           numDecimalPlaces: 1
         presentation:
           grapher_config:
-            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
+            note: UN estimates are based on national definitions of urban and rural areas, which vary across countries and limit comparability.
           title_public: Share of population living in urban areas
           title_variant: UN national definitions, HYDE
 
@@ -222,7 +222,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
+            note: UN estimates are based on national definitions of urban and rural areas, which vary across countries and limit comparability.
           title_public: Urban population
           title_variant: UN national definitions, HYDE
 
@@ -239,7 +239,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
+            note: UN estimates are based on national definitions of urban and rural areas, which vary across countries and limit comparability.
           title_public: Rural population
           title_variant: UN national definitions, HYDE
 
@@ -258,7 +258,7 @@ tables:
           numDecimalPlaces: 1
         presentation:
           grapher_config:
-            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
+            note: UN estimates are based on national definitions of urban and rural areas, which vary across countries and limit comparability.
           title_public: Share of population living in urban areas
           title_variant: UN national definitions, HYDE, with projections
 
@@ -275,7 +275,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
+            note: UN estimates are based on national definitions of urban and rural areas, which vary across countries and limit comparability.
           title_public: Urban population
           title_variant: UN national definitions, HYDE, with projections
 
@@ -292,6 +292,6 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            note: UN estimates are based on national definitions of urban and rural areas. Cross-country comparability is limited because of differences in national definitions.
+            note: UN estimates are based on national definitions of urban and rural areas, which vary across countries and limit comparability.
           title_public: Rural population
           title_variant: UN national definitions, HYDE, with projections
