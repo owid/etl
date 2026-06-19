@@ -16,7 +16,7 @@ This skill is for **people who are not ETL experts** (typically working in Claud
 ## Guiding principles
 
 1. **Build first, review later.** Don't interview the user for every detail up front. Inspect the file, infer everything you reasonably can, fill sensible defaults for the rest, and **build a working dataset end-to-end**. Then hand the user a concise review so they correct a finished thing rather than imagine an abstract one.
-2. **Ask rarely, and ask all at once.** There is exactly **one** required checkpoint with the user before building (the consolidated confirmation in Step 2), and exactly **one** after building (the review handoff in Step 7). Don't drip-feed questions. If you can guess it, guess it and flag the guess for review.
+2. **Ask rarely, and ask all at once.** There is exactly **one** required checkpoint with the user before building (the consolidated confirmation in Step 2), and exactly **one** after building (the review handoff in Steps 7–8, which also tells them how to publish to live). Don't drip-feed questions. If you can guess it, guess it and flag the guess for review.
 3. **Never block on a missing detail.** If you can't infer a field, use a clearly-marked placeholder (e.g. `attribution_short: TBD`), note it in the review, and keep going. A dataset that's 80% right and on staging beats a perfect one that never ships.
 4. **Surface every guess.** The review in Step 7 must list what you inferred vs. what the user gave you, so nothing silently ships wrong.
 
@@ -126,6 +126,8 @@ Run it against the user's file:
 .venv/bin/etls <namespace>/<version>/<short_name> --path-to-file "<path_to_file>"
 ```
 
+**If the upload fails with a credentials / R2 error**, the environment is missing the `R2_*` keys needed to push snapshots to OWID storage (a common gap on fresh Cloud co-work environments). Don't try to work around it — tell the user plainly that the environment needs `R2_ENDPOINT`, `R2_ACCESS_KEY`, and `R2_SECRET_KEY` set, point them to the gear/settings of their environment to add them, and note that after adding the keys they may need to **start a fresh session** (and tell you to continue) for the new env vars to take effect. You can keep building the rest of the chain with `--skip-upload` in the meantime, but the snapshot must be uploaded before the PR is truly complete.
+
 ### Step 5 — Build meadow / garden / grapher steps + DAG
 
 Scaffold the three steps with `/create-etl-steps` (DAG file = the topic that best fits, e.g. `energy`, `health`; ask in Step 2 if unclear). Then adapt:
@@ -199,11 +201,30 @@ STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --gra
    - **Metadata YAML:** `etl/steps/data/garden/<namespace>/<version>/<short_name>.meta.yml` — this is the file to edit for titles, units, descriptions, and decimals.
    - Country mapping: `etl/steps/data/garden/<namespace>/<version>/<short_name>.countries.json`
 
-   Then give them the **staging links** so they can build charts:
-   - Staging admin: `https://staging-site-<branch>/admin/` (and the dataset page printed by the grapher upsert, `…/admin/datasets/<id>`).
-   - Tell them the dataset will appear there once the staging server finishes building (a few minutes after push), and that they can create charts from its indicators directly in the staging admin.
+   Then give them the **staging links** so they can build charts. Paste the actual URLs directly into the chat — don't tell them to "open the PR" or "go to the staging admin"; non-experts won't know where those are, and they're unlikely to open the PR at all:
+   - **Dataset in staging admin:** the dataset page printed by the grapher upsert, `https://staging-site-<branch>/admin/datasets/<id>`. This is where they create charts from the new indicators.
+   - Tell them the dataset will appear there once the staging server finishes building (a few minutes after push).
 
 4. Ask for corrections in plain terms ("anything in the table look wrong? any column you'd describe differently?"). Apply their feedback by editing the `.meta.yml` / `.countries.json` and re-running the affected step (`--grapher` for grapher), then push again.
+
+### Step 8 — Tell them how to go live (don't assume they know)
+
+The dataset and any charts they build live on the **staging server**, not on ourworldindata.org. Getting them to live is a manual step the user has to take, and the workflow (approve charts in chart-diff, then merge the PR) is unfamiliar to non-experts — they will not discover it on their own. Spell it out explicitly in the handoff, with the real links pasted in:
+
+1. **Charts must be approved in chart-diff before they sync to live.** If the user creates any charts on the staging admin, those charts only reach production if they're **approved** in chart-diff first. Give them the direct link and tell them to click **Approve** on each chart:
+
+   ```
+   http://staging-site-<branch>/etl/wizard/chart-diff
+   ```
+
+   (Alternatively: charts created directly in the **live** admin don't need this step — but the dataset itself still has to be merged to live first, below. Mention this only if they ask; the staging→approve→merge path is the default.)
+
+2. **Merging the PR is what publishes the dataset to live.** No external review is required for a data PR like this — the user is allowed to merge it themselves. Tell them, in order:
+   - Make sure the PR checks are mostly green.
+   - Click **"Ready for review"**, then **"Squash and merge"** on the PR (link the PR URL).
+   - The dataset (and any approved charts) land on ourworldindata.org a few minutes after the merge.
+
+3. Make this a short, plain-language checklist at the end of your handoff — e.g. *"When you're happy: (1) approve your charts here «chart-diff link», (2) merge the PR here «PR link», and it's live in a few minutes."* Paste the real URLs, not placeholders.
 
 ## Notes & gotchas
 
