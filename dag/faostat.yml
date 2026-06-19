@@ -71,6 +71,9 @@ steps:
     - snapshot://faostat/2026-02-25/faostat_qcl.zip
   data://meadow/faostat/2026-02-25/faostat_qi:
     - snapshot://faostat/2026-02-25/faostat_qi.zip
+  data://meadow/faostat/2026-02-25/faostat_scl:
+    # NOTE: For convenience, we included the snapshot of SCL later, on 2026-05-21 (the latest update from FAOSTAT SCL was on 2025-11-01).
+    - snapshot://faostat/2026-02-25/faostat_scl.zip
   ##################################################################################################################
   # NOTE: The latest version of QV is missing post-2017 data for all EU-27 countries.
   # For now, import the data for those missing country-years from the previous version:
@@ -111,6 +114,7 @@ steps:
     - data://meadow/faostat/2026-02-25/faostat_qcl
     - data://meadow/faostat/2026-02-25/faostat_fbs
     - data://meadow/faostat/2026-02-25/faostat_qv
+    - data://meadow/faostat/2026-02-25/faostat_scl
   data://garden/faostat/2026-02-25/faostat_qcl:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2026-02-25/faostat_qcl
@@ -138,6 +142,12 @@ steps:
   data://garden/faostat/2026-02-25/faostat_sdgb:
     - data://meadow/faostat/2026-02-25/faostat_sdgb
     - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2026-02-25/faostat_metadata
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://garden/faostat/2026-02-25/faostat_scl:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/faostat/2026-02-25/faostat_scl
     - data://garden/faostat/2026-02-25/faostat_metadata
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
@@ -198,3 +208,24 @@ steps:
       - data://garden/regions/2023-01-01/regions
   data://grapher/faostat/2026-02-25/faostat_sdgb:
     - data://garden/faostat/2026-02-25/faostat_sdgb
+  ######################################################################################################################
+  #
+  # FAOSTAT Detailed Trade Matrix (faostat_tm).
+  #
+  # Standalone trade-flow steps that powers a bespoke food trade visualization.
+  # They are intentionally decoupled from the rest of the FAOSTAT pipeline because the matrix is huge (~8.5 GB uncompressed), and won't go to grapher in the usual way.
+  data://meadow/faostat/2026-05-07/faostat_tm:
+    - snapshot://faostat/2026-05-07/faostat_tm.zip
+  data://garden/faostat/2026-05-07/faostat_tm:
+    - data://meadow/faostat/2026-05-07/faostat_tm
+  # Viz-ready slice of the trade matrix for the latest year, with Production and
+  # apparent-supply context joined from SCL. All the build logic lives in this
+  # garden step; the dropdown definition lives next to it in food_trade.items.yaml.
+  data://garden/faostat/2026-05-07/food_trade:
+    - data://garden/faostat/2026-05-07/faostat_tm
+    - data://garden/faostat/2026-02-25/faostat_scl
+  # S3 export step: load the garden table and write a metadata JSON plus one JSON per product
+  # under s3://owid-public/data/food-trade/, for the bespoke viz to fetch.
+  export://s3/faostat/latest/food_trade:
+    - data://garden/faostat/2026-05-07/food_trade
+  ######################################################################################################################
