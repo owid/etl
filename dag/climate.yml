@@ -1,4 +1,80 @@
 steps:
+  # ===========================================================================
+  # NOT UPDATEABLE
+  # These steps receive no new data; skip them in the monthly climate update.
+  # ===========================================================================
+  #
+  # Migrated legacy datasets (frozen one-off papers and historical sources).
+  #
+  data://grapher/climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data:
+    - data://garden/climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data:
+      - snapshot://climate/2017-04-22/weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data.feather
+  data://grapher/climate/2017-12-04/ozone_concentration_stateofglobalair:
+    - data://garden/climate/2017-12-04/ozone_concentration_stateofglobalair:
+      - snapshot://climate/2017-12-04/ozone_concentration_stateofglobalair.feather
+  data://grapher/climate/2018-01-01/economic_impacts_of_2c__pretis_et_al__2018:
+    - data://garden/climate/2018-01-01/economic_impacts_of_2c__pretis_et_al__2018:
+      - snapshot://climate/2018-01-01/economic_impacts_of_2c__pretis_et_al__2018.feather
+  data://grapher/climate/2018-01-01/ozone_depleting_emissions_since_1960__scientific_assessment__2014:
+    - data://garden/climate/2018-01-01/ozone_depleting_emissions_since_1960__scientific_assessment__2014:
+      - snapshot://climate/2018-01-01/ozone_depleting_emissions_since_1960__scientific_assessment__2014.feather
+  data://grapher/climate/2018-03-21/economic_impacts_of_1_5c__pretis_et_al:
+    - data://garden/climate/2018-03-21/economic_impacts_of_1_5c__pretis_et_al:
+      - snapshot://climate/2018-03-21/economic_impacts_of_1_5c__pretis_et_al.feather
+  data://grapher/climate/2018-04-05/parties_to_montreal_protocol__unep__2023:
+    - data://garden/climate/2018-04-05/parties_to_montreal_protocol__unep__2023:
+      - snapshot://climate/2018-04-05/parties_to_montreal_protocol__unep__2023.feather
+  data://grapher/climate/2018-04-06/ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al__1996:
+    - data://garden/climate/2018-04-06/ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al__1996:
+      - snapshot://climate/2018-04-06/ozone_depletion_impacts_on_skin_cancer_incidence__slaper_et_al__1996.feather
+  data://grapher/climate/2018-07-01/ozone_and_chlorine_projections_to_2100__scientific_assessment__2014:
+    - data://garden/climate/2018-07-01/ozone_and_chlorine_projections_to_2100__scientific_assessment__2014:
+      - snapshot://climate/2018-07-01/ozone_and_chlorine_projections_to_2100__scientific_assessment__2014.feather
+  data://grapher/climate/2018-11-07/economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018:
+    - data://garden/climate/2018-11-07/economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018:
+      - snapshot://climate/2018-11-07/economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018.feather
+  data-private://grapher/climate/2018-09-20/wildfire_data_in_the_us__nifc:
+    - data-private://garden/climate/2018-09-20/wildfire_data_in_the_us__nifc:
+      - snapshot-private://climate/2018-09-20/wildfire_data_in_the_us__nifc.feather
+  data-private://grapher/climate/2021-04-13/coral_bleaching_events_by_enso_phase__hughes_et_al__2018:
+    - data-private://garden/climate/2021-04-13/coral_bleaching_events_by_enso_phase__hughes_et_al__2018:
+      - snapshot-private://climate/2021-04-13/coral_bleaching_events_by_enso_phase__hughes_et_al__2018.feather
+  data-private://grapher/climate/2022-09-10/young_people_opinions_climate_change__hickman_et_al__2021:
+    - data-private://garden/climate/2022-09-10/young_people_opinions_climate_change__hickman_et_al__2021:
+      - snapshot-private://climate/2022-09-10/young_people_opinions_climate_change__hickman_et_al__2021.feather
+  #
+  # IPCC scenarios (frozen; namespace migration emissions -> climate pending).
+  #
+  export://explorers/emissions/latest/ipcc_scenarios:
+    - data://grapher/emissions/2022-08-30/ipcc_scenarios:
+      - snapshot://emissions/2022-08-30/ipcc_scenarios.zip
+  #
+  # EPA - Climate change indicators (frozen). Consumed by climate_change_impacts below.
+  #
+  data://garden/epa/2024-04-17/ghg_concentration:
+    - data://meadow/epa/2024-04-17/ghg_concentration:
+      - snapshot://epa/2024-04-17/co2_concentration.csv
+      - snapshot://epa/2024-04-17/ch4_concentration.csv
+      - snapshot://epa/2024-04-17/n2o_concentration.csv
+  data://garden/epa/2024-04-17/ocean_heat_content:
+    - data://meadow/epa/2024-04-17/ocean_heat_content:
+      - snapshot://epa/2024-04-17/ocean_heat_content_annual_world_700m.csv
+      - snapshot://epa/2024-04-17/ocean_heat_content_annual_world_2000m.csv
+  data://garden/epa/2024-04-17/ice_sheet_mass_balance:
+    - data://meadow/epa/2024-04-17/ice_sheet_mass_balance:
+      - snapshot://epa/2024-04-17/ice_sheet_mass_balance.csv
+  data://garden/epa/2024-04-17/mass_balance_us_glaciers:
+    - data://meadow/epa/2024-04-17/mass_balance_us_glaciers:
+      - snapshot://epa/2024-04-17/mass_balance_us_glaciers.csv
+  #
+  # NOAA Climate.gov - Global sea level (frozen). Consumed by climate_change_impacts below.
+  #
+  data://garden/climate/2024-01-28/global_sea_level:
+    - data://meadow/climate/2024-01-28/global_sea_level:
+      - snapshot://climate/2024-01-28/global_sea_level.csv
+  # ===========================================================================
+  # UPDATEABLE
+  # ===========================================================================
   #
   # Copernicus Climate Change Service - Surface temperature.
   #
@@ -62,7 +138,6 @@ steps:
     # Various sources - Climate change impacts (monthly).
     - data://grapher/climate/2026-05-13/climate_change_impacts_monthly:
       - data://garden/climate/2026-05-13/climate_change_impacts
-
   #
   # NASA Ozone Watch - Ozone hole area and concentration.
   #
@@ -71,12 +146,6 @@ steps:
       - data://meadow/climate/2026-03-02/nasa_ozone_hole:
         - snapshot://climate/2026-03-02/nasa_ozone_hole_p2.txt
         - snapshot://climate/2026-03-02/nasa_ozone_hole_p1.txt
-  #
-  # IPCC scenarios
-  #
-  export://explorers/emissions/latest/ipcc_scenarios:
-    - data://grapher/emissions/2022-08-30/ipcc_scenarios:
-      - snapshot://emissions/2022-08-30/ipcc_scenarios.zip
   #
   # NSIDC - Arctic sea ice extent.
   #
@@ -113,17 +182,10 @@ steps:
     # Various sources - Long-run greenhouse gas concentration.
     - data://garden/climate/2026-05-13/long_run_ghg_concentration:
       - data://garden/climate/2026-05-13/ghg_concentration
-      # EPA - Climate change indicators (possibly not updateable).
-      - data://garden/epa/2024-04-17/ghg_concentration:
-        - data://meadow/epa/2024-04-17/ghg_concentration:
-          - snapshot://epa/2024-04-17/co2_concentration.csv
-          - snapshot://epa/2024-04-17/ch4_concentration.csv
-          - snapshot://epa/2024-04-17/n2o_concentration.csv
-    # NOAA National Centers for Environmental Information - Ocean Heat Content.
-    - data://garden/epa/2024-04-17/ocean_heat_content:
-      - data://meadow/epa/2024-04-17/ocean_heat_content:
-        - snapshot://epa/2024-04-17/ocean_heat_content_annual_world_700m.csv
-        - snapshot://epa/2024-04-17/ocean_heat_content_annual_world_2000m.csv
+      # EPA - GHG concentration (frozen; defined in NOT UPDATEABLE section above).
+      - data://garden/epa/2024-04-17/ghg_concentration
+    # EPA - Ocean heat content (frozen; defined in NOT UPDATEABLE section above).
+    - data://garden/epa/2024-04-17/ocean_heat_content
     # Rutgers University Global Snow Lab - Snow Cover Extent.
     - data://garden/climate/2026-05-13/snow_cover_extent:
       - data://meadow/climate/2026-05-13/snow_cover_extent:
@@ -133,17 +195,11 @@ steps:
     - data://garden/climate/2026-05-13/ocean_ph_levels:
       - data://meadow/climate/2026-05-13/hawaii_ocean_time_series:
         - snapshot://climate/2026-05-13/hawaii_ocean_time_series.csv
-    # NOAA Climate.gov - Global sea level (possibly not updateable).
-    - data://garden/climate/2024-01-28/global_sea_level:
-      - data://meadow/climate/2024-01-28/global_sea_level:
-        - snapshot://climate/2024-01-28/global_sea_level.csv
-    # EPA - Climate change indicators (possibly not updateable).
-    - data://garden/epa/2024-04-17/ice_sheet_mass_balance:
-      - data://meadow/epa/2024-04-17/ice_sheet_mass_balance:
-        - snapshot://epa/2024-04-17/ice_sheet_mass_balance.csv
-    - data://garden/epa/2024-04-17/mass_balance_us_glaciers:
-      - data://meadow/epa/2024-04-17/mass_balance_us_glaciers:
-        - snapshot://epa/2024-04-17/mass_balance_us_glaciers.csv
+    # NOAA Climate.gov - Global sea level (frozen; defined in NOT UPDATEABLE section above).
+    - data://garden/climate/2024-01-28/global_sea_level
+    # EPA - Ice sheet mass balance and US glaciers (frozen; defined in NOT UPDATEABLE section above).
+    - data://garden/epa/2024-04-17/ice_sheet_mass_balance
+    - data://garden/epa/2024-04-17/mass_balance_us_glaciers
     # Met Office Hadley Centre - Sea surface temperature.
     - data://garden/climate/2026-05-13/sea_surface_temperature:
       - data://meadow/climate/2026-05-13/sea_surface_temperature:
