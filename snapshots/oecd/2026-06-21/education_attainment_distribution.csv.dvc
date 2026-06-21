@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: OECD
+    title: Adults' educational attainment distribution
+    description: |-
+      Distribution of educational attainment among adults aged 25-64, by age group and gender.
+      Data are based on national labour force surveys, censuses, and household surveys, mapped to the ISCED 2011 classification.
+      Covers OECD members and selected partner economies.
+    citation_full: OECD (2026). Education at a Glance - Adults' educational attainment distribution, by age group and gender.
+    attribution_short: OECD
+    url_main: https://data-explorer.oecd.org/vis?lc=en&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_EAG_LSO_EA%40DF_LSO_NEAC_DISTR_EA&df[ag]=OECD.EDU.IMEP&df[vs]=1.0
+    url_download: |-
+      https://sdmx.oecd.org/public/rest/data/OECD.EDU.IMEP,DSD_EAG_LSO_EA@DF_LSO_NEAC_DISTR_EA,1.0/._T.Y25T64.ISCED11A_5T8..........OBS...A?startPeriod=1981&endPeriod=2024&dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: '2026-06-21'
+    date_published: '2024'
+    license:
+      name: © OECD
+      url: https://www.oecd.org/termsandconditions/
+outs:
+  - md5: 35f5dbacf15ecc625ecdb2bf58e85474
+    size: 773430
+    path: education_attainment_distribution.csv

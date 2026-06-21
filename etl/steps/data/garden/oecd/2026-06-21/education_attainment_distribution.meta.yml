@@ -1,0 +1,15 @@
+tables:
+  education_attainment_distribution:
+    variables:
+      share_tertiary_education:
+        title: Share of adults with tertiary education
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of adults aged 25-64 who have completed tertiary education (ISCED 5-8), based on national labour force surveys.
+        description_key:
+          - Tertiary education includes short-cycle tertiary (ISCED 5), bachelor's or equivalent (ISCED 6), master's or equivalent (ISCED 7), and doctoral or equivalent (ISCED 8).
+          - The age group covered is 25 to 64 years old.
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            tab: map

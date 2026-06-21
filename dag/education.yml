@@ -1,4 +1,10 @@
 steps:
+  # OECD Adults' educational attainment distribution
+  data://grapher/oecd/2026-06-21/education_attainment_distribution:
+    - data://garden/oecd/2026-06-21/education_attainment_distribution:
+      - data://meadow/oecd/2026-06-21/education_attainment_distribution:
+        - snapshot://oecd/2026-06-21/education_attainment_distribution.csv
+
   # Barro and Lee projections dataset
   data://grapher/education/2023-07-17/education_barro_lee_projections:
     # Garden step includes combined data where available with Lee and Lee historical data
