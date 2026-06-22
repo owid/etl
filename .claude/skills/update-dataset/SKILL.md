@@ -38,6 +38,7 @@ Assumptions:
 - [ ] Garden step: run + fix + diff + summarize
 - [ ] Review `sanity_checks` output (enable log flag, re-run, scan log, revert flag) — if none found and the garden step does non-trivial logic, recommend adding them; if present but missing value bounds (positive / [0,1] / [0,100] per indicator type), suggest those too (see 5b-bis)
 - [ ] Country harmonization audit: validate `.countries.json` against canonical regions (flag provider regions not yet in the regions dataset → `/add-provider-regions`), audit `.excluded_countries.json`, scan garden log for missing/unused/unknown warnings
+- [ ] Region-provider drift: if this dataset's aggregates are in `regions.yml` (`defined_by: <provider>`), check whether the new version changed the provider's region set or country membership; if so, update `regions.yml` and re-propagate via `/add-provider-regions`
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
@@ -364,6 +365,14 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - "Targets not in OWID's canonical regions or income groups" or "Garden output entities not in OWID's canonical regions or income groups" or "Missing in mapping" non-empty ⇒ stop, decide with user.
    - "Excluded entries matching canonical regions" non-empty ⇒ stop, ask whether each exclusion is intentional.
    - "Unused mappings" or "Unknown excluded entries" non-empty ⇒ surface in PR description; not a blocker.
+
+5d) Region-provider drift — if this dataset *defines* OWID regions, propagate the change
+   The harmonization audit (5c-3) catches providers **not yet** in `regions.yml`. This check is the counterpart: a provider whose aggregates are **already** in `regions.yml` can change its regions on a version bump (new/removed/renamed regions, or shifted country membership), and `regions.yml` won't update itself.
+
+   - **Does this dataset own regions?** `grep "defined_by: <provider>" etl/steps/data/garden/regions/2023-01-01/regions.yml` (e.g. `ilo_1`/`ilo_2`, `maddison`, `wid`, `wb`, `who`). No matches ⇒ skip this step.
+   - **Re-extract** the provider's region→country mapping from the **new** version — from the same source the regions were originally derived from (a `region`/`subregion` column, region entities, or a table-of-contents tier; see `/add-provider-regions` Step 1) — and **diff it against `regions.yml`** (`defined_by: <provider>` members), set-equality per region, plus new/removed/renamed regions.
+   - **If it drifted:** **stop and decide with the user** (composition changes move every region-aggregated value downstream), then update `regions.yml` and re-propagate via **`/add-provider-regions`** — rebuild garden regions, refresh the `{provider}_region` grapher indicators + metadata, regenerate owid-grapher `regions.data.ts` (`runRegionsUpdater`), and update the article section.
+   - **If unchanged:** note it and move on.
 
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
