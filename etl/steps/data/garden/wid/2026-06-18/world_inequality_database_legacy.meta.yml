@@ -102,7 +102,7 @@ tables:
         - Income is ‘fiscal’ — it represents the total income that is or should be reported on tax declarations (before any specific deduction allowed by fiscal legislation).
         - The data is estimated from a combination of household surveys and tax records. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
         - These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.
-      description_processing: We extract estimations via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool).
+      description_processing: We extract estimations via the [`wid` Stata command](https://github.com/world-inequality-database/wid-stata-tool).
     variables:
       p99p100_share_fiscal992i:
         title: Top 1% - Share (Fiscal, individuals)

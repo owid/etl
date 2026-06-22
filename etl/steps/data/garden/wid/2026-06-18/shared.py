@@ -30,7 +30,7 @@ POST_TAX_NATIONAL_DESCRIPTION = [
 
 RELATIVE_POVERTY_DESCRIPTION = "This data has been estimated by calculating the {povline}, and then checking that value against the closest threshold in the percentile distribution. The headcount ratio is then the percentile, the share of the population below that threshold."
 
-PROCESSING_DESCRIPTION = """We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively."""
+PROCESSING_DESCRIPTION = """We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/world-inequality-database/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively."""
 
 PPP_DESCRIPTION = f"The data is measured in international-$ at {PPP_YEAR} prices – this adjusts for inflation and for differences in living costs between countries."
 
@@ -534,7 +534,7 @@ WELFARE_DEFINITIONS = [
 ]
 
 PROCESSING_DESCRIPTION_DISTRIBUTIONS = (
-    """Estimations are extracted via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool)."""
+    """Estimations are extracted via the [`wid` Stata command](https://github.com/world-inequality-database/wid-stata-tool)."""
 )
 
 
