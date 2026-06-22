@@ -340,6 +340,8 @@ The frontend recognizes the provider's entities purely by the `(Provider)` name 
 
 **Multi-level full-definition providers** define one `RegionDataProvider` *per level* (e.g. `un_m49_1/2/3`; ILO uses `ilo_1`/`ilo_2`) — each level gets its own label, sort order, and tooltip. Mirror the `un_m49_1/2/3` entries in `RegionGroups.ts`.
 
+> **Don't drop the bare suffix slug.** `parseLabel` resolves an entity to a provider by its `(Provider)` name suffix — lowercased, spaces stripped — **not** by `definedBy`. So when the suffix doesn't match the per-level keys (e.g. `"Northern Africa (ILO)"` → `ilo`, not `ilo_1`), the bare slug (`ilo`) must *also* stay registered in `ADDITIONAL_REGION_DATA_PROVIDERS` + its `ADDITIONAL_REGION_DATA_PROVIDER_LABELS` and `regionGroupLabels` entries — it's the recognition handle. Drop it and `providerKey` comes back undefined, which **silently breaks both entity-selector grouping and the hover** even though the per-level definitions exist. Keep it alongside the per-level providers, exactly as `unm49` sits beside `un_m49_1/2/3`. Single-tier providers whose suffix already equals their key (Maddison → `maddison`, WID → `wid`) need no extra entry.
+
 ### The region hover (tooltip) — full-definition providers only, fully data-driven
 
 When a Grapher chart plots a region entity (e.g. `"Sub-Saharan Africa (ILO)"`) as a series, hovering its label shows a tooltip with a description, a mini world map, and a legend (`RegionTooltip.tsx` → `RegionMap.tsx`). Worth understanding because it surprises people:
