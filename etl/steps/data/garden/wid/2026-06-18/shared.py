@@ -533,9 +533,7 @@ WELFARE_DEFINITIONS = [
     "`welfare = 'wealth'` is net national wealth, which is the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.",
 ]
 
-PROCESSING_DESCRIPTION_DISTRIBUTIONS = (
-    """Estimations are extracted via the [`wid` Stata command](https://github.com/world-inequality-database/wid-stata-tool)."""
-)
+PROCESSING_DESCRIPTION_DISTRIBUTIONS = """Estimations are extracted via the [`wid` Stata command](https://github.com/world-inequality-database/wid-stata-tool)."""
 
 
 def add_metadata_vars_distribution(tb_garden: Table) -> Table:
