@@ -9,6 +9,12 @@ known errors in the *source* data together with the local fix we apply until the
 One entry per error. This replaces scattered inline `.loc[...]` / `.drop(...)` exceptions with a single
 auditable record that carries the reason, provider and reporting status.
 
+The mechanism is channel-agnostic (it works wherever `PathFinder.apply_corrections` is called), but
+**garden is the default home**: a correction is a judgment about the data, its `entity`/`year` locators
+are only canonical after garden harmonization, and some corrections target derived/rescaled columns that
+don't exist upstream. Keep meadow/snapshot a faithful mirror of the provider — reserve them for raw
+transcription typos that are wrong before any OWID processing and shared across multiple consumers.
+
 Format (a list of entries)::
 
     - indicator: consumption_emissions          # the COLUMN to correct
