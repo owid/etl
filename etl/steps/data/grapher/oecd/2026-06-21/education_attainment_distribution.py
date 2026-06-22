@@ -15,5 +15,5 @@ def run() -> None:
 
     tb = tb.format(["country", "year"])
 
-    ds_grapher = paths.create_dataset(tables=[tb])
+    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
     ds_grapher.save()
