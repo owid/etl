@@ -17,6 +17,6 @@ meta:
       url: https://www.who.int/about/policies/publishing/copyright
 wdir: ../../../data/snapshots/who/latest
 outs:
-  - md5: 0d6e50680946143dacc7089f883be585
-    size: 73861568
+  - md5: e1648987311245841be680576ba434e9
+    size: 73862731
     path: fluid.csv
