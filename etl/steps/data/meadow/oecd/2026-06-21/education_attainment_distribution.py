@@ -10,7 +10,7 @@ COLUMN_RENAMES = {"Reference area": "country", "TIME_PERIOD": "year", "OBS_VALUE
 
 def run() -> None:
     snap = paths.load_snapshot("education_attainment_distribution.csv")
-    tb = snap.read(safe_types=False)
+    tb = snap.read()
 
     # Keep only relevant columns.
     tb = tb[COLUMNS_TO_KEEP]
@@ -21,10 +21,10 @@ def run() -> None:
     # Drop rows without data.
     tb = tb.dropna(subset=["share_tertiary_education"])
 
-    # Use categoricals for country column (remove unused categories after dropna).
-    tb["country"] = tb["country"].astype(str).astype("category").cat.remove_unused_categories()
+    # Use categoricals for the country column.
+    tb["country"] = tb["country"].astype("category")
 
     tb = tb.format(["country", "year"])
 
-    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
     ds_meadow.save()
