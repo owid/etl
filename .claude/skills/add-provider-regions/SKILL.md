@@ -327,7 +327,7 @@ The provider's regions (with member countries) live in `regions.data.ts`, so it'
 2. **Add the hand-maintained labels** (TypeScript will fail to compile until each `Record<RegionDataProvider, …>` has an entry — that's your checklist):
    - `adminSiteClient/EntityPresets.ts` → `REGION_DATA_PROVIDER_LABELS`: `<provider>: "<Short> regions"` (short, for the admin dropdown).
    - `packages/@ourworldindata/grapher/src/core/RegionGroups.ts` → `regionGroupLabels`: `<provider>: "<Provider full name> regions"` (in the *"we have region definitions"* group).
-   - `packages/@ourworldindata/grapher/src/seriesLabel/RegionTooltipData.ts` → `descriptions`: `<provider>: "The **<Provider>** defines N world regions:"`. Optionally add a left-to-right map order to `customRegionDisplayOrder` (omit → alphabetical). See *"The region hover"* below for exactly what these two edits drive.
+   - `packages/@ourworldindata/grapher/src/seriesLabel/RegionTooltipData.ts` → `descriptions`: `<provider>: "The **<Provider>** defines [N world regions](https://ourworldindata.org/world-region-map-definitions#<anchor>):"` — **embed the article link in the count phrase**, matching the WB/WHO/UN entries. `<anchor>` is the slug of the provider's article-section heading (e.g. `maddison-project-database-maddison`); you must add that section to the article — see **Step 10**. Optionally add a left-to-right map order to `customRegionDisplayOrder` (omit → alphabetical). See *"The region hover"* below for what these edits drive.
 
 ### Suffix-only provider — an `AdditionalRegionDataProvider` (e.g. FAO, OECD)
 
@@ -346,7 +346,7 @@ The frontend recognizes the provider's entities purely by the `(Provider)` name 
 
 When a Grapher chart plots a region entity (e.g. `"Sub-Saharan Africa (ILO)"`) as a series, hovering its label shows a tooltip with a description, a mini world map, and a legend (`RegionTooltip.tsx` → `RegionMap.tsx`). Worth understanding because it surprises people:
 
-- **It is NOT tied to any published chart or to the `world-region-map-definitions` article.** The tooltip is assembled entirely in owid-grapher from `regions.data.ts` + the registries. The `descriptions` text merely *links* to the article (an anchor URL), so that section should exist for the link to land — but the tooltip renders regardless. You do **not** need to publish a chart for hovers to work.
+- **It is NOT tied to any published chart** and renders entirely from `regions.data.ts` + the registries — you don't need to publish a chart for hovers to work. The `descriptions` text *does* link into the `world-region-map-definitions` article (an anchor), so **add the matching section to that article (Step 10)** or the link lands on the page top. The tooltip itself renders regardless.
 - **It only exists for full-definition providers.** `TooltipKey = RegionDataProvider | "incomeGroups" | "continents"`, so suffix-only providers (`AdditionalRegionDataProvider`) get no tooltip — to give one, add the provider's definitions to `regions.data.ts`.
 - **The mini-map's configuration is computed in code, not taken from your ETL metadata or the chart's `customCategoryColors`:**
   - *Membership* (which country → which region) comes from `regions.data.ts` (`getCountriesByRegion`); no-data countries fall back to grey.
@@ -366,6 +366,21 @@ yarn typecheck          # surfaces any missing label-record entries (the Record<
 yarn fixLintChanged     # lint the changed files; yarn fixFormatChanged to format
 ```
 Confirm the provider appears in `regionGroupLabels` and the relevant label record(s), and that typecheck is clean (a missing entry in a `Record<RegionDataProvider, …>` / `Record<TooltipKey, …>` registry is a compile error — that's your safety net). Open a PR in `owid-grapher` (title like `🔨 update regions file`), with the disclosure blockquote in the body.
+
+---
+
+## Step 10 — Add the provider to the world-region-map-definitions article
+
+The [world-region-map-definitions](https://ourworldindata.org/world-region-map-definitions) article is the public, human-readable home for every provider's regions — and the target of the hover `descriptions` links (Step 9) and indicator text. Add a section for the new provider there.
+
+- It's an OWID **gdoc/article**, not in this repo — edit it in the OWID admin/gdocs (a manual editorial step), not via ETL.
+- Add a section headed `<Provider full name> (<PROVIDER>)` — e.g. *"Maddison Project Database (Maddison)"* — usually with the provider's region map and a short description of the grouping.
+- **The section anchor must match the link** used in `descriptions` (and any indicator text). The anchor is the heading slugged: lowercase, spaces → hyphens, parentheses dropped:
+  - `Maddison Project Database (Maddison)` → `#maddison-project-database-maddison`
+  - `World Inequality Database (WID)` → `#world-inequality-database-wid`
+  - `International Labour Organization (ILO)` → `#international-labour-organization-ilo`
+- For a multi-tier provider, both tiers' hovers can point at the **same** section (e.g. `ilo_1` and `ilo_2` both → `#international-labour-organization-ilo`).
+- Open the link once the section is published to confirm the anchor resolves.
 
 ---
 
