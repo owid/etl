@@ -63,10 +63,7 @@ def make_oecd(tb):
 def make_wc(tb):
     """Extract the share with no education from Wittgenstein Centre (1950+, SSP2, age 15+, both sexes)."""
     tb = tb.loc[
-        (tb["scenario"] == 2)
-        & (tb["sex"] == "total")
-        & (tb["age"] == "15+")
-        & (tb["education"] == "no_education"),
+        (tb["scenario"] == 2) & (tb["sex"] == "total") & (tb["age"] == "15+") & (tb["education"] == "no_education"),
         ["country", "year", "prop"],
     ]
     assert tb.groupby(["country", "year"]).size().max() == 1, "Only 1 row per country-year accepted."
