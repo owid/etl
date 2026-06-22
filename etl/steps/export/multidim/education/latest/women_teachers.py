@@ -27,6 +27,7 @@ MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
     "addCountryMode": "add-country",
+    "sortBy": "custom",
 }
 
 # Grouped view chart configuration
@@ -36,6 +37,7 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "yAxis": {"min": 0, "max": 100, "facetDomain": "independent"},
     "selectedFacetStrategy": "entity",
     "addCountryMode": "add-country",
+    "sortBy": "custom",
 }
 
 # --------------------- #
