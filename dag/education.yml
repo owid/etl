@@ -6,7 +6,6 @@ steps:
       - data://meadow/oecd/2026-06-21/education_attainment_distribution:
         - snapshot://oecd/2026-06-21/education_attainment_distribution.csv
       - data://garden/education/2023-07-17/education_lee_lee
-      - data://garden/un/2025-05-07/undp_hdr
 
   # Barro and Lee projections dataset
   data://grapher/education/2023-07-17/education_barro_lee_projections:

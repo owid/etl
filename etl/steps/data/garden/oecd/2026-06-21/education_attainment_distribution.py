@@ -1,11 +1,9 @@
-"""Combine multiple education sources into long-run series.
+"""Load OECD educational attainment data and splice with Lee & Lee historical estimates.
 
-Produces two indicators:
-1. share_tertiary_education: OECD observed data spliced with Lee & Lee historical estimates.
-2. average_years_of_schooling: UNDP HDR data (1990+) spliced with Lee & Lee historical estimates.
-
-For both, the more recent/reliable source is used as far back as it goes per country,
-and Lee & Lee fills in the earlier period.
+For each country with OECD data, we use OECD as far back as it goes (observed, annual).
+For years before the earliest OECD observation, we fill in with Lee & Lee historical
+estimates (5-year intervals, 1870-2010). For countries without any OECD data, we keep
+the full Lee & Lee series up to 2010.
 """
 
 import owid.catalog.processing as pr
@@ -15,33 +13,25 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# Lee & Lee columns used for the splice.
+# The Lee & Lee column that corresponds to the OECD tertiary education share (25-64, both sexes).
 LEE_LEE_TERTIARY_COL = "mf_adults__25_64_years__percentage_of_tertiary_education"
-LEE_LEE_AVG_YEARS_COL = "mf_youth_and_adults__15_64_years__average_years_of_education"
 
 
-def splice_with_lee_lee(tb_recent: Table, tb_lee_lee: Table, col: str) -> Table:
-    """Splice a recent source with Lee & Lee historical data.
-
-    For each country, uses the recent source from its earliest available year.
-    Lee & Lee fills in the years before that. Countries not in the recent source
-    keep the full Lee & Lee series.
-    """
-    first_year = tb_recent.groupby("country")["year"].min().to_dict()
-
-    mask = tb_lee_lee.apply(
-        lambda row: row["country"] not in first_year or row["year"] < first_year[row["country"]],
-        axis=1,
-    )
-    tb_ll_filtered = tb_lee_lee[mask]
-
-    return pr.concat([tb_ll_filtered, tb_recent], short_name=col)
+def sanity_check_inputs(tb_oecd: Table, tb_lee_lee: Table) -> None:
+    assert not tb_oecd.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in OECD data."
+    assert tb_oecd["share_tertiary_education"].min() >= 0, "Negative share found in OECD data."
+    assert tb_oecd["share_tertiary_education"].max() <= 100, "OECD share exceeds 100%."
+    assert LEE_LEE_TERTIARY_COL in tb_lee_lee.columns, f"Missing column {LEE_LEE_TERTIARY_COL} in Lee & Lee data."
 
 
 def sanity_check_outputs(tb: Table) -> None:
     tb_check = tb.reset_index()
     assert not tb_check.empty, "Output table is empty."
     assert not tb_check.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in output."
+    assert tb_check["share_tertiary_education"].min() >= 0, "Negative share in output."
+    assert tb_check["share_tertiary_education"].max() <= 100, "Output share exceeds 100%."
+    # We should have many more rows than OECD alone (~1200) thanks to Lee & Lee historical data.
+    assert len(tb_check) > 1500, f"Unexpectedly few rows in output: {len(tb_check)}."
 
 
 def run() -> None:
@@ -54,8 +44,7 @@ def run() -> None:
     ds_lee_lee = paths.load_dataset("education_lee_lee")
     tb_lee_lee = ds_lee_lee["education_lee_lee"].reset_index()
 
-    ds_undp = paths.load_dataset("undp_hdr")
-    tb_undp = ds_undp["undp_hdr_sex"].reset_index()
+    sanity_check_inputs(tb_oecd, tb_lee_lee)
 
     #
     # Process data.
@@ -64,28 +53,24 @@ def run() -> None:
     # Harmonize OECD country names.
     tb_oecd = paths.regions.harmonize_names(tb_oecd, country_col="country", countries_file=paths.country_mapping_path)
 
-    # --- 1. Share with tertiary education (OECD + Lee & Lee) ---
-    tb_ll_tertiary = tb_lee_lee[["country", "year", LEE_LEE_TERTIARY_COL]].copy()
-    tb_ll_tertiary = tb_ll_tertiary.rename(columns={LEE_LEE_TERTIARY_COL: "share_tertiary_education"})
-    tb_ll_tertiary = tb_ll_tertiary.dropna(subset=["share_tertiary_education"])
+    # Extract the tertiary education share from Lee & Lee and rename to match OECD column.
+    tb_ll = tb_lee_lee[["country", "year", LEE_LEE_TERTIARY_COL]].copy()
+    tb_ll = tb_ll.rename(columns={LEE_LEE_TERTIARY_COL: "share_tertiary_education"})
+    tb_ll = tb_ll.dropna(subset=["share_tertiary_education"])
 
-    tb_tertiary = splice_with_lee_lee(tb_oecd, tb_ll_tertiary, "share_tertiary_education")
+    # For each country, find the earliest year with OECD data.
+    oecd_first_year = tb_oecd.groupby("country")["year"].min().to_dict()
 
-    # --- 2. Average years of schooling (UNDP + Lee & Lee) ---
-    # UNDP: filter for sex=total, keep mys column.
-    tb_undp_mys = tb_undp.loc[tb_undp["sex"] == "total", ["country", "year", "mys"]].copy()
-    tb_undp_mys = tb_undp_mys.rename(columns={"mys": "average_years_of_schooling"})
-    tb_undp_mys = tb_undp_mys.dropna(subset=["average_years_of_schooling"])
+    # Keep Lee & Lee rows only for years before the earliest OECD data point for that country.
+    # For countries not in OECD at all, keep the full Lee & Lee series.
+    mask = tb_ll.apply(
+        lambda row: row["country"] not in oecd_first_year or row["year"] < oecd_first_year[row["country"]],
+        axis=1,
+    )
+    tb_ll = tb_ll[mask]
 
-    # Lee & Lee: extract average years of education.
-    tb_ll_avg = tb_lee_lee[["country", "year", LEE_LEE_AVG_YEARS_COL]].copy()
-    tb_ll_avg = tb_ll_avg.rename(columns={LEE_LEE_AVG_YEARS_COL: "average_years_of_schooling"})
-    tb_ll_avg = tb_ll_avg.dropna(subset=["average_years_of_schooling"])
-
-    tb_avg_years = splice_with_lee_lee(tb_undp_mys, tb_ll_avg, "average_years_of_schooling")
-
-    # --- Combine both indicators ---
-    tb = pr.merge(tb_tertiary, tb_avg_years, on=["country", "year"], how="outer")
+    # Combine: Lee & Lee historical + OECD observed.
+    tb = pr.concat([tb_ll, tb_oecd], short_name=paths.short_name)
 
     tb = tb.format(["country", "year"], short_name=paths.short_name)
 

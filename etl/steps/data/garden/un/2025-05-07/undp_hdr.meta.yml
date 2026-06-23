@@ -535,3 +535,25 @@ tables:
           - "UNDP originally obtained this data from:  Barro and Lee (2018), UNESCO Institute for Statistics (2024) and United Nations Children's Fund Multiple Indicator Cluster Surveys (various years)."
         display:
           numDecimalPlaces: 1
+
+  undp_hdr_mys_long_run:
+    variables:
+      average_years_of_schooling:
+        title: Average years of schooling (long-run)
+        unit: years
+        description_short: Average number of years of schooling received by adults, combining UNDP and Lee & Lee historical estimates.
+        description_key:
+          - This data combines two sources. Recent data comes from the UNDP Human Development Report (1990 onward, annual), which measures mean years of schooling for adults aged 25 and older. Historical estimates come from Lee & Lee (2016), measuring average years of education for the 15-64 age group.
+          - For each country, UNDP data is used from its earliest available year. Lee & Lee estimates fill in the earlier period (at 5-year intervals, from as early as 1870).
+          - The UNDP covers the 25+ age group, while Lee & Lee covers 15-64. The two overlap broadly but may differ at the margins because they weight younger and older cohorts differently.
+        description_processing: |-
+          For each country, we use UNDP data from its earliest available year (typically 1990) onward. For years before that, we use Lee & Lee (2016) historical estimates.
+        presentation:
+          topic_tags:
+            - Global Education
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: Recent data is from the UNDP Human Development Report (ages 25+). Historical data is from Lee & Lee (ages 15-64).
+        display:
+          numDecimalPlaces: 1
