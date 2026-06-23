@@ -17,6 +17,7 @@ def run() -> None:
     tables = [
         ds_garden["undp_hdr"],
         ds_garden["undp_hdr_sex"],
+        ds_garden["undp_hdr_mys_long_run"],
     ]
 
     #
