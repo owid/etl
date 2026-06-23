@@ -1,7 +1,7 @@
 dataset:
-  title: Adults' educational attainment distribution
+  title: Educational attainment – long-run estimates
   description: |-
-    Share of adults aged 25-64 with tertiary education, combining OECD observed data with Lee & Lee (2016) historical estimates.
+    Long-run educational attainment indicators combining recent observed data with Lee & Lee (2016) historical estimates.
 
 tables:
   education_attainment_distribution:
@@ -25,3 +25,19 @@ tables:
             hasMapTab: true
             tab: map
             note: For OECD countries, recent data is based on observed OECD survey data. For all other countries, the series ends in 2010 with Lee & Lee historical estimates.
+
+      average_years_of_schooling:
+        title: Average years of schooling
+        unit: years
+        description_short: Average number of years of schooling received by adults, combining UNDP and Lee & Lee historical estimates.
+        description_key:
+          - This data combines two sources. Recent data comes from the UNDP Human Development Report (1990 onward, annual), which measures mean years of schooling for adults aged 25 and older. Historical estimates come from Lee & Lee (2016), measuring average years of education for the 15-64 age group.
+          - For each country, UNDP data is used from its earliest available year. Lee & Lee estimates fill in the earlier period (at 5-year intervals, from as early as 1870).
+          - The UNDP covers the 25+ age group, while Lee & Lee covers 15-64. The two overlap broadly but may differ at the margins because they weight younger and older cohorts differently.
+        description_processing: |-
+          For each country, we use UNDP data from its earliest available year (typically 1990) onward. For years before that, we use Lee & Lee (2016) historical estimates. The Barro & Lee projections (2015-2040) previously used have been dropped.
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: Recent data is from the UNDP Human Development Report (ages 25+). Historical data is from Lee & Lee (ages 15-64).
