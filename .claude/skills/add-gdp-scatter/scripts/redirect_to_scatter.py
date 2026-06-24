@@ -74,6 +74,16 @@ def ref_counts(references: dict) -> dict[str, int]:
     return {k: len(references.get(k) or []) for k in ALL_REF_KEYS}
 
 
+def classify_redirect_error(exc: Exception, target: str) -> tuple[str, str]:
+    """Map a site-redirect API failure to a (status, note) for the report."""
+    msg = str(getattr(getattr(exc, "response", None), "text", "") or exc)
+    if "chained" in msg.lower():
+        return "CHAINED", msg[:110]
+    if "already exists" in msg.lower():
+        return "EXISTS", f"-> {target}"
+    return "ERROR", msg[:120]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--apply", action="store_true", help="create redirects + unpublish sources (otherwise audit only)")
@@ -130,25 +140,38 @@ def main() -> int:
         target = f"/grapher/{tgt_slug}?{TARGET_QUERY}"
 
         # Create the site redirect. If one already exists for this source: leave it
-        # if the target already matches, otherwise replace it (delete + recreate,
-        # since there's no update endpoint).
+        # if the target already matches, otherwise replace it. There's no update
+        # endpoint and the API rejects a duplicate source, so a replace must delete
+        # then create — and if the create fails we restore the old redirect so
+        # production never ends up with no redirect at all.
         prior = existing.get(source)
-        try:
-            if prior and prior["target"] == target:
-                status, note = "EXISTS", f"-> {target}"
+        if prior and prior["target"] == target:
+            status, note = "EXISTS", f"-> {target}"
+        elif prior:
+            try:
+                api.delete_site_redirect(prior["id"])
+            except Exception as e:
+                # Delete failed: the old redirect is still in place, nothing lost.
+                status, note = classify_redirect_error(e, target)
             else:
-                if prior:
-                    api.delete_site_redirect(prior["id"])
+                try:
+                    api.create_site_redirect(source, target)
+                    status, note = "UPDATED", f"-> {target}"
+                except Exception as e:
+                    status, note = classify_redirect_error(e, target)
+                    # Replacement failed — put the original redirect back.
+                    try:
+                        api.create_site_redirect(source, prior["target"])
+                        note = f"{note} (old redirect restored)"
+                    except Exception as e2:
+                        status = "CRITICAL"
+                        note = f"replace failed AND restore failed: {note} / restore: {str(e2)[:60]}"
+        else:
+            try:
                 api.create_site_redirect(source, target)
-                status, note = ("UPDATED" if prior else "CREATED"), f"-> {target}"
-        except Exception as e:
-            msg = str(getattr(getattr(e, "response", None), "text", "") or e)
-            if "chained" in msg.lower():
-                status, note = "CHAINED", msg[:100]
-            elif "already exists" in msg.lower():
-                status, note = "EXISTS", f"-> {target}"
-            else:
-                status, note = "ERROR", msg[:120]
+                status, note = "CREATED", f"-> {target}"
+            except Exception as e:
+                status, note = classify_redirect_error(e, target)
 
         # Unpublish the source chart.
         unpub = ""
