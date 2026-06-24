@@ -1,0 +1,43 @@
+title:
+  title: Children in child labor
+  title_variant: ""
+topic_tags:
+  - Child Labor
+default_selection:
+  - World
+default_dimensions:
+  metric: share
+
+definitions:
+  common_views:
+    - config:
+        chartTypes: ["LineChart"]
+        hasMapTab: false
+        tab: chart
+        yAxis:
+          min: 0
+
+# For now the only selector is the metric (share vs number); the underlying table is also
+# disaggregated by sex (total/boys/girls), which could be added as a dimension in the future.
+dimensions:
+  - name: Metric
+    slug: metric
+    choices:
+      - slug: share
+        name: Share
+        description: Share of children who are in child labor
+      - slug: number
+        name: Number
+        description: Number of children who are in child labor
+
+views:
+  - dimensions:
+      metric: share
+    indicators:
+      y:
+        - catalogPath: "grapher/un/2026-04-08/child_labor_report/child_labor#share_child_labor__sex_total__age_5_17"
+  - dimensions:
+      metric: number
+    indicators:
+      y:
+        - catalogPath: "grapher/un/2026-04-08/child_labor_report/child_labor#number_child_labor__sex_total__age_5_17"
