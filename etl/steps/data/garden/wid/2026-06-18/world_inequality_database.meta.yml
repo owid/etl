@@ -166,7 +166,7 @@ definitions:
     <% if welfare_type != "wealth" %>
     For some countries and years, the underlying data sources (household surveys, tax records) are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/).
     <%- else %>
-    For some countries and years, the underlying data sources are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/).
+    For some countries and years, the underlying data sources are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/) and this [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-world-inequality-lab-technical-note-2025-01/).
     <%- endif %>
 
   description_key_posttax: |-
