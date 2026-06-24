@@ -5,7 +5,7 @@ This program extracts inequality data from LIS for three types of income and one
 	- Pretax national income, income before the payment and receipt of taxes and benefits, but after payment of public and private pensions.
 	- Post-tax disposable income, income that includes all cash redistribution through the tax and transfer system, but does not include in-kind benefits and therefore does not add up to national income.
 	- Post-tax national income, income that includes all cash redistribution through the tax and transfer system and also in-kind transfers (i.e., government consumption expenditures) to individuals.
-	- Net national wealth, the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.
+	- Household net wealth, the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.
 
 The inequality variables extracted from here include Gini coefficients, averages, thresholds and shares per decile, statistics for the top 1, 0.1, 0.01 and 0.001% percentile and share ratios.
 When needed, values are converted to PPP (2011 vintage) adjusted to prices of the most recent year available.

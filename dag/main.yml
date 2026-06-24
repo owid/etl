@@ -361,10 +361,10 @@ steps:
     - data://garden/un/2025-05-15/un_members
 
   # UNODC Homicide Data
-  data://grapher/unodc/2025-05-28/homicide:
-    - data://garden/unodc/2025-05-28/homicide:
-      - data://meadow/unodc/2025-05-28/homicide:
-        - snapshot://unodc/2025-05-28/homicide.xlsx
+  data://grapher/unodc/2026-06-12/homicide:
+    - data://garden/unodc/2026-06-12/homicide:
+      - data://meadow/unodc/2026-06-12/homicide:
+        - snapshot://unodc/2026-06-12/homicide.xlsx
       - data://garden/demography/2024-07-15/population
       - data://garden/un/2024-07-12/un_wpp
 

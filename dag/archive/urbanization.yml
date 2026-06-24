@@ -2,28 +2,85 @@ steps:
   #
   # GHSL degree of urbanization.
   #
+  # archived; last active in 616e0c36a378 on 2024-12-06
   data://meadow/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
     - snapshot://urbanization/2024-01-26/ghsl_degree_of_urbanisation.zip
+  # archived; last active in 616e0c36a378 on 2024-12-06
   data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
     - data://meadow/urbanization/2024-01-26/ghsl_degree_of_urbanisation
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
+  # archived; last active in 616e0c36a378 on 2024-12-06
   data://grapher/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
     - data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation
 
   # GHSL urban centers.
+  # archived; last active in b4cb5554e777 on 2025-12-12
   data://meadow/urbanization/2024-12-02/ghsl_urban_centers:
     - snapshot://urbanization/2024-12-02/ghsl_urban_centers.xlsx
+  # archived; last active in b4cb5554e777 on 2025-12-12
   data://garden/urbanization/2024-12-02/ghsl_urban_centers:
     - data://meadow/urbanization/2024-12-02/ghsl_urban_centers
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
+  # archived; last active in b4cb5554e777 on 2025-12-12
   data://grapher/urbanization/2024-12-02/ghsl_urban_centers:
     - data://garden/urbanization/2024-12-02/ghsl_urban_centers
 
   # Stats in the city - socioeconomic and environmental indicators.
   #
+  # archived; last active in 706cf5120fd4 on 2026-06-09
   data://grapher/urbanization/2026-02-01/ghsl_stats_in_the_city:
     - data://garden/urbanization/2026-02-01/ghsl_stats_in_the_city:
       - data://meadow/urbanization/2026-02-01/ghsl_stats_in_the_city:
         - snapshot://urbanization/2026-02-01/ghsl_stats_in_the_city.zip
+  #
+  # GHSL degree of urbanization.
+  #
+  # archived; last active in a9b8eb4f4d3b on 2026-06-11
+  data://grapher/urbanization/2024-10-14/ghsl_degree_of_urbanisation:
+    - data://garden/urbanization/2024-10-14/ghsl_degree_of_urbanisation:
+      - data://meadow/urbanization/2024-10-14/ghsl_degree_of_urbanisation:
+        - snapshot://urbanization/2024-10-14/ghsl_degree_of_urbanisation.xlsx
+      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/regions/2023-01-01/regions
+
+  #
+  # UN SDG indicators related to urbanization.
+  #
+  # archived; last active in a9b8eb4f4d3b on 2026-06-11
+  data://grapher/un/2024-02-14/sdgs_urbanization:
+    - data://garden/un/2024-02-14/sdgs_urbanization:
+      - data://meadow/un/2024-02-14/sdgs_urbanization:
+        - data://meadow/un/2023-08-16/un_sdg
+
+  #
+  # UN urbanization dataset.
+  #
+
+  # archived; last active in a9b8eb4f4d3b on 2026-06-11
+  data://grapher/un/2024-01-17/urbanization_urban_rural:
+    - data://garden/un/2024-01-17/urbanization_urban_rural:
+      - data://meadow/un/2024-01-17/urbanization_urban_rural:
+        - snapshot://un/2024-01-17/urbanization_urban_rural.csv
+      - data://garden/hyde/2024-01-02/all_indicators
+  # archived; last active in a9b8eb4f4d3b on 2026-06-11
+  data://grapher/un/2024-01-17/urban_agglomerations_300k:
+    - data://garden/un/2024-01-17/urban_agglomerations_300k:
+      - data://meadow/un/2024-01-17/urban_agglomerations_300k:
+        - snapshot://un/2024-01-17/urban_agglomerations_300k.csv
+  # archived; last active in a9b8eb4f4d3b on 2026-06-11
+  data://grapher/un/2024-01-17/urban_agglomerations_size_class:
+    - data://garden/un/2024-01-17/urban_agglomerations_size_class:
+      - data://meadow/un/2024-01-17/urban_agglomerations_size_class:
+        - snapshot://un/2024-01-17/urban_agglomerations_size_class.xls
+  # archived; last active in a9b8eb4f4d3b on 2026-06-11
+  data://garden/un/2024-01-17/urban_agglomerations_largest_cities:
+    - data://meadow/un/2024-01-17/urban_agglomerations_largest_cities:
+      - snapshot://un/2024-01-17/urban_agglomerations_largest_cities.csv
+  # archived; last active in a9b8eb4f4d3b on 2026-06-11
+  data://grapher/un/2024-01-17/urban_agglomerations_largest_cities:
+    - data://garden/un/2024-01-17/urban_agglomerations_largest_cities
+  # archived; last active in a9b8eb4f4d3b on 2026-06-11
+  data://grapher/un/2024-01-17/urban_agglomerations_capitals:
+    - data://garden/un/2024-01-17/urban_agglomerations_largest_cities
