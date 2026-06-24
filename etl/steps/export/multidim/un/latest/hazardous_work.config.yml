@@ -35,9 +35,9 @@ views:
       metric: share
     indicators:
       y:
-        - catalogPath: "grapher/un/2026-04-08/child_labor_report/child_labor#share_hazardous_work__sex_total__age_5_17"
+        - catalogPath: "child_labor#share_hazardous_work__sex_total__age_5_17"
   - dimensions:
       metric: number
     indicators:
       y:
-        - catalogPath: "grapher/un/2026-04-08/child_labor_report/child_labor#number_hazardous_work__sex_total__age_5_17"
+        - catalogPath: "child_labor#number_hazardous_work__sex_total__age_5_17"
