@@ -94,15 +94,25 @@ def run() -> None:
     tb_oecd_only = tb_oecd_only.format(["country", "year"], short_name="education_attainment_distribution_oecd")
 
     # Wittgenstein Centre tables (SSP2).
-    tb_wc_tertiary = make_wc_share("post_secondary", "share_tertiary_education", "education_attainment_distribution_wc", WC_AGE_BINS_25_64)
-    tb_wc_no_edu = make_wc_share("no_education", "share_no_formal_education", "education_no_formal_wc", WC_AGE_BINS_25_64)
-    tb_wc_some_edu = make_wc_share("some_education", "share_some_formal_education", "education_some_formal_wc", WC_AGE_BINS_25_64)
-    tb_wc_no_edu_sex = make_wc_share_by_sex("no_education", "share_no_formal_education", "education_no_formal_by_sex_wc", WC_AGE_BINS_25_64)
+    tb_wc_tertiary = make_wc_share(
+        "post_secondary", "share_tertiary_education", "education_attainment_distribution_wc", WC_AGE_BINS_25_64
+    )
+    tb_wc_no_edu = make_wc_share(
+        "no_education", "share_no_formal_education", "education_no_formal_wc", WC_AGE_BINS_25_64
+    )
+    tb_wc_some_edu = make_wc_share(
+        "some_education", "share_some_formal_education", "education_some_formal_wc", WC_AGE_BINS_25_64
+    )
+    tb_wc_no_edu_sex = make_wc_share_by_sex(
+        "no_education", "share_no_formal_education", "education_no_formal_by_sex_wc", WC_AGE_BINS_25_64
+    )
 
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb, tb_oecd_only, tb_wc_tertiary, tb_wc_no_edu, tb_wc_some_edu, tb_wc_no_edu_sex])
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_oecd_only, tb_wc_tertiary, tb_wc_no_edu, tb_wc_some_edu, tb_wc_no_edu_sex]
+    )
     ds_garden.save()
 
 
