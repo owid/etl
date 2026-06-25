@@ -10,6 +10,10 @@ definitions:
         - Child & Infant Mortality
       attribution: United Nations Inter-agency Group for Child Mortality Estimation (2025)
       attribution_short: UN IGME
+    description_processing: |-
+      Aggregate measures for continents are calculated by Our World in Data, using our definition of the continents found [here](https://ourworldindata.org/world-region-map-definitions#our-world-in-data).
+
+      We do this by calculating a weighted average from the national rates, using the respective denominators (e.g. live births or children under 5) as weights.
     unit: << unit_of_measure.lower() >>
     short_unit: <% if 'rate' in indicator  %>%<% else %><%- endif -%>
     description_key:
