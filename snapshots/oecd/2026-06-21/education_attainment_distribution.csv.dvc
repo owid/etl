@@ -7,9 +7,10 @@
 #     4. Select these filters:
 #         1. Time period: select 1981 as the start year and 2024 as the end year.
 #         2. Reference area: all countries available. By default, all countries are selected (check if it is not).
-#         3. Sex: select "Total".
+#         3. Sex: select "Total", "Female", "Male".
 #         4. Age: select "From 25 to 64 years".
-#         5. Educational attainment level: select "Tertiary education".
+#         5. Educational attainment level: select "Less than primary education", "Below upper secondary education",
+#            "Upper secondary and post-secondary non-tertiary education", "Tertiary education".
 #         6. Leave all other filters at their defaults.
 #     5. Click the Download button.
 #     6. Right click on "Filtered data in tabular text (CSV)".
@@ -29,13 +30,13 @@ meta:
     attribution_short: OECD
     url_main: https://www.oecd.org/en/data/indicators/population-with-tertiary-education.html
     url_download: |-
-      https://sdmx.oecd.org/public/rest/data/OECD.EDU.IMEP,DSD_EAG_LSO_EA@DF_LSO_NEAC_DISTR_EA,1.0/._T.Y25T64.ISCED11A_5T8..........OBS...A?startPeriod=1981&endPeriod=2024&dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+      https://sdmx.oecd.org/public/rest/data/OECD.EDU.IMEP,DSD_EAG_LSO_EA@DF_LSO_NEAC_DISTR_EA,1.0/.F+M+_T.Y25T64.ISCED11A_0+ISCED11A_0T2+ISCED11A_3_4+ISCED11A_5T8..........OBS...A?startPeriod=1981&endPeriod=2024&dimensionAtObservation=AllDimensions&format=csvfilewithlabels
     date_accessed: '2026-06-21'
     date_published: '2025'
     license:
       name: "© OECD"
       url: https://www.oecd.org/termsandconditions/
 outs:
-  - md5: 35f5dbacf15ecc625ecdb2bf58e85474
-    size: 773430
+  - md5: ec203f8f1a88385f5ba63c2cf6ee7f43
+    size: 9463717
     path: education_attainment_distribution.csv

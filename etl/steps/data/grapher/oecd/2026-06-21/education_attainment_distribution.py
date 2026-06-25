@@ -4,36 +4,37 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
+AGGREGATES_TO_EXCLUDE = ["European Union (25 countries)", "G20", "OECD"]
+
+TABLE_NAMES = [
+    "education_attainment_distribution",
+    "education_no_formal_combined",
+    "education_attainment_distribution_oecd",
+    "education_attainment_distribution_oecd_sex",
+    "education_attainment_distribution_wc",
+    "education_no_formal_wc",
+    "education_some_formal_wc",
+    "education_no_formal_by_sex_wc",
+    "education_formal_combined",
+]
+
 
 def run() -> None:
     ds_garden = paths.load_dataset("education_attainment_distribution")
-    aggregates_to_exclude = ["European Union (25 countries)", "G20", "OECD"]
 
-    tb = ds_garden["education_attainment_distribution"].reset_index()
-    tb = tb[~tb["country"].isin(aggregates_to_exclude)]
-    tb = tb.format(["country", "year"])
+    tables = []
+    for name in TABLE_NAMES:
+        tb = ds_garden[name].reset_index()
 
-    tb_oecd = ds_garden["education_attainment_distribution_oecd"].reset_index()
-    tb_oecd = tb_oecd[~tb_oecd["country"].isin(aggregates_to_exclude)]
-    tb_oecd = tb_oecd.format(["country", "year"])
+        # Remove non-country aggregates that don't map to grapher entities.
+        if "country" in tb.columns:
+            tb = tb[~tb["country"].isin(AGGREGATES_TO_EXCLUDE)]
 
-    tb_wc = ds_garden["education_attainment_distribution_wc"].reset_index()
-    tb_wc = tb_wc.format(["country", "year"])
+        # Re-format with the appropriate index columns.
+        index_cols = [c for c in ["country", "year", "sex"] if c in tb.columns]
+        tb = tb.format(index_cols)
 
-    tb_wc_no_edu = ds_garden["education_no_formal_wc"].reset_index()
-    tb_wc_no_edu = tb_wc_no_edu.format(["country", "year"])
+        tables.append(tb)
 
-    tb_wc_some_edu = ds_garden["education_some_formal_wc"].reset_index()
-    tb_wc_some_edu = tb_wc_some_edu.format(["country", "year"])
-
-    tb_wc_no_edu_sex = ds_garden["education_no_formal_by_sex_wc"].reset_index()
-    tb_wc_no_edu_sex = tb_wc_no_edu_sex.format(["country", "year", "sex"])
-
-    tb_combined_formal = ds_garden["education_formal_combined"].reset_index()
-    tb_combined_formal = tb_combined_formal.format(["country", "year"])
-
-    ds_grapher = paths.create_dataset(
-        tables=[tb, tb_oecd, tb_wc, tb_wc_no_edu, tb_wc_some_edu, tb_wc_no_edu_sex, tb_combined_formal],
-        default_metadata=ds_garden.metadata,
-    )
+    ds_grapher = paths.create_dataset(tables=tables, default_metadata=ds_garden.metadata)
     ds_grapher.save()
