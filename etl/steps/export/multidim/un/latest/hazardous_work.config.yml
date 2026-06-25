@@ -1,0 +1,39 @@
+title:
+  title: Children in hazardous work
+  title_variant: ILO and UNICEF
+topic_tags:
+  - Child Labor
+default_selection:
+  - World
+default_dimensions:
+  indicator: share
+
+definitions:
+  common_views:
+    - config:
+        chartTypes: ["LineChart", "DiscreteBar"]
+        hasMapTab: false
+        tab: chart
+        yAxis:
+          min: 0
+
+dimensions:
+  - name: Indicator
+    slug: indicator
+    choices:
+      - slug: share
+        name: Share in hazardous work
+      - slug: number
+        name: Number in hazardous work
+
+views:
+  - dimensions:
+      indicator: share
+    indicators:
+      y:
+        - catalogPath: "child_labor#share_hazardous_work__sex_total__age_5_17"
+  - dimensions:
+      indicator: number
+    indicators:
+      y:
+        - catalogPath: "child_labor#number_hazardous_work__sex_total__age_5_17"
