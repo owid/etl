@@ -10,12 +10,12 @@ tables:
         title: Share of adults with tertiary education
         unit: "%"
         short_unit: "%"
-        description_short: Share of adults aged 25-64 who have attained tertiary education (ISCED 5-8).
+        description_short: Share of adults aged 25–64 who have attained tertiary education, combining OECD observed data with Lee & Lee (2016) historical estimates.
         description_key:
+          - "[Tertiary education](#dod:tertiary-education) includes short-cycle tertiary programmes, bachelor's, master's, and doctoral degrees (ISCED levels 5 through 8)."
           - This data combines two sources. Recent data for OECD countries comes from the OECD's Education at a Glance, based on national labour force surveys. Historical estimates come from Lee & Lee (2016), based on census and survey data.
           - For each OECD country, OECD data is used from its earliest available year (as early as 1981, with annual frequency). Lee & Lee estimates fill in the earlier period (at 5-year intervals, from as early as 1870).
           - For countries not covered by the OECD, only the Lee & Lee series is available, ending in 2010.
-          - Tertiary education covers ISCED levels 5 through 8, including short-cycle tertiary programs, bachelor's, master's, and doctoral degrees.
           - The OECD measures completed tertiary education, while Lee & Lee measures attainment of tertiary education (partial or completed). The two are broadly comparable, though they may diverge for countries where many people start but do not complete a degree.
           - The age group covered is 25 to 64 years old, for both sexes combined.
         description_processing: |-
