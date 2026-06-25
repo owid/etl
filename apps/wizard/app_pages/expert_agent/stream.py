@@ -292,7 +292,7 @@ async def event_stream_handler(
             # Show tool result in Streamlit UI
             tool_ui_message(
                 "markdown",
-                f"**:material/construction: :gray[:material/call_received:] Tool return**:  Tool `{event.result.tool_name}` completed",
+                f"**:material/construction: :gray[:material/call_received:] Tool return**:  Tool `{event.part.tool_name}` completed",
             )
 
         elif isinstance(event, FinalResultEvent):
