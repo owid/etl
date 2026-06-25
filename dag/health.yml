@@ -1109,21 +1109,24 @@ steps:
 
 
 
-  # Neglected Tropical Diseases - Lymphatic Filariasis (2026 update)
-  data://meadow/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
-    - snapshot://neglected_tropical_diseases/2026-06-25/lymphatic_filariasis.xlsx
-  data://garden/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
-    - data://meadow/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis
-    - data://garden/regions/2023-01-01/regions
+  # WHO Preventive Chemotherapy - Neglected Tropical Diseases (2026 update)
+  # Lymphatic filariasis
   data://grapher/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
-    - data://garden/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis
+    - data://garden/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
+            - snapshot://neglected_tropical_diseases/2026-06-25/lymphatic_filariasis.xlsx
 
-
-    # Neglected Tropical Diseases - Schistosomiasis (2026 update)
-  data://meadow/neglected_tropical_diseases/2026-06-25/schistosomiasis:
-    - snapshot://neglected_tropical_diseases/2026-06-25/schistosomiasis.xlsx
-  data://garden/neglected_tropical_diseases/2026-06-25/schistosomiasis:
-    - data://meadow/neglected_tropical_diseases/2026-06-25/schistosomiasis
-    - data://garden/regions/2023-01-01/regions
+  # Schistosomiasis
   data://grapher/neglected_tropical_diseases/2026-06-25/schistosomiasis:
-    - data://garden/neglected_tropical_diseases/2026-06-25/schistosomiasis
+    - data://garden/neglected_tropical_diseases/2026-06-25/schistosomiasis:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2026-06-25/schistosomiasis:
+            - snapshot://neglected_tropical_diseases/2026-06-25/schistosomiasis.xlsx
+
+  # Soil-transmitted helminthiases
+  data://grapher/neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases:
+    - data://garden/neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases:
+            - snapshot://neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases.xlsx
