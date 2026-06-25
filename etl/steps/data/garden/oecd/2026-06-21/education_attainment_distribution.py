@@ -25,8 +25,9 @@ LEE_LEE_TERTIARY_COL = "mf_adults__25_64_years__percentage_of_tertiary_education
 # Lee & Lee data goes up to 2010 (the last year of historical estimates).
 LEE_LEE_MAX_YEAR = 2010
 
-# Wittgenstein Centre age bins for the 25-64 age group.
+# Wittgenstein Centre age bins.
 WC_AGE_BINS_25_64 = ["25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64"]
+WC_AGE_BINS_15_64 = ["15-19", "20-24"] + WC_AGE_BINS_25_64
 
 
 def sanity_check_inputs(tb_oecd: Table, tb_lee_lee: Table) -> None:
@@ -107,11 +108,14 @@ def run() -> None:
         "no_education", "share_no_formal_education", "education_no_formal_by_sex_wc", WC_AGE_BINS_25_64
     )
 
+    # Combined Lee & Lee + Wittgenstein Centre splice for no formal / some formal education (15-64).
+    tb_combined_formal = make_ll_wc_formal_education_splice(tb_lee_lee)
+
     #
     # Save outputs.
     #
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_oecd_only, tb_wc_tertiary, tb_wc_no_edu, tb_wc_some_edu, tb_wc_no_edu_sex]
+        tables=[tb, tb_oecd_only, tb_wc_tertiary, tb_wc_no_edu, tb_wc_some_edu, tb_wc_no_edu_sex, tb_combined_formal]
     )
     ds_garden.save()
 
@@ -189,5 +193,63 @@ def make_wc_share_by_sex(education_cat: str, col_name: str, short_name: str, age
     tb["sex"] = tb["sex"].map({"female": "Women", "male": "Men"}).astype("category")
 
     tb = tb.format(["country", "year", "sex"], short_name=short_name)
+
+    return tb
+
+
+LEE_LEE_NO_EDU_COL = "mf_youth_and_adults__15_64_years__percentage_of_no_education"
+
+
+def make_ll_wc_formal_education_splice(tb_lee_lee) -> Table:
+    """Splice Lee & Lee (1870-2010) with Wittgenstein Centre (post-2010) for no/some formal education, 15-64.
+
+    Lee & Lee is used up to its last year per country. Wittgenstein Centre fills in from the next available year.
+    """
+    # Lee & Lee: no education, both sexes, 15-64.
+    tb_ll = tb_lee_lee[["country", "year", LEE_LEE_NO_EDU_COL]].copy()
+    tb_ll = tb_ll.rename(columns={LEE_LEE_NO_EDU_COL: "share_no_formal_education"})
+    tb_ll = tb_ll.dropna(subset=["share_no_formal_education"])
+    tb_ll = tb_ll[tb_ll["year"] <= LEE_LEE_MAX_YEAR]
+
+    # Wittgenstein Centre: no education, 15-64 from age bins.
+    ds_wc = paths.load_dataset("wittgenstein_human_capital")
+    tb_wc = ds_wc["by_sex_age_edu"].reset_index()
+    tb_wc = tb_wc[(tb_wc["scenario"] == 2) & (tb_wc["sex"] == "total") & (tb_wc["age"].isin(WC_AGE_BINS_15_64))]
+
+    no_pop = (
+        tb_wc[tb_wc["education"] == "no_education"]
+        .groupby(["country", "year"], observed=True)["pop"]
+        .sum()
+        .reset_index()
+        .rename(columns={"pop": "no_pop"})
+    )
+    tot_pop = (
+        tb_wc[tb_wc["education"] == "total"]
+        .groupby(["country", "year"], observed=True)["pop"]
+        .sum()
+        .reset_index()
+        .rename(columns={"pop": "tot_pop"})
+    )
+    tb_wc_no = pr.merge(no_pop, tot_pop, on=["country", "year"])
+    tb_wc_no["share_no_formal_education"] = (tb_wc_no["no_pop"] / tb_wc_no["tot_pop"]) * 100
+    tb_wc_no = tb_wc_no.drop(columns=["no_pop", "tot_pop"])
+
+    # For each country, find the last year with Lee & Lee data.
+    ll_last_year = tb_ll.groupby("country")["year"].max().to_dict()
+
+    # Keep WC rows only for years after the last Lee & Lee data point.
+    mask = tb_wc_no.apply(
+        lambda row: row["country"] not in ll_last_year or row["year"] > ll_last_year[row["country"]],
+        axis=1,
+    )
+    tb_wc_no = tb_wc_no[mask]
+
+    # Combine.
+    tb = pr.concat([tb_ll, tb_wc_no], short_name="education_formal_combined")
+
+    # Add some formal education = 100 - no formal.
+    tb["share_some_formal_education"] = 100 - tb["share_no_formal_education"]
+
+    tb = tb.format(["country", "year"], short_name="education_formal_combined")
 
     return tb

@@ -110,3 +110,38 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with no formal education, based on Wittgenstein Centre projections.
+
+  education_formal_combined:
+    variables:
+      share_no_formal_education:
+        title: Share of adults with no formal education
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of adults aged 15–64 with no formal education, combining Lee & Lee (2016) historical estimates with Wittgenstein Centre projections.
+        description_key:
+          - This data combines two sources. Historical estimates come from Lee & Lee (2016), based on census and survey data (1870–2010, at 5-year intervals). Post-2010 data comes from the Wittgenstein Centre (SSP2 scenario).
+          - The age group covered is 15 to 64 years old, for both sexes combined.
+          - No formal education means the person has never attended or completed any level of formal schooling.
+        description_processing: |-
+          For each country, we use Lee & Lee data up to its last available year (up to 2010). For years after that, we use Wittgenstein Centre projections (SSP2, 15–64, both sexes).
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: Historical data is from Lee & Lee (2016). Post-2010 data is from the Wittgenstein Centre.
+      share_some_formal_education:
+        title: Share of adults with some formal education
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of adults aged 15–64 with some formal education, combining Lee & Lee (2016) historical estimates with Wittgenstein Centre projections.
+        description_key:
+          - This data combines two sources. Historical estimates come from Lee & Lee (2016), based on census and survey data (1870–2010, at 5-year intervals). Post-2010 data comes from the Wittgenstein Centre (SSP2 scenario).
+          - The age group covered is 15 to 64 years old, for both sexes combined.
+          - Some formal education means the person has attended at least some level of formal schooling. It is computed as 100% minus the share with no formal education.
+        description_processing: |-
+          For each country, we use Lee & Lee data up to its last available year (up to 2010). For years after that, we use Wittgenstein Centre projections (SSP2, 15–64, both sexes). The share with some formal education is computed as 100% minus the share with no formal education.
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: Historical data is from Lee & Lee (2016). Post-2010 data is from the Wittgenstein Centre.
