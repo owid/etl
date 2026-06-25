@@ -556,4 +556,5 @@ tables:
             tab: map
             note: Recent data is from the UNDP Human Development Report (ages 25+). Historical data is from Lee & Lee (ages 15-64).
         display:
+          name: Average years of schooling
           numDecimalPlaces: 1
