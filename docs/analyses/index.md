@@ -55,3 +55,16 @@ This is just a sneak peek into some of our data work. But note that all our code
     This document is a technical companion to the article ["Tracking historical progress against slavery and forced labor: a long-run data view"](https://ourworldindata.org/slavery).
 
     [:material-book-open-variant: Methodology](slavery_historical_data/index.md){ .md-button }
+
+<!-- Hidden from the publications index until this notebook is ready to publish; uncomment to list it.
+!!! note ""
+
+    ## Global food trade data
+    Technical companion to the article ["How does food get traded around the world?"](https://ourworldindata.org/how-does-food-get-traded-around-the-world).
+    It examines FAOSTAT's *Detailed Trade Matrix*, including how complete the bilateral coverage is, and how well the exporting and importing countries' reports agree. It also explains the methodological choices behind our food trade visualization, including how we combine data from different FAOSTAT datasets and how we merge the separate codes that split a single commodity.
+
+
+    [:material-notebook: View notebook](food_trade/food_trade.html){ .md-button }
+    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
+    [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
+-->

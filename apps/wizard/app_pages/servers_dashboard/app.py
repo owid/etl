@@ -111,13 +111,17 @@ with st.container(horizontal=True, vertical_alignment="bottom", horizontal_align
 
         **Status Indicators**:
         - 🟢 **Running**: Container is active and operational
-        - ⏸️ **Idle**: Container is stopped to save resources, but its **data is preserved**. Wake it instantly with the **Wake** button (no commit needed) — staging servers are stopped automatically after 14 days without a commit.
+        - ⏸️ **Idle**: Container is stopped to save resources, but its **data is preserved**. Wake it instantly with the **Wake** button (no commit needed).
 
-        **Commit Status**:
-        - ✅ **Today/Recent**: Commits within the last week
-        - ⚠️ **Warning**: Commits older than 7 days
-        - ❌ **Old**: Commits much older or containers not accessible
-        - ❓ **Unknown**: Unable to determine commit status
+        **Last commit**: age of the newest ETL/Grapher commit. This is reference info only — it does **not** by itself decide when a server is stopped.
+
+        **Auto-stop** — when (and why) the reaper will stop a server:
+        - A running server is auto-stopped once **max(last commit, last _start_) is older than 14 days**. Stopping just idles it (data preserved); it's not destroyed.
+        - Because *last start* counts, **waking or restarting a server resets the clock** — so a server with an old commit can still be far from being stopped. The column shows the reason (e.g. *restarted Jun 19* vs *commit Jun 19*).
+        - 🟢 healthy · 🟡 stops within a few days · 🔴 stops on the next nightly run · ⏸️ already idle · ♾️ persistent (`master`, never auto-stopped) · ❓ can't be judged (commit unreadable).
+        - ⚠️ A **host restart bumps every container's last-start at once**, resetting the timer fleet-wide — so right after a `gaia-1` reboot most servers will read the same countdown regardless of commit age.
+
+        **Destroy** (frees the disk) only happens after the **PR is merged/closed** (~3 days later) — auto-stop never destroys.
 
         **Memory Usage**:
         - Only running containers show memory usage
@@ -410,7 +414,8 @@ else:
             "Branch": filtered_df["branch"],
             "Memory": filtered_df["memory_used_gb"].fillna(0).round(2),
             "Age (days)": filtered_df["days_old"],
-            "Last Commit": filtered_df["unified_commit"],
+            "Last commit": filtered_df["last_commit_display"],
+            "Auto-stop": filtered_df["auto_stop"],
         }
     )
 
@@ -435,8 +440,19 @@ else:
             "Age (days)": st.column_config.NumberColumn(
                 "Age (days)", help="Days since container was created", format="%d days", width="small"
             ),
-            "Last Commit": st.column_config.TextColumn(
-                "Last Commit", help="Most recent relevant commit based on server origin", width="medium"
+            "Last commit": st.column_config.TextColumn(
+                "Last commit",
+                help="Age of the newest ETL/Grapher commit. Informational only — it does not by "
+                "itself decide when a server is stopped (see Auto-stop).",
+                width="small",
+            ),
+            "Auto-stop": st.column_config.TextColumn(
+                "Auto-stop",
+                help="When the reaper will stop this server, and why it's still alive. A server is "
+                "auto-stopped once max(last commit, last start) exceeds 14 days — so a recent "
+                "restart keeps an old-commit server running. 🟢 healthy · 🟡 stops soon · "
+                "🔴 stops tonight · ⏸️ already idle · ♾️ persistent.",
+                width="medium",
             ),
         },
         hide_index=True,

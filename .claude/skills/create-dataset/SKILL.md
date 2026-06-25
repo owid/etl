@@ -16,7 +16,7 @@ This skill is for **people who are not ETL experts** (typically working in Claud
 ## Guiding principles
 
 1. **Build first, review later.** Don't interview the user for every detail up front. Inspect the file, infer everything you reasonably can, fill sensible defaults for the rest, and **build a working dataset end-to-end**. Then hand the user a concise review so they correct a finished thing rather than imagine an abstract one.
-2. **Ask rarely, and ask all at once.** There is exactly **one** required checkpoint with the user before building (the consolidated confirmation in Step 2), and exactly **one** after building (the review handoff in Step 7). Don't drip-feed questions. If you can guess it, guess it and flag the guess for review.
+2. **Ask rarely, and ask all at once.** There is exactly **one** required checkpoint with the user before building (the consolidated confirmation in Step 2), and exactly **one** after building (the review handoff in Steps 7–8, which also tells them how to publish to live). Don't drip-feed questions. If you can guess it, guess it and flag the guess for review.
 3. **Never block on a missing detail.** If you can't infer a field, use a clearly-marked placeholder (e.g. `attribution_short: TBD`), note it in the review, and keep going. A dataset that's 80% right and on staging beats a perfect one that never ships.
 4. **Surface every guess.** The review in Step 7 must list what you inferred vs. what the user gave you, so nothing silently ships wrong.
 
@@ -73,7 +73,7 @@ Write a one-paragraph internal summary of what you found before moving on.
 
 ### Step 2 — One consolidated confirmation (the only pre-build checkpoint)
 
-Now ask the user **once**, with all your best guesses pre-filled, using `AskUserQuestion` where it fits. Frame it as "here's what I figured out — correct anything that's wrong, otherwise I'll build it." Keep it to the few things that genuinely can't be guessed or that would be expensive to get wrong:
+Now ask the user **once**, with all your best guesses pre-filled, using `AskUserQuestion` where it fits. Frame it as "here's what I figured out — correct anything that's wrong, otherwise I'll build it." Before listing the specifics, set expectations in one plain sentence so the end isn't a surprise — e.g. *"I'll build the dataset and put it on a staging server for you to review; once you're happy you merge the PR and it goes live."* Then keep the questions to the few things that genuinely can't be guessed or that would be expensive to get wrong:
 
 - **Namespace + short_name + dataset title** (show your proposal; let them override).
 - **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). If they give one, fetch it now for citation, license, and column definitions.
@@ -176,6 +176,8 @@ Then build and upload the grapher step to staging — target the `grapher/...` p
 STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --grapher --private
 ```
 
+Confirm the upsert actually succeeded before moving on: it should print the dataset's admin URL / id (`…/admin/datasets/<id>`). **Capture that `<id>`** — you'll hand it to the user in Step 7. If the upsert errored or printed no dataset, fix it now rather than handing over a link that won't resolve.
+
 ### Step 7 — Commit, push, and hand off for review
 
 1. Run `make check`, then commit and push:
@@ -199,11 +201,38 @@ STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --gra
    - **Metadata YAML:** `etl/steps/data/garden/<namespace>/<version>/<short_name>.meta.yml` — this is the file to edit for titles, units, descriptions, and decimals.
    - Country mapping: `etl/steps/data/garden/<namespace>/<version>/<short_name>.countries.json`
 
-   Then give them the **staging links** so they can build charts:
-   - Staging admin: `https://staging-site-<branch>/admin/` (and the dataset page printed by the grapher upsert, `…/admin/datasets/<id>`).
-   - Tell them the dataset will appear there once the staging server finishes building (a few minutes after push), and that they can create charts from its indicators directly in the staging admin.
+   Then give them the **staging links** so they can build charts. Paste the actual URLs directly into the chat — don't tell them to "open the PR" or "go to the staging admin"; non-experts won't know where those are, and they're unlikely to open the PR at all:
+   - **Dataset in staging admin:** the dataset page printed by the grapher upsert (the `<id>` you captured in Step 6), `https://staging-site-<branch>/admin/datasets/<id>`. This is where they create charts from the new indicators.
+   - **Set the right expectation about timing.** The staging server rebuilds for a few minutes after each push, so this link will **404 (or show a "site not found" page) until the build finishes — that's normal, not a broken link**. Tell them to wait ~5 minutes and refresh. Better yet, before you hand the link over, poll it yourself until the staging host responds (e.g. `curl -so /dev/null -w "%{http_code}" https://staging-site-<branch>/admin/` stops returning a connection error / `404` "site not found") so you only give them a link that already works. Handing over a link before the build is ready — with no signal that waiting will fix it — reliably reads as "it's broken / I don't see my dataset."
 
 4. Ask for corrections in plain terms ("anything in the table look wrong? any column you'd describe differently?"). Apply their feedback by editing the `.meta.yml` / `.countries.json` and re-running the affected step (`--grapher` for grapher), then push again.
+
+### Step 8 — Tell them how to go live (don't assume they know)
+
+The dataset and any charts they build live on the **staging server**, not on ourworldindata.org. Getting them to live is a manual step the user has to take, and the workflow (approve charts in chart-diff, then merge the PR) is unfamiliar to non-experts — they will not discover it on their own. Spell it out explicitly in the handoff, with the real links pasted in:
+
+1. **Charts must be approved in chart-diff before they sync to live — and this is a human step, not yours.** If the user creates any charts on the staging admin, those charts only reach production if they're **approved** in chart-diff first. **Never approve charts yourself** (no CLI, no script, no direct DB write) — chart-diff exists so a person eyeballs each chart before it goes live, and that review must stay human. Give them the direct link and tell them to click **Approve** on each chart themselves:
+
+   ```
+   http://staging-site-<branch>/etl/wizard/chart-diff
+   ```
+
+   Creating the charts is also something the user does in the admin — assume they'll need to visit the admin at some point regardless; your job is to make that the *only* thing they have to do there.
+
+2. **Merging the PR is what publishes the dataset to live.** No external review is required for a data PR like this. The user can click **"Ready for review"** then **"Squash and merge"** on the PR themselves (link the PR URL) — but you can also **do the merge for them from the session, if they explicitly ask you to and the checks are green.** This is the one outward-facing action where, given an explicit "merge it" from the user, you should go ahead — it saves a non-expert a trip to GitHub. Do it carefully:
+
+   ```bash
+   gh pr checks <number>          # confirm checks are green first
+   gh pr ready <number>           # take it out of draft
+   gh pr merge <number> --squash  # publish
+   ```
+
+   - **Only merge on an explicit request** from the user ("merge it", "go live", "ship it") — never proactively, and never as the default end of the skill.
+   - **Only merge if checks are green.** If a check is red or still running, say so and don't merge — surface what's failing and let them decide. (Don't merge a red PR just because they asked; tell them what's red first.)
+   - If they'd rather click it themselves, that's fine — point them at the PR.
+   - The dataset (and any approved charts) land on ourworldindata.org a few minutes after the merge.
+
+3. Make this a short, plain-language checklist at the end of your handoff — e.g. *"When you're happy: (1) approve your charts here «chart-diff link», (2) then either merge the PR yourself «PR link» or just tell me to merge it and I'll do it once the checks are green — it's live a few minutes later."* Paste the real URLs, not placeholders.
 
 ## Notes & gotchas
 
