@@ -1,6 +1,6 @@
 title:
   title: Children in child labor
-  title_variant: ""
+  title_variant: ILO and UNICEF
 topic_tags:
   - Child Labor
 default_selection:
@@ -16,9 +16,6 @@ definitions:
         tab: chart
         yAxis:
           min: 0
-      metadata:
-        presentation:
-          attribution_short: ILO and UNICEF
 
 # For now the only selector is the metric (share vs number); the underlying table is also
 # disaggregated by sex (total/boys/girls), which could be added as a dimension in the future.
