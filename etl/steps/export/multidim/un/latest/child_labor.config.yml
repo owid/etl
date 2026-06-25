@@ -6,7 +6,7 @@ topic_tags:
 default_selection:
   - World
 default_dimensions:
-  metric: share
+  indicator: share
 
 definitions:
   common_views:
@@ -17,27 +17,27 @@ definitions:
         yAxis:
           min: 0
 
-# For now the only selector is the metric (share vs number); the underlying table is also
+# For now the only selector is the indicator (share vs number); the underlying table is also
 # disaggregated by sex (total/boys/girls), which could be added as a dimension in the future.
 dimensions:
-  - name: Metric
-    slug: metric
+  - name: Indicator
+    slug: indicator
     choices:
       - slug: share
-        name: Share
+        name: Share in child labor
         description: Share of children who are in child labor
       - slug: number
-        name: Number
+        name: Number in child labor
         description: Number of children who are in child labor
 
 views:
   - dimensions:
-      metric: share
+      indicator: share
     indicators:
       y:
         - catalogPath: "child_labor#share_child_labor__sex_total__age_5_17"
   - dimensions:
-      metric: number
+      indicator: number
     indicators:
       y:
         - catalogPath: "child_labor#number_child_labor__sex_total__age_5_17"
