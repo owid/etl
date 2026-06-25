@@ -192,6 +192,11 @@ MODEL_DEFAULT = "gpt-5-mini"
     is_flag=True,
     help="Symlink the new worktree's data/ to the original repo's data/ (only with --worktree). Avoids recomputing upstream ETL steps. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` in the worktree.",
 )
+@click.option(
+    "--assign",
+    is_flag=True,
+    help="Automatically assign the PR to the GitHub user the token belongs to.",
+)
 def cli(
     title: str,
     category: str | None,
@@ -204,6 +209,7 @@ def cli(
     worktree: bool,
     worktree_path: str | None,
     share_data: bool,
+    assign: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
     # Check that the user has set up a GitHub token.
@@ -269,7 +275,7 @@ def cli(
             branch_out(repo, base_branch, work_branch)
 
     # Create PR
-    create_pr(repo, work_branch, base_branch, pr_title)
+    create_pr(repo, work_branch, base_branch, pr_title, assign=assign)
 
     if resolved_worktree_path is not None:
         venv_ok = install_worktree_venv(resolved_worktree_path)
@@ -514,7 +520,7 @@ def print_worktree_hint(
         )
 
 
-def create_pr(repo, work_branch, base_branch, pr_title):
+def create_pr(repo, work_branch, base_branch, pr_title, assign: bool = False):
     """Create a draft pull request work_branch -> base_branch."""
     pr_title_str = str(pr_title)
 
@@ -540,6 +546,12 @@ def create_pr(repo, work_branch, base_branch, pr_title):
         "body": "",
         "draft": True,
     }
+    if assign:
+        user_response = requests.get(f"{GITHUB_API_BASE}/user", headers=headers)
+        if user_response.status_code == 200:
+            data["assignees"] = [user_response.json()["login"]]
+        else:
+            log.warning(f"Could not fetch GitHub user for --assign (HTTP {user_response.status_code}), skipping.")
     response = requests.post(GITHUB_API_URL, json=data, headers=headers)
     if response.status_code == 201:
         js = response.json()
