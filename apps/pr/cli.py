@@ -193,7 +193,7 @@ MODEL_DEFAULT = "gpt-5-mini"
     help="Symlink the new worktree's data/ to the original repo's data/ (only with --worktree). Avoids recomputing upstream ETL steps. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` in the worktree.",
 )
 @click.option(
-    "--assign",
+    "--auto-assign",
     is_flag=True,
     help="Automatically assign the PR to the GitHub user the token belongs to.",
 )
@@ -209,7 +209,7 @@ def cli(
     worktree: bool,
     worktree_path: str | None,
     share_data: bool,
-    assign: bool,
+    auto_assign: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
     # Check that the user has set up a GitHub token.
@@ -275,7 +275,7 @@ def cli(
             branch_out(repo, base_branch, work_branch)
 
     # Create PR
-    create_pr(repo, work_branch, base_branch, pr_title, assign=assign)
+    create_pr(repo, work_branch, base_branch, pr_title, auto_assign=auto_assign)
 
     if resolved_worktree_path is not None:
         venv_ok = install_worktree_venv(resolved_worktree_path)
@@ -520,7 +520,7 @@ def print_worktree_hint(
         )
 
 
-def create_pr(repo, work_branch, base_branch, pr_title, assign: bool = False):
+def create_pr(repo, work_branch, base_branch, pr_title, auto_assign: bool = False):
     """Create a draft pull request work_branch -> base_branch."""
     pr_title_str = str(pr_title)
 
@@ -547,12 +547,12 @@ def create_pr(repo, work_branch, base_branch, pr_title, assign: bool = False):
         "draft": True,
     }
     assignee: str | None = None
-    if assign:
+    if auto_assign:
         user_response = requests.get("https://api.github.com/user", headers=headers)
         if user_response.status_code == 200:
             assignee = user_response.json()["login"]
         else:
-            log.warning(f"Could not fetch GitHub user for --assign (HTTP {user_response.status_code}), skipping.")
+            log.warning(f"Could not fetch GitHub user for --auto-assign (HTTP {user_response.status_code}), skipping.")
     response = requests.post(GITHUB_API_URL, json=data, headers=headers)
     if response.status_code == 201:
         js = response.json()
