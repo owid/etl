@@ -25,8 +25,9 @@ from apps.housekeeper.utils import (
     owidb_get_reviews_id,
     owidb_submit_review_id,
 )
-from etl.analytics.metabase import get_question_data, read_metabase
+from etl.analytics.metabase import get_question_data
 from etl.config import OWID_ENV, SLACK_API_TOKEN
+from etl.db import read_sql
 from etl.slack_helpers import send_slack_message
 
 log = get_logger()
@@ -361,10 +362,10 @@ def get_references(chart_id: int):
 
 
 def get_usernames():
-    df = read_metabase(
-        "select fullName, slackId from users where slackId is not null",
-        database_id=5,
-    )
+    # Read staff Slack IDs straight from grapher MySQL (the native home of these columns).
+    # Previously this went through Metabase database id 5, which was removed when we
+    # switched analytics over to BigQuery.
+    df = read_sql("SELECT fullName, slackId FROM users WHERE slackId IS NOT NULL")
     df = df[["fullName", "slackId"]].dropna()
     dix = df.set_index("fullName")["slackId"].to_dict()
     return dix

@@ -2,6 +2,7 @@
 
 import json
 import subprocess
+import time
 from datetime import datetime, timezone
 from typing import Any
 
@@ -18,6 +19,18 @@ log = get_logger()
 # LXC host that staging servers live on. The fetch/destroy/stop/start commands all
 # target this host (matching ops/templates/lxc-manager/*), so keep it in one place.
 LXC_HOST = "gaia-1"
+
+# Auto-stop lifecycle, mirrored from the ops reaper cron
+# (ops/templates/lxc-manager/stop_staging_containers.py). A running container is stopped (idled,
+# data preserved) once its most recent sign of activity — max(latest commit, last *start*) — is
+# older than STOP_AFTER_DAYS. We recompute that here so the dashboard's "Auto-stop" column agrees
+# with what the cron will actually do. Keep these in sync with that script.
+STOP_AFTER_DAYS = 14
+# Container the reaper skips explicitly — never auto-stopped.
+PERSISTENT_CONTAINERS = {"staging-site-master"}
+# Sentinel the LXC `info` command returns when a repo's commit can't be read transiently. The cron
+# refuses to stop on this (the other repo might have recent work it couldn't see), so neither do we.
+COMMIT_LOOKUP_FAILED = "Unable to retrieve"
 
 
 @st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
@@ -178,6 +191,14 @@ def _process_server_data(df: pd.DataFrame) -> pd.DataFrame:
     df["etl_commit_parsed"] = pd.to_datetime(df["etl_last_commit"], errors="coerce")
     df["grapher_commit_parsed"] = pd.to_datetime(df["grapher_last_commit"], errors="coerce")
 
+    # Last *start* time (bumped by LXC only on container start, not exec/ssh). This is what the
+    # reaper counts alongside commits, so a freshly-woken server isn't stopped the same night.
+    if "last_used_at" not in df.columns:
+        df["last_used_at"] = None
+    # format="ISO8601" handles LXC's variable fractional-second precision (and None) without the
+    # per-element dateutil fallback that pandas warns about.
+    df["last_used_parsed"] = pd.to_datetime(df["last_used_at"], errors="coerce", format="ISO8601")
+
     # Calculate days since last commit
     df["etl_days_old"] = _calculate_days_since_commit(df["etl_commit_parsed"])
     df["grapher_days_old"] = _calculate_days_since_commit(df["grapher_commit_parsed"])
@@ -199,6 +220,14 @@ def _process_server_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Build a single "last commit" column based on origin (used in the server list)
     df["unified_commit"] = df.apply(_get_unified_commit_info, axis=1)
+
+    # Neutral, alarm-free relative time of the latest commit (informational only — the lifecycle
+    # signal lives in the auto_stop column below, not here).
+    df["last_commit_display"] = df.apply(_format_last_commit_neutral, axis=1)
+
+    # Honest lifecycle column: when (and why) the reaper will stop this server.
+    now = datetime.now(timezone.utc)
+    df["auto_stop"] = df.apply(lambda row: _compute_auto_stop(row, now), axis=1)
 
     # Sort by status (running first) then by creation date (newest first)
     df = df.sort_values(
@@ -345,6 +374,81 @@ def _get_unified_commit_info(row: pd.Series) -> str:
             return format_commit_info(row["grapher_last_commit"], row["grapher_days_old"])
 
 
+def _as_utc(ts) -> pd.Timestamp:
+    """Normalize a parsed timestamp to tz-aware UTC so commit and start times are comparable.
+
+    LXC emits trailing-Z timestamps; pandas parses some as tz-aware and (when the column is mixed)
+    others as naive. Localize naive values to UTC rather than guessing the host's offset.
+    """
+    ts = pd.Timestamp(ts)
+    return ts.tz_localize("UTC") if ts.tzinfo is None else ts.tz_convert("UTC")
+
+
+def _latest_commit_date(row: pd.Series) -> pd.Timestamp | None:
+    """Newest of the ETL / Grapher commit timestamps (None if neither is a real date)."""
+    dates = [_as_utc(d) for d in (row["etl_commit_parsed"], row["grapher_commit_parsed"]) if pd.notna(d)]
+    return max(dates) if dates else None
+
+
+def _commit_lookup_failed(row: pd.Series) -> bool:
+    """True if either repo's commit came back as a transient failure (vs. a legitimate absence)."""
+    return COMMIT_LOOKUP_FAILED in (row.get("etl_last_commit"), row.get("grapher_last_commit"))
+
+
+def _format_last_commit_neutral(row: pd.Series) -> str:
+    """Relative age of the latest commit, with no ✅/⚠️/❌ alarm — this column is reference info,
+    not a lifecycle signal (that's `auto_stop`)."""
+    latest = _latest_commit_date(row)
+    if pd.isna(latest):
+        return "unknown" if _commit_lookup_failed(row) else "no commits"
+    days = max(0, (datetime.now(timezone.utc) - latest).days)
+    if days == 0:
+        return "today"
+    if days == 1:
+        return "1 day ago"
+    return f"{days} days ago"
+
+
+def _compute_auto_stop(row: pd.Series, now: datetime) -> str:
+    """When (and why) the reaper will stop this server, mirroring stop_staging_containers.py.
+
+    The cron stops a running container once max(latest commit, last start) is older than
+    STOP_AFTER_DAYS. We surface the countdown plus the reason it's still alive, so an old commit
+    next to a recent restart no longer reads as "should be dead".
+    """
+    # Idle servers are already stopped — the action is Wake, not a countdown.
+    if row["status"] != "Running":
+        return "⏸️ idle · wake anytime"
+    # Persistent container is never auto-stopped.
+    if row["name"] in PERSISTENT_CONTAINERS:
+        return "♾️ persistent"
+    # The cron skips on a transient commit-lookup failure; don't imply imminent death.
+    if _commit_lookup_failed(row):
+        return "❓ won't auto-stop (commit unreadable)"
+
+    commit_date = _latest_commit_date(row)
+    last_used = _as_utc(row["last_used_parsed"]) if pd.notna(row["last_used_parsed"]) else pd.NaT
+    candidates = [d for d in (commit_date, last_used) if pd.notna(d)]
+    # No commit date at all → cron can't judge and skips it; mirror that rather than guess.
+    if pd.isna(commit_date) or not candidates:
+        return "❓ won't auto-stop (no commit date)"
+
+    last_activity = max(candidates)
+    days_left = STOP_AFTER_DAYS - (now - last_activity).days
+
+    # Which signal is keeping it alive — a recent restart or a recent commit?
+    if pd.notna(last_used) and last_used >= commit_date:
+        reason = f"restarted {last_used.strftime('%b %-d')}"
+    else:
+        reason = f"commit {commit_date.strftime('%b %-d')}"
+
+    if days_left <= 0:
+        return f"🔴 stops tonight · {reason}"
+    if days_left <= 4:
+        return f"🟡 in {days_left}d · {reason}"
+    return f"🟢 in {days_left}d · {reason}"
+
+
 def reset_mysql_database(server_name: str) -> tuple[bool, str]:
     """
     Reset the MySQL database for a staging server by running 'make refresh' in owid-grapher
@@ -481,7 +585,48 @@ def start_server(server_name: str) -> tuple[bool, str]:
     """
     cmd = f"LXC_HOST={LXC_HOST} owid-lxc start {server_name}"
     # Starting also runs a tailscale login and a short readiness delay, so allow time.
-    return _run_lxc_command(cmd, server_name, action="start", timeout=180)
+    ok, msg = _run_lxc_command(cmd, server_name, action="start", timeout=180)
+    if not ok:
+        return ok, msg
+
+    # `owid-lxc start` re-authenticates the container to Tailscale, but that step can fail
+    # silently (it's only a warning in owid-lxc). When it does, the container is Running but
+    # logged out of Tailscale, so its hostname doesn't resolve and admin/SSH are unreachable —
+    # the wake looks successful but the server is effectively dead. Verify it actually rejoined
+    # the tailnet and report honestly instead of a misleading success.
+    if _is_on_tailnet(server_name):
+        return True, f"Server {server_name} is awake and on the tailnet."
+    return False, (
+        f"Server {server_name} started, but it is NOT on the Tailscale network, so it's "
+        "unreachable by hostname (admin/SSH won't work). Tailscale failed to re-authenticate on "
+        "wake. Try waking it again; if it keeps failing, Tailscale must be re-authenticated on the host."
+    )
+
+
+def _is_on_tailnet(server_name: str, attempts: int = 3, delay: int = 5) -> bool:
+    """
+    Return True if the container is logged into Tailscale (has a 100.x tailnet IP).
+
+    Uses ``owid-lxc exec`` (host-level ``lxc exec``, which works even when Tailscale is down), so
+    it can distinguish a container that's running-and-on-the-tailnet from one that started but
+    failed its Tailscale login. Retries briefly to absorb the race right after start.
+    """
+    for attempt in range(attempts):
+        try:
+            result = subprocess.run(
+                f"LXC_HOST={LXC_HOST} owid-lxc exec {server_name} -- tailscale ip -4",
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            if result.returncode == 0 and result.stdout.strip().startswith("100."):
+                return True
+        except subprocess.TimeoutExpired:
+            log.warning("Tailscale check timed out", server=server_name, attempt=attempt)
+        if attempt < attempts - 1:
+            time.sleep(delay)
+    return False
 
 
 def stop_server(server_name: str) -> tuple[bool, str]:

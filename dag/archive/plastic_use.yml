@@ -1,20 +1,27 @@
 steps:
   # OECD plastic production and plastic waste datasets
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
   data://meadow/oecd/2023-09-21/plastic_environment_leakage_projections:
     - snapshot://oecd/2023-09-21/plastic_environment_leakage_projections.csv
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
   data://garden/oecd/2023-09-21/plastic_environment_leakage_projections:
     - data://meadow/oecd/2023-09-21/plastic_environment_leakage_projections
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
   data://grapher/oecd/2023-09-21/plastic_environment_leakage_projections:
     - data://garden/oecd/2023-09-21/plastic_environment_leakage_projections
 
 
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
   data://meadow/oecd/2023-09-21/plastic_aquatic_leakage_projections:
     - snapshot://oecd/2023-09-21/plastic_aquatic_leakage_projections.csv
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
   data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections:
     - data://meadow/oecd/2023-09-21/plastic_aquatic_leakage_projections
+  # archived; last active in 6c9a63a399c6 on 2024-12-30
   data://grapher/oecd/2023-09-21/plastic_aquatic_leakage_projections:
     - data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections
 
     # Archive grapher step for UN plastic waste dataset
+  # archived; last active in c0beb390d976 on 2025-10-07
   data://grapher/un/2023-10-09/plastic_waste:
     - data://garden/un/2023-10-09/plastic_waste

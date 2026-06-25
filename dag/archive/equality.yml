@@ -1,62 +1,80 @@
 steps:
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://meadow/wb/2022-10-29/wb_gender:
     - walden://wb/2022-10-29/wb_gender
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://garden/wb/2022-10-29/wb_gender:
     - data://meadow/wb/2022-10-29/wb_gender
+  # archived; last active in 503f627306e4 on 2024-12-23
   data://grapher/wb/2022-10-29/wb_gender:
     - data://garden/wb/2022-10-29/wb_gender
 
 
   # Equaldex dataset
+  # archived; last active in 8c96b7f0950c on 2025-04-07
   data://meadow/lgbt_rights/2024-06-03/equaldex:
     - snapshot://lgbt_rights/2024-06-03/equaldex.csv
     - snapshot://lgbt_rights/2024-06-03/equaldex_current.csv
     - snapshot://lgbt_rights/2024-06-03/equaldex_indices.csv
 
+  # archived; last active in 8c96b7f0950c on 2025-04-07
   data://garden/lgbt_rights/2024-06-03/equaldex:
     - data://meadow/lgbt_rights/2024-06-03/equaldex
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
     - data://garden/countries/2023-09-25/isd
 
+  # archived; last active in 8c96b7f0950c on 2025-04-07
   data://grapher/lgbt_rights/2024-06-03/equaldex:
     - data://garden/lgbt_rights/2024-06-03/equaldex
 
       # Homosexuality criminalization data from Mignot (2022)
+  # archived; last active in bbbfd771bb4e on 2025-07-09
   data://meadow/lgbt_rights/2024-06-11/criminalization_mignot:
     - snapshot://lgbt_rights/2024-06-11/criminalization_mignot.csv
+  # archived; last active in bbbfd771bb4e on 2025-07-09
   data://garden/lgbt_rights/2024-06-11/criminalization_mignot:
     - data://meadow/lgbt_rights/2024-06-11/criminalization_mignot
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+  # archived; last active in bbbfd771bb4e on 2025-07-09
   data://grapher/lgbt_rights/2024-06-11/criminalization_mignot:
     - data://garden/lgbt_rights/2024-06-11/criminalization_mignot
 
 # World Bank GenderStats
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://meadow/wb/2024-06-10/gender_statistics:
     - snapshot://wb/2024-06-10/gender_statistics.feather
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://garden/wb/2024-06-10/gender_statistics:
     - data://meadow/wb/2024-06-10/gender_statistics
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://garden/wb/2024-06-10/gender_statistics_country_counts:
     - data://garden/wb/2024-06-10/gender_statistics
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://grapher/wb/2024-06-10/gender_statistics:
     - data://garden/wb/2024-06-10/gender_statistics
+  # archived; last active in be087dedf0bb on 2025-09-15
   data://grapher/wb/2024-06-10/gender_statistics_country_counts:
     - data://garden/wb/2024-06-10/gender_statistics_country_counts
 
   # LGBTI Policy Index (Velasco, 2020)
+  # archived; last active in f53e73a90f9f on 2026-05-20
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
     - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
+  # archived; last active in f53e73a90f9f on 2026-05-20
   data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
     - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+  # archived; last active in f53e73a90f9f on 2026-05-20
   data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
     - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
 
   # Equaldex dataset
+  # archived; last active in 34b8f7eb13b9 on 2026-05-20
   data://grapher/lgbt_rights/2025-04-07/equaldex:
     - data://garden/lgbt_rights/2025-04-07/equaldex:
       - data://meadow/lgbt_rights/2025-04-07/equaldex:
@@ -68,14 +86,15 @@ steps:
       - data://garden/regions/2023-01-01/regions
 
   # Same-Sex Marriage Around the World from Pew Research Center
+  # archived; last active in 6b640f2145f1 on 2026-06-03
   data://grapher/pew/2025-06-27/same_sex_marriage:
     - data://garden/pew/2025-06-27/same_sex_marriage:
       - data://garden/demography/2024-07-15/population
       - data://meadow/pew/2025-06-27/same_sex_marriage:
         - snapshot://pew/2025-06-27/same_sex_marriage.csv
       - data://garden/regions/2023-01-01/regions
-
   # Homosexuality criminalization data from Mignot (2025)
+  # archived; last active in 631d7de283c2 on 2026-06-15
   data://grapher/lgbt_rights/2025-07-09/criminalization_mignot:
     - data://garden/lgbt_rights/2025-07-09/criminalization_mignot:
       - data://garden/regions/2023-01-01/regions

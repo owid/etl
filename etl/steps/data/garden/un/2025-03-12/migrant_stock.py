@@ -49,8 +49,8 @@ EXCL_REGIONS = [
 ]
 
 
-def add_others_to_world(tb, country_col, others_name="Others", rel_columns=None):
-    """Add "Others" region to "World" totals, as it isn't included automatically when summing over countries."""
+def add_others_to_world(tb, country_col, others_name="Other countries", rel_columns=None):
+    """Add "Other countries" region to "World" totals, as it isn't included automatically when summing over countries."""
     # add "World" as a region by summing over all countries
     tb_w_o = tb[tb[country_col].isin(["World", others_name])].copy()
 
