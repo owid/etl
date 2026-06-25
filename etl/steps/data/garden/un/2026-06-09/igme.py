@@ -45,7 +45,7 @@ def run() -> None:
     tb_counts_regions = regional_aggregates_counts(tb, threshold=0.8)
     # get regional population weighted averages for rate variables
     # gets weighted averages based on original denominators
-    tb_rates_regions = regional_averages_by_denominator(tb, threshold=0.8)
+    tb_rates_regions = regional_aggregates_shares_by_denom(tb, threshold=0.8)
 
     # Remove any OWID region rows from the country-level data before adding back
     # our own regional aggregates (source data may contain regional entries from UN
@@ -187,50 +187,7 @@ def sanity_checks(tb: Table) -> None:
     return None
 
 
-def regional_aggregates_counts(tb: Table, threshold: float = 0.8) -> Table:
-    """Adds regional aggregates for count variables. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
-    Returns: Table with regional aggregates for count variables. ONLY includes regions"""
-
-    units_deaths = ["Number of deaths", "Number of stillbirths"]
-
-    tb_counts = tb[tb["unit_of_measure"].isin(units_deaths)]
-
-    tb_counts = paths.regions.add_population(tb_counts)
-    tb_counts = tb_counts.dropna(subset=["population"])
-
-    # add regions to table (summing observation_value, lower_bound and upper_bound and population)
-    tb_counts = paths.regions.add_aggregates(
-        tb_counts,
-        index_columns=["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile"],
-    )
-
-    # filtering only on regions
-    tb_counts = tb_counts[tb_counts["country"].isin(REGIONS)]
-
-    # renaming population column and adding total population (for regions)
-    tb_counts = tb_counts.rename(columns={"population": "population_covered"})
-    tb_counts = paths.regions.add_population(tb_counts, population_col="total_population")
-
-    # calculating share of population covered and filtering on years above threshold
-    tb_counts["share_of_population"] = tb_counts["population_covered"] / tb_counts["total_population"]
-    tb_counts = tb_counts[tb_counts["share_of_population"] >= threshold]
-
-    tb_counts = tb_counts.drop(columns=["population_covered", "total_population", "share_of_population"])
-
-    return tb_counts
-
-
-def get_absolute_death_number(death_lookup, rate_indicator, country, year, sex, wealth_quintile, indicator_mapping):
-    death_indicator = indicator_mapping[rate_indicator]
-    death_row = death_lookup.get((country, year, sex, wealth_quintile, death_indicator))
-    if death_row is not None:
-        return death_row
-    else:
-        # LOG.warning(f"No data found for {death_indicator} in {country}, {year}, {sex}, {wealth_quintile}")
-        return None
-
-
-def regional_averages_by_denominator(tb: Table, threshold: float = 0.8) -> Table:
+def regional_aggregates_shares_by_denom(tb: Table, threshold: float = 0.8) -> Table:
     """Adds averages of death rates (based on original denominators) for the regions.
 
     Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
@@ -296,23 +253,16 @@ def regional_averages_by_denominator(tb: Table, threshold: float = 0.8) -> Table
     tb_rates = paths.regions.add_aggregates(
         tb_rates,
         index_columns=["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile"],
+        min_frac_population=threshold,
     )
 
     # filtering only on regions
     tb_rates = tb_rates[tb_rates["country"].isin(REGIONS)]
 
-    # renaming population column and adding total population (for regions)
-    tb_rates = tb_rates.rename(columns={"population": "population_covered"})
-    tb_rates = paths.regions.add_population(tb_rates, population_col="total_population")
-
     # calculating population weighted death rates & share of population covered
     tb_rates["observation_value"] = tb_rates["observation_value_denom"] / tb_rates["inferred_denominator"]
     tb_rates["lower_bound"] = tb_rates["lower_bound_denom"] / tb_rates["inferred_denominator"]
     tb_rates["upper_bound"] = tb_rates["upper_bound_denom"] / tb_rates["inferred_denominator"]
-    tb_rates["share_of_population"] = tb_rates["population_covered"] / tb_rates["total_population"]
-
-    # filtering out regions where the share of population covered is below the threshold
-    tb_rates = tb_rates[tb_rates["share_of_population"] >= threshold]
 
     # dropping unnecessary columns
     tb_rates = tb_rates.drop(
@@ -320,15 +270,53 @@ def regional_averages_by_denominator(tb: Table, threshold: float = 0.8) -> Table
             "observation_value_denom",
             "lower_bound_denom",
             "upper_bound_denom",
-            "population_covered",
-            "total_population",
-            "share_of_population",
             "inferred_denominator",
             "absolute_deaths",
+            "population",
         ]
     )
 
+    tb_rates = tb_rates.dropna(subset=["observation_value"])
+
     return tb_rates
+
+
+def regional_aggregates_counts(tb: Table, threshold: float = 0.8) -> Table:
+    """Adds regional aggregates for count variables. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
+    Returns: Table with regional aggregates for count variables. ONLY includes regions"""
+
+    units_deaths = ["Number of deaths", "Number of stillbirths"]
+
+    tb_counts = tb[tb["unit_of_measure"].isin(units_deaths)]
+
+    tb_counts = paths.regions.add_population(tb_counts)
+    tb_counts = tb_counts.dropna(subset=["population"])
+
+    # add regions to table (summing observation_value, lower_bound and upper_bound and population)
+    tb_counts = paths.regions.add_aggregates(
+        tb_counts,
+        index_columns=["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile"],
+        min_frac_population=threshold,
+    )
+
+    # filtering only on regions
+    tb_counts = tb_counts[tb_counts["country"].isin(REGIONS)]
+
+    tb_counts = tb_counts.drop(columns=["population"])
+
+    tb_counts = tb_counts.dropna(subset=["observation_value"])
+
+    return tb_counts
+
+
+def get_absolute_death_number(death_lookup, rate_indicator, country, year, sex, wealth_quintile, indicator_mapping):
+    death_indicator = indicator_mapping[rate_indicator]
+    death_row = death_lookup.get((country, year, sex, wealth_quintile, death_indicator))
+    if death_row is not None:
+        return death_row
+    else:
+        # LOG.warning(f"No data found for {death_indicator} in {country}, {year}, {sex}, {wealth_quintile}")
+        return None
 
 
 def convert_to_percentage(tb: Table) -> Table:
