@@ -546,16 +546,25 @@ def create_pr(repo, work_branch, base_branch, pr_title, assign: bool = False):
         "body": "",
         "draft": True,
     }
+    assignee: str | None = None
     if assign:
         user_response = requests.get("https://api.github.com/user", headers=headers)
         if user_response.status_code == 200:
-            data["assignees"] = [user_response.json()["login"]]
+            assignee = user_response.json()["login"]
         else:
             log.warning(f"Could not fetch GitHub user for --assign (HTTP {user_response.status_code}), skipping.")
     response = requests.post(GITHUB_API_URL, json=data, headers=headers)
     if response.status_code == 201:
         js = response.json()
         log.info(f"Draft pull request created successfully at {js['html_url']}.")
+        if assignee:
+            pr_number = js["number"]
+            assign_url = f"{GITHUB_API_BASE}/issues/{pr_number}/assignees"
+            assign_response = requests.post(assign_url, json={"assignees": [assignee]}, headers=headers)
+            if assign_response.status_code == 201:
+                log.info(f"Assigned PR to {assignee}.")
+            else:
+                log.warning(f"Could not assign PR to {assignee} (HTTP {assign_response.status_code}).")
     else:
         raise click.ClickException(f"Failed to create draft pull request:\n{response.json()}")
 
