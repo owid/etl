@@ -547,7 +547,7 @@ def create_pr(repo, work_branch, base_branch, pr_title, assign: bool = False):
         "draft": True,
     }
     if assign:
-        user_response = requests.get(f"{GITHUB_API_BASE}/user", headers=headers)
+        user_response = requests.get("https://api.github.com/user", headers=headers)
         if user_response.status_code == 200:
             data["assignees"] = [user_response.json()["login"]]
         else:
