@@ -138,7 +138,10 @@ def read_metabase(
         return response
 
     def _log_retry(retry_state) -> None:
-        log.warning(
+        # Logged at debug level on purpose: a transient 502/503/504 mid-restart is expected and
+        # resolves on retry, so it shouldn't surface in Sentry. If all attempts are exhausted,
+        # reraise=True propagates the exception, which is a genuine failure worth alerting on.
+        log.debug(
             "metabase.request_retry",
             attempt=retry_state.attempt_number,
             error=str(retry_state.outcome.exception()),
