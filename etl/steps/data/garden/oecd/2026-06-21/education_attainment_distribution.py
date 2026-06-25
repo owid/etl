@@ -90,7 +90,9 @@ def run() -> None:
 
     # --- OECD by sex ---
     tb_oecd_by_sex["sex"] = tb_oecd_by_sex["sex"].map({"female": "Women", "male": "Men"}).astype("category")
-    tb_oecd_sex = tb_oecd_by_sex.format(["country", "year", "sex"], short_name="education_attainment_distribution_oecd_sex")
+    tb_oecd_sex = tb_oecd_by_sex.format(
+        ["country", "year", "sex"], short_name="education_attainment_distribution_oecd_sex"
+    )
 
     # --- Wittgenstein Centre tables (SSP2) ---
     tb_wc_tertiary = make_wc_share(
