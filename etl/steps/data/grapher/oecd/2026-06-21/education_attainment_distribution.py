@@ -16,6 +16,7 @@ TABLE_NAMES = [
     "education_some_formal_wc",
     "education_no_formal_by_sex_wc",
     "education_formal_combined",
+    "education_no_formal_three_sources",
 ]
 
 

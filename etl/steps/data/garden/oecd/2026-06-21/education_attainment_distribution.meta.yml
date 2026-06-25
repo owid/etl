@@ -4,14 +4,16 @@ dataset:
     Distribution of educational attainment among adults aged 25-64, combining OECD observed data with Lee & Lee (2016) historical estimates and Wittgenstein Centre projections.
 
 tables:
-  # --- Combined indicators (Lee & Lee + OECD splice) ---
+  # --- Combined indicators: Lee & Lee + OECD tertiary splice ---
 
   education_attainment_distribution:
     variables:
       share_tertiary_education:
-        title: Share of adults with tertiary education
+        title: Share of adults with tertiary education (Lee & Lee + OECD)
         unit: "%"
         short_unit: "%"
+        display:
+          name: Share of adults with tertiary education
         description_short: Share of adults aged 25–64 who have attained [tertiary education](#dod:tertiary-education).
         description_key:
           - "[Tertiary education](#dod:tertiary-education) includes short-cycle tertiary programmes, bachelor's, master's, and doctoral degrees (ISCED levels 5 through 8)."
@@ -28,18 +30,22 @@ tables:
             tab: map
             note: Recent years use OECD data; earlier years use Lee & Lee (2016) estimates.
 
+  # --- Combined indicators: Lee & Lee + OECD no formal education splice ---
+
   education_no_formal_combined:
     variables:
       share_no_formal_education:
         title: Share of adults with no formal education (Lee & Lee + OECD)
         unit: "%"
         short_unit: "%"
-        description_short: Share of adults aged 25–64 with no formal education, combining OECD observed data with Lee & Lee (2016) historical estimates.
+        display:
+          name: Share of adults with no formal education
+        description_short: Share of adults with no formal education, combining OECD observed data with Lee & Lee (2016) historical estimates.
         description_key:
-          - This data combines two sources. Recent data for OECD countries comes from the OECD's Education at a Glance (share with less than primary education, ISCED 0). Historical estimates come from Lee & Lee (2016) (share with no education, ages 15–64).
+          - This data combines two sources. Recent data for OECD countries comes from the OECD's Education at a Glance (share with less than primary education, ISCED 0, ages 25–64). Historical estimates come from Lee & Lee (2016) (share with no education, ages 15–64).
           - For each OECD country, OECD data is used from its earliest available year. Lee & Lee estimates fill in the earlier period.
           - For countries not covered by the OECD, only the Lee & Lee series is available, ending in 2010.
-          - Note that the OECD indicator (less than primary, 25–64) and Lee & Lee (no education, 15–64) differ slightly in age group and definition.
+          - The OECD and Lee & Lee indicators differ slightly in definition and age group.
         description_processing: |-
           For each country, we use OECD data from its earliest available year onward. For years before that, we use Lee & Lee (2016) historical estimates.
         presentation:
@@ -51,7 +57,9 @@ tables:
         title: Share of adults with some formal education (Lee & Lee + OECD)
         unit: "%"
         short_unit: "%"
-        description_short: Share of adults aged 25–64 with some formal education, combining OECD observed data with Lee & Lee (2016) historical estimates.
+        display:
+          name: Share of adults with some formal education
+        description_short: Share of adults with some formal education, combining OECD observed data with Lee & Lee (2016) historical estimates.
         description_key:
           - Computed as 100% minus the share with no formal education.
           - This data combines two sources. Recent data for OECD countries comes from the OECD's Education at a Glance. Historical estimates come from Lee & Lee (2016).
@@ -77,15 +85,23 @@ tables:
     variables:
       share_less_than_primary:
         title: Share of adults with less than primary education (OECD)
+        display:
+          name: Less than primary education
         description_short: Share of adults aged 25–64 with less than primary education (ISCED 0).
       share_below_upper_secondary:
         title: Share of adults with below upper secondary education (OECD)
+        display:
+          name: Below upper secondary education
         description_short: Share of adults aged 25–64 with below upper secondary education (ISCED 0–2).
       share_upper_secondary_post_secondary_non_tertiary:
         title: Share of adults with upper secondary or post-secondary non-tertiary education (OECD)
+        display:
+          name: Upper secondary or post-secondary non-tertiary education
         description_short: Share of adults aged 25–64 with upper secondary or post-secondary non-tertiary education (ISCED 3–4).
       share_tertiary:
         title: Share of adults with tertiary education (OECD)
+        display:
+          name: Tertiary education
         description_short: Share of adults aged 25–64 who have completed [tertiary education](#dod:tertiary-education) (ISCED 5–8).
 
   education_attainment_distribution_oecd_sex:
@@ -102,15 +118,23 @@ tables:
     variables:
       share_less_than_primary:
         title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with less than primary education (OECD)
+        display:
+          name: Less than primary education
         description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with less than primary education (ISCED 0).
       share_below_upper_secondary:
         title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with below upper secondary education (OECD)
+        display:
+          name: Below upper secondary education
         description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with below upper secondary education (ISCED 0–2).
       share_upper_secondary_post_secondary_non_tertiary:
         title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with upper secondary or post-secondary non-tertiary education (OECD)
+        display:
+          name: Upper secondary or post-secondary non-tertiary education
         description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with upper secondary or post-secondary non-tertiary education (ISCED 3–4).
       share_tertiary:
         title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with tertiary education (OECD)
+        display:
+          name: Tertiary education
         description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 who have completed [tertiary education](#dod:tertiary-education) (ISCED 5–8).
 
   # --- Wittgenstein Centre indicators ---
@@ -121,7 +145,9 @@ tables:
         title: Share of adults with tertiary education (Wittgenstein Centre)
         unit: "%"
         short_unit: "%"
-        description_short: Share of adults aged 25–64 with post-secondary education, based on Wittgenstein Centre projections.
+        display:
+          name: Share of adults with tertiary education
+        description_short: Share of adults aged 25–64 with post-secondary education, based on Wittgenstein Centre projections (SSP2).
         description_key:
           - Data comes from the Wittgenstein Centre for Demography and Global Human Capital (SSP2 scenario).
           - Post-secondary education is the aggregate tertiary category in the Wittgenstein dataset, covering all levels above upper secondary.
@@ -138,7 +164,9 @@ tables:
         title: Share of adults with no formal education (Wittgenstein Centre)
         unit: "%"
         short_unit: "%"
-        description_short: Share of adults aged 25–64 with no formal education, based on Wittgenstein Centre projections.
+        display:
+          name: Share of adults with no formal education
+        description_short: Share of adults aged 25–64 with no formal education, based on Wittgenstein Centre projections (SSP2).
         description_key:
           - Data comes from the Wittgenstein Centre for Demography and Global Human Capital (SSP2 scenario).
           - No formal education means the person has never attended or completed any level of formal schooling.
@@ -155,7 +183,9 @@ tables:
         title: Share of adults with some formal education (Wittgenstein Centre)
         unit: "%"
         short_unit: "%"
-        description_short: Share of adults aged 25–64 with some formal education, based on Wittgenstein Centre projections.
+        display:
+          name: Share of adults with some formal education
+        description_short: Share of adults aged 25–64 with some formal education, based on Wittgenstein Centre projections (SSP2).
         description_key:
           - Data comes from the Wittgenstein Centre for Demography and Global Human Capital (SSP2 scenario).
           - Some formal education means the person has attended at least some level of formal schooling.
@@ -182,7 +212,9 @@ tables:
         title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with no formal education (Wittgenstein Centre)
         unit: "%"
         short_unit: "%"
-        description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with no formal education, based on Wittgenstein Centre projections.
+        display:
+          name: Share with no formal education
+        description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with no formal education, based on Wittgenstein Centre projections (SSP2).
 
   # --- Lee & Lee + Wittgenstein Centre splice (15-64) ---
 
@@ -192,9 +224,11 @@ tables:
         title: Share of adults with no formal education (Lee & Lee + WC)
         unit: "%"
         short_unit: "%"
-        description_short: Share of adults aged 15–64 with no formal education, combining Lee & Lee (2016) historical estimates with Wittgenstein Centre projections.
+        display:
+          name: Share of adults with no formal education
+        description_short: Share of adults aged 15–64 with no formal education, combining Lee & Lee (2016) historical estimates with Wittgenstein Centre projections (SSP2).
         description_key:
-          - This data combines two sources. Historical estimates come from Lee & Lee (2016), based on census and survey data (1870–2010, at 5-year intervals). Post-2010 data comes from the Wittgenstein Centre (SSP2 scenario).
+          - This data combines two sources. Historical estimates come from Lee & Lee (2016), based on census and survey data (1870–2010, at 5-year intervals). Post-2010 data comes from the Wittgenstein Centre (SSP2 scenario, model-based).
           - The age group covered is 15 to 64 years old, for both sexes combined.
           - No formal education means the person has never attended or completed any level of formal schooling.
         description_processing: |-
@@ -203,19 +237,61 @@ tables:
           grapher_config:
             hasMapTab: true
             tab: map
-            note: Historical data is from Lee & Lee (2016). Post-2010 data is from the Wittgenstein Centre.
+            note: Historical data is from Lee & Lee (2016). Post-2010 data is from the Wittgenstein Centre (model-based).
       share_some_formal_education:
         title: Share of adults with some formal education (Lee & Lee + WC)
         unit: "%"
         short_unit: "%"
-        description_short: Share of adults aged 15–64 with some formal education, combining Lee & Lee (2016) historical estimates with Wittgenstein Centre projections.
+        display:
+          name: Share of adults with some formal education
+        description_short: Share of adults aged 15–64 with some formal education, combining Lee & Lee (2016) historical estimates with Wittgenstein Centre projections (SSP2).
         description_key:
           - Computed as 100% minus the share with no formal education.
-          - This data combines two sources. Historical estimates come from Lee & Lee (2016). Post-2010 data comes from the Wittgenstein Centre (SSP2 scenario).
+          - This data combines two sources. Historical estimates come from Lee & Lee (2016). Post-2010 data comes from the Wittgenstein Centre (SSP2 scenario, model-based).
         description_processing: |-
           Computed as 100% minus the share with no formal education.
         presentation:
           grapher_config:
             hasMapTab: true
             tab: map
-            note: Historical data is from Lee & Lee (2016). Post-2010 data is from the Wittgenstein Centre.
+            note: Historical data is from Lee & Lee (2016). Post-2010 data is from the Wittgenstein Centre (model-based).
+
+  # --- Three-source combined: Lee & Lee + OECD + WC ---
+
+  education_no_formal_three_sources:
+    variables:
+      share_no_formal_education:
+        title: Share of adults with no formal education (Lee & Lee + OECD + WC)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with no formal education
+        description_short: Share of adults with no formal education, combining OECD observed data, Lee & Lee (2016) historical estimates, and Wittgenstein Centre projections (SSP2).
+        description_key:
+          - This data combines three sources in order of priority. For OECD countries, recent data comes from the OECD (share with less than primary education, ISCED 0, ages 25–64). Historical estimates come from Lee & Lee (2016) (share with no education, ages 15–64). For countries not covered by OECD or Lee & Lee, data comes from the Wittgenstein Centre (SSP2, ages 15–64, model-based).
+          - For OECD countries, OECD data is used from its earliest available year, with Lee & Lee filling earlier years. For non-OECD countries with Lee & Lee data, the Wittgenstein Centre extends the series after 2010. Countries only in the Wittgenstein Centre use the full WC series.
+          - The three sources differ in definition and age group. OECD measures less than primary education (25–64); Lee & Lee measures no education (15–64); Wittgenstein Centre measures no education (15–64, model-based).
+        description_processing: |-
+          For OECD countries, we use OECD data from its earliest available year onward, with Lee & Lee filling in earlier years. For non-OECD countries, we use Lee & Lee up to 2010, then Wittgenstein Centre (SSP2) from 2015 onward. Countries only in the Wittgenstein Centre use the full WC series.
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: OECD countries use observed data; other countries use Lee & Lee estimates and Wittgenstein Centre projections (model-based).
+      share_some_formal_education:
+        title: Share of adults with some formal education (Lee & Lee + OECD + WC)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with some formal education
+        description_short: Share of adults with some formal education, combining OECD observed data, Lee & Lee (2016) historical estimates, and Wittgenstein Centre projections (SSP2).
+        description_key:
+          - Computed as 100% minus the share with no formal education.
+          - This data combines three sources. See the no formal education indicator for full details on the source priority.
+        description_processing: |-
+          Computed as 100% minus the share with no formal education.
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: OECD countries use observed data; other countries use Lee & Lee estimates and Wittgenstein Centre projections (model-based).

@@ -111,6 +111,9 @@ def run() -> None:
     # --- Lee & Lee + Wittgenstein Centre splice for no/some formal education (15-64) ---
     tb_ll_wc_formal = make_ll_wc_formal_education_splice(tb_lee_lee)
 
+    # --- Three-source combined: Lee & Lee + OECD + WC for no formal education ---
+    tb_no_formal_three = make_three_source_no_formal_splice(tb_oecd_total, tb_lee_lee)
+
     #
     # Save outputs.
     #
@@ -125,6 +128,7 @@ def run() -> None:
             tb_wc_some_edu,
             tb_wc_no_edu_sex,
             tb_ll_wc_formal,
+            tb_no_formal_three,
         ]
     )
     ds_garden.save()
@@ -281,5 +285,82 @@ def make_ll_wc_formal_education_splice(tb_lee_lee) -> Table:
     tb["share_some_formal_education"] = 100 - tb["share_no_formal_education"]
 
     tb = tb.format(["country", "year"], short_name="education_formal_combined")
+
+    return tb
+
+
+def make_three_source_no_formal_splice(tb_oecd_total, tb_lee_lee) -> Table:
+    """Three-source splice for no formal education: OECD > Lee & Lee > Wittgenstein Centre.
+
+    Priority:
+    1. OECD countries: Lee & Lee (pre-OECD) → OECD less-than-primary (from earliest available year)
+    2. Non-OECD countries with Lee & Lee: Lee & Lee up to 2010 → WC from next available year
+    3. WC-only countries: WC only
+    """
+    # --- OECD: less than primary ---
+    tb_o = tb_oecd_total[["country", "year", "share_less_than_primary"]].copy()
+    tb_o = tb_o.rename(columns={"share_less_than_primary": "share_no_formal_education"})
+    tb_o = tb_o.dropna(subset=["share_no_formal_education"])
+    oecd_countries = set(tb_o["country"].unique())
+    oecd_first_year = tb_o.groupby("country")["year"].min().to_dict()
+
+    # --- Lee & Lee: no education, 15-64 ---
+    tb_ll = tb_lee_lee[["country", "year", LEE_LEE_NO_EDU_COL]].copy()
+    tb_ll = tb_ll.rename(columns={LEE_LEE_NO_EDU_COL: "share_no_formal_education"})
+    tb_ll = tb_ll.dropna(subset=["share_no_formal_education"])
+    tb_ll = tb_ll[tb_ll["year"] <= LEE_LEE_MAX_YEAR]
+
+    # For OECD countries: keep Lee & Lee only before OECD starts.
+    # For non-OECD countries: keep all Lee & Lee.
+    mask_ll = tb_ll.apply(
+        lambda row: row["country"] not in oecd_first_year or row["year"] < oecd_first_year[row["country"]],
+        axis=1,
+    )
+    tb_ll_keep = tb_ll[mask_ll]
+
+    # --- Wittgenstein Centre: no education, 15-64 ---
+    ds_wc = paths.load_dataset("wittgenstein_human_capital")
+    tb_wc = ds_wc["by_sex_age_edu"].reset_index()
+    tb_wc = tb_wc[(tb_wc["scenario"] == 2) & (tb_wc["sex"] == "total") & (tb_wc["age"].isin(WC_AGE_BINS_15_64))]
+
+    no_pop = (
+        tb_wc[tb_wc["education"] == "no_education"]
+        .groupby(["country", "year"], observed=True)["pop"]
+        .sum()
+        .reset_index()
+        .rename(columns={"pop": "no_pop"})
+    )
+    tot_pop = (
+        tb_wc[tb_wc["education"] == "total"]
+        .groupby(["country", "year"], observed=True)["pop"]
+        .sum()
+        .reset_index()
+        .rename(columns={"pop": "tot_pop"})
+    )
+    tb_wc_no = pr.merge(no_pop, tot_pop, on=["country", "year"])
+    tb_wc_no["share_no_formal_education"] = (tb_wc_no["no_pop"] / tb_wc_no["tot_pop"]) * 100
+    tb_wc_no = tb_wc_no.drop(columns=["no_pop", "tot_pop"])
+
+    # For OECD countries: WC not used (OECD takes over).
+    # For non-OECD + Lee & Lee countries: WC only after Lee & Lee ends.
+    # For WC-only countries (no OECD, no Lee & Lee): use all WC.
+    ll_last_year = tb_ll_keep.groupby("country")["year"].max().to_dict()
+
+    mask_wc = tb_wc_no.apply(
+        lambda row: (
+            row["country"] not in oecd_countries  # not an OECD country
+            and (row["country"] not in ll_last_year or row["year"] > ll_last_year[row["country"]])  # after L&L ends
+        ),
+        axis=1,
+    )
+    tb_wc_keep = tb_wc_no[mask_wc]
+
+    # Combine all three.
+    tb = pr.concat([tb_ll_keep, tb_o, tb_wc_keep], short_name="education_no_formal_three_sources")
+
+    # Add some formal education = 100 - no formal.
+    tb["share_some_formal_education"] = 100 - tb["share_no_formal_education"]
+
+    tb = tb.format(["country", "year"], short_name="education_no_formal_three_sources")
 
     return tb
