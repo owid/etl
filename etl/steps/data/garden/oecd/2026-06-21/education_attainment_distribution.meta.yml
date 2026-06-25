@@ -75,3 +75,38 @@ tables:
           grapher_config:
             hasMapTab: true
             tab: map
+
+  education_some_formal_wc:
+    variables:
+      share_some_formal_education:
+        title: Share of adults with some formal education (Wittgenstein Centre)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of adults aged 25–64 with some formal education, based on Wittgenstein Centre projections.
+        description_key:
+          - Data comes from the Wittgenstein Centre for Demography and Global Human Capital (SSP2 scenario).
+          - Some formal education means the person has attended at least some level of formal schooling.
+          - The share is constructed from 5-year age bins (25–29 through 60–64), for both sexes combined.
+          - This is model-based data, not observed survey data.
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            tab: map
+
+  education_no_formal_by_sex_wc:
+    common:
+      description_key:
+        - Data comes from the Wittgenstein Centre for Demography and Global Human Capital (SSP2 scenario).
+        - No formal education means the person has never attended or completed any level of formal schooling.
+        - The share is constructed from 5-year age bins (25–29 through 60–64), separately for women and men.
+        - This is model-based data, not observed survey data.
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+    variables:
+      share_no_formal_education:
+        title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with no formal education (Wittgenstein Centre)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with no formal education, based on Wittgenstein Centre projections.

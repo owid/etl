@@ -23,5 +23,11 @@ def run() -> None:
     tb_wc_no_edu = ds_garden["education_no_formal_wc"].reset_index()
     tb_wc_no_edu = tb_wc_no_edu.format(["country", "year"])
 
-    ds_grapher = paths.create_dataset(tables=[tb, tb_oecd, tb_wc, tb_wc_no_edu], default_metadata=ds_garden.metadata)
+    tb_wc_some_edu = ds_garden["education_some_formal_wc"].reset_index()
+    tb_wc_some_edu = tb_wc_some_edu.format(["country", "year"])
+
+    tb_wc_no_edu_sex = ds_garden["education_no_formal_by_sex_wc"].reset_index()
+    tb_wc_no_edu_sex = tb_wc_no_edu_sex.format(["country", "year", "sex"])
+
+    ds_grapher = paths.create_dataset(tables=[tb, tb_oecd, tb_wc, tb_wc_no_edu, tb_wc_some_edu, tb_wc_no_edu_sex], default_metadata=ds_garden.metadata)
     ds_grapher.save()

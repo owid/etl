@@ -25,8 +25,8 @@ LEE_LEE_TERTIARY_COL = "mf_adults__25_64_years__percentage_of_tertiary_education
 # Lee & Lee data goes up to 2010 (the last year of historical estimates).
 LEE_LEE_MAX_YEAR = 2010
 
-# Wittgenstein Centre age bins that make up the 25-64 age group.
-WC_AGE_BINS = ["25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64"]
+# Wittgenstein Centre age bins for the 25-64 age group.
+WC_AGE_BINS_25_64 = ["25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64"]
 
 
 def sanity_check_inputs(tb_oecd: Table, tb_lee_lee: Table) -> None:
@@ -93,31 +93,34 @@ def run() -> None:
     tb_oecd_only = tb_oecd.copy()
     tb_oecd_only = tb_oecd_only.format(["country", "year"], short_name="education_attainment_distribution_oecd")
 
-    # Wittgenstein Centre tables (25-64, SSP2).
-    tb_wc_tertiary = make_wc_share("post_secondary", "share_tertiary_education", "education_attainment_distribution_wc")
-    tb_wc_no_edu = make_wc_share("no_education", "share_no_formal_education", "education_no_formal_wc")
+    # Wittgenstein Centre tables (SSP2).
+    tb_wc_tertiary = make_wc_share("post_secondary", "share_tertiary_education", "education_attainment_distribution_wc", WC_AGE_BINS_25_64)
+    tb_wc_no_edu = make_wc_share("no_education", "share_no_formal_education", "education_no_formal_wc", WC_AGE_BINS_25_64)
+    tb_wc_some_edu = make_wc_share("some_education", "share_some_formal_education", "education_some_formal_wc", WC_AGE_BINS_25_64)
+    tb_wc_no_edu_sex = make_wc_share_by_sex("no_education", "share_no_formal_education", "education_no_formal_by_sex_wc", WC_AGE_BINS_25_64)
 
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb, tb_oecd_only, tb_wc_tertiary, tb_wc_no_edu])
+    ds_garden = paths.create_dataset(tables=[tb, tb_oecd_only, tb_wc_tertiary, tb_wc_no_edu, tb_wc_some_edu, tb_wc_no_edu_sex])
     ds_garden.save()
 
 
-def make_wc_share(education_cat: str, col_name: str, short_name: str) -> Table:
-    """Build an education share (25-64) from Wittgenstein Centre age bins.
+def make_wc_share(education_cat: str, col_name: str, short_name: str, age_bins: list) -> Table:
+    """Build an education share from Wittgenstein Centre age bins.
 
     For `post_secondary`: this is the aggregate tertiary category for all years.
     (From 2015, bachelor/master/short_post_secondary appear as subcategories
     but post_secondary remains the total.)
 
     For `no_education`: share of adults with no formal education.
+    For `some_education`: share of adults with some formal education.
     """
     ds_wc = paths.load_dataset("wittgenstein_human_capital")
     tb_wc = ds_wc["by_sex_age_edu"].reset_index()
 
-    # Filter: SSP2, both sexes, 25-64 age bins.
-    tb_wc = tb_wc[(tb_wc["scenario"] == 2) & (tb_wc["sex"] == "total") & (tb_wc["age"].isin(WC_AGE_BINS))]
+    # Filter: SSP2, both sexes, specified age bins.
+    tb_wc = tb_wc[(tb_wc["scenario"] == 2) & (tb_wc["sex"] == "total") & (tb_wc["age"].isin(age_bins))]
 
     cat_pop = (
         tb_wc[tb_wc["education"] == education_cat]
@@ -140,5 +143,41 @@ def make_wc_share(education_cat: str, col_name: str, short_name: str) -> Table:
     tb = tb.drop(columns=["cat_pop", "total_pop"])
 
     tb = tb.format(["country", "year"], short_name=short_name)
+
+    return tb
+
+
+def make_wc_share_by_sex(education_cat: str, col_name: str, short_name: str, age_bins: list) -> Table:
+    """Build an education share by sex from Wittgenstein Centre age bins."""
+    ds_wc = paths.load_dataset("wittgenstein_human_capital")
+    tb_wc = ds_wc["by_sex_age_edu"].reset_index()
+
+    # Filter: SSP2, specified age bins, female + male.
+    tb_wc = tb_wc[(tb_wc["scenario"] == 2) & (tb_wc["sex"].isin(["female", "male"])) & (tb_wc["age"].isin(age_bins))]
+
+    cat_pop = (
+        tb_wc[tb_wc["education"] == education_cat]
+        .groupby(["country", "year", "sex"], observed=True)["pop"]
+        .sum()
+        .reset_index()
+        .rename(columns={"pop": "cat_pop"})
+    )
+
+    total_pop = (
+        tb_wc[tb_wc["education"] == "total"]
+        .groupby(["country", "year", "sex"], observed=True)["pop"]
+        .sum()
+        .reset_index()
+        .rename(columns={"pop": "total_pop"})
+    )
+
+    tb = pr.merge(cat_pop, total_pop, on=["country", "year", "sex"])
+    tb[col_name] = (tb["cat_pop"] / tb["total_pop"]) * 100
+    tb = tb.drop(columns=["cat_pop", "total_pop"])
+
+    # Rename sex values for display.
+    tb["sex"] = tb["sex"].map({"female": "Women", "male": "Men"}).astype("category")
+
+    tb = tb.format(["country", "year", "sex"], short_name=short_name)
 
     return tb
