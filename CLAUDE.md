@@ -306,6 +306,12 @@ code --install-extension install/<name>-<version>.vsix --force
 
 Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
 
+## GitHub Actions
+
+When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinning rule imported below:
+
+@.github/instructions/github-actions.instructions.md
+
 ## Extended Documentation
 
 See `.claude/docs/` for:
