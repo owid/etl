@@ -1,9 +1,15 @@
 """Load OECD educational attainment data and splice with Lee & Lee historical estimates.
 
-For each country with OECD data, we use OECD as far back as it goes (observed, annual).
-For years before the earliest OECD observation, we fill in with Lee & Lee historical
-estimates (5-year intervals, 1870-2010). For countries without any OECD data, we keep
-the full Lee & Lee series up to 2010.
+For the combined indicator:
+- Lee & Lee historical estimates up to 2005 (we drop post-2005 Lee & Lee values
+  because they become increasingly unreliable).
+- OECD observed data from its earliest available year per country.
+- Where both overlap, OECD takes priority.
+- For countries without OECD data, the series ends at 2005.
+
+Also produces:
+- An OECD-only indicator (no splice).
+- A Wittgenstein Centre post_secondary indicator (25-64, SSP2) for comparison.
 """
 
 import owid.catalog.processing as pr
@@ -15,6 +21,12 @@ paths = PathFinder(__file__)
 
 # The Lee & Lee column that corresponds to the OECD tertiary education share (25-64, both sexes).
 LEE_LEE_TERTIARY_COL = "mf_adults__25_64_years__percentage_of_tertiary_education"
+
+# Lee & Lee data goes up to 2010 (the last year of historical estimates).
+LEE_LEE_MAX_YEAR = 2010
+
+# Wittgenstein Centre age bins that make up the 25-64 age group.
+WC_AGE_BINS = ["25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64"]
 
 
 def sanity_check_inputs(tb_oecd: Table, tb_lee_lee: Table) -> None:
@@ -30,7 +42,6 @@ def sanity_check_outputs(tb: Table) -> None:
     assert not tb_check.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in output."
     assert tb_check["share_tertiary_education"].min() >= 0, "Negative share in output."
     assert tb_check["share_tertiary_education"].max() <= 100, "Output share exceeds 100%."
-    # We should have many more rows than OECD alone (~1200) thanks to Lee & Lee historical data.
     assert len(tb_check) > 1500, f"Unexpectedly few rows in output: {len(tb_check)}."
 
 
@@ -53,16 +64,19 @@ def run() -> None:
     # Harmonize OECD country names.
     tb_oecd = paths.regions.harmonize_names(tb_oecd, country_col="country", countries_file=paths.country_mapping_path)
 
-    # Extract the tertiary education share from Lee & Lee and rename to match OECD column.
+    # Extract the tertiary education share from Lee & Lee.
     tb_ll = tb_lee_lee[["country", "year", LEE_LEE_TERTIARY_COL]].copy()
     tb_ll = tb_ll.rename(columns={LEE_LEE_TERTIARY_COL: "share_tertiary_education"})
     tb_ll = tb_ll.dropna(subset=["share_tertiary_education"])
+
+    # Drop Lee & Lee data after LEE_LEE_MAX_YEAR.
+    tb_ll = tb_ll[tb_ll["year"] <= LEE_LEE_MAX_YEAR]
 
     # For each country, find the earliest year with OECD data.
     oecd_first_year = tb_oecd.groupby("country")["year"].min().to_dict()
 
     # Keep Lee & Lee rows only for years before the earliest OECD data point for that country.
-    # For countries not in OECD at all, keep the full Lee & Lee series.
+    # For countries not in OECD at all, keep the full Lee & Lee series (up to LEE_LEE_MAX_YEAR).
     mask = tb_ll.apply(
         lambda row: row["country"] not in oecd_first_year or row["year"] < oecd_first_year[row["country"]],
         axis=1,
@@ -71,13 +85,60 @@ def run() -> None:
 
     # Combine: Lee & Lee historical + OECD observed.
     tb = pr.concat([tb_ll, tb_oecd], short_name=paths.short_name)
-
     tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     sanity_check_outputs(tb)
 
+    # OECD-only table (no Lee & Lee, no splice).
+    tb_oecd_only = tb_oecd.copy()
+    tb_oecd_only = tb_oecd_only.format(["country", "year"], short_name="education_attainment_distribution_oecd")
+
+    # Wittgenstein Centre tables (25-64, SSP2).
+    tb_wc_tertiary = make_wc_share("post_secondary", "share_tertiary_education", "education_attainment_distribution_wc")
+    tb_wc_no_edu = make_wc_share("no_education", "share_no_formal_education", "education_no_formal_wc")
+
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb, tb_oecd_only, tb_wc_tertiary, tb_wc_no_edu])
     ds_garden.save()
+
+
+def make_wc_share(education_cat: str, col_name: str, short_name: str) -> Table:
+    """Build an education share (25-64) from Wittgenstein Centre age bins.
+
+    For `post_secondary`: this is the aggregate tertiary category for all years.
+    (From 2015, bachelor/master/short_post_secondary appear as subcategories
+    but post_secondary remains the total.)
+
+    For `no_education`: share of adults with no formal education.
+    """
+    ds_wc = paths.load_dataset("wittgenstein_human_capital")
+    tb_wc = ds_wc["by_sex_age_edu"].reset_index()
+
+    # Filter: SSP2, both sexes, 25-64 age bins.
+    tb_wc = tb_wc[(tb_wc["scenario"] == 2) & (tb_wc["sex"] == "total") & (tb_wc["age"].isin(WC_AGE_BINS))]
+
+    cat_pop = (
+        tb_wc[tb_wc["education"] == education_cat]
+        .groupby(["country", "year"], observed=True)["pop"]
+        .sum()
+        .reset_index()
+        .rename(columns={"pop": "cat_pop"})
+    )
+
+    total_pop = (
+        tb_wc[tb_wc["education"] == "total"]
+        .groupby(["country", "year"], observed=True)["pop"]
+        .sum()
+        .reset_index()
+        .rename(columns={"pop": "total_pop"})
+    )
+
+    tb = pr.merge(cat_pop, total_pop, on=["country", "year"])
+    tb[col_name] = (tb["cat_pop"] / tb["total_pop"]) * 100
+    tb = tb.drop(columns=["cat_pop", "total_pop"])
+
+    tb = tb.format(["country", "year"], short_name=short_name)
+
+    return tb
