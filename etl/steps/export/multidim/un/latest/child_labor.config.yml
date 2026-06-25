@@ -25,10 +25,8 @@ dimensions:
     choices:
       - slug: share
         name: Share in child labor
-        description: Share of children who are in child labor
       - slug: number
         name: Number in child labor
-        description: Number of children who are in child labor
 
 views:
   - dimensions:

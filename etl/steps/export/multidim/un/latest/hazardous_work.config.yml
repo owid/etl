@@ -25,10 +25,8 @@ dimensions:
     choices:
       - slug: share
         name: Share in hazardous work
-        description: Share of children who are in hazardous work
       - slug: number
         name: Number in hazardous work
-        description: Number of children who are in hazardous work
 
 views:
   - dimensions:
