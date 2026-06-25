@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
@@ -16,8 +16,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("soil_transmitted_helminthiases")
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
     tb = ds_meadow["soil_transmitted_helminthiases"].reset_index()
 
@@ -50,14 +48,11 @@ def run() -> None:
     )
     # Adding region aggregates to selected variables
     tb_nat_sac = add_regions_to_selected_vars(
-        tb_nat_sac,
-        cols=["country", "year", "population_requiring_pc_for_sth__sac", "estimated_number_of_sac_treated"],
-        ds_regions=ds_regions,
+        tb_nat_sac, cols=["country", "year", "population_requiring_pc_for_sth__sac", "estimated_number_of_sac_treated"]
     )
     tb_nat_pre_sac = add_regions_to_selected_vars(
         tb_nat_pre_sac,
         cols=["country", "year", "population_requiring_pc_for_sth__pre_sac", "estimated_number_of_pre_sac_treated"],
-        ds_regions=ds_regions,
     )
     # Split the table into two tables for pre-sac and sac
     age_groups = ["pre_sac", "sac"]
@@ -112,7 +107,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def add_regions_to_selected_vars(tb: Table, cols: list[str], ds_regions: Dataset) -> Table:
+def add_regions_to_selected_vars(tb: Table, cols: list[str]) -> Table:
     """Adding regions to selected variables in the table and then combining with the original table."""
     tb_agg = paths.regions.add_aggregates(
         tb[cols],

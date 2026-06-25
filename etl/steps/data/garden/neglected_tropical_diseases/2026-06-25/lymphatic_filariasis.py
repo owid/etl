@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
@@ -17,9 +17,6 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("lymphatic_filariasis")
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
     # Read table from meadow dataset.
     tb = ds_meadow["lymphatic_filariasis"].reset_index()
     #
@@ -49,7 +46,6 @@ def run() -> None:
     tb_nat = add_regions_to_selected_vars(
         tb_nat,
         cols=["country", "year", "population_requiring_pc_for_lf", "estimated_number_of_people_treated"],
-        ds_regions=ds_regions,
     )
 
     tb_nat.metadata.short_name = "lymphatic_filariasis_national"
@@ -75,7 +71,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def add_regions_to_selected_vars(tb: Table, cols: list[str], ds_regions: Dataset) -> Table:
+def add_regions_to_selected_vars(tb: Table, cols: list[str]) -> Table:
     """
     Adding regions to selected variables in the table and then combining the table with the original table
     """

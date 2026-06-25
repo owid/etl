@@ -886,21 +886,6 @@ steps:
         - data://meadow/cancer/2025-08-08/gco_cancer_over_time_cervical:
             - snapshot://cancer/2025-08-08/gco_cancer_over_time_cervical.csv
 
-  # WHO Preventive Chemotherapy - Neglected Tropical Diseases
-  # Lymphatic filariasis
-  data://grapher/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
-    - data://garden/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
-        - data://garden/regions/2023-01-01/regions
-        - data://meadow/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
-            - snapshot://neglected_tropical_diseases/2025-08-20/lymphatic_filariasis.xlsx
-
-  # Schistosomiasis
-  data://grapher/neglected_tropical_diseases/2025-08-20/schistosomiasis:
-    - data://garden/neglected_tropical_diseases/2025-08-20/schistosomiasis:
-        - data://garden/regions/2023-01-01/regions
-        - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis:
-            - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
-
   # Neglected Tropical Diseases Funding
   data://grapher/neglected_tropical_diseases/2025-08-20/funding:
     - data://garden/neglected_tropical_diseases/2025-08-20/funding:
@@ -1104,10 +1089,6 @@ steps:
   # Death completion (Karlinsky, 2024)
   data://grapher/health/2026-06-01/deaths_karlinsky:
     - data://garden/health/2026-06-01/deaths_karlinsky
-
-
-
-
 
   # WHO Preventive Chemotherapy - Neglected Tropical Diseases (2026 update)
   # Lymphatic filariasis
