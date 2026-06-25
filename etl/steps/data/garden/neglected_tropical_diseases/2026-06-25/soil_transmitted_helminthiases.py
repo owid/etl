@@ -44,7 +44,9 @@ def run() -> None:
         .drop_duplicates(subset=["country", "year"])
     )
     tb_nat_pre_sac["estimated_number_of_pre_sac_treated"] = (
-        tb_nat_pre_sac["national_coverage__pre_sac__pct"] * tb_nat_pre_sac["population_requiring_pc_for_sth__pre_sac"] / 100
+        tb_nat_pre_sac["national_coverage__pre_sac__pct"]
+        * tb_nat_pre_sac["population_requiring_pc_for_sth__pre_sac"]
+        / 100
     )
     # Adding region aggregates to selected variables
     tb_nat_sac = add_regions_to_selected_vars(
