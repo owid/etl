@@ -17,8 +17,6 @@ definitions:
         yAxis:
           min: 0
 
-# For now the only selector is the indicator (share vs number); the underlying table is also
-# disaggregated by sex (total/boys/girls), which could be added as a dimension in the future.
 dimensions:
   - name: Indicator
     slug: indicator
