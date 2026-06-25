@@ -13,6 +13,7 @@ dataset:
   title: Preventive Chemotherapy (PC) Data Portal - Schistosomiasis
   owners:
     - Fiona Spooner
+    - Tuna Acisu
 tables:
   schistosomiasis:
     variables:

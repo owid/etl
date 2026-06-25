@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("schistosomiasis")
 
     # Read table from garden dataset.
-    tb = ds_garden["schistosomiasis"]
+    tb = ds_garden.read("schistosomiasis", reset_index=False)
 
     #
     # Save outputs.
