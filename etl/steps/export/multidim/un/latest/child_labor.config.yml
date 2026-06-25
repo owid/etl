@@ -25,8 +25,10 @@ dimensions:
     choices:
       - slug: share
         name: Share in child labor
+        description: Percentage of all children
       - slug: number
         name: Number in child labor
+        description: Total number of children
 
 views:
   - dimensions:
