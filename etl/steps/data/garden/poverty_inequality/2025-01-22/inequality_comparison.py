@@ -15,7 +15,7 @@ We want to process this data inside the ETL now.
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import build_pip_unsmoothed, build_wid_main
+from owid.catalog.core import warnings
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -59,21 +59,47 @@ REFERENCE_YEARS = [
     },
 ]
 
+# --- keyvars assembly from the dimensional datasets ---------------------------------------------
+# The comparison reads the dimensional world_bank_pip / world_inequality_database datasets directly
+# (the wide-flat *_legacy datasets are kept only for the CSV explorers). They're already long, so we
+# select the indicators below and map their dimension values onto the keyvars labels. Only unitless
+# inequality variables + the relative-poverty headcount are carried, so there's no PPP/price-year to
+# stamp — the one PPP reference is a data-derived row filter (latest PIP PPP base).
+
+# WID dimensional inequality columns -> keyvars indicator name.
+WID_INEQUALITY_INDICATORS = {
+    "gini": "gini",
+    "share_top_1": "p99p100Share",
+    "share_top_10": "p90p100Share",
+    "palma_ratio": "palmaRatio",
+}
+# WID dimensional welfare_type -> (series_code welfare code, human-readable welfare label).
+WID_WELFARE = {
+    "before tax": ("pretaxNational", "Pretax national income"),
+    "after tax": ("posttaxNational", "Post-tax national income"),
+}
+# WID dimensional extrapolated flag -> (series_code source code, human-readable source label).
+WID_SOURCE = {
+    "no": ("wid", "WID"),
+    "yes": ("widExtrapolated", "WID (including extrapolated datapoints)"),
+}
+
+# Indicators expressed as percentages (everything else here — Gini, Palma — is unitless).
+SHARE_INDICATORS = {"p90p100Share", "p99p100Share"}
+
 
 def run() -> None:
-    # Load dataset and table
-    ds_pov_ineq = paths.load_dataset("poverty_inequality_file")
+    # Load dimensional datasets.
+    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_wid = paths.load_dataset("world_inequality_database")
     # NOTE: For now I am keeping the population and regions datasets commented out, because I might use them in the future
     # ds_population = paths.load_dataset("population")
     # ds_regions = paths.load_dataset("regions")
-    ds_pip = paths.load_dataset("world_bank_pip")
-    ds_wid = paths.load_dataset("world_inequality_database")
 
-    tb = ds_pov_ineq.read("keyvars")
-
-    # Reconstruct the legacy-shaped PIP and WID tables (for indicator metadata only — see shared.py).
-    tb_pip = build_pip_unsmoothed(ds_pip)
-    tb_wid = build_wid_main(ds_wid)
+    # Assemble the combined key-indicators table directly from the dimensional datasets
+    # (this was previously the separate poverty_inequality_file step; see shared.py).
+    tb = build_keyvars(ds_pip, ds_wid)
+    pip_origins, wid_origins = keyvars_origins(ds_pip, ds_wid)
 
     # Change types of some columns to avoid issues with filtering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
@@ -110,12 +136,12 @@ def run() -> None:
     # Concatenate tables
     tb = pr.concat(tables, ignore_index=True)
 
-    # Add metadata from original tables
+    # Add provenance (origins) from the dimensional datasets
     tb = add_metadata_from_original_tables(
         tb=tb,
         indicator_match=INDICATORS_FOR_ANALYSIS,
-        tb_pip=tb_pip,
-        tb_wid=tb_wid,
+        pip_origins=pip_origins,
+        wid_origins=wid_origins,
     )
 
     # Create analysis and grapher tables
@@ -134,11 +160,163 @@ def run() -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
-        tables=garden_tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
+        tables=garden_tables, check_variables_metadata=True, default_metadata=ds_pip.metadata
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def build_keyvars(ds_pip: Dataset, ds_wid: Dataset) -> Table:
+    """Build the combined PIP + WID key-indicators (`keyvars`) long table directly from the
+    dimensional datasets."""
+    tb = pr.concat([_pip_keyvars(ds_pip), _wid_keyvars(ds_wid)], ignore_index=True, short_name="keyvars")
+
+    # Drop rows with null values in the value column.
+    tb = tb.dropna(subset=["value"]).reset_index(drop=True)
+
+    # Remove provider region aggregates and World, and fold urban/rural entities back into the country.
+    region_suffixes = ["\\(PIP\\)", "\\(LIS\\)", "\\(WID\\)"]
+    tb = tb[~tb["country"].str.contains("|".join(region_suffixes))].reset_index(drop=True)
+    tb = tb[tb["country"] != "World"].reset_index(drop=True)
+    tb = tb[~tb["country"].isin(["China (urban)", "China (rural)"])].reset_index(drop=True)
+    tb["country"] = tb["country"].str.replace(" (urban)", "", regex=False).str.replace(" (rural)", "", regex=False)
+
+    sanity_check_keyvars(tb)
+    return tb
+
+
+def keyvars_origins(ds_pip: Dataset, ds_wid: Dataset) -> tuple[list, list]:
+    """Return (pip_origins, wid_origins) for attaching provenance to the comparison's variables.
+
+    Origins are uniform within each source, so one representative dimensional column suffices.
+    """
+    pip_origins = ds_pip.read("inequality")["gini"].metadata.origins
+    wid_origins = ds_wid.read("inequality")["gini"].metadata.origins
+    return pip_origins, wid_origins
+
+
+def _pip_keyvars(ds_pip: Dataset) -> Table:
+    """Select the PIP inequality indicators from the dimensional `complete_series` table and map
+    them onto the keyvars layout. gini / palma sit on the dimension-less inequality rows (no PPP);
+    the top-decile share and relative-poverty headcount sit on the latest-PPP rows."""
+    cs = ds_pip.read("complete_series")
+
+    # Latest PPP base in the data — avoids hardcoding a year that goes stale on the next PIP update.
+    # Shares and relative-poverty headcounts are PPP-independent, so this only selects which rows exist.
+    ppp_year = int(cs["ppp_version"].dropna().max())
+    summary = _mask(cs["decile"].isna()) & _mask(cs["poverty_line"].isna())
+    inequality_rows = cs[_mask(cs["ppp_version"].isna()) & summary]
+    ppp_rows = cs[_mask(cs["ppp_version"] == ppp_year)]
+
+    slices = [
+        _slice(inequality_rows, "gini", "gini", ["country", "year", "welfare_type"]),
+        _slice(inequality_rows, "palma_ratio", "palmaRatio", ["country", "year", "welfare_type"]),
+        _slice(
+            ppp_rows[_mask(ppp_rows["decile"] == "10") & _mask(ppp_rows["poverty_line"].isna())],
+            "share",
+            "p90p100Share",
+            ["country", "year", "welfare_type"],
+        ),
+        _slice(
+            ppp_rows[_mask(ppp_rows["decile"].isna()) & _mask(ppp_rows["poverty_line"] == "50% of the median")],
+            "headcount_ratio",
+            "headcountRatio50Median",
+            ["country", "year", "welfare_type"],
+        ),
+    ]
+    tb = pr.concat(slices, ignore_index=True)
+
+    # Keep only country-level income/consumption observations. The combined "income or consumption"
+    # series belongs to the WB regional aggregates (e.g. "East Asia and Pacific (WB)"), which are not
+    # countries and must not enter the comparison — dropping that welfare type excludes them.
+    tb = tb[_mask(tb["welfare_type"].isin(["income", "consumption"]))].reset_index(drop=True)
+
+    # reporting_level from the country-name suffix (the " (urban)"/" (rural)" tag is folded back into
+    # the country name later, in build_keyvars).
+    country_str = tb["country"].astype(str)
+    tb["pipreportinglevel"] = "national"
+    tb.loc[country_str.str.endswith("(urban)"), "pipreportinglevel"] = "urban"
+    tb.loc[country_str.str.endswith("(rural)"), "pipreportinglevel"] = "rural"
+    tb["pipwelfare"] = tb["welfare_type"].astype(object)
+    tb = tb.drop(columns=["welfare_type"])
+
+    # Descriptive columns + series_code (intermediate codes: pip / disposable / perCapita).
+    tb["source"] = "PIP"
+    tb["welfare"] = "Disposable income or consumption"
+    tb["resource_sharing"] = "Per capita"
+    tb["prices"] = ""
+    tb["unit"] = ""
+    tb.loc[tb["indicator_name"].isin(SHARE_INDICATORS), "unit"] = "%"
+    tb["series_code"] = tb["indicator_name"] + "_pip_disposable_perCapita"
+
+    return tb
+
+
+def _wid_keyvars(ds_wid: Dataset) -> Table:
+    """Select the WID inequality indicators from the dimensional `inequality` and `relative_poverty`
+    tables and map them onto the keyvars layout."""
+    tb_ineq = ds_wid.read("inequality")
+    tb_ineq = tb_ineq[_mask(tb_ineq["welfare_type"].isin(WID_WELFARE))]
+    id_cols = ["country", "year", "welfare_type", "extrapolated"]
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        tb_ineq = tb_ineq.melt(
+            id_vars=id_cols, value_vars=list(WID_INEQUALITY_INDICATORS), var_name="indicator_name", value_name="value"
+        )
+    tb_ineq["indicator_name"] = tb_ineq["indicator_name"].map(WID_INEQUALITY_INDICATORS)
+
+    tb_rp = ds_wid.read("relative_poverty")
+    tb_rp = tb_rp[_mask(tb_rp["welfare_type"].isin(WID_WELFARE)) & _mask(tb_rp["poverty_line"] == "50% of the median")][
+        id_cols + ["headcount_ratio"]
+    ].rename(columns={"headcount_ratio": "value"})
+    tb_rp["indicator_name"] = "headcountRatio50Median"
+
+    tb = pr.concat([tb_ineq, tb_rp], ignore_index=True)
+
+    # Map dimensions onto the keyvars labels; series_code uses the intermediate codes.
+    source_code = tb["extrapolated"].map({k: v[0] for k, v in WID_SOURCE.items()})
+    welfare_code = tb["welfare_type"].map({k: v[0] for k, v in WID_WELFARE.items()})
+    tb["source"] = tb["extrapolated"].map({k: v[1] for k, v in WID_SOURCE.items()})
+    tb["welfare"] = tb["welfare_type"].map({k: v[1] for k, v in WID_WELFARE.items()})
+    tb["resource_sharing"] = "Per adult"
+    tb["prices"] = ""
+    tb["unit"] = ""
+    tb.loc[tb["indicator_name"].isin(SHARE_INDICATORS), "unit"] = "%"
+    tb["series_code"] = tb["indicator_name"] + "_" + source_code + "_" + welfare_code + "_perAdult"
+
+    return tb.drop(columns=["welfare_type", "extrapolated"])
+
+
+def _slice(tb: Table, value_col: str, indicator_name: str, id_cols: list[str]) -> Table:
+    """Take one indicator column from a dimensional slice and relabel it as a keyvars long row."""
+    out = tb[id_cols + [value_col]].rename(columns={value_col: "value"})
+    out["indicator_name"] = indicator_name
+    return out
+
+
+def _mask(condition):
+    """Coerce a (possibly nullable/arrow) boolean Series to a plain bool Series (NA -> False).
+
+    The dimensional tables use nullable dtypes, so comparisons yield nullable booleans that raise
+    "boolean value of NA is ambiguous" when combined with `&` or used to index. This normalises them.
+    """
+    return condition.fillna(False).astype(bool)
+
+
+def sanity_check_keyvars(tb: Table) -> None:
+    assert not tb.empty, "keyvars reconstruction is empty."
+    assert not tb["value"].isna().any(), "keyvars has null values after dropna."
+    expected = {
+        "gini_pip_disposable_perCapita",
+        "p90p100Share_pip_disposable_perCapita",
+        "palmaRatio_pip_disposable_perCapita",
+        "gini_wid_pretaxNational_perAdult",
+        "p99p100Share_wid_pretaxNational_perAdult",
+        "p90p100Share_wid_pretaxNational_perAdult",
+        "palmaRatio_wid_pretaxNational_perAdult",
+    }
+    missing = expected - set(tb["series_code"].unique())
+    assert not missing, f"Missing expected keyvars series_code(s): {missing}"
 
 
 ##############################################
@@ -445,27 +623,24 @@ def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
 def add_metadata_from_original_tables(
     tb: Table,
     indicator_match: dict[str, str],
-    tb_pip: Table,
-    tb_wid: Table,
+    pip_origins: list,
+    wid_origins: list,
 ) -> Table:
     """
-    Copy provenance (origins) and units from the dimensional source columns.
+    Attach provenance (origins) to the comparison variables, from the dimensional sources.
 
-    We deliberately do NOT copy the source title/description: the dimensional PIP/WID tables template
-    those with Jinja over dimensions (welfare_type, extrapolated, ...) that don't exist in this
-    dataset, so copying them would fail Jinja rendering in the grapher step. The user-facing
-    title/display come from the .meta.yml instead.
+    Origins are uniform within each source, so each PIP variable gets the PIP origins and each WID
+    variable the WID origins. We deliberately do NOT copy the source title/description: the
+    dimensional tables template those with Jinja over dimensions (welfare_type, extrapolated, ...)
+    that don't exist in this dataset, so copying them would fail Jinja rendering in the grapher
+    step. Units and the user-facing title/display come from the .meta.yml instead.
     """
 
-    for col, match in indicator_match.items():
+    for col in indicator_match:
         if "pip" in col:
-            source = tb_pip[match]
+            tb[col].metadata.origins = pip_origins
         elif "wid" in col:
-            source = tb_wid[match]
-        else:
-            continue
-        # Only origins are taken from the source; units and titles are defined in the .meta.yml.
-        tb[col].metadata.origins = source.metadata.origins
+            tb[col].metadata.origins = wid_origins
 
     return tb
 
