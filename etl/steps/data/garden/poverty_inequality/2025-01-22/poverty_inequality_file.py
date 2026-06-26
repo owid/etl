@@ -2,6 +2,7 @@
 
 import owid.catalog.processing as pr
 from owid.catalog.core import Table, warnings
+from shared import build_pip_percentiles, build_pip_unsmoothed, build_wid_distribution, build_wid_main
 
 from etl.helpers import PathFinder
 
@@ -20,17 +21,18 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load garden datasets
-    ds_pip = paths.load_dataset("world_bank_pip_legacy")
-    ds_wid = paths.load_dataset("world_inequality_database_legacy")
+    # Load garden datasets (dimensional PIP and WID; the legacy datasets are kept only for the
+    # CSV explorers — see shared.py for how the legacy-shaped tables are reconstructed here).
+    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_wid = paths.load_dataset("world_inequality_database")
     ds_wdi = paths.load_dataset("wdi")
 
-    # Read tables from garden datasets.
-    tb_pip = ds_pip[f"income_consumption_{PPP_YEAR_PIP}_unsmoothed"].reset_index()
-    tb_wid = ds_wid["world_inequality_database"].reset_index()
+    # Reconstruct the legacy-shaped tables this step expects from the dimensional datasets.
+    tb_pip = build_pip_unsmoothed(ds_pip)
+    tb_wid = build_wid_main(ds_wid)
 
-    tb_pip_percentiles = ds_pip[f"percentiles_income_consumption_{PPP_YEAR_PIP}"].reset_index()
-    tb_wid_percentiles = ds_wid["world_inequality_database_distribution"].reset_index()
+    tb_pip_percentiles = build_pip_percentiles(ds_pip)
+    tb_wid_percentiles = build_wid_distribution(ds_wid)
     tb_wdi = ds_wdi["wdi"].reset_index()
 
     #

@@ -201,7 +201,7 @@ def run() -> None:
     ds_regions = paths.load_dataset("regions")
     ds_wdi = paths.load_dataset("wdi")
     ds_hdr = paths.load_dataset("undp_hdr")
-    ds_pip = paths.load_dataset("world_bank_pip_legacy")
+    ds_pip = paths.load_dataset("world_bank_pip")
     ds_who = paths.load_dataset("household")
     ds_ghe = paths.load_dataset("ghe")
 
@@ -377,9 +377,17 @@ def add_external_indicators(
     tb_hdr = tb_hdr.loc[(tb_hdr["year"] == 2022) & (tb_hdr["year"] == "total"), ["country", "hdi"]]
     tb_hdr = tb_hdr.rename(columns={"hdi": "human_development_index"})
 
-    # PIP
-    tb_pip = ds_pip.read("income_consumption_2021")
-    tb_pip = tb_pip.loc[tb_pip["year"] > 2010, ["country", "year", "headcount_ratio_300"]]
+    # PIP — reconstruct the legacy income_consumption_2021 headcount_ratio_300 column from the
+    # dimensional poverty table (consolidated income-or-consumption series at the $3/day line).
+    tb_pip = ds_pip.read("poverty")
+    tb_pip = tb_pip.loc[
+        (tb_pip["ppp_version"] == 2021)
+        & (tb_pip["welfare_type"] == "income or consumption")
+        & (tb_pip["poverty_line"] == "300")
+        & (tb_pip["table"] == "Income or consumption consolidated")
+        & (tb_pip["year"] > 2010),
+        ["country", "year", "headcount_ratio"],
+    ].rename(columns={"headcount_ratio": "headcount_ratio_300"})
     ## get most recent data
     cols = ["headcount_ratio_300"]
     tb_pip = _ffill_and_keep_latest(tb_pip, cols)
