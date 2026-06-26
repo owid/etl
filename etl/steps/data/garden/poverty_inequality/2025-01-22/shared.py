@@ -5,17 +5,17 @@ assemble the combined `keyvars` table.
 inequality_comparison used to read these from the wide-flat `world_bank_pip_legacy` /
 `world_inequality_database_legacy` datasets (via a separate poverty_inequality_file step). Those
 legacy datasets are now kept only for the CSV-based explorers, so we read the dimensional datasets
-directly and reshape the few columns the key-indicator transforms need back into the legacy
-layout — reproducing the previous `keyvars` output value-for-value.
+directly and reshape the columns the comparison needs into the legacy `keyvars` layout.
+
+The comparison only uses the *unitless* inequality variables (Gini, top-share, Palma ratio) plus
+the relative-poverty headcount, so we deliberately do NOT carry the monetary series (mean, median,
+averages, thresholds). Because nothing here is expressed in money, no PPP/price-year label is
+needed — the only PPP reference is a data-derived filter that selects the latest PIP PPP base.
 """
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from owid.catalog.core import warnings
-
-# PPP versions used across the poverty/inequality key indicators.
-PPP_YEAR_PIP = 2021
-PPP_YEAR_WID = 2023
 
 # WB regional aggregates. In the legacy PIP table these rows carry a missing welfare_type and a
 # literal "<NA>" reporting_level; in the dimensional dataset they live under the combined
@@ -52,14 +52,17 @@ def _mask(condition):
 
 
 def build_pip_unsmoothed(ds_pip: Dataset) -> Table:
-    """Rebuild `income_consumption_2021_unsmoothed` (the columns create_keyvars_file_pip reads)
-    from the dimensional `complete_series` table.
+    """Rebuild the inequality columns of `income_consumption_unsmoothed` (the ones
+    create_keyvars_file_pip reads) from the dimensional `complete_series` table.
 
-    Each indicator lives on a different row-subset of complete_series:
+    Indicators live on different row-subsets of complete_series:
       - gini / palma_ratio: the dimension-less inequality rows (no PPP, so ppp_version is NaN)
-      - mean / median:      2021-PPP country-year summary rows (no decile, no poverty line)
-      - decile10_share:     2021-PPP, decile "10", no poverty line -> `share`
-      - headcount_ratio_50_median: 2021-PPP relative-poverty rows -> `headcount_ratio`
+      - decile10_share:     latest-PPP, decile "10", no poverty line -> `share`
+      - headcount_ratio_50_median: latest-PPP relative-poverty rows -> `headcount_ratio`
+
+    The PPP version used to select the share / relative-poverty rows is the latest one present in
+    the data (so it tracks PIP rebasing instead of a hardcoded year). Shares and relative-poverty
+    headcounts are PPP-independent, so the choice only determines which rows exist.
 
     Country rows keep welfare_type income/consumption; WB regions live under the combined
     "income or consumption" welfare type and are relabelled to match the legacy table (which marks
@@ -70,7 +73,10 @@ def build_pip_unsmoothed(ds_pip: Dataset) -> Table:
     cs = ds_pip.read("complete_series")
     keys = ["country", "year", "welfare_type"]
 
-    ppp_current = _mask(cs["ppp_version"] == PPP_YEAR_PIP)
+    # Latest PPP base in the data — avoids hardcoding a year that goes stale on the next PIP update.
+    ppp_year = int(cs["ppp_version"].dropna().max())
+
+    ppp_current = _mask(cs["ppp_version"] == ppp_year)
     ppp_missing = _mask(cs["ppp_version"].isna())
     decile_missing = _mask(cs["decile"].isna())
     decile_top = _mask(cs["decile"] == "10")
@@ -79,7 +85,6 @@ def build_pip_unsmoothed(ds_pip: Dataset) -> Table:
     summary = decile_missing & povline_missing
 
     tb_ineq = cs[ppp_missing & summary][keys + ["gini", "palma_ratio"]]
-    tb_mean_median = cs[ppp_current & summary][keys + ["mean", "median"]]
     tb_decile10 = cs[ppp_current & decile_top & povline_missing][keys + ["share"]].rename(
         columns={"share": "decile10_share"}
     )
@@ -88,7 +93,7 @@ def build_pip_unsmoothed(ds_pip: Dataset) -> Table:
     )
 
     tb = tb_ineq
-    for piece in [tb_mean_median, tb_decile10, tb_rel_poverty]:
+    for piece in [tb_decile10, tb_rel_poverty]:
         tb = pr.merge(tb, piece, on=keys, how="outer")
 
     # Keep income/consumption for countries, and the combined series only for regions.
@@ -113,23 +118,18 @@ def build_pip_unsmoothed(ds_pip: Dataset) -> Table:
 
 
 def build_wid_main(ds_wid: Dataset) -> Table:
-    """Rebuild the wide `world_inequality_database` table (the columns create_keyvars_file_wid reads)
-    from the dimensional inequality / incomes / relative_poverty tables.
+    """Rebuild the inequality columns of the wide `world_inequality_database` table (the ones
+    create_keyvars_file_wid reads) from the dimensional inequality / relative_poverty tables.
 
     For welfare ∈ {pretax, posttax_nat} and both extrapolation states, build:
       p0p100_gini ← inequality.gini            palma_ratio ← inequality.palma_ratio
       p99p100_share ← inequality.share_top_1   p90p100_share ← inequality.share_top_10
-      p0p100_avg ← incomes.mean (year)         median ← incomes.median (year)
-      p99p100_avg ← incomes.avg (Richest 1%, year)
       headcount_ratio_50_median ← relative_poverty.headcount_ratio (50% of the median)
     """
     tb_ineq = ds_wid.read("inequality")
-    tb_inc = ds_wid.read("incomes")
     tb_rp = ds_wid.read("relative_poverty")
 
     all_rows = _mask(tb_ineq["country"].notna())
-    summary_income = _mask(tb_inc["quantile"].isna()) & _mask(tb_inc["period"] == "year")
-    top1_income = _mask(tb_inc["quantile"] == "Richest 1%") & _mask(tb_inc["period"] == "year")
     rel_pov_50 = _mask(tb_rp["poverty_line"] == "50% of the median")
 
     specs = [
@@ -137,9 +137,6 @@ def build_wid_main(ds_wid: Dataset) -> Table:
         (tb_ineq, all_rows, "palma_ratio", "palma_ratio"),
         (tb_ineq, all_rows, "share_top_1", "p99p100_share"),
         (tb_ineq, all_rows, "share_top_10", "p90p100_share"),
-        (tb_inc, summary_income, "mean", "p0p100_avg"),
-        (tb_inc, summary_income, "median", "median"),
-        (tb_inc, top1_income, "avg", "p99p100_avg"),
         (tb_rp, rel_pov_50, "headcount_ratio", "headcount_ratio_50_median"),
     ]
 
@@ -174,23 +171,14 @@ def sanity_check_pip_unsmoothed(tb: Table) -> None:
     assert set(tb["reporting_level"].unique()) <= {"national", "urban", "rural", "<NA>"}, (
         "Unexpected reporting_level value in PIP unsmoothed reconstruction."
     )
-    for col in ["gini", "mean", "median", "decile10_share", "palma_ratio", "headcount_ratio_50_median"]:
+    for col in ["gini", "decile10_share", "palma_ratio", "headcount_ratio_50_median"]:
         assert col in tb.columns, f"Missing expected PIP column {col}."
 
 
 def sanity_check_wid_main(tb: Table) -> None:
     assert not tb.empty, "WID main reconstruction is empty."
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) in WID main reconstruction."
-    for base in [
-        "p0p100_gini",
-        "p0p100_avg",
-        "median",
-        "p99p100_share",
-        "p99p100_avg",
-        "p90p100_share",
-        "palma_ratio",
-        "headcount_ratio_50_median",
-    ]:
+    for base in ["p0p100_gini", "p99p100_share", "p90p100_share", "palma_ratio", "headcount_ratio_50_median"]:
         for welfare in ["pretax", "posttax_nat"]:
             assert f"{base}_{welfare}" in tb.columns, f"Missing expected WID column {base}_{welfare}."
 
@@ -199,8 +187,7 @@ def build_keyvars(tb_pip: Table, tb_wid: Table) -> Table:
     """Assemble the combined PIP + WID key-indicators (keyvars) long table consumed by
     inequality_comparison, from the reconstructed PIP/WID tables.
 
-    This is the table poverty_inequality_file used to publish; it is now built in-memory because
-    inequality_comparison is its only consumer.
+    Only the unitless inequality variables and the relative-poverty headcount are included.
     """
     tb_pip_keyvars = create_keyvars_file_pip(tb_pip)
     tb_wid_keyvars = create_keyvars_file_wid(tb_wid, extrapolated=False)
@@ -227,16 +214,14 @@ def build_keyvars(tb_pip: Table, tb_wid: Table) -> Table:
 
 def create_keyvars_file_pip(tb: Table) -> Table:
     """
-    Process the main table from PIP, to adapt it to a concatenated file with LIS and WID
+    Process the inequality indicators from PIP into the standardized keyvars layout.
     """
 
     tb = tb.copy()
 
-    # Set the list of indicators to use
+    # Inequality indicators only (all unitless or percentages — no monetary/PPP-priced series).
     indicators_list = [
         "gini",
-        "mean",
-        "median",
         "decile10_share",
         "palma_ratio",
         "headcount_ratio_50_median",
@@ -256,7 +241,7 @@ def create_keyvars_file_pip(tb: Table) -> Table:
     # Rename welfare_type and reporting_level
     tb = tb.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipreportinglevel"})
 
-    # Rename welfare and equivalization columns
+    # Rename indicators
     tb["indicator_name"] = tb["indicator_name"].replace(
         {
             "palma_ratio": "palmaRatio",
@@ -270,11 +255,6 @@ def create_keyvars_file_pip(tb: Table) -> Table:
     tb["resource_sharing"] = "perCapita"
     tb["source"] = "pip"
     tb["prices"] = ""
-    tb["prices"] = tb["prices"].where(
-        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
-        f"{PPP_YEAR_PIP}ppp{PPP_YEAR_PIP}",
-    )
-    tb["prices"] = tb["prices"].astype(str)
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
     tb["series_code"] = (
@@ -294,18 +274,11 @@ def create_keyvars_file_pip(tb: Table) -> Table:
 
     # Replace names for descriptive columns
     tb["source"] = tb["source"].replace({"pip": "PIP"})
-    tb["prices"] = tb["prices"].replace(
-        {f"{PPP_YEAR_PIP}ppp{PPP_YEAR_PIP}": f"{PPP_YEAR_PIP} PPPs, at {PPP_YEAR_PIP} prices"}
-    )
     tb["welfare"] = tb["welfare"].replace({"disposable": "Disposable income or consumption"})
     tb["resource_sharing"] = tb["resource_sharing"].replace({"perCapita": "Per capita"})
 
-    # Add unit column
+    # Add unit column (shares are percentages; Gini and Palma ratio are unitless)
     tb["unit"] = ""
-    tb["unit"] = tb["unit"].where(
-        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
-        "dollars",
-    )
     tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p90p100Share", "%")
     tb["unit"] = tb["unit"].astype(str)
 
@@ -314,22 +287,16 @@ def create_keyvars_file_pip(tb: Table) -> Table:
 
 def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
     """
-    Process the main table from WID, to adapt it to a concatenated file with LIS and PIP
+    Process the inequality indicators from WID into the standardized keyvars layout.
     """
     tb = tb.copy()
 
-    # Set the list of indicators to use
+    # Inequality indicators only (all unitless or percentages — no monetary/PPP-priced series).
     indicators_list = [
         "p0p100_gini_pretax",
         "p0p100_gini_posttax_nat",
-        "p0p100_avg_pretax",
-        "p0p100_avg_posttax_nat",
-        "median_pretax",
-        "median_posttax_nat",
         "p99p100_share_pretax",
         "p99p100_share_posttax_nat",
-        "p99p100_avg_pretax",
-        "p99p100_avg_posttax_nat",
         "p90p100_share_pretax",
         "p90p100_share_posttax_nat",
         "palma_ratio_pretax",
@@ -366,9 +333,7 @@ def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
     tb["indicator_name"] = tb["indicator_name"].replace(
         {
             "p0p100_gini": "gini",
-            "p0p100_avg": "mean",
             "p99p100_share": "p99p100Share",
-            "p99p100_avg": "p99p100Average",
             "p90p100_share": "p90p100Share",
             "palma_ratio": "palmaRatio",
             "headcount_ratio_50_median": "headcountRatio50Median",
@@ -382,11 +347,6 @@ def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
         tb["source"] = "wid"
 
     tb["prices"] = ""
-    tb["prices"] = tb["prices"].where(
-        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
-        f"2011ppp{PPP_YEAR_WID}",
-    )
-    tb["prices"] = tb["prices"].astype(str)
     tb["resource_sharing"] = "perAdult"
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
@@ -411,18 +371,13 @@ def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
     else:
         tb["source"] = tb["source"].replace({"wid": "WID"})
 
-    tb["prices"] = tb["prices"].replace({f"2011ppp{PPP_YEAR_WID}": f"2011 PPPs, at {PPP_YEAR_WID} prices"})
     tb["welfare"] = tb["welfare"].replace(
         {"pretaxNational": "Pretax national income", "posttaxNational": "Post-tax national income"}
     )
     tb["resource_sharing"] = tb["resource_sharing"].replace({"perAdult": "Per adult"})
 
-    # Add unit column
+    # Add unit column (top-share indicators are percentages; Gini and Palma ratio are unitless)
     tb["unit"] = ""
-    tb["unit"] = tb["unit"].where(
-        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
-        "dollars",
-    )
     tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p99p100Share", "%")
     tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p90p100Share", "%")
     tb["unit"] = tb["unit"].astype(str)
