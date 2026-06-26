@@ -1,7 +1,7 @@
 """Generate "related charts" recommendations from chart coviews.
 
 Coviews (two charts viewed in the same browsing session, from BigQuery
-`prod_google_analytics4.coviews_by_day_page`) turned out to be a simple and
+`prod_exports.coviews_by_day_page`) turned out to be a simple and
 effective signal for related content. This CLI computes the top related charts
 for every chart (or a single one) and writes them to the `related_charts`
 MySQL table with `reviewer='production'`, where they are consumed by the
