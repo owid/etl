@@ -62,6 +62,21 @@ When generating user-facing prose (PR descriptions, Slack messages, PR comments,
 
 If you find yourself doing any of these in the snapshot, move them to garden.
 
+## Glossary
+
+Internal terms that recur across this guide, the skills, and the codebase:
+
+- **ETL:** the data pipeline that gets external datasets into the Grapher
+- **Grapher:** OWID's charting tool / database for interactive visualizations
+- **OMM:** OWID-Maintained Metric — a curated indicator for a topic
+- **MDim / Multi-dimensional indicator:** interactive chart with toggleable views (e.g. total vs per capita)
+- **Explorer:** a more complex interactive tool than a single chart, with multiple tabs/views
+- **FAUST:** chart text (Footnote, Axis title, Unit, Subtitle, Title)
+- **WYSK:** "What You Should Know" — metadata/description attached to a dataset or chart
+- **Topic page:** an evergreen page on a topic (modular or linear)
+- **Key insight:** a short, standalone data point highlighted on a topic page
+- **Static viz:** a one-off image (Figma/Illustrator), not an interactive Grapher chart
+
 ## Running ETL Steps
 
 ```bash
@@ -83,8 +98,11 @@ Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run)
 **Important:**
 - **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
 - **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
-- **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code.
+- **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code. It also **fails with `AccessDenied` when the target version isn't in the catalog yet** (e.g. a version you just created) — use it only to fetch already-published upstream deps, never for the new step you're building locally.
 - For `grapher://` steps, always add `--grapher` flag
+- **Pushing to the grapher DB:** running a `data://grapher/...` step (even with `--grapher`) only builds the dataset feather. The MySQL upsert is the separate `grapher://...` step. If a metadata-only change (`display`, `description_key`, etc.) isn't showing up in the grapher DB, run `etlr grapher://grapher/<path> --grapher` explicitly to force the variable upsert.
+- **Version-bumping a grapher step mints new variable IDs**, so existing charts referencing the old indicators become ghost variables and must be remapped on staging (see the `remapping-ghost-variables` skill / `indicator_upgrade` CLI). Budget for this whenever you rename or re-version a grapher dataset.
+- **Versioning hygiene for derived/OMM steps:** an OMM's version reflects when its combining logic was written, not its inputs — but when you repoint a derived step to a newer-dated dependency, bump the step's own version folder too. Leaving a step dated before the data it ingests is confusing and should be fixed when noticed.
 - Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
 
 ## Git Workflow
@@ -274,6 +292,8 @@ df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 
 **Prefer Python when the SQL contains `%` (LIKE patterns, JSON_EXTRACT paths) or single-quoted strings — `make query` re-interprets those via shell + make and breaks unpredictably.** Use `params={...}` for `%`/quoted values to dodge pymysql's own `%`-format-string parsing.
 
+**`OWID_ENV` targets your local dev DB even when you're on a branch.** To query the branch's staging DB from Python, use `OWIDEnv.from_staging('<branch>')` (`from etl.config import OWIDEnv`) — e.g. `OWIDEnv.from_staging('my-branch').read_sql(...)`. Also note `make query` shells out to the `mysql` CLI, which may not be installed; if it errors with `mysql: command not found`, use the Python `from_staging(...).read_sql(...)` path instead.
+
 ## Additional Tools
 
 Get `--help` for details on any command.
@@ -293,6 +313,8 @@ uv add package_name
 uv remove package_name
 ```
 
+**Never run bare `uv sync`** — it prunes optional deps the repo needs (streamlit, etc.) and breaks `etl`/`etl pr`. The full environment is `uv sync --all-extras --group dev` (what `make .venv` runs); use that to install or repair the venv.
+
 ## VSCode Extensions
 
 Extensions live in `vscode_extensions/<name>/`. After **every** code change, you must compile, package, and install — just compiling is NOT enough:
@@ -305,6 +327,12 @@ code --install-extension install/<name>-<version>.vsix --force
 ```
 
 Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
+
+## GitHub Actions
+
+When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinning rule imported below:
+
+@.github/instructions/github-actions.instructions.md
 
 ## Extended Documentation
 

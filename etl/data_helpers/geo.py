@@ -1995,6 +1995,8 @@ class Regions:
         countries_that_must_have_data: dict[str, list[str]] | None = None,
         min_num_countries_informed: int | None = None,
         min_frac_countries_informed: float | None = None,
+        min_frac_population: float | dict[str, float] | None = None,
+        warn_on_missing_population: bool = True,
     ) -> Table:
         """Add region aggregates to a table.
 
@@ -2070,9 +2072,25 @@ class Regions:
             Regions not in the dict will not have this constraint applied.
             * If None, an aggregate is constructed regardless of the fraction of countries informed.
             * This condition is applied after the aggregation, and works together with min_num_countries_informed (both must be met).
+            * NOTE ON THE "_informed" SUFFIX: the denominator is the set of countries that have *ever* reported the
+            variable, not the region's full member list. See min_frac_population (no suffix) for the all-members analog.
             Example: If 30 unique countries in Europe have ever reported data for a given indicator (across all years),
             and min_frac_countries_informed=0.5, then at least 15 countries must have data in any given year, otherwise
             the aggregate for indicator and that year is nan.
+        min_frac_population : Optional[float | dict[str, float]], default: None
+            * Minimum fraction of the region's total population that must live in countries with data, for a particular
+            variable, region and year, otherwise the aggregate is set to nan.
+            * The denominator is the region's total population, read straight from the population dataset (e.g. the
+            population of "Africa"); it is not reconstructed by summing members, so a region the population dataset does
+            not know is left ungated. Countries that never appear in the data still count against coverage.
+            * Country populations come from population_col when present, otherwise from the population dataset.
+            * A float applies the same threshold to all regions; a dict maps regions to fractions; None disables it.
+            * Composes with the other coverage conditions (all must be met).
+            Example: if the countries reporting an indicator for Africa in a given year are home to 40% of Africa's
+            population, then min_frac_population=0.5 sets that year's aggregate to nan.
+        warn_on_missing_population : bool, default: True
+            * Only relevant when min_frac_population is set. If True, warn about countries or regions that have no
+            population in the population dataset (their absence affects the coverage check). Set to False to silence it.
 
         Returns
         -------
@@ -2100,6 +2118,8 @@ class Regions:
             countries_that_must_have_data=countries_that_must_have_data,
             min_num_countries_informed=min_num_countries_informed,
             min_frac_countries_informed=min_frac_countries_informed,
+            min_frac_population=min_frac_population,
+            warn_on_missing_population=warn_on_missing_population,
         )
 
     def add_per_capita(
@@ -2718,6 +2738,91 @@ class RegionAggregator:
                     original_indices_to_nan = df_region_subset[mask_to_nan]["original_index"].values
                     df_only_regions.loc[original_indices_to_nan, column] = np.nan
 
+    def _impose_population_condition(
+        self, df_only_regions, tb, columns, min_frac_population, warn_on_missing_population
+    ):
+        """Set region aggregates to NaN when too little of the region's population is covered by data.
+
+        For each variable, region and year, divides the population of the member countries that have (not-nan) data
+        by the region's total population, and sets the aggregate to NaN when that fraction is below the threshold.
+        Country populations are taken from population_col when the table already provides it, otherwise read from the
+        population dataset; the region total is always read from the population dataset (taken directly, not summed
+        from members). Missing population is reported by add_population_to_table via warn_on_missing_population.
+        Modifies df_only_regions in place.
+        """
+        if min_frac_population is None:
+            return
+
+        # A float applies the same threshold to all regions; a dict restricts it to the regions it lists.
+        if isinstance(min_frac_population, float):
+            min_frac_population = {region: min_frac_population for region in self.regions}
+        regions_to_check = [region for region in self.regions if region in min_frac_population]
+        if not regions_to_check:
+            return
+
+        other_index_columns = [column for column in self.index_columns if column != self.country_col]
+        coverage_columns = [column for column in columns if column in self.tb_coverage.columns]  # ty: ignore
+
+        # Reuse the existing coverage table (1 where the original cell had data, 0 otherwise) as a plain DataFrame.
+        cov = pd.DataFrame(self.tb_coverage)
+
+        # Population per (entity, year). Country populations are reused from population_col when the table already has
+        # it; the region totals (and country populations when there is no such column) are read from the population
+        # dataset in a single call, whose warn_on_missing_countries surfaces any entity without population.
+        df_pop_parts = []
+        entities_to_fetch = [pd.DataFrame(df_only_regions[[self.country_col, self.year_col]])]
+        if self.population_col in tb.columns:
+            df_pop_parts.append(
+                pd.DataFrame(tb[[self.country_col, self.year_col, self.population_col]]).rename(
+                    columns={self.population_col: "__population"}
+                )
+            )
+        else:
+            entities_to_fetch.append(pd.DataFrame(cov[[self.country_col, self.year_col]]))
+        df_pop_parts.append(
+            pd.DataFrame(
+                add_population_to_table(
+                    tb=Table(pd.concat(entities_to_fetch, ignore_index=True).drop_duplicates()),
+                    ds_population=self.ds_population,  # ty: ignore
+                    country_col=self.country_col,
+                    year_col=self.year_col,
+                    population_col="__population",
+                    warn_on_missing_countries=warn_on_missing_population,
+                )
+            )
+        )
+        # One population per (entity, year) so the lookups below stay one-to-one.
+        df_pop = pd.concat(df_pop_parts, ignore_index=True).drop_duplicates(subset=[self.country_col, self.year_col])
+        cov = cov.merge(df_pop, on=[self.country_col, self.year_col], how="left")
+
+        for region in regions_to_check:
+            region_mask = df_only_regions[self.country_col] == region
+            if not region_mask.any():
+                continue
+            threshold = min_frac_population[region]
+
+            # Coverage rows for the members of this region.
+            region_cov = cov[cov[self.country_col].isin(self.regions_members[region])]
+            if region_cov.empty:
+                continue
+
+            # Region rows and their total population, computed once (the total does not depend on the column).
+            # Plain DataFrame so the merges do not dispatch to Table.merge (which needs Tables on both sides).
+            region_rows = pd.DataFrame(df_only_regions[region_mask]).reset_index().rename(columns={"index": "__row"})
+            total_pop = region_rows.merge(df_pop, on=[self.country_col, self.year_col], how="left")["__population"]
+
+            for column in coverage_columns:
+                # Covered population per series-year (members with not-nan data for this column).
+                covered = (
+                    region_cov[region_cov[column]]
+                    .groupby(other_index_columns, as_index=False)["__population"]
+                    .sum()
+                    .rename(columns={"__population": "__covered"})
+                )
+                covered_pop = region_rows.merge(covered, on=other_index_columns, how="left")["__covered"].fillna(0)
+                mask_to_nan = (total_pop > 0) & (covered_pop / total_pop < threshold)
+                df_only_regions.loc[region_rows.loc[mask_to_nan, "__row"].to_numpy(), column] = np.nan
+
     def add_aggregates(
         self,
         tb: Table,
@@ -2726,6 +2831,8 @@ class RegionAggregator:
         min_num_values_per_year: int | None = None,
         min_num_countries_informed: int | dict[str, int] | None = None,
         min_frac_countries_informed: float | dict[str, float] | None = None,
+        min_frac_population: float | dict[str, float] | None = None,
+        warn_on_missing_population: bool = True,
         check_for_region_overlaps: bool = True,
         accepted_overlaps: list[dict[int, set[str]]] | None = None,
         ignore_overlaps_of_zeros: bool = False,
@@ -2799,9 +2906,31 @@ class RegionAggregator:
             Regions not in the dict will not have this constraint applied.
             * If None, an aggregate is constructed regardless of the fraction of countries informed.
             * This condition is applied after the aggregation, and works together with min_num_countries_informed (both must be met).
+            * NOTE ON THE "_informed" SUFFIX: the denominator is the set of countries that have *ever* reported the
+            variable, not the region's full member list. See min_frac_population (no suffix) for the all-members analog.
             Example: If 30 unique countries in Europe have ever reported data for a given indicator (across all years),
             and min_frac_countries_informed=0.5, then at least 15 countries must have data in any given year, otherwise
             the aggregate for indicator and that year is nan.
+        min_frac_population : Optional[float | dict[str, float]], default: None
+            * If a float is passed (between 0 and 1), this is the minimum fraction of the region's total population that
+            must live in countries with data, for a particular variable, region and year. If that fraction is not reached,
+            the aggregate will be nan.
+            * If a dict is passed, it maps region names to minimum fractions (e.g., {"Europe": 0.9, "Africa": 0.5}).
+            Regions not in the dict will not have this constraint applied.
+            * If None, an aggregate is constructed regardless of the population covered.
+            * The numerator is the population of the member countries that have (not-nan) data for that variable and year.
+            Country populations come from population_col when the table already has it, otherwise from the population
+            dataset. The denominator is the region's total population, read straight from the population dataset (e.g. the
+            population of "Africa"); it is NOT reconstructed by summing members. A region the population dataset does not
+            know is left ungated. Because the region total includes countries that never appear in the data, those count
+            against coverage.
+            * This condition is applied after the aggregation, and composes with the other coverage conditions (all must be met).
+            Example: if the countries reporting an indicator for Africa in a given year are home to 40% of Africa's
+            population, then min_frac_population=0.5 sets that year's aggregate to nan.
+        warn_on_missing_population : bool, default: True
+            * Only relevant when min_frac_population is set. If True, warn (via add_population_to_table) about countries
+            or regions that have no population in the population dataset, since their absence affects the coverage check.
+            * Set to False to silence that warning (e.g. when some entities are knowingly without population).
 
         Returns
         -------
@@ -2834,7 +2963,9 @@ class RegionAggregator:
                 if weight_col in tb.columns:
                     weight_columns.add(weight_col)
 
-        needed_columns = self.index_columns + columns + list(weight_columns)
+        # Deduplicate while preserving order: a weight column may already be an index or aggregated column,
+        # and selecting it twice would create a duplicate column that breaks downstream operations.
+        needed_columns = list(dict.fromkeys(self.index_columns + columns + list(weight_columns)))
         tb_fast = tb[needed_columns]
         other_columns = [col for col in tb.columns if col not in needed_columns]
 
@@ -2857,20 +2988,38 @@ class RegionAggregator:
             min_num_values_per_year=min_num_values_per_year,
         )
 
+        # Build the coverage table if any country- or population-based condition is specified.
+        if (
+            countries_that_must_have_data is not None
+            or min_num_countries_informed is not None
+            or min_frac_countries_informed is not None
+            or min_frac_population is not None
+        ):
+            if self.tb_coverage is None:
+                self._create_coverage_table(tb=tb_fast)
+
         # Apply country-based conditions if any are specified.
         if (
             countries_that_must_have_data is not None
             or min_num_countries_informed is not None
             or min_frac_countries_informed is not None
         ):
-            if self.tb_coverage is None:
-                self._create_coverage_table(tb=tb_fast)
             self._impose_country_conditions(
                 df_only_regions=df_only_regions,
                 columns=columns,
                 countries_that_must_have_data=countries_that_must_have_data,
                 min_num_countries_informed=min_num_countries_informed,
                 min_frac_countries_informed=min_frac_countries_informed,
+            )
+
+        # Apply the population-coverage condition if specified.
+        if min_frac_population is not None:
+            self._impose_population_condition(
+                df_only_regions=df_only_regions,
+                tb=tb,
+                columns=columns,
+                min_frac_population=min_frac_population,
+                warn_on_missing_population=warn_on_missing_population,
             )
 
         # Create a mask that selects rows of regions in the original data, if any.

@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: United Nations Inter-agency Group for Child Mortality Estimation
+    title: United Nations Inter-agency Group for Child Mortality Estimation
+    description: |-
+      The United Nations Inter-agency Group for Child Mortality Estimation (UN IGME) was formed in 2004 to share data on child mortality, improve methods for child mortality estimation, report on progress towards child survival goals, and enhance country capacity to produce timely and properly assessed estimates of child mortality. The UN IGME is led by the United Nations Children’s Fund (UNICEF) and includes the World Health Organization (WHO), the World Bank Group and the United Nations Population Division of the Department of Economic and Social Affairs as full members.
+
+      UN IGME updates its child mortality estimates annually after reviewing newly available data and assessing data quality. The web portal contains the latest UN IGME estimates of child mortality at the country, regional and global levels, and the data used to derive them.
+    citation_full: United Nations Inter-agency Group for Child Mortality Estimation (2026).
+    version_producer: 2025
+    attribution_short: UN IGME
+    url_main: https://childmortality.org/all-cause-mortality/data
+    url_download: https://childmortality.org/wp-content/uploads/2026/03/UN-IGME-2025.zip
+    date_accessed: '2026-06-09'
+    date_published: '2026-03-17'
+    license:
+      name: Copyright © UNICEF
+      url: https://www.unicef.org/legal#copyright
+outs:
+  - md5: f71e5a179897aa6ecab9be923d14c4ca
+    size: 21229096
+    path: igme.zip
