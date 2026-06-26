@@ -449,19 +449,23 @@ def add_metadata_from_original_tables(
     tb_wid: Table,
 ) -> Table:
     """
-    Add the original metadata we have in the garden steps of the main metadata.
-    This way we can add origins and indicator-based metadata
+    Copy provenance (origins) and units from the dimensional source columns.
+
+    We deliberately do NOT copy the source title/description: the dimensional PIP/WID tables template
+    those with Jinja over dimensions (welfare_type, extrapolated, ...) that don't exist in this
+    dataset, so copying them would fail Jinja rendering in the grapher step. The user-facing
+    title/display come from the .meta.yml instead.
     """
 
     for col, match in indicator_match.items():
-        # If col contains "pip"
         if "pip" in col:
-            # Get the metadata from the PIP table
-            tb[col] = tb[col].copy_metadata(tb_pip[match])
-        # If col contains "wid"
+            source = tb_pip[match]
         elif "wid" in col:
-            # Get the metadata from the WID table
-            tb[col] = tb[col].copy_metadata(tb_wid[match])
+            source = tb_wid[match]
+        else:
+            continue
+        # Only origins are taken from the source; units and titles are defined in the .meta.yml.
+        tb[col].metadata.origins = source.metadata.origins
 
     return tb
 
