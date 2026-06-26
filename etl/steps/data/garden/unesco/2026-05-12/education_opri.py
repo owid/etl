@@ -210,30 +210,24 @@ _SDG_TERTIARY_COLS = {
 
 
 def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table) -> Table:
-    """Combine Lee & Lee historical enrollment (pre-1985) with recent OPRI and SDGs data (1985+).
+    """Combine UNESCO data with Lee & Lee historical enrollment estimates.
 
-    The combined series uses:
-    - Primary NER (1985+): UNESCO OPRI direct survey data
-    - Tertiary GER (1985+): UNESCO SDGs dataset (GER.5T8)
-    - Primary and tertiary (pre-1985): Lee & Lee (2016) historical estimates
+    The combined series prefers UNESCO data wherever it exists and falls back
+    to Lee & Lee (2016) only for country-years where UNESCO has no coverage.
+    This avoids discarding UNESCO observations that exist before 1985 and
+    reduces discontinuities at the splice boundary.
 
-    Both primary and tertiary use 1985 as the cutoff year between Lee & Lee
-    historical estimates and UNESCO recent data.
+    Sources:
+    - Primary NER: UNESCO OPRI (preferred), Lee & Lee (fallback)
+    - Tertiary GER: UNESCO SDGs (preferred), Lee & Lee (fallback)
 
     Secondary enrollment is omitted because OPRI and SDGs only have separate
     lower/upper secondary series, not a single combined secondary series.
 
     Returns the OPRI table with combined enrollment columns appended.
-    Individual country series go back to ~1820; World and regional aggregates
-    are included for all periods via Lee & Lee garden aggregates (pre-1985)
-    and OPRI/SDGs (1985+).
     """
 
-    # Pre-1985 historical data from Lee & Lee for both primary and tertiary.
-    # Recent data (1985+) comes from UNESCO OPRI (primary) and SDGs (tertiary).
-    tb_hist = tb_lee[tb_lee["year"] < 1985].copy()
-
-    # 3. Recent primary NER (1985+) from OPRI itself
+    # 1. UNESCO primary NER from OPRI (all available years)
     opri_primary_map = {
         "Total net enrolment rate, primary, both sexes (%)": "mf_primary_enrollment_rates",
         "Total net enrolment rate, primary, female (%)": "f_primary_enrollment_rates",
@@ -243,28 +237,25 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
     tb_primary = (
         tb_opri[["country", "year"] + list(avail_primary)]
         .rename(columns=avail_primary)
-        .loc[lambda t: t["year"] >= 1985]
         .copy()
     )
 
-    # 4. Recent tertiary GER (1985+) from SDGs (world aggregates available from 1985)
+    # 2. UNESCO tertiary GER from SDGs (all available years)
     avail_tertiary = {k: v for k, v in _SDG_TERTIARY_COLS.items() if k in tb_sdgs.columns}
     tb_tertiary = (
         tb_sdgs[["country", "year"] + list(avail_tertiary)]
         .rename(columns=avail_tertiary)
-        .loc[lambda t: t["year"] >= 1985]
         .copy()
     )
 
-    # 5. Merge recent primary + tertiary into one recent table
-    tb_recent = pr.merge(tb_primary, tb_tertiary, on=["country", "year"], how="outer")
+    # 3. Merge UNESCO primary + tertiary into one table
+    tb_unesco = pr.merge(tb_primary, tb_tertiary, on=["country", "year"], how="outer")
 
-    # 6. Combine historical (Lee & Lee, pre-1985) and recent (OPRI/SDG, 1985+) using outer merge.
-    # The cutoff is 1985 for both primary and tertiary; prefer the recent source,
-    # falling back to Lee & Lee where the recent source has no data.
-    tb_combined = pr.merge(tb_recent, tb_hist, on=["country", "year"], how="outer", suffixes=("", "_hist"))
+    # 4. Outer-merge with Lee & Lee; prefer UNESCO where both exist,
+    #    fall back to Lee & Lee only where UNESCO is NaN.
+    tb_combined = pr.merge(tb_unesco, tb_lee, on=["country", "year"], how="outer", suffixes=("", "_hist"))
 
-    hist_enr_cols = [c for c in tb_hist.columns if c not in ["country", "year"]]
+    hist_enr_cols = [c for c in tb_lee.columns if c not in ["country", "year"]]
     for col in hist_enr_cols:
         hist_col = f"{col}_hist"
         if hist_col in tb_combined.columns:
@@ -272,12 +263,31 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
             tb_combined.loc[mask, col] = tb_combined.loc[mask, hist_col]
             tb_combined = tb_combined.drop(columns=[hist_col])
 
-    # 7. Known data error: US 1975 male primary rate is implausible
-    mask_us75 = (tb_combined["country"] == "United States") & (tb_combined["year"] == 1975)
-    if mask_us75.any() and "m_primary_enrollment_rates" in tb_combined.columns:
-        tb_combined.loc[mask_us75, "m_primary_enrollment_rates"] = None
+    # 5. Add Lee & Lee origins to the combined columns so the source attribution
+    #    reflects both UNESCO and Lee & Lee.
+    lee_origins = []
+    for col in hist_enr_cols:
+        if col in tb_lee.columns:
+            lee_origins.extend(tb_lee[col].metadata.origins)
+    # Deduplicate origins by producer+title
+    seen = set()
+    unique_lee_origins = []
+    for o in lee_origins:
+        key = (getattr(o, "producer", ""), getattr(o, "title", ""))
+        if key not in seen:
+            seen.add(key)
+            unique_lee_origins.append(o)
 
-    # 8. Rename to OPRI-style human-readable column names
+    combined_value_cols = [c for c in tb_combined.columns if c in hist_enr_cols]
+    for col in combined_value_cols:
+        existing_origins = tb_combined[col].metadata.origins
+        existing_keys = {(getattr(o, "producer", ""), getattr(o, "title", "")) for o in existing_origins}
+        for o in unique_lee_origins:
+            key = (getattr(o, "producer", ""), getattr(o, "title", ""))
+            if key not in existing_keys:
+                existing_origins.append(o)
+
+    # 6. Rename to OPRI-style human-readable column names
     rename = {k: v for k, v in _COMBINED_ENROLMENT_TO_OPRI.items() if k in tb_combined.columns}
     tb_combined = tb_combined.rename(columns=rename)
 
@@ -288,8 +298,8 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
         n_rows=len(tb_combined),
     )
 
-    # 10. Outer-merge onto OPRI: fills in enrollment for existing (country, year) pairs
-    #     and adds new rows for pre-1985 historical entries not in OPRI.
+    # 7. Outer-merge onto OPRI: fills in enrollment for existing (country, year) pairs
+    #     and adds new rows for historical entries not in OPRI.
     # Only include the renamed combined columns (not raw Lee & Lee secondary rates).
     combined_cols = list(_COMBINED_ENROLMENT_TO_OPRI.values())
     new_cols = [c for c in tb_combined.columns if c in combined_cols]
