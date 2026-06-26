@@ -183,9 +183,7 @@ def make_ll_oecd_splice(
     return tb
 
 
-def _compute_wc_share(
-    ds_wc: Dataset, education_cat: str, age_bins: list, sex_filter: str = "total"
-) -> Table:
+def _compute_wc_share(ds_wc: Dataset, education_cat: str, age_bins: list, sex_filter: str = "total") -> Table:
     """Compute education share from Wittgenstein Centre age bins for a given education category and sex filter."""
     tb_wc = ds_wc.read("by_sex_age_edu")
 
@@ -221,9 +219,7 @@ def _compute_wc_share(
     return tb
 
 
-def make_wc_share(
-    ds_wc: Dataset, education_cat: str, col_name: str, short_name: str, age_bins: list
-) -> Table:
+def make_wc_share(ds_wc: Dataset, education_cat: str, col_name: str, short_name: str, age_bins: list) -> Table:
     """Build an education share from Wittgenstein Centre age bins."""
     tb = _compute_wc_share(ds_wc, education_cat, age_bins, sex_filter="total")
     tb = tb.rename(columns={"share": col_name})
@@ -231,9 +227,7 @@ def make_wc_share(
     return tb
 
 
-def make_wc_share_by_sex(
-    ds_wc: Dataset, education_cat: str, col_name: str, short_name: str, age_bins: list
-) -> Table:
+def make_wc_share_by_sex(ds_wc: Dataset, education_cat: str, col_name: str, short_name: str, age_bins: list) -> Table:
     """Build an education share by sex from Wittgenstein Centre age bins."""
     tb = _compute_wc_share(ds_wc, education_cat, age_bins, sex_filter="by_sex")
     tb = tb.rename(columns={"share": col_name})
