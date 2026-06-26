@@ -15,7 +15,7 @@ We want to process this data inside the ETL now.
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import build_keyvars, build_pip_unsmoothed, build_wid_main
+from shared import build_keyvars, keyvars_origins
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -68,11 +68,10 @@ def run() -> None:
     # ds_population = paths.load_dataset("population")
     # ds_regions = paths.load_dataset("regions")
 
-    # Reconstruct the legacy-shaped PIP and WID tables and assemble the keyvars table in-memory
+    # Assemble the combined key-indicators table directly from the dimensional datasets
     # (this was previously the separate poverty_inequality_file step; see shared.py).
-    tb_pip = build_pip_unsmoothed(ds_pip)
-    tb_wid = build_wid_main(ds_wid)
-    tb = build_keyvars(tb_pip, tb_wid)
+    tb = build_keyvars(ds_pip, ds_wid)
+    pip_origins, wid_origins = keyvars_origins(ds_pip, ds_wid)
 
     # Change types of some columns to avoid issues with filtering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
@@ -109,12 +108,12 @@ def run() -> None:
     # Concatenate tables
     tb = pr.concat(tables, ignore_index=True)
 
-    # Add metadata from original tables
+    # Add provenance (origins) from the dimensional datasets
     tb = add_metadata_from_original_tables(
         tb=tb,
         indicator_match=INDICATORS_FOR_ANALYSIS,
-        tb_pip=tb_pip,
-        tb_wid=tb_wid,
+        pip_origins=pip_origins,
+        wid_origins=wid_origins,
     )
 
     # Create analysis and grapher tables
@@ -444,27 +443,24 @@ def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
 def add_metadata_from_original_tables(
     tb: Table,
     indicator_match: dict[str, str],
-    tb_pip: Table,
-    tb_wid: Table,
+    pip_origins: list,
+    wid_origins: list,
 ) -> Table:
     """
-    Copy provenance (origins) and units from the dimensional source columns.
+    Attach provenance (origins) to the comparison variables, from the dimensional sources.
 
-    We deliberately do NOT copy the source title/description: the dimensional PIP/WID tables template
-    those with Jinja over dimensions (welfare_type, extrapolated, ...) that don't exist in this
-    dataset, so copying them would fail Jinja rendering in the grapher step. The user-facing
-    title/display come from the .meta.yml instead.
+    Origins are uniform within each source, so each PIP variable gets the PIP origins and each WID
+    variable the WID origins. We deliberately do NOT copy the source title/description: the
+    dimensional tables template those with Jinja over dimensions (welfare_type, extrapolated, ...)
+    that don't exist in this dataset, so copying them would fail Jinja rendering in the grapher
+    step. Units and the user-facing title/display come from the .meta.yml instead.
     """
 
-    for col, match in indicator_match.items():
+    for col in indicator_match:
         if "pip" in col:
-            source = tb_pip[match]
+            tb[col].metadata.origins = pip_origins
         elif "wid" in col:
-            source = tb_wid[match]
-        else:
-            continue
-        # Only origins are taken from the source; units and titles are defined in the .meta.yml.
-        tb[col].metadata.origins = source.metadata.origins
+            tb[col].metadata.origins = wid_origins
 
     return tb
 
