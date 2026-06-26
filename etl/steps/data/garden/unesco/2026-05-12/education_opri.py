@@ -212,14 +212,15 @@ _SDG_TERTIARY_COLS = {
 def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table) -> Table:
     """Combine UNESCO data with Lee & Lee historical enrollment estimates.
 
-    The combined series prefers UNESCO data wherever it exists and falls back
-    to Lee & Lee (2016) only for country-years where UNESCO has no coverage.
-    This avoids discarding UNESCO observations that exist before 1985 and
-    reduces discontinuities at the splice boundary.
+    The combined series uses UNESCO data wherever it exists (including pre-1985
+    observations) and falls back to Lee & Lee (2016) for the pre-1985 period
+    only. Lee & Lee post-1985 values are excluded because their aggregate
+    estimates (World, regions) diverge significantly from UNESCO's
+    administrative data, creating large discontinuities at the splice boundary.
 
     Sources:
-    - Primary NER: UNESCO OPRI (preferred), Lee & Lee (fallback)
-    - Tertiary GER: UNESCO SDGs (preferred), Lee & Lee (fallback)
+    - Primary NER: UNESCO OPRI (preferred), Lee & Lee pre-1985 (fallback)
+    - Tertiary GER: UNESCO SDGs (preferred), Lee & Lee pre-1985 (fallback)
 
     Secondary enrollment is omitted because OPRI and SDGs only have separate
     lower/upper secondary series, not a single combined secondary series.
@@ -227,7 +228,7 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
     Returns the OPRI table with combined enrollment columns appended.
     """
 
-    # 1. UNESCO primary NER from OPRI (all available years)
+    # 1. UNESCO primary NER from OPRI (all available years — extends to ~1970 for some countries)
     opri_primary_map = {
         "Total net enrolment rate, primary, both sexes (%)": "mf_primary_enrollment_rates",
         "Total net enrolment rate, primary, female (%)": "f_primary_enrollment_rates",
@@ -236,18 +237,24 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
     avail_primary = {k: v for k, v in opri_primary_map.items() if k in tb_opri.columns}
     tb_primary = tb_opri[["country", "year"] + list(avail_primary)].rename(columns=avail_primary).copy()
 
-    # 2. UNESCO tertiary GER from SDGs (all available years)
+    # 2. UNESCO tertiary GER from SDGs (all available years — starts ~1970 for some entities)
     avail_tertiary = {k: v for k, v in _SDG_TERTIARY_COLS.items() if k in tb_sdgs.columns}
     tb_tertiary = tb_sdgs[["country", "year"] + list(avail_tertiary)].rename(columns=avail_tertiary).copy()
 
     # 3. Merge UNESCO primary + tertiary into one table
     tb_unesco = pr.merge(tb_primary, tb_tertiary, on=["country", "year"], how="outer")
 
-    # 4. Outer-merge with Lee & Lee; prefer UNESCO where both exist,
-    #    fall back to Lee & Lee only where UNESCO is NaN.
-    tb_combined = pr.merge(tb_unesco, tb_lee, on=["country", "year"], how="outer", suffixes=("", "_hist"))
+    # 4. Lee & Lee: cap at pre-1985. Post-1985 Lee & Lee aggregate estimates (World,
+    #    regions) diverge from UNESCO — e.g. Lee & Lee World primary 1995 = 91% vs
+    #    UNESCO 2000 = 81%. Keeping only pre-1985 avoids injecting inflated values
+    #    into the gap between Lee & Lee's last observation and UNESCO's first.
+    tb_hist = tb_lee[tb_lee["year"] < 1985].copy()
 
-    hist_enr_cols = [c for c in tb_lee.columns if c not in ["country", "year"]]
+    # 5. Outer-merge with Lee & Lee; prefer UNESCO where both exist,
+    #    fall back to Lee & Lee only where UNESCO is NaN.
+    tb_combined = pr.merge(tb_unesco, tb_hist, on=["country", "year"], how="outer", suffixes=("", "_hist"))
+
+    hist_enr_cols = [c for c in tb_hist.columns if c not in ["country", "year"]]
     for col in hist_enr_cols:
         hist_col = f"{col}_hist"
         if hist_col in tb_combined.columns:
@@ -255,12 +262,32 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
             tb_combined.loc[mask, col] = tb_combined.loc[mask, hist_col]
             tb_combined = tb_combined.drop(columns=[hist_col])
 
+    # Known Lee & Lee data error: US 1975 male primary rate is 50.9 (implausible —
+    # would mean half of American boys weren't in primary school). This produces an
+    # erroneous both-sexes average of 72.0. Null both out.
+    # NOTE: The World 1975 aggregate is NOT nulled — the bad US value actually pulls
+    # the World average *down*, and the 1970→1975 jump reflects genuine education
+    # expansion in decolonizing countries during that decade.
+    mask_us75 = (tb_combined["country"] == "United States") & (tb_combined["year"] == 1975)
+    for col in ["mf_primary_enrollment_rates", "m_primary_enrollment_rates"]:
+        if mask_us75.any() and col in tb_combined.columns:
+            tb_combined.loc[mask_us75, col] = None
+
+    # Early SDGs tertiary data (1971-1974) for World is very noisy — oscillates
+    # between 10-13% while Lee & Lee has smooth 5-year estimates in that range.
+    # Prefer Lee & Lee through 1974 for World tertiary to avoid chart jaggedness.
+    tertiary_cols = [c for c in tb_combined.columns if "tertiary" in c and c not in ["country", "year"]]
+    mask_world_early = (tb_combined["country"] == "World") & tb_combined["year"].between(1971, 1974)
+    for col in tertiary_cols:
+        if mask_world_early.any() and col in tb_combined.columns:
+            tb_combined.loc[mask_world_early, col] = None
+
     # 5. Add Lee & Lee origins to the combined columns so the source attribution
     #    reflects both UNESCO and Lee & Lee.
     lee_origins = []
     for col in hist_enr_cols:
-        if col in tb_lee.columns:
-            lee_origins.extend(tb_lee[col].metadata.origins)
+        if col in tb_hist.columns:
+            lee_origins.extend(tb_hist[col].metadata.origins)
     # Deduplicate origins by producer+title
     seen = set()
     unique_lee_origins = []
@@ -381,17 +408,23 @@ def add_ner_from_oosr(tb_opri: Table, tb_sdgs: Table) -> Table:
 def drop_outliers(tb):
     """Remove implausible values from the pivoted OPRI table and log each removal.
 
-    Uses a dynamic scan: any "percentage of GDP" column with a value exceeding
-    `_GDP_PCT_THRESHOLD` is automatically nulled out and logged. This catches both
-    known bad data points and any new ones that appear in future updates without
-    requiring manual hard-coding of country+year+column triples.
+    Three categories of outliers:
+
+    1. **GDP percentage ceiling**: Any single education-level spending above 10%
+       of GDP is implausible (dynamic scan, no hard-coding needed).
+
+    2. **Zero-value percentage indicators**: Isolated 0.0 values in percentage
+       columns that are surrounded by plausible non-zero values in adjacent years.
+       These are missing data reported as zero by the source.
+
+    3. **Specific point outliers**: Individual data points verified as source
+       errors by comparing against surrounding years and cross-source checks.
     """
-    # Any single education-level spending above this share of GDP is implausible.
-    _GDP_PCT_THRESHOLD = 10
-
-    gdp_pct_cols = [col for col in tb.columns if "percentage of GDP" in col]
-
     n_dropped = 0
+
+    # --- 1. GDP percentage ceiling ---
+    _GDP_PCT_THRESHOLD = 10
+    gdp_pct_cols = [col for col in tb.columns if "percentage of GDP" in col]
     for col in gdp_pct_cols:
         outlier_mask = tb[col].notna() & (tb[col] > _GDP_PCT_THRESHOLD)
         if not outlier_mask.any():
@@ -408,6 +441,55 @@ def drop_outliers(tb):
             )
         n_dropped += int(outlier_mask.sum())
         tb.loc[outlier_mask, col] = None
+
+    # --- 2. Zero-value percentage indicators ---
+    # Specific (country, year, column_substring) where 0.0 is confirmed missing data.
+    zero_outliers = [
+        # Eswatini: private enrollment in primary was ~80% for 1970-1997, then 0% for 1998-2007.
+        ("Eswatini", range(1998, 2008), "private institutions"),
+        # Estonia: staff compensation in primary was ~59-66% but 0% in 2012.
+        ("Estonia", [2012], "staff compensation"),
+    ]
+    for country, years, col_substr in zero_outliers:
+        matching_cols = [c for c in tb.columns if col_substr in c.lower()]
+        for col in matching_cols:
+            mask = (tb["country"] == country) & (tb["year"].isin(years)) & (tb[col] == 0.0)
+            n = int(mask.sum())
+            if n > 0:
+                tb.loc[mask, col] = None
+                n_dropped += n
+                paths.log.info(
+                    "outlier_zeros_removed",
+                    country=country,
+                    years=str(list(years)),
+                    indicator=col,
+                    n_removed=n,
+                    reason="0% is implausible given adjacent years",
+                )
+
+    # --- 3. Specific point outliers ---
+    point_outliers = [
+        # US 1975: UNESCO OPRI primary NER = 83.8%, but Lee & Lee and OPRI's own
+        # later data (1986+) are consistently 95-100%. Isolated early UNESCO data
+        # point that creates a misleading dip in the combined historical series.
+        ("United States", 1975, "Total net enrolment rate, primary"),
+    ]
+    for country, year, col_prefix in point_outliers:
+        matching_cols = [c for c in tb.columns if c.startswith(col_prefix)]
+        for col in matching_cols:
+            mask = (tb["country"] == country) & (tb["year"] == year) & tb[col].notna()
+            n = int(mask.sum())
+            if n > 0:
+                paths.log.info(
+                    "outlier_removed",
+                    country=country,
+                    year=year,
+                    indicator=col,
+                    value=round(float(tb.loc[mask, col].iloc[0]), 2),
+                    reason="isolated early data point inconsistent with 95-100% trend in adjacent decades",
+                )
+                tb.loc[mask, col] = None
+                n_dropped += n
 
     if n_dropped:
         paths.log.info("outliers_summary", total_cells_dropped=n_dropped, threshold_pct_gdp=_GDP_PCT_THRESHOLD)
