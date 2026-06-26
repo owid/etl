@@ -1,19 +1,21 @@
-"""Adapters that rebuild the legacy-shaped PIP and WID key-indicator tables from the new
-*dimensional* garden datasets (`world_bank_pip`, `world_inequality_database`).
+"""Helpers for inequality_comparison: rebuild the legacy-shaped PIP and WID key-indicator tables
+from the new *dimensional* garden datasets (`world_bank_pip`, `world_inequality_database`) and
+assemble the combined `keyvars` table.
 
-`poverty_inequality_file` and `inequality_comparison` used to read the wide-flat
-`world_bank_pip_legacy` / `world_inequality_database_legacy` datasets. Those legacy datasets
-are now kept only for the CSV-based explorers, so the steps here read the dimensional datasets
-instead and reshape the few columns their downstream key-indicator transforms need back into the
-legacy layout. The downstream `create_keyvars_file_*` functions are left untouched — these
-adapters reproduce their expected inputs value-for-value.
+inequality_comparison used to read these from the wide-flat `world_bank_pip_legacy` /
+`world_inequality_database_legacy` datasets (via a separate poverty_inequality_file step). Those
+legacy datasets are now kept only for the CSV-based explorers, so we read the dimensional datasets
+directly and reshape the few columns the key-indicator transforms need back into the legacy
+layout — reproducing the previous `keyvars` output value-for-value.
 """
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
+from owid.catalog.core import warnings
 
-# PPP version used across the poverty/inequality file.
+# PPP versions used across the poverty/inequality key indicators.
 PPP_YEAR_PIP = 2021
+PPP_YEAR_WID = 2023
 
 # WB regional aggregates. In the legacy PIP table these rows carry a missing welfare_type and a
 # literal "<NA>" reporting_level; in the dimensional dataset they live under the combined
@@ -191,3 +193,238 @@ def sanity_check_wid_main(tb: Table) -> None:
     ]:
         for welfare in ["pretax", "posttax_nat"]:
             assert f"{base}_{welfare}" in tb.columns, f"Missing expected WID column {base}_{welfare}."
+
+
+def build_keyvars(tb_pip: Table, tb_wid: Table) -> Table:
+    """Assemble the combined PIP + WID key-indicators (keyvars) long table consumed by
+    inequality_comparison, from the reconstructed PIP/WID tables.
+
+    This is the table poverty_inequality_file used to publish; it is now built in-memory because
+    inequality_comparison is its only consumer.
+    """
+    tb_pip_keyvars = create_keyvars_file_pip(tb_pip)
+    tb_wid_keyvars = create_keyvars_file_wid(tb_wid, extrapolated=False)
+    tb_wid_keyvars_extrapolated = create_keyvars_file_wid(tb_wid, extrapolated=True)
+
+    tb = pr.concat(
+        [tb_pip_keyvars, tb_wid_keyvars, tb_wid_keyvars_extrapolated],
+        ignore_index=True,
+        short_name="keyvars",
+    )
+
+    # Drop rows with null values in the value column.
+    tb = tb.dropna(subset=["value"])
+
+    # Remove provider region aggregates and World, and fold urban/rural entities back into the country.
+    region_suffixes_list = ["\\(PIP\\)", "\\(LIS\\)", "\\(WID\\)"]
+    tb = tb[~tb["country"].str.contains("|".join(region_suffixes_list))].reset_index(drop=True)
+    tb = tb[tb["country"] != "World"].reset_index(drop=True)
+    tb = tb[~tb["country"].isin(["China (urban)", "China (rural)"])].reset_index(drop=True)
+    tb["country"] = tb["country"].str.replace(" (urban)", "", regex=False).str.replace(" (rural)", "", regex=False)
+
+    return tb
+
+
+def create_keyvars_file_pip(tb: Table) -> Table:
+    """
+    Process the main table from PIP, to adapt it to a concatenated file with LIS and WID
+    """
+
+    tb = tb.copy()
+
+    # Set the list of indicators to use
+    indicators_list = [
+        "gini",
+        "mean",
+        "median",
+        "decile10_share",
+        "palma_ratio",
+        "headcount_ratio_50_median",
+    ]
+
+    # Select the columns to keep
+    tb = tb[["country", "year", "reporting_level", "welfare_type"] + indicators_list]
+
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        # Make pip table longer
+        tb = tb.melt(
+            id_vars=["country", "year", "reporting_level", "welfare_type"],
+            var_name="indicator_name",
+            value_name="value",
+        )
+
+    # Rename welfare_type and reporting_level
+    tb = tb.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipreportinglevel"})
+
+    # Rename welfare and equivalization columns
+    tb["indicator_name"] = tb["indicator_name"].replace(
+        {
+            "palma_ratio": "palmaRatio",
+            "headcount_ratio_50_median": "headcountRatio50Median",
+            "decile10_share": "p90p100Share",
+        }
+    )
+
+    # Add descriptive columns
+    tb["welfare"] = "disposable"
+    tb["resource_sharing"] = "perCapita"
+    tb["source"] = "pip"
+    tb["prices"] = ""
+    tb["prices"] = tb["prices"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
+        f"{PPP_YEAR_PIP}ppp{PPP_YEAR_PIP}",
+    )
+    tb["prices"] = tb["prices"].astype(str)
+
+    # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
+    tb["series_code"] = (
+        tb["indicator_name"].astype(str)
+        + "_"
+        + tb["source"].astype(str)
+        + "_"
+        + tb["welfare"].astype(str)
+        + "_"
+        + tb["resource_sharing"].astype(str)
+        + "_"
+        + tb["prices"].astype(str)
+    )
+
+    # Remove trailing "_" from series_code
+    tb["series_code"] = tb["series_code"].str.rstrip("_")
+
+    # Replace names for descriptive columns
+    tb["source"] = tb["source"].replace({"pip": "PIP"})
+    tb["prices"] = tb["prices"].replace(
+        {f"{PPP_YEAR_PIP}ppp{PPP_YEAR_PIP}": f"{PPP_YEAR_PIP} PPPs, at {PPP_YEAR_PIP} prices"}
+    )
+    tb["welfare"] = tb["welfare"].replace({"disposable": "Disposable income or consumption"})
+    tb["resource_sharing"] = tb["resource_sharing"].replace({"perCapita": "Per capita"})
+
+    # Add unit column
+    tb["unit"] = ""
+    tb["unit"] = tb["unit"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
+        "dollars",
+    )
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p90p100Share", "%")
+    tb["unit"] = tb["unit"].astype(str)
+
+    return tb
+
+
+def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
+    """
+    Process the main table from WID, to adapt it to a concatenated file with LIS and PIP
+    """
+    tb = tb.copy()
+
+    # Set the list of indicators to use
+    indicators_list = [
+        "p0p100_gini_pretax",
+        "p0p100_gini_posttax_nat",
+        "p0p100_avg_pretax",
+        "p0p100_avg_posttax_nat",
+        "median_pretax",
+        "median_posttax_nat",
+        "p99p100_share_pretax",
+        "p99p100_share_posttax_nat",
+        "p99p100_avg_pretax",
+        "p99p100_avg_posttax_nat",
+        "p90p100_share_pretax",
+        "p90p100_share_posttax_nat",
+        "palma_ratio_pretax",
+        "palma_ratio_posttax_nat",
+        "headcount_ratio_50_median_pretax",
+        "headcount_ratio_50_median_posttax_nat",
+    ]
+
+    # Add _extrapolated to each member of indicators_list
+    if extrapolated:
+        indicators_list = [indicator + "_extrapolated" for indicator in indicators_list]
+
+    # Select the columns to keep
+    tb = tb[["country", "year"] + indicators_list]
+
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        # Make wid table longer
+        tb = tb.melt(id_vars=["country", "year"], var_name="indicator_welfare", value_name="value")
+
+    # Replace the name posttax_nat with posttax
+    tb["indicator_welfare"] = tb["indicator_welfare"].str.replace("posttax_nat", "posttax")
+
+    if extrapolated:
+        tb["indicator_welfare"] = tb["indicator_welfare"].str.replace("_extrapolated", "")
+
+    # Split indicator_welfare column into two columns, using the last "_" as separator
+    tb[["indicator_name", "welfare"]] = tb["indicator_welfare"].str.rsplit("_", n=1, expand=True)
+
+    # Drop indicator_welfare column
+    tb = tb.drop(columns=["indicator_welfare"])
+
+    # Rename welfare column
+    tb["welfare"] = tb["welfare"].replace({"pretax": "pretaxNational", "posttax": "posttaxNational"})
+    tb["indicator_name"] = tb["indicator_name"].replace(
+        {
+            "p0p100_gini": "gini",
+            "p0p100_avg": "mean",
+            "p99p100_share": "p99p100Share",
+            "p99p100_avg": "p99p100Average",
+            "p90p100_share": "p90p100Share",
+            "palma_ratio": "palmaRatio",
+            "headcount_ratio_50_median": "headcountRatio50Median",
+        }
+    )
+
+    # Add descriptive columns
+    if extrapolated:
+        tb["source"] = "widExtrapolated"
+    else:
+        tb["source"] = "wid"
+
+    tb["prices"] = ""
+    tb["prices"] = tb["prices"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
+        f"2011ppp{PPP_YEAR_WID}",
+    )
+    tb["prices"] = tb["prices"].astype(str)
+    tb["resource_sharing"] = "perAdult"
+
+    # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
+    tb["series_code"] = (
+        tb["indicator_name"].astype(str)
+        + "_"
+        + tb["source"].astype(str)
+        + "_"
+        + tb["welfare"].astype(str)
+        + "_"
+        + tb["resource_sharing"].astype(str)
+        + "_"
+        + tb["prices"].astype(str)
+    )
+
+    # Remove trailing "_" from series_code
+    tb["series_code"] = tb["series_code"].str.rstrip("_")
+
+    # Replace names for descriptive columns
+    if extrapolated:
+        tb["source"] = tb["source"].replace({"widExtrapolated": "WID (including extrapolated datapoints)"})
+    else:
+        tb["source"] = tb["source"].replace({"wid": "WID"})
+
+    tb["prices"] = tb["prices"].replace({f"2011ppp{PPP_YEAR_WID}": f"2011 PPPs, at {PPP_YEAR_WID} prices"})
+    tb["welfare"] = tb["welfare"].replace(
+        {"pretaxNational": "Pretax national income", "posttaxNational": "Post-tax national income"}
+    )
+    tb["resource_sharing"] = tb["resource_sharing"].replace({"perAdult": "Per adult"})
+
+    # Add unit column
+    tb["unit"] = ""
+    tb["unit"] = tb["unit"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
+        "dollars",
+    )
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p99p100Share", "%")
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p90p100Share", "%")
+    tb["unit"] = tb["unit"].astype(str)
+
+    return tb

@@ -15,7 +15,7 @@ We want to process this data inside the ETL now.
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import build_pip_unsmoothed, build_wid_main
+from shared import build_keyvars, build_pip_unsmoothed, build_wid_main
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -61,19 +61,18 @@ REFERENCE_YEARS = [
 
 
 def run() -> None:
-    # Load dataset and table
-    ds_pov_ineq = paths.load_dataset("poverty_inequality_file")
+    # Load dimensional datasets.
+    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_wid = paths.load_dataset("world_inequality_database")
     # NOTE: For now I am keeping the population and regions datasets commented out, because I might use them in the future
     # ds_population = paths.load_dataset("population")
     # ds_regions = paths.load_dataset("regions")
-    ds_pip = paths.load_dataset("world_bank_pip")
-    ds_wid = paths.load_dataset("world_inequality_database")
 
-    tb = ds_pov_ineq.read("keyvars")
-
-    # Reconstruct the legacy-shaped PIP and WID tables (for indicator metadata only — see shared.py).
+    # Reconstruct the legacy-shaped PIP and WID tables and assemble the keyvars table in-memory
+    # (this was previously the separate poverty_inequality_file step; see shared.py).
     tb_pip = build_pip_unsmoothed(ds_pip)
     tb_wid = build_wid_main(ds_wid)
+    tb = build_keyvars(tb_pip, tb_wid)
 
     # Change types of some columns to avoid issues with filtering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
@@ -134,7 +133,7 @@ def run() -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
-        tables=garden_tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
+        tables=garden_tables, check_variables_metadata=True, default_metadata=ds_pip.metadata
     )
 
     # Save changes in the new garden dataset.
