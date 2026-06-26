@@ -166,7 +166,7 @@ definitions:
     <% if welfare_type != "wealth" %>
     For some countries and years, the underlying data sources (household surveys, tax records) are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/).
     <%- else %>
-    For some countries and years, the underlying data sources are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/).
+    For some countries and years, the underlying data sources are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/) and this [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-world-inequality-lab-technical-note-2025-01/).
     <%- endif %>
 
   description_key_posttax: |-
@@ -208,7 +208,7 @@ definitions:
     This data shows the {definitions.concept_welfare_type} threshold for a specific group of the population. The "poorest decile" threshold, for example, is the {definitions.concept_welfare_type} level below which the poorest 10% of people in a country fall.
 
   description_processing_general: |-
-    We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
+    We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/world-inequality-database/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
 
   description_processing_relative_poverty: |-
     This data has been estimated by calculating the <<poverty_line>>, and then checking that value against the closest threshold in the percentile distribution. The headcount ratio is then the percentile, the share of the population below that threshold.
