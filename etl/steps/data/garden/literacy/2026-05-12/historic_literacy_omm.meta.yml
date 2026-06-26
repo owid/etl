@@ -8,7 +8,8 @@ definitions:
         - Global Education
     processing_level: major
     display:
-      numDecimalPlaces: 2
+      roundingMode: significantFigures
+      numSignificantFigures: 2
     description_key:
       - Literacy is a foundational skill. Children need to learn to read so that they can read to learn. When we fail to teach this foundational skill, people have fewer opportunities to lead the rich and interesting lives that a good education offers. This indicator measures the percentage of people aged 15 and older who can read and write a simple sentence about their daily life.
       - Historical data shows that only a very small share of the population, a tiny elite, was able to read and write. Although literacy has increased over the last few generations, it remains an important challenge for our time to [provide this foundational skill to all](https://ourworldindata.org/better-learning).
