@@ -31,6 +31,8 @@ tables:
         display:
           name: Share of adults with tertiary education
         description_short: Share of adults aged 25–64 who have attained [tertiary education](#dod:tertiary-education).
+        presentation:
+          title_public: Share of adults with tertiary education
         description_key:
           - "[Tertiary education](#dod:tertiary-education) includes short-cycle tertiary programmes, bachelor's, master's, and doctoral degrees (ISCED levels 5 through 8)."
           - This data combines two sources. Recent data for OECD countries comes from the OECD's Education at a Glance, based on national labour force surveys. Historical estimates come from Lee & Lee (2016), based on census and survey data.
