@@ -25,7 +25,7 @@ def run() -> None:
 
     tables = []
     for name in TABLE_NAMES:
-        tb = ds_garden[name].reset_index()
+        tb = ds_garden.read(name)
 
         # Remove non-country aggregates that don't map to grapher entities.
         if "country" in tb.columns:

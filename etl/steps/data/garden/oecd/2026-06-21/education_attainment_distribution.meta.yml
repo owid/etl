@@ -1,7 +1,23 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    display:
+      numDecimalPlaces: 1
+
+    presentation:
+      topic_tags:
+        - Global Education
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   title: Adults' educational attainment distribution
-  description: |-
-    Distribution of educational attainment among adults aged 25-64, combining OECD observed data with Lee & Lee (2016) historical estimates and Wittgenstein Centre projections.
+  update_period_days: 365
+
+  owners:
+   - Veronika Samborska
 
 tables:
   # --- Combined indicators: Lee & Lee + OECD tertiary splice ---
@@ -92,6 +108,7 @@ tables:
         title: Share of adults with below upper secondary education (OECD)
         display:
           name: Below upper secondary education
+
         description_short: Share of adults aged 25–64 with below upper secondary education (ISCED 0–2).
       share_upper_secondary_post_secondary_non_tertiary:
         title: Share of adults with upper secondary or post-secondary non-tertiary education (OECD)
