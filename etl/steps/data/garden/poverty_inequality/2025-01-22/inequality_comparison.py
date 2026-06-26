@@ -66,23 +66,6 @@ REFERENCE_YEARS = [
 # inequality variables + the relative-poverty headcount are carried, so there's no PPP/price-year to
 # stamp — the one PPP reference is a data-derived row filter (latest PIP PPP base).
 
-# WB regional aggregates (the legacy table marked these with missing welfare_type and "<NA>" reporting
-# level; in the dimensional data they sit under the combined "income or consumption" welfare type).
-PIP_REGIONS = [
-    "East Asia and Pacific (WB)",
-    "Eastern and Southern Africa (WB)",
-    "Europe and Central Asia (WB)",
-    "Latin America and Caribbean (WB)",
-    "Middle East, North Africa, Afghanistan and Pakistan (WB)",
-    "North America (WB)",
-    "South Asia (WB)",
-    "Sub-Saharan Africa (WB)",
-    "Western and Central Africa (WB)",
-    "World",
-    "World (excluding China)",
-    "World (excluding India)",
-]
-
 # WID dimensional inequality columns -> keyvars indicator name.
 WID_INEQUALITY_INDICATORS = {
     "gini": "gini",
@@ -244,22 +227,18 @@ def _pip_keyvars(ds_pip: Dataset) -> Table:
     ]
     tb = pr.concat(slices, ignore_index=True)
 
-    # Keep income/consumption for countries, and the combined series only for regions.
-    is_region = tb["country"].isin(PIP_REGIONS)
-    keep = _mask(tb["welfare_type"].isin(["income", "consumption"])) | (
-        is_region & _mask(tb["welfare_type"] == "income or consumption")
-    )
-    tb = tb[keep].reset_index(drop=True)
+    # Keep only country-level income/consumption observations. The combined "income or consumption"
+    # series belongs to the WB regional aggregates (e.g. "East Asia and Pacific (WB)"), which are not
+    # countries and must not enter the comparison — dropping that welfare type excludes them.
+    tb = tb[_mask(tb["welfare_type"].isin(["income", "consumption"]))].reset_index(drop=True)
 
-    # reporting_level from the country-name suffix; regions get "<NA>" / missing welfare (legacy convention).
+    # reporting_level from the country-name suffix (the " (urban)"/" (rural)" tag is folded back into
+    # the country name later, in build_keyvars).
     country_str = tb["country"].astype(str)
     tb["pipreportinglevel"] = "national"
     tb.loc[country_str.str.endswith("(urban)"), "pipreportinglevel"] = "urban"
     tb.loc[country_str.str.endswith("(rural)"), "pipreportinglevel"] = "rural"
-    region_mask = tb["country"].isin(PIP_REGIONS)
-    tb.loc[region_mask, "pipreportinglevel"] = "<NA>"
     tb["pipwelfare"] = tb["welfare_type"].astype(object)
-    tb.loc[region_mask, "pipwelfare"] = None
     tb = tb.drop(columns=["welfare_type"])
 
     # Descriptive columns + series_code (intermediate codes: pip / disposable / perCapita).
