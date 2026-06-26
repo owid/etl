@@ -234,19 +234,11 @@ def combine_historical_enrollment(tb_opri: Table, tb_lee: Table, tb_sdgs: Table)
         "Total net enrolment rate, primary, male (%)": "m_primary_enrollment_rates",
     }
     avail_primary = {k: v for k, v in opri_primary_map.items() if k in tb_opri.columns}
-    tb_primary = (
-        tb_opri[["country", "year"] + list(avail_primary)]
-        .rename(columns=avail_primary)
-        .copy()
-    )
+    tb_primary = tb_opri[["country", "year"] + list(avail_primary)].rename(columns=avail_primary).copy()
 
     # 2. UNESCO tertiary GER from SDGs (all available years)
     avail_tertiary = {k: v for k, v in _SDG_TERTIARY_COLS.items() if k in tb_sdgs.columns}
-    tb_tertiary = (
-        tb_sdgs[["country", "year"] + list(avail_tertiary)]
-        .rename(columns=avail_tertiary)
-        .copy()
-    )
+    tb_tertiary = tb_sdgs[["country", "year"] + list(avail_tertiary)].rename(columns=avail_tertiary).copy()
 
     # 3. Merge UNESCO primary + tertiary into one table
     tb_unesco = pr.merge(tb_primary, tb_tertiary, on=["country", "year"], how="outer")
