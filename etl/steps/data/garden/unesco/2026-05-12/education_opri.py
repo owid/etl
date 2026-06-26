@@ -449,6 +449,15 @@ def drop_outliers(tb):
         ("Eswatini", range(1998, 2008), "private institutions"),
         # Estonia: staff compensation in primary was ~59-66% but 0% in 2012.
         ("Estonia", [2012], "staff compensation"),
+        # Venezuela: entrance age was 3 through 2016, then 0 from 2017. Not a real policy change.
+        ("Venezuela", range(2017, 2026), "official entrance age"),
+        # Saint Helena: entrance age was 5 in 1998, duration was 11, both drop to 0 from 1999.
+        ("Saint Helena", range(1999, 2026), "official entrance age"),
+        ("Saint Helena", range(1999, 2026), "duration of compulsory"),
+        # India 2023-24: out-of-school children drops from 509k to 0. Not credible for 1.4B population.
+        ("India", [2023, 2024], "out-of-school children"),
+        # Turkey 2022-23: out-of-school children drops from 125k to 0.
+        ("Turkey", [2022, 2023], "out-of-school children"),
     ]
     for country, years, col_substr in zero_outliers:
         matching_cols = [c for c in tb.columns if col_substr in c.lower()]
@@ -473,6 +482,13 @@ def drop_outliers(tb):
         # later data (1986+) are consistently 95-100%. Isolated early UNESCO data
         # point that creates a misleading dip in the combined historical series.
         ("United States", 1975, "Total net enrolment rate, primary"),
+        # Algeria 2025: lower secondary NER drops from ~100% to ~22% for all sex
+        # breakdowns. Same source-error pattern as the Algeria 2025 OOS spike in SDGs.
+        ("Algeria", 2025, "Total net enrolment rate, lower secondary"),
+        # Gambia 2012: inbound mobility drops from 100% to 0.94% in one year.
+        ("Gambia", 2012, "Inbound mobility rate"),
+        # Kiribati 2017: % female teachers drops from 82% to 0.3%, recovers to 83% in 2020.
+        ("Kiribati", 2017, "Percentage of teachers in primary education who are female"),
     ]
     for country, year, col_prefix in point_outliers:
         matching_cols = [c for c in tb.columns if c.startswith(col_prefix)]

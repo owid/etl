@@ -394,8 +394,6 @@ def drop_outliers(tb: Table) -> Table:
         ("Nauru", 2024, "Proportion of primary schools with access to basic drinking water (%)"),
         # BVI: qualified teachers in primary was 78-100% for 2014-2021, then 0% in 2022.
         ("British Virgin Islands", 2022, "Percentage of qualified teachers in primary education, both sexes (%)"),
-        # BVI: qualified teachers in secondary was ~82-100% for 2014-2021, then 0% in 2022.
-        ("British Virgin Islands", 2022, "Percentage of qualified teachers in secondary education, both sexes (%)"),
     ]
     for country, year, indicator_label in zero_outliers:
         # After pivot, column names include ", indicator_id" suffix — match by prefix.
@@ -423,6 +421,8 @@ def drop_outliers(tb: Table) -> Table:
         # World 1970: tertiary GER = 17.44, but 1971 = 8.73 and Lee & Lee 1970 = 9.49.
         # Isolated spike in early UNESCO data; surrounding years are 8-11%.
         ("World", 1970, "Gross enrolment ratio for tertiary education"),
+        # BVI 2022: qualified teachers in secondary drops from 94% to 1.3%.
+        ("British Virgin Islands", 2022, "Percentage of qualified teachers in secondary education"),
     ]
     for country, year, indicator_prefix in point_outliers:
         matching_cols = [c for c in tb.columns if c.startswith(indicator_prefix)]
