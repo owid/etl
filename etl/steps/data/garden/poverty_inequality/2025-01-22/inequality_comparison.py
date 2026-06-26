@@ -15,6 +15,7 @@ We want to process this data inside the ETL now.
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
+from shared import build_pip_unsmoothed, build_wid_main
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -22,11 +23,6 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# Define PPP year for PIP
-# NOTE: Change this in case of new PPP versions in the future
-# TODO: Change to 2021 prices
-PPP_YEAR_PIP = 2021
 
 # Initialize logger
 log = get_logger()
@@ -70,14 +66,14 @@ def run() -> None:
     # NOTE: For now I am keeping the population and regions datasets commented out, because I might use them in the future
     # ds_population = paths.load_dataset("population")
     # ds_regions = paths.load_dataset("regions")
-    ds_pip = paths.load_dataset("world_bank_pip_legacy")
-    ds_wid = paths.load_dataset("world_inequality_database_legacy")
+    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_wid = paths.load_dataset("world_inequality_database")
 
     tb = ds_pov_ineq.read("keyvars")
 
-    # Load tables from PIP, WID, and LIS datasets (for metadata)
-    tb_pip = ds_pip.read(f"income_consumption_{PPP_YEAR_PIP}_unsmoothed")
-    tb_wid = ds_wid.read("world_inequality_database")
+    # Reconstruct the legacy-shaped PIP and WID tables (for indicator metadata only — see shared.py).
+    tb_pip = build_pip_unsmoothed(ds_pip)
+    tb_wid = build_wid_main(ds_wid)
 
     # Change types of some columns to avoid issues with filtering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
@@ -453,19 +449,23 @@ def add_metadata_from_original_tables(
     tb_wid: Table,
 ) -> Table:
     """
-    Add the original metadata we have in the garden steps of the main metadata.
-    This way we can add origins and indicator-based metadata
+    Copy provenance (origins) and units from the dimensional source columns.
+
+    We deliberately do NOT copy the source title/description: the dimensional PIP/WID tables template
+    those with Jinja over dimensions (welfare_type, extrapolated, ...) that don't exist in this
+    dataset, so copying them would fail Jinja rendering in the grapher step. The user-facing
+    title/display come from the .meta.yml instead.
     """
 
     for col, match in indicator_match.items():
-        # If col contains "pip"
         if "pip" in col:
-            # Get the metadata from the PIP table
-            tb[col] = tb[col].copy_metadata(tb_pip[match])
-        # If col contains "wid"
+            source = tb_pip[match]
         elif "wid" in col:
-            # Get the metadata from the WID table
-            tb[col] = tb[col].copy_metadata(tb_wid[match])
+            source = tb_wid[match]
+        else:
+            continue
+        # Only origins are taken from the source; units and titles are defined in the .meta.yml.
+        tb[col].metadata.origins = source.metadata.origins
 
     return tb
 
