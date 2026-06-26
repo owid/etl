@@ -372,7 +372,9 @@ def drop_outliers(tb: Table) -> Table:
             if n > 0:
                 tb.loc[zero_mask, col] = None
                 n_total += n
-                log.info("outlier_zeros_removed", indicator=col, n_removed=n, reason="0% govt expenditure is implausible")
+                log.info(
+                    "outlier_zeros_removed", indicator=col, n_removed=n, reason="0% govt expenditure is implausible"
+                )
 
     # Also catch zeros in "percentage of GDP" expenditure columns (same logic).
     gdp_pct_cols = [c for c in tb.columns if "percentage of gdp" in c.lower() and "expenditure" in c.lower()]
@@ -404,7 +406,13 @@ def drop_outliers(tb: Table) -> Table:
             if n > 0:
                 tb.loc[mask, col] = None
                 n_total += n
-                log.info("outlier_removed", country=country, year=year, indicator=col, reason="0% is implausible given adjacent years")
+                log.info(
+                    "outlier_removed",
+                    country=country,
+                    year=year,
+                    indicator=col,
+                    reason="0% is implausible given adjacent years",
+                )
 
     # --- 3. Specific point outliers ---
     # Individual values confirmed as source errors.
@@ -424,7 +432,13 @@ def drop_outliers(tb: Table) -> Table:
             if n > 0:
                 tb.loc[mask, col] = None
                 n_total += n
-                log.info("outlier_removed", country=country, year=year, indicator=col, reason="point outlier inconsistent with adjacent years")
+                log.info(
+                    "outlier_removed",
+                    country=country,
+                    year=year,
+                    indicator=col,
+                    reason="point outlier inconsistent with adjacent years",
+                )
 
     log.info("outliers_summary", step="education_sdgs", total_cells_removed=n_total)
     return tb
