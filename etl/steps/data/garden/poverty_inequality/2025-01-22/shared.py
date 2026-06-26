@@ -1,16 +1,15 @@
-"""Adapters that rebuild the legacy-shaped PIP and WID tables from the new *dimensional*
-garden datasets (`world_bank_pip`, `world_inequality_database`).
+"""Adapters that rebuild the legacy-shaped PIP and WID key-indicator tables from the new
+*dimensional* garden datasets (`world_bank_pip`, `world_inequality_database`).
 
 `poverty_inequality_file` and `inequality_comparison` used to read the wide-flat
 `world_bank_pip_legacy` / `world_inequality_database_legacy` datasets. Those legacy datasets
 are now kept only for the CSV-based explorers, so the steps here read the dimensional datasets
-instead and reshape the few tables/columns their downstream transforms need back into the
-legacy layout. The downstream functions (`create_keyvars_file_*`, `create_percentiles_file_*`)
-are left untouched — these adapters reproduce their expected inputs value-for-value.
+instead and reshape the few columns their downstream key-indicator transforms need back into the
+legacy layout. The downstream `create_keyvars_file_*` functions are left untouched — these
+adapters reproduce their expected inputs value-for-value.
 """
 
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Dataset, Table
 
 # PPP version used across the poverty/inequality file.
@@ -34,24 +33,14 @@ PIP_REGIONS = [
     "World (excluding India)",
 ]
 
-# Dimensional welfare_type -> legacy welfare code. Only pretax and posttax_nat are consumed by the
-# keyvars file, but the full map is used for the distribution table.
+# Dimensional welfare_type -> legacy welfare code (only pretax and posttax_nat are consumed).
 WID_WELFARE_TO_CODE = {
     "before tax": "pretax",
     "after tax": "posttax_nat",
 }
-WID_DISTRIBUTION_WELFARE_TO_CODE = {
-    "before tax": "pretax",
-    "after tax": "posttax_nat",
-    "after tax disposable": "posttax_dis",
-    "wealth": "wealth",
-}
-# Legacy distribution `welfare` categorical order (so the untouched create_percentiles_file_wid,
-# which calls `.cat.rename_categories`, behaves identically).
-WID_DISTRIBUTION_WELFARE_CATEGORIES = ["posttax_dis", "posttax_nat", "pretax", "wealth"]
 
 
-def _mask(condition: pd.Series) -> pd.Series:
+def _mask(condition):
     """Coerce a (possibly nullable/arrow) boolean Series to a plain bool Series (NA -> False).
 
     The dimensional tables use nullable dtypes, so comparisons yield nullable booleans that raise
@@ -121,22 +110,6 @@ def build_pip_unsmoothed(ds_pip: Dataset) -> Table:
     return tb
 
 
-def build_pip_percentiles(ds_pip: Dataset) -> Table:
-    """Rebuild `percentiles_income_consumption_2021` from the dimensional `percentiles` table.
-
-    The dimensional percentiles table already carries reporting_level, welfare_type
-    (income/consumption), the 1..100 percentile and a *100 share, so this is just a PPP filter.
-    """
-    tb = ds_pip.read("percentiles")
-    tb = tb[_mask(tb["ppp_version"] == PPP_YEAR_PIP)].reset_index(drop=True)
-
-    assert not tb.empty, "PIP percentiles reconstruction is empty."
-    assert set(tb["welfare_type"].dropna().unique()) <= {"income", "consumption"}, (
-        "Unexpected welfare_type in PIP percentiles."
-    )
-    return tb
-
-
 def build_wid_main(ds_wid: Dataset) -> Table:
     """Rebuild the wide `world_inequality_database` table (the columns create_keyvars_file_wid reads)
     from the dimensional inequality / incomes / relative_poverty tables.
@@ -174,30 +147,6 @@ def build_wid_main(ds_wid: Dataset) -> Table:
         tb = piece if tb is None else pr.merge(tb, piece, on=["country", "year"], how="outer")
 
     sanity_check_wid_main(tb)
-    return tb
-
-
-def build_wid_distribution(ds_wid: Dataset) -> Table:
-    """Rebuild `world_inequality_database_distribution` from the dimensional `distribution` table by
-    pivoting the `extrapolated` dimension into `_extrapolated` suffix columns and mapping the
-    human-readable welfare names back to the legacy welfare codes (as an ordered categorical)."""
-    tb = ds_wid.read("distribution")
-    tb["welfare"] = (
-        tb["welfare_type"]
-        .map(WID_DISTRIBUTION_WELFARE_TO_CODE)
-        .astype("category")
-        .cat.set_categories(WID_DISTRIBUTION_WELFARE_CATEGORIES)
-    )
-
-    index_cols = ["country", "year", "welfare", "p", "percentile"]
-    value_cols = ["thr", "avg", "share"]
-    tb_no = tb[_mask(tb["extrapolated"] == "no")][index_cols + value_cols]
-    tb_yes = tb[_mask(tb["extrapolated"] == "yes")][index_cols + value_cols].rename(
-        columns={c: f"{c}_extrapolated" for c in value_cols}
-    )
-    tb = pr.merge(tb_no, tb_yes, on=index_cols, how="outer")
-
-    assert not tb.empty, "WID distribution reconstruction is empty."
     return tb
 
 
