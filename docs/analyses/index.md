@@ -56,7 +56,6 @@ This is just a sneak peek into some of our data work. But note that all our code
 
     [:material-book-open-variant: Methodology](slavery_historical_data/index.md){ .md-button }
 
-<!-- Hidden from the publications index until this notebook is ready to publish; uncomment to list it.
 !!! note ""
 
     ## Global food trade data
@@ -67,4 +66,3 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-notebook: View notebook](food_trade/food_trade.html){ .md-button }
     [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
     [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
--->
