@@ -369,7 +369,10 @@ def fetch_bins() -> pd.DataFrame:
     2021 PPP USD and `pop` is the bin's population in millions. The file is ~1.1 GB, so it is cached
     on disk and only downloaded once.
     """
-    local_path = Path(CACHE_DIR) / "global_dist_1000bins_2021.dta"
+    # Key the cache filename to the source URL (its name embeds the PIP release vintage), so that
+    # bumping GLOBAL_DIST_1000BINS_URL for a later release downloads fresh instead of silently
+    # reusing a stale .dta left in .cache from a previous run.
+    local_path = Path(CACHE_DIR) / GLOBAL_DIST_1000BINS_URL.rsplit("/", 1)[-1]
     if not local_path.is_file():
         log.info("Downloading the 1000-bin global distribution file (~1.1 GB). This runs once and is cached.")
         local_path.parent.mkdir(parents=True, exist_ok=True)
