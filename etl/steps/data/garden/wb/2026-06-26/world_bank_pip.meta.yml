@@ -298,11 +298,11 @@ definitions:
 
   description_processing_relative_poverty: |-
     <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line — in this case <<poverty_line>> — and then run a specific query on the PIP API to return the share of population below that line.
+    Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year and calculate a relative poverty line — in this case <<poverty_line>>. For countries, we then run a specific query on the PIP API to return the share of the population below that line. For regions, we calculate the share below that line from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), which provides 1,000 welfare bins per country and year.
     <%- endif %>
 
   description_processing_thr: |-
-    Income and consumption thresholds by decile are not directly available in the World Bank PIP API. We extract the metric primarily from [auxiliary percentiles data provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646). Missing country values and regional aggregations of the indicator are calculated by running multiple queries on the API to obtain the closest poverty line to each threshold.
+    Income and consumption thresholds by decile are not directly available in the World Bank PIP API. We extract the metric primarily from [auxiliary percentiles data provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646). Missing country values are calculated by running multiple queries on the API to obtain the closest poverty line to each threshold. Regional thresholds are calculated from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304): we pool the binned distributions of all countries in each region, order the population by welfare, and read the welfare level at each percentile.
 
   # NOTE: Modify depending on the final data structure
   description_processing_share_90_99: |-
@@ -312,7 +312,7 @@ definitions:
     Income and consumption averages by decile are not directly available in the World Bank PIP API. We calculate the metric by multiplying the share of each decile by the mean income or consumption of the distribution and dividing by the population share of the decile (10%).
 
   description_processing_thr_percentiles: |-
-    We calculate missing country and regional values of thresholds by running multiple queries on the API to obtain the closest poverty line to each threshold. This data is merged with the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles).
+    We calculate missing country values of thresholds by running multiple queries on the API to obtain the closest poverty line to each threshold, and merge them with the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles). Regional thresholds are built from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304) by pooling the binned distributions of all countries in each region and reading the welfare level at each percentile.
 
   description_processing_palma_ratio: |-
     The Palma ratio is not directly available in the World Bank PIP API. We calculate the metric by dividing the income share of the richest 10% by the income share of the poorest 40%. Both these values are available in the API.

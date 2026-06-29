@@ -5,11 +5,18 @@ DATA EXTRACTION FOR THE WORLD BANK POVERTY AND INEQUALITY PLATFORM (PIP) API
 This code generates key indicators and percentiles from the World Bank PIP API.
 This is done by combining the results of several queries to the API:
     - A set of poverty lines (8) to obtain key indicators per PPP year (PPP_VERSIONS) and for countries and regions.
-    - Thousands of poverty lines to construct percentiles for a group of countries.
-    - Thousands of poverty lines to construct percentiles for all the regions.
-    - Thousands of poverty lines to construct estimates of relative poverty.
+    - Thousands of poverty lines to construct percentiles for the countries missing from the published percentile file.
+    - Thousands of poverty lines to construct estimates of relative poverty for countries.
 
-Percentiles are partially constructed because the data officially published by the World Bank is missing some countries and all the regions.
+Regions are NOT queried with poverty lines any more. Regional percentiles, regional medians and
+regional relative poverty are built directly from the World Bank's "1000 Binned Global Distribution"
+file (2021 PPP, see GLOBAL_DIST_1000BINS_URL), by pooling each region's member-country bins. This
+removes the ~5,400 `pip-grp` percentile queries plus the regional relative-poverty queries that the
+previous versions ran. As a result, regional data is produced for 2021 PPP only (the bins file is
+2021 PPP); country data still covers every PPP version.
+
+Country percentiles are partially constructed because the data officially published by the World Bank
+is missing some countries.
 
 To run this code from scratch,
     - Connect to the staging server of this pull request:
@@ -19,27 +26,25 @@ To run this code from scratch,
         rm -rf .cache/*
     - (If needed) Delete the files in R2:
         rclone delete r2:owid-private/cache/pip_api --fast-list --transfers 32 --checkers 32 --verbose
-    - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`.
+    - Update GLOBAL_DIST_1000BINS_URL to the bins file matching the new PIP release (see its NOTE).
+    - Check if you need to update the poverty lines in the function `poverty_lines_countries`.
         - Check the list of countries without percentile data. It will show up as a list in the output (_These countries are available in a common query but not in the percentile file:_)
         - Open
             https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=150&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&identity=PROD&format=csv
-            https://api.worldbank.org/pip/v1/pip-grp?country=NAC&year=all&povline=430&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
-        - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
-    - Run the code. You have two options to see the output, in the terminal or in the background:
-        etls wb/{version}/pip_api
-        nohup uv run etls wb/{version}/pip_api > output.log 2>&1 &
+        - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the function.
+    - Run the code. It extracts the data AND creates both snapshots in one go (no separate upload
+      scripts). You have two options to see the output, in the terminal or in the background:
+        etls wb/{version}/world_bank_pip
+        nohup uv run etls wb/{version}/world_bank_pip > output.log 2>&1 &
+      Add --skip-upload to build the snapshots locally without uploading them to S3.
     - You can kill the process with:
-        pkill -f pip_api
+        pkill -f world_bank_pip
 
-When the code finishes, you will have the following files in the cache folder:
-    - world_bank_pip.csv: file with the results of the queries for key indicators (8 for countries and 8 for regions), plus some additional indicators (thresholds, relative poverty).
-    - world_bank_pip_percentiles.csv: file with the percentiles taken from WB Databank and the ones constructed from the API.
-
-Copy these files to this folder and run in the terminal:
-    etls wb/{version}/world_bank_pip --path-to-file snapshots/wb/{version}/world_bank_pip.csv
-    etls wb/{version}/world_bank_pip_percentiles --path-to-file snapshots/wb/{version}/world_bank_pip_percentiles.csv
-
-You can delete the files after this.
+The script writes two CSVs to the cache folder and ingests them as snapshots:
+    - world_bank_pip.csv: key indicators (8 poverty lines for countries and regions), plus
+      additional indicators (thresholds, relative poverty).
+    - world_bank_pip_percentiles.csv: country percentiles (from the WB Databank and constructed for
+      missing countries) and regional percentiles (built from the 1000-bin global distribution).
 
 """
 
@@ -62,6 +67,11 @@ from tenacity.wait import wait_random_exponential
 
 from etl.files import checksum_str
 from etl.paths import CACHE_DIR
+from etl.snapshot import Snapshot
+
+# Namespace and version of this snapshot folder (used to create the snapshots directly from here).
+SNAPSHOT_NAMESPACE = Path(__file__).parent.parent.name
+SNAPSHOT_VERSION = Path(__file__).parent.name
 
 # Initialize logger.
 log = get_logger()
@@ -83,6 +93,21 @@ EXTRACT_COUNTRY_PERCENTILES = True
 
 # Select live (1) or internal (0) API
 LIVE_API = 1
+
+# URL of the World Bank's "1000 Binned Global Distribution" file (2021 PPP), used to build
+# regional percentiles and regional relative poverty directly, instead of running thousands of
+# `pip-grp` API queries. Each row is a (country, year, bin) with the bin's average welfare (`welf`,
+# 2021 PPP/day) and population (`pop`, millions).
+# NOTE: Update this link on every new PIP release. Find the latest file at
+# https://datacatalog.worldbank.org/search/dataset/0064304 — the file name embeds the release
+# vintage (e.g. `20260324_2021`), which must match the PIP API release used for the rest of the data.
+GLOBAL_DIST_1000BINS_URL = (
+    "https://datacatalogfiles.worldbank.org/ddh-published/0064304/DR0094424/"
+    "GlobalDist1000bins_1990_2026_20260324_2021_01_02_PROD.dta"
+)
+# The bins file is published for 2021 PPP only, so regional percentiles/relative poverty are
+# produced for 2021 PPP. (Country data still covers every PPP version in POVLINES_DICT.)
+BINS_PPP_VERSION = 2021
 
 
 # Constants
@@ -119,49 +144,6 @@ def poverty_lines_countries():
     return povlines
 
 
-def poverty_lines_regions():
-    """
-    These poverty lines are used to calculate percentiles for regions. None of them are in the percentile file.
-    # NOTE: In future updates, check if these poverty lines are enough for the extraction
-    """
-    # Define poverty lines and their increase
-
-    under_2_dollars = list(range(1, 200, 1))
-    between_2_and_5_dollars = list(range(200, 500, 2))
-    between_5_and_10_dollars = list(range(500, 1000, 5))
-    between_10_and_20_dollars = list(range(1000, 2000, 10))
-    between_20_and_30_dollars = list(range(2000, 3000, 10))
-    between_30_and_55_dollars = list(range(3000, 5500, 10))
-    between_55_and_80_dollars = list(range(5500, 8000, 10))
-    between_80_and_100_dollars = list(range(8000, 10000, 10))
-    between_100_and_150_dollars = list(range(10000, 15000, 10))
-    between_150_and_175_dollars = list(range(15000, 17500, 10))
-    between_175_and_250_dollars = list(range(17500, 25000, 20))
-    between_250_and_300_dollars = list(range(25000, 30000, 50))
-    between_300_and_320_dollars = list(range(30000, 32000, 100))
-    between_320_and_440_dollars = list(range(32000, 44000, 100))
-
-    # povlines is all these lists together
-    povlines = (
-        under_2_dollars
-        + between_2_and_5_dollars
-        + between_5_and_10_dollars
-        + between_10_and_20_dollars
-        + between_20_and_30_dollars
-        + between_30_and_55_dollars
-        + between_55_and_80_dollars
-        + between_80_and_100_dollars
-        + between_100_and_150_dollars
-        + between_150_and_175_dollars
-        + between_175_and_250_dollars
-        + between_250_and_300_dollars
-        + between_300_and_320_dollars
-        + between_320_and_440_dollars
-    )
-
-    return povlines
-
-
 # Define poverty lines for key indicators, depending on the PPP version.
 # It includes the international poverty line, lower and upper-middle income lines, and some other lines.
 # NOTE: Define this dictionary to show the most recent PPP prices second
@@ -179,9 +161,9 @@ PPP_VERSIONS = list(POVLINES_DICT.keys())
 # Define current International Poverty Line (IPL) in the latest prices
 INTERNATIONAL_POVERTY_LINE_CURRENT = INTERNATIONAL_POVERTY_LINES[PPP_VERSIONS[1]] / 100
 
-# Define poverty lines to calculate percentiles
+# Define poverty lines to construct percentiles for countries missing from the published file.
+# Regional percentiles no longer use poverty-line queries — they come from the 1000-bin distribution.
 POV_LINES_COUNTRIES = poverty_lines_countries()
-POV_LINES_REGIONS = poverty_lines_regions()
 
 # Define old PIP regions, which will be phased out in future versions of the API
 OLD_REGIONS = [
@@ -197,7 +179,6 @@ OLD_REGIONS = [
 # # DEBUGGING
 # PPP_VERSIONS = [2021]
 # POV_LINES_COUNTRIES = [1, 1000, 25000, 50000]
-# POV_LINES_REGIONS = [1, 1000, 25000, 50000]
 
 
 @click.command()
@@ -207,8 +188,8 @@ OLD_REGIONS = [
     type=bool,
     help="Select live (1) or internal (0) API",
 )
-# @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
-def run(live_api: bool) -> None:
+@click.option("--upload/--skip-upload", default=True, type=bool, help="Create and upload the snapshots to S3")
+def run(live_api: bool, upload: bool) -> None:
     if live_api:
         wb_api = WB_API("https://api.worldbank.org/pip/v1")
     else:
@@ -253,6 +234,22 @@ def run(live_api: bool) -> None:
     df = add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, wb_api)
 
     df = add_filled_data(df, wb_api)
+
+    # Ingest the generated files as snapshots directly from this script (no separate upload scripts).
+    create_snapshots(upload=upload)
+
+
+def create_snapshots(upload: bool = True) -> None:
+    """
+    Create the world_bank_pip and world_bank_pip_percentiles snapshots from the CSV files this
+    script just wrote to the cache folder. This replaces the previous setup where a separate
+    pip_api.py extracted the data and two upload scripts ingested it: now one
+    `etls .../world_bank_pip` run extracts and ingests both snapshots.
+    """
+    for short_name in ["world_bank_pip", "world_bank_pip_percentiles"]:
+        snap = Snapshot(f"{SNAPSHOT_NAMESPACE}/{SNAPSHOT_VERSION}/{short_name}.csv")
+        snap.create_snapshot(filename=f"{CACHE_DIR}/{short_name}.csv", upload=upload)
+        log.info(f"Snapshot created: {snap.uri}")
 
 
 class WB_API:
@@ -345,6 +342,7 @@ def _fetch_csv(url: str) -> pd.DataFrame:
 @memory.cache
 def _fetch_percentiles(version: int) -> pd.DataFrame:
     # These URLs were copied from https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
+    # NOTE: Check if these links are still valid for the new PIP release. If not, update them to the new links.
     if version == PPP_VERSIONS[0]:
         url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin_revised.csv"
     elif version == PPP_VERSIONS[1]:
@@ -358,6 +356,173 @@ def _fetch_percentiles(version: int) -> pd.DataFrame:
     # _df_percentiles = _df_percentiles.drop(columns=["Unnamed: 0"])
 
     return _df_percentiles
+
+
+# Module-level cache so the (expensive) bins pooling + computation runs only once per process.
+_REGIONAL_BINS_CACHE: dict = {}
+
+
+def fetch_bins() -> pd.DataFrame:
+    """
+    Download the World Bank 1000-binned global distribution (2021 PPP) and return a tidy frame.
+
+    Each row is a (country, year, bin): `welf` is the bin's average daily per-capita welfare in
+    2021 PPP USD and `pop` is the bin's population in millions. The file is ~1.1 GB, so it is cached
+    on disk and only downloaded once.
+    """
+    # Key the cache filename to the source URL (its name embeds the PIP release vintage), so that
+    # bumping GLOBAL_DIST_1000BINS_URL for a later release downloads fresh instead of silently
+    # reusing a stale .dta left in .cache from a previous run.
+    local_path = Path(CACHE_DIR) / GLOBAL_DIST_1000BINS_URL.rsplit("/", 1)[-1]
+    if not local_path.is_file():
+        log.info("Downloading the 1000-bin global distribution file (~1.1 GB). This runs once and is cached.")
+        local_path.parent.mkdir(parents=True, exist_ok=True)
+        with requests.get(GLOBAL_DIST_1000BINS_URL, stream=True, timeout=TIMEOUT) as r:
+            r.raise_for_status()
+            with open(local_path, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024 * 1024):
+                    f.write(chunk)
+        log.info("1000-bin global distribution file downloaded.")
+
+    df_bins = pd.read_stata(local_path, columns=["year", "code", "quantile", "welf", "pop"])
+    df_bins["year"] = df_bins["year"].astype(int)
+    df_bins["quantile"] = df_bins["quantile"].astype(int)
+    return df_bins
+
+
+def build_regional_bins(wb_api: WB_API) -> pd.DataFrame:
+    """
+    Pool the per-country 1000-bin distributions into PIP regional distributions (2021 PPP).
+
+    Region membership is taken from the PIP `country_list` auxiliary table (the authoritative source
+    for PIP groupings), not from the bins file's own region columns. Each country's bins are assigned
+    to its standard region (EAS, ECS, ...), to its africa-split region (AFE/AFW, only for Sub-Saharan
+    countries), and to the World aggregate (WLD).
+
+    Returns a long frame with columns: country_code (region code), country (region name), year, welf,
+    pop. Region names/codes match those the PIP `pip-grp` API returns, so they harmonize identically
+    downstream.
+    """
+    df_bins = fetch_bins()
+
+    # Region membership from the PIP country_list aux table.
+    country_list = pip_aux_tables(wb_api, table="country_list")["country_list"]
+    membership = country_list[["country_code", "region", "region_code", "africa_split", "africa_split_code"]].copy()
+
+    # Drop the redundant country_code coming from the merge (it equals the bins `code`).
+    df = df_bins.merge(membership, left_on="code", right_on="country_code", how="left").drop(columns=["country_code"])
+
+    # Every bins country must map to a PIP region.
+    unmapped = sorted(df.loc[df["region_code"].isna(), "code"].unique())
+    assert not unmapped, f"These bins countries are not in the PIP country_list: {unmapped}"
+
+    base_cols = ["country_code", "country", "year", "welf", "pop"]
+
+    # Standard regions (EAS, ECS, LCN, MEA, NAC, SAS, SSF).
+    df_standard = df.rename(columns={"region_code": "country_code", "region": "country"})[base_cols]
+
+    # Africa split (AFE, AFW): only Sub-Saharan countries have a non-null africa_split.
+    df_africa = df[df["africa_split_code"].notna()].rename(
+        columns={"africa_split_code": "country_code", "africa_split": "country"}
+    )[base_cols]
+
+    # World (WLD): every country.
+    df_world = df.assign(country_code="WLD", country="World")[base_cols]
+
+    return pd.concat([df_standard, df_africa, df_world], ignore_index=True)
+
+
+def compute_regional_distributions_from_bins(wb_api: WB_API) -> dict:
+    """
+    Build regional percentiles and regional relative poverty from the 1000-bin global distribution,
+    replacing the thousands of `pip-grp` API queries the previous versions used.
+
+    For each region and year, the member countries' bins are pooled and sorted by welfare, and:
+        - percentiles 1-99: `thr` (welfare at the p-th cumulative-population point), `avg` (mean
+          welfare of the 1%-of-population band) and `share` (welfare share of the band, as a fraction
+          like the country data);
+        - relative poverty below 40/50/60% of the regional median: headcount ratio, poverty gap index
+          (FGT1), poverty severity (FGT2) and the Watts index (all as fractions, like the API output).
+
+    Returns {"percentiles": DataFrame, "relative": DataFrame}. Cached per process.
+    """
+    if "result" in _REGIONAL_BINS_CACHE:
+        return _REGIONAL_BINS_CACHE["result"]
+
+    regional_bins = build_regional_bins(wb_api)
+
+    percentiles = np.arange(1, 100)
+    upper_frac = percentiles / 100.0
+    lower_frac = (percentiles - 1) / 100.0
+
+    perc_rows = []
+    rel_rows = []
+
+    for (country_code, country, year), g in regional_bins.groupby(["country_code", "country", "year"], sort=False):
+        g = g.sort_values("welf")
+        welf = g["welf"].to_numpy()
+        pop = g["pop"].to_numpy()
+
+        cum_pop = np.cumsum(pop)
+        total_pop = cum_pop[-1]
+        # Cumulative population share (%) at the midpoint of each bin, used to read thresholds.
+        cum_share_mid = (cum_pop - pop / 2) / total_pop * 100
+
+        # Threshold at percentile p: welfare level at the p-th cumulative-population point.
+        thr = np.interp(percentiles, cum_share_mid, welf)
+
+        # Cumulative welfare vs cumulative population (exact: within a bin, welfare accrues linearly
+        # with population at the bin's welfare). Prepend 0 to integrate from the bottom.
+        cum_pop0 = np.concatenate([[0.0], cum_pop])
+        cum_welf0 = np.concatenate([[0.0], np.cumsum(welf * pop)])
+        total_welf = cum_welf0[-1]
+
+        # Welfare held by each 1%-of-population band ((p-1)% , p%].
+        band_welf = np.interp(upper_frac * total_pop, cum_pop0, cum_welf0) - np.interp(
+            lower_frac * total_pop, cum_pop0, cum_welf0
+        )
+        avg = band_welf / (total_pop / 100.0)  # mean welfare within the band
+        share = band_welf / total_welf  # welfare share of the band (fraction)
+
+        perc_rows.append(
+            pd.DataFrame(
+                {
+                    "ppp_version": BINS_PPP_VERSION,
+                    "country": country,
+                    "country_code": country_code,
+                    "year": year,
+                    "reporting_level": np.nan,
+                    "welfare_type": np.nan,
+                    "target_percentile": percentiles,
+                    "thr": thr,
+                    "avg": avg,
+                    "share": share,
+                }
+            )
+        )
+
+        # Relative poverty: the median is the 50th-percentile threshold.
+        median = float(np.interp(50, cum_share_mid, welf))
+        rel = {"country": country, "country_code": country_code, "year": year, "median": median}
+        for pct in [40, 50, 60]:
+            line = median * pct / 100.0
+            below = welf < line
+            pop_below = pop[below]
+            welf_below = welf[below]
+            gap = (line - welf_below) / line
+            rel[f"headcount_ratio_{pct}_median"] = pop_below.sum() / total_pop
+            rel[f"poverty_gap_index_{pct}_median"] = (gap * pop_below).sum() / total_pop
+            rel[f"poverty_severity_{pct}_median"] = (gap**2 * pop_below).sum() / total_pop
+            rel[f"watts_{pct}_median"] = (np.log(line / welf_below) * pop_below).sum() / total_pop
+        rel_rows.append(rel)
+
+    result = {
+        "percentiles": pd.concat(perc_rows, ignore_index=True),
+        "relative": pd.DataFrame(rel_rows),
+    }
+    _REGIONAL_BINS_CACHE["result"] = result
+    log.info("Regional percentiles and relative poverty computed from the 1000-bin distribution.")
+    return result
 
 
 ############################################################################################################
@@ -582,8 +747,12 @@ def pip_query_region(
 
 def generate_percentiles_raw(wb_api: WB_API):
     """
-    Generates percentiles data from query results. This is the raw data to get the percentiles.
-    Uses concurrency to speed up the process.
+    Generate raw percentile query results for COUNTRIES that are missing from the World Bank's
+    published percentile file. Uses concurrency to speed up the process.
+
+    Regions are no longer queried here: regional percentiles are built directly from the 1000-bin
+    global distribution (see compute_regional_distributions_from_bins), which removes the thousands
+    of `pip-grp` API calls the previous versions needed.
     """
     start_time = time.time()
 
@@ -626,38 +795,6 @@ def generate_percentiles_raw(wb_api: WB_API):
             ]
             pool.starmap(get_percentiles_data, tasks)
 
-    def get_percentiles_data_region(povline, versions, ppp_version):
-        """
-        Check if region percentiles data exists. If not, run the query.
-        """
-        if Path(
-            f"{CACHE_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
-        ).is_file():
-            return
-        else:
-            return pip_query_region(
-                wb_api,
-                popshare_or_povline="povline",
-                value=povline / 100,
-                versions=versions,
-                country_code="all",
-                year="all",
-                welfare_type="all",
-                reporting_level="all",
-                ppp_version=ppp_version,
-                download="true",
-            )
-
-    def concurrent_percentiles_region_function():
-        """
-        Executes get_percentiles_data_region concurrently.
-        """
-        # Make sure the directory exists. If not, create it
-        Path(f"{CACHE_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
-        with ThreadPool(MAX_WORKERS) as pool:
-            tasks = [(povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_REGIONS]
-            pool.starmap(get_percentiles_data_region, tasks)
-
     def get_query_country(povline, ppp_version, country_code):
         """
         Here I check if the country file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
@@ -675,23 +812,6 @@ def generate_percentiles_raw(wb_api: WB_API):
             df_query_country = pd.read_csv(file_path_country)
 
         return df_query_country
-
-    def get_query_region(povline, ppp_version):
-        """
-        Here I check if the regional file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-        """
-        file_path_region = (
-            f"{CACHE_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
-        )
-        if Path(file_path_region).is_file():
-            df_query_region = pd.read_csv(file_path_region)
-        else:
-            # Run the main function to get the data
-            log.warning(f"We need to come back to the extraction! regions, {povline}, {ppp_version} PPPs)")
-            get_percentiles_data_region(povline, versions, ppp_version)
-            df_query_region = pd.read_csv(file_path_region)
-
-        return df_query_region
 
     def get_list_of_missing_countries():
         """
@@ -763,86 +883,38 @@ def generate_percentiles_raw(wb_api: WB_API):
         list_missing_countries = []
         missing_countries = ""
 
-    concurrent_percentiles_region_function()
-    log.info("Region files downloaded")
+    # If every country is already in the published percentile file, there is nothing to construct.
+    if not list_missing_countries:
+        log.info("No missing-country percentiles to construct from the API.")
+        return pd.DataFrame()
 
-    log.info("Now we are concatenating the files")
-
-    if list_missing_countries:
-        with ThreadPool(MAX_WORKERS) as pool:
-            tasks = [
-                (povline, ppp_version, missing_countries)
-                for ppp_version in PPP_VERSIONS
-                for povline in POV_LINES_COUNTRIES
-            ]
-            dfs = pool.starmap(get_query_country, tasks)
-
-        df_country = pd.concat(dfs, ignore_index=True)
-        log.info("Country files concatenated")
-
+    log.info("Now we are concatenating the country files")
     with ThreadPool(MAX_WORKERS) as pool:
-        tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_REGIONS]
-        dfs = pool.starmap(get_query_region, tasks)
+        tasks = [
+            (povline, ppp_version, missing_countries) for ppp_version in PPP_VERSIONS for povline in POV_LINES_COUNTRIES
+        ]
+        dfs = pool.starmap(get_query_country, tasks)
 
-    df_region = pd.concat(dfs, ignore_index=True)
-    log.info("Region files concatenated")
+    df_country = pd.concat(dfs, ignore_index=True)
+    log.info("Country files concatenated")
 
-    # Create poverty_line_cents column, multiplying by 100, rounding and making it an integer
-    if list_missing_countries:
-        df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
-
-    df_region["poverty_line_cents"] = round(df_region["poverty_line"] * 100).astype(int)
-
-    log.info("Checking if all the poverty lines are in the concatenated files")
-
-    # Check if all the poverty lines are in the df in country and region df
-    if list_missing_countries:
-        assert set(df_country["poverty_line_cents"].unique()) == set(POV_LINES_COUNTRIES), log.fatal(
-            "Not all poverty lines are in the country file!"
-        )
-    assert set(df_region["poverty_line_cents"].unique()) == set(POV_LINES_REGIONS), log.fatal(
-        "Not all poverty lines are in the region file!"
+    # Check that all the poverty lines are present.
+    df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
+    assert set(df_country["poverty_line_cents"].unique()) == set(POV_LINES_COUNTRIES), log.fatal(
+        "Not all poverty lines are in the country file!"
     )
+    df_country = df_country.drop(columns=["poverty_line_cents"])
 
-    # Drop poverty_line_cents column
-    if list_missing_countries:
-        df_country = df_country.drop(columns=["poverty_line_cents"])
-    df_region = df_region.drop(columns=["poverty_line_cents"])
-
-    log.info("Checking if the set of countries and regions is the same as in PIP")
-
-    # I check if the set of countries is the same in the df and in the list of missing countries
-    if list_missing_countries:
-        assert set(df_country["country_code"].unique()) == set(list_missing_countries), log.fatal(
-            f"List of countries is different from the one we needed to extract! ({list_missing_countries})"
-        )
-
-    # I check if the set of regions is the same in the df and in the aux table (list of regions)
-    aux_dict = pip_aux_tables(wb_api, table="regions")
-
-    # Select the dataframe and specific values in grouping_type
-    df_region_aux = aux_dict["regions"]
-    df_region_aux = df_region_aux[df_region_aux["grouping_type"].isin(["africa_split", "region", "world"])]
-
-    assert set(df_region["country"].unique()) == set(df_region_aux["region"].unique()), log.fatal(
-        "List of regions is not the same as the one defined in PIP!"
+    # Check that the set of countries matches the ones we needed to extract.
+    assert set(df_country["country_code"].unique()) == set(list_missing_countries), log.fatal(
+        f"List of countries is different from the one we needed to extract! ({list_missing_countries})"
     )
-
-    log.info("Concatenating the raw percentile data for countries and regions")
-
-    # Concatenate df_country and df_region
-    if list_missing_countries:
-        df = pd.concat([df_country, df_region], ignore_index=True)
-    else:
-        df = df_region.copy()
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
-    log.info(
-        f"Concatenation of raw percentile data for countries and regions completed. Execution time: {elapsed_time} seconds"
-    )
+    log.info(f"Construction of raw country percentile data completed. Execution time: {elapsed_time} seconds")
 
-    return df
+    return df_country
 
 
 def calculate_percentile(p, df):
@@ -945,29 +1017,39 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
 
         # Define percentiles, from 1 to 99
         percentiles = range(1, 100, 1)
-        df_percentiles = pd.DataFrame()
 
-        # Estimate percentiles
-        dfs = [calculate_percentile(p, df) for p in percentiles]
+        frames = []
 
-        df_percentiles = pd.concat(dfs, ignore_index=True)
-
-        log.info("Percentiles calculated and consolidated")
-
-        # Rename headcount to estimated_percentile and poverty_line to thr
-        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
+        # Estimate percentiles for the COUNTRIES missing from the published file (df may be empty
+        # if every country is already published). Regions are handled separately, from the bins.
+        if not df.empty:
+            dfs = [calculate_percentile(p, df) for p in percentiles]
+            df_constructed = pd.concat(dfs, ignore_index=True)
+            # Rename headcount to estimated_percentile and poverty_line to thr
+            df_constructed = df_constructed.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})
+            frames.append(df_constructed)
+            log.info("Country percentiles for missing countries calculated")
+        else:
+            log.info("No missing-country percentiles to construct.")
 
         # Add official percentiles from the World Bank Databank
         if EXTRACT_COUNTRY_PERCENTILES:
-            df_percentiles_published_ppp_old = format_official_percentiles(PPP_VERSIONS[0], wb_api)
-            df_percentiles_published_ppp_current = format_official_percentiles(PPP_VERSIONS[1], wb_api)
-
-            df_percentiles = pd.concat(
-                [df_percentiles, df_percentiles_published_ppp_old, df_percentiles_published_ppp_current],
-                ignore_index=True,
-            )
+            frames.append(format_official_percentiles(PPP_VERSIONS[0], wb_api))
+            frames.append(format_official_percentiles(PPP_VERSIONS[1], wb_api))
         else:
             log.warning("Skipping official country percentiles (EXTRACT_COUNTRY_PERCENTILES is False)")
+
+        # Add regional percentiles built from the 1000-bin global distribution (2021 PPP only).
+        df_regions = compute_regional_distributions_from_bins(wb_api)["percentiles"].copy()
+        # estimated_percentile/distance_to_p let these rows flow through sanity_checks like the
+        # API-constructed ones (distance_to_p = 0 means they always pass the tolerance check). Both
+        # columns are dropped before the final CSV, so the output schema is unchanged.
+        df_regions["estimated_percentile"] = df_regions["target_percentile"] / 100
+        df_regions["distance_to_p"] = 0.0
+        frames.append(df_regions)
+
+        df_percentiles = pd.concat(frames, ignore_index=True)
+        log.info("Percentiles calculated and consolidated")
 
         # Drop duplicates. Keep the second one (the official one)
         df_percentiles = df_percentiles.drop_duplicates(
@@ -1309,43 +1391,9 @@ def generate_relative_poverty(wb_api: WB_API):
             tasks = [(df.iloc[i], pct, versions) for pct in [40, 50, 60] for i in range(len(df))]
             pool.starmap(get_relative_data, tasks)
 
-    def get_relative_data_region(df_row, pct, versions):
+    def add_relative_indicators(df):
         """
-        This function is structured in a way to make it work with concurrency.
-        It checks if the regional file related to the row exists. If not, it runs the query.
-        """
-        if ~np.isnan(df_row["median"]):
-            if Path(
-                f"{CACHE_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median'] * pct))}_ppp_{PPP_VERSIONS[1]}.csv"
-            ).is_file():
-                return
-            else:
-                return pip_query_region(
-                    wb_api,
-                    popshare_or_povline="povline",
-                    value=df_row["median"] * pct / 100,
-                    versions=versions,
-                    country_code=df_row["country_code"],
-                    year=df_row["year"],
-                    welfare_type="all",
-                    reporting_level="all",
-                    ppp_version=PPP_VERSIONS[1],
-                    download="true",
-                )
-
-    def concurrent_relative_region_function(df):
-        """
-        This is the main function to make concurrency work for regional data.
-        """
-        # Make sure the directory exists. If not, create it
-        Path(f"{CACHE_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
-        with ThreadPool(int(round(MAX_WORKERS / 2))) as pool:
-            tasks = [(df.iloc[i], pct, versions) for pct in [40, 50, 60] for i in range(len(df))]
-            pool.starmap(get_relative_data_region, tasks)
-
-    def add_relative_indicators(df, country_or_region):
-        """
-        Integrates the relative indicators to the df.
+        Integrates the relative indicators to the country df from the cached query results.
         """
         for pct in [40, 50, 60]:
             # Initialize lists
@@ -1355,27 +1403,14 @@ def generate_relative_poverty(wb_api: WB_API):
             watts_list = []
             for i in range(len(df)):
                 if ~np.isnan(df["median"].iloc[i]) and df.iloc[i]["country_code"] not in OLD_REGIONS:
-                    if country_or_region == "country":
-                        # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-                        file_path = f"{CACHE_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median'] * pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_{PPP_VERSIONS[1]}.csv"
-                        if Path(file_path).is_file():
-                            results = pd.read_csv(file_path)
-                        else:
-                            # Run the main function to get the data
-                            get_relative_data(df.iloc[i], pct, versions)
-                            results = pd.read_csv(file_path)
-
-                    elif country_or_region == "region":
-                        # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-                        file_path = f"{CACHE_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median'] * pct))}_ppp_{PPP_VERSIONS[1]}.csv"
-                        if Path(file_path).is_file():
-                            results = pd.read_csv(file_path)
-                        else:
-                            # Run the main function to get the data
-                            get_relative_data_region(df.iloc[i], pct, versions)
-                            results = pd.read_csv(file_path)
+                    # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
+                    file_path = f"{CACHE_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median'] * pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_{PPP_VERSIONS[1]}.csv"
+                    if Path(file_path).is_file():
+                        results = pd.read_csv(file_path)
                     else:
-                        raise ValueError("country_or_region must be 'country' or 'region'")
+                        # Run the main function to get the data
+                        get_relative_data(df.iloc[i], pct, versions)
+                        results = pd.read_csv(file_path)
 
                     headcount_ratio_value = results["headcount"].iloc[0]
                     headcount_ratio_list.append(headcount_ratio_value)
@@ -1429,7 +1464,7 @@ def generate_relative_poverty(wb_api: WB_API):
     concurrent_relative_function(df_country)
 
     # Add relative indicators from the results above
-    df_country = add_relative_indicators(df=df_country, country_or_region="country")
+    df_country = add_relative_indicators(df=df_country)
 
     # FOR REGIONS
     # Get data from the most common query
@@ -1445,14 +1480,16 @@ def generate_relative_poverty(wb_api: WB_API):
         ppp_version=PPP_VERSIONS[1],
     )
 
-    # Patch medians
+    # Patch medians (regional p50 now comes from the bins-based percentiles file)
     df_region = median_patch(df_region, country_or_region="region")
 
-    # Run the main function to get the data
-    concurrent_relative_region_function(df_region)
-
-    # Add relative indicators from the results above
-    df_region = add_relative_indicators(df=df_region, country_or_region="region")
+    # Add regional relative poverty indicators computed from the 1000-bin distribution, instead of
+    # running thousands of `pip-grp` queries at 40/50/60% of each regional median.
+    rel_region = compute_regional_distributions_from_bins(wb_api)["relative"]
+    rel_cols = [c for c in rel_region.columns if c.endswith("_median")]
+    df_region = df_region.merge(
+        rel_region[["country_code", "year"] + rel_cols], on=["country_code", "year"], how="left"
+    )
 
     # Concatenate df_country and df_region
     df = pd.concat([df_country, df_region], ignore_index=True)
