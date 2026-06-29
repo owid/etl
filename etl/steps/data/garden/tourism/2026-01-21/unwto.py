@@ -280,7 +280,11 @@ def sanity_check_population_ratios(tb: Table) -> None:
       genuinely receive >100× their population in visitors.
     """
     # Columns that represent counts of people (guests, arrivals, departures, trips).
-    PERSON_COUNT_COLUMNS = [col for col in tb.columns if any(k in col for k in ["guest", "arrival", "departure", "trip", "vis_tourist", "vis_excur"])]
+    PERSON_COUNT_COLUMNS = [
+        col
+        for col in tb.columns
+        if any(k in col for k in ["guest", "arrival", "departure", "trip", "vis_tourist", "vis_excur"])
+    ]
 
     for col in PERSON_COUNT_COLUMNS:
         data = tb[["country", "year", "population", col]].dropna(subset=[col, "population"])
