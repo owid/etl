@@ -171,6 +171,18 @@ def split_electricity(tb_step1, tb_shares):
     # Indirect emissions = share of electricity consumed by the activity, times total electricity emissions.
     tb["ghg_emissions_indirect"] = tb["electricity_share"] * tb["electricity_total"]
     tb["ghg_emissions"] = tb["ghg_emissions_direct"] + tb["ghg_emissions_indirect"]
+
+    # Redistributing electricity must conserve emissions: per country-year, the indirect emissions summed
+    # across activities should recover the full electricity-generation emissions (i.e. the shares sum to 1).
+    conservation = tb.groupby(["country", "year"], observed=True).agg(
+        indirect_sum=("ghg_emissions_indirect", "sum"), electricity_total=("electricity_total", "first")
+    )
+    conservation = conservation[conservation["electricity_total"] > 0]
+    error = "Electricity redistribution did not conserve total emissions (indirect emissions don't sum to the electricity total)."
+    assert (
+        abs(conservation["indirect_sum"] - conservation["electricity_total"]) / conservation["electricity_total"] < 1e-3
+    ).all(), error
+
     tb = tb.drop(columns=["electricity_share", "electricity_total"], errors="raise")
 
     return tb
@@ -181,8 +193,6 @@ def sanity_check_outputs(tb, activities):
     assert set(tb["sector"]) == set(activities), error
     error = "Output has missing GHG emissions."
     assert tb[["ghg_emissions", "ghg_emissions_direct", "ghg_emissions_indirect"]].notna().all().all(), error
-    # The redistributed electricity should conserve total emissions: per country-year, summing all activities'
-    # totals should equal summing their direct emissions plus the full electricity-generation emissions.
     error = "Negative indirect emissions found."
     assert (tb["ghg_emissions_indirect"] >= 0).all(), error
 
