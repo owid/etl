@@ -2,8 +2,11 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
+from structlog import get_logger
 
 from etl.helpers import PathFinder
+
+log = get_logger()
 
 # World source variants in priority order (UIS is most authoritative for UNESCO data)
 _WORLD_VARIANTS = ["World (UIS)", "World (SDG)", "World (WB)", "World (UNICEF)", "World (MDG)"]
@@ -264,12 +267,7 @@ def run() -> None:
     tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
     tb_pivoted = tb_pivoted.reset_index()
 
-    # Remove Turkey 1998 value for Government expenditure on education as a percentage of GDP (%), XGDP.FSGOV (likely an error)
-    gdp_col = "Government expenditure on education as a percentage of GDP (%), XGDP.FSGOV"
-    if gdp_col in tb_pivoted.columns:
-        mask = (tb_pivoted["country"] == "Turkey") & (tb_pivoted["year"] == 1998)
-        assert tb_pivoted.loc[mask, gdp_col].iloc[0] == 0, "Turkey 1998 GDP is not zero, investigate before removing"
-        tb_pivoted.loc[mask, gdp_col] = None
+    tb_pivoted = drop_outliers(tb_pivoted)
 
     tb_pivoted = tb_pivoted.format(["country", "year"])
 
@@ -338,4 +336,109 @@ def combine_historical_expenditure(tb: Table, tb_expenditure: Table) -> Table:
     )
 
     tb = tb.format(["country", "year"])
+    return tb
+
+
+def drop_outliers(tb: Table) -> Table:
+    """Remove implausible values from the pivoted SDGs table.
+
+    Three categories of outliers are handled, each logged for auditability:
+
+    1. **Zero-value expenditure (% of govt spending)**: UNESCO reports 0.0 for
+       many country-years where data is simply missing. No country spends 0% of
+       its budget on education; these are recording artifacts.
+
+    2. **Zero-value percentage indicators**: Isolated 0.0 values in percentage
+       columns (qualified teachers, school infrastructure) that are surrounded
+       by plausible non-zero values. Treated as missing-reported-as-zero.
+
+    3. **Specific point outliers**: Individual data points verified as source
+       errors by comparing against surrounding years and cross-source checks.
+    """
+    n_total = 0
+
+    # --- 1. Zero expenditure as % of govt spending ---
+    # 541 rows across 104 countries where UNESCO reports exactly 0.0.
+    # Countries like Australia (1980), Austria (1981-88), Argentina (1982-90)
+    # all show 0% followed by normal 10-25% values — clearly missing data.
+    # After pivot, column names are human-readable with indicator_id suffix, e.g.
+    # "Expenditure on education as a percentage of total government expenditure (%) (UIS calculation), XGOVEXP.IMF"
+    exp_govt_cols = [c for c in tb.columns if "percentage of total government expenditure" in c.lower()]
+
+    for col in exp_govt_cols:
+        if col in tb.columns:
+            zero_mask = tb[col] == 0.0
+            n = int(zero_mask.sum())
+            if n > 0:
+                tb.loc[zero_mask, col] = None
+                n_total += n
+                log.info(
+                    "outlier_zeros_removed", indicator=col, n_removed=n, reason="0% govt expenditure is implausible"
+                )
+
+    # Also catch zeros in "percentage of GDP" expenditure columns (same logic).
+    gdp_pct_cols = [c for c in tb.columns if "percentage of gdp" in c.lower() and "expenditure" in c.lower()]
+    for col in gdp_pct_cols:
+        zero_mask = tb[col] == 0.0
+        n = int(zero_mask.sum())
+        if n > 0:
+            tb.loc[zero_mask, col] = None
+            n_total += n
+            log.info("outlier_zeros_removed", indicator=col, n_removed=n, reason="0% of GDP expenditure is implausible")
+
+    # --- 2. Zero-value percentage indicators ---
+    # Specific (country, year, column) triples where 0.0 is clearly missing data.
+    # Each entry is documented with the surrounding context that confirms it's wrong.
+    zero_outliers = [
+        # Nauru: drinking water in primary schools was 100% for 2019-2023, then 0% in 2024.
+        ("Nauru", 2024, "Proportion of primary schools with access to basic drinking water (%)"),
+        # BVI: qualified teachers in primary was 78-100% for 2014-2021, then 0% in 2022.
+        ("British Virgin Islands", 2022, "Percentage of qualified teachers in primary education, both sexes (%)"),
+    ]
+    for country, year, indicator_label in zero_outliers:
+        # After pivot, column names include ", indicator_id" suffix — match by prefix.
+        matching_cols = [c for c in tb.columns if c.startswith(indicator_label)]
+        for col in matching_cols:
+            mask = (tb["country"] == country) & (tb["year"] == year) & (tb[col] == 0.0)
+            n = int(mask.sum())
+            if n > 0:
+                tb.loc[mask, col] = None
+                n_total += n
+                log.info(
+                    "outlier_removed",
+                    country=country,
+                    year=year,
+                    indicator=col,
+                    reason="0% is implausible given adjacent years",
+                )
+
+    # --- 3. Specific point outliers ---
+    # Individual values confirmed as source errors.
+    point_outliers = [
+        # Algeria 2025: out-of-school rate jumped from ~4% to 77.6% for all sex breakdowns.
+        # This is a single-year spike inconsistent with the entire 2011-2024 trend (3-7%).
+        ("Algeria", 2025, "Out-of-school rate for adolescents of lower secondary school age"),
+        # World 1970: tertiary GER = 17.44, but 1971 = 8.73 and Lee & Lee 1970 = 9.49.
+        # Isolated spike in early UNESCO data; surrounding years are 8-11%.
+        ("World", 1970, "Gross enrolment ratio for tertiary education"),
+        # BVI 2022: qualified teachers in secondary drops from 94% to 1.3%.
+        ("British Virgin Islands", 2022, "Percentage of qualified teachers in secondary education"),
+    ]
+    for country, year, indicator_prefix in point_outliers:
+        matching_cols = [c for c in tb.columns if c.startswith(indicator_prefix)]
+        for col in matching_cols:
+            mask = (tb["country"] == country) & (tb["year"] == year) & tb[col].notna()
+            n = int(mask.sum())
+            if n > 0:
+                tb.loc[mask, col] = None
+                n_total += n
+                log.info(
+                    "outlier_removed",
+                    country=country,
+                    year=year,
+                    indicator=col,
+                    reason="point outlier inconsistent with adjacent years",
+                )
+
+    log.info("outliers_summary", step="education_sdgs", total_cells_removed=n_total)
     return tb

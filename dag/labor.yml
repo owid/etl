@@ -50,6 +50,10 @@ steps:
         - snapshot://un/2026-04-08/child_labor_trends.csv
         - snapshot://un/2026-04-08/child_labor_by_region.csv
         - snapshot://un/2026-04-08/hazardous_work_by_region.csv
+  export://multidim/un/latest/child_labor:
+    - data://grapher/un/2026-04-08/child_labor_report
+  export://multidim/un/latest/hazardous_work:
+    - data://grapher/un/2026-04-08/child_labor_report
 
   #
   # Child labor in the long run (multiple sources)

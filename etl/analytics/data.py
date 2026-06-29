@@ -12,6 +12,7 @@ from etl.analytics.config import (
     OWID_BASE_URL,
     POST_LINK_TYPES_TO_URL,
     POST_TYPE_TO_URL,
+    SEMANTIC_LAYER_SCHEMA,
 )
 from etl.analytics.datasette import read_datasette
 from etl.analytics.metabase import read_semantic_layer
@@ -83,7 +84,7 @@ def get_number_of_days(
         )
 
     # There is always a lag in analytics, so we need to find out the maximum date informed in the analytics data.
-    query = f"SELECT MAX({day_column_name}) AS date_max FROM {table_name}"
+    query = f"SELECT MAX({day_column_name}) AS date_max FROM {SEMANTIC_LAYER_SCHEMA}.{table_name}"
     date_max_informed = read_analytics(sql=query)["date_max"].item()
     date_end = min(pd.to_datetime(date_max_informed), pd.to_datetime(date_max))
 
@@ -141,8 +142,8 @@ def get_chart_views_per_day_by_chart_id(
         c.url,
         v.day,
         SUM(v.events) AS events
-    FROM charts c
-    JOIN grapher_views_detailed v ON c.url = v.grapher
+    FROM {SEMANTIC_LAYER_SCHEMA}.charts c
+    JOIN {SEMANTIC_LAYER_SCHEMA}.grapher_views_detailed v ON c.url = v.grapher
     {where_sql}
     GROUP BY c.chart_id, c.url, v.day
     ORDER BY c.chart_id, v.day ASC;
@@ -192,8 +193,8 @@ def get_chart_views_by_chart_id(
         c.url,
         c.published_at,
         SUM(v.events) AS views
-    FROM charts c
-    JOIN grapher_views_detailed v ON c.url = v.grapher
+    FROM {SEMANTIC_LAYER_SCHEMA}.charts c
+    JOIN {SEMANTIC_LAYER_SCHEMA}.grapher_views_detailed v ON c.url = v.grapher
     {where_sql}
     GROUP BY c.chart_id, c.url, c.published_at
     ORDER BY views DESC
@@ -302,8 +303,8 @@ def get_post_views_by_url(
     SELECT
         url,
         SUM(views) AS views
-    FROM views_detailed
-    JOIN pages USING(url)
+    FROM {SEMANTIC_LAYER_SCHEMA}.views_detailed
+    JOIN {SEMANTIC_LAYER_SCHEMA}.pages USING(url)
     WHERE day >= '{date_min}'
     AND day <= '{date_max}'
     """

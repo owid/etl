@@ -188,12 +188,12 @@ definitions:
     - The data comes from administrative records such as school enrollment reports, combined with population estimates typically sourced from the United Nations or national statistical offices.
 
   desc_key_net_enr_historical: &desc_key_net_enr_historical
-    - This indicator combines data from two sources. From 1985 onwards, it draws on UNESCO administrative records. Before 1985, it uses adjusted enrollment ratios from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html) — modified gross enrollment ratios that account for grade repetition. These serve as the best available approximation of net enrollment rates for earlier periods, when age-specific enrollment data were not widely collected.
+    - This indicator combines data from two sources. Where UNESCO administrative records are available (from as early as the 1970s for some countries), those are used. Before 1985, where UNESCO data is not available, it draws on adjusted enrollment ratios from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html) — modified gross enrollment ratios that account for grade repetition, serving as the best available approximation of net enrollment rates for periods when age-specific enrollment data were not widely collected.
     - The net enrollment rate shows what share of children are enrolled at the education level intended for their age — for example, a rate of 90% means 90% of children in the official age group are enrolled at that level.
     - A rate below 100% doesn't necessarily mean those children are out of school — some may be enrolled at a different level than expected for their age.
 
   desc_key_ger_historical: &desc_key_ger_historical
-    - This indicator combines data from two sources. From 1985 onwards, it draws on UNESCO administrative records. Before 1985, it uses gross enrollment ratios from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html).
+    - This indicator combines data from two sources. Where UNESCO administrative records are available, those are used. Before 1985, where UNESCO data is not available, it draws on gross enrollment ratios from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html).
     - The gross enrollment ratio counts all students enrolled at a given education level, regardless of age — including those who started late or repeated grades. Values can exceed 100% for this reason.
     - A value well below 100% suggests many children of the official age are not enrolled at that level. A value well above 100% often signals high rates of grade repetition or late entry.
 
@@ -1389,7 +1389,7 @@ tables:
           tolerance: *display_tolerance
 
       # ========================================================================
-      # COMBINED HISTORICAL ENROLLMENT RATES (Lee & Lee pre-1985 + UNESCO 1985+)
+      # COMBINED HISTORICAL ENROLLMENT RATES (UNESCO preferred, Lee & Lee fallback)
       # ========================================================================
 
       net_enrolment_rate__primary__both_sexes__pct__combined_historical:
@@ -1399,8 +1399,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
         description_processing: |-
-          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html). Their enrollment ratios adjust for grade repetition, bringing them closer to a true net enrollment rate than raw gross enrollment ratios — though age-specific records needed for a true net rate were not widely available historically.
-          - 1985 onwards: Data comes from UNESCO OPRI, based on school censuses that track enrollment by individual age.
+          - UNESCO OPRI data (based on school censuses that track enrollment by individual age) is used wherever available. Before 1985, for country-years without UNESCO coverage, data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), whose enrollment ratios adjust for grade repetition, bringing them closer to a true net enrollment rate than raw gross enrollment ratios.
         presentation:
           title_public: Net enrollment rate in primary education
         display:
@@ -1415,8 +1414,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
         description_processing: |-
-          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html). Their enrollment ratios adjust for grade repetition, bringing them closer to a true net enrollment rate than raw gross enrollment ratios — though age-specific records needed for a true net rate were not widely available historically.
-          - 1985 onwards: Data comes from UNESCO OPRI, based on school censuses that track enrollment by individual age.
+          - UNESCO OPRI data (based on school censuses that track enrollment by individual age) is used wherever available. Before 1985, for country-years without UNESCO coverage, data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), whose enrollment ratios adjust for grade repetition, bringing them closer to a true net enrollment rate than raw gross enrollment ratios.
         presentation:
           title_public: Net enrollment rate in primary education among girls
         display:
@@ -1431,8 +1429,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
         description_processing: |-
-          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html). Their enrollment ratios adjust for grade repetition, bringing them closer to a true net enrollment rate than raw gross enrollment ratios — though age-specific records needed for a true net rate were not widely available historically.
-          - 1985 onwards: Data comes from UNESCO OPRI, based on school censuses that track enrollment by individual age.
+          - UNESCO OPRI data (based on school censuses that track enrollment by individual age) is used wherever available. Before 1985, for country-years without UNESCO coverage, data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), whose enrollment ratios adjust for grade repetition, bringing them closer to a true net enrollment rate than raw gross enrollment ratios.
         presentation:
           title_public: Net enrollment rate in primary education among boys
         display:
@@ -1447,8 +1444,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger_historical
         description_processing: |-
-          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), which reported gross enrollment ratios for tertiary education.
-          - 1985 onwards: Data comes from the UNESCO SDG dataset, based on administrative records that track enrollment by age and education level.
+          - UNESCO SDG data (based on administrative records that track enrollment by age and education level) is used wherever available. Before 1985, for country-years without UNESCO coverage, data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), which reported gross enrollment ratios for tertiary education.
         presentation:
           title_public: Gross enrollment ratio in tertiary education
         display:
@@ -1463,8 +1459,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger_historical
         description_processing: |-
-          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), which reported gross enrollment ratios for tertiary education.
-          - 1985 onwards: Data comes from the UNESCO SDG dataset, based on administrative records that track enrollment by age and education level.
+          - UNESCO SDG data (based on administrative records that track enrollment by age and education level) is used wherever available. Before 1985, for country-years without UNESCO coverage, data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), which reported gross enrollment ratios for tertiary education.
         presentation:
           title_public: Gross enrollment ratio in tertiary education among women
         display:
@@ -1479,8 +1474,7 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger_historical
         description_processing: |-
-          - Pre-1985: Data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), which reported gross enrollment ratios for tertiary education.
-          - 1985 onwards: Data comes from the UNESCO SDG dataset, based on administrative records that track enrollment by age and education level.
+          - UNESCO SDG data (based on administrative records that track enrollment by age and education level) is used wherever available. Before 1985, for country-years without UNESCO coverage, data comes from [Lee and Lee (2016)](https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html), which reported gross enrollment ratios for tertiary education.
         presentation:
           title_public: Gross enrollment ratio in tertiary education among men
         display:

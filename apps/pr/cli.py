@@ -192,6 +192,11 @@ MODEL_DEFAULT = "gpt-5-mini"
     is_flag=True,
     help="Symlink the new worktree's data/ to the original repo's data/ (only with --worktree). Avoids recomputing upstream ETL steps. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` in the worktree.",
 )
+@click.option(
+    "--auto-assign",
+    is_flag=True,
+    help="Automatically assign the PR to the GitHub user the token belongs to.",
+)
 def cli(
     title: str,
     category: str | None,
@@ -204,6 +209,7 @@ def cli(
     worktree: bool,
     worktree_path: str | None,
     share_data: bool,
+    auto_assign: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
     # Check that the user has set up a GitHub token.
@@ -269,7 +275,7 @@ def cli(
             branch_out(repo, base_branch, work_branch)
 
     # Create PR
-    create_pr(repo, work_branch, base_branch, pr_title)
+    create_pr(repo, work_branch, base_branch, pr_title, auto_assign=auto_assign)
 
     if resolved_worktree_path is not None:
         venv_ok = install_worktree_venv(resolved_worktree_path)
@@ -514,7 +520,7 @@ def print_worktree_hint(
         )
 
 
-def create_pr(repo, work_branch, base_branch, pr_title):
+def create_pr(repo, work_branch, base_branch, pr_title, auto_assign: bool = False):
     """Create a draft pull request work_branch -> base_branch."""
     pr_title_str = str(pr_title)
 
@@ -540,10 +546,25 @@ def create_pr(repo, work_branch, base_branch, pr_title):
         "body": "",
         "draft": True,
     }
+    assignee: str | None = None
+    if auto_assign:
+        user_response = requests.get("https://api.github.com/user", headers=headers)
+        if user_response.status_code == 200:
+            assignee = user_response.json()["login"]
+        else:
+            log.warning(f"Could not fetch GitHub user for --auto-assign (HTTP {user_response.status_code}), skipping.")
     response = requests.post(GITHUB_API_URL, json=data, headers=headers)
     if response.status_code == 201:
         js = response.json()
         log.info(f"Draft pull request created successfully at {js['html_url']}.")
+        if assignee:
+            pr_number = js["number"]
+            assign_url = f"{GITHUB_API_BASE}/issues/{pr_number}/assignees"
+            assign_response = requests.post(assign_url, json={"assignees": [assignee]}, headers=headers)
+            if assign_response.status_code == 201:
+                log.info(f"Assigned PR to {assignee}.")
+            else:
+                log.warning(f"Could not assign PR to {assignee} (HTTP {assign_response.status_code}).")
     else:
         raise click.ClickException(f"Failed to create draft pull request:\n{response.json()}")
 

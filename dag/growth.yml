@@ -55,7 +55,7 @@ steps:
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
     - data://garden/worldbank_wdi/2026-02-27/wdi
     - data://garden/un/2024-07-12/un_wpp
-    - data://garden/un/2025-03-25/igme
+    - data://garden/un/2026-06-09/igme
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality
     - data://garden/wash/2025-12-08/household
     - data://garden/tourism/2026-01-21/unwto
