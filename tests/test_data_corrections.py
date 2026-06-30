@@ -1,9 +1,13 @@
 """Tests for etl.data_corrections (the .corrections.yml mechanism)."""
 
+import json
+
 import pytest
+import yaml
 from owid.catalog import Table
 
 from etl.data_corrections import apply_corrections, load_corrections
+from etl.paths import BASE_DIR, STEP_DIR
 
 
 def _make_table() -> Table:
@@ -214,6 +218,21 @@ def test_expect_rejects_unknown_operator():
         _validate_correction(
             _correction(action="scale", factor=0.5, entity="France", years="all", expect={"approx": 10}), "<test>"
         )
+
+
+def test_all_repo_corrections_match_schema():
+    """Every `.corrections.yml` in the repo must validate against schemas/corrections-schema.json
+    (the same schema VSCode uses), so the editor lint and CI agree."""
+    jsonschema = pytest.importorskip("jsonschema")
+    schema = json.loads((BASE_DIR / "schemas" / "corrections-schema.json").read_text())
+    jsonschema.Draft7Validator.check_schema(schema)
+    validator = jsonschema.Draft7Validator(schema)
+    files = sorted(STEP_DIR.rglob("*.corrections.yml"))
+    assert files, "expected at least one .corrections.yml in the repo"
+    for path in files:
+        data = yaml.safe_load(path.read_text())
+        errors = [f"{list(e.path)}: {e.message}" for e in validator.iter_errors(data)]
+        assert not errors, f"{path} does not match the corrections schema:\n" + "\n".join(errors)
 
 
 def test_build_audit_captures_drop_before_values():
