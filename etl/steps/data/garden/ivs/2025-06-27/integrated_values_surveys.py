@@ -226,7 +226,9 @@ def run() -> None:
     # Drop columns
     tb = drop_indicators_and_replace_nans(tb)
 
-    tb = paths.regions.harmonize_names(tb)
+    # The IVS and WVS tables share one countries mapping file, so each leaves some entries unused;
+    # silence the (expected) "unused values in mapping" warning.
+    tb = paths.regions.harmonize_names(tb, warn_on_unused_countries=False)
 
     # Sanity checks
     tb = sanity_checks(tb)
@@ -241,7 +243,7 @@ def run() -> None:
 
     tb_wvs = process_wvs(tb_wvs)
 
-    tb_wvs = paths.regions.harmonize_names(tb_wvs)
+    tb_wvs = paths.regions.harmonize_names(tb_wvs, warn_on_unused_countries=False)
 
     # Sanity checks (recodes must sum to 100%)
     tb_wvs = sanity_checks_wvs(tb_wvs)
