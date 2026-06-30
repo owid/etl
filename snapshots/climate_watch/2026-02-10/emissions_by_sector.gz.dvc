@@ -5,7 +5,7 @@ meta:
     description: |-
       Climate Watch Historical Emissions data contains sector-level greenhouse gas (GHG) emissions, including emissions of the six major GHGs from most major sources and sinks. Non-CO₂ emissions are expressed in CO₂ equivalents using 100-year global warming potential values from the Intergovernmental Panel on Climate Change (IPCC) Fifth Assessment Report (AR5).
 
-      More information about their data sources and methodology can be found in their [FAQ page](https://www.climatewatchdata.org/about/faq/ghg). Specifically, the definitions of all Climate Watch data sectors and their methodology are explained in [this document](https://files.wri.org/d8/s3fs-public/2024-05/climate-watch-country-greenhouse-gas-emissions-data-methodology.pdf).
+      More information about their data sources and methodology can be found in their [FAQ page](https://www.climatewatchdata.org/about/faq/ghg). Specifically, the definitions of all Climate Watch data sectors and their methodology are explained in [this document](https://files.wri.org/d8/s3fs-public/2024-05/climate-watch-country-greenhouse-gas-emissions-data-methodology.pdf?VersionId=1geU96keSmqZlUjv41FNGB4CLpHQbruN).
     citation_full: |-
       Climate Watch. 2026. Washington, DC: World Resources Institute (WRI). Available online at: https://www.climatewatchdata.org
 
