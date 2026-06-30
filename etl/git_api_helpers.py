@@ -13,6 +13,7 @@ from github import Auth, Github, GithubException, GithubRetry, InputGitTreeEleme
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from structlog import get_logger
+from urllib3.util.retry import Retry
 
 from etl.config import (
     GITHUB_TOKEN,
@@ -34,12 +35,16 @@ log = get_logger()
 # writes; a genuinely invalid token keeps returning 401, exhausts the retries, and still raises.
 #
 # Extend PyGithub's own GithubRetry (rather than a bare urllib3 Retry) so we keep its default handling
-# of 5xx and 403 secondary-rate-limit responses — it appends 403 and adds {GET, POST} to allowed
-# methods itself, and we add 401 to the 5xx force list. backoff_factor adds spacing between attempts.
+# of 5xx and 403 secondary-rate-limit responses, and we add 401 to the 5xx force list. We also set
+# allowed_methods explicitly: GithubRetry's default is the urllib3 idempotent set plus {GET, POST},
+# which omits PATCH — but owidbot edits its existing PR comment via IssueComment.edit (a PATCH), so a
+# transient 401 there would otherwise escape the retry. All of these calls are idempotent/rejected
+# pre-processing, so retrying them is safe. backoff_factor adds spacing between attempts.
 GITHUB_RETRY = GithubRetry(
     total=10,
     backoff_factor=1.0,
     status_forcelist=list(range(500, 600)) + [401],
+    allowed_methods=Retry.DEFAULT_ALLOWED_METHODS | {"GET", "POST", "PATCH"},
 )
 
 
