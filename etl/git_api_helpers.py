@@ -9,10 +9,11 @@ from typing import Any
 
 import jwt
 import requests
-from github import Auth, Github, GithubException, InputGitTreeElement
+from github import Auth, BadCredentialsException, Github, GithubException, InputGitTreeElement
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from structlog import get_logger
+from tenacity import Retrying, retry_if_exception, stop_after_attempt, wait_exponential
 
 from etl.config import (
     GITHUB_TOKEN,
@@ -25,6 +26,21 @@ from etl.paths import BASE_DIR
 
 # Initialize logger.
 log = get_logger()
+
+
+def _is_transient_github_error(exc: BaseException) -> bool:
+    """Whether a GitHub API exception is worth retrying.
+
+    GitHub's auth backend occasionally returns a spurious 401 "Bad credentials" for a token that is
+    actually valid, especially under bursty load (e.g. scan-chart-diff iterating over many PRs). Those
+    blips, and 5xx server errors, are transient and resolve on retry. A genuinely invalid token keeps
+    returning 401, so the retries exhaust and the error is still raised (ETL-85).
+    """
+    if isinstance(exc, BadCredentialsException):
+        return True
+    if isinstance(exc, GithubException) and isinstance(exc.status, int) and exc.status >= 500:
+        return True
+    return False
 
 
 def get_github_instance(access_token: str | None = None) -> Github:
@@ -168,14 +184,26 @@ class GithubApiRepo:
 
     @property
     def repo(self) -> Repository:
-        """Get the PyGithub Repository object (lazily loaded)."""
+        """Get the PyGithub Repository object (lazily loaded).
+
+        Retries transient GitHub auth/5xx errors with backoff (see _is_transient_github_error); a
+        persistently bad token still raises once the attempts are exhausted.
+        """
         if self._repo is None:
-            if self.full_repo_name.count("/") == 1:
-                # Get by org/repo format
-                self._repo = self.g.get_repo(self.full_repo_name)
-            else:
-                # Get by org and repo separately
-                self._repo = self.g.get_organization(self.org).get_repo(self.repo_name)
+            for attempt in Retrying(
+                retry=retry_if_exception(_is_transient_github_error),
+                stop=stop_after_attempt(4),
+                wait=wait_exponential(multiplier=2, min=2, max=30),
+                reraise=True,
+            ):
+                with attempt:
+                    if self.full_repo_name.count("/") == 1:
+                        # Get by org/repo format
+                        self._repo = self.g.get_repo(self.full_repo_name)
+                    else:
+                        # Get by org and repo separately
+                        self._repo = self.g.get_organization(self.org).get_repo(self.repo_name)
+        assert self._repo is not None  # Either set above or the retry loop re-raised.
         return self._repo
 
     def fetch_file_content(self, file_path: str, branch: str) -> str:
