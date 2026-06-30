@@ -1271,6 +1271,12 @@ steps:
   data://grapher/un/2025-04-25/long_run_child_mortality:
     - data://garden/un/2025-04-25/long_run_child_mortality
 
+  # archived; last active in b0d22bce86f9 on 2026-06-30
+  data://grapher/wvs/2023-06-25/longitudinal_wvs:
+    - data://garden/wvs/2023-06-25/longitudinal_wvs:
+      - data://meadow/wvs/2023-06-25/longitudinal_wvs:
+        - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
+        - data://garden/regions/2023-01-01/regions
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
