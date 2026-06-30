@@ -65,8 +65,13 @@ def collect_corrections(step_dir: Path) -> list[dict[str, Any]]:
 
 
 def _fmt(v: float | None) -> str:
-    """Compact human-readable number (e.g. -1.23, 6.4e+07)."""
-    return "—" if v is None else f"{v:.4g}"
+    """Human-readable number with thousands separators (e.g. 56,180,148 · -742,811 · 14.2)."""
+    if v is None:
+        return "—"
+    a = abs(v)
+    if a != 0 and (a < 0.01 or a >= 1e15):
+        return f"{v:.3g}"  # fall back to scientific only for extreme magnitudes
+    return f"{v:,.2f}".rstrip("0").rstrip(".") or "0"
 
 
 def _affected_table(affected: list, action: str) -> str:
