@@ -44,12 +44,21 @@ def get_metabase_db_docs():
     except yaml.YAMLError as e:
         raise RuntimeError(f"Failed to parse YAML file {file_ref.name}: {e}")
 
-    # Extract semantic layer
-    assert "metabase" in yaml_data, "YAML data must contain 'metabase' key"
-    semantic_db = next(
-        (item for item in yaml_data["metabase"] if "semantic" in item.get("database_name", "").lower()), None
-    )
-    if semantic_db is None:
-        raise ValueError("No semantic database found in metabase data")
-    assert "tables" in semantic_db, "Semantic database must contain 'tables' key"
-    return semantic_db["tables"]
+    # Extract semantic-layer tables.
+    # The analytics "semantic layer" used to be a dedicated DuckDB database exposed in Metabase, but it
+    # was migrated to the `prod_semantic` dataset on BigQuery (owid/analytics#735). In db_docs.yml these
+    # tables now live under the top-level `bigquery:` key (the `metabase:` key is empty), each qualified
+    # as `owid-analytics:prod_semantic.<table>`. We keep only the semantic-layer tables and present them
+    # with their dataset-qualified name (`prod_semantic.<table>`), which is how queries must reference
+    # them on BigQuery (see etl/analytics/data.py).
+    assert "bigquery" in yaml_data, "YAML data must contain 'bigquery' key"
+    project_prefix = "owid-analytics:"
+    semantic_prefix = f"{project_prefix}prod_semantic."
+    tables = [
+        {**item, "table": item["table"][len(project_prefix) :], "description": item.get("description", "")}
+        for item in yaml_data["bigquery"]
+        if str(item.get("table", "")).startswith(semantic_prefix)
+    ]
+    if not tables:
+        raise ValueError("No semantic-layer (prod_semantic) tables found in bigquery section of analytics docs")
+    return tables
