@@ -18,7 +18,7 @@ meta:
     # Citation
     producer: Impact Global Health
     citation_full: |-
-      Impact Global Health, G-FINDER data portal, https://gfinderdata.impactglobalhealth.org
+      Impact Global Health (2025), G-FINDER data portal, https://gfinderdata.impactglobalhealth.org, accessed 25 June 2026.
 
     # Files
     url_main: https://gfinderdata.impactglobalhealth.org/pages/data-visualisations/allNeglectedDiseases
@@ -26,6 +26,7 @@ meta:
 
     # License
     license:
+      #This was previously listed as "CC BY 4.0" but I couldn't confirm this. The website only gives the copyright notice.
       name: © 2026 Impact Global Health Ltd
       url: https://gfinderdata.impactglobalhealth.org/pages/data-visualisations/allNeglectedDiseases
 outs:

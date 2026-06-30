@@ -13,6 +13,13 @@ definitions:
     short_unit: $
     display:
       numDecimalPlaces: 0
+  proc_categories: &proc_categories |-
+      We combined several research technology categories into broader groups: "Diagnostics" and "General diagnostic platforms & multi-disease diagnostics" are merged into "Diagnostics and diagnostic platforms"; "Biological vector control products", "Chemical vector control products", and "Fundamental vector control research" are merged into "Vector control products and research".
+  proc_malaria: &proc_malaria |-
+      We aggregated the three malaria subtypes tracked separately by G-FINDER (P. vivax, P. falciparum, and Multiple/other malaria strains) into a single combined category.
+
+
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -28,21 +35,33 @@ tables:
       amount__usd:
         title: Funding for << disease.lower() >> - all technologies
         description_short: "The amount of funding for << disease.lower() >>. This data is expressed in US dollars, adjusted for inflation."
+        description_processing: |-
+          - {{ definitions.proc_categories }}
+          - {{ definitions.proc_malaria }}
   funding_product:
     variables:
       amount__usd:
         title: Funding for technology - << product.lower() >> - towards all diseases
         description_short: "The amount of funding for << product.lower() >>. This data is expressed in US dollars, adjusted for inflation."
+        description_processing: |-
+          - {{ definitions.proc_categories }}
+          - {{ definitions.proc_malaria }}
   funding_product_ntd:
     variables:
       amount__usd:
         title: Funding for technology - << product_ntd.lower() >> - towards neglected tropical diseases
         description_short: "The amount of funding for << product_ntd.lower() >> towards neglected tropical diseases as defined by the WHO. This data is expressed in US dollars, adjusted for inflation."
-        description_processing: "We separated out this funding data for << product_ntd.lower() >>, for just neglected tropical diseases as defined by the WHO. This includes: Buruli ulcer, Chagas' disease, Dengue, Hookworm (ancylostomiasis & necatoriasis), Leishmaniasis, Leprosy, Lymphatic filariasis, multiple helminth infections, multiple kinetoplastid diseases, Mycetoma,  Onchocerciasis, Roundworm, Scabies, Schistosomiasis, Sleeping sickness (HAT), Snakebite envenoming, Strongyloidiasis & other intestinal roundworms, Tapeworm (Taeniasis/Cysticercosis), Trachoma, Whipworm (trichuriasis),Yaws."
+        description_processing: |-
+          - We separated out this funding data for << product_ntd.lower() >>, for just neglected tropical diseases as defined by the WHO. This includes: Buruli ulcer, Chagas' disease, Dengue, Hookworm (ancylostomiasis & necatoriasis), Leishmaniasis, Leprosy, Lymphatic filariasis, multiple helminth infections, multiple kinetoplastid diseases, Mycetoma,  Onchocerciasis, Roundworm, Scabies, Schistosomiasis, Sleeping sickness (HAT), Snakebite envenoming, Strongyloidiasis & other intestinal roundworms, Tapeworm (Taeniasis/Cysticercosis), Trachoma, Whipworm (trichuriasis), Yaws."
+          - {{ definitions.proc_categories }}
+          - {{ definitions.proc_malaria }}
   funding_disease_product:
     variables:
       amount__usd:
         title: Funding for << product.lower() >> for treating << disease.lower() >>
         description_short: "The amount of funding for << product.lower() >> for treating << disease >>.This data is expressed in US dollars, adjusted for inflation."
+        description_processing: |-
+          - {{ definitions.proc_categories }}
+          - {{ definitions.proc_malaria }}
         description_key:
           - "This dataset covers major funding towards Neglected Diseases: Bacterial pneumonia & meningitis, Buruli ulcer, Chagas disease, Cryptococcal meningitis, Dengue, Diarrhoeal diseases, Helminth infections (worms & flukes), Hepatitis B, Hepatitis C, Histoplasmosis, HIV/AIDS, Kinetoplastid diseases, Leprosy, Leptospirosis, Malaria, Mycetoma, Rheumatic fever, Salmonella infections, Scabies, Snakebite envenoming, Trachoma, Tuberculosis, Yaws. Emerging Infectious Diseases: Arenaviral haemorrhagic fevers (including Lassa fever), Bunyaviral diseases (including CCHF, RVF, SFTS), Chikungunya, Coronaviral diseases (including MERS, SARS, COVID-19), Emergent non-polio enteroviruses (including EV71, D68), Filoviral diseases (including Ebola, Marburg), Henipaviral diseases (including Nipah), Mpox (monkeypox), Zika. Sexual & Reproductive Health: Contraception, HIV/AIDS, HPV and HPV-related cervical cancer, Multi-purpose prevention technologies, Post-partum haemorrhage, Pre-eclampsia and eclampsia, Sexually transmitted infections."

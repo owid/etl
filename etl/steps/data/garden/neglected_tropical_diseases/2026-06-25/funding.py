@@ -55,6 +55,11 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("funding")
 
+    # Rename Chikungunya rows
+    tb["disease"] = tb["disease"].replace(
+        {"Togaviridae (including Alphaviruses e.g. CHIKV) - Chikungunya (CHIKV)": "Chikungunya"}
+    )
+
     # Group some of the research technologies (products) into broader groups
     tb = aggregate_products(tb)
 
@@ -66,11 +71,6 @@ def run() -> None:
 
     # The funding for each product - across all diseases
     tb_product = format_table(tb=tb, group=["product", "year"], index_col=["product"], short_name="funding_product")
-
-    # Rename Chikungunya rows
-    tb["disease"] = tb["disease"].replace(
-        {"Togaviridae (including Alphaviruses e.g. CHIKV) - Chikungunya (CHIKV)": "Chikungunya"}
-    )
 
     # Funding for each product - across only the NTDs in the dataset
     missing_items = [item for item in NTDS if item not in tb["disease"].values]
