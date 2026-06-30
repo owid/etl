@@ -16,8 +16,8 @@ meta:
     attribution_short: HMD
     url_main: https://www.mortality.org/Data/STMF
     url_download: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
-    date_accessed: '2026-06-29'
-    date_published: '2026-06-01'
+    date_accessed: '2026-06-30'
+    date_published: '2026-06-29'
     license:
       name: Creative Commons BY 4.0
       url: https://www.mortality.org/Data/UserAgreement
