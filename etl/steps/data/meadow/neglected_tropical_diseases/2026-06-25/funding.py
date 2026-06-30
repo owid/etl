@@ -24,7 +24,14 @@ def run() -> None:
 
     # Combine Disease/Health area and Subcategory with a hyphen if subcategory is not empty, otherwise just use Disease/Health area
 
-    tb["disease"] = tb.apply(lambda row: row["Disease/Health area"] + " - " + row["Subcategory"] if row["Subcategory"] else row["Disease/Health area"], axis=1)
+    tb["disease"] = tb.apply(
+        lambda row: (
+            row["Disease/Health area"] + " - " + row["Subcategory"]
+            if row["Subcategory"]
+            else row["Disease/Health area"]
+        ),
+        axis=1,
+    )
 
     tb = tb.drop(columns=["Disease/Health area", "Subcategory"])
     # Drop 'FY'from the year column
