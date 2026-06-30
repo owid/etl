@@ -7,9 +7,9 @@ definitions:
         - Global Health
         - Neglected Tropical Diseases
       grapher_config:
-        note: "This data is expressed in constant 2024 US$."
+        note: "This data is expressed in constant 2024 US$. Despite high coverage, some R&D funding data maybe missing, as not all funders respond to the survey."
         selectedEntityNames: ["World"]
-    unit: constant 2024 US$
+    unit: constant 2024 US$ #this is always the latest year of the report!
     short_unit: $
     display:
       numDecimalPlaces: 0
@@ -18,9 +18,10 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
   owners:
     - Fiona Spooner
+    - Tuna Acisu
+
 tables:
   funding_disease:
     variables:
