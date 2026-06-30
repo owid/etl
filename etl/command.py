@@ -253,6 +253,14 @@ def main_cli(
             if not steps:
                 click.echo("No steps modified relative to origin/master.")
                 return
+            # `--modified` surfaces modified export steps (multidim/explorer recipes) by design, but
+            # they're only buildable in export mode. When a branch edits only such a recipe (e.g. a
+            # single `<explorer>.<key>.config.yml`), the modified set is export-only; without this we
+            # would exclude it downstream and crash with "No steps matched". Enable export (which also
+            # un-excludes the grapher deps the export step needs) so the explorer actually rebuilds.
+            if not export and any(s.startswith("export://") for s in steps):
+                export = True
+                click.echo("Detected modified export step(s); enabling --export for this run.")
             click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
             # We matched modified catalog paths as substrings, so disable exact matching downstream.
             exact_match = False
