@@ -44,21 +44,6 @@ ABBREVIATIONS = {
     "occupancy": "occ",
 }
 
-# Source-side unit corrections: (country, meadow_column, divisor).
-# UNWTO occasionally reports a country-indicator in units while the rest are in thousands.
-# Each entry divides the raw value by `divisor` before the blanket ×1000 conversion.
-# If the source fixes the inconsistency, the population sanity check will still pass and
-# the correction becomes a harmless no-op (dividing an already-correct value makes it too small,
-# which the check would also catch on the next update — remove the entry then).
-UNIT_CORRECTIONS = [
-    # Taiwan reports domestic hotel guests in units, not thousands (as of 2026-01-21 snapshot).
-    (
-        "Taiwan",
-        "domestic_tourism_accommodation_domestic__accommodation__short_term_accommodation__hotels_and_similar__isic_5510__guests",
-        1000,
-    ),
-]
-
 # Columns to keep after shortening column names
 COLUMNS_TO_KEEP = [
     "dom_tour_trips_total_overnight_vis_tourists",
@@ -107,25 +92,11 @@ def run() -> None:
     # Drop columns with all NaN values
     tb = tb.dropna(axis=1, how="all")
 
-    # Corrections for source-side unit inconsistencies.
-    # The sanity_check_population_ratios() below will catch any *new* mismatches — when it
-    # fails, investigate the source and add a correction here.
-    # If the source fixes the inconsistency, the correction becomes wrong (makes values too
-    # small). To guard against that, we verify the correction is still needed: the raw value
-    # must be >100× the median of other countries. If not, the source was fixed — remove the entry.
-    for country, col, divisor in UNIT_CORRECTIONS:
-        if col in tb.columns:
-            mask = tb["country"] == country
-            country_vals = tb.loc[mask, col].dropna()
-            others_median = tb.loc[~mask, col].dropna().median()
-            if len(country_vals) > 0 and others_median > 0:
-                ratio = country_vals.median() / others_median
-                assert ratio > 100, (
-                    f"Unit correction for {country}/{col} may no longer be needed: "
-                    f"ratio to others' median is only {ratio:.1f}x (expected >100x). "
-                    f"The source may have fixed the inconsistency — verify and remove the entry from UNIT_CORRECTIONS."
-                )
-            tb.loc[mask, col] = tb.loc[mask, col] / divisor
+    # Corrections for source-side unit inconsistencies (see unwto.corrections.yml). Applied on the raw
+    # meadow values, before the ×1000 conversion below. Each correction self-validates via its `expect`
+    # guard and fails loudly if the source fixes the issue. The sanity_check_population_ratios() below
+    # independently catches any *new* mismatches — when it fails, investigate and add a correction.
+    tb = paths.apply_corrections(tb)
 
     # Find columns that start with the specified prefixes - units are not thousands
     matching_columns = [col for col in tb.columns if any(col.startswith(prefix) for prefix in PREFIXES_NOT_THOUSANDS)]

@@ -154,6 +154,68 @@ def test_validate_rejects_match_combined_with_years():
         _validate_correction(_correction(action="drop", match={"value": 10.0}, years=[2006]), "<test>")
 
 
+def test_scale_multiplies_matched_values():
+    tb = _make_table()
+    out = apply_corrections(tb, [_correction(action="scale", factor=0.5, entity="France", years="all")])
+    # France 2006 (10.0) and 2016 (20.0) halved; Panama untouched.
+    assert sorted(out.loc[out["country"] == "France", "value"].tolist()) == [5.0, 10.0]
+    assert sorted(out.loc[out["country"] == "Panama", "value"].tolist()) == [-3.0, -2.0, -1.0]
+    # Metadata preserved through scale.
+    assert out["value"].metadata.unit == "tonnes"
+
+
+def test_scale_requires_numeric_factor():
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="numeric 'factor'"):
+        _validate_correction(_correction(action="scale", entity="France", years="all"), "<test>")
+    # A boolean is not a valid factor (bool is an int subclass — guard against it).
+    with pytest.raises(AssertionError, match="numeric 'factor'"):
+        _validate_correction(_correction(action="scale", factor=True, entity="France", years="all"), "<test>")
+
+
+def test_years_all_selects_every_year_for_entity():
+    tb = _make_table()
+    out = apply_corrections(tb, [_correction(action="drop", entity="Panama", years="all")])
+    # All three Panama rows dropped; France untouched.
+    assert (out["country"] == "Panama").sum() == 0
+    assert (out["country"] == "France").sum() == 2
+
+
+def test_expect_passes_when_anomaly_present():
+    tb = _make_table()
+    # France values are 10 and 20, both > 5 → expectation holds, scale applies.
+    out = apply_corrections(
+        tb, [_correction(action="scale", factor=0.1, entity="France", years="all", expect={"gt": 5})]
+    )
+    assert sorted(out.loc[out["country"] == "France", "value"].tolist()) == [1.0, 2.0]
+
+
+def test_expect_raises_when_anomaly_fixed():
+    tb = _make_table()
+    # Panama values are negative; expecting them > 0 fails (simulates an upstream fix).
+    with pytest.raises(AssertionError, match="may have been fixed"):
+        apply_corrections(
+            tb, [_correction(action="override", value=0.0, entity="Panama", years="all", expect={"gt": 0})]
+        )
+
+
+def test_expect_rejected_on_flag():
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="cannot be combined with action 'flag'"):
+        _validate_correction(_correction(action="flag", entity="Panama", years="all", expect={"gt": 0}), "<test>")
+
+
+def test_expect_rejects_unknown_operator():
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="unknown 'expect' operators"):
+        _validate_correction(
+            _correction(action="scale", factor=0.5, entity="France", years="all", expect={"approx": 10}), "<test>"
+        )
+
+
 def test_load_corrections_rejects_both_entity_and_match(tmp_path):
     p = tmp_path / "x.corrections.yml"
     p.write_text(

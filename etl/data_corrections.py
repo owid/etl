@@ -19,8 +19,8 @@ Format (a list of entries)::
 
     - indicator: consumption_emissions          # the COLUMN to correct
       entity: Panama                            # country/entity
-      years: [2006, 2008, 2016]                 # list | latest | {after/before/from/to: Y}
-      action: drop                              # drop | override | flag
+      years: [2006, 2008, 2016]                 # list | all | latest | {after/before/from/to: Y}
+      action: drop                              # drop | override | scale | flag
       reason: Negative consumption-based CO2 (physically impossible) in source data.
       provider: Global Carbon Project
       reported: 2024-11-13                       # optional — when we told the provider
@@ -38,7 +38,24 @@ Actions:
 - ``drop``     — remove the matched rows (use for long/tidy tables, where a row *is* one data point).
 - ``override`` — replace the indicator value of the matched rows with ``value``. Set ``value: null``
                  to blank a single bad cell in a wide table without dropping the whole row.
+- ``scale``    — multiply the indicator value of the matched rows by ``factor`` (e.g. ``factor: 0.001``
+                 to fix a value reported in units while the rest are in thousands).
 - ``flag``     — no data change; logs that the (uncorrected) error is known.
+
+Guard against silently re-applying a correction after the source fixes it (optional ``expect``)::
+
+    - indicator: ..._guests
+      entity: Taiwan
+      years: all
+      action: scale
+      factor: 0.001
+      expect: {gt: 1000000}                      # matched values must still be anomalously large
+      ...
+
+``expect`` is a mapping of comparison operator (``eq``/``ne``/``gt``/``ge``/``lt``/``le``) to a numeric
+threshold; every operator must hold for *all* matched rows or the step fails loudly. ``drop`` is already
+self-validating (the row vanishing trips the no-match assertion), but ``override``/``scale`` keep the row,
+so ``expect`` is how they detect an upstream fix. It cannot be combined with ``flag``.
 
 There is intentionally no ``id`` field — a stable identifier is derived from the entry's target
 (provider / indicator / entity+years or match) for logs and error messages.
@@ -61,8 +78,18 @@ log = get_logger()
 DEFAULT_COUNTRY_COL = "country"
 DEFAULT_YEAR_COL = "year"
 
-VALID_ACTIONS = {"drop", "override", "flag"}
+VALID_ACTIONS = {"drop", "override", "scale", "flag"}
 VALID_STATUSES = {"open", "reported", "acknowledged", "fixed_upstream"}
+
+# Comparison operators allowed in an `expect:` guard, mapping to the function applied elementwise.
+EXPECT_OPERATORS = {
+    "eq": lambda values, threshold: values == threshold,
+    "ne": lambda values, threshold: values != threshold,
+    "gt": lambda values, threshold: values > threshold,
+    "ge": lambda values, threshold: values >= threshold,
+    "lt": lambda values, threshold: values < threshold,
+    "le": lambda values, threshold: values <= threshold,
+}
 
 
 def load_corrections(path: Path | str) -> list[dict[str, Any]]:
@@ -132,6 +159,29 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
     if action == "override":
         assert "value" in correction, f"Correction [{label}]: action 'override' requires a 'value'."
 
+    if action == "scale":
+        factor = correction.get("factor")
+        assert isinstance(factor, (int, float)) and not isinstance(factor, bool), (
+            f"Correction [{label}]: action 'scale' requires a numeric 'factor'."
+        )
+
+    if "expect" in correction:
+        # `expect` only guards a data-changing action — there is nothing to guard for 'flag'.
+        assert action != "flag", f"Correction [{label}]: 'expect' cannot be combined with action 'flag'."
+        expect = correction["expect"]
+        assert isinstance(expect, dict) and len(expect) > 0, (
+            f"Correction [{label}]: 'expect' must be a non-empty mapping of operator → threshold."
+        )
+        unknown_ops = set(expect) - set(EXPECT_OPERATORS)
+        assert not unknown_ops, (
+            f"Correction [{label}]: unknown 'expect' operators {sorted(unknown_ops)} "
+            f"(expected a subset of {sorted(EXPECT_OPERATORS)})."
+        )
+        for op, threshold in expect.items():
+            assert isinstance(threshold, (int, float)) and not isinstance(threshold, bool), (
+                f"Correction [{label}]: 'expect.{op}' threshold must be numeric, got {threshold!r}."
+            )
+
 
 def _column_values(tb: Table, col: str, index_names: list[str]) -> np.ndarray:
     """Return the values of `col` whether it lives in the table's columns or its index."""
@@ -145,9 +195,12 @@ def _column_values(tb: Table, col: str, index_names: list[str]) -> np.ndarray:
 def _year_mask(years: Any, year_values: np.ndarray, label: str) -> np.ndarray:
     """Build a boolean mask over rows selected by the `years` grammar.
 
-    Supports: a literal list of years, the keyword `latest` (the max year present in the table, i.e.
-    the dataset's most recent year), and range dicts using `after` / `before` / `from` / `to`.
+    Supports: a literal list of years, the keyword `all` (every year for the entity), the keyword
+    `latest` (the max year present in the table, i.e. the dataset's most recent year), and range dicts
+    using `after` / `before` / `from` / `to`.
     """
+    if years == "all":
+        return np.ones(len(year_values), dtype=bool)
     if years == "latest":
         assert len(year_values) > 0, f"Correction [{label}]: table has no rows, cannot resolve 'latest' year."
         return year_values == year_values.max()
@@ -167,7 +220,7 @@ def _year_mask(years: Any, year_values: np.ndarray, label: str) -> np.ndarray:
             mask &= year_values <= years["to"]
         return mask
     raise ValueError(
-        f"Correction [{label}]: unsupported 'years' value {years!r} (expected list, 'latest' or a range dict)."
+        f"Correction [{label}]: unsupported 'years' value {years!r} (expected list, 'all', 'latest' or a range dict)."
     )
 
 
@@ -187,6 +240,23 @@ def _row_mask(tb: Table, correction: dict[str, Any], country_col: str, year_col:
     entity_mask = _column_values(tb, country_col, index_names) == correction["entity"]
     year_values = _column_values(tb, year_col, index_names)
     return entity_mask & _year_mask(correction["years"], year_values, label)
+
+
+def _check_expectation(tb: Table, correction: dict[str, Any], mask: np.ndarray, label: str) -> None:
+    """Assert the matched rows still satisfy the `expect` predicate (i.e. the anomaly is still present).
+
+    This is the "raise if fixed upstream" guard: every operator in `expect` must hold for *all* matched
+    values of the indicator column. If any fails, the upstream error was likely corrected and the
+    correction should be removed.
+    """
+    values = tb.loc[mask, correction["indicator"]]
+    for op, threshold in correction["expect"].items():
+        satisfied = EXPECT_OPERATORS[op](values, threshold)
+        assert satisfied.all(), (
+            f"Correction [{label}]: expectation '{op} {threshold}' failed for {(~satisfied).sum()} of "
+            f"{len(values)} matched rows (values: {sorted(set(values.tolist()))[:5]}). The upstream error "
+            f"may have been fixed — remove or update this correction."
+        )
 
 
 def apply_corrections(
@@ -225,11 +295,19 @@ def apply_corrections(
             f"remove or update this correction."
         )
 
+        # `drop` is self-validating (the row vanishing trips the assert above), but `override`/`scale`
+        # keep the row, so a fixed-upstream value would be silently re-mangled. An optional `expect`
+        # guard asserts the matched rows are *still* anomalous before we touch them.
+        if "expect" in correction:
+            _check_expectation(tb, correction, mask, label)
+
         if action == "drop":
             tb = tb[~mask]
             dropped_any = True
         elif action == "override":
             tb.loc[mask, correction["indicator"]] = correction["value"]
+        elif action == "scale":
+            tb.loc[mask, correction["indicator"]] *= correction["factor"]
 
         log.info("data_corrections.apply", correction=label, action=action, matched=n_matched)
 
