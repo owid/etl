@@ -46,16 +46,6 @@ dimensions:
         name: "Main index"
       - slug: political_regime
         name: "Political regime"
-      - slug: electoral_pluralism_index
-        name: "Electoral pluralism index"
-      - slug: functioning_government_index
-        name: "Functioning government index"
-      - slug: political_participation_index
-        name: "\xadPolitical participation index"
-      - slug: democratic_culture_index
-        name: "Democratic culture index"
-      - slug: civil_liberties_index
-        name: "\xadCivil liberties index"
       - slug: number_and_share_of_democracies
         name: "\xad\xad\xadNumber and share of democracies"
       - slug: people_living_in_democracies
@@ -76,36 +66,6 @@ views:
         - catalogPath: eiu#regime_eiu
     config:
       colorVariableId: eiu#regime_eiu
-  - dimensions:
-      metric: democracy
-      sub_metric: electoral_pluralism_index
-    indicators:
-      y:
-        - catalogPath: eiu#elect_freefair_eiu
-  - dimensions:
-      metric: democracy
-      sub_metric: functioning_government_index
-    indicators:
-      y:
-        - catalogPath: eiu#funct_gov_eiu
-  - dimensions:
-      metric: democracy
-      sub_metric: political_participation_index
-    indicators:
-      y:
-        - catalogPath: eiu#pol_part_eiu
-  - dimensions:
-      metric: democracy
-      sub_metric: democratic_culture_index
-    indicators:
-      y:
-        - catalogPath: eiu#dem_culture_eiu
-  - dimensions:
-      metric: democracy
-      sub_metric: civil_liberties_index
-    indicators:
-      y:
-        - catalogPath: eiu#civlib_eiu
   - dimensions:
       metric: democracy
       sub_metric: number_and_share_of_democracies
