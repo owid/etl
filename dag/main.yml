@@ -404,12 +404,14 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
 
-  # Integrated Values Survey
+  # Integrated Values Survey (also builds the World Values Survey table from its own snapshot/meadow)
 
   data://grapher/ivs/2025-06-27/integrated_values_surveys:
     - data://garden/ivs/2025-06-27/integrated_values_surveys:
       - data://meadow/ivs/2025-06-27/integrated_values_surveys:
         - snapshot://ivs/2025-06-27/integrated_values_surveys.csv
+      - data://meadow/wvs/2026-06-30/world_values_survey:
+        - snapshot://wvs/2026-06-30/world_values_survey.csv
 
   #
   # Media deaths

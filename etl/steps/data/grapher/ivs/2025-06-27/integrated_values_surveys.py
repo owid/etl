@@ -13,8 +13,9 @@ def run() -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("integrated_values_surveys")
 
-    # Read table from garden dataset.
+    # Read both tables from garden dataset (Integrated Values Surveys + World Values Survey).
     tb = ds_garden.read("integrated_values_surveys", reset_index=False)
+    tb_wvs = ds_garden.read("world_values_survey", reset_index=False)
 
     #
     # Process data.
@@ -24,7 +25,9 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(
+        tables=[tb, tb_wvs], check_variables_metadata=True, default_metadata=ds_garden.metadata
+    )
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
