@@ -9,11 +9,10 @@ from typing import Any
 
 import jwt
 import requests
-from github import Auth, Github, GithubException, InputGitTreeElement
+from github import Auth, Github, GithubException, GithubRetry, InputGitTreeElement
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from structlog import get_logger
-from urllib3.util.retry import Retry
 
 from etl.config import (
     GITHUB_TOKEN,
@@ -33,12 +32,14 @@ log = get_logger()
 # (repo lookup, get_pulls, check-run/comment writes, ...) is covered, not just the initial repository
 # resolution. A 401 means the request was rejected before processing, so retrying is safe even for
 # writes; a genuinely invalid token keeps returning 401, exhausts the retries, and still raises.
-GITHUB_RETRY = Retry(
-    total=4,
-    status_forcelist=[401],
-    allowed_methods=None,  # retry on all HTTP methods (a 401 is rejected pre-processing)
-    backoff_factor=2,
-    respect_retry_after_header=True,
+#
+# Extend PyGithub's own GithubRetry (rather than a bare urllib3 Retry) so we keep its default handling
+# of 5xx and 403 secondary-rate-limit responses — it appends 403 and adds {GET, POST} to allowed
+# methods itself, and we add 401 to the 5xx force list. backoff_factor adds spacing between attempts.
+GITHUB_RETRY = GithubRetry(
+    total=10,
+    backoff_factor=1.0,
+    status_forcelist=list(range(500, 600)) + [401],
 )
 
 
