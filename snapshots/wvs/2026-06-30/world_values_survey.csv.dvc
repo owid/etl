@@ -18,3 +18,7 @@ meta:
       name: WVSA Conditions of use
       url: https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
   is_public: false
+outs:
+  - md5: 9882d6eb153c9606cec9f190c1ff46d1
+    size: 14211
+    path: world_values_survey.csv
