@@ -30,7 +30,7 @@ from etl.collection import Collection, CollectionSet
 from etl.collection.core.create import Listable, create_collection
 from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
-from etl.data_corrections import apply_corrections, load_corrections
+from etl.data_corrections import apply_corrections, build_audit, load_corrections, write_audit
 from etl.data_helpers.geo import Regions
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -335,6 +335,9 @@ class PathFinder:
         if not self.corrections_path.exists():
             return tb
         corrections = load_corrections(self.corrections_path)
+        # Record the affected rows (before/after) so `etl corrections --charts` can visualise the
+        # problematic values, which are gone from the published data once the correction is applied.
+        write_audit(self.corrections_path, build_audit(tb, corrections, country_col=country_col, year_col=year_col))
         return apply_corrections(tb, corrections, country_col=country_col, year_col=year_col)
 
     @property

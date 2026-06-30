@@ -16,11 +16,10 @@ from pathlib import Path
 from typing import Any
 
 import rich_click as click
-from owid.catalog import Dataset
 from rich.console import Console
 from rich.table import Table as RichTable
 
-from etl.data_corrections import load_corrections
+from etl.data_corrections import _label, load_corrections, read_audit
 from etl.paths import BASE_DIR, STEP_DIR
 
 console = Console()
@@ -64,116 +63,115 @@ def collect_corrections(step_dir: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def _dataset_dir(corrections_path: Path) -> Path:
-    """The built-dataset directory that corresponds to a `.corrections.yml` file.
+def _fmt(v: float | None) -> str:
+    """Compact human-readable number (e.g. -1.23, 6.4e+07)."""
+    return "—" if v is None else f"{v:.4g}"
 
-    `etl/steps/data/garden/gcp/.../x.corrections.yml` → `data/garden/gcp/.../x`.
+
+def _affected_table(affected: list, action: str) -> str:
+    """A small table of the affected points: year, the (problematic) before value, and the after value."""
+    after_label = "After" if action != "drop" else "Result"
+    body = "".join(
+        f'<tr><td>{int(y)}</td><td class="bad">{_fmt(before)}</td>'
+        f"<td>{'removed' if action == 'drop' else _fmt(after)}</td></tr>"
+        for y, before, after in affected
+    )
+    return f'<table class="affected"><thead><tr><th>Year</th><th>Before</th><th>{after_label}</th></tr></thead><tbody>{body}</tbody></table>'
+
+
+def _chart_svg(series: list, affected: list, action: str) -> str:
+    """SVG of the full *pre-correction* series, with the problematic (before) values highlighted.
+
+    Uses a symlog y-axis when the values cross zero or span many orders of magnitude, so a small
+    negative dip stays visible next to values that are millions of times larger.
     """
-    rel = corrections_path.relative_to(STEP_DIR)  # e.g. data/garden/.../x.corrections.yml
-    return BASE_DIR / rel.parent / rel.name.replace(".corrections.yml", "")
+    import math
 
+    w, h = 720, 280
+    ml, mr, mt, mb = 64, 24, 16, 34  # margins
+    pts = [(int(y), float(v)) for y, v in series]
+    after_pts = [(int(y), a) for y, _, a in affected if action != "drop" and a is not None]
+    before_pts = [(int(y), b) for y, b, _ in affected if b is not None]
+    all_vals = [v for _, v in pts] + [a for _, a in after_pts] + [b for _, b in before_pts]
+    if not pts or not all_vals:
+        return '<span class="note">No numeric data captured for this correction.</span>'
 
-def _load_series(corrections_path: Path, indicator: str, entity: str, country_col: str = "country") -> list[tuple]:
-    """Return the published `(year, value)` series for `entity`/`indicator` from the built dataset.
+    years = [y for y, _ in pts] + [y for y, _ in before_pts]
+    if len(set(years)) < 2:
+        return ""  # a single-year "series" is not a time series — the before→after table says it all
+    ymin_x, ymax_x = min(years), max(years)
+    vmin, vmax = min(all_vals), max(all_vals)
+    nonzero = [abs(v) for v in all_vals if v != 0]
+    use_symlog = (vmin < 0 < vmax) or (nonzero and max(nonzero) / min(nonzero) > 1000)
+    linthresh = min(nonzero) if nonzero else 1.0
 
-    Raises on any problem (dataset not built, indicator renamed/absent) — the caller turns that into a
-    "chart unavailable" note rather than failing the whole report.
-    """
-    import pandas as pd
+    def t(v: float) -> float:
+        return math.copysign(math.log10(1 + abs(v) / linthresh), v) if use_symlog else v
 
-    ds = Dataset(_dataset_dir(corrections_path))
-    for table_name in ds.table_names:
-        tb = ds[table_name].reset_index()
-        if indicator in tb.columns and country_col in tb.columns and "year" in tb.columns:
-            if not pd.api.types.is_numeric_dtype(tb[indicator]):
-                raise ValueError(f"indicator '{indicator}' is categorical — no time series")
-            sub = tb[tb[country_col] == entity][["year", indicator]].dropna()
-            series = sorted((int(y), float(v)) for y, v in zip(sub["year"], sub[indicator]))
-            if series:
-                return series
-    raise ValueError(f"indicator '{indicator}' not found for '{entity}' in the built dataset")
+    tmin, tmax = t(vmin), t(vmax)
+    tspan = (tmax - tmin) or 1.0
+    xspan = (ymax_x - ymin_x) or 1
 
-
-def _affected_years(correction: dict[str, Any], series_years: list[int]) -> set[int]:
-    """Years the correction targets, intersected with the years present on the chart's axis."""
-    years = correction.get("years")
-    axis = set(series_years)
-    if years == "all":
-        return axis
-    if years == "latest":
-        return {max(series_years)} if series_years else set()
-    if isinstance(years, list):
-        return {int(y) for y in years}
-    if isinstance(years, dict):
-        lo = max(years.get("from", years.get("after", -(10**9)) + 1), min(axis, default=-(10**9)))
-        hi = min(years.get("to", years.get("before", 10**9) - 1), max(axis, default=10**9))
-        return {y for y in range(lo, hi + 1)}
-    return set()
-
-
-def _sparkline_svg(series: list[tuple], affected: set[int], action: str) -> str:
-    """A small self-contained SVG line chart of the series, annotating the affected years."""
-    w, h, pad = 480, 140, 32
-    years = [y for y, _ in series]
-    vals = [v for _, v in series]
-    ymin, ymax = min(years), max(years)
-    vmin, vmax = min(vals), max(vals)
-    xspan = max(ymax - ymin, 1)
-    vspan = max(vmax - vmin, 1e-9)
-
-    def px(year: int) -> float:
-        return pad + (year - ymin) / xspan * (w - 2 * pad)
+    def px(year: float) -> float:
+        return ml + (year - ymin_x) / xspan * (w - ml - mr)
 
     def py(val: float) -> float:
-        return h - pad - (val - vmin) / vspan * (h - 2 * pad)
+        return h - mb - (t(val) - tmin) / tspan * (h - mt - mb)
 
-    points = " ".join(f"{px(y):.1f},{py(v):.1f}" for y, v in series)
-    dots = "".join(f'<circle cx="{px(y):.1f}" cy="{py(v):.1f}" r="2" fill="#3b6"/>' for y, v in series)
+    # Horizontal gridlines / y labels at min, max, and 0 (if the range crosses it).
+    grid_vals = sorted({vmin, vmax} | ({0.0} if vmin < 0 < vmax else set()))
+    grid = "".join(
+        f'<line x1="{ml}" y1="{py(gv):.1f}" x2="{w - mr}" y2="{py(gv):.1f}" stroke="#eee"/>'
+        f'<text x="{ml - 6}" y="{py(gv) + 3:.1f}" font-size="11" fill="#999" text-anchor="end">{_fmt(gv)}</text>'
+        for gv in grid_vals
+    )
+    line = " ".join(f"{px(y):.1f},{py(v):.1f}" for y, v in pts)
+    polyline = f'<polyline points="{line}" fill="none" stroke="#9bb" stroke-width="1.5"/>' if len(pts) > 1 else ""
+    dots = "".join(f'<circle cx="{px(y):.1f}" cy="{py(v):.1f}" r="2.5" fill="#9bb"/>' for y, v in pts)
+    # Problematic (before) values in red — these are the points the correction acts on.
+    bad = "".join(f'<circle cx="{px(y):.1f}" cy="{py(b):.1f}" r="5" fill="#d9534f"/>' for y, b in before_pts)
+    # Corrected (after) values in green (scale/override only).
+    good = "".join(f'<circle cx="{px(y):.1f}" cy="{py(a):.1f}" r="4" fill="#5cb85c"/>' for y, a in after_pts)
 
-    # Annotate the affected years.
-    marks = []
-    for ay in sorted(affected):
-        x = px(ay)
-        if action == "drop":
-            # The dropped points are gone from the series — mark the position with a red axis tick.
-            marks.append(
-                f'<line x1="{x:.1f}" y1="{h - pad:.1f}" x2="{x:.1f}" y2="{h - pad + 6:.1f}" stroke="#d9534f" stroke-width="2"/>'
-            )
-        else:
-            # scale/override keep the (corrected) point — highlight it.
-            match = [v for yy, v in series if yy == ay]
-            if match:
-                marks.append(
-                    f'<circle cx="{x:.1f}" cy="{py(match[0]):.1f}" r="4" fill="none" stroke="#d9534f" stroke-width="2"/>'
-                )
-    polyline = f'<polyline points="{points}" fill="none" stroke="#3b6" stroke-width="1.5"/>' if len(series) > 1 else ""
     return (
-        f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg">'
-        f'<line x1="{pad}" y1="{h - pad}" x2="{w - pad}" y2="{h - pad}" stroke="#ddd"/>'
-        f"{polyline}{dots}{''.join(marks)}"
-        f'<text x="{pad}" y="{h - pad + 18}" font-size="10" fill="#999">{ymin}</text>'
-        f'<text x="{w - pad}" y="{h - pad + 18}" font-size="10" fill="#999" text-anchor="end">{ymax}</text>'
-        f'<text x="{pad - 4}" y="{py(vmax):.1f}" font-size="10" fill="#999" text-anchor="end">{vmax:g}</text>'
-        f'<text x="{pad - 4}" y="{py(vmin):.1f}" font-size="10" fill="#999" text-anchor="end">{vmin:g}</text>'
-        "</svg>"
+        f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg" class="chart">'
+        f"{grid}{polyline}{dots}{bad}{good}"
+        f'<text x="{ml}" y="{h - 8}" font-size="11" fill="#999">{ymin_x}</text>'
+        f'<text x="{w - mr}" y="{h - 8}" font-size="11" fill="#999" text-anchor="end">{ymax_x}</text>'
+        + (
+            f'<text x="{w - mr}" y="{mt + 10}" font-size="10" fill="#bbb" text-anchor="end">symlog</text>'
+            if use_symlog
+            else ""
+        )
+        + "</svg>"
     )
 
 
 def _chart_cell(r: dict[str, Any]) -> str:
-    """The expandable chart HTML for a correction row, or a note explaining why it's unavailable."""
-    c = r["correction"]
-    if "match" in c or "entity" not in c:
-        return '<span class="note">Chart not supported for match-based corrections.</span>'
-    try:
-        series = _load_series(r["path"], c["indicator"], c["entity"])
-    except (FileNotFoundError, ValueError, KeyError) as e:
-        return f'<span class="note">Chart unavailable: {html.escape(str(e))}. Build the step (or the indicator was renamed after the correction).</span>'
-    affected = _affected_years(c, [y for y, _ in series])
-    legend = "red tick = removed year" if c.get("action") == "drop" else "red ring = corrected value"
-    return (
-        f'<div class="note">Published (post-correction) series for {html.escape(c["entity"])} · {legend}</div>'
-        + _sparkline_svg(series, affected, c.get("action", ""))
-    )
+    """The expandable detail for a correction: a before→after table plus a time-series chart."""
+    records = read_audit(r["path"])
+    if records is None:
+        rel = r["path"].parent.relative_to(STEP_DIR)
+        return f'<span class="note">No audit captured yet — run the step (<code>etlr {rel}</code>) to generate chart data.</span>'
+    rec = next((x for x in records if x["label"] == _label(r["correction"])), None)
+    if rec is None:
+        return '<span class="note">No audit entry for this correction (re-run the step after editing it).</span>'
+    if not rec.get("numeric"):
+        return '<span class="note">Indicator is non-numeric (categorical) — no time series.</span>'
+
+    action = rec["action"]
+    legend = "red = removed values" if action == "drop" else "red = original (bad) value · green = corrected value"
+    blocks = []
+    for ent in rec["entities"]:
+        if not ent["affected"]:
+            continue
+        blocks.append(
+            f'<div class="entity-block">'
+            f'<div class="note"><b>{html.escape(ent["entity"])}</b> · pre-correction series · {legend}</div>'
+            f'<div class="chart-row">{_affected_table(ent["affected"], action)}{_chart_svg(ent["series"], ent["affected"], action)}</div>'
+            f"</div>"
+        )
+    return "".join(blocks) or '<span class="note">No affected points captured.</span>'
 
 
 def _render_html(rows: list[dict[str, Any]], generated_at: str, charts: bool) -> str:
@@ -257,6 +255,13 @@ def _render_html(rows: list[dict[str, Any]], generated_at: str, charts: bool) ->
   tr.detail td {{ background: #fbfbfd; padding: 1rem; }}
   tr.hidden {{ display: none !important; }}
   .note {{ color: #888; font-size: .78rem; margin-bottom: .4rem; }}
+  .entity-block {{ margin-bottom: 1.25rem; }}
+  .chart-row {{ display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }}
+  .chart {{ background: #fff; border: 1px solid #eee; border-radius: 6px; }}
+  table.affected {{ border-collapse: collapse; font-size: .8rem; min-width: 220px; }}
+  table.affected th, table.affected td {{ border: 1px solid #eee; padding: .3rem .6rem; text-align: right; }}
+  table.affected th {{ background: #f7f7f7; position: static; }}
+  table.affected td.bad {{ color: #d9534f; font-weight: 600; }}
 </style>
 </head>
 <body>

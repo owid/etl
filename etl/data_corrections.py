@@ -64,6 +64,7 @@ This module is the mechanism only. The cross-dataset dashboard, per-provider rep
 auto-expiry on re-ingestion are deliberately out of scope here.
 """
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -71,6 +72,8 @@ import numpy as np
 import yaml
 from owid.catalog import Table
 from structlog import get_logger
+
+from etl.paths import DATA_DIR, STEP_DIR
 
 log = get_logger()
 
@@ -315,3 +318,108 @@ def apply_corrections(
         tb = tb.reset_index(drop=True)
 
     return tb
+
+
+# --------------------------------------------------------------------------------------------------
+# Audit: capture the before/after of each correction so `etl corrections --charts` can show the
+# *problematic* values (which are gone from the published data once the correction is applied).
+# --------------------------------------------------------------------------------------------------
+
+
+def _to_float(value: Any) -> float | None:
+    """Coerce a value to float, or None if it's missing/non-numeric (e.g. a categorical entity)."""
+    try:
+        f = float(value)
+    except (TypeError, ValueError):
+        return None
+    return None if f != f else f  # drop NaN
+
+
+def audit_path_for(corrections_path: Path | str) -> Path:
+    """Where the audit JSON for a given `.corrections.yml` lives (under the gitignored data/ tree)."""
+    rel = Path(corrections_path).resolve().relative_to(STEP_DIR.resolve())  # data/<channel>/.../x.corrections.yml
+    parts = rel.parts[1:] if rel.parts and rel.parts[0] == "data" else rel.parts
+    name = parts[-1].replace(".corrections.yml", ".audit.json")
+    return DATA_DIR / "corrections_audit" / Path(*parts[:-1]) / name
+
+
+def build_audit(
+    tb: Table,
+    corrections: list[dict[str, Any]],
+    *,
+    country_col: str = DEFAULT_COUNTRY_COL,
+    year_col: str = DEFAULT_YEAR_COL,
+) -> list[dict[str, Any]]:
+    """Record each correction's affected entities: their full *pre-correction* series and the
+    before/after of every affected point. Computed on `tb` before any correction is applied.
+    """
+    index_names = [name for name in tb.index.names if name is not None]
+    records = []
+    for correction in corrections:
+        indicator = correction["indicator"]
+        try:
+            ind_vals = _column_values(tb, indicator, index_names)
+            entity_vals = _column_values(tb, country_col, index_names).astype(str)
+            year_vals = _column_values(tb, year_col, index_names)
+        except KeyError:
+            continue  # can't audit if the locator columns aren't present at this stage
+        mask = _row_mask(tb, correction, country_col, year_col)
+        action = correction["action"]
+        factor = correction.get("factor")
+        override_value = _to_float(correction.get("value"))
+
+        any_numeric = False
+        entities = []
+        for ent in sorted(set(entity_vals[mask].tolist())):
+            ent_mask = entity_vals == ent
+            series = sorted(
+                [int(y), fv]
+                for y, v in zip(year_vals[ent_mask].tolist(), ind_vals[ent_mask].tolist())
+                if (fv := _to_float(v)) is not None
+            )
+            any_numeric = any_numeric or bool(series)
+            affected = []
+            for y, v in sorted(zip(year_vals[(ent_mask & mask)].tolist(), ind_vals[(ent_mask & mask)].tolist())):
+                before = _to_float(v)
+                if before is None:
+                    continue  # a matched-but-empty cell carries no value to show
+                if action == "drop":
+                    after = None
+                elif action == "override":
+                    after = override_value
+                elif action == "scale":
+                    after = before * float(factor) if before is not None else None
+                else:
+                    after = before
+                affected.append([int(y), before, after])
+            entities.append({"entity": ent, "series": series, "affected": affected})
+
+        records.append(
+            {
+                "label": _label(correction),
+                "indicator": indicator,
+                "action": action,
+                "reason": correction.get("reason"),
+                "numeric": any_numeric,
+                "entities": entities,
+            }
+        )
+    return records
+
+
+def write_audit(corrections_path: Path | str, records: list[dict[str, Any]]) -> None:
+    """Write the audit JSON for a corrections file (best-effort; never raises)."""
+    try:
+        path = audit_path_for(corrections_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(records))
+    except (OSError, TypeError, ValueError) as e:
+        log.warning("data_corrections.audit_write_failed", path=str(corrections_path), error=str(e))
+
+
+def read_audit(corrections_path: Path | str) -> list[dict[str, Any]] | None:
+    """Read the audit JSON for a corrections file, or None if it hasn't been generated yet."""
+    path = audit_path_for(corrections_path)
+    if not path.exists():
+        return None
+    return json.loads(path.read_text())

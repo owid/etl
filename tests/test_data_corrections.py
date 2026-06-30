@@ -216,6 +216,42 @@ def test_expect_rejects_unknown_operator():
         )
 
 
+def test_build_audit_captures_drop_before_values():
+    from etl.data_corrections import build_audit
+
+    tb = _make_table()
+    records = build_audit(tb, [_correction(action="drop", entity="Panama", years=[2006, 2016])])
+    assert len(records) == 1
+    rec = records[0]
+    assert rec["action"] == "drop" and rec["numeric"] is True
+    ent = rec["entities"][0]
+    assert ent["entity"] == "Panama"
+    # Full pre-correction series is captured (all 3 Panama years).
+    assert ent["series"] == [[2006, -1.0], [2008, -2.0], [2016, -3.0]]
+    # Affected points carry the before value and None (removed) as the after.
+    assert ent["affected"] == [[2006, -1.0, None], [2016, -3.0, None]]
+
+
+def test_build_audit_captures_scale_before_after():
+    from etl.data_corrections import build_audit
+
+    tb = _make_table()
+    records = build_audit(tb, [_correction(action="scale", factor=0.5, entity="France", years="all")])
+    ent = records[0]["entities"][0]
+    # before → before*factor for every affected point.
+    assert ent["affected"] == [[2006, 10.0, 5.0], [2016, 20.0, 10.0]]
+
+
+def test_audit_path_is_under_data_tree():
+    from etl.data_corrections import audit_path_for
+    from etl.paths import STEP_DIR
+
+    p = STEP_DIR / "data" / "garden" / "gcp" / "2025-11-13" / "global_carbon_budget.corrections.yml"
+    out = audit_path_for(p)
+    assert out.name == "global_carbon_budget.audit.json"
+    assert "corrections_audit" in out.parts and "garden" in out.parts
+
+
 def test_load_corrections_rejects_both_entity_and_match(tmp_path):
     p = tmp_path / "x.corrections.yml"
     p.write_text(
