@@ -17,6 +17,13 @@ redistributes the Electricity activity into the activities that consume the elec
 The ideal data for these custom categories comes from the IEA, but it is under a heavy paywall, so the
 tables are built from Climate Watch as an approximation. See WRI's methodology:
 https://files.wri.org/d8/s3fs-public/2024-05/climate-watch-country-greenhouse-gas-emissions-data-methodology.pdf?VersionId=1geU96keSmqZlUjv41FNGB4CLpHQbruN
+
+Note: that PDF (dated 2024-05) states non-CO2 gases are converted to CO2 equivalents with IPCC AR4 global
+warming potentials, but it predates a methodology change. Climate Watch's data explorer now states that, as
+of 16 September 2025, it uses AR5 GWPs (see the "meta" note at
+https://www.climatewatchdata.org/data-explorer/historical-emissions?historical-emissions-data-sources=climate-watch&historical-emissions-gases=all-ghg&historical-emissions-sectors=total-including-lulucf#meta).
+Our 2026-02-10 snapshot therefore uses AR5, which is what the gross-LULUCF step matches when converting the
+Jones et al. land emissions.
 """
 
 from etl.helpers import PathFinder

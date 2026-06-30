@@ -2,7 +2,7 @@ definitions:
   description_processing: |-
     Emissions are categorized by human activity following the approach of the "emissions by human activity" dataset, which is based on Climate Watch's emissions by sector.
 
-    The "Growing food" activity, however, is replaced with gross agriculture-and-land-use emissions from Jones et al. (national contributions). Climate Watch's land-use-change-and-forestry emissions are net, so global land-use CO₂ is close to zero, which understates the climate impact of land use. Jones et al. report the gross land component (land-use-change CO₂ plus agricultural CH₄ and N₂O), which we convert to CO₂ equivalents using IPCC AR4 100-year global warming potentials (CH₄ = 25, N₂O = 298).
+    The "Growing food" activity, however, is replaced with gross agriculture-and-land-use emissions from Jones et al. (national contributions). Climate Watch's land-use-change-and-forestry emissions are net, so global land-use CO₂ is close to zero, which understates the climate impact of land use. Jones et al. report the gross land component (land-use-change CO₂ plus agricultural CH₄ and N₂O), which we convert to CO₂ equivalents using IPCC AR5 100-year global warming potentials (CH₄ = 28, N₂O = 265), to match the convention Climate Watch uses for the other activities.
   common:
     presentation:
       topic_tags:
