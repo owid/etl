@@ -7,8 +7,9 @@ agriculture-and-land-use emissions derived from Jones et al. (national contribut
 Climate Watch's land-use-change-and-forestry emissions are *net* (so global land-use CO2 is close to
 zero), which understates the climate impact of land use. Jones et al. report the *gross* land component
 (land-use-change CO2 plus agricultural CH4 and N2O), which is much larger. We convert Jones' per-gas land
-emissions to CO2 equivalents using IPCC AR4 100-year global warming potentials (CH4 = 25, N2O = 298),
-rather than the AR6 values used in the national_contributions garden step, and use the result as the new
+emissions to CO2 equivalents using IPCC AR5 100-year global warming potentials (CH4 = 28, N2O = 265), to
+match Climate Watch (the source for every other activity), which expresses non-CO2 gases with AR5 values.
+This differs from the AR6 values used in the national_contributions garden step. The result becomes the new
 "Growing food" activity.
 
 It produces two country-level tables (electricity is still its own activity, as in the input step):
@@ -24,9 +25,10 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# IPCC AR4 100-year global warming potentials, used to convert Jones et al. land emissions to CO2 equivalents.
-CH4_TO_CO2EQ_AR4 = 25
-N2O_TO_CO2EQ_AR4 = 298
+# IPCC AR5 100-year global warming potentials, used to convert Jones et al. land emissions to CO2 equivalents.
+# Climate Watch (the source for all other activities) expresses non-CO2 gases with AR5 GWPs, so we match it.
+CH4_TO_CO2EQ_AR5 = 28
+N2O_TO_CO2EQ_AR5 = 265
 
 # Activity whose emissions we replace with Jones et al.'s gross agriculture-and-land-use figures.
 ACTIVITY_TO_REPLACE = "Growing food"
@@ -39,12 +41,17 @@ def compute_jones_land(ds_jones):
 
     # Gross land-use CO2 emissions (Jones' LULUCF CO2, which is much larger than Climate Watch's net figure).
     tb["co2_land"] = tb["annual_emissions_co2_land"]
-    # Gross agriculture-and-land-use GHG emissions, using AR4 global warming potentials.
+    # Gross agriculture-and-land-use GHG emissions, using AR5 global warming potentials.
     tb["ghg_land"] = (
         tb["annual_emissions_co2_land"]
-        + CH4_TO_CO2EQ_AR4 * tb["annual_emissions_ch4_land"]
-        + N2O_TO_CO2EQ_AR4 * tb["annual_emissions_n2o_land"]
+        + CH4_TO_CO2EQ_AR5 * tb["annual_emissions_ch4_land"]
+        + N2O_TO_CO2EQ_AR5 * tb["annual_emissions_n2o_land"]
     )
+
+    # Keep only entity-years where Jones provides the complete gross figures. A few small island states
+    # (e.g. Marshall Islands, Palau) report land-use CO2 but no agricultural CH4/N2O, leaving the GHG sum
+    # undefined; those are dropped downstream rather than backfilled with Climate Watch's net figures.
+    tb = tb.dropna(subset=["co2_land", "ghg_land"]).reset_index(drop=True)
 
     return tb[["country", "year", "co2_land", "ghg_land"]]
 
@@ -67,12 +74,13 @@ def replace_growing_food(tb, jones, ofc=None):
     # Keep every activity except the one we replace.
     tb_other = tb[tb["sector"] != ACTIVITY_TO_REPLACE].reset_index(drop=True)
 
-    # Build the new "Growing food" activity from Jones' gross land emissions.
+    # Build the new "Growing food" activity from Jones' gross land emissions, keeping only the (country, year)
+    # pairs where Jones has land data. The inner merge drops the rest, rather than falling back to Climate
+    # Watch's net figures (which would mix conventions within a single chart).
     gf = tb[tb["sector"] == ACTIVITY_TO_REPLACE].reset_index(drop=True)
-    gf = gf.merge(jones, on=["country", "year"], how="left")
-    # Use Jones' gross figures, falling back to Climate Watch where Jones has no data.
-    gf["co2_emissions"] = gf["co2_land"].fillna(gf["co2_emissions"])
-    gf["ghg_emissions"] = gf["ghg_land"].fillna(gf["ghg_emissions"])
+    gf = gf.merge(jones, on=["country", "year"], how="inner")
+    gf["co2_emissions"] = gf["co2_land"]
+    gf["ghg_emissions"] = gf["ghg_land"]
     gf = gf.drop(columns=["co2_land", "ghg_land"], errors="raise")
 
     # In the base table, "Growing food" also contains other fuel combustion, which we keep on top.
@@ -83,12 +91,16 @@ def replace_growing_food(tb, jones, ofc=None):
             gf["ghg_emissions"] = gf["ghg_emissions"] + gf["ghg_ofc"].fillna(0)
         gf = gf.drop(columns=["co2_ofc", "ghg_ofc"], errors="raise")
 
+    # Drop the other activities for any (country, year) without Jones land data, so an entity's stacked
+    # total never mixes gross land emissions (Jones) with net land emissions (Climate Watch).
+    tb_other = tb_other.merge(gf[["country", "year"]].drop_duplicates(), on=["country", "year"], how="inner")
+
     tb = pr.concat([tb_other, gf], ignore_index=True)
 
     return tb
 
 
-def sanity_check_outputs(tb_base, tb_other, jones):
+def sanity_check_outputs(tb_base, tb_other):
     # Every input activity should still be present.
     error = "Set of activities changed unexpectedly."
     assert set(tb_base["sector"]) == {
@@ -114,13 +126,6 @@ def sanity_check_outputs(tb_base, tb_other, jones):
     error = "Expected positive gross 'Growing food' emissions at World level."
     assert (world_gf["ghg_emissions"] > 0).all(), error
 
-    # Warn about entities that have a "Growing food" activity but no Jones coverage (kept as Climate Watch).
-    covered = set(zip(jones.dropna(subset=["ghg_land"])["country"], jones.dropna(subset=["ghg_land"])["year"]))
-    gf = tb_other[tb_other["sector"] == "Growing food"]
-    missing = sorted(set(gf["country"]) - {c for c, _ in covered})
-    if missing:
-        paths.log.warning(f"Entities without Jones land coverage (kept as Climate Watch): {missing}")
-
 
 def run() -> None:
     #
@@ -137,7 +142,7 @@ def run() -> None:
     #
     # Process data.
     #
-    # Gross agriculture-and-land-use emissions from Jones et al., using AR4 global warming potentials.
+    # Gross agriculture-and-land-use emissions from Jones et al., using AR5 global warming potentials.
     jones = compute_jones_land(ds_jones)
 
     # Other fuel combustion (the part of the base "Growing food" that is not agriculture or land use).
@@ -147,8 +152,14 @@ def run() -> None:
     tb_base_gross = replace_growing_food(tb_base, jones, ofc=ofc)
     tb_other_gross = replace_growing_food(tb_other, jones, ofc=None)
 
+    # Report any entities dropped for lacking Jones land data (so coverage gaps surface, rather than being
+    # silently filled with Climate Watch's net figures).
+    dropped = sorted(set(tb_base["country"]) - set(tb_base_gross["country"]))
+    if dropped:
+        paths.log.warning(f"Dropped entities without Jones land coverage: {dropped}")
+
     # Sanity checks.
-    sanity_check_outputs(tb_base=tb_base_gross, tb_other=tb_other_gross, jones=jones)
+    sanity_check_outputs(tb_base=tb_base_gross, tb_other=tb_other_gross)
 
     # Improve table format.
     tb_base_gross = tb_base_gross.format(

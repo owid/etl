@@ -1,6 +1,6 @@
 definitions:
   description_processing_gross: |-
-    The "Growing food" activity uses gross agriculture-and-land-use emissions from Jones et al. (land-use-change CO₂ plus agricultural CH₄ and N₂O, with IPCC AR4 global warming potentials), rather than Climate Watch's net land-use figures.
+    The "Growing food" activity uses gross agriculture-and-land-use emissions from Jones et al. (land-use-change CO₂ plus agricultural CH₄ and N₂O, with IPCC AR5 global warming potentials), rather than Climate Watch's net land-use figures.
   description_processing_direct: |-
     Direct emissions are the emissions produced on-site by each activity (for example, fuel burned in vehicles or factories), taken from the step that keeps electricity as its own activity. They do not include the emissions from generating the electricity that the activity consumes.
 
