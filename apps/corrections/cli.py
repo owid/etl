@@ -255,7 +255,7 @@ def _render_html(rows: list[dict[str, Any]], generated_at: str, charts: bool) ->
   .card .label {{ font-size: .75rem; color: #777; text-transform: uppercase; letter-spacing: .04em; }}
   input[type="search"] {{ width: 100%; max-width: 420px; padding: .5rem .75rem; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 1rem; font-size: .9rem; }}
   .table-wrap {{ overflow-x: auto; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; }}
-  table {{ border-collapse: collapse; width: 100%; font-size: .82rem; }}
+  #t {{ border-collapse: collapse; width: 100%; font-size: .82rem; }}
   th, td {{ text-align: left; padding: .55rem .75rem; border-bottom: 1px solid #f0f0f0; vertical-align: top; }}
   th {{ position: sticky; top: 0; background: #f7f7f7; font-weight: 600; cursor: pointer; white-space: nowrap; }}
   code {{ font-size: .78rem; background: #f3f3f3; padding: .1rem .3rem; border-radius: 3px; word-break: break-all; }}
@@ -272,8 +272,8 @@ def _render_html(rows: list[dict[str, Any]], generated_at: str, charts: bool) ->
   .note {{ color: #888; font-size: .78rem; margin-bottom: .4rem; }}
   .entity-block {{ margin-bottom: 1.5rem; }}
   .chart-row {{ display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }}
-  .plot {{ flex: 1 1 560px; min-width: 480px; height: 300px; }}
-  table.affected {{ border-collapse: collapse; font-size: .8rem; min-width: 220px; }}
+  .plot {{ flex: 0 1 620px; min-width: 0; height: 320px; }}
+  table.affected {{ border-collapse: collapse; font-size: .8rem; width: auto; flex: 0 0 auto; align-self: flex-start; }}
   table.affected th, table.affected td {{ border: 1px solid #eee; padding: .3rem .6rem; text-align: right; }}
   table.affected th {{ background: #f7f7f7; position: static; }}
   table.affected td.bad {{ color: #d9534f; font-weight: 600; }}
