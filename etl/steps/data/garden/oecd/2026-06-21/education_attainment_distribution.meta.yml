@@ -1,0 +1,381 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    display:
+      numDecimalPlaces: 1
+
+    presentation:
+      topic_tags:
+        - Global Education
+
+
+  attribution_lee_oecd: &attribution_lee_oecd Lee and Lee; OECD
+  attribution_wc: &attribution_wc Wittgenstein Centre
+  attribution_lee_wc: &attribution_lee_wc Lee and Lee; Wittgenstein Centre
+  attribution_lee_oecd_wc: &attribution_lee_oecd_wc Lee and Lee; OECD; Wittgenstein Centre
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Adults' educational attainment distribution
+  update_period_days: 365
+
+  owners:
+   - Veronika Samborska
+
+tables:
+  # --- Combined indicators: Lee & Lee + OECD tertiary splice ---
+
+  education_attainment_distribution:
+    common:
+      processing_level: major
+    variables:
+      share_tertiary_education:
+        title: Share of adults with tertiary education (Lee & Lee + OECD)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with tertiary education
+        description_short: Share of adults aged 25–64 who have attained [tertiary education](#dod:tertiary-education).
+        description_key:
+          - "[Tertiary education](#dod:tertiary-education) — a university degree or another qualification beyond secondary school — opens doors to higher earnings, better job security, and a wider range of life choices. How widely it's attained tells us how broadly those opportunities have spread."
+          - Reliable, year-by-year data on tertiary attainment only exists for recent decades, and only for OECD countries. To see how this has changed over the long run, or to cover the rest of the world, we rely on historical reconstructions instead.
+          - This indicator combines two sources as a result. For OECD countries, we use the [OECD's own survey data](https://data-explorer.oecd.org/?fs[0]=Topic,0%7CEducation%20and%20skills%23EDU%23&pg=0&fc=Topic&bp=true&snb=117), which goes back to 1981 in some cases. For all other years and countries, we use historical estimates from [Lee & Lee (2016)](http://piketty.pse.ens.fr/files/LeeLee2016.pdf), which reach as far back as 1870.
+          - The two sources don't measure quite the same thing. The OECD counts people who finished their degree, while Lee & Lee count anyone who started one, whether or not they finished it. In most countries this makes little difference, but in countries where many people enroll without completing a degree, the two figures can diverge.
+          - Comparisons across the full time span should be made with some caution, since each country switches from estimate to survey data at a different point.
+        description_processing: |-
+          For each country, we use OECD data from its earliest available year onward. For years before the first OECD observation, we use the Lee & Lee (2016) historical estimates up to 2010. Countries without any OECD data retain the full Lee & Lee series up to 2010. The Barro & Lee projections (2015-2040) previously used have been dropped because they significantly underestimated tertiary attainment in many countries compared to observed data.
+        presentation:
+          title_public: Share of adults with tertiary education
+          attribution_short: *attribution_lee_oecd
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: Recent years use OECD data; earlier years use Lee & Lee (2016) estimates.
+
+  # --- Combined indicators: Lee & Lee + OECD no formal education splice ---
+
+  education_no_formal_combined:
+    common:
+      processing_level: major
+    variables:
+      share_no_formal_education:
+        title: Share of adults with no formal education (Lee & Lee + OECD)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with no formal education
+        description_short: Share of adults with no formal education.
+        description_key:
+          - Going to school at all is the first and most basic step in a person's education. Two centuries ago, almost no one had that chance; today, in most countries, almost everyone does. This indicator tracks that change over time.
+          - It combines two sources. For OECD countries, recent figures come from the [OECD's Education at a Glance](https://data-explorer.oecd.org/?fs[0]=Topic,0%7CEducation%20and%20skills%23EDU%23&pg=0&fc=Topic&bp=true&snb=117), which surveys people directly. For everywhere else, and for earlier years, we rely on historical estimates from [Lee & Lee (2016)](http://piketty.pse.ens.fr/files/LeeLee2016.pdf), which go back to 1870.
+          - The two sources are similar but not identical. The OECD counts people with less than a primary education, while Lee & Lee count people with no education at all. The OECD also focuses on people aged 25 to 64, while Lee & Lee cover a slightly wider range, from 15 to 64.
+          - As with any indicator built by splicing different sources together, small jumps can appear in a country's series around the year it switches from one source to the other. These jumps reflect a change in measurement, not necessarily a real change in education levels.
+        description_processing: |-
+          For each country, we use OECD data from its earliest available year onward. For years before that, we use Lee & Lee (2016) historical estimates.
+        presentation:
+          title_public: Share of adults with no formal education
+          attribution_short: *attribution_lee_oecd
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: "Formal education is [primary](#dod:primary-education) or higher. Recent years use OECD data; earlier years use Lee & Lee (2016) estimates."
+      share_some_formal_education:
+        title: Share of adults with some formal education (Lee & Lee + OECD)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with some formal education
+        description_short: Share of adults with some formal education.
+        description_key:
+          - This indicator measures the share of adults who have completed at least some formal schooling — meaning [primary education](#dod:primary-education) or higher. It is computed as 100% minus the share with no formal education.
+          - It combines two sources. For OECD countries, recent figures come from the [OECD's Education at a Glance](https://data-explorer.oecd.org/?fs[0]=Topic,0%7CEducation%20and%20skills%23EDU%23&pg=0&fc=Topic&bp=true&snb=117), based on direct surveys. For everywhere else, and for earlier years, it uses historical estimates from [Lee & Lee (2016)](http://piketty.pse.ens.fr/files/LeeLee2016.pdf), which go back to 1870.
+          - The two sources are similar but not identical. The OECD counts people with less than a primary education (ages 25–64), while Lee & Lee count people with no education at all (ages 15–64). Small jumps can appear in a country's series around the year it switches from one source to the other.
+        description_processing: |-
+          Computed as 100% minus the share with no formal education.
+        presentation:
+          title_public: Share of adults with some formal education
+          attribution_short: *attribution_lee_oecd
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: "Formal education is [primary](#dod:primary-education) or higher. Recent years use OECD data; earlier years use Lee & Lee (2016) estimates."
+
+  # --- OECD-only indicators ---
+
+  education_attainment_distribution_oecd:
+    common:
+      unit: "%"
+      short_unit: "%"
+      description_key:
+        - The [OECD's Education at a Glance](https://data-explorer.oecd.org/?fs[0]=Topic,0%7CEducation%20and%20skills%23EDU%23&pg=0&fc=Topic&bp=true&snb=117) report is one of the few sources that measures education levels through direct national surveys rather than estimation or modeling. People report their own highest level of completed education, which is then classified using an international standard so that countries can be compared.
+        - Because it relies on surveys, this data is only available for OECD member and partner countries, and typically only from the 1980s or later.
+      presentation:
+        attribution_short: OECD
+        grapher_config:
+          hasMapTab: true
+          tab: map
+    variables:
+      share_less_than_primary:
+        title: Share of adults with less than primary education (OECD)
+        display:
+          name: Less than primary education
+        presentation:
+          title_public: Less than primary education
+        description_short: Share of adults aged 25–64 with less than primary education (ISCED 0).
+      share_below_upper_secondary:
+        title: Share of adults with below upper secondary education (OECD)
+        display:
+          name: Below upper secondary education
+        presentation:
+          title_public: Below upper secondary education
+        description_short: Share of adults aged 25–64 with below upper secondary education (ISCED 0–2).
+      share_upper_secondary_post_secondary_non_tertiary:
+        title: Share of adults with upper secondary or post-secondary non-tertiary education (OECD)
+        display:
+          name: Upper secondary or post-secondary non-tertiary education
+        presentation:
+          title_public: Upper secondary or post-secondary non-tertiary education
+        description_short: Share of adults aged 25–64 with upper secondary or post-secondary non-tertiary education (ISCED 3–4).
+      share_tertiary:
+        title: Share of adults with tertiary education (OECD)
+        display:
+          name: Tertiary education
+        presentation:
+          title_public: Tertiary education
+        description_short: Share of adults aged 25–64 who have completed [tertiary education](#dod:tertiary-education) (ISCED 5–8).
+
+  education_attainment_distribution_oecd_sex:
+    common:
+      unit: "%"
+      short_unit: "%"
+      description_key:
+        - The [OECD's Education at a Glance](https://data-explorer.oecd.org/?fs[0]=Topic,0%7CEducation%20and%20skills%23EDU%23&pg=0&fc=Topic&bp=true&snb=117) report is one of the few sources that measures education levels through direct national surveys rather than estimation or modeling. People report their own highest level of completed education, which is then classified using an international standard so that countries can be compared.
+        - Because it relies on surveys, this data is only available for OECD member and partner countries, and typically only from the 1980s or later.
+      presentation:
+        attribution_short: OECD
+        grapher_config:
+          hasMapTab: true
+          tab: map
+    variables:
+      share_less_than_primary:
+        title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with less than primary education (OECD)
+        display:
+          name: Less than primary education
+        presentation:
+          title_public: Less than primary education
+        description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with less than primary education (ISCED 0).
+      share_below_upper_secondary:
+        title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with below upper secondary education (OECD)
+        display:
+          name: Below upper secondary education
+        presentation:
+          title_public: Below upper secondary education
+        description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with below upper secondary education (ISCED 0–2).
+      share_upper_secondary_post_secondary_non_tertiary:
+        title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with upper secondary or post-secondary non-tertiary education (OECD)
+        display:
+          name: Upper secondary or post-secondary non-tertiary education
+        presentation:
+          title_public: Upper secondary or post-secondary non-tertiary education
+        description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with upper secondary or post-secondary non-tertiary education (ISCED 3–4).
+      share_tertiary:
+        title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with tertiary education (OECD)
+        display:
+          name: Tertiary education
+        presentation:
+          title_public: Tertiary education
+        description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 who have completed [tertiary education](#dod:tertiary-education) (ISCED 5–8).
+
+  # --- Wittgenstein Centre indicators ---
+
+  education_attainment_distribution_wc:
+    variables:
+      share_tertiary_education:
+        title: Share of adults with post-secondary education (Wittgenstein Centre)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with post-secondary education
+        description_short: Share of adults aged 25–64 with post-secondary education.
+        description_key:
+          - This data comes from a population model rather than a household survey. It was built by the Wittgenstein Centre for Demography and Global Human Capital to project how education levels will shift as younger, better-educated generations replace older ones.
+          - The figures shown here use the model's "SSP2" scenario, often described as the middle-of-the-road path. It assumes that past trends in schooling continue, without big accelerations or setbacks.
+          - Because this is a projection rather than a direct measurement, it should be read as the model's best estimate of where education levels are heading, not as a survey result.
+          - Post-secondary education covers everyone with any qualification beyond upper secondary school.
+        presentation:
+          title_public: Share of adults with post-secondary education
+          title_variant: Model-based
+          attribution_short: *attribution_wc
+          grapher_config:
+            hasMapTab: true
+            tab: map
+
+  education_no_formal_wc:
+    variables:
+      share_no_formal_education:
+        title: Share of adults with no formal education (Wittgenstein Centre)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with no formal education
+        description_short: Share of adults aged 25–64 with no formal education.
+        description_key:
+          - This data comes from a population model rather than a household survey. It was built by the Wittgenstein Centre for Demography and Global Human Capital to project how education levels will shift as younger, better-educated generations replace older ones.
+          - The figures shown here use the model's "SSP2" scenario, often described as the middle-of-the-road path. It assumes that past trends in schooling continue, without big accelerations or setbacks.
+          - Because this is a projection rather than a direct measurement, it should be read as the model's best estimate of where education levels are heading, not as a survey result.
+          - No formal education means someone who has never attended or completed school at any level.
+        presentation:
+          title_public: Share of adults with no formal education
+          title_variant: Model-based
+          attribution_short: *attribution_wc
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: "Formal education is [primary](#dod:primary-education) or higher."
+
+  education_some_formal_wc:
+    variables:
+      share_some_formal_education:
+        title: Share of adults with some formal education (Wittgenstein Centre)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with some formal education
+        description_short: Share of adults aged 25–64 with some formal education.
+        description_key:
+          - This indicator measures the share of adults who have completed at least some formal schooling — meaning [primary education](#dod:primary-education) or higher. It is computed as 100% minus the share with no formal education.
+          - The data comes from a population model built by the Wittgenstein Centre for Demography and Global Human Capital, using the "SSP2" (middle-of-the-road) scenario. It assumes that past trends in schooling continue, without big accelerations or setbacks.
+          - Because this is a projection rather than a direct measurement, it should be read as the model's best estimate of where education levels are heading, not as a survey result.
+        description_processing: |-
+          Computed as 100% minus the share with no formal education.
+        presentation:
+          title_public: Share of adults with some formal education
+          title_variant: Model-based
+          attribution_short: *attribution_wc
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: "Formal education is [primary](#dod:primary-education) or higher."
+
+  education_no_formal_by_sex_wc:
+    common:
+      description_key:
+        - This data comes from a population model rather than a household survey. It was built by the Wittgenstein Centre for Demography and Global Human Capital to project how education levels will shift as younger, better-educated generations replace older ones.
+        - The figures shown here use the model's "SSP2" scenario, often described as the middle-of-the-road path. It assumes that past trends in schooling continue, without big accelerations or setbacks.
+        - Because this is a projection rather than a direct measurement, it should be read as the model's best estimate of where education levels are heading, not as a survey result.
+        - No formal education means someone who has never attended or completed school at any level.
+      presentation:
+        title_variant: Model-based
+        attribution_short: *attribution_wc
+        grapher_config:
+          hasMapTab: true
+          tab: map
+          note: "Formal education is [primary](#dod:primary-education) or higher."
+    variables:
+      share_no_formal_education:
+        title: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> with no formal education (Wittgenstein Centre)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share with no formal education
+        presentation:
+          title_public: Share with no formal education
+        description_short: Share of <% if sex == "Women" %>women<% elif sex == "Men" %>men<% endif %> aged 25–64 with no formal education.
+
+  # --- Lee & Lee + Wittgenstein Centre splice (15-64) ---
+
+  education_formal_combined:
+    common:
+      processing_level: major
+    variables:
+      share_no_formal_education:
+        title: Share of adults with no formal education (Lee & Lee + WC)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with no formal education
+        description_short: Share of adults aged 15–64 with no formal education.
+        description_key:
+          - This indicator stitches together two sources to cover as much time and as many countries as possible. Up to 2010, it uses historical estimates from [Lee & Lee (2016)](http://piketty.pse.ens.fr/files/LeeLee2016.pdf), which go back as far as 1870. From 2015 onward, it switches to projections from the Wittgenstein Centre's population model.
+          - No formal education means someone who has never attended or completed school at any level.
+          - The switch from historical estimate to model projection happens in 2010–2015 for every country, regardless of how reliable the data is around that point. Treat any sharp change in a country's series around those years with some caution.
+        description_processing: |-
+          For each country, we use Lee & Lee data up to its last available year (up to 2010). For years after that, we use Wittgenstein Centre projections (SSP2, 15–64, both sexes).
+        presentation:
+          title_public: Share of adults with no formal education
+          attribution_short: *attribution_lee_wc
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: "Formal education is [primary](#dod:primary-education) or higher. Historical data is from Lee & Lee (2016). Post-2010 data is from the Wittgenstein Centre (model-based)."
+      share_some_formal_education:
+        title: Share of adults with some formal education (Lee & Lee + WC)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with some formal education
+        description_short: Share of adults aged 15–64 with some formal education.
+        description_key:
+          - This indicator measures the share of adults who have completed at least some formal schooling — meaning [primary education](#dod:primary-education) or higher. It is computed as 100% minus the share with no formal education.
+          - It stitches together two sources. Up to 2010, it uses historical estimates from [Lee & Lee (2016)](http://piketty.pse.ens.fr/files/LeeLee2016.pdf), which go back as far as 1870. From 2015 onward, it switches to projections from the Wittgenstein Centre's population model (SSP2 scenario).
+          - The switch from historical estimate to model projection happens in 2010–2015 for every country. Treat any sharp change in a country's series around those years with some caution.
+        description_processing: |-
+          Computed as 100% minus the share with no formal education.
+        presentation:
+          title_public: Share of adults with some formal education
+          attribution_short: *attribution_lee_wc
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: "Formal education is [primary](#dod:primary-education) or higher. Historical data is from Lee & Lee (2016). Post-2010 data is from the Wittgenstein Centre (model-based)."
+
+  # --- Three-source combined: Lee & Lee + OECD + WC ---
+
+  education_no_formal_three_sources:
+    common:
+      processing_level: major
+    variables:
+      share_no_formal_education:
+        title: Share of adults with no formal education (Lee & Lee + OECD + WC)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with no formal education
+        description_short: Share of adults with no formal education.
+        description_key:
+          - This indicator pieces together three sources, in order, to build the longest and most complete picture possible. For OECD countries, it uses the [OECD's own survey data](https://data-explorer.oecd.org/?fs[0]=Topic,0%7CEducation%20and%20skills%23EDU%23&pg=0&fc=Topic&bp=true&snb=117) first. Where that's missing, it falls back to historical estimates from [Lee & Lee (2016)](http://piketty.pse.ens.fr/files/LeeLee2016.pdf). For countries that neither of those sources cover, it uses projections from the Wittgenstein Centre's population model instead.
+          - The three sources don't measure exactly the same thing. The OECD counts people with less than a primary education, among 25 to 64 year-olds. Lee & Lee and the Wittgenstein Centre both count people with no education at all, among a slightly wider group: 15 to 64 year-olds. In practice, the difference between these definitions is small.
+          - For most countries with long-run data, this means the series is built from real survey data for recent decades and from historical estimates or model projections for everything before that. Treat sharp changes around the years where the source switches with some caution.
+        description_processing: |-
+          For OECD countries, we use OECD data from its earliest available year onward, with Lee & Lee filling in earlier years. For non-OECD countries, we use Lee & Lee up to 2010, then Wittgenstein Centre (SSP2) from 2015 onward. Countries only in the Wittgenstein Centre use the full WC series.
+        presentation:
+          title_public: Share of adults with no formal education
+          attribution_short: *attribution_lee_oecd_wc
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: "Formal education is [primary](#dod:primary-education) or higher. OECD countries use observed data; other countries use Lee & Lee estimates and Wittgenstein Centre projections (model-based)."
+
+      share_some_formal_education:
+        title: Share of adults with some formal education (Lee & Lee + OECD + WC)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of adults with some formal education
+        description_short: Share of adults with at least some formal education.
+        description_key:
+          - This indicator measures the share of adults who have completed at least some formal schooling — meaning [primary education](#dod:primary-education) or higher. It is computed as 100% minus the share with no formal education.
+          - It pieces together three sources in order of priority. For OECD countries, it uses the [OECD's own survey data](https://data-explorer.oecd.org/?fs[0]=Topic,0%7CEducation%20and%20skills%23EDU%23&pg=0&fc=Topic&bp=true&snb=117). Where that is missing, it falls back to historical estimates from [Lee & Lee (2016)](http://piketty.pse.ens.fr/files/LeeLee2016.pdf). For countries that neither source covers, it uses projections from the Wittgenstein Centre's population model (SSP2 scenario).
+          - The three sources don't measure exactly the same thing. The OECD counts people with less than a primary education (ages 25–64), while Lee & Lee and the Wittgenstein Centre count people with no education at all (ages 15–64). In practice, the difference is small. Treat sharp changes around the years where the source switches with some caution.
+        description_processing: |-
+          Computed as 100% minus the share with no formal education.
+        presentation:
+          title_public: Share of adults with some formal education
+          attribution_short: *attribution_lee_oecd_wc
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            note: "Formal education is [primary](#dod:primary-education) or higher. OECD countries use observed data; other countries use Lee & Lee estimates and Wittgenstein Centre projections (model-based)."

@@ -59,6 +59,7 @@ steps:
     - data://garden/wb/2025-07-01/income_groups
     - data://meadow/un/2025-05-07/undp_hdr:
       - snapshot://un/2025-05-07/undp_hdr.csv
+    - data://garden/education/2023-07-17/education_lee_lee
   data://grapher/un/2025-05-07/undp_hdr:
     - data://garden/un/2025-05-07/undp_hdr
 

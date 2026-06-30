@@ -1,4 +1,13 @@
 steps:
+  # OECD Adults' educational attainment distribution
+  # Splices Lee & Lee historical estimates (pre-OECD) with OECD observed data
+  data://grapher/oecd/2026-06-21/education_attainment_distribution:
+    - data://garden/oecd/2026-06-21/education_attainment_distribution:
+      - data://meadow/oecd/2026-06-21/education_attainment_distribution:
+        - snapshot://oecd/2026-06-21/education_attainment_distribution.csv
+      - data://garden/education/2023-07-17/education_lee_lee
+      - data://garden/demography/2026-02-11/wittgenstein_human_capital
+
   # Barro and Lee projections dataset
   data://grapher/education/2023-07-17/education_barro_lee_projections:
     # Garden step includes combined data where available with Lee and Lee historical data
@@ -53,7 +62,7 @@ steps:
   # OECD + Wittgenstein: People with education (long-run)
   data://grapher/education/2024-12-11/people_with_education:
     - data://garden/education/2024-12-11/people_with_education:
-      - data://garden/demography/2024-12-06/wittgenstein_human_capital
+      - data://garden/demography/2026-02-11/wittgenstein_human_capital
       - data://garden/education/2023-08-14/oecd_education
 
   # UNESCO data on other policy related education indicators
