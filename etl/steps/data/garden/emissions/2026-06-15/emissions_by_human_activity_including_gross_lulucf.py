@@ -63,7 +63,7 @@ def compute_other_fuel_combustion(tb_base, tb_other):
     gf_other = tb_other[tb_other["sector"] == ACTIVITY_TO_REPLACE][
         ["country", "year", "co2_emissions", "ghg_emissions"]
     ]
-    ofc = gf_base.merge(gf_other, on=["country", "year"], how="inner", suffixes=("_base", "_other"))
+    ofc = pr.merge(gf_base, gf_other, on=["country", "year"], how="inner", suffixes=("_base", "_other"))
     ofc["co2_ofc"] = ofc["co2_emissions_base"] - ofc["co2_emissions_other"]
     ofc["ghg_ofc"] = ofc["ghg_emissions_base"] - ofc["ghg_emissions_other"]
 
@@ -78,14 +78,14 @@ def replace_growing_food(tb, jones, ofc=None):
     # pairs where Jones has land data. The inner merge drops the rest, rather than falling back to Climate
     # Watch's net figures (which would mix conventions within a single chart).
     gf = tb[tb["sector"] == ACTIVITY_TO_REPLACE].reset_index(drop=True)
-    gf = gf.merge(jones, on=["country", "year"], how="inner")
+    gf = pr.merge(gf, jones, on=["country", "year"], how="inner")
     gf["co2_emissions"] = gf["co2_land"]
     gf["ghg_emissions"] = gf["ghg_land"]
     gf = gf.drop(columns=["co2_land", "ghg_land"], errors="raise")
 
     # In the base table, "Growing food" also contains other fuel combustion, which we keep on top.
     if ofc is not None:
-        gf = gf.merge(ofc, on=["country", "year"], how="left")
+        gf = pr.merge(gf, ofc, on=["country", "year"], how="left")
         with pr.ignore_warnings():
             gf["co2_emissions"] = gf["co2_emissions"] + gf["co2_ofc"].fillna(0)
             gf["ghg_emissions"] = gf["ghg_emissions"] + gf["ghg_ofc"].fillna(0)
@@ -93,7 +93,7 @@ def replace_growing_food(tb, jones, ofc=None):
 
     # Drop the other activities for any (country, year) without Jones land data, so an entity's stacked
     # total never mixes gross land emissions (Jones) with net land emissions (Climate Watch).
-    tb_other = tb_other.merge(gf[["country", "year"]].drop_duplicates(), on=["country", "year"], how="inner")
+    tb_other = pr.merge(tb_other, gf[["country", "year"]].drop_duplicates(), on=["country", "year"], how="inner")
 
     tb = pr.concat([tb_other, gf], ignore_index=True)
 
@@ -152,11 +152,17 @@ def run() -> None:
     tb_base_gross = replace_growing_food(tb_base, jones, ofc=ofc)
     tb_other_gross = replace_growing_food(tb_other, jones, ofc=None)
 
-    # Report any entities dropped for lacking Jones land data (so coverage gaps surface, rather than being
-    # silently filled with Climate Watch's net figures).
-    dropped = sorted(set(tb_base["country"]) - set(tb_base_gross["country"]))
+    # Report (country, year) rows dropped for lacking Jones land data, so coverage gaps surface (including
+    # entities that lose only some years) rather than being silently filled with Climate Watch's net figures.
+    before = set(map(tuple, tb_base[["country", "year"]].drop_duplicates().to_numpy()))
+    after = set(map(tuple, tb_base_gross[["country", "year"]].drop_duplicates().to_numpy()))
+    dropped = sorted(before - after)
     if dropped:
-        paths.log.warning(f"Dropped entities without Jones land coverage: {dropped}")
+        by_country = {
+            c: f"{min(y for cc, y in dropped if cc == c)}-{max(y for cc, y in dropped if cc == c)}"
+            for c in sorted({c for c, _ in dropped})
+        }
+        paths.log.warning(f"Dropped country-years without Jones land coverage: {by_country}")
 
     # Sanity checks.
     sanity_check_outputs(tb_base=tb_base_gross, tb_other=tb_other_gross)
