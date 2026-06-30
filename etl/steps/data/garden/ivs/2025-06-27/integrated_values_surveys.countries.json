@@ -1,6 +1,5 @@
 {
   "Albania": "Albania",
-  "United Kingdom": "United Kingdom",
   "Algeria": "Algeria",
   "Andorra": "Andorra",
   "Argentina": "Argentina",
@@ -117,5 +116,6 @@
   "Luxembourg": "Luxembourg",
   "Malta": "Malta",
   "Northern Cyprus": "Northern Cyprus",
-  "Portugal": "Portugal"
+  "Portugal": "Portugal",
+  "United Kingdom": "United Kingdom"
 }
