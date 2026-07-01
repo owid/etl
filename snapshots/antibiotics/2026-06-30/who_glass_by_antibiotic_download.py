@@ -199,7 +199,9 @@ async def run_discover() -> None:
         log.info("=== <select> elements ===")
         for s in selects:
             vis = "visible" if s["visible"] else "hidden"
-            log.info("select", id=s["id"], visibility=vis, option_count=s["optionCount"], first_options=s["firstOptions"])
+            log.info(
+                "select", id=s["id"], visibility=vis, option_count=s["optionCount"], first_options=s["firstOptions"]
+            )
 
         # selectize wrappers (Shiny hides <select> behind selectize by default)
         selectize = await page.eval_on_selector_all(
@@ -405,7 +407,11 @@ async def print_options() -> None:
             await set_select(page, SEL_SYNDROME, syn_val)
             for v, lbl in await get_select_options(page, SEL_PATHOGEN):
                 all_pathogens[v] = lbl
-        log.info("Pathogen options", count=len(all_pathogens), options=[{"value": v, "label": lbl} for v, lbl in all_pathogens.items()])
+        log.info(
+            "Pathogen options",
+            count=len(all_pathogens),
+            options=[{"value": v, "label": lbl} for v, lbl in all_pathogens.items()],
+        )
 
         # Antibiotic depends on syndrome + pathogen — collect across all combinations
         all_antibiotics: dict[str, str] = {}
@@ -416,7 +422,11 @@ async def print_options() -> None:
                 await set_select(page, SEL_PATHOGEN, path_val)
                 for v, lbl in await get_select_options(page, SEL_ANTIBIOTIC):
                     all_antibiotics[v] = lbl
-        log.info("Antibiotic options", count=len(all_antibiotics), options=[{"value": v, "label": lbl} for v, lbl in all_antibiotics.items()])
+        log.info(
+            "Antibiotic options",
+            count=len(all_antibiotics),
+            options=[{"value": v, "label": lbl} for v, lbl in all_antibiotics.items()],
+        )
 
         await browser.close()
 
