@@ -121,7 +121,14 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         // - tb = tb.set_index(["disease", "Year"], verify_integrity=False)
         // `Table.format()` is the modern way to set the index — it also sorts rows,
         // validates the key, and normalizes column names/types.
-        pattern: /\.set_index\(/g,
+        //
+        // The `[^()]*` captures the argument list (which never contains its own parens
+        // in a finalize call) and the negative lookahead `(?!\s*[.\[])` skips calls that
+        // are chained or subscripted — those are intermediate lookups/reshapes where
+        // `format()` is NOT a replacement, e.g.:
+        //   - .set_index("country")["pa_nus_prvt_pp"]        (subscript)
+        //   - tb_meta.set_index("indicator_code").to_dict("index")  (method chain)
+        pattern: /\.set_index\([^()]*\)(?!\s*[.\[])/g,
         message: '`set_index` is outdated for finalizing a table. Use `tb.format()` instead, which sets the index and also sorts rows, checks the key is unique, and normalizes column names/types. `format()` expects `country` and `year` by default; pass custom keys with `tb.format(["disease", "year"])`. For year-less tables use `set_index("country")` plus `tb.metadata.short_name`.',
         severity: vscode.DiagnosticSeverity.Warning,
         scope: 'etl/steps/data/**'

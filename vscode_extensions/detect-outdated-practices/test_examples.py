@@ -93,3 +93,8 @@ tb = tb.set_index(["disease", "Year"], verify_integrity=False)
 
 # Example 3: Single-key index
 tb = tb.set_index("country")
+
+# These should NOT be detected — set_index is chained/subscripted here, so it is an
+# intermediate lookup or reshape, not a table finalize (format() is not a replacement):
+series = tb.set_index("country")["pa_nus_prvt_pp"]
+metadata_dict = tb_meta.set_index("indicator_code").to_dict("index")
