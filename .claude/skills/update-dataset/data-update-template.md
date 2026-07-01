@@ -17,7 +17,7 @@ title: [Punchy title — a finding/claim, a question, or an action/invitation. E
 excerpt: [One short sentence summary that's distinct from the title. Common patterns: "Explore updated data from <producer>." / "Explore updated data on <topic> from <producer>." / "Track <topic descriptor>." / "We've updated <N> charts with the latest data from <producer>." / "We updated nearly N of our charts with the latest data."]
 type: announcement
 authors: [Author name(s). Comma-separated for co-authors, e.g. "Hannah Ritchie, Edouard Mathieu".]
-kicker: Data update
+kicker: data-update
 
 \[+body\]
 
@@ -92,7 +92,7 @@ If the dataset doesn't lend itself to a single headline finding, the question fo
 
 **`authors`** — The person who did the work, by name. Comma-separated for co-authors. Pull from the user (or the slack-announcement.md draft if it lists one).
 
-**`kicker`** — Always `Data update`. (One example used `Data Update` with capital U — both work; lowercase `update` matches the more recent posts.)
+**`kicker`** — Use `data-update` (lowercase, hyphenated). This is the current convention — all five most recent posts as of July 2026 (oil spills, homicides, wildfires, democracy, SIPRI) use `kicker: data-update`. Older posts used `Data update` / `Data Update`; the CMS accepts those too, but match the current lowercase-hyphenated form.
 
 **`\[+body\]`** — Literal marker. Always sits between the frontmatter and the body. Keep the backslash escapes.
 
