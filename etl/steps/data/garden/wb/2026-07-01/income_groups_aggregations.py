@@ -14,6 +14,12 @@ REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceani
 # Define fraction of allowed NaNs per year
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
+# (region, year) pairs where the "missing population" residual (region total minus the summed
+# classified populations) is knowingly slightly negative — the summed classified population
+# marginally exceeds the region total, due to population-estimate mismatches. These are clamped
+# to 0 (missing population can't be negative); any *new* case fails for review.
+EXPECTED_NEGATIVE_MISSING_POP = {("Europe", 1990)}
+
 
 def run() -> None:
     #
@@ -59,12 +65,12 @@ def sanity_check_outputs(tb: Table) -> None:
     assert count_cols, "No '_count' columns found in the aggregations output."
     assert (tb[count_cols] >= 0).all().all(), "Negative country count found in the aggregations output."
 
-    # Status populations are non-negative. `classification_missing_pop` is excluded: it is a residual
-    # (region total minus the summed classified populations) that can be slightly negative when
-    # population estimates exceed the summed classified population (e.g. overlapping historical territories).
-    status_pop_cols = [c for c in tb.columns if c.endswith("_pop") and not c.endswith("missing_pop")]
-    assert status_pop_cols, "No status '_pop' columns found in the aggregations output."
-    assert (tb[status_pop_cols] >= 0).all().all(), "Negative status population found in the aggregations output."
+    # All population columns are non-negative. The `classification_missing_pop` residual (region total
+    # minus the summed classified populations) can compute slightly negative, but it is clamped to 0
+    # upstream (see EXPECTED_NEGATIVE_MISSING_POP), so it is included in this check.
+    pop_cols = [c for c in tb.columns if c.endswith("_pop")]
+    assert pop_cols, "No '_pop' columns found in the aggregations output."
+    assert (tb[pop_cols] >= 0).all().all(), "Negative population found in the aggregations output."
 
 
 def add_country_counts_and_population_by_status(
@@ -141,5 +147,17 @@ def add_country_counts_and_population_by_status(
 
     # Keep only the columns I need
     tb_regions = tb_regions[["country", "year"] + columns_count + columns_pop]
+
+    # The "missing population" residual can be slightly negative when the summed classified
+    # populations exceed the region total. Clamp such residuals to 0 (missing population can't be
+    # negative), but fail on any *new* (region, year) case so it's reviewed rather than silently zeroed.
+    for c in [col for col in tb_regions.columns if col.endswith("_missing_pop")]:
+        neg_mask = tb_regions[c] < 0
+        unexpected = {
+            (str(country), int(year))
+            for country, year in zip(tb_regions.loc[neg_mask, "country"], tb_regions.loc[neg_mask, "year"])
+        } - EXPECTED_NEGATIVE_MISSING_POP
+        assert not unexpected, f"New negative {c} case(s) — review before clamping to 0: {sorted(unexpected)}"
+        tb_regions.loc[neg_mask, c] = 0
 
     return tb_regions
