@@ -10,6 +10,24 @@ Hand the draft to the user for review and publication. The skill does not presum
 
 ---
 
+## Keep the style in sync (re-check ~monthly)
+
+The `/latest` house style drifts over time (title shape, `kicker` value, body length, closing line). The **source of truth is the team's `/Data updates` Drive folder**: https://drive.google.com/drive/folders/1oL0uLHKI6f2qi1rJA6-qFFRYEBw_-rfm
+
+**Conventions last verified against the folder: 2026-07-01.**
+
+When you draft a `/latest` post (step 9b of `update-dataset`), check the date above. **If more than a month has passed**, first read the **5 most recent** docs in that folder, reconcile the guidance in this file with what they actually do, then update this template and bump the "last verified" date. Reconcile at least:
+
+- `kicker` value (currently `data-update`, lowercase-hyphenated)
+- title shape (question / action / finding — currently mostly questions)
+- `excerpt` pattern
+- body length and shape, and the closing "I recently updated our charts … + cadence" line
+- `{.cta}` URL/text conventions
+
+Reading the folder: the Google Drive `parentId` search often returns nothing for this shared drive — fall back to `fullText contains 'datasetProducts'` (matches the search-URL CTA) or `title contains '<recent dataset>'` to surface the docs, then `read_file_content` each.
+
+---
+
 ## Template (paste-ready for a new Google Doc)
 
 ```
