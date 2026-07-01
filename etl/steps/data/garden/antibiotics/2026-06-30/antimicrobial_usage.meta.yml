@@ -101,9 +101,13 @@ tables:
         unit: defined daily doses
         display:
           numDecimalPlaces: 0
+        description_processing: |-
+          We add doses from each route of administration to get the total doses for each AWaRe category. The route of administration can be one of the following: orally administered, parenterally administered, rectally administered, or inhaled.
       did:
         title: Defined daily doses per 1000 inhabitants per day of << awarelabel>> antibiotics used
         description_short: "Total [defined daily doses](#dod:defined-daily-doses) of AWaRe category: <<awarelabel>> used per 1000 inhabitants per day. {definitions.aware_description}"
         unit: defined daily doses per 1000 inhabitants per day
         display:
           numDecimalPlaces: 1
+        description_processing: |-
+          We add doses from each route of administration to get the total doses for each AWaRe category. The route of administration can be one of the following: orally administered, parenterally administered, rectally administered, or inhaled.

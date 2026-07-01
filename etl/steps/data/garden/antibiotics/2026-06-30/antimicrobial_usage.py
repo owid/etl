@@ -3,13 +3,13 @@
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -17,25 +17,31 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("antimicrobial_usage")
 
     # Read table from meadow dataset.
-    tb_class = ds_meadow["class"].reset_index()
-    tb_aware = ds_meadow["aware"].reset_index()
+    tb_class = ds_meadow.read("class")
+    tb_aware = ds_meadow.read("aware")
     #
     # Process data.
     #
-    tb_class = paths.regions.harmonize_names(tb_class, country_col="country", countries_file=paths.country_mapping_path)
-    tb_aware = paths.regions.harmonize_names(tb_aware, country_col="country", countries_file=paths.country_mapping_path)
+    tb_class = paths.regions.harmonize_names(tb_class)
+    tb_aware = paths.regions.harmonize_names(tb_aware)
 
     # Tidy notes column
     tb_class = tidy_notes(tb_class)
+
     # Aggregate by antimicrobial class
     tb_class_agg, tb_notes = aggregate_antimicrobial_classes(tb_class)
+
     # Save the origins of the aggregated table to insert back in later
     # Drop columns that are not needed in the garden dataset.
     tb_class = tb_class.drop(
-        columns=["whoregioncode", "whoregionname", "countryiso3", "incomeworldbankjune", "atc4", "notes"]
+        columns=["whoregioncode", "whoregionname", "countryiso3", "incomeworldbankjune", "atc4", "note"]
     )
-    tb_aware = tb_aware.drop(columns=["whoregioncode", "whoregionname", "incomeworldbankjune", "aware", "notes"])
+    tb_aware = tb_aware.drop(columns=["whoregioncode", "whoregionname", "incomeworldbankjune", "aware", "note"])
 
+    # Add over all routes of administration to get the total doses for each AWaRe category
+    tb_aware = add_routes_of_administration(tb_aware)
+
+    # format tables
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration"])
     tb_aware = tb_aware.format(["country", "year", "awarelabel"])
     tb_class_agg = pivot_aggregated_table(tb_class_agg, tb_notes)
@@ -45,8 +51,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb_class, tb_aware, tb_class_agg],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
@@ -54,6 +59,13 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_routes_of_administration(tb_aware: Table):
+    tb_aware = tb_aware.copy(deep=True)
+    # Group by country, year, and awarelabel, summing ddd and did across all routes of administration
+    tb_aware = tb_aware.groupby(["country", "year", "awarelabel"], dropna=False)[["ddd", "did"]].sum().reset_index()
+    return tb_aware
 
 
 def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
@@ -89,10 +101,11 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
     return tb_class_agg
 
 
-def aggregate_antimicrobial_classes(tb: Table) -> Table:
+def aggregate_antimicrobial_classes(tb: Table):
     """
     Aggregating by antimicrobial class, we want to combine antibacterials and antituberculosis, but also keep antituberculosis separately
     """
+
     tb = tb.copy(deep=True)
     # Convert the column to strings (if not already done)
     tb["antimicrobialclass"] = tb["antimicrobialclass"].astype("string")
@@ -118,7 +131,7 @@ def aggregate_antimicrobial_classes(tb: Table) -> Table:
     actual_values = set(tb["antimicrobialclass"].unique())
     assert actual_values == expected_class_values
     # Format the notes tables before it's removed
-    tb_notes = tb[["country", "year", "antimicrobialclass", "notes"]].dropna(subset=["notes"])
+    tb_notes = tb[["country", "year", "antimicrobialclass", "note"]].dropna(subset=["note"])
     tb_notes = format_notes(tb_notes)
 
     # Aggregate the data
@@ -139,8 +152,8 @@ def format_notes(tb_notes: Table) -> Table:
     """
     Format notes column
     """
-    for note in tb_notes["notes"].unique():
-        msk = tb_notes["notes"] == note
+    for note in tb_notes["note"].unique():
+        msk = tb_notes["note"] == note
         tb_note = tb_notes[msk]
         countries = tb_note["country"].unique()
         countries_formatted = combine_countries(countries)
@@ -172,7 +185,7 @@ def tidy_notes(tb_class: Table) -> Table:
         "Data incomplete: not all antibiotics reported systematically": "data is incomplete, not all antibiotics reported systematically.",
         "For antituberculosis medicines: data are incomplete": "data are incomplete for antituberculosis medicines.",
     }
-    tb_class["notes"] = tb_class["notes"].replace(notes_dict)
+    tb_class["note"] = tb_class["note"].replace(notes_dict)
     return tb_class
 
 
