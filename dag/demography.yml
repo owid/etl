@@ -32,6 +32,26 @@ steps:
   data://grapher/demography/2024-07-15/population:
     - data://garden/demography/2024-07-15/population
 
+  # Federico-Tena variant of the OMM (owid-issues#1232 — F-T replaces Gapminder for 1800-1938;
+  # 1939-1949 bridged by per-country linear interpolation between F-T(1938) and UN WPP(1950)).
+  # Fully Gapminder-free: unlike 2024-07-15, Gapminder Systema Globalis is also dropped (former
+  # states such as Czechoslovakia/Yugoslavia/E-W Germany are no longer included; USSR remains,
+  # built from successors).
+  # Mirrors the 2024-07-15 step's output schema so consumers don't need code changes.
+  data://garden/demography/2026-05-28/population:
+    # HYDE 3.3
+    - data://garden/hyde/2024-01-02/all_indicators
+    # Federico-Tena V2 (1991 borders, 2026)
+    - data://garden/demography/2026-05-20/federico_tena_population
+    # UN WPP (2024)
+    - data://garden/un/2024-07-12/un_wpp
+    # Auxiliary
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/faostat/2024-03-14/faostat_rl_auxiliary
+  data://grapher/demography/2026-05-28/population:
+    - data://garden/demography/2026-05-28/population
+
   # WPP ########################################
   # WPP (2024)
   data://meadow/un/2024-07-12/un_wpp:
@@ -138,6 +158,15 @@ steps:
   data://garden/ggdc/2024-01-19/maddison_federico_paper:
     - data://meadow/ggdc/2024-01-19/maddison_federico_paper:
         - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
+
+  # Federico–Tena World Population Historical Database — V2 (1991 borders, 2026 update).
+  # Published Dataverse release that supersedes the 2024-01-19 working-paper Excel.
+  # Two tables: main population series (1991 borders) and the per-(country, year)
+  # Quality Assessment file (1938 borders).
+  data://garden/demography/2026-05-20/federico_tena_population:
+    - data://meadow/demography/2026-05-20/federico_tena_population:
+        - snapshot://demography/2026-05-20/federico_tena_population.tab
+        - snapshot://demography/2026-05-20/federico_tena_population_quality.xlsx
 
   #
   # Population of the Republic of Ireland territory between 1841 and 2006 (Central Statistics Office of Ireland)
