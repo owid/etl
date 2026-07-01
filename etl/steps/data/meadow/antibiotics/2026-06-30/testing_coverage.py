@@ -2,13 +2,13 @@
 
 from owid.catalog import processing as pr
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -26,10 +26,9 @@ def run(dest_dir: str) -> None:
         "All",
     ]
     tables = []
+
     for region in regions:
-        tb = snap.read_in_archive(
-            filename=f"who_glass_testing_coverage/Testing coverage by infectious syndrome_{region}.csv", skiprows=4
-        )
+        tb = snap.read_in_archive(filename=f"Testing coverage by infection type_{region}.csv", skiprows=4)
         tb["country"] = region
         tables.append(tb)
 
@@ -45,7 +44,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()

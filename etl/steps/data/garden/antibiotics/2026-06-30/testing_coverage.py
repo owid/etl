@@ -2,23 +2,24 @@
 
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
 # Number of countries in each WHO region.
 WHO_REGION_MEMBERS = {
-    "African Region (WHO)": 47,
+    "Africa (WHO)": 47,
     "World": 194,
     "Eastern Mediterranean (WHO)": 22,
-    "European Region (WHO)": 53,
-    "Region of the Americas (WHO)": 35,
-    "South-East Asia Region (WHO)": 11,
-    "Western Pacific Region (WHO)": 27,
+    "Europe (WHO)": 53,
+    "Americas (WHO)": 35,
+    "South-East Asia (WHO)": 11,
+    "Western Pacific (WHO)": 27,
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -31,7 +32,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
+
     tb = format_specimen(tb)
     tb = tb.drop(columns=["min", "q1", "median", "q3", "max"])
     # A table where the specimen column is the country, to make stacked bar chart.
@@ -59,8 +61,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb, tb_specimen], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_specimen], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -71,6 +73,7 @@ def format_specimen(tb: Table) -> Table:
     """
     Format the syndrome column.
     """
+
     specimen_dict = {"BLOOD": "bloodstream", "STOOL": "stool", "URINE": "urinary_tract", "UROGENITAL": "gonorrhea"}
     tb["specimen"] = tb["specimen"].astype(str)
     tb["specimen"] = tb["specimen"].replace(specimen_dict)

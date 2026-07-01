@@ -19,10 +19,6 @@ definitions:
   description_key_ast_gonorrhea: &description_key_ast_gonorrhea
     - Neisseria gonorrhoeae infections are tested for their susceptibility to macrolide antibiotics and third-generation cephalosporin antibiotics.
 
-
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
@@ -30,6 +26,8 @@ dataset:
   owners:
     - Fiona Spooner
     - Tuna Acisu
+
+
 tables:
   testing_coverage:
     variables:
