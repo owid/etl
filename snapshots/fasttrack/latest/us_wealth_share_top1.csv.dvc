@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: Saez and Zucman (2020)
+    title: 'The rise of income and wealth inequality in America: Evidence from distributional macroeconomic accounts'
+    url_download: |-
+      gAAAAABqRAgA1fZL9cck4-ksqiv9ZXtiTFihATteW9SAL-bxrB_tUbu_PNjpZ42UlWajvEBz4Ixv664C3Qt_c-s0kbZJg0GXJ7UQpNsdsD8mB9zCdGAY0xtPl5UJAsrcO3xvvIjtaZYXInmbXIAhlL28XUMm3npu22UZFW2TPYU1id5pHDpfAIVqKKyl45U2CjCLV9fSZ2j8itFd3Quk0ozIyw8KU9_9e-D1DJCNwhNNE-TeLSSQiASlqMBT_BN2jfBVg60AWZMT
+    date_accessed: '2026-06-30'
+  name: DRAFT US wealth distribution share top 1
+  description: ''
+  license: {}
+  is_public: false
+outs:
+  - md5: 98f5ded19c80414e811f4f228ed3de5a
+    size: 2511
+    path: us_wealth_share_top1.csv
