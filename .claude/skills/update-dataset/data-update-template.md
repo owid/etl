@@ -89,6 +89,21 @@ The `\[+body\]` and `\[\]` markers use backslash-escaped brackets — that's how
 - **`{.cta}` and `{.image}` blocks** — opening tag, fields, closing tag all on consecutive lines with **no blank lines inside**. Keep one blank line between the body and `{.cta}`, and between `{.cta}` and `{.image}`.
 - **When auto-creating the Doc via the Drive `create_file` API** (skill step 9b): don't insert blank spacer lines to force paragraph separation — they become empty paragraphs the user must delete. Upload with single newlines and let the OWID GDocs Add-on finalize the formatting.
 
+### OWID CMS Doc styling — colors & indents (reproducible via an HTML upload)
+
+The OWID GDocs Add-on colors and indents these docs. You can reproduce that styling **directly on `create_file`** by uploading `contentMimeType: "text/html"` with the inline styles below (verified: Google Docs' HTML import preserves the colors, the `margin-left` indents, hyperlinks, and — crucially — decodes HTML **entities**, so `&mdash;` → "—" and `&#128073;` → "👉" come through clean, unlike raw 4-byte chars in a markdown upload which mojibake). This lands a fully-styled doc that needs no add-on pass. The scheme (extracted from a correctly-formatted doc, e.g. Homicides):
+
+| Element | Text color | Left indent |
+|---|---|---|
+| Field keys (`title: `, `excerpt: `, `type: `, `authors: `, `kicker: `, `url: `, `text: `, `filename: `) | blue `#0094ff` | — |
+| Frontmatter **values** (title/excerpt/type/authors/kicker) | black `#000000` | 0 |
+| `\[+body\]` and `\[\]` | orange `#f47835` | 0 |
+| Body paragraphs, and `url:`/`text:`/`filename:` **values** | grey `#666666` | body 10pt; url/text/filename 20pt |
+| `{.cta}`, `{}`, `{.image}` | green `#23974a` | 10pt |
+| Inline links | blue `#1155cc`, underlined | — |
+
+Per-line HTML shape: `<p style="margin-left:10pt"><span style="color:#666666">…</span></p>`; links `<a href="…" style="color:#1155cc;text-decoration:underline">…</a>`; encode all non-ASCII as HTML entities. Verify afterward with `download_file_content(exportMimeType="text/html")` and check the `color:` / `margin-left:` survived. (If OWID changes the scheme, re-extract it from a recent correctly-formatted doc rather than trusting these hex values.)
+
 ---
 
 ## Field-by-field guidance
