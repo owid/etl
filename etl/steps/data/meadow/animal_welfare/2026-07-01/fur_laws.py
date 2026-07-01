@@ -17,9 +17,7 @@ def run() -> None:
     # Process data.
     #
     # Normalize whitespace in country names (the spreadsheet cells contain stray spaces and line breaks).
-    country_metadata = tb["COUNTRY"].metadata
     tb["COUNTRY"] = tb["COUNTRY"].astype("string").str.replace(r"\s+", " ", regex=True).str.strip()
-    tb["COUNTRY"].metadata = country_metadata
 
     # Remove last row, which simply gives general additional information.
     # It says that any country that is not informed in the spreadsheet can be assumed to have no active fur farms.
