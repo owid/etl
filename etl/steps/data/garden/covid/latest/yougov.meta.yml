@@ -96,7 +96,7 @@ tables:
           Average response-score to question: {definitions.question_mapper}
         display:
           numDecimalPlaces: 3
-          yearIsDay: true
+          timeInterval: day
           zeroDay: "2020-01-21"
       num_responses:
         title: "Question: << question >> - Number of responses"
@@ -105,7 +105,7 @@ tables:
           Number of responses to question: {definitions.question_mapper}
         display:
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: "2020-01-21"
 
 
@@ -114,7 +114,7 @@ tables:
     common:
       display:
         numDecimalPlaces: 2
-        yearIsDay: true
+        timeInterval: day
         zeroDay: "2020-01-21"
     variables:
       people_vaccinated_per_hundred:

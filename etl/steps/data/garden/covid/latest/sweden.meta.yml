@@ -17,11 +17,11 @@ tables:
         title: Deaths
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       incomplete_deaths:
         title: Incomplete deaths
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'

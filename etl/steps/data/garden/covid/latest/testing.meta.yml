@@ -149,7 +149,7 @@ definitions:
     Zimbabwe: tests performed
   display_common: &display_common
     zeroDay: "2020-01-21"
-    yearIsDay: true
+    timeInterval: day
     entityAnnotationsMap: *annotations
 
   common:

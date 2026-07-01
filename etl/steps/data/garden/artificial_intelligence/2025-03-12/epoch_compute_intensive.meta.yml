@@ -26,7 +26,7 @@ tables:
         description_short: Refers to the specific area, application, or field in which an AI model is designed to operate.
         display:
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
 
 
       parameters:
@@ -45,7 +45,7 @@ tables:
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       training_computation_petaflop:
         title: Training computation (petaFLOP)
@@ -62,7 +62,7 @@ tables:
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
         presentation:
           grapher_config:
             title: Training computation

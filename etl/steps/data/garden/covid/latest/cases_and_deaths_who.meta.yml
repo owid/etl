@@ -28,7 +28,7 @@ tables:
         unit: '%'
         display:
           name: Biweekly growth in cases
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
         short_unit: '%'
       biweekly_cases:
@@ -37,20 +37,20 @@ tables:
         display:
           name: Biweekly cases
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       biweekly_cases_per_million_people:
         title: Biweekly cases per million people
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       biweekly_death_growth__pct:
         title: Biweekly death growth (%)
         unit: '%'
         display:
           name: Biweekly death growth
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
         short_unit: '%'
       biweekly_deaths:
@@ -59,33 +59,33 @@ tables:
         display:
           name: Biweekly deaths
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       biweekly_deaths_per_million_people:
         title: Biweekly deaths per million people
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       case_fatality_rate_of_covid_19__pct:
         title: Case fatality rate of COVID-19 (%)
         unit: '%'
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       case_fatality_rate_of_covid_19__pct__only_observations_with__gte_100_cases:
         title: Case fatality rate of COVID-19 (%) (Only observations with ≥100 cases)
         unit: '%'
         display:
           numDecimalPlaces: 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
         short_unit: '%'
       daily_new_confirmed_cases_due_to_covid_19__rolling_7_day_average__right_aligned:
         title: Daily new confirmed cases due to COVID-19 (rolling 7-day average, right-aligned)
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_new_confirmed_cases_of_covid_19:
         title: Daily new confirmed cases of COVID-19
@@ -93,19 +93,19 @@ tables:
         display:
           name: Daily confirmed cases
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_new_confirmed_cases_of_covid_19_per_million_people:
         title: Daily new confirmed cases of COVID-19 per million people
         unit: cases
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_new_confirmed_cases_of_covid_19_per_million_people__rolling_7_day_average__right_aligned:
         title: Daily new confirmed cases of COVID-19 per million people (rolling 7-day average, right-aligned)
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_new_confirmed_deaths_due_to_covid_19:
         title: Daily new confirmed deaths due to COVID-19
@@ -113,25 +113,25 @@ tables:
         display:
           name: Daily confirmed deaths
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_new_confirmed_deaths_due_to_covid_19__rolling_7_day_average__right_aligned:
         title: Daily new confirmed deaths due to COVID-19 (rolling 7-day average, right-aligned)
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_new_confirmed_deaths_due_to_covid_19_per_million_people:
         title: Daily new confirmed deaths due to COVID-19 per million people
         unit: deaths per million
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_new_confirmed_deaths_due_to_covid_19_per_million_people__rolling_7_day_average__right_aligned:
         title: Daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       days_since_the_total_confirmed_cases_of_covid_19_per_million_people_reached_1:
         title: Days since the total confirmed cases of COVID-19 per million people reached 1
@@ -139,103 +139,103 @@ tables:
         display:
           includeInTable: false
           name: Days since the total confirmed cases per million people reached 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       days_since_the_total_confirmed_cases_of_covid_19_reached_100:
         title: Days since the total confirmed cases of COVID-19 reached 100
         unit: ''
         display:
           includeInTable: false
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       days_since_the_total_confirmed_cases_of_covid_19_reached_100__with_population__gte__5m:
         title: Days since the total confirmed cases of COVID-19 reached 100 (with population ≥ 5M)
         unit: ''
         display:
           includeInTable: false
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       days_since_the_total_confirmed_deaths_of_covid_19_per_million_people_reached_0_1:
         title: Days since the total confirmed deaths of COVID-19 per million people reached 0.1
         unit: ''
         display:
           includeInTable: false
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       days_since_the_total_confirmed_deaths_of_covid_19_reached_5:
         title: Days since the total confirmed deaths of COVID-19 reached 5
         unit: ''
         display:
           includeInTable: false
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       has_population__gte__5m_and_had__gte_100_cases__gte_21_days_ago_and_has_testing_data:
         title: Has population ≥ 5M AND had ≥100 cases ≥21 days ago AND has testing data
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       total_confirmed_cases_of_covid_19:
         title: Total confirmed cases of COVID-19
         unit: cases
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       total_confirmed_cases_of_covid_19_per_million_people:
         title: Total confirmed cases of COVID-19 per million people
         unit: cases per million
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       total_confirmed_deaths_due_to_covid_19:
         title: Total confirmed deaths due to COVID-19
         unit: deaths
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       total_confirmed_deaths_due_to_covid_19_per_million_people:
         title: Total confirmed deaths due to COVID-19 per million people
         unit: deaths per million
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       weekly_case_growth__pct:
         title: Weekly case growth (%)
         unit: '%'
         display:
           numDecimalPlaces: 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
         short_unit: '%'
       weekly_cases:
         title: Weekly cases
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       weekly_cases_per_million_people:
         title: Weekly cases per million people
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       weekly_death_growth__pct:
         title: Weekly death growth (%)
         unit: '%'
         display:
           numDecimalPlaces: 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
         short_unit: '%'
       weekly_deaths:
         title: Weekly deaths
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       weekly_deaths_per_million_people:
         title: Weekly deaths per million people
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'

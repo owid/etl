@@ -53,7 +53,7 @@ tables:
       #       hideRelativeChange:
       #     tolerance: 0
       #     unit: arbitrary units
-      #     yearIsDay: false
+      #     timeInterval: day  # day | week | month | quarter | year | decade; omit for yearly data
       #     zeroDay:
         {}
 

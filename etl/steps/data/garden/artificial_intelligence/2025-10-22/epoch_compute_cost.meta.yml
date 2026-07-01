@@ -19,7 +19,7 @@ tables:
         description_short: Specific area, application, or field in which an AI system is designed to operate.
         display:
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       publication_date:
         title: Publication date

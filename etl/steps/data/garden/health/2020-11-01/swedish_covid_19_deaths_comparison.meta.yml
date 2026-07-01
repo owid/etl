@@ -9,7 +9,7 @@ tables:
         title: new_deaths_smoothed
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
     dimensions:
       - name: year
         slug: year
