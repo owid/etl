@@ -46,8 +46,8 @@ Assumptions:
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
-- [ ] Render Slack announcement via `data-updates-comms`, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
-- [ ] Draft public-facing "Data update" post for OWID /latest, add to PR description, hand to user for review and publication
+- [ ] Render Slack announcement via `data-updates-comms`, save to workbench, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
+- [ ] Draft public-facing "Data update" post for OWID /latest, get the user's sign-off on the markdown, create the Google Doc in /Data updates, and hand the user the link (not added to the PR)
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
 - [ ] Ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot (see "Removing the old version & reordering the DAG") — don't forget this step
@@ -362,7 +362,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
       - `## Excluded entries matching canonical regions` — possible over-exclusion (Python check #4) — list each
       - `## Garden output entities not in OWID's canonical regions or income groups` — distinct `country` values found in the built garden tables that aren't in canonical regions or income groups (Python check #5) — list each entity
 
-   7. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections, before the Slack announcement) **with the same listings**, not just a summary. Empty sections can be omitted.
+   7. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections) **with the same listings**, not just a summary. Empty sections can be omitted.
 
    **When you report progress to the user during the workflow, never just give a count — always include the list (or grouped categories) so they can judge in one glance.**
 
@@ -648,11 +648,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      - **Skip**: population-weighted variants (harder to read quickly), within-regime breakdowns (too niche), country-specific views
    - Add snippets for the editorial prompts from source metadata, garden/grapher metadata, resolved sanity-check/workaround notes, and non-routine PR changes. Keep these as snippets/facts, not polished Slack prose.
 
-9) Slack announcement & PR update
+9) Slack announcement
    - Run the `data-updates-comms` skill with `workbench/<short_name>/update-context.yml` as input. `data-updates-comms` is the canonical owner of the Slack form wording, copy-paste format, editorial framing, search URL, and any standalone fallback gathering. Do not duplicate that rendering logic here.
    - Save the rendered draft to `workbench/<short_name>/slack-announcement.md`.
    - If `data-updates-comms` reports missing mechanical fields, gather them, update `update-context.yml`, and re-render rather than inventing values. Ask the user if a missing field requires judgment.
-   - **Do not embed the full draft in the PR description.** GitHub is a poor medium for paste-ready text (code fences scroll horizontally; rendered markdown copies lossily and bloats the PR), and the comms drafts aren't part of the code review. Keep the draft as the `workbench/<short_name>/slack-announcement.md` file — the user copies from there — and add only a compact **Announcements** section to the PR body: a couple of lines naming the Slack post (destination `#data-updates-comms`) and the /latest post title, with no full text.
+   - **Do not put the announcement in the PR at all** — no embed and no pointer. The draft stays as the `workbench/<short_name>/slack-announcement.md` file (the user copies from there); comms drafts are internal and are kept out of the public data-update PR.
    - **Post `@codex review` as a separate PR comment** (not in the PR description) to trigger an automated code review. Use:
      ```bash
      gh pr comment <pr_number> --body "@codex review"
@@ -681,8 +681,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **CTA text** — descriptive: "Explore the updated data in our interactive charts" (default), "Explore all of the updated data in our interactive charts" (broad), "Explore the interactive version of this chart" (single chart), "Explore this data going back to YYYY in our interactive chart" (single chart with date depth).
    - **Image filename** — `YYYY-MM-data-update-<slug>.png` (e.g. `2026-04-data-update-h5n1-flu.png`). The skill doesn't generate the image; the user adds it to the Doc separately.
    - Save the draft to `workbench/<short_name>/data-update.md`.
-   - **Don't embed the full draft in the PR description** (same reasoning as the Slack section). Just add the /latest post's title to the compact **Announcements** pointer in the PR body.
-   - **Propose the draft as markdown and get sign-off before creating the Doc.** Show the user the full post rendered as markdown (in chat) so they can read it and request edits inline, and ask whether they're happy to publish it as a Google Doc. Iterate on `workbench/<short_name>/data-update.md` until they approve — *then* create the Doc. This ordering matters: the Drive API can't edit or delete a Doc once created, so getting the content approved first avoids orphaned drafts.
+   - **Propose the draft as markdown and get sign-off before creating the Doc.** Show the user the full post rendered as markdown (in chat) so they can read it and request edits inline, and ask whether they're happy to publish it as a Google Doc. Iterate on `workbench/<short_name>/data-update.md` until they approve — *then* create the Doc. This ordering matters: the Drive API can't edit or delete a Doc once created, so getting the content approved first avoids orphaned drafts. (Like the Slack draft, the /latest post is **not** added to the PR.)
    - **Once the user approves, create the Google Doc** in the `/Data updates` folder so they don't have to copy-paste, using the Drive MCP `create_file` tool. Match the folder's title convention (e.g. "2026-06 Data update: Homicides").
      - **Upload styled HTML** (`contentMimeType: "text/html"`), applying the OWID CMS colors and indents from the template's "OWID CMS Doc styling" table (blue keys, black frontmatter values, grey body, orange `[+body]`/`[]`, green `{...}` markers, blue-underline links; body indent 10pt, `url:`/`text:`/`filename:` 20pt). Verified: HTML import preserves colors + `margin-left` indents + hyperlinks, and lands a fully-styled doc that needs no add-on pass. This is preferred over a `text/markdown` upload (which gives hyperlinks but no OWID colors/indents).
      - **Encode all non-ASCII as HTML entities** (e.g. `&mdash;` for an em-dash). Entities decode correctly on import; **raw 4-byte chars (emoji) mojibake** to `ð`, so use the entity form (`&#NNNNN;`) if you ever need one.
@@ -729,7 +728,6 @@ At the end of the workflow, update the PR description with:
 - A **tracking-issue link** as the first line of the Summary — e.g. `Tracks: [owid/owid-issues#NNNN](https://github.com/owid/owid-issues/issues/NNNN)`. Most data updates have a corresponding `owid-issues` ticket; try to find it by searching the title or `<short_name>` first, and **ask the user for the issue number if you can't locate one** rather than skipping the link silently.
 - A summary of key changes at the top
 - Collapsed `<details>` sections **only for the pipeline steps that changed in a non-obvious way**. Skip any step that's just the boilerplate generated by `etl update` — don't add a placeholder like "unchanged from boilerplate". The Summary already explains the why; per-step sections are only for the how, when the how isn't obvious from the diff.
-- A collapsed section for the Slack announcement
 
 ## Downstream dependency check
 
