@@ -80,11 +80,14 @@ filename: [YYYY-MM-data-update-<slug>.png — a chart screenshot the user adds t
 
 The `\[+body\]` and `\[\]` markers use backslash-escaped brackets — that's how they appear in the published Google Docs (the escapes prevent Google Docs' auto-link rendering from collapsing the brackets). Keep the escapes when pasting into the Doc; the OWID CMS strips them on ingest.
 
-**Spacing rules** the team prefers (different from the raw Google Docs export, which inserts paragraph breaks everywhere):
+**Formatting the Google Doc — use the OWID GDocs Add-on.** OWID has a Google Docs Add-on (Extensions menu in the Doc) that formats these CMS docs into the right shape. Rely on it to finalize the doc rather than hand-tuning spacing. The **finished Doc is compact: every line is its own paragraph with no empty "spacer" paragraphs between them** — frontmatter fields, the `\[+body\]` marker, body paragraphs, and the `{.cta}`/`{.image}` blocks are all consecutive (Google Docs uses one paragraph per Enter, so blank lines are not needed and read as empty paragraphs to delete).
+
+**Spacing rules for the paste-ready *markdown draft*** (this file's output — the source you paste in or upload; the Add-on / import then collapses it to the compact Doc form above):
 
 - **Frontmatter section** (`title:` through `kicker:`) — one field per line, **no blank lines** between fields.
-- **Body** — keep blank lines between paragraphs.
+- **Body** — keep blank lines between paragraphs (so markdown treats each as its own paragraph).
 - **`{.cta}` and `{.image}` blocks** — opening tag, fields, closing tag all on consecutive lines with **no blank lines inside**. Keep one blank line between the body and `{.cta}`, and between `{.cta}` and `{.image}`.
+- **When auto-creating the Doc via the Drive `create_file` API** (skill step 9b): don't insert blank spacer lines to force paragraph separation — they become empty paragraphs the user must delete. Upload with single newlines and let the OWID GDocs Add-on finalize the formatting.
 
 ---
 
