@@ -13,11 +13,15 @@ dataset:
   owners:
     - Fiona Spooner
     - Tuna Acisu
+
 tables:
   glass_enrolment:
     variables:
       enrolment:
-        title: Which countries have enrolled in the Global Antimicrobial Resistance Surveillance System (GLASS)?
+        title: Which countries are enrolled in the Global Antimicrobial Resistance Surveillance System (GLASS)?
         description_short: "Global Antimicrobial Resistance Surveillance System participation status of each country."
         unit: ""
         short_unit: ""
+        description_key:
+          - The Global Antimicrobial Resistance Surveillance System (GLASS) is a global initiative by the World Health Organization (WHO) to monitor and track antimicrobial use (AMU) and antimicrobial resistance (AMR) worldwide. GLASS collects data on e.g. the use of antibiotics to treat certain infections and the prevalence of resistant bacteria in different countries.
+          - This indicator shows whether countries participate in the antimicrobial use surveillance (AMU), antimicrobial resistance surveillance (AMR), neither or both, as part of the GLASS initiative. Participating countries are expected to submit data on antimicrobial usage and resistance to the WHO, which uses the data to assess the global burden of antimicrobial resistance and guide policy decisions.

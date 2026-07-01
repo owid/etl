@@ -1,12 +1,14 @@
 """Load a snapshot and create a meadow dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+YEAR_GIVEN = 2024  # check on website: https://worldhealthorg.shinyapps.io/glass-dashboard/_w_40cdd046f5ef42ad90bcd40e74452236/#!/home
 
-def run(dest_dir: str) -> None:
+
+def run() -> None:
     #
     # Load inputs.
     #
@@ -18,11 +20,14 @@ def run(dest_dir: str) -> None:
     # Drop the rows where there isn't a country name
     tb = tb.dropna(subset=["Code"])
 
-    # Check the number of countries
-    assert len(tb["Country"] == 197)
+    # Check the number of countries (196)
+    # Hong Kong got removed in 2024 update
+    assert len(tb["Country"]) == 196, f"{len(tb['Country'])} countries found, expected 196"
+
     # Rename columns
     tb = tb.drop(columns=["Country"]).rename(columns={"Label": "country"})
-    tb["year"] = snap.metadata.origin.date_published.split("-")[0]
+    tb["year"] = YEAR_GIVEN
+
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
@@ -32,7 +37,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()

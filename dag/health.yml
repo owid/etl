@@ -384,12 +384,6 @@ steps:
       - data://meadow/cancer/2024-10-13/gco_cancer_today_cervical:
         - snapshot://cancer/2024-10-13/gco_cancer_today_cervical.csv
 
-  # Antibiotic resistance data - WHO GLASS
-  data://grapher/antibiotics/2024-10-18/who_glass_by_antibiotic:
-    - data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic:
-      - data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic:
-        - snapshot://antibiotics/2024-10-18/who_glass_by_antibiotic.zip
-
   # ANIMUSE - antibiotic use in animals
   data://grapher/antibiotics/2024-10-23/animuse_year:
     - data://garden/antibiotics/2024-10-23/animuse_year:
@@ -413,16 +407,6 @@ steps:
     - data://garden/antibiotics/2024-10-23/tracss:
       - data://meadow/antibiotics/2024-10-23/tracss:
         - snapshot://antibiotics/2024-10-23/tracss.xlsx
-  # WHO Antimicrobial usage
-  data://grapher/antibiotics/2024-11-12/antimicrobial_usage:
-    - data://garden/antibiotics/2024-11-12/antimicrobial_usage:
-      - data://meadow/antibiotics/2024-11-12/antimicrobial_usage:
-        - snapshot://antibiotics/2024-11-12/antimicrobial_usage.xlsx
-  # WHO Antibiotic testing coverage
-  data://grapher/antibiotics/2024-11-15/testing_coverage:
-    - data://garden/antibiotics/2024-11-15/testing_coverage:
-      - data://meadow/antibiotics/2024-11-15/testing_coverage:
-        - snapshot://antibiotics/2024-11-15/testing_coverage.zip
 
   # IHME Neonatal all infectious syndromes
   data-private://meadow/antibiotics/2024-11-20/microbe:
@@ -454,11 +438,6 @@ steps:
     - data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream:
       - snapshot-private://antibiotics/2024-12-02/total_pathogen_bloodstream.csv
 
-  # WHO GLASS Enrolment
-  data://grapher/antibiotics/2024-12-03/glass_enrolment:
-    - data://garden/antibiotics/2024-12-03/glass_enrolment:
-      - data://meadow/antibiotics/2024-12-03/glass_enrolment:
-        - snapshot://antibiotics/2024-12-03/glass_enrolment.xlsx
   # MICROBE - total deaths by pathogen and amr resistance
   data-private://grapher/antibiotics/2024-12-04/microbe_total_pathogens_amr:
     - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens_amr:
@@ -1107,16 +1086,11 @@ steps:
   # Death completion (Karlinsky, 2024)
   data://grapher/health/2026-06-01/deaths_karlinsky:
     - data://garden/health/2026-06-01/deaths_karlinsky
-  data://meadow/antibiotics/2026-06-30/antimicrobial_usage:
-    - snapshot://antibiotics/2026-06-30/antimicrobial_usage.xlsx
-  data://garden/antibiotics/2026-06-30/antimicrobial_usage:
-    - data://meadow/antibiotics/2026-06-30/antimicrobial_usage
-
 
   # WHO GLASS - Antimicrobial usage
   data://grapher/antibiotics/2026-06-30/antimicrobial_usage:
-    - data://garden/antibiotics/2026-06-30/antimicrobial_usage
-      - data://meadow/antibiotics/2026-06-30/antimicrobial_usage
+  - data://garden/antibiotics/2026-06-30/antimicrobial_usage:
+    - data://meadow/antibiotics/2026-06-30/antimicrobial_usage:
         - snapshot://antibiotics/2026-06-30/antimicrobial_usage.xlsx
 
   # WHO GLASS - Antibiotic testing coverage
