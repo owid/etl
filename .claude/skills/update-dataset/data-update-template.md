@@ -1,6 +1,6 @@
 # Data Update Post Template (for OWID /latest)
 
-Use this template to draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest) when a dataset refresh ships. **The published format is a Google Doc** that gets ingested by OWID's CMS — the doc has structured frontmatter fields (`title`, `excerpt`, `type`, `authors`, `kicker`), a `\[+body\]` marker, body prose, and trailing `{.cta}` and `{.image}` blocks. The skill should produce output in **exactly that format** so the runner can paste it into a new Google Doc in the team's `/Data updates` Drive folder.
+Use this template to draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest) when a dataset refresh ships. **The published format is a Google Doc** that gets ingested by OWID's CMS — the doc has structured frontmatter fields (`title`, `excerpt`, `type`, `authors`, `kicker`), a `[+body]` marker, body prose, and trailing `{.cta}` and `{.image}` blocks. The skill should produce output in **exactly that format** so the runner can paste it into a new Google Doc in the team's `/Data updates` Drive folder.
 
 This is **separate from the Slack announcement** — that one is a 10-field form for the internal #data-updates-comms channel; this one is a mini-blog-post for OWID readers. They share editorial content but live in different formats.
 
@@ -37,7 +37,7 @@ type: announcement
 authors: [Author name(s). Comma-separated for co-authors, e.g. "Hannah Ritchie, Edouard Mathieu".]
 kicker: data-update
 
-\[+body\]
+[+body]
 
 [Body — 100–200 words of flowing prose, first-person, conversational. Recipe (mirroring the published examples — ATUS, PIP, NVIDIA, OECD Government at a Glance, UNU-WIDER, robots, ozone, mobile money, fertilizers, democracy, WASH):
 
@@ -75,12 +75,12 @@ text: [Descriptive link text. One of:
 filename: [YYYY-MM-data-update-<slug>.png — a chart screenshot the user adds to the Doc separately. The slug is a short, lowercase-hyphenated topic tag, e.g. world-bank-pip, nvidia-revenue, h5n1-flu, govt-revenue, ozone-hole, robots-per-worker.]
 {}
 
-\[\]
+[]
 ```
 
-The `\[+body\]` and `\[\]` markers use backslash-escaped brackets — that's how they appear in the published Google Docs (the escapes prevent Google Docs' auto-link rendering from collapsing the brackets). Keep the escapes when pasting into the Doc; the OWID CMS strips them on ingest.
+The `[+body]` and `[]` markers are plain brackets — do **not** add backslash escapes to them. (Any backslashes that show up in a `read_file_content` dump are an artifact of that markdown representation, not the real Doc content.) The OWID CMS reads the plain markers directly.
 
-**Formatting the Google Doc — use the OWID GDocs Add-on.** OWID has a Google Docs Add-on (Extensions menu in the Doc) that formats these CMS docs into the right shape. Rely on it to finalize the doc rather than hand-tuning spacing. The **finished Doc is compact: every line is its own paragraph with no empty "spacer" paragraphs between them** — frontmatter fields, the `\[+body\]` marker, body paragraphs, and the `{.cta}`/`{.image}` blocks are all consecutive (Google Docs uses one paragraph per Enter, so blank lines are not needed and read as empty paragraphs to delete).
+**Formatting the Google Doc — use the OWID GDocs Add-on.** OWID has a Google Docs Add-on (Extensions menu in the Doc) that formats these CMS docs into the right shape. Rely on it to finalize the doc rather than hand-tuning spacing. The **finished Doc is compact: every line is its own paragraph with no empty "spacer" paragraphs between them** — frontmatter fields, the `[+body]` marker, body paragraphs, and the `{.cta}`/`{.image}` blocks are all consecutive (Google Docs uses one paragraph per Enter, so blank lines are not needed and read as empty paragraphs to delete).
 
 **Spacing rules for the paste-ready *markdown draft*** (this file's output — the source you paste in or upload; the Add-on / import then collapses it to the compact Doc form above):
 
@@ -97,7 +97,7 @@ The OWID GDocs Add-on colors and indents these docs. You can reproduce that styl
 |---|---|---|
 | Field keys (`title: `, `excerpt: `, `type: `, `authors: `, `kicker: `, `url: `, `text: `, `filename: `) | blue `#0094ff` | — |
 | Frontmatter **values** (title/excerpt/type/authors/kicker) | black `#000000` | 0 |
-| `\[+body\]` and `\[\]` | orange `#f47835` | 0 |
+| `[+body]` and `[]` | orange `#f47835` | 0 |
 | Body paragraphs, and `url:`/`text:`/`filename:` **values** | grey `#666666` | body 10pt; url/text/filename 20pt |
 | `{.cta}`, `{}`, `{.image}` | green `#23974a` | 10pt |
 | Inline links | blue `#1155cc`, underlined | — |
@@ -130,7 +130,7 @@ If the dataset doesn't lend itself to a single headline finding, the question fo
 
 **`kicker`** — Use `data-update` (lowercase, hyphenated). This is the current convention — all five most recent posts as of July 2026 (oil spills, homicides, wildfires, democracy, SIPRI) use `kicker: data-update`. Older posts used `Data update` / `Data Update`; the CMS accepts those too, but match the current lowercase-hyphenated form.
 
-**`\[+body\]`** — Literal marker. Always sits between the frontmatter and the body. Keep the backslash escapes.
+**`[+body]`** — Literal marker (plain brackets, no backslashes). Always sits between the frontmatter and the body.
 
 **Body voice** — First-person, conversational, author voice. The post reads like the person who did the work telling you about it. **Not** corporate ("OWID has updated…" is wrong); **yes** "I recently updated…", "I've just updated…", "I just updated…", or "We recently updated…" / "We've just updated…" for joint work.
 
@@ -170,9 +170,9 @@ The `text:` is descriptive — see the patterns under "Field-by-field guidance" 
 
 **`{.image}` block** — Filename of the chart screenshot. Pattern: `YYYY-MM-data-update-<slug>.png`. The image itself isn't generated by the skill; it's added to the Google Doc separately by the user. The skill just fills in the expected filename so the slot is reserved. **Always precede the `{.image}` block with a `:skip … :endskip` wrapped "👉 Add a picture here" reminder line** so the user notices the slot when copy-pasting into the Doc, and so the reminder won't leak to the published post if the user forgets to remove it.
 
-**`\[\]`** — Literal end-of-post marker. Always sits at the very end of the published content.
+**`[]`** — Literal end-of-post marker. Always sits at the very end of the published content.
 
-**Optional `:skip` ... `:endskip` block (after `\[\]`)** — For paragraphs the author drafted but cut from the final version. Won't be published. The skill should NOT generate `:skip` content automatically; it's a human editing tool. Mention it only if the user asks how to keep deleted material around.
+**Optional `:skip` ... `:endskip` block (after `[]`)** — For paragraphs the author drafted but cut from the final version. Won't be published. The skill should NOT generate `:skip` content automatically; it's a human editing tool. Mention it only if the user asks how to keep deleted material around.
 
 ---
 
@@ -189,7 +189,7 @@ type: announcement
 authors: Veronika Samborska
 kicker: Data update
 
-\[+body\]
+[+body]
 
 [Most of the chips](https://epoch.ai/data/ai-chip-sales?view=graph&tab=h100_equivalents&proportion=share&viewType=designer) used to train and run AI models come from NVIDIA. This makes NVIDIA's data center & AI revenue one of the clearest public figures available for tracking demand for AI hardware.
 
@@ -208,7 +208,7 @@ text: Explore this data going back to 2014 in our interactive chart
 filename: 2026-04-data-update-nvidia-revenue.png
 {}
 
-\[\]
+[]
 ```
 
 ### Action-titled, with caveat and quarterly cadence (H5N1, ~135 words)
@@ -220,7 +220,7 @@ type: announcement
 authors: Lucas Rodés-Guirao
 kicker: Data update
 
-\[+body\]
+[+body]
 
 Avian influenza A (H5N1), often referred to as "bird flu", is a subtype of influenza virus that infects birds and mammals. In rare cases, humans can also be infected.
 
@@ -241,7 +241,7 @@ text: Explore the updated data in our interactive chart
 filename: 2026-04-data-update-h5n1-flu.png
 {}
 
-\[\]
+[]
 ```
 
 ### Finding-titled, with cross-reference (World Bank PIP, ~190 words)
@@ -253,7 +253,7 @@ type: announcement
 authors: Pablo Arriagada
 kicker: Data update
 
-\[+body\]
+[+body]
 
 How many people live in poverty around the world, and how has that changed over the last decades?
 
@@ -278,5 +278,5 @@ text: Explore all of the updated data in our interactive charts
 filename: 2026-04-data-update-world-bank-pip.png
 {}
 
-\[\]
+[]
 ```
