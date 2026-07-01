@@ -247,6 +247,81 @@ the wording from the questionnaire PDF; the code→category order from the `.dta
 to the `variables:` block. To re-run the generator after a wording fix, splice cleanly: find the first new
 key in the file, truncate from there, and re-append the regenerated block (don't blindly append twice).
 
+**Enumerate the possible answers in every `description_short`.** Don't stop at naming the response(s) the
+indicator measures — append the full set of options the respondent could choose, so each indicator is
+self-describing. Follow the IVS pattern: for categorical / Likert scales end the sentence with `Possible
+answers are "<a>", "<b>", … and "<z>".` (list them in the source order from the `.dta` value labels); for an
+N-point numeric scale state the anchored range instead (e.g. `on a scale from 1 ("never justifiable") to 10
+("always justifiable")`). This applies to **every** column in the block — the aggregates (`agree_agg_*`,
+`never_just_agg_*`, …), each individual category, and the `dont_know` / `no_answer` / `avg_score` columns —
+they all carry the same possible-answer clause; only the measured-response part differs. Pull the exact
+option wording from the `.dta` value labels (verify per Step 0), never from memory — e.g. WVS D066_01's
+fifth point is literally `Disagree strongly`, and F114E labels only the 1 and 10 endpoints. Same rule for
+IVS and WVS.
+
+**Keep IVS and WVS at metadata parity.** Any `description_short` house-style or convention you apply to one
+table's indicators, apply to the other's too — e.g. the possible-answers clause above was added to both the
+IVS and WVS blocks. When you improve or restyle the IVS metadata, mirror the change on WVS (and vice-versa)
+so the two blocks stay consistent, differing only in the survey-specific anchors (`*_wvs`) and the question
+wording.
+
+Canonical shape of a variable entry (a WVS entry = the IVS entry **plus** the three `*_wvs` override lines;
+everything else is inherited from `definitions.common`, so don't re-specify it):
+
+```yaml
+definitions:
+  common:                                 # applied dataset-wide → inherited by BOTH tables
+    presentation: {attribution_short: Integrated Values Surveys}   # IVS-worded
+    processing_level: major
+    description_key: [ …IVS-worded (merged WVS+EVS, IVS waves)… ]
+    description_processing: | …IVS-worded…
+    display: &common-display
+      numDecimalPlaces: 1
+      tolerance: 5
+      entityAnnotationsMap: |-
+        United Kingdom: England, Scotland, and Wales
+    unit: "%"
+    short_unit: "%"
+  # WVS overrides (common is IVS-specific) — referenced per WVS variable:
+  attribution_short_wvs: &attribution_short_wvs World Values Survey
+  description_key_wvs: &description_key_wvs [ …WVS-worded… ]
+  description_processing_wvs: &description_processing_wvs | …WVS-worded…
+
+tables:
+  integrated_values_surveys:              # IVS variable — inherits all of common
+    variables:
+      <short_name>:
+        title: '<unique across BOTH tables>'
+        description_short: '% of respondents … "<question stem>". Possible answers are "<a>", …, "<z>".'
+        display:
+          name: <short label>
+          <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_<topic>
+
+  world_values_survey:                    # WVS variable — SAME shape + the 3 *_wvs overrides
+    variables:
+      <short_name>:
+        title: '<unique across BOTH tables>'
+        description_short: '% of respondents … "<question stem>". Possible answers are "<a>", …, "<z>".'
+        description_key: *description_key_wvs                 # ← WVS-only override
+        description_processing: *description_processing_wvs   # ← WVS-only override
+        display:
+          name: <short label>
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs           # ← WVS-only override
+          topic_tags: *topic_tags_<topic>
+
+      avg_score_<q>:                        # unit-less average column (either table)
+        title: '…: average score'
+        description_short: 'Average score … on a scale from 1 ("…") to 10 ("…").'
+        display: {name: '…: average score', numDecimalPlaces: 2, <<: *common-display}
+        unit: ""
+        short_unit: ""
+        presentation: {topic_tags: *topic_tags_<topic>}       # + attribution_short: *attribution_short_wvs on WVS
+```
+
 **Battery questions — separate the prompt from the item.** Many WVS/EVS questions read a generic prompt
 then list items (e.g. "…with the following statements? - Work is a duty…"). In `description_short` never
 leave a raw `" - "` separator **and** never let the item dangle straight after the "?" (e.g.
