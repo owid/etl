@@ -223,28 +223,28 @@ tables:
         unit: ''
         display:
           name: Cancel public events (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       close_public_transport:
         title: close_public_transport
         unit: ''
         display:
           name: Close public transport (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       contact_tracing:
         title: contact_tracing
         unit: ''
         display:
           name: Contact tracing (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       containment_index:
         title: containment_index
         unit: (0 to 100, 100 = strictest)
         display:
           name: COVID-19 Containment and Health Index
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       debt_relief:
         title: debt_relief
@@ -261,28 +261,28 @@ tables:
         unit: ''
         display:
           name: Debt or contract relief
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       emergency_investment_healthcare:
         title: emergency_investment_healthcare
         unit: ''
         display:
           name: Emergency investment in health care (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       facial_coverings:
         title: facial_coverings
         unit: ''
         display:
           name: Facial coverings (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       fiscal_measures:
         title: fiscal_measures
         unit: ''
         display:
           name: Fiscal measures (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       income_support:
         title: income_support
@@ -300,119 +300,119 @@ tables:
         unit: ''
         display:
           name: Income support
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       international_support:
         title: international_support
         unit: ''
         display:
           name: International support (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       international_travel_controls:
         title: international_travel_controls
         unit: ''
         display:
           name: International travel controls (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       investment_vaccines:
         title: investment_vaccines
         unit: $
         display:
           name: Investment in COVID-19 vaccines
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
         short_unit: $
       pregnant_vaccine_eligibility:
         title: pregnant_vaccine_eligibility
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       public_information_campaigns:
         title: public_information_campaigns
         unit: ''
         display:
           name: Public information campaigns (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       restriction_gatherings:
         title: restriction_gatherings
         unit: ''
         display:
           name: Restrictions on gatherings (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       restrictions_internal_movements:
         title: restrictions_internal_movements
         unit: ''
         display:
           name: Restrictions on internal movement (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       school_closures:
         title: school_closures
         unit: ''
         display:
           name: School closures
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       stay_home_requirements:
         title: stay_home_requirements
         unit: ''
         display:
           name: Stay at home requirements (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       stringency_index:
         title: stringency_index
         unit: (0 to 100, 100 = strictest)
         display:
           name: Government Response Stringency Index
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       testing_policy:
         title: testing_policy
         unit: ''
         display:
           name: Testing policy (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       vaccination_policy:
         title: vaccination_policy
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       vaccine_availability:
         title: vaccine_availability
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       vaccine_eligibility:
         title: vaccine_eligibility
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       vaccine_eligibility_age:
         title: vaccine_eligibility_age
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       vaccine_eligibility_age_at_risk:
         title: vaccine_eligibility_age_at_risk
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       workplace_closures:
         title: workplace_closures
         unit: ''
         display:
           name: Workplace Closures (OxBSG)
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'

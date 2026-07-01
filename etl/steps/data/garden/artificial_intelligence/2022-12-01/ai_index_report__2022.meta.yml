@@ -52,7 +52,7 @@ tables:
         title: growth_ai_hiring_smoothed
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
         description: |-
           The overall hiring rate is the number of LinkedIn members who added a new employer in the same period the job began, divided by the total number of LinkedIn members in the corresponding location.

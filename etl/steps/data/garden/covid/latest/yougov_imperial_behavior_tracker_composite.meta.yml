@@ -45,7 +45,7 @@ tables:
           includeInTable: true
           name: Share of people who have received at least one dose of a COVID-19 vaccine
           numDecimalPlaces: 2
-          yearIsDay: true
+          timeInterval: day
         short_unit: '%'
       uncertain_covid_vaccinate_this_week_pct_pop:
         title: uncertain_covid_vaccinate_this_week_pct_pop
@@ -77,7 +77,7 @@ tables:
           name: Share of people who have not received a COVID-19 vaccine and are uncertain if they would get a COVID-19 vaccine
             if it was available to them this week
           numDecimalPlaces: 2
-          yearIsDay: true
+          timeInterval: day
         short_unit: '%'
       unwillingness_covid_vaccinate_this_week_pct_pop:
         title: unwillingness_covid_vaccinate_this_week_pct_pop
@@ -109,7 +109,7 @@ tables:
           name: Share of people who have not received a COVID-19 vaccine and would not get a COVID-19 vaccine if it was available
             to them this week
           numDecimalPlaces: 2
-          yearIsDay: true
+          timeInterval: day
         short_unit: '%'
       willingness_covid_vaccinate_this_week_pct_pop:
         title: willingness_covid_vaccinate_this_week_pct_pop
@@ -140,5 +140,5 @@ tables:
           name: Share of people who have not received a COVID-19 vaccine and would get a COVID-19 vaccine if it was available
             to them this week
           numDecimalPlaces: 2
-          yearIsDay: true
+          timeInterval: day
         short_unit: '%'

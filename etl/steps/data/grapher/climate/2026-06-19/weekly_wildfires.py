@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     for column in tb.columns:
         tb[column].metadata.display = {}
         tb[column].metadata.display["zeroDay"] = "2000-01-01"
-        tb[column].metadata.display["yearIsDay"] = True
+        tb[column].metadata.display["timeInterval"] = "day"
 
     #
     # Save outputs.

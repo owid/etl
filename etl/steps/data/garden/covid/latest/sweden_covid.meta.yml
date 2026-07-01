@@ -6,7 +6,7 @@ definitions:
         - COVID-19
     display:
       zeroDay: "2020-01-01"
-      yearIsDay: true
+      timeInterval: day
 
 
 # Learn more about the available fields:

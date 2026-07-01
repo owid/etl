@@ -32,7 +32,7 @@ definitions:
     Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
   common_display: &common_display
     zeroDay: "2020-01-21"
-    yearIsDay: true
+    timeInterval: day
   daily_population: &daily_population |-
     This indicator is estimated by normalizing by population. We have used daily population estimates, which leads to changes in the denominator between datapoints from different days. For instance, the denominator for January 1st will be different to the one on January 2nd.
   common:
