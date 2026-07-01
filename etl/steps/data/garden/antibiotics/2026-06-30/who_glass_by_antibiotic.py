@@ -1,12 +1,12 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -19,7 +19,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
+
     # Split the table into two, one where antibiotic is disregarded (it creates unnecessary duplicates for bcis_per_million and total_bcis)
     tb_bci = (
         tb[["country", "year", "syndrome", "pathogen", "bcis_per_million", "total_bcis"]]
@@ -43,8 +44,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb_bci, tb_anti], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    ds_garden = paths.create_dataset(
+        tables=[tb_bci, tb_anti], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
