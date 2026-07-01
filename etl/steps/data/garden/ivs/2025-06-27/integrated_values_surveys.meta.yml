@@ -5,14 +5,14 @@ definitions:
       attribution_short: Integrated Values Surveys
     processing_level: major
     description_key:
-      - When available, we consider “Don’t know” and “No answer” to be valid response categories and include them in percentage calculations. “Missing” responses, however, are excluded from the set of possible answers.
+      - When available, we consider “Don’t know” and “No answer” to be valid response categories and include them in percentage calculations. “Not applicable”, “Not asked”, and “Missing” responses, however, are excluded from the set of possible answers.
       - The years in the data represent the latest year of each Integrated Values Surveys wave, which is not necessarily the year of the survey. For example, the 2022 wave (IVS wave 7) includes surveys conducted between 2017 and 2022. This is done to improve comparability across waves.
     description_processing: |
       We collected the data by merging the World Values Survey and the European Values Study, following the methodology described in the [Integrated Values Surveys (IVS) website](https://www.worldvaluessurvey.org/WVSEVStrend.jsp).
 
       We processed the indicators from microdata of the IVS using Stata. Weights are applied for each country.
 
-      We consider “Don’t know” and “No answer” to be valid response categories and include them in percentage calculations. “Missing” responses, however, are excluded from the set of possible answers.
+      We consider “Don’t know” and “No answer” to be valid response categories and include them in percentage calculations. “Not applicable”, “Not asked”, and “Missing” responses, however, are excluded from the set of possible answers.
 
       We processed the years in the data to represent the latest year of each IVS wave, which is not necessarily the year of the survey. For example, the 2022 wave (IVS wave 7) includes surveys conducted between 2017 and 2022.
     display: &common-display
@@ -91,6 +91,19 @@ definitions:
     - Illicit Drug Use
   topic_tags_fertility_rate: &topic_tags_fertility_rate
     - Fertility Rate
+
+  # World Values Survey (WVS) overrides: the common block above is IVS-specific (it describes merging
+  # WVS and EVS), so WVS-only indicators reference these instead.
+  attribution_short_wvs: &attribution_short_wvs World Values Survey
+  description_key_wvs: &description_key_wvs
+    - When available, we consider “Don’t know” and “No answer” to be valid response categories and include them in percentage calculations. “Not applicable”, “Not asked”, and “Missing” responses, however, are excluded from the set of possible answers.
+    - The years in the data represent the latest year of each World Values Survey wave, which is not necessarily the year of the survey. For example, the 2022 wave (WVS wave 7) includes surveys conducted between 2017 and 2022. This is done to improve comparability across waves.
+  description_processing_wvs: &description_processing_wvs |
+    We processed the indicators from the microdata of the World Values Survey Time-Series (1981-2022) using Stata. Weights are applied for each country.
+
+    We consider “Don’t know” and “No answer” to be valid response categories and include them in percentage calculations. “Not applicable”, “Not asked”, and “Missing” responses, however, are excluded from the set of possible answers.
+
+    We processed the years in the data to represent the latest year of each WVS wave, which is not necessarily the year of the survey. For example, the 2022 wave (WVS wave 7) includes surveys conducted between 2017 and 2022.
 dataset:
   update_period_days: 365
 
@@ -8294,3 +8307,278 @@ tables:
           <<: *common-display
         unit: ""
         short_unit: ""
+
+  world_values_survey:
+    variables:
+      # --- D066_01: Problem if a woman earns more than her husband (5-point agree) ---
+      agree_agg_women_income:
+        title: 'Problems if a woman earns more than her husband: Agree (strongly agree or agree)'
+        description_short: '% of respondents replying "strongly agree" or "agree" when asked how much they agree with the statement "If a woman earns more money than her husband, it''s almost certain to cause problems". Possible answers are "strongly agree", "agree", "neither agree nor disagree", "disagree" and "strongly disagree".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: Agree a woman earning more than her husband causes problems
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_women_s_rights
+      disagree_agg_women_income:
+        title: 'Problems if a woman earns more than her husband: Disagree (disagree or strongly disagree)'
+        description_short: '% of respondents replying "disagree" or "strongly disagree" when asked how much they agree with the statement "If a woman earns more money than her husband, it''s almost certain to cause problems". Possible answers are "strongly agree", "agree", "neither agree nor disagree", "disagree" and "strongly disagree".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: Disagree a woman earning more than her husband causes problems
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_women_s_rights
+      strongly_agree_women_income:
+        title: 'Problems if a woman earns more than her husband: Strongly agree'
+        description_short: '% of respondents replying "strongly agree" when asked how much they agree with the statement "If a woman earns more money than her husband, it''s almost certain to cause problems". Possible answers are "strongly agree", "agree", "neither agree nor disagree", "disagree" and "strongly disagree".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Strongly agree'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_women_s_rights
+      agree_women_income:
+        title: 'Problems if a woman earns more than her husband: Agree'
+        description_short: '% of respondents replying "agree" when asked how much they agree with the statement "If a woman earns more money than her husband, it''s almost certain to cause problems". Possible answers are "strongly agree", "agree", "neither agree nor disagree", "disagree" and "strongly disagree".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Agree'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_women_s_rights
+      neither_women_income:
+        title: 'Problems if a woman earns more than her husband: Neither agree nor disagree'
+        description_short: '% of respondents replying "neither agree nor disagree" when asked how much they agree with the statement "If a woman earns more money than her husband, it''s almost certain to cause problems". Possible answers are "strongly agree", "agree", "neither agree nor disagree", "disagree" and "strongly disagree".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Neither agree nor disagree'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_women_s_rights
+      disagree_women_income:
+        title: 'Problems if a woman earns more than her husband: Disagree (only)'
+        description_short: '% of respondents replying "disagree" when asked how much they agree with the statement "If a woman earns more money than her husband, it''s almost certain to cause problems". Possible answers are "strongly agree", "agree", "neither agree nor disagree", "disagree" and "strongly disagree".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Disagree'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_women_s_rights
+      strongly_disagree_women_income:
+        title: 'Problems if a woman earns more than her husband: Strongly disagree'
+        description_short: '% of respondents replying "strongly disagree" when asked how much they agree with the statement "If a woman earns more money than her husband, it''s almost certain to cause problems". Possible answers are "strongly agree", "agree", "neither agree nor disagree", "disagree" and "strongly disagree".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Strongly disagree'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_women_s_rights
+      dont_know_women_income:
+        title: 'Problems if a woman earns more than her husband: Don''t know'
+        description_short: '% of respondents replying "don''t know" when asked how much they agree with the statement "If a woman earns more money than her husband, it''s almost certain to cause problems". Possible answers are "strongly agree", "agree", "neither agree nor disagree", "disagree" and "strongly disagree".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: "Don't know"
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_women_s_rights
+      no_answer_women_income:
+        title: 'Problems if a woman earns more than her husband: No answer'
+        description_short: '% of respondents giving no answer when asked how much they agree with the statement "If a woman earns more money than her husband, it''s almost certain to cause problems". Possible answers are "strongly agree", "agree", "neither agree nor disagree", "disagree" and "strongly disagree".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'No answer'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_women_s_rights
+
+      # --- E069_64: Confidence in elections (4-point) ---
+      confidence_elections:
+        title: 'Confidence in elections (a great deal or quite a lot)'
+        description_short: '% of respondents replying "a great deal" or "quite a lot" when asked how much confidence they have in elections. Possible answers are "a great deal", "quite a lot", "not very much" and "none at all".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: Confidence in elections
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_democracy
+      great_deal_elections:
+        title: 'Confidence in elections: A great deal'
+        description_short: '% of respondents replying "a great deal" when asked how much confidence they have in elections. Possible answers are "a great deal", "quite a lot", "not very much" and "none at all".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'A great deal'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_democracy
+      quite_a_lot_elections:
+        title: 'Confidence in elections: Quite a lot'
+        description_short: '% of respondents replying "quite a lot" when asked how much confidence they have in elections. Possible answers are "a great deal", "quite a lot", "not very much" and "none at all".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Quite a lot'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_democracy
+      not_very_much_elections:
+        title: 'Confidence in elections: Not very much'
+        description_short: '% of respondents replying "not very much" when asked how much confidence they have in elections. Possible answers are "a great deal", "quite a lot", "not very much" and "none at all".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Not very much'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_democracy
+      none_at_all_elections:
+        title: 'Confidence in elections: None at all'
+        description_short: '% of respondents replying "none at all" when asked how much confidence they have in elections. Possible answers are "a great deal", "quite a lot", "not very much" and "none at all".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'None at all'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_democracy
+      dont_know_elections:
+        title: 'Confidence in elections: Don''t know'
+        description_short: '% of respondents replying "don''t know" when asked how much confidence they have in elections. Possible answers are "a great deal", "quite a lot", "not very much" and "none at all".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: "Don't know"
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_democracy
+      no_answer_elections:
+        title: 'Confidence in elections: No answer'
+        description_short: '% of respondents giving no answer when asked how much confidence they have in elections. Possible answers are "a great deal", "quite a lot", "not very much" and "none at all".'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'No answer'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_democracy
+
+      # --- F114E: Justifiable, terrorism as a political, ideological or religious means (10-point) ---
+      never_just_agg_terrorism:
+        title: 'Justifiable, terrorism: Not justifiable (1-4)'
+        description_short: '% of respondents answering between 1 and 4 when asked whether terrorism as a political, ideological or religious means can be justified, on a scale from 1 ("never justifiable") to 10 ("always justifiable").'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: Terrorism not justifiable
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_terrorism
+      always_just_agg_terrorism:
+        title: 'Justifiable, terrorism: Justifiable (7-10)'
+        description_short: '% of respondents answering between 7 and 10 when asked whether terrorism as a political, ideological or religious means can be justified, on a scale from 1 ("never justifiable") to 10 ("always justifiable").'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: Terrorism justifiable
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_terrorism
+      never_just_terrorism:
+        title: 'Justifiable, terrorism: Never justifiable (1)'
+        description_short: '% of respondents answering "never justifiable" (1 on the 1-to-10 scale) when asked whether terrorism as a political, ideological or religious means can be justified.'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Never justifiable'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_terrorism
+      always_just_terrorism:
+        title: 'Justifiable, terrorism: Always justifiable (10)'
+        description_short: '% of respondents answering "always justifiable" (10 on the 1-to-10 scale) when asked whether terrorism as a political, ideological or religious means can be justified.'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Always justifiable'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_terrorism
+      neutral_terrorism:
+        title: 'Justifiable, terrorism: Neutral (5-6)'
+        description_short: '% of respondents answering 5 or 6 when asked whether terrorism as a political, ideological or religious means can be justified, on a scale from 1 ("never justifiable") to 10 ("always justifiable").'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Neutral'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_terrorism
+      dont_know_terrorism:
+        title: 'Justifiable, terrorism: Don''t know'
+        description_short: '% of respondents replying "don''t know" when asked whether terrorism as a political, ideological or religious means can be justified, on a scale from 1 ("never justifiable") to 10 ("always justifiable").'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: "Don't know"
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_terrorism
+      no_answer_terrorism:
+        title: 'Justifiable, terrorism: No answer'
+        description_short: '% of respondents giving no answer when asked whether terrorism as a political, ideological or religious means can be justified, on a scale from 1 ("never justifiable") to 10 ("always justifiable").'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'No answer'
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_terrorism
+      avg_score_terrorism:
+        title: 'Justifiable, terrorism: average score'
+        description_short: 'Average score when asked whether terrorism as a political, ideological or religious means can be justified, on a scale from 1 ("never justifiable") to 10 ("always justifiable").'
+        description_key: *description_key_wvs
+        description_processing: *description_processing_wvs
+        display:
+          name: 'Justifiable, terrorism: average score'
+          numDecimalPlaces: 2
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+        presentation:
+          attribution_short: *attribution_short_wvs
+          topic_tags: *topic_tags_terrorism
