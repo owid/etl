@@ -26,6 +26,7 @@ def run() -> None:
         update_existing=True,
         folder_id=team_folder_id,
         metadata_variables=["literacy_rate"],
+        metadata_table=tb,
         role="reader",
         general_access="anyone",
     )
