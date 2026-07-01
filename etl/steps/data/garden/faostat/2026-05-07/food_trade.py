@@ -1,29 +1,16 @@
 """Garden step for the FAOSTAT food-trade Sankey viz.
 
-Builds the slice of bilateral trade flows from the trade matrix, with two columns from SCL Production:
+Builds the slice of bilateral trade flows from the trade matrix:
 
   exporter (str)               — exporting country (OWID-harmonized)
   importer (str)               — importing country (OWID-harmonized)
   item     (str)               — viz-display item (see food_trade.items.yaml)
   value    (float, tonnes)     — bilateral A→B trade flow in tonnes
-  exporter_production (float)  — exporter's SCL Production tonnes of that item
-                                 (NaN if SCL has no Production row for it)
-  importer_supply (float)      — importer's domestic supply in tonnes,
-                                 computed from SCL via the FAOSTAT Food
-                                 Balance Sheet identity:
-                                     Production + Imports - Exports - Stock Variation
-                                 All four components come from SCL. Stock
-                                 Variation in SCL is `Closing - Opening`
-                                 (positive when stocks accumulated during
-                                 the year, negative when drawn down) — so
-                                 it is *subtracted* from the supply, as
-                                 accumulated stocks don't reach domestic
-                                 use.
 
 The display items shown in the dropdown are curated in
 `food_trade.items.yaml`. Each entry maps one or more FAO commodity item codes
-(the same codebook used by both TM and SCL) to their names. Most items have a
-single code, so the rollup is a direct integer-code filter against `item_code`.
+to their names. Most items have a single code, so the rollup is a direct integer-code
+filter against `item_code`.
 
 A few items combine several codes: FAO splits some commodities into a primary
 product and a mechanically-derived form whose trade is reported separately
@@ -31,12 +18,9 @@ product and a mechanically-derived form whose trade is reported separately
 raw + refined sugar), and the primary code alone captures only a fraction of
 the traded weight. For these we sum the trade of all the item's codes to
 recover the full bilateral flow. Summing the *trade* does not double-count (the
-codes are distinct shipments under distinct customs headings), but we drop the
-Production and domestic-supply context: the derived form is processed from the
-primary, so summing their production would double-count, and the two are on
-incompatible weight bases anyway. A combined item is identified in the output
-by `100000 + its first code`, so its id is never mistaken for a single FAO
-commodity.
+codes are distinct shipments under distinct customs headings). A combined item
+is identified in the output by `100000 + its first code`, so its id is never
+mistaken for a single FAO commodity.
 
 For each (exporter, importer, item) the trade matrix typically has two
 reports — one from each side — that can disagree. We default to the
@@ -51,7 +35,6 @@ items in `food_trade.items.yaml` that aren't in the TM snapshot raise a
 clear assertion (sanity check below).
 """
 
-import pandas as pd
 import yaml
 from owid.catalog import Table
 from owid.catalog import processing as pr
@@ -59,19 +42,6 @@ from owid.catalog import processing as pr
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
-
-# Domestic supply is published only where SCL's imports corroborate the trade we observe: SCL's
-# recorded imports must cover at least this share of the observed inbound flows, otherwise SCL has
-# under-recorded imports and the supply is understated, so we blank it. 0.9 matches the measurement
-# noise floor — well-reporting countries agree with the observed trade within ~10%, so a larger gap
-# signals a real hole rather than normal CIF/FOB / timing / classification wobble.
-MIN_IMPORT_COVERAGE = 0.9
-
-# Regression guard for the import gate: at MIN_IMPORT_COVERAGE the trade matrix corroborates the large
-# majority of supplies (~83% in 2023), so blanking should stay well under this share. A larger share
-# means SCL imports and observed trade have diverged unexpectedly (bad data or a logic slip), and the
-# build should fail rather than ship a hollowed-out supply column.
-MAX_SUPPLY_BLANKED_SHARE = 0.20
 
 # Offset added to a combined item's first code to form its id (e.g. beef 867 -> 100867). FAO item
 # codes top out in the low thousands, so the 100000+ range can never collide with a real code, and
@@ -149,9 +119,8 @@ def sanity_check_items_config(items: list[dict], tm_items: dict[int, str]) -> No
     )
 
 
-def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
-    """Reshape the trade matrix into the viz-ready slice with Production and
-    apparent domestic supply context."""
+def build_food_trade_table(tb_tm: Table) -> Table:
+    """Reshape the trade matrix into the viz-ready slice of bilateral flows."""
     # Pick the latest well-covered year: the latest one whose distinct-reporter count is at
     # least 90% of the series maximum, i.e. not the partially reported tail year. We count
     # reporters rather than rows so a genuine trade contraction can't look like low coverage.
@@ -162,8 +131,6 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     with open(paths.side_file("food_trade.items.yaml")) as f:
         items = parse_items_config(yaml.safe_load(f))
     code_to_display = {code: it["display"] for it in items for code in it["codes"]}
-    # Single-code items carry Production/supply; combined items don't (see module docstring).
-    supply_codes = {code for it in items if not it["combined"] for code in it["codes"]}
 
     # 1) Filter TM to the curated items, as quantities in tonnes for the chosen year, then drop self-trade rows.
     trade_flows = tb_tm[
@@ -188,58 +155,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
         ["reporter_country", "partner_country", "item", "element", "year"], observed=True, as_index=False
     )["value"].sum()
 
-    # 2) Build per-(country, item) Production and apparent domestic supply from SCL.
-    #    Supply follows the FBS identity documented in the module docstring; all four
-    #    components are SCL quantities in tonnes, restricted to the single-code items. Combined
-    #    items are excluded: their codes are on incompatible weight bases and the derived form is
-    #    processed from the primary, so production/supply can't be summed (see module docstring).
-    components = ["Production", "Import quantity", "Export quantity", "Stock Variation"]
-    scl = tb_scl[
-        (tb_scl["year"] == year) & (tb_scl["unit_short_name"] == "t") & tb_scl["element"].isin(components)
-    ].copy()
-    # SCL stores item_code as zero-padded strings ("00000015"); convert to int to join with TM.
-    scl["item_code"] = scl["item_code"].astype(str).astype(int)
-    scl["country"] = scl["country"].astype(str)
-    scl["element"] = scl["element"].astype(str)
-    scl = scl[scl["item_code"].isin(supply_codes)]
-
-    # Pivot the four components into one column each, keyed on (country, item_code, year). We
-    # pivot rather than groupby-sum so that a duplicate (country, item_code, year, element) row
-    # raises instead of being silently summed: SCL reports one value per key, so duplicates
-    # would be a data error, not something to aggregate. join_column_levels_with moves the index
-    # back to columns and restores each component column's value metadata.
-    supply_context = scl.pivot(
-        index=["country", "item_code", "year"], columns="element", values="value", join_column_levels_with=""
-    )
-    # Every component should be present for at least some (country, item); a whole component
-    # missing would mean SCL dropped it for the year, which we must not silently treat as 0.
-    missing_components = [c for c in components if c not in supply_context.columns]
-    assert not missing_components, f"SCL is missing entire component(s) {missing_components} in {year}."
-    supply_context["supply"] = (
-        supply_context["Production"].fillna(0)
-        + supply_context["Import quantity"].fillna(0)
-        - supply_context["Export quantity"].fillna(0)
-        - supply_context["Stock Variation"].fillna(0)
-    )
-    # A non-positive supply can't be the denominator of an import share, so treat it as missing:
-    # negative means the FBS components don't reconcile (re-exports not captured by stock
-    # variation, timing mismatches, primary-equivalent aggregation), and zero is the signature of
-    # a (country, item) built entirely from blank components. Either way the ratio should be
-    # undefined, not infinite or misleadingly small. Where SCL omits a positive component (e.g. an
-    # unrecorded import) supply stays positive but understated; we keep SCL's figure as-is rather
-    # than patch it from TM, which we treat as a separate, un-reconciled source.
-    supply_context.loc[supply_context["supply"] <= 0, "supply"] = pd.NA
-    supply_context["item"] = supply_context["item_code"].map(code_to_display)
-
-    # Exporter context column: only emit `exporter_production` for countries with
-    # an SCL Production figure (we don't want to imply "0 production" for absent rows).
-    exporter_production = (
-        supply_context[["country", "item", "year", "Production"]]
-        .dropna(subset=["Production"])
-        .rename(columns={"country": "exporter", "Production": "exporter_production"})
-    )
-
-    # 3) Join the directional reports into one row per (exporter, importer, item, year).
+    # 2) Join the directional reports into one row per (exporter, importer, item, year).
     export_reports = trade_flows.loc[
         trade_flows["element"] == "Export quantity", ["reporter_country", "partner_country", "item", "year", "value"]
     ].rename(columns={"reporter_country": "exporter", "partner_country": "importer", "value": "value_exporter"})
@@ -254,38 +170,7 @@ def build_food_trade_table(tb_tm: Table, tb_scl: Table) -> Table:
     bilateral = bilateral.dropna(subset=["value"])
     bilateral = bilateral[bilateral["value"] > 0]
 
-    # Importer context column: the FBS-identity supply per (importer, item), kept only where the
-    # trade matrix corroborates it. SCL's import leg is importer-sourced (see module docstring), so
-    # when SCL records far fewer imports than the inbound flows we observe, the supply is understated
-    # and we blank it: keep supply only where SCL's imports cover at least MIN_IMPORT_COVERAGE of the
-    # observed inbound trade (or there is no observed inbound to corroborate). TM only decides whether
-    # to trust SCL's figure here; it never changes it.
-    observed_inbound = (
-        bilateral.groupby(["importer", "item", "year"], observed=True)["value"]
-        .sum()
-        .reset_index()
-        .rename(columns={"value": "observed_inbound"})
-    )
-    importer_supply = supply_context[["country", "item", "year", "supply", "Import quantity"]].rename(
-        columns={"country": "importer", "supply": "importer_supply", "Import quantity": "scl_import"}
-    )
-    importer_supply = pr.merge(importer_supply, observed_inbound, on=["importer", "item", "year"], how="left")
-    scl_import = importer_supply["scl_import"].fillna(0).to_numpy(dtype="float64")
-    observed = importer_supply["observed_inbound"].fillna(0).to_numpy(dtype="float64")
-    uncorroborated = scl_import < MIN_IMPORT_COVERAGE * observed
-    has_supply = importer_supply["importer_supply"].notna().to_numpy()
-    n_supply = int(has_supply.sum())
-    blanked_share = int((uncorroborated & has_supply).sum()) / n_supply if n_supply else 0.0
-    assert blanked_share <= MAX_SUPPLY_BLANKED_SHARE, (
-        f"Import gate blanked {blanked_share:.0%} of domestic-supply values (> {MAX_SUPPLY_BLANKED_SHARE:.0%}); "
-        "SCL imports and observed trade have diverged unexpectedly — investigate before trusting the output."
-    )
-    importer_supply.loc[uncorroborated, "importer_supply"] = pd.NA
-    importer_supply = importer_supply[["importer", "item", "year", "importer_supply"]]
-
     food_trade = bilateral[["exporter", "importer", "item", "year", "value"]]
-    food_trade = pr.merge(food_trade, exporter_production, on=["exporter", "item", "year"], how="left")
-    food_trade = pr.merge(food_trade, importer_supply, on=["importer", "item", "year"], how="left")
     food_trade = food_trade.sort_values(["exporter", "importer", "item", "year"]).reset_index(drop=True)
     # Carry the item id as a dimension so downstream steps get the display->id mapping from the
     # data itself, rather than re-reading the curated items config. Single-code items use their FAO
@@ -302,13 +187,11 @@ def run() -> None:
     #
     ds_tm = paths.load_dataset("faostat_tm")
     tb_tm = ds_tm.read("faostat_tm", safe_types=False)
-    ds_scl = paths.load_dataset("faostat_scl")
-    tb_scl = ds_scl.read("faostat_scl", safe_types=False)
 
     #
     # Process data.
     #
-    tb = build_food_trade_table(tb_tm, tb_scl)
+    tb = build_food_trade_table(tb_tm)
 
     #
     # Save outputs.
