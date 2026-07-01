@@ -257,7 +257,16 @@ N-point numeric scale state the anchored range instead (e.g. `on a scale from 1 
 they all carry the same possible-answer clause; only the measured-response part differs. Pull the exact
 option wording from the `.dta` value labels (verify per Step 0), never from memory — e.g. WVS D066_01's
 fifth point is literally `Disagree strongly`, and F114E labels only the 1 and 10 endpoints. Same rule for
-IVS and WVS.
+IVS and WVS. This is a rule for **new** indicators you add — apply it as you write each entry.
+
+Do **not** attempt an automated bulk back-fill of the possible-answers clause across the *existing* IVS
+indicators. Most already convey their answers (often inside the question quote, e.g. important-in-life ends
+"…very important, rather important, not very important or not at all important?"), so a blanket append is
+redundant; and mapping an existing `shortName` back to its source `.dta` code is trap-laden — suffixes
+collide (`*_democratic_political_system` is E117, not the 1–10 E236 `*_democratic`; `*_secure_neighborhood`
+is the H001 security scale, not the G007_18_B neighborhood-*trust* scale), and value-label wording can
+diverge from the pipeline's recode wording (E124 human-rights: labels say "There is a lot of respect…" while
+the columns use "a great deal of respect…"). It was tried once and deliberately skipped for these reasons.
 
 **Keep IVS and WVS at metadata parity.** Any `description_short` house-style or convention you apply to one
 table's indicators, apply to the other's too — e.g. the possible-answers clause above was added to both the
