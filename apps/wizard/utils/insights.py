@@ -117,7 +117,10 @@ def _indicator_to_frame(indicator: dict, codes: bool = False) -> pd.DataFrame:
 
 
 def _detect_time_col_type(metadata) -> Literal["dates", "years"]:
-    if metadata.get("display", {}).get("yearIsDay"):
+    display = metadata.get("display", {})
+    # Sub-yearly data is encoded as days-since-zeroDay integers, tagged via timeInterval
+    # (or the deprecated yearIsDay flag, kept as a fallback for un-migrated indicators).
+    if display.get("timeInterval") in {"day", "week", "month"} or display.get("yearIsDay"):
         return "dates"
 
     return "years"
