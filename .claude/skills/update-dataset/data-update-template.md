@@ -31,6 +31,10 @@ Reading the folder: the Google Drive `parentId` search often returns nothing for
 ## Template (paste-ready for a new Google Doc)
 
 ```
+:skip
+preview
+:endskip
+
 title: [Punchy title — a finding/claim, a question, or an action/invitation. Examples: "Nearly one in ten people worldwide still live in extreme poverty", "How much do governments spend, and what do they spend it on?", "Track confirmed human cases of H5N1 'bird flu' since 1997". NOT just the dataset name.]
 excerpt: [One short sentence summary that's distinct from the title. Common patterns: "Explore updated data from <producer>." / "Explore updated data on <topic> from <producer>." / "Track <topic descriptor>." / "We've updated <N> charts with the latest data from <producer>." / "We updated nearly N of our charts with the latest data."]
 type: announcement
@@ -103,6 +107,8 @@ Per-line HTML shape: `<p style="margin-left:10pt"><span style="color:#666666">�
 ---
 
 ## Field-by-field guidance
+
+**Top `:skip` / `preview` / `:endskip` block** — Sits at the very top of the doc, before the frontmatter. It's a `:skip` block (not published) that holds the doc's preview link — paste the admin GDoc preview URL (from [https://admin.owid.io/admin/gdocs](https://admin.owid.io/admin/gdocs) once the doc is registered) in place of the literal word `preview`. Keep the literal `preview` placeholder in the paste-ready template.
 
 **`title`** — A punchy claim, a question, or an action/invitation. The title is the part that pulls readers into the feed; "Luxembourg Income Study" is descriptive but unmemorable. Three observed patterns:
 
