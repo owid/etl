@@ -55,7 +55,7 @@ When it's a restructure:
 
 - **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
 - **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
-- **Slack + `/latest` drafts are not expected in the PR body at all.** They are unreviewed internal/reader-facing copy and `owid/etl` is public, so `/update-dataset` keeps them in the author's gitignored `workbench/` and surfaces them via chat only (steps 9 / 9b). Their absence from the PR is correct, not a gap — don't flag it.
+- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b), so their absence from the PR is correct — don't flag it.
 
 ### 4. Run the full pipeline end-to-end
 
@@ -248,7 +248,7 @@ Structure the review with:
 5. **🔴 Blockers** — must-fix before merge
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
-8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts are intentionally kept out of the public PR — don't expect them here.)
+8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
 
 ## Severity rubric
 
