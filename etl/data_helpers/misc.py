@@ -945,12 +945,11 @@ def _get_variables_to_process(table: Table, metadata_variables: list[str] | None
     if metadata_variables is None:
         return list(table.columns)
 
-    variables_to_process = [var for var in metadata_variables if var in table.columns]
     missing_vars = [var for var in metadata_variables if var not in table.columns]
     if missing_vars:
-        log.warning(f"Warning: Variables {missing_vars} not found in table")
+        raise ValueError(f"metadata_variables not found in table: {missing_vars}")
 
-    return variables_to_process
+    return metadata_variables
 
 
 def _extract_metadata_rows(metadata_obj, included_fields: set) -> list[list[str]]:
@@ -1097,8 +1096,13 @@ def export_table_to_gsheet(
     general_access: Literal["anyone", "domain", "user"] = "anyone",
     include_metadata: bool = True,
     metadata_variables: list[str] | None = None,
+    metadata_table: Table | None = None,
 ) -> tuple[str, str] | None:
     """Export a Table to Google Sheets with improved error handling and performance.
+
+    `metadata_variables` is resolved against `metadata_table` (falling back to `table`
+    if not given), so a variable can be documented in a metadata tab even if it isn't
+    one of the columns written to the data tab.
 
     Returns
     -------
@@ -1128,7 +1132,7 @@ def export_table_to_gsheet(
 
         # Add metadata if requested
         if include_metadata:
-            _add_metadata_tabs(sheet, table, metadata_variables)
+            _add_metadata_tabs(sheet, metadata_table if metadata_table is not None else table, metadata_variables)
 
         # Set permissions
         _set_permissions(sheet.sheet_id, role, general_access)

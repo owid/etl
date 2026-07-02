@@ -14,10 +14,10 @@ def run() -> None:
     ds_garden = paths.load_dataset("funding")
 
     # Read table from garden dataset.
-    tb_disease = ds_garden["funding_disease"]
-    tb_product = ds_garden["funding_product"]
-    tb_product_ntd = ds_garden["funding_product_ntd"]
-    tb_disease_product = ds_garden["funding_disease_product"]
+    tb_disease = ds_garden.read("funding_disease", reset_index=False)
+    tb_product = ds_garden.read("funding_product", reset_index=False)
+    tb_product_ntd = ds_garden.read("funding_product_ntd", reset_index=False)
+    tb_disease_product = ds_garden.read("funding_disease_product", reset_index=False)
 
     # Save outputs.
     #

@@ -1073,6 +1073,7 @@ steps:
       - data-private://meadow/ihme_gbd/2026-02-07/impairments:
         - snapshot-private://ihme_gbd/2026-02-07/impairments.feather
       - data://garden/demography/2024-07-15/population
+
   # archived; last active in 9e949ea0595e on 2026-06-04
   data://garden/who/2024-01-03/gho:
     - data://garden/regions/2023-01-01/regions
@@ -1103,3 +1104,10 @@ steps:
     - data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic:
       - data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic:
         - snapshot://antibiotics/2024-10-18/who_glass_by_antibiotic.zip
+
+  # Neglected Tropical Diseases Funding (2025 update)
+  # archived; last active in 081e64f9e13b on 2026-06-30
+  data://grapher/neglected_tropical_diseases/2025-08-20/funding:
+    - data://garden/neglected_tropical_diseases/2025-08-20/funding:
+      - data://meadow/neglected_tropical_diseases/2025-08-20/funding:
+        - snapshot://neglected_tropical_diseases/2025-08-20/funding.xlsx

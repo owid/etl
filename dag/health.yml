@@ -880,11 +880,12 @@ steps:
       - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis:
         - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
 
-  # Neglected Tropical Diseases Funding
-  data://grapher/neglected_tropical_diseases/2025-08-20/funding:
-    - data://garden/neglected_tropical_diseases/2025-08-20/funding:
-      - data://meadow/neglected_tropical_diseases/2025-08-20/funding:
-        - snapshot://neglected_tropical_diseases/2025-08-20/funding.xlsx
+
+  # Neglected Tropical Diseases Funding - 2026 update
+  data://grapher/neglected_tropical_diseases/2026-06-25/funding:
+    - data://garden/neglected_tropical_diseases/2026-06-25/funding:
+      - data://meadow/neglected_tropical_diseases/2026-06-25/funding:
+        - snapshot://neglected_tropical_diseases/2026-06-25/funding.xlsx
 
   # GBD 2023 data for bespoke treemap project
   data://garden/ihme_gbd/2025-10-13/gbd_treemap:
