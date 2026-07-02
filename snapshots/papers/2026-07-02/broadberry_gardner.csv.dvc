@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Africa's Growth Prospects in a European Mirror - Agricultural labor force shares
+    description: |-
+      Benchmark estimates of the share of the labor force employed in agriculture in five European countries (Great Britain, France, Italy, the Netherlands and Poland) between 1300 and 1981, as reported by Broadberry and Gardner (2013). The estimates draw on historical reconstructions of the sectoral distribution of the labor force, including Broadberry, Campbell and van Leeuwen (2013) for Britain and Allen (2000) for other European countries.
+
+      The estimates were transcribed from the paper by Our World in Data. Estimates for England/Great Britain are labeled as United Kingdom.
+    date_published: "2013"
+
+    # Citation
+    producer: Broadberry and Gardner
+    citation_full: |-
+      Broadberry, S., & Gardner, L. (2013). Africa's Growth Prospects in a European Mirror: A Historical Perspective. CAGE Working Paper No. 172, University of Warwick.
+
+    # Files
+    url_main: https://wrap.warwick.ac.uk/59340/
+    date_accessed: '2026-07-02'
+
+    # License
+    license:
+      name: © Broadberry and Gardner (2013)
+      url: https://wrap.warwick.ac.uk/59340/
+outs:
+  - md5: ca3ab991053497c10e4f9899f9fa15ec
+    size: 706
+    path: broadberry_gardner.csv
