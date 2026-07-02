@@ -92,8 +92,6 @@ def prepare_smil_data(tb_smil: Table) -> Table:
         Selected World coal production data from Smil.
 
     """
-    tb_smil = tb_smil.reset_index()
-
     columns = {
         "country": "country",
         "year": "year",
@@ -121,8 +119,6 @@ def prepare_uk_historical_data(tb_uk: Table) -> Table:
         Selected UK coal production data.
 
     """
-    tb_uk = tb_uk.reset_index()
-
     columns = {
         "country": "country",
         "year": "year",
@@ -173,9 +169,6 @@ def combine_data(tb_review: Table, tb_shift: Table, tb_historical: Table) -> Tab
     combined = dataframes.combine_two_overlapping_dataframes(
         df1=combined, df2=tb_historical, index_columns=index_columns
     )
-
-    # Update the name of the new combined table.
-    combined.metadata.short_name = paths.short_name
 
     # Remove rows that only have nan.
     combined = combined.dropna(subset=combined.drop(columns=["country", "year"]).columns, how="all")
@@ -347,11 +340,11 @@ def run() -> None:
 
     # Load Smil dataset and read its main table (used to extend World coal production before 1900).
     ds_smil = paths.load_dataset("smil_2017")
-    tb_smil = ds_smil.read("smil_2017", reset_index=False)
+    tb_smil = ds_smil.read("smil_2017")
 
     # Load UK historical energy dataset and read its main table (used to extend UK coal production before 1900).
     ds_uk = paths.load_dataset("uk_historical_energy")
-    tb_uk = ds_uk.read("uk_historical_energy", reset_index=False)
+    tb_uk = ds_uk.read("uk_historical_energy")
 
     #
     # Process data.
@@ -386,7 +379,7 @@ def run() -> None:
     sanity_check_outputs(tb=tb)
 
     # Create an appropriate index and sort conveniently.
-    tb = tb.format()
+    tb = tb.format(short_name=paths.short_name)
 
     #
     # Save outputs.

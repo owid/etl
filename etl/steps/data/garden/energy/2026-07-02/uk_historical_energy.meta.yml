@@ -22,10 +22,10 @@ tables:
         description_short: |-
           Coal production in the United Kingdom, measured in [terawatt-hours](#dod:watt-hours).
         description_processing: |-
-          - We use the "Supply2" column of the coal long-run sheet ("1.3.1 CoalLR"), which corresponds to total UK coal production (equal to total inland consumption plus overseas shipments and bunkers). For example, the 1913 value of 292 million tonnes matches the historical peak of British coal production.
           - We convert coal from million tonnes to terawatt-hours using a factor of 6.85 megawatt-hours per tonne. Rather than assume a textbook calorific value, we calibrated this factor from the overlap with the longer-running Shift Dataportal series (which reports UK coal in terawatt-hours from 1900): over 1900-1950 the implied factor is a near-constant ~6.85 megawatt-hours per tonne (stable to within 3%), so this historical segment joins the modern series with no step at the splice. This is consistent with the calorific value implied by the source's own units (1 tonne of coal ~ 0.588 tonnes of oil equivalent ~ 6.84 megawatt-hours per tonne).
-          - Pre-1800 "annual" values are benchmark estimates (from Flinn) that have been linearly interpolated in the original source, so early year-to-year variation should not be over-interpreted; values become solidly annual from around 1830.
-          - The geographical coverage of the series drifts over time: the early estimates (Flinn, Church) cover Great Britain, later official figures cover the United Kingdom, and before 1922 the United Kingdom included all of Ireland.
+        description_key:
+          - "Pre-1800 values are benchmark estimates (from Flinn) that have been linearly interpolated yearly."
+          - "The geographical coverage of the series drifts over time: the early estimates (Flinn, Church) cover Great Britain, later official figures cover the United Kingdom, and before 1922 the United Kingdom included all of Ireland."
         display:
           name: Coal
           numDecimalPlaces: 0
