@@ -48,10 +48,22 @@ def build_and_publish_catalog_jsonld(
         )
         return
 
-    keys = [f"{path}/{DATASET_JSONLD_FILENAME}" for path in result.emitted]
+    # Datasets are now served at their stable "<namespace>/<dataset>" short key rather than
+    # their dated catalog path.
+    keys = [f"{entry.short_key}/{DATASET_JSONLD_FILENAME}" for entry in result.emitted_entries]
     keys.extend([SITEMAP_FILENAME, QUALITY_REPORT_FILENAME])
-    stale_keys = [f"{item.catalog_path}/{DATASET_JSONLD_FILENAME}" for item in result.skipped]
-    sync_jsonld_artifacts(connect_r2(), bucket, catalog_dir, keys, delete_keys=stale_keys)
+
+    # Delete the old dated-path dataset.jsonld for every currently-emitted dataset: it's no
+    # longer written locally (superseded by the short key above), but a prior publish may
+    # still have left it live on R2, which would otherwise sit around as duplicate content.
+    delete_keys = [f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.emitted_entries]
+    # Also delete both locations for datasets that newly failed the quality gate: the stale
+    # dated-path copy, and the live short-key copy a prior publish may have emitted — a
+    # dataset that becomes ineligible (e.g. non_redistributable) must stop being served.
+    delete_keys.extend(f"{item.catalog_path}/{DATASET_JSONLD_FILENAME}" for item in result.skipped)
+    delete_keys.extend(f"{entry.short_key}/{DATASET_JSONLD_FILENAME}" for entry in result.skipped_entries)
+
+    sync_jsonld_artifacts(connect_r2(), bucket, catalog_dir, keys, delete_keys=delete_keys)
 
 
 def sync_jsonld_artifacts(

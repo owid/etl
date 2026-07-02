@@ -35,6 +35,8 @@ class TableSchemaInput:
 def dataset_to_schema_org(
     *,
     dataset_path: str,
+    page_path: str,
+    version: str | None = None,
     dataset_meta: DatasetMeta,
     tables: list[TableSchemaInput],
     base_url: str = DEFAULT_CATALOG_BASE_URL,
@@ -44,9 +46,23 @@ def dataset_to_schema_org(
     The catalog folder is the top-level Dataset. For single-table datasets, table
     metadata is flattened into the top-level Dataset. For multi-table datasets,
     each table is represented as a nested Dataset via ``hasPart``.
+
+    ``page_path`` is the stable, version-agnostic short key (``"<namespace>/<dataset>"``)
+    used for the public landing page URL and ``@id``. ``dataset_path`` is the full,
+    dated catalog path (``"garden/<namespace>/<version>/<dataset>"``) and is only used
+    for ``identifier``, documenting where the dataset actually lives in the catalog.
+    ``version`` is the real dated version to report (falls back to ``dataset_meta.version``
+    when not given, e.g. for datasets whose metadata version is a genuine "latest" alias
+    with no dated folder of its own).
     """
     dataset_path = dataset_path.strip("/")
-    dataset_url = f"{base_url.rstrip('/')}/{dataset_path}/"
+    page_path = page_path.strip("/")
+    dataset_url = f"{base_url.rstrip('/')}/{page_path}/"
+    # Data files themselves stay at their real, dated catalog location (old dated files persist
+    # on R2 after a new version ships), so distribution contentUrls are built from dataset_path,
+    # not the short page_path used for the landing page's own url/@id.
+    file_base_url = f"{base_url.rstrip('/')}/{dataset_path}/"
+    resolved_version = version or dataset_meta.version
 
     title = _dataset_title(dataset_meta, tables)
     description = _dataset_description(dataset_meta, tables)
@@ -76,9 +92,9 @@ def dataset_to_schema_org(
         "thumbnailUrl": DEFAULT_THUMBNAIL_URL,
     }
 
-    if dataset_meta.version:
-        result["version"] = str(dataset_meta.version)
-        date_modified = _first_valid_date([dataset_meta.version])
+    if resolved_version:
+        result["version"] = str(resolved_version)
+        date_modified = _first_valid_date([resolved_version])
         if date_modified:
             result["dateModified"] = date_modified
     if license_url:
@@ -117,11 +133,11 @@ def dataset_to_schema_org(
         variables = _variable_measured(table)
         if variables:
             result["variableMeasured"] = variables
-        distributions = _distributions(dataset_url, table)
+        distributions = _distributions(file_base_url, table)
         if distributions:
             result["distribution"] = distributions
     elif tables:
-        result["hasPart"] = [_table_dataset(dataset_url, table, dataset_meta) for table in tables]
+        result["hasPart"] = [_table_dataset(dataset_url, file_base_url, table, dataset_meta) for table in tables]
 
     return _drop_empty(result)
 
@@ -146,7 +162,9 @@ def table_description(table: TableSchemaInput, dataset_meta: DatasetMeta) -> str
     return None
 
 
-def _table_dataset(dataset_url: str, table: TableSchemaInput, dataset_meta: DatasetMeta) -> dict[str, Any]:
+def _table_dataset(
+    dataset_url: str, file_base_url: str, table: TableSchemaInput, dataset_meta: DatasetMeta
+) -> dict[str, Any]:
     name = table.metadata.title or table.short_name.replace("_", " ").title()
     result: dict[str, Any] = {
         "@type": "Dataset",
@@ -162,7 +180,7 @@ def _table_dataset(dataset_url: str, table: TableSchemaInput, dataset_meta: Data
     if variables:
         result["variableMeasured"] = variables
 
-    distributions = _distributions(dataset_url, table)
+    distributions = _distributions(file_base_url, table)
     if distributions:
         result["distribution"] = distributions
 
@@ -196,7 +214,8 @@ def _variable_measured(table: TableSchemaInput) -> list[dict[str, Any]]:
     return variables
 
 
-def _distributions(dataset_url: str, table: TableSchemaInput) -> list[dict[str, Any]]:
+def _distributions(file_base_url: str, table: TableSchemaInput) -> list[dict[str, Any]]:
+    """Build DataDownload entries pointing at the real, dated file location (not the short page URL)."""
     result = []
     for format in table.formats:
         result.append(
@@ -204,7 +223,7 @@ def _distributions(dataset_url: str, table: TableSchemaInput) -> list[dict[str, 
                 "@type": "DataDownload",
                 "name": f"{table.short_name}.{format}",
                 "encodingFormat": _encoding_format(format),
-                "contentUrl": f"{dataset_url}{table.short_name}.{format}",
+                "contentUrl": f"{file_base_url}{table.short_name}.{format}",
             }
         )
     return result

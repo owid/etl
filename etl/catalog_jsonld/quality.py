@@ -2,10 +2,17 @@
 
 from __future__ import annotations
 
+from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 
+from owid.catalog.core.datasets import CHANNEL
 from owid.catalog.core.meta import DatasetMeta
 from owid.catalog.schema_org import TableSchemaInput, license_to_url, table_description
+
+# Root-level file/dir names that live directly under catalog_dir and must not be
+# shadowed by a short-key namespace segment.
+RESERVED_ROOT_NAMES = {"robots.txt", "jsonld_quality_report.json"}
 
 
 @dataclass
@@ -20,11 +27,41 @@ class DatasetQualityResult:
         return not self.blockers
 
 
+def is_reserved_namespace(namespace: str) -> bool:
+    """Return True if ``namespace`` would collide with a reserved top-level catalog_dir name.
+
+    Reserved names are the catalog channels (``garden``, ``meadow``, ``snapshot``, ...),
+    fixed root-level artifact files (``robots.txt``, the quality report), and the sitemap
+    file family (``sitemap.xml``, ``sitemap-index.xml``, ``sitemap-<N>.xml``).
+    """
+    if namespace in set(CHANNEL.__args__):
+        return True
+    if namespace in RESERVED_ROOT_NAMES:
+        return True
+    if namespace.startswith("sitemap") and namespace.endswith(".xml"):
+        return True
+    return False
+
+
+def find_duplicate_short_key_paths(entries: Iterable[tuple[str, str, str]]) -> set[str]:
+    """Return catalog_paths whose ``<namespace>/<dataset>`` short key is shared by another entry.
+
+    ``entries`` is an iterable of ``(catalog_path, namespace, dataset)`` tuples, one per
+    candidate emitted dataset in the current build. This is a batch-level check: a single
+    dataset can't tell it collides with another without seeing the whole set.
+    """
+    entries = list(entries)
+    counts = Counter(f"{namespace}/{dataset}" for _, namespace, dataset in entries)
+    return {catalog_path for (catalog_path, namespace, dataset) in entries if counts[f"{namespace}/{dataset}"] > 1}
+
+
 def assess_dataset_quality(
     *,
     catalog_path: str,
+    namespace: str,
     dataset_meta: DatasetMeta,
     tables: list[TableSchemaInput],
+    duplicate_short_key: bool = False,
 ) -> DatasetQualityResult:
     result = DatasetQualityResult(catalog_path=catalog_path)
 
@@ -33,6 +70,12 @@ def assess_dataset_quality(
 
     if dataset_meta.non_redistributable:
         result.blockers.append("non_redistributable")
+
+    if is_reserved_namespace(namespace):
+        result.blockers.append("reserved_namespace")
+
+    if duplicate_short_key:
+        result.blockers.append("duplicate_short_key")
 
     if not _has_title(dataset_meta, tables):
         result.blockers.append("missing_title")

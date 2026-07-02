@@ -31,6 +31,7 @@ def test_single_table_dataset_flattens_table_metadata() -> None:
 
     jsonld = dataset_to_schema_org(
         dataset_path="garden/biodiversity/2025-04-07/cherry_blossom",
+        page_path="biodiversity/cherry_blossom",
         dataset_meta=DatasetMeta(
             namespace="biodiversity",
             version="2025-04-07",
@@ -42,6 +43,11 @@ def test_single_table_dataset_flattens_table_metadata() -> None:
 
     assert jsonld["@type"] == "Dataset"
     assert jsonld["name"] == "Cherry Blossom Full Bloom Dates in Kyoto, Japan"
+    # The public URL/@id are built from the stable short page_path, not the dated catalog path.
+    assert jsonld["url"] == "https://catalog.ourworldindata.org/biodiversity/cherry_blossom/"
+    assert jsonld["@id"] == "https://catalog.ourworldindata.org/biodiversity/cherry_blossom/#dataset"
+    # identifier documents the real, dated catalog location.
+    assert jsonld["identifier"] == "garden/biodiversity/2025-04-07/cherry_blossom"
     assert jsonld["license"] == "https://creativecommons.org/licenses/by/4.0/"
     assert jsonld["dateModified"] == "2025-04-07"
     assert jsonld["thumbnailUrl"] == "https://ourworldindata.org/owid-logo.svg"
@@ -53,8 +59,93 @@ def test_single_table_dataset_flattens_table_metadata() -> None:
     assert jsonld["keywords"] == ["Biodiversity"]
     assert jsonld["variableMeasured"][0]["identifier"] == "full_flowering_date"
     assert len(jsonld["distribution"]) == 1
-    assert jsonld["distribution"][0]["contentUrl"].endswith("/cherry_blossom.feather")
+    # Distribution content URLs still point at the real, dated file location on R2 — not the
+    # short page_path used for url/@id.
+    assert (
+        jsonld["distribution"][0]["contentUrl"]
+        == "https://catalog.ourworldindata.org/garden/biodiversity/2025-04-07/cherry_blossom/cherry_blossom.feather"
+    )
     assert "hasPart" not in jsonld
+
+
+def test_version_param_overrides_latest_dataset_meta_version() -> None:
+    """A dataset whose own metadata version is a "latest" alias should still report a real date,
+    sourced from the explicit ``version`` param (e.g. derived from the dated catalog path)."""
+    table = TableSchemaInput(
+        short_name="owid_co2",
+        metadata=TableMeta(short_name="owid_co2", title="CO2 emissions", description="Table description"),
+        variables={
+            "value": VariableMeta(title="Value", origins=[Origin(producer="Example Producer", title="Origin title")])
+        },
+        formats=["csv"],
+    )
+
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/emissions/2025-12-04/owid_co2",
+        page_path="emissions/owid_co2",
+        version="2025-12-04",
+        dataset_meta=DatasetMeta(
+            namespace="emissions",
+            version="latest",
+            short_name="owid_co2",
+            title="CO2 emissions",
+        ),
+        tables=[table],
+    )
+
+    assert jsonld["version"] == "2025-12-04"
+    assert jsonld["dateModified"] == "2025-12-04"
+
+
+def test_version_falls_back_to_dataset_meta_version_when_not_given() -> None:
+    table = TableSchemaInput(
+        short_name="cherry_blossom",
+        metadata=TableMeta(short_name="cherry_blossom", title="Cherry blossom", description="Table description"),
+        variables={
+            "value": VariableMeta(title="Value", origins=[Origin(producer="Example Producer", title="Origin title")])
+        },
+        formats=["csv"],
+    )
+
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/biodiversity/2025-04-07/cherry_blossom",
+        page_path="biodiversity/cherry_blossom",
+        dataset_meta=DatasetMeta(
+            namespace="biodiversity",
+            version="2025-04-07",
+            short_name="cherry_blossom",
+            title="Cherry blossom",
+        ),
+        tables=[table],
+    )
+
+    assert jsonld["version"] == "2025-04-07"
+
+
+def test_distribution_content_urls_use_dated_path_not_short_page_path() -> None:
+    """Regression guard: data files stay at their real, dated catalog location even though the
+    dataset's own url/@id move to the stable short page_path. Old dated files persist on R2
+    after a new version ships, so pointing distributions there is safe and correct."""
+    table = TableSchemaInput(
+        short_name="owid_co2",
+        metadata=TableMeta(short_name="owid_co2", title="CO2 emissions"),
+        variables={"value": VariableMeta(title="Value", origins=[Origin(producer="Example Producer", title="t")])},
+        formats=["feather", "csv"],
+    )
+
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/emissions/2025-12-04/owid_co2",
+        page_path="emissions/owid_co2",
+        dataset_meta=DatasetMeta(namespace="emissions", version="2025-12-04", short_name="owid_co2"),
+        tables=[table],
+    )
+
+    content_urls = {d["contentUrl"] for d in jsonld["distribution"]}
+    assert content_urls == {
+        "https://catalog.ourworldindata.org/garden/emissions/2025-12-04/owid_co2/owid_co2.feather",
+        "https://catalog.ourworldindata.org/garden/emissions/2025-12-04/owid_co2/owid_co2.csv",
+    }
+    assert jsonld["url"] == "https://catalog.ourworldindata.org/emissions/owid_co2/"
 
 
 def test_multi_table_dataset_uses_has_part() -> None:
@@ -80,6 +171,7 @@ def test_multi_table_dataset_uses_has_part() -> None:
 
     jsonld = dataset_to_schema_org(
         dataset_path="garden/example/2025-01-01/example_dataset",
+        page_path="example/example_dataset",
         dataset_meta=DatasetMeta(
             namespace="example",
             version="2025-01-01",
@@ -92,7 +184,13 @@ def test_multi_table_dataset_uses_has_part() -> None:
 
     assert "variableMeasured" not in jsonld
     assert [part["identifier"] for part in jsonld["hasPart"]] == ["table_a", "table_b"]
-    assert jsonld["hasPart"][0]["distribution"][0]["contentUrl"].endswith("/table_a.feather")
+    # @id uses the short page_path...
+    assert jsonld["hasPart"][0]["@id"] == "https://catalog.ourworldindata.org/example/example_dataset/#table-table_a"
+    # ...but the distribution's contentUrl uses the real, dated catalog path.
+    assert (
+        jsonld["hasPart"][0]["distribution"][0]["contentUrl"]
+        == "https://catalog.ourworldindata.org/garden/example/2025-01-01/example_dataset/table_a.feather"
+    )
     # Tables set no description of their own and the origin has none either, so the hasPart
     # nodes fall back to the dataset-level description rather than being left blank.
     assert jsonld["hasPart"][0]["description"] == "Dataset description"
@@ -119,6 +217,7 @@ def test_table_description_falls_back_to_origin_then_dataset() -> None:
 
     jsonld = dataset_to_schema_org(
         dataset_path="garden/example/2025-01-01/example_dataset",
+        page_path="example/example_dataset",
         dataset_meta=DatasetMeta(
             namespace="example",
             version="2025-01-01",
