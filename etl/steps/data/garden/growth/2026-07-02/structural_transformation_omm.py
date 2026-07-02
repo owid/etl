@@ -110,6 +110,16 @@ def prepare_wdi(tb: Table) -> Table:
     placeholder = (tb[SHARE_GDP_COLUMNS] == 0).any(axis=1)
     tb.loc[placeholder, SHARE_GDP_COLUMNS] = float("nan")
 
+    # Rescale the sector value added shares so they measure each sector's share of the
+    # sectors' summed value added, as in the historical sources, rather than a share of
+    # GDP at market prices. The World Bank measures sector value added at basic prices
+    # over GDP at market prices, so the three sectors sum to 100 minus net taxes on
+    # products as a share of GDP (a wedge that varies across countries). Rows where any
+    # sector is missing become missing, since the composition is undefined there.
+    va_sum = tb["share_gdp_agriculture"] + tb["share_gdp_industry"] + tb["share_gdp_services"]
+    for sector in SECTORS:
+        tb[f"share_gdp_{sector}"] = tb[f"share_gdp_{sector}"] / va_sum * 100
+
     # Number employed by sector: sector share of total employment times total employment
     # (derived in the WDI garden step from the ILO-modeled employment-to-population ratio
     # and the UN population aged 15 and over).

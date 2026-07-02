@@ -131,11 +131,14 @@ tables:
         title: Share of agriculture in GDP
         unit: "%"
         short_unit: "%"
-        description_short: Value added of agriculture, including hunting, forestry and fishing, as a share of GDP, at current prices.
+        description_short: Value added of agriculture, including hunting, forestry and fishing, as a share of the total value added of the three broad economic sectors, at current prices.
         description_key:
-          - Recent estimates are published by the World Bank and measure value added as a share of GDP. Because of taxes, subsidies and measurement differences, the three sectors may not sum to exactly 100%.
-          - Historical estimates measure each sector's share of the total value added of the three sectors, at current prices, and sum to 100%.
-        description_processing: "{definitions.description_processing_splice}"
+          - Each sector's value added is measured as a share of the summed value added of the three broad sectors, at current prices, so the three sectors sum to 100%.
+          - The World Bank publishes sector value added as a share of GDP at market prices, where the three sectors sum to less than 100% because taxes on products (minus subsidies) are part of GDP but not of any sector's value added. For consistency with the historical estimates, the recent estimates are rescaled to shares of the sectors' summed value added.
+        description_processing: |-
+          {definitions.description_processing_splice}
+
+          The World Bank publishes sector value added as a share of GDP at market prices. Those shares are rescaled by the sum of the three sectors, so that each sector is expressed as a share of the sectors' summed value added, consistently with the historical estimates.
         display:
           name: Agriculture
           numDecimalPlaces: 1
@@ -145,12 +148,15 @@ tables:
         title: Share of industry in GDP
         unit: "%"
         short_unit: "%"
-        description_short: Value added of industry, including mining, manufacturing and construction, as a share of GDP, at current prices.
+        description_short: Value added of industry, including mining, manufacturing and construction, as a share of the total value added of the three broad economic sectors, at current prices.
         description_key:
-          - Recent estimates are published by the World Bank and measure value added as a share of GDP. Because of taxes, subsidies and measurement differences, the three sectors may not sum to exactly 100%.
-          - Historical estimates measure each sector's share of the total value added of the three sectors, at current prices, and sum to 100%.
+          - Each sector's value added is measured as a share of the summed value added of the three broad sectors, at current prices, so the three sectors sum to 100%.
+          - The World Bank publishes sector value added as a share of GDP at market prices, where the three sectors sum to less than 100% because taxes on products (minus subsidies) are part of GDP but not of any sector's value added. For consistency with the historical estimates, the recent estimates are rescaled to shares of the sectors' summed value added.
           - "{definitions.description_key_utilities}"
-        description_processing: "{definitions.description_processing_splice}"
+        description_processing: |-
+          {definitions.description_processing_splice}
+
+          The World Bank publishes sector value added as a share of GDP at market prices. Those shares are rescaled by the sum of the three sectors, so that each sector is expressed as a share of the sectors' summed value added, consistently with the historical estimates.
         display:
           name: Industry
           numDecimalPlaces: 1
@@ -160,12 +166,15 @@ tables:
         title: Share of services in GDP
         unit: "%"
         short_unit: "%"
-        description_short: Value added of services as a share of GDP, at current prices.
+        description_short: Value added of services as a share of the total value added of the three broad economic sectors, at current prices.
         description_key:
-          - Recent estimates are published by the World Bank and measure value added as a share of GDP. Because of taxes, subsidies and measurement differences, the three sectors may not sum to exactly 100%.
-          - Historical estimates measure each sector's share of the total value added of the three sectors, at current prices, and sum to 100%.
+          - Each sector's value added is measured as a share of the summed value added of the three broad sectors, at current prices, so the three sectors sum to 100%.
+          - The World Bank publishes sector value added as a share of GDP at market prices, where the three sectors sum to less than 100% because taxes on products (minus subsidies) are part of GDP but not of any sector's value added. For consistency with the historical estimates, the recent estimates are rescaled to shares of the sectors' summed value added.
           - "{definitions.description_key_utilities}"
-        description_processing: "{definitions.description_processing_splice}"
+        description_processing: |-
+          {definitions.description_processing_splice}
+
+          The World Bank publishes sector value added as a share of GDP at market prices. Those shares are rescaled by the sum of the three sectors, so that each sector is expressed as a share of the sectors' summed value added, consistently with the historical estimates.
         display:
           name: Services
           numDecimalPlaces: 1
