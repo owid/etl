@@ -3015,7 +3015,7 @@ VariablePresentationMeta(grapher_config: dict[str, typing.Any] | None = None, ti
 Allowed fields for `display` attribute used for grapher:
     name
     zeroDay
-    yearIsDay
+    timeInterval
     includeInTable
     numDecimalPlaces
     conversionFactor
