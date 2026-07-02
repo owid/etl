@@ -55,7 +55,14 @@ def test_single_table_dataset_flattens_table_metadata() -> None:
     assert jsonld["publisher"]["logo"] == "https://ourworldindata.org/owid-logo.svg"
     assert jsonld["temporalCoverage"] == "1812/2023"
     assert jsonld["spatialCoverage"] == "Worldwide"
-    assert jsonld["creator"] == {"@type": "Organization", "name": "Example Producer"}
+    assert jsonld["creator"] == {
+        "@type": "Organization",
+        "name": "Our World in Data",
+        "url": "https://ourworldindata.org",
+    }
+    # The origin has no DOI in its citation, so no related-article citation is emitted;
+    # the producer is still credited via isBasedOn below.
+    assert "citation" not in jsonld
     assert jsonld["isBasedOn"]["url"] == "https://example.com/source"
     assert jsonld["keywords"] == ["Biodiversity"]
     assert jsonld["variableMeasured"][0]["identifier"] == "full_flowering_date"
@@ -413,26 +420,39 @@ def test_plain_description_strips_detail_on_demand_links() -> None:
     assert variable["description"] == "Measured in terawatt-hours."
 
 
-def test_creator_and_citation_lead_with_most_used_origin() -> None:
+def test_citation_extracts_dois_and_leads_with_most_used_origin() -> None:
     main_origin = Origin(
         producer="Global Carbon Project",
         attribution="Global Carbon Budget (2025)",
         title="Global Carbon Budget",
-        citation_full="Global Carbon Project (2025). Global Carbon Budget.",
+        citation_full=(
+            "Friedlingstein, P. et al.: Global Carbon Budget 2024, Earth Syst. Sci. Data, "
+            "https://doi.org/10.5194/essd-17-965-2025, 2025."
+        ),
         url_main="https://globalcarbonbudget.org",
     )
     helper_origin = Origin(
         producer="Various sources",
         attribution="Population based on various sources (2024)",
         title="Population",
-        citation_full="Population is based on various sources.",
+        # No DOI: helper source stays out of citation, but keeps its isBasedOn entry.
+        citation_full="Population is based on various sources: https://ourworldindata.org/population-sources",
         url_main="https://example.com/population",
     )
-    # The helper origin (population) backs the *first* column; the main origin backs the
-    # remaining columns. Creator/citation must still lead with the main origin.
+    doi_prefix_origin = Origin(
+        producer="Bolt and van Zanden",
+        title="Maddison Project Database",
+        date_published="2024-04-26",
+        # "DOI: <id>" form (no doi.org URL) must be recognized too.
+        citation_full='Bolt and van Zanden (2024), "Maddison style estimates". DOI: 10.1111/joes.12618.',
+        url_main="https://example.com/maddison",
+    )
+    # The helper origin backs the *first* column; the main origin backs the remaining
+    # columns. Citation must still lead with the main origin, not follow column order.
     variables = {"population": VariableMeta(title="Population", origins=[helper_origin])}
-    for name in ("co2", "co2_per_capita", "cumulative_co2"):
+    for name in ("co2", "co2_per_capita"):
         variables[name] = VariableMeta(title=name, origins=[main_origin])
+    variables["gdp"] = VariableMeta(title="gdp", origins=[doi_prefix_origin])
     table = TableSchemaInput(
         short_name="owid_co2",
         metadata=TableMeta(short_name="owid_co2", title="CO2", description="Table description"),
@@ -445,14 +465,16 @@ def test_creator_and_citation_lead_with_most_used_origin() -> None:
         dataset_meta=DatasetMeta(short_name="owid_co2", title="CO2 dataset", description="Dataset description"),
         tables=[table],
     )
-    # creator carries producer names (no edition years from `attribution`), main source first.
-    assert jsonld["creator"] == [
-        {"@type": "Organization", "name": "Global Carbon Project"},
-        {"@type": "Organization", "name": "Various sources"},
-    ]
-    # All sources are cited, main source first — not whichever origin the first column uses.
+    # Creator is the author of this compiled artifact; producers keep credit in isBasedOn.
+    assert jsonld["creator"] == {
+        "@type": "Organization",
+        "name": "Our World in Data",
+        "url": "https://ourworldindata.org",
+    }
     assert jsonld["citation"] == [
-        "Global Carbon Project (2025). Global Carbon Budget.",
-        "Population is based on various sources.",
+        "Global Carbon Budget (2025). https://doi.org/10.5194/essd-17-965-2025",
+        # Attribution missing: fall back to producer (year of date_published).
+        "Bolt and van Zanden (2024). https://doi.org/10.1111/joes.12618",
     ]
     assert jsonld["isBasedOn"][0]["url"] == "https://globalcarbonbudget.org"
+    assert {item["url"] for item in jsonld["isBasedOn"]} >= {"https://example.com/population"}

@@ -113,9 +113,14 @@ def dataset_to_schema_org(
     if license_url:
         result["license"] = license_url
 
-    creator = _creator_from_origins(origins)
-    if creator:
-        result["creator"] = creator
+    # Creator is the author of this artifact (the OWID-processed dataset), matching how
+    # compiled datasets are marked up elsewhere (HuggingFace, Zenodo, Google's own examples).
+    # Upstream producers keep credit in isBasedOn (name + URL) and citation.
+    result["creator"] = {
+        "@type": "Organization",
+        "name": "Our World in Data",
+        "url": "https://ourworldindata.org",
+    }
 
     citations = _citations(origins)
     if citations:
@@ -395,34 +400,40 @@ def _license_to_url(license: License | None) -> str | None:
     return license_to_url(license)
 
 
-def _citations(origins: list[Origin]) -> list[str]:
-    """Unique full citations, main source first (origins are pre-ordered by variable usage).
+_DOI_RE = re.compile(r"(?:https?://(?:dx\.)?doi\.org/|\bdoi:\s*)(10\.\d{4,9}/[^\s\"'\)\]]+)", re.IGNORECASE)
 
-    schema.org allows multiple ``citation`` values; a single arbitrary citation (e.g. the
-    population helper source of a CO2 dataset) misrepresents the dataset.
+
+def _citations(origins: list[Origin]) -> list[str]:
+    """Short citation snippets with DOIs for the source papers, main source first.
+
+    Per Google's dataset guidance, ``citation`` identifies *related academic articles*
+    (data papers, data descriptors) — not the dataset itself — and should carry a DOI.
+    Each snippet pairs the origin's short attribution with the first DOI found in its
+    full citation. Origins without a DOI (helper sources like population, web-only data)
+    are covered by ``isBasedOn`` instead.
     """
     citations: list[str] = []
     for origin in origins:
-        if origin.citation_full and origin.citation_full not in citations:
-            citations.append(origin.citation_full)
+        if not origin.citation_full:
+            continue
+        match = _DOI_RE.search(origin.citation_full)
+        if not match:
+            continue
+        doi_url = f"https://doi.org/{match.group(1).rstrip('.,;')}"
+        label = origin.attribution or _producer_with_year(origin)
+        snippet = f"{label.rstrip('.')}. {doi_url}" if label else doi_url
+        if snippet not in citations:
+            citations.append(snippet)
     return citations[:5]
 
 
-def _creator_from_origins(origins: list[Origin]) -> dict[str, str] | list[dict[str, str]] | None:
-    producers = []
-    for origin in origins:
-        # `attribution` is a citation-style label with edition years ("Global Carbon Budget
-        # (2025)"); `producer` is the actual organization/author name, which is what a
-        # schema.org creator should carry.
-        producer = origin.producer or origin.attribution
-        if producer and producer not in producers:
-            producers.append(producer)
-    creators = [{"@type": "Organization", "name": producer} for producer in producers[:5]]
-    if not creators:
+def _producer_with_year(origin: Origin) -> str | None:
+    if not origin.producer:
         return None
-    if len(creators) == 1:
-        return creators[0]
-    return creators
+    year = str(origin.date_published or "")[:4]
+    if year.isdigit():
+        return f"{origin.producer} ({year})"
+    return origin.producer
 
 
 def _is_based_on(origins: list[Origin]) -> list[dict[str, Any]] | dict[str, Any] | None:
