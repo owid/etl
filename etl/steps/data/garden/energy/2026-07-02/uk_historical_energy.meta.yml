@@ -22,10 +22,10 @@ tables:
         description_short: |-
           Coal production in the United Kingdom, measured in [terawatt-hours](#dod:watt-hours).
         description_processing: |-
-          - We convert coal from million tonnes to terawatt-hours using a factor of 6.85 megawatt-hours per tonne. Rather than assume a textbook calorific value, we calibrated this factor from the overlap with the longer-running Shift Dataportal series (which reports UK coal in terawatt-hours from 1900): over 1900-1950 the implied factor is a near-constant ~6.85 megawatt-hours per tonne (stable to within 3%), so this historical segment joins the modern series with no step at the splice. This is consistent with the calorific value implied by the source's own units (1 tonne of coal ~ 0.588 tonnes of oil equivalent ~ 6.84 megawatt-hours per tonne).
+          - We convert coal from million tonnes to terawatt-hours using the coal energy content given in the source's own units table: 1 tonne of coal equals 0.588 tonnes of oil equivalent, and 1 tonne of oil equivalent equals 41,870,000 kilojoules (with 1 kilowatt-hour equal to 3,600 kilojoules), which works out to about 6.84 megawatt-hours per tonne.
         description_key:
-          - "Pre-1800 values are benchmark estimates (from Flinn) that have been linearly interpolated yearly."
-          - "The geographical coverage of the series drifts over time: the early estimates (Flinn, Church) cover Great Britain, later official figures cover the United Kingdom, and before 1922 the United Kingdom included all of Ireland."
+          - "The source states that, in places, gaps in the series were filled by linear interpolation between known values. In the coal series the earliest decades increase by a constant amount each year, which reflects such interpolation, so year-to-year variation in the early period should not be over-interpreted."
+          - "According to the source, the statistics relate to Great Britain until 1882, the United Kingdom including all of Ireland from 1883 to 1920, and the present-day United Kingdom (England, Wales, Scotland and Northern Ireland) afterwards."
         display:
           name: Coal
           numDecimalPlaces: 0

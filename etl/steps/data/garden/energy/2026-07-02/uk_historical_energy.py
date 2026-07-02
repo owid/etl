@@ -7,15 +7,11 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Conversion factor from million tonnes of coal to terawatt-hours.
-# The physical factor is 6.85 MWh per tonne, and converting million tonnes to TWh leaves it numerically unchanged
-# (1 Mt = 1e6 tonnes and 1 MWh = 1e-6 TWh, and those two cancel), so million tonnes * 6.85 = TWh.
-# Rather than assume a textbook calorific value, we calibrate this factor from the overlap between this NIC series (in
-# tonnes) and the Shift series (in TWh) for UK coal: over 1900-1950 the implied factor is a near-constant ~6.85 MWh per
-# tonne (median 6.85, stable to <3%), and it is 6.85 exactly at the 1900 splice year, so the pre-1900 segment joins the
-# 1900+ Shift series with no step at the splice. This is consistent with the calorific value implied by the NIC file's
-# own "Units" sheet (1 tonne of coal = 0.588 tonnes of oil equivalent ~ 6.84 MWh).
-MT_TO_TWH = 6.85
+# Conversion factor from million tonnes of coal to terawatt-hours, taken entirely from the coal energy content stated
+# in the NIC file's own "Units" sheet: 1 tonne of coal = 0.588 tonnes of oil equivalent (toe), 1 toe = 41,870,000 kJ,
+# and 1 kWh = 3,600 kJ. So one tonne of coal = 0.588 * 41,870,000 / 3,600 kWh ~ 6.84 MWh. Converting million tonnes to
+# TWh leaves the number unchanged (1 Mt = 1e6 tonnes and 1 MWh = 1e-6 TWh cancel out), so: TWh = million tonnes * 6.84.
+MT_TO_TWH = 0.588 * 41_870_000 / 3_600 / 1_000  # tonnes of coal -> MWh, i.e. TWh per million tonnes (~6.84)
 
 
 def sanity_check_inputs(tb: Table) -> None:

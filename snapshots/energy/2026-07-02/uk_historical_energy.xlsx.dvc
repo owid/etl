@@ -3,10 +3,10 @@ meta:
     # Data product / Snapshot
     title: UK historical energy data
     description: |-
-      A historical energy data set for the United Kingdom, compiled by Roger Fouquet (Grantham Research Institute on Climate Change and the Environment, London School of Economics and Political Science) for the National Infrastructure Commission (NIC).
+      A historical energy data set for the United Kingdom, compiled by Roger Fouquet (Grantham Research Institute on Climate Change and the Environment, London School of Economics and Political Science) for the National Infrastructure Commission (NIC). It brings together long-run time series on the UK's energy consumption, energy prices and carbon dioxide emissions, spanning as far back as 1700.
 
-      The dataset brings together long-run time series on the UK's energy consumption, production, prices and carbon dioxide emissions from 1700 to 2018. For coal, the long-run series compiles production and consumption estimates from Flinn (History of the British Coal Industry, Vol. 2, covering 1700-1830), Church (Vol. 3, covering 1830-1913) and official figures from the UK Department for Business, Energy & Industrial Strategy (BEIS) from 1913 onwards, underpinned by the production estimates of Pollard (1980) and Mitchell (1984).
-    date_published: "2020-03-31"
+      The long-run coal series combines historical estimates from M.W. Flinn's and R. Church's volumes of "The History of the British Coal Industry" (covering 1700-1830 and 1830-1913 respectively) with the official "Historical coal data" published by the UK Department for Business, Energy & Industrial Strategy (BEIS), which covers 1853 to 2018.
+    date_published: "2020-10-02"
 
     # Citation
     producer: National Infrastructure Commission
@@ -14,14 +14,15 @@ meta:
       Fouquet, R. (2020). A historical energy data set for the UK. National Infrastructure Commission. Version 1, finalized on 31 March 2020, based on the Digest of United Kingdom Energy Statistics 2019 with historical extension. Prepared by Roger Fouquet (Grantham Research Institute on Climate Change and the Environment, London School of Economics and Political Science).
 
     # Files
-    url_main: https://nic.org.uk/studies-reports/national-infrastructure-assessment/national-infrastructure-assessment-2018/historical-energy-data/
-    # NOTE: The National Infrastructure Commission no longer maintains this file, so we retrieve it from the Internet Archive's Wayback Machine.
+    # NOTE: The National Infrastructure Commission no longer hosts this dataset (both its landing page and the file now
+    # return 404), so both URLs point to Internet Archive Wayback Machine captures.
+    url_main: https://web.archive.org/web/20250323165206/https://nic.org.uk/data/all-data/historic-energy/
     url_download: https://web.archive.org/web/20240812215702id_/https://nic.org.uk/app/uploads/Historical-Energy-Data-Final-Dataset.xlsx
     date_accessed: "2026-07-02"
 
     # License
     license:
-      name: Open Government Licence v3.0
+      name: Open Government License v3.0
       url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
 outs:
   - md5: 68e8375f87dc59ba86344a3b008841ca
