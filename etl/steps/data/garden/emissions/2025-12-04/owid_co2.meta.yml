@@ -1,3 +1,8 @@
 dataset:
+  title: OWID CO2 dataset
+  description: |-
+    OWID CO2 dataset.
+
+    This dataset will be loaded by [the co2-data repository](https://github.com/owid/co2-data), to create a csv file of the dataset that can be downloaded in one click.
   owners:
     - Pablo Rosado
