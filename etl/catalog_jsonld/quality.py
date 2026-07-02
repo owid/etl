@@ -44,10 +44,7 @@ def assess_dataset_quality(
         result.blockers.append("missing_license_url")
 
     if not _has_provenance(tables):
-        if dataset_meta.sources:
-            result.blockers.append("legacy_sources_without_origins")
-        else:
-            result.blockers.append("missing_provenance")
+        result.blockers.append("missing_provenance")
 
     if not any(table.formats for table in tables):
         result.blockers.append("missing_public_distribution")
