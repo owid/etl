@@ -117,9 +117,9 @@ def dataset_to_schema_org(
     if creator:
         result["creator"] = creator
 
-    citation = _first_non_empty(origin.citation_full for origin in origins)
-    if citation:
-        result["citation"] = citation
+    citations = _citations(origins)
+    if citations:
+        result["citation"] = citations[0] if len(citations) == 1 else citations
 
     date_published = _first_valid_date(origin.date_published for origin in origins)
     if date_published:
@@ -340,16 +340,23 @@ def _dataset_description(dataset_meta: DatasetMeta) -> str:
 
 
 def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:
-    origins: list[Origin] = []
-    seen = set()
+    """Return unique origins, ordered by how many variables reference each one.
+
+    Column order is meaningless here: helper columns (ISO codes, population, GDP) often come
+    first in a table, and everything derived from the origin list (creator, citation,
+    isBasedOn, datePublished) should lead with the dataset's main source, which is the origin
+    the most variables reference — not whichever origin the first column happens to use.
+    """
+    origins: dict[Any, Origin] = {}
+    counts: dict[Any, int] = {}
     for table in tables:
         for variable in table.variables.values():
             for origin in variable.origins:
                 key = (origin.producer, origin.title, origin.url_main, origin.url_download, origin.citation_full)
-                if key not in seen:
-                    seen.add(key)
-                    origins.append(origin)
-    return origins
+                origins.setdefault(key, origin)
+                counts[key] = counts.get(key, 0) + 1
+    order = sorted(origins, key=lambda key: -counts[key])
+    return [origins[key] for key in order]
 
 
 def _license_url(dataset_meta: DatasetMeta, origins: list[Origin], tables: list[TableSchemaInput]) -> str | None:
@@ -388,10 +395,26 @@ def _license_to_url(license: License | None) -> str | None:
     return license_to_url(license)
 
 
+def _citations(origins: list[Origin]) -> list[str]:
+    """Unique full citations, main source first (origins are pre-ordered by variable usage).
+
+    schema.org allows multiple ``citation`` values; a single arbitrary citation (e.g. the
+    population helper source of a CO2 dataset) misrepresents the dataset.
+    """
+    citations: list[str] = []
+    for origin in origins:
+        if origin.citation_full and origin.citation_full not in citations:
+            citations.append(origin.citation_full)
+    return citations[:5]
+
+
 def _creator_from_origins(origins: list[Origin]) -> dict[str, str] | list[dict[str, str]] | None:
     producers = []
     for origin in origins:
-        producer = origin.attribution or origin.producer
+        # `attribution` is a citation-style label with edition years ("Global Carbon Budget
+        # (2025)"); `producer` is the actual organization/author name, which is what a
+        # schema.org creator should carry.
+        producer = origin.producer or origin.attribution
         if producer and producer not in producers:
             producers.append(producer)
     creators = [{"@type": "Organization", "name": producer} for producer in producers[:5]]

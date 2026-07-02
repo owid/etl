@@ -411,3 +411,48 @@ def test_plain_description_strips_detail_on_demand_links() -> None:
     (variable,) = jsonld["variableMeasured"]
     # Detail-on-demand links only resolve on ourworldindata.org; keep just the link text.
     assert variable["description"] == "Measured in terawatt-hours."
+
+
+def test_creator_and_citation_lead_with_most_used_origin() -> None:
+    main_origin = Origin(
+        producer="Global Carbon Project",
+        attribution="Global Carbon Budget (2025)",
+        title="Global Carbon Budget",
+        citation_full="Global Carbon Project (2025). Global Carbon Budget.",
+        url_main="https://globalcarbonbudget.org",
+    )
+    helper_origin = Origin(
+        producer="Various sources",
+        attribution="Population based on various sources (2024)",
+        title="Population",
+        citation_full="Population is based on various sources.",
+        url_main="https://example.com/population",
+    )
+    # The helper origin (population) backs the *first* column; the main origin backs the
+    # remaining columns. Creator/citation must still lead with the main origin.
+    variables = {"population": VariableMeta(title="Population", origins=[helper_origin])}
+    for name in ("co2", "co2_per_capita", "cumulative_co2"):
+        variables[name] = VariableMeta(title=name, origins=[main_origin])
+    table = TableSchemaInput(
+        short_name="owid_co2",
+        metadata=TableMeta(short_name="owid_co2", title="CO2", description="Table description"),
+        variables=variables,
+        formats=["feather"],
+    )
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/emissions/2025-12-04/owid_co2",
+        page_path="emissions/owid_co2",
+        dataset_meta=DatasetMeta(short_name="owid_co2", title="CO2 dataset", description="Dataset description"),
+        tables=[table],
+    )
+    # creator carries producer names (no edition years from `attribution`), main source first.
+    assert jsonld["creator"] == [
+        {"@type": "Organization", "name": "Global Carbon Project"},
+        {"@type": "Organization", "name": "Various sources"},
+    ]
+    # All sources are cited, main source first — not whichever origin the first column uses.
+    assert jsonld["citation"] == [
+        "Global Carbon Project (2025). Global Carbon Budget.",
+        "Population is based on various sources.",
+    ]
+    assert jsonld["isBasedOn"][0]["url"] == "https://globalcarbonbudget.org"
