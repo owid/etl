@@ -121,12 +121,32 @@ def dataset_to_schema_org(
         if distributions:
             result["distribution"] = distributions
     elif tables:
-        result["hasPart"] = [_table_dataset(dataset_url, table) for table in tables]
+        result["hasPart"] = [_table_dataset(dataset_url, table, dataset_meta) for table in tables]
 
     return _drop_empty(result)
 
 
-def _table_dataset(dataset_url: str, table: TableSchemaInput) -> dict[str, Any]:
+def table_description(table: TableSchemaInput, dataset_meta: DatasetMeta) -> str | None:
+    """Return the best available description for a single table node.
+
+    Tables rarely set their own ``description`` (a mostly-internal field), so for
+    the ``hasPart`` representation we fall back to descriptions that already exist
+    in the metadata — the producer's (origin) description, then the dataset-level
+    description — rather than leaving the node blank. Nothing is synthesized here;
+    if none of these are populated the node has no description.
+    """
+    if table.metadata.description:
+        return table.metadata.description
+    origins = _unique_origins([table])
+    description = _first_non_empty(origin.description_snapshot or origin.description for origin in origins)
+    if description:
+        return description
+    if dataset_meta.description:
+        return dataset_meta.description
+    return None
+
+
+def _table_dataset(dataset_url: str, table: TableSchemaInput, dataset_meta: DatasetMeta) -> dict[str, Any]:
     name = table.metadata.title or table.short_name.replace("_", " ").title()
     result: dict[str, Any] = {
         "@type": "Dataset",
@@ -134,8 +154,9 @@ def _table_dataset(dataset_url: str, table: TableSchemaInput) -> dict[str, Any]:
         "name": name,
         "identifier": table.short_name,
     }
-    if table.metadata.description:
-        result["description"] = table.metadata.description
+    description = table_description(table, dataset_meta)
+    if description:
+        result["description"] = description
 
     variables = _variable_measured(table)
     if variables:

@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from owid.catalog.core.meta import DatasetMeta
-from owid.catalog.schema_org import TableSchemaInput, license_to_url
+from owid.catalog.schema_org import TableSchemaInput, license_to_url, table_description
 
 
 @dataclass
@@ -51,7 +51,10 @@ def assess_dataset_quality(
 
     for table in tables:
         warnings = []
-        if not table.metadata.description:
+        # A table rarely sets its own description (a mostly-internal field); the emitted
+        # JSON-LD falls back to the producer (origin) or dataset description, so only warn
+        # when no description resolves from any of those existing sources.
+        if not table_description(table, dataset_meta):
             warnings.append("missing_table_description")
         variable_count = len(
             [name for name in table.variables if name not in set(table.primary_key or table.metadata.primary_key)]
