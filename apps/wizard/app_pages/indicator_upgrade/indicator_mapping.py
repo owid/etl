@@ -528,23 +528,21 @@ def convert_year_to_date(df: pd.DataFrame, indicator_ids: list[int]) -> pd.DataF
     select
         id as variableId,
         display->>'$.timeInterval' as timeInterval,
-        display->>'$.yearIsDay' as yearIsDay,
         display->>'$.zeroDay' as zeroDay
     from variables where id in %(indicator_ids)s;
     """
     mf = read_sql(q, get_engine(), params={"indicator_ids": tuple(indicator_ids)})
     df = df.merge(mf, on="variableId")
 
-    # Sub-yearly data is encoded as days-since-zeroDay integers, tagged via timeInterval
-    # (or the deprecated yearIsDay flag, kept as a fallback for un-migrated DB rows).
-    ix = df.timeInterval.isin(["day", "week", "month"]) | (df.yearIsDay == "true")
+    # Sub-yearly data is encoded as days-since-zeroDay integers, tagged via timeInterval.
+    ix = df.timeInterval.isin(["day", "week", "month"])
     if ix.any():
         df.year = df.year.astype(object)  # ty: ignore[unresolved-attribute]
         df.loc[ix, "year"] = pd.to_datetime(df.loc[ix, "zeroDay"]).dt.date + np.array(
             [pd.Timedelta(days=y) for y in df.loc[ix, "year"]]
         )
 
-    return df.drop(columns=["timeInterval", "yearIsDay", "zeroDay"])
+    return df.drop(columns=["timeInterval", "zeroDay"])
 
 
 def reset_indicator_form() -> None:
