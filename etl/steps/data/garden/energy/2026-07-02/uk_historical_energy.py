@@ -1,6 +1,4 @@
-"""Garden step for the UK historical energy data (NIC / Fouquet).
-
-"""
+"""Garden step for the UK historical energy data (NIC / Fouquet)."""
 
 from owid.catalog import Table
 

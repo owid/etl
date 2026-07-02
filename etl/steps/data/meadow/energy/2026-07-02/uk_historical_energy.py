@@ -1,8 +1,8 @@
 """Load a snapshot and create a meadow dataset.
 
 The NIC historical energy file has many sheets; for now we only extract UK coal production from the coal long-run sheet
-("1.3.1 CoalLR"). The sheet has a multi-row header, so we read it without a header and select the relevant columns by
-position after locating the header row.
+("1.3.1 CoalLR"). That sheet has a multi-row header, so we skip down to the row holding the column names ("Year" and
+"Supply2") and select those two columns.
 
 """
 
