@@ -56,7 +56,7 @@ dev = [
     "pytest-cov>=2.12.1",
     "watchdog>=2.1.5",
     "argh>=0.26.2",
-    "ty==0.0.26",
+    "ty==0.0.55",
     "pandas-stubs>=2.2.3,<3",
     "ruff==0.15.8",
     "ipykernel>=6.29.0",

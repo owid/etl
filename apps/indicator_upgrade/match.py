@@ -611,7 +611,7 @@ def find_mapping_suggestions_optim(
     missing_old: pd.DataFrame,
     missing_new: pd.DataFrame,
     similarity_name: str = "partial_ratio",
-) -> list[dict[str, pd.DataFrame | pd.Series]]:
+) -> list[dict[str, Any]]:
     """Find suggestions for mapping old variables to new variables.
 
     Creates a list with new variable suggestions for each old variable. The list is therefore the same

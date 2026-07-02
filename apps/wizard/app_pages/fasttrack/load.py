@@ -37,7 +37,7 @@ SHEET_TO_GID = {
 }
 
 
-def load_existing_sheets_from_snapshots() -> list[dict[str, str]]:
+def load_existing_sheets_from_snapshots() -> list[dict[str, str | bool | None]]:
     """Load available sheets from local environment."""
     existing_sheets = []
     for path in (SNAPSHOTS_DIR / "fasttrack").rglob("*.dvc"):

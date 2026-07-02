@@ -8,7 +8,7 @@ from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Literal, TypedDict, cast
 
 import fastjsonschema
 import pandas as pd
@@ -44,6 +44,15 @@ from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
 # Logging
 log = get_logger()
+
+
+class _GroupedViewsEntry(TypedDict):
+    overwrite: bool
+    views: list[View]
+    dimension: str
+    choice_new: str
+    choices: list[str]
+    replace: bool
 
 
 @pruned_json
@@ -922,7 +931,7 @@ class Collection(MDIMBase):
                     raise TypeError("`choices` must be a list!")
                 return group["choices"]
 
-        new_views_all = []
+        new_views_all: list[_GroupedViewsEntry] = []
         for group in groups:
             # Get dimension slug
             assert "dimension" in group, "Dimension must be provided!"

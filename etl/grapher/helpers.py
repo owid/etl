@@ -202,7 +202,7 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     # Set column names to new short names and use proper metadata
     wide_tb.columns = short_names
     for col, meta in zip(wide_tb.columns, metadatas):
-        wide_tb[col].metadata = meta
+        wide_tb[col].metadata = meta  # ty: ignore[unresolved-attribute]
 
     return wide_tb
 
