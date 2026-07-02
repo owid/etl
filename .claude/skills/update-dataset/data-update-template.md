@@ -1,6 +1,6 @@
 # Data Update Post Template (for OWID /latest)
 
-Use this template to draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest) when a dataset refresh ships. **The published format is a Google Doc** that gets ingested by OWID's CMS — the doc has structured frontmatter fields (`title`, `excerpt`, `type`, `authors`, `kicker`), a `[+body]` marker, body prose, and trailing `{.cta}` and `{.image}` blocks. The skill should produce output in **exactly that format** so the runner can paste it into a new Google Doc in the team's `/Data updates` Drive folder.
+Use this template to draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest) when a dataset refresh ships. **The published format is a Google Doc** that gets ingested by OWID's CMS — the doc has structured frontmatter fields (`title`, `excerpt`, `type`, `authors`, `kicker`), a `\[+body\]` marker, body prose, and trailing `{.cta}` and `{.image}` blocks. The skill should produce output in **exactly that format** so the runner can paste it into a new Google Doc in the team's `/Data updates` Drive folder.
 
 This is **separate from the Slack announcement** — that one is a 10-field form for the internal #data-updates-comms channel; this one is a mini-blog-post for OWID readers. They share editorial content but live in different formats.
 
@@ -10,38 +10,16 @@ Hand the draft to the user for review and publication. The skill does not presum
 
 ---
 
-## Keep the style in sync (re-check ~monthly)
-
-The `/latest` house style drifts over time (title shape, `kicker` value, body length, closing line). The **source of truth is the team's `/Data updates` Drive folder**: https://drive.google.com/drive/folders/1oL0uLHKI6f2qi1rJA6-qFFRYEBw_-rfm
-
-**Conventions last verified against the folder: 2026-07-01.**
-
-When you draft a `/latest` post (step 9b of `update-dataset`), check the date above. **If more than a month has passed**, first read the **5 most recent** docs in that folder, reconcile the guidance in this file with what they actually do, then update this template and bump the "last verified" date. Reconcile at least:
-
-- `kicker` value (currently `data-update`, lowercase-hyphenated)
-- title shape (question / action / finding — currently mostly questions)
-- `excerpt` pattern
-- body length and shape, and the closing "I recently updated our charts … + cadence" line
-- `{.cta}` URL/text conventions
-
-Reading the folder: the Google Drive `parentId` search often returns nothing for this shared drive — fall back to `fullText contains 'datasetProducts'` (matches the search-URL CTA) or `title contains '<recent dataset>'` to surface the docs, then `read_file_content` each.
-
----
-
 ## Template (paste-ready for a new Google Doc)
 
 ```
-:skip
-preview
-:endskip
-
 title: [Punchy title — a finding/claim, a question, or an action/invitation. Examples: "Nearly one in ten people worldwide still live in extreme poverty", "How much do governments spend, and what do they spend it on?", "Track confirmed human cases of H5N1 'bird flu' since 1997". NOT just the dataset name.]
 excerpt: [One short sentence summary that's distinct from the title. Common patterns: "Explore updated data from <producer>." / "Explore updated data on <topic> from <producer>." / "Track <topic descriptor>." / "We've updated <N> charts with the latest data from <producer>." / "We updated nearly N of our charts with the latest data."]
 type: announcement
 authors: [Author name(s). Comma-separated for co-authors, e.g. "Hannah Ritchie, Edouard Mathieu".]
-kicker: data-update
+kicker: Data update
 
-[+body]
+\[+body\]
 
 [Body — 100–200 words of flowing prose, first-person, conversational. Recipe (mirroring the published examples — ATUS, PIP, NVIDIA, OECD Government at a Glance, UNU-WIDER, robots, ozone, mobile money, fertilizers, democracy, WASH):
 
@@ -71,44 +49,28 @@ text: [Descriptive link text. One of:
 - "Explore the data in our new interactive chart" (new chart/MDIM)]
 {}
 
+:skip
+**👉 Add a picture here.** Attach a chart screenshot to the Google Doc and use the filename below.
+:endskip
+
 {.image}
 filename: [YYYY-MM-data-update-<slug>.png — a chart screenshot the user adds to the Doc separately. The slug is a short, lowercase-hyphenated topic tag, e.g. world-bank-pip, nvidia-revenue, h5n1-flu, govt-revenue, ozone-hole, robots-per-worker.]
 {}
 
-[]
+\[\]
 ```
 
-The `[+body]` and `[]` markers are plain brackets — do **not** add backslash escapes to them. (Any backslashes that show up in a `read_file_content` dump are an artifact of that markdown representation, not the real Doc content.) The OWID CMS reads the plain markers directly.
+The `\[+body\]` and `\[\]` markers use backslash-escaped brackets — that's how they appear in the published Google Docs (the escapes prevent Google Docs' auto-link rendering from collapsing the brackets). Keep the escapes when pasting into the Doc; the OWID CMS strips them on ingest.
 
-**Formatting the Google Doc — use the OWID GDocs Add-on.** OWID has a Google Docs Add-on (Extensions menu in the Doc) that formats these CMS docs into the right shape. Rely on it to finalize the doc rather than hand-tuning spacing. The **finished Doc is compact: every line is its own paragraph with no empty "spacer" paragraphs between them** — frontmatter fields, the `[+body]` marker, body paragraphs, and the `{.cta}`/`{.image}` blocks are all consecutive (Google Docs uses one paragraph per Enter, so blank lines are not needed and read as empty paragraphs to delete).
-
-**Spacing rules for the paste-ready *markdown draft*** (this file's output — the source you paste in or upload; the Add-on / import then collapses it to the compact Doc form above):
+**Spacing rules** the team prefers (different from the raw Google Docs export, which inserts paragraph breaks everywhere):
 
 - **Frontmatter section** (`title:` through `kicker:`) — one field per line, **no blank lines** between fields.
-- **Body** — keep blank lines between paragraphs (so markdown treats each as its own paragraph).
+- **Body** — keep blank lines between paragraphs.
 - **`{.cta}` and `{.image}` blocks** — opening tag, fields, closing tag all on consecutive lines with **no blank lines inside**. Keep one blank line between the body and `{.cta}`, and between `{.cta}` and `{.image}`.
-- **When auto-creating the Doc via the Drive `create_file` API** (skill step 9b): don't insert blank spacer lines to force paragraph separation — they become empty paragraphs the user must delete. Upload with single newlines and let the OWID GDocs Add-on finalize the formatting.
-
-### OWID CMS Doc styling — colors & indents (reproducible via an HTML upload)
-
-The OWID GDocs Add-on colors and indents these docs. You can reproduce that styling **directly on `create_file`** by uploading `contentMimeType: "text/html"` with the inline styles below (verified: Google Docs' HTML import preserves the colors, the `margin-left` indents, hyperlinks, and — crucially — decodes HTML **entities**, so `&mdash;` → "—" and `&#128073;` → "👉" come through clean, unlike raw 4-byte chars in a markdown upload which mojibake). This lands a fully-styled doc that needs no add-on pass. The scheme (extracted from a correctly-formatted doc, e.g. Homicides):
-
-| Element | Text color | Left indent |
-|---|---|---|
-| Field keys (`title: `, `excerpt: `, `type: `, `authors: `, `kicker: `, `url: `, `text: `, `filename: `) | blue `#0094ff` | — |
-| Frontmatter **values** (title/excerpt/type/authors/kicker) | black `#000000` | 0 |
-| `[+body]` and `[]` | orange `#f47835` | 0 |
-| Body paragraphs, and `url:`/`text:`/`filename:` **values** | grey `#666666` | body 10pt; url/text/filename 20pt |
-| `{.cta}`, `{}`, `{.image}` | green `#23974a` | 10pt |
-| Inline links | blue `#1155cc`, underlined | — |
-
-Per-line HTML shape: `<p style="margin-left:10pt"><span style="color:#666666">…</span></p>`; links `<a href="…" style="color:#1155cc;text-decoration:underline">…</a>`; encode all non-ASCII as HTML entities. Verify afterward with `download_file_content(exportMimeType="text/html")` and check the `color:` / `margin-left:` survived. (If OWID changes the scheme, re-extract it from a recent correctly-formatted doc rather than trusting these hex values.)
 
 ---
 
 ## Field-by-field guidance
-
-**Top `:skip` / `preview` / `:endskip` block** — Sits at the very top of the doc, before the frontmatter. It's a `:skip` block (not published) that holds the doc's preview link — paste the admin GDoc preview URL (from [https://admin.owid.io/admin/gdocs](https://admin.owid.io/admin/gdocs) once the doc is registered) in place of the literal word `preview`. Keep the literal `preview` placeholder in the paste-ready template.
 
 **`title`** — A punchy claim, a question, or an action/invitation. The title is the part that pulls readers into the feed; "Luxembourg Income Study" is descriptive but unmemorable. Three observed patterns:
 
@@ -130,9 +92,9 @@ If the dataset doesn't lend itself to a single headline finding, the question fo
 
 **`authors`** — The person who did the work, by name. Comma-separated for co-authors. Pull from the user (or the slack-announcement.md draft if it lists one).
 
-**`kicker`** — Use `data-update` (lowercase, hyphenated). This is the current convention — all five most recent posts as of July 2026 (oil spills, homicides, wildfires, democracy, SIPRI) use `kicker: data-update`. Older posts used `Data update` / `Data Update`; the CMS accepts those too, but match the current lowercase-hyphenated form.
+**`kicker`** — Always `Data update`. (One example used `Data Update` with capital U — both work; lowercase `update` matches the more recent posts.)
 
-**`[+body]`** — Literal marker (plain brackets, no backslashes). Always sits between the frontmatter and the body.
+**`\[+body\]`** — Literal marker. Always sits between the frontmatter and the body. Keep the backslash escapes.
 
 **Body voice** — First-person, conversational, author voice. The post reads like the person who did the work telling you about it. **Not** corporate ("OWID has updated…" is wrong); **yes** "I recently updated…", "I've just updated…", "I just updated…", or "We recently updated…" / "We've just updated…" for joint work.
 
@@ -170,11 +132,11 @@ For releases that meaningfully extend coverage (new countries, new years), the u
 
 The `text:` is descriptive — see the patterns under "Field-by-field guidance" above.
 
-**`{.image}` block** — Filename of the chart screenshot. Pattern: `YYYY-MM-data-update-<slug>.png`. The image itself isn't generated by the skill; the user adds the screenshot to the Google Doc separately, so the skill just fills in the expected filename to reserve the slot. Don't add a `:skip`-wrapped "add a picture" reminder to the doc — the real published docs don't use one; just tell the user to add the screenshot in the handoff message.
+**`{.image}` block** — Filename of the chart screenshot. Pattern: `YYYY-MM-data-update-<slug>.png`. The image itself isn't generated by the skill; it's added to the Google Doc separately by the user. The skill just fills in the expected filename so the slot is reserved. **Always precede the `{.image}` block with a `:skip … :endskip` wrapped "👉 Add a picture here" reminder line** so the user notices the slot when copy-pasting into the Doc, and so the reminder won't leak to the published post if the user forgets to remove it.
 
-**`[]`** — Literal end-of-post marker. Always sits at the very end of the published content.
+**`\[\]`** — Literal end-of-post marker. Always sits at the very end of the published content.
 
-**Optional `:skip` ... `:endskip` block (after `[]`)** — For paragraphs the author drafted but cut from the final version. Won't be published. The skill should NOT generate `:skip` content automatically; it's a human editing tool. Mention it only if the user asks how to keep deleted material around.
+**Optional `:skip` ... `:endskip` block (after `\[\]`)** — For paragraphs the author drafted but cut from the final version. Won't be published. The skill should NOT generate `:skip` content automatically; it's a human editing tool. Mention it only if the user asks how to keep deleted material around.
 
 ---
 
@@ -191,7 +153,7 @@ type: announcement
 authors: Veronika Samborska
 kicker: Data update
 
-[+body]
+\[+body\]
 
 [Most of the chips](https://epoch.ai/data/ai-chip-sales?view=graph&tab=h100_equivalents&proportion=share&viewType=designer) used to train and run AI models come from NVIDIA. This makes NVIDIA's data center & AI revenue one of the clearest public figures available for tracking demand for AI hardware.
 
@@ -210,7 +172,7 @@ text: Explore this data going back to 2014 in our interactive chart
 filename: 2026-04-data-update-nvidia-revenue.png
 {}
 
-[]
+\[\]
 ```
 
 ### Action-titled, with caveat and quarterly cadence (H5N1, ~135 words)
@@ -222,7 +184,7 @@ type: announcement
 authors: Lucas Rodés-Guirao
 kicker: Data update
 
-[+body]
+\[+body\]
 
 Avian influenza A (H5N1), often referred to as "bird flu", is a subtype of influenza virus that infects birds and mammals. In rare cases, humans can also be infected.
 
@@ -243,7 +205,7 @@ text: Explore the updated data in our interactive chart
 filename: 2026-04-data-update-h5n1-flu.png
 {}
 
-[]
+\[\]
 ```
 
 ### Finding-titled, with cross-reference (World Bank PIP, ~190 words)
@@ -255,7 +217,7 @@ type: announcement
 authors: Pablo Arriagada
 kicker: Data update
 
-[+body]
+\[+body\]
 
 How many people live in poverty around the world, and how has that changed over the last decades?
 
@@ -280,5 +242,5 @@ text: Explore all of the updated data in our interactive charts
 filename: 2026-04-data-update-world-bank-pip.png
 {}
 
-[]
+\[\]
 ```
