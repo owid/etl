@@ -28,7 +28,7 @@ Use WebFetch to fetch `url_main`. From the page content, extract as much metadat
 | `title` | Page `<title>`, main heading, dataset title |
 | `description` | Page description, abstract, or "about" section — copy the producer's text **verbatim**, don't paraphrase. For academic papers, use the abstract verbatim. If the page prose spans several paragraphs, take all of them (skip only navigation/boilerplate) |
 | `producer` | Organisation name, data owner, author |
-| `citation_full` | Official citation or "how to cite" section |
+| `citation_full` | The producer's recommended citation, copied **verbatim** — look for "cite as" / "suggested citation" / "please make the following reference" blocks on the page, an "Original citation" on repository pages (e.g. WRAP), NBER's suggested citation, or "Reference:" headers inside the data files themselves. Only construct a citation in standard format when the producer provides none |
 | `attribution_short` | Short org name / acronym |
 | `date_published` | Publication date or last-updated date |
 | `license_name` | License section (e.g. "CC BY 4.0", "Open Government Licence") |
@@ -191,5 +191,6 @@ Show:
 - The `outs` block `md5` and `size` fields are filled in automatically by DVC when the snapshot runs — just set them to empty/zero in the template.
 - Omit optional YAML fields entirely (don't leave them blank) to keep the DVC file clean.
 - Never guess at citation text — if you can't find it on the page, leave a placeholder like `<TO BE FILLED>` and ask the user.
+- `citation_full` should be the producer's recommended citation **verbatim** whenever one exists (page "cite as" blocks, repository "Original citation", NBER suggested citations, "Reference:" lines inside the data files). If the recommended citation is for a working-paper version of a published work, keep it verbatim and append the published version (e.g. "Published as: …"). Construct a standard-format citation only when the producer recommends none.
 - `description` must be the producer's own words, copied verbatim from the landing page or the paper's abstract — a fluent paraphrase is not acceptable. Verify against the actual page text.
 - When the snapshot is a single file/table of a broader data product, split the metadata: `title`/`description` describe the data product (verbatim), while `title_snapshot`/`description_snapshot` describe the specific file. Whenever `title_snapshot` is set, also write a `description_snapshot` — that one doesn't need to be verbatim. OWID-side context (hand-transcription notes, "retrieved from the Internet Archive", etc.) belongs in `description_snapshot`, never inside the producer's `description`.
