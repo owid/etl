@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+  "$id": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
   "required": [
     "$schema",
     "dimensions"
@@ -12,8 +12,8 @@
       "type": "string",
       "description": "Url of the concrete schema version to use to validate this document",
       "format": "uri",
-      "default": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
-      "const": "https://files.ourworldindata.org/schemas/grapher-schema.010.json"
+      "default": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
+      "const": "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
     },
     "id": {
       "type": "integer",
@@ -133,11 +133,6 @@
                 "type": "string",
                 "description": "Entity annotations"
               },
-              "yearIsDay": {
-                "type": "boolean",
-                "default": false,
-                "description": "Deprecated: use timeInterval instead. Switch to indicate if the number in the year column represents a day (since zeroDay) or not i.e. a year"
-              },
               "timeInterval": {
                 "type": "string",
                 "description": "Interval that each value in the year/time column represents. Sub-yearly intervals (day, week, month) are encoded as days-since-zeroDay integers.",
@@ -193,7 +188,7 @@
               },
               "zeroDay": {
                 "type": "string",
-                "description": "Iso date day string for the starting date if yearIsDay is used",
+                "description": "ISO date string for the day that time value 0 represents, for sub-yearly (day/week/month) timeInterval data encoded as days-since-zeroDay integers",
                 "default": "2020-01-21"
               }
             },

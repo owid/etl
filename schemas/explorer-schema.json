@@ -238,19 +238,19 @@
                         "description": "A subset of the grapher config.",
                         "properties": {
                             "$schema": {
-                                "$ref": "grapher-schema.010.json#/properties/$schema"
+                                "$ref": "grapher-schema.011.json#/properties/$schema"
                             },
                             "addCountryMode": {
-                                "$ref": "grapher-schema.010.json#/properties/addCountryMode"
+                                "$ref": "grapher-schema.011.json#/properties/addCountryMode"
                             },
                             "compareEndPointsOnly": {
-                                "$ref": "grapher-schema.010.json#/properties/compareEndPointsOnly"
+                                "$ref": "grapher-schema.011.json#/properties/compareEndPointsOnly"
                             },
                             "selectedEntityColors": {
-                                "$ref": "grapher-schema.010.json#/properties/selectedEntityColors"
+                                "$ref": "grapher-schema.011.json#/properties/selectedEntityColors"
                             },
                             "relatedQuestions": {
-                                "$ref": "grapher-schema.010.json#/properties/relatedQuestions"
+                                "$ref": "grapher-schema.011.json#/properties/relatedQuestions"
                             },
                             "relatedQuestionText": {
                                 "type": "string",
@@ -261,152 +261,152 @@
                                 "description": "URL for a related question link"
                             },
                             "title": {
-                                "$ref": "grapher-schema.010.json#/properties/title"
+                                "$ref": "grapher-schema.011.json#/properties/title"
                             },
                             "map": {
-                                "$ref": "grapher-schema.010.json#/properties/map"
+                                "$ref": "grapher-schema.011.json#/properties/map"
                             },
                             "maxTime": {
-                                "$ref": "grapher-schema.010.json#/properties/maxTime"
+                                "$ref": "grapher-schema.011.json#/properties/maxTime"
                             },
                             "subtitle": {
-                                "$ref": "grapher-schema.010.json#/properties/subtitle"
+                                "$ref": "grapher-schema.011.json#/properties/subtitle"
                             },
                             "selectedEntityNames": {
-                                "$ref": "grapher-schema.010.json#/properties/selectedEntityNames"
+                                "$ref": "grapher-schema.011.json#/properties/selectedEntityNames"
                             },
                             "focusedSeriesNames": {
-                                "$ref": "grapher-schema.010.json#/properties/focusedSeriesNames"
+                                "$ref": "grapher-schema.011.json#/properties/focusedSeriesNames"
                             },
                             "baseColorScheme": {
-                                "$ref": "grapher-schema.010.json#/properties/baseColorScheme"
+                                "$ref": "grapher-schema.011.json#/properties/baseColorScheme"
                             },
                             "yAxis": {
-                                "$ref": "grapher-schema.010.json#/properties/yAxis"
+                                "$ref": "grapher-schema.011.json#/properties/yAxis"
                             },
                             "tab": {
-                                "$ref": "grapher-schema.010.json#/properties/tab"
+                                "$ref": "grapher-schema.011.json#/properties/tab"
                             },
                             "matchingEntitiesOnly": {
-                                "$ref": "grapher-schema.010.json#/properties/matchingEntitiesOnly"
+                                "$ref": "grapher-schema.011.json#/properties/matchingEntitiesOnly"
                             },
                             "hideLogo": {
-                                "$ref": "grapher-schema.010.json#/properties/hideLogo"
+                                "$ref": "grapher-schema.011.json#/properties/hideLogo"
                             },
                             "timelineMinTime": {
-                                "$ref": "grapher-schema.010.json#/properties/timelineMinTime"
+                                "$ref": "grapher-schema.011.json#/properties/timelineMinTime"
                             },
                             "variantName": {
-                                "$ref": "grapher-schema.010.json#/properties/variantName"
+                                "$ref": "grapher-schema.011.json#/properties/variantName"
                             },
                             "hideTimeline": {
-                                "$ref": "grapher-schema.010.json#/properties/hideTimeline"
+                                "$ref": "grapher-schema.011.json#/properties/hideTimeline"
                             },
                             "originUrl": {
-                                "$ref": "grapher-schema.010.json#/properties/originUrl"
+                                "$ref": "grapher-schema.011.json#/properties/originUrl"
                             },
                             "colorScale": {
-                                "$ref": "grapher-schema.010.json#/properties/colorScale"
+                                "$ref": "grapher-schema.011.json#/properties/colorScale"
                             },
                             "scatterPointLabelStrategy": {
-                                "$ref": "grapher-schema.010.json#/properties/scatterPointLabelStrategy"
+                                "$ref": "grapher-schema.011.json#/properties/scatterPointLabelStrategy"
                             },
                             "selectedFacetStrategy": {
-                                "$ref": "grapher-schema.010.json#/properties/selectedFacetStrategy"
+                                "$ref": "grapher-schema.011.json#/properties/selectedFacetStrategy"
                             },
                             "sourceDesc": {
-                                "$ref": "grapher-schema.010.json#/properties/sourceDesc"
+                                "$ref": "grapher-schema.011.json#/properties/sourceDesc"
                             },
                             "invertColorScheme": {
-                                "$ref": "grapher-schema.010.json#/properties/invertColorScheme"
+                                "$ref": "grapher-schema.011.json#/properties/invertColorScheme"
                             },
                             "hideRelativeToggle": {
-                                "$ref": "grapher-schema.010.json#/properties/hideRelativeToggle"
+                                "$ref": "grapher-schema.011.json#/properties/hideRelativeToggle"
                             },
                             "comparisonLines": {
-                                "$ref": "grapher-schema.010.json#/properties/comparisonLines"
+                                "$ref": "grapher-schema.011.json#/properties/comparisonLines"
                             },
                             "internalNotes": {
-                                "$ref": "grapher-schema.010.json#/properties/internalNotes"
+                                "$ref": "grapher-schema.011.json#/properties/internalNotes"
                             },
                             "version": {
-                                "$ref": "grapher-schema.010.json#/properties/version"
+                                "$ref": "grapher-schema.011.json#/properties/version"
                             },
                             "logo": {
-                                "$ref": "grapher-schema.010.json#/properties/logo"
+                                "$ref": "grapher-schema.011.json#/properties/logo"
                             },
                             "entityType": {
-                                "$ref": "grapher-schema.010.json#/properties/entityType"
+                                "$ref": "grapher-schema.011.json#/properties/entityType"
                             },
                             "facettingLabelByYVariables": {
-                                "$ref": "grapher-schema.010.json#/properties/facettingLabelByYVariables"
+                                "$ref": "grapher-schema.011.json#/properties/facettingLabelByYVariables"
                             },
                             "note": {
-                                "$ref": "grapher-schema.010.json#/properties/note"
+                                "$ref": "grapher-schema.011.json#/properties/note"
                             },
                             "chartTypes": {
-                                "$ref": "grapher-schema.010.json#/properties/chartTypes"
+                                "$ref": "grapher-schema.011.json#/properties/chartTypes"
                             },
                             "hasMapTab": {
-                                "$ref": "grapher-schema.010.json#/properties/hasMapTab"
+                                "$ref": "grapher-schema.011.json#/properties/hasMapTab"
                             },
                             "stackMode": {
-                                "$ref": "grapher-schema.010.json#/properties/stackMode"
+                                "$ref": "grapher-schema.011.json#/properties/stackMode"
                             },
                             "minTime": {
-                                "$ref": "grapher-schema.010.json#/properties/minTime"
+                                "$ref": "grapher-schema.011.json#/properties/minTime"
                             },
                             "hideAnnotationFieldsInTitle": {
                                 "type": "boolean",
                                 "description": "Whether to hide annotation fields in the title"
                             },
                             "excludedEntityNames": {
-                                "$ref": "grapher-schema.010.json#/properties/excludedEntityNames"
+                                "$ref": "grapher-schema.011.json#/properties/excludedEntityNames"
                             },
                             "xAxis": {
-                                "$ref": "grapher-schema.010.json#/properties/xAxis"
+                                "$ref": "grapher-schema.011.json#/properties/xAxis"
                             },
                             "timelineMaxTime": {
-                                "$ref": "grapher-schema.010.json#/properties/timelineMaxTime"
+                                "$ref": "grapher-schema.011.json#/properties/timelineMaxTime"
                             },
                             "hideConnectedScatterLines": {
-                                "$ref": "grapher-schema.010.json#/properties/hideConnectedScatterLines"
+                                "$ref": "grapher-schema.011.json#/properties/hideConnectedScatterLines"
                             },
                             "showNoDataArea": {
-                                "$ref": "grapher-schema.010.json#/properties/showNoDataArea"
+                                "$ref": "grapher-schema.011.json#/properties/showNoDataArea"
                             },
                             "zoomToSelection": {
-                                "$ref": "grapher-schema.010.json#/properties/zoomToSelection"
+                                "$ref": "grapher-schema.011.json#/properties/zoomToSelection"
                             },
                             "showYearLabels": {
-                                "$ref": "grapher-schema.010.json#/properties/showYearLabels"
+                                "$ref": "grapher-schema.011.json#/properties/showYearLabels"
                             },
                             "hideTotalValueLabel": {
-                                "$ref": "grapher-schema.010.json#/properties/hideTotalValueLabel"
+                                "$ref": "grapher-schema.011.json#/properties/hideTotalValueLabel"
                             },
                             "hideScatterLabels": {
-                                "$ref": "grapher-schema.010.json#/properties/hideScatterLabels"
+                                "$ref": "grapher-schema.011.json#/properties/hideScatterLabels"
                             },
                             "sortBy": {
-                                "$ref": "grapher-schema.010.json#/properties/sortBy"
+                                "$ref": "grapher-schema.011.json#/properties/sortBy"
                             },
                             "sortOrder": {
-                                "$ref": "grapher-schema.010.json#/properties/sortOrder"
+                                "$ref": "grapher-schema.011.json#/properties/sortOrder"
                             },
                             "sortColumnSlug": {
-                                "$ref": "grapher-schema.010.json#/properties/sortColumnSlug"
+                                "$ref": "grapher-schema.011.json#/properties/sortColumnSlug"
                             },
                             "hideFacetControl": {
-                                "$ref": "grapher-schema.010.json#/properties/hideFacetControl"
+                                "$ref": "grapher-schema.011.json#/properties/hideFacetControl"
                             },
                             "includedEntityNames": {
-                                "$ref": "grapher-schema.010.json#/properties/includedEntityNames"
+                                "$ref": "grapher-schema.011.json#/properties/includedEntityNames"
                             },
                             "entityTypePlural": {
-                                "$ref": "grapher-schema.010.json#/properties/entityTypePlural"
+                                "$ref": "grapher-schema.011.json#/properties/entityTypePlural"
                             },
                             "missingDataStrategy": {
-                                "$ref": "grapher-schema.010.json#/properties/missingDataStrategy"
+                                "$ref": "grapher-schema.011.json#/properties/missingDataStrategy"
                             },
                             "yScaleToggle": {
                                 "type": "boolean",

@@ -17,7 +17,7 @@ When the grapher API changes and requires a new schema version, you need to upda
 
 1. **Update the default schema version** in `etl/config.py`:
    ```python
-   DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.010.json"
+   DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
    ```
 
 2. **Update schema references** in these files:

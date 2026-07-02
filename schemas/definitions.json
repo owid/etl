@@ -708,11 +708,6 @@
         "type": "string",
         "description": "Entity annotations"
       },
-      "yearIsDay": {
-        "type": "boolean",
-        "default": false,
-        "description": "Deprecated: use `timeInterval` instead. Switch to indicate if the number in the year column represents a day (since zeroDay) or a year."
-      },
       "timeInterval": {
         "type": "string",
         "description": "Interval that each value in the year/time column represents. Sub-yearly intervals (day, week, month) are encoded as days-since-`zeroDay` integers.",
@@ -787,7 +782,7 @@
       },
       "zeroDay": {
         "type": "string",
-        "description": "ISO date day string for the starting date if `yearIsDay` is `True`."
+        "description": "ISO date string for the day that time value 0 represents, for sub-yearly (day/week/month) `timeInterval` data encoded as days-since-`zeroDay` integers."
       }
     },
     "additionalProperties": false

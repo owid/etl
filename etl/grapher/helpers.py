@@ -747,8 +747,12 @@ TIME_INTERVALS = {"day", "week", "month", "year"}
 
 
 def _validate_time_interval(tab: Table, col: str) -> None:
-    """Validate the display.timeInterval field, if set."""
+    """Validate the display.timeInterval field, and guard against the removed yearIsDay flag."""
     display = tab[col].m.display or {}
+    # yearIsDay has been fully replaced by timeInterval; catch any regression or stray copy-paste.
+    assert "yearIsDay" not in display, (
+        f"Column `{col}` sets the removed display.yearIsDay flag; use display.timeInterval instead."
+    )
     time_interval = display.get("timeInterval")
     if time_interval is not None:
         assert time_interval in TIME_INTERVALS, (
