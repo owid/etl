@@ -1,0 +1,10 @@
+# Known upstream data errors in the Global Carbon Budget, corrected locally until fixed at the source.
+# See etl/data_corrections.py for the format.
+- indicator: consumption_emissions
+  entity: Panama
+  years: [2006, 2008, 2016]
+  action: drop
+  reason: Negative consumption-based CO2 emissions (physically impossible) in the source data.
+  provider: Global Carbon Project
+  reported: "2024-11-13"
+  status: reported
