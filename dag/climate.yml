@@ -226,7 +226,7 @@ steps:
   #
   data://grapher/climate/2026-06-19/yearly_burned_area:
     - data://garden/climate/2026-06-19/yearly_burned_area:
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
       - data://meadow/climate/2026-06-19/yearly_burned_area:
         - snapshot://climate/2026-06-19/yearly_burned_area.csv
       - data://garden/regions/2023-01-01/regions

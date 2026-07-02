@@ -41,7 +41,7 @@ steps:
         - snapshot://emissions/2025-02-12/ceds_air_pollutants__detailed.zip
         - snapshot://emissions/2025-02-12/ceds_air_pollutants__bunkers.zip
       - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
       - data://garden/demography/2024-07-15/population
   #
   # Emissions - Air pollution explorer
@@ -62,7 +62,7 @@ steps:
   # GCP - Global Carbon Budget.
   #
   data://garden/gcp/2025-11-13/global_carbon_budget:
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
@@ -97,7 +97,7 @@ steps:
       - snapshot://emissions/2025-12-04/national_contributions_cumulative_emissions.csv
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   #
   # Jones et al. - National contributions to climate change.
   #
@@ -134,7 +134,7 @@ steps:
   # Climate Watch - Greenhouse gas emissions by sector.
   #
   data://garden/climate_watch/2026-02-10/emissions_by_sector:
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/demography/2024-07-15/population
     - data://meadow/climate_watch/2026-02-10/emissions_by_sector:
       - snapshot://climate_watch/2026-02-10/emissions_by_sector.gz

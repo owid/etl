@@ -1,10 +1,7 @@
-"""Load a meadow dataset and create a garden dataset."""
-# NOTE: We have manually modified the value for Ethiopia, because, although it is included in the file, it has officially a temporary status of unclassification.
-# NOTE: Check this back when it's fixed in the source file.
+"""Load the income_groups garden dataset and build country-count and population aggregates by income status."""
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -17,6 +14,12 @@ REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceani
 # Define fraction of allowed NaNs per year
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
+# (region, year) pairs where the "missing population" residual (region total minus the summed
+# classified populations) is knowingly slightly negative — the summed classified population
+# marginally exceeds the region total, due to population-estimate mismatches. These are clamped
+# to 0 (missing population can't be negative); any *new* case fails for review.
+EXPECTED_NEGATIVE_MISSING_POP = {("Europe", 1990)}
+
 
 def run() -> None:
     #
@@ -24,7 +27,6 @@ def run() -> None:
     #
     # Load meadow dataset and read its main table.
     ds_garden = paths.load_dataset("income_groups")
-    ds_regions = paths.load_dataset("regions")
     tb = ds_garden.read("income_groups")
 
     #
@@ -32,11 +34,14 @@ def run() -> None:
     #
 
     tb = add_country_counts_and_population_by_status(
-        tb=tb, columns=["classification"], ds_regions=ds_regions, regions=REGIONS, missing_data_on_columns=False
+        tb=tb, columns=["classification"], regions=REGIONS, missing_data_on_columns=False
     )
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format(["country", "year"], short_name=paths.short_name)
+
+    # Run sanity checks on the output.
+    sanity_check_outputs(tb)
 
     #
     # Save outputs.
@@ -49,8 +54,27 @@ def run() -> None:
     ds_garden.save()
 
 
+def sanity_check_outputs(tb: Table) -> None:
+    # No column should be entirely empty.
+    assert tb.columns[tb.isna().all()].empty, (
+        f"Aggregations output has a fully-NaN column: {list(tb.columns[tb.isna().all()])}"
+    )
+
+    # Country counts are non-negative integers.
+    count_cols = [c for c in tb.columns if c.endswith("_count")]
+    assert count_cols, "No '_count' columns found in the aggregations output."
+    assert (tb[count_cols] >= 0).all().all(), "Negative country count found in the aggregations output."
+
+    # All population columns are non-negative. The `classification_missing_pop` residual (region total
+    # minus the summed classified populations) can compute slightly negative, but it is clamped to 0
+    # upstream (see EXPECTED_NEGATIVE_MISSING_POP), so it is included in this check.
+    pop_cols = [c for c in tb.columns if c.endswith("_pop")]
+    assert pop_cols, "No '_pop' columns found in the aggregations output."
+    assert (tb[pop_cols] >= 0).all().all(), "Negative population found in the aggregations output."
+
+
 def add_country_counts_and_population_by_status(
-    tb: Table, columns: list[str], ds_regions: Dataset, regions: list[str], missing_data_on_columns: bool = False
+    tb: Table, columns: list[str], regions: list[str], missing_data_on_columns: bool = False
 ) -> Table:
     """
     Add country counts and population by status for the columns in the list
@@ -87,9 +111,8 @@ def add_country_counts_and_population_by_status(
         "sum",
     )
 
-    tb_regions = geo.add_regions_to_table(
+    tb_regions = paths.regions.add_aggregates(
         tb=tb_regions,
-        ds_regions=ds_regions,
         regions=regions,
         aggregations=aggregations,
         frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
@@ -124,5 +147,17 @@ def add_country_counts_and_population_by_status(
 
     # Keep only the columns I need
     tb_regions = tb_regions[["country", "year"] + columns_count + columns_pop]
+
+    # The "missing population" residual can be slightly negative when the summed classified
+    # populations exceed the region total. Clamp such residuals to 0 (missing population can't be
+    # negative), but fail on any *new* (region, year) case so it's reviewed rather than silently zeroed.
+    for c in [col for col in tb_regions.columns if col.endswith("_missing_pop")]:
+        neg_mask = tb_regions[c] < 0
+        unexpected = {
+            (str(country), int(year))
+            for country, year in zip(tb_regions.loc[neg_mask, "country"], tb_regions.loc[neg_mask, "year"])
+        } - EXPECTED_NEGATIVE_MISSING_POP
+        assert not unexpected, f"New negative {c} case(s) — review before clamping to 0: {sorted(unexpected)}"
+        tb_regions.loc[neg_mask, c] = 0
 
     return tb_regions

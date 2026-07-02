@@ -1,26 +1,24 @@
 """Load a meadow dataset and create a garden dataset."""
-# NOTE: We have manually modified the value for Ethiopia, because, although it is included in the file, it has officially a temporary status of unclassification.
-# NOTE: Check this back when it's fixed in the source file.
 
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Dissolved/former states (and territories) with no classification in the latest release.
+# NOTE: Venezuela and Ethiopia were reclassified in the 2026-07-01 release (LM and L respectively)
+# after years of unclassification, so they are no longer part of this set.
 EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE = {
     "Czechoslovakia",
     "Mayotte",
     "Netherlands Antilles",
     "Serbia and Montenegro",
     "USSR",
-    "Venezuela",
     "Yugoslavia",
-    "Ethiopia",  # NOTE: This is the one we manually modified. Delete when it has a classification again.
 }
 
 # Define French overseas territories where we want to assign the same income group as France
@@ -45,17 +43,13 @@ def run() -> None:
     run_sanity_checks_on_inputs(tb=tb)
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
 
     # Harmonize income group labels.
     tb = harmonize_income_group_labels(tb)
 
     # Drop unnecessary columns.
     tb = tb.drop(columns=["country_code"], errors="raise")
-
-    # Delete the row for Ethiopia in the latest year, as it has a temporary status of unclassification.
-    # NOTE: This is a manual fix, delete the line when the source file is fixed.
-    tb = tb[~((tb["country"] == "Ethiopia") & (tb["year"] == tb["year"].max()))].reset_index(drop=True)
 
     # Create an additional table for the classification of the latest year available.
     tb_latest = tb.reset_index(drop=True).drop_duplicates(subset=["country"], keep="last")

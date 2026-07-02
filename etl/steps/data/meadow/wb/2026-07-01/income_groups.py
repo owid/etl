@@ -53,14 +53,18 @@ def run() -> None:
 
 def run_sanity_checks_on_inputs(tb: Table) -> None:
     # Sanity checks on input data.
-    assert (num_rows := tb.shape[0]) == (num_rows_expected := 239), (
+    # NOTE: In the 2026-07-01 release the source dropped the legend rows ("Low income (L)", etc.)
+    # that used to sit between the year header and the first country, so the row count fell from
+    # 239 to 234 and the first country (Afghanistan) moved from row 10 to row 5. Re-audit these
+    # constants on each update — a change usually signals a source layout change.
+    assert (num_rows := tb.shape[0]) == (num_rows_expected := 234), (
         f"Invalid number of rows. Expected was {num_rows_expected}, but found {num_rows}"
     )
     assert (num_cols := tb.shape[1]) >= (num_cols_expected := 38), (
         f"Invalid number of columns. Expected was >{num_cols_expected}, but found {num_cols}"
     )
-    assert tb.loc[10, "World Bank Analytical Classifications"] == "Afghanistan", (
-        "Row 10, column 'World Bank Analytical Classifications' expected to have value 'Afghanistan'"
+    assert tb.loc[5, "World Bank Analytical Classifications"] == "Afghanistan", (
+        "Row 5, column 'World Bank Analytical Classifications' expected to have value 'Afghanistan'"
     )
 
     # Sanity check on years.
