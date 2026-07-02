@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,8 +18,8 @@ from owid.catalog.core.meta import TableMeta, VariableMeta
 from owid.catalog.schema_org import DEFAULT_CATALOG_BASE_URL, TableSchemaInput, dataset_to_schema_org
 from structlog import get_logger
 
-from etl.catalog_jsonld.quality import DatasetQualityResult, assess_dataset_quality
-from etl.catalog_jsonld.sitemap import sitemap_xml
+from etl.catalog_jsonld.quality import DatasetQualityResult, assess_dataset_quality, find_duplicate_short_key_paths
+from etl.catalog_jsonld.sitemap import SitemapEntry, sitemap_xml
 from etl.paths import DATA_DIR
 
 log = get_logger()
@@ -27,10 +28,31 @@ QUALITY_REPORT_FILENAME = "jsonld_quality_report.json"
 SITEMAP_FILENAME = "sitemap.xml"
 DATASET_JSONLD_FILENAME = "dataset.jsonld"
 
+_VERSION_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+@dataclass(frozen=True)
+class LatestDatasetPath:
+    """One resolved ``<namespace>/<dataset>`` entry: its full catalog path, and version.
+
+    ``catalog_path`` is the dated catalog-folder path (e.g. ``garden/emissions/2025-12-04/owid_co2``).
+    ``short_key`` is the stable, version-agnostic public page key (e.g. ``emissions/owid_co2``).
+    """
+
+    catalog_path: str
+    namespace: str
+    dataset: str
+    version: str
+
+    @property
+    def short_key(self) -> str:
+        return f"{self.namespace}/{self.dataset}"
+
 
 @dataclass
 class JsonLdBuildResult:
     emitted: list[str] = field(default_factory=list)
+    emitted_entries: list[LatestDatasetPath] = field(default_factory=list)
     skipped: list[DatasetQualityResult] = field(default_factory=list)
     warnings: list[DatasetQualityResult] = field(default_factory=list)
 
@@ -45,53 +67,85 @@ def build_catalog_jsonld_artifacts(
 ) -> JsonLdBuildResult:
     """Generate dataset JSON-LD files, sitemap, and quality report locally.
 
-    When ``only`` is given, restrict generation to datasets whose
-    ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
+    JSON-LD files are written to a stable, version-agnostic short-key tree
+    (``catalog_dir / "<namespace>" / "<dataset>" / "dataset.jsonld"``) rather than inside the
+    dataset's own dated catalog folder, so the public landing page URL doesn't change every
+    time the dataset gets a new version. When ``only`` is given, restrict generation to
+    datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
     """
     catalog = LocalCatalog(catalog_dir, channels=(channel,))
     latest_paths = latest_dataset_paths(catalog.frame, channel=channel, only=only)
     result = JsonLdBuildResult()
-    sitemap_urls = []
+    sitemap_entries: list[SitemapEntry] = []
+    build_date = datetime.now(timezone.utc).date().isoformat()
 
-    for catalog_path in latest_paths:
+    duplicate_catalog_paths = find_duplicate_short_key_paths(
+        (entry.catalog_path, entry.namespace, entry.dataset) for entry in latest_paths
+    )
+
+    for entry in latest_paths:
+        catalog_path = entry.catalog_path
         ds = Dataset(catalog_dir / catalog_path)
         tables = load_table_schema_inputs(ds)
-        quality = assess_dataset_quality(catalog_path=catalog_path, dataset_meta=ds.metadata, tables=tables)
+        quality = assess_dataset_quality(
+            catalog_path=catalog_path,
+            namespace=entry.namespace,
+            dataset_meta=ds.metadata,
+            tables=tables,
+            duplicate_short_key=catalog_path in duplicate_catalog_paths,
+        )
         if not quality.is_eligible:
             result.skipped.append(quality)
             if not dry_run:
-                stale_jsonld = Path(ds.path) / DATASET_JSONLD_FILENAME
-                if stale_jsonld.exists():
-                    stale_jsonld.unlink()
+                _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
             continue
 
         jsonld = dataset_to_schema_org(
             dataset_path=catalog_path,
+            page_path=entry.short_key,
+            version=entry.version,
             dataset_meta=ds.metadata,
             tables=tables,
             base_url=base_url,
         )
         result.emitted.append(catalog_path)
+        result.emitted_entries.append(entry)
         if quality.warnings or quality.table_warnings:
             result.warnings.append(quality)
 
-        sitemap_urls.append(f"{base_url.rstrip('/')}/{catalog_path}/")
+        sitemap_entries.append(
+            SitemapEntry(
+                url=f"{base_url.rstrip('/')}/{entry.short_key}/",
+                lastmod=entry.version if _VERSION_DATE_RE.match(entry.version) else build_date,
+            )
+        )
         if not dry_run:
-            with open(Path(ds.path) / DATASET_JSONLD_FILENAME, "w") as ostream:
+            # The dataset used to be served at its dated catalog-folder path; that location is
+            # no longer written to, so clean up anything left over from a prior publish.
+            _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
+
+            target_dir = catalog_dir / entry.namespace / entry.dataset
+            target_dir.mkdir(parents=True, exist_ok=True)
+            with open(target_dir / DATASET_JSONLD_FILENAME, "w") as ostream:
                 json.dump(jsonld, ostream, indent=2, ensure_ascii=False)
                 ostream.write("\n")
 
     if not dry_run:
-        (catalog_dir / SITEMAP_FILENAME).write_text(sitemap_xml(sitemap_urls))
+        (catalog_dir / SITEMAP_FILENAME).write_text(sitemap_xml(sitemap_entries))
         (catalog_dir / QUALITY_REPORT_FILENAME).write_text(json.dumps(quality_report(result), indent=2) + "\n")
 
     return result
 
 
+def _remove_if_exists(path: Path) -> None:
+    if path.exists():
+        path.unlink()
+
+
 def latest_dataset_paths(
     frame: pd.DataFrame, *, channel: CHANNEL = "garden", only: set[str] | None = None
-) -> list[str]:
-    """Return latest public dataset-folder paths for a catalog channel.
+) -> list[LatestDatasetPath]:
+    """Return latest public dataset entries for a catalog channel.
 
     Private datasets are always excluded (``is_public == True`` filter). When ``only`` is
     provided, the result is further restricted to datasets whose ``"<namespace>/<dataset>"``
@@ -115,7 +169,16 @@ def latest_dataset_paths(
             log.warning("catalog_jsonld.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
         latest = latest[latest["dataset_key"].isin(only)]
 
-    return sorted(latest["dataset_path"].unique().tolist())
+    entries = [
+        LatestDatasetPath(
+            catalog_path=str(row.dataset_path),
+            namespace=str(row.namespace),
+            dataset=str(row.dataset),
+            version=str(row.version),
+        )
+        for row in latest.itertuples()
+    ]
+    return sorted(entries, key=lambda entry: entry.catalog_path)
 
 
 def load_table_schema_inputs(ds: Dataset) -> list[TableSchemaInput]:
