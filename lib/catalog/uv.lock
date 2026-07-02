@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-06-29T15:46:36.03299Z"
+exclude-newer = "2026-06-29T17:40:06.761929Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -1521,7 +1521,7 @@ wheels = [
 
 [[package]]
 name = "owid-catalog"
-version = "1.2.1"
+version = "1.2.2"
 source = { editable = "." }
 dependencies = [
     { name = "brotli" },
@@ -1607,7 +1607,7 @@ dev = [
 
 [[package]]
 name = "owid-datautils"
-version = "0.6.4"
+version = "0.6.5"
 source = { editable = "../datautils" }
 dependencies = [
     { name = "boto3" },
@@ -1673,7 +1673,7 @@ dev = [
 
 [[package]]
 name = "owid-repack"
-version = "0.1.9"
+version = "0.1.10"
 source = { editable = "../repack" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
