@@ -281,6 +281,10 @@ def find_inactive_dataset_entries(
         return [], []
     inactive = inactive.copy()
     inactive["dataset_path"] = inactive["path"].map(lambda p: str(p).rsplit("/", 1)[0])
+    # `frame` has one row per table, but `dataset_path` strips the table name — dedupe so a
+    # multi-table dataset doesn't produce repeated identical entries (inflated report counts,
+    # redundant HEAD/DELETE calls on the same key).
+    inactive = inactive.drop_duplicates(["channel", "namespace", "version", "dataset"])
 
     def to_entries(rows: pd.DataFrame) -> list[LatestDatasetPath]:
         entries = [

@@ -263,6 +263,32 @@ def test_build_catalog_jsonld_artifacts_cleans_up_dataset_archived_with_no_repla
     assert not stale_short_key.exists()
 
 
+def test_build_catalog_jsonld_artifacts_archived_multi_table_dataset_yields_one_entry(tmp_path: Path) -> None:
+    # Regression test: LocalCatalog.frame has one row per table, but dataset_path strips the
+    # table name — a multi-table archived dataset must still yield exactly one archived_entries
+    # item, not one per table (which would inflate report counts and schedule redundant
+    # HEAD/DELETE calls against the same dataset.jsonld key on every publish).
+    data_dir = tmp_path / "data"
+    dataset_dir = data_dir / "garden" / "emissions" / "2024-01-01" / "owid_co2"
+    ds = Dataset.create_empty(
+        dataset_dir,
+        DatasetMeta(channel="garden", namespace="emissions", version="2024-01-01", short_name="owid_co2"),
+    )
+    for table_name in ("table_one", "table_two"):
+        tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name=table_name)
+        tb = tb.set_index("year")
+        tb.metadata.title = "Example table"
+        tb.metadata.description = "Table description"
+        ds.add(tb)
+    ds.save()
+    archived = "garden/emissions/2024-01-01/owid_co2"
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", active_steps=set())
+
+    assert [entry.catalog_path for entry in result.archived_entries] == [archived]
+
+
 def test_build_catalog_jsonld_artifacts_only_unmatched_entry_warns_and_emits_nothing(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     co2_path = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2")
