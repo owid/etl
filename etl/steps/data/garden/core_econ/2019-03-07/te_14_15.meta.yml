@@ -1,0 +1,22 @@
+dataset:
+  title: TE-14.15
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_14_15:
+    variables:
+      uk_government_debt__pct_of_nominal_gdp:
+        title: UK government debt (% of nominal GDP)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

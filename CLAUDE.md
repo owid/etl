@@ -7,14 +7,40 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`)
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
-- **Only edit live steps** — when fixing or improving metadata, code, or configs, only touch files that are in the active DAG (`dag/*.yml`), not archived ones (`dag/archive/*.yml`), unless explicitly asked to
-- **Never push/commit** unless explicitly told to
+- **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
+- **Never push, commit, or open PRs** unless explicitly told to
 - **Ask the user** if unsure - don't guess
 - **Always run `make check` before committing**
 - If not told otherwise, save outputs to `ai/` directory.
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
 - **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
+## Team
+
+When generating user-facing prose (PR descriptions, Slack messages, PR comments, review responses, etc.):
+
+1. **Attribute the work** with a single italicized blockquote at the very top of the PR body, and as the opening line of any standalone Slack draft or long PR comment you generate:
+
+   ```
+   > _Written by Claude Code — @<handle> at the wheel._
+   ```
+
+   Use the handle of the human directing the work (usually the current git user; fall back to asking if ambiguous). Skip the disclosure on tiny mechanical comments (e.g. a one-line `@codex review` ping) — it's meant for substantive prose.
+
+2. **Use exact handles** from the table below when tagging colleagues. Don't guess — a wrong tag pings a real person. If a name isn't in this table, write the plain name (e.g. "Bastian") instead of `@`-tagging, and ask the user for the handle.
+
+   | Name | GitHub handle |
+   |---|---|
+   | Pablo A Rosado | `@pabloarosado` |
+   | Pablo Arriagada | `@paarriagadap` |
+   | Veronika Samborska | `@veronikasamborska1994` |
+   | Mojmir Vinkler | `@Marigold` |
+   | Lucas Rodés-Guirao | `@lucasrodes` |
+   | Tuna Acisu | `@antea04` |
+   | Fiona Spooner | `@spoonerf` |
+   | Edouard Mathieu | `@edomt` |
+
+   The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the `/latest` data-update post on ourworldindata.org) — those are authored by the named human, not by Claude.
 
 ## Pipeline Overview
 
@@ -26,6 +52,30 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 | meadow | `etl/steps/data/meadow/` | Basic cleaning |
 | garden | `etl/steps/data/garden/` | Business logic, harmonization |
 | grapher | `etl/steps/data/grapher/` | MySQL ingestion |
+
+**Snapshot is raw passthrough only.** It downloads the source files and writes them out using the source's own row labels, column labels, and period labels. That's it. The following all belong in **garden**, not in the snapshot script:
+
+- Summing or merging rows from different source categories into one bucket
+- Picking the most recent value when several source files report the same period
+- Converting a source's period labels (fiscal quarters, season codes, week numbers) into dates
+- Renaming source categories for the chart
+
+If you find yourself doing any of these in the snapshot, move them to garden.
+
+## Glossary
+
+Internal terms that recur across this guide, the skills, and the codebase:
+
+- **ETL:** the data pipeline that gets external datasets into the Grapher
+- **Grapher:** OWID's charting tool / database for interactive visualizations
+- **OMM:** OWID-Maintained Metric — a curated indicator for a topic
+- **MDim / Multi-dimensional indicator:** interactive chart with toggleable views (e.g. total vs per capita)
+- **Explorer:** a more complex interactive tool than a single chart, with multiple tabs/views
+- **FAUST:** chart text (Footnote, Axis title, Unit, Subtitle, Title)
+- **WYSK:** "What You Should Know" — metadata/description attached to a dataset or chart
+- **Topic page:** an evergreen page on a topic (modular or linear)
+- **Key insight:** a short, standalone data point highlighted on a topic page
+- **Static viz:** a one-off image (Figma/Illustrator), not an interactive Grapher chart
 
 ## Running ETL Steps
 
@@ -46,8 +96,13 @@ Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run)
 ```
 
 **Important:**
-- **Avoid `--force`** — `etlr` has built-in change detection and only re-runs steps whose code or data changed. Use `--force` only when you need to re-run a step despite no code changes (e.g., after fixing external data). Never use `--force` alone — always pair with `--only`.
+- **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
+- **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
+- **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code. It also **fails with `AccessDenied` when the target version isn't in the catalog yet** (e.g. a version you just created) — use it only to fetch already-published upstream deps, never for the new step you're building locally.
 - For `grapher://` steps, always add `--grapher` flag
+- **Pushing to the grapher DB:** running a `data://grapher/...` step (even with `--grapher`) only builds the dataset feather. The MySQL upsert is the separate `grapher://...` step. If a metadata-only change (`display`, `description_key`, etc.) isn't showing up in the grapher DB, run `etlr grapher://grapher/<path> --grapher` explicitly to force the variable upsert.
+- **Version-bumping a grapher step mints new variable IDs**, so existing charts referencing the old indicators become ghost variables and must be remapped on staging (see the `remapping-ghost-variables` skill / `indicator_upgrade` CLI). Budget for this whenever you rename or re-version a grapher dataset.
+- **Versioning hygiene for derived/OMM steps:** an OMM's version reflects when its combining logic was written, not its inputs — but when you repoint a derived step to a newer-dated dependency, bump the step's own version folder too. Leaving a step dated before the data it ingests is confusing and should be fixed when noticed.
 - Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
 
 ## Git Workflow
@@ -69,7 +124,9 @@ git push
 gh pr edit <number> --body "..."
 ```
 
-**Always post `@codex review` as a separate PR comment** (not in the PR description) to trigger a Codex review.
+**Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
+
+**Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
 
 ### Commit Message Emojis
 
@@ -90,11 +147,18 @@ Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 ### Preserving metadata/origins in steps
 
 - **No `np.where`** — strips origins. Use `tb["col"] = tb["b"]; tb.loc[mask, "col"] = tb.loc[mask, "a"]`
+- **No `pd.concat`** — strips origins. Use `pr.concat` (`from owid.catalog import processing as pr`)
+- **No `pd.to_numeric` / `pd.to_datetime`** — strip origins. Use `pr.to_numeric` / `pr.to_datetime` (same `from owid.catalog import processing as pr`).
+- **No `pd.DataFrame(tb)`** to "convert" a Table back to a plain DataFrame for downstream helpers — strips column origins. Tables are DataFrame subclasses; pass them through helpers directly and use `pr.*` for any combining ops.
+- **`.dt.*` and `.str.*` accessors return plain Series** — they drop the Variable's metadata on assignment. After `tb[col] = tb[col].str.strip()` (or `.dt.date.astype(str)`), restore with `tb[col] = tb[col].copy_metadata(tb[other_col])` or save `tb[col].metadata` before and reassign after.
+- **`pr.merge` / `pr.concat` require Tables on every side** — if you're merging in a synthetic axis (`pd.date_range`, etc.), wrap it as `Table(df.to_frame())` first, otherwise you get `AttributeError: 'DataFrame'/'Series' object has no attribute 'all_columns'`.
 - **No `index.map()`** to pull columns from another table — loses origins. Use `tb.join(other[["col"]], how="left")`
 - **`snap.read_csv/json/excel/feather/...`** — prefer over manual file reading + `pd.DataFrame`
+- **Don't re-wrap `snap.read_csv()` output in `Table(...)`** — the Table constructor with a plain DataFrame argument drops column-level origins. Mutate the returned Table directly: `tb = snap.read_csv(); tb = tb.dropna(...)`
 - **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
 - **`Table.format()`** needs both `country` and `year`. For year-less tables: `set_index("country")` + set `tb.metadata.short_name`
 - **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`
+- **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
 
 ### Performance
 
@@ -134,6 +198,18 @@ Built on **owid.catalog** library:
 - Multiple formats (feather, parquet, csv) with automatic schema validation
 
 
+### HTTP calls to OWID infra
+
+When internal code hits an OWID host (catalog, grapher, `files.ourworldindata.org`, `search.owid.io`, Datasette, admin API, etc.), use the shared session from `etl.http` instead of bare `requests` / `httpx` / `pd.read_*(url)`. It pre-sets a `User-Agent: owid-etl/...` header so our traffic is distinguishable in CDN logs.
+
+```python
+from etl.http import session as http_session  # for requests
+from etl.http import HEADERS                   # for httpx.AsyncClient(headers=HEADERS)
+from etl.http import STORAGE_OPTIONS           # for pd.read_csv(url, storage_options=STORAGE_OPTIONS)
+```
+
+Don't tag calls to third-party hosts (GitHub, Notion, Slack, source-data providers in `snapshots/`, etc.) — they should keep the default UA.
+
 ### YAML Editing (preserve comments)
 ```python
 from etl.files import ruamel_load, ruamel_dump
@@ -142,6 +218,63 @@ data['key'] = new_value
 with open(file_path, 'w') as f:
     f.write(ruamel_dump(data))
 ```
+
+### Description fields: `.dvc` vs garden `description_processing`
+
+Two different descriptions, two different jobs. Don't mix them:
+
+- **`.dvc` `meta.origin.description`** describes what **the producer** publishes — the source's schema, calendar, structure, and any context the producer themselves gives about the data.
+- **Garden `description_processing`** describes what **OWID** does to that data — aggregation, relabeling, deduplication, derivations, date conversion.
+
+If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
+
+## Sanity checks
+
+Silent data corruption is one of the easier bugs to miss. A step can run cleanly, pass type checks, and ship to staging while producing wrong numbers — and by the time someone notices on a chart, the bad data may already be live. Sanity checks are how we catch that at build time instead.
+
+**Write them. Make them strict.** Every garden step that does anything more than a straight load-and-format should assert its assumptions about both the input it received and the output it produced. The bar isn't "would I notice this on a chart" — it's "could this go wrong, and if it did, would the step still finish without complaining?". If yes, that's a check.
+
+### Where they go
+
+- **Garden** is the main home. The input tables, the transformations, and the output table are all in one place, and that's where business logic lives. Put one `sanity_check_inputs(...)` right after loading meadow tables (before any transform), and one `sanity_check_outputs(...)` right before `paths.create_dataset(...)`. Call both from `run()`. See [`rff/2026-06-10/emissions_weighted_carbon_price.py`](etl/steps/data/garden/rff/2026-06-10/emissions_weighted_carbon_price.py) for a clean, recent example.
+- **Snapshot** usually doesn't need checks — most snapshots just download and write. But when the snapshot itself does non-trivial parsing (PDF tables, custom binary formats, scraping), add integrity checks right before `snap.create_snapshot(...)`. If the parser can produce silently-wrong rows, the snapshot is the only place to catch it before the bad rows leak into meadow.
+- **Meadow** should stay light. If you find yourself wanting checks there, it usually means the logic belongs in garden instead.
+
+### How they look
+
+Use plain `assert` with a clear error message. Hard-fail is the default — let the step crash loudly. Save `log.warning(...)` for checks that flag suspicious patterns the maintainer should *review* but that aren't always wrong (e.g., a country dropping to zero in the latest year — could be a real signal, could be incomplete reporting).
+
+```python
+def sanity_check_inputs(tb_economy: Table, tb_coverage: Table) -> None:
+    assert set(tb_economy["jurisdiction"]) == set(tb_coverage["jurisdiction"]), "Jurisdictions don't match between the two input tables."
+    assert not tb_economy.duplicated(subset=["jurisdiction", "year"]).any(), "Duplicate (jurisdiction, year) rows in economy table."
+    price_cols = [c for c in tb_economy.columns if c not in ["jurisdiction", "year"]]
+    assert tb_economy[price_cols].min().min() >= 0, "Negative price found — source error or unit mistake."
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    assert tb.columns[tb.isna().all()].empty, "Output has a fully-NaN column."
+    # Soft signal — surface for review, don't fail.
+    dropped = sorted(set(tb[tb["year"] == tb["year"].max()].query("value == 0")["country"]))
+    if dropped:
+        log.warning(f"Countries that dropped to zero in the latest year: {dropped}")
+```
+
+### Categories worth checking
+
+Pick whichever apply to your step. Don't write all of these by default — write the ones that would catch a real failure mode for this dataset.
+
+- **Shape / schema invariants.** Set-equality on the columns, categories, subcategories, variables, or any other identifier list you expect to be stable across versions. (`set(tb["category"]) == set(EXPECTED_CATEGORIES)`.) Catches schema changes at the source.
+- **Key uniqueness.** `assert not tb.duplicated(subset=[...]).any()` on whatever key columns the table is supposed to be unique on. Catches accidental row duplication from joins.
+- **Value ranges.** Non-negative where it should be, within plausible bounds where you know them, no NaN where you don't expect any. Catches unit mistakes and parser drift.
+- **Cross-table / cross-source agreement.** If two source tables both report the same key, their overlap should agree to the dollar (or within a documented tolerance). Catches misaligned extractions.
+- **Sum reconciles with published total.** If the source publishes both the components and the total, assert that summing the components equals the total within tolerance. See [`emissions/2026-02-11/emissions_by_custom_sector.py`](etl/steps/data/garden/emissions/2026-02-11/emissions_by_custom_sector.py:172) for an example. Catches row-shift extraction bugs and unit-mismatches.
+- **No silent drops.** If you filter, dedupe, or aggregate, assert that the row count or aggregate matches what you'd expect. (`assert len(tb) == n_expected`.) Catches transforms that quietly lose data.
+- **Coverage didn't shrink.** When updating a dataset version, check that you still have at least as many countries / quarters / categories as the previous version — a sudden drop is usually a parsing regression, not a real change.
+
+### When checks fail
+
+Don't suppress the assertion to get the step to pass. Treat the failure as the signal it is: investigate, then either fix the upstream logic or — if the source genuinely changed — update the assertion (and document why in a `# NOTE:` comment near the check).
 
 ## Querying MySQL
 
@@ -156,6 +289,10 @@ Automatically connects to `staging-site-{branch}` based on current git branch.
 from etl.config import OWID_ENV
 df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 ```
+
+**Prefer Python when the SQL contains `%` (LIKE patterns, JSON_EXTRACT paths) or single-quoted strings — `make query` re-interprets those via shell + make and breaks unpredictably.** Use `params={...}` for `%`/quoted values to dodge pymysql's own `%`-format-string parsing.
+
+**`OWID_ENV` targets your local dev DB even when you're on a branch.** To query the branch's staging DB from Python, use `OWIDEnv.from_staging('<branch>')` (`from etl.config import OWIDEnv`) — e.g. `OWIDEnv.from_staging('my-branch').read_sql(...)`. Also note `make query` shells out to the `mysql` CLI, which may not be installed; if it errors with `mysql: command not found`, use the Python `from_staging(...).read_sql(...)` path instead.
 
 ## Additional Tools
 
@@ -176,6 +313,8 @@ uv add package_name
 uv remove package_name
 ```
 
+**Never run bare `uv sync`** — it prunes optional deps the repo needs (streamlit, etc.) and breaks `etl`/`etl pr`. The full environment is `uv sync --all-extras --group dev` (what `make .venv` runs); use that to install or repair the venv.
+
 ## VSCode Extensions
 
 Extensions live in `vscode_extensions/<name>/`. After **every** code change, you must compile, package, and install — just compiling is NOT enough:
@@ -188,6 +327,12 @@ code --install-extension install/<name>-<version>.vsix --force
 ```
 
 Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
+
+## GitHub Actions
+
+When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinning rule imported below:
+
+@.github/instructions/github-actions.instructions.md
 
 ## Extended Documentation
 

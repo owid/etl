@@ -1,24 +1,20 @@
 definitions:
   common:
     description_key:
-      - "The net zero status of a country can be one of the following:
-        - Achieved (externally validated)
-        - Achieved (self-declared)
-        - In law
-        - In policy document
-        - Declaration / pledge
-        - Proposed / in discussion"
+      - "The net zero status of a country can be one of the following: - Achieved (externally validated) - Achieved (self-declared) - In law - In policy document - Declaration / pledge - Proposed / in discussion"
       - The inclusion criteria for net-zero commitments may vary from country to country. For example, the inclusion of international aviation emissions, or the acceptance of carbon offsets.
     description_from_producer: "More detail about each indicator is available in [the Tracker Codebook](https://docs.google.com/document/d/13bGE8FCOeF5QweoOvyMPZi3XbZrGLEPL2aM04LuZQcc/edit?usp=sharing)."
     unit: ""
     short_unit: ""
   presentation:
     topic_tags:
-    - CO2 & Greenhouse Gas Emissions
+      - CO2 & Greenhouse Gas Emissions
 
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   net_zero_tracker:
     variables:

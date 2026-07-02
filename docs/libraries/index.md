@@ -7,7 +7,7 @@ hide:
 
 We have developed various python libraries that are used in our projects.
 
-## [`owid.catalog`](catalog.md)
+## [`owid.catalog`](catalog/intro.md)
 Data management with rich metadata support. Implements core data structures used in ETL.
 
 ## [`owid.repack`](repack.md)
@@ -16,5 +16,5 @@ Data packaging and optimization. Automatically reduces memory usage of pandas Da
 ## [`owid.datautils`](datautils.md)
 Data processing utilities. Examples are functions to help with data cleaning, transformation, and geographic data harmonization.
 
-## [`owid-grapher-py`](https://docs.owid.io/projects/owid-grapher-py/en/latest/)
+## [`owid-grapher-py`](https://docs.owid.io/projects/owid-grapher-py/)
 Python library for programmatic creation and management of Our World in Data charts. Provides a high-level interface to the Grapher configuration system.

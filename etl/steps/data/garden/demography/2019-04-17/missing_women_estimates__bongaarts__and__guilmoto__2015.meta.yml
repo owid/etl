@@ -1,5 +1,7 @@
 dataset:
   title: Missing women estimates (Bongaarts & Guilmoto, 2015)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   missing_women_estimates__bongaarts__and__guilmoto__2015:
     variables:

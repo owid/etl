@@ -1,5 +1,7 @@
 dataset:
   title: Oil production - Etemad & Luciana
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   oil_production__etemad__and__luciana:
     variables:

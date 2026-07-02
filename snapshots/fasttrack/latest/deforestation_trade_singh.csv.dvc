@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Singh et al. (2026)
+    title: deforestation_trade_singh
+    citation_full: |-
+      Singh, C., Persson, U. M., Croft, S., Kastner, T., & West, C. D. (2026). Commodity-driven deforestation, associated carbon emissions and trade 2001-2023 (Version 2.1) [Dataset].
+    url_main: https://doi.org/10.5281/zenodo.18953516
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRNWOtTUwN8MVHGwve-ixvSZMe_ktXF-fNfrKBKUuMUVYk27LabSe8EGBpIWYeZKWMMqP1W_Mopcsnv/pub?output=csv
+    date_accessed: '2026-06-18'
+  name: Deforestation embedded in trade (Singh et al, 2026)
+  description: ''
+  license: {}
+outs:
+  - md5: 38b87b4d4b5b07520597c1e8bd5d83bc
+    size: 240786
+    path: deforestation_trade_singh.csv

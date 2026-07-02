@@ -1,5 +1,7 @@
 dataset:
   title: Death rate from energy production - Markandya & Wilkinson (2007)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   death_rate_from_energy_production__markandya__and__wilkinson__2007:
     variables:

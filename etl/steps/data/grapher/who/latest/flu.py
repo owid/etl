@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 import structlog
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.files import yaml_load
 from etl.helpers import PathFinder, create_dataset, get_metadata_path
@@ -53,7 +54,7 @@ def run(dest_dir: str) -> None:
     tb_flunet = convert_to_float(tb_flunet)
     tb_fluid = convert_to_float(tb_fluid)
 
-    tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date", "hemisphere", "year"], how="outer"))
+    tb_flu = pr.merge(tb_fluid, tb_flunet, on=["country", "date", "hemisphere", "year"], how="outer")
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
 
     # Remove data prior to 2009 as we don't show this on the explorer
@@ -76,11 +77,11 @@ def run(dest_dir: str) -> None:
     # Name `month_date` is not supported, we have to use `date` instead
     tb_flu_monthly = tb_flu_monthly.rename(columns={"month_date": "date"})
 
-    # Create Tables
-    tb_flu = Table(tb_flu, short_name="flu").set_index(["country", "date"], verify_integrity=True)
-    tb_flu_monthly = Table(tb_flu_monthly, short_name="flu_monthly").set_index(
-        ["country", "date"], verify_integrity=True
-    )
+    # Set index on the Tables (origins were preserved by pr.merge / pr.concat above)
+    tb_flu.metadata.short_name = "flu"
+    tb_flu = tb_flu.set_index(["country", "date"], verify_integrity=True)
+    tb_flu_monthly.metadata.short_name = "flu_monthly"
+    tb_flu_monthly = tb_flu_monthly.set_index(["country", "date"], verify_integrity=True)
 
     # Drop extra variables for both tables using the new helper function.
     # Ideally, we'd have metadata for all variables in the table.
@@ -154,14 +155,14 @@ def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
         date_series = pd.Series(pd.date_range(min_date, max_date, freq="7D").astype(str), name="date")
 
         if len(date_series[~date_series.isin(country_df["date"])]) > 0:
-            country_df = pd.merge(country_df, date_series, how="outer")
+            country_df = pr.merge(country_df, Table(date_series.to_frame()), how="outer")
             country_df[["country", "hemisphere"]] = country_df[["country", "hemisphere"]].ffill()
             assert len(date_series) == country_df.shape[0]
             assert country_df.country.isna().sum() == 0
 
         filled_dfs.append(country_df)
 
-    return pd.concat(filled_dfs)  # ty: ignore
+    return pr.concat(filled_dfs)
 
 
 def create_monthly_aggregates(df: pd.DataFrame, days_held_back: int) -> pd.DataFrame:
@@ -202,7 +203,7 @@ def create_monthly_aggregates(df: pd.DataFrame, days_held_back: int) -> pd.DataF
     rate_agg_cols = ["country", "month_date"] + rate_cols
     rate_agg_df = df[rate_agg_cols].groupby(["country", "month_date"]).mean(numeric_only=True).reset_index()
 
-    month_agg_df = pd.merge(month_agg_df, rate_agg_df, on=["country", "month_date"], how="outer")
+    month_agg_df = pr.merge(month_agg_df, rate_agg_df, on=["country", "month_date"], how="outer")
     # drop previous month unless it is past 28th of current month - so we don't show data for a month until it has 4 weeks worth of data
     previous_month = current_month - timedelta(days=1)
     previous_month = previous_month.replace(day=1).date().strftime("%Y-%m-01")
@@ -241,7 +242,7 @@ def create_regional_aggregates(df: pd.DataFrame) -> pd.DataFrame:
 
     df_orig = df_orig.drop(columns=["hemisphere"])
 
-    df_out = pd.concat([df_orig, global_aggregate, hemisphere_aggregate])
+    df_out = pr.concat([df_orig, global_aggregate, hemisphere_aggregate])
 
     return df_out
 

@@ -3,6 +3,8 @@ dataset:
   description: Aviation's share of global CO2 emissions since 1940.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   aviation_emissions_lee_bergero_gcp:
     variables:

@@ -39,7 +39,7 @@ COLUMNS_AND_CATEGORIES = {
         "indicator": "Stillbirth rate",
         "sex": "Total",
         "wealth_quintile": "Total",
-        "unit_of_measure": "Stillbirths per 100 births",
+        "unit_of_measure": "Deaths per 100 births",
     },
     "igme_under_fifteen_mortality": {
         "indicator": "Under-fifteen mortality rate",
@@ -87,7 +87,6 @@ def run() -> None:
     ds_pip = paths.load_dataset("world_bank_pip")
     ds_undp_hdr = paths.load_dataset("undp_hdr")
     ds_ihme_gbd = paths.load_dataset("gbd_risk_deaths")
-    ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
@@ -287,7 +286,7 @@ def run() -> None:
         how="outer",
     )
 
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
 
     tb = add_regions_columns(tb, ds_regions)
 

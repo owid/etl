@@ -1,0 +1,55 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Biodiversity
+        - Fish & Overfishing
+    unit: whales
+    description_from_producer: |-
+      - All known catches for species caught by subsistence whaling hunts were omitted from the tallies.
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  historic_whaling_decades:
+    variables:
+      blue:
+        title: Number of Blue Whales caught per decade
+        description_short: Number of Blue Whales caught per decade
+      brydes:
+        title: Number of Bryde's Whales caught per decade
+        description_short: Number of Bryde's Whales caught per decade
+      fin:
+        title: Number of Fin Whales caught per decade
+        description_short: Number of Fin Whales caught per decade
+      gray:
+        title: Number of Gray Whales caught per decade
+        description_short: Number of Gray Whales caught per decade
+      humpback:
+        title: Number of Humpback Whales caught per decade
+        description_short: Number of Humpback Whales caught per decade
+      minke:
+        title: Number of Minke Whales caught per decade
+        description_short: Number of Minke Whales caught per decade
+      right:
+        title: Number of Right Whales caught per decade
+        description_short: Number of Right Whales caught per decade
+      sei:
+        title: Number of Sei Whales caught per decade
+        description_short: Number of Sei Whales caught per decade
+      sperm:
+        title: Number of Sperm Whales caught per decade
+        description_short: Number of Sperm Whales caught per decade
+      total:
+        title: Total number of whales caught per decade
+        description_short: Total number of whales caught per decade
+      unspecified_other:
+        title: Number of whales caught per decade, where species is unspecified or other
+        description_short: Number of whales caught per decade, where the species is unspecified or other

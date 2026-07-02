@@ -1,0 +1,21 @@
+dataset:
+  title: Figure 15.20_CentralBank
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_15_20_centralbank:
+    variables:
+      central_bank_independence_index__mid_1980s:
+        title: Central bank independence index, mid-1980s
+        unit: ''
+        description: |-
+          Independence of central bank is calculated by adding together the political independence (Table 12) and the economic independence (Table 13) of the central bank.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

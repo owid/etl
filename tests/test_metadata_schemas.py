@@ -2,7 +2,7 @@ import json
 import subprocess
 from pathlib import Path
 
-import requests
+import pytest
 import structlog
 import yaml
 from jsonschema import (
@@ -12,6 +12,7 @@ from jsonschema.exceptions import ValidationError
 from yaml.loader import SafeLoader
 
 from etl.config import DEFAULT_GRAPHER_SCHEMA
+from etl.dag_helpers import get_active_snapshots, get_active_steps
 from etl.files import read_json_schema
 from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
 
@@ -41,6 +42,27 @@ def load_yaml_as_string(path):
     SafeLoader.add_constructor("tag:yaml.org,2002:timestamp", construct_yaml_str)
     with open(path) as file:
         return yaml.load(file, Loader=SafeLoader)
+
+
+def _strip_jinja_templated_values(obj):
+    """Recursively remove dict entries whose value is a Jinja-templated string.
+
+    Used to skip schema validation for typed (non-string) fields that contain
+    Jinja templates — those validate at runtime after rendering, not statically.
+    Only called on `display` and `presentation.grapher_config` blocks (which
+    have typed numeric fields like ``numDecimalPlaces``, ``yAxis.min``,
+    ``yEquals``); string-typed fields elsewhere keep their schema coverage.
+    """
+    if isinstance(obj, dict):
+        for key in list(obj.keys()):
+            val = obj[key]
+            if isinstance(val, str) and "<%" in val:
+                del obj[key]
+            else:
+                _strip_jinja_templated_values(val)
+    elif isinstance(obj, list):
+        for item in obj:
+            _strip_jinja_templated_values(item)
 
 
 def _get_changed_files_vs_master(pattern: str) -> set[str] | None:
@@ -112,10 +134,16 @@ def test_dataset_schemas():
 
     validator = Draft7Validator(DATASET_SCHEMA)
     validation_errors = []
+    active_steps = get_active_steps()
 
     # Walk over all files in STEPS_DATA_DIR with *.meta.yml extension
     for meta_file_path in Path(STEPS_DATA_DIR).glob("**/*.meta.yml"):
         if not _should_validate(meta_file_path, changed_files):
+            continue
+
+        # Skip files that are not part of the active DAG (archived steps)
+        rel = str(meta_file_path.relative_to(STEPS_DATA_DIR)).rsplit(".meta.yml", 1)[0]
+        if not any(s.startswith(rel) for s in active_steps):
             continue
 
         # extract version from path
@@ -145,12 +173,22 @@ def test_dataset_schemas():
                 if "$schema" in ind.get("presentation", {}).get("grapher_config", {}):
                     del ind["presentation"]["grapher_config"]
 
-                # Ignore display fields containing Jinja templates (validated after rendering)
+                # Strip Jinja templates from the two blocks that hold typed
+                # numeric fields (display: numDecimalPlaces, yAxis…; grapher_config:
+                # yAxis.min/max, yEquals…). Runtime rendering + post-render schema
+                # validation in `etl.grapher.helpers._validate_grapher_config`
+                # catches type mismatches for those fields after Jinja resolves.
+                # All other fields (description_short, title_public, etc.) keep
+                # their schema coverage even when they contain Jinja, since their
+                # schema type is `string` and Jinja-templated strings still pass.
                 display = ind.get("display", {})
                 if display:
                     for key in list(display.keys()):
                         if isinstance(display[key], str) and "<%" in display[key]:
                             del display[key]
+                gc = ind.get("presentation", {}).get("grapher_config", {})
+                if gc:
+                    _strip_jinja_templated_values(gc)
 
         # Validate the loaded data against the schema
         try:
@@ -175,9 +213,16 @@ def test_snapshot_schemas():
         return  # No .dvc files changed, skip entirely
 
     validator = Draft7Validator(SNAPSHOT_SCHEMA)
+    active_snapshots = get_active_snapshots()
 
     for meta_file_path in Path(SNAPSHOTS_DIR).glob("**/*.dvc"):
         if not _should_validate(meta_file_path, changed_files):
+            continue
+
+        # Skip files that are not part of the active DAG (archived snapshots)
+        rel = str(meta_file_path.relative_to(SNAPSHOTS_DIR))
+        rel_no_dvc = rel.rsplit(".dvc", 1)[0]
+        if rel_no_dvc not in active_snapshots:
             continue
 
         # extract version from etl/snapshots/namespace/version/snapshot_name.ext.dvc
@@ -204,28 +249,85 @@ def test_snapshot_schemas():
 # These are ETL-specific and intentionally absent from upstream.
 LOCAL_ONLY_PROPERTIES = {"data", "includedEntities"}
 
+# Vendored copy of the upstream grapher schema (see scripts/generate_schema_types.py --refresh).
+VENDORED_GRAPHER_SCHEMA = SCHEMAS_DIR / DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[-1]
+
+
+def _local_enum_values(node) -> set | None:
+    """Return the set of enum values a local schema node accepts, or None if unconstrained.
+
+    Handles the local Jinja escape-hatch convention, where an upstream enum is wrapped as
+    `oneOf: [{enum: [...]}, {type: string, pattern: "{definitions"}]` — the pattern branch only
+    accepts Jinja/definitions strings, so plain values must still be listed in the enum branch.
+    """
+    if not isinstance(node, dict):
+        return None
+    if "enum" in node:
+        return set(node["enum"])
+    values = set()
+    has_enum_branch = False
+    for branch in node.get("oneOf", []) + node.get("anyOf", []):
+        if isinstance(branch, dict) and "enum" in branch:
+            has_enum_branch = True
+            values |= set(branch["enum"])
+    return values if has_enum_branch else None
+
+
+def _find_enum_drift(upstream_node, local_node, path="grapher_config") -> list[str]:
+    """Recursively compare enums between the upstream grapher schema and the local copy.
+
+    Returns drift messages for every upstream enum value that the local schema would reject.
+    Local relaxations (e.g. a field loosened to plain `string`) are skipped, and the local
+    schema is allowed to accept extra values (e.g. `WorldMap` in chartTypes).
+    """
+    errors = []
+    if not isinstance(upstream_node, dict) or not isinstance(local_node, dict):
+        return errors
+
+    if "enum" in upstream_node:
+        local_values = _local_enum_values(local_node)
+        if local_values is not None:
+            missing = set(upstream_node["enum"]) - local_values
+            if missing:
+                errors.append(f"{path}: local enum is missing upstream values {sorted(missing)}")
+
+    for key, up_child in upstream_node.get("properties", {}).items():
+        loc_child = local_node.get("properties", {}).get(key)
+        if loc_child is not None:
+            errors += _find_enum_drift(up_child, loc_child, f"{path}.{key}")
+
+    if "items" in upstream_node and "items" in local_node:
+        errors += _find_enum_drift(upstream_node["items"], local_node["items"], f"{path}[]")
+
+    return errors
+
+
+def _load_embedded_grapher_config() -> dict:
+    with open(SCHEMAS_DIR / "dataset-schema.json") as f:
+        dataset_schema = json.load(f)
+    return dataset_schema["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
+        "additionalProperties"
+    ]["properties"]["presentation"]["properties"]["grapher_config"]
+
 
 def test_grapher_config_schema_sync():
-    """Verify that our local grapher_config schema stays in sync with the upstream
-    grapher schema. Detects when upstream adds new properties that we're missing,
-    or when property definitions have diverged and may need updating.
+    """Verify that the grapher_config block embedded in dataset-schema.json stays in sync with
+    the vendored grapher schema. Detects new properties we're missing and (recursively) enum
+    values the embedded copy would reject — e.g. a new chart type added upstream.
 
     We maintain a local copy of grapher_config properties (rather than using $ref)
     because our meta.yml files use Jinja templates and {definitions...} references
     that the strict upstream schema would reject.
+
+    This test compares against the VENDORED copy in schemas/, so it is offline and
+    deterministic. Staleness of the vendored copy itself vs the live upstream is covered by
+    `test_vendored_grapher_schema_is_current` (integration).
     """
-    # Load local schema
-    with open(SCHEMAS_DIR / "dataset-schema.json") as f:
-        dataset_schema = json.load(f)
-    local_gc = dataset_schema["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
-        "additionalProperties"
-    ]["properties"]["presentation"]["properties"]["grapher_config"]
+    local_gc = _load_embedded_grapher_config()
     local_props = set(local_gc["properties"].keys())
 
-    # Fetch upstream schema
-    resp = requests.get(DEFAULT_GRAPHER_SCHEMA, timeout=20)
-    resp.raise_for_status()
-    upstream = resp.json()
+    with open(VENDORED_GRAPHER_SCHEMA) as f:
+        upstream = json.load(f)
     upstream_props = set(upstream["properties"].keys())
 
     # Check for upstream properties missing locally
@@ -241,7 +343,7 @@ def test_grapher_config_schema_sync():
             snippets.append(snippet)
 
         raise AssertionError(
-            f"Upstream grapher schema ({DEFAULT_GRAPHER_SCHEMA}) has properties missing from\n"
+            f"Vendored grapher schema ({VENDORED_GRAPHER_SCHEMA.name}) has properties missing from\n"
             f"schemas/dataset-schema.json → grapher_config: {sorted(missing)}\n"
             f"\n"
             f"To fix, add these properties inside the 'grapher_config.properties' object in\n"
@@ -253,6 +355,20 @@ def test_grapher_config_schema_sync():
             "from upstream, add it to LOCAL_ONLY_PROPERTIES in this test file."
         )
 
+    # Check that enum values inside shared properties haven't drifted (e.g. a new chart type
+    # added to `tab` or `sortBy` upstream that the embedded copy would reject).
+    drift = []
+    for prop, up_node in upstream["properties"].items():
+        loc_node = local_gc["properties"].get(prop)
+        if loc_node is not None:
+            drift += _find_enum_drift(up_node, loc_node, f"grapher_config.{prop}")
+    assert not drift, (
+        "Enum values in schemas/dataset-schema.json → grapher_config have drifted from the\n"
+        f"vendored grapher schema ({VENDORED_GRAPHER_SCHEMA.name}):\n  "
+        + "\n  ".join(drift)
+        + "\n\nSync the listed enums (see the /sync-grapher-schema skill)."
+    )
+
     # Check for local properties removed from upstream (excluding known local-only ones)
     removed = (local_props - LOCAL_ONLY_PROPERTIES) - upstream_props
     if removed:
@@ -260,3 +376,46 @@ def test_grapher_config_schema_sync():
             "Local grapher_config has properties not in upstream schema (may be deprecated)",
             properties=sorted(removed),
         )
+
+
+@pytest.mark.integration
+def test_vendored_grapher_schema_is_current():
+    """Verify that the vendored grapher schema matches the live upstream one.
+
+    Upstream mutates the schema in place without version bumps (e.g. dumbbell plots landed in
+    grapher-schema.010.json directly), so this is the automatic watch for upstream changes.
+    Network-dependent by nature, hence integration-marked. To fix a failure, run
+    `python scripts/generate_schema_types.py --refresh` and review the diff
+    (see the /sync-grapher-schema skill).
+    """
+    from etl.http import session
+
+    resp = session.get(DEFAULT_GRAPHER_SCHEMA, timeout=30)
+    resp.raise_for_status()
+    with open(VENDORED_GRAPHER_SCHEMA) as f:
+        vendored = json.load(f)
+    assert vendored == resp.json(), (
+        f"Vendored {VENDORED_GRAPHER_SCHEMA.name} is stale vs {DEFAULT_GRAPHER_SCHEMA}.\n"
+        "Run `python scripts/generate_schema_types.py --refresh` and follow /sync-grapher-schema."
+    )
+
+
+@pytest.mark.integration
+def test_no_newer_grapher_schema_version():
+    """Detect when upstream publishes a NEW grapher schema version.
+
+    `grapher-schema.latest.json` carries an `$id` naming the concrete version it points to;
+    when that moves past DEFAULT_GRAPHER_SCHEMA, we should consider bumping. See the
+    "Version bump" section of the /sync-grapher-schema skill.
+    """
+    from etl.http import session
+
+    latest_url = DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[0] + "/grapher-schema.latest.json"
+    resp = session.get(latest_url, timeout=30)
+    resp.raise_for_status()
+    latest_id = resp.json().get("$id")
+    assert latest_id == DEFAULT_GRAPHER_SCHEMA, (
+        f"Upstream published a newer grapher schema: {latest_id} "
+        f"(we pin {DEFAULT_GRAPHER_SCHEMA}).\n"
+        "Follow the 'Version bump' section of the /sync-grapher-schema skill to upgrade."
+    )

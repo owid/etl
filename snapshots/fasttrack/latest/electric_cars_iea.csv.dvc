@@ -2,15 +2,15 @@ meta:
   origin:
     producer: International Energy Agency. Global EV Outlook 2025.
     title: electric_cars_iea
-    citation_full: 'IEA (2025), Global EV Outlook 2025, IEA, Paris https://www.iea.org/reports/global-ev-outlook-2025, License: CC BY 4.0'
-    url_main: https://www.iea.org/data-and-statistics/data-product/global-ev-outlook-2025
+    citation_full: 'IEA (2026), Global EV Outlook 2026, IEA, Paris https://www.iea.org/reports/global-ev-outlook-2026, Licence: CC BY 4.0'
+    url_main: https://www.iea.org/reports/global-ev-outlook-2026
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRDQ1EYuQPZasmbfjaghH9f65Nd2yLkQ0QAnOP5bp0LHWkwnjVcwssk6VFDhmWPOzjw2gCFyOqXBTQU/pub?output=csv
-    date_accessed: '2025-05-15'
-  name: Electric car sales (IEA, 2025)
+    date_accessed: '2026-06-15'
+  name: Electric car sales (IEA, 2026)
   description: Electric car sales and stocks data from the International Energy Agency.
   license: {}
 outs:
-  - md5: da697dc44b720fe11bac1775a3ce04ac
-    size: 51549
+  - md5: 3d51677c0cba972e9f025d4c0c475c46
+    size: 81755
     path: electric_cars_iea.csv

@@ -1,0 +1,19 @@
+dataset:
+  title: TE-20.25a_CO2
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_20_25a_co2:
+    variables:
+      co2_emissions_per_capita_in_2018__metric_tonnes:
+        title: CO2 emissions per capita in 2018 (metric tonnes)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

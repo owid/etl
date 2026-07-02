@@ -1,162 +1,99 @@
 steps:
   #
-  # Smil - Global primary energy (2017).
-  #
-  data://meadow/papers/2023-12-12/smil_2017:
-    - snapshot://papers/2023-12-12/smil_2017.csv
-  data://garden/papers/2023-12-12/smil_2017:
-    - data://meadow/papers/2023-12-12/smil_2017
-  #
   # UNEP - Global trends in renewable energy investment.
   #
-  data://meadow/unep/2023-12-12/renewable_energy_investments:
-    - snapshot://unep/2023-12-12/global_trends_in_renewable_energy_investment.pdf
-  data://garden/unep/2023-12-12/renewable_energy_investments:
-    - data://meadow/unep/2023-12-12/renewable_energy_investments
   data://grapher/unep/2023-12-12/renewable_energy_investments:
-    - data://garden/unep/2023-12-12/renewable_energy_investments
-  #
-  # Shift - Energy production from fossil fuels.
-  #
-  data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels:
-    - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
-  data://garden/shift/2023-12-12/energy_production_from_fossil_fuels:
-    - data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/regions/2023-01-01/regions
-  #
-  # UK BEIS - UK historical electricity.
-  #
-  data://meadow/uk_beis/2023-12-12/uk_historical_electricity:
-    - snapshot://uk_beis/2023-12-12/uk_historical_electricity.xls
-  data://garden/uk_beis/2023-12-12/uk_historical_electricity:
-    - data://meadow/uk_beis/2023-12-12/uk_historical_electricity
-  #
-  # IRENA - Renewable power generation costs.
-  #
-  # NOTE: The following step is kept because it contains more data (mostly prior to 2010) than the latest release.
-  data://meadow/irena/2024-11-15/renewable_power_generation_costs:
-    - snapshot://irena/2024-11-15/renewable_power_generation_costs.xlsx
-  #
-  # IEA - Fossil fuel subsidies
-  #
-  data://meadow/iea/2024-11-20/fossil_fuel_subsidies:
-    - snapshot://iea/2024-11-20/fossil_fuel_subsidies.xlsx
-  #
-  # IEA - Fossil fuel subsidies
-  #
-  data://garden/iea/2024-11-20/fossil_fuel_subsidies:
-    - data://meadow/iea/2024-11-20/fossil_fuel_subsidies
+    - data://garden/unep/2023-12-12/renewable_energy_investments:
+      - data://meadow/unep/2023-12-12/renewable_energy_investments:
+        - snapshot://unep/2023-12-12/global_trends_in_renewable_energy_investment.pdf
   #
   # IEA - Fossil fuel subsidies
   #
   data://grapher/iea/2024-11-20/fossil_fuel_subsidies:
-    - data://garden/iea/2024-11-20/fossil_fuel_subsidies
+    - data://garden/iea/2024-11-20/fossil_fuel_subsidies:
+      - data://meadow/iea/2024-11-20/fossil_fuel_subsidies:
+        - snapshot://iea/2024-11-20/fossil_fuel_subsidies.xlsx
   #
-  # Eurostat - Harmonised index of consumer prices (HICP)
+  # IEA - Electric vehicle charging points
   #
-  data://meadow/eurostat/2025-02-03/harmonised_index_of_consumer_prices:
-    - snapshot://eurostat/2025-02-03/harmonised_index_of_consumer_prices.gz
-  #
-  # Eurostat - Harmonised index of consumer prices (HICP)
-  #
-  data://garden/eurostat/2025-02-03/harmonised_index_of_consumer_prices:
-    - data://meadow/eurostat/2025-02-03/harmonised_index_of_consumer_prices
-  #
-  # Eurostat - Producer prices in industry
-  #
-  data://meadow/eurostat/2025-02-03/producer_prices_in_industry:
-    - snapshot://eurostat/2025-02-03/producer_prices_in_industry.gz
-  #
-  # Eurostat - Producer prices in industry
-  #
-  data://garden/eurostat/2025-02-03/producer_prices_in_industry:
-    - data://meadow/eurostat/2025-02-03/producer_prices_in_industry
-  #
-  # Eurostat - Energy statistics, prices of natural gas and electricity
-  #
-  data://meadow/eurostat/2025-02-03/gas_and_electricity_prices:
-    - snapshot://eurostat/2025-02-03/gas_and_electricity_prices.zip
-  #
-  # Eurostat - Energy statistics, prices of natural gas and electricity
-  #
-  data://garden/eurostat/2025-02-03/gas_and_electricity_prices:
-    - data://meadow/eurostat/2025-02-03/gas_and_electricity_prices
-    - data://garden/eurostat/2025-02-03/harmonised_index_of_consumer_prices
-  #
-  # Ember - European wholesale electricity prices
-  #
-  data://meadow/ember/2025-02-03/european_wholesale_electricity_prices:
-    - snapshot://ember/2025-02-03/european_wholesale_electricity_prices.csv
-  #
-  # Ember - European wholesale electricity prices
-  #
-  data://garden/ember/2025-02-03/european_wholesale_electricity_prices:
-    - data://meadow/ember/2025-02-03/european_wholesale_electricity_prices
-    - data://garden/eurostat/2025-02-03/producer_prices_in_industry
-  #
-  # Energy prices
-  #
-  data://garden/energy/2025-02-03/energy_prices:
-    - data://garden/eurostat/2025-02-03/gas_and_electricity_prices
-    - data://garden/ember/2025-02-03/european_wholesale_electricity_prices
-  #
-  # Energy prices
-  #
-  data://grapher/energy/2025-02-03/energy_prices:
-    - data://garden/energy/2025-02-03/energy_prices
+  data://grapher/iea/2026-06-18/ev_charging_points:
+    - data://garden/iea/2026-06-18/ev_charging_points:
+      - data://meadow/iea/2026-06-18/ev_charging_points:
+        - snapshot://iea/2026-06-18/ev_charging_points.csv
   #
   # Energy prices explorer
   #
   export://multidim/energy/latest/energy_prices:
-    - data://grapher/energy/2025-02-03/energy_prices
+    # Energy prices
+    - data://grapher/energy/2025-02-03/energy_prices:
+      - data://garden/energy/2025-02-03/energy_prices:
+        # Eurostat - Energy statistics, prices of natural gas and electricity
+        - data://garden/eurostat/2025-02-03/gas_and_electricity_prices:
+          - data://meadow/eurostat/2025-02-03/gas_and_electricity_prices:
+            - snapshot://eurostat/2025-02-03/gas_and_electricity_prices.zip
+          # Eurostat - Harmonised index of consumer prices (HICP)
+          - data://garden/eurostat/2025-02-03/harmonised_index_of_consumer_prices:
+            - data://meadow/eurostat/2025-02-03/harmonised_index_of_consumer_prices:
+              - snapshot://eurostat/2025-02-03/harmonised_index_of_consumer_prices.gz
+        # Ember - European wholesale electricity prices
+        - data://garden/ember/2025-02-03/european_wholesale_electricity_prices:
+          - data://meadow/ember/2025-02-03/european_wholesale_electricity_prices:
+            - snapshot://ember/2025-02-03/european_wholesale_electricity_prices.csv
+          # Eurostat - Producer prices in industry
+          - data://garden/eurostat/2025-02-03/producer_prices_in_industry:
+            - data://meadow/eurostat/2025-02-03/producer_prices_in_industry:
+              - snapshot://eurostat/2025-02-03/producer_prices_in_industry.gz
   #
-  # IRENA - Renewable energy patents.
+  # Impacts of energy production explorer.
   #
-  data://meadow/irena/2025-06-20/renewable_energy_patents:
-    - snapshot://irena/2025-06-20/renewable_energy_patents.csv
-  #
-  # IRENA - Renewable energy patents.
-  #
-  data://garden/irena/2025-06-20/renewable_energy_patents:
-    - data://garden/wb/2025-07-01/income_groups
-    - data://meadow/irena/2025-06-20/renewable_energy_patents
-    - data://garden/regions/2023-01-01/regions
+  export://explorers/energy/latest/impacts_of_energy_sources:
+    # UNECE - Life Cycle Assessment of Electricity Generation Options.
+    - data://grapher/unece/2026-05-04/life_cycle_assessment_of_electricity:
+      - data://garden/unece/2026-05-04/life_cycle_assessment_of_electricity:
+        - data://meadow/unece/2026-05-04/life_cycle_assessment_of_electricity:
+          - snapshot://unece/2026-05-04/life_cycle_assessment_of_electricity.pdf
   #
   # IRENA - Renewable energy patents.
   #
   data://grapher/irena/2025-06-20/renewable_energy_patents:
-    - data://garden/irena/2025-06-20/renewable_energy_patents
-  #
-  # Energy Institute - Statistical Review of World Energy.
-  #
-  data://meadow/energy_institute/2025-06-27/statistical_review_of_world_energy:
-    - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.csv
-    - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.xlsx
+    - data://garden/irena/2025-06-20/renewable_energy_patents:
+      - data://garden/wb/2025-07-01/income_groups
+      - data://meadow/irena/2025-06-20/renewable_energy_patents:
+        - snapshot://irena/2025-06-20/renewable_energy_patents.csv
+      - data://garden/regions/2023-01-01/regions
   #
   # Energy Institute - Statistical Review of World Energy.
   #
   data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
-    - data://meadow/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #
-  # Energy Institute - Statistical Review of World Energy.
-  #
+    - data://meadow/energy_institute/2025-06-27/statistical_review_of_world_energy:
+      - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.csv
+      - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.xlsx
   data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
   #
-  # EIA - Energy consumption.
+  # EIA - International Energy.
   #
-  data://meadow/eia/2025-07-08/energy_consumption:
-    - snapshot://eia/2025-07-08/international_energy_data.zip
-  #
-  # EIA - Energy consumption.
-  #
-  data://garden/eia/2025-07-08/energy_consumption:
-    - data://meadow/eia/2025-07-08/energy_consumption
+  data://garden/eia/2026-05-05/international_energy:
+    - data://meadow/eia/2026-05-05/international_energy:
+      - snapshot://eia/2026-05-05/international_energy.zip
+    # EIA - International Energy archive (frozen 2022 export of indicators EIA no longer publishes).
+    - data://meadow/eia/2026-05-05/international_energy_archive:
+      - snapshot://eia/2026-05-05/international_energy_archive.zip
     - data://garden/wb/2025-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
+  #
+  # Energy - Fossil fuels explorer.
+  #
+  export://explorers/energy/latest/fossil_fuels:
+    # Energy - Fossil fuels.
+    - data://grapher/energy/2026-05-05/fossil_fuels:
+      - data://garden/energy/2026-05-05/fossil_fuels:
+        - data://garden/eia/2026-05-05/international_energy
+        - data://garden/demography/2024-07-15/population
+        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/regions/2023-01-01/regions
   #
   # Energy - Energy mix.
   #
@@ -164,238 +101,155 @@ steps:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
     - data://garden/wb/2025-07-01/income_groups
-  #
-  # Energy - Energy mix.
-  #
   data://grapher/energy/2025-06-27/energy_mix:
     - data://garden/energy/2025-06-27/energy_mix
   #
   # Energy - Fossil fuel reserves/production ratio.
   #
-  data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
-    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #
-  # Energy - Fossil fuel reserves/production ratio.
-  #
   data://grapher/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
-    - data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio
+    - data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
+      - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
   #
   # Energy - Fossil Fuel Production.
   #
   data://garden/energy/2025-06-27/fossil_fuel_production:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-    - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels
+    # Shift - Energy production from fossil fuels.
+    - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels:
+      - data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels:
+        - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
+      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
-  #
-  # Energy - Fossil Fuel Production.
-  #
   data://grapher/energy/2025-06-27/fossil_fuel_production:
     - data://garden/energy/2025-06-27/fossil_fuel_production
   #
   # Energy - Global primary energy.
   #
-  data://garden/energy/2025-06-27/global_primary_energy:
-    - data://garden/papers/2023-12-12/smil_2017
-    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #
-  # Energy - Global primary energy.
-  #
   data://grapher/energy/2025-06-27/global_primary_energy:
-    - data://garden/energy/2025-06-27/global_primary_energy
+    - data://garden/energy/2025-06-27/global_primary_energy:
+      # Smil - Global primary energy (2017).
+      - data://garden/papers/2023-12-12/smil_2017:
+        - data://meadow/papers/2023-12-12/smil_2017:
+          - snapshot://papers/2023-12-12/smil_2017.csv
+      - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
   #
   # Energy - Primary energy consumption.
   #
-  data://garden/energy/2025-06-27/primary_energy_consumption:
+  data://garden/energy/2026-05-05/primary_energy_consumption:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/eia/2025-07-08/energy_consumption
-  #
-  # Energy - Primary energy consumption.
-  #
-  data://grapher/energy/2025-06-27/primary_energy_consumption:
-    - data://garden/energy/2025-06-27/primary_energy_consumption
-  #
-  # IRENA - Renewable energy statistics.
-  #
-  data://meadow/irena/2025-07-18/renewable_energy_statistics:
-    - snapshot://irena/2025-07-18/renewable_energy_statistics.xlsx
+    - data://garden/eia/2026-05-05/international_energy
+  data://grapher/energy/2026-05-05/primary_energy_consumption:
+    - data://garden/energy/2026-05-05/primary_energy_consumption
   #
   # IRENA - Renewable energy statistics.
   #
   data://garden/irena/2025-07-18/renewable_energy_statistics:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
-    - data://meadow/irena/2025-07-18/renewable_energy_statistics
-  #
-  # IRENA - Renewable energy statistics.
-  #
+    - data://meadow/irena/2025-07-18/renewable_energy_statistics:
+      - snapshot://irena/2025-07-18/renewable_energy_statistics.xlsx
   data://grapher/irena/2025-07-18/renewable_capacity_by_technology:
     - data://garden/irena/2025-07-18/renewable_energy_statistics
-  #
-  # IRENA - Renewable energy statistics.
-  #
   data://grapher/irena/2025-07-18/renewable_capacity:
     - data://garden/irena/2025-07-18/renewable_energy_statistics
   #
   # IRENA - Renewable power generation costs.
   #
-  data://meadow/irena/2025-08-22/renewable_power_generation_costs:
-    - snapshot://irena/2025-08-22/renewable_power_generation_costs.xlsx
-  #
-  # IRENA - Renewable power generation costs.
-  #
   # NOTE: This step combines two versions of the data, because the latest release does not have data prior to 2010, for some reason.
   data://garden/irena/2025-08-22/renewable_power_generation_costs:
-    - data://meadow/irena/2025-08-22/renewable_power_generation_costs
-    - data://meadow/irena/2024-11-15/renewable_power_generation_costs
+    - data://meadow/irena/2025-08-22/renewable_power_generation_costs:
+      - snapshot://irena/2025-08-22/renewable_power_generation_costs.xlsx
+    # IRENA - Renewable power generation costs.
+    # NOTE: The following step is kept because it contains more data (mostly prior to 2010) than the latest release.
+    - data://meadow/irena/2024-11-15/renewable_power_generation_costs:
+      - snapshot://irena/2024-11-15/renewable_power_generation_costs.xlsx
     - data://garden/economics/2025-08-29/owid_deflator
-  #
-  # IRENA - Renewable power generation costs.
-  #
   data://grapher/irena/2025-08-22/renewable_power_generation_costs:
     - data://garden/irena/2025-08-22/renewable_power_generation_costs
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  data://garden/energy/2025-08-22/photovoltaic_cost_and_capacity:
-    - data://garden/irena/2025-08-22/renewable_power_generation_costs
-    - data://garden/irena/2025-07-18/renewable_energy_statistics
-    - data://garden/papers/2023-12-12/nemet_2009
-    - data://garden/papers/2023-12-12/farmer_lafond_2016
-  #
-  # Energy - Photovoltaic cost and capacity.
-  #
   data://grapher/energy/2025-08-22/photovoltaic_cost_and_capacity:
-    - data://garden/energy/2025-08-22/photovoltaic_cost_and_capacity
-  #
-  # Lazard - Levelized Cost of Energy
-  #
-  data://meadow/lazard/2025-09-17/levelized_cost_of_energy:
-    - snapshot://lazard/2025-09-17/levelized_cost_of_energy.csv
-  #
-  # Lazard - Levelized Cost of Energy+
-  #
-  data://garden/lazard/2025-09-17/levelized_cost_of_energy:
-    - data://meadow/lazard/2025-09-17/levelized_cost_of_energy
-    - data://garden/economics/2025-08-29/owid_deflator
+    - data://garden/energy/2025-08-22/photovoltaic_cost_and_capacity:
+      - data://garden/irena/2025-08-22/renewable_power_generation_costs
+      - data://garden/irena/2025-07-18/renewable_energy_statistics
+      - data://garden/papers/2023-12-12/nemet_2009
+      - data://garden/papers/2023-12-12/farmer_lafond_2016
   #
   # Lazard - Levelized Cost of Energy+
   #
   data://grapher/lazard/2025-09-17/levelized_cost_of_energy:
-    - data://garden/lazard/2025-09-17/levelized_cost_of_energy
-  #
-  # Rupert Way - Historical energy costs.
-  #
-  data-private://meadow/energy/2025-09-18/historical_energy_costs:
-    - snapshot-private://energy/2025-09-18/historical_energy_costs.xlsx
-  #
-  # Rupert Way - Historical energy costs.
-  #
-  data-private://garden/energy/2025-09-18/historical_energy_costs:
-    - data-private://meadow/energy/2025-09-18/historical_energy_costs
+    - data://garden/lazard/2025-09-17/levelized_cost_of_energy:
+      # Lazard - Levelized Cost of Energy
+      - data://meadow/lazard/2025-09-17/levelized_cost_of_energy:
+        - snapshot://lazard/2025-09-17/levelized_cost_of_energy.csv
+      - data://garden/economics/2025-08-29/owid_deflator
   #
   # Rupert Way - Historical energy costs.
   #
   data-private://grapher/energy/2025-09-18/historical_energy_costs:
-    - data-private://garden/energy/2025-09-18/historical_energy_costs
-  #
-  # Rupert Way - Historical battery costs.
-  #
-  data://meadow/energy/2025-11-19/historical_battery_costs:
-    - snapshot://energy/2025-11-19/historical_battery_costs.xlsx
-  #
-  # Rupert Way - Historical battery costs.
-  #
-  data://garden/energy/2025-11-19/historical_battery_costs:
-    - data://meadow/energy/2025-11-19/historical_battery_costs
+    - data-private://garden/energy/2025-09-18/historical_energy_costs:
+      - data-private://meadow/energy/2025-09-18/historical_energy_costs:
+        - snapshot-private://energy/2025-09-18/historical_energy_costs.xlsx
   #
   # Rupert Way - Historical battery costs.
   #
   data://grapher/energy/2025-11-19/historical_battery_costs:
-    - data://garden/energy/2025-11-19/historical_battery_costs
-  #
-  # Benchmark Mineral Intelligence - Battery cell prices.
-  #
-  data-private://meadow/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
-    - snapshot-private://benchmark_mineral_intelligence/2025-12-02/battery_cell_prices_by_chemistry.xlsx
-    - snapshot-private://benchmark_mineral_intelligence/2025-12-02/battery_cell_prices.xlsx
-  #
-  # Benchmark Mineral Intelligence - Battery cell prices.
-  #
-  data-private://garden/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
-    - data-private://meadow/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices
+    - data://garden/energy/2025-11-19/historical_battery_costs:
+      - data://meadow/energy/2025-11-19/historical_battery_costs:
+        - snapshot://energy/2025-11-19/historical_battery_costs.xlsx
   #
   # Benchmark Mineral Intelligence - Battery cell prices.
   #
   data-private://grapher/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
-    - data-private://garden/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices
+    - data-private://garden/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
+      - data-private://meadow/benchmark_mineral_intelligence/2025-12-02/battery_cell_prices:
+        - snapshot-private://benchmark_mineral_intelligence/2025-12-02/battery_cell_prices_by_chemistry.xlsx
+        - snapshot-private://benchmark_mineral_intelligence/2025-12-02/battery_cell_prices.xlsx
 
   #
   # Energy innovation in the long run (Fouquet 2026)
   #
   data://meadow/light/2025-12-29/energy_innovation_long_run:
     - snapshot://light/2025-12-29/energy_innovation_long_run.xlsx
-  data://garden/light/2025-12-29/energy_innovation_long_run:
-    - data://meadow/light/2025-12-29/energy_innovation_long_run
-    - data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data
-    - data://garden/ons/2025-12-31/cpi_uk
-    - data://garden/ons/2025-12-31/average_weekly_earnings_uk
   data://grapher/light/2025-12-29/energy_innovation_long_run:
-    - data://garden/light/2025-12-29/energy_innovation_long_run
-
-  data://garden/light/2026-01-21/energy_innovation_long_run:
-    - data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data
-    - data://meadow/light/2025-12-29/energy_innovation_long_run
+    - data://garden/light/2025-12-29/energy_innovation_long_run:
+      - data://meadow/light/2025-12-29/energy_innovation_long_run
+      - data://garden/bank_of_england/2025-12-29/millennium_macroeconomic_data
+      - data://garden/ons/2025-12-31/cpi_uk
+      - data://garden/ons/2025-12-31/average_weekly_earnings_uk
   data://grapher/light/2026-01-21/energy_innovation_long_run:
-    - data://garden/light/2026-01-21/energy_innovation_long_run
+    - data://garden/light/2026-01-21/energy_innovation_long_run:
+      - data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data
+      - data://meadow/light/2025-12-29/energy_innovation_long_run
   #
   # Energy - OWID Energy dataset.
   #
   export://github/energy_data/latest/owid_energy:
     - data://garden/energy_data/2026-04-24/owid_energy
-  #
-  # Energy - OWID Energy dataset.
-  #
   export://s3/energy_data/latest/owid_energy:
     - data://garden/energy_data/2026-04-24/owid_energy
   #
   # UN: Energy Statistics Database
   #
-  data://meadow/un/2026-02-11/energy_statistics_database:
-    - snapshot://un/2026-02-11/energy_statistics_database.zip
-  #
-  # UN: Energy Statistics Database
-  #
   data://garden/un/2026-02-11/energy_statistics_database:
-    - data://meadow/un/2026-02-11/energy_statistics_database
+    - data://meadow/un/2026-02-11/energy_statistics_database:
+      - snapshot://un/2026-02-11/energy_statistics_database.zip
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2025-07-01/income_groups
-  #
-  # Energy: global historical electricity from Pinto et al. (2023).
-  #
-  data://meadow/energy/2026-02-06/global_historical_electricity:
-    - snapshot://energy/2026-02-06/global_historical_electricity.zip
-  #
-  # Ember - Yearly electricity data.
-  #
-  data://meadow/ember/2026-04-24/yearly_electricity:
-    - snapshot://ember/2026-04-24/yearly_electricity__europe.csv
-    - snapshot://ember/2026-04-24/yearly_electricity__global.csv
   #
   # Ember - Yearly electricity data.
   #
   data://garden/ember/2026-04-24/yearly_electricity:
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-    - data://meadow/ember/2026-04-24/yearly_electricity
+    - data://meadow/ember/2026-04-24/yearly_electricity:
+      - snapshot://ember/2026-04-24/yearly_electricity__europe.csv
+      - snapshot://ember/2026-04-24/yearly_electricity__global.csv
     - data://garden/wb/2025-07-01/income_groups
-  #
-  # Energy: global historical electricity from Pinto et al. (2023).
-  #
-  data://garden/energy/2026-04-24/global_historical_electricity:
-    - data://meadow/energy/2026-02-06/global_historical_electricity
-    - data://garden/ember/2026-04-24/yearly_electricity
   #
   # Energy - Electricity mix (EI & Ember).
   #
@@ -404,39 +258,54 @@ steps:
     - data://garden/ember/2026-04-24/yearly_electricity
     - data://garden/demography/2024-07-15/population
   #
-  # Energy: global historical electricity scaling.
-  #
-  data://garden/energy/2026-04-24/global_historical_electricity_scaling:
-    - data://garden/energy/2026-04-24/global_historical_electricity
-  #
-  # Energy - UK historical electricity.
-  #
-  data://garden/energy/2026-04-24/uk_historical_electricity:
-    - data://garden/uk_beis/2023-12-12/uk_historical_electricity
-    - data://garden/energy/2026-04-24/electricity_mix
-  #
   # Energy - OWID Energy dataset.
   #
   data://garden/energy_data/2026-04-24/owid_energy:
     - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2025-06-27/primary_energy_consumption
+    - data://garden/energy/2026-05-05/primary_energy_consumption
     - data://garden/energy/2025-06-27/fossil_fuel_production
     - data://garden/energy/2026-04-24/electricity_mix
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/energy/2025-06-27/energy_mix
-  #
-  # Energy - Electricity mix (EI & Ember).
-  #
   data://grapher/energy/2026-04-24/electricity_mix:
     - data://garden/energy/2026-04-24/electricity_mix
   #
   # Energy: global historical electricity scaling.
   #
   data://grapher/energy/2026-04-24/global_historical_electricity_scaling:
-    - data://garden/energy/2026-04-24/global_historical_electricity_scaling
+    - data://garden/energy/2026-04-24/global_historical_electricity_scaling:
+      # Energy: global historical electricity from Pinto et al. (2023).
+      - data://garden/energy/2026-04-24/global_historical_electricity:
+        - data://meadow/energy/2026-02-06/global_historical_electricity:
+          - snapshot://energy/2026-02-06/global_historical_electricity.zip
+        - data://garden/ember/2026-04-24/yearly_electricity
   #
   # Energy - UK historical electricity.
   #
   data://grapher/energy/2026-04-24/uk_historical_electricity:
-    - data://garden/energy/2026-04-24/uk_historical_electricity
+    - data://garden/energy/2026-04-24/uk_historical_electricity:
+      # UK BEIS - UK historical electricity.
+      - data://garden/uk_beis/2023-12-12/uk_historical_electricity:
+        - data://meadow/uk_beis/2023-12-12/uk_historical_electricity:
+          - snapshot://uk_beis/2023-12-12/uk_historical_electricity.xls
+      - data://garden/energy/2026-04-24/electricity_mix
+  #
+  # IEA - Energy and AI.
+  #
+  data://grapher/energy/2026-04-27/energy_ai:
+    - data://garden/energy/2026-04-27/energy_ai:
+      - data://garden/regions/2023-01-01/regions
+      # Older IEA release, kept to backfill pre-2023 history in the garden.
+      - data://meadow/energy/2025-11-07/energy_ai:
+        - snapshot://energy/2025-11-07/energy_ai.xlsx
+      - data://meadow/energy/2026-04-27/energy_ai:
+        - snapshot://energy/2026-04-27/energy_ai.xlsx
+      - data://garden/energy/2026-04-24/electricity_mix
+  #
+  # CSO Ireland - Data centres metered electricity consumption.
+  #
+  data://grapher/energy/2025-11-10/ireland_metered_consumption:
+    - data://garden/energy/2025-11-10/ireland_metered_consumption:
+      - data://meadow/energy/2025-11-10/ireland_metered_consumption:
+        - snapshot://energy/2025-11-10/ireland_metered_consumption.csv

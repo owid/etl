@@ -201,6 +201,8 @@ definitions:
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Arriagada
 tables:
   multidimensional_poverty_index:
     variables:

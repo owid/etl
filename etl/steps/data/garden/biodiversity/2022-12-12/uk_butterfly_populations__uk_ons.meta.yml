@@ -1,5 +1,7 @@
 dataset:
   title: UK Butterfly Populations (UK ONS)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   uk_butterfly_populations__uk_ons:
     variables:

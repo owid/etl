@@ -1,0 +1,110 @@
+name: Sync grapher schema
+
+# The grapher chart-config schema is owned by the web team in owid-grapher and mutated
+# in place without version bumps (e.g. dumbbell plots landed in grapher-schema.010.json
+# directly). This workflow watches upstream and:
+#   - opens/updates a draft PR with the refreshed vendored copy + regenerated types
+#     when the pinned version changes in place
+#   - opens an issue when a NEW schema version is published
+# Remaining manual propagation (e.g. the grapher_config block embedded in
+# dataset-schema.json) is enforced by unit tests on the PR — finish it with the
+# /sync-grapher-schema skill.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1-5" # weekdays at 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Check upstream for changes
+        id: check
+        run: |
+          set -euo pipefail
+          VENDORED=$(ls schemas/grapher-schema.*.json)
+          NAME=$(basename "$VENDORED")
+          curl -fsS "https://files.ourworldindata.org/schemas/$NAME" -o /tmp/upstream.json
+          curl -fsS "https://files.ourworldindata.org/schemas/grapher-schema.latest.json" -o /tmp/latest.json
+          python3 - "$VENDORED" >> "$GITHUB_OUTPUT" <<'EOF'
+          import json
+          import sys
+
+          vendored_path = sys.argv[1]
+          vendored = json.load(open(vendored_path))
+          upstream = json.load(open("/tmp/upstream.json"))
+          latest_id = json.load(open("/tmp/latest.json")).get("$id", "")
+          pinned_url = "https://files.ourworldindata.org/schemas/" + vendored_path.rsplit("/", 1)[-1]
+          print(f"changed={str(vendored != upstream).lower()}")
+          print(f"new_version={str(bool(latest_id) and latest_id != pinned_url).lower()}")
+          print(f"latest_id={latest_id}")
+          print(f"pinned_url={pinned_url}")
+          EOF
+
+      - name: Open issue for new schema version
+        if: steps.check.outputs.new_version == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LATEST_ID: ${{ steps.check.outputs.latest_id }}
+          PINNED_URL: ${{ steps.check.outputs.pinned_url }}
+        run: |
+          set -euo pipefail
+          TITLE="New grapher schema version published upstream"
+          EXISTING=$(gh issue list --search "\"$TITLE\" in:title" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$EXISTING" ]; then
+            gh issue create --title "$TITLE" --body "$(printf 'Upstream now publishes **%s** while we pin **%s**.\n\nFollow the "Version bump" section of the \`/sync-grapher-schema\` skill to upgrade (bump \`DEFAULT_GRAPHER_SCHEMA\` in \`etl/config.py\`, sed the \`$ref\`s, re-vendor, regenerate).\n\n_Opened automatically by the sync-grapher-schema workflow._' "$LATEST_ID" "$PINNED_URL")"
+          else
+            echo "Issue #$EXISTING already open, skipping."
+          fi
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        if: steps.check.outputs.changed == 'true'
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        if: steps.check.outputs.changed == 'true'
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        if: steps.check.outputs.changed == 'true'
+        run: uv sync --all-extras --group dev
+
+      - name: Refresh vendored schema and regenerate types
+        if: steps.check.outputs.changed == 'true'
+        run: uv run python scripts/generate_schema_types.py --refresh
+
+      - name: Create pull request
+        if: steps.check.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: auto-sync-grapher-schema
+          draft: true
+          title: "📊 :robot: sync grapher schema from upstream"
+          commit-message: "📊🤖 automatic grapher schema sync"
+          body: |
+            The upstream grapher schema changed in place. This PR contains the automatic part of the sync:
+
+            - refreshed vendored `schemas/grapher-schema.*.json`
+            - regenerated `etl/collection/model/schema_types.py`
+
+            **Review the vendored diff** — it is the authoritative list of upstream changes.
+
+            If CI fails on `test_grapher_config_schema_sync`, the change also needs manual propagation
+            (the `grapher_config` block embedded in `schemas/dataset-schema.json`, and possibly new
+            `$ref`s in `schemas/multidim-schema.json` / `schemas/explorer-schema.json`). Check out this
+            branch and run the `/sync-grapher-schema` skill to finish.
+
+            _Opened automatically by the sync-grapher-schema workflow._
+          reviewers: lucasrodes

@@ -15,6 +15,17 @@ DIMENSIONS_CONFIG = {
     "equivalence_scale": ["square root"],
 }
 
+# Override of description_key_welfare_type (luxembourg_income_study.meta.yml line 108) for the grouped
+# welfare_type=before_vs_after view. The OLD_* constants mirror the garden text verbatim — the assertion
+# in _get_before_vs_after_metadata catches drift in the source.
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = (
+    "Income is measured after taxes have been paid and most government benefits have been received."
+)
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = (
+    "Income is measured before taxes have been paid and most government benefits have been received."
+)
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown separately. In most countries, relative poverty is lower after taxes and benefits than before, but the extent varies widely."
+
 
 def run() -> None:
     config = paths.load_collection_config()
@@ -35,7 +46,7 @@ def run() -> None:
         groups=[
             {
                 "dimension": "welfare_type",
-                "choices": ["dhi", "mi"],
+                "choices": ["mi", "dhi"],
                 "choice_new_slug": "before_vs_after",
                 "view_config": {
                     "title": "{title}",
@@ -44,8 +55,12 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": ["LineChart", "Dumbbell"],
                     "missingDataStrategy": "hide",
+                    # Sort the dumbbell (and table) entities by the after-tax value, lowest first
+                    "sortBy": "column",
+                    "sortColumnSlug": _after_tax_catalog_path,
+                    "sortOrder": "asc",
                 },
                 "view_metadata": {
                     "description_short": "{subtitle}",
@@ -71,28 +86,49 @@ def run() -> None:
     c.save()
 
 
+def _after_tax_catalog_path(view):
+    """Return the after-tax (dhi) indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
+    return next((i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None)
+
+
 def _get_before_vs_after_metadata(tb, view):
     """Extract and transform metadata from grapher_config for before_vs_after views."""
     if not view.indicators.y:
         return {"title": "", "subtitle": "", "description_key": []}
 
-    first_ind = view.indicators.y[0]
+    # Build the combined title/subtitle from the before-tax (mi) indicator, so it doesn't
+    # depend on the order of indicators in the view (mirrors the WID before_vs_after logic).
+    first_ind = next((i for i in view.indicators.y if "_mi_" in i.catalogPath), view.indicators.y[0])
     col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
 
     if col_name and col_name in tb.columns:
         meta = tb[col_name].metadata
         grapher_config = meta.presentation.grapher_config if meta.presentation else {}
 
-        title = grapher_config.get("title", "")
-        title = title.replace("after tax", "before vs. after tax")
-
-        subtitle = grapher_config.get("subtitle", "")
-        subtitle = subtitle.replace(" Income here is measured after taxes and benefits.", "")
+        title = _assert_and_replace(
+            grapher_config.get("title", ""), "before tax", "before vs. after tax", "grapher_config.title", col_name
+        )
+        subtitle = _assert_and_replace(
+            grapher_config.get("subtitle", ""),
+            " Income here is measured before taxes and benefits.",
+            "",
+            "grapher_config.subtitle",
+            col_name,
+        )
 
         description_key = list(meta.description_key) if meta.description_key else []
-        if len(description_key) > 1:
-            description_key.pop(1)
+        old_welfare_keys = {OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI, OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI}
+        assert any(b in old_welfare_keys for b in description_key), (
+            f"Neither OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI nor _MI found in {col_name}.description_key — garden text changed, update the constants."
+        )
+        description_key = [NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER if b in old_welfare_keys else b for b in description_key]
 
         return {"title": title, "subtitle": subtitle, "description_key": description_key}
 
     return {"title": "", "subtitle": "", "description_key": []}
+
+
+def _assert_and_replace(text, old, new, field, col_name):
+    """Replace `old` with `new` in `text`; assert `old` was present so silent drift in the garden meta surfaces as a clear error."""
+    assert old in text, f"'{old}' not found in {col_name}.{field} — garden text changed, update the replacement."
+    return text.replace(old, new)

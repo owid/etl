@@ -724,7 +724,9 @@ for env_var in env_vars:
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
 METABASE_API_KEY_ADMIN = os.environ.get("METABASE_API_KEY_ADMIN")
 METABASE_URL = os.environ.get("METABASE_URL")
-METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+# Semantic layer = the `prod_semantic` dataset on the "Data warehouse (BigQuery)" connection (id 3).
+# The old DuckDB semantic-layer connection (id 2) was retired (owid/analytics#735).
+METABASE_SEMANTIC_LAYER_DATABASE_ID = 3
 METABASE_URL_LOCAL = os.environ.get("METABASE_URL", "http://localhost:3000")
 METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
 

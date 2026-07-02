@@ -160,13 +160,6 @@ sections:
         entrypoint: app_pages/harmonizer/app.py
         icon: ":material/music_note:"
         image_url: "https://www.shutterstock.com/image-vector/abstract-vector-musical-background-music-260nw-485443810.jpg"
-      # - title: "Dataset preview"
-      #   alias: datasets
-      #   description: "Preview datasets and their indicators"
-      #   maintainer: "@lucas"
-      #   entrypoint: app_pages/dataset_preview/app.py
-      #   icon: ":material/search:"
-      #   image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
       - title: "Producer analytics"
         alias: producer-analytics
         description: "Share analytics with data producers"
@@ -186,15 +179,6 @@ sections:
         entrypoint: app_pages/search_comparison/app.py
         icon: ":material/compare:"
         image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
-      # This app is causing a segmentation fault (I couldn't figure out why).
-      # Given that we have the data insights admin search, this app may not be needed anymore.
-      # - title: "Insight search"
-      #   alias: insight_search
-      #   description: "Browse DIs"
-      #   maintainer: "@pablo"
-      #   entrypoint: app_pages/insight_search/app.py
-      #   icon: ":material/search:"
-      #   image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
       - title: "Indicator search"
         alias: indicator_search
         description: "Find similar indicators"
@@ -240,13 +224,6 @@ sections:
         maintainer: "@pablo"
         icon: ":material/map:"
         image_url: "https://upload.wikimedia.org/wikipedia/en/8/8c/Human_Language_Families_Map_%28Wikipedia_Colors_.PNG"
-      - title: "ID to Path"
-        alias: explorer_editor
-        entrypoint: app_pages/explorer_edit.py
-        description: Migrate id-based explorers
-        maintainer: "@lucas"
-        icon: ":material/explore:"
-        image_url: "https://upload.wikimedia.org/wikipedia/en/1/18/Dora_the_Explorer_2004_album_cover.jpg"
 
   - title: "Misc"
     description: |-
@@ -275,39 +252,3 @@ sections:
         image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
         disable:
           staging: true
-
-  # - title: "Metadata"
-  #   description: |-
-  #     Improve our metadata or learn how to use it.
-  #   apps:
-  #     - title: "Meta Upgrader"
-  #       description: "Migrate old metadata to new format."
-  #       maintainer: "@veronika / @lucas"
-  #       entrypoint: app_pages/metagpt.py
-  #       icon: ":material/upgrade:"
-  #       alias: metagpt
-  #       image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
-  #       disable:
-  #         "production": True
-  #         "staging": True
-  #     - title: "Meta Playground"
-  #       alias: metaplay
-  #       description: "How is metadata presented in data pages?"
-  #       maintainer: "@lucas"
-  #       entrypoint: app_pages/metaplay.py
-  #       icon: ":material/sports_volleyball:"
-  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
-  #       disable:
-  #         "production": True
-  #         "staging": True
-legacy:
-  description: |-
-    The pages below are legacy now. They are kept in case the new pages are not working properly.
-  apps:
-    - title: "Similar charts (deprecated)"
-      alias: similar_charts
-      description: "Find similar charts"
-      maintainer: "@mojmir"
-      entrypoint: app_pages/similar_charts/app.py
-      icon: ":material/bar_chart:"
-      image_url: "https://media.istockphoto.com/id/1296381479/vector/set-of-simple-infographic-graphs-and-charts-data-visualization-statistics-and-business.jpg?s=612x612&w=0&k=20&c=JpEoP-6w16OwVC49Sq2PEI8-dHF1CZnm7rHyL5DoxqA="

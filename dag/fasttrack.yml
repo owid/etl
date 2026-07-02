@@ -260,3 +260,15 @@ steps:
     - snapshot-private://fasttrack/latest/gov_torture_kill.csv
   data://grapher/fasttrack/latest/stunting_rate_schneider:
     - snapshot://fasttrack/latest/stunting_rate_schneider.csv
+  data://grapher/fasttrack/latest/deforestation_commodity_singh_perrson:
+    - snapshot://fasttrack/latest/deforestation_commodity_singh_perrson.csv
+  data://grapher/fasttrack/latest/deforestation_by_commodity_singh:
+    - snapshot://fasttrack/latest/deforestation_by_commodity_singh.csv
+  data://grapher/fasttrack/latest/deforestation_trade_singh:
+    - snapshot://fasttrack/latest/deforestation_trade_singh.csv
+  data-private://grapher/fasttrack/latest/uk_wealth_share_top1:
+    - snapshot-private://fasttrack/latest/uk_wealth_share_top1.csv
+  data-private://grapher/fasttrack/latest/us_wealth_share_top1:
+    - snapshot-private://fasttrack/latest/us_wealth_share_top1.csv
+  data-private://grapher/fasttrack/latest/france_wealth_share_top1:
+    - snapshot-private://fasttrack/latest/france_wealth_share_top1.csv

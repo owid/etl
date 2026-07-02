@@ -21,6 +21,7 @@ from owid.catalog.core.datasets import FileFormat
 from owid.catalog.s3_utils import connect_r2
 
 from etl import config, files
+from etl.http import STORAGE_OPTIONS
 from etl.paths import DATA_DIR
 
 config.enable_sentry()
@@ -420,17 +421,19 @@ def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
 
 
 def read_frame(uri: str, max_retries: int = 3) -> pd.DataFrame:  # ty: ignore
+    is_remote = uri.startswith("http://") or uri.startswith("https://")
+    read_kwargs = {"storage_options": STORAGE_OPTIONS} if is_remote else {}
     retries = 0
     while retries <= max_retries:
         try:
             if uri.endswith(".feather"):
-                return cast(pd.DataFrame, pd.read_feather(uri))
+                return cast(pd.DataFrame, pd.read_feather(uri, **read_kwargs))
 
             elif uri.endswith(".parquet"):
-                return cast(pd.DataFrame, pd.read_parquet(uri))
+                return cast(pd.DataFrame, pd.read_parquet(uri, **read_kwargs))
 
             elif uri.endswith(".csv"):
-                return pd.read_csv(uri)
+                return pd.read_csv(uri, **read_kwargs)
 
             else:
                 raise ValueError(f"Unknown format for {uri}")

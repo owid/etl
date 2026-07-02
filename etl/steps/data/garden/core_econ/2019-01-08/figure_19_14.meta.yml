@@ -1,0 +1,19 @@
+dataset:
+  title: Figure_19.14
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_19_14:
+    variables:
+      extent_of_support_or_opposition_to_redistribution:
+        title: Extent of support or opposition to redistribution
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

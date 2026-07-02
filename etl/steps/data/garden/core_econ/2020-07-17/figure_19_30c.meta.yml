@@ -1,0 +1,22 @@
+dataset:
+  title: Figure_19.30c
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_19_30c:
+    variables:
+      inequality_in_disposable_income__gini_coefficient:
+        title: Inequality in disposable income (Gini coefficient)
+        unit: ''
+      number_of_protective_services__employees_per_10_000_in_2000:
+        title: Number of protective services (employees per 10,000 in 2000)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

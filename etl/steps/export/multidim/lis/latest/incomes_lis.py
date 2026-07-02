@@ -19,6 +19,22 @@ EQUIVALENCE_SCALE = "square root"
 
 PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
 
+# Override of description_key_welfare_type (luxembourg_income_study.meta.yml line 108) for the grouped
+# welfare_type=before_vs_after view. The OLD_* constants mirror the garden text verbatim — the assertion
+# in _get_before_vs_after_metadata catches drift in the source.
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = (
+    "Income is measured after taxes have been paid and most government benefits have been received."
+)
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = (
+    "Income is measured before taxes have been paid and most government benefits have been received."
+)
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_SHARE = "This data is based on income measured both before and after taxes and benefits, which are shown separately. Taxes and benefits typically increase the share going to poorer groups and reduce the share going to richer groups."
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_REST = "This data is based on income measured both before and after taxes and benefits, which are shown separately. Taxes and benefits typically raise incomes at the bottom of the distribution and reduce incomes at the top."
+
+# Override of description_key_thr (luxembourg_income_study.meta.yml line 147) for the grouped thr+decile=all view.
+OLD_DESCRIPTION_KEY_THR = 'This data shows the income threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
+NEW_DESCRIPTION_KEY_THR_ALL = 'This data shows the income threshold for each decile of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
+
 
 def run() -> None:
     config = paths.load_collection_config()
@@ -89,6 +105,35 @@ def run() -> None:
         },
     )
 
+    # Group deciles 1, 5, 9 as P10/P50/P90 — only used for thr indicator
+    c.group_views(
+        groups=[
+            {
+                "dimension": "decile",
+                "choices": ["1", "5", "9"],
+                "choice_new_slug": "p10_p50_p90",
+                "view_config": {
+                    "hideRelativeToggle": False,
+                    "selectedFacetStrategy": "entity",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "chartTypes": ["LineChart", "DiscreteBar"],
+                    "hideTotalValueLabel": True,
+                    "baseColorScheme": "OwidCategoricalE",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
+                },
+                "view_metadata": {
+                    "description_short": "{subtitle}",
+                },
+            },
+        ],
+        params={
+            "title": _get_p10_p50_p90_title,
+            "subtitle": _get_p10_p50_p90_subtitle,
+        },
+    )
+
     # Filter decile views: keep only relevant deciles per indicator
     non_share = [i for i in c.dimension_choices["indicator"] if i != "share"]
     non_thr = [i for i in c.dimension_choices["indicator"] if i != "thr"]
@@ -97,6 +142,7 @@ def run() -> None:
             {"decile": ["2", "3", "4", "6", "7", "8"]},
             {"decile": ["10_40_50"], "indicator": non_share},
             {"decile": ["5", "9"], "indicator": non_thr},
+            {"decile": ["p10_p50_p90"], "indicator": non_thr},
         ]
     )
 
@@ -105,7 +151,7 @@ def run() -> None:
 
     # Customize grouped decile views: sort indicators and set display names
     for view in c.views:
-        if view.matches(decile="all") and view.indicators.y:
+        if view.matches(decile=["all", "p10_p50_p90"]) and view.indicators.y:
             # Sort indicators by decile number
             reverse_order = view.matches(indicator="share")
             view.indicators.y = sorted(view.indicators.y, key=_get_decile_number, reverse=reverse_order)
@@ -121,20 +167,37 @@ def run() -> None:
                 if name:
                     ind.display = {"name": name}
 
+    # description_key_thr's "given decile" wording fits single-decile views; rewrite it for the grouped all-decile view while preserving the indicator's other bullets.
+    for view in c.views:
+        if view.matches(indicator="thr", decile="all") and view.indicators.y:
+            col_name = view.indicators.y[0].catalogPath.split("#")[-1]
+            source_description_key = list(tb[col_name].metadata.description_key) if col_name in tb.columns else []
+            assert OLD_DESCRIPTION_KEY_THR in source_description_key, (
+                f"OLD_DESCRIPTION_KEY_THR not found in {col_name}.description_key — garden text changed, update OLD_DESCRIPTION_KEY_THR/NEW_DESCRIPTION_KEY_THR_ALL."
+            )
+            view.metadata = view.metadata or {}
+            view.metadata["description_key"] = [
+                NEW_DESCRIPTION_KEY_THR_ALL if b == OLD_DESCRIPTION_KEY_THR else b for b in source_description_key
+            ]
+
     # Group welfare_type (before vs after tax)
     c.group_views(
         groups=[
             {
                 "dimension": "welfare_type",
-                "choices": ["dhi", "mi"],
+                "choices": ["mi", "dhi"],
                 "choice_new_slug": "before_vs_after",
                 "view_config": {
                     "hideRelativeToggle": True,
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "tab": "chart",
-                    "chartTypes": ["LineChart"],
+                    "chartTypes": ["LineChart", "Dumbbell"],
                     "missingDataStrategy": "hide",
+                    # Sort the dumbbell (and table) entities by the after-tax value, lowest first
+                    "sortBy": "column",
+                    "sortColumnSlug": _after_tax_catalog_path,
+                    "sortOrder": "asc",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
                     "note": "",
@@ -156,7 +219,7 @@ def run() -> None:
         [
             {
                 "welfare_type": ["before_vs_after"],
-                "decile": ["all", "10_40_50"],
+                "decile": ["all", "10_40_50", "p10_p50_p90"],
             }
         ]
     )
@@ -197,6 +260,28 @@ def _get_grouped_decile_subtitle(view):
     return subtitles.get(view.dimensions.get("indicator"), "")
 
 
+def _get_p10_p50_p90_title(view):
+    """Return title for the P10/P50/P90 grouped threshold view."""
+    period = view.dimensions.get("period")
+    wt_label = "after tax" if view.dimensions.get("welfare_type") == "dhi" else "before tax"
+    return f"Threshold income per {period} marking the poorest decile, the median, and the richest decile ({wt_label})"
+
+
+def _get_p10_p50_p90_subtitle(view):
+    """Return subtitle for the P10/P50/P90 grouped threshold view."""
+    period = view.dimensions.get("period")
+    wt_label = "after tax" if view.dimensions.get("welfare_type") == "dhi" else "before tax"
+    return (
+        f"The level of income per person per {period} below which 10%, 50% and 90% of the population falls. "
+        f"Income here is measured {wt_label}es and benefits. {PPP_ADJUSTMENT_SUBTITLE}"
+    )
+
+
+def _after_tax_catalog_path(view):
+    """Return the after-tax (dhi) indicator's catalogPath for a before_vs_after view (used to sort entities by it)."""
+    return next((i.catalogPath for i in view.indicators.y if "_dhi_" in i.catalogPath), None)
+
+
 def _get_before_vs_after_metadata(tb, view):
     """Extract and transform metadata from grapher_config for before_vs_after views.
 
@@ -205,21 +290,37 @@ def _get_before_vs_after_metadata(tb, view):
     if not view.indicators.y:
         return {"title": "", "subtitle": "", "description_key": []}
 
-    first_ind = view.indicators.y[0]
+    # Build the combined title/subtitle from the before-tax (mi) indicator, so it doesn't
+    # depend on the order of indicators in the view (mirrors the WID before_vs_after logic).
+    first_ind = next((i for i in view.indicators.y if "_mi_" in i.catalogPath), view.indicators.y[0])
     col_name = first_ind.catalogPath.split("#")[-1] if "#" in first_ind.catalogPath else None
 
     if col_name and col_name in tb.columns:
         meta = tb[col_name].metadata
         grapher_config = meta.presentation.grapher_config if meta.presentation else {}
 
-        title = grapher_config.get("title", "")
-        title = title.replace("after tax", "before vs. after tax")
-
-        subtitle = grapher_config.get("subtitle", "")
-        subtitle = subtitle.replace(" Income here is measured after taxes and benefits.", "")
+        title = _assert_and_replace(
+            grapher_config.get("title", ""), "before tax", "before vs. after tax", "grapher_config.title", col_name
+        )
+        subtitle = _assert_and_replace(
+            grapher_config.get("subtitle", ""),
+            " Income here is measured before taxes and benefits.",
+            "",
+            "grapher_config.subtitle",
+            col_name,
+        )
 
         description_key = list(meta.description_key) if meta.description_key else []
-        description_key = [k for k in description_key if "post-tax" not in k and "pre-tax" not in k]
+        old_welfare_keys = {OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI, OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI}
+        assert any(b in old_welfare_keys for b in description_key), (
+            f"Neither OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI nor _MI found in {col_name}.description_key — garden text changed, update the constants."
+        )
+        new_text = (
+            NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_SHARE
+            if view.dimensions.get("indicator") == "share"
+            else NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_REST
+        )
+        description_key = [new_text if b in old_welfare_keys else b for b in description_key]
 
         return {"title": title, "subtitle": subtitle, "description_key": description_key}
 
@@ -258,5 +359,15 @@ def _get_display_name_from_metadata(ind, indicator_titles):
                 if extracted.endswith(suffix):
                     extracted = extracted[: -len(suffix)]
                     break
-            return extracted[0].upper() + extracted[1:] if extracted else extracted
+            name = extracted[0].upper() + extracted[1:] if extracted else extracted
+            # In thr views, annotate the 5th decile as the median.
+            if name and col_name.startswith("thr__") and _get_decile_number(ind) == 5:
+                name = f"{name} (median)"
+            return name
     return None
+
+
+def _assert_and_replace(text, old, new, field, col_name):
+    """Replace `old` with `new` in `text`; assert `old` was present so silent drift in the garden meta surfaces as a clear error."""
+    assert old in text, f"'{old}' not found in {col_name}.{field} — garden text changed, update the replacement."
+    return text.replace(old, new)

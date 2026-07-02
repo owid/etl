@@ -10,7 +10,7 @@ A VS Code extension that detects and highlights outdated code practices in Pytho
 
 ## Detected Patterns
 
-Currently, the extension detects the following outdated practices:
+Currently, the extension detects the following outdated practices. Unless noted otherwise, each pattern is scoped to data step files (`etl/steps/data/**`).
 
 ### 1. `dest_dir` Usage
 Detects use of this outdated variable in various contexts:
@@ -19,7 +19,7 @@ Detects use of this outdated variable in various contexts:
 - Variable usage: `dest_dir,` or `dest_dir)`
 - String literals: `"dest_dir"` or `'dest_dir'`
 
-**Recommended alternative:** Use modern path handling patterns
+**Recommended alternative:** Use `paths.create_dataset`, which does not need `dest_dir`
 
 ### 2. `geo.harmonize_countries()`
 Detects calls to the outdated country harmonization function:
@@ -28,7 +28,37 @@ Detects calls to the outdated country harmonization function:
 
 **Recommended alternative:** Use `paths.regions.harmonize_names(tb)` instead
 
-### 3. `paths.load_dependency()`
+### 3. `geo.add_population_to_table()`
+Detects calls to the deprecated population helper.
+
+**Recommended alternative:** Use `paths.regions.add_population(tb)` (auto-resolves the population dataset from the DAG); for per-capita indicators, prefer `paths.regions.add_per_capita(tb)`
+
+### 4. `geo.add_regions_to_table()`
+Detects calls to the deprecated region-aggregation helper.
+
+**Recommended alternative:** Use `paths.regions.add_aggregates(tb, ...)` (auto-resolves regions and income_groups from the DAG)
+
+### 5. `geo.add_region_aggregates()`
+Detects calls to the older sibling of `add_regions_to_table()`.
+
+**Recommended alternative:** Use `paths.regions.add_aggregates(tb, ...)` (auto-resolves regions and income_groups from the DAG)
+
+### 6. `geo.list_countries_in_region()`
+Detects calls to the deprecated region-membership helper (excludes `geo.list_countries_in_region_that_must_have_data()`, which has its own pattern).
+
+**Recommended alternative:** Use `paths.regions.get_region(<name>)` (auto-resolves regions from the DAG)
+
+### 7. `geo.list_countries_in_region_that_must_have_data()`
+Detects calls to this deprecated helper. No replacement is currently implemented.
+
+**Recommended action:** Inline the country-selection logic locally and flag it for follow-up
+
+### 8. `geo.interpolate_table()`
+Detects calls to the deprecated interpolation helper.
+
+**Recommended alternative:** Use `etl.data_helpers.misc.interpolate_table` instead
+
+### 9. `paths.load_dependency()`
 Detects calls to the deprecated dependency loader:
 - `paths.load_dependency("namespace/version/dataset")`
 - `ds = paths.load_dependency(...)`
@@ -37,7 +67,7 @@ Detects calls to the deprecated dependency loader:
 - Use `paths.load_dataset()` for loading datasets
 - Use `paths.load_snapshot()` for loading snapshots
 
-### 4. `if __name__ == "__main__"` in Snapshots
+### 10. `if __name__ == "__main__"` in Snapshots
 Detects outdated main block patterns in snapshot files:
 - `if __name__ == "__main__":`
 - `if __name__=="__main__":`
@@ -45,7 +75,14 @@ Detects outdated main block patterns in snapshot files:
 
 **Scope:** Only applies to files in `snapshots/**`
 
-**Recommended action:** Remove this pattern from snapshot files
+**Recommended action:** Remove this pattern — snapshots run directly via `etls` (or `etl snapshot`)
+
+### 11. `.set_index()` to finalize a table
+Detects calls that set the index manually before `create_dataset`:
+- `tb = tb.set_index(["country", "year"])`
+- `tb = tb.set_index(["disease", "Year"], verify_integrity=False)`
+
+**Recommended alternative:** Use `tb.format()`, which sets the index and also sorts rows, checks the key is unique, and normalizes column names/types. `format()` expects `country` and `year` by default; pass custom keys with `tb.format(["disease", "year"])`. For year-less tables use `set_index("country")` plus `tb.metadata.short_name`
 
 ## Adding New Patterns
 
@@ -170,5 +207,5 @@ This extension is installed automatically via `make vsce-sync` from the project 
 
 To manually install:
 ```bash
-code --install-extension vscode_extensions/detect-outdated-practices/install/detect-outdated-practices-0.0.1.vsix
+code --install-extension vscode_extensions/detect-outdated-practices/install/detect-outdated-practices-0.0.4.vsix
 ```

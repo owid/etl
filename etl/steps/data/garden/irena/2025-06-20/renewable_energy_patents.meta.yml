@@ -9,11 +9,13 @@ definitions:
     display:
       numDecimalPlaces: 0
     description_key:
-    - The number of patents filed for the last few years may be subject to a time lag; processing times of patent applications vary and some patents submitted over this period may not yet be recorded in the statistics.
+      - The number of patents filed for the last few years may be subject to a time lag; processing times of patent applications vary and some patents submitted over this period may not yet be recorded in the statistics.
 
 dataset:
   update_period_days: 365
 
+  owners:
+    - Pablo Rosado
 tables:
   renewable_energy_patents:
     title: Renewable energy patents

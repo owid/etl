@@ -3,6 +3,8 @@ dataset:
   description: ''
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   global_precipitation_anomaly_noaa:
     variables:

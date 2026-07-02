@@ -1,5 +1,7 @@
 dataset:
   title: Coefficient of Variation (CV) in caloric intake
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   coefficient_of_variation__cv__in_caloric_intake:
     variables:

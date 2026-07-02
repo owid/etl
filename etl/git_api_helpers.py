@@ -9,10 +9,11 @@ from typing import Any
 
 import jwt
 import requests
-from github import Auth, Github, GithubException, InputGitTreeElement
+from github import Auth, Github, GithubException, GithubRetry, InputGitTreeElement
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from structlog import get_logger
+from urllib3.util.retry import Retry
 
 from etl.config import (
     GITHUB_TOKEN,
@@ -26,6 +27,26 @@ from etl.paths import BASE_DIR
 # Initialize logger.
 log = get_logger()
 
+# GitHub's auth backend occasionally returns a spurious 401 "Bad credentials" for a token that is
+# actually valid, especially under bursty load (e.g. scan-chart-diff iterating over many PRs); the
+# whole scan then aborts and floods Sentry (ETL-85). Retry the 401 at the HTTP layer so every API call
+# (repo lookup, get_pulls, check-run/comment writes, ...) is covered, not just the initial repository
+# resolution. A 401 means the request was rejected before processing, so retrying is safe even for
+# writes; a genuinely invalid token keeps returning 401, exhausts the retries, and still raises.
+#
+# Extend PyGithub's own GithubRetry (rather than a bare urllib3 Retry) so we keep its default handling
+# of 5xx and 403 secondary-rate-limit responses, and we add 401 to the 5xx force list. We also set
+# allowed_methods explicitly: GithubRetry's default is the urllib3 idempotent set plus {GET, POST},
+# which omits PATCH — but owidbot edits its existing PR comment via IssueComment.edit (a PATCH), so a
+# transient 401 there would otherwise escape the retry. All of these calls are idempotent/rejected
+# pre-processing, so retrying them is safe. backoff_factor adds spacing between attempts.
+GITHUB_RETRY = GithubRetry(
+    total=10,
+    backoff_factor=1.0,
+    status_forcelist=list(range(500, 600)) + [401],
+    allowed_methods=Retry.DEFAULT_ALLOWED_METHODS | {"GET", "POST", "PATCH"},
+)
+
 
 def get_github_instance(access_token: str | None = None) -> Github:
     """Return a PyGithub instance authenticated with the token.
@@ -36,8 +57,8 @@ def get_github_instance(access_token: str | None = None) -> Github:
     token = access_token or GITHUB_TOKEN
     if token:
         auth = Auth.Token(token)
-        return Github(auth=auth)
-    return Github()  # Anonymous access
+        return Github(auth=auth, retry=GITHUB_RETRY)
+    return Github(retry=GITHUB_RETRY)  # Anonymous access
 
 
 def generate_jwt(client_id: str, private_key_path: str) -> str:
@@ -168,7 +189,10 @@ class GithubApiRepo:
 
     @property
     def repo(self) -> Repository:
-        """Get the PyGithub Repository object (lazily loaded)."""
+        """Get the PyGithub Repository object (lazily loaded).
+
+        Transient GitHub 401s are retried at the HTTP layer (see GITHUB_RETRY in get_github_instance).
+        """
         if self._repo is None:
             if self.full_repo_name.count("/") == 1:
                 # Get by org/repo format

@@ -119,11 +119,15 @@ def test_app_fasttrack():
     # at.radio[0].set_value("update_gsheet")
     _pick_button_by_label(at, "Submit").click().run()
 
-    # Allow ValidationError for missing sheet template
+    # Allow ValidationError for missing sheet template, or for the latest sheet (picked by
+    # date_accessed, regardless of visibility) being a draft that hasn't been published as
+    # CSV yet -- both are expected states of real, unpublished/in-progress fasttrack data,
+    # not bugs in the app.
     if at.exception:
         msg = at.exception[0].message
         allowed = [
-            "Sheet not found, have you copied the template? Creating new Google Sheets document or new sheets with the same name in the existing document does not work."
+            "Sheet not found, have you copied the template? Creating new Google Sheets document or new sheets with the same name in the existing document does not work.",
+            "URL does not contain `?output=csv`. Have you published it as CSV and not as HTML by accident?",
         ]
         if any(text in msg for text in allowed):
             return
@@ -173,26 +177,6 @@ def test_app_dashboard():
     assert not at.exception
 
 
-# @pytest.mark.integration
-# @pytest.mark.usefixtures("set_config")
-# def test_app_dataset_preview():
-#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/dataset_preview/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
-
-#     # Select random dataset
-#     dataset_id = _get_random_dataset()
-
-#     sel = at.selectbox[0]
-#     sel.set_value(dataset_id).run()
-
-#     assert not at.exception
-
-#     # Click dependency graph
-#     btn = _pick_button_by_label(at, "Dependency graph")
-#     btn.click().run()
-
-#     assert not at.exception
-
-
 def _get_random_dataset():
     with Session(config.OWID_ENV.engine) as session:
         ds = (
@@ -216,27 +200,6 @@ def test_app_producer_analytics():
     ).run()
 
     assert not at.exception
-
-
-@pytest.mark.integration
-@pytest.mark.usefixtures("set_config")
-def test_app_explorer():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/explorer_edit.py"), default_timeout=DEFAULT_TIMEOUT).run()
-
-    assert not at.exception
-
-
-# @pytest.mark.integration
-# @pytest.mark.usefixtures("set_config")
-# def test_app_insight_search():
-#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/insight_search/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
-
-#     # Set Author
-#     assert len(at.multiselect) == 1
-#     at.multiselect
-#     at.multiselect[0].set_value(["Max Roser"]).run()
-
-#     assert not at.exception
 
 
 # @pytest.mark.integration

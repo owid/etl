@@ -1,5 +1,7 @@
 dataset:
   title: Human rights protection – Fariss et al. (2020)
+  owners:
+    - Max Roser  # backport
 tables:
   human_rights_protection__fariss_et_al__2020:
     variables:

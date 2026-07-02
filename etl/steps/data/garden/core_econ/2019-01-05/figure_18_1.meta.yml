@@ -1,0 +1,20 @@
+dataset:
+  title: Figure_18.1
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_18_1:
+    variables:
+      total_number_of_employees:
+        title: Total number of employees
+        unit: ''
+        description: Total number of employees is calculated by adding together all operations in a given country.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

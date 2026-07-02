@@ -263,25 +263,32 @@ def run() -> None:
             "indicators": {
                 "y": [
                     {
-                        "catalogPath": "global_hen_inventory#number_of_hens_in_cages",
+                        "catalogPath": "eggs_and_hens_statistics#number_of_hens_in_cages",
                         "display": {
-                            "tolerance": 10,
+                            "name": "In cages",
+                            "color": "#883039",
+                            "tolerance": 5,
                         },
                     },
                     {
-                        "catalogPath": "global_hen_inventory#number_of_hens_cage_free",
+                        "catalogPath": "eggs_and_hens_statistics#number_of_hens_cage_free",
                         "display": {
-                            "tolerance": 10,
+                            "name": "Cage-free",
+                            "color": "#5D7395",
+                            "tolerance": 5,
                         },
                     },
                 ]
             },
             "config": {
-                "title": "Number of laying hens in cages and cage-free housing",
+                "title": "Egg-laying hens in cages and cage-free systems",
+                "subtitle": "Cage-free housing systems include barns and free-range (non-organic and organic) farms. Cages can be conventional (battery cages) or enriched.",
+                "note": "Data may refer to different years for each country, due to limited data availability.",
                 "hasMapTab": False,
                 "type": "StackedDiscreteBar",
-                # TODO: How can I add the Settings button, to allow for relative?
-                # "stackMode": "absolute",
+                "stackMode": "absolute",
+                "hideRelativeToggle": False,
+                "selectedEntityNames": config["config"]["selection"],
             },
         }
     )

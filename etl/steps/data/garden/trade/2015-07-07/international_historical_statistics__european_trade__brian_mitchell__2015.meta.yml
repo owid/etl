@@ -1,5 +1,7 @@
 dataset:
   title: 'International Historical Statistics: European trade - Brian Mitchell (2015)'
+  owners:
+    - Max Roser  # backport
 tables:
   international_historical_statistics__european_trade__brian_mitchell__2015:
     variables:

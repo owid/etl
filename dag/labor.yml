@@ -1,25 +1,22 @@
 steps:
-
   #
   # ILOSTAT
   #
-  data://meadow/un/2026-02-03/ilostat:
-    - snapshot://un/2026-02-03/ilostat_dictionary_sex.parquet
-    - snapshot://un/2026-02-03/ilostat_dictionary_note_classif.parquet
-    - snapshot://un/2026-02-03/ilostat_dictionary_classif1.parquet
-    - snapshot://un/2026-02-03/ilostat_dictionary_ref_area.parquet
-    - snapshot://un/2026-02-03/ilostat.parquet
-    - snapshot://un/2026-02-03/ilostat_dictionary_obs_status.parquet
-    - snapshot://un/2026-02-03/ilostat_dictionary_note_source.parquet
-    - snapshot://un/2026-02-03/ilostat_dictionary_source.parquet
-    - snapshot://un/2026-02-03/ilostat_dictionary_indicator.parquet
-    - snapshot://un/2026-02-03/ilostat_dictionary_classif2.parquet
-    - snapshot://un/2026-02-03/ilostat_table_of_contents_country.parquet
-    - snapshot://un/2026-02-03/ilostat_dictionary_note_indicator.parquet
-  data://garden/un/2026-02-03/ilostat:
-    - data://meadow/un/2026-02-03/ilostat
   data://grapher/un/2026-02-03/ilostat:
-    - data://garden/un/2026-02-03/ilostat
+    - data://garden/un/2026-02-03/ilostat:
+      - data://meadow/un/2026-02-03/ilostat:
+        - snapshot://un/2026-02-03/ilostat_dictionary_sex.parquet
+        - snapshot://un/2026-02-03/ilostat_dictionary_note_classif.parquet
+        - snapshot://un/2026-02-03/ilostat_dictionary_classif1.parquet
+        - snapshot://un/2026-02-03/ilostat_dictionary_ref_area.parquet
+        - snapshot://un/2026-02-03/ilostat.parquet
+        - snapshot://un/2026-02-03/ilostat_dictionary_obs_status.parquet
+        - snapshot://un/2026-02-03/ilostat_dictionary_note_source.parquet
+        - snapshot://un/2026-02-03/ilostat_dictionary_source.parquet
+        - snapshot://un/2026-02-03/ilostat_dictionary_indicator.parquet
+        - snapshot://un/2026-02-03/ilostat_dictionary_classif2.parquet
+        - snapshot://un/2026-02-03/ilostat_table_of_contents_country.parquet
+        - snapshot://un/2026-02-03/ilostat_dictionary_note_indicator.parquet
 
   #
   # ILOSTAT national vs. modeled comparison (from WDI)
@@ -34,30 +31,44 @@ steps:
     - data://grapher/worldbank_wdi/2026-02-27/wdi
 
   #
-  # Female labor force participation in the long run (from Killingsworth and Heckman, 1986)
-  #
-  data://meadow/labor/2026-02-17/female_labor_force_participation_long_run:
-    - snapshot://labor/2026-02-17/female_labor_force_participation_long_run.csv
-  data://garden/labor/2026-02-17/female_labor_force_participation_long_run:
-    - data://meadow/labor/2026-02-17/female_labor_force_participation_long_run
-
-  #
   # Female labor participation rate OMM
   #
-  data://garden/labor/2026-02-17/female_labor_force_participation_omm:
-    - data://garden/labor/2026-02-17/female_labor_force_participation_long_run
-    - data://garden/worldbank_wdi/2026-02-27/wdi
   data://grapher/labor/2026-02-17/female_labor_force_participation_omm:
-    - data://garden/labor/2026-02-17/female_labor_force_participation_omm
+    - data://garden/labor/2026-02-17/female_labor_force_participation_omm:
+      # Female labor force participation in the long run (from Killingsworth and Heckman, 1986)
+      - data://garden/labor/2026-02-17/female_labor_force_participation_long_run:
+        - data://meadow/labor/2026-02-17/female_labor_force_participation_long_run:
+          - snapshot://labor/2026-02-17/female_labor_force_participation_long_run.csv
+      - data://garden/worldbank_wdi/2026-02-27/wdi
 
   #
   # ILO/UNICEF child labor report
   #
-  data://meadow/un/2026-04-08/child_labor_report:
-    - snapshot://un/2026-04-08/child_labor_trends.csv
-    - snapshot://un/2026-04-08/child_labor_by_region.csv
-    - snapshot://un/2026-04-08/hazardous_work_by_region.csv
-  data://garden/un/2026-04-08/child_labor_report:
-    - data://meadow/un/2026-04-08/child_labor_report
   data://grapher/un/2026-04-08/child_labor_report:
-    - data://garden/un/2026-04-08/child_labor_report
+    - data://garden/un/2026-04-08/child_labor_report:
+      - data://meadow/un/2026-04-08/child_labor_report:
+        - snapshot://un/2026-04-08/child_labor_trends.csv
+        - snapshot://un/2026-04-08/child_labor_by_region.csv
+        - snapshot://un/2026-04-08/hazardous_work_by_region.csv
+  export://multidim/un/latest/child_labor:
+    - data://grapher/un/2026-04-08/child_labor_report
+  export://multidim/un/latest/hazardous_work:
+    - data://grapher/un/2026-04-08/child_labor_report
+
+  #
+  # Child labor in the long run (multiple sources)
+  #
+  data://grapher/child_labor/2026-05-08/child_labor_long_run:
+    - data://garden/child_labor/2026-05-08/child_labor_long_run:
+      - data://meadow/child_labor/2026-05-08/child_labor_long_run:
+        - snapshot://child_labor/2026-05-06/child_labor_us_long.csv
+        - snapshot://child_labor/2026-05-06/child_labor_belgium.csv
+        - snapshot://child_labor/2026-05-06/child_labor_portugal.csv
+        - snapshot://child_labor/2026-05-06/child_labor_denmark.csv
+        - snapshot://child_labor/2026-05-06/child_labor_italy.csv
+        - snapshot://child_labor/2026-05-06/child_labor_sweden.csv
+        - snapshot://child_labor/2026-05-06/child_labor_us_carter_sutch.csv
+        - snapshot://child_labor/2026-05-06/child_labor_portugal_goulart_bedi.csv
+        - snapshot://child_labor/2026-05-06/child_labor_england_wales_scotland.csv
+        - snapshot://un/2026-05-06/child_labor_england_wales.csv
+        - snapshot://un/2026-05-06/child_labor_japan.csv

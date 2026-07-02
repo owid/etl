@@ -40,6 +40,60 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         scope: 'etl/steps/data/**'
     },
     {
+        // Matches geo.add_population_to_table (deprecated per its own docstring).
+        // Common patterns:
+        // - geo.add_population_to_table(tb=tb, ds_population=...)
+        // - tb = geo.add_population_to_table(...)
+        pattern: /geo\.add_population_to_table\(/g,
+        message: '`geo.add_population_to_table` is outdated. Use `paths.regions.add_population(tb)` instead (auto-resolves the population dataset from the DAG; for per-capita indicators, prefer `paths.regions.add_per_capita(tb)`).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.add_regions_to_table (deprecated per its own docstring).
+        // Common patterns:
+        // - geo.add_regions_to_table(tb=tb, ds_regions=..., regions=[...], aggregations=...)
+        // - tb = geo.add_regions_to_table(...)
+        pattern: /geo\.add_regions_to_table\(/g,
+        message: '`geo.add_regions_to_table` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.add_region_aggregates (older sibling of add_regions_to_table).
+        // The docstring at etl/data_helpers/geo.py:286 says: "use the add_aggregates() method of the Regions class".
+        pattern: /geo\.add_region_aggregates\(/g,
+        message: '`geo.add_region_aggregates` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.list_countries_in_region.
+        // The docstring at etl/data_helpers/geo.py:121 says: "use the get_region() method of the Regions class".
+        // The negative lookahead skips list_countries_in_region_that_must_have_data, which has its own warning below.
+        pattern: /geo\.list_countries_in_region(?!_that_must_have_data)\(/g,
+        message: '`geo.list_countries_in_region` is outdated. Use `paths.regions.get_region(<name>)` instead (auto-resolves regions from the DAG).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.list_countries_in_region_that_must_have_data.
+        // The docstring at etl/data_helpers/geo.py:178 says: "Currently no alternative is implemented." Flag anyway so the
+        // call site is visible — users may need to inline the logic or wait for a replacement.
+        pattern: /geo\.list_countries_in_region_that_must_have_data\(/g,
+        message: '`geo.list_countries_in_region_that_must_have_data` is deprecated and no replacement is currently implemented. Inline the country-selection logic locally and flag this for follow-up.',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches geo.interpolate_table.
+        // The docstring at etl/data_helpers/geo.py:695 says: "Use `etl.data_helpers.misc.interpolate_table` instead".
+        pattern: /geo\.interpolate_table\(/g,
+        message: '`geo.interpolate_table` is outdated. Use `etl.data_helpers.misc.interpolate_table` instead.',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
+    },
+    {
         // Matches paths.load_dependency
         // Common patterns:
         // - paths.load_dependency("dataset_name")
@@ -59,6 +113,25 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         message: '`if __name__ == "__main__"` blocks are outdated in snapshot files. Remove it, as you no longer need it. You can now run snapshots directly with `etls` (or `etl snapshot`) command.',
         severity: vscode.DiagnosticSeverity.Warning,
         scope: 'snapshots/**'
+    },
+    {
+        // Matches .set_index(...) used to finalize a table before create_dataset.
+        // Common patterns:
+        // - tb = tb.set_index(["country", "year"])
+        // - tb = tb.set_index(["disease", "Year"], verify_integrity=False)
+        // `Table.format()` is the modern way to set the index — it also sorts rows,
+        // validates the key, and normalizes column names/types.
+        //
+        // The `[^()]*` captures the argument list (which never contains its own parens
+        // in a finalize call) and the negative lookahead `(?!\s*[.\[])` skips calls that
+        // are chained or subscripted — those are intermediate lookups/reshapes where
+        // `format()` is NOT a replacement, e.g.:
+        //   - .set_index("country")["pa_nus_prvt_pp"]        (subscript)
+        //   - tb_meta.set_index("indicator_code").to_dict("index")  (method chain)
+        pattern: /\.set_index\([^()]*\)(?!\s*[.\[])/g,
+        message: '`set_index` is outdated for finalizing a table. Use `tb.format()` instead, which sets the index and also sorts rows, checks the key is unique, and normalizes column names/types. `format()` expects `country` and `year` by default; pass custom keys with `tb.format(["disease", "year"])`. For year-less tables use `set_index("country")` plus `tb.metadata.short_name`.',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
     }
 ];
 

@@ -12,9 +12,11 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Pablo Rosado
 tables:
   global_historical_electricity:
     variables:
       # Since (almost) all variables are combined with Ember's data, we don't need to define metadata for them.
       # The only variables that don't have metadata are other_production and other_share, which we probably won't use.
-      {}
+        {}

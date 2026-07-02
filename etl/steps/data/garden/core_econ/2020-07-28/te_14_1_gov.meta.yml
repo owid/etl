@@ -1,0 +1,24 @@
+dataset:
+  title: TE-14.1_gov
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_14_1_gov:
+    variables:
+      gdp_growth__pct:
+        title: GDP growth (%)
+        unit: '%'
+      government_revenue__as_a_per_cent_of_gnp:
+        title: Government revenue (as a per cent of GNP)
+        unit: '%'
+        description: |-
+          Government revenue is calculated as the sum of state, local and federal government current receipts. The data for all series can be downloaded from the interactive NIPA tables on the US BEA website.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

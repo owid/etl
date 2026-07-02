@@ -1,0 +1,20 @@
+dataset:
+  title: TE-13.20b
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_13_20b:
+    variables:
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: '%'
+        description: Unemployment rate of the UK population aged 16 and over, seasonally adjusted.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

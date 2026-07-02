@@ -2,13 +2,13 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate vsce-exclude-archived owid_mcp vsce-compile vsce-sync install-hooks
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks
 
 include default.mk
 
-SRC = etl snapshots apps api_search tests docs owid_mcp
+SRC = etl snapshots apps api_search tests docs owid_mcp owl_steps lib/owl/owl
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
-LIBS = lib/*
+LIBS = lib/catalog lib/datautils lib/owl lib/repack
 
 help:
 	@echo 'Available commands:'
@@ -32,10 +32,10 @@ help:
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make query SQL="..." Run SQL query on staging MySQL for current branch'
-	@echo '  make install-hooks	Install git hooks (runs make check before commit)'
+	@echo '  make install-hooks	Activate pre-commit hook (auto-runs with make .venv)'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
-	@echo '  make vsce-exclude-archived  Exclude archived steps from VSCode user settings'
+	@echo '  make check-all 	Format, lint, and typecheck (including for modules in lib/)'
 	@echo '  make vsce-sync 	Sync VS Code extensions (install missing, upgrade outdated)'
 # 	@echo '  make vsce-compile EXT=name [BUMP=patch|minor|major] [INSTALL=1]  Compile and package VS Code extension'
 	@echo '  make watch     	Run all tests, watching for changes'
@@ -67,12 +67,12 @@ docs.build: .venv
 	@echo '==> Pre-processing documentation files'
 	@$(MAKE) --no-print-directory docs.pre
 	@echo '==> Building documentation with Zensical'
-	@DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:[(f,h) for f,h in o(cfg,p) if '/.venv' not in f]; __import__('zensical').build(__import__('os').path.abspath('zensical.toml'),True)"
+	@DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:type(r:=o(cfg,p))(x for x in r if '/.venv' not in x[0]); __import__('zensical').build(__import__('os').path.abspath('zensical.toml'),{'clean':True,'strict':False})"
 	@echo '==> Post-processing documentation files'
 	@$(MAKE) --no-print-directory docs.post
 
 docs.serve: .venv
-	DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:[(f,h) for f,h in o(cfg,p) if '/.venv' not in f]; __import__('zensical').serve(__import__('os').path.abspath('zensical.toml'),{'dev_addr':'localhost:9010','open':False,'strict':False})"
+	DOCS_BUILD=1 .venv/bin/python -c "import zensical.config as c; o=c._list_sources; c._list_sources=lambda cfg,p:type(r:=o(cfg,p))(x for x in r if '/.venv' not in x[0]); __import__('zensical').serve(__import__('os').path.abspath('zensical.toml'),{'dev_addr':'localhost:9010','open':False,'strict':False})"
 
 watch-all:
 	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
@@ -83,6 +83,14 @@ test-all:
 	@for lib in $(LIBS); do \
 		echo "================ $$lib ================="; \
 		(cd $$lib && make test); \
+	done
+
+check-all:
+	@echo '================ etl ================='
+	@make check
+	@for lib in $(LIBS); do \
+		echo "================ $$lib ================="; \
+		(cd $$lib && make check); \
 	done
 
 format-all:
@@ -124,7 +132,7 @@ full: .venv
 
 clean:
 	@echo '==> Cleaning data/ folder'
-	rm -rf data && git checkout data
+	rm -rf data && mkdir data
 
 clobber: clean
 	find . -name .venv | xargs rm -rf
@@ -224,19 +232,23 @@ vsce-sync:
 		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension sync."; \
 	fi
 
-# Backward-compatible alias
+# Activate the tracked pre-commit hook by pointing git at scripts/hooks/.
+# Idempotent; runs as a dependency of .venv so a fresh clone gets the hook
+# the first time anyone sets up the environment.
 install-hooks:
-	@echo '==> Installing git hooks'
-	cp scripts/hooks/pre-commit .git/hooks/pre-commit
-	chmod +x .git/hooks/pre-commit
-	@echo '==> Done. pre-commit hook will run make check before each commit.'
+	@if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then \
+		if [ "$$(git config --get core.hooksPath 2>/dev/null)" != "scripts/hooks" ]; then \
+			git config core.hooksPath scripts/hooks; \
+			chmod +x scripts/hooks/pre-commit; \
+			echo '==> pre-commit hook active (core.hooksPath=scripts/hooks)'; \
+		fi; \
+	fi
+
+.venv: .venv-default install-hooks
+	@true
 
 # Backward-compatible alias
 install-vscode-extensions: vsce-sync
-
-vsce-exclude-archived: .venv
-	@echo '==> Excluding archived steps from VSCode user settings'
-	.venv/bin/python scripts/exclude_archived_steps.py --settings-scope user
 
 # Compile and package a VS Code extension
 # Usage: make vsce-compile EXT=detect-outdated-practices [BUMP=patch|minor|major] [INSTALL=1]

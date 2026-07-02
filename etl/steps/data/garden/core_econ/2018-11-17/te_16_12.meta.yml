@@ -1,0 +1,25 @@
+dataset:
+  title: TE-16.12
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_16_12:
+    variables:
+      real_wage_growth__average_annual_growth_rate__1970_2011:
+        title: Real wage growth (average annual growth rate, 1970-2011)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      unemployment_rate__average_annual_rate__1970_2011:
+        title: Unemployment rate (average annual rate, 1970-2011)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

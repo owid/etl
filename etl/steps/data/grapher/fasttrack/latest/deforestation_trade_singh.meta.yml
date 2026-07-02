@@ -1,0 +1,68 @@
+dataset:
+  title: Deforestation embedded in trade (Singh et al, 2026)
+  description: ''
+  licenses:
+    - {}
+tables:
+  deforestation_trade_singh:
+    variables:
+      imported_deforestation_ha:
+        title: Imported deforestation
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation caused by imported agricultural products.
+      exported_deforestation_ha:
+        title: Exported deforestation
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation caused by exported agricultural products.
+      net_traded_deforestation_ha:
+        title: Net traded deforestation
+        unit: hectares
+        short_unit: ha
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          Estimated net deforestation caused by agricultural products. This is deforestation caused by imported goods, minus exported goods.
+      production_emissions_mtco2:
+        title: Deforestation emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+          conversionFactor: 1000000.0
+        description: Estimated carbon emissions produced from domestic deforestation. This includes estimated emissions from
+          peatland.
+      consumption_emissions_mtco2:
+        title: Trade-adjusted deforestation emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          numDecimalPlaces: 0
+          conversionFactor: 1000000.0
+        description: |-
+          Estimated carbon emissions produced from deforestation, which is adjusted for trade. This means it includes emissions associated with imported products. This includes estimated emissions from peatland.
+      production_deforestation_sqm_per_capita:
+        title: Domestic deforestation per person
+        unit: square meters
+        short_unit: m²
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation per person based on domestic deforestation.
+      consumption_deforestation_sqm_per_capita:
+        title: Trade-adjusted deforestation per person
+        unit: square meters
+        short_unit: m²
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          Estimated consumption-based deforestation per person; this is adjusted for trade, so it reflects consumption deforestation, not domestic production.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

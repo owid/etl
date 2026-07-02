@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
+import uuid
 import warnings
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -115,7 +116,14 @@ class Dataset:
         if path.is_dir():
             if not (path / "index.json").exists():
                 raise Exception(f"refuse to overwrite non-dataset dir at: {path}")
-            shutil.rmtree(path)
+            # Atomically move aside before deletion so a partially failed rmtree
+            # (e.g. ENOTEMPTY from concurrent writers) doesn't leave the dataset
+            # path in a half-deleted state without index.json. The suffix is a
+            # uuid so a leftover temp dir from an earlier partial cleanup never
+            # collides with the next attempt.
+            tmp = path.with_name(f".{path.name}.tmp.{uuid.uuid4().hex}")
+            path.rename(tmp)
+            shutil.rmtree(tmp, ignore_errors=True)
 
         path.mkdir(parents=True, exist_ok=True)
 
@@ -323,7 +331,6 @@ class Dataset:
         self,
         metadata_path: Path,
         yaml_params: dict[str, Any] | None = None,
-        if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
         errors: Literal["ignore", "warn", "raise"] = "raise",
         extra_variables: Literal["raise", "ignore"] = "raise",
@@ -338,10 +345,6 @@ class Dataset:
             metadata_path: Path to the .meta.yml file with metadata definitions.
                 See existing metadata files for examples of the expected structure.
             yaml_params: Additional parameters to pass to the YAML loader.
-            if_source_exists: How to handle existing sources:
-                - "replace" (default): Replace existing source with new one
-                - "append": Append new source to existing sources
-                - "fail": Raise exception if source already exists
             if_origins_exist: How to handle existing origins:
                 - "replace" (default): Replace existing origin with new one
                 - "append": Append new origin to existing origins
@@ -364,7 +367,7 @@ class Dataset:
             ... )
             ```
         """
-        self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
+        self.metadata.update_from_yaml(metadata_path)
 
         with open(metadata_path) as istream:
             metadata = yaml.safe_load(istream)
@@ -386,6 +389,39 @@ class Dataset:
                     extra_variables=extra_variables,
                 )
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
+
+    def update_metadata_from_dict(
+        self,
+        metadata: dict[str, Any],
+        if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+        errors: Literal["ignore", "warn", "raise"] = "raise",
+        extra_variables: Literal["raise", "ignore"] = "raise",
+    ) -> None:
+        """Update dataset and table metadata from a parsed metadata dictionary."""
+        from owid.catalog.core.yaml_metadata import update_metadata_from_dict
+
+        for k, v in metadata.get("dataset", {}).items():
+            if k != "sources":
+                setattr(self.metadata, k, v)
+
+        for table_name in metadata.get("tables", {}).keys():
+            try:
+                table = self[table_name]
+            except KeyError as e:
+                if errors == "raise":
+                    raise e
+                if errors == "warn":
+                    warnings.warn(str(e))
+                continue
+            update_metadata_from_dict(
+                table,
+                metadata,
+                table_name,
+                if_origins_exist=if_origins_exist,
+                extra_variables=extra_variables,
+            )
+            table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
     def index(self, catalog_path: Path = Path("/")) -> pd.DataFrame:
         """Generate an index DataFrame describing all tables in this dataset.

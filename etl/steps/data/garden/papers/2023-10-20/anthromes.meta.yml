@@ -1,3 +1,6 @@
+dataset:
+  owners:
+    - Fiona Spooner
 definitions:
   description_uninhabited_ice: &description_uninhabited_ice |
     Ice-covered areas that are not inhabited by humans or user for urban, crop or pasture land.
@@ -192,7 +195,7 @@ tables:
       share_of_land_type_woodlands:
         title: Share of land that is covered by woodland
         description_short: |-
-         The share of total land area covered by residential woodlands, populated woodlands, remote woodlands or wild woodlands.
+          The share of total land area covered by residential woodlands, populated woodlands, remote woodlands or wild woodlands.
         unit: "%"
         short_unit: "%"
         description_processing: |-

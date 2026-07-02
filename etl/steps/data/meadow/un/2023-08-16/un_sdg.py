@@ -2,8 +2,8 @@
 
 import re
 
-import pandas as pd
 from owid.catalog import Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -21,31 +21,30 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Retrieve snapshot.
+    # Retrieve snapshot. Reading via `snap.read_feather` attaches the snapshot's
+    # origin to every column, so origins propagate through meadow → garden → grapher
+    # without per-step plumbing.
     snap = paths.load_snapshot("un_sdg.feather")
-
-    # Load data from snapshot.
-    df = pd.read_feather(snap.path)
+    tb = snap.read_feather()
 
     log.info("un_sdg.load_and_clean")
-    df = load_and_clean(df)
-    log.info("Size of dataframe", rows=df.shape[0], colums=df.shape[1])
-    df = df.reset_index(drop=True).drop(columns="index")
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = load_and_clean(tb)
+    log.info("Size of dataframe", rows=tb.shape[0], colums=tb.shape[1])
+    tb = tb.reset_index(drop=True).drop(columns="index")
+    tb = tb.underscore()
+    tb.metadata.short_name = paths.short_name
     ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
     ds.save()
     log.info("un_sdg.end")
 
 
-def load_and_clean(original_df: pd.DataFrame) -> pd.DataFrame:
-    # Load and clean the data
+def load_and_clean(tb: Table) -> Table:
     log.info("un_sdg.reading_in_original_data")
-    original_df = original_df.copy(deep=False)
 
     # removing values that aren't numeric e.g. Null and N values
-    original_df.dropna(subset=["Value"], inplace=True)
-    original_df.dropna(subset=["TimePeriod"], how="all", inplace=True)
-    original_df = original_df.loc[pd.to_numeric(original_df["Value"], errors="coerce").notnull()]
-    original_df.rename(columns={"GeoAreaName": "Country", "TimePeriod": "Year"}, inplace=True)
-    original_df = original_df.rename(columns=lambda k: re.sub(r"[\[\]]", "", k))  # ty: ignore
-    return original_df
+    tb = tb.dropna(subset=["Value"])
+    tb = tb.dropna(subset=["TimePeriod"], how="all")
+    tb = tb.loc[pr.to_numeric(tb["Value"], errors="coerce").notnull()]
+    tb = tb.rename(columns={"GeoAreaName": "Country", "TimePeriod": "Year"})
+    tb = tb.rename(columns=lambda k: re.sub(r"[\[\]]", "", k))
+    return tb

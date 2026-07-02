@@ -1,11 +1,11 @@
 dataset:
   title: Child Mortality Estimates
+  owners:
+    - Fiona Spooner
 tables:
   igme:
     title: Child Mortality Estimates
-    description:
-      The 2018 vintages of UN IGME's child mortality estimates. This has greater temporal coverage of many of the
-      variables, including 5-14 years mortality rate which is necessary for calculating the under-fifteen mortality rate.
+    description: The 2018 vintages of UN IGME's child mortality estimates. This has greater temporal coverage of many of the variables, including 5-14 years mortality rate which is necessary for calculating the under-fifteen mortality rate.
     variables:
       obs_value:
         title: Observation value

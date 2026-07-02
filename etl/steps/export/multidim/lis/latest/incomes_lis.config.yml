@@ -14,7 +14,7 @@ default_selection:
 
 default_dimensions:
   indicator: thr
-  decile: all
+  decile: p10_p50_p90
   welfare_type: dhi
   period: month
 
@@ -29,16 +29,22 @@ dimensions:
     choices:
       - slug: mean
         name: Mean income
+        description: The average income across the whole population
       - slug: median
         name: Median income
-      - slug: avg
-        name: Mean income, by decile
+        description: The level of income which 50% of the population falls below, and 50% fall above
       - slug: thr
-        name: Income threshold for each decile
-        description: The income level below which 10%, 20%, 30%, etc. of the population falls
+        name: Threshold income
+        description: The level of income below which 10%, 20%, 30%, etc. of the population falls
+        group: By decile
+      - slug: avg
+        name: "Mean income "
+        description: The average level of income of each decile (tenth) of the population
+        group: By decile
       - slug: share
-        name: Income share of each decile
-        description: The share of income received by each income group
+        name: Share of income
+        description: The share of income received by each decile (tenth) of the population
+        group: By decile
 
   - name: Group
     slug: decile
@@ -56,6 +62,8 @@ dimensions:
         name: All deciles
       - slug: "10_40_50"
         name: Poorest 50%, middle 40% and richest 10%
+      - slug: p10_p50_p90
+        name: "Poorest 10%, median, richest 10%"
       - slug: nan
         name: ""
 

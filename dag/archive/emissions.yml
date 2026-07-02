@@ -1,7 +1,31 @@
 steps:
   #
+  # Emissions - Greenhouse gas emissions by custom sector (2025-09-24).
+  #
+  # archived; last active in 565bef28a32b on 2026-06-16
+  data-private://grapher/emissions/2025-09-24/emissions_by_custom_sector:
+    - data-private://garden/emissions/2025-09-24/emissions_by_custom_sector:
+      - snapshot-private://wri/2025-09-24/emissions_by_detailed_sector.json
+  #
+  # Emissions - Greenhouse gas emissions by custom sector (2026-02-11).
+  #
+  # archived; last active in 565bef28a32b on 2026-06-16
+  data://grapher/emissions/2026-02-11/emissions_by_custom_sector:
+    - data://garden/emissions/2026-02-11/emissions_by_custom_sector:
+      - data://garden/climate_watch/2026-02-10/emissions_by_sector
+      - data://garden/ember/2026-04-24/yearly_electricity
+  #
+  # Emissions - Greenhouse gas emissions by custom sector (2026-03-04).
+  #
+  # archived; last active in 565bef28a32b on 2026-06-16
+  data://grapher/emissions/2026-03-04/emissions_by_custom_sector:
+    - data://garden/emissions/2026-03-04/emissions_by_custom_sector:
+      - data://garden/climate_watch/2026-02-10/emissions_by_sector
+      - data://garden/un/2026-02-11/energy_statistics_database
+  #
   # Jones et al. (2023) - National contributions to climate change (2023-05-02).
   #
+  # archived; last active in 87d8bedb44be on 2023-11-24
   data://meadow/emissions/2023-05-02/national_contributions:
     - snapshot://emissions/2023-05-02/national_contributions_annual_emissions.csv
     - snapshot://emissions/2023-05-02/national_contributions_cumulative_emissions.csv
@@ -9,6 +33,7 @@ steps:
   #
   # Emissions - CO2 dataset (2023-12-12).
   #
+  # archived; last active in ded92d067d98 on 2024-04-15
   data://garden/emissions/2023-12-12/owid_co2:
     - data://garden/emissions/2023-11-23/national_contributions
     - data://garden/gcp/2023-12-12/global_carbon_budget
@@ -20,17 +45,21 @@ steps:
   #
   # Jones et al. (2023) - National contributions to climate change.
   #
+  # archived; last active in ded92d067d98 on 2024-04-15
   data://meadow/emissions/2023-11-23/national_contributions:
     - snapshot://emissions/2023-11-23/national_contributions_annual_emissions.csv
     - snapshot://emissions/2023-11-23/national_contributions_cumulative_emissions.csv
     - snapshot://emissions/2023-11-23/national_contributions_temperature_response.csv
+  # archived; last active in ded92d067d98 on 2024-04-15
   data://garden/emissions/2023-11-23/national_contributions:
     - data://meadow/emissions/2023-11-23/national_contributions
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2023-04-30/income_groups
+  # archived; last active in ded92d067d98 on 2024-04-15
   data://grapher/emissions/2023-11-23/national_contributions:
     - data://garden/emissions/2023-11-23/national_contributions
+  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/gcp/2023-12-12/global_carbon_budget:
     - data://meadow/gcp/2023-12-12/global_carbon_budget
     - data://garden/wb/2023-04-30/income_groups
@@ -38,6 +67,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/energy/2024-05-08/primary_energy_consumption
     - data://garden/demography/2023-03-31/population
+  # archived; last active in e915d8542d95 on 2024-06-25
   data://grapher/gcp/2023-12-12/global_carbon_budget:
     - data://garden/gcp/2023-12-12/global_carbon_budget
   #
@@ -45,12 +75,14 @@ steps:
   #
   # The data from the following step will be used in this static chart:
   # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
+  # archived; last active in e915d8542d95 on 2024-06-25
   data://garden/emissions/2024-02-26/gdp_and_co2_decoupling:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/gcp/2023-12-12/global_carbon_budget
   #
   # GCP - Global Carbon Budget (published on 2023-12-05, updated on 2023-12-12 to use the latest primary energy data).
   #
+  # archived; last active in 892fcef7add2 on 2024-11-22
   data://meadow/gcp/2023-12-12/global_carbon_budget:
     - snapshot://gcp/2023-12-12/global_carbon_budget_fossil_co2_emissions.csv
     - snapshot://gcp/2023-12-12/global_carbon_budget_national_emissions.xlsx
@@ -59,6 +91,7 @@ steps:
   #
   # GCP - Global Carbon Budget (published on 2023-12-05, updated on 2024-06-20 to use the latest primary energy data).
   #
+  # archived; last active in 892fcef7add2 on 2024-11-22
   data://garden/gcp/2024-06-20/global_carbon_budget:
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/demography/2023-03-31/population
@@ -69,17 +102,20 @@ steps:
   #
   # Decoupling of GDP and CO2 (2023).
   #
+  # archived; last active in 892fcef7add2 on 2024-11-22
   data://garden/emissions/2024-06-20/gdp_and_co2_decoupling:
     - data://garden/gcp/2024-06-20/global_carbon_budget
     - data://garden/worldbank_wdi/2024-05-20/wdi
   #
   # GCP - Global Carbon Budget.
   #
+  # archived; last active in 892fcef7add2 on 2024-11-22
   data://grapher/gcp/2024-06-20/global_carbon_budget:
     - data://garden/gcp/2024-06-20/global_carbon_budget
   #
   # GCP - Global Carbon Budget.
   #
+  # archived; last active in 892fcef7add2 on 2024-11-22
   data://meadow/gcp/2024-11-13/global_carbon_budget:
     - snapshot://gcp/2024-11-13/global_carbon_budget_national_emissions.xlsx
     - snapshot://gcp/2024-11-13/global_carbon_budget_fossil_co2_emissions.csv
@@ -88,6 +124,7 @@ steps:
   #
   # GCP - Global Carbon Budget.
   #
+  # archived; last active in 892fcef7add2 on 2024-11-22
   data://garden/gcp/2024-11-13/global_carbon_budget:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/wb/2024-07-29/income_groups
@@ -109,67 +146,83 @@ steps:
   #
   # Decoupling of GDP and CO2 (2023).
   #
+  # archived; last active in 892fcef7add2 on 2024-11-22
   data://garden/emissions/2024-11-13/gdp_and_co2_decoupling:
     - data://garden/gcp/2024-11-13/global_carbon_budget
     - data://garden/worldbank_wdi/2024-05-20/wdi
   #
   # GCP - Global Carbon Budget.
   #
+  # archived; last active in 892fcef7add2 on 2024-11-22
   data://grapher/gcp/2024-11-13/global_carbon_budget:
     - data://garden/gcp/2024-11-13/global_carbon_budget
   #
   # Climate Watch - Greenhouse gas emissions by sector (2023-10-31).
   #
+  # archived; last active in 0e7c319f9af6 on 2024-11-22
   data://meadow/climate_watch/2023-10-31/emissions_by_sector:
     - snapshot://climate_watch/2023-10-31/emissions_by_sector.gz
   #
   # Jones et al. - National contributions to climate change.
   #
+  # archived; last active in 0e7c319f9af6 on 2024-11-22
   data://meadow/emissions/2024-04-08/national_contributions:
     - snapshot://emissions/2024-04-08/national_contributions_temperature_response.csv
     - snapshot://emissions/2024-04-08/national_contributions_annual_emissions.csv
     - snapshot://emissions/2024-04-08/national_contributions_cumulative_emissions.csv
+  # archived; last active in 0e7c319f9af6 on 2024-11-22
   data://garden/climate_watch/2023-10-31/emissions_by_sector:
     - data://meadow/climate_watch/2023-10-31/emissions_by_sector
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
+  # archived; last active in 0e7c319f9af6 on 2024-11-22
   data://garden/emissions/2024-04-08/national_contributions:
     - data://meadow/emissions/2024-04-08/national_contributions
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
+  # archived; last active in 0e7c319f9af6 on 2024-11-22
   data://grapher/climate_watch/2023-10-31/emissions_by_sector:
     - data://garden/climate_watch/2023-10-31/emissions_by_sector
+  # archived; last active in 0e7c319f9af6 on 2024-11-22
   data://grapher/emissions/2024-04-08/national_contributions:
     - data://garden/emissions/2024-04-08/national_contributions
   #
   # RFF - Emissions-weighted Carbon Price (2022-09-14).
   #
+  # archived; last active in 3fecaa75c13f on 2025-06-02
   data://meadow/rff/2023-10-19/emissions_weighted_carbon_price:
     - snapshot://rff/2023-10-19/emissions_weighted_carbon_price.zip
   #
   # RFF - World Carbon Pricing (2022-09-14).
   #
+  # archived; last active in 3fecaa75c13f on 2025-06-02
   data://meadow/rff/2023-10-19/world_carbon_pricing:
     - snapshot://rff/2023-10-19/emissions_weighted_carbon_price.zip
     - snapshot://rff/2023-10-19/world_carbon_pricing.zip
+  # archived; last active in 3fecaa75c13f on 2025-06-02
   data://garden/rff/2023-10-19/emissions_weighted_carbon_price:
     - data://meadow/rff/2023-10-19/emissions_weighted_carbon_price
+  # archived; last active in 3fecaa75c13f on 2025-06-02
   data://garden/rff/2023-10-19/world_carbon_pricing:
     - data://meadow/rff/2023-10-19/world_carbon_pricing
+  # archived; last active in 3fecaa75c13f on 2025-06-02
   data://grapher/rff/2023-10-19/emissions_weighted_carbon_price:
     - data://garden/rff/2023-10-19/emissions_weighted_carbon_price
+  # archived; last active in 3fecaa75c13f on 2025-06-02
   data://grapher/rff/2023-10-19/world_carbon_pricing:
     - data://garden/rff/2023-10-19/world_carbon_pricing
   #
   # Climate Watch - Greenhouse gas emissions by sector.
   #
+  # archived; last active in 63101a07a234 on 2025-09-23
   data://meadow/climate_watch/2024-11-21/emissions_by_sector:
     - snapshot://climate_watch/2024-11-21/emissions_by_sector.gz
   #
   # Climate Watch - Greenhouse gas emissions by sector.
   #
+  # archived; last active in 63101a07a234 on 2025-09-23
   data://garden/climate_watch/2024-11-21/emissions_by_sector:
     - data://meadow/climate_watch/2024-11-21/emissions_by_sector
     - data://garden/regions/2023-01-01/regions
@@ -178,11 +231,13 @@ steps:
   #
   # Climate Watch - Greenhouse gas emissions by sector.
   #
+  # archived; last active in 63101a07a234 on 2025-09-23
   data://grapher/climate_watch/2024-11-21/emissions_by_sector:
     - data://garden/climate_watch/2024-11-21/emissions_by_sector
   #
   # GCP - Global Carbon Budget.
   #
+  # archived; last active in 641acae08fc6 on 2025-11-13
   data://meadow/gcp/2024-11-21/global_carbon_budget:
     - snapshot://gcp/2024-11-21/global_carbon_budget_land_use_change_emissions.xlsx
     - snapshot://gcp/2024-11-21/global_carbon_budget_national_emissions.xlsx
@@ -191,6 +246,7 @@ steps:
   #
   # GCP - Global Carbon Budget.
   #
+  # archived; last active in 641acae08fc6 on 2025-11-13
   data://garden/gcp/2024-11-21/global_carbon_budget:
     - data://garden/demography/2024-07-15/population
     - data://garden/energy/2025-06-27/primary_energy_consumption
@@ -201,17 +257,20 @@ steps:
   #
   # GCP - Global Carbon Budget.
   #
+  # archived; last active in 641acae08fc6 on 2025-11-13
   data://grapher/gcp/2024-11-21/global_carbon_budget:
     - data://garden/gcp/2024-11-21/global_carbon_budget
   #
   # Decoupling of GDP and CO2 (2023).
   #
+  # archived; last active in 641acae08fc6 on 2025-11-13
   data://garden/emissions/2024-11-21/gdp_and_co2_decoupling:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/gcp/2024-11-21/global_carbon_budget
   #
   # Emissions - CO2 dataset.
   #
+  # archived; last active in 641acae08fc6 on 2025-11-13
   data://garden/emissions/2024-11-21/owid_co2:
     - data://garden/demography/2024-07-15/population
     - data://garden/energy/2025-06-27/primary_energy_consumption
@@ -222,6 +281,7 @@ steps:
   #
   # Jones et al. - National contributions to climate change.
   #
+  # archived; last active in a5efcf70cd57 on 2025-12-04
   data://meadow/emissions/2024-11-21/national_contributions:
     - snapshot://emissions/2024-11-21/national_contributions_temperature_response.csv
     - snapshot://emissions/2024-11-21/national_contributions_cumulative_emissions.csv
@@ -229,6 +289,7 @@ steps:
   #
   # Jones et al. - National contributions to climate change.
   #
+  # archived; last active in a5efcf70cd57 on 2025-12-04
   data://garden/emissions/2024-11-21/national_contributions:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/emissions/2024-11-21/national_contributions
@@ -237,6 +298,7 @@ steps:
   #
   # Emissions - CO2 dataset.
   #
+  # archived; last active in a5efcf70cd57 on 2025-12-04
   data://garden/emissions/2025-11-13/owid_co2:
     - data://garden/gcp/2025-11-13/global_carbon_budget
     - data://garden/emissions/2024-11-21/national_contributions
@@ -247,31 +309,38 @@ steps:
   #
   # Jones et al. - National contributions to climate change.
   #
+  # archived; last active in a5efcf70cd57 on 2025-12-04
   data://grapher/emissions/2024-11-21/national_contributions:
     - data://garden/emissions/2024-11-21/national_contributions
   #
   # IPCC - Emission Factor Database (2023-10-24).
   #
+  # archived; last active in 05b14dc74db2 on 2026-01-08
   data://meadow/emissions/2023-10-24/emission_factors:
     - snapshot://emissions/2023-10-24/emission_factors.xlsx
+  # archived; last active in 05b14dc74db2 on 2026-01-08
   data://garden/emissions/2023-10-24/emission_factors:
     - data://meadow/emissions/2023-10-24/emission_factors
+  # archived; last active in 05b14dc74db2 on 2026-01-08
   data://grapher/emissions/2023-10-24/emission_factors:
     - data://garden/emissions/2023-10-24/emission_factors
   #
   # Decoupling of GDP and CO2.
   #
+  # archived; last active in 70d1a813baf5 on 2026-03-05
   data://garden/emissions/2025-11-13/gdp_and_co2_decoupling:
     - data://garden/worldbank_wdi/2025-09-08/wdi
     - data://garden/gcp/2025-11-13/global_carbon_budget
   #
   # Climate Watch - Greenhouse gas emissions by sector.
   #
+  # archived; last active in c42644b370a2 on 2026-02-10
   data://meadow/climate_watch/2025-09-19/emissions_by_sector:
     - snapshot://climate_watch/2025-09-19/emissions_by_sector.gz
   #
   # Climate Watch - Greenhouse gas emissions by sector.
   #
+  # archived; last active in c42644b370a2 on 2026-02-10
   data://garden/climate_watch/2025-09-19/emissions_by_sector:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/climate_watch/2025-09-19/emissions_by_sector
@@ -280,6 +349,7 @@ steps:
   #
   # Climate Watch - Greenhouse gas emissions by sector.
   #
+  # archived; last active in c42644b370a2 on 2026-02-10
   data://grapher/climate_watch/2025-09-19/emissions_by_sector:
     - data://garden/climate_watch/2025-09-19/emissions_by_sector
   #
@@ -289,3 +359,300 @@ steps:
     - data://garden/worldbank_wdi/2026-02-27/wdi
     - data://garden/gcp/2025-11-13/global_carbon_budget
     - data://garden/regions/2023-01-01/regions
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  # archived; last active in c9d19beb5ddb on 2026-05-11
+  data://meadow/rff/2025-06-02/emissions_weighted_carbon_price:
+    - snapshot://rff/2025-06-02/emissions_weighted_carbon_price.zip
+  #
+  # RFF - World Carbon Pricing.
+  #
+  # The following step loads the EWC snapshot simply to get the IPCC codes.
+  # archived; last active in c9d19beb5ddb on 2026-05-11
+  data://meadow/rff/2025-06-02/world_carbon_pricing:
+    - snapshot://rff/2025-06-02/world_carbon_pricing.zip
+    - snapshot://rff/2025-06-02/emissions_weighted_carbon_price.zip
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  # archived; last active in c9d19beb5ddb on 2026-05-11
+  data://garden/rff/2025-06-02/emissions_weighted_carbon_price:
+    - data://meadow/rff/2025-06-02/emissions_weighted_carbon_price
+  #
+  # RFF - World Carbon Pricing.
+  #
+  # archived; last active in c9d19beb5ddb on 2026-05-11
+  data://garden/rff/2025-06-02/world_carbon_pricing:
+    - data://meadow/rff/2025-06-02/world_carbon_pricing
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  # archived; last active in c9d19beb5ddb on 2026-05-11
+  data://grapher/rff/2025-06-02/emissions_weighted_carbon_price:
+    - data://garden/rff/2025-06-02/emissions_weighted_carbon_price
+  #
+  # RFF - World Carbon Pricing.
+  #
+  # archived; last active in c9d19beb5ddb on 2026-05-11
+  data://grapher/rff/2025-06-02/world_carbon_pricing:
+    - data://garden/rff/2025-06-02/world_carbon_pricing
+  #
+  # RFF - World Carbon Pricing.
+  #
+  # archived; last active in 324984998c8e on 2026-05-19
+  data://grapher/rff/2026-05-08/world_carbon_pricing:
+    - data://garden/rff/2026-05-08/world_carbon_pricing:
+      # The IPCC codes lookup is loaded from a dedicated snapshot pinned to an old commit of the ECP
+      # repo, since the file was removed from upstream during the 2026 restructure.
+      - data://meadow/rff/2026-05-08/world_carbon_pricing:
+        - snapshot://rff/2026-05-08/world_carbon_pricing.zip
+        - snapshot://rff/2026-05-08/ipcc_codes.csv
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  # archived; last active in 324984998c8e on 2026-05-19
+  data://grapher/rff/2026-05-08/emissions_weighted_carbon_price:
+    - data://garden/rff/2026-05-08/emissions_weighted_carbon_price:
+      - data://meadow/rff/2026-05-08/emissions_weighted_carbon_price:
+        - snapshot://rff/2026-05-08/emissions_weighted_carbon_price.zip
+  #
+  # RFF - World Carbon Pricing.
+  #
+  # archived; last active in e6dde5790cb7 on 2026-06-10
+  data://grapher/rff/2026-05-18/world_carbon_pricing:
+    - data://garden/rff/2026-05-18/world_carbon_pricing:
+      # The IPCC codes lookup is loaded from a dedicated snapshot pinned to an old commit of the ECP
+      # repo, since the file was removed from upstream during the 2026 restructure.
+      - data://meadow/rff/2026-05-18/world_carbon_pricing:
+        - snapshot://rff/2026-05-18/world_carbon_pricing.zip
+        - snapshot://rff/2026-05-18/ipcc_codes.csv
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  # archived; last active in e6dde5790cb7 on 2026-06-10
+  data://grapher/rff/2026-05-18/emissions_weighted_carbon_price:
+    - data://garden/rff/2026-05-18/emissions_weighted_carbon_price:
+      - data://meadow/rff/2026-05-18/emissions_weighted_carbon_price:
+        - snapshot://rff/2026-05-18/emissions_weighted_carbon_price.zip
+  # archived; last active in 37e480682d06 on 2023-04-10
+  data://grapher/rff/2022-09-14/emissions_weighted_carbon_price:
+    - data://garden/rff/2022-09-14/emissions_weighted_carbon_price:
+      - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__coverage:
+        - walden://rff/2022-09-14/emissions_weighted_carbon_price__coverage
+      - data://meadow/rff/2022-09-14/emissions_weighted_carbon_price__economy:
+        - walden://rff/2022-09-14/emissions_weighted_carbon_price__economy
+  # archived; last active in 37e480682d06 on 2023-04-10
+  data://grapher/gcp/2022-09-29/global_carbon_budget_additional:
+    - data://garden/gcp/2022-09-29/global_carbon_budget_additional:
+      - data://garden/owid/latest/key_indicators
+      - data://meadow/gcp/2022-09-29/global_carbon_budget_additional:
+        - walden://gcp/2022-09-29/global_carbon_budget_global
+  # archived; last active in 37e480682d06 on 2023-04-10
+  data://grapher/rff/2022-09-14/world_carbon_pricing_any_sector:
+    - data://garden/rff/2022-09-14/world_carbon_pricing:
+      - data://meadow/rff/2022-09-14/world_carbon_pricing:
+        - walden://rff/2022-09-14/world_carbon_pricing
+        - walden://rff/2022-09-14/ipcc_codes
+      - data://meadow/rff/2022-09-14/world_carbon_pricing__subnational:
+        - walden://rff/2022-09-14/world_carbon_pricing__subnational
+        - walden://rff/2022-09-14/ipcc_codes
+  # archived; last active in 464e3f2eca8a on 2023-05-04
+  data://garden/emissions/2022-11-11/owid_co2:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector:
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/owid/latest/key_indicators
+      - data://meadow/cait/2022-08-10/ghg_emissions_by_sector:
+        - walden://cait/2022-08-10/cait_ghg_emissions
+    - data://garden/gcp/2022-11-11/global_carbon_budget:
+      - data://garden/wb/2021-07-01/wb_income
+      - data://meadow/gcp/2022-11-11/global_carbon_budget_land_use_change_emissions:
+        - walden://gcp/2022-11-11/global_carbon_budget_land_use_change_emissions
+      - data://garden/energy/2022-07-29/primary_energy_consumption
+      - data://meadow/gcp/2022-11-11/global_carbon_budget_global_emissions:
+        - walden://gcp/2022-11-11/global_carbon_budget_global_emissions
+      - data://garden/ggdc/2020-10-01/ggdc_maddison
+      - data://garden/owid/latest/key_indicators
+      - data://meadow/gcp/2022-11-11/global_carbon_budget_national_emissions:
+        - walden://gcp/2022-11-11/global_carbon_budget_national_emissions
+      - data://meadow/gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions:
+        - walden://gcp/2022-11-11/global_carbon_budget_fossil_co2_emissions
+    - data://garden/energy/2022-07-29/primary_energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/owid/latest/key_indicators
+  # archived; last active in 8e9cd030135d on 2023-05-10
+  data://grapher/gcp/2022-11-11/global_carbon_budget:
+    - data://garden/gcp/2022-11-11/global_carbon_budget
+  # archived; last active in e80dbf7b9f13 on 2023-07-20
+  data://garden/emissions/2023-05-03/owid_co2:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+    - data://garden/gcp/2023-04-28/global_carbon_budget:
+      - data://garden/wb/2021-07-01/wb_income
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/energy/2023-06-01/primary_energy_consumption
+      - data://garden/demography/2022-12-08/population
+      - data://garden/ggdc/2020-10-01/ggdc_maddison
+      - data://meadow/gcp/2023-04-28/global_carbon_budget:
+        - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
+        - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
+        - snapshot://gcp/2023-04-28/global_carbon_budget_fossil_co2_emissions.csv
+        - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
+    - data://garden/energy/2023-06-01/primary_energy_consumption
+    - data://garden/demography/2022-12-08/population
+    - data://garden/emissions/2023-05-02/national_contributions:
+      - data://garden/wb/2021-07-01/wb_income
+      - data://garden/regions/2023-01-01/regions
+      - data://meadow/emissions/2023-05-02/national_contributions
+      - data://garden/demography/2022-12-08/population
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/regions/2023-01-01/regions
+  # archived; last active in e80dbf7b9f13 on 2023-07-20
+  data://grapher/gcp/2023-04-28/global_carbon_budget:
+    - data://garden/gcp/2023-04-28/global_carbon_budget
+  # archived; last active in 953f5b798f39 on 2023-10-09
+  data://grapher/emissions/2023-10-06/gdp_and_co2_decoupling:
+    - data://garden/emissions/2023-10-06/gdp_and_co2_decoupling:
+      - data://garden/worldbank_wdi/2022-05-26/wdi
+      - data://garden/gcp/2023-09-28/global_carbon_budget:
+        - data://garden/wb/2023-04-30/income_groups
+        - data://meadow/gcp/2023-09-28/global_carbon_budget:
+          - snapshot://gcp/2023-09-28/global_carbon_budget_national_emissions.xlsx
+          - snapshot://gcp/2023-09-28/global_carbon_budget_land_use_change_emissions.xlsx
+          - snapshot://gcp/2023-09-28/global_carbon_budget_global_emissions.xlsx
+          - snapshot://gcp/2023-09-28/global_carbon_budget_fossil_co2_emissions.csv
+        - data://garden/ggdc/2020-10-01/ggdc_maddison
+        - data://garden/energy/2023-07-10/primary_energy_consumption
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/demography/2023-03-31/population
+  # archived; last active in 61d5e4ed5e37 on 2023-10-13
+  data://grapher/gcp/2023-07-10/global_carbon_budget:
+    - data://garden/gcp/2023-07-10/global_carbon_budget:
+      - data://garden/wb/2023-04-30/income_groups
+      - data://meadow/gcp/2023-07-10/global_carbon_budget:
+        - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
+        - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
+        - snapshot://gcp/2023-04-28/global_carbon_budget_fossil_co2_emissions.csv
+        - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
+      - data://garden/ggdc/2020-10-01/ggdc_maddison
+      - data://garden/energy/2023-07-10/primary_energy_consumption
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2023-03-31/population
+  # archived; last active in 61d5e4ed5e37 on 2023-10-13
+  data://garden/emissions/2023-07-10/owid_co2:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+    - data://garden/emissions/2023-05-02/national_contributions
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/energy/2023-07-10/primary_energy_consumption
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/gcp/2023-07-10/global_carbon_budget
+    - data://garden/demography/2023-03-31/population
+  # archived; last active in b336d76f5cfb on 2023-10-23
+  data://grapher/rff/2022-10-11/world_carbon_pricing_any_sector:
+    - data://garden/rff/2022-10-11/world_carbon_pricing:
+      - data://meadow/rff/2022-10-11/world_carbon_pricing:
+        - walden://rff/2022-10-11/ipcc_codes
+        - walden://rff/2022-10-11/world_carbon_pricing
+      - data://meadow/rff/2022-10-11/world_carbon_pricing__subnational:
+        - walden://rff/2022-10-11/ipcc_codes
+        - walden://rff/2022-10-11/world_carbon_pricing__subnational
+  # archived; last active in b336d76f5cfb on 2023-10-23
+  data://grapher/rff/2022-10-11/emissions_weighted_carbon_price:
+    - data://garden/rff/2022-10-11/emissions_weighted_carbon_price:
+      - data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__economy:
+        - walden://rff/2022-10-11/emissions_weighted_carbon_price__economy
+      - data://meadow/rff/2022-10-11/emissions_weighted_carbon_price__coverage:
+        - walden://rff/2022-10-11/emissions_weighted_carbon_price__coverage
+  # archived; last active in 7276fe0a911d on 2023-11-24
+  data://garden/emissions/2023-11-08/owid_co2:
+    - data://garden/gcp/2023-09-28/global_carbon_budget
+    - data://garden/emissions/2023-05-02/national_contributions
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/energy/2023-07-10/primary_energy_consumption
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/demography/2023-03-31/population
+  # archived; last active in 87d8bedb44be on 2023-11-24
+  data://grapher/emissions/2023-05-02/national_contributions:
+    - data://garden/emissions/2023-05-02/national_contributions
+  # archived; last active in 87d8bedb44be on 2023-11-24
+  data://grapher/cait/2022-08-10/co2_emissions:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  # archived; last active in 87d8bedb44be on 2023-11-24
+  data://garden/emissions/2023-09-28/owid_co2:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+    - data://garden/gcp/2023-09-28/global_carbon_budget
+    - data://garden/emissions/2023-05-02/national_contributions
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/energy/2023-07-10/primary_energy_consumption
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  # archived; last active in 87d8bedb44be on 2023-11-24
+  data://grapher/cait/2022-08-10/n2o_emissions:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  # archived; last active in 87d8bedb44be on 2023-11-24
+  data://grapher/cait/2022-08-10/all_ghg_emissions:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  # archived; last active in 87d8bedb44be on 2023-11-24
+  data://grapher/cait/2022-08-10/ch4_emissions:
+    - data://garden/cait/2022-08-10/ghg_emissions_by_sector
+  # archived; last active in 7fcd4ff1db85 on 2023-12-07
+  data://garden/emissions/2023-11-23/owid_co2:
+    - data://garden/gcp/2023-09-28/global_carbon_budget
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/energy/2023-07-10/primary_energy_consumption
+    - data://garden/emissions/2023-11-23/national_contributions
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/demography/2023-03-31/population
+  # archived; last active in 325aff97266b on 2023-12-28
+  data://grapher/gcp/2023-09-28/global_carbon_budget:
+    - data://garden/gcp/2023-09-28/global_carbon_budget
+  # archived; last active in 325aff97266b on 2023-12-28
+  data://grapher/gcp/2023-12-05/global_carbon_budget:
+    - data://garden/gcp/2023-12-05/global_carbon_budget:
+      - data://garden/wb/2023-04-30/income_groups
+      - data://meadow/gcp/2023-12-05/global_carbon_budget:
+        - snapshot://gcp/2023-12-05/global_carbon_budget_global_emissions.xlsx
+        - snapshot://gcp/2023-12-05/global_carbon_budget_national_emissions.xlsx
+        - snapshot://gcp/2023-12-05/global_carbon_budget_land_use_change_emissions.xlsx
+        - snapshot://gcp/2023-12-05/global_carbon_budget_fossil_co2_emissions.csv
+      - data://garden/ggdc/2020-10-01/ggdc_maddison
+      - data://garden/energy/2023-07-10/primary_energy_consumption
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2023-03-31/population
+  # archived; last active in 325aff97266b on 2023-12-28
+  data://garden/emissions/2023-12-05/owid_co2:
+    - data://garden/gcp/2023-12-05/global_carbon_budget
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/energy/2023-07-10/primary_energy_consumption
+    - data://garden/emissions/2023-11-23/national_contributions
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/demography/2023-03-31/population
+  # archived; last active in e915d8542d95 on 2024-06-25
+  data://garden/emissions/latest/owid_co2:
+    - data://garden/emissions/2024-04-08/national_contributions
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/energy/2024-05-08/primary_energy_consumption
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/gcp/2023-12-12/global_carbon_budget
+    - data://garden/demography/2023-03-31/population
+  # archived; last active in 2d215d1139d0 on 2024-06-25
+  data://external/co2-data/latest/owid_co2:
+    - data://garden/emissions/2024-04-08/national_contributions
+    - data://garden/gcp/2024-06-20/global_carbon_budget
+    - data://garden/energy/2024-06-20/primary_energy_consumption
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/demography/2023-03-31/population
+  # archived; last active in c746e64b393c on 2024-08-23
+  data://external/co2_data/latest/owid_co2:
+    - data://garden/emissions/2024-04-08/national_contributions
+    - data://garden/gcp/2024-06-20/global_carbon_budget
+    - data://garden/energy/2024-06-20/primary_energy_consumption
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/demography/2023-03-31/population

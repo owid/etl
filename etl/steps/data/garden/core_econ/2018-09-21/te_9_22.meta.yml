@@ -1,0 +1,32 @@
+dataset:
+  title: TE-9.22
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_9_22:
+    variables:
+      exact_year:
+        title: Exact Year
+        unit: ''
+      share_of_employees_covered_by_collective_bargaining_agreements__early_2010s__pct:
+        title: Share of employees covered by collective bargaining agreements (early 2010s, %)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Adjusted bargaining (or union) coverage rate.
+      unemployment_rate__2000_2018_average__pct:
+        title: Unemployment rate (2000-2018 average, %)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

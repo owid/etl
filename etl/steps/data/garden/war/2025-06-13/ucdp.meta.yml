@@ -41,6 +41,26 @@ definitions:
       One-sided violence is defined by the {definitions.all.ucdp_linked} as the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
 
       <%- endif -%>
+    # Conflict-type label used in titles/subtitles (e.g. "armed conflicts", "one-sided violence").
+    # Outer trim markers intentionally non-stripping (<% ... %>) so surrounding spaces in the
+    # interpolating template (e.g. title: "Deaths {prep} {label} based...") are preserved.
+    conflict_label: |-
+      <% if conflict_type == "all" -%>armed conflicts
+      <%- elif conflict_type == "one-sided violence" -%>one-sided violence
+      <%- else -%><< conflict_type >> conflicts
+      <%- endif %>
+    # Slug for the matching DoD ("details on demand") definition link.
+    conflict_dod_slug: |-
+      <% if conflict_type == "all" -%>armed-conflict-ucdp
+      <%- elif conflict_type == "one-sided violence" -%>onesided-ucdp
+      <%- elif conflict_type == "non-state conflict" -%>nonstate-ucdp
+      <%- else -%><< conflict_type >>-ucdp
+      <%- endif %>
+    # Preposition: "from" for one-sided violence, "in" for everything else.
+    conflict_prep: |-
+      <% if conflict_type == "one-sided violence" -%>from
+      <%- else -%>in
+      <%- endif %>
     location_conflicts_method: |-
       UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the geoBoundaries dataset.
 
@@ -74,8 +94,21 @@ definitions:
       The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
-    description_short_per_capita: <% set per_capita = ", per 100,000 people" %>
-      {definitions.number_deaths.description_short}
+    description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths.description_short}
+    title: "Deaths {definitions.all.conflict_prep} {definitions.all.conflict_label} based on where they occurred"
+    title_per_capita: "Death rate {definitions.all.conflict_prep} {definitions.all.conflict_label} based on where they occurred"
+    subtitle: |-
+      <%- if conflict_type == "one-sided violence" -%>
+      Included are deaths of civilians from [one-sided violence](#dod:onesided-ucdp) that was ongoing that year.
+      <%- else -%>
+      Included are deaths of combatants and civilians due to fighting in [{definitions.all.conflict_label}](#dod:{definitions.all.conflict_dod_slug}) that were ongoing that year.
+      <%- endif -%>
+    subtitle_per_capita: |-
+      <%- if conflict_type == "one-sided violence" -%>
+      Deaths of civilians from [one-sided violence](#dod:onesided-ucdp) that was ongoing that year, per 100,000 people.
+      <%- else -%>
+      Deaths of combatants and civilians due to fighting, per 100,000 people. Included are [{definitions.all.conflict_label}](#dod:{definitions.all.conflict_dod_slug}) that were ongoing that year.
+      <%- endif -%>
     key_point_1: |-
       This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [non-state conflicts](#dod:nonstate-ucdp), [violence against civilians](#dod:onesided-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
     key_point_2: |-
@@ -95,7 +128,7 @@ definitions:
         {definitions.number_deaths.key_point_1}
         <%- endif %>
       - "{definitions.number_deaths.key_point_2}"
-      - 'We show here the "best" death estimates as identified by UCDP. They also report high and low estimates.'
+      - "We show here the \"best\" death estimates as identified by UCDP. They also report high and low estimates."
 
   number_deaths_type:
     description_short: |-
@@ -122,14 +155,15 @@ definitions:
       The best estimate of the number of deaths of << people_type >> in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
-    description_short_per_capita: <% set per_capita = ", per 100,000 people" %>
-      {definitions.number_deaths_type.description_short}
+    description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths_type.description_short}
     description_key: &description_key_deaths_type
       - "{definitions.all.conflict_type}"
 
   number_ongoing_conflicts:
+    # Outer trim markers intentionally non-stripping (<% ... %>) so a leading space
+    # in the interpolating template (e.g. "...over time. {description_short}") is preserved.
     description_short: |-
-      <%- if conflict_type == "all" -%>
+      <% if conflict_type == "all" -%>
       Included are armed conflicts that were ongoing a year.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
@@ -150,7 +184,7 @@ definitions:
       <%- else -%>
       Included are << conflict_type >> conflicts that were ongoing a year.
 
-      <%- endif -%>
+      <%- endif %>
     description_key: &description_key_ongoing
       - "{definitions.all.conflict_type}"
       # - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
@@ -317,6 +351,8 @@ tables:
           {definitions.all.location_conflicts_method}
         presentation:
           grapher_config:
+            title: "{definitions.number_deaths.title}"
+            subtitle: "{definitions.number_deaths.subtitle}"
             map:
               colorScale:
                 baseColorScheme: OrRd
@@ -332,22 +368,22 @@ tables:
                   - 1
                 customNumericLabels:
                   - "0"
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
                 customNumericColorsActive: true
                 customNumericColors:
                   - "#e8f4ea"
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
-                  - null
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
+                  - 
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -414,6 +450,8 @@ tables:
           {definitions.all.location_conflicts_method}
         presentation:
           grapher_config:
+            title: "{definitions.number_deaths.title_per_capita}"
+            subtitle: "{definitions.number_deaths.subtitle_per_capita}"
             map:
               colorScale:
                 binningStrategy: "manual"
@@ -493,7 +531,8 @@ tables:
         description_short: |-
           {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
-        presentation: # TODO
+        presentation:
+          # TODO
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
       number_new_conflicts_per_country:
@@ -552,3 +591,5 @@ dataset:
     You can find more information about the data in our article: [To be published]
 
     This dataset contains information on armed conflicts - state, non-state and one-sided conflicts, in the period of 1989 and 2022.
+  owners:
+    - Lucas Rodés-Guirao

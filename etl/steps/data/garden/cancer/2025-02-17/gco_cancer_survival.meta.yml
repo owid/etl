@@ -21,6 +21,8 @@ dataset:
   update_period_days: 365
 
 
+  owners:
+    - Veronika Samborska
 tables:
   gco_cancer_survival:
     variables:
@@ -50,7 +52,7 @@ tables:
             <%- endif -%>
         display:
           numDecimalPlaces: 0
-          name:  |-
+          name: |-
             <% if gender == 'All' %>
             << cancer >> cancer
             <% elif gender != 'All' %>
@@ -82,7 +84,7 @@ tables:
             <%- endif -%>
         display:
           numDecimalPlaces: 1
-          name:  |-
+          name: |-
             <% if gender == 'All' %>
             << cancer >> cancer
             <% elif gender != 'All' %>
@@ -113,7 +115,7 @@ tables:
             <%- endif -%>
         display:
           numDecimalPlaces: 1
-          name:  |-
+          name: |-
             <% if gender == 'All' %>
             << cancer >> cancer
             <% elif gender != 'All' %>

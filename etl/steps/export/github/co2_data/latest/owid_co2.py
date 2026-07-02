@@ -117,14 +117,17 @@ Additionally, to construct indicators per capita, per GDP, and per unit energy, 
   - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy_institute/{stat_review_version}/statistical_review_of_world_energy.py)
 - International energy data (U.S. Energy Information Administration, EIA):
   - [Source data](https://www.eia.gov/opendata/bulkfiles.php)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/eia/{eia_version}/international_energy_data.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/eia/{eia_version}/energy_consumption.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/eia/{eia_version}/energy_consumption.py)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/eia/{eia_version}/international_energy.zip.dvc)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/eia/{eia_version}/international_energy.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/eia/{eia_version}/international_energy.py)
 - Primary energy consumption (EI's Statistical review of world energy & EIA's International energy data):
   - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/energy/{primary_energy_version}/primary_energy_consumption.py)
 
 ## Changelog
 
+- 2026-06-01:
+  - Update dataset to use the latest EIA's International Energy Data.
+  - Changed the units of the carbon intensity of energy indicators from kilograms to grams of CO₂ per kilowatt-hour.
 - 2025-12-04:
   - Update greenhouse gases using the latest data from Jones et al. (2025).
 - 2025-11-13:

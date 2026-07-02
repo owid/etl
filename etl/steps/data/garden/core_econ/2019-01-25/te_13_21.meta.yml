@@ -1,0 +1,23 @@
+dataset:
+  title: TE-13.21
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_13_21:
+    variables:
+      cpi_inflation__pct:
+        title: CPI inflation (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Inflation, consumer prices (annual %)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

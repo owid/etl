@@ -248,60 +248,6 @@ class License(MetaBase):
         return bool(self.name or self.url)
 
 
-# DEPRECATED: use Origin instead
-@pruned_json
-@dataclass(eq=False)
-class Source(MetaBase):
-    """Legacy source metadata for datasets.
-
-    Warning:
-        **DEPRECATED**: Use `Origin` instead for new datasets. This class is
-        maintained for backward compatibility only.
-
-    Source contains metadata about the origin of data in legacy format. Modern
-    datasets should use the `Origin` class which provides more comprehensive
-    metadata fields.
-
-    Attributes:
-        name: Source name or identifier.
-        description: Description of the source.
-        url: URL to the source's main page.
-        source_data_url: Direct URL to download the data.
-        owid_data_url: OWID-hosted URL for the data.
-        date_accessed: Date when the source was accessed (ISO format).
-        publication_date: Date when the source was published.
-        publication_year: Year of publication.
-        published_by: Publisher or institution name (used in Grapher).
-
-        Example:
-            ```python
-            # Legacy usage (prefer Origin for new code)
-            source = Source(
-                name="World Bank",
-                published_by="World Bank Group",
-                url="https://data.worldbank.org"
-            )
-            ```
-
-    Note:
-        In Grapher admin, only the first source of a dataset is visible and editable.
-        The most important fields for Grapher are `published_by` and `description`.
-    """
-
-    name: str | None = None
-    description: str | None = None
-    url: str | None = None
-    source_data_url: str | None = None
-    owid_data_url: str | None = None
-    date_accessed: str | None = None
-    publication_date: str | None = None
-    publication_year: int | None = None
-    # specific fields for grapher
-    # NOTE: it's not clear how to map description & name to fields in grapher, so
-    # we're keeping both for the time being. We might consolidate them in the future
-    published_by: str | None = None
-
-
 @pruned_json
 @dataclass(eq=False)
 class Origin(MetaBase):
@@ -505,9 +451,6 @@ class VariableMeta(MetaBase):
     # we would capture this.
     license: License | None = None
 
-    # This is the old sources that we keep for compatibility. Use is strongly discouraged going forward
-    sources: list[Source] = field(default_factory=list)
-
     # The type of the variable, automatically inferred from the data if empty
     type: VARIABLE_TYPE | None = None
 
@@ -586,8 +529,6 @@ class DatasetMeta(MetaBase):
     short_name: str | None = None
     title: str | None = None
     description: str | None = None
-    # sources is deprecated, use origins on indicator level instead
-    sources: list[Source] = field(default_factory=list)
     licenses: list[License] = field(default_factory=list)
     is_public: bool = True
     additional_info: dict[str, Any] | None = None
@@ -596,22 +537,11 @@ class DatasetMeta(MetaBase):
     update_period_days: int | None = None
     # prohibit redistribution (disable chart download)
     non_redistributable: bool = False
+    # OWID team members who maintain this dataset; first entry is the accountable owner
+    owners: list[str] = field(default_factory=list)
 
     # an md5 checksum of the ingredients used to make this dataset
     source_checksum: str | None = None
-
-    def __post_init__(self) -> None:
-        """Imply version from publication_date or publication_year if not given
-        in __init__."""
-        if self.version is None:
-            if len(self.sources) == 1:
-                (source,) = self.sources
-                if source.publication_date:
-                    self.version = str(source.publication_date)
-                elif source.publication_year:
-                    self.version = str(source.publication_year)
-                else:
-                    self.version = None
 
     def _params_yaml(self) -> dict:
         """Parameters passed to YAML for dynamic interpolation."""
@@ -620,44 +550,14 @@ class DatasetMeta(MetaBase):
             params["YEAR"] = pd.to_datetime(self.version).year
         return params
 
-    def update_from_yaml(
-        self,
-        path: Path | str,
-        if_source_exists: SOURCE_EXISTS_OPTIONS = "fail",
-    ) -> None:
+    def update_from_yaml(self, path: Path | str) -> None:
         """The main reason for wanting to do this is to manually override what goes into Grapher before an export."""
         from owid.catalog.core import utils
 
         annot = utils.dynamic_yaml_load(path, self._params_yaml())
 
-        # None is treated differently from [] - if given empty list, we clear sources
-        dataset_sources = annot.get("dataset", {}).get("sources")
-        if dataset_sources is not None:
-            # update sources of dataset, if there are no sources in the new dataset, don't update existing ones
-            if if_source_exists == "replace":
-                self.sources = []
-
-            new_sources = []
-            for source_annot in dataset_sources:
-                # if there's an existing source, update it
-                ds_sources = [s for s in self.sources if s.name == source_annot["name"]]
-                if ds_sources:
-                    ds_sources[0].update(**source_annot)
-                # there is already a source in a dataset, raise an error
-                elif self.sources and if_source_exists == "fail":
-                    raise ValueError(
-                        f"Source {self.sources[0].name} would be overwritten by source {source_annot['name']}"
-                    )
-                # otherwise append it
-                else:
-                    new_sources.append(Source(**source_annot))
-
-            self.sources.extend(new_sources)
-
-        # update dataset
         for k, v in annot.get("dataset", {}).items():
-            if k not in ("sources",):
-                setattr(self, k, v)
+            setattr(self, k, v)
 
     @property
     def uri(self) -> str:

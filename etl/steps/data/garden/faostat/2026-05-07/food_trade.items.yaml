@@ -1,0 +1,477 @@
+# Curated items for the food-trade visualization.
+#
+# Selection: FAO 'crops & livestock products' (QCL) commodities that are meaningfully traded
+# (ranked by number of bilateral flows, tonnage and value), plus widely-recognised processed
+# foods (bread, pasta, chocolate, ...). Excludes non-food, residual 'n.e.c.' aggregates, and
+# items too obscure to be widely recognised.
+#
+# Each entry:
+#   display:     name shown in the visualization dropdown.
+#   item_codes:  FAO commodity item code(s) -> the code's name in FAOSTAT TM (asserted against
+#                the snapshot in the garden step). Most items have a single code. A few combine a
+#                primary commodity with a mechanically-derived form that trade is split across
+#                (beef bone-in + boneless, almonds in-shell + shelled, milled + broken rice, raw +
+#                refined sugar). For those, the trade of all codes is summed and the item carries
+#                no production or supply context, because summing those would double-count (the
+#                derived form is processed from the primary). The first code is the item's id;
+#                combined items use 100000 + that code, so the id is never mistaken for a single
+#                FAO commodity.
+items:
+  - display: Almonds
+    item_codes:
+      221: Almonds, in shell
+      231: Almonds, shelled
+  - display: Apples
+    item_codes:
+      515: Apples
+  - display: Apricots
+    item_codes:
+      526: Apricots
+  - display: Artichokes
+    item_codes:
+      366: Artichokes
+  - display: Asparagus
+    item_codes:
+      367: Asparagus
+  - display: Avocados
+    item_codes:
+      572: Avocados
+  - display: Bananas
+    item_codes:
+      486: Bananas
+  - display: Barley
+    item_codes:
+      44: Barley
+  - display: Beef
+    item_codes:
+      867: Meat of cattle with the bone, fresh or chilled
+      870: Meat of cattle boneless, fresh or chilled
+  - display: Beer
+    item_codes:
+      51: Beer of barley, malted
+  - display: Black pepper
+    item_codes:
+      687: Pepper (Piper spp.), raw
+  - display: Blueberries
+    item_codes:
+      552: Blueberries
+  - display: Brazil nuts
+    item_codes:
+      216: Brazil nuts, in shell
+      229: Brazil nuts, shelled
+  - display: Bread
+    item_codes:
+      20: Bread
+  - display: Breakfast cereals
+    item_codes:
+      41: Breakfast cereals
+  - display: Broad beans
+    item_codes:
+      181: Broad beans and horse beans, dry
+  - display: Buckwheat
+    item_codes:
+      89: Buckwheat
+  - display: Butter
+    item_codes:
+      886: Butter of cow milk
+  - display: Cabbages
+    item_codes:
+      358: Cabbages
+  - display: Carrots
+    item_codes:
+      426: Carrots and turnips
+  - display: Cashews
+    item_codes:
+      217: Cashew nuts, in shell
+      230: Cashew nuts, shelled
+  - display: Cassava
+    item_codes:
+      125: Cassava, fresh
+  - display: Cauliflower and broccoli
+    item_codes:
+      393: Cauliflowers and broccoli
+  - display: Cheese
+    item_codes:
+      901: Cheese from whole cow milk
+  - display: Cherries
+    item_codes:
+      531: Cherries
+  - display: Chestnuts
+    item_codes:
+      220: Chestnuts, in shell
+  - display: Chicken meat
+    item_codes:
+      1058: Meat of chickens, fresh or chilled
+  - display: Chickpeas
+    item_codes:
+      191: Chick peas, dry
+  - display: Chillies and peppers
+    item_codes:
+      401: Chillies and peppers, green (Capsicum spp. and Pimenta spp.)
+  - display: Chocolate
+    item_codes:
+      666: Chocolate products nes
+  - display: Cider
+    item_codes:
+      517: Cider and other fermented beverages
+  - display: Cinnamon
+    item_codes:
+      693: Cinnamon and cinnamon-tree flowers, raw
+  - display: Cloves
+    item_codes:
+      698: Cloves (whole stems), raw
+  - display: Cocoa beans
+    item_codes:
+      661: Cocoa beans
+  - display: Cocoa powder
+    item_codes:
+      665: Cocoa powder and cake
+  - display: Coconut oil
+    item_codes:
+      252: Coconut oil
+  - display: Coconuts
+    item_codes:
+      249: Coconuts, in shell
+  - display: Confectionery
+    item_codes:
+      168: Sugar confectionery
+  - display: Cowpeas
+    item_codes:
+      195: Cow peas, dry
+  - display: Cranberries
+    item_codes:
+      554: Cranberries
+  - display: Cream
+    item_codes:
+      885: Cream, fresh
+  - display: Cucumbers
+    item_codes:
+      397: Cucumbers and gherkins
+  - display: Currants
+    item_codes:
+      550: Currants
+  - display: Dates
+    item_codes:
+      577: Dates
+  - display: Dry beans
+    item_codes:
+      176: Beans, dry
+  - display: Dry peas
+    item_codes:
+      187: Peas, dry
+  - display: Duck meat
+    item_codes:
+      1069: Meat of ducks, fresh or chilled
+  - display: Eggplant
+    item_codes:
+      399: Eggplants (aubergines)
+  - display: Eggs
+    item_codes:
+      1062: Hen eggs in shell, fresh
+  - display: Figs
+    item_codes:
+      569: Figs
+  - display: Garlic
+    item_codes:
+      406: Green garlic
+  - display: Ginger
+    item_codes:
+      720: Ginger, raw
+  - display: Goat meat
+    item_codes:
+      1017: Meat of goat, fresh or chilled
+  - display: Grapefruit
+    item_codes:
+      507: Pomelos and grapefruits
+  - display: Grapes
+    item_codes:
+      560: Grapes
+  - display: Green beans
+    item_codes:
+      414: Other beans, green
+  - display: Green coffee
+    item_codes:
+      656: Coffee, green
+  - display: Green maize
+    item_codes:
+      446: Green corn (maize)
+  - display: Green peas
+    item_codes:
+      417: Peas, green
+  - display: Groundnut oil
+    item_codes:
+      244: Groundnut oil
+  - display: Groundnuts
+    item_codes:
+      242: Groundnuts, excluding shelled
+      243: Groundnuts, shelled
+  - display: Hazelnuts
+    item_codes:
+      225: Hazelnuts, in shell
+      233: Hazelnuts, shelled
+  - display: Honey
+    item_codes:
+      1182: Natural honey
+  - display: Ice cream
+    item_codes:
+      910: Ice cream and other edible ice
+  - display: Infant food
+    item_codes:
+      109: Infant food
+  - display: Kiwi
+    item_codes:
+      592: Kiwi fruit
+  - display: Leeks
+    item_codes:
+      407: Leeks and other alliaceous vegetables
+  - display: Lemons and limes
+    item_codes:
+      497: Lemons and limes
+  - display: Lentils
+    item_codes:
+      201: Lentils, dry
+  - display: Lettuce
+    item_codes:
+      372: Lettuce and chicory
+  - display: Linseed
+    item_codes:
+      333: Linseed
+  - display: Linseed oil
+    item_codes:
+      334: Oil of linseed
+  - display: Maize
+    item_codes:
+      56: Maize (corn)
+  - display: Maize flour
+    item_codes:
+      58: Flour of maize
+  - display: Maize oil
+    item_codes:
+      60: Oil of maize
+  - display: Mangoes
+    item_codes:
+      571: Mangoes, guavas and mangosteens
+  - display: Margarine
+    item_codes:
+      1242: Margarine and shortening
+  - display: Melons
+    item_codes:
+      568: Cantaloupes and other melons
+  - display: Milk
+    item_codes:
+      882: Raw milk of cattle
+  - display: Milk powder
+    item_codes:
+      897: Whole milk powder
+  - display: Millet
+    item_codes:
+      79: Millet
+  - display: Molasses
+    item_codes:
+      165: Molasses
+  - display: Mushrooms
+    item_codes:
+      449: Mushrooms and truffles
+  - display: Mustard seed
+    item_codes:
+      292: Mustard seed
+  - display: Oats
+    item_codes:
+      75: Oats
+  - display: Okra
+    item_codes:
+      430: Okra
+  - display: Olive oil
+    item_codes:
+      261: Olive oil
+  - display: Olives
+    item_codes:
+      260: Olives
+  - display: Onions
+    item_codes:
+      403: Onions and shallots, dry (excluding dehydrated)
+  - display: Orange juice
+    item_codes:
+      491: Orange juice
+  - display: Oranges
+    item_codes:
+      490: Oranges
+  - display: Palm kernel oil
+    item_codes:
+      258: Oil of palm kernel
+  - display: Palm kernels
+    item_codes:
+      256: Palm kernels
+  - display: Palm oil
+    item_codes:
+      257: Palm oil
+  - display: Papayas
+    item_codes:
+      600: Papayas
+  - display: Pasta
+    item_codes:
+      18: Uncooked pasta, not stuffed or otherwise prepared
+  - display: Peaches and nectarines
+    item_codes:
+      534: Peaches and nectarines
+  - display: Pears
+    item_codes:
+      521: Pears
+  - display: Persimmons
+    item_codes:
+      587: Persimmons
+  - display: Pineapples
+    item_codes:
+      574: Pineapples
+  - display: Pistachios
+    item_codes:
+      223: Pistachios, in shell
+  - display: Plantains
+    item_codes:
+      489: Plantains and cooking bananas
+  - display: Plums
+    item_codes:
+      536: Plums and sloes
+  - display: Poppy seed
+    item_codes:
+      296: Poppy seed
+  - display: Pork
+    item_codes:
+      1035: Meat of pig with the bone, fresh or chilled
+      1038: Meat of pig boneless, fresh or chilled
+  - display: Potatoes
+    item_codes:
+      116: Potatoes
+  - display: Pumpkins and squash
+    item_codes:
+      394: Pumpkins, squash and gourds
+  - display: Quinces
+    item_codes:
+      523: Quinces
+  - display: Quinoa
+    item_codes:
+      92: Quinoa
+  - display: Rabbit meat
+    item_codes:
+      1141: Meat of rabbits and hares, fresh or chilled
+  - display: Rapeseed
+    item_codes:
+      270: Rape or colza seed
+  - display: Rapeseed oil
+    item_codes:
+      271: Rapeseed or canola oil, crude
+  - display: Raspberries
+    item_codes:
+      547: Raspberries
+  - display: Rice
+    item_codes:
+      31: Rice, milled
+      32: Rice, broken
+      28: Husked rice
+  - display: Roasted coffee
+    item_codes:
+      657: Coffee, decaffeinated or roasted
+  - display: Rye
+    item_codes:
+      71: Rye
+  - display: Safflower oil
+    item_codes:
+      281: Safflower-seed oil, crude
+  - display: Safflower seed
+    item_codes:
+      280: Safflower seed
+  - display: Sesame oil
+    item_codes:
+      290: Oil of sesame seed
+  - display: Sesame seed
+    item_codes:
+      289: Sesame seed
+  - display: Sheep meat
+    item_codes:
+      977: Meat of sheep, fresh or chilled
+  - display: Sorghum
+    item_codes:
+      83: Sorghum
+  - display: Soybean meal for feed
+    item_codes:
+      238: Cake of soya beans
+  - display: Soybean oil
+    item_codes:
+      237: Soya bean oil
+  - display: Soybeans
+    item_codes:
+      236: Soya beans
+  - display: Spinach
+    item_codes:
+      373: Spinach
+  - display: Spirits
+    item_codes:
+      634: Undenatured ethyl alcohol of an alcoholic strength by volume of less than 80% vol; spirits, liqueurs and other spirituous beverages
+  - display: Spring onions
+    item_codes:
+      402: Onions and shallots, green
+  - display: Strawberries
+    item_codes:
+      544: Strawberries
+  - display: Sugar
+    item_codes:
+      162: Raw cane or beet sugar (centrifugal only)
+      164: Refined sugar
+  - display: Sugar beet
+    item_codes:
+      157: Sugar beet
+  - display: Sugar cane
+    item_codes:
+      156: Sugar cane
+  - display: Sunflower oil
+    item_codes:
+      268: Sunflower-seed oil, crude
+  - display: Sunflower seed
+    item_codes:
+      267: Sunflower seed
+  - display: Sweet potatoes
+    item_codes:
+      122: Sweet potatoes
+  - display: Tangerines and mandarins
+    item_codes:
+      495: Tangerines, mandarins, clementines
+  - display: Taro
+    item_codes:
+      136: Taro
+  - display: Tea
+    item_codes:
+      667: Tea leaves
+  - display: Tomato paste
+    item_codes:
+      391: Paste of tomatoes
+  - display: Tomatoes
+    item_codes:
+      388: Tomatoes
+  - display: Turkey meat
+    item_codes:
+      1080: Meat of turkeys, fresh or chilled
+  - display: Vanilla
+    item_codes:
+      692: Vanilla, raw
+  - display: Walnuts
+    item_codes:
+      222: Walnuts, in shell
+      232: Walnuts, shelled
+  - display: Watermelons
+    item_codes:
+      567: Watermelons
+  - display: Wheat
+    item_codes:
+      15: Wheat
+  - display: Wheat flour
+    item_codes:
+      16: Wheat and meslin flour
+  - display: Wine
+    item_codes:
+      564: Wine
+  - display: Yams
+    item_codes:
+      137: Yams
+  - display: Yoghurt
+    item_codes:
+      891: Yoghurt

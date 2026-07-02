@@ -2,7 +2,7 @@
 
 It is good to keep these separate since CED data is still in preview, and might contain errors.
 
-For more details on the processing pipeline, please refer to garden/war/2024-08-26/ucdp.
+For more details on the processing pipeline, please refer to garden/war/2026-06-10/ucdp.
 """
 
 import re
@@ -49,14 +49,16 @@ REGIONS_MAPPING = {
 }
 REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 # Last year of data
-LAST_YEAR = 2024
-LAST_YEAR_PREVIEW = 2025
+LAST_YEAR = 2025
+LAST_YEAR_PREVIEW = 2026
 
-# Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 1248
+# Number of events with no location assigned (see function estimate_metrics_locations).
+# With stable GED 26.1 (data through 2025) + CED 2026-Q1, there are 1303 events without
+# an exact polygon coordinate match (up from 1255 with the previous stable release).
+NUM_MISSING_LOCATIONS = 1303
 
 # Catalog path of the main UCDP dataset. NOTE: Change this when there is a new UCDP stable (yearly) release.
-VERSION_UCDP_STABLE = "2025-06-13"
+VERSION_UCDP_STABLE = "2026-06-10"
 CATALOG_PATH = f"garden/war/{VERSION_UCDP_STABLE}/ucdp"
 
 
@@ -84,7 +86,6 @@ def run() -> None:
     # Load tables
     tb_ged = ds_meadow.read("ucdp_ged")
     tb_conflict = ds_meadow.read("ucdp_battle_related_conflict")
-    tb_dyadic = ds_meadow.read("ucdp_battle_related_dyadic")
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
     tb_regions = ds_gw.read("gleditsch_regions")
     tb_codes = ds_gw.read("gleditsch_countries")
@@ -108,7 +109,6 @@ def run() -> None:
     tables = module_ucdp.run_pipeline(
         tb_ged=tb_ged,
         tb_conflict=tb_conflict,
-        tb_dyadic=tb_dyadic,
         tb_prio=tb_prio,
         tb_regions=tb_regions,
         tb_codes=tb_codes,

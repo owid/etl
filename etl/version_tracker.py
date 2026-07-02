@@ -25,10 +25,6 @@ DAG_TEMP_STEP = "data-private://meadow/temp/latest/step"
 # Define the base URL for the grapher datasets (which will be different depending on the environment).
 GRAPHER_DATASET_BASE_URL = f"{ADMIN_HOST}/admin/datasets/"
 
-# Maximum number of days allowed for an unused new step before it's considered archivable.
-# If, within that time period, no charts or external steps use it, the step will become archivable.
-MAX_NUM_DAYS_BEFORE_ARCHIVABLE = 30
-
 # Get current date (used to estimate the number of days until the next update of each step).
 TODAY = pd.to_datetime(datetime.now().strftime("%Y-%m-%d"))
 
@@ -46,8 +42,6 @@ class UpdateState(Enum):
     OUTDATED = "Outdated"
     MINOR_UPDATE = "Minor update possible"
     MAJOR_UPDATE = "Major update possible"
-    ARCHIVABLE = "Archivable"
-    ARCHIVED = "Archived"
     UNUSED = "Not yet used"
 
 
@@ -173,31 +167,27 @@ def get_all_step_usages(dag_reverse: dict[str, Any], step: str) -> list[str]:
 
 
 def load_steps_for_each_dag_file() -> dict[str, dict[str, list[str]]]:
-    """Return a dictionary of all ETL (active and archive) dag files, and the steps they contain.
+    """Return a dictionary of all active ETL dag files, and the steps they contain.
 
     Returns
     -------
     dag_file_steps : Dict[str, Dict[str, List[str]]]
-        Dictionary with items {"active": {step_1: dag_file_name_1, step_2: dag_file_name_2, ...}, "archive": {...}}.
+        Dictionary with items {"active": {step_1: dag_file_name_1, step_2: dag_file_name_2, ...}}.
     """
-    # Create a temporary dictionary with the path to the folder of active and archive dag files.
-    dag_file_paths = {"active": paths.DAG_DIR.glob("*.yml"), "archive": paths.DAG_DIR.glob("archive/*.yml")}
-    # Create a dictionary that will contain the content of the active dag files and the archive dag files.
-    dag_file_steps = {"active": {}, "archive": {}}
-    for dag_file_path in dag_file_paths:
-        for dag_file in dag_file_paths[dag_file_path]:
-            # ``load_single_dag_file`` returns the same flat ``{step: deps}``
-            # shape as ``load_dag`` but without following ``include``, so each
-            # step is attributed to the file that actually declares it.
-            content = load_single_dag_file(dag_file)
-            if content:
-                dag_file_steps[dag_file_path][dag_file.stem] = content
+    dag_file_steps = {"active": {}}
+    for dag_file in paths.DAG_DIR.glob("*.yml"):
+        # ``load_single_dag_file`` returns the same flat ``{step: deps}``
+        # shape as ``load_dag`` but without following ``include``, so each
+        # step is attributed to the file that actually declares it.
+        content = load_single_dag_file(dag_file)
+        if content:
+            dag_file_steps["active"][dag_file.stem] = content
 
     return dag_file_steps
 
 
 def load_dag_file_for_each_step() -> dict[str, str]:
-    """Return a dictionary of all ETL (active and archive) steps and name of their dag file.
+    """Return a dictionary of all active ETL steps and name of their dag file.
 
     Returns
     -------
@@ -205,16 +195,10 @@ def load_dag_file_for_each_step() -> dict[str, str]:
         Dictionary with items {step_1: dag_file_name_1, step_2: dag_file_name_2, ...}.
     """
     dag_file_steps = load_steps_for_each_dag_file()
-    # Reverse active dictionary of dag files.
     active_dag_files = reverse_graph(dag_file_steps["active"])  # ty: ignore
     dag_file_steps_reverse = {
         step: list(active_dag_files[step])[0] for step in active_dag_files if len(active_dag_files[step]) > 0
     }
-    # Add the reverse of the archive dictionary of dag files.
-    archive_dag_files = reverse_graph(dag_file_steps["archive"])  # ty: ignore
-    dag_file_steps_reverse.update(
-        {step: list(archive_dag_files[step])[0] for step in archive_dag_files if len(archive_dag_files[step]) > 0}
-    )
 
     return dag_file_steps_reverse
 
@@ -291,26 +275,6 @@ class VersionTracker:
 
     """
 
-    # List of steps known to be archivable (or unused), that we want to keep in the active dag for technical reasons.
-    ARCHIVABLE_STEPS_TO_KEEP = [
-        DAG_TEMP_STEP,
-        "data://explorers/dummy/2020-01-01/dummy",
-        "data://garden/dummy/2020-01-01/dummy",
-        "data://garden/dummy/2020-01-01/dummy_full",
-        "data://garden/dummy/2023-10-12/dummy_monster",
-        "data://grapher/dummy/2020-01-01/dummy",
-        "data://grapher/dummy/2020-01-01/dummy_full",
-        "data://grapher/dummy/2023-10-12/dummy_monster",
-        "data://meadow/dummy/2020-01-01/dummy",
-        "data://meadow/dummy/2020-01-01/dummy_full",
-        "snapshot://dummy/2020-01-01/dummy.csv",
-        "snapshot://dummy/2020-01-01/dummy_full.csv",
-        "data://examples/examples/latest/jupytext_example",
-        "data://examples/examples/latest/notebook_example",
-        "data://examples/examples/latest/script_example",
-        "data://examples/examples/latest/vs_code_cells_example",
-    ]
-
     # List of metrics to fetch related to analytics.
     ANALYTICS_COLUMNS = [
         # "views_7d",
@@ -321,32 +285,25 @@ class VersionTracker:
     def __init__(
         self,
         connect_to_db: bool = True,
-        warn_on_archivable: bool = True,
         warn_on_unused: bool = True,
-        ignore_archive: bool = False,
         exclude_steps: list[str] | None = None,
     ):
         # Load dag of active steps (a dictionary step: set of dependencies).
+        # The VersionTracker works only with the active dag; the archive dag is a
+        # git-derived record (see `etl archive-dag`) and is intentionally ignored here.
         self.dag_active = load_dag(paths.DAG_FILE)
-        if ignore_archive:
-            # Fully ignore the archive dag (so that all steps are only active steps, and there are no archive steps).
-            self.dag_all = self.dag_active.copy()
-        else:
-            # Load dag of active and archive steps.
-            self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
+        self.dag_all = self.dag_active
 
         # Optionally exclude certain steps and dependencies.
         self.exclude_steps = exclude_steps
         if self.exclude_steps:
             self.dag_active = remove_steps_from_dag(self.dag_active, self.exclude_steps)
-            self.dag_all = remove_steps_from_dag(self.dag_all, self.exclude_steps)
+            self.dag_all = self.dag_active
 
         # Create a reverse dag (a dictionary where each item is step: set of usages).
         self.dag_all_reverse = reverse_graph(graph=self.dag_all)
         # Create a reverse dag (a dictionary where each item is step: set of usages) of active steps.
         self.dag_active_reverse = reverse_graph(graph=self.dag_active)
-        # Generate the dag of only archive steps.
-        self.dag_archive = {step: self.dag_all[step] for step in self.dag_all if step not in self.dag_active}
         # List all unique steps that exist in the dag.
         self.all_steps = list_all_steps_in_dag(self.dag_all)
         # Remove walden steps (TODO: remove this when walden is fully deprecated).
@@ -365,9 +322,6 @@ class VersionTracker:
         if self.connect_to_db and not can_connect():
             log.warning("Unable to connect to DB. Some checks will be skipped and charts info will not be available.")
             self.connect_to_db = False
-
-        # Warn about archivable steps.
-        self.warn_on_archivable = warn_on_archivable
 
         # Warn about unused steps.
         self.warn_on_unused = warn_on_unused
@@ -500,12 +454,11 @@ class VersionTracker:
             log.error(f"Unknown channel {channel} for step {step}.")
 
         path_to_script_detected = None
-        # A step script can exist either as a .py file, as a .ipynb file, or a __init__.py file inside a folder.
+        # A step script can exist either as a .py file or a __init__.py file inside a folder.
         # In the case of snapshots, there may or may not be a .py file, but there definitely needs to be a dvc file.
         # In that case, the corresponding script is not trivial to find, but at least we can return the dvc file.
         for path_to_script_candidate in [
             path_to_script.with_suffix(".py"),  # ty: ignore
-            path_to_script.with_suffix(".ipynb"),  # ty: ignore
             path_to_script / "__init__.py",  # ty: ignore
             path_to_script.with_name(path_to_script.name + ".dvc"),  # ty: ignore
         ]:
@@ -617,14 +570,6 @@ class VersionTracker:
             ),
             "update_state",
         ] = UpdateState.UP_TO_DATE.value
-        # If a step is not the latest version, has no charts, and no external usages, it is archivable.
-        # NOTE: See that below we also make archivable all steps that have been unused for too long.
-        steps_active_df.loc[
-            (steps_active_df["n_charts"] == 0)
-            & (steps_active_df["n_external_usages"] == 0)
-            & (~steps_active_df["is_latest"]),
-            "update_state",
-        ] = UpdateState.ARCHIVABLE.value
         # If a step is the latest version but has no charts and no external usages, it is unused.
         steps_active_df.loc[
             (steps_active_df["n_charts"] == 0)
@@ -633,38 +578,10 @@ class VersionTracker:
             "update_state",
         ] = UpdateState.UNUSED.value
 
-        def _days_since_step_creation(version):
-            # Calculate the number of days since the creation of the step.
-            if version == "latest":
-                # If the version is 'latest', assume the step was created today.
-                return 0
-            try:
-                # If the version is a full date, use it to calculate the number of days since then.
-                version_date = pd.to_datetime(version).date()
-            except ValueError:
-                # If the version is a year, assume the step was created on the first day of that year.
-                version_date = pd.to_datetime(f"{version}-01-01").date()
-            return (TODAY.date() - version_date).days
-
-        # Make archivable all steps that have been unused for too long.
-        steps_active_df.loc[
-            (steps_active_df["update_state"] == UpdateState.UNUSED.value)
-            & (steps_active_df["version"].apply(_days_since_step_creation) > MAX_NUM_DAYS_BEFORE_ARCHIVABLE),
-            "update_state",
-        ] = UpdateState.ARCHIVABLE.value
-
-        # There are special steps that, even though they are archivable or unused, we want to keep in the active dag.
-        steps_active_df.loc[steps_active_df["step"].isin(self.ARCHIVABLE_STEPS_TO_KEEP), "update_state"] = (
-            UpdateState.UP_TO_DATE.value
-        )
-
         # All explorers and external steps should be considered up to date.
         steps_active_df.loc[steps_active_df["channel"].isin(["explorers", "external"]), "update_state"] = (
             UpdateState.UP_TO_DATE.value
         )
-
-        # Add update state to archived steps.
-        steps_inactive_df["update_state"] = UpdateState.ARCHIVED.value
 
         # Concatenate active and inactive steps.
         steps_df = pd.concat([steps_active_df, steps_inactive_df], ignore_index=True)
@@ -1016,32 +933,13 @@ class VersionTracker:
             error_message = self._generate_error_for_missing_dependencies(missing_steps=missing_steps)
             log.error(f"{error_message}\n\nSolution: Check if you may have accidentally deleted those missing steps.")
 
-    def check_that_active_dependencies_are_not_archived(self) -> None:
-        """Check that all active dependencies are not archived; if they are, raise an informative error."""
-        # Find any archive steps that are dependencies of active steps, and should therefore not be archive steps.
-        missing_steps = set(self.dag_archive) & set(self.all_active_dependencies)
-
-        if len(missing_steps) > 0:
-            error_message = self._generate_error_for_missing_dependencies(missing_steps=missing_steps)
-            log.error(f"{error_message}\n\nSolution: Either archive the active steps or un-archive the archive steps.")
-
     def check_that_all_active_steps_are_necessary(self) -> None:
         """Check that all active steps are needed in the dag; if not, raise an informative warning."""
-        if self.warn_on_archivable:
-            # Find all active steps that can safely be archived.
-            archivable_steps = self.steps_df[self.steps_df["update_state"] == UpdateState.ARCHIVABLE.value][
-                "step"
-            ].tolist()
-            self._log_warnings_and_errors(
-                message="Some active steps can safely be archived:",
-                list_affected=archivable_steps,
-                warning_or_error="warning",
-            )
         if self.warn_on_unused:
-            # Find all active steps that are not yet used (and should either be used or archived).
+            # Find all active steps that are not yet used.
             unused_steps = self.steps_df[self.steps_df["update_state"] == UpdateState.UNUSED.value]["step"].tolist()
             self._log_warnings_and_errors(
-                message="Some active steps are not yet used, and could potentially be archived:",
+                message="Some active steps are not yet used:",
                 list_affected=unused_steps,
                 warning_or_error="warning",
             )
@@ -1127,16 +1025,13 @@ class VersionTracker:
     def apply_sanity_checks(self) -> None:
         """Apply all sanity checks."""
         self.check_that_active_dependencies_are_defined()
-        self.check_that_active_dependencies_are_not_archived()
         self.check_that_all_steps_have_a_script()
         self.check_that_all_steps_have_update_state()
         if self.connect_to_db:
             self.check_that_db_datasets_with_charts_are_not_archived()
             self.check_that_db_datasets_with_charts_have_active_etl_steps()
             self.check_that_db_datasets_exist_in_etl()
-        # The following check will warn of archivable steps (if warn_on_archivable is True).
-        # Depending on whether connect_to_db is True or False, the criterion will be different.
-        # When False, the criterion is rather a proxy; True uses a more meaningful criterion.
+        # The following check will warn of unused steps (if warn_on_unused is True).
         self.check_that_all_active_steps_are_necessary()
 
 
@@ -1145,30 +1040,20 @@ class VersionTracker:
     "--skip-db",
     is_flag=True,
     default=False,
-    help="True to skip connecting to the database of the current environment. False to try to connect to DB, to get a better informed picture of what steps may be missing or archivable. If not connected, all checks will be based purely on the content of the ETL dag.",
-)
-@click.option(
-    "--warn-on-archivable",
-    is_flag=True,
-    default=False,
-    help="True to warn about archivable steps. By default this is False, because we currently have many archivable steps.",
+    help="True to skip connecting to the database of the current environment. False to try to connect to DB, to get a better informed picture of what steps may be missing. If not connected, all checks will be based purely on the content of the ETL dag.",
 )
 @click.option(
     "--warn-on-unused",
     is_flag=True,
     default=False,
-    help="True to warn about unused steps (i.e. steps that may be up-to-date, but not yet used anywhere, and hence can potentially be archived). By default this is False, because we currently have many unused steps.",
+    help="True to warn about unused steps (i.e. steps that may be up-to-date, but not yet used anywhere). By default this is False, because we currently have many unused steps.",
 )
-def run_version_tracker_checks(
-    skip_db: bool = False, warn_on_archivable: bool = False, warn_on_unused: bool = False
-) -> None:
+def run_version_tracker_checks(skip_db: bool = False, warn_on_unused: bool = False) -> None:
     """Check that all DAG dependencies (e.g. make sure no step is missing).
 
     Run all version tracker sanity checks.
     """
-    VersionTracker(
-        connect_to_db=not skip_db, warn_on_archivable=warn_on_archivable, warn_on_unused=warn_on_unused
-    ).apply_sanity_checks()
+    VersionTracker(connect_to_db=not skip_db, warn_on_unused=warn_on_unused).apply_sanity_checks()
 
 
 def _add_days_to_update_columns(steps_df):

@@ -10,6 +10,8 @@ dataset:
     You can find more details on the dataset in its notes at https://web.archive.org/web/20230717140532/https://dataverse.harvard.edu/file.xhtml?fileId=5857673&version=2.0
   licenses:
     - {}
+  owners:
+    - Bastian Herre  # fasttrack
 tables:
   war_deaths_by_war_mars:
     common:
@@ -22,16 +24,12 @@ tables:
       war_deaths_low:
         title: War deaths (lower estimate)
         unit: deaths
-        description_short: The low estimate of the number of deaths over the duration of this war. Deaths of combatants due to fighting
-          are included.
+        description_short: The low estimate of the number of deaths over the duration of this war. Deaths of combatants due to fighting are included.
       war_deaths_high:
         title: War deaths (higher estimate)
         unit: deaths
-        description_short: The high estimate of the number of deaths over the duration of this war. Deaths of combatants due to
-          fighting are included.
+        description_short: The high estimate of the number of deaths over the duration of this war. Deaths of combatants due to fighting are included.
       civil_war:
         title: Civil war
         unit: ""
-        description_short: The indicator distinguishes between civil and interstate wars. A civil war is a conflict between combatants
-          that were previously part of the same state, but now at least one seeks control or secession. An interstate war
-          is a conflict between states.
+        description_short: The indicator distinguishes between civil and interstate wars. A civil war is a conflict between combatants that were previously part of the same state, but now at least one seeks control or secession. An interstate war is a conflict between states.

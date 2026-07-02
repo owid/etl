@@ -224,6 +224,33 @@ def run() -> None:
     # Prepare GDP data
     tb_gdp = prepare_gdp_data(tb_maddison)
 
+    # Build country → OWID continent and country → MPD region maps. Reused below to label
+    # the thousand_bins tables alongside the existing PIP `region` / `region_old` columns.
+    owid_members = paths.regions.get_regions(
+        names=["Africa", "Asia", "Europe", "North America", "Oceania", "South America"],
+        only_subregions=True,
+    )
+    country_to_owid_region = {c: r for r, members in owid_members.items() for c in members}
+    # Channel Islands isn't a member of any OWID continent in the regions dataset.
+    country_to_owid_region.setdefault("Channel Islands", "Europe")
+
+    country_to_mpd_region = (
+        tb_maddison[["country", "region"]]
+        .drop_duplicates()
+        .assign(country=lambda d: d["country"].str.replace(" (Maddison)", "", regex=False))
+        .groupby("country")["region"]
+        .first()
+        .to_dict()
+    )
+    # PIP countries not available in MPD — use the manual mapping already maintained at the top of this file.
+    country_to_mpd_region.update(MISSING_COUNTRIES_AND_REGIONS)
+    # Successor states of historical MPD entities (inherit the historical entity's region).
+    for entity_name in ["USSR", "Yugoslavia", "Czechoslovakia", "Sudan (former)"]:
+        entity_region = country_to_mpd_region.get(entity_name)
+        if entity_region is not None:
+            for successor in paths.regions.get_region(entity_name)["successors"]:
+                country_to_mpd_region.setdefault(successor, entity_region)
+
     # Extract years where World has data in Maddison for benchmark columns (only before LATEST_YEAR_PIP_FILLED)
     maddison_world_years = set(
         tb_maddison[
@@ -458,11 +485,18 @@ def run() -> None:
                 subset=["country", "year", "region", "region_old", "quantile"]
             )
         )
+    tb_thousand_bins_interpolated_ginis = attach_extra_region_columns(
+        tb_thousand_bins_interpolated_ginis, country_to_owid_region, country_to_mpd_region
+    )
     tb_thousand_bins_interpolated_ginis = tb_thousand_bins_interpolated_ginis.format(
-        ["country", "year", "region", "region_old", "quantile"], short_name="thousand_bins_interpolated_ginis"
+        ["country", "year", "region", "region_old", "owid_region", "mpd_region", "quantile"],
+        short_name="thousand_bins_interpolated_ginis",
+    )
+    tb_thousand_bins_interpolated_ginis_all_lognormal = attach_extra_region_columns(
+        tb_thousand_bins_interpolated_ginis_all_lognormal, country_to_owid_region, country_to_mpd_region
     )
     tb_thousand_bins_interpolated_ginis_all_lognormal = tb_thousand_bins_interpolated_ginis_all_lognormal.format(
-        ["country", "year", "region", "region_old", "quantile"],
+        ["country", "year", "region", "region_old", "owid_region", "mpd_region", "quantile"],
         short_name="thousand_bins_interpolated_ginis_all_lognormal",
     )
 
@@ -501,6 +535,34 @@ def run() -> None:
 
     # Save dataset
     ds_garden.save()
+
+
+def attach_extra_region_columns(
+    tb: Table,
+    country_to_owid_region: dict,
+    country_to_mpd_region: dict,
+) -> Table:
+    """Attach OWID continent and Maddison Project Database region columns to a thousand_bins table.
+
+    Memory-light: maps via categorical codes (one int per row) instead of expanding full-length
+    string arrays — important because these tables are tens of millions of rows. Metadata is
+    inherited from the existing PIP `region` column so origins propagate to the output.
+    """
+    country = tb["country"]
+    if not isinstance(country.dtype, pd.CategoricalDtype):
+        country = country.astype("category")
+
+    categories = country.cat.categories
+    codes = country.cat.codes.to_numpy()
+
+    owid_per_cat = pd.Categorical([country_to_owid_region.get(c) for c in categories])
+    mpd_per_cat = pd.Categorical([country_to_mpd_region.get(c) for c in categories])
+
+    tb["owid_region"] = pd.Categorical.from_codes(owid_per_cat.codes[codes], categories=owid_per_cat.categories)
+    tb["mpd_region"] = pd.Categorical.from_codes(mpd_per_cat.codes[codes], categories=mpd_per_cat.categories)
+    tb["owid_region"] = tb["owid_region"].copy_metadata(tb["region"])
+    tb["mpd_region"] = tb["mpd_region"].copy_metadata(tb["region"])
+    return tb
 
 
 def prepare_gdp_data(tb_maddison: Table) -> Table:
@@ -1006,8 +1068,11 @@ def select_growth_factor(tb: Table) -> Table:
 
 def smooth_estimates(tb: Table) -> Table:
     """
-    Create smoothed estimates using 10-year rolling averages for headcount and headcount_ratio.
+    Create smoothed estimates using 11-year centered rolling averages for headcount and headcount_ratio.
     This addresses uncertainty in historical estimates.
+    A centered window is used (rather than a trailing one) so the smoothed value at year Y averages
+    [Y-5, Y+5]. A trailing window biases each decadal point upward, because the monotonically declining
+    poverty series leans on the higher-poverty preceding decade.
     Only keeps decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1 (plus all years from LATEST_YEAR_PIP_FILLED onwards).
     """
 
@@ -1029,20 +1094,21 @@ def smooth_estimates(tb: Table) -> Table:
     # Sort by country, year, and poverty line
     tb_avg = tb_avg.sort_values(["country", "year", "poverty_line"]).reset_index(drop=True)
 
-    # Calculate 10-year rolling averages per country and poverty line for headcount_ratio
+    # Calculate 11-year centered rolling averages per country and poverty line for headcount_ratio
     tb_avg["headcount_ratio_avg"] = tb_avg.groupby(["country", "poverty_line"])["headcount_ratio"].transform(
-        lambda x: x.rolling(window=10, min_periods=1).mean()
+        lambda x: x.rolling(window=11, min_periods=1, center=True).mean()
     )
 
-    # Calculate 10-year rolling averages per country and poverty line for headcount
+    # Calculate 11-year centered rolling averages per country and poverty line for headcount
     tb_avg["headcount_avg"] = tb_avg.groupby(["country", "poverty_line"])["headcount"].transform(
-        lambda x: x.rolling(window=10, min_periods=1).mean()
+        lambda x: x.rolling(window=11, min_periods=1, center=True).mean()
     )
 
-    # Replace values at LATEST_YEAR_PIP_FILLED - 1 with original values (to ensure continuity with PIP data)
-    mask_last_year = tb_avg["year"] == (LATEST_YEAR_PIP_FILLED - 1)
-    tb_avg.loc[mask_last_year, "headcount_ratio_avg"] = tb_avg.loc[mask_last_year, "headcount_ratio"]
-    tb_avg.loc[mask_last_year, "headcount_avg"] = tb_avg.loc[mask_last_year, "headcount"]
+    # Anchor the endpoints to the original values: EARLIEST_YEAR (no left-side data to smooth) and
+    # LATEST_YEAR_PIP_FILLED - 1 (to ensure continuity with PIP data).
+    mask_anchor = tb_avg["year"].isin([EARLIEST_YEAR, LATEST_YEAR_PIP_FILLED - 1])
+    tb_avg.loc[mask_anchor, "headcount_ratio_avg"] = tb_avg.loc[mask_anchor, "headcount_ratio"]
+    tb_avg.loc[mask_anchor, "headcount_avg"] = tb_avg.loc[mask_anchor, "headcount"]
 
     # Keep only decadal years, EARLIEST_YEAR, and LATEST_YEAR_PIP_FILLED - 1
     tb_avg = tb_avg[

@@ -3,6 +3,8 @@ dataset:
   description: Estimates of electricity consumption in the residential sector only.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   residential_electricity_consumption:
     variables:

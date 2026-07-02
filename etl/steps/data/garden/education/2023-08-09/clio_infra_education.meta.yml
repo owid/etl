@@ -1,36 +1,13 @@
 dataset:
   title: Historical numeracy and years of schooling estimates (Clio Infra)
-  description: &desc >-
-    This dataset contains historical estimates of average years of education and numeracy estimates.
-    It also includes historical estimates of Gini coefficient of inequality in educational attainment (years of education) and Gini and gender coefficient of inequality for both educational attainment and numeracy.
-
-  licenses:
-  - url: https://creativecommons.org/publicdomain/zero/1.0/
-  sources:
-  - name: Clio Infra
-    date_accessed: '2023-08-09'
-    description:  *desc
-    url: https://clio-infra.eu/Indicators/NumeracyTotal.html#datasets
-    source_data_url: https://clio-infra.eu/index.html
-    publication_date: '2013-12-26'
-    publication_year: 2013
-    published_by: >-
-      van Zanden, J., et al. (eds.) (2014), How Was Life?: Global Well-being since 1820, OECD Publishing, Paris, https://doi.org/10.1787/9789264214262-en.;
-
-
-      van Leeuwen, Bas; van Leeuwen-Li, Jieli, 2015, "Average Years of Education", https://hdl.handle.net/10622/KCBMKI, IISH Data Collection, V1
-
-
-      Carmichael, Sarah; Dilli, Selin; Rijpma, Auke, 2015, "Gender Equality Years of Education", https://hdl.handle.net/10622/OTHFUK, IISH Data Collection, V1
-
-
-      van Leeuwen, Bas; van Leeuwen-Li, Jieli, 2015, "Educational Inequality Gini Coefficient", https://hdl.handle.net/10622/KORKQW, IISH Data Collection, V1
+  owners:
+    - Veronika Samborska
 tables:
   clio_infra_education:
     variables:
       years_of_education:
         title: Historical estimates of average years of education
-        description: The average years of education in the total population aged 15 years and older is given for the period 1870-2010.
+        description_short: The average years of education in the total population aged 15 years and older is given for the period 1870-2010.
         unit: years
         short_unit: ''
         display:
@@ -38,7 +15,7 @@ tables:
 
       years_of_education_gini:
         title: Historical estimates of average years of education, Gini inequality index
-        description: >-
+        description_short: >-
           The Gini coefficient measures the inequality in the spread of education in the total population aged 15 years and older.
 
 
@@ -51,7 +28,7 @@ tables:
 
       years_of_education_gender:
         title: Historical estimates of average years of education, gender differences
-        description: >-
+        description_short: >-
           Ratio of girls to boys in average years of schooling by country and decade.
 
 
@@ -68,8 +45,8 @@ tables:
           numDecimalPlaces: 1
 
       numeracy:
-        title:  Historical numeracy estimates
-        description: >-
+        title: Historical numeracy estimates
+        description_short: >-
           Age heaping is observed in age data collection, where people tend to report their ages in rounded figures, often ending in 0 or 5, rather than their exact age.
           For example, individiauals might state their age as 30, 35, or 40 and avoid being precise with figures like 31, 36, or 39. This is believed to happen more often in populations that lack basic numeracy skills.
 
@@ -85,21 +62,21 @@ tables:
 
       numeracy_gender:
         title: Historical numeracy estimates, gender differences
-        description: >-
-            Age heaping is observed in age data collection, where people tend to report their ages in rounded figures, often ending in 0 or 5, rather than their exact age.
-            For example, individiauals might state their age as 30, 35, or 40 and avoid being precise with figures like 31, 36, or 39. This is believed to happen more often in populations that lack basic numeracy skills.
+        description_short: >-
+          Age heaping is observed in age data collection, where people tend to report their ages in rounded figures, often ending in 0 or 5, rather than their exact age.
+          For example, individiauals might state their age as 30, 35, or 40 and avoid being precise with figures like 31, 36, or 39. This is believed to happen more often in populations that lack basic numeracy skills.
 
 
-            Age heaping can therefore be used to estimate historic data on basic numeracy across different regions and timeframes.
+          Age heaping can therefore be used to estimate historic data on basic numeracy across different regions and timeframes.
 
 
-            To estimate age heaping (also known as Whipple index) the authors of this dataset divide the number of people who report their ages to end in 0 or 5 by the expected real age distribution if ages were evenly distributed, meaning ages ending in 0 or 5 would appear about one-fifth of the time.
-            If all individuals in a population report ages ending in 0 or 5, the score is 500. If half of individuals report such ages, the score is 250. If one fifth of the population which is approximate number of people whose age in fact ends on 0 or 5 report age-heaping, the score would be 100, indicating no age heaping.
+          To estimate age heaping (also known as Whipple index) the authors of this dataset divide the number of people who report their ages to end in 0 or 5 by the expected real age distribution if ages were evenly distributed, meaning ages ending in 0 or 5 would appear about one-fifth of the time.
+          If all individuals in a population report ages ending in 0 or 5, the score is 500. If half of individuals report such ages, the score is 250. If one fifth of the population which is approximate number of people whose age in fact ends on 0 or 5 report age-heaping, the score would be 100, indicating no age heaping.
 
 
-            To estimate gender inequality in numeracy the male age-heaping index is subtracted from the female one, divided by the male one and multiplied by -100.
-            A higher score suggests fewer women are rounding their ages compared to men in a specific region. Positive indices indicates women have an advantage in numeracy and negative indicates men have an advantage in numeracy.
-            The index isn't proportional. E.g., a 50% heaping in women (score 250) against perfect reporting by men (score 100) gives a gender equality index of -150, but if roles are reversed, the index becomes 60.
+          To estimate gender inequality in numeracy the male age-heaping index is subtracted from the female one, divided by the male one and multiplied by -100.
+          A higher score suggests fewer women are rounding their ages compared to men in a specific region. Positive indices indicates women have an advantage in numeracy and negative indicates men have an advantage in numeracy.
+          The index isn't proportional. E.g., a 50% heaping in women (score 250) against perfect reporting by men (score 100) gives a gender equality index of -150, but if roles are reversed, the index becomes 60.
         unit: '%'
         short_unit: '%'
         display:

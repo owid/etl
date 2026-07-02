@@ -20,7 +20,6 @@ def run(dest_dir: str) -> None:
     # Load countries-regions dataset (required to get ISO codes).
     ds_regions = paths.load_dataset("regions")
     # Load the population dataset
-    ds_population = paths.load_dataset("population")
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("igme", version=paths.version)
     # Load vintage dataset which has older data needed for youth mortality
@@ -48,9 +47,9 @@ def run(dest_dir: str) -> None:
     tb = round_down_year(tb)
 
     # get regional data for count variables
-    tb_counts_regions = regional_aggregates_counts(tb, ds_regions, ds_population, threshold=0.8)
+    tb_counts_regions = regional_aggregates_counts(tb, ds_regions, threshold=0.8)
     # get regional population weighted averages for rate variables
-    tb_rates_regions = population_weighted_regional_averages(tb, ds_population, ds_regions, threshold=0.8)
+    tb_rates_regions = population_weighted_regional_averages(tb, ds_regions, threshold=0.8)
 
     # Adding regional aggregates to table
     tb = pr.concat([tb, tb_counts_regions, tb_rates_regions])
@@ -96,13 +95,13 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def regional_aggregates_counts(tb: Table, ds_regions: Dataset, ds_population: Dataset, threshold: float = 0.8) -> Table:
+def regional_aggregates_counts(tb: Table, ds_regions: Dataset, threshold: float = 0.8) -> Table:
     """Adds regional aggregates for count variables. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
     Returns: Table with regional aggregates for count variables. ONLY includes regions"""
 
     tb_counts = tb[tb["unit_of_measure"] == "Number of deaths"]
 
-    tb_counts = geo.add_population_to_table(tb_counts, ds_population)
+    tb_counts = paths.regions.add_population(tb_counts)
     tb_counts = tb_counts.dropna(subset=["population"])
 
     # add regions to table (summing obs_value, lower_bound and upper_bound and population)
@@ -117,7 +116,7 @@ def regional_aggregates_counts(tb: Table, ds_regions: Dataset, ds_population: Da
 
     # renaming population column and adding total population (for regions)
     tb_counts = tb_counts.rename(columns={"population": "population_covered"})
-    tb_counts = geo.add_population_to_table(tb_counts, ds_population, population_col="total_population")
+    tb_counts = paths.regions.add_population(tb_counts, population_col="total_population")
 
     # calculating share of population covered and filtering on years above threshold
     tb_counts["share_of_population"] = tb_counts["population_covered"] / tb_counts["total_population"]
@@ -128,16 +127,14 @@ def regional_aggregates_counts(tb: Table, ds_regions: Dataset, ds_population: Da
     return tb_counts
 
 
-def population_weighted_regional_averages(
-    tb: Table, ds_population: Dataset, ds_regions: Dataset, threshold: float = 0.8
-) -> Table:
+def population_weighted_regional_averages(tb: Table, ds_regions: Dataset, threshold: float = 0.8) -> Table:
     """Adds population-weighted averages of death rates for the regions. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
     Returns: Table with population-weighted averages of death rates for the regions. ONLY includes regions"""
 
     tb_rates = tb[tb["unit_of_measure"] != "Number of deaths"]
 
     # adding population to the table and dropping rows with missing population
-    tb_rates = geo.add_population_to_table(tb_rates, ds_population)
+    tb_rates = paths.regions.add_population(tb_rates)
     tb_rates = tb_rates.dropna(subset=["population"])
 
     # calculating column for population weighted death rates
@@ -158,7 +155,7 @@ def population_weighted_regional_averages(
 
     # renaming population column and adding total population (for regions)
     tb_rates = tb_rates.rename(columns={"population": "population_covered"})
-    tb_rates = geo.add_population_to_table(tb_rates, ds_population, population_col="total_population")
+    tb_rates = paths.regions.add_population(tb_rates, population_col="total_population")
 
     # calculating population weighted death rates & share of population covered
     tb_rates["obs_value"] = tb_rates["obs_value_pop"] / tb_rates["population_covered"]

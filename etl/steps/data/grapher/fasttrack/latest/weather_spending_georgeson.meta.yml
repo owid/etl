@@ -3,6 +3,8 @@ dataset:
   description: Spending on weathering forecasting and services across income groups in 2015.
   licenses:
     - {}
+  owners:
+    - Hannah Ritchie  # fasttrack
 tables:
   weather_spending_georgeson:
     variables:
@@ -10,8 +12,7 @@ tables:
         title: Spending per person
         unit: US$ per person
         short_unit: $
-        description: The amount spent on weather forecasting and services, measured per person. This is measured in 2015 US
-          dollars.
+        description: The amount spent on weather forecasting and services, measured per person. This is measured in 2015 US dollars.
       weather_spending_percent_gdp:
         title: Spending as a share of GDP
         unit: percent

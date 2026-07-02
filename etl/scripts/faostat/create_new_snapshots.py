@@ -7,6 +7,10 @@ Snapshots will be stored as:
 * .zip files, for data of each of the individual domains (e.g. faostat_qcl.zip).
 * .json files, for metadata (faostat_metadata.json).
 
+Note: fetching the additional metadata (faostat_metadata.json) now requires a FAOSTAT API token.
+Register for a (free) account on the FAOSTAT developer portal to obtain one, then add it to your
+local `.env` as `FAOSTAT_API_TOKEN=...`. The data zip downloads still work without a token.
+
 Usage:
 * To show available options:
 ```
@@ -30,11 +34,13 @@ uv run python -m create_new_snapshots -a
 import argparse
 import datetime as dt
 import json
+import os
 import tempfile
 from typing import Any, cast
 
 import requests
 from dateutil import parser
+from dotenv import load_dotenv
 
 from etl.scripts.faostat.shared import (
     API_BASE_URL,
@@ -189,16 +195,9 @@ def is_dataset_already_up_to_date(
     """
     dataset_up_to_date = False
     for snapshot in existing_snapshots:
-        # NOTE: This is still necessary (in the current implementation) to be able to handle old snapshots.
-        assert snapshot.metadata.source or snapshot.metadata.origin
-        if snapshot.metadata.source:
-            snapshot_source_data_url = snapshot.metadata.source.source_data_url
-            snapshot_date_accessed = parser.parse(str(snapshot.metadata.source.date_accessed)).date()
-        elif snapshot.metadata.origin:
-            snapshot_source_data_url = snapshot.metadata.origin.url_download
-            snapshot_date_accessed = parser.parse(str(snapshot.metadata.origin.date_accessed)).date()
-        else:
-            raise ValueError(f"Snapshot {snapshot.metadata.short_name} does not have source or origin.")
+        assert snapshot.metadata.origin, f"Snapshot {snapshot.metadata.short_name} does not have an origin."
+        snapshot_source_data_url = snapshot.metadata.origin.url_download
+        snapshot_date_accessed = parser.parse(str(snapshot.metadata.origin.date_accessed)).date()
         if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed >= source_modification_date):
             dataset_up_to_date = True
 
@@ -244,17 +243,26 @@ class FAOAdditionalMetadata:
 
     @staticmethod
     def _fetch_additional_metadata_and_save(output_filename: str) -> None:
+        load_dotenv()
+        token = os.environ.get("FAOSTAT_API_TOKEN")
+        if not token:
+            raise RuntimeError(
+                "FAOSTAT_API_TOKEN is not set. Register on the FAOSTAT developer portal "
+                "for a free API token and add it to your local .env as FAOSTAT_API_TOKEN=..."
+            )
+        headers = {"Authorization": f"Bearer {token}"}
+
         faostat_metadata = {}
         # Fetch additional metadata for each domain and category using API.
         for domain in INCLUDED_DATASETS_CODES:
             log.info(f"Fetching additional metadata for domain {domain}.")
             domain_meta = {}
             # Get list of categories (e.g. "items", "element", etc.) for this dataset.
-            response = requests.get(f"{API_BASE_URL}/{domain}")
+            response = requests.get(f"{API_BASE_URL}/{domain}", headers=headers)
             assert response.ok, f"Failed to fetch API data for dataset {domain}."
             categories = [field["code"] for field in json.loads(response.content)["data"]]
             for category in categories:
-                resp = requests.get(f"{API_BASE_URL}/{domain}/{category}")
+                resp = requests.get(f"{API_BASE_URL}/{domain}/{category}", headers=headers)
                 if resp.ok:
                     domain_meta[category] = resp.json()
 
@@ -284,7 +292,7 @@ class FAOAdditionalMetadata:
             snap.create_snapshot(filename=f.name, upload=True)
 
 
-def main(read_only: bool = False, include_all_datasets: bool = False) -> None:
+def run(read_only: bool = False, include_all_datasets: bool = False) -> None:
     # Load list of existing snapshots related to current NAMESPACE.
     existing_snapshots = [
         snapshot for snapshot in list(snapshot_catalog(match=NAMESPACE)) if "backport/" not in snapshot.uri
@@ -349,4 +357,4 @@ if __name__ == "__main__":
         help="If given, create snapshots for all datasets, even if the source data was not updated.",
     )
     args = argument_parser.parse_args()
-    main(read_only=args.read_only, include_all_datasets=args.include_all_datasets)
+    run(read_only=args.read_only, include_all_datasets=args.include_all_datasets)

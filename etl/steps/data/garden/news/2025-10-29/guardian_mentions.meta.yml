@@ -11,6 +11,8 @@ dataset:
   update_period_days: 365
   title: "Country mentions in The Guardian articles"
 
+  owners:
+    - Lucas Rodés-Guirao
 tables:
   guardian_mentions:
     variables:

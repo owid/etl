@@ -403,8 +403,10 @@ class ChartDiffShow:
                 source = filter_out_fields_in_metadata_for_checksum(source)
                 target = filter_out_fields_in_metadata_for_checksum(target)
 
-                # Get meta json diff
-                meta_diff = compare_dictionaries(source, target, fromfile="source", tofile="target")
+                # PROD is the base; STAGING is what the user is proposing to merge — pass
+                # `target` (prod) first so the diff reads as `production → staging` and
+                # the staging branch shows up as additions/modifications.
+                meta_diff = compare_dictionaries(target, source, fromfile="production", tofile="staging")
                 if meta_diff:
                     meta_diffs[indicator_id] = meta_diff
 
@@ -589,6 +591,13 @@ class ChartDiffShow:
     def _show_narrative_charts(self) -> None:
         """Show narrative charts that use this chart as parent, with side-by-side comparison."""
         if not self.diff.chart_id:
+            return
+
+        # Respect the sidebar toggle. The list-side filter in app.py only runs when
+        # `show_all` is off; without this gate the block would still render here when
+        # the user toggles narrative-charts off but also has "Show all charts" enabled.
+        # Mirrors the same pattern in `_show_citations`.
+        if not st.session_state.get("show-narrative-charts", True):
             return
 
         # Load narrative charts for this parent chart

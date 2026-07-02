@@ -1,0 +1,35 @@
+dataset:
+  title: Figure_17.8_nominal_ir
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_17_8_nominal_ir:
+    variables:
+      consumer_price_inflation__pct:
+        title: Consumer price inflation (%)
+        unit: '%'
+      federal_government_budget_balance__as_a_pct_of_gnp:
+        title: Federal government budget balance (as a % of GNP)
+        unit: '%'
+      short_term_nominal_interest_rate__pct:
+        title: Short-term nominal interest rate (%)
+        unit: '%'
+        description: The short-term nominal interest rate is the short-term commercial paper rate.
+      short_term_real_interest_rate__pct:
+        title: Short-term real interest rate (%)
+        unit: '%'
+        description: |-
+          The short-term real interest rate is the short-term commercial paper rate deflated by the consumer price index for all urban consumers (all items).
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: '%'
+        description: The unemployment rate is expressed as a percentage of the civilian labour force.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,17 +1,12 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
-from structlog import get_logger
 from tabulate import tabulate
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# Initialize logger.
-log = get_logger()
 
 # Set table format when printing
 TABLEFMT = "pretty"
@@ -126,6 +121,94 @@ RELIGION_HOW_OFTEN_PRAY_QUESTIONS = ["pray"]
 
 IMPORTANCE_OF_GOD_QUESTIONS = ["god"]
 
+JOBS_SCARCE_QUESTIONS = [
+    "men_more_right_to_a_job_than_women",
+    "priority_to_nationals_over_immigrants",
+]
+
+GENDER_ROLES_QUESTIONS = [
+    "housewife_just_as_fulfilling",
+    "men_better_political_leaders",
+    "university_more_important_for_a_boy",
+    "pre_school_child_suffers_with_working_mother",
+    "men_better_business_executives",
+]
+
+NEIGHBORHOOD_FREQUENCY_QUESTIONS = [
+    "robberies",
+    "police_or_military_interfere",
+    "racist_behavior",
+    "drug_sale_in_streets",
+]
+
+# H008_02 uses a different (often/sometimes/rarely/never) scale than the H002 frequency block
+FELT_UNSAFE_QUESTIONS = ["felt_unsafe_at_home"]
+
+SECURITY_ACTIONS_QUESTIONS = [
+    "didnt_carry_much_money",
+    "preferred_not_to_go_out_at_night",
+    "carried_a_weapon",
+    "victim_of_a_crime",
+    "family_victim_of_a_crime",
+]
+
+NEIGHBORHOOD_SECURITY_QUESTIONS = ["secure_neighborhood"]
+
+HUMAN_RIGHTS_RESPECT_QUESTIONS = ["respect_human_rights"]
+
+# Continuous index (kept on its native 0-1 scale, so it must be excluded from the 0 -> null replacement)
+WELZEL_EQUALITY_INDEX_COLUMNS = ["avg_score_welzel_equality"]
+
+# Media information source questions (5-point frequency: daily/weekly/monthly/less than monthly/never)
+MEDIA_QUESTIONS = [
+    "information_source_daily_newspaper",
+    "information_source_talk_with_friends_or_colleagues",
+    "information_source_tv_news",
+    "information_source_radio_news",
+    "information_source_mobile_phone",
+    "information_source_email",
+    "information_source_internet",
+]
+
+# How close you feel questions (4-point: very close/close/not very close/not close at all)
+CLOSENESS_QUESTIONS = [
+    "how_close_you_feel_to_continent",
+    "how_close_you_feel_to_world",
+    "how_close_you_feel_to_village_town_or_city",
+    "how_close_you_feel_to_county_region_district",
+    "how_close_you_feel_to_country",
+]
+
+# Science and technology agreement questions (10-point: completely disagree to completely agree)
+TECHNOLOGY_QUESTIONS = [
+    "science_and_technology_make_life_healthier_and_easier",
+    "science_and_technology_bring_more_opportunities_for_next_generation",
+    "we_depend_too_much_on_science_and_not_enough_on_faith",
+    "science_breaks_down_ideas_of_right_and_wrong",
+]
+
+# Science and technology: is the world better or worse off (10-point), single custom block
+SCIENCE_WORLD_QUESTIONS = ["science_world"]
+
+# Aims of country (multinomial: one choice out of four named goals)
+AIMS_COUNTRY_QUESTIONS = ["aims_of_country_first_choice", "aims_of_country_second_choice"]
+
+# Aims of respondent (multinomial: one choice out of four named goals)
+AIMS_RESPONDENT_QUESTIONS = ["aims_of_respondent_first_choice", "aims_of_respondent_second_choice"]
+
+# Most important goal (multinomial: one choice out of four named goals)
+MOST_IMPORTANT_QUESTIONS = ["most_important_first_choice", "most_important_second_choice"]
+
+# Feel concerned about humankind (5-point), single custom block
+HUMANKIND_CONCERN_QUESTIONS = ["humankind"]
+
+# --- World Values Survey (WVS) table ---
+# WVS-only questions (asked in WVS but absent from IVS), built into a separate `world_values_survey`
+# table inside this same dataset. Each entry is the column suffix produced by wvs_create_file.do.
+WVS_WOMEN_INCOME_QUESTIONS = ["women_income"]  # D066_01, 5-point agree
+WVS_CONFIDENCE_ELECTIONS_QUESTIONS = ["elections"]  # E069_64, 4-point confidence
+WVS_TERRORISM_QUESTIONS = ["terrorism"]  # F114E, 10-point justifiable
+
 
 def run() -> None:
     #
@@ -143,7 +226,9 @@ def run() -> None:
     # Drop columns
     tb = drop_indicators_and_replace_nans(tb)
 
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    # The IVS and WVS tables share one countries mapping file, so each leaves some entries unused;
+    # silence the (expected) "unused values in mapping" warning.
+    tb = paths.regions.harmonize_names(tb, warn_on_unused_countries=False)
 
     # Sanity checks
     tb = sanity_checks(tb)
@@ -151,10 +236,28 @@ def run() -> None:
     tb = tb.format(["country", "year"])
 
     #
+    # Build the World Values Survey (WVS) table from its own meadow dataset (WVS-only questions).
+    #
+    ds_meadow_wvs = paths.load_dataset("world_values_survey")
+    tb_wvs = ds_meadow_wvs.read("world_values_survey")
+
+    tb_wvs = process_wvs(tb_wvs)
+
+    tb_wvs = paths.regions.harmonize_names(tb_wvs, warn_on_unused_countries=False)
+
+    # Sanity checks (recodes must sum to 100%)
+    tb_wvs = sanity_checks_wvs(tb_wvs)
+
+    tb_wvs = tb_wvs.format(["country", "year"])
+
+    #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    # Create a new garden dataset with the same metadata as the meadow dataset. The dataset holds two
+    # tables: the Integrated Values Surveys table and the World Values Survey table.
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_wvs], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -186,7 +289,8 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     dont_know_cols = [cols for cols in tb.columns if "dont_know" in cols]
 
     # Replace zero values with nulls, except for columns containing "no_answer" and "dont_know"
-    subset_cols = tb.columns.difference(no_answer_cols + dont_know_cols)
+    # The Welzel equality sub-index is a continuous 0-1 index where 0 is a valid value, so it is excluded too.
+    subset_cols = tb.columns.difference(no_answer_cols + dont_know_cols + WELZEL_EQUALITY_INDEX_COLUMNS)
     tb[subset_cols] = tb[subset_cols].replace(0, float("nan"))
 
     # Replace nulls in Schwartz questions by 0 when the main answer is not null
@@ -392,6 +496,111 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
             "not",
             "neutral",
         ],
+    )
+
+    # For jobs scarce questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=JOBS_SCARCE_QUESTIONS,
+        answers=["agree", "disagree", "neither"],
+    )
+
+    # For gender roles questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=GENDER_ROLES_QUESTIONS,
+        answers=["strongly_agree", "agree", "disagree", "strongly_disagree"],
+    )
+
+    # For neighborhood frequency questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=NEIGHBORHOOD_FREQUENCY_QUESTIONS,
+        answers=["very_frequently", "quite_frequently", "not_frequently", "not_at_all_frequently"],
+    )
+
+    # For security actions and crime victim questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=SECURITY_ACTIONS_QUESTIONS,
+        answers=["yes", "no"],
+    )
+
+    # For secure in neighborhood question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=NEIGHBORHOOD_SECURITY_QUESTIONS,
+        answers=["very", "quite", "not_very", "not_at_all"],
+    )
+
+    # For respect for human rights question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=HUMAN_RIGHTS_RESPECT_QUESTIONS,
+        answers=["great_deal", "some", "not_much", "none_at_all"],
+    )
+
+    # For felt unsafe from crime at home question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=FELT_UNSAFE_QUESTIONS,
+        answers=["often", "sometimes", "rarely", "never"],
+    )
+
+    # For media information source questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=MEDIA_QUESTIONS,
+        answers=["daily", "weekly", "monthly", "less_than_monthly", "never"],
+    )
+
+    # For how close you feel questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=CLOSENESS_QUESTIONS,
+        answers=["very_close", "close", "not_very_close", "not_close_at_all"],
+    )
+
+    # For science and technology agreement questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=TECHNOLOGY_QUESTIONS,
+        answers=["agree", "neutral", "disagree"],
+    )
+
+    # For science and technology world better/worse off question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=SCIENCE_WORLD_QUESTIONS,
+        answers=["better_off", "neutral", "worse_off"],
+    )
+
+    # For aims of country questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=AIMS_COUNTRY_QUESTIONS,
+        answers=["economic_growth", "strong_defence", "more_say", "beautiful_cities"],
+    )
+
+    # For aims of respondent questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=AIMS_RESPONDENT_QUESTIONS,
+        answers=["maintaining_order", "give_people_say", "fighting_prices", "freedom_of_speech"],
+    )
+
+    # For most important goal questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=MOST_IMPORTANT_QUESTIONS,
+        answers=["stable_economy", "humane_society", "ideas_over_money", "fight_crime"],
+    )
+
+    # For feel concerned about humankind question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=HUMANKIND_CONCERN_QUESTIONS,
+        answers=["very_much", "much", "to_a_certain_extent", "not_so_much", "not_at_all"],
     )
 
     # Drop rows with all null values in columns not country and year
@@ -680,6 +889,148 @@ def sanity_checks(tb: Table) -> Table:
         margin=MARGIN,
     )
 
+    # For jobs scarce questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=JOBS_SCARCE_QUESTIONS,
+        answers=["agree", "disagree", "neither", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For gender roles questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=GENDER_ROLES_QUESTIONS,
+        answers=["strongly_agree", "agree", "disagree", "strongly_disagree", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For neighborhood frequency questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=NEIGHBORHOOD_FREQUENCY_QUESTIONS,
+        answers=[
+            "very_frequently",
+            "quite_frequently",
+            "not_frequently",
+            "not_at_all_frequently",
+            "dont_know",
+            "no_answer",
+        ],
+        margin=MARGIN,
+    )
+
+    # For security actions and crime victim questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=SECURITY_ACTIONS_QUESTIONS,
+        answers=["yes", "no", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For secure in neighborhood question
+    tb = check_sum_100(
+        tb=tb,
+        questions=NEIGHBORHOOD_SECURITY_QUESTIONS,
+        answers=["very", "quite", "not_very", "not_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For respect for human rights question
+    tb = check_sum_100(
+        tb=tb,
+        questions=HUMAN_RIGHTS_RESPECT_QUESTIONS,
+        answers=["great_deal", "some", "not_much", "none_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For felt unsafe from crime at home question
+    tb = check_sum_100(
+        tb=tb,
+        questions=FELT_UNSAFE_QUESTIONS,
+        answers=["often", "sometimes", "rarely", "never", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For media information source questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=MEDIA_QUESTIONS,
+        answers=["daily", "weekly", "monthly", "less_than_monthly", "never", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For how close you feel questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=CLOSENESS_QUESTIONS,
+        answers=["very_close", "close", "not_very_close", "not_close_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For science and technology agreement questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=TECHNOLOGY_QUESTIONS,
+        answers=["agree", "neutral", "disagree", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For science and technology world better/worse off question
+    tb = check_sum_100(
+        tb=tb,
+        questions=SCIENCE_WORLD_QUESTIONS,
+        answers=["better_off", "neutral", "worse_off", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For aims of country questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=AIMS_COUNTRY_QUESTIONS,
+        answers=["economic_growth", "strong_defence", "more_say", "beautiful_cities", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For aims of respondent questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=AIMS_RESPONDENT_QUESTIONS,
+        answers=[
+            "maintaining_order",
+            "give_people_say",
+            "fighting_prices",
+            "freedom_of_speech",
+            "dont_know",
+            "no_answer",
+        ],
+        margin=MARGIN,
+    )
+
+    # For most important goal questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=MOST_IMPORTANT_QUESTIONS,
+        answers=["stable_economy", "humane_society", "ideas_over_money", "fight_crime", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For feel concerned about humankind question
+    tb = check_sum_100(
+        tb=tb,
+        questions=HUMANKIND_CONCERN_QUESTIONS,
+        answers=[
+            "very_much",
+            "much",
+            "to_a_certain_extent",
+            "not_so_much",
+            "not_at_all",
+            "dont_know",
+            "no_answer",
+        ],
+        margin=MARGIN,
+    )
+
     return tb
 
 
@@ -700,13 +1051,70 @@ def check_sum_100(tb: Table, questions: list[str], answers: list[str], margin: f
         ].notnull().all(axis=1)
         tb_error = tb[mask].reset_index(drop=True).copy()
 
-        if not tb_error.empty:
-            log.fatal(
-                f"""{len(tb_error)} answers for {q} are not adding up to 100%:
-                {tabulate(tb_error[["country", "year"] + answers_by_question + ["sum_check"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
-            )
+        assert tb_error.empty, (
+            f"{len(tb_error)} answers for {q} are not adding up to 100%:\n"
+            f"{tabulate(tb_error[['country', 'year'] + answers_by_question + ['sum_check']], headers='keys', tablefmt=TABLEFMT, floatfmt='.1f')}"
+        )
 
     # Remove sum_check
     tb = tb.drop(columns=["sum_check"])
+
+    return tb
+
+
+def process_wvs(tb: Table) -> Table:
+    """
+    Process the World Values Survey table (WVS-only questions).
+
+    Unlike IVS, WVS shares contain no spurious zeros: country-years where a question was not asked are
+    missing after the Stata merge (not zero), so no 0 -> null replacement is applied here. We only null out
+    "don't know" where the rest of the answers are null (parity with IVS), then drop all-null rows.
+    """
+    # Replace 0 by null for "don't know" columns if the rest of the columns are null.
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=WVS_WOMEN_INCOME_QUESTIONS,
+        answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree"],
+    )
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=WVS_CONFIDENCE_ELECTIONS_QUESTIONS,
+        answers=["great_deal", "quite_a_lot", "not_very_much", "none_at_all"],
+    )
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=WVS_TERRORISM_QUESTIONS,
+        answers=["never_just_agg", "always_just_agg", "neutral"],
+    )
+
+    # Drop rows with all null values in columns other than country and year.
+    tb = tb.dropna(how="all", subset=tb.columns.difference(["country", "year"]))
+
+    return tb
+
+
+def sanity_checks_wvs(tb: Table) -> Table:
+    """
+    Perform sanity checks on the World Values Survey table (the mutually-exclusive categories plus
+    "don't know" and "no answer" must add up to 100%).
+    """
+    tb = check_sum_100(
+        tb=tb,
+        questions=WVS_WOMEN_INCOME_QUESTIONS,
+        answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+    tb = check_sum_100(
+        tb=tb,
+        questions=WVS_CONFIDENCE_ELECTIONS_QUESTIONS,
+        answers=["great_deal", "quite_a_lot", "not_very_much", "none_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+    tb = check_sum_100(
+        tb=tb,
+        questions=WVS_TERRORISM_QUESTIONS,
+        answers=["never_just_agg", "always_just_agg", "neutral", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
 
     return tb

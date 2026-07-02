@@ -1,0 +1,215 @@
+# Mini-explorer for fh indicators (used by democracy.py with combine_collections).
+# Carries only the views whose `dataset` dimension maps to this upstream source.
+# FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
+# `presentation.grapher_config` in the corresponding garden meta.yml — Grapher
+# inherits it at chart render time. Per-view `config:` here is intentionally empty
+# for single-y views; multi-y views keep their combined chart config.
+
+definitions:
+  display_n_dem: &display_n_dem
+    name: "Non-democracies"
+    color: "#ef8a62"
+  display_elect_dem: &display_elect_dem
+    name: "Electoral democracies"
+    color: "#2c7bb6"
+  display_nf: &display_nf
+    name: "Not free countries"
+    color: "#a588c3"
+  display_pf: &display_pf
+    name: "Partly free countries"
+    color: "#e8b864"
+  display_f: &display_f
+    name: "Free countries"
+    color: "#58ac8c"
+
+  group_subtitle: &group_subtitle |-
+    [Data](#dod:democracy-fh) by [Freedom House](#dod:freedom-house).
+
+  common_views:
+    - config:
+        colorVariableId: regions#owid_region
+
+config:
+  explorerTitle: "Democracy"
+  explorerSubtitle: "Explore changes in the world's democratic and non-democratic systems."
+  isPublished: true
+
+dimensions:
+  - slug: metric
+    name: "Metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: freedom
+        name: "\xad\xad\xad\xadFreedom"
+      - slug: electoral_democracy
+        name: "\xad\xad\xad\xadElectoral democracy"
+  - slug: sub_metric
+    name: "Sub-metric"
+    presentation:
+      type: dropdown
+    choices:
+      - slug: main_classification
+        name: "Main classification"
+      - slug: democratic_electoral_institutions
+        name: "Democratic electoral institutions"
+      - slug: political_rights_score
+        name: "Political rights score"
+      - slug: political_rights_rating
+        name: "Political rights rating"
+      - slug: civil_liberties_score
+        name: "Civil liberties score"
+      - slug: civil_liberties_rating
+        name: "Civil liberties rating"
+      - slug: number_and_share_of_free_countries_and_territories
+        name: "Number and share of free countries and territories"
+      - slug: people_living_in_free_countries_and_territories
+        name: "People living in free countries and territories"
+      - slug: number_and_share_of_democracies
+        name: "\xadNumber and share of democracies"
+      - slug: people_living_in_democracies
+        name: "\xadPeople living in democracies"
+
+views:
+  - dimensions:
+      metric: freedom
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: fh#regime
+    config:
+      colorVariableId: fh#regime
+  - dimensions:
+      metric: freedom
+      sub_metric: political_rights_score
+    indicators:
+      y:
+        - catalogPath: fh#polrights_score
+  - dimensions:
+      metric: freedom
+      sub_metric: political_rights_rating
+    indicators:
+      y:
+        - catalogPath: fh#polrights
+  - dimensions:
+      metric: freedom
+      sub_metric: civil_liberties_score
+    indicators:
+      y:
+        - catalogPath: fh#civlibs_score
+  - dimensions:
+      metric: freedom
+      sub_metric: civil_liberties_rating
+    indicators:
+      y:
+        - catalogPath: fh#civlibs
+  - dimensions:
+      metric: freedom
+      sub_metric: number_and_share_of_free_countries_and_territories
+    indicators:
+      y:
+        - catalogPath: fh_regions#num_regime__category_not_free
+          display: *display_nf
+        - catalogPath: fh_regions#num_regime__category_partly_free
+          display: *display_pf
+        - catalogPath: fh_regions#num_regime__category_free
+          display: *display_f
+    config:
+      title: "Free countries and territories"
+      type: &id001 "StackedArea StackedDiscreteBar"
+      subtitle: *group_subtitle
+      stackMode: "relative"
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      metric: freedom
+      sub_metric: people_living_in_free_countries_and_territories
+    indicators:
+      y:
+        - catalogPath: fh_regions#pop_regime__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: fh_regions#pop_regime__category_not_free
+          display: *display_nf
+        - catalogPath: fh_regions#pop_regime__category_partly_free
+          display: *display_pf
+        - catalogPath: fh_regions#pop_regime__category_free
+          display: *display_f
+    config:
+      title: "People living in free countries and territories"
+      type: *id001
+      subtitle: *group_subtitle
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: main_classification
+    indicators:
+      y:
+        - catalogPath: fh#electdem
+    config:
+      colorVariableId: fh#electdem
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: democratic_electoral_institutions
+    indicators:
+      y:
+        - catalogPath: fh#electprocess
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: political_rights_score
+    indicators:
+      y:
+        - catalogPath: fh#polrights_score
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: political_rights_rating
+    indicators:
+      y:
+        - catalogPath: fh#polrights
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: civil_liberties_score
+    indicators:
+      y:
+        - catalogPath: fh#civlibs_score
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: civil_liberties_rating
+    indicators:
+      y:
+        - catalogPath: fh#civlibs
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: number_and_share_of_democracies
+    indicators:
+      y:
+        - catalogPath: fh_regions#num_electdem__category_non_electoral_democracy
+          display: *display_n_dem
+        - catalogPath: fh_regions#num_electdem__category_electoral_democracy
+          display: *display_elect_dem
+    config:
+      title: "Countries that are democracies and non-democracies"
+      type: *id001
+      subtitle: *group_subtitle
+      stackMode: "relative"
+      yAxis:
+        min: 0
+        facetDomain: "independent"
+  - dimensions:
+      metric: electoral_democracy
+      sub_metric: people_living_in_democracies
+    indicators:
+      y:
+        - catalogPath: fh_regions#pop_electdem__category__1
+          display:
+            name: "No regime data"
+            color: "#555555"
+        - catalogPath: fh_regions#pop_electdem__category_non_electoral_democracy
+          display: *display_n_dem
+        - catalogPath: fh_regions#pop_electdem__category_electoral_democracy
+          display: *display_elect_dem
+    config:
+      title: "People living in democracies and non-democracies"
+      type: *id001
+      subtitle: *group_subtitle

@@ -413,11 +413,54 @@
             "$ref": "definitions.json#/license"
           }
         },
-        "sources": {
+        "owners": {
           "type": "array",
-          "description": "(DEPRECATED, no longer in use). List of all sources of the indicators in this dataset.",
+          "title": "Dataset owners",
+          "description": "Contributors who built or maintain this dataset. The first entry is the accountable owner / point of contact for issues with the data page. Former employees who originally created the data can remain in the list (matches the article-author convention); reorder so a current employee is first.",
+          "guidelines": [
+            "First entry is the accountable owner and will be surfaced as the contact person.",
+            "Use the canonical display name (with diacritics) — entries are validated against the enum below."
+          ],
+          "requirement_level": "optional",
           "items": {
-            "$ref": "definitions.json#/source"
+            "type": "string",
+            "enum": [
+              "Pablo Rosado",
+              "Pablo Arriagada",
+              "Veronika Samborska",
+              "Mojmír Vinkler",
+              "Lucas Rodés-Guirao",
+              "Tuna Acisu",
+              "Fiona Spooner",
+              "Edouard Mathieu",
+              "Hannah Ritchie",
+              "Max Roser",
+              "Joe Hasell",
+              "Esteban Ortiz-Ospina",
+              "Diana Beltekian",
+              "Sandra Tzvetkova",
+              "Saloni Dattani",
+              "Sophie Ochmann",
+              "Charlie Giattino",
+              "Cameron Appel",
+              "Bastian Herre",
+              "Bobbie Macdonald",
+              "Ruby Mittal",
+              "Daniel Gavrilov",
+              "Aibek Aldabergenov",
+              "Gyorgy Attila Ruzicska",
+              "Marco Molteni",
+              "Jaiden Mispy",
+              "Bernadeta",
+              "Shahid Ahmad",
+              "Breck Yunits",
+              "Choo Yan Min",
+              "Mallika Snyder",
+              "Marcel Gerber",
+              "Bertha Rohenkohl",
+              "Daniel Bachler",
+              "Lars Yencken"
+            ]
           }
         }
       }
@@ -811,13 +854,6 @@
                   ],
                   "category": "metadata"
                 },
-                "sources": {
-                  "type": "array",
-                  "description": "List of all sources of the indicator. Automatically filled. NOTE: This is no longer in use, you should use origins.",
-                  "items": {
-                    "$ref": "definitions.json#/source"
-                  }
-                },
                 "origins": {
                   "type": "array",
                   "description": "List of all origins of the indicator.",
@@ -984,7 +1020,7 @@
                       "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
                         [
-                          "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](http://analytics/private?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name) (requires Tailscale)."
+                          "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](https://datasette-public.owid.io/owid?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name)."
                         ],
                         [
                           "The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."
@@ -1308,7 +1344,16 @@
                               "enum": [
                                 "chart",
                                 "map",
-                                "table"
+                                "table",
+                                "line",
+                                "slope",
+                                "discrete-bar",
+                                "marimekko",
+                                "scatter",
+                                "stacked-area",
+                                "stacked-bar",
+                                "stacked-discrete-bar",
+                                "dumbbell"
                               ]
                             },
                             {
@@ -1607,9 +1652,52 @@
                               "SlopeChart",
                               "StackedBar",
                               "WorldMap",
-                              "Marimekko"
+                              "Marimekko",
+                              "Dumbbell"
                             ]
                           }
+                        },
+                        "dumbbell": {
+                          "type": "object",
+                          "description": "Configuration of the dumbbell chart",
+                          "properties": {
+                            "connectorStyle": {
+                              "type": "string",
+                              "default": "arrow",
+                              "description": "How the connector between dumbbell heads is drawn.\n- arrow: draw an arrow pointing from start to end\n- line: draw a simple line (only respected when two indicators are plotted)\n",
+                              "enum": [
+                                "arrow",
+                                "line"
+                              ]
+                            },
+                            "valueLabelMode": {
+                              "type": "string",
+                              "default": "absolute",
+                              "description": "What to display as value labels next to each dumbbell.\n- absolute: show the raw values at the start and end\n- change: show the absolute change (e.g. +50)\n- percentChange: show the percentage change (e.g. +33%)\n- none: hide value labels\n",
+                              "enum": [
+                                "absolute",
+                                "change",
+                                "percentChange",
+                                "none"
+                              ]
+                            },
+                            "trendColorMap": {
+                              "type": "object",
+                              "description": "Custom colors for the time-range encoding",
+                              "properties": {
+                                "increase": {
+                                  "type": "string",
+                                  "description": "Color for dumbbells whose value increased over time"
+                                },
+                                "decrease": {
+                                  "type": "string",
+                                  "description": "Color for dumbbells whose value decreased over time"
+                                }
+                              },
+                              "additionalProperties": false
+                            }
+                          },
+                          "additionalProperties": false
                         },
                         "hasMapTab": {
                           "oneOf": [
@@ -1741,13 +1829,16 @@
                         },
                         "sortBy": {
                           "type": "string",
-                          "description": "Sort criterium (used by stacked bar charts and marimekko)",
+                          "description": "Sort criterion (used by discrete bar, stacked discrete bar, marimekko, and dumbbell charts).\n- column: sort by the value of a specific column, identified by sortColumnSlug\n- total: sort by the total across all columns\n- entityName: sort alphabetically by entity name\n- custom: preserve the specified entity order\n- change: sort by the change between the start and end values (dumbbell charts only)\n- startValue: sort by the start value (dumbbell charts only)\n- endValue: sort by the end value (dumbbell charts only)\n",
                           "default": "total",
                           "enum": [
                             "column",
                             "total",
                             "entityName",
-                            "custom"
+                            "custom",
+                            "change",
+                            "startValue",
+                            "endValue"
                           ]
                         },
                         "sortOrder": {
@@ -1789,6 +1880,48 @@
                             "hide",
                             "show"
                           ]
+                        },
+                        "dumbbell": {
+                          "type": "object",
+                          "description": "Configuration of the dumbbell chart",
+                          "properties": {
+                            "connectorStyle": {
+                              "type": "string",
+                              "default": "arrow",
+                              "description": "How the connector between dumbbell heads is drawn.\n- arrow: draw an arrow pointing from start to end\n- line: draw a simple line (only respected when two indicators are plotted)\n",
+                              "enum": [
+                                "arrow",
+                                "line"
+                              ]
+                            },
+                            "valueLabelMode": {
+                              "type": "string",
+                              "default": "absolute",
+                              "description": "What to display as value labels next to each dumbbell.\n- absolute: show the raw values at the start and end\n- change: show the absolute change (e.g. +50)\n- percentChange: show the percentage change (e.g. +33%)\n- none: hide value labels\n",
+                              "enum": [
+                                "absolute",
+                                "change",
+                                "percentChange",
+                                "none"
+                              ]
+                            },
+                            "trendColorMap": {
+                              "type": "object",
+                              "description": "Custom colors for the time-range encoding",
+                              "properties": {
+                                "increase": {
+                                  "type": "string",
+                                  "description": "Color for dumbbells whose value increased over time"
+                                },
+                                "decrease": {
+                                  "type": "string",
+                                  "description": "Color for dumbbells whose value decreased over time"
+                                }
+                              },
+                              "additionalProperties": false
+                            }
+                          },
+                          "additionalProperties": false
                         }
                       },
                       "additionalProperties": false

@@ -1,0 +1,34 @@
+# This is a file extracted from Table 2 in the chapter Children's work, industrialism and the family economy in Japan (1872-1926).
+# In case of updating, it needs to be uploaded manually
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Child labour in historical perspective (1800-1985)"
+    description: |-
+      The aim of the Historical Perspectives series is to use a greater understanding of the history of childhood to shed light on the quest for improved policies and programmes for dealing with contemporary child-related social issues. In investigating the social and economic factors and policy measures that have proved instrumental in all but ending child labour in industrialized countries, these papers aim to direct attention to measures that might be adopted to accelerate substantially the movement towards elimination at least of the most harmful and exploitative forms of child labour in today’s developing world.
+    date_published: "1996"
+    title_snapshot: "Child labour in historical perspective (1800-1985) - Children's work, industrialism and the family economy in Japan (1872-1926)"
+    description_snapshot: |-
+      Table 2, taken from the book chapter on child labor in Japan.
+
+    # Citation
+    producer: Cunningham and Viazzo
+    citation_full: |-
+      Saito, O. (1996). Children's work, industrialism and the family economy in Japan (1872-1926). Table 2 In H. Cunningham & P. Viazzo (Eds.), Child labour in historical perspective, 1800–1985: Case studies from Europe, Japan and Colombia (p. 77). UNICEF International Child Development Centre / Istituto degli Innocenti, Florence, Italy.
+    attribution_short: UNICEF
+
+    # Files
+    url_main: https://ideas.repec.org/p/ucf/hisper/hisper96-1.html
+    date_accessed: '2026-05-06'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ideas.repec.org/p/ucf/hisper/hisper96-1.html
+outs:
+  - md5: dcad81bc012097e38899f86b9b314237
+    size: 233
+    path: child_labor_japan.csv

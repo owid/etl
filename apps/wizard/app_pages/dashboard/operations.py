@@ -17,7 +17,7 @@ TODAY = datetime.now().strftime("%Y-%m-%d")
 @st.fragment
 def render_operations():
     st.markdown("### Operations")
-    cols = st.columns(2, border=True)
+    cols = st.columns(1, border=True)
     ####################################################################################################################
     # UPDATE STEPS
     ####################################################################################################################
@@ -25,22 +25,6 @@ def render_operations():
     # with st.container(border=True):
     with cols[0]:
         render_action_update()
-
-    ####################################################################################################################
-    # EXECUTE SNAPSHOTS AND ETL STEPS
-    ####################################################################################################################
-    # Add an expander menu with additional parameters for the ETL command.
-    # with st.container(border=True):
-    # with cols[1]:
-    #     render_action_execute(steps_df)
-
-    ####################################################################################################################
-    # ARCHIVE STEPS
-    ####################################################################################################################
-    # Add an expander menu with additional parameters for the ETL command.
-    # with st.container(border=True):
-    with cols[1]:
-        render_action_archive()
 
 
 def render_action_update():
@@ -150,56 +134,6 @@ def render_action_execute(steps_df: pd.DataFrame):
                         st.balloons()
                     # Add a button to close the output expander.
                     st.button("Close", key="acknowledge_cmd_output_etl_run")
-
-
-def render_action_archive():
-    st.markdown("##### Archive steps")
-    with st_horizontal(vertical_alignment="center"):
-        with st.popover("More settings", icon=":material/settings:"):
-            dry_run_archive = st.toggle(
-                "Dry run",
-                False,
-                help="If checked, nothing will be written to the dag.",
-            )
-            include_usages_archive = st.toggle(
-                "Include usages",
-                True,
-                help="If checked, archive also other archivable steps using the steps selected.",
-            )
-
-        btn_archive = st.button(
-            "Run",
-            help="Move archivable steps in the **Operations list** to their corresponding archive dag.",
-            type="primary",
-            icon=":material/play_circle:",
-            # width="stretch",
-        )
-
-    # Button to execute the update command and show its output.
-    if btn_archive:
-        if OWID_ENV.env_local == "production":
-            st.error("Archiving is not available in production. Run them locally or in staging.")
-            st.stop()
-        else:
-            with st.spinner("Archiving steps...", show_time=True):
-                command = "etl archive " + " ".join(st.session_state.selected_steps) + " --non-interactive"
-                if dry_run_archive:
-                    command += " --dry-run"
-                if include_usages_archive:
-                    command += " --include-usages"
-                cmd_output = execute_bash_command(command)
-                # Show the output of the command in an expander.
-                with st.expander("Command:", expanded=True):
-                    st.text(command)
-                    st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
-                if "error" not in cmd_output.lower():
-                    # Celebrate that the operation was successful.
-                    st.balloons()
-                    if not dry_run_archive:  # NOTE: this was previously `dry_run_update`. Replace this back to it if unexpected errors appear.
-                        # Reload steps_df to include the new steps.
-                        st.session_state["reload_key"] += 1
-                # Add a button to close the output expander.
-                st.button("Close and reload _Steps table_", key="acknowledge_cmd_output")
 
 
 def _define_command_to_execute_snapshots_and_etl_steps(

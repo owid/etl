@@ -1,5 +1,7 @@
 dataset:
   title: Top marginal income tax rate - World Inequality Report (2018)
+  owners:
+    - Diana Beltekian  # backport
 tables:
   top_marginal_income_tax_rate__world_inequality_report__2018:
     variables:

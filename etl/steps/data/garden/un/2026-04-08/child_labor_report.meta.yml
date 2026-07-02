@@ -73,6 +73,10 @@ definitions:
   note_including_household_chores: |-
     Work here refers to economic activities (employment and production of goods). Does not include the worst forms of child labor that cannot be measured through surveys (trafficking, forced labor, etc.).
 
+  # Age clause spliced into chart titles: empty for the full 5-17 range (matching the standalone charts), " aged <<age>>" otherwise.
+  title_age_suffix: |-
+    <% if age == "5-17" %><%- else %> aged <<age>><%- endif %>
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -80,6 +84,8 @@ dataset:
   update_period_days: 429
 
 
+  owners:
+    - Pablo Arriagada
 tables:
   child_labor:
     variables:
@@ -96,6 +102,8 @@ tables:
           - "{definitions.description_key_modelled_data}"
         presentation:
           grapher_config:
+            title: Share of {definitions.sex}{definitions.title_age_suffix} in child labor
+            subtitle: Percentage of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
             note: "{definitions.note_excluding_household_chores}"
         display:
           name: Share of {definitions.sex} in child labor (<<age>>)
@@ -115,6 +123,8 @@ tables:
           - "{definitions.description_key_modelled_data}"
         presentation:
           grapher_config:
+            title: Number of {definitions.sex}{definitions.title_age_suffix} in child labor
+            subtitle: Number of {definitions.sex} aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
             note: "{definitions.note_excluding_household_chores}"
         display:
           name: Number of {definitions.sex} in child labor (<<age>>)
@@ -133,6 +143,8 @@ tables:
           - "{definitions.description_key_modelled_data}"
         presentation:
           grapher_config:
+            title: Share of {definitions.sex}{definitions.title_age_suffix} in hazardous work
+            subtitle: Percentage of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
             note: "{definitions.note_excluding_household_chores}"
         display:
           name: Share of {definitions.sex} in hazardous work (<<age>>)
@@ -151,6 +163,8 @@ tables:
           - "{definitions.description_key_modelled_data}"
         presentation:
           grapher_config:
+            title: Number of {definitions.sex}{definitions.title_age_suffix} in hazardous work
+            subtitle: Number of {definitions.sex} aged <<age>> in [child labor](#dod:child-labor) who are doing work that — by its nature or conditions — is likely to harm their health, safety, or morals.
             note: "{definitions.note_excluding_household_chores}"
         display:
           name: Number of {definitions.sex} in hazardous work (<<age>>)

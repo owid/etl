@@ -1,5 +1,7 @@
 dataset:
   title: Decomposition times of marine debris
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   decomposition_times_of_marine_debris:
     variables:

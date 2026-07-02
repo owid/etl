@@ -1,5 +1,7 @@
 dataset:
   title: Global agricultural production by farm size (Riccardi et al. 2018)
+  owners:
+    - Hannah Ritchie  # backport
 tables:
   global_agricultural_production_by_farm_size__riccardi_et_al__2018:
     variables:

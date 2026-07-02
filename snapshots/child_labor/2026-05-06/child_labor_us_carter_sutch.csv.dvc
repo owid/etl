@@ -1,0 +1,33 @@
+# This is a file extracted from Table 1 in page 49.
+# In case of updating, it needs to be uploaded manually
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Fixing the facts: editing of the 1880 US Census of occupations with implications for long-term labor-force trends and the sociology of official statistics"
+    description: |-
+      This journal article re-examines the 1880 US Census of occupations and the editorial conventions applied to it, with implications for long-run labor-force trends — including child and youth labor force participation rates from 1870 onward.
+    date_published: "1996"
+    title_snapshot: "Fixing the facts: editing of the 1880 US Census of occupations - Youth labor force participation rates"
+    description_snapshot: |-
+      Table 1, taken from the journal article on the 1880 US Census of occupations and long-term labor-force trends.
+
+    # Citation
+    producer: Carter and Sutch
+    citation_full: |-
+      Carter, S. B., & Sutch, R. (1996). Fixing the facts: editing of the 1880 US Census of occupations with implications for long-term labor-force trends and the sociology of official statistics. Table 1 (p. 49). Historical Methods: A Journal of Quantitative Analysis. https://doi.org/10.1080/01615440.1996.10112726
+
+    # Files
+    url_main: https://www.tandfonline.com/doi/abs/10.1080/01615440.1996.10112726
+    date_accessed: '2026-05-07'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.tandfonline.com/doi/abs/10.1080/01615440.1996.10112726
+outs:
+  - md5: b0ade94b59137d4973959181dbb51b59
+    size: 130
+    path: child_labor_us_carter_sutch.csv

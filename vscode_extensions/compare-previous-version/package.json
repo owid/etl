@@ -2,7 +2,7 @@
   "name": "compare-previous-version",
   "displayName": "Compare Previous Version",
   "description": "Compare current file with its previous version by finding the highest date version that's lower than current",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "owid",
   "engines": {
     "vscode": "^1.93.0"
@@ -47,12 +47,16 @@
     "@typescript-eslint/parser": "^8.7.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
-    "esbuild": "^0.27.0",
+    "esbuild": "^0.28.1",
     "eslint": "^9.11.1",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.6.2"
   },
   "dependencies": {
     "ignore": "^6.0.2"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.5",
+    "js-yaml": "^4.2.0"
   }
 }

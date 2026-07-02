@@ -1,8 +1,7 @@
 meta:
   source:
     name: Our World in Data catalog backport
-    url: https://owid.cloud/admin/datasets/3239
-    date_accessed: 2023-08-10 08:31:17.249536
+    url: https://admin.owid.io/admin/datasets/3239
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: TE-15.1_RulingParty
@@ -10,6 +9,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c5dd9abd9ea8dd8414c706922e63ab06
-  size: 6554
-  path: dataset_3239_te_15_1_rulingparty_values.feather
+  - md5: 2207d3f30eb9c25cea72cf3e638cd60f
+    size: 6594
+    path: dataset_3239_te_15_1_rulingparty_values.feather

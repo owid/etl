@@ -5,11 +5,12 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import click
-import requests
 from PIL import Image
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 from tqdm.auto import tqdm
+
+from etl.http import session as http_session
 
 # Initialize log.
 log = get_logger()
@@ -26,7 +27,7 @@ def get_chart_metadata(chart_url):
     base_url = urlunparse(urlparse(chart_url)._replace(query=""))
     chart_metadata_url = str(base_url).rstrip("/") + ".metadata.json"
     log.info(f"Fetching metadata from: {chart_metadata_url}")
-    response = requests.get(chart_metadata_url)
+    response = http_session.get(chart_metadata_url)
     response.raise_for_status()
     chart_metadata = response.json()
 
@@ -35,7 +36,7 @@ def get_chart_metadata(chart_url):
 
 def get_indicator_metadata(indicator_metadata_url):
     # Given an indicator metadata URL, get the indicator metadata.
-    response = requests.get(indicator_metadata_url)
+    response = http_session.get(indicator_metadata_url)
     response.raise_for_status()
     return response.json()
 
@@ -125,7 +126,7 @@ def download_chart_png(png_url, output_file):
 
     # Download PNG.
     try:
-        response = requests.get(png_url, stream=True)
+        response = http_session.get(png_url, stream=True)
         response.raise_for_status()
         with open(output_file, "wb") as file:
             for chunk in response.iter_content(chunk_size=8192):
