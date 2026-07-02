@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: GGDC 10-Sector Database
+    description: |-
+      The GGDC 10-Sector Database provides long-run, internationally comparable annual series on value added (at current and constant national prices) and persons engaged for ten broad sectors of the economy (following ISIC rev. 3.1), covering 42 economies in Africa, Asia, Latin America, North America and Europe from 1950 (at the earliest) to 2013.
+    date_published: "2015-01-01"
+    version_producer: 2014 release, updated January 2015
+
+    # Citation
+    producer: Groningen Growth and Development Centre
+    citation_full: |-
+      Timmer, M. P., de Vries, G. J., & de Vries, K. (2015). Patterns of Structural Change in Developing Countries. In J. Weiss & M. Tribe (Eds.), Routledge Handbook of Industry and Development (pp. 65-83). Routledge.
+
+    # Files
+    url_main: https://www.rug.nl/ggdc/structuralchange/previous-sector-database/10-sector-2014
+    url_download: https://www.rug.nl/ggdc/docs/10sd_jan15_2014.xlsx
+    date_accessed: '2026-07-02'
+
+    # License
+    license:
+      name: Free to use with citation
+      url: https://www.rug.nl/ggdc/structuralchange/previous-sector-database/10-sector-2014
+outs:
+  - md5: a6977dd3c4895d5a4ac56b4713b7614f
+    size: 1299476
+    path: ggdc_10_sector.xlsx
