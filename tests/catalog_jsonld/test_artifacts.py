@@ -16,6 +16,7 @@ def _add_eligible_dataset(
     dataset: str,
     version: str = "2025-01-01",
     non_redistributable: bool = False,
+    jsonld: bool = True,
 ) -> str:
     """Create a minimal, quality-eligible garden dataset and return its catalog path."""
     dataset_dir = data_dir / "garden" / namespace / version / dataset
@@ -36,6 +37,7 @@ def _add_eligible_dataset(
             title=f"{dataset} title",
             description=f"{dataset} description",
             non_redistributable=non_redistributable,
+            jsonld=jsonld,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -67,6 +69,7 @@ def test_build_catalog_jsonld_artifacts_writes_dataset_jsonld_sitemap_and_report
             short_name="example_dataset",
             title="Example dataset",
             description="Dataset description",
+            jsonld=True,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -128,6 +131,7 @@ def test_build_catalog_jsonld_artifacts_cleans_up_stale_old_location_for_emitted
             short_name="example_dataset",
             title="Example dataset",
             description="Dataset description",
+            jsonld=True,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -288,3 +292,107 @@ def test_build_catalog_jsonld_artifacts_blocks_duplicate_short_keys(tmp_path: Pa
     assert result.emitted == []
     assert {item.catalog_path for item in result.skipped} == {path_a, path_b}
     assert all("duplicate_short_key" in item.blockers for item in result.skipped)
+
+
+def test_build_catalog_jsonld_artifacts_renders_templated_metadata_via_dimensions(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    dataset_dir = data_dir / "garden" / "example" / "2025-01-01" / "long_dataset"
+    origin = Origin(
+        producer="Example Producer",
+        title="Original dataset",
+        description="Original description",
+        citation_full="Example Producer (2025). Original dataset.",
+        license=License(name="CC BY 4.0"),
+    )
+    ds = Dataset.create_empty(
+        dataset_dir,
+        DatasetMeta(
+            channel="garden",
+            namespace="example",
+            version="2025-01-01",
+            short_name="long_dataset",
+            title="Long dataset",
+            description="Dataset description",
+            jsonld=True,
+        ),
+    )
+    tb = Table(
+        pd.DataFrame(
+            {
+                "year": [2020, 2020, 2021],
+                "poverty_line": ["national", "extreme", "national"],
+                "headcount": [1, 2, 3],
+            }
+        ),
+        short_name="long_table",
+    )
+    tb = tb.set_index(["year", "poverty_line"])
+    tb.metadata.title = "Long table"
+    tb.metadata.description = "Table description"
+    tb.metadata.dimensions = [
+        {"name": "year", "slug": "year"},
+        {"name": "Poverty line", "slug": "poverty_line"},
+    ]
+    # NOTE: dimension values must be non-numeric here — repack converts numeric-looking
+    # strings to ints on save, and templates are rendered with the stored type.
+    tb._fields["headcount"] = VariableMeta(
+        title='<% if poverty_line == "national" %>Below the national line<% else %>Below another line<% endif %>',
+        description_short='People below the <% if poverty_line == "national" %>national<% else %>other<% endif %> line.',
+        origins=[origin],
+    )
+    ds.add(tb)
+    ds.save()
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+
+    assert result.emitted == ["garden/example/2025-01-01/long_dataset"]
+    jsonld = json.loads((data_dir / "example" / "long_dataset" / "dataset.jsonld").read_text())
+    serialized = json.dumps(jsonld)
+    assert "<%" not in serialized and "<<" not in serialized
+    variables = {variable["identifier"]: variable for variable in jsonld["variableMeasured"]}
+    # The dimension column is emitted with its observed values (year is entity/time: skipped).
+    assert "year" not in variables
+    assert "Values: extreme, national." in variables["poverty_line"]["description"]
+    # "national" is the most frequent poverty_line: it is the representative example slice.
+    assert variables["headcount"]["description"] == (
+        "For example, for poverty_line=national: People below the national line. "
+        "Varies by the dimension columns: poverty_line."
+    )
+    assert variables["headcount"]["name"] == "headcount"
+
+
+def test_build_catalog_jsonld_artifacts_blocks_raw_jinja_leaking_from_unguarded_fields(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    catalog_path = _add_eligible_dataset(data_dir, namespace="example", dataset="leaky_dataset")
+    # The dataset description is emitted verbatim by schema_org (it has no per-variable jinja
+    # guard); a template here must trip the post-generation safety net, not ship.
+    ds = Dataset(data_dir / catalog_path)
+    ds.metadata.description = "Data about <<country>>."
+    ds.save()
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+
+    assert result.emitted == []
+    assert [quality.blockers for quality in result.skipped] == [["raw_jinja_in_jsonld"]]
+    assert not (data_dir / "example" / "leaky_dataset" / "dataset.jsonld").exists()
+
+
+def test_build_catalog_jsonld_artifacts_requires_metadata_opt_in_without_allowlist(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    _add_eligible_dataset(data_dir, namespace="example", dataset="flagged", jsonld=True)
+    _add_eligible_dataset(data_dir, namespace="example", dataset="unflagged", jsonld=False)
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+
+    # Without an allowlist, only the dataset that opts in via metadata is considered; the
+    # unflagged one is invisible (not emitted, but also not reported as skipped).
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    assert result.emitted == ["garden/example/2025-01-01/flagged"]
+    assert result.skipped == []
+    assert (data_dir / "example" / "flagged" / "dataset.jsonld").exists()
+    assert not (data_dir / "example" / "unflagged" / "dataset.jsonld").exists()
+
+    # An explicit allowlist overrides the metadata opt-in.
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", only={"example/unflagged"})
+    assert result.emitted == ["garden/example/2025-01-01/unflagged"]

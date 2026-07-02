@@ -64,7 +64,8 @@ class CannotPublish(Exception):
     "--jsonld",
     is_flag=True,
     default=False,
-    help="Generate and publish Schema.org Dataset JSON-LD artifacts for eligible catalog datasets.",
+    help="Generate and publish Schema.org Dataset JSON-LD artifacts for catalog datasets that "
+    "opt in via `dataset: jsonld: true` in their metadata (and pass the quality gates).",
 )
 @click.option(
     "--jsonld-base-url",
@@ -76,7 +77,8 @@ class CannotPublish(Exception):
     "--jsonld-only",
     multiple=True,
     help="Restrict JSON-LD generation to these datasets, as '<namespace>/<dataset>' "
-    "(repeatable). Default: all eligible garden datasets.",
+    "(repeatable). Overrides the metadata opt-in: listed datasets are considered even "
+    "without `dataset: jsonld: true`.",
 )
 def publish_cli(
     dry_run: bool,

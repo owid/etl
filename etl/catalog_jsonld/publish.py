@@ -33,6 +33,8 @@ def build_and_publish_catalog_jsonld(
 
     When ``only`` is given, restrict generation to datasets whose
     ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
+    Otherwise only datasets that opt in via ``dataset: jsonld: true`` in their
+    metadata are considered.
     """
     result = build_catalog_jsonld_artifacts(
         catalog_dir=catalog_dir,

@@ -254,3 +254,92 @@ def test_license_to_url_resolves_known_license_names() -> None:
     assert license_to_url(License(name="CC BY 4.0")) == "https://creativecommons.org/licenses/by/4.0/"
     assert license_to_url(License(name=" CC-BY 4.0 ")) == "https://creativecommons.org/licenses/by/4.0/"
     assert license_to_url(License(name="Custom license")) is None
+
+
+def test_templated_variable_metadata_is_never_emitted_raw() -> None:
+    meta = VariableMeta(
+        title='<% if poverty_line == "215" %>Below $2.15<% else %>Below the line<% endif %>',
+        description_short="The share of population below <<poverty_line>> a day.",
+        unit="international-$ in <<ppp_version>> prices",
+    )
+    table = TableSchemaInput(
+        short_name="poverty",
+        metadata=TableMeta(short_name="poverty", title="Poverty", description="Table description"),
+        variables={"headcount_ratio": meta},
+        formats=["feather"],
+    )
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/wb/2025-01-01/pip",
+        page_path="wb/pip",
+        dataset_meta=DatasetMeta(short_name="pip", title="PIP", description="Dataset description"),
+        tables=[table],
+    )
+    (variable,) = jsonld["variableMeasured"]
+    # Without representative dimension values nothing can be rendered: fall back to the
+    # identifier and omit the templated fields entirely.
+    assert variable["name"] == "headcount_ratio"
+    assert "description" not in variable
+    assert "unitText" not in variable
+    serialized = str(jsonld)
+    assert "<%" not in serialized and "<<" not in serialized
+
+
+def test_templated_description_renders_example_using_representative_dimensions() -> None:
+    meta = VariableMeta(
+        title="Poverty headcount",
+        description_short='People below <% if poverty_line == "215" %>$2.15<% else %>the line<% endif %> a day.',
+        unit="people in <<ppp_version>> prices",
+    )
+    table = TableSchemaInput(
+        short_name="poverty",
+        metadata=TableMeta(
+            short_name="poverty",
+            title="Poverty",
+            description="Table description",
+            dimensions=[
+                {"name": "country", "slug": "country"},
+                {"name": "year", "slug": "year"},
+                {"name": "Poverty line", "slug": "poverty_line"},
+            ],
+        ),
+        variables={"headcount": meta},
+        formats=["feather"],
+        primary_key=["country", "year", "poverty_line"],
+        dimension_values={"poverty_line": ["215", "365"]},
+        representative_dimensions={"poverty_line": "215"},
+    )
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/wb/2025-01-01/pip",
+        page_path="wb/pip",
+        dataset_meta=DatasetMeta(short_name="pip", title="PIP", description="Dataset description"),
+        tables=[table],
+    )
+    variables = {variable["identifier"]: variable for variable in jsonld["variableMeasured"]}
+    # country/year are conveyed by temporal/spatialCoverage, not emitted as dimensions.
+    assert set(variables) == {"poverty_line", "headcount"}
+    assert variables["poverty_line"]["name"] == "Poverty line"
+    assert "Values: 215, 365." in variables["poverty_line"]["description"]
+    assert variables["headcount"]["description"] == (
+        "For example, for poverty_line=215: People below $2.15 a day. Varies by the dimension columns: poverty_line."
+    )
+    # A templated unit is only correct for one slice of the column: omitted.
+    assert "unitText" not in variables["headcount"]
+
+
+def test_plain_description_strips_detail_on_demand_links() -> None:
+    meta = VariableMeta(title="Consumption", description_short="Measured in [terawatt-hours](#dod:watt-hours).")
+    table = TableSchemaInput(
+        short_name="energy",
+        metadata=TableMeta(short_name="energy", title="Energy", description="Table description"),
+        variables={"consumption": meta},
+        formats=["feather"],
+    )
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/energy/2025-01-01/energy",
+        page_path="energy/energy",
+        dataset_meta=DatasetMeta(short_name="energy", title="Energy", description="Dataset description"),
+        tables=[table],
+    )
+    (variable,) = jsonld["variableMeasured"]
+    # Detail-on-demand links only resolve on ourworldindata.org; keep just the link text.
+    assert variable["description"] == "Measured in terawatt-hours."

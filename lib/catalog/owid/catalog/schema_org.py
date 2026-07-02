@@ -6,12 +6,20 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+import jinja2
+
+from owid.catalog.core.jinja import _expand_jinja_text, _uses_jinja
 from owid.catalog.core.meta import DatasetMeta, License, Origin, TableMeta, VariableMeta
+from owid.catalog.core.utils import remove_details_on_demand
 
 DEFAULT_CATALOG_BASE_URL = "https://catalog.ourworldindata.org"
 DEFAULT_LOGO_URL = "https://ourworldindata.org/owid-logo.svg"
 DEFAULT_THUMBNAIL_URL = DEFAULT_LOGO_URL
 MAX_VARIABLES_MEASURED = 100
+MAX_DIMENSION_VALUES_LISTED = 40
+# Dimensions that every table has and that are already conveyed by temporalCoverage /
+# spatialCoverage — not worth a PropertyValue of their own.
+ENTITY_TIME_DIMENSIONS = {"country", "year", "date"}
 KNOWN_LICENSE_URLS = {
     "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
     "CC-BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
@@ -30,6 +38,11 @@ class TableSchemaInput:
     primary_key: list[str] = field(default_factory=list)
     temporal_coverage: str | None = None
     spatial_coverage: str | None = None
+    # For long-format tables: distinct values per dimension column (slug -> sorted values)
+    # and one representative dimension combination observed in the data, used to render
+    # Jinja-templated variable metadata into an example instead of leaking the raw template.
+    dimension_values: dict[str, list[Any]] = field(default_factory=dict)
+    representative_dimensions: dict[str, Any] = field(default_factory=dict)
 
 
 def dataset_to_schema_org(
@@ -195,23 +208,89 @@ def _table_dataset(
 def _variable_measured(table: TableSchemaInput) -> list[dict[str, Any]]:
     variables = []
     primary_key = set(table.primary_key or table.metadata.primary_key or [])
+
+    # In long-format tables one physical column holds many logical indicators; the dimension
+    # columns select among them. They are part of the primary key (so the loop below skips
+    # them), yet they carry the information a consumer needs to slice the table — emit them
+    # first, with their observed values.
+    dimension_items = _dimension_property_values(table)
+    dimension_slugs = {item["identifier"] for item in dimension_items}
+    variables.extend(dimension_items[:MAX_VARIABLES_MEASURED])
+
     for name, meta in table.variables.items():
-        if name in primary_key:
+        if name in primary_key or name in dimension_slugs:
             continue
+        if len(variables) >= MAX_VARIABLES_MEASURED:
+            break
         item: dict[str, Any] = {
             "@type": "PropertyValue",
             "name": _variable_title(name, meta),
             "identifier": name,
         }
-        description = _variable_description(meta)
+        description = _variable_description(meta) or _example_description(meta, table)
         if description:
             item["description"] = description
-        if meta.unit:
+        if meta.unit and not _uses_jinja(meta.unit):
+            # A templated unit (e.g. "international-$ in <<ppp_version>> prices") is only
+            # correct for one slice of the column; omit it rather than emit a wrong or raw value.
             item["unitText"] = meta.unit
         variables.append(_drop_empty(item))
-        if len(variables) >= MAX_VARIABLES_MEASURED:
-            break
     return variables
+
+
+def _dimension_property_values(table: TableSchemaInput) -> list[dict[str, Any]]:
+    items = []
+    for dimension in table.metadata.dimensions or []:
+        slug = dimension["slug"]
+        if slug in ENTITY_TIME_DIMENSIONS:
+            continue
+        parts = ["Dimension column: selects one of the data series stored in this table."]
+        dimension_description = dimension.get("description")
+        if dimension_description and not _uses_jinja(dimension_description):
+            parts.append(dimension_description)
+        values = table.dimension_values.get(slug) or []
+        if values:
+            listed = ", ".join(str(value) for value in values[:MAX_DIMENSION_VALUES_LISTED])
+            if len(values) > MAX_DIMENSION_VALUES_LISTED:
+                listed += f", … ({len(values)} values in total)"
+            parts.append(f"Values: {listed}.")
+        items.append(
+            {
+                "@type": "PropertyValue",
+                "name": dimension.get("name") or slug,
+                "identifier": slug,
+                "description": " ".join(parts),
+            }
+        )
+    return items
+
+
+def _example_description(meta: VariableMeta, table: TableSchemaInput) -> str | None:
+    """Render a Jinja-templated description for one representative dimension combination.
+
+    Used when every description field of a variable is templated (long-format tables), so
+    the plain-text fallback chain in ``_variable_description`` comes up empty. The rendered
+    text describes a single slice of the column, so it is explicitly labelled as an example.
+    """
+    dimensions = table.representative_dimensions
+    if not dimensions:
+        return None
+    for template in (meta.description_short, meta.description_from_producer, meta.description, meta.title):
+        if not template or not _uses_jinja(template):
+            continue
+        try:
+            rendered = _expand_jinja_text(template, dimensions, remove_dods=True)
+        except jinja2.TemplateError:
+            continue
+        if not isinstance(rendered, str) or not rendered.strip():
+            continue
+        rendered = rendered.strip()
+        if not rendered.endswith((".", "!", "?")):
+            rendered += "."
+        example = ", ".join(f"{slug}={value}" for slug, value in dimensions.items())
+        varies_by = ", ".join(dimensions)
+        return f"For example, for {example}: {rendered} Varies by the dimension columns: {varies_by}."
+    return None
 
 
 def _distributions(file_base_url: str, table: TableSchemaInput) -> list[dict[str, Any]]:
@@ -372,22 +451,28 @@ def _keywords(tables: list[TableSchemaInput]) -> list[str]:
 
 
 def _variable_title(name: str, meta: VariableMeta) -> str:
-    if meta.presentation and meta.presentation.title_public:
+    # Jinja-templated candidates are skipped: a template only makes sense once rendered with
+    # dimension values, and the raw text is noise for JSON-LD consumers. The identifier is
+    # the honest fallback for a column whose title varies by slice.
+    if meta.presentation and meta.presentation.title_public and not _uses_jinja(meta.presentation.title_public):
         return meta.presentation.title_public
-    if meta.title:
+    if meta.title and not _uses_jinja(meta.title):
         return meta.title
     return name
 
 
 def _variable_description(meta: VariableMeta) -> str | None:
-    if meta.description_short:
-        return meta.description_short
-    if meta.description_key:
-        return " ".join(meta.description_key)
-    if meta.description_from_producer:
-        return meta.description_from_producer
-    if meta.description:
-        return meta.description
+    candidates = (
+        meta.description_short,
+        " ".join(meta.description_key) if meta.description_key else None,
+        meta.description_from_producer,
+        meta.description,
+    )
+    for candidate in candidates:
+        if candidate and not _uses_jinja(candidate):
+            # Descriptions may contain markdown detail-on-demand links ("[term](#dod:term)")
+            # that only resolve on ourworldindata.org; keep just the link text here.
+            return remove_details_on_demand(candidate)
     return None
 
 

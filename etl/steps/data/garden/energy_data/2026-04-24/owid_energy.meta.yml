@@ -1,4 +1,6 @@
 dataset:
+  # Canary for the public catalog landing page / Schema.org JSON-LD (catalog-discovery project).
+  jsonld: true
   title: Energy dataset
   owners:
     - Pablo Rosado
