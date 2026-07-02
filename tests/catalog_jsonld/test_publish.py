@@ -30,7 +30,14 @@ class FakeS3:
         self.deleted.append(Key)
 
 
-def _add_eligible_dataset(data_dir: Path, *, namespace: str, dataset: str, version: str = "2025-01-01") -> str:
+def _add_eligible_dataset(
+    data_dir: Path,
+    *,
+    namespace: str,
+    dataset: str,
+    version: str = "2025-01-01",
+    non_redistributable: bool = False,
+) -> str:
     dataset_dir = data_dir / "garden" / namespace / version / dataset
     origin = Origin(
         producer="Example Producer",
@@ -48,6 +55,7 @@ def _add_eligible_dataset(data_dir: Path, *, namespace: str, dataset: str, versi
             short_name=dataset,
             title=f"{dataset} title",
             description=f"{dataset} description",
+            non_redistributable=non_redistributable,
         ),
     )
     tb = Table(pd.DataFrame({"year": [2020], "value": [1]}), short_name="example_table")
@@ -120,3 +128,27 @@ def test_build_and_publish_catalog_jsonld_uses_short_keys_and_deletes_old_dated_
     assert f"emissions/owid_co2/{DATASET_JSONLD_FILENAME}" not in captured["delete_keys"]
     # ...but the old dated catalog-path location is, so it doesn't linger as duplicate content.
     assert f"{co2_path}/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
+
+
+def test_build_and_publish_catalog_jsonld_deletes_short_key_for_skipped_dataset(tmp_path: Path, monkeypatch) -> None:
+    """A dataset that fails the quality gate (e.g. becomes non-redistributable) must have its
+    live short-key JSON-LD scheduled for deletion — a prior publish may have emitted it, and
+    an ineligible dataset must stop being served."""
+    data_dir = tmp_path / "data"
+    restricted_path = _add_eligible_dataset(data_dir, namespace="wb", dataset="restricted", non_redistributable=True)
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+
+    captured: dict[str, Any] = {}
+
+    def fake_sync_jsonld_artifacts(s3, bucket, catalog_dir, keys, delete_keys=None):
+        captured["keys"] = keys
+        captured["delete_keys"] = delete_keys
+
+    monkeypatch.setattr("etl.catalog_jsonld.publish.connect_r2", lambda: object())
+    monkeypatch.setattr("etl.catalog_jsonld.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+
+    build_and_publish_catalog_jsonld(bucket="test-bucket", catalog_dir=data_dir, channel="garden")
+
+    assert f"wb/restricted/{DATASET_JSONLD_FILENAME}" not in captured["keys"]
+    assert f"wb/restricted/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
+    assert f"{restricted_path}/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]

@@ -54,6 +54,7 @@ class JsonLdBuildResult:
     emitted: list[str] = field(default_factory=list)
     emitted_entries: list[LatestDatasetPath] = field(default_factory=list)
     skipped: list[DatasetQualityResult] = field(default_factory=list)
+    skipped_entries: list[LatestDatasetPath] = field(default_factory=list)
     warnings: list[DatasetQualityResult] = field(default_factory=list)
 
 
@@ -77,7 +78,6 @@ def build_catalog_jsonld_artifacts(
     latest_paths = latest_dataset_paths(catalog.frame, channel=channel, only=only)
     result = JsonLdBuildResult()
     sitemap_entries: list[SitemapEntry] = []
-    build_date = datetime.now(timezone.utc).date().isoformat()
 
     duplicate_catalog_paths = find_duplicate_short_key_paths(
         (entry.catalog_path, entry.namespace, entry.dataset) for entry in latest_paths
@@ -96,8 +96,13 @@ def build_catalog_jsonld_artifacts(
         )
         if not quality.is_eligible:
             result.skipped.append(quality)
+            result.skipped_entries.append(entry)
             if not dry_run:
                 _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
+                # A prior build may have emitted this dataset at its stable short key;
+                # remove the local copy so it can't linger after the dataset stops
+                # being eligible (the R2 copy is deleted by the publish step).
+                _remove_if_exists(catalog_dir / entry.namespace / entry.dataset / DATASET_JSONLD_FILENAME)
             continue
 
         jsonld = dataset_to_schema_org(
@@ -116,7 +121,10 @@ def build_catalog_jsonld_artifacts(
         sitemap_entries.append(
             SitemapEntry(
                 url=f"{base_url.rstrip('/')}/{entry.short_key}/",
-                lastmod=entry.version if _VERSION_DATE_RE.match(entry.version) else build_date,
+                # Non-date versions (e.g. "latest") carry no real modification date; omit
+                # lastmod rather than stamping the build date, which would falsely mark the
+                # page as modified on every publish.
+                lastmod=entry.version if _VERSION_DATE_RE.match(entry.version) else None,
             )
         )
         if not dry_run:

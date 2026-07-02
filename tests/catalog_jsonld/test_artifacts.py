@@ -208,6 +208,41 @@ def test_build_catalog_jsonld_artifacts_excludes_non_redistributable(tmp_path: P
     assert not (data_dir / "garden" / "wb" / "2025-01-01" / "restricted" / "dataset.jsonld").exists()
 
 
+def test_build_catalog_jsonld_artifacts_omits_lastmod_for_non_date_version(tmp_path: Path) -> None:
+    """Datasets versioned "latest" have no real modification date; the sitemap entry must omit
+    lastmod rather than stamping the build date, which would falsely mark the page as modified
+    on every publish."""
+    data_dir = tmp_path / "data"
+    _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="latest")
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+
+    assert result.emitted == ["garden/emissions/latest/owid_co2"]
+    sitemap = (data_dir / "sitemap.xml").read_text()
+    assert "<loc>https://catalog.ourworldindata.org/emissions/owid_co2/</loc>" in sitemap
+    assert "<lastmod>" not in sitemap
+
+
+def test_build_catalog_jsonld_artifacts_removes_short_key_artifact_when_dataset_becomes_ineligible(
+    tmp_path: Path,
+) -> None:
+    """A dataset emitted at its short key by a prior build must have that local artifact removed
+    once it fails a quality gate, so an ineligible dataset can't keep a stale public JSON-LD."""
+    data_dir = tmp_path / "data"
+    _add_eligible_dataset(data_dir, namespace="wb", dataset="restricted", non_redistributable=True)
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+    stale_short_key = data_dir / "wb" / "restricted" / "dataset.jsonld"
+    stale_short_key.parent.mkdir(parents=True)
+    stale_short_key.write_text('{"from": "a prior build"}')
+
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+
+    assert result.emitted == []
+    assert [entry.short_key for entry in result.skipped_entries] == ["wb/restricted"]
+    assert not stale_short_key.exists()
+
+
 def test_build_catalog_jsonld_artifacts_blocks_reserved_namespace(tmp_path: Path) -> None:
     """A namespace that collides with a catalog channel name (e.g. "garden") would shadow a
     root-level catalog_dir entry if used as a short-key first segment, so it's blocked."""
