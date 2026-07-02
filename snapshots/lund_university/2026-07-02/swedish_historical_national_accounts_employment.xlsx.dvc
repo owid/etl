@@ -34,7 +34,7 @@ meta:
 
     # License
     license:
-      name: Free to use with citation
+      name: © Department of Economic History, Lund University
       url: https://www.lusem.lu.se/organisation/department-economic-history/research-department-economic-history/databases-department-economic-history/economic-history-data/swedish-historical-national-accounts-1300-2022
 outs:
   - md5: 971f610ddfd70b02c527f5c95eab5f0b
