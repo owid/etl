@@ -3,11 +3,12 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Growth and Structural Transformation - dataset
+    title: Growth and Structural Transformation
+    title_snapshot: Growth and Structural Transformation - dataset
     description: |-
-      Data files accompanying the chapter "Growth and Structural Transformation" of the Handbook of Economic Growth. The chapter presents the stylized facts of the reallocation of economic activity across the broad sectors of agriculture, manufacturing and services, and includes long-run historical time series of employment and value added by sector for ten currently rich countries: Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States.
-
-      Economic activities are classified into agriculture, industry and services. Following the authors' convention, utilities are included within services rather than industry.
+      Structural transformation refers to the reallocation of economic activity across the broad sectors agriculture, manufacturing and services. This review article synthesizes and evaluates recent advances in the research on structural transformation. We begin by presenting the stylized facts of structural transformation across time and space. We then develop a multi-sector extension of the one-sector growth model that encompasses the main existing theories of structural transformation. We argue that this multi-sector model serves as a natural benchmark to study structural transformation and that it is able to account for many salient features of structural transformation. We also argue that this multi-sector model delivers new and sharper insights for understanding economic development, regional income convergence, aggregate productivity trends, hours worked, business cycles, and wage inequality. We conclude by suggesting several directions for future research on structural transformation.
+    description_snapshot: |-
+      Data files accompanying the chapter, including long-run historical time series of employment and value added (at current prices) by sector for ten currently rich countries: Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States. Economic activities are classified into agriculture, industry and services; following the authors' convention, utilities are included within services rather than industry.
 
       The authors' website hosting the data is no longer online, so the file is retrieved from the Internet Archive's capture of it.
     date_published: "2014"

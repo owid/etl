@@ -3,12 +3,15 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Africa's Growth Prospects in a European Mirror - Agricultural labor force shares
+    title: Africa's Growth Prospects in a European Mirror
+    title_snapshot: Africa's Growth Prospects in a European Mirror - Agricultural labor force shares
     description: |-
-      Benchmark estimates of the share of the labor force employed in agriculture in five European countries (Great Britain, France, Italy, the Netherlands and Poland) between 1300 and 1981, as reported by Broadberry and Gardner (2013). The estimates draw on historical reconstructions of the sectoral distribution of the labor force, including Broadberry, Campbell and van Leeuwen (2013) for Britain and Allen (2000) for other European countries.
+      Drawing on recent quantitative research on Europe reaching back to the medieval period, and noting a relationship between the quality of institutions and economic growth, this paper offers a reassessment of Africa's growth prospects. Periods of positive growth driven by trade, followed by growth reversals which wiped out the gains of the previous boom, characterized pre-modern Europe as well as twentieth century Africa. Since per capita incomes in much of sub-Saharan Africa are currently at the level of medieval Europe, which did not make the breakthrough to modern economic growth until the nineteenth century, we caution against too optimistic a reading of Africa's recent growth experience. Without the institutional changes necessary to facilitate structural change, growth reversals continue to pose a serious threat to African prosperity. Only if growth continues after a downturn in Africa's terms of trade can we be sure that the corner has been turned.
+    description_snapshot: |-
+      Benchmark estimates of the share of the labor force employed in agriculture in five European countries (Great Britain, France, Italy, the Netherlands and Poland) between 1300 and 1981, as reported in the paper. The estimates draw on historical reconstructions of the sectoral distribution of the labor force, including Broadberry, Campbell and van Leeuwen (2013) for Britain and Allen (2000) for other European countries.
 
       The estimates were transcribed from the paper by Our World in Data. Estimates for England/Great Britain are labeled as United Kingdom.
-    date_published: "2013"
+    date_published: "2013-09-27"
 
     # Citation
     producer: Broadberry and Gardner

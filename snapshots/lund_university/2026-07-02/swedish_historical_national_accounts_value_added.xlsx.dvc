@@ -6,9 +6,11 @@ meta:
     title: Swedish Historical National Accounts
     title_snapshot: Swedish Historical National Accounts - Value added by sector
     description: |-
-      The Swedish Historical National Accounts (SHNA) provide long-run series on production, value added, employment and GDP for Sweden, originally published by Olle Krantz and Lennart Schön (Swedish Historical National Accounts 1800-2000, Lund Studies in Economic History, 2007), extended and revised in 2012 and 2015, and updated in 2020, 2023 and 2025 by the Department of Economic History at Lund University.
+      The Swedish Historical National Accounts 1560–2010, released in 2015 and updated in 2020, 2023 and 2025, presents a database with an extended and revised version of SHNA 1560–2022. Principles for revisions and extension of data 1560-1800 are found in Schön & Krantz (2015), "New Swedish Historical National Accounts since the 16th Century in Constant and Current Prices", Lund Papers in Economic History 140, Lund University.
 
-      This file is Table III of the SHNA: value added of the main sectors of the Swedish economy and GDP at factor prices, 1800-2022, in millions of SEK at current and constant (1910/12) prices. The main sectors are agriculture, manufacturing industry, building and construction, transport and communication, private services, public services, and services of dwellings.
+      Comprehensive accounts of data and revisions of the 2007 version of SHNA 1800-2000 are to be found as well in Schön & Krantz (2012), "Swedish Historical National Accounts 1560–2010", Lund Papers in Economic History 123, Lund University. Description and specification of the latest 2023 update can be found in Nilsson, et al. (2023), "Swedish Historical National Accounts. 2023 Update, Revision and Underlying Principles".
+    description_snapshot: |-
+      This file is Table III of the database: value added of the main sectors of the Swedish economy and GDP at factor prices, 1800-2022, in millions of SEK at current and constant (1910/12) prices. The main sectors are agriculture, manufacturing industry, building and construction, transport and communication, private services, public services, and services of dwellings.
     date_published: "2025"
     version_producer: 2025 update
 

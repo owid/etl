@@ -5,14 +5,20 @@ meta:
     # Data product / Snapshot
     title: GGDC 10-Sector Database
     description: |-
-      The GGDC 10-Sector Database provides long-run, internationally comparable annual series on value added (at current and constant national prices) and persons engaged for ten broad sectors of the economy (following ISIC rev. 3.1), covering 42 economies in Africa, Asia, Latin America, North America and Europe from 1950 (at the earliest) to 2013.
+      The GGDC 10-Sector Database provides a long-run internationally comparable dataset on sectoral productivity performance in Africa, Asia, and Latin America. Variables covered in the data set are annual series of value added, output deflators, and persons employed for 10 broad sectors.
+
+      The GGDC 10-Sector Database gives sector detail to the historical macro data in Maddison (2003) from 1950 onwards. It consists of series for 11 countries in Africa, 11 countries in Asia, 2 countries in the Middle East and North Africa, and 9 in Latin-America. For comparison, we have also added data for the US and several European countries.
+
+      It should be stressed that the estimates for the total economy are aggregated across sectors and that, because of adjustments at the sector level, the aggregate results are not fully consistent with the national accounts aggregates (see the sources and methods document). Also note that value added data in this database are expressed in local currencies.
     date_published: "2015-01-01"
     version_producer: 2014 release, updated January 2015
 
     # Citation
-    producer: Groningen Growth and Development Centre
+    producer: Timmer et al.
     citation_full: |-
-      Timmer, M. P., de Vries, G. J., & de Vries, K. (2015). Patterns of Structural Change in Developing Countries. In J. Weiss & M. Tribe (Eds.), Routledge Handbook of Industry and Development (pp. 65-83). Routledge.
+      Timmer, M. P., de Vries, G. J., & de Vries, K. (2015). “Patterns of Structural Change in Developing Countries.” . In J. Weiss, & M. Tribe (Eds.), Routledge Handbook of Industry and Development. (pp. 65-83). Routledge.
+    attribution: Timmer et al. – GGDC 10-Sector Database 2014
+    attribution_short: GGDC 10-Sector Database
 
     # Files
     url_main: https://www.rug.nl/ggdc/structuralchange/previous-sector-database/10-sector-2014
