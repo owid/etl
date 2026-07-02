@@ -70,9 +70,16 @@ def build_and_publish_catalog_jsonld(
     delete_keys.extend(f"{entry.short_key}/{DATASET_JSONLD_FILENAME}" for entry in result.skipped_entries)
     # Also delete both locations for datasets archived outright (no active replacement at
     # all) — they never appear in emitted/skipped above, since no on-disk version of them is
-    # active, but a prior publish may still have left their JSON-LD live on R2.
+    # active, but a prior publish may still have left their JSON-LD live on R2. Several
+    # archived_entries can share the same short key (every inactive version of a fully-dead
+    # dataset is included), so dedupe with a set to avoid redundant delete calls.
     delete_keys.extend(f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.archived_entries)
-    delete_keys.extend(f"{entry.short_key}/{DATASET_JSONLD_FILENAME}" for entry in result.archived_entries)
+    delete_keys.extend({f"{entry.short_key}/{DATASET_JSONLD_FILENAME}" for entry in result.archived_entries})
+    # Also delete the old dated path for versions superseded by an active replacement under
+    # the same short key (e.g. a stale ".../latest/..." build left behind after re-versioning
+    # to a dated one) — only the dated path, never the short key, which the active version
+    # legitimately owns instead.
+    delete_keys.extend(f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.superseded_entries)
 
     sync_jsonld_artifacts(connect_r2(), bucket, catalog_dir, keys, delete_keys=delete_keys)
 

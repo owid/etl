@@ -213,6 +213,11 @@ def test_build_catalog_jsonld_artifacts_ignores_stale_archived_latest_version(tm
     stale_latest = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="latest")
     current = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="2025-12-04")
     LocalCatalog(data_dir, channels=("garden",)).reindex()
+    # A prior build (from before "latest" was superseded) may have left a dataset.jsonld at
+    # its own dated path — it must be cleaned up even though the dataset itself is still active
+    # under a different version.
+    stale_dated = data_dir / stale_latest / "dataset.jsonld"
+    stale_dated.write_text('{"from": "before supersession"}')
 
     result = build_catalog_jsonld_artifacts(
         catalog_dir=data_dir,
@@ -225,6 +230,8 @@ def test_build_catalog_jsonld_artifacts_ignores_stale_archived_latest_version(tm
     assert stale_latest not in result.emitted
     # The dataset has an active replacement, so it's superseded, not archived outright.
     assert result.archived_entries == []
+    assert [entry.catalog_path for entry in result.superseded_entries] == [stale_latest]
+    assert not stale_dated.exists()
 
 
 def test_build_catalog_jsonld_artifacts_cleans_up_dataset_archived_with_no_replacement(tmp_path: Path) -> None:
