@@ -147,8 +147,8 @@ def aggregate_products(tb: Table) -> Table:
 
     assert len(missing_keys) == 0, f"Missing keys in replacement_dict: {missing_keys}"
     # Going round the houses to replace the values in the product column to aggregate them
-    tb["product"] = tb["product"].astype(str).replace(replacement_dict)
-    tb["product"] = tb["product"].replace("nan", pd.NA)
+    tb["product"] = tb["product"].astype(object).where(tb["product"].notna(), other=pd.NA)
+    tb["product"] = tb["product"].replace(replacement_dict)
     tb["product"] = tb["product"].astype("category")
 
     return tb
