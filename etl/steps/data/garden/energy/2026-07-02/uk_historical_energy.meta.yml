@@ -1,0 +1,33 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    processing_level: major
+
+dataset:
+  update_period_days: 0
+
+  owners:
+    - Pablo Rosado
+
+tables:
+  uk_historical_energy:
+    title: UK historical energy data
+    variables:
+      coal_production_twh:
+        title: Coal production (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        description_short: |-
+          Coal production in the United Kingdom, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          - We convert coal from million tonnes to terawatt-hours using the coal energy content given in the source's own units table: 1 tonne of coal equals 0.588 tonnes of oil equivalent, and 1 tonne of oil equivalent equals 41,870,000 kilojoules (with 1 kilowatt-hour equal to 3,600 kilojoules), which works out to about 6.84 megawatt-hours per tonne.
+        description_key:
+          - "The source states that, in places, gaps in the series were filled by linear interpolation between known values. In the coal series the earliest decades increase by a constant amount each year, which reflects such interpolation, so year-to-year variation in the early period should not be over-interpreted."
+          - "According to the source, the statistics relate to Great Britain until 1882, the United Kingdom including all of Ireland from 1883 to 1920, and the present-day United Kingdom (England, Wales, Scotland and Northern Ireland) afterwards."
+        display:
+          name: Coal
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Coal production in the United Kingdom

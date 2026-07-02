@@ -120,6 +120,12 @@ steps:
         - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
       - data://garden/wb/2025-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
+    # Smil - Global primary energy (2017), used to extend World coal production before 1900.
+    - data://garden/papers/2023-12-12/smil_2017
+    # NIC / Fouquet - UK historical energy data, used to extend UK coal production before 1900.
+    - data://garden/energy/2026-07-02/uk_historical_energy:
+      - data://meadow/energy/2026-07-02/uk_historical_energy:
+        - snapshot://energy/2026-07-02/uk_historical_energy.xlsx
     - data://garden/demography/2024-07-15/population
   data://grapher/energy/2025-06-27/fossil_fuel_production:
     - data://garden/energy/2025-06-27/fossil_fuel_production
