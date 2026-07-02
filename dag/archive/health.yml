@@ -1081,6 +1081,7 @@ steps:
     - data://garden/demography/2023-03-31/population
 
   # Neglected Tropical Diseases Funding (2025 update)
+  # archived; last active in 081e64f9e13b on 2026-06-30
   data://grapher/neglected_tropical_diseases/2025-08-20/funding:
     - data://garden/neglected_tropical_diseases/2025-08-20/funding:
       - data://meadow/neglected_tropical_diseases/2025-08-20/funding:
