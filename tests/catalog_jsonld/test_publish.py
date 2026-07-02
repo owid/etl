@@ -187,3 +187,35 @@ def test_build_and_publish_catalog_jsonld_deletes_both_locations_for_archived_da
     assert f"emissions/owid_co2/{DATASET_JSONLD_FILENAME}" not in captured["keys"]
     assert f"emissions/owid_co2/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
     assert f"{archived_path}/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
+
+
+def test_build_and_publish_catalog_jsonld_deletes_dated_path_for_superseded_version(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """A dataset version superseded by an active replacement under the same short key (e.g. a
+    stale ".../latest/..." build left behind after re-versioning to a dated one) must have its
+    own old dated-path JSON-LD scheduled for deletion — but not the short key, which the
+    active version legitimately owns and keeps serving."""
+    data_dir = tmp_path / "data"
+    stale_path = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="latest")
+    current_path = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="2025-12-04")
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+
+    captured: dict[str, Any] = {}
+
+    def fake_sync_jsonld_artifacts(s3, bucket, catalog_dir, keys, delete_keys=None):
+        captured["keys"] = keys
+        captured["delete_keys"] = delete_keys
+
+    monkeypatch.setattr("etl.catalog_jsonld.publish.connect_r2", lambda: object())
+    monkeypatch.setattr("etl.catalog_jsonld.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+
+    build_and_publish_catalog_jsonld(
+        bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(current_path)}
+    )
+
+    assert f"emissions/owid_co2/{DATASET_JSONLD_FILENAME}" in captured["keys"]
+    assert f"{stale_path}/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
+    assert f"{current_path}/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
+    # The short key is actively served by the current version, so it must never be deleted.
+    assert f"emissions/owid_co2/{DATASET_JSONLD_FILENAME}" not in captured["delete_keys"]

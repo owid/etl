@@ -58,6 +58,7 @@ class JsonLdBuildResult:
     skipped_entries: list[LatestDatasetPath] = field(default_factory=list)
     warnings: list[DatasetQualityResult] = field(default_factory=list)
     archived_entries: list[LatestDatasetPath] = field(default_factory=list)
+    superseded_entries: list[LatestDatasetPath] = field(default_factory=list)
 
 
 def build_catalog_jsonld_artifacts(
@@ -86,18 +87,25 @@ def build_catalog_jsonld_artifacts(
     result = JsonLdBuildResult()
     sitemap_entries: list[SitemapEntry] = []
 
-    # A dataset can be archived outright, with no active replacement at all — every on-disk
-    # version of it is excluded from `latest_paths` above, so it never becomes an emitted or
-    # skipped entry either. Without this, a dataset.jsonld it published before being archived
-    # (at its dated path and/or its stable short key) would linger on R2 forever, since nothing
-    # would ever schedule its deletion again.
-    result.archived_entries = find_archived_dataset_entries(
+    # Every on-disk build whose step isn't in the active DAG is excluded from `latest_paths`
+    # above, so a superseded or fully-archived version never becomes an emitted or skipped
+    # entry. Without this, a dataset.jsonld published before the step went inactive (at its
+    # old dated path, and — for a fully-archived dataset with no active replacement at all —
+    # its stable short key too) would linger on R2 forever, since nothing would ever schedule
+    # its deletion again.
+    result.archived_entries, result.superseded_entries = find_inactive_dataset_entries(
         catalog.frame, channel=channel, only=only, active_steps=active_steps
     )
     for entry in result.archived_entries:
         if not dry_run:
             _remove_if_exists(catalog_dir / entry.catalog_path / DATASET_JSONLD_FILENAME)
             _remove_if_exists(catalog_dir / entry.namespace / entry.dataset / DATASET_JSONLD_FILENAME)
+    for entry in result.superseded_entries:
+        # Its short key is legitimately owned by the active version emitted elsewhere in this
+        # same build (or by nothing, if that active version is itself quality-skipped) — only
+        # this specific old dated path needs cleaning up, never the short key.
+        if not dry_run:
+            _remove_if_exists(catalog_dir / entry.catalog_path / DATASET_JSONLD_FILENAME)
 
     duplicate_catalog_paths = find_duplicate_short_key_paths(
         (entry.catalog_path, entry.namespace, entry.dataset) for entry in latest_paths
@@ -231,26 +239,31 @@ def latest_dataset_paths(
     return sorted(entries, key=lambda entry: entry.catalog_path)
 
 
-def find_archived_dataset_entries(
+def find_inactive_dataset_entries(
     frame: pd.DataFrame,
     *,
     channel: CHANNEL = "garden",
     only: set[str] | None = None,
     active_steps: set[str] | None = None,
-) -> list[LatestDatasetPath]:
-    """Return one entry per ``<namespace>/<dataset>`` group that has NO active-DAG
-    representative at all — every on-disk version of it has been archived, with no
-    replacement. These are never emitted, but a prior build may have published a
-    dataset.jsonld for them (at their old dated catalog path and/or their stable short key)
-    that must be cleaned up now that the step is gone for good.
+) -> tuple[list[LatestDatasetPath], list[LatestDatasetPath]]:
+    """Return every on-disk build whose step is not in the active DAG, split into two lists:
 
-    The returned entry's ``catalog_path``/``version`` are the most-recent on-disk build
-    found, used only to target the cleanup; there's no "current version" for an archived
-    dataset. Respects ``only``/``active_steps`` the same way :func:`latest_dataset_paths` does.
+    - ``archived``: builds belonging to a ``<namespace>/<dataset>`` group with NO active-DAG
+      representative at all (the step was removed outright, with no replacement). A prior
+      build may have published a dataset.jsonld for them at both their dated catalog path and
+      their stable short key, and both need cleaning up now that the step is gone for good.
+    - ``superseded``: builds belonging to a group that DOES have an active representative
+      (just not this particular on-disk version — e.g. an old ``.../latest/...`` build left
+      behind after re-versioning to a dated one). Only their dated-path JSON-LD needs cleaning
+      up; their short key is legitimately owned by the active version instead.
+
+    Every inactive on-disk version is returned (not just the newest per group), since any of
+    them may carry a leftover dated-path dataset.jsonld from when it used to be current.
+    Respects ``only``/``active_steps`` the same way :func:`latest_dataset_paths` does.
     """
     df = frame.loc[(frame["channel"] == channel) & (frame["is_public"] == True)].copy()  # noqa: E712
     if df.empty:
-        return []
+        return [], []
     if active_steps is None:
         active_steps = graph_nodes(load_dag())
     df["step"] = (
@@ -260,26 +273,34 @@ def find_archived_dataset_entries(
     if only is not None:
         df = df[df["dataset_key"].isin(only)]
         if df.empty:
-            return []
-    active_keys = set(df.loc[df["step"].isin(active_steps), "dataset_key"])
-    orphaned = df[~df["dataset_key"].isin(active_keys)]
-    if orphaned.empty:
-        return []
-    orphaned = orphaned.copy()
-    orphaned["dataset_path"] = orphaned["path"].map(lambda p: str(p).rsplit("/", 1)[0])
-    orphaned = orphaned.sort_values("version")
-    latest_orphaned = orphaned.drop_duplicates(["channel", "namespace", "dataset"], keep="last")
+            return [], []
+    is_active = df["step"].isin(active_steps)
+    active_keys = set(df.loc[is_active, "dataset_key"])
+    inactive = df[~is_active]
+    if inactive.empty:
+        return [], []
+    inactive = inactive.copy()
+    inactive["dataset_path"] = inactive["path"].map(lambda p: str(p).rsplit("/", 1)[0])
+    # `frame` has one row per table, but `dataset_path` strips the table name — dedupe so a
+    # multi-table dataset doesn't produce repeated identical entries (inflated report counts,
+    # redundant HEAD/DELETE calls on the same key).
+    inactive = inactive.drop_duplicates(["channel", "namespace", "version", "dataset"])
 
-    entries = [
-        LatestDatasetPath(
-            catalog_path=str(row.dataset_path),
-            namespace=str(row.namespace),
-            dataset=str(row.dataset),
-            version=str(row.version),
-        )
-        for row in latest_orphaned.itertuples()
-    ]
-    return sorted(entries, key=lambda entry: entry.catalog_path)
+    def to_entries(rows: pd.DataFrame) -> list[LatestDatasetPath]:
+        entries = [
+            LatestDatasetPath(
+                catalog_path=str(row.dataset_path),
+                namespace=str(row.namespace),
+                dataset=str(row.dataset),
+                version=str(row.version),
+            )
+            for row in rows.itertuples()
+        ]
+        return sorted(entries, key=lambda entry: entry.catalog_path)
+
+    archived = to_entries(inactive[~inactive["dataset_key"].isin(active_keys)])
+    superseded = to_entries(inactive[inactive["dataset_key"].isin(active_keys)])
+    return archived, superseded
 
 
 def load_table_schema_inputs(ds: Dataset) -> list[TableSchemaInput]:
