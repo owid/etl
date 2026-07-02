@@ -1,0 +1,83 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Neglected Tropical Diseases
+    processing_level: minor
+  schistosomiasis_desc: &schistosomiasis_desc |-
+    Schistosomiasis is a painful and debilitating disease caused by parasitic worms of the species Schistosoma. It is transmitted by coming into contact with contaminated water, such as bathing or swimming in it or drinking it. It causes a variety of symptoms, from abdominal pain and bloody stool or urine to liver damage, kidney failure and cancer.
+  schistosomiasis_ntd: &schistosomiasis_ntd |-
+    Schistosomiasis is most common in tropical and subtropical regions of the world, especially in poor communities without access to safe drinking water and adequate sanitation. It is classified as a [neglected tropical disease (NTD)](#dod:neglected-tropical-diseases) by the World Health Organization (WHO).
+  schistosomiasis_pc: &schistosomiasis_pc |-
+    The WHO recommends [preventive chemotherapy](#dod:preventive-chemotherapy) for schistosomiasis, which means administrating safe and effective drugs to at-risk populations, regardless of whether individuals are infected or not. The WHO recommends that all school-age children and at-risk adults in endemic areas receive preventive chemotherapy.
+  schistosomiasis_pc_map: &schistosomiasis_pc_map |-
+    This data shows how much of the at-risk population is receiving preventive chemotherapy for schistosomiasis. 100% means that every person at-risk for contracting schistosomiasis is receiving preventive chemotherapy, while 0% means that no one at-risk is receiving preventive chemotherapy. In rare cases, the number of people treated may exceed the number of people targeted, which can result in a coverage percentage greater than 100%.
+  schistosomiasis_pc_numbers: &schistosomiasis_pc_numbers |-
+    This data shows the number of people who require preventive chemotherapy for schistosomiasis. Not everyone who requires preventive chemotherapy is receiving it — we show the percentage of the at-risk population who are receiving preventive chemotherapy in our chart on [treatment coverage](https://ourworldindata.org/grapher/schistosomiasis-treatment-coverage).
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Preventive Chemotherapy (PC) Data Portal - Schistosomiasis
+  owners:
+    - Fiona Spooner
+    - Tuna Acisu
+tables:
+  schistosomiasis:
+    variables:
+      population_requiring_pc_for_sch_annually:
+        title: Population requiring preventive chemotherapy annually
+        description_short: "Population requiring [preventive chemotherapy](#dod:preventive-chemotherapy) for schistosomiasis."
+        unit: "people"
+        display:
+          numDecimalPlaces: 0
+        description_key:
+          - *schistosomiasis_desc
+          - *schistosomiasis_ntd
+          - *schistosomiasis_pc
+          - *schistosomiasis_pc_numbers
+      sac_population_requiring_pc_for_sch_annually:
+        title: School-age children population requiring preventive chemotherapy annually
+        description_short: "School-age children population requiring [preventive chemotherapy](#dod:preventive-chemotherapy) for schistosomiasis."
+        unit: "school-age children"
+        display:
+          numDecimalPlaces: 0
+      number_of_people_targeted:
+        title: Number of people targeted
+        description_short: "Number of people targeted for [preventive chemotherapy](#dod:preventive-chemotherapy) for schistosomiasis."
+        unit: "people"
+        display:
+          numDecimalPlaces: 0
+      reported_number_of_people_treated:
+        title: Reported number of people treated
+        description_short: "Reported number of people treated for schistosomiasis."
+        unit: "people"
+        display:
+          numDecimalPlaces: 0
+      reported_number_of_sac_treated:
+        title: Reported number of school-age children treated
+        description_short: "Reported number of school-age children treated for schistosomiasis."
+        unit: "school-age children"
+        display:
+          numDecimalPlaces: 0
+      programme_coverage__pct:
+        title: Programme coverage
+        description_short: "Programme coverage for [preventive chemotherapy](#dod:preventive-chemotherapy) for schistosomiasis."
+        unit: "%"
+        display:
+          numDecimalPlaces: 1
+      national_coverage__pct:
+        title: National coverage (%)
+        description_short: "Drug coverage out of estimated population who require it."
+        unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_key:
+          - *schistosomiasis_desc
+          - *schistosomiasis_ntd
+          - *schistosomiasis_pc
+          - *schistosomiasis_pc_map

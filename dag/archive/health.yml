@@ -1079,3 +1079,18 @@ steps:
     - data://meadow/who/2024-01-03/gho:
       - snapshot://who/2024-01-03/gho.zip
     - data://garden/demography/2023-03-31/population
+
+ # WHO Preventive Chemotherapy - Neglected Tropical Diseases
+  # Lymphatic filariasis
+  data://grapher/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+    - data://garden/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+            - snapshot://neglected_tropical_diseases/2025-08-20/lymphatic_filariasis.xlsx
+
+  # Schistosomiasis
+  data://grapher/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+            - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
