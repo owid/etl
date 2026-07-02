@@ -197,13 +197,17 @@ def add_annual_change(tb: Table) -> Table:
 
     # Calculate annual change.
     combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
+    # Only consider changes between consecutive years as annual changes. Some historical series are sparse (e.g. the
+    # World coal series is decadal before 1900), and a naive row-to-row change there would be a multi-year change
+    # mislabeled as an annual (previous-year) change, so we blank those out.
+    is_consecutive = combined.groupby("country", observed=True)["year"].diff() == 1
     for cat in ("Coal", "Oil", "Gas"):
-        combined[f"Annual change in {cat.lower()} production (%)"] = (
+        pct_change = (
             combined.groupby("country", observed=True)[f"{cat} production (TWh)"].pct_change(fill_method=None) * 100
         )
-        combined[f"Annual change in {cat.lower()} production (TWh)"] = combined.groupby("country", observed=True)[
-            f"{cat} production (TWh)"
-        ].diff()
+        abs_change = combined.groupby("country", observed=True)[f"{cat} production (TWh)"].diff()
+        combined[f"Annual change in {cat.lower()} production (%)"] = pct_change.where(is_consecutive)
+        combined[f"Annual change in {cat.lower()} production (TWh)"] = abs_change.where(is_consecutive)
 
     return combined
 
@@ -360,8 +364,13 @@ def run() -> None:
     tb_uk = prepare_uk_historical_data(tb_uk=tb_uk)
     tb_historical = pr.concat([tb_smil, tb_uk], ignore_index=True)
 
-    # Run sanity checks on inputs.
+    # Run sanity checks on inputs (including that historical and Shift data agree at their 1900 overlap).
     sanity_check_inputs(tb_review=tb_review, tb_shift=tb_shift, tb_historical=tb_historical)
+
+    # The historical sources extend beyond 1900 (Smil to 1960, NIC to 2018), but they are only meant to fill the
+    # pre-1900 tail. Restrict them to before 1900 so they can never backfill a later gap in the Energy Institute or
+    # Shift data.
+    tb_historical = tb_historical[tb_historical["year"] < 1900].reset_index(drop=True)
 
     # Combine Statistical Review, Shift, and historical coal data.
     tb = combine_data(tb_review=tb_review, tb_shift=tb_shift, tb_historical=tb_historical)
