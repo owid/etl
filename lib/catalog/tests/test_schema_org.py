@@ -37,6 +37,7 @@ def test_single_table_dataset_flattens_table_metadata() -> None:
             version="2025-04-07",
             short_name="cherry_blossom",
             title="Cherry Blossom Full Bloom Dates in Kyoto, Japan",
+            description="Cherry blossom bloom dates in Kyoto.",
         ),
         tables=[table],
     )
@@ -89,6 +90,7 @@ def test_version_param_overrides_latest_dataset_meta_version() -> None:
             version="latest",
             short_name="owid_co2",
             title="CO2 emissions",
+            description="CO2 emissions dataset.",
         ),
         tables=[table],
     )
@@ -115,6 +117,7 @@ def test_version_falls_back_to_dataset_meta_version_when_not_given() -> None:
             version="2025-04-07",
             short_name="cherry_blossom",
             title="Cherry blossom",
+            description="Cherry blossom bloom dates in Kyoto.",
         ),
         tables=[table],
     )
@@ -237,7 +240,7 @@ def test_table_description_falls_back_to_origin_then_dataset() -> None:
     assert parts["no_origin_desc"]["description"] == "Dataset-level description"
 
 
-def test_table_description_helper_prefers_explicit_and_returns_none_without_any_source() -> None:
+def test_table_description_ignores_internal_table_metadata_description() -> None:
     origin_without_desc = Origin(producer="Producer", title="Original")
     table = TableSchemaInput(
         short_name="t",
@@ -245,11 +248,14 @@ def test_table_description_helper_prefers_explicit_and_returns_none_without_any_
         variables={"value": VariableMeta(title="Value", origins=[origin_without_desc])},
         formats=["feather"],
     )
-    # No table/origin/dataset description available anywhere -> None (nothing is synthesized).
+    # No origin/dataset description available anywhere -> None (nothing is synthesized).
     assert table_description(table, DatasetMeta(short_name="d")) is None
-    # An explicit table description wins over origin and dataset descriptions.
-    table.metadata.description = "Explicit table description"
-    assert table_description(table, DatasetMeta(short_name="d", description="ds")) == "Explicit table description"
+    # TableMeta.description is a mostly-internal field and must never leak into JSON-LD, even
+    # when explicitly set: it neither wins over an available dataset description...
+    table.metadata.description = "Internal table description"
+    assert table_description(table, DatasetMeta(short_name="d", description="ds")) == "ds"
+    # ...nor gets used as a last resort when nothing else is available.
+    assert table_description(table, DatasetMeta(short_name="d")) is None
 
 
 def test_dataset_description_raises_without_explicit_description() -> None:
@@ -284,12 +290,13 @@ def test_dataset_description_raises_without_explicit_description() -> None:
         assert "owid_energy" in str(error)
 
 
-def test_dataset_description_falls_back_to_single_table_description_only() -> None:
-    """A single-table dataset may rely on the table's own description in lieu of a dataset-level
-    one, but that shortcut does not extend to picking an indicator origin's description."""
+def test_dataset_description_ignores_table_level_description() -> None:
+    """A table's own ``description`` (a mostly-internal field) must never substitute for a real
+    ``dataset.description`` — only an explicit dataset-level description satisfies the
+    requirement, even for a single-table dataset."""
     table = TableSchemaInput(
         short_name="owid_energy",
-        metadata=TableMeta(short_name="owid_energy", title="Energy", description="Table-level description."),
+        metadata=TableMeta(short_name="owid_energy", title="Energy", description="Internal table description."),
         variables={
             "population": VariableMeta(
                 title="Population",
@@ -299,14 +306,16 @@ def test_dataset_description_falls_back_to_single_table_description_only() -> No
         formats=["feather"],
     )
 
-    jsonld = dataset_to_schema_org(
-        dataset_path="garden/energy_data/2026-04-24/owid_energy",
-        page_path="energy_data/owid_energy",
-        dataset_meta=DatasetMeta(namespace="energy_data", version="2026-04-24", short_name="owid_energy"),
-        tables=[table],
-    )
-
-    assert jsonld["description"] == "Table-level description."
+    try:
+        dataset_to_schema_org(
+            dataset_path="garden/energy_data/2026-04-24/owid_energy",
+            page_path="energy_data/owid_energy",
+            dataset_meta=DatasetMeta(namespace="energy_data", version="2026-04-24", short_name="owid_energy"),
+            tables=[table],
+        )
+        raise AssertionError("Expected dataset_to_schema_org to raise ValueError for a missing description.")
+    except ValueError as error:
+        assert "owid_energy" in str(error)
 
 
 def test_license_to_url_resolves_known_license_names() -> None:

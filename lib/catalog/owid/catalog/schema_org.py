@@ -65,7 +65,7 @@ def dataset_to_schema_org(
     resolved_version = version or dataset_meta.version
 
     title = _dataset_title(dataset_meta, tables)
-    description = _dataset_description(dataset_meta, tables)
+    description = _dataset_description(dataset_meta)
     origins = _unique_origins(tables)
     license_url = _license_url(dataset_meta, origins, tables)
 
@@ -145,14 +145,13 @@ def dataset_to_schema_org(
 def table_description(table: TableSchemaInput, dataset_meta: DatasetMeta) -> str | None:
     """Return the best available description for a single table node.
 
-    Tables rarely set their own ``description`` (a mostly-internal field), so for
-    the ``hasPart`` representation we fall back to descriptions that already exist
-    in the metadata — the producer's (origin) description, then the dataset-level
-    description — rather than leaving the node blank. Nothing is synthesized here;
-    if none of these are populated the node has no description.
+    ``TableMeta.description`` is a mostly-internal field, never set with a public-facing
+    description in mind, so it is never used for JSON-LD. For the ``hasPart`` representation
+    we instead fall back to descriptions that already exist in the metadata — the producer's
+    (origin) description, then the dataset-level description — rather than leaving the node
+    blank. Nothing is synthesized here; if none of these are populated the node has no
+    description.
     """
-    if table.metadata.description:
-        return table.metadata.description
     origins = _unique_origins([table])
     description = _first_non_empty(origin.description_snapshot or origin.description for origin in origins)
     if description:
@@ -239,24 +238,22 @@ def _dataset_title(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) ->
     return "Untitled OWID catalog dataset"
 
 
-def _dataset_description(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) -> str:
-    """Return the dataset's own description — never guessed from indicator origins.
+def _dataset_description(dataset_meta: DatasetMeta) -> str:
+    """Return the dataset's own description — never guessed from indicator origins or tables.
 
     A dataset's variables can span several unrelated origins: its own primary source plus
     auxiliary indicators (population, GDP, regions, ...) pulled in for per-capita or aggregate
     columns. Picking a description from any single one of those origins says nothing reliable
     about the dataset as a whole, and which one gets picked is an implementation detail (e.g.
-    column order) rather than a meaningful choice. Every public dataset is expected to set its
-    own ``dataset.description`` in its ``.meta.yml`` (or, for a single-table dataset, the
-    table's ``description``); ``assess_dataset_quality`` blocks datasets that don't, via the
+    column order) rather than a meaningful choice. ``TableMeta.description`` isn't a substitute
+    either — it's a mostly-internal field that authors rarely set with a public-facing dataset
+    description in mind. Every public dataset is expected to set its own ``dataset.description``
+    in its ``.meta.yml``; ``assess_dataset_quality`` blocks datasets that don't, via the
     ``missing_description`` check, before this function is ever called. Raising here — rather
     than inventing something — is a backstop in case that gate is ever bypassed.
     """
     if dataset_meta.description:
         return dataset_meta.description
-    table_description_value = _first_non_empty(table.metadata.description for table in tables)
-    if table_description_value:
-        return table_description_value
     raise ValueError(
         f"Dataset '{dataset_meta.short_name}' has no description set. "
         "Add `dataset.description` to its .meta.yml — it must not be guessed from indicator origins."
