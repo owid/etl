@@ -1,0 +1,31 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: UK historical energy data
+    description: |-
+      A historical energy data set for the United Kingdom, compiled by Roger Fouquet (Grantham Research Institute on Climate Change and the Environment, London School of Economics and Political Science) for the National Infrastructure Commission (NIC).
+
+      The dataset brings together long-run time series on the UK's energy consumption, production, prices and carbon dioxide emissions from 1700 to 2018. For coal, the long-run series (sheet "1.3.1 CoalLR") compiles production and consumption estimates from Flinn (History of the British Coal Industry, Vol. 2, covering 1700-1830), Church (Vol. 3, covering 1830-1913) and official figures from the UK Department for Business, Energy & Industrial Strategy (BEIS) from 1913 onwards, underpinned by the production estimates of Pollard (1980) and Mitchell (1984).
+
+      Because the source is no longer actively maintained by the National Infrastructure Commission, the file is retrieved from the Internet Archive's Wayback Machine.
+    date_published: "2020-03-31"
+
+    # Citation
+    producer: National Infrastructure Commission
+    citation_full: |-
+      Fouquet, R. (2020). A historical energy data set for the UK. National Infrastructure Commission. Version 1, finalised on 31 March 2020, based on the Digest of United Kingdom Energy Statistics 2019 with historical extension. Prepared by Roger Fouquet (Grantham Research Institute on Climate Change and the Environment, London School of Economics and Political Science).
+    attribution_short: NIC
+
+    # Files
+    url_main: https://nic.org.uk/studies-reports/national-infrastructure-assessment/national-infrastructure-assessment-2018/historical-energy-data/
+    url_download: https://web.archive.org/web/20240812215702id_/https://nic.org.uk/app/uploads/Historical-Energy-Data-Final-Dataset.xlsx
+    date_accessed: "2026-07-02"
+
+    # License
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+outs:
+  - md5: 68e8375f87dc59ba86344a3b008841ca
+    size: 2477827
+    path: uk_historical_energy.xlsx
