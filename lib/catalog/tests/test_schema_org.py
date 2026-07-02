@@ -1,5 +1,5 @@
 from owid.catalog.core.meta import DatasetMeta, License, Origin, TableMeta, VariableMeta, VariablePresentationMeta
-from owid.catalog.schema_org import TableSchemaInput, dataset_to_schema_org, license_to_url
+from owid.catalog.schema_org import TableSchemaInput, dataset_to_schema_org, license_to_url, table_description
 
 
 def test_single_table_dataset_flattens_table_metadata() -> None:
@@ -93,6 +93,62 @@ def test_multi_table_dataset_uses_has_part() -> None:
     assert "variableMeasured" not in jsonld
     assert [part["identifier"] for part in jsonld["hasPart"]] == ["table_a", "table_b"]
     assert jsonld["hasPart"][0]["distribution"][0]["contentUrl"].endswith("/table_a.feather")
+    # Tables set no description of their own and the origin has none either, so the hasPart
+    # nodes fall back to the dataset-level description rather than being left blank.
+    assert jsonld["hasPart"][0]["description"] == "Dataset description"
+    assert jsonld["hasPart"][1]["description"] == "Dataset description"
+
+
+def test_table_description_falls_back_to_origin_then_dataset() -> None:
+    origin_with_desc = Origin(producer="Producer", title="Original", description="Producer description of the data.")
+    origin_without_desc = Origin(producer="Producer", title="Original")
+    tables = [
+        TableSchemaInput(
+            short_name="with_origin_desc",
+            metadata=TableMeta(short_name="with_origin_desc", title="A"),
+            variables={"value": VariableMeta(title="Value", origins=[origin_with_desc])},
+            formats=["feather"],
+        ),
+        TableSchemaInput(
+            short_name="no_origin_desc",
+            metadata=TableMeta(short_name="no_origin_desc", title="B"),
+            variables={"value": VariableMeta(title="Value", origins=[origin_without_desc])},
+            formats=["feather"],
+        ),
+    ]
+
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/example/2025-01-01/example_dataset",
+        dataset_meta=DatasetMeta(
+            namespace="example",
+            version="2025-01-01",
+            short_name="example_dataset",
+            title="Example dataset",
+            description="Dataset-level description",
+        ),
+        tables=tables,
+    )
+
+    parts = {part["identifier"]: part for part in jsonld["hasPart"]}
+    # Producer (origin) description is preferred when present...
+    assert parts["with_origin_desc"]["description"] == "Producer description of the data."
+    # ...otherwise it falls back to the dataset description (never left blank).
+    assert parts["no_origin_desc"]["description"] == "Dataset-level description"
+
+
+def test_table_description_helper_prefers_explicit_and_returns_none_without_any_source() -> None:
+    origin_without_desc = Origin(producer="Producer", title="Original")
+    table = TableSchemaInput(
+        short_name="t",
+        metadata=TableMeta(short_name="t", title="T"),
+        variables={"value": VariableMeta(title="Value", origins=[origin_without_desc])},
+        formats=["feather"],
+    )
+    # No table/origin/dataset description available anywhere -> None (nothing is synthesized).
+    assert table_description(table, DatasetMeta(short_name="d")) is None
+    # An explicit table description wins over origin and dataset descriptions.
+    table.metadata.description = "Explicit table description"
+    assert table_description(table, DatasetMeta(short_name="d", description="ds")) == "Explicit table description"
 
 
 def test_license_to_url_resolves_known_license_names() -> None:
