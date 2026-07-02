@@ -19,7 +19,7 @@ dataset:
   update_period_days: 365
 
 tables:
-  structural_transformation:
+  structural_transformation_omm:
     variables:
       share_employed_agriculture:
         title: Share of employment in agriculture

@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("structural_transformation")
+    ds_garden = paths.load_dataset("structural_transformation_omm")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("structural_transformation", reset_index=False)
+    tb = ds_garden.read("structural_transformation_omm", reset_index=False)
 
     #
     # Save outputs.

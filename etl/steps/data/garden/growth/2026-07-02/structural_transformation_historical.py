@@ -9,7 +9,7 @@ https://assets.ourworldindata.org/uploads/2017/10/Documentation-for-Historical-e
 
 Unlike the 2017 compilation, US data is not updated with Bureau of Economic Analysis
 releases: those updates only affected years that are superseded by World Bank data in
-the combined dataset built downstream (see structural_transformation).
+the combined dataset built downstream (see structural_transformation_omm).
 
 Sectors follow the convention of Herrendorf, Rogerson and Valentinyi (2014): utilities
 are classified within services, not industry.
