@@ -68,6 +68,11 @@ def build_and_publish_catalog_jsonld(
     # dataset that becomes ineligible (e.g. non_redistributable) must stop being served.
     delete_keys.extend(f"{item.catalog_path}/{DATASET_JSONLD_FILENAME}" for item in result.skipped)
     delete_keys.extend(f"{entry.short_key}/{DATASET_JSONLD_FILENAME}" for entry in result.skipped_entries)
+    # Also delete both locations for datasets archived outright (no active replacement at
+    # all) — they never appear in emitted/skipped above, since no on-disk version of them is
+    # active, but a prior publish may still have left their JSON-LD live on R2.
+    delete_keys.extend(f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.archived_entries)
+    delete_keys.extend(f"{entry.short_key}/{DATASET_JSONLD_FILENAME}" for entry in result.archived_entries)
 
     sync_jsonld_artifacts(connect_r2(), bucket, catalog_dir, keys, delete_keys=delete_keys)
 

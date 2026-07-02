@@ -223,6 +223,37 @@ def test_build_catalog_jsonld_artifacts_ignores_stale_archived_latest_version(tm
 
     assert result.emitted == [current]
     assert stale_latest not in result.emitted
+    # The dataset has an active replacement, so it's superseded, not archived outright.
+    assert result.archived_entries == []
+
+
+def test_build_catalog_jsonld_artifacts_cleans_up_dataset_archived_with_no_replacement(tmp_path: Path) -> None:
+    # Regression test: unlike the "superseded" case above, a dataset removed from the DAG with
+    # NO active replacement at all has every on-disk version excluded from latest_dataset_paths,
+    # so it never becomes an emitted or skipped entry either. Without explicit archived-entry
+    # tracking, a dataset.jsonld it published before being archived (at its old dated path and
+    # its stable short key) would never be scheduled for deletion again.
+    data_dir = tmp_path / "data"
+    archived = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="2024-01-01")
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+    stale_dated = data_dir / archived / "dataset.jsonld"
+    stale_dated.write_text('{"from": "before archiving"}')
+    stale_short_key = data_dir / "emissions" / "owid_co2" / "dataset.jsonld"
+    stale_short_key.parent.mkdir(parents=True)
+    stale_short_key.write_text('{"from": "before archiving"}')
+
+    result = build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir,
+        channel="garden",
+        # Nothing is active: the dataset has been archived with no replacement.
+        active_steps=set(),
+    )
+
+    assert result.emitted == []
+    assert result.skipped == []
+    assert [entry.catalog_path for entry in result.archived_entries] == [archived]
+    assert not stale_dated.exists()
+    assert not stale_short_key.exists()
 
 
 def test_build_catalog_jsonld_artifacts_only_unmatched_entry_warns_and_emits_nothing(tmp_path: Path) -> None:
