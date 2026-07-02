@@ -463,7 +463,9 @@ def test_build_catalog_jsonld_artifacts_renders_templated_metadata_via_dimension
     ds.save()
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    result = build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir, channel="garden", active_steps={_step_uri("garden/example/2025-01-01/long_dataset")}
+    )
 
     assert result.emitted == ["garden/example/2025-01-01/long_dataset"]
     jsonld = json.loads((data_dir / "example" / "long_dataset" / "dataset.jsonld").read_text())
@@ -491,7 +493,9 @@ def test_build_catalog_jsonld_artifacts_blocks_raw_jinja_leaking_from_unguarded_
     ds.save()
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    result = build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+    )
 
     assert result.emitted == []
     assert [quality.blockers for quality in result.skipped] == [["raw_jinja_in_jsonld"]]
@@ -504,14 +508,17 @@ def test_build_catalog_jsonld_artifacts_requires_metadata_opt_in_without_allowli
     _add_eligible_dataset(data_dir, namespace="example", dataset="unflagged", jsonld=False)
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
+    active_steps = {_step_uri("garden/example/2025-01-01/flagged"), _step_uri("garden/example/2025-01-01/unflagged")}
     # Without an allowlist, only the dataset that opts in via metadata is considered; the
     # unflagged one is invisible (not emitted, but also not reported as skipped).
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", active_steps=active_steps)
     assert result.emitted == ["garden/example/2025-01-01/flagged"]
     assert result.skipped == []
     assert (data_dir / "example" / "flagged" / "dataset.jsonld").exists()
     assert not (data_dir / "example" / "unflagged" / "dataset.jsonld").exists()
 
     # An explicit allowlist overrides the metadata opt-in.
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", only={"example/unflagged"})
+    result = build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir, channel="garden", only={"example/unflagged"}, active_steps=active_steps
+    )
     assert result.emitted == ["garden/example/2025-01-01/unflagged"]
