@@ -20,6 +20,7 @@ from structlog import get_logger
 
 from etl.catalog_jsonld.quality import DatasetQualityResult, assess_dataset_quality, find_duplicate_short_key_paths
 from etl.catalog_jsonld.sitemap import SitemapEntry, sitemap_xml
+from etl.dag_helpers import load_dag
 from etl.paths import DATA_DIR
 
 log = get_logger()
@@ -65,6 +66,7 @@ def build_catalog_jsonld_artifacts(
     base_url: str = DEFAULT_CATALOG_BASE_URL,
     dry_run: bool = False,
     only: set[str] | None = None,
+    active_steps: set[str] | None = None,
 ) -> JsonLdBuildResult:
     """Generate dataset JSON-LD files, sitemap, and quality report locally.
 
@@ -73,9 +75,13 @@ def build_catalog_jsonld_artifacts(
     dataset's own dated catalog folder, so the public landing page URL doesn't change every
     time the dataset gets a new version. When ``only`` is given, restrict generation to
     datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
+
+    ``active_steps`` overrides the set of active DAG step URIs used to exclude stale,
+    archived on-disk builds (see :func:`latest_dataset_paths`). Defaults to the real DAG;
+    tests should pass an explicit set instead of relying on ``dag/*.yml``.
     """
     catalog = LocalCatalog(catalog_dir, channels=(channel,))
-    latest_paths = latest_dataset_paths(catalog.frame, channel=channel, only=only)
+    latest_paths = latest_dataset_paths(catalog.frame, channel=channel, only=only, active_steps=active_steps)
     result = JsonLdBuildResult()
     sitemap_entries: list[SitemapEntry] = []
 
@@ -151,16 +157,36 @@ def _remove_if_exists(path: Path) -> None:
 
 
 def latest_dataset_paths(
-    frame: pd.DataFrame, *, channel: CHANNEL = "garden", only: set[str] | None = None
+    frame: pd.DataFrame,
+    *,
+    channel: CHANNEL = "garden",
+    only: set[str] | None = None,
+    active_steps: set[str] | None = None,
 ) -> list[LatestDatasetPath]:
     """Return latest public dataset entries for a catalog channel.
 
-    Private datasets are always excluded (``is_public == True`` filter). When ``only`` is
+    Private datasets are always excluded (``is_public == True`` filter). Datasets whose step
+    is no longer in the active DAG are also excluded — otherwise a stale on-disk build left
+    over from before a dataset was re-versioned (e.g. an archived ``.../latest/...`` step
+    superseded by a dated version) can outrank the real latest version, since ``"latest"``
+    sorts after any ``YYYY-MM-DD`` version string. ``active_steps`` defaults to the real DAG
+    (``load_dag()``); pass an explicit set to override it (e.g. in tests). When ``only`` is
     provided, the result is further restricted to datasets whose ``"<namespace>/<dataset>"``
     is in the set. Matching is version-agnostic so it survives data re-versioning. Allowlist
     entries that match no dataset are logged as a warning (typo / renamed dataset).
     """
     df = frame.loc[(frame["channel"] == channel) & (frame["is_public"] == True)].copy()  # noqa: E712
+    if df.empty:
+        if only:
+            for dataset_key in sorted(only):
+                log.warning("catalog_jsonld.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
+        return []
+    if active_steps is None:
+        active_steps = set(load_dag())
+    df["step"] = (
+        "data://" + df["channel"] + "/" + df["namespace"] + "/" + df["version"].astype(str) + "/" + df["dataset"]
+    )
+    df = df[df["step"].isin(active_steps)]
     if df.empty:
         if only:
             for dataset_key in sorted(only):

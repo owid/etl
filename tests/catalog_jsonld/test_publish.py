@@ -10,6 +10,11 @@ from etl.catalog_jsonld.artifacts import DATASET_JSONLD_FILENAME, QUALITY_REPORT
 from etl.catalog_jsonld.publish import build_and_publish_catalog_jsonld, sync_jsonld_artifacts
 
 
+def _step_uri(catalog_path: str) -> str:
+    """Convert a catalog dataset path (e.g. 'garden/ns/2025-01-01/short_name') to its DAG step URI."""
+    return f"data://{catalog_path}"
+
+
 class FakeS3:
     """Minimal stand-in for the boto3 S3 client used by sync_jsonld_artifacts."""
 
@@ -119,7 +124,9 @@ def test_build_and_publish_catalog_jsonld_uses_short_keys_and_deletes_old_dated_
     monkeypatch.setattr("etl.catalog_jsonld.publish.connect_r2", lambda: object())
     monkeypatch.setattr("etl.catalog_jsonld.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
 
-    build_and_publish_catalog_jsonld(bucket="test-bucket", catalog_dir=data_dir, channel="garden")
+    build_and_publish_catalog_jsonld(
+        bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(co2_path)}
+    )
 
     assert f"emissions/owid_co2/{DATASET_JSONLD_FILENAME}" in captured["keys"]
     assert SITEMAP_FILENAME in captured["keys"]
@@ -147,7 +154,9 @@ def test_build_and_publish_catalog_jsonld_deletes_short_key_for_skipped_dataset(
     monkeypatch.setattr("etl.catalog_jsonld.publish.connect_r2", lambda: object())
     monkeypatch.setattr("etl.catalog_jsonld.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
 
-    build_and_publish_catalog_jsonld(bucket="test-bucket", catalog_dir=data_dir, channel="garden")
+    build_and_publish_catalog_jsonld(
+        bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(restricted_path)}
+    )
 
     assert f"wb/restricted/{DATASET_JSONLD_FILENAME}" not in captured["keys"]
     assert f"wb/restricted/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]

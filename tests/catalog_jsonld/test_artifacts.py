@@ -9,6 +9,11 @@ from structlog.testing import capture_logs
 from etl.catalog_jsonld.artifacts import build_catalog_jsonld_artifacts
 
 
+def _step_uri(catalog_path: str) -> str:
+    """Convert a catalog dataset path (e.g. 'garden/ns/2025-01-01/short_name') to its DAG step URI."""
+    return f"data://{catalog_path}"
+
+
 def _add_eligible_dataset(
     data_dir: Path,
     *,
@@ -81,7 +86,11 @@ def test_build_catalog_jsonld_artifacts_writes_dataset_jsonld_sitemap_and_report
 
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    result = build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri("garden/example/2025-01-01/example_dataset")},
+    )
 
     assert result.emitted == ["garden/example/2025-01-01/example_dataset"]
     # dataset.jsonld now lives at the stable "<namespace>/<dataset>" short key, not inside the
@@ -141,7 +150,11 @@ def test_build_catalog_jsonld_artifacts_cleans_up_stale_old_location_for_emitted
     stale_old_location.write_text("{}")
 
     LocalCatalog(data_dir, channels=("garden",)).reindex()
-    build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri("garden/example/2025-01-01/example_dataset")},
+    )
 
     assert not stale_old_location.exists()
     assert (data_dir / "example" / "example_dataset" / "dataset.jsonld").exists()
@@ -150,11 +163,16 @@ def test_build_catalog_jsonld_artifacts_cleans_up_stale_old_location_for_emitted
 def test_build_catalog_jsonld_artifacts_only_allowlist_restricts_emission(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     co2_path = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2")
-    _add_eligible_dataset(data_dir, namespace="energy_data", dataset="owid_energy")
-    _add_eligible_dataset(data_dir, namespace="demography", dataset="population")
+    energy_path = _add_eligible_dataset(data_dir, namespace="energy_data", dataset="owid_energy")
+    population_path = _add_eligible_dataset(data_dir, namespace="demography", dataset="population")
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", only={"emissions/owid_co2"})
+    result = build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir,
+        channel="garden",
+        only={"emissions/owid_co2"},
+        active_steps={_step_uri(p) for p in (co2_path, energy_path, population_path)},
+    )
 
     # Only the allowlisted dataset is emitted; the others are not even assessed.
     assert result.emitted == [co2_path]
@@ -172,22 +190,53 @@ def test_build_catalog_jsonld_artifacts_only_allowlist_restricts_emission(tmp_pa
 def test_build_catalog_jsonld_artifacts_only_is_version_agnostic(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     # Two versions of the same dataset: the allowlist matches on namespace/dataset, latest wins.
-    _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="2024-01-01")
+    older = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="2024-01-01")
     newer = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="2025-12-04")
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", only={"emissions/owid_co2"})
+    result = build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir,
+        channel="garden",
+        only={"emissions/owid_co2"},
+        active_steps={_step_uri(older), _step_uri(newer)},
+    )
 
     assert result.emitted == [newer]
 
 
+def test_build_catalog_jsonld_artifacts_ignores_stale_archived_latest_version(tmp_path: Path) -> None:
+    # Regression test: a dataset re-versioned from "latest" to a dated version leaves a stale
+    # on-disk "latest" build behind. Since the string "latest" sorts after any YYYY-MM-DD
+    # version, naive version-max selection would wrongly pick the stale archived build over
+    # the real, active, dated one. Excluding non-active-DAG steps must prevent that.
+    data_dir = tmp_path / "data"
+    stale_latest = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="latest")
+    current = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="2025-12-04")
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+
+    result = build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir,
+        channel="garden",
+        # Only the dated version is in the active DAG; "latest" is a stale, archived leftover.
+        active_steps={_step_uri(current)},
+    )
+
+    assert result.emitted == [current]
+    assert stale_latest not in result.emitted
+
+
 def test_build_catalog_jsonld_artifacts_only_unmatched_entry_warns_and_emits_nothing(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
-    _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2")
+    co2_path = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2")
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
     with capture_logs() as logs:
-        result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", only={"wb/does_not_exist"})
+        result = build_catalog_jsonld_artifacts(
+            catalog_dir=data_dir,
+            channel="garden",
+            only={"wb/does_not_exist"},
+            active_steps={_step_uri(co2_path)},
+        )
 
     assert result.emitted == []
     assert (data_dir / "sitemap.xml").read_text().count("<url>") == 0
@@ -197,10 +246,12 @@ def test_build_catalog_jsonld_artifacts_only_unmatched_entry_warns_and_emits_not
 
 def test_build_catalog_jsonld_artifacts_excludes_non_redistributable(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
-    _add_eligible_dataset(data_dir, namespace="wb", dataset="restricted", non_redistributable=True)
+    restricted_path = _add_eligible_dataset(data_dir, namespace="wb", dataset="restricted", non_redistributable=True)
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    result = build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir, channel="garden", active_steps={_step_uri(restricted_path)}
+    )
 
     assert result.emitted == []
     assert [item.catalog_path for item in result.skipped] == ["garden/wb/2025-01-01/restricted"]
@@ -213,10 +264,10 @@ def test_build_catalog_jsonld_artifacts_omits_lastmod_for_non_date_version(tmp_p
     lastmod rather than stamping the build date, which would falsely mark the page as modified
     on every publish."""
     data_dir = tmp_path / "data"
-    _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="latest")
+    path = _add_eligible_dataset(data_dir, namespace="emissions", dataset="owid_co2", version="latest")
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(path)})
 
     assert result.emitted == ["garden/emissions/latest/owid_co2"]
     sitemap = (data_dir / "sitemap.xml").read_text()
@@ -230,13 +281,13 @@ def test_build_catalog_jsonld_artifacts_removes_short_key_artifact_when_dataset_
     """A dataset emitted at its short key by a prior build must have that local artifact removed
     once it fails a quality gate, so an ineligible dataset can't keep a stale public JSON-LD."""
     data_dir = tmp_path / "data"
-    _add_eligible_dataset(data_dir, namespace="wb", dataset="restricted", non_redistributable=True)
+    path = _add_eligible_dataset(data_dir, namespace="wb", dataset="restricted", non_redistributable=True)
     LocalCatalog(data_dir, channels=("garden",)).reindex()
     stale_short_key = data_dir / "wb" / "restricted" / "dataset.jsonld"
     stale_short_key.parent.mkdir(parents=True)
     stale_short_key.write_text('{"from": "a prior build"}')
 
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(path)})
 
     assert result.emitted == []
     assert [entry.short_key for entry in result.skipped_entries] == ["wb/restricted"]
@@ -250,7 +301,7 @@ def test_build_catalog_jsonld_artifacts_blocks_reserved_namespace(tmp_path: Path
     path = _add_eligible_dataset(data_dir, namespace="garden", dataset="something")
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
-    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    result = build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(path)})
 
     assert result.emitted == []
     assert [item.catalog_path for item in result.skipped] == [path]
@@ -272,8 +323,8 @@ def test_build_catalog_jsonld_artifacts_blocks_duplicate_short_keys(tmp_path: Pa
 
     real_latest_dataset_paths = artifacts_module.latest_dataset_paths
 
-    def fake_latest_dataset_paths(frame, *, channel="garden", only=None):
-        entries = real_latest_dataset_paths(frame, channel=channel, only=only)
+    def fake_latest_dataset_paths(frame, *, channel="garden", only=None, active_steps=None):
+        entries = real_latest_dataset_paths(frame, channel=channel, only=only, active_steps=active_steps)
         return [
             artifacts_module.LatestDatasetPath(
                 catalog_path=entry.catalog_path, namespace="emissions", dataset="owid_co2", version=entry.version
@@ -283,7 +334,11 @@ def test_build_catalog_jsonld_artifacts_blocks_duplicate_short_keys(tmp_path: Pa
 
     monkeypatch.setattr(artifacts_module, "latest_dataset_paths", fake_latest_dataset_paths)
 
-    result = artifacts_module.build_catalog_jsonld_artifacts(catalog_dir=data_dir, channel="garden")
+    result = artifacts_module.build_catalog_jsonld_artifacts(
+        catalog_dir=data_dir,
+        channel="garden",
+        active_steps={_step_uri(path_a), _step_uri(path_b)},
+    )
 
     assert result.emitted == []
     assert {item.catalog_path for item in result.skipped} == {path_a, path_b}
