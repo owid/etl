@@ -270,3 +270,5 @@ steps:
     - snapshot-private://fasttrack/latest/uk_wealth_share_top1.csv
   data-private://grapher/fasttrack/latest/us_wealth_share_top1:
     - snapshot-private://fasttrack/latest/us_wealth_share_top1.csv
+  data-private://grapher/fasttrack/latest/france_wealth_share_top1:
+    - snapshot-private://fasttrack/latest/france_wealth_share_top1.csv
