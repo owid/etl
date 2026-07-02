@@ -20,7 +20,7 @@ from structlog import get_logger
 
 from etl.catalog_jsonld.quality import DatasetQualityResult, assess_dataset_quality, find_duplicate_short_key_paths
 from etl.catalog_jsonld.sitemap import SitemapEntry, sitemap_xml
-from etl.dag_helpers import load_dag
+from etl.dag_helpers import graph_nodes, load_dag
 from etl.paths import DATA_DIR
 
 log = get_logger()
@@ -170,7 +170,9 @@ def latest_dataset_paths(
     over from before a dataset was re-versioned (e.g. an archived ``.../latest/...`` step
     superseded by a dated version) can outrank the real latest version, since ``"latest"``
     sorts after any ``YYYY-MM-DD`` version string. ``active_steps`` defaults to the real DAG
-    (``load_dag()``); pass an explicit set to override it (e.g. in tests). When ``only`` is
+    (``graph_nodes(load_dag())``, matching keys and dependency values alike — a step can be
+    active purely as someone else's dependency without its own top-level DAG entry); pass an
+    explicit set to override it (e.g. in tests). When ``only`` is
     provided, the result is further restricted to datasets whose ``"<namespace>/<dataset>"``
     is in the set. Matching is version-agnostic so it survives data re-versioning. Allowlist
     entries that match no dataset are logged as a warning (typo / renamed dataset).
@@ -182,7 +184,7 @@ def latest_dataset_paths(
                 log.warning("catalog_jsonld.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
         return []
     if active_steps is None:
-        active_steps = set(load_dag())
+        active_steps = graph_nodes(load_dag())
     df["step"] = (
         "data://" + df["channel"] + "/" + df["namespace"] + "/" + df["version"].astype(str) + "/" + df["dataset"]
     )
