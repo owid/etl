@@ -1,19 +1,17 @@
 """Long-run employment and GDP shares by sector for ten currently rich countries.
 
-This step reproduces Our World in Data's 2017 compilation "Historical employment and
-output by sector" from its original sources. The base is Herrendorf, Rogerson and
-Valentinyi (2014), updated country by country with the GGDC 10-Sector Database (January
-2015 release), the Swedish Historical National Accounts, and BEA's historical GDP by
-industry statistics for the United States, following the recipe in the 2017 documentation:
+This step combines several sources into long-run series of employment numbers and value
+added shares by broad economic sector. The base is the dataset published by Herrendorf,
+Rogerson and Valentinyi (2014), updated country by country with the GGDC 10-Sector
+Database (January 2015 release), the Swedish Historical National Accounts, and BEA's
+historical GDP by industry statistics for the United States (1947-1997). The
+country-by-country combination follows the methodology described in
 https://assets.ourworldindata.org/uploads/2017/10/Documentation-for-Historical-employment-and-output-by-sector-%E2%80%93-OWID-2017.pdf
 
-Unlike the 2017 compilation, US employment is not updated with Bureau of Economic
-Analysis data: that update only affected 2008-2015, years that are superseded by World
-Bank data in the combined dataset built downstream (see structural_transformation_omm).
-US value added is updated with the current release of the same BEA dataset used in 2017
-(the NAICS-based historical GDP by industry statistics, 1947-1997); the 2017 compilation
-additionally extended US value added to 2016 with BEA's current accounts, years that are
-also superseded by World Bank data downstream.
+Years from 1991 onwards for employment and from each country's first World Bank year for
+value added are superseded by World Bank data in the combined dataset built downstream
+(see structural_transformation_omm), so this step does not extend the series into that
+era (e.g. US value added beyond 1997).
 
 Sectors follow the convention of Herrendorf, Rogerson and Valentinyi (2014): utilities
 are classified within services, not industry.
@@ -31,8 +29,9 @@ SECTORS = ["agriculture", "industry", "services"]
 EMPLOYMENT_COLUMNS = [f"number_employed_{sector}" for sector in SECTORS]
 SHARE_COLUMNS = [f"share_gdp_{sector}" for sector in SECTORS]
 
-# Compilation recipe, following the 2017 documentation. The base source is Herrendorf,
-# Rogerson and Valentinyi (2014). "va" and "emp" list (source, first_year, last_year)
+# Country-by-country combination recipe (see the methodology documentation linked in the
+# module docstring). The base source is Herrendorf, Rogerson and Valentinyi (2014).
+# "va" and "emp" list (source, first_year, last_year)
 # spans that are replaced with another source; last_year None means "onwards".
 # "va_drop_years" / "emp_drop_years" remove observations:
 #   - Finland: negative value added for services in 1917-1920 and 1945-1946.
@@ -44,8 +43,8 @@ RECIPE = {
     "Finland": {"va_drop_years": [1917, 1918, 1919, 1920, 1945, 1946]},
     "France": {"va": [("ggdc", 1970, None)], "va_drop_years": [1937]},
     "Japan": {"va": [("ggdc", 1953, None)], "emp": [("ggdc", 1953, None)]},
-    # NOTE: The 2017 documentation says South Korean value added was updated with GGDC from
-    # 1953 onwards, but the published 2017 values match Herrendorf et al. through 1962 and
+    # NOTE: The methodology documentation says South Korean value added switches to GGDC in
+    # 1953, but the previously published values match Herrendorf et al. through 1962 and
     # GGDC only from 1963 (the same year as the employment switch), so 1963 is used here.
     "South Korea": {"va": [("ggdc", 1963, None)], "emp": [("ggdc", 1963, None)]},
     "Netherlands": {"va": [("ggdc", 1970, None)], "emp": [("ggdc", 1949, 1949), ("ggdc", 1960, None)]},
@@ -314,7 +313,7 @@ def prepare_bea(tb: Table) -> Table:
 
 
 def apply_recipe(tb_hrv: Table, overrides: dict, tb_lund: Table) -> Table:
-    """Apply the 2017 compilation recipe country by country."""
+    """Apply the country-by-country combination recipe."""
     tables = []
     for country, rules in RECIPE.items():
         if rules.get("replace_all"):
@@ -423,8 +422,9 @@ def sanity_check_outputs(tb: Table) -> None:
     dropped = tb[(tb["country"] == "United States") & (tb["year"] <= 1830)]
     assert dropped[EMPLOYMENT_COLUMNS].isna().all().all(), error
 
-    # Spot checks against the frozen 2017 compilation (grapher dataset "Historical
-    # employment and output by sector - OWID (2017)"), so recipe regressions fail loudly.
+    # Spot checks against the previously published version of this data (grapher dataset
+    # "Historical employment and output by sector - OWID (2017)"), so recipe regressions
+    # fail loudly.
     spot_checks = [
         ("Belgium", 1846, "number_employed_agriculture", 681000, 1),
         ("United Kingdom", 1801, "number_employed_agriculture", 1426000, 1),
