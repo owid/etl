@@ -240,15 +240,27 @@ def _dataset_title(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) ->
 
 
 def _dataset_description(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) -> str:
+    """Return the dataset's own description — never guessed from indicator origins.
+
+    A dataset's variables can span several unrelated origins: its own primary source plus
+    auxiliary indicators (population, GDP, regions, ...) pulled in for per-capita or aggregate
+    columns. Picking a description from any single one of those origins says nothing reliable
+    about the dataset as a whole, and which one gets picked is an implementation detail (e.g.
+    column order) rather than a meaningful choice. Every public dataset is expected to set its
+    own ``dataset.description`` in its ``.meta.yml`` (or, for a single-table dataset, the
+    table's ``description``); ``assess_dataset_quality`` blocks datasets that don't, via the
+    ``missing_description`` check, before this function is ever called. Raising here — rather
+    than inventing something — is a backstop in case that gate is ever bypassed.
+    """
     if dataset_meta.description:
         return dataset_meta.description
-    if len(tables) == 1 and tables[0].metadata.description:
-        return tables[0].metadata.description
-    origins = _unique_origins(tables)
-    description = _first_non_empty(origin.description_snapshot or origin.description for origin in origins)
-    if description:
-        return description
-    return "Dataset published in the Our World in Data catalog."
+    table_description_value = _first_non_empty(table.metadata.description for table in tables)
+    if table_description_value:
+        return table_description_value
+    raise ValueError(
+        f"Dataset '{dataset_meta.short_name}' has no description set. "
+        "Add `dataset.description` to its .meta.yml — it must not be guessed from indicator origins."
+    )
 
 
 def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:

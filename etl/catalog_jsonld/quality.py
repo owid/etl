@@ -117,14 +117,10 @@ def _has_title(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) -> boo
 
 
 def _has_description(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) -> bool:
-    if dataset_meta.description or any(table.metadata.description for table in tables):
-        return True
-    for table in tables:
-        for variable in table.variables.values():
-            for origin in variable.origins:
-                if origin.description or origin.description_snapshot:
-                    return True
-    return False
+    # Matches the contract in owid.catalog.schema_org._dataset_description: an indicator
+    # origin's description (e.g. an auxiliary population/GDP column) does not count as the
+    # dataset having a description of its own — only an explicit dataset- or table-level one does.
+    return bool(dataset_meta.description or any(table.metadata.description for table in tables))
 
 
 def _has_license_url(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) -> bool:

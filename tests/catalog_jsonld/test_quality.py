@@ -139,6 +139,21 @@ def test_missing_table_description_not_warned_when_dataset_description_present()
     assert result.table_warnings == {}
 
 
+def test_assess_dataset_quality_blocks_missing_description_even_with_origin_description() -> None:
+    # An indicator origin's description (e.g. a borrowed population/GDP column) must not count as
+    # the dataset having a description of its own — only an explicit dataset- or table-level one
+    # does. Otherwise a dataset could pass this gate and then blow up in dataset_to_schema_org,
+    # which refuses to guess a description from origins.
+    result = assess_dataset_quality(
+        catalog_path="garden/example/2025-01-01/example_dataset",
+        namespace="example",
+        dataset_meta=DatasetMeta(short_name="example_dataset", title="Example"),
+        tables=[_table("table_a", origin_desc="Producer description of the data.")],
+    )
+    assert "missing_description" in result.blockers
+    assert not result.is_eligible
+
+
 def test_missing_table_description_not_warned_when_origin_description_present() -> None:
     # No table or dataset description, but the producer (origin) provides one.
     result = assess_dataset_quality(

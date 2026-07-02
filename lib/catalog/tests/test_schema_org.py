@@ -136,7 +136,9 @@ def test_distribution_content_urls_use_dated_path_not_short_page_path() -> None:
     jsonld = dataset_to_schema_org(
         dataset_path="garden/emissions/2025-12-04/owid_co2",
         page_path="emissions/owid_co2",
-        dataset_meta=DatasetMeta(namespace="emissions", version="2025-12-04", short_name="owid_co2"),
+        dataset_meta=DatasetMeta(
+            namespace="emissions", version="2025-12-04", short_name="owid_co2", description="CO2 emissions dataset."
+        ),
         tables=[table],
     )
 
@@ -248,6 +250,63 @@ def test_table_description_helper_prefers_explicit_and_returns_none_without_any_
     # An explicit table description wins over origin and dataset descriptions.
     table.metadata.description = "Explicit table description"
     assert table_description(table, DatasetMeta(short_name="d", description="ds")) == "Explicit table description"
+
+
+def test_dataset_description_raises_without_explicit_description() -> None:
+    """Regression guard: a dataset with no dataset- or table-level description must fail loudly
+    rather than silently borrow a description from one of its indicators' origins. Previously, a
+    dataset combining many indicators from its own primary source with a borrowed auxiliary
+    indicator (e.g. population, added for per-capita columns) would describe itself using
+    whichever origin happened to be attached to the first column defined in the table — here,
+    population's origin — even though population has nothing to do with the dataset's actual
+    subject matter."""
+    population_origin = Origin(producer="Our World in Data", title="Population", description="Population blurb.")
+    energy_origin = Origin(producer="Energy Institute", title="Statistical Review", description="Energy blurb.")
+    table = TableSchemaInput(
+        short_name="owid_energy",
+        metadata=TableMeta(short_name="owid_energy", title="Energy"),
+        variables={
+            "population": VariableMeta(title="Population", origins=[population_origin]),
+            "coal_consumption": VariableMeta(title="Coal consumption", origins=[energy_origin]),
+        },
+        formats=["feather"],
+    )
+
+    try:
+        dataset_to_schema_org(
+            dataset_path="garden/energy_data/2026-04-24/owid_energy",
+            page_path="energy_data/owid_energy",
+            dataset_meta=DatasetMeta(namespace="energy_data", version="2026-04-24", short_name="owid_energy"),
+            tables=[table],
+        )
+        raise AssertionError("Expected dataset_to_schema_org to raise ValueError for a missing description.")
+    except ValueError as error:
+        assert "owid_energy" in str(error)
+
+
+def test_dataset_description_falls_back_to_single_table_description_only() -> None:
+    """A single-table dataset may rely on the table's own description in lieu of a dataset-level
+    one, but that shortcut does not extend to picking an indicator origin's description."""
+    table = TableSchemaInput(
+        short_name="owid_energy",
+        metadata=TableMeta(short_name="owid_energy", title="Energy", description="Table-level description."),
+        variables={
+            "population": VariableMeta(
+                title="Population",
+                origins=[Origin(producer="Our World in Data", title="Population", description="Population blurb.")],
+            )
+        },
+        formats=["feather"],
+    )
+
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/energy_data/2026-04-24/owid_energy",
+        page_path="energy_data/owid_energy",
+        dataset_meta=DatasetMeta(namespace="energy_data", version="2026-04-24", short_name="owid_energy"),
+        tables=[table],
+    )
+
+    assert jsonld["description"] == "Table-level description."
 
 
 def test_license_to_url_resolves_known_license_names() -> None:

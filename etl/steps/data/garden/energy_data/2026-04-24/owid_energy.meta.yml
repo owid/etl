@@ -1,4 +1,6 @@
 dataset:
   title: Energy dataset
+  description: |-
+    This dataset combines key global energy indicators — energy mix, fossil fuel production, primary energy consumption, and electricity mix — compiled from the Energy Institute's Statistical Review of World Energy, Ember, Shift, and the U.S. Energy Information Administration, alongside auxiliary population and GDP data used to calculate per-capita and per-GDP indicators.
   owners:
     - Pablo Rosado
