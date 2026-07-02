@@ -108,6 +108,8 @@ steps:
     - data://meadow/lund_university/2026-07-02/swedish_historical_national_accounts:
       - snapshot://lund_university/2026-07-02/swedish_historical_national_accounts_value_added.xlsx
       - snapshot://lund_university/2026-07-02/swedish_historical_national_accounts_employment.xlsx
+    - data://meadow/bea/2026-07-02/gdp_by_industry_historical:
+      - snapshot://bea/2026-07-02/gdp_by_industry_historical.zip
   data://grapher/growth/2026-07-02/structural_transformation_omm:
     - data://garden/growth/2026-07-02/structural_transformation_omm:
       - data://garden/growth/2026-07-02/structural_transformation_historical

@@ -3,13 +3,17 @@
 This step reproduces Our World in Data's 2017 compilation "Historical employment and
 output by sector" from its original sources. The base is Herrendorf, Rogerson and
 Valentinyi (2014), updated country by country with the GGDC 10-Sector Database (January
-2015 release) and the Swedish Historical National Accounts, following the recipe in the
-2017 documentation:
+2015 release), the Swedish Historical National Accounts, and BEA's historical GDP by
+industry statistics for the United States, following the recipe in the 2017 documentation:
 https://assets.ourworldindata.org/uploads/2017/10/Documentation-for-Historical-employment-and-output-by-sector-%E2%80%93-OWID-2017.pdf
 
-Unlike the 2017 compilation, US data is not updated with Bureau of Economic Analysis
-releases: those updates only affected years that are superseded by World Bank data in
-the combined dataset built downstream (see structural_transformation_omm).
+Unlike the 2017 compilation, US employment is not updated with Bureau of Economic
+Analysis data: that update only affected 2008-2015, years that are superseded by World
+Bank data in the combined dataset built downstream (see structural_transformation_omm).
+US value added is updated with the current release of the same BEA dataset used in 2017
+(the NAICS-based historical GDP by industry statistics, 1947-1997); the 2017 compilation
+additionally extended US value added to 2016 with BEA's current accounts, years that are
+also superseded by World Bank data downstream.
 
 Sectors follow the convention of Herrendorf, Rogerson and Valentinyi (2014): utilities
 are classified within services, not industry.
@@ -28,26 +32,26 @@ EMPLOYMENT_COLUMNS = [f"number_employed_{sector}" for sector in SECTORS]
 SHARE_COLUMNS = [f"share_gdp_{sector}" for sector in SECTORS]
 
 # Compilation recipe, following the 2017 documentation. The base source is Herrendorf,
-# Rogerson and Valentinyi (2014). "va" and "emp" list (first_year, last_year) spans that
-# are replaced with the GGDC 10-Sector Database; last_year None means "onwards".
+# Rogerson and Valentinyi (2014). "va" and "emp" list (source, first_year, last_year)
+# spans that are replaced with another source; last_year None means "onwards".
 # "va_drop_years" / "emp_drop_years" remove observations:
 #   - Finland: negative value added for services in 1917-1920 and 1945-1946.
 #   - France: apparent typo in the 1937 value added data.
 #   - United States: no services or industry employment in 1800-1830.
 RECIPE = {
     "Belgium": {},
-    "Spain": {"va": [(1970, None)]},
+    "Spain": {"va": [("ggdc", 1970, None)]},
     "Finland": {"va_drop_years": [1917, 1918, 1919, 1920, 1945, 1946]},
-    "France": {"va": [(1970, None)], "va_drop_years": [1937]},
-    "Japan": {"va": [(1953, None)], "emp": [(1953, None)]},
+    "France": {"va": [("ggdc", 1970, None)], "va_drop_years": [1937]},
+    "Japan": {"va": [("ggdc", 1953, None)], "emp": [("ggdc", 1953, None)]},
     # NOTE: The 2017 documentation says South Korean value added was updated with GGDC from
     # 1953 onwards, but the published 2017 values match Herrendorf et al. through 1962 and
     # GGDC only from 1963 (the same year as the employment switch), so 1963 is used here.
-    "South Korea": {"va": [(1963, None)], "emp": [(1963, None)]},
-    "Netherlands": {"va": [(1970, None)], "emp": [(1949, 1949), (1960, None)]},
+    "South Korea": {"va": [("ggdc", 1963, None)], "emp": [("ggdc", 1963, None)]},
+    "Netherlands": {"va": [("ggdc", 1970, None)], "emp": [("ggdc", 1949, 1949), ("ggdc", 1960, None)]},
     "Sweden": {"replace_all": True},
-    "United Kingdom": {"va": [(1960, None)], "emp": [(1948, None)]},
-    "United States": {"emp_drop_years": [1800, 1810, 1820, 1830]},
+    "United Kingdom": {"va": [("ggdc", 1960, None)], "emp": [("ggdc", 1948, None)]},
+    "United States": {"va": [("bea", 1947, None)], "emp_drop_years": [1800, 1810, 1820, 1830]},
 }
 
 # Countries to keep from the GGDC 10-Sector Database (before harmonization).
@@ -85,6 +89,26 @@ LUND_EMP_BUCKETS = {
     "services": ["transport_communication", "private_services", "public_services"],
 }
 
+# Aggregation of the BEA (NAICS-based) industries into the three broad sectors, following
+# the convention of Herrendorf, Rogerson and Valentinyi (2014): utilities in services.
+BEA_BUCKETS = {
+    "agriculture": ["Agriculture, forestry, fishing, and hunting"],
+    "industry": ["Mining", "Construction", "Manufacturing"],
+    "services": [
+        "Utilities",
+        "Wholesale trade",
+        "Retail trade",
+        "Transportation and warehousing",
+        "Information",
+        "Finance, insurance, real estate, rental, and leasing",
+        "Professional and business services",
+        "Educational services, health care, and social assistance",
+        "Arts, entertainment, recreation, accommodation, and food services",
+        "Other services, except government",
+        "Government",
+    ],
+}
+
 
 def run() -> None:
     #
@@ -93,11 +117,13 @@ def run() -> None:
     ds_hrv = paths.load_dataset("herrendorf_rogerson_valentinyi")
     ds_ggdc = paths.load_dataset("ggdc_10_sector")
     ds_lund = paths.load_dataset("swedish_historical_national_accounts")
+    ds_bea = paths.load_dataset("gdp_by_industry_historical")
 
     tb_hrv = ds_hrv.read("herrendorf_rogerson_valentinyi")
     tb_ggdc = ds_ggdc.read("ggdc_10_sector")
     tb_lund_va = ds_lund.read("value_added")
     tb_lund_emp = ds_lund.read("employment")
+    tb_bea = ds_bea.read("gdp_by_industry_historical")
 
     #
     # Process data.
@@ -107,25 +133,38 @@ def run() -> None:
     tb_hrv = paths.regions.harmonize_names(tb=tb_hrv)
     tb_ggdc = paths.regions.harmonize_names(tb=tb_ggdc)
 
-    sanity_check_inputs(tb_hrv=tb_hrv, tb_ggdc=tb_ggdc, tb_lund_va=tb_lund_va, tb_lund_emp=tb_lund_emp)
+    sanity_check_inputs(tb_hrv=tb_hrv, tb_ggdc=tb_ggdc, tb_lund_va=tb_lund_va, tb_lund_emp=tb_lund_emp, tb_bea=tb_bea)
 
     tb_hrv = prepare_hrv(tb_hrv)
     tb_ggdc = prepare_ggdc(tb_ggdc)
     tb_lund = prepare_lund(tb_lund_va, tb_lund_emp)
+    tb_bea = prepare_bea(tb_bea)
 
-    tb = apply_recipe(tb_hrv=tb_hrv, tb_ggdc=tb_ggdc, tb_lund=tb_lund)
+    tb = apply_recipe(tb_hrv=tb_hrv, overrides={"ggdc": tb_ggdc, "bea": tb_bea}, tb_lund=tb_lund)
 
     # Round employment to whole persons.
     tb[EMPLOYMENT_COLUMNS] = tb[EMPLOYMENT_COLUMNS].round()
 
-    # Each output column combines the three sources, so assign the union of origins.
-    origins = []
-    for tb_source in [tb_hrv, tb_ggdc, tb_lund]:
-        for origin in tb_source["number_employed_agriculture"].m.origins:
-            if origin not in origins:
-                origins.append(origin)
-    for column in EMPLOYMENT_COLUMNS + SHARE_COLUMNS:
-        tb[column].metadata.origins = origins
+    # Each output column combines several sources, so assign the union of origins.
+    employment_origins = union_source_origins(
+        [
+            tb_hrv["number_employed_agriculture"],
+            tb_ggdc["number_employed_agriculture"],
+            tb_lund["number_employed_agriculture"],
+        ]
+    )
+    share_origins = union_source_origins(
+        [
+            tb_hrv["share_gdp_agriculture"],
+            tb_ggdc["share_gdp_agriculture"],
+            tb_lund["share_gdp_agriculture"],
+            tb_bea["share_gdp_agriculture"],
+        ]
+    )
+    for column in EMPLOYMENT_COLUMNS:
+        tb[column].metadata.origins = employment_origins
+    for column in SHARE_COLUMNS:
+        tb[column].metadata.origins = share_origins
 
     sanity_check_outputs(tb)
 
@@ -252,7 +291,29 @@ def prepare_lund(tb_va: Table, tb_emp: Table) -> Table:
     return tb
 
 
-def apply_recipe(tb_hrv: Table, tb_ggdc: Table, tb_lund: Table) -> Table:
+def prepare_bea(tb: Table) -> Table:
+    """Aggregate the BEA industries into the three broad sectors and compute shares."""
+    tb = tb.pivot(index="year", columns="industry", values="value_added").reset_index()
+
+    # Value added at current prices (millions of dollars), aggregated into buckets.
+    for bucket, industries in BEA_BUCKETS.items():
+        tb[f"va_{bucket}"] = tb[industries].sum(axis=1, min_count=len(industries))
+
+    # The sum of the three buckets covers every industry, so it should reconcile with GDP.
+    va_sum = tb["va_agriculture"] + tb["va_industry"] + tb["va_services"]
+    error = "BEA sector value added does not reconcile with the reported gross domestic product."
+    assert ((va_sum - tb["Gross domestic product"]).abs() / tb["Gross domestic product"] < 0.001).all(), error
+
+    # Value added shares of the total value added of the three sectors, at current prices.
+    for sector in SECTORS:
+        tb[f"share_gdp_{sector}"] = tb[f"va_{sector}"] / va_sum * 100
+
+    tb["country"] = "United States"
+
+    return tb[["country", "year"] + SHARE_COLUMNS]
+
+
+def apply_recipe(tb_hrv: Table, overrides: dict, tb_lund: Table) -> Table:
     """Apply the 2017 compilation recipe country by country."""
     tables = []
     for country, rules in RECIPE.items():
@@ -260,8 +321,8 @@ def apply_recipe(tb_hrv: Table, tb_ggdc: Table, tb_lund: Table) -> Table:
             tb_country = tb_lund[tb_lund["country"] == country].copy()
         else:
             tb_country = tb_hrv[tb_hrv["country"] == country].copy()
-            tb_country = apply_overrides(tb_country, tb_ggdc, country, rules.get("emp", []), EMPLOYMENT_COLUMNS)
-            tb_country = apply_overrides(tb_country, tb_ggdc, country, rules.get("va", []), SHARE_COLUMNS)
+            tb_country = apply_overrides(tb_country, overrides, country, rules.get("emp", []), EMPLOYMENT_COLUMNS)
+            tb_country = apply_overrides(tb_country, overrides, country, rules.get("va", []), SHARE_COLUMNS)
             for year in rules.get("va_drop_years", []):
                 tb_country.loc[tb_country["year"] == year, SHARE_COLUMNS] = float("nan")
             for year in rules.get("emp_drop_years", []):
@@ -276,9 +337,10 @@ def apply_recipe(tb_hrv: Table, tb_ggdc: Table, tb_lund: Table) -> Table:
     return tb
 
 
-def apply_overrides(tb_country: Table, tb_override: Table, country: str, spans: list, columns: list) -> Table:
+def apply_overrides(tb_country: Table, overrides: dict, country: str, spans: list, columns: list) -> Table:
     """Replace the values of `columns` in the given year spans with the override source."""
-    for first_year, last_year in spans:
+    for source, first_year, last_year in spans:
+        tb_override = overrides[source]
         year_mask = tb_country["year"] >= first_year
         override_mask = tb_override["year"] >= first_year
         if last_year is not None:
@@ -299,7 +361,17 @@ def apply_overrides(tb_country: Table, tb_override: Table, country: str, spans: 
     return tb_country
 
 
-def sanity_check_inputs(tb_hrv: Table, tb_ggdc: Table, tb_lund_va: Table, tb_lund_emp: Table) -> None:
+def union_source_origins(variables: list) -> list:
+    """Union of the origins of several variables, preserving order."""
+    origins = []
+    for variable in variables:
+        for origin in variable.m.origins:
+            if origin not in origins:
+                origins.append(origin)
+    return origins
+
+
+def sanity_check_inputs(tb_hrv: Table, tb_ggdc: Table, tb_lund_va: Table, tb_lund_emp: Table, tb_bea: Table) -> None:
     error = "Herrendorf, Rogerson and Valentinyi data does not contain the expected countries."
     assert set(tb_hrv["country"]) == set(RECIPE), error
 
@@ -316,6 +388,13 @@ def sanity_check_inputs(tb_hrv: Table, tb_ggdc: Table, tb_lund_va: Table, tb_lun
 
     error = "SHNA tables should only contain Sweden."
     assert set(tb_lund_va["country"]) == set(tb_lund_emp["country"]) == {"Sweden"}, error
+
+    error = "BEA data does not contain the expected industries."
+    bea_industries = [industry for bucket in BEA_BUCKETS.values() for industry in bucket]
+    assert set(bea_industries) <= set(tb_bea["industry"]), error
+
+    error = "BEA data does not cover the expected years."
+    assert tb_bea["year"].min() == 1947 and tb_bea["year"].max() == 1997, error
 
 
 def sanity_check_outputs(tb: Table) -> None:
@@ -351,6 +430,8 @@ def sanity_check_outputs(tb: Table) -> None:
         ("United Kingdom", 1801, "number_employed_agriculture", 1426000, 1),
         ("Japan", 1953, "number_employed_agriculture", 17081689, 2),
         ("South Korea", 1963, "share_gdp_agriculture", 41.41, 0.1),
+        # BEA-sourced (the frozen value is 6.6, rounded to one decimal in the BEA source).
+        ("United States", 1950, "share_gdp_agriculture", 6.6, 0.15),
     ]
     for country, year, column, expected, tolerance in spot_checks:
         value = tb.loc[(tb["country"] == country) & (tb["year"] == year), column].iloc[0]
