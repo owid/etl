@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass, field
+from typing import Any
 
 from owid.catalog.core.datasets import CHANNEL
 from owid.catalog.core.meta import DatasetMeta
@@ -41,6 +43,18 @@ def is_reserved_namespace(namespace: str) -> bool:
     if namespace.startswith("sitemap") and namespace.endswith(".xml"):
         return True
     return False
+
+
+def jsonld_contains_raw_jinja(jsonld: dict[str, Any]) -> bool:
+    """Return True if the serialized JSON-LD still contains Jinja template markers.
+
+    Variable metadata in long-format tables is Jinja-templated (rendered per dimension
+    combination by grapher, not by the catalog). ``schema_org`` guards the fields it knows
+    about; this is the last line of defense so an unguarded field can never ship a raw
+    template to the public page.
+    """
+    text = json.dumps(jsonld, ensure_ascii=False)
+    return "<%" in text or "<<" in text
 
 
 def find_duplicate_short_key_paths(entries: Iterable[tuple[str, str, str]]) -> set[str]:

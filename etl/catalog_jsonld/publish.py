@@ -34,6 +34,8 @@ def build_and_publish_catalog_jsonld(
 
     When ``only`` is given, restrict generation to datasets whose
     ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
+    Otherwise only datasets that opt in via ``dataset: jsonld: true`` in their
+    metadata are considered.
 
     ``active_steps`` overrides the set of active DAG step URIs used to exclude stale,
     archived on-disk builds (see :func:`etl.catalog_jsonld.artifacts.latest_dataset_paths`).

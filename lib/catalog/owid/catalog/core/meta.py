@@ -537,6 +537,10 @@ class DatasetMeta(MetaBase):
     update_period_days: int | None = None
     # prohibit redistribution (disable chart download)
     non_redistributable: bool = False
+    # opt this dataset into the public catalog landing page / Schema.org JSON-LD publication
+    # (canary rollout of the catalog-discovery project; set via `dataset: jsonld: true` in
+    # the garden step's .meta.yml)
+    jsonld: bool = False
     # OWID team members who maintain this dataset; first entry is the accountable owner
     owners: list[str] = field(default_factory=list)
 

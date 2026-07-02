@@ -725,6 +725,8 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 180
+  # Canary for the public catalog landing page / Schema.org JSON-LD (catalog-discovery project).
+  jsonld: true
 
   owners:
     - Pablo Arriagada

@@ -15,10 +15,20 @@ import pyarrow.parquet as pq
 from owid.catalog.api.legacy import CHANNEL, LocalCatalog
 from owid.catalog.core.datasets import SUPPORTED_FORMATS, Dataset
 from owid.catalog.core.meta import TableMeta, VariableMeta
-from owid.catalog.schema_org import DEFAULT_CATALOG_BASE_URL, TableSchemaInput, dataset_to_schema_org
+from owid.catalog.schema_org import (
+    DEFAULT_CATALOG_BASE_URL,
+    ENTITY_TIME_DIMENSIONS,
+    TableSchemaInput,
+    dataset_to_schema_org,
+)
 from structlog import get_logger
 
-from etl.catalog_jsonld.quality import DatasetQualityResult, assess_dataset_quality, find_duplicate_short_key_paths
+from etl.catalog_jsonld.quality import (
+    DatasetQualityResult,
+    assess_dataset_quality,
+    find_duplicate_short_key_paths,
+    jsonld_contains_raw_jinja,
+)
 from etl.catalog_jsonld.sitemap import SitemapEntry, sitemap_xml
 from etl.dag_helpers import graph_nodes, load_dag
 from etl.paths import DATA_DIR
@@ -76,7 +86,8 @@ def build_catalog_jsonld_artifacts(
     (``catalog_dir / "<namespace>" / "<dataset>" / "dataset.jsonld"``) rather than inside the
     dataset's own dated catalog folder, so the public landing page URL doesn't change every
     time the dataset gets a new version. When ``only`` is given, restrict generation to
-    datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
+    datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist);
+    otherwise only datasets that opt in via ``DatasetMeta.jsonld`` are considered.
 
     ``active_steps`` overrides the set of active DAG step URIs used to exclude stale,
     archived on-disk builds (see :func:`latest_dataset_paths`). Defaults to the real DAG;
@@ -114,6 +125,12 @@ def build_catalog_jsonld_artifacts(
     for entry in latest_paths:
         catalog_path = entry.catalog_path
         ds = Dataset(catalog_dir / catalog_path)
+        # Without an explicit allowlist, only datasets that opt in via `dataset: jsonld: true`
+        # in their metadata are considered (canary rollout of the catalog-discovery project).
+        # Unflagged datasets are invisible to this build: not emitted, not reported, and any
+        # previously published artifacts are left untouched.
+        if only is None and not ds.metadata.jsonld:
+            continue
         tables = load_table_schema_inputs(ds)
         quality = assess_dataset_quality(
             catalog_path=catalog_path,
@@ -141,6 +158,19 @@ def build_catalog_jsonld_artifacts(
             tables=tables,
             base_url=base_url,
         )
+        # Safety net: metadata fields can be Jinja templates (long-format tables render them
+        # per dimension combination elsewhere). schema_org guards the known fields, but any
+        # template that still leaks into the output must never ship — skip the dataset instead.
+        if jsonld_contains_raw_jinja(jsonld):
+            quality.blockers.append("raw_jinja_in_jsonld")
+            result.skipped.append(quality)
+            result.skipped_entries.append(entry)
+            log.warning("catalog_jsonld.raw_jinja_in_jsonld", dataset=catalog_path)
+            if not dry_run:
+                _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
+                _remove_if_exists(catalog_dir / entry.namespace / entry.dataset / DATASET_JSONLD_FILENAME)
+            continue
+
         result.emitted.append(catalog_path)
         result.emitted_entries.append(entry)
         if quality.warnings or quality.table_warnings:
@@ -318,6 +348,12 @@ def load_table_schema_inputs(ds: Dataset) -> list[TableSchemaInput]:
             formats=formats,
             primary_key=table_meta.primary_key,
         )
+        dimension_values, representative_dimensions = _dimension_values_from_table_data(
+            dataset_path=dataset_path,
+            table_name=table_meta.short_name,
+            formats=formats,
+            table_meta=table_meta,
+        )
         tables.append(
             TableSchemaInput(
                 short_name=table_meta.short_name,
@@ -327,6 +363,8 @@ def load_table_schema_inputs(ds: Dataset) -> list[TableSchemaInput]:
                 primary_key=table_meta.primary_key,
                 temporal_coverage=temporal_coverage,
                 spatial_coverage=spatial_coverage,
+                dimension_values=dimension_values,
+                representative_dimensions=representative_dimensions,
             )
         )
     return tables
@@ -371,9 +409,7 @@ def _coverage_from_table_data(
     if not wanted_columns:
         return None, None
 
-    tb = _read_coverage_columns(
-        dataset_path=dataset_path, table_name=table_name, formats=formats, columns=wanted_columns
-    )
+    tb = _read_table_columns(dataset_path=dataset_path, table_name=table_name, formats=formats, columns=wanted_columns)
     if tb is None:
         return None, "Worldwide" if "country" in columns else None
 
@@ -382,7 +418,51 @@ def _coverage_from_table_data(
     return temporal_coverage, spatial_coverage
 
 
-def _read_coverage_columns(
+def _dimension_values_from_table_data(
+    *, dataset_path: Path, table_name: str, formats: list[str], table_meta: TableMeta
+) -> tuple[dict[str, list[Any]], dict[str, Any]]:
+    """Read distinct values per dimension column, plus one representative dimension combination.
+
+    Long-format tables declare their dimension columns in ``TableMeta.dimensions``; the values
+    only exist in the data. The representative combination (the most frequent one) is used to
+    render Jinja-templated variable metadata into a concrete example.
+    """
+    slugs = [
+        dimension["slug"]
+        for dimension in table_meta.dimensions or []
+        if dimension["slug"] not in ENTITY_TIME_DIMENSIONS
+    ]
+    if not slugs:
+        return {}, {}
+    df = _read_table_columns(dataset_path=dataset_path, table_name=table_name, formats=formats, columns=slugs)
+    if df is None:
+        return {}, {}
+
+    dimension_values: dict[str, list[Any]] = {}
+    for slug in slugs:
+        values = [_as_python_scalar(value) for value in df[slug].dropna().unique()]
+        try:
+            values.sort()
+        except TypeError:
+            values.sort(key=str)
+        dimension_values[slug] = values
+
+    representative_dimensions: dict[str, Any] = {}
+    combos = df.dropna()
+    if not combos.empty:
+        top = combos.value_counts().index[0]
+        if not isinstance(top, tuple):
+            top = (top,)
+        representative_dimensions = {slug: _as_python_scalar(value) for slug, value in zip(combos.columns, top)}
+    return dimension_values, representative_dimensions
+
+
+def _as_python_scalar(value: Any) -> Any:
+    # numpy scalars compare fine but serialize badly (json.dump chokes on np.int64).
+    return value.item() if hasattr(value, "item") else value
+
+
+def _read_table_columns(
     *, dataset_path: Path, table_name: str, formats: list[str], columns: list[str]
 ) -> pd.DataFrame | None:
     for format in formats:

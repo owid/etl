@@ -174,3 +174,11 @@ def test_missing_table_description_warned_when_no_description_anywhere() -> None
         tables=[_table("table_a")],
     )
     assert result.table_warnings["table_a"] == ["missing_table_description"]
+
+
+def test_jsonld_contains_raw_jinja_detects_template_markers() -> None:
+    from etl.catalog_jsonld.quality import jsonld_contains_raw_jinja
+
+    assert jsonld_contains_raw_jinja({"name": '<% if x == "a" %>A<% endif %>'})
+    assert jsonld_contains_raw_jinja({"hasPart": [{"description": "The value of <<x>>."}]})
+    assert not jsonld_contains_raw_jinja({"name": "Plain text", "description": "1 < 2 and 3 > 2"})
