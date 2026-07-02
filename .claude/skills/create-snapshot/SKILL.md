@@ -26,7 +26,7 @@ Use WebFetch to fetch `url_main`. From the page content, extract as much metadat
 | Field | Where to look |
 |-------|---------------|
 | `title` | Page `<title>`, main heading, dataset title |
-| `description` | Page description, abstract, or "about" section |
+| `description` | Page description, abstract, or "about" section — copy the producer's text **verbatim**, don't paraphrase. For academic papers, use the abstract verbatim. If the page prose spans several paragraphs, take all of them (skip only navigation/boilerplate) |
 | `producer` | Organisation name, data owner, author |
 | `citation_full` | Official citation or "how to cite" section |
 | `attribution_short` | Short org name / acronym |
@@ -81,8 +81,12 @@ meta:
   origin:
     # Data product / Snapshot
     title: "<title>"
-    description: |-               # omit block if empty
+    title_snapshot: "<title> - <file specifics>"   # only when the file is one table/extract of a broader data product
+    description: |-               # omit block if empty; verbatim producer text
       <description>
+    description_snapshot: |-      # required whenever title_snapshot is set; own wording is fine here
+      <what this specific file contains: table number, variables, units, years, plus any OWID-side
+      context such as manual transcription or retrieval from an archived copy>
     date_published: "<date_published>"
 
     # Citation
@@ -187,3 +191,5 @@ Show:
 - The `outs` block `md5` and `size` fields are filled in automatically by DVC when the snapshot runs — just set them to empty/zero in the template.
 - Omit optional YAML fields entirely (don't leave them blank) to keep the DVC file clean.
 - Never guess at citation text — if you can't find it on the page, leave a placeholder like `<TO BE FILLED>` and ask the user.
+- `description` must be the producer's own words, copied verbatim from the landing page or the paper's abstract — a fluent paraphrase is not acceptable. Verify against the actual page text.
+- When the snapshot is a single file/table of a broader data product, split the metadata: `title`/`description` describe the data product (verbatim), while `title_snapshot`/`description_snapshot` describe the specific file. Whenever `title_snapshot` is set, also write a `description_snapshot` — that one doesn't need to be verbatim. OWID-side context (hand-transcription notes, "retrieved from the Internet Archive", etc.) belongs in `description_snapshot`, never inside the producer's `description`.
