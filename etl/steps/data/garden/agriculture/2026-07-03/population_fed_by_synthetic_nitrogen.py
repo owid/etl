@@ -9,16 +9,13 @@ Rosa & Gabrielli (2023, https://doi.org/10.1088/1748-9326/aca815), whose country
 own words, consistent with the earlier estimates for the year 2000.
 """
 
+import pandas as pd
 from owid.catalog import Table
-from owid.catalog import processing as pr
-from structlog import get_logger
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-log = get_logger()
 
 # First year of the output series (first year of the digitized curve in Figure 1 of Erisman et al. (2008)).
 YEAR_MIN = 1900
@@ -32,40 +29,37 @@ YEAR_LAST_ERISMAN = 2008
 # 3.8 billion people fed, roughly half of the world population) they report as consistent with the year-2000 estimates.
 SHARE_FED_RECENT = 48.0
 
+# Name of the column with the digitized share.
+SHARE_COLUMN = "share_of_population_fed_by_synthetic_nitrogen"
 
-def sanity_check_inputs(tb: Table, tb_population: Table) -> None:
-    # Expected digitized years and shares from Figure 1 of Erisman et al. (2008).
+
+def sanity_check_inputs(tb: Table, last_year: int) -> None:
+    # Expected digitized years from Figure 1 of Erisman et al. (2008).
     expected_years = {1900, 1910, 1930, 1940, 1950, 1955, 1960, 1970, 1980, 1990, 2000, 2008}
     assert set(tb["year"]) == expected_years, "Digitized years changed unexpectedly."
-    share = tb.sort_values("year")["share_of_population_fed_by_synthetic_nitrogen"]
+    share = tb.sort_values("year")[SHARE_COLUMN]
     assert share.notna().all(), "Digitized share contains missing values."
     assert (share.diff().dropna() >= 0).all(), "Digitized share is expected to be monotonically non-decreasing."
     assert share.iloc[0] == 0, "Share in 1900 is expected to be zero."
     assert share.iloc[-1] == SHARE_FED_RECENT, (
         "Share in 2008 is expected to coincide with the share assumed for recent years."
     )
-
-    # World population must be annual and positive over the full output period.
-    years_population = tb_population[tb_population["year"] >= YEAR_MIN]["year"]
-    assert set(years_population) == set(range(YEAR_MIN, years_population.max() + 1)), (
-        "World population is expected to be annual since 1900."
-    )
-    assert (tb_population["population"] > 0).all(), "World population is expected to be positive."
-    assert years_population.max() >= 2023, "World population series ends earlier than expected."
+    assert last_year >= 2023, "Population estimates end earlier than expected."
 
 
 def sanity_check_outputs(tb: Table) -> None:
     assert tb.columns[tb.isna().all()].empty, "Output has a fully-NaN column."
+    assert tb["world_population"].notna().all(), "World population has missing values."
     assert (tb["world_population"] > 0).all(), "World population is expected to be positive."
     # Where the share is defined, the two estimated populations must add up to the total.
-    defined = tb.dropna(subset=["share_of_population_fed_by_synthetic_nitrogen"])
+    defined = tb.dropna(subset=[SHARE_COLUMN])
     assert (
         (defined["population_fed_by_synthetic_nitrogen"] + defined["population_not_fed_by_synthetic_nitrogen"])
         == defined["world_population"]
     ).all(), "Estimated populations fed and not fed by synthetic nitrogen do not add up to the world population."
     # The share must be defined for all years after the last estimate by Erisman et al. (2008).
     recent = tb[tb["year"] >= YEAR_LAST_ERISMAN]
-    assert (recent["share_of_population_fed_by_synthetic_nitrogen"] == SHARE_FED_RECENT).all(), (
+    assert (recent[SHARE_COLUMN] == SHARE_FED_RECENT).all(), (
         "Share of population fed is expected to be constant in recent years."
     )
 
@@ -78,38 +72,41 @@ def run() -> None:
     ds_meadow = paths.load_dataset("population_fed_by_synthetic_nitrogen")
     tb = ds_meadow.read("population_fed_by_synthetic_nitrogen")
 
-    # Load population dataset and read the table of population estimates (without projections).
+    # Load population dataset.
     ds_population = paths.load_dataset("population")
-    tb_population = ds_population.read("historical")
 
     #
     # Process data.
     #
-    # Select world population estimates for the relevant years.
-    tb_population = tb_population[
-        (tb_population["country"] == "World") & (tb_population["year"] >= YEAR_MIN)
-    ].reset_index(drop=True)
-    tb_population = tb_population[["country", "year", "population_historical"]].rename(
-        columns={"population_historical": "population"}, errors="raise"
-    )
+    # Find the last year for which population estimates (not projections) are available, to avoid extending the series
+    # into projected future years.
+    tb_historical = ds_population.read("historical")
+    last_year = int(tb_historical.loc[tb_historical["country"] == "World", "year"].max())
 
-    sanity_check_inputs(tb=tb, tb_population=tb_population)
+    sanity_check_inputs(tb=tb, last_year=last_year)
 
-    # Combine the (sparse) digitized share with the (annual) world population.
-    tb = pr.merge(tb_population, tb, on="year", how="left")
+    # Build an annual "World" spine from 1900 to the last year with population estimates.
+    tb_spine = Table(pd.DataFrame({"country": "World", "year": range(YEAR_MIN, last_year + 1)}))
+
+    # Merge the (sparse) digitized share onto the annual spine.
+    tb = tb_spine.merge(tb, on="year", how="left")
 
     # Erisman et al. (2008) estimates end in 2008; assume the share remains constant afterwards.
-    tb.loc[tb["year"] > YEAR_LAST_ERISMAN, "share_of_population_fed_by_synthetic_nitrogen"] = SHARE_FED_RECENT
+    tb.loc[tb["year"] > YEAR_LAST_ERISMAN, SHARE_COLUMN] = SHARE_FED_RECENT
+
+    # Add world population using the shared helper. This attaches the single, collapsed "Various sources" population
+    # origin (instead of the disaggregated HYDE/Gapminder/UN WPP origins from the raw population table).
+    tb = paths.regions.add_population(tb, population_col="world_population")
 
     # Estimate the number of people fed by synthetic nitrogen fertilizers, and the number of people that could be
     # supported without them.
-    tb["population_fed_by_synthetic_nitrogen"] = (
-        tb["share_of_population_fed_by_synthetic_nitrogen"] / 100 * tb["population"]
-    ).round(0)
-    tb["population_not_fed_by_synthetic_nitrogen"] = tb["population"] - tb["population_fed_by_synthetic_nitrogen"]
-
-    # Rename the total population column for clarity (the only entity in this dataset is the World).
-    tb = tb.rename(columns={"population": "world_population"}, errors="raise")
+    tb["population_fed_by_synthetic_nitrogen"] = (tb[SHARE_COLUMN] / 100 * tb["world_population"]).round(0)
+    tb["population_not_fed_by_synthetic_nitrogen"] = tb["world_population"] - tb["population_fed_by_synthetic_nitrogen"]
+    # Both derived populations come from the same two sources; keep the order consistent (data source before
+    # population), so the population origin is not listed first.
+    tb["population_not_fed_by_synthetic_nitrogen"].metadata.origins = tb[
+        "population_fed_by_synthetic_nitrogen"
+    ].metadata.origins
 
     sanity_check_outputs(tb=tb)
 
