@@ -1255,5 +1255,5 @@ def get_chart_in_article_views_cached(chart_ids: list[int]) -> dict[int, list[Ar
     return (
         df_articles.groupby("chart_id")[["url", "views_daily", "title"]]
         .apply(lambda x: [ArticleRef(row["url"], row["title"], row["views_daily"]) for _, row in x.iterrows()])
-        .to_dict()
+        .to_dict()  # ty: ignore
     )

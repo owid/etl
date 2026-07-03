@@ -105,7 +105,7 @@ def owidb_submit_review_id(object_type: str, object_id: int):
 #####################################
 # LLM                               #
 #####################################
-def get_chart_summary(chart) -> dict[str, str | int | float] | None:
+def get_chart_summary(chart) -> dict[str, str | int | float | ChartSuggestion] | None:
     """Summarize chart details with LLM using structured input/output.
 
     Generates a message to be shared on Slack.
@@ -230,13 +230,13 @@ def compute_config_diff(old: Any, new: Any, path: str = "") -> dict[str, Any]:
     - {"added": value} for new fields
     - {"removed": value} for removed fields
     """
-    diff = {}
+    diff: dict[str, Any] = {}
 
     # Both are dicts - recurse
     if isinstance(old, dict) and isinstance(new, dict):
         all_keys = set(old.keys()) | set(new.keys())
         for key in all_keys:
-            key_path = f"{path}.{key}" if path else key
+            key_path = f"{path}.{key}" if path else str(key)
             if key not in old:
                 diff[key_path] = {"added": new[key]}
             elif key not in new:

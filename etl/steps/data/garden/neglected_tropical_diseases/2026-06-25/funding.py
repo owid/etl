@@ -17,30 +17,30 @@ paths = PathFinder(__file__)
 NTDS = [
     "Buruli ulcer",
     "Kinetoplastid diseases - Chagas' disease",
-    "Chikungunya",  # New
+    "Chikungunya",  # In the dataset as "Togaviridae (including Alphaviruses e.g. CHIKV) - Chikungunya (CHIKV)"
     "Dengue",
-    "Hookworm (ancylostomiasis & necatoriasis)",
     "Kinetoplastid diseases - Leishmaniasis",
     "Leprosy",
     "Helminth infections (worms & flukes) - Lymphatic filariasis (elephantiasis)",
     "Helminth infections (worms & flukes) - Multiple helminth infections",
+    "Helminth infections (worms & flukes) - Hookworm (ancylostomiasis & necatoriasis)",
     "Kinetoplastid diseases - Multiple kinetoplastid diseases",
     "Mycetoma",
     "Helminth infections (worms & flukes) - Onchocerciasis (river blindness)",
     "Helminth infections (worms & flukes) - Roundworm (ascariasis)",
     "Scabies",
     "Helminth infections (worms & flukes) - Schistosomiasis (bilharziasis)",
-    "Kinetoplastid diseases - Sleeping sickness (HAT)",
+    "Kinetoplastid diseases - Sleeping sickness (HAT)",  # Human African trypanosomiasis
     "Snakebite envenoming",
     "Helminth infections (worms & flukes) - Strongyloidiasis & other intestinal roundworms",
     "Helminth infections (worms & flukes) - Tapeworm (taeniasis / cysticercosis)",
     "Trachoma",
     "Helminth infections (worms & flukes) - Whipworm (trichuriasis)",
     "Yaws",
+    # Diseases recognized by WHO as NTDs but not in G-Finder
     # "Dracunculiasis",
     # "Echinococcosis",
-    # "Foodborne trematodiases",
-    # "Human African trypanosomiasis",
+    # "Foodborne trematodiases"
 ]
 
 
@@ -53,23 +53,38 @@ def run() -> None:
     ds_meadow = paths.load_dataset("funding")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["funding"].reset_index()
+    tb = ds_meadow.read("funding")
+
+    # Rename Chikungunya rows
+    tb["disease"] = tb["disease"].replace(
+        {"Togaviridae (including Alphaviruses e.g. CHIKV) - Chikungunya (CHIKV)": "Chikungunya"}
+    )
+
     # Group some of the research technologies (products) into broader groups
     tb = aggregate_products(tb)
+
     # The funding for each disease
     tb_disease = format_table(tb=tb, group=["disease", "year"], index_col=["disease"], short_name="funding_disease")
+
     # Combining the types of malaria
     tb_disease = aggregate_malaria(tb_disease, groupby_cols=[], index_cols=["disease"])
+
     # The funding for each product - across all diseases
     tb_product = format_table(tb=tb, group=["product", "year"], index_col=["product"], short_name="funding_product")
+
     # Funding for each product - across only the NTDs in the dataset
     missing_items = [item for item in NTDS if item not in tb["disease"].values]
-    log.info(f"Missing items in the NTD list: {missing_items}, check if they are in the dataset.")
+    if missing_items:
+        log.warning(f"Missing items in the NTD list: {missing_items}, check if they are in the dataset.")
+    else:
+        log.info("All expected NTDs are present in the dataset.")
+
     tb_product_ntd = tb[tb["disease"].isin(NTDS)].copy()
     tb_product_ntd = tb_product_ntd.rename(columns={"product": "product_ntd"})
     tb_product_ntd = format_table(
         tb=tb_product_ntd, group=["product_ntd", "year"], index_col=["product_ntd"], short_name="funding_product_ntd"
     )
+
     # The funding for each disease*product
     tb_disease_product = format_table(
         tb=tb,
@@ -119,18 +134,21 @@ def aggregate_products(tb: Table) -> Table:
     Aggregate some of the research technologies (products) into broader groups
     """
     replacement_dict = {
+        # Diagnostics and diagnostic platforms
         "Diagnostics": "Diagnostics and diagnostic platforms",
         "General diagnostic platforms & multi-disease diagnostics": "Diagnostics and diagnostic platforms",
+        # Vector control products and research
         "Biological vector control products": "Vector control products and research",
         "Chemical vector control products": "Vector control products and research",
         "Fundamental vector control research": "Vector control products and research",
     }
+
     missing_keys = set(replacement_dict.keys()) - set(tb["product"].unique())
 
     assert len(missing_keys) == 0, f"Missing keys in replacement_dict: {missing_keys}"
     # Going round the houses to replace the values in the product column to aggregate them
-    tb["product"] = tb["product"].astype(str).replace(replacement_dict)
-    tb["product"] = tb["product"].replace("nan", pd.NA)
+    tb["product"] = tb["product"].astype(object).where(tb["product"].notna(), other=pd.NA)
+    tb["product"] = tb["product"].replace(replacement_dict)
     tb["product"] = tb["product"].astype("category")
 
     return tb
