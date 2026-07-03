@@ -175,7 +175,9 @@ definitions:
     <%- endif %>
 
   description_key_tax_caveats: |-
+    <% if welfare_type != "wealth" %>
     Tax records are an important source for WID, but they have limitations. They only capture people who file tax returns, and even where the data is more complete, income that is unreported, evaded, or held offshore may not be captured.
+    <%- endif %>
 
   description_key_relative_poverty: |-
     This is a measure of _relative_ poverty — it captures the share of people whose {definitions.concept_welfare_type} is low by the standards typical in their own country.
