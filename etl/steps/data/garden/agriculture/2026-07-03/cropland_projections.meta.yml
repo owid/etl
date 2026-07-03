@@ -1,0 +1,35 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Land Use
+    unit: hectares
+    short_unit: ha
+    processing_level: major
+    display:
+      numDecimalPlaces: 0
+    description_key:
+      - Cropland — called "arable land" in the source, following FAOSTAT terminology — is the physical area used to grow crops, including both temporary and permanent crops, in rainfed and irrigated production systems.
+      - Projections are based on simulations with FAO's Global Agriculture Perspectives System (GAPS) model, starting from a 2012 base year.
+    description_processing: |-
+      - We calculate the total cropland of each country and scenario by adding up the projected physical areas of all crops, in both rainfed and irrigated production systems.
+      - The world total also includes the projected areas of groups of countries (e.g. "Rest of Sub-Saharan Africa") that are not informed individually in the data; therefore, it is larger than the sum of all individual countries in this dataset.
+
+dataset:
+  update_period_days: 0
+
+tables:
+  cropland_projections:
+    variables:
+      cropland_bau:
+        title: Projected cropland under the Business As Usual scenario
+        description_short: |-
+          Projected area of land used to grow crops, under FAO's "Business As Usual" scenario, where historical trends in food and agriculture continue.
+      cropland_tss:
+        title: Projected cropland under the Towards Sustainability scenario
+        description_short: |-
+          Projected area of land used to grow crops, under FAO's "Towards Sustainability" scenario, where food and agriculture systems shift towards more sustainable practices.
+      cropland_sss:
+        title: Projected cropland under the Stratified Societies scenario
+        description_short: |-
+          Projected area of land used to grow crops, under FAO's "Stratified Societies" scenario, where inequalities across and within countries increase.
