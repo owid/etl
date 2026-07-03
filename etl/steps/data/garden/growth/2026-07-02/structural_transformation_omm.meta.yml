@@ -7,8 +7,6 @@ definitions:
         - Economic Growth
   description_processing_splice: |-
     This indicator combines two sources: recent estimates from the World Bank's World Development Indicators, and a compilation of historical sources built by Our World in Data, based on the dataset published by Herrendorf, Rogerson and Valentinyi (2014) and updated with the GGDC 10-Sector Database (January 2015 release) and the Swedish Historical National Accounts. For each country, World Bank data is used from its first available year onwards; historical sources only inform earlier years.
-  description_processing_compilation: |-
-    This data combines several sources: the base is the dataset published by Herrendorf, Rogerson and Valentinyi (2014), updated country by country with the GGDC 10-Sector Database (January 2015 release), the Swedish Historical National Accounts, and the Bureau of Economic Analysis' GDP by industry statistics for the United States. The country-by-country combination follows the methodology described in https://assets.ourworldindata.org/uploads/2017/10/Documentation-for-Historical-employment-and-output-by-sector-%E2%80%93-OWID-2017.pdf.
   description_key_utilities: |-
     In the historical estimates, utilities (electricity, gas and water) are counted within services, following Herrendorf, Rogerson and Valentinyi (2014). The World Bank counts them within industry. This creates a small definitional break between the historical and recent segments of the industry and services series.
   description_key_employment_concepts: |-
@@ -17,7 +15,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  title: Long-run data on employment and GDP by economic sector
+  title: Long-run data on employment by economic sector
   update_period_days: 365
 
 tables:
@@ -129,44 +127,3 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Number of people employed in services
-      share_gdp_agriculture:
-        title: Share of agriculture in GDP
-        unit: "%"
-        short_unit: "%"
-        description_short: Value added of agriculture, including hunting, forestry and fishing, as a share of the total value added of the three broad economic sectors, at current prices.
-        description_key:
-          - Each sector's value added is measured as a share of the summed value added of the three broad sectors, at current prices, so the three sectors sum to 100%.
-        description_processing: "{definitions.description_processing_compilation}"
-        display:
-          name: Agriculture
-          numDecimalPlaces: 1
-        presentation:
-          title_public: Share of agriculture in GDP
-      share_gdp_industry:
-        title: Share of industry in GDP
-        unit: "%"
-        short_unit: "%"
-        description_short: Value added of industry, including mining, manufacturing and construction, as a share of the total value added of the three broad economic sectors, at current prices.
-        description_key:
-          - Each sector's value added is measured as a share of the summed value added of the three broad sectors, at current prices, so the three sectors sum to 100%.
-          - Utilities (electricity, gas and water) are counted within services rather than industry, following Herrendorf, Rogerson and Valentinyi (2014).
-        description_processing: "{definitions.description_processing_compilation}"
-        display:
-          name: Industry
-          numDecimalPlaces: 1
-        presentation:
-          title_public: Share of industry in GDP
-      share_gdp_services:
-        title: Share of services in GDP
-        unit: "%"
-        short_unit: "%"
-        description_short: Value added of services as a share of the total value added of the three broad economic sectors, at current prices.
-        description_key:
-          - Each sector's value added is measured as a share of the summed value added of the three broad sectors, at current prices, so the three sectors sum to 100%.
-          - Utilities (electricity, gas and water) are counted within services rather than industry, following Herrendorf, Rogerson and Valentinyi (2014).
-        description_processing: "{definitions.description_processing_compilation}"
-        display:
-          name: Services
-          numDecimalPlaces: 1
-        presentation:
-          title_public: Share of services in GDP

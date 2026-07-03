@@ -1,27 +1,22 @@
-"""Long-run data on employment and GDP by broad economic sector (agriculture, industry, services).
+"""Long-run data on employment by broad economic sector (agriculture, industry, services).
 
 Combines three sources:
   - World Bank World Development Indicators (WDI): sector employment shares (ILO-modeled,
     1991 onwards) and total employment.
   - The historical compilation built in structural_transformation_historical (Herrendorf,
-    Rogerson and Valentinyi 2014, updated with the GGDC 10-Sector Database, the Swedish
-    Historical National Accounts and BEA's historical GDP by industry statistics), covering
-    ten currently rich countries since 1800.
+    Rogerson and Valentinyi 2014, updated with the GGDC 10-Sector Database and the Swedish
+    Historical National Accounts), covering ten currently rich countries since 1800.
   - Broadberry and Gardner (2013): benchmark estimates of the share of the labor force
     employed in agriculture in five European countries, 1300-1981.
 
-The employment indicators splice the historical compilation with WDI: for each country and
-indicator, WDI is used from its first available year onwards; historical sources only
-contribute years strictly before that. This avoids mixing definitions within the modern
-segment of a series. Precedence among historical sources for employment shares: shares
-derived from the compilation's employment numbers first, then the Broadberry and Gardner
-benchmarks.
+The indicators splice the historical compilation with WDI: for each country and indicator,
+WDI is used from its first available year onwards; historical sources only contribute
+years strictly before that. This avoids mixing definitions within the modern segment of a
+series. Precedence among historical sources for employment shares: shares derived from the
+compilation's employment numbers first, then the Broadberry and Gardner benchmarks.
 
-The GDP share indicators come solely from the historical compilation, without any WDI
-data. The compilation measures each sector's share of the sectors' summed value added, so
-the three sectors sum to 100%; the World Bank instead publishes sector value added as a
-share of GDP at market prices, a different concept where the sectors sum to 100% minus net
-taxes on products.
+The compilation's value added shares by sector are not published here; they remain
+available in structural_transformation_historical.
 """
 
 from owid.catalog import Table
@@ -38,11 +33,7 @@ paths = PathFinder(__file__)
 SECTORS = ["agriculture", "industry", "services"]
 SHARE_EMPLOYED_COLUMNS = [f"share_employed_{sector}" for sector in SECTORS]
 NUMBER_EMPLOYED_COLUMNS = [f"number_employed_{sector}" for sector in SECTORS]
-SHARE_GDP_COLUMNS = [f"share_gdp_{sector}" for sector in SECTORS]
-INDICATOR_COLUMNS = SHARE_EMPLOYED_COLUMNS + NUMBER_EMPLOYED_COLUMNS + SHARE_GDP_COLUMNS
-
-# Columns spliced with WDI (the GDP shares come solely from the historical compilation).
-WDI_SPLICED_COLUMNS = SHARE_EMPLOYED_COLUMNS + NUMBER_EMPLOYED_COLUMNS
+INDICATOR_COLUMNS = SHARE_EMPLOYED_COLUMNS + NUMBER_EMPLOYED_COLUMNS
 
 # WDI indicators used (columns of the wide wdi table, named after the WDI codes).
 WDI_COLUMNS = {
@@ -122,7 +113,7 @@ def prepare_wdi(tb: Table) -> Table:
         tb[f"number_employed_{sector}"] = (tb[f"share_employed_{sector}"] / 100 * tb["number_employed"]).round()
     tb = tb.drop(columns=["number_employed"])
 
-    tb = tb.dropna(subset=WDI_SPLICED_COLUMNS, how="all").reset_index(drop=True)
+    tb = tb.dropna(subset=INDICATOR_COLUMNS, how="all").reset_index(drop=True)
 
     return tb
 
@@ -139,7 +130,7 @@ def prepare_historical(tb: Table) -> Table:
 
 
 def combine_sources(tb_wdi: Table, tb_historical: Table, tb_broadberry: Table) -> Table:
-    """Combine the sources: employment spliced with WDI, GDP shares from the compilation only."""
+    """Combine the historical sources with WDI, using WDI from its first year per country."""
     tb = pr.merge(tb_wdi, tb_historical, on=["country", "year"], how="outer", suffixes=("", "_hist"))
 
     # Broadberry and Gardner benchmarks: lowest precedence for the agriculture employment share.
@@ -154,7 +145,7 @@ def combine_sources(tb_wdi: Table, tb_historical: Table, tb_broadberry: Table) -
     )
     tb = tb.drop(columns=["share_employed_agriculture_bg"])
 
-    for column in WDI_SPLICED_COLUMNS:
+    for column in INDICATOR_COLUMNS:
         # First year with WDI data, per country.
         first_wdi_year = tb[tb[column].notna()].groupby("country", observed=True)["year"].min()
         cutoff = tb["country"].map(first_wdi_year)
@@ -168,7 +159,7 @@ def combine_sources(tb_wdi: Table, tb_historical: Table, tb_broadberry: Table) -
         tb[column] = tb[column].combine_first(historical)
         tb[column].m.origins = origins
 
-    tb = tb.drop(columns=[f"{column}_hist" for column in WDI_SPLICED_COLUMNS])
+    tb = tb.drop(columns=[f"{column}_hist" for column in INDICATOR_COLUMNS])
     tb = tb.dropna(subset=INDICATOR_COLUMNS, how="all").reset_index(drop=True)
 
     return tb
@@ -194,7 +185,7 @@ def report_splice_discontinuities(tb_wdi: Table, tb_historical: Table) -> None:
     for country in tb_historical["country"].unique():
         tb_hist_country = tb_historical[tb_historical["country"] == country]
         tb_wdi_country = tb_wdi[tb_wdi["country"] == country]
-        for column in WDI_SPLICED_COLUMNS:
+        for column in INDICATOR_COLUMNS:
             hist_values = tb_hist_country.dropna(subset=[column])
             wdi_values = tb_wdi_country.dropna(subset=[column])
             if hist_values.empty or wdi_values.empty:
@@ -239,7 +230,7 @@ def sanity_check_outputs(tb: Table) -> None:
     error = "Duplicate (country, year) rows in the output table."
     assert not tb.duplicated(subset=["country", "year"]).any(), error
 
-    for column in SHARE_EMPLOYED_COLUMNS + SHARE_GDP_COLUMNS:
+    for column in SHARE_EMPLOYED_COLUMNS:
         error = f"{column} has values outside [0, 100]."
         assert tb[column].dropna().between(0, 100.01).all(), error
         error = f"{column} has exact zeros, which would be placeholder values."
@@ -252,20 +243,11 @@ def sanity_check_outputs(tb: Table) -> None:
     error = "Modern era should cover most countries in the world."
     assert tb[tb["year"] == 2019]["share_employed_agriculture"].notna().sum() > 150, error
 
-    # GDP shares come solely from the historical compilation.
-    error = "GDP shares should only exist for the compilation countries."
-    with_gdp = tb.dropna(subset=SHARE_GDP_COLUMNS, how="all")
-    assert set(with_gdp["country"]) == set(COMPILATION_COUNTRIES), error
-
-    error = "GDP shares must sum to 100."
-    share_sum = tb[SHARE_GDP_COLUMNS].dropna().sum(axis=1)
-    assert ((share_sum - 100).abs() < 0.1).all(), error
-
     # No gap between the end of the historical series and the start of the WDI series for
     # the compilation countries: each employment series should be continuous at the splice.
     for country in COMPILATION_COUNTRIES:
         tb_country = tb[tb["country"] == country]
-        for column in WDI_SPLICED_COLUMNS:
+        for column in INDICATOR_COLUMNS:
             years = tb_country.dropna(subset=[column])["year"]
             error = f"Gap around the splice point in {country}, {column}."
             recent = years[years.between(1985, 2000)]
