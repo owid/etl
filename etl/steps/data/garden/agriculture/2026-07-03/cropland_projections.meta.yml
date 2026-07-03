@@ -16,6 +16,7 @@ definitions:
       - The 2012 base year is shared by the three scenarios.
 
 dataset:
+  title: Cropland projections to 2050
   update_period_days: 0
 
 tables:

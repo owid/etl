@@ -15,6 +15,7 @@ definitions:
       - We combine the observed consumption from FAOSTAT Food Balance Sheets with the projected consumption from FAO's 2018 report "The future of food and agriculture - Alternative pathways to 2050" (Business As Usual scenario), without any adjustment. The projections are calibrated to FAOSTAT Food Balance Sheets in their 2012 base year, where both sources agree within a few percent.
 
 dataset:
+  title: Global meat consumption, with projections to 2050
   update_period_days: 365
 
 tables:
