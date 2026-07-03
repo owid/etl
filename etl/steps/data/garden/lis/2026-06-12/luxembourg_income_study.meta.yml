@@ -1101,7 +1101,10 @@ tables:
         description_short: |-
           The share of income received by the poorest 50% of the population.
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Share (bottom 50%) ({definitions.welfare_type})
@@ -1130,6 +1133,8 @@ tables:
         description_short: |-
           The share of income received by the richest 10% of the population.
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
@@ -1160,6 +1165,8 @@ tables:
         description_short: |-
           The share of income received by the middle 40% of the population. The middle 40% is the share of the population whose income lies between the poorest 50% and the richest 10%.
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"

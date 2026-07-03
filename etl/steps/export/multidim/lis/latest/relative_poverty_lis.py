@@ -20,7 +20,7 @@ DIMENSIONS_CONFIG = {
 # in _get_before_vs_after_metadata catches drift in the source.
 OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = "Income is measured after taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received."
 OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = "Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. LIS includes private pensions, meaning a retired person’s before-tax income depends on how their country organizes pensions."
-NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown separately. In most countries, relative poverty is lower after taxes and benefits than before, but the extent varies widely."
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown as separate series. Comparing the two gives a sense of the redistribution achieved through a country's tax and benefits system. In most countries, relative poverty is lower after taxes and benefits than before, but the size of this gap varies widely across countries."
 
 
 def run() -> None:
