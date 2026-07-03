@@ -230,6 +230,11 @@ Two different descriptions, two different jobs. Don't mix them:
 
 If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
 
+### Optional `.dvc` origin fields: use only when needed
+
+- **`title_snapshot` / `description_snapshot`**: only when several snapshots are created from the same data product and need disambiguation (e.g. one bulk download split into multiple files). If a data product maps to a single snapshot, omit both — even if the file is only a subset of the product; describe that subset in `description` instead. Don't copy these fields from existing `.dvc` files that legitimately use them.
+- **`attribution`**: omit — grapher builds the attribution automatically (producer + year). Only set it when the automatic one would be wrong (e.g. the producer requires a specific citation label).
+
 ## Sanity checks
 
 Silent data corruption is one of the easier bugs to miss. A step can run cleanly, pass type checks, and ship to staging while producing wrong numbers — and by the time someone notices on a chart, the bad data may already be live. Sanity checks are how we catch that at build time instead.

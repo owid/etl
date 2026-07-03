@@ -11,14 +11,12 @@ meta:
       - Stratified Societies (SSS): a future of increased inequality.
 
       Projections are provided for a 2012 base year and the years 2030, 2035, 2040 and 2050.
-    title_snapshot: The future of food and agriculture - Alternative pathways to 2050 - Crop production
-    description_snapshot: |-
-      Country-level projections of crop production indicators (arable land, harvested area, crop yields, and cropping intensity), disaggregated by crop and by production system (rainfed or irrigated), for the three scenarios of the report.
 
-      Following FAOSTAT terminology, "arable land" is used in this dataset for the physical area under temporary and permanent agricultural crops (which FAOSTAT calls "cropland").
+      The country-level data on crop production includes projections of arable land, harvested area, crop yields, and cropping intensity, disaggregated by crop and by production system (rainfed or irrigated), for the three scenarios of the report.
+
+      Following FAOSTAT terminology, "arable land" is used in this data for the physical area under temporary and permanent agricultural crops (which FAOSTAT calls "cropland").
     citation_full: |-
       FAO. 2018. The future of food and agriculture - Alternative pathways to 2050. Rome. 224 pp. Licence: CC BY-NC-SA 3.0 IGO.
-    attribution: FAO (2018)
     attribution_short: FAO
     url_main: https://www.fao.org/global-perspectives-studies/food-agriculture-projections-to-2050/en/
     url_download: https://www.fao.org/fileadmin/user_upload/global-perspective/csv/FOFA2050CountryData_Crop-production.csv.zip
