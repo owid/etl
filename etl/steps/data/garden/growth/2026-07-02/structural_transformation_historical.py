@@ -3,15 +3,14 @@
 This step combines several sources into long-run series of employment numbers and value
 added shares by broad economic sector. The base is the dataset published by Herrendorf,
 Rogerson and Valentinyi (2014), updated country by country with the GGDC 10-Sector
-Database (January 2015 release), the Swedish Historical National Accounts, and BEA's
-historical GDP by industry statistics for the United States (1947-1997). The
-country-by-country combination follows the methodology described in
+Database (January 2015 release), the Swedish Historical National Accounts, and BEA's GDP
+by industry statistics for the United States (the historical statistics for 1947-1997 and
+the current accounts from 1998 onwards). The country-by-country combination follows the
+methodology described in
 https://assets.ourworldindata.org/uploads/2017/10/Documentation-for-Historical-employment-and-output-by-sector-%E2%80%93-OWID-2017.pdf
 
-Years from 1991 onwards for employment and from each country's first World Bank year for
-value added are superseded by World Bank data in the combined dataset built downstream
-(see structural_transformation_omm), so this step does not extend the series into that
-era (e.g. US value added beyond 1997).
+Employment years from 1991 onwards are superseded by World Bank data in the combined
+dataset built downstream (see structural_transformation_omm).
 
 Sectors follow the convention of Herrendorf, Rogerson and Valentinyi (2014): utilities
 are classified within services, not industry.
@@ -117,12 +116,14 @@ def run() -> None:
     ds_ggdc = paths.load_dataset("ggdc_10_sector")
     ds_lund = paths.load_dataset("swedish_historical_national_accounts")
     ds_bea = paths.load_dataset("gdp_by_industry_historical")
+    ds_bea_current = paths.load_dataset("gdp_by_industry")
 
     tb_hrv = ds_hrv.read("herrendorf_rogerson_valentinyi")
     tb_ggdc = ds_ggdc.read("ggdc_10_sector")
     tb_lund_va = ds_lund.read("value_added")
     tb_lund_emp = ds_lund.read("employment")
     tb_bea = ds_bea.read("gdp_by_industry_historical")
+    tb_bea_current = ds_bea_current.read("gdp_by_industry")
 
     #
     # Process data.
@@ -132,12 +133,27 @@ def run() -> None:
     tb_hrv = paths.regions.harmonize_names(tb=tb_hrv)
     tb_ggdc = paths.regions.harmonize_names(tb=tb_ggdc)
 
-    sanity_check_inputs(tb_hrv=tb_hrv, tb_ggdc=tb_ggdc, tb_lund_va=tb_lund_va, tb_lund_emp=tb_lund_emp, tb_bea=tb_bea)
+    sanity_check_inputs(
+        tb_hrv=tb_hrv,
+        tb_ggdc=tb_ggdc,
+        tb_lund_va=tb_lund_va,
+        tb_lund_emp=tb_lund_emp,
+        tb_bea=tb_bea,
+        tb_bea_current=tb_bea_current,
+    )
 
     tb_hrv = prepare_hrv(tb_hrv)
     tb_ggdc = prepare_ggdc(tb_ggdc)
     tb_lund = prepare_lund(tb_lund_va, tb_lund_emp)
-    tb_bea = prepare_bea(tb_bea)
+
+    # BEA: the historical statistics through 1997, the current accounts from 1998 onwards.
+    tb_bea = pr.concat([prepare_bea(tb_bea), prepare_bea(tb_bea_current).query("year >= 1998")], ignore_index=True)
+    sanity_check_bea_vintage_seam(tb_bea)
+
+    # Route every input through the harmonization mapping, for transparency (the Lund and
+    # BEA labels are identity mappings).
+    tb_lund = paths.regions.harmonize_names(tb=tb_lund)
+    tb_bea = paths.regions.harmonize_names(tb=tb_bea)
 
     tb = apply_recipe(tb_hrv=tb_hrv, overrides={"ggdc": tb_ggdc, "bea": tb_bea}, tb_lund=tb_lund)
 
@@ -360,6 +376,16 @@ def apply_overrides(tb_country: Table, overrides: dict, country: str, spans: lis
     return tb_country
 
 
+def sanity_check_bea_vintage_seam(tb_bea: Table) -> None:
+    """The BEA historical statistics (through 1997) and current accounts (1998 onwards) are
+    different vintages of the same accounts; the seam between them should be small."""
+    v1997 = tb_bea[tb_bea["year"] == 1997].iloc[0]
+    v1998 = tb_bea[tb_bea["year"] == 1998].iloc[0]
+    for column in SHARE_COLUMNS:
+        error = f"Large break between the BEA vintages at 1997/1998 in {column}."
+        assert abs(v1998[column] - v1997[column]) < 5, error
+
+
 def union_source_origins(variables: list) -> list:
     """Union of the origins of several variables, preserving order."""
     origins = []
@@ -370,7 +396,9 @@ def union_source_origins(variables: list) -> list:
     return origins
 
 
-def sanity_check_inputs(tb_hrv: Table, tb_ggdc: Table, tb_lund_va: Table, tb_lund_emp: Table, tb_bea: Table) -> None:
+def sanity_check_inputs(
+    tb_hrv: Table, tb_ggdc: Table, tb_lund_va: Table, tb_lund_emp: Table, tb_bea: Table, tb_bea_current: Table
+) -> None:
     error = "Herrendorf, Rogerson and Valentinyi data does not contain the expected countries."
     assert set(tb_hrv["country"]) == set(RECIPE), error
 
@@ -388,12 +416,18 @@ def sanity_check_inputs(tb_hrv: Table, tb_ggdc: Table, tb_lund_va: Table, tb_lun
     error = "SHNA tables should only contain Sweden."
     assert set(tb_lund_va["country"]) == set(tb_lund_emp["country"]) == {"Sweden"}, error
 
-    error = "BEA data does not contain the expected industries."
     bea_industries = [industry for bucket in BEA_BUCKETS.values() for industry in bucket]
+    error = "BEA historical data does not contain the expected industries."
     assert set(bea_industries) <= set(tb_bea["industry"]), error
 
-    error = "BEA data does not cover the expected years."
+    error = "BEA historical data does not cover the expected years."
     assert tb_bea["year"].min() == 1947 and tb_bea["year"].max() == 1997, error
+
+    error = "BEA current accounts data does not contain the expected industries."
+    assert set(bea_industries) <= set(tb_bea_current["industry"]), error
+
+    error = "BEA current accounts data does not cover the expected years."
+    assert tb_bea_current["year"].min() == 1997 and tb_bea_current["year"].max() >= 2024, error
 
 
 def sanity_check_outputs(tb: Table) -> None:

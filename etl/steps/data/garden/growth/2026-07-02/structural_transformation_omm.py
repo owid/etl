@@ -87,6 +87,10 @@ def run() -> None:
     #
     sanity_check_inputs(tb_historical=tb_historical, tb_broadberry=tb_broadberry, tb_wdi=tb_wdi)
 
+    # Route the Broadberry and Gardner labels through the harmonization mapping, for
+    # transparency (they are identity mappings).
+    tb_broadberry = paths.regions.harmonize_names(tb=tb_broadberry)
+
     tb_wdi = prepare_wdi(tb_wdi)
     tb_historical = prepare_historical(tb_historical)
 
