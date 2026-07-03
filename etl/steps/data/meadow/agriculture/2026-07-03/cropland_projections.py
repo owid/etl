@@ -24,24 +24,8 @@ def run() -> None:
     # country codes are not needed.
     tb = tb.drop(columns=["Domain", "CountryCode", "Region"], errors="raise")
 
-    # Rename columns conveniently.
-    tb = tb.rename(
-        columns={
-            "Indicator": "indicator",
-            "Item": "item",
-            "Element": "element",
-            "CountryName": "country",
-            "Scenario": "scenario",
-            "Units": "units",
-            "Year": "year",
-            "Value": "value",
-        },
-        errors="raise",
-    )
-
-    # Use categoricals for low-cardinality string columns, to reduce the size of the table.
-    for column in ["indicator", "item", "element", "country", "scenario", "units"]:
-        tb[column] = tb[column].astype("category")
+    # Rename country column (the rest will be underscored by the format() below).
+    tb = tb.rename(columns={"CountryName": "country"}, errors="raise")
 
     # Improve table format.
     tb = tb.format(["indicator", "item", "element", "country", "scenario", "year"])
