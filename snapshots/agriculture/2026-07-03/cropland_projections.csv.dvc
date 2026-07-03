@@ -10,22 +10,19 @@ meta:
       - Towards Sustainability (TSS): a shift towards more sustainable food systems.
       - Stratified Societies (SSS): a future of increased inequality.
 
-      Projections are provided for a 2012 base year and the years 2030, 2035, 2040 and 2050.
+      Table 4.12 of the report presents world totals of arable land for a historical year (1970), the base year of the projections (2012), and the years 2030 and 2050 under each of the three scenarios.
 
-      The country-level data on crop production includes projections of arable land, harvested area, crop yields, and cropping intensity, disaggregated by crop and by production system (rainfed or irrigated), for the three scenarios of the report.
-
-      Following FAOSTAT terminology, "arable land" is used in this data for the physical area under temporary and permanent agricultural crops (which FAOSTAT calls "cropland").
+      Following FAOSTAT terminology, "arable land" is used in the report for the physical area under temporary and permanent agricultural crops (which FAOSTAT calls "cropland").
     citation_full: |-
       FAO. 2018. The future of food and agriculture - Alternative pathways to 2050. Rome. 224 pp.
     attribution_short: FAO
-    url_main: https://www.fao.org/global-perspectives-studies/food-agriculture-projections-to-2050/en/
-    url_download: https://www.fao.org/fileadmin/user_upload/global-perspective/csv/FOFA2050CountryData_Crop-production.csv.zip
+    url_main: https://www.fao.org/global-perspectives-studies/resources/detail/en/c/1157074/
     date_accessed: '2026-07-03'
     date_published: '2018'
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://openknowledge.fao.org/handle/20.500.14283/I8429EN
 outs:
-  - md5: bbc303d4950840bce3d15ecdbace50d6
-    size: 3750041
-    path: cropland_projections.zip
+  - md5: e8f141760175c0eca1e2a37040faff33
+    size: 251
+    path: cropland_projections.csv

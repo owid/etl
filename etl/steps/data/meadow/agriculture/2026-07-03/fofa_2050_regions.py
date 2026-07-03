@@ -11,7 +11,7 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("cropland_projections.csv")
+    snap = paths.load_snapshot("fofa_2050_regions.csv")
 
     # Load data from snapshot.
     tb = snap.read_csv()
@@ -20,7 +20,7 @@ def run() -> None:
     # Process data.
     #
     # Improve table format.
-    tb = tb.format(["scenario", "year"])
+    tb = tb.format(["domain", "indicator", "item", "element", "region", "scenario", "year"])
 
     #
     # Save outputs.
