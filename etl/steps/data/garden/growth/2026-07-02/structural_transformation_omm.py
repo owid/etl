@@ -12,8 +12,13 @@ Combines three sources:
 The indicators splice the historical compilation with WDI: for each country and indicator,
 WDI is used from its first available year onwards; historical sources only contribute
 years strictly before that. This avoids mixing definitions within the modern segment of a
-series. Precedence among historical sources for employment shares: shares derived from the
-compilation's employment numbers first, then the Broadberry and Gardner benchmarks.
+series. The years 1986-1990 are excluded from the historical series: the definitional
+break between the historical persons-engaged data and the ILO-modeled data from 1991 is
+large for some countries (e.g. Japan, United States), and excluding these years keeps the
+transition between the two sources consistent (see
+https://ourworldindata.org/agri-employment-sources). Precedence among historical sources
+for employment shares: shares derived from the compilation's employment numbers first,
+then the Broadberry and Gardner benchmarks.
 
 The compilation's value added shares by sector are not published here; they remain
 available in structural_transformation_historical.
@@ -121,6 +126,10 @@ def prepare_wdi(tb: Table) -> Table:
 def prepare_historical(tb: Table) -> Table:
     """Derive employment shares from the compilation's employment numbers."""
     tb = tb.copy()
+
+    # Exclude 1986-1990 to keep the transition to the ILO-modeled series (from 1991)
+    # consistent; see the module docstring.
+    tb = tb[~tb["year"].between(1986, 1990)].reset_index(drop=True)
 
     number_employed_total = tb[NUMBER_EMPLOYED_COLUMNS].sum(axis=1, min_count=len(NUMBER_EMPLOYED_COLUMNS))
     for sector in SECTORS:
@@ -242,6 +251,9 @@ def sanity_check_outputs(tb: Table) -> None:
 
     error = "Modern era should cover most countries in the world."
     assert tb[tb["year"] == 2019]["share_employed_agriculture"].notna().sum() > 150, error
+
+    error = "Years 1986-1990 should be excluded (no historical values, and WDI starts in 1991)."
+    assert tb[tb["year"].between(1986, 1990)].empty, error
 
     # No gap between the end of the historical series and the start of the WDI series for
     # the compilation countries: each employment series should be continuous at the splice.
