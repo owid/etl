@@ -13,9 +13,9 @@ definitions:
     - No more recent time series of this share exists. However, [Rosa & Gabrielli (2023)](https://doi.org/10.1088/1748-9326/aca815) computed a country-level estimate for 2019 of about 3.8 billion people fed by synthetic nitrogen fertilizers (about half of the world population, and half of the global protein supply), which the authors note is consistent with the earlier estimates for the year 2000. This indicates that the roughly 50% share has held.
     - For years after 2008, we assume that the share of the world population fed by synthetic nitrogen fertilizers has remained constant at 48%. Changes since then are therefore driven by population growth, not by a new measurement of that share.
   description_processing: &description-processing |-
-    The share of the world population fed by synthetic nitrogen fertilizers was read off Figure 1 of Erisman et al. (2008), which ends in 2008 (at 48%). For later years, we assume this share has remained constant at 48%. This is supported by Rosa & Gabrielli (2023), whose country-level estimate for 2019 (about 3.8 billion people fed) is consistent with the roughly 50% share.
+    The share of the world population fed by synthetic nitrogen fertilizers was read off Figure 1 of Erisman et al. (2008), which reports values only for select years and ends in 2008 (at 48%). We linearly interpolate between these years to obtain a value for every year, and for years after 2008 we assume the share has remained constant at 48%. This is supported by Rosa & Gabrielli (2023), whose country-level estimate for 2019 (about 3.8 billion people fed) is consistent with the roughly 50% share.
 
-    To estimate the number of people fed by synthetic nitrogen fertilizers, we multiplied this share by our long-run world population series.
+    To estimate the number of people fed by synthetic nitrogen fertilizers, we multiplied this annual share by our long-run world population series.
 
 dataset:
   update_period_days: 365

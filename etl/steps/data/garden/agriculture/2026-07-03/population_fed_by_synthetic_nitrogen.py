@@ -2,6 +2,7 @@
 Erisman et al. (2008)) with OWID's long-run world population, to estimate the number of people fed (and supported
 without) synthetic nitrogen fertilizers.
 
+The digitized share is only available for select years, so we linearly interpolate it to obtain one value per year.
 Erisman et al. (2008) estimated the share up to 2008 (48%). From then on, we assume the share stays constant, so the
 extension of the series to recent years is driven purely by population growth. This assumption is supported by
 Rosa & Gabrielli (2023, https://doi.org/10.1088/1748-9326/aca815), whose country-level estimate for 2019 (about
@@ -12,6 +13,7 @@ own words, consistent with the earlier estimates for the year 2000.
 import pandas as pd
 from owid.catalog import Table
 
+from etl.data_helpers.misc import interpolate_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -49,15 +51,23 @@ def sanity_check_inputs(tb: Table, last_year: int) -> None:
 
 def sanity_check_outputs(tb: Table) -> None:
     assert tb.columns[tb.isna().all()].empty, "Output has a fully-NaN column."
-    assert tb["world_population"].notna().all(), "World population has missing values."
+    # After interpolation, every indicator must be defined for every year (annual series, no gaps).
+    assert tb.notna().all().all(), "Output has missing values after interpolation."
     assert (tb["world_population"] > 0).all(), "World population is expected to be positive."
-    # Where the share is defined, the two estimated populations must add up to the total.
-    defined = tb.dropna(subset=[SHARE_COLUMN])
+    assert tb["year"].is_monotonic_increasing and not tb["year"].duplicated().any(), (
+        "Years are not a clean annual axis."
+    )
+    # The interpolated share must stay within the range of the digitized endpoints and be non-decreasing.
+    assert tb[SHARE_COLUMN].between(0, SHARE_FED_RECENT).all(), "Interpolated share is out of the expected range."
+    assert (tb.sort_values("year")[SHARE_COLUMN].diff().dropna() >= 0).all(), (
+        "Interpolated share is expected to be monotonically non-decreasing."
+    )
+    # The two estimated populations must add up to the total.
     assert (
-        (defined["population_fed_by_synthetic_nitrogen"] + defined["population_not_fed_by_synthetic_nitrogen"])
-        == defined["world_population"]
+        (tb["population_fed_by_synthetic_nitrogen"] + tb["population_not_fed_by_synthetic_nitrogen"])
+        == tb["world_population"]
     ).all(), "Estimated populations fed and not fed by synthetic nitrogen do not add up to the world population."
-    # The share must be defined for all years after the last estimate by Erisman et al. (2008).
+    # The share must be constant for all years after the last estimate by Erisman et al. (2008).
     recent = tb[tb["year"] >= YEAR_LAST_ERISMAN]
     assert (recent[SHARE_COLUMN] == SHARE_FED_RECENT).all(), (
         "Share of population fed is expected to be constant in recent years."
@@ -93,6 +103,10 @@ def run() -> None:
 
     # Erisman et al. (2008) estimates end in 2008; assume the share remains constant afterwards.
     tb.loc[tb["year"] > YEAR_LAST_ERISMAN, SHARE_COLUMN] = SHARE_FED_RECENT
+
+    # The digitized share is only given for select years (1900, 1910, 1930, ...); linearly interpolate between them
+    # to obtain one value per year, so the derived populations form annual series rather than sparse points.
+    tb = interpolate_table(tb, entity_col="country", time_col="year", time_mode="none", method="linear")
 
     # Add world population using the shared helper. This attaches the single, collapsed "Various sources" population
     # origin (instead of the disaggregated HYDE/Gapminder/UN WPP origins from the raw population table).
