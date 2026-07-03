@@ -490,9 +490,9 @@ tables:
           - "{definitions.description_key_gini_wealth_note}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Gini coefficient (<<welfare_type>>)
           numDecimalPlaces: 2
@@ -522,9 +522,9 @@ tables:
           - "{definitions.description_key_palma_ratio}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Palma ratio (<<welfare_type>>)
           numDecimalPlaces: 1
@@ -553,9 +553,9 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: P50/P10 ratio (<<welfare_type>>)
           numDecimalPlaces: 1
@@ -569,9 +569,9 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: P90/P10 ratio (<<welfare_type>>)
           numDecimalPlaces: 1
@@ -585,9 +585,9 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: P90/P50 ratio (<<welfare_type>>)
           numDecimalPlaces: 1
@@ -601,9 +601,9 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: S80/S20 ratio (<<welfare_type>>)
           numDecimalPlaces: 1
@@ -617,9 +617,9 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: S90/S10 ratio (<<welfare_type>>)
           numDecimalPlaces: 1
@@ -633,9 +633,9 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: S90/S50 ratio (<<welfare_type>>)
           numDecimalPlaces: 1
@@ -651,9 +651,9 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Share (bottom 50%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -685,9 +685,9 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Share (middle 40%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -703,9 +703,9 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Share (90-99th percentiles, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -721,9 +721,9 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Share (top 10%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -754,9 +754,9 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Share (top 1%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -787,9 +787,9 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Share (top 0.1%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -821,9 +821,9 @@ tables:
           - "{definitions.description_key_relative_poverty}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
 
@@ -861,9 +861,9 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Mean (<<welfare_type>>)
           numDecimalPlaces: "{definitions.numdecimalplaces_period}"
@@ -894,9 +894,9 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: Median (<<welfare_type>>)
           numDecimalPlaces: "{definitions.numdecimalplaces_period}"
@@ -932,9 +932,9 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: |-
             {macros}
@@ -975,9 +975,9 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: |-
             {macros}
@@ -1018,9 +1018,9 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
-          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
+          - "{definitions.description_key_tax_caveats}"
         display:
           name: |-
             {macros}
