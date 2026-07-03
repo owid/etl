@@ -11,7 +11,7 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("cropland_projections.csv")
+    snap = paths.load_snapshot("fofa_2050_arable_land.csv")
 
     # Load data from snapshot.
     tb = snap.read_csv()

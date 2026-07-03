@@ -44,7 +44,7 @@ DATA = pd.DataFrame(
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def run(upload: bool) -> None:
     # Initialize a new snapshot.
-    snap = Snapshot(f"agriculture/{SNAPSHOT_VERSION}/cropland_projections.csv")
+    snap = Snapshot(f"agriculture/{SNAPSHOT_VERSION}/fofa_2050_arable_land.csv")
 
     # Save snapshot.
     snap.create_snapshot(data=DATA, upload=upload)

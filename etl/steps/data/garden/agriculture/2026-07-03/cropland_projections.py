@@ -20,10 +20,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("cropland_projections")
+    ds_meadow = paths.load_dataset("fofa_2050_arable_land")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("cropland_projections")
+    tb = ds_meadow.read("fofa_2050_arable_land")
 
     #
     # Process data.

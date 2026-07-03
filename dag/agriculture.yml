@@ -169,8 +169,8 @@ steps:
         #
         data://grapher/agriculture/2026-07-03/cropland_projections:
                 - data://garden/agriculture/2026-07-03/cropland_projections:
-                          - data://meadow/agriculture/2026-07-03/cropland_projections:
-                                    - snapshot://agriculture/2026-07-03/cropland_projections.csv
+                          - data://meadow/agriculture/2026-07-03/fofa_2050_arable_land:
+                                    - snapshot://agriculture/2026-07-03/fofa_2050_arable_land.csv
         #
         # FAO - Global meat consumption, with projections to 2050.
         #
