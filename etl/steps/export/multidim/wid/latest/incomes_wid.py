@@ -20,16 +20,16 @@ DIMENSIONS_CONFIG = {
 # Define if data is extrapolated or not
 EXTRAPOLATED = "no"
 
-# Override of description_key_welfare_type (world_inequality_database.meta.yml line 123) for the grouped
+# Override of description_key_welfare_type (world_inequality_database.meta.yml line 144) for the grouped
 # welfare_type=before_vs_after views. The OLD_* constants mirror the garden text verbatim — the assertion
 # in _replace_welfare_type_bullet catches drift in the source.
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX = "Income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance, such as unemployment insurance. Contributions to social insurance are deducted, and the corresponding benefits are added back and counted as income."
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX = "Income is measured after taxes have been paid and most government benefits have been received. Not just cash benefits like social assistance, but also public services like health and education, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by most other sources."
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX = "Income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance benefits, such as unemployment insurance — contributions to these are deducted, and the corresponding benefits are added back as income. This unusual choice is made because countries organize pensions very differently — in public systems, private ones, or a mix — and treating them in the same way avoids the comparison being driven by those differences."
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX = "Income is measured after taxes have been paid and most government benefits have been received. This includes not only cash benefits like social assistance, but also the value of public services like hospitals and schools, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by survey-based data sources."
 NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown separately. Taxes and benefits typically increase the share going to poorer groups and reduce the share going to richer groups."
 
 # Sourced from the after_tax indicator's description_key. The before_vs_after view inherits from the
 # before_tax indicator, so this bullet is otherwise lost; we re-attach it as the last bullet.
-DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY = "Data on income after tax and benefits is less widely available than that before tax. Where it is missing, distributions are constructed from the more widely available pre-tax data, combined with data on tax revenue and government expenditure. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/)."
+DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY = "Data on income after tax and benefits is less widely available than that before tax. Where it is missing, WID constructs distributions from the more widely available pre-tax data, combined with data on tax revenue and government expenditure. These estimates are more uncertain than where direct data is available. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/)."
 
 
 def run() -> None:

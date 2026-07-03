@@ -108,9 +108,9 @@ definitions:
 
   description_key_welfare_type: |-
     <% if welfare_type == "dhi" %>
-    Income is measured after taxes have been paid and most government benefits have been received.
+    Income is measured after taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received.
     <%- elif welfare_type == "mi" %>
-    Income is measured before taxes have been paid and most government benefits have been received.
+    Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. LIS includes private pensions, meaning a retired person’s before-tax income depends on how their country organizes pensions.
     <%- endif %>
 
   description_key_equivalence_scale: |-

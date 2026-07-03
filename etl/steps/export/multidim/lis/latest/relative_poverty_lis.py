@@ -15,15 +15,11 @@ DIMENSIONS_CONFIG = {
     "equivalence_scale": ["square root"],
 }
 
-# Override of description_key_welfare_type (luxembourg_income_study.meta.yml line 108) for the grouped
+# Override of description_key_welfare_type (luxembourg_income_study.meta.yml line 109) for the grouped
 # welfare_type=before_vs_after view. The OLD_* constants mirror the garden text verbatim — the assertion
 # in _get_before_vs_after_metadata catches drift in the source.
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = (
-    "Income is measured after taxes have been paid and most government benefits have been received."
-)
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = (
-    "Income is measured before taxes have been paid and most government benefits have been received."
-)
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = "Income is measured after taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received."
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = "Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. LIS includes private pensions, meaning a retired person’s before-tax income depends on how their country organizes pensions."
 NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown separately. In most countries, relative poverty is lower after taxes and benefits than before, but the extent varies widely."
 
 
