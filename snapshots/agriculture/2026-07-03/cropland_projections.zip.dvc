@@ -16,7 +16,7 @@ meta:
 
       Following FAOSTAT terminology, "arable land" is used in this data for the physical area under temporary and permanent agricultural crops (which FAOSTAT calls "cropland").
     citation_full: |-
-      FAO. 2018. The future of food and agriculture - Alternative pathways to 2050. Rome. 224 pp. Licence: CC BY-NC-SA 3.0 IGO.
+      FAO. 2018. The future of food and agriculture - Alternative pathways to 2050. Rome. 224 pp.
     attribution_short: FAO
     url_main: https://www.fao.org/global-perspectives-studies/food-agriculture-projections-to-2050/en/
     url_download: https://www.fao.org/fileadmin/user_upload/global-perspective/csv/FOFA2050CountryData_Crop-production.csv.zip

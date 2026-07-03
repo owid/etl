@@ -230,10 +230,16 @@ Two different descriptions, two different jobs. Don't mix them:
 
 If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
 
-### Optional `.dvc` origin fields: use only when needed
+### Origin metadata fields: follow the metadata reference
 
-- **`title_snapshot` / `description_snapshot`**: only when several snapshots are created from the same data product and need disambiguation (e.g. one bulk download split into multiple files). If a data product maps to a single snapshot, omit both — even if the file is only a subset of the product; describe that subset in `description` instead. Don't copy these fields from existing `.dvc` files that legitimately use them.
-- **`attribution`**: omit — grapher builds the attribution automatically (producer + year). Only set it when the automatic one would be wrong (e.g. the producer requires a specific citation label).
+When writing or editing `.dvc` origin fields, follow the ETL metadata reference — `schemas/definitions.json` in this repo (rendered at https://docs.owid.io/projects/etl/architecture/metadata/reference/). It defines, per field, the requirement level, formatting guidelines, and good/bad examples. Don't infer field usage by copying other `.dvc` files — they may use optional fields for reasons that don't apply to your snapshot.
+
+Mistakes the reference already covers but that keep happening:
+
+- **`title_snapshot` / `description_snapshot`**: default to omitting both. Only use them when several snapshots are created from the same data product and need disambiguation. If a data product maps to a single snapshot — even one that is a subset of the product — describe that subset in `description` instead.
+- **`attribution`**: omit — grapher builds `producer (year)` automatically. Only set it when that automatic format is genuinely uninformative (e.g. a well-known data product title should be cited alongside the producer).
+- **`citation_full`**: follow the producer's requested citation, but with appropriate minor edits: don't fold other metadata fields into it — e.g. license text like "Licence: CC BY-NC-SA 3.0 IGO" belongs in `license`, not in the citation.
+- **American spelling, always** — even when the producer's own text uses British spelling (adapting it is one of the "minor edits" the reference allows).
 
 ## Sanity checks
 
