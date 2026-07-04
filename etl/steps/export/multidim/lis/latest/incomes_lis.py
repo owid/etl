@@ -19,15 +19,11 @@ EQUIVALENCE_SCALE = "square root"
 
 PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
 
-# Override of description_key_welfare_type (luxembourg_income_study.meta.yml line 108) for the grouped
+# Override of description_key_welfare_type (luxembourg_income_study.meta.yml line 109) for the grouped
 # welfare_type=before_vs_after view. The OLD_* constants mirror the garden text verbatim — the assertion
 # in _get_before_vs_after_metadata catches drift in the source.
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = (
-    "Income is measured after taxes have been paid and most government benefits have been received."
-)
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = (
-    "Income is measured before taxes have been paid and most government benefits have been received."
-)
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = "Income is measured after taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received."
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = "Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. LIS includes private pensions, meaning a retired person’s before-tax income depends on how their country organizes pensions."
 NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_SHARE = "This data is based on income measured both before and after taxes and benefits, which are shown separately. Taxes and benefits typically increase the share going to poorer groups and reduce the share going to richer groups."
 NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_REST = "This data is based on income measured both before and after taxes and benefits, which are shown separately. Taxes and benefits typically raise incomes at the bottom of the distribution and reduce incomes at the top."
 

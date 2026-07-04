@@ -143,11 +143,11 @@ definitions:
 
   description_key_welfare_type: |-
     <% if welfare_type == "before tax" %>
-    Income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance, such as unemployment insurance. Contributions to social insurance are deducted, and the corresponding benefits are added back and counted as income.
+    Income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance benefits, such as unemployment insurance — contributions to these are deducted, and the corresponding benefits are added back as income. This unusual choice is made because countries organize pensions very differently — in public systems, private ones, or a mix — and treating them in the same way avoids the comparison being driven by those differences.
     <%- elif welfare_type == "after tax" %>
-    Income is measured after taxes have been paid and most government benefits have been received. Not just cash benefits like social assistance, but also public services like health and education, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by most other sources.
+    Income is measured after taxes have been paid and most government benefits have been received. This includes not only cash benefits like social assistance, but also the value of public services like hospitals and schools, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by survey-based data sources.
     <%- elif welfare_type == "after tax disposable" %>
-    Income is measured after taxes have been paid and most government benefits have been received. It does not include public services like health and education, or collective spending such as defense and infrastructure, so it does not add up to national income.
+    Income is measured after taxes have been paid and most government benefits have been received. It does not include the value of public services like hospitals and schools, and collective spending, such as defense and infrastructure, so it does not add up to national income.
     <%- elif welfare_type == "wealth" %>
     This measure is related to household net wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
     <%- endif %>
@@ -157,21 +157,26 @@ definitions:
 
   description_key_methodology_1: |-
     <% if welfare_type != "wealth" %>
-    The data comes from the World Inequality Database (WID), which combines household surveys, tax records, and national accounts to estimate how a country's total national income is distributed across the population. Because tax records have direct information on high earners, this approach captures more of the income received by those at the top of the distribution than surveys alone.
+    The data comes from the World Inequality Database (WID), which combines household surveys, tax records, and national accounts to estimate how a country's total national income is distributed across the population. Tax records have direct information on high earners, so this approach captures more of the income received by those at the top of the distribution than surveys alone. It also provides a longer historical perspective. WID is based on national income — a broader concept than what surveys measure — which includes components people wouldn’t normally think of as part of their income, such as retained corporate profits and imputed rent from owner-occupied housing.
     <%- else %>
     The data comes from the World Inequality Database (WID), and it is constructed using the Mixed Income Capitalization-Survey (MICS) method, which combines capitalized income flows from tax data with survey-based estimates for assets that do not generate taxable income. This is done because wealth distributions are usually not directly available in administrative data, and because wealth surveys coverage is even more limited than for income.
     <%- endif %>
 
   description_key_methodology_2: |-
     <% if welfare_type != "wealth" %>
-    For some countries and years, the underlying data sources (household surveys, tax records) are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/).
+    For some countries and years, the underlying data sources (household surveys, tax records) are not available. In these cases, WID estimates it by extrapolating from other years or data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/).
     <%- else %>
-    For some countries and years, the underlying data sources are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/).
+    For some countries and years, the underlying data sources are not available. In these cases, estimates are extrapolated from other years or modeled based on data from other countries, which introduces uncertainty. For more information, see the [WID methodology documentation](https://wid.world/document/distributional-national-accounts-dina-guidelines-2025-methods-and-concepts-used-in-the-world-inequality-database/) and this [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-world-inequality-lab-technical-note-2025-01/).
     <%- endif %>
 
   description_key_posttax: |-
     <% if welfare_type in ["after tax"] %>
-    Data on income after tax and benefits is less widely available than that before tax. Where it is missing, distributions are constructed from the more widely available pre-tax data, combined with data on tax revenue and government expenditure. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/).
+    Data on income after tax and benefits is less widely available than that before tax. Where it is missing, WID constructs distributions from the more widely available pre-tax data, combined with data on tax revenue and government expenditure. These estimates are more uncertain than where direct data is available. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/).
+    <%- endif %>
+
+  description_key_tax_caveats: |-
+    <% if welfare_type != "wealth" %>
+    Tax records are an important source for WID, but they have limitations. They only capture people who file tax returns, and even where the data is more complete, income that is unreported, evaded, or held offshore may not be captured.
     <%- endif %>
 
   description_key_relative_poverty: |-
@@ -208,7 +213,7 @@ definitions:
     This data shows the {definitions.concept_welfare_type} threshold for a specific group of the population. The "poorest decile" threshold, for example, is the {definitions.concept_welfare_type} level below which the poorest 10% of people in a country fall.
 
   description_processing_general: |-
-    We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
+    We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/world-inequality-database/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively.
 
   description_processing_relative_poverty: |-
     This data has been estimated by calculating the <<poverty_line>>, and then checking that value against the closest threshold in the percentile distribution. The headcount ratio is then the percentile, the share of the population below that threshold.
@@ -487,6 +492,7 @@ tables:
           - "{definitions.description_key_gini_wealth_note}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -518,6 +524,7 @@ tables:
           - "{definitions.description_key_palma_ratio}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -548,6 +555,7 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -563,6 +571,7 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -578,6 +587,7 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -593,6 +603,7 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -608,6 +619,7 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -623,6 +635,7 @@ tables:
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -640,6 +653,7 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -673,6 +687,7 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -690,6 +705,7 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -707,6 +723,7 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -739,6 +756,7 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -771,6 +789,7 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -804,6 +823,7 @@ tables:
           - "{definitions.description_key_relative_poverty}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         description_processing: |-
@@ -843,6 +863,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -875,6 +896,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -912,6 +934,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -954,6 +977,7 @@ tables:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
@@ -996,6 +1020,7 @@ tables:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_methodology_1}"
+          - "{definitions.description_key_tax_caveats}"
           - "{definitions.description_key_methodology_2}"
           - "{definitions.description_key_posttax}"
         display:
