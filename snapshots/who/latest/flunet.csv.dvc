@@ -10,13 +10,13 @@ meta:
     attribution_short: WHO
     url_main: https://www.who.int/tools/flunet
     url_download: https://xmart-api-public.who.int/FLUMART/VIW_FNT?&$format=csv
-    date_accessed: '2026-07-04'
+    date_accessed: '2026-07-05'
     date_published: '2023-02-16'
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
 wdir: ../../../data/snapshots/who/latest
 outs:
-  - md5: 2697afc63c77f331616ccfeafd9e28a9
-    size: 31606929
+  - md5: 681e0f867a94bf357f23860d5937f0b8
+    size: 31615054
     path: flunet.csv
