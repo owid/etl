@@ -25,18 +25,21 @@ jobs:
       packages: ${{ steps.filter.outputs.packages }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
       with:
         fetch-depth: 2
+        persist-credentials: false
 
     - name: Detect which packages changed
       id: filter
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        PACKAGE: ${{ github.event.inputs.package }}
       run: |
         catalog=false
         datautils=false
         repack=false
-        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          PACKAGE="${{ github.event.inputs.package }}"
+        if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
           if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "catalog" ]; then catalog=true; fi
           if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "datautils" ]; then datautils=true; fi
           if [ "$PACKAGE" = "all" ] || [ "$PACKAGE" = "repack" ]; then repack=true; fi
@@ -79,9 +82,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
       with:
         fetch-depth: 2
+        persist-credentials: false
 
     - name: Check if version needs publishing
       run: |
@@ -105,7 +109,11 @@ jobs:
         python-version: '3.x'
 
     - name: Set up uv
-      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
+      uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
+      with:
+        # Caching is disabled in this release pipeline to avoid cache-poisoning
+        # of the published package artifact (zizmor cache-poisoning audit).
+        enable-cache: false
 
     - name: Build ${{ matrix.name }}
       run: |

@@ -8,7 +8,7 @@ definitions:
 dataset:
   title: "Unemployment rates, by age and education level (ILOSTAT)"
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   unemployment:
     variables:

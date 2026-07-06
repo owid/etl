@@ -403,6 +403,11 @@
           "title": "Non-redistribution of dataset ",
           "description": "Whether the dataset is non-redistributable, and therefore data should not be downloadable from the chart."
         },
+        "jsonld": {
+          "type": "boolean",
+          "title": "Publish catalog landing page / JSON-LD",
+          "description": "Opt this dataset into the public catalog landing page with Schema.org Dataset JSON-LD (`etl d publish --jsonld`). Canary rollout of the catalog-discovery project; the dataset must also pass the JSON-LD quality gates."
+        },
         "licenses": {
           "type": "array",
           "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset.",

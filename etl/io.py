@@ -59,9 +59,18 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], incl
             # Not a data/snapshot step. It might be an export step (etl/steps/export/...); if so,
             # record its export:// URI so a branch that only edits an export recipe still selects it.
             try:
-                export_path = abs_step_path.relative_to(STEP_DIR / "export").with_suffix("").with_suffix("").as_posix()
+                rel_export = abs_step_path.relative_to(STEP_DIR / "export")
             except ValueError:
                 continue
+            # A collection recipe can be split across companion config files named
+            # `<short>.<key>.config.yml` (e.g. democracy.eiu.config.yml) that all feed the single
+            # `<short>.py` step. Blindly stripping suffixes would invent a nonexistent
+            # `<short>.<key>` step, so resolve to the sibling `<short>.py` recipe when it exists.
+            short = abs_step_path.name.split(".", 1)[0]
+            if (abs_step_path.parent / f"{short}.py").exists():
+                export_path = (rel_export.parent / short).as_posix()
+            else:
+                export_path = rel_export.with_suffix("").with_suffix("").as_posix()
             changed_export_uris.append(f"export://{export_path}")
 
     if not dataset_catalog_paths:

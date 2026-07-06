@@ -64,5 +64,9 @@ def cli(dry_run: bool) -> None:
             if "Can't connect to MySQL server" in str(e):
                 log.warning("scan-chart-diff.cant-connect", pr=pr)
                 continue
+            # Server reset the connection mid-query (being refreshed/restarted)
+            if "Lost connection to MySQL server" in str(e):
+                log.warning("scan-chart-diff.lost-connection", pr=pr)
+                continue
             else:
                 raise e

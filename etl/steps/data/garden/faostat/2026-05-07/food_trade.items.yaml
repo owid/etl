@@ -392,6 +392,9 @@ items:
   - display: Sorghum
     item_codes:
       83: Sorghum
+  - display: Soybean meal for feed
+    item_codes:
+      238: Cake of soya beans
   - display: Soybean oil
     item_codes:
       237: Soya bean oil

@@ -1,33 +1,59 @@
 ---
 name: add-ivs-indicators
-description: Add new indicator codes (WVS/EVS question codes like C001, D059, H002_01, Y022) to the existing Integrated Values Surveys (IVS) pipeline WITHOUT bumping the version. Use when the user wants to add IVS/WVS/EVS questions to integrated_values_surveys, extend the IVS dataset with new survey items, or says "add these codes to IVS".
+description: Add new survey question codes (e.g. C001, D059, H002_01, Y022, E268, G055) to OWID's values-survey pipeline WITHOUT bumping the version — either the Integrated Values Surveys table (integrated_values_surveys, WVS+EVS merged) or the World Values Survey table (world_values_survey, WVS-only questions). Both tables live in the same ivs/<version> garden+grapher dataset. Use when the user wants to add IVS/WVS/EVS questions, extend integrated_values_surveys or world_values_survey, or says "add these codes to IVS" / "add these WVS questions".
 metadata:
   internal: true
 ---
 
-# Add indicators to Integrated Values Surveys (no version bump)
+# Add indicators to the values-survey pipeline (IVS / WVS, no version bump)
 
-Adds new WVS/EVS question codes to the existing `integrated_values_surveys` pipeline. The version is
-**not** bumped — you extend the current `ivs/<version>` step in place.
+Adds new question codes to OWID's values-survey pipeline **without bumping the version** — you extend the
+current `ivs/<version>` step in place. The dataset holds **two tables**, and you pick which one you're
+adding to:
+
+- **`integrated_values_surveys`** — the IVS (WVS **+** EVS merged trend). Source: the IVS `.dta`.
+- **`world_values_survey`** — WVS-only questions (asked in WVS but absent from IVS). Source: the WVS
+  Time-Series `.dta`.
+
+Both tables live in the **same** `ivs/<v>` garden + grapher dataset, so variable **titles must be unique
+across both tables** (Step 5/6). The two paths differ in only a handful of places; everything else in this
+skill is identical. **Pick the target first**, then read each step with the right column:
+
+| Aspect | IVS → `integrated_values_surveys` | WVS → `world_values_survey` |
+|---|---|---|
+| Source `.dta` | `Integrated_values_surveys_1981-2022.dta` (`snapshots/ivs/<v>/`) | `WVS_Time_Series_1981-2022_stata_v5_0.dta` (`snapshots/wvs/<wv>/`) |
+| Stata script | `snapshots/ivs/<v>/ivs_create_file.do` | `snapshots/wvs/<wv>/wvs_create_file.do` |
+| Snapshot / meadow | `ivs/<v>/integrated_values_surveys` | `wvs/<wv>/world_values_survey` |
+| Garden code | `drop_indicators_and_replace_nans` + `sanity_checks` | `process_wvs` + `sanity_checks_wvs` (same garden file) |
+| **Missing codes** | extended-missing `.a/.b/.c/.d/.e` | **negative**: `-1` DK, `-2` NA, `-3` N/A, `-4` not asked, `-5` missing |
+| **DK / NA** | `.a` / `.b` | `-1` / `-2` |
+| **Keep rule** (Step 1) | `keep if var>=1` then drop `.c/.d/.e` | `keep if var>=-2 & var<.` (drops -5/-4/-3 + sysmiss) |
+| **avg_score** | `gen avg_score=var` (ext-missing auto-excluded) | `gen avg_score=var if var>=0` (exclude negative DK/NA) |
+| zero→null in garden | yes (IVS has spurious zeros) | **no** (WVS has none; absent country-years are NaN after merge) |
+| Reference docs | IVS Common EVS/WVS dictionary | WVS Time-Series variable list (`F00003844…xlsx`) |
+| Notion `Available` dict (Step 9) | yes | **n/a** — skip (WVS has no Notion tracker) |
+
+Find the active versions: `ls etl/steps/data/garden/ivs/` (shared garden/grapher dataset → `<v>`) and
+`ls snapshots/wvs/` (WVS snapshot/meadow → `<wv>`).
 
 ## Why this pipeline is unusual
 
-The IVS snapshot is **not** a downloaded file — it's a CSV produced by a **Stata** script
-(`snapshots/ivs/<version>/ivs_create_file.do`) that collapses the WVS+EVS microdata
-(`Integrated_values_surveys_1981-2022.dta`) into country×year response shares. So adding indicators
-means editing the `.do` file, having the **user run it in Stata** (Claude cannot run Stata), then
-flowing the new columns through meadow → garden → grapher.
+Neither snapshot is a downloaded file — each is a CSV produced by a **Stata** script (`*_create_file.do`)
+that collapses survey microdata into country×year response shares (we publish only the aggregated shares,
+not the microdata — this also respects the WVS "no redistribution" license). So adding indicators means
+editing the `.do`, having the **user run it in Stata** (Claude cannot run Stata), then flowing the new
+columns through meadow → garden → grapher.
 
-End-to-end flow:
+End-to-end flow (same for both targets):
 
 ```
-edit ivs_create_file.do  →  USER runs it in Stata → regenerates ivs.csv
+edit <ivs|wvs>_create_file.do  →  USER runs it in Stata → regenerates the csv
   → re-snapshot (same version)  →  meadow VARS_DICT  →  garden constants + checks
-  →  garden .meta.yml  →  etlr (meadow→garden→grapher)  →  Notion Available flags
+  →  garden .meta.yml  →  etlr (meadow→garden→grapher)  →  [IVS only: Notion Available flags]
 ```
 
-Find the active version first: `ls etl/steps/data/garden/ivs/`. All paths below use `<v>` for it
-(e.g. `2025-06-27`).
+Paths below use `<v>` for the shared garden/grapher version (e.g. `2025-06-27`) and `<wv>` for the WVS
+snapshot/meadow version (e.g. `2026-06-30`).
 
 ## Reference docs (kept out of git — `*.pdf`/`*.xlsx` are git-ignored)
 
@@ -63,6 +89,10 @@ for each variable lives in the `.dta` value labels. Read **every code you're add
 
 ```python
 import pandas as pd
+# IVS: snapshots/ivs/<v>/Integrated_values_surveys_1981-2022.dta   → convert_categoricals=True
+# WVS: snapshots/wvs/<wv>/WVS_Time_Series_1981-2022_stata_v5_0.dta → convert_categoricals=False, then
+#      inspect raw codes: WVS codes missing as NEGATIVES (-1 DK, -2 NA, -4 not asked, -5 missing); the
+#      positive codes (and 0 where it's a real category, e.g. immigration G05x) are the substantive answers.
 path = "snapshots/ivs/<v>/Integrated_values_surveys_1981-2022.dta"
 # .dta is row-major: each read_stata() streams the whole 878 MB file once. Read EVERY code you
 # need in ONE pass, then inspect each from the in-memory frame — NOT one read_stata() per code
@@ -81,7 +111,7 @@ Key gotchas:
 - **Look-alike questions can have different scales.** H002 neighborhood frequency =
   `Very / Quite / Not / Not at all frequently`; H008_02 ("felt unsafe at home") =
   `Often / Sometimes / Rarely / Never` — don't lump them into one block.
-- Missing codes follow `.a` Don't know, `.b` No answer, `.c/.d/.e` excluded. Negative codes aren't used.
+- **Missing codes differ by survey.** IVS: `.a` Don't know, `.b` No answer, `.c/.d/.e` excluded (negatives unused). WVS: `-1` Don't know, `-2` No answer, `-3` not applicable, `-4` not asked, `-5` missing.
 - Confirm the Q-number + verbatim wording from the **dictionary** + **questionnaire** (see Reference docs).
 
 For the user-facing wording, prefer the fuller **questionnaire** text; for the answer/category names the
@@ -95,6 +125,13 @@ block (a `foreach` loop for multi-item groups, or a custom block for a single qu
 0/1 dummies → `collapse (mean) … [w=S017], by(year country)` → `save` a tempfile → later
 `merge 1:1 year country` in the "Combine all the saved datasets" section. New codes must also be added
 to the master `keep S002VS S002EVS S003 S017 $questions` line.
+
+> **WVS target?** Edit `snapshots/wvs/<wv>/wvs_create_file.do` instead — same idiom, but the master keep is
+> `keep S002VS S003 S017 $questions` (no `S002EVS`) and the missing-value handling differs: per question use
+> `keep if \`var' >= -2 & \`var' < .` (drops -5/-4/-3 and system-missing; keeps substantive + DK + NA), then
+> `dont_know_<q> = (\`var' == -1)`, `no_answer_<q> = (\`var' == -2)`, substantive dummies on the positive
+> codes, and for avg_score questions `gen avg_score_<q> = \`var' if \`var' >= 0` (so negative DK/NA are
+> excluded from the mean). The structural-twin table below still applies — only the keep / DK / NA lines change.
 
 **Reuse the closest existing structural twin** instead of inventing a block:
 
@@ -210,6 +247,90 @@ the wording from the questionnaire PDF; the code→category order from the `.dta
 to the `variables:` block. To re-run the generator after a wording fix, splice cleanly: find the first new
 key in the file, truncate from there, and re-append the regenerated block (don't blindly append twice).
 
+**Enumerate the possible answers in every `description_short`.** Don't stop at naming the response(s) the
+indicator measures — append the full set of options the respondent could choose, so each indicator is
+self-describing. Follow the IVS pattern: for categorical / Likert scales end the sentence with `Possible
+answers are "<a>", "<b>", … and "<z>".` (list them in the source order from the `.dta` value labels); for an
+N-point numeric scale state the anchored range instead (e.g. `on a scale from 1 ("never justifiable") to 10
+("always justifiable")`). This applies to **every** column in the block — the aggregates (`agree_agg_*`,
+`never_just_agg_*`, …), each individual category, and the `dont_know` / `no_answer` / `avg_score` columns —
+they all carry the same possible-answer clause; only the measured-response part differs. Pull the exact
+option wording from the `.dta` value labels (verify per Step 0), never from memory — e.g. WVS D066_01's
+fifth point is literally `Disagree strongly`, and F114E labels only the 1 and 10 endpoints. Same rule for
+IVS and WVS. This is a rule for **new** indicators you add — apply it as you write each entry.
+
+Do **not** attempt an automated bulk back-fill of the possible-answers clause across the *existing* IVS
+indicators. Most already convey their answers (often inside the question quote, e.g. important-in-life ends
+"…very important, rather important, not very important or not at all important?"), so a blanket append is
+redundant; and mapping an existing `shortName` back to its source `.dta` code is trap-laden — suffixes
+collide (`*_democratic_political_system` is E117, not the 1–10 E236 `*_democratic`; `*_secure_neighborhood`
+is the H001 security scale, not the G007_18_B neighborhood-*trust* scale), and value-label wording can
+diverge from the pipeline's recode wording (E124 human-rights: labels say "There is a lot of respect…" while
+the columns use "a great deal of respect…"). It was tried once and deliberately skipped for these reasons.
+
+**Keep IVS and WVS at metadata parity.** Any `description_short` house-style or convention you apply to one
+table's indicators, apply to the other's too — e.g. the possible-answers clause above was added to both the
+IVS and WVS blocks. When you improve or restyle the IVS metadata, mirror the change on WVS (and vice-versa)
+so the two blocks stay consistent, differing only in the survey-specific anchors (`*_wvs`) and the question
+wording.
+
+Canonical shape of a variable entry (a WVS entry = the IVS entry **plus** the three `*_wvs` override lines;
+everything else is inherited from `definitions.common`, so don't re-specify it):
+
+```yaml
+definitions:
+  common:                                 # applied dataset-wide → inherited by BOTH tables
+    presentation: {attribution_short: Integrated Values Surveys}   # IVS-worded
+    processing_level: major
+    description_key: [ …IVS-worded (merged WVS+EVS, IVS waves)… ]
+    description_processing: | …IVS-worded…
+    display: &common-display
+      numDecimalPlaces: 1
+      tolerance: 5
+      entityAnnotationsMap: |-
+        United Kingdom: England, Scotland, and Wales
+    unit: "%"
+    short_unit: "%"
+  # WVS overrides (common is IVS-specific) — referenced per WVS variable:
+  attribution_short_wvs: &attribution_short_wvs World Values Survey
+  description_key_wvs: &description_key_wvs [ …WVS-worded… ]
+  description_processing_wvs: &description_processing_wvs | …WVS-worded…
+
+tables:
+  integrated_values_surveys:              # IVS variable — inherits all of common
+    variables:
+      <short_name>:
+        title: '<unique across BOTH tables>'
+        description_short: '% of respondents … "<question stem>". Possible answers are "<a>", …, "<z>".'
+        display:
+          name: <short label>
+          <<: *common-display
+        presentation:
+          topic_tags: *topic_tags_<topic>
+
+  world_values_survey:                    # WVS variable — SAME shape + the 3 *_wvs overrides
+    variables:
+      <short_name>:
+        title: '<unique across BOTH tables>'
+        description_short: '% of respondents … "<question stem>". Possible answers are "<a>", …, "<z>".'
+        description_key: *description_key_wvs                 # ← WVS-only override
+        description_processing: *description_processing_wvs   # ← WVS-only override
+        display:
+          name: <short label>
+          <<: *common-display
+        presentation:
+          attribution_short: *attribution_short_wvs           # ← WVS-only override
+          topic_tags: *topic_tags_<topic>
+
+      avg_score_<q>:                        # unit-less average column (either table)
+        title: '…: average score'
+        description_short: 'Average score … on a scale from 1 ("…") to 10 ("…").'
+        display: {name: '…: average score', numDecimalPlaces: 2, <<: *common-display}
+        unit: ""
+        short_unit: ""
+        presentation: {topic_tags: *topic_tags_<topic>}       # + attribution_short: *attribution_short_wvs on WVS
+```
+
 **Battery questions — separate the prompt from the item.** Many WVS/EVS questions read a generic prompt
 then list items (e.g. "…with the following statements? - Work is a duty…"). In `description_short` never
 leave a raw `" - "` separator **and** never let the item dangle straight after the "?" (e.g.
@@ -234,10 +355,15 @@ adjacent-string-literal concatenation and silently yields `Dont know`. After app
 with `ruamel_load` and assert the count + that a new `avg_score_*` entry shows `unit == ""` and the
 `&common-display` anchor resolved (e.g. `numDecimalPlaces`).
 
-**`title` must be UNIQUE across the whole dataset** — grapher enforces this at the `--grapher` upload
-(`_adapt_table_for_grapher`), *not* at the garden build, so a clash sails through `check_sum_100` and only
-explodes at upload (`AssertionError: Variable titles are not unique`). The trap: an **aggregate** and a
-**category** that describe the same thing collide on title even when their column names differ. Real
+**`title` must be UNIQUE across the whole dataset — and the dataset holds BOTH tables.** Because
+`integrated_values_surveys` and `world_values_survey` share one grapher dataset, a WVS title must not clash
+with any IVS title (or vice-versa). WVS shares many concepts with IVS (worries, confidence, justifiable,
+…), so when you add a WVS question that duplicates an IVS concept, **suffix the WVS title** (e.g.
+`… (World Values Survey)`) to keep it unique; `display.name` may still repeat. Grapher enforces this at the
+`--grapher` upload (`_adapt_table_for_grapher`), *not* at the garden build, so a clash sails through
+`check_sum_100` and only explodes at upload (`AssertionError: Variable titles are not unique`). The trap: an
+**aggregate** and a **category** that describe the same thing collide on title even when their column names
+differ. Real
 example from this work — the closeness category `close_*` and the high aggregate `feel_close_*` both wanted
 `title: "Feel close to X"`. Fix: disambiguate the aggregate `title` (`"Feel close to X (very close or
 close)"`) and keep the short label in `display.name` (only `title` must be unique — `display.name` may
@@ -349,12 +475,14 @@ stata = {f"{p}_{underscore(LABELS[c])}" for codes, prefs in GROUPS.items() for c
 stata |= {f"{p}_humankind" for p in [...]}            # custom blocks: literal names, no rename
 
 meta = ruamel_load(open("etl/steps/data/garden/ivs/<v>/integrated_values_surveys.meta.yml").read())
-metakeys = set(meta["tables"]["integrated_values_surveys"]["variables"])
+# Pick the table you're editing: "integrated_values_surveys" (IVS) or "world_values_survey" (WVS).
+TABLE = "integrated_values_surveys"
+metakeys = set(meta["tables"][TABLE]["variables"])
 print("stata not meta:", sorted(stata - metakeys) or "none ✓")
 print("meta not stata:", sorted(metakeys - stata) or "none ✓")   # restrict metakeys to the new ones
 # also: assert no new code endswith another new code (rename ambiguity)
-# and assert ALL titles are unique (grapher requires it — see Step 5):
-titles = [v["title"] for v in meta["tables"]["integrated_values_surveys"]["variables"].values()]
+# and assert ALL titles are unique across BOTH tables (one shared grapher dataset — see Step 5):
+titles = [v["title"] for t in meta["tables"].values() for v in t["variables"].values()]
 assert len(titles) == len(set(titles)), "duplicate variable titles — grapher upload will fail"
 
 # and: every topic_tag must be in the curated schema enum (else it's silently dropped at upload)
@@ -411,10 +539,11 @@ git push
 
 Post `@codex review` as a **separate** PR comment; keep the PR body in sync with substantial pushes.
 
-## Step 9 — Notion `Available` dictionary (required)
+## Step 9 — Notion `Available` dictionary (required — IVS only)
 
-This is **not** optional — always finish the job by flipping the flags so the dictionary reflects what's
-actually in the dataset.
+**WVS target: skip this step entirely** — there is no Notion `Available` tracker for `world_values_survey`.
+For IVS this is **not** optional — always finish the job by flipping the flags so the dictionary reflects
+what's actually in the dataset.
 
 The **Integrated Values Surveys dictionary** Notion DB (`collection://fd3a1354-9da6-48e7-91bb-a0665ddd0f0b`)
 has an `Available` checkbox per code. Flip `Available = ✅` **only for codes that survive into the garden

@@ -7,7 +7,7 @@ Loads the `food_trade` garden table and writes two kinds of files:
     that tells the viz which (entity, product) combinations have any data;
   * one per-product JSON at `food-trade.<product_id>.json` carrying that
     product's `flows` (every (exporter, importer, value) triple in the data
-    for that item), plus `production` and `supply` per entity.
+    for that item).
 
 The product-keyed split naturally powers "Global trade of item X" views in
 the viz: pick a product, fetch one JSON, render. The metadata's
@@ -51,43 +51,20 @@ def _build_product_data(df: pd.DataFrame, product: str, entity_to_id: dict) -> d
 
     Schema:
         {
-          "flows":      {"exporters": [<entity_id>],
-                         "importers": [<entity_id>],
-                         "values":    [<tonnes>]},
-          "production": {"entities":  [<entity_id>], "values": [<tonnes>]},
-          "supply":     {"entities":  [<entity_id>], "values": [<tonnes>]}
+          "flows": {"exporters": [<entity_id>],
+                    "importers": [<entity_id>],
+                    "values":    [<tonnes>]}
         }
-
-    `production` / `supply` list only the entities that have a value for
-    this product — NaN entries are dropped so the consumer never has to
-    handle JSON `null`.
     """
     rows = df[df["item"] == product]
 
-    out: dict = {
+    return {
         "flows": {
             "exporters": [entity_to_id[e] for e in rows["exporter"]],
             "importers": [entity_to_id[e] for e in rows["importer"]],
             "values": rows["value"].astype(float).round(NUM_DECIMALS).tolist(),
         }
     }
-
-    # Production: per-exporter for this product. Dedupe by exporter (same
-    # value repeats across all rows that share the exporter), drop NaN.
-    prod = rows[["exporter", "exporter_production"]].dropna().drop_duplicates("exporter").sort_values("exporter")
-    out["production"] = {
-        "entities": [entity_to_id[e] for e in prod["exporter"]],
-        "values": prod["exporter_production"].astype(float).round(NUM_DECIMALS).tolist(),
-    }
-
-    # Supply: per-importer for this product. Dedupe by importer, drop NaN.
-    sup = rows[["importer", "importer_supply"]].dropna().drop_duplicates("importer").sort_values("importer")
-    out["supply"] = {
-        "entities": [entity_to_id[e] for e in sup["importer"]],
-        "values": sup["importer_supply"].astype(float).round(NUM_DECIMALS).tolist(),
-    }
-
-    return out
 
 
 def _build_products_by_entity(df: pd.DataFrame, entity_to_id: dict, product_to_id: dict) -> dict:

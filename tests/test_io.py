@@ -23,6 +23,23 @@ def test_get_all_changed_catalog_paths_directly_changed_export_step(mock_load_da
     assert get_all_changed_catalog_paths(files_changed, include_export=True) == ["export://multidim/un/latest/un_wpp"]
 
 
+@patch("etl.io.load_dag")
+def test_get_all_changed_catalog_paths_collection_subconfig(mock_load_dag):
+    """A collection sub-config maps to its parent `<short>` export step, not a phantom step.
+
+    The democracy explorer is built by `democracy.py` from companion configs like
+    `democracy.eiu.config.yml`. Editing only a sub-config must select the real
+    `export://explorers/democracy/latest/democracy` step; naive suffix-stripping would invent a
+    nonexistent `...democracy.eiu` step and make the staging deploy fail with "No steps matched".
+    Resolution relies on the sibling `democracy.py` recipe existing on disk.
+    """
+    mock_load_dag.return_value = {}
+    files_changed = {"etl/steps/export/explorers/democracy/latest/democracy.eiu.config.yml": "M"}
+    assert get_all_changed_catalog_paths(files_changed, include_export=True) == [
+        "export://explorers/democracy/latest/democracy"
+    ]
+
+
 @patch("etl.io.filter_to_subgraph")
 @patch("etl.io.load_dag")
 def test_get_all_changed_catalog_paths_downstream_and_direct_export_deduped(mock_load_dag, mock_filter_to_subgraph):

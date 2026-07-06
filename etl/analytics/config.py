@@ -15,6 +15,12 @@ ANALYTICS_JSON_URL = f"{ANALYTICS_URL}.json"
 # Maximum number of rows that a single Datasette csv call can return.
 MAX_DATASETTE_N_ROWS = 10000
 
+# Schema (BigQuery dataset) where the semantic-layer tables live, on the "Data warehouse (BigQuery)"
+# connection (METABASE_SEMANTIC_LAYER_DATABASE_ID). BigQuery requires table names to be qualified with
+# their dataset (e.g. `prod_semantic.charts`), unlike the old DuckDB semantic layer where bare names
+# resolved. See owid/analytics#735 (DuckDB → BigQuery migration).
+SEMANTIC_LAYER_SCHEMA = "prod_semantic"
+
 # Base OWID URL, used to find views in articles and topic pages.
 OWID_BASE_URL = "https://ourworldindata.org/"
 

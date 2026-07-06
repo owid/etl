@@ -553,9 +553,6 @@ steps:
   data://grapher/economics/2016-09-22/tax_composition__todaro_and_smith__2014:
     - data://garden/economics/2016-09-22/tax_composition__todaro_and_smith__2014:
       - snapshot://economics/2016-09-22/tax_composition__todaro_and_smith__2014.feather
-  data://grapher/agriculture/2017-08-10/forestry_area__fao__2017:
-    - data://garden/agriculture/2017-08-10/forestry_area__fao__2017:
-      - snapshot://agriculture/2017-08-10/forestry_area__fao__2017.feather
   data://grapher/labor/2017-03-21/us_female_labor_force_participation_1890_2005__olivetti__2013:
     - data://garden/labor/2017-03-21/us_female_labor_force_participation_1890_2005__olivetti__2013:
       - snapshot://labor/2017-03-21/us_female_labor_force_participation_1890_2005__olivetti__2013.feather
