@@ -28,7 +28,7 @@ tables:
         description_short: Share of working people employed in agriculture, including hunting, forestry and fishing.
         description_key:
           - Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, measuring agricultural employment as a share of total employment.
-          - Earlier estimates for ten of today's rich countries are derived from historical reconstructions of the number of people working in each sector. For five European countries, benchmark estimates from Broadberry and Gardner (2013) reach back as far as 1300; these measure the share of the total labor force, which also includes unemployed people.
+          - Earlier estimates for ten countries (Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States) are derived from historical reconstructions of the number of people working in each sector. For five European countries (France, Italy, the Netherlands, Poland and the United Kingdom), benchmark estimates from Broadberry and Gardner (2013) reach back as far as 1300; these measure the share of the total labor force, which also includes unemployed people.
         description_processing: |-
           {definitions.description_processing_splice}
 
@@ -48,7 +48,7 @@ tables:
         description_short: Share of working people employed in industry, including mining, manufacturing and construction.
         description_key:
           - Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, measuring industrial employment as a share of total employment.
-          - Earlier estimates for ten of today's rich countries are derived from historical reconstructions of the number of people working in each sector.
+          - Earlier estimates for ten countries (Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States) are derived from historical reconstructions of the number of people working in each sector.
           - "{definitions.description_key_utilities}"
         description_processing: |-
           {definitions.description_processing_splice}
@@ -66,7 +66,7 @@ tables:
         description_short: Share of working people employed in services.
         description_key:
           - Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, measuring services employment as a share of total employment.
-          - Earlier estimates for ten of today's rich countries are derived from historical reconstructions of the number of people working in each sector.
+          - Earlier estimates for ten countries (Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States) are derived from historical reconstructions of the number of people working in each sector.
           - "{definitions.description_key_utilities}"
         description_processing: |-
           {definitions.description_processing_splice}

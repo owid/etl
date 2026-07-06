@@ -1,4 +1,4 @@
-"""Long-run employment and GDP shares by sector for ten currently rich countries.
+"""Long-run employment and GDP shares by sector for ten countries: Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States.
 
 This step combines several sources into long-run series of employment numbers and value
 added shares by broad economic sector. The base is the dataset published by Herrendorf,

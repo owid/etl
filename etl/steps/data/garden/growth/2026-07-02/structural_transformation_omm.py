@@ -5,9 +5,9 @@ Combines three sources:
     1991 onwards) and total employment.
   - The historical compilation built in structural_transformation_historical (Herrendorf,
     Rogerson and Valentinyi 2014, updated with the GGDC 10-Sector Database and the Swedish
-    Historical National Accounts), covering ten currently rich countries since 1800.
+    Historical National Accounts), covering ten countries since 1800 (Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States).
   - Broadberry and Gardner (2013): benchmark estimates of the share of the labor force
-    employed in agriculture in five European countries, 1300-1981.
+    employed in agriculture in five European countries (France, Italy, the Netherlands, Poland and the United Kingdom), 1300-1981.
 
 The indicators splice the historical compilation with WDI: for each country and indicator,
 WDI is used from its first available year onwards; historical sources only contribute
