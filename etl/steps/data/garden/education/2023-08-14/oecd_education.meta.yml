@@ -11,7 +11,7 @@ dataset:
 
     It includes indicators relating to historic data and more recent data on population with no formal education and literacy.
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   oecd_education:
     variables:

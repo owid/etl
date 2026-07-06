@@ -1,7 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 dataset:
   owners:
-    - Veronika Samborska
+    - Lucas Rodés-Guirao
 definitions:
   common:
     processing_level: minor

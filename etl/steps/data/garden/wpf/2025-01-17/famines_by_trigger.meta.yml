@@ -29,7 +29,7 @@ dataset:
 
 
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   famines_by_trigger:
     variables:

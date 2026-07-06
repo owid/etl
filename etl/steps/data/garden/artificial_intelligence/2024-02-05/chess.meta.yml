@@ -10,7 +10,7 @@ definitions:
 dataset:
   update_period_days: 360
   owners:
-    - Veronika Samborska
+    - Edouard Mathieu
 tables:
   chess:
     variables:

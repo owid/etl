@@ -263,7 +263,7 @@ dataset:
   title: UNESCO Institute for Statistics (UIS) - Education (SDGs)
 
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   education_sdgs:
     variables:

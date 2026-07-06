@@ -65,7 +65,6 @@ dataset:
 
   owners:
     - Fiona Spooner
-    - Veronika Samborska
 tables:
   by_mechanisms:
     variables:

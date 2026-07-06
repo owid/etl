@@ -60,7 +60,7 @@ definitions:
 dataset:
   update_period_days: 365
   owners:
-    - Veronika Samborska
+    - Lucas Rodés-Guirao
 
 tables:
   wup_urban_rural_population:

@@ -19,7 +19,7 @@ dataset:
   update_period_days: 90
 
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   ai_indicator:
     variables:

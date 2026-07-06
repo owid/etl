@@ -9,7 +9,7 @@ dataset:
   update_period_days: 91
   owners:
     - Edouard Mathieu
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   nvidia_revenue:
     variables:

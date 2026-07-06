@@ -19,7 +19,6 @@ dataset:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
     - Lucas Rodés-Guirao
-    - Veronika Samborska
 tables:
   population_fariss:
     # Learn more about the available fields:

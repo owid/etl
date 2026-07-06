@@ -31,7 +31,7 @@ dataset:
   title: Monthly surface temperature by country
 
   owners:
-    - Veronika Samborska
+    - Pablo Rosado
 tables:
   surface_temperature:
     variables:

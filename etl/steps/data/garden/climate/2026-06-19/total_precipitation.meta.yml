@@ -23,7 +23,7 @@ dataset:
   title: Monthly precipitation by country
   update_period_days: 180
   owners:
-    - Veronika Samborska
+    - Pablo Rosado
 tables:
   total_precipitation:
     variables:

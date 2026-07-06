@@ -12,7 +12,7 @@ dataset:
   title: Missing data - Deaths from Suicides
 
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   who_md_suicides:
     variables:

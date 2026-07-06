@@ -4,8 +4,6 @@ dataset:
   owners:
     - Mojmír Vinkler
     - Pablo Arriagada
-    - Veronika Samborska
-
 tables:
   wdi:
     variables:

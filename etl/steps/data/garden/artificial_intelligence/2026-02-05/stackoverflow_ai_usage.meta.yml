@@ -22,7 +22,7 @@ dataset:
 
   owners:
     - Edouard Mathieu
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   stackoverflow_ai_usage:
     variables:

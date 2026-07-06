@@ -8,7 +8,7 @@ dataset:
   update_period_days: 365
 
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   mobile_money:
     variables:

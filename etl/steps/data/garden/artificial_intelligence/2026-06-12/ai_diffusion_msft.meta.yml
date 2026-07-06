@@ -11,7 +11,7 @@ dataset:
 
   owners:
     - Edouard Mathieu
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   ai_diffusion_msft:
     variables:

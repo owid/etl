@@ -30,7 +30,7 @@ dataset:
   non_redistributable: true
 
   owners:
-    - Veronika Samborska
+    - Lucas Rodés-Guirao
     - Edouard Mathieu
 tables:
   dynabench:

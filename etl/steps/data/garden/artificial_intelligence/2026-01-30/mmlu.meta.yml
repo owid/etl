@@ -24,7 +24,7 @@ dataset:
 
 
   owners:
-    - Veronika Samborska
+    - Lucas Rodés-Guirao
 tables:
   mmlu_by_model:
     variables:

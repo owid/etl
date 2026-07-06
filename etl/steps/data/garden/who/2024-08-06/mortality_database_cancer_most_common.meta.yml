@@ -14,7 +14,7 @@ dataset:
   title: WHO Mortality Database - Leading cancer types causing death
 
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   mortality_database_cancer:
     variables:

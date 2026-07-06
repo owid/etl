@@ -72,8 +72,6 @@ dataset:
   title: Global Terrorism Database
   update_period_days: 365
 
-  owners:
-    - Veronika Samborska
 tables:
   global_terrorism_database:
     variables:

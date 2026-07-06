@@ -25,7 +25,7 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   gender_statistics:
     # Learn more about the available fields:

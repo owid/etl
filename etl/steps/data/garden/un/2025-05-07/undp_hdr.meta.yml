@@ -30,8 +30,6 @@ dataset:
   update_period_days: 365
   owners:
     - Lucas Rodés-Guirao
-    - Veronika Samborska
-
 tables:
   undp_hdr:
     common:

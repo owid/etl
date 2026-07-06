@@ -3,7 +3,7 @@
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 dataset:
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   plastic_waste:
     variables:

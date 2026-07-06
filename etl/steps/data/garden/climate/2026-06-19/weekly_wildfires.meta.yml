@@ -20,7 +20,7 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
-    - Veronika Samborska
+    - Pablo Rosado
 tables:
   weekly_wildfires:
     # Learn more about the available fields:

@@ -21,7 +21,7 @@ dataset:
   update_period_days: 365
 
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   literacy_1451_1800:
     variables:
