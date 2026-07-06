@@ -122,6 +122,32 @@ class AdminAPI:
             raise AdminAPIError({"error": js["error"], "tags": tags})
         return js
 
+    def create_site_redirect(self, source: str, target: str, user_id: int | None = None) -> dict:
+        """Create a site-wide URL redirect (redirects table).
+
+        Unlike chart_slug_redirects (slug -> chartId only), this supports an
+        arbitrary target including a query string, e.g. "/grapher/foo?tab=scatter".
+        Source query params are stripped on redirect; the target may carry its own.
+        """
+        resp = http_session.post(
+            f"{self.owid_env.admin_api}/site-redirects/new",
+            headers=self._headers(user_id),
+            json={"source": source, "target": target},
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success"):
+            raise AdminAPIError({"error": js.get("error"), "source": source, "target": target})
+        return js
+
+    def delete_site_redirect(self, redirect_id: int, user_id: int | None = None) -> dict:
+        """Delete a site-wide URL redirect by id (there is no update endpoint, so
+        callers change a target by deleting then re-creating)."""
+        resp = http_session.delete(
+            f"{self.owid_env.admin_api}/site-redirects/{redirect_id}",
+            headers=self._headers(user_id),
+        )
+        return self._json_from_response(resp)
+
     def put_grapher_config(self, variable_id: int, grapher_config: dict[str, Any]) -> dict:
         # If schema is missing, use the default one
         grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
@@ -263,7 +289,9 @@ class AdminAPI:
 def requests_with_retry() -> requests.Session:
     s = requests.Session()
     s.headers["User-Agent"] = USER_AGENT
-    retries = Retry(total=5, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+    # 401 is included because staging's admin API can transiently reject a valid key while
+    # grapher-build's DB migrations run concurrently with this build (see owid/ops#540).
+    retries = Retry(total=5, backoff_factor=1, status_forcelist=[401, 500, 502, 503, 504])
     s.mount("http://", HTTPAdapter(max_retries=retries))
     s.mount("https://", HTTPAdapter(max_retries=retries))
     return s

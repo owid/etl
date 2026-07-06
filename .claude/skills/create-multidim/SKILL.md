@@ -36,7 +36,9 @@ https://ourworldindata.org/grapher/{chart-slug}.metadata.json
 https://api.ourworldindata.org/v1/indicators/{id}.metadata.json
 ```
 
-The catalogPath format is: `grapher/{namespace}/{version}/{dataset}/{table}#{variable_name}`
+**Reference indicators by the short `{table}#{variable_name}` form** (e.g. `child_labor#share_child_labor__sex_total__age_5_17`). PathFinder resolves the namespace/version/dataset from the step's DAG dependency, so the config never hardcodes the version — when the dataset version bumps, only the DAG entry changes. See `etl/steps/export/multidim/wid/latest/wealth_wid.config.yml` for a real example.
+
+The full form `grapher/{namespace}/{version}/{dataset}/{table}#{variable_name}` is valid too, but only reach for it to disambiguate when two DAG dependencies both contain a table of the same name. Never hardcode the version just to "be explicit" — it rots on the next update.
 
 Look at the indicator shortNames to identify the dimensional structure. For example:
 - `life_expectancy__sex_female__age_0__type_period` → dimensions: sex, age
@@ -157,7 +159,7 @@ views:
       sex: female
     indicators:
       y:
-        - catalogPath: grapher/namespace/version/dataset/table#variable_female
+        - catalogPath: table#variable_female
     config:
       title: "Title for females view"
       subtitle: "Subtitle for females view"
@@ -166,7 +168,7 @@ views:
       sex: male
     indicators:
       y:
-        - catalogPath: grapher/namespace/version/dataset/table#variable_male
+        - catalogPath: table#variable_male
     config:
       title: "Title for males view"
       subtitle: "Subtitle for males view"
@@ -182,10 +184,10 @@ views:
       sex: female
     indicators:
       y:
-        - catalogPath: grapher/ns/ver/ds/tb#indicator_a
+        - catalogPath: tb#indicator_a
           display:
             name: "Label for line A"
-        - catalogPath: grapher/ns/ver/ds/tb#indicator_b
+        - catalogPath: tb#indicator_b
           display:
             name: "Label for line B"
     config:
@@ -215,6 +217,10 @@ definitions:
           colorScale:
             binningStrategy: manual
 ```
+
+## Per-view FAUST: inherit from garden, don't re-type it
+
+A view's chart config can omit `title`/`subtitle`/`note` — each view then inherits FAUST from the indicator's `presentation.grapher_config` in the **garden** `.meta.yml` (templated by dimension). Inheritance is from `grapher_config` only — there is no fallback to the indicator `title`/`description_short`/`display.name`. So to replicate an existing chart's FAUST across many views, set `grapher_config.title`/`subtitle`/`note` once in the garden metadata (e.g. age-aware via a Jinja `<% if %>` template), rebuild the grapher step, and leave the view configs thin. To verify what will actually render, read the resolved per-view config from `multi_dim_x_chart_configs` → `chart_configs` in the staging DB.
 
 ## Common Dimension Patterns
 

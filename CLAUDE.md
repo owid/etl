@@ -62,6 +62,21 @@ When generating user-facing prose (PR descriptions, Slack messages, PR comments,
 
 If you find yourself doing any of these in the snapshot, move them to garden.
 
+## Glossary
+
+Internal terms that recur across this guide, the skills, and the codebase:
+
+- **ETL:** the data pipeline that gets external datasets into the Grapher
+- **Grapher:** OWID's charting tool / database for interactive visualizations
+- **OMM:** OWID-Maintained Metric — a curated indicator for a topic
+- **MDim / Multi-dimensional indicator:** interactive chart with toggleable views (e.g. total vs per capita)
+- **Explorer:** a more complex interactive tool than a single chart, with multiple tabs/views
+- **FAUST:** chart text (Footnote, Axis title, Unit, Subtitle, Title)
+- **WYSK:** "What You Should Know" — metadata/description attached to a dataset or chart
+- **Topic page:** an evergreen page on a topic (modular or linear)
+- **Key insight:** a short, standalone data point highlighted on a topic page
+- **Static viz:** a one-off image (Figma/Illustrator), not an interactive Grapher chart
+
 ## Running ETL Steps
 
 ```bash
@@ -83,8 +98,11 @@ Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run)
 **Important:**
 - **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
 - **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
-- **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code.
+- **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code. It also **fails with `AccessDenied` when the target version isn't in the catalog yet** (e.g. a version you just created) — use it only to fetch already-published upstream deps, never for the new step you're building locally.
 - For `grapher://` steps, always add `--grapher` flag
+- **Pushing to the grapher DB:** running a `data://grapher/...` step (even with `--grapher`) only builds the dataset feather. The MySQL upsert is the separate `grapher://...` step. If a metadata-only change (`display`, `description_key`, etc.) isn't showing up in the grapher DB, run `etlr grapher://grapher/<path> --grapher` explicitly to force the variable upsert.
+- **Version-bumping a grapher step mints new variable IDs**, so existing charts referencing the old indicators become ghost variables and must be remapped on staging (see the `remapping-ghost-variables` skill / `indicator_upgrade` CLI). Budget for this whenever you rename or re-version a grapher dataset.
+- **Versioning hygiene for derived/OMM steps:** an OMM's version reflects when its combining logic was written, not its inputs — but when you repoint a derived step to a newer-dated dependency, bump the step's own version folder too. Leaving a step dated before the data it ingests is confusing and should be fixed when noticed.
 - Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
 
 ## Git Workflow
@@ -109,6 +127,8 @@ gh pr edit <number> --body "..."
 **Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
 
 **Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
+
+To run the full **review → wait → fix → re-review** loop hands-off (and watch CI) in the background while you keep working, use the `pr-babysitter` skill — it spawns a background agent that triggers Codex, judges and fixes the valid findings, and loops to a cap (never merges). Fire it proactively after pushing a substantial chunk to a PR branch.
 
 ### Commit Message Emojis
 
@@ -253,6 +273,7 @@ Pick whichever apply to your step. Don't write all of these by default — write
 - **Sum reconciles with published total.** If the source publishes both the components and the total, assert that summing the components equals the total within tolerance. See [`emissions/2026-02-11/emissions_by_custom_sector.py`](etl/steps/data/garden/emissions/2026-02-11/emissions_by_custom_sector.py:172) for an example. Catches row-shift extraction bugs and unit-mismatches.
 - **No silent drops.** If you filter, dedupe, or aggregate, assert that the row count or aggregate matches what you'd expect. (`assert len(tb) == n_expected`.) Catches transforms that quietly lose data.
 - **Coverage didn't shrink.** When updating a dataset version, check that you still have at least as many countries / quarters / categories as the previous version — a sudden drop is usually a parsing regression, not a real change.
+- **Magnitude matches the previous version.** When rewriting or updating a step, compare output values against the previous live version — a silent unit regression (e.g. a dropped ×1e6 conversion) passes every schema check and ships wrong-by-a-million values. Source columns whose headers carry unit markers (`(mils)`, `(000)`, `%`) demand an explicit conversion in garden **plus** a magnitude assert (`assert 1e12 < tb[col].max() < 1e14`), so the conversion can't be lost in a future rewrite.
 
 ### When checks fail
 
@@ -274,6 +295,23 @@ df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
 
 **Prefer Python when the SQL contains `%` (LIKE patterns, JSON_EXTRACT paths) or single-quoted strings — `make query` re-interprets those via shell + make and breaks unpredictably.** Use `params={...}` for `%`/quoted values to dodge pymysql's own `%`-format-string parsing.
 
+**`OWID_ENV` targets your local dev DB even when you're on a branch.** To query the branch's staging DB from Python, use `OWIDEnv.from_staging('<branch>')` (`from etl.config import OWIDEnv`) — e.g. `OWIDEnv.from_staging('my-branch').read_sql(...)`. Also note `make query` shells out to the `mysql` CLI, which may not be installed; if it errors with `mysql: command not found`, use the Python `from_staging(...).read_sql(...)` path instead.
+
+### Production queries via public Datasette
+
+When you need production data (which charts use an indicator, chart configs, gdoc links) and local/prod MySQL isn't reachable, query the public Datasette over HTTP:
+
+```bash
+curl -s "https://datasette-public.owid.io/owid.json?sql=<url-encoded SQL>"
+```
+
+`chart_dimensions` + `charts` + `chart_configs` answer "which charts use variable X"; `narrative_charts` and `posts_gdocs_links` cover derived charts and article references — together they answer the full "what does this dataset affect?" question when assessing the blast radius of a data fix.
+
+## Verifying charts on staging
+
+- **Indicator data/metadata API**: `https://api-staging.owid.io/staging-site-<branch>/v1/indicators/<id>.data.json` (and `.metadata.json`). The path prefix is `staging-site-<branch>`, **not** the bare branch name — a wrong prefix silently serves data from a different environment instead of 404ing, which looks exactly like "my fix didn't take". When in doubt, grep the staging chart page (`http://staging-site-<branch>/grapher/<slug>`) for `data.json` to get the exact URLs it loads.
+- **Rendered chart without a browser**: `http://staging-site-<branch>/grapher/<slug>.svg` returns a server-side render — grep it for axis labels / entity names to verify a fix end-to-end (e.g. `grep -oE '>[0-9]+ [a-z]+[^<]*<'` to read the y-axis ticks).
+
 ## Additional Tools
 
 Get `--help` for details on any command.
@@ -293,6 +331,8 @@ uv add package_name
 uv remove package_name
 ```
 
+**Never run bare `uv sync`** — it prunes optional deps the repo needs (streamlit, etc.) and breaks `etl`/`etl pr`. The full environment is `uv sync --all-extras --group dev` (what `make .venv` runs); use that to install or repair the venv.
+
 ## VSCode Extensions
 
 Extensions live in `vscode_extensions/<name>/`. After **every** code change, you must compile, package, and install — just compiling is NOT enough:
@@ -305,6 +345,12 @@ code --install-extension install/<name>-<version>.vsix --force
 ```
 
 Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
+
+## GitHub Actions
+
+When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinning rule imported below:
+
+@.github/instructions/github-actions.instructions.md
 
 ## Extended Documentation
 

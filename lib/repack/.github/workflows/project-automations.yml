@@ -13,6 +13,8 @@ on:
             - review_requested
             - closed
 
+permissions: {}
+
 jobs:
     prio:
         name: Sync issue priority to project board

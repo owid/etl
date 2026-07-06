@@ -1,7 +1,7 @@
 dataset:
   title: The Semiconductor Supply Chain Assessing National Competitiveness (CSET, 2022)
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   semiconductors_cset:
     variables:

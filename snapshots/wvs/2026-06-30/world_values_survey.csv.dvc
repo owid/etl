@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: World Values Survey
+    title: World Values Survey
+    description: |-
+      The World Values Survey (WVS) is an international research program devoted to the scientific and academic study of social, political, economic, religious and cultural values of people in the world. The project’s goal is to assess which impact values stability or change over time has on the social, political and economic development of countries and societies. The project grew out of the European Values Study and was started in 1981 by its Founder and first President (1981-2013) Professor Ronald Inglehart from the University of Michigan (USA) and his team, and since then has been operating in more than 120 world societies. The main research instrument of the project is a representative comparative social survey which is conducted globally every 5 years. Extensive geographical and thematic scope, free availability of survey data and project findings for broad public turned the WVS into one of the most authoritative and widely-used cross-national surveys in the social sciences. At the moment, WVS is the largest non-commercial cross-national empirical time-series investigation of human beliefs and values ever executed.
+    citation_full: |-
+      Inglehart, R., Haerpfer, C., Moreno, A., Welzel, C., Kizilova, K., Diez-Medrano J., M. Lagos, P. Norris, E. Ponarin & B. Puranen (eds.). 2022. World Values Survey: All Rounds – Country-Pooled Datafile Version 5.0. Madrid, Spain & Vienna, Austria: JD Systems Institute & WVSA Secretariat. https://doi.org/10.14281/18241.17
+    attribution_short: WVS
+    version_producer: Version 5.0 (1981-2022)
+    url_main: https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
+    date_published: '2024-04-30'
+    date_accessed: '2026-06-30'
+    license:
+      name: WVSA Conditions of use
+      url: https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
+outs:
+  - md5: 9882d6eb153c9606cec9f190c1ff46d1
+    size: 14211
+    path: world_values_survey.csv

@@ -46,22 +46,21 @@ tables:
           conversionFactor: 1000000.0
         description: |-
           Estimated carbon emissions produced from deforestation, which is adjusted for trade. This means it includes emissions associated with imported products. This includes estimated emissions from peatland.
-      production_emissions_tco2_per_capita:
-        title: Deforestation emissions per person
-        unit: tonnes
-        short_unit: t
+      production_deforestation_sqm_per_capita:
+        title: Domestic deforestation per person
+        unit: square meters
+        short_unit: m²
+        display:
+          numDecimalPlaces: 0
+        description: Estimated deforestation per person based on domestic deforestation.
+      consumption_deforestation_sqm_per_capita:
+        title: Trade-adjusted deforestation per person
+        unit: square meters
+        short_unit: m²
         display:
           numDecimalPlaces: 0
         description: |-
-          Estimated per capita carbon emissions produced from domestic deforestation. This includes estimated emissions from peatland.
-      consumption_emissions_tco2_per_capita:
-        title: Trade-adjusted deforestation emissions per person
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-        description: |-
-          Estimated per capita carbon emissions produced from deforestation, which is adjusted for trade. This means it includes emissions associated with imported products. This includes estimated emissions from peatland.
+          Estimated consumption-based deforestation per person; this is adjusted for trade, so it reflects consumption deforestation, not domestic production.
     dimensions:
       - name: country
         slug: country

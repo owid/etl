@@ -10,7 +10,7 @@ dataset:
   title: World Urbanization Prospects Dataset - Number of Inhabitants to Define Urban Agglomerations
 
   owners:
-    - Veronika Samborska
+    - Lucas Rodés-Guirao
 tables:
   urban_agglomerations_definition:
     variables:

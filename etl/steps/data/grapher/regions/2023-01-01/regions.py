@@ -78,6 +78,13 @@ def run() -> None:
         # Add a column with the region that each country belongs to, according to the current institution.
         tb_regions = tb_regions.merge(_tb_regions, on="country", how="left", validate="one_to_one")
 
+    # Arab States is a broad ILO region (ilo_1) with no intermediate breakdown, so it is only tagged
+    # ilo_1. Backfill it into the intermediate map (ilo_2) so its countries are not left blank there;
+    # this mirrors ILOSTAT, which lists Arab States in both its broad-region and subregion classifications.
+    if {"ilo_1_region", "ilo_2_region"} <= set(tb_regions.columns):
+        mask = tb_regions["ilo_2_region"].isna() & (tb_regions["ilo_1_region"] == "Arab States (ILO)")
+        tb_regions.loc[mask, "ilo_2_region"] = tb_regions.loc[mask, "ilo_1_region"]
+
     # Remove unnecessary columns.
     tb_regions = tb_regions.drop(
         columns=["code", "is_historical", "region_type", "defined_by", "members"], errors="raise"

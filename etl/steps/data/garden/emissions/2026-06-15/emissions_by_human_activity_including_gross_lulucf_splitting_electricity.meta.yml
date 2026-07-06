@@ -1,0 +1,65 @@
+definitions:
+  description_processing_gross: |-
+    The "Growing food" activity uses gross agriculture-and-land-use emissions from Jones et al. (land-use-change CO₂ plus agricultural CH₄ and N₂O, with IPCC AR5 100-year global warming potentials), rather than Climate Watch's net land-use figures.
+  description_processing_direct: |-
+    Direct emissions are the emissions produced on-site by each activity (for example, fuel burned in vehicles or factories), taken from the step that keeps electricity as its own activity. They do not include the emissions from generating the electricity that the activity consumes.
+
+    {definitions.description_processing_gross}
+  description_processing_indirect: |-
+    Using UNdata's figures on final electricity consumption by sector, we calculate the share of total electricity consumed by each activity (e.g. the fraction of total electricity used in industry, in buildings, etc.).
+
+    Each activity's share of electricity consumption is then multiplied by the total emissions from electricity generation, yielding indirect emissions: the emissions attributable to the electricity each activity consumes.
+  description_processing_total: |-
+    {definitions.description_processing_direct}
+
+    {definitions.description_processing_indirect}
+
+    Total emissions per activity are the sum of direct and indirect emissions, so they reflect both on-site fuel combustion and the emissions embedded in the electricity each activity uses.
+  common:
+    presentation:
+      topic_tags:
+        - CO2 & Greenhouse Gas Emissions
+    processing_level: major
+    display:
+      numSignificantFigures: 2
+    unit: "tonnes of CO₂ equivalent"
+    short_unit: "t CO₂e"
+
+
+dataset:
+  title: Greenhouse gas emissions by human activity (including gross land-use emissions, splitting electricity)
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  # Electricity split across the activities that consume it, with "Other" folded into the activities.
+  emissions_by_human_activity_including_gross_lulucf_splitting_electricity:
+    title: Emissions by human activity (including gross land-use emissions, splitting electricity across activities)
+    variables:
+      ghg_emissions:
+        title: Greenhouse gas emissions by human activity (gross land use, direct and indirect emissions)
+        description_processing: "{definitions.description_processing_total}"
+      ghg_emissions_direct:
+        title: Greenhouse gas emissions by human activity (gross land use, direct emissions)
+        description_processing: "{definitions.description_processing_direct}"
+      ghg_emissions_indirect:
+        title: Greenhouse gas emissions by human activity (gross land use, indirect emissions from electricity)
+        description_processing: "{definitions.description_processing_indirect}"
+  # Same, but with the miscellaneous emissions shown as a separate "Other" activity.
+  emissions_by_human_activity_including_gross_lulucf_including_other_splitting_electricity:
+    title: Emissions by human activity (including gross land-use emissions and an "Other" activity, splitting electricity)
+    variables:
+      ghg_emissions:
+        title: Greenhouse gas emissions by human activity (gross land use, direct and indirect emissions, including an "Other" activity)
+        description_processing: "{definitions.description_processing_total}"
+        presentation:
+          grapher_config:
+            note: |-
+              "Other" emissions are those that cannot be allocated to any specific activity, including waste in landfills, fugitive emissions, and other fuel combustion. "Growing food" uses gross agriculture and land-use emissions.
+      ghg_emissions_direct:
+        title: Greenhouse gas emissions by human activity (gross land use, direct emissions, including an "Other" activity)
+        description_processing: "{definitions.description_processing_direct}"
+      ghg_emissions_indirect:
+        title: Greenhouse gas emissions by human activity (gross land use, indirect emissions from electricity, including an "Other" activity)
+        description_processing: "{definitions.description_processing_indirect}"

@@ -1,5 +1,7 @@
 """Tools for an interactive (ipython) session."""
 
+from typing import Any
+
 import yaml
 from owid.catalog import Table
 
@@ -23,7 +25,7 @@ def print_tables_metadata_template(tables: list[Table], fields: list[str] | None
     for tb in tables:
         dict_variables = {}
         for column in tb.columns:
-            dict_values = {}
+            dict_values: dict[str, Any] = {}
             for field in fields:
                 if field.startswith("presentation"):
                     field = field.replace("presentation.", "")

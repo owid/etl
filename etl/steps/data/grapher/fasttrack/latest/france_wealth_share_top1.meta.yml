@@ -1,0 +1,16 @@
+dataset:
+  title: DRAFT France wealth distribution share top 1
+  description: ''
+  licenses:
+    - {}
+tables:
+  france_wealth_share_top1:
+    variables:
+      top_1:
+        title: top_1
+        unit: '%'
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

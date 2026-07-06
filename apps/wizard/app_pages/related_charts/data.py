@@ -94,7 +94,7 @@ def get_coviews_sessions(after_date: str, min_sessions: int = 5) -> pd.Series:
             REGEXP_EXTRACT(url1, r'grapher/([^/]+)') AS slug1,
             REGEXP_EXTRACT(url2, r'grapher/([^/]+)') AS slug2,
             SUM(sessions_coviewed) AS total_sessions
-        FROM prod_google_analytics4.coviews_by_day_page
+        FROM prod_exports.coviews_by_day_page
         WHERE day >= '{after_date}'
             AND url1 LIKE 'https://ourworldindata.org/grapher%'
             AND url2 LIKE 'https://ourworldindata.org/grapher%'

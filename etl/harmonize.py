@@ -162,18 +162,18 @@ class CountryRegionMapper:
         tb_regions["aliases"] = [json.loads(alias) if pd.notnull(alias) else [] for alias in tb_regions["aliases"]]
         # Explode list of aliases to have one row per alias.
         aliases_s = tb_regions["aliases"].explode().dropna()
-        aliases = {}
-        valid_names = set()
+        aliases: dict[str, str] = {}
+        valid_names: set[str] = set()
         for row in rc_df.itertuples():
-            name = row.name  # ty: ignore
-            code = row.Index  # ty: ignore
+            name = str(row.name)  # ty: ignore[unresolved-attribute]
+            code = str(row.Index)  # ty: ignore[unresolved-attribute]
             valid_names.add(name)
-            aliases[name.lower()] = name  # ty: ignore[unresolved-attribute]
+            aliases[name.lower()] = name
             if code in aliases_s.index:
                 for alias in aliases_s.loc[[code]]:
-                    aliases[alias.lower()] = name
+                    aliases[str(alias).lower()] = name
             # Include the region code itself as another alias.
-            aliases[code.lower()] = name  # ty: ignore[unresolved-attribute]
+            aliases[code.lower()] = name
 
         self.aliases = aliases
         self.valid_names = valid_names
