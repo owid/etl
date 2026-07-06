@@ -74,8 +74,8 @@ if "$dataset" == "all" {
 	*Get distinct values of countries and call it list_of countries
 	*I will use this list to extract data per country instead of one big dataset that generates issues
 	*Drop CY from the list of countries, as it's failing
-	qui levelsof country if !inlist(country, "RU"), local(list_of_countries) clean
-	*qui levelsof country, local(list_of_countries) clean
+	*qui levelsof country if !inlist(country, "RU"), local(list_of_countries) clean
+	qui levelsof country, local(list_of_countries) clean
 }
 
 else if "$dataset" == "test" {
@@ -113,7 +113,7 @@ foreach option in $options {
 		}
 
 		foreach c in `list_of_countries' {
-			
+
 			di "avg thr for `c'"
 
 			*Get average and threshold income for pre tax and post tax (nat and dis) data
@@ -142,7 +142,7 @@ foreach option in $options {
 		qui save "`avgthr'"
 
 		foreach c in `list_of_countries' {
-			
+
 			di "gini share for `c'"
 
 			*Gets shares and Gini for pre and post tax income
