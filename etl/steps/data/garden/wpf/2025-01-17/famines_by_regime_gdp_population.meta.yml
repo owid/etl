@@ -13,7 +13,7 @@ dataset:
   title: Deaths from famines by regime, GDP and population growth
 
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
     - Lucas Rodés-Guirao
 tables:
   famines:

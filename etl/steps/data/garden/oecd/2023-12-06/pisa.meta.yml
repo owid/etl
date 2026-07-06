@@ -78,7 +78,7 @@ dataset:
   update_period_days: 365
 
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   pisa_math_boys_girls:
     variables:

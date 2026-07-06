@@ -1081,6 +1081,23 @@ steps:
       - snapshot://who/2024-01-03/gho.zip
     - data://garden/demography/2023-03-31/population
 
+ # WHO Preventive Chemotherapy - Neglected Tropical Diseases
+  # Lymphatic filariasis
+  # archived; last active in 72cb65d4fe31 on 2026-06-25
+  data://grapher/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+    - data://garden/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+            - snapshot://neglected_tropical_diseases/2025-08-20/lymphatic_filariasis.xlsx
+
+  # Schistosomiasis
+  # archived; last active in 72cb65d4fe31 on 2026-06-25
+  data://grapher/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+            - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
+
      #WHO GLASS Enrolment
   data://grapher/antibiotics/2024-12-03/glass_enrolment:
     - data://garden/antibiotics/2024-12-03/glass_enrolment:
@@ -1111,3 +1128,4 @@ steps:
     - data://garden/neglected_tropical_diseases/2025-08-20/funding:
       - data://meadow/neglected_tropical_diseases/2025-08-20/funding:
         - snapshot://neglected_tropical_diseases/2025-08-20/funding.xlsx
+

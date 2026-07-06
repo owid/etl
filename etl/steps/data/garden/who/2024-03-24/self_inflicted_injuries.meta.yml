@@ -14,7 +14,7 @@ dataset:
   title: WHO Mortality Database - Self-inflicted injuries
 
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   self_inflicted_injuries:
     variables:

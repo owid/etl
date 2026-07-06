@@ -367,6 +367,10 @@ steps:
   data-private://grapher/biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022:
     - data-private://garden/biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022:
       - snapshot-private://biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022.feather
+  # archived; last active in 3832cda37fb9 on 2026-07-03
+  data://grapher/agriculture/2017-08-10/forestry_area__fao__2017:
+    - data://garden/agriculture/2017-08-10/forestry_area__fao__2017:
+      - snapshot://agriculture/2017-08-10/forestry_area__fao__2017.feather
 data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
   - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
     - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather

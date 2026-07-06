@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass, field
+from typing import Any
 
 from owid.catalog.core.datasets import CHANNEL
 from owid.catalog.core.meta import DatasetMeta
@@ -41,6 +43,18 @@ def is_reserved_namespace(namespace: str) -> bool:
     if namespace.startswith("sitemap") and namespace.endswith(".xml"):
         return True
     return False
+
+
+def jsonld_contains_raw_jinja(jsonld: dict[str, Any]) -> bool:
+    """Return True if the serialized JSON-LD still contains Jinja template markers.
+
+    Variable metadata in long-format tables is Jinja-templated (rendered per dimension
+    combination by grapher, not by the catalog). ``schema_org`` guards the fields it knows
+    about; this is the last line of defense so an unguarded field can never ship a raw
+    template to the public page.
+    """
+    text = json.dumps(jsonld, ensure_ascii=False)
+    return "<%" in text or "<<" in text
 
 
 def find_duplicate_short_key_paths(entries: Iterable[tuple[str, str, str]]) -> set[str]:
@@ -80,7 +94,7 @@ def assess_dataset_quality(
     if not _has_title(dataset_meta, tables):
         result.blockers.append("missing_title")
 
-    if not _has_description(dataset_meta, tables):
+    if not _has_description(dataset_meta):
         result.blockers.append("missing_description")
 
     if not _has_license_url(dataset_meta, tables):
@@ -116,15 +130,12 @@ def _has_title(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) -> boo
     return bool(dataset_meta.title or dataset_meta.short_name or any(table.metadata.title for table in tables))
 
 
-def _has_description(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) -> bool:
-    if dataset_meta.description or any(table.metadata.description for table in tables):
-        return True
-    for table in tables:
-        for variable in table.variables.values():
-            for origin in variable.origins:
-                if origin.description or origin.description_snapshot:
-                    return True
-    return False
+def _has_description(dataset_meta: DatasetMeta) -> bool:
+    # Matches the contract in owid.catalog.schema_org._dataset_description: neither an
+    # indicator origin's description (e.g. an auxiliary population/GDP column) nor
+    # TableMeta.description (a mostly-internal field) counts as the dataset having a
+    # description of its own — only an explicit dataset.description does.
+    return bool(dataset_meta.description)
 
 
 def _has_license_url(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) -> bool:
