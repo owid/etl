@@ -20,26 +20,17 @@ def _agg(df: pd.DataFrame, water_types: set, quality_filter: set | None = None) 
     mask = df["bathingWaterType"].isin(water_types)
     if quality_filter is not None:
         mask &= df["quality"].isin(quality_filter)
-    return (
-        df[mask]
-        .groupby(["country", "year"], observed=True)["bathingWaterIdentifier"]
-        .count()
-        .reset_index()
-    )
+    return df[mask].groupby(["country", "year"], observed=True)["bathingWaterIdentifier"].count().reset_index()
 
 
 def make_nr_c(df: pd.DataFrame) -> pd.DataFrame:
     """Number of classified coastal bathing water sites."""
-    return _agg(df, COASTAL_TYPES, CLASSIFIED_QUALITIES).rename(
-        columns={"bathingWaterIdentifier": "sdg_14_40_nr_c"}
-    )
+    return _agg(df, COASTAL_TYPES, CLASSIFIED_QUALITIES).rename(columns={"bathingWaterIdentifier": "sdg_14_40_nr_c"})
 
 
 def make_nr_ex_c(df: pd.DataFrame) -> pd.DataFrame:
     """Number of coastal bathing water sites with excellent quality."""
-    return _agg(df, COASTAL_TYPES, {EXCELLENT_QUALITY}).rename(
-        columns={"bathingWaterIdentifier": "sdg_14_40_nr_ex_c"}
-    )
+    return _agg(df, COASTAL_TYPES, {EXCELLENT_QUALITY}).rename(columns={"bathingWaterIdentifier": "sdg_14_40_nr_ex_c"})
 
 
 def make_pct_ex_c(df: pd.DataFrame) -> pd.DataFrame:
@@ -53,16 +44,12 @@ def make_pct_ex_c(df: pd.DataFrame) -> pd.DataFrame:
 
 def make_nr_in(df: pd.DataFrame) -> pd.DataFrame:
     """Number of classified inland bathing water sites."""
-    return _agg(df, INLAND_TYPES, CLASSIFIED_QUALITIES).rename(
-        columns={"bathingWaterIdentifier": "sdg_14_40_nr_in"}
-    )
+    return _agg(df, INLAND_TYPES, CLASSIFIED_QUALITIES).rename(columns={"bathingWaterIdentifier": "sdg_14_40_nr_in"})
 
 
 def make_nr_ex_in(df: pd.DataFrame) -> pd.DataFrame:
     """Number of inland bathing water sites with excellent quality."""
-    return _agg(df, INLAND_TYPES, {EXCELLENT_QUALITY}).rename(
-        columns={"bathingWaterIdentifier": "sdg_14_40_nr_ex_in"}
-    )
+    return _agg(df, INLAND_TYPES, {EXCELLENT_QUALITY}).rename(columns={"bathingWaterIdentifier": "sdg_14_40_nr_ex_in"})
 
 
 def make_pct_ex_in(df: pd.DataFrame) -> pd.DataFrame:
