@@ -28,4 +28,4 @@ meta:
 outs:
   - md5: e8f141760175c0eca1e2a37040faff33
     size: 251
-    path: fofa_2050_arable_land.csv
+    path: future_of_food_and_agriculture_arable_land.csv
