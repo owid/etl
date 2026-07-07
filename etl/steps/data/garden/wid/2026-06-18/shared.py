@@ -7,7 +7,7 @@ from owid.catalog import Table, VariableMeta
 
 # Define PPP year
 # NOTE: Change the year when needed
-PPP_YEAR = 2024
+PPP_YEAR = 2025
 
 # Define default tolerance for each variable
 TOLERANCE = 5
