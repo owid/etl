@@ -371,6 +371,10 @@ steps:
   data://grapher/agriculture/2017-08-10/forestry_area__fao__2017:
     - data://garden/agriculture/2017-08-10/forestry_area__fao__2017:
       - snapshot://agriculture/2017-08-10/forestry_area__fao__2017.feather
+  # archived; last active in bc11d6451c60 on 2026-07-07
+  data-private://grapher/artificial_intelligence/2022-12-01/ai_index_report__2022:
+    - data-private://garden/artificial_intelligence/2022-12-01/ai_index_report__2022:
+      - snapshot-private://artificial_intelligence/2022-12-01/ai_index_report__2022.feather
 data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
   - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
     - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather
