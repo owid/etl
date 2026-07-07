@@ -1,14 +1,4 @@
-"""Combine the share of the world population fed by synthetic nitrogen fertilizers (digitized from Figure 1 of
-Erisman et al. (2008)) with OWID's long-run world population, to estimate the number of people fed (and supported
-without) synthetic nitrogen fertilizers.
-
-The digitized share is only available for select years, so we linearly interpolate it to obtain one value per year.
-Erisman et al. (2008) estimated the share up to 2008 (48%). From then on, we assume the share stays constant, so the
-extension of the series to recent years is driven purely by population growth. This assumption is supported by
-Rosa & Gabrielli (2023, https://doi.org/10.1088/1748-9326/aca815), whose country-level estimate for 2019 (about
-3.8 billion people fed by synthetic nitrogen fertilizers, roughly half of the world population) is, in the authors'
-own words, consistent with the earlier estimates for the year 2000.
-"""
+"""Combine the share of the world population fed by synthetic nitrogen fertilizers (from Erisman et al. (2008)) with OWID's long-run world population, to estimate the number of people fed (and supported without) synthetic nitrogen fertilizers."""
 
 import pandas as pd
 from owid.catalog import Table
@@ -20,16 +10,8 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# First year of the output series (first year of the digitized curve in Figure 1 of Erisman et al. (2008)).
-YEAR_MIN = 1900
-
-# Last year of the estimates by Erisman et al. (2008).
-YEAR_LAST_ERISMAN = 2008
-
-# Share (%) of the world population fed by synthetic nitrogen fertilizers estimated by Erisman et al. (2008) for 2008,
-# assumed to remain constant afterwards.
-# NOTE: This assumption is consistent with Rosa & Gabrielli (2023), whose country-level estimate for 2019 (about
-# 3.8 billion people fed, roughly half of the world population) they report as consistent with the year-2000 estimates.
+# Share (%) of the world population fed by synthetic nitrogen fertilizers estimated by Erisman et al. (2008) for 2008, assumed to remain constant afterwards.
+# NOTE: This assumption is consistent with Rosa & Gabrielli (2023), whose country-level estimate for 2019 (about 3.8 billion people fed, roughly half of the world population) they report as consistent with the year-2000 estimates.
 SHARE_FED_RECENT = 48.0
 
 # Name of the column with the digitized share.
@@ -69,7 +51,7 @@ def sanity_check_outputs(tb: Table) -> None:
         == tb["world_population"]
     ).all(), "Estimated populations fed and not fed by synthetic nitrogen do not add up to the world population."
     # The share must be constant for all years after the last estimate by Erisman et al. (2008).
-    recent = tb[tb["year"] >= YEAR_LAST_ERISMAN]
+    recent = tb[tb["year"] >= 2008]
     assert (recent[SHARE_COLUMN] == SHARE_FED_RECENT).all(), (
         "Share of population fed is expected to be constant in recent years."
     )
@@ -89,36 +71,30 @@ def run() -> None:
     #
     # Process data.
     #
-    # Find the last year for which population estimates (not projections) are available, to avoid extending the series
-    # into projected future years.
+    # Find the last year for which population estimates (not projections) are available, to avoid extending the series into projected future years.
     tb_historical = ds_population.read("historical")
     last_year = int(tb_historical.loc[tb_historical["country"] == "World", "year"].max())
 
     sanity_check_inputs(tb=tb, last_year=last_year)
 
     # Build an annual "World" spine from 1900 to the last year with population estimates.
-    tb_spine = Table(pd.DataFrame({"country": "World", "year": range(YEAR_MIN, last_year + 1)}))
+    tb_spine = Table(pd.DataFrame({"country": "World", "year": range(1900, last_year + 1)}))
 
     # Merge the (sparse) digitized share onto the annual spine.
     tb = pr.merge(tb_spine, tb, on="year", how="left")
 
     # Erisman et al. (2008) estimates end in 2008; assume the share remains constant afterwards.
-    tb.loc[tb["year"] > YEAR_LAST_ERISMAN, SHARE_COLUMN] = SHARE_FED_RECENT
+    tb.loc[tb["year"] > 2008, SHARE_COLUMN] = SHARE_FED_RECENT
 
-    # The digitized share is only given for select years (1900, 1910, 1930, ...); linearly interpolate between them
-    # to obtain one value per year, so the derived populations form annual series rather than sparse points.
+    # The digitized share is only given for select years (1900, 1910, 1930, ...); linearly interpolate between them to obtain one value per year, so the derived populations form annual series rather than sparse points.
     tb = interpolate_table(tb, entity_col="country", time_col="year", time_mode="none", method="linear")
 
-    # Add world population using the shared helper. This attaches the single, collapsed "Various sources" population
-    # origin (instead of the disaggregated HYDE/Gapminder/UN WPP origins from the raw population table).
+    # Add world population to table, properly handling origins.
     tb = paths.regions.add_population(tb, population_col="world_population")
 
-    # Estimate the number of people fed by synthetic nitrogen fertilizers, and the number of people that could be
-    # supported without them.
+    # Estimate the number of people fed by synthetic nitrogen fertilizers, and the number of people that could be supported without them.
     tb["population_fed_by_synthetic_nitrogen"] = (tb[SHARE_COLUMN] / 100 * tb["world_population"]).round(0)
     tb["population_not_fed_by_synthetic_nitrogen"] = tb["world_population"] - tb["population_fed_by_synthetic_nitrogen"]
-    # Both derived populations come from the same two sources; keep the order consistent (data source before
-    # population), so the population origin is not listed first.
     tb["population_not_fed_by_synthetic_nitrogen"].metadata.origins = tb[
         "population_fed_by_synthetic_nitrogen"
     ].metadata.origins

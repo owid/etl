@@ -10,8 +10,7 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Retrieve snapshot with the share of the world population fed by synthetic nitrogen fertilizers, digitized from
-    # Figure 1 of Erisman et al. (2008).
+    # Retrieve snapshot.
     snap = paths.load_snapshot("population_fed_by_synthetic_nitrogen.csv")
     tb = snap.read_csv()
 

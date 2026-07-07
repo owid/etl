@@ -5,15 +5,13 @@ meta:
     # Data product / Snapshot
     title: How a century of ammonia synthesis changed the world
     description: |-
-      Erisman et al. (2008) trace the impact of the Haber-Bosch process, which converts atmospheric nitrogen into ammonia, on world food production. Figure 1 of the paper shows the trend in world population along with an estimate of the share of the world population that is sustained by synthetic nitrogen fertilizers produced via the Haber-Bosch process. The authors estimate that by 2000 nitrogen fertilizers were responsible for feeding 44% of the world population, rising to 48% by 2008.
-
-      This snapshot contains that share of the world population fed by synthetic nitrogen fertilizers, as read off Figure 1 by Our World in Data in 2017.
+      Erisman et al. (2008) trace the impact of the Haber-Bosch process, which converts atmospheric nitrogen into ammonia, on world food production. Figure 1 of the paper shows the trend in world population along with an estimate of the share of the world population that is sustained by synthetic nitrogen fertilizers produced via the Haber-Bosch process.
     date_published: "2008-09-28"
 
     # Citation
     producer: Erisman et al.
     citation_full: |-
-      Erisman, J. W., Sutton, M. A., Galloway, J., Klimont, Z., & Winiwarter, W. (2008). How a century of ammonia synthesis changed the world. Nature Geoscience, 1(10), 636-639. https://doi.org/10.1038/ngeo325
+      Erisman, J., Sutton, M., Galloway, J. et al. How a century of ammonia synthesis changed the world. Nature Geosci 1, 636-639 (2008). https://doi.org/10.1038/ngeo325
 
     # Files
     url_main: https://www.nature.com/articles/ngeo325

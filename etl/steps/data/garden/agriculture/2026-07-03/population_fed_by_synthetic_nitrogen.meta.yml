@@ -8,14 +8,13 @@ definitions:
       topic_tags:
         - Fertilizers
   description_key: &description-key
-    - Synthetic nitrogen fertilizers are made from ammonia produced via the Haber-Bosch process, invented in the early 20th century. By making reactive nitrogen abundant, they removed one of the main constraints on crop yields and greatly increased the amount of food that can be grown.
-    - "[Erisman et al. (2008)](https://doi.org/10.1038/ngeo325) estimated the share of the world population whose food supply relies on synthetic nitrogen fertilizers: it grew from 0% in 1900 to 44% in 2000, and 48% in 2008. This is consistent with [Smil (2002)](https://doi.org/10.1579/0044-7447-31.2.126), who estimated that around 40% of the world population depended on them by 2000."
-    - No more recent time series of this share exists. However, [Rosa & Gabrielli (2023)](https://doi.org/10.1088/1748-9326/aca815) computed a country-level estimate for 2019 of about 3.8 billion people fed by synthetic nitrogen fertilizers (about half of the world population, and half of the global protein supply), which the authors note is consistent with the earlier estimates for the year 2000. This indicates that the roughly 50% share has held.
-    - For years after 2008, we assume that the share of the world population fed by synthetic nitrogen fertilizers has remained constant at 48%. Changes since then are therefore driven by population growth, not by a new measurement of that share.
+    - "Synthetic nitrogen fertilizers are made from ammonia produced using the Haber-Bosch process."
+    - "The Haber-Bosch process was invented in the early 20th century. It enabled the large-scale production of synthetic nitrogen fertilizers and greatly increased the amount of food that can be grown."
   description_processing: &description-processing |-
-    The share of the world population fed by synthetic nitrogen fertilizers was read off Figure 1 of Erisman et al. (2008), which reports values only for select years and ends in 2008 (at 48%). We linearly interpolate between these years to obtain a value for every year, and for years after 2008 we assume the share has remained constant at 48%. This is supported by Rosa & Gabrielli (2023), whose country-level estimate for 2019 (about 3.8 billion people fed) is consistent with the roughly 50% share.
-
-    To estimate the number of people fed by synthetic nitrogen fertilizers, we multiplied this annual share by our long-run world population series.
+    - "The share of the world population fed by synthetic nitrogen fertilizers was read off Figure 1 of [Erisman et al. (2008)](https://doi.org/10.1038/ngeo325), who estimated that this share grew from 0% in 1900 to 44% in 2000, and 48% in 2008. This is broadly consistent with [Smil (2002)](https://doi.org/10.1579/0044-7447-31.2.126), who estimated that the Haber-Bosch process provided the very means of survival for about 40% of humanity around 2000."
+    - For years after 2008, we assume that the share of the world population fed by synthetic nitrogen fertilizers has remained constant at 48%. This is consistent with [Rosa & Gabrielli (2023)](https://doi.org/10.1088/1748-9326/aca815), who estimated that about 3.8 billion people (roughly half of the global population) were fed by synthetic nitrogen fertilizers in 2019. Under this assumption, changes in the number of people fed by synthetic nitrogen fertilizers after 2008 are driven solely by population growth.
+    - We linearly interpolate between these years to obtain a value for every year.
+    - To estimate the number of people fed by synthetic nitrogen fertilizers, we multiplied this annual share by Our World in Data's long-run world population series.
 
 dataset:
   update_period_days: 365

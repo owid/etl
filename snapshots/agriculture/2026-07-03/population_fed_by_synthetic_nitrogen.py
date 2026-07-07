@@ -1,12 +1,8 @@
 """Script to create a snapshot of the share of the world population fed by synthetic nitrogen fertilizers.
 
 The data is the share of the world population sustained by synthetic nitrogen fertilizers (produced via the
-Haber-Bosch process), digitized by Our World in Data in 2017 from Figure 1 of Erisman et al. (2008),
-"How a century of ammonia synthesis changed the world" (https://www.nature.com/articles/ngeo325).
+Haber-Bosch process), extracted from Figure 1 of Erisman et al. (2008).
 
-The digitized values are hardcoded below (they were lifted from the legacy grapher dataset
-"Population fed by Haber-Bosch fertilizers - FAO (2017)", where each value was stored as
-share x world population, with population frozen at 2015).
 """
 
 import pandas as pd
