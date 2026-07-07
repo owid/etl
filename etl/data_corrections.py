@@ -69,6 +69,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 import yaml
 from owid.catalog import Table
 from structlog import get_logger
@@ -227,6 +228,16 @@ def _year_mask(years: Any, year_values: np.ndarray, label: str) -> np.ndarray:
     )
 
 
+def _eq_mask(values: np.ndarray, target: Any) -> np.ndarray:
+    """Elementwise equality that treats missing values as non-matching rather than raising.
+
+    `values` may be an object array holding `pd.NA`/`None` (e.g. a nullable string column) — comparing
+    those to a scalar with plain `==` yields `pd.NA` instead of `False`, which blows up a later `&=`
+    with a `TypeError: boolean value of NA is ambiguous`.
+    """
+    return pd.Series(values).eq(target).fillna(False).to_numpy()
+
+
 def _row_mask(tb: Table, correction: dict[str, Any], country_col: str, year_col: str) -> np.ndarray:
     """Return a positional boolean mask over `tb` selecting the rows a correction targets."""
     index_names = [name for name in tb.index.names if name is not None]
@@ -237,10 +248,10 @@ def _row_mask(tb: Table, correction: dict[str, Any], country_col: str, year_col:
         for key, value in correction["match"].items():
             # `value` is shorthand for the indicator column; any other key matches that column by name.
             col = correction["indicator"] if key == "value" else key
-            mask &= _column_values(tb, col, index_names) == value
+            mask &= _eq_mask(_column_values(tb, col, index_names), value)
         return mask
 
-    entity_mask = _column_values(tb, country_col, index_names) == correction["entity"]
+    entity_mask = _eq_mask(_column_values(tb, country_col, index_names), correction["entity"])
     year_values = _column_values(tb, year_col, index_names)
     return entity_mask & _year_mask(correction["years"], year_values, label)
 
@@ -335,6 +346,19 @@ def _to_float(value: Any) -> float | None:
     return None if f != f else f  # drop NaN
 
 
+def _to_int(value: Any) -> int | None:
+    """Coerce a value to int, or None if it's not a whole-number label.
+
+    Some tables carry non-integer year labels for rows unrelated to a given correction (e.g. a
+    reporting-period range like "1872-6") — those points simply can't be placed on the audit's
+    year axis, so they're dropped rather than raising.
+    """
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def audit_path_for(corrections_path: Path | str) -> Path:
     """Where the audit JSON for a given `.corrections.yml` lives (under the gitignored data/ tree)."""
     rel = Path(corrections_path).resolve().relative_to(STEP_DIR.resolve())  # data/<channel>/.../x.corrections.yml
@@ -373,16 +397,20 @@ def build_audit(
         for ent in sorted(set(entity_vals[mask].tolist())):
             ent_mask = entity_vals == ent
             series = sorted(
-                [int(y), fv]
+                [y_int, fv]
                 for y, v in zip(year_vals[ent_mask].tolist(), ind_vals[ent_mask].tolist())
-                if (fv := _to_float(v)) is not None
+                if (fv := _to_float(v)) is not None and (y_int := _to_int(y)) is not None
             )
             any_numeric = any_numeric or bool(series)
             affected = []
-            for y, v in sorted(zip(year_vals[(ent_mask & mask)].tolist(), ind_vals[(ent_mask & mask)].tolist())):
+            for y, v in sorted(
+                zip(year_vals[(ent_mask & mask)].tolist(), ind_vals[(ent_mask & mask)].tolist()),
+                key=lambda pair: str(pair[0]),
+            ):
                 before = _to_float(v)
-                if before is None:
-                    continue  # a matched-but-empty cell carries no value to show
+                y_int = _to_int(y)
+                if before is None or y_int is None:
+                    continue  # a matched-but-empty cell, or a non-integer year label, carries nothing to plot
                 if action == "drop":
                     after = None
                 elif action == "override":
@@ -391,7 +419,7 @@ def build_audit(
                     after = before * float(factor) if before is not None else None
                 else:
                     after = before
-                affected.append([int(y), before, after])
+                affected.append([y_int, before, after])
             entities.append({"entity": ent, "series": series, "affected": affected})
 
         records.append(

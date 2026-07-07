@@ -2,6 +2,7 @@
 
 import json
 
+import pandas as pd
 import pytest
 import yaml
 from owid.catalog import Table
@@ -95,6 +96,24 @@ def test_override_requires_value():
 
     with pytest.raises(AssertionError):
         _validate_correction(_correction(action="override", match={"value": 10.0}), "<test>")
+
+
+def test_match_ignores_missing_values_in_other_rows():
+    # A `match` correction must not blow up when other rows of the same column hold pandas' NA
+    # sentinel (e.g. a nullable "string" dtype column) — comparing NA to the match target should
+    # read as "no match", not raise `TypeError: boolean value of NA is ambiguous`.
+    tb = Table(
+        {
+            "country": ["Panama", "France", "France"],
+            "year": [2006, 2006, 2016],
+            "value": pd.array(["-1", pd.NA, "Inaccurtae forecasts"], dtype="string"),
+        }
+    )
+    out = apply_corrections(
+        tb,
+        [_correction(action="override", match={"value": "Inaccurtae forecasts"}, value="Inaccurate forecasts")],
+    )
+    assert out.loc[out["country"] == "France", "value"].tolist()[-1] == "Inaccurate forecasts"
 
 
 def test_flag_is_a_noop_on_data():
@@ -258,6 +277,26 @@ def test_build_audit_captures_scale_before_after():
     records = build_audit(tb, [_correction(action="scale", factor=0.5, entity="France", years="all")])
     ent = records[0]["entities"][0]
     # before → before*factor for every affected point.
+    assert ent["affected"] == [[2006, 10.0, 5.0], [2016, 20.0, 10.0]]
+
+
+def test_build_audit_skips_non_integer_year_labels():
+    from etl.data_corrections import build_audit
+
+    # Some tables carry non-integer year labels for rows unrelated to the correction (e.g. a
+    # reporting-period range like "1872-6") — those points should be dropped, not raise.
+    tb = Table(
+        {
+            "country": ["France", "France", "France"],
+            "year": ["1872-6", "2006", "2016"],
+            "value": [5.0, 10.0, 20.0],
+        }
+    )
+    records = build_audit(tb, [_correction(action="scale", factor=0.5, entity="France", years="all")])
+    ent = records[0]["entities"][0]
+    # The "1872-6" row is dropped from both the full series and (since `years: all` also matches it)
+    # the affected points, while the two integer-year rows are kept.
+    assert ent["series"] == [[2006, 10.0], [2016, 20.0]]
     assert ent["affected"] == [[2006, 10.0, 5.0], [2016, 20.0, 10.0]]
 
 
