@@ -23,4 +23,4 @@ meta:
 outs:
   - md5: 2c294aac56d6842698469a4c94fb1c4d
     size: 16982166
-    path: fofa_2050_regions.csv
+    path: future_of_food_and_agriculture_regions.csv
