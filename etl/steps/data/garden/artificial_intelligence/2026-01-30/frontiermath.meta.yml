@@ -13,7 +13,7 @@ dataset:
 
 
   owners:
-    - Veronika Samborska
+    - Lucas Rodés-Guirao
 tables:
   epoch_benchmark_data:
     variables:

@@ -27,7 +27,7 @@ dataset:
   title: Equatorial Pacific Sea Surface Temperatures (SST) data - El Niño or La Niña
 
   owners:
-    - Veronika Samborska
+    - Pablo Rosado
 tables:
   sst:
     variables:

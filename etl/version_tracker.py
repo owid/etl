@@ -383,7 +383,7 @@ class VersionTracker:
 
         return dependencies
 
-    def get_all_step_usages_ndim(self, only_active: bool = False) -> list[str]:
+    def get_all_step_usages_ndim(self, only_active: bool = False) -> list[list[str]]:
         """Get all usages for a given step in the dag (including usages of usages)."""
         dependencies = []
         memo = {}

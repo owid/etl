@@ -333,7 +333,7 @@ class MapBracketer:
         max_bracket_possible = round_to_nearest_power_of_ten(values_nonzero.max(), floor=False)
 
         # Initialize a dictionary of brackets.
-        brackets_all = {}
+        brackets_all: dict[str, np.ndarray] = {}
 
         # Calculate log-like brackets.
 
@@ -399,7 +399,7 @@ class MapBracketer:
             if len(bracket_values) == 0:
                 # If no brackets are possible, then fill the brackets with the minimum and maximum values possible, and
                 # zeros in between.
-                bracket_values = [self.min_value] + [0] * (MIN_NUM_BRACKETS - 1) + [self.max_value]
+                bracket_values = np.array([self.min_value] + [0] * (MIN_NUM_BRACKETS - 1) + [self.max_value])
             brackets_all[BRACKET_LABELS["linear"][str(shift)]] = bracket_values
 
         return brackets_all

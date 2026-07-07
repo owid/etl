@@ -26,13 +26,13 @@ Use WebFetch to fetch `url_main`. From the page content, extract as much metadat
 | Field | Where to look |
 |-------|---------------|
 | `title` | Page `<title>`, main heading, dataset title |
-| `description` | Page description, abstract, or "about" section |
+| `description` | Page description, abstract, or "about" section — copy the producer's text **verbatim** (light copyedits only — typos, spacing, encoding artifacts), don't paraphrase. For academic papers, use the abstract verbatim. If the page prose spans several paragraphs, take all of them (skip only navigation/boilerplate) |
 | `producer` | Organisation name, data owner, author |
-| `citation_full` | Official citation or "how to cite" section |
+| `citation_full` | The producer's recommended citation, copied **verbatim** (light copyedits only — fixing a typo, stray spacing, or encoding artifacts; never rephrasing) — look for "cite as" / "suggested citation" / "please make the following reference" blocks on the page, an "Original citation" on repository pages (e.g. WRAP), NBER's suggested citation, or "Reference:" headers inside the data files themselves. Sites often have a dedicated "how to cite" / citation page separate from the dataset landing page — browse the site's navigation for one. Only construct a citation in standard format when the producer provides none |
 | `attribution_short` | Short org name / acronym |
-| `date_published` | Publication date or last-updated date |
-| `license_name` | License section (e.g. "CC BY 4.0", "Open Government Licence") |
-| `license_url` | Link to the license |
+| `date_published` | Publication date or last-updated date. Not on the landing page? Look on other pages of the site (news/release notes, documentation), in the paper itself (title page and abstract often carry the exact date, e.g. "27 September 2013"), or in the files (file names like `10sd_jan15_2014.xlsx` or `shna2025tablesiii.xlsx` encode the release, and notes/readme sheets or PDF metadata may state it). Use a partial date ("YYYY" or "YYYY-MM") if that's all the source supports; never default it to `date_accessed`. Ask the user if still unsure |
+| `license_name` | License section (e.g. "CC BY 4.0", "Open Government Licence"). Not on the landing page? Also check the documentation (sources & methods documents, notes/readme sheets inside the data files, repository cover sheets like WRAP) and other pages within the same website — producers often have a dedicated licensing / terms-of-use / "about the data" section reachable from the site navigation. If no license is stated anywhere, **warn the user explicitly** and fall back to rights-reserved `© <producer> (<year>)` — never invent permissive terms like "Free to use" |
+| `license_url` | Link to the license, or to the page/document where the terms are stated |
 | `file_extension` | Infer from `url_download` if provided (csv, xlsx, xls, zip, json…); default `csv` |
 
 Leave fields blank if they cannot be inferred — the user will fill them in.
@@ -81,8 +81,12 @@ meta:
   origin:
     # Data product / Snapshot
     title: "<title>"
-    description: |-               # omit block if empty
+    title_snapshot: "<title> - <file specifics>"   # only when the file is one table/extract of a broader data product
+    description: |-               # omit block if empty; verbatim producer text
       <description>
+    description_snapshot: |-      # required whenever title_snapshot is set; own wording is fine here
+      <what this specific file contains: table number, variables, units, years, plus any OWID-side
+      context such as manual transcription or retrieval from an archived copy>
     date_published: "<date_published>"
 
     # Citation
@@ -187,3 +191,7 @@ Show:
 - The `outs` block `md5` and `size` fields are filled in automatically by DVC when the snapshot runs — just set them to empty/zero in the template.
 - Omit optional YAML fields entirely (don't leave them blank) to keep the DVC file clean.
 - Never guess at citation text — if you can't find it on the page, leave a placeholder like `<TO BE FILLED>` and ask the user.
+- Licenses and citations are often not on the landing page: check the documentation too (sources & methods PDFs, notes sheets inside the workbook, repository cover sheets), and look for dedicated pages elsewhere on the same site (licensing, terms of use, how-to-cite sections). A citation request ("please cite as...") is not a license — you may summarize it as the license name only when the page explicitly frames usage terms (e.g. "when using these data (for whatever purpose), please make the following reference"). If nothing is stated anywhere, warn the user and use `© <producer> (<year>)`.
+- `citation_full` should be the producer's recommended citation **verbatim** whenever one exists (page "cite as" blocks, repository "Original citation", NBER suggested citations, "Reference:" lines inside the data files); slight modifications are fine to fix typos or spacing issues in the source (e.g. "mirror : a" → "mirror: a"), but never rephrase or reformat the citation style. If the recommended citation is for a working-paper version of a published work, keep it and append the published version (e.g. "Published as: …"). Construct a standard-format citation only when the producer recommends none.
+- `description` must be the producer's own words, copied verbatim from the landing page or the paper's abstract — a fluent paraphrase is not acceptable. Slight modifications are fine when they fix a typo, spacing, or encoding artifact in the source text. Verify against the actual page text.
+- When the snapshot is a single file/table of a broader data product, split the metadata: `title`/`description` describe the data product (verbatim), while `title_snapshot`/`description_snapshot` describe the specific file. Whenever `title_snapshot` is set, also write a `description_snapshot` — that one doesn't need to be verbatim. OWID-side context (hand-transcription notes, "retrieved from the Internet Archive", etc.) belongs in `description_snapshot`, never inside the producer's `description`.

@@ -21,7 +21,6 @@ dataset:
   title: History Database of the Global Environment
   owners:
     - Lucas Rodés-Guirao
-    - Veronika Samborska
 tables:
   all_indicators:
     # Learn more about the available fields:

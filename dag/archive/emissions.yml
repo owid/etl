@@ -2,14 +2,14 @@ steps:
   #
   # Emissions - Greenhouse gas emissions by custom sector (2025-09-24).
   #
-  # archived; last active in 565bef28a32b on 2026-06-16
+  # archived; last active in 1f4d2cf663cc on 2026-06-29
   data-private://grapher/emissions/2025-09-24/emissions_by_custom_sector:
     - data-private://garden/emissions/2025-09-24/emissions_by_custom_sector:
       - snapshot-private://wri/2025-09-24/emissions_by_detailed_sector.json
   #
   # Emissions - Greenhouse gas emissions by custom sector (2026-02-11).
   #
-  # archived; last active in 565bef28a32b on 2026-06-16
+  # archived; last active in 1f4d2cf663cc on 2026-06-29
   data://grapher/emissions/2026-02-11/emissions_by_custom_sector:
     - data://garden/emissions/2026-02-11/emissions_by_custom_sector:
       - data://garden/climate_watch/2026-02-10/emissions_by_sector
@@ -17,7 +17,7 @@ steps:
   #
   # Emissions - Greenhouse gas emissions by custom sector (2026-03-04).
   #
-  # archived; last active in 565bef28a32b on 2026-06-16
+  # archived; last active in 1f4d2cf663cc on 2026-06-29
   data://grapher/emissions/2026-03-04/emissions_by_custom_sector:
     - data://garden/emissions/2026-03-04/emissions_by_custom_sector:
       - data://garden/climate_watch/2026-02-10/emissions_by_sector
