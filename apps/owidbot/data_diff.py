@@ -48,7 +48,9 @@ def run(include: str, branch: str | None = None) -> str:
         call_etl_diff(include, output_json=json_path, output_html=html_path)
 
         report = DiffReport.from_json(json_path.read_text())
-        report_url = upload_html_report(html_path, branch) if branch else None
+        # A report that just says "no differences" isn't worth hosting — upload only when
+        # there's something to show.
+        report_url = upload_html_report(html_path, branch) if branch and report.status != "clean" else None
 
     return format_comment(report, report_url)
 
