@@ -13,14 +13,14 @@ When needed, values are converted to PPP (2011 vintage) adjusted to prices of th
 HOW TO EXECUTE:
 
 1. Open this do-file in a local installation of Stata (it takes several hours to execute)
-2. It generates four files, which exclude and include extrapolations. They need to be imported as snapshots in the ETL, as
-	etls wid/2026-02-10/world_inequality_database --path-to-file snapshots/wid/2026-02-10/wid_indices_992j_exclude.csv
-	etls wid/2026-02-10/world_inequality_database_with_extrapolations --path-to-file snapshots/wid/2026-02-10/wid_indices_992j_include.csv
-	etls wid/2026-02-10/world_inequality_database_distribution --path-to-file snapshots/wid/2026-02-10/wid_distribution_992j_exclude.csv
-	etls wid/2026-02-10/world_inequality_database_distribution_with_extrapolations --path-to-file snapshots/wid/2026-02-10/wid_distribution_992j_include.csv
-	etls wid/2026-02-10/world_inequality_database_fiscal --path-to-file snapshots/wid/2026-02-10/wid_indices_fiscal_992ijt_exclude.csv
-3. Delete the csv files by running
-    rm snapshots/wid/2026-02-10/*.csv
+2. It generates five CSV files in this directory (snapshots/wid/2026-06-18/), which exclude and
+   include extrapolations. A single command imports all five as snapshots in the ETL (the script
+   world_inequality_database.py maps each generated CSV to its snapshot):
+	etls wid/2026-06-18/world_inequality_database
+3. Delete the leftover csv files: from the snapshots/wid/2026-06-18/ folder, run
+    rm *.csv
+   (kept on separate lines so the path and the glob never form a "slash-star" token, which
+    Stata would otherwise read as a nested block-comment opener and comment out the whole file)
 
 	(Change the date for future updates)
 
@@ -74,7 +74,7 @@ if "$dataset" == "all" {
 	*Get distinct values of countries and call it list_of countries
 	*I will use this list to extract data per country instead of one big dataset that generates issues
 	*Drop CY from the list of countries, as it's failing
-	*qui levelsof country if !inlist(country, "CY", "CZ", "FR", "KH"), local(list_of_countries) clean
+	*qui levelsof country if !inlist(country, "RU"), local(list_of_countries) clean
 	qui levelsof country, local(list_of_countries) clean
 }
 
@@ -114,6 +114,8 @@ foreach option in $options {
 
 		foreach c in `list_of_countries' {
 
+			di "avg thr for `c'"
+
 			*Get average and threshold income for pre tax and post tax (nat and dis) data
 			qui wid, indicators($indicators_avg_thr) perc($percentiles) areas(`c') ages($age) pop($unit) $exclude_option clear
 
@@ -140,6 +142,8 @@ foreach option in $options {
 		qui save "`avgthr'"
 
 		foreach c in `list_of_countries' {
+
+			di "gini share for `c'"
 
 			*Gets shares and Gini for pre and post tax income
 			qui wid, indicators($indicators_gini_share) perc($percentiles) areas(`c') ages($age) pop($unit) $exclude_option clear
