@@ -782,6 +782,9 @@
                             "originUrl": {
                                 "$ref": "grapher-schema.010.json#/properties/originUrl"
                             },
+                            "license": {
+                                "$ref": "grapher-schema.010.json#/properties/license"
+                            },
                             "colorScale": {
                                 "$ref": "grapher-schema.010.json#/properties/colorScale"
                             },

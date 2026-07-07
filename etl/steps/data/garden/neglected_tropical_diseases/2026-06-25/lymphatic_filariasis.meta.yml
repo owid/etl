@@ -6,6 +6,19 @@ definitions:
         - Global Health
         - Neglected Tropical Diseases
     processing_level: minor
+  lf_desc: &lf_desc |-
+    Lymphatic filariasis is a painful and profoundly disfiguring disease caused by a parasitic worm transmitted to humans through the bites of infected mosquitoes. It causes damage to the lymphatic system, fever and pain and can lead to swelling of the limbs and genitals, which often results in permanent disability and social stigma.
+  lf_ntd: &lf_ntd |-
+    Lymphatic filariasis is most common in tropical and subtropical regions of the world, especially in poor communities without adequate protection from mosquito bites. It is classified as a [neglected tropical disease (NTD)](#dod:neglected-tropical-diseases) by the World Health Organization (WHO).
+  lf_pc: &lf_pc |-
+    The WHO recommends [preventive chemotherapy](#dod:preventive-chemotherapy) for lymphatic filariasis, which means administrating safe and effective drugs to at-risk populations, regardless of whether individuals are infected or not.
+  lf_pc_map: &lf_pc_map |-
+    This data shows how much of the at-risk population is receiving preventive chemotherapy for lymphatic filariasis. 100% means that every person at-risk for contracting lymphatic filariasis is receiving preventive chemotherapy, while 0% means that no one at-risk is receiving preventive chemotherapy. In rare cases, the number of people treated may exceed the number of people targeted, which can result in a coverage percentage greater than 100%.
+  lf_pc_numbers: &lf_pc_numbers |-
+    This data shows the number of people who require preventive chemotherapy for lymphatic filariasis. Not everyone who requires preventive chemotherapy is receiving it — we show the percentage of the at-risk population who are receiving preventive chemotherapy in our chart on [national coverage](https://ourworldindata.org/grapher/lymphatic-filariasis-treatment-coverage).
+
+
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -13,12 +26,13 @@ dataset:
   title: Preventive Chemotherapy (PC) Data Portal - Lymphatic Filariasis
   owners:
     - Fiona Spooner
+    - Tuna Acisu
+
+
+
 tables:
   lymphatic_filariasis:
     variables:
-      current_status_of_mda:
-        title: Current status of MDA
-        unit: ""
       number_of_ius_covered:
         title: Number of implementation units covered
         unit: ""
@@ -58,12 +72,22 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+        description_key:
+          - *lf_desc
+          - *lf_ntd
+          - *lf_pc
+          - *lf_pc_map
       population_requiring_pc_for_lf:
         title: Population requiring preventive chemotherapy for lymphatic filariasis
         description_short: "Population requiring [preventive chemotherapy](#dod:preventive-chemotherapy) for [lymphatic filariasis](#dod:lymphatic-filariasis)."
         unit: "people"
         display:
           numDecimalPlaces: 0
+        description_key:
+          - *lf_desc
+          - *lf_ntd
+          - *lf_pc
+          - *lf_pc_numbers
       estimated_number_of_people_treated:
         title: Estimated number of people treated
         description_short: "Estimated number of people treated for [lymphatic filariasis](#dod:lymphatic-filariasis)."
