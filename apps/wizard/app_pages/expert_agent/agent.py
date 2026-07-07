@@ -11,19 +11,14 @@ import yaml
 from pydantic_ai import Agent
 
 # from pydantic_ai.agent import CallToolsNode
-from pydantic_ai.mcp import CallToolFunc, MCPServerStreamableHTTP, ToolResult
+from pydantic_ai.mcp import CallToolFunc, MCPToolset, ToolResult
 from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.tools import RunContext
 
 # from RestrictedPython import compile_restricted, safe_globals
 from apps.wizard.app_pages.expert_agent.media import save_code_file, save_plot_file
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, MODEL_DEFAULT, QueryResult, log, serialize_df
-from etl.analytics.datasette import (
-    DatasetteSQLError,
-    _generate_url_to_datasette,
-    read_datasette,
-)
-from etl.analytics.metabase import _generate_question_url, create_question, get_question_info
+from etl.analytics.metabase import _generate_question_url, create_question, get_question_info, read_semantic_layer
 from etl.analytics.metabase import get_question_data as _get_question_data
 from etl.config import GOOGLE_API_KEY, OWID_MCP_SERVER_URL
 from etl.docs import (
@@ -91,7 +86,7 @@ async def process_tool_call(
     #     message_type="markdown",
     #     text=f"**:material/compare_arrows: MCP**: Querying OWID MCP, method `{name}`",
     # )
-    return await call_tool(name, tool_args, {"deps": ctx.deps})
+    return await call_tool(name, tool_args, metadata={"deps": ctx.deps})
 
 
 ## Trying to tweak the settings for OpenAI responses
@@ -106,11 +101,12 @@ settings = OpenAIResponsesModelSettings(
 def get_toolsets():
     # if ("expert_use_mcp" in st.session_state) and st.session_state["expert_use_mcp"]:
     # Create MCP server instance inside function to avoid event loop binding issues
-    mcp_server_prod = MCPServerStreamableHTTP(
-        url=OWID_MCP_SERVER_URL,
+    # NOTE: The trailing underscore in the prefix is kept for backwards compatibility with the old
+    # `MCPServerStreamableHTTP(tool_prefix="owid_data_")`, which joined prefix and tool name with "_" too.
+    mcp_server_prod = MCPToolset(
+        OWID_MCP_SERVER_URL,
         process_tool_call=process_tool_call,
-        tool_prefix="owid_data_",
-    )
+    ).prefixed("owid_data_")
     return [mcp_server_prod]
 
 
@@ -386,42 +382,39 @@ async def get_db_table_fields(tb_names: list[str]) -> dict[str, Any]:
     return result
 
 
-# Metabase/Datasette
+# Metabase
 @agent.tool_plain(docstring_format="google")
 async def execute_query(query: str, title: str, description: str, num_rows: int = 10) -> QueryResult:
-    """Execute a query in the semantic layer and get the data results.
+    """Execute a query against the BigQuery semantic layer and get the data results.
 
-    The query is ran on Datasette, and if valid, it obtains the results from Datasette and creates a "question" in Metabase with the same query. Note that Metabase and Datasette use the same underlying database, so the query should work in both places.
+    The query runs on the semantic layer via Metabase; if valid, it returns the results and creates a "question" in Metabase with the same query.
 
     If the query is invalid, it returns an error message that can be used to improve the query until valid.
 
     Args:
-        query: Query to Datasette instance.
+        query: SQL query (BigQuery / GoogleSQL) against the semantic layer. Reference tables with their dataset, e.g. `prod_semantic.views_detailed`.
         title: Title that describes what the query does. Should be short and concise.
         description: Description of what the query does. Should be 1-3 sentence long.
         num_rows: Number of rows to return. Defaults to 10. Too many rows may increase the tokens. Be mindful when increasing this number.
     Returns:
         QueryResult: Serializable object with the following fields:
-            message (str): Message about the query execution. "SUCCCESS" if the query was valid, or an error message if not.
+            message (str): Message about the query execution. "SUCCESS" if the query was valid, or an error message if not.
             valid (bool): Whether the query was valid or not.
             result (str): The data results in markdown format (first `num_rows` rows).
             url_metabase (str): Link to the created question in Metabase, if the query was valid and the question was created successfully.
-            url_datasette (str): Link to the query in Datasette.
     """
     # tool_ui_message(
     #     message_type="markdown",
-    #     text=f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from Datasette, via `execute_query`",
+    #     text=f"**:material/construction: Tool use**: Getting data ({num_rows} rows) from the semantic layer, via `execute_query`",
     # )
 
     try:
-        df = read_datasette(query, use_https=False)
-        url_datasette = _generate_url_to_datasette(query)
+        df = read_semantic_layer(query)
 
         if df.empty:
             return QueryResult(
-                message="Query returned no results. Try it on Datasette",
+                message="Query returned no results. Double-check it against the schema.",
                 valid=False,
-                url_datasette=url_datasette,
             )
 
         # Serialize dataframe
@@ -429,9 +422,8 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
 
         if data.data == []:
             return QueryResult(
-                message="Query returned no results. Try it on Datasette",
+                message="Query returned no results. Double-check it against the schema.",
                 valid=False,
-                url_datasette=url_datasette,
             )
 
         try:
@@ -451,13 +443,11 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
             valid=True,
             result=data,
             url_metabase=url_metabase,
-            url_datasette=url_datasette,
             card_id_metabase=card_id,
         )
-    except (DatasetteSQLError,) as e:
-        # Handle specific Datasette-related errors
+    except Exception as e:
         return QueryResult(
-            message=f"ERROR. Query is invalid! Check for correctness, it must be DuckDB compatible!\nError: {e}",
+            message=f"ERROR. Query is invalid! Check for correctness, it must be BigQuery (GoogleSQL) compatible!\nError: {e}",
             valid=False,
         )
 

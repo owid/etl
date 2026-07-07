@@ -8,7 +8,7 @@ definitions:
 dataset:
   title: Global Plastics Outlook - Plastics waste in 2019 by region and application
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   plastic_waste_2019:
     variables:

@@ -23,6 +23,10 @@ COMMON_CONFIG = {
     "chartTypes": ["StackedBar"],
 }
 
+# Expected years for sanity checks
+EXPECTED_YEAR_MAX = 2025
+EXPECTED_YEAR_PREVIEW_MAX = 2026
+
 
 def run() -> None:
     #
@@ -38,7 +42,9 @@ def run() -> None:
     tb_pre = ds_pre.read("ucdp_preview")
 
     # Check years
-    assert tb["year"].max() == 2024
+    assert tb["year"].max() == EXPECTED_YEAR_MAX, (
+        f"Latest year not expected! Expected {EXPECTED_YEAR_MAX}, got {tb['year'].max()}"
+    )
     assert tb_pre["year"].max() == 2026
 
     # Filter unnecessary columns
@@ -180,7 +186,9 @@ def run() -> None:
                         "facetDomain": "independent",
                     },
                     "map": {
-                        "time": 2024,
+                        # Pin the map to the last complete (stable) year — bump on
+                        # every stable UCDP update.
+                        "time": 2025,
                     },
                     "hideTimeline": True,
                 },
@@ -344,7 +352,10 @@ def _set_subtitle(view):
         if view.d.indicator == "deaths":
             subtitle = subtitle_template.format(placeholder=f" in {dod}")
             if view.matches(conflict_type="all", estimate="best", people="all"):
-                subtitle += " Data for 2025 is preliminary, and data for 2026 is incomplete and includes deaths within the first quarter."
+                # NOTE: update this on every stable/quarterly UCDP update — it must
+                # describe exactly which years are preliminary/incomplete in the
+                # preview dataset (see the checklist in the owid-issues template).
+                subtitle += " Data for 2026 is incomplete and includes deaths within the first quarter."
             return subtitle
         elif view.d.indicator == "death_rate":
             return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")

@@ -9,7 +9,7 @@ the period 1451-1800, processing the table from page 51 of the PDF.
 import re
 
 import pandas as pd
-import PyPDF2
+import pypdf
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -26,8 +26,8 @@ def run() -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("literacy_1451_1800.pdf")
 
-    # Read the PDF using PyPDF2
-    reader = PyPDF2.PdfReader(snap.path)
+    # Read the PDF using pypdf
+    reader = pypdf.PdfReader(snap.path)
 
     # Extract text from page 51 (0-based index 50)
     page_51 = reader.pages[50]

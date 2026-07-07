@@ -14,6 +14,13 @@ steps:
       - data://meadow/iea/2024-11-20/fossil_fuel_subsidies:
         - snapshot://iea/2024-11-20/fossil_fuel_subsidies.xlsx
   #
+  # IEA - Electric vehicle charging points
+  #
+  data://grapher/iea/2026-06-18/ev_charging_points:
+    - data://garden/iea/2026-06-18/ev_charging_points:
+      - data://meadow/iea/2026-06-18/ev_charging_points:
+        - snapshot://iea/2026-06-18/ev_charging_points.csv
+  #
   # Energy prices explorer
   #
   export://multidim/energy/latest/energy_prices:
@@ -113,6 +120,12 @@ steps:
         - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
       - data://garden/wb/2025-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
+    # Smil - Global primary energy (2017), used to extend World coal production before 1900.
+    - data://garden/papers/2023-12-12/smil_2017
+    # NIC / Fouquet - UK historical energy data, used to extend UK coal production before 1900.
+    - data://garden/energy/2026-07-02/uk_historical_energy:
+      - data://meadow/energy/2026-07-02/uk_historical_energy:
+        - snapshot://energy/2026-07-02/uk_historical_energy.xlsx
     - data://garden/demography/2024-07-15/population
   data://grapher/energy/2025-06-27/fossil_fuel_production:
     - data://garden/energy/2025-06-27/fossil_fuel_production
@@ -283,3 +296,22 @@ steps:
         - data://meadow/uk_beis/2023-12-12/uk_historical_electricity:
           - snapshot://uk_beis/2023-12-12/uk_historical_electricity.xls
       - data://garden/energy/2026-04-24/electricity_mix
+  #
+  # IEA - Energy and AI.
+  #
+  data://grapher/energy/2026-04-27/energy_ai:
+    - data://garden/energy/2026-04-27/energy_ai:
+      - data://garden/regions/2023-01-01/regions
+      # Older IEA release, kept to backfill pre-2023 history in the garden.
+      - data://meadow/energy/2025-11-07/energy_ai:
+        - snapshot://energy/2025-11-07/energy_ai.xlsx
+      - data://meadow/energy/2026-04-27/energy_ai:
+        - snapshot://energy/2026-04-27/energy_ai.xlsx
+      - data://garden/energy/2026-04-24/electricity_mix
+  #
+  # CSO Ireland - Data centres metered electricity consumption.
+  #
+  data://grapher/energy/2025-11-10/ireland_metered_consumption:
+    - data://garden/energy/2025-11-10/ireland_metered_consumption:
+      - data://meadow/energy/2025-11-10/ireland_metered_consumption:
+        - snapshot://energy/2025-11-10/ireland_metered_consumption.csv

@@ -76,6 +76,14 @@ steps:
             - data://meadow/biodiversity/2024-10-30/fish_stocks:
                 - snapshot://biodiversity/2024-10-30/fish_stocks.csv
 
+  # IWC member countries by year
+  data://meadow/iwc/2026-06-07/iwc_members:
+    - snapshot://iwc/2026-06-07/iwc_members.csv
+  data://garden/iwc/2026-06-07/iwc_members:
+    - data://meadow/iwc/2026-06-07/iwc_members
+  data://grapher/iwc/2026-06-07/iwc_members:
+    - data://garden/iwc/2026-06-07/iwc_members
+
   # Whaling catches (IWC) (recent)
   data://meadow/iwc/2026-05-29/whaling_total_catches:
     - snapshot://iwc/2026-05-29/whaling_total_catches.xlsx
@@ -89,7 +97,6 @@ steps:
     - data://meadow/biodiversity/2026-05-29/historic_whaling
   data://meadow/biodiversity/2026-05-29/historic_whaling:
     - snapshot://biodiversity/2026-05-29/historic_whaling_rocha_et_al.xlsx
-
 
   # Long run whaling data (Rocha + IWC)
   data://grapher/biodiversity/2026-05-29/long_run_whaling:

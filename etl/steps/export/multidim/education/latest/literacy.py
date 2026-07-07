@@ -24,6 +24,7 @@ MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
     "addCountryMode": "add-country",
+    "sortBy": "custom",
 }
 
 # Common grouped view configuration
@@ -167,6 +168,8 @@ def get_literacy_rate_columns(tb):
             "poorest_quintile",
             "richest_quintile",
             "adjusted",
+            "immigrant_background",
+            "non_immigrant_background",
         ]
     )
 

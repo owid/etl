@@ -24,6 +24,7 @@ Usage:
 import argparse
 import difflib
 import os
+import subprocess
 import sys
 import tempfile
 import termios
@@ -142,7 +143,7 @@ def _confirm_edit_or_skip(current, proposed):
             try:
                 tmp.write(proposed)
                 tmp.close()
-                os.system(f'{editor} "{tmp.name}"')
+                subprocess.run(f'{editor} "{tmp.name}"', shell=True)
                 with open(tmp.name) as f:
                     chosen = f.read()
             finally:

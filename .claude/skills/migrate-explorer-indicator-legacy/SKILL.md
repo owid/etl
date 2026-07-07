@@ -20,9 +20,9 @@ metadata:
 
 # Modernize a Legacy ETL Explorer Step
 
-Take an explorer step that already lives in this repo but uses the old DataFrame-driven plumbing, extract the dimensions/views/config, and hand off to `/create-explorer` to write the modern YAML-driven step. Then archive the legacy code.
+Take an explorer step that already lives in this repo but uses the old DataFrame-driven plumbing, extract the dimensions/views/config, and hand off to `/create-explorer` to write the modern YAML-driven step. Then remove the legacy code.
 
-> **Scope of this skill:** identifying which legacy shape you have, reading the legacy code, mapping its DataFrames into the dimension/view structure that `/create-explorer` consumes, and archiving the old step. The export-step authoring (Python skeleton, YAML schema, full-YAML vs table-driven, FAUST upstream, post-processing, DAG, verification) lives in `/create-explorer`. Don't duplicate that content here.
+> **Scope of this skill:** identifying which legacy shape you have, reading the legacy code, mapping its DataFrames into the dimension/view structure that `/create-explorer` consumes, and removing the old step. The export-step authoring (Python skeleton, YAML schema, full-YAML vs table-driven, FAUST upstream, post-processing, DAG, verification) lives in `/create-explorer`. Don't duplicate that content here.
 
 ## Inputs
 
@@ -94,19 +94,19 @@ Invoke `/create-explorer` with:
 
 In `dag/<ns>.yml`, the `/create-explorer` skill writes the new `export://explorers/<ns>/latest/<short>:` block. You then need to:
 
-- If a previous `export://explorers/<ns>/<v>/<short>:` block existed (Pattern B with non-`latest` version), move it to `dag/archive/<ns>.yml`.
-- For Pattern A: also remove the legacy `data://explorers/<ns>/<v>/<short>:` block from `dag/<ns>.yml` and move it to `dag/archive/`. Find any consumers (`grep -rn 'data://explorers/<ns>/<v>/<short>' dag/`) and update them.
+- If a previous `export://explorers/<ns>/<v>/<short>:` block existed (Pattern B with non-`latest` version), delete it from `dag/<ns>.yml`.
+- For Pattern A: also remove the legacy `data://explorers/<ns>/<v>/<short>:` block from `dag/<ns>.yml`. Find any consumers (`grep -rn 'data://explorers/<ns>/<v>/<short>' dag/`) and update them.
 
-### 5. Archive the legacy step
+The archive dag (`dag/archive/*.yml`) is not edited by hand — `etl archive-dag` reconstructs it from git history and records the removed steps with their last-active commit (for recovery via `git checkout`).
+
+### 5. Remove the legacy step
 
 ```bash
 # Pattern B
-mkdir -p etl/steps/archive/export/explorers/<ns>/<v>/
-git mv etl/steps/export/explorers/<ns>/<v>/<short>.py etl/steps/archive/export/explorers/<ns>/<v>/
+git rm etl/steps/export/explorers/<ns>/<v>/<short>.py
 
-# Pattern A (also archive the wide-CSV writer)
-mkdir -p etl/steps/archive/data/explorers/<ns>/<v>/
-git mv etl/steps/data/explorers/<ns>/<v>/<short>.py etl/steps/archive/data/explorers/<ns>/<v>/
+# Pattern A (also remove the wide-CSV writer)
+git rm etl/steps/data/explorers/<ns>/<v>/<short>.py
 # plus any sibling YAMLs under that dir
 ```
 

@@ -10,7 +10,7 @@ dataset:
   title: World Urbanization Prospects Dataset - Number of countries with a given minimum urban population threshold
 
   owners:
-    - Veronika Samborska
+    - Lucas Rodés-Guirao
 tables:
   urban_agglomerations_definition:
     variables:

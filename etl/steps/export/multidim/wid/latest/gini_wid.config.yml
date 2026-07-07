@@ -5,12 +5,12 @@ topic_tags:
   - Economic Inequality
 
 default_selection:
-  - Chile
   - Brazil
   - South Africa
   - United States
   - France
   - China
+  - Netherlands
 
 default_dimensions:
   welfare_type: before tax

@@ -39,7 +39,7 @@ COLUMNS_AND_CATEGORIES = {
         "indicator": "Stillbirth rate",
         "sex": "Total",
         "wealth_quintile": "Total",
-        "unit_of_measure": "Stillbirths per 100 births",
+        "unit_of_measure": "Deaths per 100 births",
     },
     "igme_under_fifteen_mortality": {
         "indicator": "Under-fifteen mortality rate",

@@ -3,8 +3,6 @@ dataset:
   description: Electric car sales and stocks data from the International Energy Agency.
   licenses:
     - {}
-  owners:
-    - Hannah Ritchie  # fasttrack
 tables:
   electric_cars_iea:
     variables:

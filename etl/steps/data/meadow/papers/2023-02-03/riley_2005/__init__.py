@@ -13,7 +13,7 @@ from authors.
 import hashlib
 
 import pandas as pd
-import PyPDF2
+import pypdf
 from owid.catalog import Dataset, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
@@ -73,7 +73,7 @@ def check_expected_data(local_file: str) -> None:
     """
     # Extract text from PDF (Walden)
     with open(local_file, "rb") as f:
-        pdfReader = PyPDF2.PdfReader(f)
+        pdfReader = pypdf.PdfReader(f)
         text_pdf = pdfReader.pages[2].extract_text()
     # Load text from PDF as expected
     hash = hashlib.md5(text_pdf.encode()).hexdigest()

@@ -60,6 +60,23 @@ def update_metadata_from_yaml(
     mtime = (Path(resolved).stat().st_mtime, shared_path.stat().st_mtime if shared_path.exists() else 0.0)
     annot = _load_annot(resolved, tuple(sorted(params.items())), mtime)
 
+    update_metadata_from_dict(
+        tb,
+        annot,
+        table_name,
+        extra_variables=extra_variables,
+        if_origins_exist=if_origins_exist,
+    )
+
+
+def update_metadata_from_dict(
+    tb: Table,
+    annot: dict[str, Any],
+    table_name: str,
+    extra_variables: Literal["raise", "ignore"] = "raise",
+    if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+) -> None:
+    """Update metadata of table and variables from a parsed metadata dictionary."""
     tb.metadata.short_name = table_name
 
     t_annot = annot.get("tables", {}).get(table_name, {})

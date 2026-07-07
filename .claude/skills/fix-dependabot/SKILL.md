@@ -9,6 +9,8 @@ metadata:
 
 Resolve open Dependabot security alerts by upgrading vulnerable dependencies across the ETL monorepo — including pip packages (`pyproject.toml` + `uv.lock`), lib/ subdirectories, and npm packages in `vscode_extensions/`.
 
+**Goal: leave zero open Dependabot PRs.** Security alerts are the priority, but Dependabot also opens routine **version-update PRs** that have no associated alert (e.g. esbuild minor bumps, or js-yaml bumps in extensions GitHub didn't flag). Don't stop at the alerts — also clear these (Step 4c) so the PR list is empty afterward. The default is to fold every open Dependabot PR's bump into the single batch PR and close the originals; if the user only wants the security alerts, scope to those instead.
+
 ## Step 1: Fetch and summarize alerts
 
 ```bash
@@ -51,6 +53,8 @@ For each open PR:
    ```
 4. If you create a replacement PR that batches or supersedes Dependabot PRs, close the superseded PRs and reference the replacement PR in the close comment.
 5. Re-run the PR list and confirm there are no open irrelevant Dependabot PRs before reporting completion.
+
+**Map each open PR to an alert (or not).** Cross-reference this PR list against the alert list from Step 1. A PR whose package/manifest matches an open alert is a *security* PR — handled by Steps 2–4. A PR with **no** matching open alert is a routine *version-update* PR — handled by Step 4c. Both kinds should be gone by the end.
 
 ## Step 2: Categorize each alert
 
@@ -129,6 +133,42 @@ For each vulnerable npm package:
    npm ls <package>
    ```
 
+### npm transitive vs. direct deps
+
+Before adding a package to `dependencies`, check whether the extension actually imports it:
+
+```bash
+rg -l "from ['\"]<package>|require\(['\"]<package>" vscode_extensions/<ext>/src
+```
+
+- **Imported in `src/`** → it's a real runtime dependency; bump it in `dependencies` (`npm install <package>@^<version>`).
+- **Not imported** (it's a dev-tooling transitive dep, e.g. pulled in by eslint/mocha) → do **not** add it to `dependencies` (that creates a phantom runtime dep). Instead force the patched version via the existing `overrides` block in `package.json`, then `npm install`. This matches how Dependabot itself fixes those (lockfile-only).
+
+## Step 4c: Clear remaining (non-security) Dependabot version-update PRs
+
+After the security alerts are handled, fold every *remaining* open Dependabot PR (the ones with no matching alert from Step 1b) into the same batch branch, then close them. These are routine bumps — usually npm devDeps in `vscode_extensions/` (e.g. esbuild) or js-yaml in extensions GitHub didn't alert on.
+
+For each remaining PR, apply its bump locally rather than merging the Dependabot branch (keeps everything in one PR with one CI run):
+
+1. Read the target package + version from the PR title (`Bump <pkg> from <old> to <new> in /<path>`).
+2. `cd` into the manifest's directory and apply it the same way as Step 4 (direct bump if imported in `src/`, `overrides` if a dev-tooling transitive — see above). For a pure devDependency like esbuild, bump it in `devDependencies`: `npm install -D <pkg>@^<new>`.
+3. Verify it resolved: `npm ls <pkg>`.
+
+After applying all of them, **compile each touched extension** so a bad bump fails locally, not in CI:
+
+```bash
+cd vscode_extensions/<ext> && npm run compile   # or `npm run lint` if there's no compile script
+```
+
+Then close each superseded Dependabot PR referencing the batch PR (do this in Step 6, after the batch PR exists):
+
+```bash
+gh pr close <number> --repo owid/etl --comment \
+  "Superseded by #<batch-PR>, which applies this bump as part of a single batched Dependabot sweep. Closing as obsolete."
+```
+
+If a bump is risky or a major version jump with breaking changes, don't force it into the batch — leave that PR open and flag it for the user instead.
+
 ## Step 5: Verify changes
 
 Run `make check-all` (lint + format + typecheck across the root and every `lib/`). The plain `make check` only covers the top-level codebase, so breaking changes from upgrades to packages used by `lib/` (e.g. gdown's `fuzzy=` removal in `lib/datautils/`) would slip through.
@@ -158,6 +198,8 @@ Stage and commit all changed files:
 Use commit emoji `🐛🤖` (bug fix, AI-written).
 
 After pushing, post `@codex review` as a PR comment.
+
+Then close **every** open Dependabot PR this batch covers — both the security ones (Steps 2–4) and the version-update ones (Step 4c) — with a comment referencing this PR (see the close commands in Steps 1b and 4c). Finally, re-run the Step 1b PR list and confirm it's empty (modulo anything you deliberately left open and flagged for the user). If the title only covers security fixes but you also swept version updates, use a broader title like `Fix Dependabot vulnerabilities and clear version-update PRs`.
 
 ## Important notes
 

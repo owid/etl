@@ -24,6 +24,15 @@ def run() -> None:
     tb["share_empty_seats"] = 100 - tb["passenger_load_factor"]
     tb["share_empty_seats"].metadata.origins = tb["passenger_load_factor"].metadata.origins
 
+    # The source publishes RPKs and ASKs in millions (columns "RPKs (mils)" and "ASKs (mils)").
+    # Convert to actual passenger-kilometres and seat-kilometres.
+    for col in ["revenue_passenger_kilometers", "available_seat_kilometers"]:
+        tb[col] *= 1e6
+
+    # Sanity check: after conversion, recent global traffic and capacity should be in the trillions.
+    for col in ["revenue_passenger_kilometers", "available_seat_kilometers"]:
+        assert 1e12 < tb[col].max() < 1e14, f"Unexpected magnitude for {col} — check the source units."
+
     # Improve table format.
     tb = tb.format(["country", "year"])
 

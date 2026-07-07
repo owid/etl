@@ -14,7 +14,7 @@ default_selection:
 
 default_dimensions:
   indicator: thr
-  decile: all
+  decile: p10_p50_p90
   period: month
   survey_comparability: No spells
 

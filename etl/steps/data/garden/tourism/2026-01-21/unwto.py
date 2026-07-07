@@ -92,6 +92,12 @@ def run() -> None:
     # Drop columns with all NaN values
     tb = tb.dropna(axis=1, how="all")
 
+    # Corrections for source-side unit inconsistencies (see unwto.corrections.yml). Applied on the raw
+    # meadow values, before the ×1000 conversion below. Each correction self-validates via its `expect`
+    # guard and fails loudly if the source fixes the issue. The sanity_check_population_ratios() below
+    # independently catches any *new* mismatches — when it fails, investigate and add a correction.
+    tb = paths.apply_corrections(tb)
+
     # Find columns that start with the specified prefixes - units are not thousands
     matching_columns = [col for col in tb.columns if any(col.startswith(prefix) for prefix in PREFIXES_NOT_THOUSANDS)]
     # Multiply the all the other columns by 1000 as these are in thousands
@@ -152,6 +158,10 @@ def run() -> None:
         tb["dom_tour_trips_total_overnight_vis_tourists_per_person"] = (
             tb["dom_tour_trips_total_overnight_vis_tourists"] / tb["population"]
         )
+
+    # Sanity check: no person-count indicator should exceed 50× the country's population.
+    # Catches unit mismatches at the source (e.g. values in units instead of thousands).
+    sanity_check_population_ratios(tb)
 
     tb = tb.drop(columns=["population"])
 
@@ -224,6 +234,48 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def sanity_check_population_ratios(tb: Table) -> None:
+    """Check that person-count indicators don't exceed a plausible multiple of the country's population.
+
+    After unit conversion (×1000), indicators like guests, arrivals, trips, and departures should
+    not exceed a threshold × population. A value that does almost certainly has the wrong units in
+    the source (e.g. reported in units instead of thousands). This check is immune to what other
+    countries report — it only depends on the country's own population, which is a hard physical bound.
+
+    Thresholds differ by indicator type:
+    - Domestic indicators (dom_*): max 50× population. A country's own residents can't generate
+      more than ~50 hotel stays per person per year.
+    - Inbound indicators (in_*): max 200× population. Micro-states like Andorra and Macao
+      genuinely receive >100× their population in visitors.
+    """
+    # Columns that represent counts of people (guests, arrivals, departures, trips).
+    PERSON_COUNT_COLUMNS = [
+        col
+        for col in tb.columns
+        if any(k in col for k in ["guest", "arrival", "departure", "trip", "vis_tourist", "vis_excur"])
+    ]
+
+    for col in PERSON_COUNT_COLUMNS:
+        data = tb[["country", "year", "population", col]].dropna(subset=[col, "population"])
+        if data.empty:
+            continue
+        data = data[data["population"] > 0]
+
+        # Domestic indicators have a tighter bound — residents can't exceed their own population by much.
+        max_ratio = 50 if col.startswith("dom_") else 200
+
+        ratio = data[col] / data["population"]
+        violations = data[ratio > max_ratio]
+        if not violations.empty:
+            for _, row in violations.iterrows():
+                r = row[col] / row["population"]
+                raise AssertionError(
+                    f"'{col}': {row['country']} ({int(row['year'])}) has {row[col]:,.0f} "
+                    f"which is {r:,.0f}x its population ({row['population']:,.0f}). "
+                    f"The source likely reports this indicator in a different unit (e.g. units instead of thousands)."
+                )
 
 
 def shorten_column_names(columns):

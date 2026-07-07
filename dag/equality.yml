@@ -22,12 +22,13 @@ steps:
       - data://garden/countries/2023-09-25/isd
 
   # Homosexuality criminalization data from Mignot (2025)
-  data://grapher/lgbt_rights/2025-07-09/criminalization_mignot:
-    - data://garden/lgbt_rights/2025-07-09/criminalization_mignot:
-      - data://garden/regions/2023-01-01/regions
+  data://grapher/lgbt_rights/2026-06-15/criminalization_mignot:
+    - data://garden/lgbt_rights/2026-06-15/criminalization_mignot:
       - data://garden/demography/2024-07-15/population
-      - data://meadow/lgbt_rights/2025-07-09/criminalization_mignot:
-        - snapshot://lgbt_rights/2025-07-09/criminalization_mignot.csv
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2025-07-01/income_groups
+      - data://meadow/lgbt_rights/2026-06-15/criminalization_mignot:
+        - snapshot://lgbt_rights/2026-06-15/criminalization_mignot.csv
 
   #
   # World Bank - Gender Statistics

@@ -147,9 +147,10 @@ GROUPS = (
                 "graphviz": "etl.to_graphviz.to_graphviz",
                 "compare": "etl.compare.cli",
                 "update": "apps.step_update.cli.cli",
-                "archive": "apps.step_update.cli.archive_cli",
+                "archive-dag": "apps.archive_dag.cli.cli",
                 "pr": "apps.pr.cli.cli",
                 "pr-clean": "apps.pr.cli.clean_cli",
+                "corrections": "apps.corrections.cli.cli",
             },
         },
         {
@@ -169,6 +170,7 @@ GROUPS = (
             "commands": {
                 "chart-sync": "apps.chart_sync.cli.cli",
                 "approve": "apps.chart_approval.cli.cli",
+                "related-charts": "apps.related_charts.cli.cli",
             },
         },
         {

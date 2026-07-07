@@ -1,0 +1,54 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Biodiversity
+        - Fish & Overfishing
+
+### Other points to add maybe
+# Russia joining date refers to USSR
+# Some countries have joined with reservations. Some of these are under objection from other IWC member countries. For simplicity, we have not included the reservations in the dataset and consider these countries as members from the year they joined.
+
+dataset:
+  update_period_days: 365
+  description: |
+    Membership status of countries in the International Whaling Commission (IWC) from 1946 to 2025.
+
+    Data sources:
+     - Up to 2019: https://www.state.gov/wp-content/uploads/2024/05/Intl-Convention-for-the-Regulation-of-Whaling.pdf
+     - Since 2019: Updates via https://iwc.int/commission/members and current State of the Convention document, received in direct communication with the IWC Secretariat.
+
+
+tables:
+  iwc_members:
+    variables:
+      member:
+        title: Was the country a member of the IWC in that year?
+        description_short: Whether the country was a member of the IWC in that year.
+        unit: ""
+        description_processing: If the country has left during the year it is not considered a member for that year.
+      former_member:
+        title: Was the country a former member of the IWC in that year?
+        description_short: Whether the country had joined and left the IWC by that year.
+        unit: ""
+        description_processing: If the country has left during the year it is considered a former member for that year.
+      year_joined:
+        title: Year the country joined the IWC
+        description_short: The year the country joined the IWC.
+        unit: year
+        description_processing: If the country has joined, left and rejoined the IWC, this refers to the latest joining year.
+      year_left:
+        title: Year the country left the IWC
+        description_short: The year the country left the IWC, if applicable.
+        unit: year
+        description_processing: If the country previously has withdrawn and rejoined the IWC, this refers to the latest withdrawal year.
+      current_status:
+        title: Current membership status of the country
+        description_short: Whether the country is currently a member or former member of the IWC. If the country has never been a member, it is classified as a non-member.
+        unit: ""
+        description_processing: The status refers to the status of the country on the 31.12. of that year. If the country has left during the year it is already considered a former member for that year.

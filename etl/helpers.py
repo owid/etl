@@ -30,6 +30,7 @@ from etl.collection import Collection, CollectionSet
 from etl.collection.core.create import Listable, create_collection
 from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
+from etl.data_corrections import apply_corrections, build_audit, load_corrections, write_audit
 from etl.data_helpers.geo import Regions
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -192,11 +193,7 @@ def create_dataset(
 
 
 def get_metadata_path(dest_dir: str) -> Path:
-    N_archive = PathFinder(str(paths.STEP_DIR / "archive" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
-    if N_archive.metadata_path.exists():
-        N = N_archive
-    else:
-        N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
     return N.metadata_path
 
 
@@ -289,10 +286,7 @@ class PathFinder:
     def dag(self):
         """Lazy loading of DAG."""
         if self._dag is None:
-            if "/archive/" in str(self.f):
-                self._dag = load_dag_cached(paths.DAG_ARCHIVE_FILE)
-            else:
-                self._dag = load_dag_cached()
+            self._dag = load_dag_cached()
         return self._dag
 
     @property
@@ -326,6 +320,25 @@ class PathFinder:
     @property
     def excluded_countries_path(self) -> Path:
         return self.directory / (self.short_name + ".excluded_countries.json")
+
+    @property
+    def corrections_path(self) -> Path:
+        return self.directory / (self.short_name + ".corrections.yml")
+
+    def apply_corrections(self, tb: Table, *, country_col: str = "country", year_col: str = "year") -> Table:
+        """Apply the step's `.corrections.yml` (known upstream data errors) to a table.
+
+        Mirrors the `.excluded_countries.json` ergonomics: a sibling file next to the step, applied in
+        one line. If no corrections file exists, the table is returned unchanged. See
+        `etl.data_corrections` for the file format.
+        """
+        if not self.corrections_path.exists():
+            return tb
+        corrections = load_corrections(self.corrections_path)
+        # Record the affected rows (before/after) so `etl corrections --charts` can visualise the
+        # problematic values, which are gone from the published data once the correction is applied.
+        write_audit(self.corrections_path, build_audit(tb, corrections, country_col=country_col, year_col=year_col))
+        return apply_corrections(tb, corrections, country_col=country_col, year_col=year_col)
 
     @property
     def metadata_path(self) -> Path:

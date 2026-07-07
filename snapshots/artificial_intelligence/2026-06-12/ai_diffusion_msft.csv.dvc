@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    title: Microsoft AI Diffusion Report
+    date_published: "2026-05-06"
+    description: |-
+      Microsoft measures AI diffusion as the share of working-age adults worldwide who have used a generative AI product during the reported period. This measure is derived from aggregated and anonymized Microsoft telemetry and then adjusted to reflect differences in OS and device-market share, internet penetration, and country population. Additional details on the methodology are available in their [AI Diffusion technical paper](https://arxiv.org/abs/2511.02781).
+
+      The dataset contains three waves of estimates:
+      - H1 2025 (January–June 2025)
+      - H2 2025 (July–December 2025)
+      - Q1 2026 (January–March 2026)
+
+    producer: Microsoft
+    citation_full: |-
+      Misra, A., Wang, J., McCullers, S., White, K., & Lavista Ferres, J. (2025). Measuring AI Diffusion: A Population-Normalized Metric for Tracking Global AI Usage. arXiv. https://doi.org/10.48550/arXiv.2511.02781
+
+      Misra, A., et al. (2026). Measuring AI Diffusion Across U.S. Geographies: County, State, and Metro Estimates. https://aka.ms/AI_Diffusion_US_Technical_Report
+
+    url_main: https://github.com/microsoft/ai-diffusion-report
+    url_download: https://raw.githubusercontent.com/microsoft/ai-diffusion-report/main/data/AI_Diffusion_Q12026_Update.csv
+    date_accessed: "2026-06-12"
+
+    license:
+      name: MIT License
+      url: https://github.com/microsoft/ai-diffusion-report/blob/main/LICENSE.md
+outs:
+  - md5: 3786e4c45f3fff04b85a02220ae8da5b
+    size: 4468
+    path: ai_diffusion_msft.csv

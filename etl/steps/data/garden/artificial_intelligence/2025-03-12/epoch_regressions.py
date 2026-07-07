@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from datetime import datetime
+
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -13,7 +15,8 @@ paths = PathFinder(__file__)
 # Constants for defining the time periods
 DL_ERA_START = 2010
 START_DATE = 1950
-END_DATE = 2025.2
+_now = datetime.now()
+END_DATE = _now.year + (_now.month - 1) / 12 + (_now.day - 1) / 365
 
 
 def run() -> None:
