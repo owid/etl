@@ -26,6 +26,8 @@ definitions:
 dataset:
   title: Cropland projections to 2050
   update_period_days: 0
+  owners:
+    - Pablo Rosado
 
 tables:
   cropland_projections:
