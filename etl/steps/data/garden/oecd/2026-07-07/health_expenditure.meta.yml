@@ -1,5 +1,10 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  # NOTE: Base year of the constant-price PPP series (BASE_PER in the source). Update it
+  # here AND in the PPP_YEAR constant in health_expenditure.py if the OECD rebases — the
+  # garden sanity check enforces they match the data.
+  ppp_year: "2020"
+
   common:
     processing_level: minor
     presentation:
@@ -282,8 +287,8 @@ tables:
         description_short: Health expenditure in <<financing_scheme.lower()>> divided by population.
         description_key:
           - "{definitions.key_financing_scheme}"
-          - The data is measured in international-$ at 2020 prices – this adjusts for inflation and for differences in the cost of living between countries.
-        unit: international-$ in 2020 prices
+          - The data is measured in international-$ at {definitions.ppp_year} prices – this adjusts for inflation and for differences in the cost of living between countries.
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         display:
           name: Health expenditure per capita - <<financing_scheme>>
@@ -297,8 +302,8 @@ tables:
         description_short: Health expenditure in <<financing_scheme.lower()>>.
         description_key:
           - "{definitions.key_financing_scheme}"
-          - The data is measured in international-$ at 2020 prices – this adjusts for inflation and for differences in the cost of living between countries.
-        unit: international-$ in 2020 prices
+          - The data is measured in international-$ at {definitions.ppp_year} prices – this adjusts for inflation and for differences in the cost of living between countries.
+        unit: international-$ in {definitions.ppp_year} prices
         short_unit: $
         display:
           name: Health expenditure - <<financing_scheme>>

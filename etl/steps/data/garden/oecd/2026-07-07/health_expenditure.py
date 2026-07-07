@@ -38,6 +38,13 @@ EXPECTED_FINANCING_SCHEMES = {
 # parsing or mapping regression, not a real change — re-audit before lowering this.
 MIN_COUNTRIES = 61
 
+# Base year of the constant-price PPP series. If the OECD rebases, this constant AND the
+# `ppp_year` definition in health_expenditure.meta.yml must be updated together.
+PPP_YEAR = 2020
+
+# Indicators expressed in constant PPP dollars (the ones the base year applies to).
+PPP_INDICATORS = ["US dollars, PPP converted", "US dollars per person, PPP converted"]
+
 
 def run() -> None:
     #
@@ -110,6 +117,11 @@ def sanity_check_inputs(tb: Table) -> None:
     negative = tb[tb["value"] < 0]
     assert negative.empty, (
         f"Negative expenditure values in meadow input: {negative[['country', 'year', 'indicator']].head()}"
+    )
+    base_years = set(tb.loc[tb["indicator"].isin(PPP_INDICATORS), "base_period"].dropna())
+    assert base_years == {PPP_YEAR}, (
+        f"PPP base year changed: {sorted(base_years)} != {{{PPP_YEAR}}}. The OECD rebased the constant-price "
+        "series — update PPP_YEAR here and `ppp_year` in health_expenditure.meta.yml together."
     )
 
 
