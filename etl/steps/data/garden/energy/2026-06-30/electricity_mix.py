@@ -543,6 +543,47 @@ HISTORICAL_ELECTRICITY_COLUMNS = {
 }
 
 
+def check_historical_overlap(tb_historical: Table, combined: Table) -> None:
+    """Check that Pinto's historical World series agrees with the modern (Ember/SR) World series.
+
+    The two sources overlap from 2000 onwards. Since Pinto's granular sources are mapped onto the
+    standard categories (and, e.g., its "other fossil" is used as a proxy for oil), we allow a
+    generous tolerance; the check is only meant to catch a broken mapping. On the overlap, modern
+    data is kept anyway (Pinto only fills the earlier years).
+    """
+    index_columns = ["country", "year"]
+    # The "other renewables including bioenergy" aggregate is not checked: Pinto groups combustible
+    # renewables, geothermal and tidal/wave differently from Ember, so the reconstructed aggregate is
+    # inherently fuzzy. Its base components (bioenergy, other renewables) are checked individually.
+    columns_to_skip = {"other_renewables_including_bioenergy_generation__twh"}
+    common_columns = sorted((set(tb_historical.columns) & set(combined.columns)) - set(index_columns) - columns_to_skip)
+    world_historical = tb_historical[tb_historical["country"] == "World"]
+    world_modern = combined[combined["country"] == "World"]
+    violations = []
+    for column in common_columns:
+        compared = world_historical[index_columns + [column]].merge(
+            world_modern[index_columns + [column]], on=index_columns, suffixes=("_historical", "_modern")
+        )
+        # Skip small values (in TWh), where relative differences are noisy and irrelevant.
+        compared = compared[compared[f"{column}_modern"] > 20].dropna()
+        if compared.empty:
+            continue
+        pct_change = (
+            100
+            * (compared[f"{column}_historical"] - compared[f"{column}_modern"]).abs()
+            / compared[f"{column}_modern"].abs()
+        )
+        # Allow a larger tolerance for categories whose mapping is known to be approximate.
+        tolerance = 25 if any(s in column for s in ["oil", "other_renewables", "bioenergy"]) else 15
+        if (pct_change >= tolerance).any():
+            violations.append(f"{column} (max {pct_change.max():.1f}%, tolerance {tolerance}%)")
+    assert not violations, (
+        "Pinto's historical World electricity disagrees with modern data beyond tolerance for: "
+        + "; ".join(violations)
+        + ". The mapping from Pinto's sources may need revisiting."
+    )
+
+
 def add_historical_electricity(combined: Table, tb_historical: Table) -> Table:
     """Extend the World electricity series back to ~1900 using Pinto et al.'s global historical data.
 
@@ -557,6 +598,9 @@ def add_historical_electricity(combined: Table, tb_historical: Table) -> Table:
     tb_historical["other_renewables_including_bioenergy_generation__twh"] = tb_historical[
         ["bioenergy_generation__twh", "other_renewables_excluding_bioenergy_generation__twh"]
     ].sum(axis=1, min_count=1)
+
+    # Sanity check that Pinto's historical data agrees with modern data over their overlap.
+    check_historical_overlap(tb_historical=tb_historical, combined=combined)
 
     # Combine, prioritizing the modern electricity mix over the historical data on overlapping years.
     combined = combine_two_overlapping_dataframes(df1=combined, df2=tb_historical, index_columns=["country", "year"])
