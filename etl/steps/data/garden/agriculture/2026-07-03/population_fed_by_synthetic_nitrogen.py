@@ -12,6 +12,7 @@ own words, consistent with the earlier estimates for the year 2000.
 
 import pandas as pd
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers.misc import interpolate_table
 from etl.helpers import PathFinder
@@ -99,7 +100,7 @@ def run() -> None:
     tb_spine = Table(pd.DataFrame({"country": "World", "year": range(YEAR_MIN, last_year + 1)}))
 
     # Merge the (sparse) digitized share onto the annual spine.
-    tb = tb_spine.merge(tb, on="year", how="left")
+    tb = pr.merge(tb_spine, tb, on="year", how="left")
 
     # Erisman et al. (2008) estimates end in 2008; assume the share remains constant afterwards.
     tb.loc[tb["year"] > YEAR_LAST_ERISMAN, SHARE_COLUMN] = SHARE_FED_RECENT
