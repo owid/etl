@@ -150,6 +150,7 @@ GROUPS = (
                 "archive-dag": "apps.archive_dag.cli.cli",
                 "pr": "apps.pr.cli.cli",
                 "pr-clean": "apps.pr.cli.clean_cli",
+                "corrections": "apps.corrections.cli.cli",
             },
         },
         {
