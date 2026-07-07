@@ -185,6 +185,10 @@ def run() -> None:
     ds_garden.save()
 ```
 
+### Correcting known upstream data errors (`.corrections.yml`)
+
+For a known *source* error we patch locally until the provider fixes it, don't inline `.loc[...]`/`.drop(...)` — declare it in a `<short_name>.corrections.yml` next to the step and apply with `tb = paths.apply_corrections(tb)`. See `etl/data_corrections.py` for the format; `etl corrections -o /tmp/c.html --charts` inventories and visualises them all. For enumerated provider point-errors only — systematic recoding *rules* and aggregation stay in step code.
+
 ### Ad-hoc Data Exploration
 ```python
 from etl.snapshot import Snapshot
