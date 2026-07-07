@@ -810,6 +810,20 @@ class TestAddRegionAggregates:
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
         assert df.var_01.m.title == "Var 01"
 
+    def test_add_region_raises_when_must_have_country_not_a_member(self):
+        # A "must-have" country that is not a member of the region can never satisfy the subset check,
+        # so the aggregate would be silently set to NaN and dropped. The guard must raise instead
+        # (this is the failure mode that silently nulled income-group aggregates after a reclassification).
+        with pytest.raises(ValueError, match="not members of the region"):
+            geo.add_region_aggregates(
+                df=self.df_in,
+                region="Region 2",
+                countries_in_region=["Country 3"],
+                countries_that_must_have_data=["Country 1"],  # not a member of Region 2
+                country_col="country",
+                year_col="year",
+            )
+
 
 class MockRegionsDataset:
     def __getitem__(self, name: str) -> Table:

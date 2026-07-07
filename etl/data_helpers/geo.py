@@ -370,6 +370,23 @@ def add_region_aggregates(
     if countries_that_must_have_data is None:
         countries_that_must_have_data = []
 
+    # Guard against a silent-null failure mode: if a "must-have" country is not actually a member of the
+    # region, the subset check below can never pass, so the region's aggregate is silently set to NaN and
+    # dropped — and downstream indicators that divide by it lose that region/group with no error at all.
+    # This typically happens after a reclassification (e.g. the World Bank moves a country to a different
+    # income group, or a country leaves a region's member list). Fail loudly so the caller fixes the list.
+    if isinstance(countries_that_must_have_data, list):
+        _must_have_non_members = [c for c in countries_that_must_have_data if c not in set(countries_in_region)]
+        if _must_have_non_members:
+            raise ValueError(
+                f"add_region_aggregates: for region {region!r}, countries_that_must_have_data contains "
+                f"{_must_have_non_members}, which are not members of the region. A required country that is "
+                f"not a member makes the aggregate impossible to compute, so it would be silently set to NaN "
+                f"and dropped. This usually means the country was reclassified (e.g. it changed income group) "
+                f"or left the region — remove it from countries_that_must_have_data, or move it to the group "
+                f"it now belongs to."
+            )
+
     if index_columns is None:
         index_columns = [country_col, year_col]
 
