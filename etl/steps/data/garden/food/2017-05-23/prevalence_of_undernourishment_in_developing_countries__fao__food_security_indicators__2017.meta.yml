@@ -17,7 +17,7 @@ tables:
         title: Prevalence of undernourishment in developing countries
         unit: '%'
         short_unit: '%'
-        description_short: Percentage of the population in developing countries defined as undernourished.
+        description_short: Share of people in developing countries whose habitual food consumption is insufficient to provide the dietary energy required to maintain a normal, active and healthy life.
         description_key:
           - Undernourishment is solely determined by the sufficiency of energy (calorie) intake. It does not consider the quality or diversity of someone's diet.
           - |-
