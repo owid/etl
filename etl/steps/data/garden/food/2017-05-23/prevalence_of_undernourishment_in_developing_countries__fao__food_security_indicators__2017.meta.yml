@@ -1,7 +1,6 @@
 definitions:
   common:
     presentation:
-      attribution_short: FAO
       topic_tags:
         - Hunger & Undernourishment
 
@@ -9,6 +8,7 @@ dataset:
   title: Prevalence of Undernourishment in Developing Countries - FAO (Food Security Indicators) (2017)
   owners:
     - Hannah Ritchie
+    - Pablo Rosado
   update_period_days: 0
 
 tables:
