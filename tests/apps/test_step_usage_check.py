@@ -4,7 +4,7 @@
 pinning down: it decides what counts as a downstream regression after a foundational update.
 """
 
-from apps.step_usage_check.cli import Finding, TableCoverage, _diff_coverage
+from apps.step_usage_check.cli import Finding, TableCoverage, _dependency_ordered, _diff_coverage
 
 CONSUMER = "data://garden/ns/2026-01-01/consumer"
 
@@ -82,3 +82,37 @@ def test_small_value_change_is_ignored():
     before = {"t": _cov({"gdp": 1000})}
     after = {"t": _cov({"gdp": 950})}
     assert _diff_coverage(CONSUMER, before, after) == []
+
+
+def test_dependency_ordered_rebuilds_deps_before_dependents():
+    # root -> A -> B (dag maps step -> its deps). B depends on A, A depends on root.
+    dag = {
+        "A": {"root"},
+        "B": {"A"},
+        "root": set(),
+    }
+    # We only rebuild the downstream consumers A and B; A must come before B so B is rebuilt
+    # against the freshly-rebuilt A (a lexicographic sort already happens to give A, B here, so
+    # also assert the reverse-named case below where lexicographic order is wrong).
+    assert _dependency_ordered({"A", "B"}, dag) == ["A", "B"]
+
+
+def test_dependency_ordered_beats_lexicographic():
+    # Name the dependency later in the alphabet than its dependent, so a plain sort would put the
+    # dependent first — the bug Codex caught. Dependency order must still rebuild the dep first.
+    # "zzz_base" is a dep of "aaa_top"; lexicographically "aaa_top" < "zzz_base".
+    dag = {
+        "aaa_top": {"zzz_base"},
+        "zzz_base": {"root"},
+        "root": set(),
+    }
+    assert _dependency_ordered({"aaa_top", "zzz_base"}, dag) == ["zzz_base", "aaa_top"]
+
+
+def test_dependency_ordered_is_deterministic():
+    # Two consumers with no dependency between them: order among independents follows the DAG's own
+    # topological order (not alphabetical), but it must be stable run-to-run for the same DAG.
+    dag = {"b": {"root"}, "a": {"root"}, "root": set()}
+    first = _dependency_ordered({"b", "a"}, dag)
+    assert first == _dependency_ordered({"b", "a"}, dag)
+    assert set(first) == {"a", "b"}

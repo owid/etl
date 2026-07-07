@@ -34,6 +34,7 @@ from rich.console import Console
 
 from etl import config, paths
 from etl.command import main as etl_main
+from etl.steps import to_dependency_order
 from etl.version_tracker import VersionTracker
 
 log = structlog.get_logger()
@@ -76,6 +77,21 @@ def _dest_dir(step: str) -> Path:
 
 def _is_catalog_step(step: str) -> bool:
     return step.startswith(CATALOG_SCHEMES)
+
+
+def _dependency_ordered(consumers: set[str], dag: dict[str, set[str]]) -> list[str]:
+    """Sort `consumers` so each comes after the consumers it (transitively) depends on.
+
+    A consumer that itself depends on another consumer (common with `--all`, e.g. root -> A -> B)
+    must be rebuilt *after* it — otherwise, since `_rebuild` uses `only=True`, B would be rebuilt
+    against the stale on-disk build of the not-yet-rebuilt A and could report a false green.
+    `to_dependency_order` lists deps before their dependents, so we use each step's position in it
+    as the sort key. That order is deterministic for a given DAG (independent steps keep the graph's
+    own order, not alphabetical); the `s` tie-break only disambiguates the defensive fallback for a
+    step that somehow isn't in the DAG.
+    """
+    order = {step: i for i, step in enumerate(to_dependency_order(dag))}
+    return sorted(consumers, key=lambda s: (order.get(s, len(order)), s))
 
 
 def _load_coverage(step: str) -> dict[str, TableCoverage] | None:
@@ -208,7 +224,7 @@ def _resolve_consumers(step_arg: str, all_usages: bool) -> tuple[list[str], list
     `step_arg` may be a full step URI or a path fragment (e.g. `wb/2026-07-01/income_groups`), in
     which case it matches every active step containing it (snapshot/meadow/garden/grapher of the
     dataset). Returns (matched_steps, consumers) with the matched steps themselves excluded from
-    the consumer list.
+    the consumer list. Consumers come back in dependency order (see `_dependency_ordered`).
     """
     vt = VersionTracker(connect_to_db=False, warn_on_unused=False)
     if "://" in step_arg:
@@ -224,7 +240,7 @@ def _resolve_consumers(step_arg: str, all_usages: bool) -> tuple[list[str], list
         consumers.update(usages)
     # A consumer that is itself one of the matched steps is not "downstream" — drop it.
     consumers.difference_update(matched)
-    return matched, sorted(consumers)
+    return matched, _dependency_ordered(consumers, vt.dag_all)
 
 
 @click.command(name="usage-check", cls=click.RichCommand)
