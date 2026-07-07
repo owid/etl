@@ -1,7 +1,7 @@
 dataset:
   title: Cross-country literacy rates - World Bank, CIA World Factbook, and other sources
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   literacy_rates:
     variables:

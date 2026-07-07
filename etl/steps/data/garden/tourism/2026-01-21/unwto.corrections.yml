@@ -1,0 +1,15 @@
+# Known upstream data errors in the UNWTO data, corrected locally until fixed at the source.
+# See etl/data_corrections.py for the format. Applied on the raw meadow values (before the garden
+# ×1000 thousands→units conversion), so `indicator` uses the long meadow column name.
+- indicator: domestic_tourism_accommodation_domestic__accommodation__short_term_accommodation__hotels_and_similar__isic_5510__guests
+  entity: Taiwan
+  years: all
+  action: scale
+  factor: 0.001
+  # Guard: Taiwan's raw value is ~46–64 million while the next-largest country is ~0.35 million.
+  # A fixed source would report ~46–64 thousand (in line with others), tripping this `gt` and
+  # telling us to remove the entry. 1,000,000 sits safely between the buggy and fixed magnitudes.
+  expect: {gt: 1000000}
+  reason: UNWTO reports Taiwan's domestic short-term hotel guests in units while every other country reports in thousands, making the value ~1000× too large after the garden ×1000 conversion.
+  provider: UNWTO
+  status: open
