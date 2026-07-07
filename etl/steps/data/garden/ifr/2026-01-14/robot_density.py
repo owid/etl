@@ -24,9 +24,9 @@ def run() -> None:
 
     tb["robot_density"] = tb["robot_density"] / 10
 
-    # Fix incorrect China 2023 value (revised to 142 robots per 10,000 employees per IFR)
-    # The image with the new data is paywalled but was forwarded to us by the source
-    tb.loc[(tb["country"] == "China") & (tb["year"] == 2023), "robot_density"] = 142 / 10
+    # Fix known upstream data errors (e.g. China's incorrect 2023 value), declared in
+    # robot_density.corrections.yml.
+    tb = paths.apply_corrections(tb)
 
     # Improve table format.
     tb = tb.format(["country", "year"])

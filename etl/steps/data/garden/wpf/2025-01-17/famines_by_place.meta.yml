@@ -23,7 +23,7 @@ dataset:
   title: Deaths from famines by top countries and by decade
 
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   famines_by_place:
     variables:

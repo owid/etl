@@ -306,6 +306,7 @@ class _ViewConfigBase(TypedDict, total=False):
     includedEntityNames: list[str]
     internalNotes: str
     invertColorScheme: bool
+    license: Literal["cc-by", "cc-by-sa", "cc-by-nc", "cc-by-nc-sa", "cc-by-nd", "cc-by-nc-nd"]
     logo: Literal["owid", "core+owid", "gv+owid"]
     map: MapConfig
     matchingEntitiesOnly: bool

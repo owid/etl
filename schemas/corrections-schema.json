@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ETL data corrections",
+  "description": "Declarative corrections for known upstream data errors. See etl/data_corrections.py.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["indicator", "action", "reason", "provider", "status"],
+    "properties": {
+      "indicator": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The column to correct."
+      },
+      "entity": {
+        "type": "string",
+        "description": "Country/entity to locate rows by (use together with 'years')."
+      },
+      "years": {
+        "description": "Years to locate rows by: a list, 'all', 'latest', or an after/before/from/to range.",
+        "oneOf": [
+          {
+            "type": "array",
+            "items": { "type": "integer" },
+            "minItems": 1
+          },
+          { "enum": ["all", "latest"] },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "properties": {
+              "after": { "type": "integer" },
+              "before": { "type": "integer" },
+              "from": { "type": "integer" },
+              "to": { "type": "integer" }
+            }
+          }
+        ]
+      },
+      "match": {
+        "type": "object",
+        "minProperties": 1,
+        "description": "Locate rows by their current value(s), e.g. {value: 4.5}. Mutually exclusive with entity/years."
+      },
+      "action": {
+        "enum": ["drop", "override", "scale", "flag"],
+        "description": "drop = remove rows; override = set value; scale = multiply by factor; flag = log only."
+      },
+      "value": {
+        "description": "Replacement value for action 'override' (use null to blank a single cell)."
+      },
+      "factor": {
+        "type": "number",
+        "description": "Multiplier for action 'scale' (e.g. 0.001 to fix a units/thousands mismatch)."
+      },
+      "expect": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "description": "Guard asserted over all matched rows before applying the fix; fails loudly if the source is fixed.",
+        "properties": {
+          "eq": { "type": "number" },
+          "ne": { "type": "number" },
+          "gt": { "type": "number" },
+          "ge": { "type": "number" },
+          "lt": { "type": "number" },
+          "le": { "type": "number" }
+        }
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Why this is a known error (human-readable)."
+      },
+      "provider": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The upstream data provider."
+      },
+      "status": {
+        "enum": ["open", "reported", "acknowledged", "fixed_upstream"],
+        "description": "Reporting status with the provider."
+      },
+      "reported": {
+        "type": "string",
+        "format": "date",
+        "description": "Date we reported the error to the provider (optional)."
+      }
+    },
+    "oneOf": [
+      {
+        "required": ["entity", "years"],
+        "not": { "required": ["match"] }
+      },
+      {
+        "required": ["match"],
+        "not": { "anyOf": [{ "required": ["entity"] }, { "required": ["years"] }] }
+      }
+    ],
+    "allOf": [
+      {
+        "if": { "properties": { "action": { "const": "override" } }, "required": ["action"] },
+        "then": { "required": ["value"] }
+      },
+      {
+        "if": { "properties": { "action": { "const": "scale" } }, "required": ["action"] },
+        "then": { "required": ["factor"] }
+      },
+      {
+        "if": { "properties": { "action": { "const": "flag" } }, "required": ["action"] },
+        "then": { "not": { "required": ["expect"] } }
+      }
+    ]
+  }
+}
