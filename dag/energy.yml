@@ -275,6 +275,15 @@ steps:
     - data://garden/ember/2026-04-24/yearly_electricity
     - data://garden/demography/2024-07-15/population
   #
+  # Energy - Electricity mix (EI & Ember, 2026 Statistical Review).
+  #
+  data://garden/energy/2026-06-30/electricity_mix:
+    - data://garden/energy_institute/2026-06-30/statistical_review_of_world_energy
+    - data://garden/ember/2026-04-24/yearly_electricity
+    - data://garden/demography/2024-07-15/population
+  data://grapher/energy/2026-06-30/electricity_mix:
+    - data://garden/energy/2026-06-30/electricity_mix
+  #
   # Energy - OWID Energy dataset.
   #
   data://garden/energy_data/2026-04-24/owid_energy:
