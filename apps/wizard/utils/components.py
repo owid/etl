@@ -255,21 +255,6 @@ def tag_in_md(tag_name: str, color: str, icon: str | None = None):
         return f":{color}-background[{tag_name}]"
 
 
-def st_tag(tag_name: str, color: str, icon: str):
-    """Create a custom HTML tag.
-
-    Parameters
-    ----------
-    tag_name : str
-        Tag name.
-    color : str
-        Color of the tag. Must be replaced with any of the following supported colors: blue, green, orange, red, violet, gray/grey, rainbow
-    icon: str
-        Icon of the tag. Can be material (e.g. ':material/upgrade:') or emoji (e.g. '🪄').
-    """
-    st.markdown(tag_in_md(tag_name, color, icon))
-
-
 class Pagination:
     """Use pagination to show a list of items in Streamlit.
 
@@ -651,11 +636,6 @@ def preview_file(
 def st_toast_error(message: str) -> None:
     """Show error message."""
     st.toast(f"❌ :red[{message}]")
-
-
-def st_toast_success(message: str) -> None:
-    """Show success message."""
-    st.toast(f"✅ :green[{message}]")
 
 
 def update_query_params(key: str, side_effect: Callable[[], None] | None = None):

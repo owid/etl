@@ -145,13 +145,7 @@ api = [
 wizard = [
     "streamlit>=1.52.0",
     "streamlit-aggrid>=1.1.0,!=1.1.8.*,<1.1.9",
-    "streamlit-ace>=0.1.1",
-    "streamlit-extras>=0.3.6",
-    "streamlit-agraph>=0.0.45",
-    "pygwalker>=0.4.9",
     "plotly>=5.23.0",
-    "geographiclib>=2.0",
-    "streamlit-feedback>=0.1.3",
     "statsmodels>=0.14.4",
     "sentence-transformers>=5.1.0",
     "pandas-gbq>=0.25.0",
@@ -171,7 +165,6 @@ etls = 'etl.snapshot_command:snapshot_cli'
 etlp = 'apps.pr.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 compare = 'etl.compare:cli'
-backport = 'apps.backport.backport:backport_cli'
 
 [tool.ruff]
 lint.extend-select = [
