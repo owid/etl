@@ -9,9 +9,9 @@ paths = PathFinder(__file__)
 
 # Labels of the three scenarios in the original data, and names of the output columns.
 SCENARIOS = {
-    "Business As Usual": "cropland_bau",
-    "Towards Sustainability": "cropland_tss",
-    "Stratified Societies": "cropland_sss",
+    "Business As Usual": "cropland_business_as_usual",
+    "Towards Sustainability": "cropland_towards_sustainability",
+    "Stratified Societies": "cropland_stratified_societies",
 }
 
 
@@ -20,10 +20,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("fofa_2050_arable_land")
+    ds_meadow = paths.load_dataset("future_of_food_and_agriculture_arable_land")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("fofa_2050_arable_land")
+    tb = ds_meadow.read("future_of_food_and_agriculture_arable_land")
 
     #
     # Process data.

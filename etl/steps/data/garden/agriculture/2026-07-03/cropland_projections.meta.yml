@@ -30,7 +30,7 @@ dataset:
 tables:
   cropland_projections:
     variables:
-      cropland_bau:
+      cropland_business_as_usual:
         title: Projected cropland under the Business As Usual scenario
         description_short: |-
           Projected area of land used to grow crops, under FAO's "Business As Usual" scenario, where historical trends in food and agriculture continue.
@@ -38,7 +38,7 @@ tables:
           - *description-key-cropland
           - *description-key-gaps
           - *description-key-bau
-      cropland_tss:
+      cropland_towards_sustainability:
         title: Projected cropland under the Towards Sustainability scenario
         description_short: |-
           Projected area of land used to grow crops, under FAO's "Towards Sustainability" scenario, where food and agriculture systems shift towards more sustainable practices.
@@ -46,7 +46,7 @@ tables:
           - *description-key-cropland
           - *description-key-gaps
           - *description-key-tss
-      cropland_sss:
+      cropland_stratified_societies:
         title: Projected cropland under the Stratified Societies scenario
         description_short: |-
           Projected area of land used to grow crops, under FAO's "Stratified Societies" scenario, where inequalities across and within countries increase.

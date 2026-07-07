@@ -5,11 +5,14 @@ Alternative pathways to 2050, https://www.fao.org/3/I8429EN/i8429en.pdf).
 
 NOTE: FAO also publishes machine-readable outputs of the underlying GAPS model at
 https://www.fao.org/global-perspectives-studies/food-agriculture-projections-to-2050/en/
-However, those raw model outputs deviate from the figures published in the report; e.g. the world total in the 2012
-base year is 1,601 million hectares in the model outputs, but 1,567 in the report (which coincides with FAOSTAT
-cropland at the time of publication). At the country level, deviations between raw model outputs and FAOSTAT data can
-be much larger. Therefore, we use the (world-level) published figures, which connect better with the observed FAOSTAT
-data.
+We do not use them for arable land because they correspond to a slightly different (revised) model run, which was
+never re-anchored to FAOSTAT land statistics, whereas the figures printed in the report were. Concretely:
+- In the 2012 base year, the machine-readable world total is 1,601 million hectares, while the report publishes 1,567
+  (which coincides with FAOSTAT cropland at the time of publication). Charts combining these projections with the
+  observed FAOSTAT series would therefore show a visible discontinuity if the machine-readable data was used.
+- The deviation is not a constant offset: it varies by region and year in both directions (e.g. for Sub-Saharan
+  Africa in 2050, the machine-readable total is 11% lower than the published one), and at the country level it can
+  be much larger (e.g. more than 40% for Australia and Canada).
 """
 
 from pathlib import Path
@@ -44,11 +47,7 @@ DATA = pd.DataFrame(
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def run(upload: bool) -> None:
     # Initialize a new snapshot.
-    snap = Snapshot(f"agriculture/{SNAPSHOT_VERSION}/fofa_2050_arable_land.csv")
+    snap = Snapshot(f"agriculture/{SNAPSHOT_VERSION}/future_of_food_and_agriculture_arable_land.csv")
 
     # Save snapshot.
     snap.create_snapshot(data=DATA, upload=upload)
-
-
-if __name__ == "__main__":
-    run()

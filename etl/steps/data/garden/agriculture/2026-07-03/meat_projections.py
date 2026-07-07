@@ -1,4 +1,4 @@
-"""Load FAOSTAT food balances and FOFA 2050 projections, and create a garden dataset of meat consumption.
+"""Load FAOSTAT food balances and FAO's "future of food and agriculture" projections, and create a garden dataset of meat consumption.
 
 Historical meat (and egg) consumption comes from FAOSTAT Food Balance Sheets (element "Food", i.e. the quantity
 available for human consumption). Projected consumption comes from FAO's 2018 report "The future of food and
@@ -20,7 +20,7 @@ paths = PathFinder(__file__)
 ELEMENT_CODE_FOOD = "005142"
 
 # Item codes in faostat_fbsc, and names of the output columns.
-# NOTE: There is no FOFA projection for eggs, so eggs are informed only for the observed period.
+# NOTE: The projections do not include eggs, so eggs are informed only for the observed period.
 FBSC_ITEM_CODES = {
     "00002731": "beef_and_buffalo",  # Bovine Meat
     "00002732": "sheep_and_goat",  # Mutton & Goat Meat
@@ -29,21 +29,16 @@ FBSC_ITEM_CODES = {
     "00002744": "eggs",  # Eggs
 }
 
-# Items in the FOFA 2050 projections, and names of the output columns.
-FOFA_ITEMS = {
+# Items in the projections data, and names of the output columns.
+PROJECTIONS_ITEMS = {
     "Beef and veal": "beef_and_buffalo",
     "Sheep and goat meat": "sheep_and_goat",
     "Pigmeat": "pigmeat",
     "Poultry meat": "poultry",
 }
 
-# Scenario of the FOFA 2050 projections to adopt.
-FOFA_SCENARIO = "Business As Usual"
-
-# Maximum accepted relative deviation between the observed consumption and the projections' base year (2012).
-# NOTE: The projections were calibrated to the Food Balance Sheets available in 2018, and FAOSTAT has revised its
-# historical data since then; deviations are currently between 1.7% and 3.6%.
-BASE_YEAR_RELATIVE_TOLERANCE = 0.05
+# Scenario of the projections to adopt.
+SCENARIO = "Business As Usual"
 
 
 def prepare_observed(tb_fbsc: Table) -> Table:
@@ -67,19 +62,19 @@ def prepare_observed(tb_fbsc: Table) -> Table:
     return observed
 
 
-def prepare_projections(tb_fofa: Table) -> Table:
-    projections = tb_fofa[
-        (tb_fofa["region"] == "World")
-        & (tb_fofa["indicator"] == "Commodity balances, volume")
-        & (tb_fofa["element"] == "Food use")
-        & (tb_fofa["scenario"] == FOFA_SCENARIO)
-        & (tb_fofa["item"].isin(FOFA_ITEMS))
+def prepare_projections(tb_projections: Table) -> Table:
+    projections = tb_projections[
+        (tb_projections["region"] == "World")
+        & (tb_projections["indicator"] == "Commodity balances, volume")
+        & (tb_projections["element"] == "Food use")
+        & (tb_projections["scenario"] == SCENARIO)
+        & (tb_projections["item"].isin(PROJECTIONS_ITEMS))
     ][["region", "year", "item", "units", "value"]].reset_index(drop=True)
 
     # Sanity checks.
-    assert set(projections["item"]) == set(FOFA_ITEMS), "Missing items in FOFA projections."
-    assert set(projections["units"]) == {"1000 tonnes"}, "Units in FOFA projections have changed."
-    assert (projections["value"] > 0).all(), "Non-positive consumption in FOFA projections."
+    assert set(projections["item"]) == set(PROJECTIONS_ITEMS), "Missing items in the projections data."
+    assert set(projections["units"]) == {"1000 tonnes"}, "Units in the projections data have changed."
+    assert (projections["value"] > 0).all(), "Non-positive consumption in the projections data."
 
     # Convert from thousand tonnes to tonnes.
     projections["value"] *= 1000
@@ -88,18 +83,22 @@ def prepare_projections(tb_fofa: Table) -> Table:
     projections = projections.rename(columns={"region": "country"}).pivot(
         index=["country", "year"], columns="item", values="value", join_column_levels_with="_"
     )
-    projections = projections.rename(columns=FOFA_ITEMS, errors="raise")
+    projections = projections.rename(columns=PROJECTIONS_ITEMS, errors="raise")
 
     return projections
 
 
 def sanity_check_base_year(observed: Table, projections: Table) -> None:
-    for column in FOFA_ITEMS.values():
+    # Maximum accepted relative deviation between the observed consumption and the projections' base year (2012).
+    # NOTE: The projections were calibrated to the Food Balance Sheets available in 2018, and FAOSTAT has revised its
+    # historical data since then; deviations are currently between 1.7% and 3.6%.
+    tolerance = 0.05
+    for column in PROJECTIONS_ITEMS.values():
         observed_2012 = observed.loc[observed["year"] == 2012, column].item()
         projected_2012 = projections.loc[projections["year"] == 2012, column].item()
-        assert abs(projected_2012 - observed_2012) / observed_2012 < BASE_YEAR_RELATIVE_TOLERANCE, (
-            f"Consumption of {column} in 2012 deviates more than expected between FAOSTAT (observed) and FOFA "
-            f"(projections' base year)."
+        assert abs(projected_2012 - observed_2012) / observed_2012 < tolerance, (
+            f"Consumption of {column} in 2012 deviates more than expected between the observed data (FAOSTAT) and "
+            f"the projections' base year."
         )
 
 
@@ -111,16 +110,16 @@ def run() -> None:
     ds_fbsc = paths.load_dataset("faostat_fbsc")
     tb_fbsc = ds_fbsc.read("faostat_fbsc")
 
-    # Load FOFA 2050 projections dataset and read its main table.
-    ds_fofa = paths.load_dataset("fofa_2050_regions")
-    tb_fofa = ds_fofa.read("fofa_2050_regions")
+    # Load the "future of food and agriculture" projections dataset and read its main table.
+    ds_projections = paths.load_dataset("future_of_food_and_agriculture_regions")
+    tb_projections = ds_projections.read("future_of_food_and_agriculture_regions")
 
     #
     # Process data.
     #
-    # Prepare observed consumption (from FAOSTAT) and projected consumption (from FOFA).
+    # Prepare observed consumption (from FAOSTAT) and projected consumption (from the FAO report).
     observed = prepare_observed(tb_fbsc=tb_fbsc)
-    projections = prepare_projections(tb_fofa=tb_fofa)
+    projections = prepare_projections(tb_projections=tb_projections)
 
     # Check that the projections' base year agrees with the observed data.
     sanity_check_base_year(observed=observed, projections=projections)
@@ -136,7 +135,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_fofa.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_projections.metadata)
 
     # Save garden dataset.
     ds_garden.save()

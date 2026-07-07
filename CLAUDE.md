@@ -96,6 +96,7 @@ Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run)
 ```
 
 **Important:**
+- **Snapshot scripts need no `__main__` guard** — the `etls` CLI imports the module and invokes its click command `run` directly, so don't add `if __name__ == "__main__":` boilerplate. Many old scripts still carry it; don't copy them.
 - **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
 - **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
 - **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code. It also **fails with `AccessDenied` when the target version isn't in the catalog yet** (e.g. a version you just created) — use it only to fetch already-published upstream deps, never for the new step you're building locally.
@@ -145,6 +146,15 @@ To run the full **review → wait → fix → re-review** loop hands-off (and wa
 Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 
 ## Code Patterns
+
+### Descriptive short names
+
+Step, table, and indicator short names must be readable by any OWID colleague without context. Spell terms out instead of coining acronyms or initialisms:
+
+- Steps: `future_of_food_and_agriculture_arable_land`, not `fofa_2050_arable_land`
+- Indicators: `cropland_business_as_usual` / `cropland_stratified_societies`, not `cropland_bau` / `cropland_sss`
+
+Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style producer acronyms that OWID already uses). If the source uses an internal acronym for a scenario, product, or variable, expand it in our short names — the acronym can live in titles/descriptions where there's room to define it.
 
 ### Preserving metadata/origins in steps
 
