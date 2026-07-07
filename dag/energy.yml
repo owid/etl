@@ -283,7 +283,8 @@ steps:
     - data://garden/demography/2024-07-15/population
     # Pinto et al. historical electricity (Pinto only; merged with Ember/SR here in electricity_mix).
     - data://garden/energy/2026-06-30/global_historical_electricity:
-      - data://meadow/energy/2026-02-06/global_historical_electricity
+      - data://meadow/energy/2026-02-06/global_historical_electricity:
+        - snapshot://energy/2026-02-06/global_historical_electricity.zip
   data://grapher/energy/2026-06-30/electricity_mix:
     - data://garden/energy/2026-06-30/electricity_mix
   #
@@ -302,13 +303,9 @@ steps:
   #
   # Energy: global historical electricity scaling.
   #
-  data://grapher/energy/2026-04-24/global_historical_electricity_scaling:
-    - data://garden/energy/2026-04-24/global_historical_electricity_scaling:
-      # Energy: global historical electricity from Pinto et al. (2023).
-      - data://garden/energy/2026-04-24/global_historical_electricity:
-        - data://meadow/energy/2026-02-06/global_historical_electricity:
-          - snapshot://energy/2026-02-06/global_historical_electricity.zip
-        - data://garden/ember/2026-04-24/yearly_electricity
+  data://grapher/energy/2026-06-30/global_historical_electricity_scaling:
+    - data://garden/energy/2026-06-30/global_historical_electricity_scaling:
+      - data://garden/energy/2026-06-30/electricity_mix
   #
   # Energy - UK historical electricity.
   #

@@ -14,16 +14,16 @@ SOURCES = {
     "Gas": "Gas",
     "Hydro": "Hydro",
     "Nuclear": "Nuclear",
-    "Other fossil": "Oil",
+    "Oil": "Oil",
     "Solar": "Solar",
     "Total": "Total",
     "Wind": "Wind",
-    # 'Clean': 'Clean',
     # 'Fossil': 'Fossil',
-    # 'Gas and other fossil': 'Gas and other fossil',
-    # 'Hydro bioenergy and other renewables': 'Hydro bioenergy and other renewables',
-    # 'Renewables': 'Renewables',
-    # 'Wind and solar': 'Wind and solar',
+    # 'Low carbon': 'Low carbon',
+    # 'Renewable': 'Renewable',
+    # 'Solar and wind': 'Solar and wind',
+    # 'Other renewables excluding bioenergy': 'Other renewables excluding bioenergy',
+    # 'Other renewables including bioenergy': 'Other renewables including bioenergy',
 }
 
 

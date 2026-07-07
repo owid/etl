@@ -1,4 +1,9 @@
-"""Load a garden dataset and create a garden dataset on scaling of electricity production."""
+"""Garden step on the scaling of global historical electricity production.
+
+For each electricity source, we track global production from the first year in which it surpassed
+100 TWh. The input is the World electricity mix long-run series (Ember + Statistical Review + Pinto
+et al.), so this step reuses the already-combined data instead of re-merging sources.
+"""
 
 import owid.catalog.processing as pr
 
@@ -15,20 +20,21 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset.
-    ds_garden = paths.load_dataset("global_historical_electricity")
-
-    # Read table from garden dataset.
-    tb = ds_garden.read("global_historical_electricity")
+    # Load the electricity mix dataset and read its main table (World long-run series).
+    ds_electricity = paths.load_dataset("electricity_mix")
+    tb = ds_electricity.read("electricity_mix")
 
     #
     # Process data.
     #
-    # Gather all production and share data since generating over 100TWh for each source.
+    # Keep only World data.
+    tb = tb[tb["country"] == "World"].reset_index(drop=True)
+
+    # Gather production and share data for each source, from the first year it generated over 100 TWh.
     tables = []
-    for column_production in sorted([col for col in tb.columns if col.endswith("_production")]):
-        source = column_production.replace("_production", "")
-        column_share = f"{source}_share"
+    for column_production in sorted([col for col in tb.columns if col.endswith("_generation__twh")]):
+        source = column_production.replace("_generation__twh", "")
+        column_share = f"{source}_share_of_electricity__pct"
 
         # Filter to rows where production >= threshold.
         mask = tb[column_production] >= PRODUCTION_THRESHOLD
@@ -45,8 +51,11 @@ def run() -> None:
         if source == "total":
             assert column_share not in tb_source.columns
             tb_source["share_since_100_twh"] = 100
-        else:
+        elif column_share in tb_source.columns:
             tb_source = tb_source.rename(columns={column_share: "share_since_100_twh"}, errors="raise")
+        else:
+            # Skip sources without a corresponding share column.
+            continue
 
         # Add a source column.
         tb_source["source"] = source.replace("_", " ").capitalize()
