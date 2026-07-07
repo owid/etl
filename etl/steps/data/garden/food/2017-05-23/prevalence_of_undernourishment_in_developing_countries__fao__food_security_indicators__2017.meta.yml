@@ -1,6 +1,7 @@
 definitions:
   common:
     presentation:
+      attribution_short: FAO
       topic_tags:
         - Hunger & Undernourishment
 
