@@ -38,13 +38,17 @@ def run() -> None:
                 "share_bcis_with_ast",
             ]
             # adding additional columns of key information stored in the csv
-            tb["year"] = str(filters.iloc[1, 0]).split(":")[-1]
-            tb["syndrome"] = str(filters.iloc[3, 0]).split(":")[-1]
-            tb["pathogen"] = str(filters.iloc[4, 0]).split(":")[-1]
-            tb["antibiotic"] = str(filters.iloc[5, 0]).split(":")[-1]
-            assert all(tb[["year", "syndrome", "pathogen", "antibiotic"]].notna()), (
-                f"missing key information in {file_name}"
+            year = str(filters.iloc[1, 0]).split(":")[-1].strip()
+            syndrome = str(filters.iloc[3, 0]).split(":")[-1].strip()
+            pathogen = str(filters.iloc[4, 0]).split(":")[-1].strip()
+            antibiotic = str(filters.iloc[5, 0]).split(":")[-1].strip()
+            assert all(v not in ("", "nan") for v in [year, syndrome, pathogen, antibiotic]), (
+                f"missing key information in {file_name}: year={year!r}, syndrome={syndrome!r}, pathogen={pathogen!r}, antibiotic={antibiotic!r}"
             )
+            tb["year"] = year
+            tb["syndrome"] = syndrome
+            tb["pathogen"] = pathogen
+            tb["antibiotic"] = antibiotic
             tables.append(tb)
 
     tb = pr.concat(tables)

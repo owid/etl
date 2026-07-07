@@ -193,7 +193,7 @@ def tidy_notes(tb_class: Table) -> Table:
 
 def combine_countries(countries):
     # Combine countries into a string
-    if not countries:
+    if len(countries) == 0:
         return ""
     elif len(countries) == 1:
         return countries[0]
