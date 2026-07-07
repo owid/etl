@@ -18,6 +18,8 @@ definitions:
 dataset:
   title: Global meat consumption, with projections to 2050
   update_period_days: 365
+  owners:
+    - Pablo Rosado
 
 tables:
   meat_projections:
