@@ -77,7 +77,7 @@ class AdminAPI:
             inheritance_param = "enable" if is_inheritance_enabled else "disable"
             params["inheritance"] = inheritance_param
 
-        resp = requests_with_retry().post(
+        resp = http_session.post(
             self.owid_env.admin_api + "/charts",
             headers=self._headers(user_id),
             json=config,
@@ -100,7 +100,7 @@ class AdminAPI:
             inheritance_param = "enable" if is_inheritance_enabled else "disable"
             params["inheritance"] = inheritance_param
 
-        resp = requests_with_retry().put(
+        resp = http_session.put(
             f"{self.owid_env.admin_api}/charts/{chart_id}",
             headers=self._headers(user_id),
             json=config,

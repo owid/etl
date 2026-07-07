@@ -74,13 +74,19 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
     """
 
     tb_notes_dict = {
-        "Antibacterials (ATC J01, A07AA, P01AB)": "antibacterials",
         "Antimalarials (ATC P01B)": "anti_malarials",
         "Antimycotics and antifungals for systemic use (J02, D01B)": "antifungals",
         "Antivirals for systemic use (ATC J05)": "antivirals",
         "Drugs for the treatment of tuberculosis (ATC J04A)": "antituberculosis",
         "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)": "antibacterials_and_antituberculosis",
     }
+    # All classes that appear in notes must have a mapping in tb_notes_dict.
+    # "Drugs for the treatment of tuberculosis (ATC J04A)" has no notes but is still in the dict
+    # to ensure the pivot produces short column names (ddd_antituberculosis, not the raw snake-case).
+    assert set(tb_notes["antimicrobialclass"].unique()) <= set(tb_notes_dict.keys()), (
+        f"tb_notes contains classes not covered by tb_notes_dict: "
+        f"{set(tb_notes['antimicrobialclass'].unique()) - set(tb_notes_dict.keys())}"
+    )
     tb_notes["category"] = tb_notes["antimicrobialclass"].map(tb_notes_dict)
     tb_class_agg = tb_class_agg.copy(deep=True)
     tb_class_agg["antimicrobialclass"] = tb_class_agg["antimicrobialclass"].replace(tb_notes_dict)
@@ -90,14 +96,12 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
     tb_class_agg = tb_class_agg.reset_index(drop=True)
 
     for key in tb_notes_dict.values():
-        if f"ddd_{key}" in tb_class_agg.columns:
-            tb_class_agg[f"ddd_{key}"].metadata.description_key = tb_notes["description_processing"][
-                tb_notes["category"] == key
-            ]
-        if f"did_{key}" in tb_class_agg.columns:
-            tb_class_agg[f"did_{key}"].metadata.description_key = tb_notes["description_processing"][
-                tb_notes["category"] == key
-            ]
+        matching = tb_notes["description_processing"][tb_notes["category"] == key]
+        if not matching.empty:
+            if f"ddd_{key}" in tb_class_agg.columns:
+                tb_class_agg[f"ddd_{key}"].metadata.description_key = matching.iloc[0]
+            if f"did_{key}" in tb_class_agg.columns:
+                tb_class_agg[f"did_{key}"].metadata.description_key = matching.iloc[0]
     return tb_class_agg
 
 
@@ -142,8 +146,6 @@ def aggregate_antimicrobial_classes(tb: Table):
         tb_anti_tb.groupby(["country", "year", "antimicrobialclass"], dropna=False)[["ddd", "did"]].sum().reset_index()
     )
     tb_combined = pr.concat([tb, tb_anti_tb])
-
-    tb_combined.format(["country", "year", "antimicrobialclass"])
 
     return tb_combined, tb_notes
 

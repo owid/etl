@@ -1087,10 +1087,10 @@ steps:
 
 
   # WHO GLASS - Country enrolment
-  data://grapher/antibiotics/2026-06-30/glass_enrolment:
-    - data://garden/antibiotics/2026-06-30/glass_enrolment:
-        - data://meadow/antibiotics/2026-06-30/glass_enrolment:
-            - snapshot://antibiotics/2026-06-30/glass_enrolment.xlsx
+  data://grapher/antibiotics/2024-12-03/glass_enrolment:
+    - data://garden/antibiotics/2024-12-03/glass_enrolment:
+      - data://meadow/antibiotics/2024-12-03/glass_enrolment:
+          - snapshot://antibiotics/2024-12-03/glass_enrolment.xlsx
 
 
   # WHO GLASS - Testing coverage by infection and antibiotic
