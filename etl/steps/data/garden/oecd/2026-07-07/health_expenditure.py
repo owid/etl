@@ -38,8 +38,8 @@ EXPECTED_FINANCING_SCHEMES = {
 # parsing or mapping regression, not a real change — re-audit before lowering this.
 MIN_COUNTRIES = 61
 
-# Base year of the constant-price PPP series. If the OECD rebases, this constant AND the
-# `ppp_year` definition in health_expenditure.meta.yml must be updated together.
+# NOTE: Base year of the constant-price PPP series. If the OECD rebases, update this
+# constant AND the `ppp_year` definition in health_expenditure.meta.yml together.
 PPP_YEAR = 2020
 
 # Indicators expressed in constant PPP dollars (the ones the base year applies to).
