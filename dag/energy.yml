@@ -281,6 +281,7 @@ steps:
     - data://garden/energy_institute/2026-06-30/statistical_review_of_world_energy
     - data://garden/ember/2026-04-24/yearly_electricity
     - data://garden/demography/2024-07-15/population
+    - data://garden/energy/2026-04-24/global_historical_electricity
   data://grapher/energy/2026-06-30/electricity_mix:
     - data://garden/energy/2026-06-30/electricity_mix
   #

@@ -519,6 +519,51 @@ def check_carbon_intensity(combined: Table) -> None:
     # combined["co2_intensity__gco2_kwh"] = co2_intensity.copy()
 
 
+# Mapping from the columns of the global historical electricity dataset (Pinto et al. + Ember, World only)
+# to the electricity mix columns. Only generation columns are grafted; per capita and share variables are
+# recomputed afterwards. Shares from the historical dataset are ignored (recomputed from generation).
+# NOTE: "other_fossil" in the historical dataset (oil + waste + peat) is used as a proxy for oil-fired
+# generation; before ~1965, non-coal, non-gas fossil generation is dominated by oil, so this is a good
+# approximation for the long-run tail.
+HISTORICAL_ELECTRICITY_COLUMNS = {
+    "total_production": "total_generation__twh",
+    "coal_production": "coal_generation__twh",
+    "gas_production": "gas_generation__twh",
+    "other_fossil_production": "oil_generation__twh",
+    "nuclear_production": "nuclear_generation__twh",
+    "hydro_production": "hydro_generation__twh",
+    "solar_production": "solar_generation__twh",
+    "wind_production": "wind_generation__twh",
+    "bioenergy_production": "bioenergy_generation__twh",
+    "other_renewables_production": "other_renewables_excluding_bioenergy_generation__twh",
+    "fossil_production": "fossil_generation__twh",
+    "renewables_production": "renewable_generation__twh",
+    "clean_production": "low_carbon_generation__twh",
+    "wind_and_solar_production": "solar_and_wind_generation__twh",
+}
+
+
+def add_historical_electricity(combined: Table, tb_historical: Table) -> Table:
+    """Extend the World electricity series back to ~1900 using Pinto et al.'s global historical data.
+
+    Where the modern electricity mix (Ember and the Statistical Review) already has data, it is kept;
+    the historical dataset only fills the earlier years (roughly 1900-1964).
+    """
+    tb_historical = tb_historical[["country", "year"] + list(HISTORICAL_ELECTRICITY_COLUMNS)].rename(
+        columns=HISTORICAL_ELECTRICITY_COLUMNS, errors="raise"
+    )
+
+    # Reconstruct "other renewables including bioenergy" from its two components.
+    tb_historical["other_renewables_including_bioenergy_generation__twh"] = tb_historical[
+        ["bioenergy_generation__twh", "other_renewables_excluding_bioenergy_generation__twh"]
+    ].sum(axis=1, min_count=1)
+
+    # Combine, prioritizing the modern electricity mix over the historical data on overlapping years.
+    combined = combine_two_overlapping_dataframes(df1=combined, df2=tb_historical, index_columns=["country", "year"])
+
+    return combined
+
+
 def run() -> None:
     #
     # Load data.
@@ -530,6 +575,10 @@ def run() -> None:
     # Load Ember's yearly electricity dataset and read its main table.
     ds_ember = paths.load_dataset("yearly_electricity")
     tb_ember = ds_ember.read("yearly_electricity", reset_index=False)
+
+    # Load the global historical electricity dataset (Pinto et al. + Ember), used to extend the World series back to ~1900.
+    ds_historical = paths.load_dataset("global_historical_electricity")
+    tb_historical = ds_historical.read("global_historical_electricity")
 
     # Load population dataset.
 
@@ -590,6 +639,9 @@ def run() -> None:
 
     # Combine EI and Ember data.
     combined = combine_ei_and_ember_data(tb_review=tb_review, tb_ember=tb_ember)
+
+    # Extend the World electricity series back to ~1900 with Pinto et al.'s global historical data.
+    combined = add_historical_electricity(combined=combined, tb_historical=tb_historical)
 
     # Remove combined data for aggregate regions where Ember and the Statistical Review have a strong disagreement.
     # This way we avoid spurious jumps in the combined series.
