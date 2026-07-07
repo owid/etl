@@ -60,11 +60,12 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Passenger-km
+        description_processing: The source publishes this data in millions of passenger-kilometres. We converted it to passenger-kilometres.
 
       available_seat_kilometers:
         title: Available seat-kilometres
         unit: seat-kilometres
-        short_unit: km
+        short_unit: seat-km
         description_short: The total seating capacity provided by airlines, also known as available seat-kilometres.
         description_key:
           - Available seat-kilometres measure how much passenger-carrying capacity airlines offered.
@@ -77,3 +78,4 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Available seat-km
+        description_processing: The source publishes this data in millions of seat-kilometres. We converted it to seat-kilometres.

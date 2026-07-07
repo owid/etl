@@ -21,10 +21,20 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = tb.rename(columns={"Country": "country", "Year": "year", "Type of MDA": "type_of_mda"}, errors="raise")
+    tb = tb.rename(
+        columns={
+            "Country": "country",
+            "Year": "year",
+            "Type of MDA": "type_of_mda",
+            "Current status of MDA": "mda_status",
+        },
+        errors="raise",
+    )
+
     tb = tb.replace("No data", np.nan)
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "type_of_mda"])
+    tb = tb.format(["country", "year", "type_of_mda", "mda_status"])
 
     #
     # Save outputs.

@@ -2,7 +2,6 @@
 
 import numpy as np
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -17,19 +16,17 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("schistosomiasis")
     # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
-    tb = ds_meadow["schistosomiasis"].reset_index()
+    tb = ds_meadow.read("schistosomiasis")
 
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
     tb = tb.drop(columns=["region", "age_group", "country_code"])
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb,
         regions=REGIONS,
-        ds_regions=ds_regions,
         min_num_values_per_year=1,
     )
     # Replace regional values in percentage columns with NaN
