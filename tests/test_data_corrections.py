@@ -98,6 +98,103 @@ def test_override_requires_value():
         _validate_correction(_correction(action="override", match={"value": 10.0}), "<test>")
 
 
+def test_match_column_reference_matches_across_columns():
+    # A `match` value of {column: <name>} compares against another column of the same row instead
+    # of a literal — e.g. dropping a row where two columns happen to hold the same (spurious) value.
+    tb = Table(
+        {
+            "country": ["Belgium", "Belgium", "France"],
+            "year": [2024, 2025, 2025],
+            "barn": [5.0, 3.0, 3.0],
+            "free_range": [5.0, 3.0, 4.0],
+        }
+    )
+    out = apply_corrections(
+        tb,
+        [
+            _correction(
+                indicator="barn",
+                action="drop",
+                match={"country": "Belgium", "year": 2025, "value": {"column": "free_range"}},
+            )
+        ],
+    )
+    assert list(zip(out["country"], out["year"])) == [("Belgium", 2024), ("France", 2025)]
+
+
+def test_match_column_reference_no_match_when_columns_differ():
+    tb = Table({"country": ["Belgium"], "year": [2025], "barn": [5.0], "free_range": [7.0]})
+    with pytest.raises(AssertionError, match="matched no rows"):
+        apply_corrections(
+            tb,
+            [
+                _correction(
+                    indicator="barn",
+                    action="drop",
+                    match={"country": "Belgium", "year": 2025, "value": {"column": "free_range"}},
+                )
+            ],
+        )
+
+
+def test_match_column_reference_missing_column_raises():
+    tb = _make_table()
+    with pytest.raises(KeyError, match="not found"):
+        apply_corrections(tb, [_correction(action="drop", match={"value": {"column": "does_not_exist"}})])
+
+
+def test_validate_rejects_malformed_match_column_reference():
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="column"):
+        _validate_correction(_correction(action="drop", match={"value": {"col": "free_range"}}), "<test>")
+
+
+def test_validate_rejects_column_reference_as_override_value():
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="column"):
+        _validate_correction(_correction(action="override", match={"value": 10.0}, value={"column": "other"}), "<test>")
+
+
+def test_load_corrections_accepts_column_reference_match(tmp_path):
+    p = tmp_path / "x.corrections.yml"
+    p.write_text(
+        "- indicator: barn\n"
+        "  match: {country: Belgium, year: 2025, value: {column: free_range}}\n"
+        "  action: drop\n"
+        "  reason: r\n"
+        "  provider: p\n"
+        "  status: open\n"
+    )
+    corrections = load_corrections(p)
+    assert corrections[0]["match"]["value"] == {"column": "free_range"}
+
+
+def test_build_audit_handles_column_reference_match():
+    from etl.data_corrections import build_audit
+
+    tb = Table(
+        {
+            "country": ["Belgium", "France"],
+            "year": [2025, 2025],
+            "barn": [5.0, 3.0],
+            "free_range": [5.0, 4.0],
+        }
+    )
+    records = build_audit(
+        tb,
+        [
+            _correction(
+                indicator="barn",
+                action="drop",
+                match={"country": "Belgium", "year": 2025, "value": {"column": "free_range"}},
+            )
+        ],
+    )
+    assert records[0]["entities"][0]["entity"] == "Belgium"
+
+
 def test_match_ignores_missing_values_in_other_rows():
     # A `match` correction must not blow up when other rows of the same column hold pandas' NA
     # sentinel (e.g. a nullable "string" dtype column) — comparing NA to the match target should

@@ -34,6 +34,14 @@ Rows can also be located by their current value instead of entity+years::
       value: 5
       ...
 
+A `match` value can also reference another column of the *same row* instead of a literal, to express
+a relationship between two columns rather than a fixed constant::
+
+    - indicator: barn
+      match: {country: Belgium, year: 2025, value: {column: free_range}}
+      action: drop                                # drop the row where barn == free_range
+      ...
+
 Actions:
 - ``drop``     — remove the matched rows (use for long/tidy tables, where a row *is* one data point).
 - ``override`` — replace the indicator value of the matched rows with ``value``. Set ``value: null``
@@ -86,6 +94,14 @@ VALID_ACTIONS = {"drop", "override", "scale", "flag"}
 VALID_STATUSES = {"open", "reported", "acknowledged", "fixed_upstream"}
 
 # Comparison operators allowed in an `expect:` guard, mapping to the function applied elementwise.
+#
+# `expect`'s threshold is deliberately literal-only (unlike `match`, which also accepts a
+# `{column: <name>}` reference — see `_resolve`). No correction needs a cross-column `expect` yet, and
+# wiring it up isn't free: `_resolve` returns a table-length array, but `_check_expectation` compares
+# against `tb.loc[mask, indicator]` (already mask-narrowed), so the resolved array would need slicing
+# by the same `mask` before the elementwise comparison — an extra step with no test coverage today. If
+# this is ever needed: resolve the threshold via `_resolve(tb, threshold, index_names, label)`, then
+# index it with `mask` before passing it to the operator lambda.
 EXPECT_OPERATORS = {
     "eq": lambda values, threshold: values == threshold,
     "ne": lambda values, threshold: values != threshold,
@@ -159,9 +175,26 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
         # (they would be silently ignored), so reject the combination.
         mixed = {"entity", "years"} & set(correction)
         assert not mixed, f"Correction [{label}]: do not combine 'match' with {sorted(mixed)}."
+        # A match value may reference another column of the same row (`{column: <name>}`) instead of a
+        # literal. Reject any other dict shape now, rather than letting it silently build an all-false
+        # mask (a literal `==` against a dict never matches) that only surfaces as a confusing
+        # "matched no rows" at apply time.
+        for key, value in match.items():
+            if isinstance(value, dict):
+                assert set(value) == {"column"} and isinstance(value.get("column"), str) and value["column"], (
+                    f"Correction [{label}]: match.{key} must be a literal or {{'column': <name>}}, got {value!r}."
+                )
 
     if action == "override":
         assert "value" in correction, f"Correction [{label}]: action 'override' requires a 'value'."
+        # `{column: ...}` references are only resolved inside `match` (to compare two columns of the
+        # same row); resolving one as the top-level override target isn't implemented, so a value
+        # shaped that way would be assigned into every matched cell as a literal dict — reject it.
+        value = correction["value"]
+        assert not (isinstance(value, dict) and "column" in value), (
+            f"Correction [{label}]: action 'override' does not support a {{'column': ...}} reference as "
+            f"'value' — that form is only resolved inside 'match'."
+        )
 
     if action == "scale":
         factor = correction.get("factor")
@@ -233,9 +266,23 @@ def _eq_mask(values: np.ndarray, target: Any) -> np.ndarray:
 
     `values` may be an object array holding `pd.NA`/`None` (e.g. a nullable string column) — comparing
     those to a scalar with plain `==` yields `pd.NA` instead of `False`, which blows up a later `&=`
-    with a `TypeError: boolean value of NA is ambiguous`.
+    with a `TypeError: boolean value of NA is ambiguous`. `target` may itself be an array (see
+    `_resolve`), in which case this compares elementwise position-by-position, same as against a scalar.
     """
     return pd.Series(values).eq(target).fillna(False).to_numpy()
+
+
+def _resolve(tb: Table, spec: Any, index_names: list[str], label: str) -> Any:
+    """Resolve a `match` operand: `{"column": <name>}` resolves to that column's full array, so the
+    caller ends up comparing two columns of the same row elementwise instead of a column against a
+    fixed constant. Anything else is returned unchanged (the literal case).
+    """
+    if isinstance(spec, dict):
+        assert "column" in spec, (
+            f"Correction [{label}]: expected a column reference like {{'column': <name>}}, got {spec!r}."
+        )
+        return _column_values(tb, spec["column"], index_names)
+    return spec
 
 
 def _row_mask(tb: Table, correction: dict[str, Any], country_col: str, year_col: str) -> np.ndarray:
@@ -248,7 +295,8 @@ def _row_mask(tb: Table, correction: dict[str, Any], country_col: str, year_col:
         for key, value in correction["match"].items():
             # `value` is shorthand for the indicator column; any other key matches that column by name.
             col = correction["indicator"] if key == "value" else key
-            mask &= _eq_mask(_column_values(tb, col, index_names), value)
+            target = _resolve(tb, value, index_names, label)
+            mask &= _eq_mask(_column_values(tb, col, index_names), target)
         return mask
 
     entity_mask = _eq_mask(_column_values(tb, country_col, index_names), correction["entity"])
@@ -390,6 +438,10 @@ def build_audit(
         mask = _row_mask(tb, correction, country_col, year_col)
         action = correction["action"]
         factor = correction.get("factor")
+        # `correction.get("value")` here is the top-level override target, not a `match`-nested
+        # `{column: ...}` reference (those live inside `match["value"]`, a different dict) — the two
+        # `"value"` keys never collide, so `_to_float` seeing a real reference dict can't happen for a
+        # correction that's valid per `_validate_correction`.
         override_value = _to_float(correction.get("value"))
 
         any_numeric = False
