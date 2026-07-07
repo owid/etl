@@ -50,6 +50,7 @@ Assumptions:
 - [ ] Draft public-facing "Data update" post for OWID /latest, get the user's sign-off on the markdown, create the Google Doc in /Data updates, and hand the user the link (not added to the PR)
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
+- [ ] Run the silent-breakage check (`etl usage-check <namespace>/<new_version>/<short_name>`) whenever downstream consumers were repointed in this PR — it rebuilds each consumer against the new data and coverage-diffs it; investigate any build failure, dropped table/column/entity, or all-NaN series before merging (see "Silent-breakage check" section)
 - [ ] Ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot (see "Removing the old version & reordering the DAG") — don't forget this step
 - [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
 
@@ -747,6 +748,23 @@ If downstream dependents exist, **decide with the user** whether to bump them in
   - **Remove the old own-chain block from `dag/main.yml` *before* the bulk sweep**, or the sweep turns the old definition into a duplicate of the new key. Relocate the new block into the old slot (nested form) as part of the same edit.
   - Downstream datasets **keep their own version and variable IDs** — only their *dependency* on the updated dataset changes — so **no chart remapping is needed for them**; their aggregates just recompute against the new data (visible in Chart Diff). The indicator upgrade (step 7) still only concerns charts that use the updated dataset's *own* variables.
   - This is the only case where "Removing the old version" happens in the same PR — otherwise the old chain must stay until the follow-up repoints its consumers.
+
+## Silent-breakage check (`etl usage-check`)
+
+A foundational-dataset update can leave a downstream step **building cleanly while quietly dropping data** — a region whose aggregate can no longer be computed goes NaN, a reclassified country disappears, a join stops matching. Nothing raises; the feather is written; the gap only surfaces on a chart weeks later. (One common cause — a `countries_that_must_have_data` entry that is no longer a member of its group — now hard-fails in `geo.add_region_aggregates`. But not every silent drop comes from that one helper, so verify the actual outputs.)
+
+Run the checker on the updated chain — it works for any dataset, regional or not:
+
+```bash
+etl usage-check <namespace>/<new_version>/<short_name>           # direct consumers (default)
+etl usage-check <namespace>/<new_version>/<short_name> --all     # full transitive downstream
+etl usage-check <namespace>/<new_version>/<short_name> --dry-run # just list what would rebuild
+```
+
+For each `data://` consumer it records the on-disk coverage, **force-rebuilds it against the new upstream** (never a catalog download), reloads, and flags: build failures, dropped tables / columns / entities, all-NaN columns, and entities present but empty. A non-zero exit means investigate before merging. `grapher://` / `export://` consumers are listed but skipped (they upsert to MySQL / have no catalog output).
+
+- **When you bumped consumers in this PR:** run it right after repointing (and before removing the old chain), so each consumer's pre-update build is still on disk to diff against. Direct consumers are the default; use `--all` on a foundational dataset to walk the full cascade.
+- **When you deferred consumers to a follow-up PR:** use `--dry-run` to confirm the "Downstream dependencies" list is complete, and run the full check in the follow-up PR that does the repoint.
 
 ## Removing the old version & reordering the DAG
 

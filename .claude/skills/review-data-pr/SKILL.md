@@ -214,6 +214,14 @@ rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/arch
 
 After excluding the dataset's own chain, any remaining hits are downstream consumers — flag 🟡 unless the PR body already documents them under a "Downstream dependencies" section.
 
+**Silent-breakage check (when consumers were repointed in this PR).** Mirrors `/update-dataset` § "Silent-breakage check". If the PR bumps downstream consumers to the new version (rather than deferring them), a consumer can still build green while quietly losing data — a region aggregate that goes NaN, a reclassified country that disappears, a join that stops matching. A green pipeline run does **not** prove coverage held. Run the checker yourself over the updated chain and read its output:
+
+```bash
+etl usage-check <namespace>/<new_version>/<short_name>        # rebuilds each consumer + coverage-diffs it
+```
+
+Any build failure, dropped table/column/entity, or all-NaN series it reports is a 🔴 (the update silently dropped data downstream) unless the author has already triaged it in the PR body. If consumers were **deferred** to a follow-up PR, this check belongs to that PR — here just confirm the "Downstream dependencies" list is complete.
+
 ### 13. /update-dataset workflow status
 
 Verify the author completed each post-step item from `/update-dataset`. The procedures live there — here we just confirm the **outcomes**:
@@ -252,7 +260,7 @@ Structure the review with:
 
 ## Severity rubric
 
-- 🔴 **Blocker**: missing mandatory metadata field, genuinely broken link (fails curl + WebFetch + Wayback), failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, stale year in `citation_full`/`attribution`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, explorer/MDim still referencing old-version variables on staging, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data
+- 🔴 **Blocker**: missing mandatory metadata field, genuinely broken link (fails curl + WebFetch + Wayback), failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, stale year in `citation_full`/`attribution`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, explorer/MDim still referencing old-version variables on staging, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data, downstream consumer that silently lost coverage (dropped table/column/entity or all-NaN series per `etl usage-check`) after a same-PR repoint
 - 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues, undocumented sanity-check findings, phantom `sort:` labels with no backing value, over-exclusion of a canonical region, undocumented `missing values in mapping` countries, count series mis-routed into a rate/average aggregation branch, `citation_full` year ≠ `date_published` year (verify), pre-existing inherited metadata gap (`update_period_days`/`attributionShort`/`description_short` already missing in the prior version), PR author missing from `dataset.owners`, missing tracking-issue link in the PR body
 - 🟢 **Informational**: things to be aware of but not action items
 
