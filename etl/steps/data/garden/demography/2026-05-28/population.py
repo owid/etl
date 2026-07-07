@@ -2,7 +2,7 @@
 owid-issues#1232; see reports/population_ft/).
 
 Stitching:
-    - HYDE 3.3                          for years < 1800              (unchanged from 2024-07-15)
+    - HYDE 3.5                          for years < 1800              (2024-07-15 used HYDE 3.3)
     - Federico-Tena V2 (1991 borders)   for 1800-1938                 (replaces Gapminder v7)
     - linear interpolation              for 1939-1949 per country     (between F-T(1938) & WPP(1950))
     - UN WPP (2024)                     for >= 1950                   (unchanged)
@@ -42,6 +42,7 @@ from utils import (
 )
 
 from etl.data_helpers import geo
+from etl.data_helpers.misc import interpolate_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -476,10 +477,27 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
     # Keep track of original sources for merging back later
     sources_agg = tb_agg.loc[:, ["country", "year", "source"]].copy()
 
-    tb_agg = geo.interpolate_table(
-        tb_agg.loc[tb_agg["year"] >= YEAR_START_GAPMINDER, ["country", "year", "population"]],
-        "country",
-        "year",
+    tb_agg = tb_agg.loc[tb_agg["year"] >= YEAR_START_GAPMINDER, ["country", "year", "population"]]
+    first_year_observed = tb_agg.groupby("country", observed=True)["year"].min()
+
+    # Fill HYDE's decadal pre-1950 points to annual values so region aggregates can be built for
+    # every year. NOTE: interpolation must stay strictly within each country's own data range
+    # (`full_range_entity` + interior-only). Extrapolating beyond it (the old
+    # `geo.interpolate_table` default, `limit_direction="both"`) back-filled entities whose data
+    # starts in 1950 (South Sudan, Kosovo, Jersey, ...) flat across 1800-1949 inside region
+    # aggregates — double-counting people already included in F-T's 1991-borders parents
+    # (e.g. Kosovo inside Serbia).
+    tb_agg = interpolate_table(
+        tb_agg,
+        entity_col="country",
+        time_col="year",
+        time_mode="full_range_entity",
+        limit_area="inside",
+    )
+    first_year_interp = tb_agg.groupby("country", observed=True)["year"].min()
+    assert first_year_interp.ge(first_year_observed.reindex(first_year_interp.index)).all(), (
+        "Interpolation created rows before a country's first actual data point — this back-fills "
+        "post-1950 entities into pre-1950 region aggregates."
     )
 
     # Add source column back to interpolated data

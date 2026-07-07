@@ -39,8 +39,8 @@ steps:
   # built from successors).
   # Mirrors the 2024-07-15 step's output schema so consumers don't need code changes.
   data://garden/demography/2026-05-28/population:
-    # HYDE 3.3
-    - data://garden/hyde/2024-01-02/all_indicators
+    # HYDE 3.5
+    - data://garden/hyde/2026-06-08/all_indicators
     # Federico-Tena V2 (1991 borders, 2026)
     - data://garden/demography/2026-05-20/federico_tena_population
     # UN WPP (2024)

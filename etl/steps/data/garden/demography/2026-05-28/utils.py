@@ -17,7 +17,7 @@ SOURCES_NAMES = {
     "unwpp": "United Nations - World Population Prospects (2024) (https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=Population)",
     "ft": "Federico-Tena World Population Database — V2, 1991 borders (2026) (https://edatos.consorciomadrono.es/dataset.xhtml?persistentId=doi:10.21950/GW7SOZ)",
     "ft_interp": "Linear interpolation between Federico-Tena (1938) and UN WPP (1950)",
-    "hyde": "HYDE v3.3 (2023) (https://public.yoda.uu.nl/geo/UU01/AEZZIT.html)",
+    "hyde": "HYDE v3.5 (2025) (https://doi.org/10.24416/UU01-F45D44)",
 }
 
 # Former countries, sourced from our regions dataset.
