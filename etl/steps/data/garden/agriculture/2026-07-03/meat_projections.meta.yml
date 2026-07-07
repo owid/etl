@@ -13,7 +13,7 @@ definitions:
       - Values up to the present are observed data from FAOSTAT Food Balance Sheets; later values are projections from FAO's report "The future of food and agriculture - Alternative pathways to 2050", under its Business As Usual scenario.
       - In the Business As Usual scenario, the world develops according to socio-economic, technological and environmental patterns that fail to address many challenges of food and agriculture, despite efforts to achieve Sustainable Development Goal targets. Economic growth is moderate but uneven across countries, and policies provide only limited incentives to move towards sustainability.
     description_processing: |-
-      - We combine the observed consumption from FAOSTAT Food Balance Sheets with the projected consumption from FAO's 2018 report "The future of food and agriculture - Alternative pathways to 2050" (Business As Usual scenario), without any adjustment. The projections are calibrated to FAOSTAT Food Balance Sheets in their 2012 base year, where both sources agree within a few percent.
+      - We combine the data from the FAOSTAT Food Balance Sheets with the projected consumption from FAO's 2018 report "The future of food and agriculture - Alternative pathways to 2050" (Business As Usual scenario), without any adjustment. The projections are calibrated to FAOSTAT Food Balance Sheets in their 2012 base year, where both sources agree within a few percent.
 
 dataset:
   title: Global meat consumption, with projections to 2050
@@ -40,12 +40,3 @@ tables:
         title: Consumption of sheep and goat meat, with projections
         description_short: |-
           Quantity of sheep and goat meat available for human consumption, with projections up to 2050.
-      eggs:
-        title: Consumption of eggs
-        description_short: |-
-          Quantity of eggs available for human consumption.
-        description_key:
-          - Consumption here means the quantity of food available for human consumption, as reported in FAOSTAT Food Balance Sheets. It includes food that is wasted at the household level and not eaten.
-          - The source of the projections does not inform egg consumption, so, unlike the other indicators in this dataset, this indicator only covers the observed period.
-        description_processing: |-
-          - Values are taken directly from FAOSTAT Food Balance Sheets, without projections.

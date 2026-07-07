@@ -8,11 +8,8 @@ meta:
       - Towards Sustainability (TSS): a shift towards more sustainable food systems.
       - Stratified Societies (SSS): a future of increased inequality.
     title_snapshot: The future of food and agriculture - Alternative pathways to 2050 - Regional data
-    description_snapshot: |-
-      Machine-readable outputs of the GAPS model, aggregated into eight world regions and the world total, for a 2012 base year and the years 2030, 2035, 2040 and 2050, covering crop production, livestock, commodity markets, food security, fertilizers and emissions, and macroeconomic indicators.
     citation_full: |-
-      FAO. 2018. The future of food and agriculture - Alternative pathways to 2050. Rome. 224 pp.
-    attribution_short: FAO
+      Food and Agriculture Organization of the United Nations. 2018. The future of food and agriculture - Alternative pathways to 2050. Rome.
     url_main: https://www.fao.org/global-perspectives-studies/food-agriculture-projections-to-2050/en/
     url_download: https://www.fao.org/fileadmin/user_upload/global-perspective/csv/FOFA2050RegionsData_all.csv
     date_accessed: '2026-07-03'

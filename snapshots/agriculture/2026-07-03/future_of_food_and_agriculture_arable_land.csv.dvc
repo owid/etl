@@ -12,10 +12,6 @@ meta:
     title_snapshot: The future of food and agriculture - Alternative pathways to 2050 - Arable land
     description_snapshot: |-
       World totals of arable land, transcribed from Table 4.12 of the report, including a historical value (1970), the base year of the projections (2012), and projections (2030 and 2050) under each of the three scenarios.
-
-      Following FAOSTAT terminology, "arable land" is used in the report for the physical area under temporary and permanent agricultural crops (which FAOSTAT calls "cropland").
-
-      Note that these published figures differ slightly from the machine-readable outputs of the GAPS model (which correspond to a revised model run, not re-anchored to FAOSTAT data).
     citation_full: |-
       FAO. 2018. The future of food and agriculture - Alternative pathways to 2050. Rome. 224 pp.
     attribution_short: FAO

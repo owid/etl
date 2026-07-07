@@ -1,6 +1,6 @@
 """Load FAOSTAT food balances and FAO's "future of food and agriculture" projections, and create a garden dataset of meat consumption.
 
-Historical meat (and egg) consumption comes from FAOSTAT Food Balance Sheets (element "Food", i.e. the quantity
+Historical meat consumption comes from FAOSTAT Food Balance Sheets (element "Food", i.e. the quantity
 available for human consumption). Projected consumption comes from FAO's 2018 report "The future of food and
 agriculture - Alternative pathways to 2050", under its Business As Usual scenario.
 
@@ -20,13 +20,11 @@ paths = PathFinder(__file__)
 ELEMENT_CODE_FOOD = "005142"
 
 # Item codes in faostat_fbsc, and names of the output columns.
-# NOTE: The projections do not include eggs, so eggs are informed only for the observed period.
 FBSC_ITEM_CODES = {
     "00002731": "beef_and_buffalo",  # Bovine Meat
     "00002732": "sheep_and_goat",  # Mutton & Goat Meat
     "00002733": "pigmeat",  # Pigmeat
     "00002734": "poultry",  # Poultry Meat
-    "00002744": "eggs",  # Eggs
 }
 
 # Items in the projections data, and names of the output columns.

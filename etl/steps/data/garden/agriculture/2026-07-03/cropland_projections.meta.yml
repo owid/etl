@@ -13,7 +13,7 @@ definitions:
       - The 2012 base year is shared by the three scenarios.
   # Shared bullets, and descriptions of each scenario (condensed from Chapter 2 of the report, FAO 2018).
   description_key_cropland: &description-key-cropland |-
-    Cropland — called "arable land" in the source, following FAOSTAT terminology — is the physical area used to grow crops, including both temporary and permanent crops.
+    Cropland — called "arable land" in the source — is the physical area used to grow crops, including both temporary and permanent crops.
   description_key_gaps: &description-key-gaps |-
     Projections are based on simulations with FAO's Global Agriculture Perspectives System (GAPS) model, starting from a 2012 base year.
   description_key_bau: &description-key-bau |-
