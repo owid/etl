@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: Etemad & Luciani
+    title: World Energy Production 1800-1985
+    description: |-
+      This file, hosted by The Shift Project through The Shift Data Portal, compiles historical primary energy production data from several sources, identified in a "source" column:
+      - Etemad & Luciani: covers the period 1900-1979 for 127 countries (as well as regional and other aggregates), broken down by fuel (coal, oil, gas, nuclear, hydroelectricity, geothermal and peat) and converted to million tonnes of oil equivalent (Mtoe).
+      - U.S. Energy Information Administration (EIA): covers the period from 1980 onwards.
+    citation_full: |-
+      Bouda Etemad and Jean Luciani, with Paul Bairoch and Jean-Claude Toutain, World Energy Production 1800-1985, Librairie Droz, Geneva, 1991, ISBN 2-600-56007-6.
+      Data digitized and published by The Shift Project (The Shift Data Portal), with agreement of B. Etemad. https://github.com/dataforgoodfr/shiftdataportal
+    date_published: "1991-01-01"
+    date_accessed: "2026-07-07"
+    url_main: https://www.theshiftdataportal.org/
+    url_download: https://raw.githubusercontent.com/dataforgoodfr/shiftdataportal/b69de961ce4beb010661b444b6030fc14b6b9b24/server/data/WORLD_ENERGY_HISTORY_primary_energy_prod.csv
+    license:
+      name: CC BY-SA 3.0
+      url: https://www.theshiftdataportal.org/legal-notice
+outs:
+  - md5: a9c2d4e0ce0ac12c5b3d8c39464a22e0
+    size: 13721220
+    path: etemad_luciani.csv

@@ -73,6 +73,17 @@ steps:
   data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
   #
+  # Energy Institute - Statistical Review of World Energy (2026, Total Energy Supply).
+  #
+  data://garden/energy_institute/2026-06-30/statistical_review_of_world_energy:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2025-07-01/income_groups
+    - data://meadow/energy_institute/2026-06-30/statistical_review_of_world_energy:
+      - snapshot://energy_institute/2026-06-30/statistical_review_of_world_energy.csv
+      - snapshot://energy_institute/2026-06-30/statistical_review_of_world_energy.xlsx
+  data://grapher/energy_institute/2026-06-30/statistical_review_of_world_energy:
+    - data://garden/energy_institute/2026-06-30/statistical_review_of_world_energy
+  #
   # EIA - International Energy.
   #
   data://garden/eia/2026-05-05/international_energy:

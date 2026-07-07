@@ -1,0 +1,16 @@
+# Known errors in the Energy Institute's Statistical Review of World Energy that we patch locally
+# until the provider fixes them. One entry per error. See etl/data_corrections.py for the format.
+
+- indicator: total_energy_supply_ej
+  entity: Croatia
+  years: [1983]
+  action: override
+  value: null
+  expect: {gt: 1}
+  reason: >-
+    Croatia is reported with a total energy supply of ~7.8 EJ in 1983 (roughly 20 times its
+    present-day value, and before Croatia existed as an independent country). Every other year before
+    1990 is zero. This is a spurious value in the 2026 consolidated dataset, present in both the narrow
+    CSV and the "Total Energy Supply (TES) -EJ" sheet of the workbook.
+  provider: Energy Institute
+  status: open
