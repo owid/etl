@@ -10,6 +10,7 @@ from typing import Any, cast
 
 import numpy as np
 import pandas as pd
+import requests
 import rich
 import rich_click as click
 import structlog
@@ -353,12 +354,15 @@ class RemoteDataset:
         return tb
 
 
-def _data_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
-    """Return True if every local table's feather file is byte-identical to its remote counterpart.
+def _dataset_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
+    """Return True if every local table's feather AND .meta.json file is byte-identical to its
+    remote counterpart.
 
     Compares the local MD5 to the remote object's S3/R2 ETag (which is the file's MD5 for
-    OWID's non-multipart uploads). Used to skip data diffs when ``source_checksum`` cascades
-    from an upstream metadata-only change but the actual feather bytes are unchanged.
+    OWID's non-multipart uploads). Used to skip diffs when ``source_checksum`` cascades
+    from an upstream change but neither the data nor the table metadata changed. Dataset-level
+    metadata (``index.json``) is compared in-memory by the caller — its bytes always differ
+    because they contain the source checksum itself.
     """
     from owid.catalog.core.datasets import checksum_file
 
@@ -367,20 +371,21 @@ def _data_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
 
     local_md5: dict[str, str] = {}
     for t in ds_local.table_names:
-        path = Path(ds_local.path) / f"{t}.feather"
-        if not path.exists():
-            return False
-        local_md5[t] = checksum_file(path.as_posix()).hexdigest()
+        for fname in (f"{t}.feather", f"{t}.meta.json"):
+            path = Path(ds_local.path) / fname
+            if not path.exists():
+                return False
+            local_md5[fname] = checksum_file(path.as_posix()).hexdigest()
 
     base = (
         f"{DEFAULT_CATALOG_URL}{ds_remote.metadata.channel}/{ds_remote.metadata.namespace}/"
         f"{ds_remote.metadata.version}/{ds_remote.metadata.short_name}"
     )
 
-    def _remote_md5(table_name: str) -> str | None:
+    def _remote_md5(fname: str) -> str | None:
         try:
-            r = http_session.head(f"{base}/{table_name}.feather", timeout=10)
-        except Exception:
+            r = http_session.head(f"{base}/{fname}", timeout=10)
+        except requests.RequestException:
             return None
         if r.status_code != 200:
             return None
@@ -389,7 +394,7 @@ def _data_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
     with ThreadPoolExecutor(max_workers=min(8, max(1, len(local_md5)))) as executor:
         remote_md5 = dict(zip(local_md5.keys(), executor.map(_remote_md5, local_md5.keys())))
 
-    return all(local_md5[t] == remote_md5.get(t) for t in local_md5)
+    return all(local_md5[f] == remote_md5.get(f) for f in local_md5)
 
 
 @click.command(name="diff", help=__doc__)
@@ -579,13 +584,19 @@ def cli(
             # to improve performance. Source checksum should be enough
             continue
 
-        # Fast-path: source_checksum differs (typical when an upstream metadata change cascades)
-        # but the feather files are byte-identical. Compare local MD5 to remote S3/R2 ETag and
-        # skip the full data download/diff when they match.
+        # Fast-path: source_checksum differs (typical when an upstream change cascades) but
+        # nothing observable changed. Skip the full download/diff only when dataset-level
+        # metadata is equal AND every table's feather + .meta.json is byte-identical (local MD5
+        # vs remote S3/R2 ETag) — a metadata-only change must still get a full diff.
         if ds_a and ds_b:
             local_ds = ds_b if isinstance(ds_a, RemoteDataset) else ds_a
             remote_ds = ds_a if isinstance(ds_a, RemoteDataset) else (ds_b if isinstance(ds_b, RemoteDataset) else None)
-            if remote_ds is not None and isinstance(local_ds, Dataset) and _data_files_match(local_ds, remote_ds):
+            if (
+                remote_ds is not None
+                and isinstance(local_ds, Dataset)
+                and _dataset_metadata_dict(ds_a) == _dataset_metadata_dict(ds_b)
+                and _dataset_files_match(local_ds, remote_ds)
+            ):
                 skipped_identical_data += 1
                 continue
 
