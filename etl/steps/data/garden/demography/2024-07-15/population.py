@@ -418,15 +418,17 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
             "Mexico",
             "Iran",
         ],
+        # NOTE: Keep in sync with current income-group membership — the World Bank reclassifies countries
+        # yearly, and a "must-have" country that is no longer a member of its group nulls the whole
+        # aggregate. The FY2027 classification (2025 GNI) moved the Philippines and Vietnam to
+        # upper-middle income, so they were removed here.
         "Lower-middle-income countries": [
             "India",
             "Pakistan",
             "Nigeria",
             "Bangladesh",
-            "Philippines",
             "Egypt",
             "Kenya",
-            "Vietnam",
         ],
         "Low-income countries": [
             # "Ethiopia", Currently not classified as low-income by the World Bank, but historically it was.
