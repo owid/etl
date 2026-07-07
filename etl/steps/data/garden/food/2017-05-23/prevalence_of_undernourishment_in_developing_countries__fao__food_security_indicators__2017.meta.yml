@@ -18,12 +18,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage of the population in developing countries defined as undernourished.
-        description_from_producer: |-
-          The prevalence of undernourishment expresses the probability that a randomly selected individual from the population consumes an amount of calories that is insufficient to cover her/his energy requirement for an active and healthy life. The indicator is computed by comparing a probability distribution of habitual daily dietary energy consumption with a threshold level called the minimum dietary energy requirement. Both are based on the notion of an average individual in the reference population.
-
-          This is the traditional FAO hunger indicator, adopted as official Millennium Development Goal indicator for Goal 1, Target 1.9.
-
-          The indicator is calculated in three year averages, from 1969-71 to 2014-16 to reduce the impact of possible errors in estimated DES, due to the difficulties in properly accounting of stock variations in major food.
         description_key:
           - Undernourishment is solely determined by the sufficiency of energy (calorie) intake. It does not consider the quality or diversity of someone's diet.
           - |-
