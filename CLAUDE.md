@@ -17,15 +17,23 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 
 ## Team
 
-When generating user-facing prose (PR descriptions, Slack messages, PR comments, review responses, etc.):
+Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it."
 
-1. **Attribute the work** with a single italicized blockquote at the very top of the PR body, and as the opening line of any standalone Slack draft or long PR comment you generate:
+1. **Attribute the work.** Put this blockquote as the *first line* of the content:
 
    ```
    > _Written by Claude Code — @<handle> at the wheel._
    ```
 
-   Use the handle of the human directing the work (usually the current git user; fall back to asking if ambiguous). Skip the disclosure on tiny mechanical comments (e.g. a one-line `@codex review` ping) — it's meant for substantive prose.
+   It applies to **every** surface, **every** time you post:
+   - PR descriptions / bodies
+   - PR issue-level comments
+   - **Inline review comments _and_ replies to review comments** (e.g. answering Codex / Copilot / a reviewer)
+   - Standalone Slack messages or drafts
+
+   Use the handle of the human directing the work (usually the current git user; ask if ambiguous).
+
+   **The only exception** is a comment that is a bare mechanical token with *no prose* — a lone `@codex review` ping or a 👍. The moment your comment contains a sentence of explanation, it needs the line. When in doubt, include it.
 
 2. **Use exact handles** from the table below when tagging colleagues. Don't guess — a wrong tag pings a real person. If a name isn't in this table, write the plain name (e.g. "Bastian") instead of `@`-tagging, and ask the user for the handle.
 
