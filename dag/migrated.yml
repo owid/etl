@@ -634,9 +634,6 @@ steps:
   data-private://grapher/health/2021-09-01/lead_concentrations_in_paint__ipen__2021:
     - data-private://garden/health/2021-09-01/lead_concentrations_in_paint__ipen__2021:
       - snapshot-private://health/2021-09-01/lead_concentrations_in_paint__ipen__2021.feather
-  data-private://grapher/artificial_intelligence/2022-12-01/ai_index_report__2022:
-    - data-private://garden/artificial_intelligence/2022-12-01/ai_index_report__2022:
-      - snapshot-private://artificial_intelligence/2022-12-01/ai_index_report__2022.feather
   data://grapher/health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017:
     - data://garden/health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017:
       - snapshot://health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017.feather
