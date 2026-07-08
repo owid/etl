@@ -196,7 +196,7 @@ def add_variable_metadata(tb: Table) -> Table:
         "per_capita_kwh": ("{name} per capita", "kilowatt-hours per person", "kWh"),
         "share_pct": ("{name} as a share of total energy supply", "%", "%"),
         "annual_change_twh": ("Annual change in {name_lower}", "terawatt-hours", "TWh"),
-        "annual_change_pct": ("Annual change in {name_lower}", "%", "%"),
+        "annual_change_pct": ("Annual change in {name_lower} (%)", "%", "%"),
     }
     source_names = {**SOURCE_NAMES, "total_energy_supply": "Total energy supply"}
     for column in tb.columns:

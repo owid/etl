@@ -1,0 +1,33 @@
+title:
+  title: "Fossil fuel production"
+  title_variant: ""
+default_selection:
+  - "World"
+topic_tags:
+  - "Energy"
+  - "Fossil Fuels"
+dimensions:
+  - slug: "fuel"
+    name: "Fuel"
+    choices:
+      - slug: "coal"
+        name: "Coal"
+      - slug: "oil"
+        name: "Oil"
+      - slug: "gas"
+        name: "Gas"
+  - slug: "metric"
+    name: "Metric"
+    choices:
+      - slug: "production"
+        name: "Production"
+        description: "Total production, in terawatt-hours"
+      - slug: "per_capita"
+        name: "Production per capita"
+        description: "Production per person, in kilowatt-hours"
+      - slug: "reserves_ratio"
+        name: "Reserves-to-production ratio"
+        description: "Years of production left at current rates (World only)"
+views:
+  # Views are generated programmatically in the step.
+  []

@@ -125,6 +125,8 @@ steps:
     - data://garden/papers/2023-12-12/smil_2017
   data://grapher/energy/2026-06-30/energy_mix:
     - data://garden/energy/2026-06-30/energy_mix
+  export://multidim/energy/latest/energy_mix:
+    - data://grapher/energy/2026-06-30/energy_mix
   #
   # Energy - Fossil fuel production (2026 Statistical Review, incl. reserves-to-production ratio).
   #
@@ -142,6 +144,8 @@ steps:
         - snapshot://papers/2026-06-30/etemad_luciani.csv
   data://grapher/energy/2026-06-30/fossil_fuel_production:
     - data://garden/energy/2026-06-30/fossil_fuel_production
+  export://multidim/energy/latest/fossil_fuel_production:
+    - data://grapher/energy/2026-06-30/fossil_fuel_production
   #
   # Energy - Fossil fuel reserves/production ratio.
   #
@@ -315,6 +319,8 @@ steps:
         - snapshot://energy/2026-02-06/global_historical_electricity.zip
   data://grapher/energy/2026-06-30/electricity_mix:
     - data://garden/energy/2026-06-30/electricity_mix
+  export://multidim/energy/latest/electricity_mix:
+    - data://grapher/energy/2026-06-30/electricity_mix
   #
   # Energy - OWID Energy dataset.
   #

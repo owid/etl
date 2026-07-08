@@ -173,7 +173,7 @@ def add_variable_metadata(tb: Table) -> Table:
                 "terawatt-hours",
                 "TWh",
             ),
-            f"{fuel}_production_annual_change_pct": (f"Annual change in {name.lower()} production", "%", "%"),
+            f"{fuel}_production_annual_change_pct": (f"Annual change in {name.lower()} production (%)", "%", "%"),
             f"{fuel}_reserves_to_production_ratio": (
                 f"{name} reserves-to-production ratio",
                 "years",
