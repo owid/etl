@@ -229,7 +229,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
     # Ask LLM for summary
     client = OpenAIWrapper()
 
-    # Prepare messages for Insighter
+    # Prepare messages for the LLM
     messages = [
         {
             "role": "system",

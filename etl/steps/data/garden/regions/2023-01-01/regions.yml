@@ -4065,7 +4065,8 @@
     - VEN
     - VGB
 - code: WID_MENA
-  name: "MENA (WID)"
+  name: "Middle East and North Africa (WID)"
+  short_name: "MENA (WID)"
   region_type: "aggregate"
   defined_by: wid
   members:
@@ -4136,7 +4137,7 @@
     - UKR
     - UZB
 - code: WID_SSEA
-  name: "South & South-East Asia (WID)"
+  name: "South and South-East Asia (WID)"
   region_type: "aggregate"
   defined_by: wid
   members:

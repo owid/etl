@@ -82,7 +82,7 @@ def cli(
     services_body = {}
     for service in services:
         if service == "data-diff":
-            services_body["data-diff"] = data_diff.run(include)
+            services_body["data-diff"] = data_diff.run(include, branch=branch)
 
         elif service == "chart-diff":
             charts_df = chart_diff.call_chart_diff(branch)

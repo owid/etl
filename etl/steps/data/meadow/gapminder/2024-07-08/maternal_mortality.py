@@ -50,32 +50,7 @@ def run(dest_dir: str) -> None:
 
     #
     # cleaning errors (manually):
-    # Australia (first two rows span 110 years, when they should only span 10 as seen in https://docs.google.com/spreadsheets/u/0/d/14ZtQy9kd0pMRKWg_zKsTg3qKHoGtflj-Ekal9gIPZ4A/pub?gid=1#)
-    # replace with middle of the decade numbers
-    tb.loc[(tb["Country"] == "Australia") & (tb["year"] == "1871-1980"), "year"] = "1875"
-    tb.loc[(tb["Country"] == "Australia") & (tb["year"] == "1881-1990"), "year"] = "1885"
-
-    # wrong entries for Finland (duplicate 1772, 1775, 1967 -> should be 1872, 1875, 1957)
-    tb.loc[(tb["year"] == "1772") & (tb["Country"] == "Finland") & (tb["Maternal deaths"] == 487), "year"] = "1872"
-    tb.loc[(tb["year"] == "1775") & (tb["Country"] == "Finland") & (tb["Maternal deaths"] == 629), "year"] = "1875"
-    tb.loc[(tb["year"] == "1967") & (tb["Country"] == "Finland") & (tb["Maternal deaths"] == 77), "year"] = "1957"
-
-    # wrong entry for Sweden (duplicate 1967 -> should be 1957)
-    tb.loc[(tb["year"] == "1967") & (tb["Country"] == "Sweden") & (tb["Maternal deaths"] == 39), "year"] = "1957"
-
-    # wrong entry for US (duplicate 1967 -> should be 1957)
-    tb.loc[(tb["year"] == "1967") & (tb["Country"] == "United States") & (tb["Live Births"] == 4308000), "year"] = (
-        "1957"
-    )
-
-    # wrong entry for Belgium (duplicate 1973 -> should be 1873)
-    tb.loc[(tb["year"] == "1973") & (tb["Country"] == "Belgium") & (tb["Maternal deaths"] == 1283), "year"] = "1873"
-
-    # wrong entry for New Zealand (range 1989-02 -> should be 1898-02, take midpoint 1900)
-    tb.loc[(tb["year"] == "1989-02") & (tb["Country"] == "New Zealand"), "year"] = "1900"
-
-    # duplicate entry for New Zealand (1950, drop Loudon data)
-    tb = tb.drop(tb[(tb["year"] == "1950") & (tb["Country"] == "New Zealand") & (tb["MMR"] == 90)].index)
+    tb = paths.apply_corrections(tb, country_col="Country", year_col="year")
 
     # remove zeros from data (these are artifacts)
     # check with - print(tb.loc[tb[tb==0].dropna(how="all").index])

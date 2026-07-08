@@ -1,0 +1,90 @@
+# Known upstream data errors in the Gapminder maternal mortality data, corrected locally until fixed
+# at the source. See etl/data_corrections.py for the format.
+
+# Australia's first two rows span 110 years each, when they should only span 10 (see
+# https://docs.google.com/spreadsheets/u/0/d/14ZtQy9kd0pMRKWg_zKsTg3qKHoGtflj-Ekal9gIPZ4A/pub?gid=1#).
+# Replaced with the midpoint of the decade.
+- indicator: year
+  match: {value: "1871-1980", Country: Australia}
+  action: override
+  value: "1875"
+  reason: Year range spans 110 years instead of 10; replaced with the decade's midpoint.
+  provider: Gapminder
+  status: open
+
+- indicator: year
+  match: {value: "1881-1990", Country: Australia}
+  action: override
+  value: "1885"
+  reason: Year range spans 110 years instead of 10; replaced with the decade's midpoint.
+  provider: Gapminder
+  status: open
+
+# Finland: duplicate years 1772, 1775, 1967 should be 1872, 1875, 1957.
+- indicator: year
+  match: {value: "1772", Country: Finland, Maternal deaths: 487}
+  action: override
+  value: "1872"
+  reason: Duplicate year 1772 is a typo for 1872.
+  provider: Gapminder
+  status: open
+
+- indicator: year
+  match: {value: "1775", Country: Finland, Maternal deaths: 629}
+  action: override
+  value: "1875"
+  reason: Duplicate year 1775 is a typo for 1875.
+  provider: Gapminder
+  status: open
+
+- indicator: year
+  match: {value: "1967", Country: Finland, Maternal deaths: 77}
+  action: override
+  value: "1957"
+  reason: Duplicate year 1967 is a typo for 1957.
+  provider: Gapminder
+  status: open
+
+# Sweden: duplicate year 1967 should be 1957.
+- indicator: year
+  match: {value: "1967", Country: Sweden, Maternal deaths: 39}
+  action: override
+  value: "1957"
+  reason: Duplicate year 1967 is a typo for 1957.
+  provider: Gapminder
+  status: open
+
+# United States: duplicate year 1967 should be 1957.
+- indicator: year
+  match: {value: "1967", Country: United States, Live Births: 4308000}
+  action: override
+  value: "1957"
+  reason: Duplicate year 1967 is a typo for 1957.
+  provider: Gapminder
+  status: open
+
+# Belgium: duplicate year 1973 should be 1873.
+- indicator: year
+  match: {value: "1973", Country: Belgium, Maternal deaths: 1283}
+  action: override
+  value: "1873"
+  reason: Duplicate year 1973 is a typo for 1873.
+  provider: Gapminder
+  status: open
+
+# New Zealand: range 1989-02 should be 1898-02; take the midpoint 1900.
+- indicator: year
+  match: {value: "1989-02", Country: New Zealand}
+  action: override
+  value: "1900"
+  reason: Year range "1989-02" is a typo for "1898-02"; replaced with the midpoint 1900.
+  provider: Gapminder
+  status: open
+
+# New Zealand: duplicate 1950 entry from a different source (Loudon), dropped in favor of the other row.
+- indicator: MMR
+  match: {Country: New Zealand, year: "1950", value: 90}
+  action: drop
+  reason: Duplicate 1950 entry sourced from Loudon; dropped in favor of the other 1950 row.
+  provider: Gapminder
+  status: open
