@@ -1,0 +1,20 @@
+# NOTE: Variable titles, units and short units are set in the step code (they are generated
+# programmatically for each source and metric).
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+    description_processing: |-
+      - Energy is measured as Total Energy Supply (TES), following the physical energy content method used by the Energy Institute's Statistical Review of World Energy since its 2025 release. Fossil fuels are counted by their gross calorific value; wind, solar and hydropower are counted as the electricity they generate; and nuclear is counted as the heat input to its reactors (using an assumed thermal efficiency of around 33%).
+      - The total energy supply is extended to countries not covered by the Statistical Review using the U.S. Energy Information Administration's (EIA) total energy consumption. The Statistical Review is prioritized where both sources are available.
+      - The World series is extended back to 1800 using Vaclav Smil's historical estimates (2017), for years before the Statistical Review begins (1965). Only commercially-traded energy sources are included (traditional biomass, which Smil reports but the Statistical Review does not, is excluded so the series stays on a single basis with no step at the splice).
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+tables:
+  energy_mix:
+    variables: {}

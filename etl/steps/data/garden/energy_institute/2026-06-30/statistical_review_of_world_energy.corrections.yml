@@ -14,3 +14,19 @@
     CSV and the "Total Energy Supply (TES) -EJ" sheet of the workbook.
   provider: Energy Institute
   status: open
+
+- indicator: total_energy_supply_ej
+  entity: Poland
+  years: [1975]
+  action: override
+  value: 4.379
+  expect: {lt: 1}
+  reason: >-
+    Poland's total energy supply for 1975 is reported as ~0.34 EJ, about one thirteenth of the
+    neighboring years (~4 EJ) and smaller than Poland's coal supply alone that year. This is a
+    spurious value in the 2026 consolidated dataset, present in both the narrow CSV and the
+    "Total Energy Supply (TES) -EJ" sheet of the workbook. We replace it with the sum of Poland's
+    energy sources that year (4.379 EJ), which is what the total energy supply represents and which
+    is consistent with the neighboring years (4.06 EJ in 1974, 4.62 EJ in 1976).
+  provider: Energy Institute
+  status: open

@@ -115,6 +115,17 @@ steps:
   data://grapher/energy/2025-06-27/energy_mix:
     - data://garden/energy/2025-06-27/energy_mix
   #
+  # Energy - Energy mix (Total Energy Supply, 2026 Statistical Review).
+  #
+  data://garden/energy/2026-06-30/energy_mix:
+    - data://garden/energy_institute/2026-06-30/statistical_review_of_world_energy
+    - data://garden/eia/2026-05-05/international_energy
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/demography/2024-07-15/population
+    - data://garden/papers/2023-12-12/smil_2017
+  data://grapher/energy/2026-06-30/energy_mix:
+    - data://garden/energy/2026-06-30/energy_mix
+  #
   # Energy - Fossil fuel reserves/production ratio.
   #
   data://grapher/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
