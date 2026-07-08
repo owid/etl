@@ -79,7 +79,10 @@ def upload_html_report(html_path: Path, branch: str) -> str | None:
 def format_comment(report: DiffReport, report_url: str | None) -> str:
     summary = _format_summary(report, report_url)
 
-    changed = [ds for ds in report.datasets if ds.change_kind != "identical"]
+    # Biggest differences first, same ordering as the HTML report.
+    changed = sorted(
+        (ds for ds in report.datasets if ds.change_kind != "identical"), key=lambda ds: (-ds.severity, ds.path)
+    )
     diff = "\n".join(line for ds in changed for line in _format_dataset(ds))
     diff = _truncate_diff(diff)
 

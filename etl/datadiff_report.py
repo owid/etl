@@ -30,9 +30,13 @@ class ValueDiff:
     total: int
     # Display-ready records; rows of a "changed" diff have "<col> -" (old) and "<col> +" (new) keys.
     sample: list[dict[str, str]] = field(default_factory=list)
-    # True when the sample of a numeric "changed" diff is sorted by |relative change| (largest
-    # first) and carries a "Δ %" display column; non-numeric samples stay random and unsorted.
+    # True when the sample of a numeric "changed" diff is sorted by change size (largest first)
+    # and carries a "Δ %" display column; non-numeric samples stay random and unsorted.
     sorted_by_delta: bool = False
+    # Median BARD (|a-b| / (|a|+|b|), see `etl.data_helpers.misc.bard`) across ALL changed rows
+    # of a numeric column — the typical size of the change, bounded in [0, 1]. None when the
+    # column is non-numeric (or the diff is not of kind "changed").
+    median_bard: float | None = None
 
     @property
     def pct(self) -> float:
@@ -41,6 +45,20 @@ class ValueDiff:
     @property
     def symbol(self) -> str:
         return {"new": "+", "removed": "-", "changed": "~"}[self.kind]
+
+    @property
+    def severity(self) -> float:
+        """How big the differences are, in [0, 1] — the report's sort key.
+
+        Numeric changed diffs use their median BARD; non-numeric changes and removed values
+        count as a full change (a category flip / lost value has no meaningful "size"); purely
+        new values sort last — they're additions, not differences.
+        """
+        if self.kind == "new":
+            return 0.0
+        if self.median_bard is not None:
+            return self.median_bard
+        return 1.0
 
 
 @dataclass
@@ -52,6 +70,18 @@ class ColumnDiffResult:
     changes: list[str] = field(default_factory=list)
     meta_diff: str = ""
     value_diffs: list[ValueDiff] = field(default_factory=list)
+
+    @property
+    def severity(self) -> float:
+        """Biggest change among the column's value diffs; removed columns are maximal, new ones
+        minimal, metadata-only changes just above identical."""
+        if self.kind == "removed":
+            return 1.0
+        if self.kind == "new":
+            return 0.0
+        if self.value_diffs:
+            return max(v.severity for v in self.value_diffs)
+        return 0.001 if self.kind != "identical" else 0.0
 
 
 @dataclass
@@ -69,6 +99,13 @@ class TableDiffResult:
     @property
     def any_change(self) -> bool:
         return self.kind != "identical" or bool(self.changed_columns)
+
+    @property
+    def severity(self) -> float:
+        """A table is as critical as its most-changed column."""
+        s = max((c.severity for c in self.columns), default=0.0)
+        # Metadata-only table changes rank just above identical.
+        return max(s, 0.001) if self.kind != "identical" else s
 
 
 @dataclass
@@ -93,6 +130,22 @@ class DatasetDiffResult:
         if self.kind in ("new", "removed"):
             return self.kind
         return "changed" if self.any_change else "identical"
+
+    @property
+    def severity(self) -> float:
+        """A dataset is as critical as its most-changed table.
+
+        Comparison errors rank above everything (they hide unknown changes), removed datasets
+        above any value change (data loss), and brand-new datasets low (additions, self-evident
+        in a version bump).
+        """
+        if self.change_kind == "error":
+            return 3.0
+        if self.change_kind == "removed":
+            return 2.0
+        if self.change_kind == "new":
+            return 0.005
+        return max((t.severity for t in self.tables), default=0.0)
 
 
 @dataclass
@@ -256,7 +309,8 @@ def _render_table(t: TableDiffResult) -> str:
     ]
     if t.meta_diff:
         parts.append(_render_meta_diff(t.meta_diff, "table metadata diff"))
-    for c in t.columns:
+    # Most-changed columns first (stable: ties keep collection order).
+    for c in sorted(t.columns, key=lambda c: -c.severity):
         if c.kind == "identical":
             continue
         parts.append(_render_column(t.name, c))
@@ -297,7 +351,8 @@ def _render_dataset(ds: DatasetDiffResult) -> str:
         parts.append(f'<div class="error-msg">⚠ {_e(ds.error)}</div>')
     if ds.meta_diff:
         parts.append(_render_meta_diff(ds.meta_diff, "dataset metadata diff"))
-    for t in ds.tables:
+    # Most-changed tables first (stable: ties keep collection order).
+    for t in sorted(ds.tables, key=lambda t: -t.severity):
         if t.any_change or ds.kind in ("new", "removed"):
             parts.append(_render_table(t))
     parts.append("</div></details>")
@@ -322,9 +377,10 @@ def render_html(report: DiffReport) -> str:
                 f'<div class="card {kind}"><div class="count">{count:,}</div><div class="label">{label}</div></div>'
             )
 
-    # Changed/new/removed/errored datasets first, identical last.
-    order = {"error": 0, "changed": 1, "new": 2, "removed": 3, "identical": 4}
-    datasets = sorted(report.datasets, key=lambda ds: (order[ds.change_kind], ds.path))
+    # Biggest differences first: comparison errors, then removed datasets (data loss), then
+    # changed datasets ranked by the size of their changes (median BARD of the most-changed
+    # column), then new datasets; identical last. Path as tie-break for determinism.
+    datasets = sorted(report.datasets, key=lambda ds: (-ds.severity, ds.path))
     sections = "".join(_render_dataset(ds) for ds in datasets)
 
     skipped_note = (

@@ -8,7 +8,14 @@ import pytest
 from owid.catalog import Dataset, DatasetMeta, Table
 
 from etl.datadiff import DatasetDiff, RemoteDataset, _changed_records, _dataset_files_match
-from etl.datadiff_report import DiffReport, render_html
+from etl.datadiff_report import (
+    ColumnDiffResult,
+    DatasetDiffResult,
+    DiffReport,
+    TableDiffResult,
+    ValueDiff,
+    render_html,
+)
 
 
 def _create_datasets(tmp_path):
@@ -113,6 +120,8 @@ def test_structured_result(tmp_path):
     # Numeric changed samples carry an absolute "Δ %" display column and are marked delta-sorted.
     assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2", "Δ %": "33.3%"}]
     assert value_diffs["changed"].sorted_by_delta
+    # 3 -> 2: BARD = |3-2| / (3+2) = 0.2
+    assert value_diffs["changed"].median_bard == pytest.approx(0.2)
 
     # JSON round-trip
     report = DiffReport(datasets=[res], skipped_cascade=2)
@@ -123,31 +132,71 @@ def test_structured_result(tmp_path):
     assert report2.status == "changed"
 
 
-def test_changed_records_sorts_numeric_by_relative_change():
+def test_changed_records_sorts_numeric_by_change_size():
     both = pd.DataFrame(
         {
             "country": ["small", "big", "from_zero"],
             "a -": [100.0, 100.0, 0.0],
-            "a +": [101.0, 250.0, 5.0],  # +1%, +150%, +∞%
+            "a +": [101.0, 250.0, 5.0],  # BARD ≈ 0.005, 0.43, 1.0
         }
     )
-    records, sorted_by_delta = _changed_records(both, "a")
+    records, sorted_by_delta, median_bard = _changed_records(both, "a")
     assert sorted_by_delta
-    # Largest absolute relative change first; growth from zero counts as infinite and ranks on top.
+    # Biggest changes (by BARD) first; growth from zero is a maximal change and ranks on top.
     assert [r["country"] for r in records] == ["from_zero", "big", "small"]
     assert [r["Δ %"] for r in records] == ["∞%", "150.0%", "1.0%"]
+    # Median BARD across all changed rows: median(0.005, 0.43, 1.0) ≈ 0.43.
+    assert median_bard == pytest.approx(150 / 350, abs=1e-6)
 
     # A sample larger than the limit keeps only the biggest movers.
-    top, _ = _changed_records(both, "a", limit=2)
+    top, _, _ = _changed_records(both, "a", limit=2)
     assert [r["country"] for r in top] == ["from_zero", "big"]
 
 
 def test_changed_records_non_numeric_falls_back_to_random_sample():
     both = pd.DataFrame({"country": ["UK", "US"], "a -": ["x", "y"], "a +": ["y", "z"]})
-    records, sorted_by_delta = _changed_records(both, "a")
+    records, sorted_by_delta, median_bard = _changed_records(both, "a")
     assert not sorted_by_delta
+    assert median_bard is None
     assert all("Δ %" not in r for r in records)
     assert len(records) == 2
+
+
+def test_report_sorts_by_severity():
+    """Datasets, tables and columns render biggest-differences-first."""
+
+    def col(name, median_bard):
+        return ColumnDiffResult(
+            name=name,
+            kind="changed",
+            changes=["changed data"],
+            value_diffs=[ValueDiff(kind="changed", count=10, total=100, median_bard=median_bard)],
+        )
+
+    # Table/column order in the model is deliberately "small change first".
+    ds_small = DatasetDiffResult(
+        path="garden/n/v/small",
+        kind="identical",
+        tables=[TableDiffResult(name="t", kind="identical", columns=[col("a", 0.01)])],
+    )
+    ds_big = DatasetDiffResult(
+        path="garden/n/v/big",
+        kind="identical",
+        tables=[
+            TableDiffResult(name="minor", kind="identical", columns=[col("x", 0.05)]),
+            TableDiffResult(name="major", kind="identical", columns=[col("tiny", 0.02), col("huge", 0.9)]),
+        ],
+    )
+    html = render_html(DiffReport(datasets=[ds_small, ds_big]))
+
+    # Dataset with the biggest change first.
+    assert html.index("garden/n/v/big") < html.index("garden/n/v/small")
+    # Within a dataset, the most-changed table first; within a table, the most-changed column first.
+    assert html.index("major") < html.index("minor")
+    assert html.index("major.huge") < html.index("major.tiny")
+    # Severity levels: dataset takes the max of its tables.
+    assert ds_big.severity == pytest.approx(0.9)
+    assert ds_small.severity == pytest.approx(0.01)
 
 
 @pytest.mark.filterwarnings("ignore:Table `tab` does not have a primary_key")
