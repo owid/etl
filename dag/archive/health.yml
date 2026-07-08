@@ -1098,12 +1098,6 @@ steps:
         - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis:
             - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
 
-     #WHO GLASS Enrolment
-  data://grapher/antibiotics/2024-12-03/glass_enrolment:
-    - data://garden/antibiotics/2024-12-03/glass_enrolment:
-      - data://meadow/antibiotics/2024-12-03/glass_enrolment:
-        - snapshot://antibiotics/2024-12-03/glass_enrolment.xlsx
-
       # WHO Antimicrobial usage
   data://grapher/antibiotics/2024-11-12/antimicrobial_usage:
     - data://garden/antibiotics/2024-11-12/antimicrobial_usage:

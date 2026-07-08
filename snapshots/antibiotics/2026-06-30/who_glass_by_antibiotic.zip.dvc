@@ -9,7 +9,7 @@ meta:
       The global AMR data dashboard describes the implementation status, quality assurance, and standards of national AMR surveillance systems in 2023. It also describes the progress in global coverage of GLASS-AMR since its initiation (2016), and presents global antibiotic resistance estimates for the latest available calendar year (2023).
 
       The main unit of observation for AMR data are bacteriologically confirmed infections (BCIs) with interpretable antibiotic susceptibility test (AST) results. The latter are presented for infectious syndromes, bacterial pathogens and antibiotics under surveillance. The reader is referred to previous report editions and the manual for early implementation for a detailed description of GLASS methods. The 2024 GLASS report uses mid-year population estimates of the United Nations World Population Prospects 2024, to calculate testing coverage per million population each year.
-    citation_full: Global AMR data - Global Antimicrobial Resistance and Use Surveillance System (GLASS), World Health Organization (2025), https://worldhealthorg.shinyapps.io/glass-dashboard/_w_679389fb/#!/amr
+    citation_full: Global AMR data - Global Antimicrobial Resistance and Use Surveillance System (GLASS), World Health Organization (2025), https://worldhealthorg.shinyapps.io/glass-dashboard/_w_679389fb/#!/amr.
     attribution_short: WHO
     url_main: https://worldhealthorg.shinyapps.io/glass-dashboard/_w_679389fb/#!/amr
     date_accessed: '2026-06-30'
