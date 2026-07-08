@@ -110,8 +110,8 @@ def test_structured_result(tmp_path):
     assert value_diffs["new"].count == 1
     assert value_diffs["new"].total == 3
     assert value_diffs["new"].sample == [{"country": "FR", "a": "3"}]
-    # Numeric changed samples carry a "Δ %" display column and are marked delta-sorted.
-    assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2", "Δ %": "-33.3%"}]
+    # Numeric changed samples carry an absolute "Δ %" display column and are marked delta-sorted.
+    assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2", "Δ %": "33.3%"}]
     assert value_diffs["changed"].sorted_by_delta
 
     # JSON round-trip
@@ -133,9 +133,9 @@ def test_changed_records_sorts_numeric_by_relative_change():
     )
     records, sorted_by_delta = _changed_records(both, "a")
     assert sorted_by_delta
-    # Largest relative change first; growth from zero counts as an infinite change and ranks on top.
+    # Largest absolute relative change first; growth from zero counts as infinite and ranks on top.
     assert [r["country"] for r in records] == ["from_zero", "big", "small"]
-    assert [r["Δ %"] for r in records] == ["+∞%", "+150.0%", "+1.0%"]
+    assert [r["Δ %"] for r in records] == ["∞%", "150.0%", "1.0%"]
 
     # A sample larger than the limit keeps only the biggest movers.
     top, _ = _changed_records(both, "a", limit=2)

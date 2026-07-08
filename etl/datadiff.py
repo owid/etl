@@ -805,11 +805,12 @@ def _changed_records(both: pd.DataFrame, col: str, limit: int = SAMPLE_LIMIT) ->
     top = both.iloc[order].copy()
 
     def _fmt_delta(o: float, n: float) -> str:
+        # Absolute relative change — direction is already visible in the old/new columns.
         if pd.isna(o) or pd.isna(n):
             return "—"
         if o == 0:
-            return "+∞%" if n > o else "-∞%"
-        return f"{(n - o) / abs(o) * 100:+.1f}%"
+            return "∞%"
+        return f"{abs(n - o) / abs(o) * 100:.1f}%"
 
     top["Δ %"] = [_fmt_delta(o, n) for o, n in zip(old.iloc[order], new.iloc[order])]
     return _df_to_records(top, limit=limit), True
