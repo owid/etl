@@ -50,7 +50,7 @@ Assumptions:
 - [ ] Draft public-facing "Data update" post for OWID /latest, get the user's sign-off on the markdown, create the Google Doc in /Data updates, and hand the user the link (not added to the PR)
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
-- [ ] Run the silent-breakage check (`etl usage-check <namespace>/<new_version>/<short_name>`) whenever downstream consumers were repointed in this PR — it rebuilds each consumer against the new data and coverage-diffs it; investigate any build failure, dropped table/column/entity, or all-NaN series before merging (see "Silent-breakage check" section)
+- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: `etlr --modified --continue-on-failure --private` (all downstream consumers still build), then read the data-diff report (owidbot comment / `etl diff REMOTE data/ --changed --output-html`) for dropped entities/columns or all-NaN series (see "Silent-breakage check" section)
 - [ ] Ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot (see "Removing the old version & reordering the DAG") — don't forget this step
 - [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
 
@@ -749,22 +749,26 @@ If downstream dependents exist, **decide with the user** whether to bump them in
   - Downstream datasets **keep their own version and variable IDs** — only their *dependency* on the updated dataset changes — so **no chart remapping is needed for them**; their aggregates just recompute against the new data (visible in Chart Diff). The indicator upgrade (step 7) still only concerns charts that use the updated dataset's *own* variables.
   - This is the only case where "Removing the old version" happens in the same PR — otherwise the old chain must stay until the follow-up repoints its consumers.
 
-## Silent-breakage check (`etl usage-check`)
+## Silent-breakage check (downstream builds + value diff)
 
-A foundational-dataset update can leave a downstream step **building cleanly while quietly dropping data** — a region whose aggregate can no longer be computed goes NaN, a reclassified country disappears, a join stops matching. Nothing raises; the feather is written; the gap only surfaces on a chart weeks later. (One common cause — a `countries_that_must_have_data` entry that is no longer a member of its group — now hard-fails in `geo.add_region_aggregates`. But not every silent drop comes from that one helper, so verify the actual outputs.)
+A foundational-dataset update can leave a downstream step **building cleanly while quietly dropping data** — a region whose aggregate can no longer be computed goes NaN, a reclassified country disappears, a join stops matching. Nothing raises; the feather is written; the gap only surfaces on a chart weeks later. (One common cause — a `countries_that_must_have_data` entry that is no longer a member of its group — now hard-fails in `geo.add_region_aggregates`. But not every silent drop comes from that one helper, so verify the actual outputs.) Two existing commands cover it — no bespoke tool:
 
-Run the checker on the updated chain — it works for any dataset, regional or not:
+**1. Do all downstream consumers still build?** Run locally after repointing, before pushing:
 
 ```bash
-etl usage-check <namespace>/<new_version>/<short_name>           # direct consumers (default)
-etl usage-check <namespace>/<new_version>/<short_name> --all     # full transitive downstream
-etl usage-check <namespace>/<new_version>/<short_name> --dry-run # just list what would rebuild
+.venv/bin/etlr --modified --continue-on-failure --private              # add --dry-run to list scope first
 ```
 
-For each `data://` consumer it records the on-disk coverage, **force-rebuilds it against the new upstream** (never a catalog download), reloads, and flags: build failures, dropped tables / columns / entities, all-NaN columns, and entities present but empty. A non-zero exit means investigate before merging. `grapher://` / `export://` consumers are listed but skipped (they upsert to MySQL / have no catalog output).
+`--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. This catches consumers that crash against the new dependency — a failure mode staging hides (the failed step just stays stale in the catalog; data-diff shows it as unchanged and the traceback is buried in the Buildkite log). Use `--workers N` to parallelize a big fan-out.
 
-- **When you bumped consumers in this PR:** run it right after repointing (and before removing the old chain), so each consumer's pre-update build is still on disk to diff against. Direct consumers are the default; use `--all` on a foundational dataset to walk the full cascade.
-- **When you deferred consumers to a follow-up PR:** use `--dry-run` to confirm the "Downstream dependencies" list is complete, and run the full check in the follow-up PR that does the repoint.
+**2. How much did their outputs change?** Value-level comparison via datadiff:
+
+- **On the PR (zero effort):** read owidbot's **data-diff** comment + its sidecar HTML report (`https://catalog.ourworldindata.org/diffs/<branch>/data-diff.html`) — it compares the staging build (new dependency) against production (old dependency) with per-column changed-value counts and old→new sample rows. For a dependency bump the consumers' code is unchanged, so this is a clean old-dep-vs-new-dep comparison.
+- **Locally, after step 1:** `etl diff REMOTE data/ --changed --include garden --output-html data-diff.html`.
+
+Read the diff for the silent-drop signatures: a column or entity that vanished, a series that went all-NaN, a region aggregate whose values collapsed. **Don't diff against stale local builds** — a consumer built at an unknown earlier time (or downloaded from the catalog) conflates code drift with the dependency change and produces false positives; `REMOTE`/production is the trustworthy baseline because CI built it from master.
+
+- **When you deferred consumers to a follow-up PR:** the checks above belong to that follow-up PR; here just confirm the "Downstream dependencies" list is complete (`etlr --modified --dry-run` shows the affected set).
 
 ## Removing the old version & reordering the DAG
 
