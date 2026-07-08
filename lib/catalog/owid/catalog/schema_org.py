@@ -379,12 +379,17 @@ def _origin_key(origin: Origin) -> tuple[Any, ...]:
 
 
 def _license_url(dataset_meta: DatasetMeta, origins: list[Origin], tables: list[TableSchemaInput]) -> str | None:
-    for origin in origins:
-        url = _license_to_url(origin.license)
-        if url:
-            return url
+    # The record describes the OWID-compiled dataset, so a dataset-level license declared in
+    # its .meta.yml (e.g. CC BY for owid_co2, matching its GitHub repo) speaks for the whole
+    # artifact and wins. Origin licenses are a per-source fallback: the "first" one is just
+    # the most-referenced source's license, which can misrepresent the compilation (owid_co2
+    # used to advertise GCB's ICOS data license).
     for license in dataset_meta.licenses:
         url = _license_to_url(license)
+        if url:
+            return url
+    for origin in origins:
+        url = _license_to_url(origin.license)
         if url:
             return url
     for table in tables:

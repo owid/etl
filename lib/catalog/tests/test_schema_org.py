@@ -560,3 +560,43 @@ def test_citation_skips_doi_of_auxiliary_origin() -> None:
         "https://www.energyinst.org/statistical-review/",
         "https://example.com/maddison",
     }
+
+
+def test_dataset_level_license_wins_over_origin_license() -> None:
+    """A dataset-level license declared in .meta.yml describes the compiled artifact and must
+    take precedence over per-source origin licenses (owid_co2 used to advertise GCB's ICOS
+    data license just because GCB is its most-referenced origin)."""
+    origin = Origin(
+        producer="Global Carbon Project",
+        title="Global Carbon Budget",
+        license=License(name="ICOS", url="https://www.icos-cp.eu/data-services/about-data-portal/data-license"),
+    )
+    table = TableSchemaInput(
+        short_name="owid_co2",
+        metadata=TableMeta(short_name="owid_co2", title="CO2", description="Table description"),
+        variables={"co2": VariableMeta(title="CO2", origins=[origin])},
+        formats=["feather"],
+    )
+    kwargs: dict = dict(
+        dataset_path="garden/emissions/2025-12-04/owid_co2",
+        page_path="emissions/owid_co2",
+        tables=[table],
+    )
+
+    jsonld = dataset_to_schema_org(
+        dataset_meta=DatasetMeta(
+            short_name="owid_co2",
+            title="CO2 dataset",
+            description="Dataset description",
+            licenses=[License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")],
+        ),
+        **kwargs,
+    )
+    assert jsonld["license"] == "https://creativecommons.org/licenses/by/4.0/"
+
+    # Without a dataset-level license, the most-referenced origin's license is the fallback.
+    jsonld = dataset_to_schema_org(
+        dataset_meta=DatasetMeta(short_name="owid_co2", title="CO2 dataset", description="Dataset description"),
+        **kwargs,
+    )
+    assert jsonld["license"] == "https://www.icos-cp.eu/data-services/about-data-portal/data-license"
