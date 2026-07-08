@@ -1,0 +1,66 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: people
+    short_unit: ""
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Fish & Overfishing
+    description_processing: |-
+      - FAO reports these figures in thousands of people; we present them as a number of people.
+      - FAO reports the 2000s and the 2010s as decade averages. We plot these at the midpoint of each decade (2005 and 2015), alongside the single years 1995, 2020 and 2022.
+      - We keep FAO's own continental regions, labeled with a "(FAO)" suffix. The source does not provide country-level figures, so Our World in Data's standard regions cannot be constructed from this data.
+
+tables:
+  employment_in_fisheries_and_aquaculture:
+    variables:
+      total:
+        title: Number of people employed in fisheries and aquaculture
+        description_short: Number of people employed in the primary sector of fisheries and aquaculture, as full-time, part-time, occasional or unspecified workers.
+        display:
+          name: Fisheries and aquaculture
+        presentation:
+          title_public: Number of people employed in fisheries and aquaculture
+        description_key:
+          - The primary sector covers people who catch or farm aquatic animals. It excludes workers in processing, trade and other downstream activities.
+          - Workers are counted whether they are employed full-time, part-time, occasionally, or with an unspecified working-time status.
+          - Asia accounts for the large majority of the world's fisheries and aquaculture workers, followed by Africa and Latin America and the Caribbean.
+          - FAO revised its employment estimates for 1995 to 2021 upward relative to earlier editions of The State of World Fisheries and Aquaculture.
+      aquaculture:
+        title: Number of people employed in aquaculture
+        description_short: Number of people employed in aquaculture, the farming of aquatic animals. This excludes people who catch wild fish.
+        display:
+          name: Aquaculture
+        presentation:
+          title_public: Number of people employed in aquaculture
+      capture_fisheries:
+        title: Number of people employed in capture fisheries
+        description_short: Number of people employed catching wild aquatic animals, combining inland and marine fisheries. This excludes people who farm fish (aquaculture).
+        display:
+          name: Capture fisheries
+        presentation:
+          title_public: Number of people employed in capture fisheries
+      inland_fisheries:
+        title: Number of people employed in inland fisheries
+        description_short: Number of people employed catching wild aquatic animals in inland waters, such as rivers and lakes.
+        display:
+          name: Inland fisheries
+        presentation:
+          title_public: Number of people employed in inland fisheries
+      marine_fisheries:
+        title: Number of people employed in marine fisheries
+        description_short: Number of people employed catching wild aquatic animals in marine waters, such as seas and oceans.
+        display:
+          name: Marine fisheries
+        presentation:
+          title_public: Number of people employed in marine fisheries
+      unspecified:
+        title: Number of people employed in an unspecified fisheries or aquaculture subsector
+        description_short: Number of workers in the primary sector of fisheries and aquaculture who could not be assigned to a specific subsector.
+        display:
+          name: Unspecified
+        presentation:
+          title_public: Number of people employed in an unspecified fisheries or aquaculture subsector
