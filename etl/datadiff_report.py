@@ -11,6 +11,7 @@ This module must not import from `etl.datadiff` to avoid a circular dependency.
 import datetime as dt
 import html
 import json
+import re
 from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
 
@@ -19,6 +20,43 @@ ChangeKind = Literal["new", "removed", "changed", "identical", "error"]
 # Number of sample rows stored per value diff (the text output shows only 5; the HTML report
 # can afford more).
 SAMPLE_LIMIT = 100
+
+# Severity tiers (thresholds on the BARD-based severity score in [0, 1]): they tell a reviewer
+# where to stop reading. In "typical relative change" terms: large ≳ 35%, moderate ≳ 2%,
+# small = anything non-zero below that (usually rounding-level noise).
+Tier = Literal["large", "moderate", "small", "none"]
+TIER_LARGE = 0.15
+TIER_MODERATE = 0.01
+TIER_ICONS = {"large": "🔴", "moderate": "🟡", "small": "🟢"}
+
+# Entries shown in the "Top changes" watch list at the head of the report.
+TOP_CHANGES_LIMIT = 15
+# The triage aids (Top changes section, tier strip) only appear when there's something to
+# triage: a report with a couple of changed datasets is already scannable, and on the common
+# single-dataset PR they'd be redundant noise. Per-row tier chips render at any size.
+TRIAGE_MIN_DATASETS = 3
+
+
+def _tier(severity: float) -> Tier:
+    if severity >= TIER_LARGE:
+        return "large"
+    if severity >= TIER_MODERATE:
+        return "moderate"
+    if severity > 0:
+        return "small"
+    return "none"
+
+
+def _bard_to_rel(severity: float) -> str:
+    """Human-readable typical relative change for a BARD-based severity.
+
+    For same-sign values, BARD t corresponds to a relative change of 2t/(1-t) — e.g. t=0.2 is a
+    ~50% change. Above ~0.83 the equivalent exceeds 1000%, where a precise number stops being
+    informative.
+    """
+    if severity >= 0.83:
+        return ">1000%"
+    return f"~{200 * severity / (1 - severity):.0f}%"
 
 
 @dataclass
@@ -50,12 +88,15 @@ class ValueDiff:
     def severity(self) -> float:
         """How big the differences are, in [0, 1] — the report's sort key.
 
-        Numeric changed diffs use their median BARD; non-numeric changes and removed values
-        count as a full change (a category flip / lost value has no meaningful "size"); purely
-        new values sort last — they're additions, not differences.
+        Numeric changed diffs use their median BARD; non-numeric changes count as a full change
+        (a category flip has no meaningful "size"); removed values scale with the share of rows
+        lost (coverage loss is additionally surfaced by the dataset's coverage chip, which forces
+        the 🔴 tier); purely new values sort last — they're additions, not differences.
         """
         if self.kind == "new":
             return 0.0
+        if self.kind == "removed":
+            return self.pct / 100
         if self.median_bard is not None:
             return self.median_bard
         return 1.0
@@ -107,6 +148,32 @@ class TableDiffResult:
         # Metadata-only table changes rank just above identical.
         return max(s, 0.001) if self.kind != "identical" else s
 
+    @property
+    def removed_row_count(self) -> int:
+        """Rows present before and gone after (index-level removals; coverage loss)."""
+        # All dims of a table share the same removed index rows — the first dim suffices.
+        for c in self.columns:
+            if c.is_dim:
+                for v in c.value_diffs:
+                    if v.kind == "removed":
+                        return v.count
+        return 0
+
+    @property
+    def removed_labels(self) -> list[str]:
+        """Entity/dim labels of removed rows (from the stored sample, so possibly a subset)."""
+        for c in self.columns:
+            if c.is_dim:
+                for v in c.value_diffs:
+                    if v.kind == "removed":
+                        seen: list[str] = []
+                        for row in v.sample:
+                            label = row.get(c.name, "")
+                            if label and label not in seen:
+                                seen.append(label)
+                        return seen
+        return []
+
 
 @dataclass
 class DatasetDiffResult:
@@ -146,6 +213,43 @@ class DatasetDiffResult:
         if self.change_kind == "new":
             return 0.005
         return max((t.severity for t in self.tables), default=0.0)
+
+    @property
+    def removed_row_count(self) -> int:
+        return sum(t.removed_row_count for t in self.tables)
+
+    @property
+    def removed_labels(self) -> list[str]:
+        seen: list[str] = []
+        for t in self.tables:
+            for label in t.removed_labels:
+                if label not in seen:
+                    seen.append(label)
+        return seen
+
+    @property
+    def has_coverage_loss(self) -> bool:
+        """Rows/entities, columns or whole tables that existed before and are gone after."""
+        return (
+            self.removed_row_count > 0
+            or any(t.kind == "removed" for t in self.tables)
+            or any(c.kind == "removed" for t in self.tables for c in t.columns)
+        )
+
+    @property
+    def tier(self) -> Tier:
+        """Reviewer triage tier. Coverage loss always makes a dataset 🔴 — a disappearing
+        entity/series is the classic silent breakage of a dependency update, regardless of how
+        small it is relative to the dataset."""
+        if self.change_kind in ("error", "removed"):
+            return "large"
+        if self.change_kind == "identical":
+            return "none"
+        if self.has_coverage_loss:
+            return "large"
+        if self.change_kind == "new":
+            return "small"
+        return _tier(self.severity)
 
 
 @dataclass
@@ -247,6 +351,57 @@ def _e(s: Any) -> str:
     return html.escape(str(s))
 
 
+def _anchor(ds_path: str, table: str, col: str) -> str:
+    """Stable element id for a column's detail block, so the Top changes list can link to it."""
+    return "c-" + re.sub(r"[^a-z0-9]+", "-", f"{ds_path}-{table}-{col}".lower()).strip("-")
+
+
+def _tier_chip(severity: float, kind: ChangeKind = "changed") -> str:
+    """Colored triage chip: tier icon + the typical relative change it corresponds to."""
+    tier = _tier(severity)
+    if tier == "none":
+        return ""
+    label = {"removed": "removed", "new": "new"}.get(kind) or f"typical change {_bard_to_rel(severity)}"
+    return f'<span class="chip tier {tier}">{TIER_ICONS[tier]} {_e(label)}</span>'
+
+
+def _coverage_chip(ds: DatasetDiffResult) -> str:
+    """Coverage-loss chip: entities/rows that existed before and are gone after."""
+    if not ds.has_coverage_loss:
+        return ""
+    bits = []
+    if ds.removed_row_count:
+        labels = ds.removed_labels[:4]
+        shown = ", ".join(labels)
+        more = "…" if len(ds.removed_labels) > len(labels) else ""
+        bits.append(f"{ds.removed_row_count:,} row(s) removed" + (f": {shown}{more}" if shown else ""))
+    n_removed_cols = sum(1 for t in ds.tables for c in t.columns if c.kind == "removed")
+    if n_removed_cols:
+        bits.append(f"{n_removed_cols} column(s) removed")
+    n_removed_tables = sum(1 for t in ds.tables if t.kind == "removed")
+    if n_removed_tables:
+        bits.append(f"{n_removed_tables} table(s) removed")
+    return f'<span class="chip cov">− {_e(" · ".join(bits))}</span>'
+
+
+def _top_changes(report: "DiffReport", limit: int = TOP_CHANGES_LIMIT) -> list[tuple[float, float, str, str, str]]:
+    """The indicators to watch: (severity, pct_rows, ds_path, table, column) across all changed
+    datasets, biggest changes first. Dims are excluded — entity-level losses surface via the
+    coverage chip instead."""
+    rows = []
+    for ds in report.datasets:
+        if ds.change_kind != "changed":
+            continue
+        for t in ds.tables:
+            for c in t.columns:
+                if c.is_dim or c.kind == "identical" or c.severity <= 0.001:
+                    continue
+                pct = max((v.pct for v in c.value_diffs if v.kind != "new"), default=0.0)
+                rows.append((c.severity, pct, ds.path, t.name, c.name))
+    rows.sort(key=lambda r: (-r[0], -r[1], r[2]))
+    return rows[:limit]
+
+
 def _render_meta_diff(meta_diff: str, label: str) -> str:
     """Render an ndiff metadata diff as a collapsible block with +/- lines colored."""
     if not meta_diff:
@@ -286,13 +441,15 @@ def _render_value_diff(v: ValueDiff) -> str:
     )
 
 
-def _render_column(table_name: str, c: ColumnDiffResult) -> str:
+def _render_column(table_name: str, c: ColumnDiffResult, ds_path: str = "") -> str:
     chips = "".join(f'<span class="chip">{_e(ch)}</span>' for ch in c.changes)
     dim = '<span class="chip dim">dim</span>' if c.is_dim else ""
+    tier = _tier_chip(c.severity, c.kind) if not c.is_dim else ""
+    anchor = f' id="{_anchor(ds_path, table_name, c.name)}"' if ds_path else ""
     parts = [
-        f'<div class="col {c.kind}">'
+        f'<div class="col {c.kind}"{anchor}>'
         f'<div class="col-head"><span class="sym {c.kind}">{_SYMBOLS[c.kind]}</span> '
-        f"<code>{_e(table_name)}.{_e(c.name)}</code> {dim}{chips}</div>"
+        f"<code>{_e(table_name)}.{_e(c.name)}</code> {dim}{tier}{chips}</div>"
     ]
     if c.meta_diff:
         parts.append(_render_meta_diff(c.meta_diff, "metadata diff"))
@@ -302,10 +459,10 @@ def _render_column(table_name: str, c: ColumnDiffResult) -> str:
     return "".join(parts)
 
 
-def _render_table(t: TableDiffResult) -> str:
+def _render_table(t: TableDiffResult, ds_path: str = "") -> str:
     parts = [
         f'<div class="tbl"><div class="tbl-head"><span class="sym {t.kind}">{_SYMBOLS[t.kind]}</span> '
-        f"Table <b>{_e(t.name)}</b></div>"
+        f"Table <b>{_e(t.name)}</b>{_tier_chip(t.severity, t.kind)}</div>"
     ]
     if t.meta_diff:
         parts.append(_render_meta_diff(t.meta_diff, "table metadata diff"))
@@ -313,7 +470,7 @@ def _render_table(t: TableDiffResult) -> str:
     for c in sorted(t.columns, key=lambda c: -c.severity):
         if c.kind == "identical":
             continue
-        parts.append(_render_column(t.name, c))
+        parts.append(_render_column(t.name, c, ds_path))
     parts.append("</div>")
     return "".join(parts)
 
@@ -340,10 +497,11 @@ def _render_dataset(ds: DatasetDiffResult) -> str:
     kind = ds.change_kind
     open_attr = " open" if kind in ("changed", "error") else ""
     new_version = ' <span class="chip">new version</span>' if ds.is_new_version else ""
+    tier = _tier_chip(ds.severity, kind) if kind == "changed" else ""
     parts = [
         f'<details class="ds {kind}"{open_attr}>'
         f'<summary><span class="sym {kind}">{_SYMBOLS[kind]}</span> '
-        f'<code class="path">{_e(ds.path)}</code>{new_version}'
+        f'<code class="path">{_e(ds.path)}</code>{new_version}{tier}{_coverage_chip(ds)}'
         f'<span class="ds-note">{_e(_dataset_summary_note(ds))}</span></summary>'
         f'<div class="ds-body">'
     ]
@@ -354,7 +512,7 @@ def _render_dataset(ds: DatasetDiffResult) -> str:
     # Most-changed tables first (stable: ties keep collection order).
     for t in sorted(ds.tables, key=lambda t: -t.severity):
         if t.any_change or ds.kind in ("new", "removed"):
-            parts.append(_render_table(t))
+            parts.append(_render_table(t, ds.path))
     parts.append("</div></details>")
     return "".join(parts)
 
@@ -382,6 +540,33 @@ def render_html(report: DiffReport) -> str:
     # column), then new datasets; identical last. Path as tie-break for determinism.
     datasets = sorted(report.datasets, key=lambda ds: (-ds.severity, ds.path))
     sections = "".join(_render_dataset(ds) for ds in datasets)
+
+    # Triage aids — only when the report is big enough to need them.
+    tier_strip = ""
+    top_block = ""
+    if report.n_changed >= TRIAGE_MIN_DATASETS:
+        tier_counts = {"large": 0, "moderate": 0, "small": 0}
+        for ds in report.datasets:
+            if ds.change_kind != "identical" and ds.tier != "none":
+                tier_counts[ds.tier] += 1
+        strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
+        if strip_bits:
+            tier_strip = f'<div class="tier-strip">{" · ".join(strip_bits)} <span class="tier-hint">(by typical change size; coverage loss ⇒ 🔴)</span></div>'
+
+        top = _top_changes(report)
+        if top:
+            items = []
+            for severity, pct, ds_path, table, col in top:
+                tier = _tier(severity)
+                items.append(
+                    f'<li><span class="ti">{TIER_ICONS.get(tier, "")}</span> '
+                    f'<a href="#{_anchor(ds_path, table, col)}"><code>{_e(ds_path)}</code> · <code>{_e(table)}.{_e(col)}</code></a>'
+                    f'<span class="top-meta">typical change {_e(_bard_to_rel(severity))} · {pct:.0f}% of rows</span></li>'
+                )
+            top_block = (
+                '<details class="top-changes" open><summary><b>Top changes — indicators to watch</b></summary>'
+                f"<ol>{''.join(items)}</ol></details>"
+            )
 
     skipped_note = (
         f'<div class="skipped-note">= {report.skipped_cascade:,} more dataset(s) skipped: '
@@ -432,6 +617,20 @@ def render_html(report: DiffReport) -> str:
   .sym.error {{ color: #c62828; }}
   .chip {{ font-size: .7rem; background: #fdf3d7; color: #8a6d00; border-radius: 10px; padding: .1rem .5rem; margin-left: .3rem; white-space: nowrap; }}
   .chip.dim {{ background: #e8eaf6; color: #3949ab; }}
+  .chip.tier.large {{ background: #fdeaea; color: #b71c1c; }}
+  .chip.tier.moderate {{ background: #fdf3d7; color: #8a6d00; }}
+  .chip.tier.small {{ background: #e9f6ec; color: #1b5e20; }}
+  .chip.cov {{ background: #fdeaea; color: #b71c1c; font-weight: 600; }}
+  .tier-strip {{ font-size: .9rem; margin: -0.75rem 0 1rem; }}
+  .tier-strip .tier-hint {{ color: #999; font-size: .78rem; }}
+  details.top-changes {{ background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: .6rem 1rem; margin-bottom: 1rem; }}
+  details.top-changes > summary {{ cursor: pointer; font-size: .95rem; }}
+  details.top-changes ol {{ margin: .5rem 0 .25rem; padding-left: 1.5rem; }}
+  details.top-changes li {{ font-size: .85rem; margin: .25rem 0; }}
+  details.top-changes a {{ text-decoration: none; color: inherit; }}
+  details.top-changes a:hover code {{ background: #eef; }}
+  .top-meta {{ color: #888; font-size: .78rem; margin-left: .5rem; }}
+  .ti {{ margin-right: .15rem; }}
   .tbl {{ margin: .75rem 0 0; }}
   .tbl-head {{ font-size: .9rem; margin-bottom: .25rem; }}
   .col {{ margin: .5rem 0 .5rem 1.5rem; }}
@@ -463,6 +662,8 @@ def render_html(report: DiffReport) -> str:
   <div class="sub">generated {generated_at} · <code>etl diff</code> report</div>
   <div class="headline">{_STATUS_HEADLINE[report.status]}</div>
   <div class="cards">{"".join(cards)}</div>
+  {tier_strip}
+  {top_block}
   <div class="controls">
     <input type="search" id="filter" placeholder="Filter datasets (path, table, column…)">
     <label><input type="checkbox" id="show-identical"> show identical datasets</label>

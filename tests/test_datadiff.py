@@ -162,16 +162,83 @@ def test_changed_records_non_numeric_falls_back_to_random_sample():
     assert len(records) == 2
 
 
+def _changed_col(name, median_bard, is_dim=False):
+    return ColumnDiffResult(
+        name=name,
+        kind="changed",
+        is_dim=is_dim,
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="changed", count=10, total=100, median_bard=median_bard)],
+    )
+
+
+def _changed_ds(path, median_bard):
+    return DatasetDiffResult(
+        path=path,
+        kind="identical",
+        tables=[TableDiffResult(name="t", kind="identical", columns=[_changed_col("a", median_bard)])],
+    )
+
+
+def test_severity_tiers():
+    assert _changed_ds("garden/n/v/x", 0.5).tier == "large"
+    assert _changed_ds("garden/n/v/x", 0.05).tier == "moderate"
+    assert _changed_ds("garden/n/v/x", 0.002).tier == "small"
+    assert DatasetDiffResult(path="garden/n/v/x", kind="identical").tier == "none"
+    # Errors and removed datasets are always large.
+    assert DatasetDiffResult(path="garden/n/v/x", kind="identical", error="boom").tier == "large"
+    assert DatasetDiffResult(path="garden/n/v/x", kind="removed").tier == "large"
+
+
+def test_coverage_loss_forces_large_tier():
+    # A dim with removed values = entities that disappeared -> coverage loss -> 🔴, even though
+    # the value change itself is tiny.
+    dim = ColumnDiffResult(
+        name="country",
+        kind="changed",
+        is_dim=True,
+        value_diffs=[
+            ValueDiff(kind="removed", count=2, total=100, sample=[{"country": "Vietnam"}, {"country": "Philippines"}])
+        ],
+    )
+    ds = DatasetDiffResult(
+        path="garden/n/v/x",
+        kind="identical",
+        tables=[TableDiffResult(name="t", kind="identical", columns=[dim, _changed_col("a", 0.001)])],
+    )
+    assert ds.has_coverage_loss
+    assert ds.removed_row_count == 2
+    assert ds.removed_labels == ["Vietnam", "Philippines"]
+    assert ds.tier == "large"
+
+    # The coverage chip is rendered on the dataset summary line.
+    html = render_html(DiffReport(datasets=[ds]))
+    assert "row(s) removed" in html
+    assert "Vietnam" in html
+
+
+def test_triage_aids_only_on_big_reports():
+    small = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
+    html_small = render_html(small)
+    # A single changed dataset: no watch list, no tier strip — but the row chip still renders.
+    # (Assert on rendered elements, not bare class names — those always appear in the stylesheet.)
+    assert "Top changes" not in html_small
+    assert '<div class="tier-strip">' not in html_small
+    assert "typical change" in html_small
+
+    big = DiffReport(datasets=[_changed_ds(f"garden/n/v/d{i}", 0.5 - i * 0.1) for i in range(4)])
+    html_big = render_html(big)
+    assert "Top changes" in html_big
+    assert '<div class="tier-strip">' in html_big
+    # Watch-list entries link to the column detail blocks (anchor present in both places).
+    assert 'href="#c-garden-n-v-d0-t-a"' in html_big
+    assert 'id="c-garden-n-v-d0-t-a"' in html_big
+
+
 def test_report_sorts_by_severity():
     """Datasets, tables and columns render biggest-differences-first."""
 
-    def col(name, median_bard):
-        return ColumnDiffResult(
-            name=name,
-            kind="changed",
-            changes=["changed data"],
-            value_diffs=[ValueDiff(kind="changed", count=10, total=100, median_bard=median_bard)],
-        )
+    col = _changed_col
 
     # Table/column order in the model is deliberately "small change first".
     ds_small = DatasetDiffResult(
