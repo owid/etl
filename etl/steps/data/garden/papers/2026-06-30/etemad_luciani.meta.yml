@@ -1,0 +1,25 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+tables:
+  etemad_luciani:
+    variables:
+      coal_production_twh:
+        title: Coal production (Etemad & Luciani)
+        unit: terawatt-hours
+        short_unit: TWh
+      oil_production_twh:
+        title: Oil production (Etemad & Luciani)
+        unit: terawatt-hours
+        short_unit: TWh
+      gas_production_twh:
+        title: Gas production (Etemad & Luciani)
+        unit: terawatt-hours
+        short_unit: TWh

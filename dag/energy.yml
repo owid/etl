@@ -126,6 +126,23 @@ steps:
   data://grapher/energy/2026-06-30/energy_mix:
     - data://garden/energy/2026-06-30/energy_mix
   #
+  # Energy - Fossil fuel production (2026 Statistical Review, incl. reserves-to-production ratio).
+  #
+  data://garden/energy/2026-06-30/fossil_fuel_production:
+    - data://garden/energy_institute/2026-06-30/statistical_review_of_world_energy
+    - data://garden/eia/2026-05-05/international_energy
+    # Smil - Global primary energy (2017), used to extend World coal production before 1900.
+    - data://garden/papers/2023-12-12/smil_2017
+    # NIC / Fouquet - UK historical energy data, used to extend UK coal production before 1900.
+    - data://garden/energy/2026-07-02/uk_historical_energy
+    - data://garden/demography/2024-07-15/population
+    # Etemad & Luciani - historical fossil fuel production (1900-1979).
+    - data://garden/papers/2026-06-30/etemad_luciani:
+      - data://meadow/papers/2026-06-30/etemad_luciani:
+        - snapshot://papers/2026-06-30/etemad_luciani.csv
+  data://grapher/energy/2026-06-30/fossil_fuel_production:
+    - data://garden/energy/2026-06-30/fossil_fuel_production
+  #
   # Energy - Fossil fuel reserves/production ratio.
   #
   data://grapher/energy/2025-06-27/fossil_fuel_reserves_production_ratio:

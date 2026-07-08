@@ -1,0 +1,18 @@
+# NOTE: Variable titles, units and short units are set in the step code.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+        - Fossil Fuels
+    description_processing: |-
+      - Fossil fuel production is taken from the Energy Institute's Statistical Review of World Energy (from 1965), extended before then with Etemad & Luciani's historical estimates (1900-1979) and, for coal, with Vaclav Smil (2017) for the World and the NIC / Fouquet historical dataset for the United Kingdom (before 1900). It is extended to countries not covered by the Statistical Review, and to recent years, with the U.S. Energy Information Administration's data.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+tables:
+  fossil_fuel_production:
+    variables: {}
