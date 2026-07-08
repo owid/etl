@@ -766,9 +766,6 @@ steps:
   data://grapher/forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017:
     - data://garden/forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017:
       - snapshot://forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017.feather
-  data-private://grapher/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
-    - data-private://garden/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
-      - snapshot-private://fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021.feather
   data://grapher/labor/2016-02-18/child_labor_italy__historic__toniolo__g__and__vecchi__g__2007:
     - data://garden/labor/2016-02-18/child_labor_italy__historic__toniolo__g__and__vecchi__g__2007:
       - snapshot://labor/2016-02-18/child_labor_italy__historic__toniolo__g__and__vecchi__g__2007.feather
