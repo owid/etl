@@ -355,7 +355,7 @@ steps:
         - snapshot://energy/2025-11-07/energy_ai.xlsx
       - data://meadow/energy/2026-04-27/energy_ai:
         - snapshot://energy/2026-04-27/energy_ai.xlsx
-      - data://garden/energy/2026-04-24/electricity_mix
+      - data://garden/energy/2026-06-30/electricity_mix
   #
   # CSO Ireland - Data centres metered electricity consumption.
   #
