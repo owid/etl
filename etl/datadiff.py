@@ -782,6 +782,39 @@ def _df_to_records(df: pd.DataFrame, limit: int = SAMPLE_LIMIT) -> list[dict[str
     return [{str(k): _fmt(v) for k, v in row.items()} for row in df_samp.to_dict("records")]
 
 
+def _changed_records(both: pd.DataFrame, col: str, limit: int = SAMPLE_LIMIT) -> tuple[list[dict[str, str]], bool]:
+    """Sample records for a changed-values diff.
+
+    For numeric columns, keep the rows with the largest |relative change| (largest first) and
+    append a "Δ %" display column, so the report surfaces the biggest moves instead of a random
+    sample. Other dtypes keep the plain random sample. Returns (records, sorted_by_delta).
+    """
+    old_col, new_col = f"{col} -", f"{col} +"
+    if not (pd.api.types.is_numeric_dtype(both[old_col]) and pd.api.types.is_numeric_dtype(both[new_col])):
+        return _df_to_records(both, limit=limit), False
+
+    old = both[old_col].astype("float64")
+    new = both[new_col].astype("float64")
+    # Sort magnitude: a value appearing/disappearing (NaN on one side) or growing from zero is a
+    # maximal change, so rank it above any finite percentage.
+    magnitude = ((new - old) / old.abs() * 100).abs().to_numpy()
+    magnitude[~np.isfinite(magnitude)] = np.inf
+
+    # Positional (iloc) selection is safe even if `both` has a non-unique index.
+    order = np.argsort(-magnitude, kind="stable")[:limit]
+    top = both.iloc[order].copy()
+
+    def _fmt_delta(o: float, n: float) -> str:
+        if pd.isna(o) or pd.isna(n):
+            return "—"
+        if o == 0:
+            return "+∞%" if n > o else "-∞%"
+        return f"{(n - o) / abs(o) * 100:+.1f}%"
+
+    top["Δ %"] = [_fmt_delta(o, n) for o, n in zip(old.iloc[order], new.iloc[order])]
+    return _df_to_records(top, limit=limit), True
+
+
 def _data_diff(
     table_a: Table,
     table_b: Table,
@@ -839,7 +872,12 @@ def _data_diff(
         else:
             both = samp_a.join(samp_b, lsuffix=" -", rsuffix=" +")
         lines += _df_to_str(both)
-        value_diffs.append(ValueDiff(kind="changed", count=int(neq.sum()), total=int(n), sample=_df_to_records(both)))
+        records, sorted_by_delta = _changed_records(both, col)
+        value_diffs.append(
+            ValueDiff(
+                kind="changed", count=int(neq.sum()), total=int(n), sample=records, sorted_by_delta=sorted_by_delta
+            )
+        )
 
     # add color
     lines = ["[violet]" + line for line in lines]

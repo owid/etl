@@ -30,6 +30,9 @@ class ValueDiff:
     total: int
     # Display-ready records; rows of a "changed" diff have "<col> -" (old) and "<col> +" (new) keys.
     sample: list[dict[str, str]] = field(default_factory=list)
+    # True when the sample of a numeric "changed" diff is sorted by |relative change| (largest
+    # first) and carries a "Δ %" display column; non-numeric samples stay random and unsorted.
+    sorted_by_delta: bool = False
 
     @property
     def pct(self) -> float:
@@ -219,7 +222,11 @@ def _render_value_diff(v: ValueDiff) -> str:
             for c in cols
         )
         trs.append(f"<tr>{tds}</tr>")
-    note = f'<div class="note">showing {len(v.sample):,} of {v.count:,} rows</div>' if v.count > len(v.sample) else ""
+    if v.count > len(v.sample):
+        what = "largest relative changes" if v.sorted_by_delta else "rows"
+        note = f'<div class="note">showing {len(v.sample):,} {what} of {v.count:,} rows</div>'
+    else:
+        note = ""
     return (
         f'<div class="vd">{head}<div class="table-wrap"><table><thead><tr>{ths}</tr></thead>'
         f"<tbody>{''.join(trs)}</tbody></table></div>{note}</div>"

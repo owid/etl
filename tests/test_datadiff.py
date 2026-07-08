@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 from owid.catalog import Dataset, DatasetMeta, Table
 
-from etl.datadiff import DatasetDiff, RemoteDataset, _dataset_files_match
+from etl.datadiff import DatasetDiff, RemoteDataset, _changed_records, _dataset_files_match
 from etl.datadiff_report import DiffReport, render_html
 
 
@@ -110,7 +110,9 @@ def test_structured_result(tmp_path):
     assert value_diffs["new"].count == 1
     assert value_diffs["new"].total == 3
     assert value_diffs["new"].sample == [{"country": "FR", "a": "3"}]
-    assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2"}]
+    # Numeric changed samples carry a "Δ %" display column and are marked delta-sorted.
+    assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2", "Δ %": "-33.3%"}]
+    assert value_diffs["changed"].sorted_by_delta
 
     # JSON round-trip
     report = DiffReport(datasets=[res], skipped_cascade=2)
@@ -119,6 +121,33 @@ def test_structured_result(tmp_path):
     assert report2.n_changed == 1
     assert report2.n_identical == 0
     assert report2.status == "changed"
+
+
+def test_changed_records_sorts_numeric_by_relative_change():
+    both = pd.DataFrame(
+        {
+            "country": ["small", "big", "from_zero"],
+            "a -": [100.0, 100.0, 0.0],
+            "a +": [101.0, 250.0, 5.0],  # +1%, +150%, +∞%
+        }
+    )
+    records, sorted_by_delta = _changed_records(both, "a")
+    assert sorted_by_delta
+    # Largest relative change first; growth from zero counts as an infinite change and ranks on top.
+    assert [r["country"] for r in records] == ["from_zero", "big", "small"]
+    assert [r["Δ %"] for r in records] == ["+∞%", "+150.0%", "+1.0%"]
+
+    # A sample larger than the limit keeps only the biggest movers.
+    top, _ = _changed_records(both, "a", limit=2)
+    assert [r["country"] for r in top] == ["from_zero", "big"]
+
+
+def test_changed_records_non_numeric_falls_back_to_random_sample():
+    both = pd.DataFrame({"country": ["UK", "US"], "a -": ["x", "y"], "a +": ["y", "z"]})
+    records, sorted_by_delta = _changed_records(both, "a")
+    assert not sorted_by_delta
+    assert all("Δ %" not in r for r in records)
+    assert len(records) == 2
 
 
 @pytest.mark.filterwarnings("ignore:Table `tab` does not have a primary_key")
