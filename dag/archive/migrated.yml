@@ -367,15 +367,15 @@ steps:
   data-private://grapher/biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022:
     - data-private://garden/biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022:
       - snapshot-private://biodiversity/2022-12-07/international_whaling_commissions_members_by_year__2022.feather
-  # archived; last active in 3832cda37fb9 on 2026-07-03
+  # archived; last active in ea735aa2268d on 2026-07-03
   data://grapher/agriculture/2017-08-10/forestry_area__fao__2017:
     - data://garden/agriculture/2017-08-10/forestry_area__fao__2017:
       - snapshot://agriculture/2017-08-10/forestry_area__fao__2017.feather
-  # archived; last active in cb28bd953aef on 2026-07-08
+  # archived; last active in 904297695b9e on 2026-07-08
   data-private://grapher/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
     - data-private://garden/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
       - snapshot-private://fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021.feather
-  # archived; last active in bc11d6451c60 on 2026-07-07
+  # archived; last active in 36a087b9a3b4 on 2026-07-07
   data-private://grapher/artificial_intelligence/2022-12-01/ai_index_report__2022:
     - data-private://garden/artificial_intelligence/2022-12-01/ai_index_report__2022:
       - snapshot-private://artificial_intelligence/2022-12-01/ai_index_report__2022.feather
