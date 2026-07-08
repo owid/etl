@@ -478,3 +478,85 @@ def test_citation_extracts_dois_and_leads_with_most_used_origin() -> None:
     ]
     assert jsonld["isBasedOn"][0]["url"] == "https://globalcarbonbudget.org"
     assert {item["url"] for item in jsonld["isBasedOn"]} >= {"https://example.com/population"}
+
+
+def test_same_as_emitted_from_dataset_meta() -> None:
+    table = TableSchemaInput(
+        short_name="owid_co2",
+        metadata=TableMeta(short_name="owid_co2", title="CO2 emissions", description="Table description"),
+        variables={
+            "value": VariableMeta(title="Value", origins=[Origin(producer="Example Producer", title="Origin title")])
+        },
+        formats=["feather"],
+    )
+    kwargs: dict = dict(
+        dataset_path="garden/emissions/2025-12-04/owid_co2",
+        page_path="emissions/owid_co2",
+        tables=[table],
+    )
+
+    jsonld = dataset_to_schema_org(
+        dataset_meta=DatasetMeta(
+            short_name="owid_co2",
+            title="CO2 dataset",
+            description="Dataset description",
+            same_as=["https://github.com/owid/co2-data", "https://ourworldindata.org/co2-dataset-sources"],
+        ),
+        **kwargs,
+    )
+    assert jsonld["sameAs"] == [
+        "https://github.com/owid/co2-data",
+        "https://ourworldindata.org/co2-dataset-sources",
+    ]
+
+    # Without same_as in the metadata, the key is absent entirely.
+    jsonld = dataset_to_schema_org(
+        dataset_meta=DatasetMeta(short_name="owid_co2", title="CO2 dataset", description="Dataset description"),
+        **kwargs,
+    )
+    assert "sameAs" not in jsonld
+
+
+def test_citation_skips_doi_of_auxiliary_origin() -> None:
+    """An auxiliary source's data paper must not headline as the dataset's related article.
+
+    Mirrors owid_energy: none of the main sources has a DOI, and the Maddison GDP database
+    (backing 2 of 130 variables) carries one — without the main-source share cut-off it
+    would be the dataset's *only* citation.
+    """
+    main_origin = Origin(
+        producer="Energy Institute",
+        title="Statistical Review of World Energy",
+        citation_full="Energy Institute - Statistical Review of World Energy (2025).",  # no DOI
+        url_main="https://www.energyinst.org/statistical-review/",
+    )
+    aux_origin = Origin(
+        producer="Bolt and van Zanden",
+        title="Maddison Project Database",
+        citation_full='Bolt and van Zanden (2024), "Maddison style estimates". DOI: 10.1111/joes.12618.',
+        url_main="https://example.com/maddison",
+    )
+    # 19 variables on the main source alone, 2 also carrying the aux origin: 2/21 < 10%.
+    variables = {f"v{i}": VariableMeta(title=f"v{i}", origins=[main_origin]) for i in range(1, 20)}
+    variables["gdp"] = VariableMeta(title="gdp", origins=[main_origin, aux_origin])
+    variables["energy_per_gdp"] = VariableMeta(title="energy_per_gdp", origins=[main_origin, aux_origin])
+    table = TableSchemaInput(
+        short_name="owid_energy",
+        metadata=TableMeta(short_name="owid_energy", title="Energy", description="Table description"),
+        variables=variables,
+        formats=["feather"],
+    )
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/energy_data/2026-04-24/owid_energy",
+        page_path="energy_data/owid_energy",
+        dataset_meta=DatasetMeta(short_name="owid_energy", title="Energy dataset", description="Dataset description"),
+        tables=[table],
+    )
+    # The aux origin backs 2 of 21 variables (<10%): its DOI is not citation-worthy, and the
+    # main origin has no DOI, so the citation field is omitted entirely.
+    assert "citation" not in jsonld
+    # The aux origin keeps its provenance credit in isBasedOn.
+    assert {item["url"] for item in jsonld["isBasedOn"]} == {
+        "https://www.energyinst.org/statistical-review/",
+        "https://example.com/maddison",
+    }

@@ -20,6 +20,10 @@ MAX_DIMENSION_VALUES_LISTED = 40
 # Dimensions that every table has and that are already conveyed by temporalCoverage /
 # spatialCoverage — not worth a PropertyValue of their own.
 ENTITY_TIME_DIMENSIONS = {"country", "year", "date"}
+# An origin must back at least this share of a dataset's variables before its DOI is offered
+# as a related-article citation; below that it's an auxiliary source (population, GDP) whose
+# credit belongs in isBasedOn, not in citation.
+MIN_CITATION_VARIABLE_SHARE = 0.1
 KNOWN_LICENSE_URLS = {
     "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
     "CC-BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
@@ -105,6 +109,12 @@ def dataset_to_schema_org(
         "thumbnailUrl": DEFAULT_THUMBNAIL_URL,
     }
 
+    # sameAs points at reference pages that identify this same dataset elsewhere (GitHub
+    # mirror, methodology page). Google Dataset Search clusters records sharing a sameAs
+    # target into one entry, so this is what ties third-party republications back to ours.
+    if dataset_meta.same_as:
+        result["sameAs"] = list(dataset_meta.same_as)
+
     if resolved_version:
         result["version"] = str(resolved_version)
         date_modified = _first_valid_date([resolved_version])
@@ -122,7 +132,7 @@ def dataset_to_schema_org(
         "url": "https://ourworldindata.org",
     }
 
-    citations = _citations(origins)
+    citations = _citations(origins, tables)
     if citations:
         result["citation"] = citations[0] if len(citations) == 1 else citations
 
@@ -357,11 +367,15 @@ def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:
     for table in tables:
         for variable in table.variables.values():
             for origin in variable.origins:
-                key = (origin.producer, origin.title, origin.url_main, origin.url_download, origin.citation_full)
+                key = _origin_key(origin)
                 origins.setdefault(key, origin)
                 counts[key] = counts.get(key, 0) + 1
     order = sorted(origins, key=lambda key: -counts[key])
     return [origins[key] for key in order]
+
+
+def _origin_key(origin: Origin) -> tuple[Any, ...]:
+    return (origin.producer, origin.title, origin.url_main, origin.url_download, origin.citation_full)
 
 
 def _license_url(dataset_meta: DatasetMeta, origins: list[Origin], tables: list[TableSchemaInput]) -> str | None:
@@ -403,18 +417,39 @@ def _license_to_url(license: License | None) -> str | None:
 _DOI_RE = re.compile(r"(?:https?://(?:dx\.)?doi\.org/|\bdoi:\s*)(10\.\d{4,9}/[^\s\"'\)\]]+)", re.IGNORECASE)
 
 
-def _citations(origins: list[Origin]) -> list[str]:
-    """Short citation snippets with DOIs for the source papers, main source first.
+def _citations(origins: list[Origin], tables: list[TableSchemaInput]) -> list[str]:
+    """Short citation snippets with DOIs for the source papers, main sources first.
 
     Per Google's dataset guidance, ``citation`` identifies *related academic articles*
     (data papers, data descriptors) — not the dataset itself — and should carry a DOI.
     Each snippet pairs the origin's short attribution with the first DOI found in its
-    full citation. Origins without a DOI (helper sources like population, web-only data)
-    are covered by ``isBasedOn`` instead.
+    full citation.
+
+    Only the dataset's main sources qualify: an origin must back at least
+    ``MIN_CITATION_VARIABLE_SHARE`` of the variables that carry origins. Without that
+    cut-off, an auxiliary source that happens to publish a data paper would headline as
+    the dataset's related article — in owid_energy, the Maddison GDP database (backing 2
+    of 130 variables) used to be the *only* citation, because none of the main energy
+    sources has a DOI. Auxiliary and DOI-less origins keep their provenance credit via
+    ``isBasedOn`` instead.
     """
+    counts: dict[Any, int] = {}
+    n_vars = 0
+    for table in tables:
+        for variable in table.variables.values():
+            if not variable.origins:
+                continue
+            n_vars += 1
+            for origin in variable.origins:
+                key = _origin_key(origin)
+                counts[key] = counts.get(key, 0) + 1
+    min_count = MIN_CITATION_VARIABLE_SHARE * n_vars
+
     citations: list[str] = []
     for origin in origins:
         if not origin.citation_full:
+            continue
+        if counts.get(_origin_key(origin), 0) < min_count:
             continue
         match = _DOI_RE.search(origin.citation_full)
         if not match:
