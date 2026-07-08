@@ -60,8 +60,7 @@ def test_single_table_dataset_flattens_table_metadata() -> None:
         "name": "Our World in Data",
         "url": "https://ourworldindata.org",
     }
-    # The origin has no DOI in its citation, so no related-article citation is emitted;
-    # the producer is still credited via isBasedOn below.
+    # citation is deliberately never emitted; the producer is credited via isBasedOn below.
     assert "citation" not in jsonld
     assert jsonld["isBasedOn"]["url"] == "https://example.com/source"
     assert jsonld["keywords"] == ["Biodiversity"]
@@ -420,7 +419,7 @@ def test_plain_description_strips_detail_on_demand_links() -> None:
     assert variable["description"] == "Measured in terawatt-hours."
 
 
-def test_citation_extracts_dois_and_leads_with_most_used_origin() -> None:
+def test_no_citation_emitted_and_is_based_on_leads_with_most_used_origin() -> None:
     main_origin = Origin(
         producer="Global Carbon Project",
         attribution="Global Carbon Budget (2025)",
@@ -435,24 +434,14 @@ def test_citation_extracts_dois_and_leads_with_most_used_origin() -> None:
         producer="Various sources",
         attribution="Population based on various sources (2024)",
         title="Population",
-        # No DOI: helper source stays out of citation, but keeps its isBasedOn entry.
         citation_full="Population is based on various sources: https://ourworldindata.org/population-sources",
         url_main="https://example.com/population",
     )
-    doi_prefix_origin = Origin(
-        producer="Bolt and van Zanden",
-        title="Maddison Project Database",
-        date_published="2024-04-26",
-        # "DOI: <id>" form (no doi.org URL) must be recognized too.
-        citation_full='Bolt and van Zanden (2024), "Maddison style estimates". DOI: 10.1111/joes.12618.',
-        url_main="https://example.com/maddison",
-    )
     # The helper origin backs the *first* column; the main origin backs the remaining
-    # columns. Citation must still lead with the main origin, not follow column order.
+    # columns. isBasedOn must still lead with the main origin, not follow column order.
     variables = {"population": VariableMeta(title="Population", origins=[helper_origin])}
     for name in ("co2", "co2_per_capita"):
         variables[name] = VariableMeta(title=name, origins=[main_origin])
-    variables["gdp"] = VariableMeta(title="gdp", origins=[doi_prefix_origin])
     table = TableSchemaInput(
         short_name="owid_co2",
         metadata=TableMeta(short_name="owid_co2", title="CO2", description="Table description"),
@@ -471,62 +460,12 @@ def test_citation_extracts_dois_and_leads_with_most_used_origin() -> None:
         "name": "Our World in Data",
         "url": "https://ourworldindata.org",
     }
-    assert jsonld["citation"] == [
-        "Global Carbon Budget (2025). https://doi.org/10.5194/essd-17-965-2025",
-        # Attribution missing: fall back to producer (year of date_published).
-        "Bolt and van Zanden (2024). https://doi.org/10.1111/joes.12618",
-    ]
+    # citation is deliberately never emitted, even though the main origin's citation_full
+    # carries a DOI: a mined citation list kept misrepresenting auxiliary sources as the
+    # dataset's primary reference. isBasedOn carries the source credit.
+    assert "citation" not in jsonld
     assert jsonld["isBasedOn"][0]["url"] == "https://globalcarbonbudget.org"
     assert {item["url"] for item in jsonld["isBasedOn"]} >= {"https://example.com/population"}
-
-
-def test_citation_skips_doi_of_uncredited_origin() -> None:
-    """Only the sources credited in isBasedOn may have their data paper cited.
-
-    Mirrors owid_energy: none of the main sources has a DOI, and the Maddison GDP database
-    (backing 2 of 130 variables, ranked below the five credited sources) carries one —
-    without anchoring citation to the isBasedOn list it would be the dataset's *only*
-    citation.
-    """
-    main_origins = [
-        Origin(
-            producer=f"Producer {i}",
-            title=f"Main source {i}",
-            citation_full=f"Producer {i} (2025). Main source {i}.",  # no DOI
-            url_main=f"https://example.com/main-{i}",
-        )
-        for i in range(5)
-    ]
-    aux_origin = Origin(
-        producer="Bolt and van Zanden",
-        title="Maddison Project Database",
-        citation_full='Bolt and van Zanden (2024), "Maddison style estimates". DOI: 10.1111/joes.12618.',
-        url_main="https://example.com/maddison",
-    )
-    # Each main source backs several variables; the aux origin backs a single one, ranking
-    # it 6th — below the isBasedOn cap of 5 credited sources.
-    variables = {}
-    for i, origin in enumerate(main_origins):
-        for j in range(3):
-            name = f"v{i}_{j}"
-            variables[name] = VariableMeta(title=name, origins=[origin])
-    variables["gdp"] = VariableMeta(title="gdp", origins=[aux_origin])
-    table = TableSchemaInput(
-        short_name="owid_energy",
-        metadata=TableMeta(short_name="owid_energy", title="Energy", description="Table description"),
-        variables=variables,
-        formats=["feather"],
-    )
-    jsonld = dataset_to_schema_org(
-        dataset_path="garden/energy_data/2026-04-24/owid_energy",
-        page_path="energy_data/owid_energy",
-        dataset_meta=DatasetMeta(short_name="owid_energy", title="Energy dataset", description="Dataset description"),
-        tables=[table],
-    )
-    # The aux origin didn't make the credited isBasedOn list, so its DOI is not cited —
-    # and the credited sources have no DOI, so the citation field is omitted entirely.
-    assert {item["url"] for item in jsonld["isBasedOn"]} == {f"https://example.com/main-{i}" for i in range(5)}
-    assert "citation" not in jsonld
 
 
 def test_dataset_level_license_wins_over_origin_license() -> None:

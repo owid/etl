@@ -109,6 +109,10 @@ def dataset_to_schema_org(
     # signal — any record sharing a target URL (e.g. a third-party mirror claiming our
     # GitHub repo) would get folded into one entry with ours, instead of our record
     # standing alone and competing on ranking.
+    # NOTE: we also emit no `citation` (related academic articles): a DOI-mined citation
+    # list kept misrepresenting auxiliary sources as the dataset's primary reference
+    # (e.g. the Maddison GDP paper as owid_energy's only citation). Source credit is
+    # fully covered by `isBasedOn`.
 
     if resolved_version:
         result["version"] = str(resolved_version)
@@ -127,17 +131,11 @@ def dataset_to_schema_org(
         "url": "https://ourworldindata.org",
     }
 
-    credited_origins = _based_on_origins(origins)
-
-    citations = _citations(credited_origins)
-    if citations:
-        result["citation"] = citations[0] if len(citations) == 1 else citations
-
     date_published = _first_valid_date(origin.date_published for origin in origins)
     if date_published:
         result["datePublished"] = date_published
 
-    based_on = _is_based_on(credited_origins)
+    based_on = _is_based_on(origins)
     if based_on:
         result["isBasedOn"] = based_on
 
@@ -364,15 +362,11 @@ def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:
     for table in tables:
         for variable in table.variables.values():
             for origin in variable.origins:
-                key = _origin_key(origin)
+                key = (origin.producer, origin.title, origin.url_main, origin.url_download, origin.citation_full)
                 origins.setdefault(key, origin)
                 counts[key] = counts.get(key, 0) + 1
     order = sorted(origins, key=lambda key: -counts[key])
     return [origins[key] for key in order]
-
-
-def _origin_key(origin: Origin) -> tuple[Any, ...]:
-    return (origin.producer, origin.title, origin.url_main, origin.url_download, origin.citation_full)
 
 
 def _license_url(dataset_meta: DatasetMeta, origins: list[Origin], tables: list[TableSchemaInput]) -> str | None:
@@ -416,69 +410,15 @@ def _license_to_url(license: License | None) -> str | None:
     return license_to_url(license)
 
 
-_DOI_RE = re.compile(r"(?:https?://(?:dx\.)?doi\.org/|\bdoi:\s*)(10\.\d{4,9}/[^\s\"'\)\]]+)", re.IGNORECASE)
-
-
-def _citations(credited_origins: list[Origin]) -> list[str]:
-    """Short citation snippets with DOIs for the source papers, main sources first.
-
-    Per Google's dataset guidance, ``citation`` identifies *related academic articles*
-    (data papers, data descriptors) — not the dataset itself — and should carry a DOI.
-    Each snippet pairs the origin's short attribution with the first DOI found in its
-    full citation.
-
-    ``credited_origins`` is the same list ``isBasedOn`` renders (see
-    :func:`_based_on_origins`): we only cite the data papers of the sources we credit.
-    A marginal origin that falls below the isBasedOn cut must not have its DOI headlined
-    either — on owid_energy, the Maddison GDP database (backing 2 of 130 variables) used
-    to be the *only* citation, because none of the main energy sources has a DOI.
-    """
-    citations: list[str] = []
-    for origin in credited_origins:
-        if not origin.citation_full:
-            continue
-        match = _DOI_RE.search(origin.citation_full)
-        if not match:
-            continue
-        doi_url = f"https://doi.org/{match.group(1).rstrip('.,;')}"
-        label = origin.attribution or _producer_with_year(origin)
-        snippet = f"{label.rstrip('.')}. {doi_url}" if label else doi_url
-        if snippet not in citations:
-            citations.append(snippet)
-    return citations
-
-
-def _producer_with_year(origin: Origin) -> str | None:
-    if not origin.producer:
-        return None
-    year = str(origin.date_published or "")[:4]
-    if year.isdigit():
-        return f"{origin.producer} ({year})"
-    return origin.producer
-
-
-def _based_on_origins(origins: list[Origin]) -> list[Origin]:
-    """The sources the dataset publicly credits: usage-ordered, URL-deduped, capped at 5.
-
-    This single cut-off decides both which sources appear in ``isBasedOn`` and whose data
-    papers may appear in ``citation`` — an origin too marginal to credit is too marginal
-    to cite.
-    """
-    out = []
+def _is_based_on(origins: list[Origin]) -> list[dict[str, Any]] | dict[str, Any] | None:
+    items = []
     seen = set()
     for origin in origins:
         url = origin.url_main or origin.url_download
         if not url or not _looks_like_url(url) or url in seen:
             continue
         seen.add(url)
-        out.append(origin)
-    return out[:5]
-
-
-def _is_based_on(credited_origins: list[Origin]) -> list[dict[str, Any]] | dict[str, Any] | None:
-    items = []
-    for origin in credited_origins:
-        item: dict[str, Any] = {"@type": "CreativeWork", "url": origin.url_main or origin.url_download}
+        item: dict[str, Any] = {"@type": "CreativeWork", "url": url}
         if origin.title:
             item["name"] = origin.title
         items.append(item)
@@ -486,7 +426,7 @@ def _is_based_on(credited_origins: list[Origin]) -> list[dict[str, Any]] | dict[
         return None
     if len(items) == 1:
         return items[0]
-    return items
+    return items[:5]
 
 
 def _temporal_coverage(tables: list[TableSchemaInput]) -> str | None:
