@@ -337,12 +337,15 @@ def _build_last_seen(since: str | None, limit: int | None) -> dict[str, LastSeen
     removed: dict[str, LastSeen] = {}
     # Recovery points must survive a squash-merge: branch-local commits disappear from
     # history once the PR is squashed, leaving `git checkout <sha>` with nothing to check
-    # out. When a removal's parent is not reachable from origin/master, fall back to the
-    # merge-base with origin/master — the last shared commit, which still contains the
-    # step. Steps that only ever existed on the branch have no recoverable state on the
-    # default branch and are skipped entirely.
+    # out. When a removal's parent is not reachable from origin/master, record the tip of
+    # origin/master instead (the newest shipped state of the step — it may have received
+    # updates on master after this branch was cut). If master no longer declares the step,
+    # fall back to the merge-base — the last shared commit that still contains it. Steps
+    # that only ever existed on the branch have no recoverable state on the default branch
+    # and are skipped entirely.
     master_sha = _default_branch_sha()
     reachable: dict[str, bool] = {}
+    master_state: tuple[int, dict[str, tuple[set[str], str]]] | None = None
     merge_base: tuple[str, int, dict[str, tuple[set[str], str]]] | None = None
     try:
         # Seed the previous state from the baseline (the ``since`` commit) so a removal
@@ -370,22 +373,33 @@ def _build_last_seen(since: str | None, limit: int | None) -> dict[str, LastSeen
                     if rec_sha not in reachable:
                         reachable[rec_sha] = _is_ancestor(rec_sha, master_sha)
                     if not reachable[rec_sha]:
-                        if merge_base is None:
-                            mb_sha = _run_git("merge-base", "HEAD", master_sha).strip()
-                            mb_ts = int(_run_git("show", "-s", "--format=%ct", mb_sha).strip())
-                            mb_dag = _active_dag_at(mb_sha, _tree_blob_map(mb_sha), reader)
-                            merge_base = (mb_sha, mb_ts, mb_dag)
-                        mb_sha, mb_ts, mb_dag = merge_base
-                        if step not in mb_dag:
-                            # Branch-only transient step (created and removed within this
-                            # branch): it never shipped, so there is nothing to archive.
-                            log.info("archive_dag.skip_branch_only_step", step=step)
-                            continue
-                        # Record the merge-base state (deps as declared there) so the
-                        # marker points at a commit that survives the squash-merge.
-                        deps, dag_file = mb_dag[step]
+                        if master_state is None:
+                            master_ts = int(_run_git("show", "-s", "--format=%ct", master_sha).strip())
+                            master_state = (master_ts, _active_dag_at(master_sha, _tree_blob_map(master_sha), reader))
+                        master_ts, master_dag = master_state
+                        if step in master_dag:
+                            # The step is still active on master's tip — record that: it
+                            # carries any updates the step received on master after this
+                            # branch was cut, and it survives the squash-merge.
+                            deps, dag_file = master_dag[step]
+                            rec_sha, rec_ts = master_sha, master_ts
+                        else:
+                            if merge_base is None:
+                                mb_sha = _run_git("merge-base", "HEAD", master_sha).strip()
+                                mb_ts = int(_run_git("show", "-s", "--format=%ct", mb_sha).strip())
+                                mb_dag = _active_dag_at(mb_sha, _tree_blob_map(mb_sha), reader)
+                                merge_base = (mb_sha, mb_ts, mb_dag)
+                            mb_sha, mb_ts, mb_dag = merge_base
+                            if step not in mb_dag:
+                                # Branch-only transient step (created and removed within this
+                                # branch): it never shipped, so there is nothing to archive.
+                                log.info("archive_dag.skip_branch_only_step", step=step)
+                                continue
+                            # Master already dropped the step independently; the merge-base
+                            # is the last shared commit that still contains it.
+                            deps, dag_file = mb_dag[step]
+                            rec_sha, rec_ts = mb_sha, mb_ts
                         deps = {d for d in deps if d.startswith("walden") or _is_parseable_step(d)}
-                        rec_sha, rec_ts = mb_sha, mb_ts
                 removed[step] = LastSeen(sha=rec_sha, timestamp=rec_ts, deps=deps, dag_file=dag_file)
             for step in cur_keys:
                 removed.pop(step, None)  # re-added → no longer archived
