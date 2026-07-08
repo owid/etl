@@ -9,8 +9,15 @@ definitions:
     presentation:
       topic_tags:
         - Fish & Overfishing
+      attribution_short: FAO
     description_processing: |-
       - FAO reports the 2000s and the 2010s as decade averages. We assign that average value to its midpoint year (2005 and 2015, respectively). All other years refer to single years.
+
+dataset:
+  title: Employment in fisheries and aquaculture
+  update_period_days: 730
+  owners:
+    - Pablo Rosado
 
 tables:
   employment_in_fisheries_and_aquaculture:

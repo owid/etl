@@ -10,9 +10,9 @@ meta:
     url_main: https://openknowledge.fao.org/handle/20.500.14283/cd0683en
     date_accessed: '2026-07-08'
     date_published: '2024-06-07'
-  license:
-    name: CC BY-NC-SA 3.0 IGO
-    url: https://openknowledge.fao.org/handle/20.500.14283/cd0683en
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://openknowledge.fao.org/handle/20.500.14283/cd0683en
 outs:
   - md5: 5d3d3d8bb452fed6f37a6178e8d43ef1
     size: 6959
