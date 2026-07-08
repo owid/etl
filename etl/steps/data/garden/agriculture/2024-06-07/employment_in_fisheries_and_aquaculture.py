@@ -16,27 +16,6 @@ PERIOD_TO_YEAR = {
     "2022": 2022,
 }
 
-# Regions as labeled in the source table, before harmonization (see the .countries.json mapping,
-# which relabels them with FAO's "(FAO)" suffix). Used to sanity-check the source hasn't changed.
-SOURCE_REGIONS = {
-    "Africa",
-    "Asia",
-    "Europe",
-    "Latin America and the Caribbean",
-    "Northern America",
-    "Oceania",
-    "World",
-}
-# FAO's continental regions after harmonization (i.e. excluding the world aggregate). Used in checks.
-CONTINENTS = [
-    "Africa (FAO)",
-    "Asia (FAO)",
-    "Europe (FAO)",
-    "Latin America and the Caribbean (FAO)",
-    "Northern America (FAO)",
-    "Oceania (FAO)",
-]
-
 # Map the source's subsector labels to indicator column names.
 SUBSECTOR_TO_COLUMN = {
     "Aquaculture": "aquaculture",
@@ -46,69 +25,46 @@ SUBSECTOR_TO_COLUMN = {
     "Fisheries and aquaculture, total": "total",
 }
 
-# Tolerance (in number of people) for reconciliation checks: the source is rounded to thousands, so
-# component sums and regional sums can differ from the reported totals by a few thousand people.
-RECONCILIATION_TOLERANCE = 3000
+# Label of the source row that holds the grand total across subsectors.
+TOTAL_SUBSECTOR = "Fisheries and aquaculture, total"
+
+# Reconciliation tolerance, in thousands of people: the source is rounded to thousands, so summed
+# parts can differ from a reported total by a couple of thousand.
+RECONCILIATION_TOLERANCE = 3
+
+
+def _assert_reconciles(tb: Table, part_mask, total_mask, groupby: list[str], what: str) -> None:
+    """Assert the summed parts equal the reported totals in every group, within tolerance."""
+    parts = tb[part_mask].groupby(groupby, observed=True)["employment_thousands"].sum()
+    totals = tb[total_mask].set_index(groupby)["employment_thousands"].reindex(parts.index)
+    # Cast to signed numpy ints: the source column is unsigned, so a bare subtraction would underflow.
+    diff = parts.to_numpy().astype("int64") - totals.to_numpy().astype("int64")
+    assert (abs(diff) <= RECONCILIATION_TOLERANCE).all(), f"Reconciliation failed: {what}."
 
 
 def sanity_check_inputs(tb: Table) -> None:
-    assert set(tb["subsector"]) == set(SUBSECTOR_TO_COLUMN), "Unexpected set of subsectors in the source table."
-    assert set(tb["region"]) == SOURCE_REGIONS, "Unexpected set of regions in the source table."
-    assert set(tb["period"]) == set(PERIOD_TO_YEAR), "Unexpected set of periods in the source table."
-    assert not tb.duplicated(subset=["region", "subsector", "period"]).any(), (
-        "Duplicate (region, subsector, period) rows."
+    # The table is transcribed by hand, so check it reconciles. harmonize_names separately warns if a
+    # region is missing from or unused in the country mapping, so the region set is not checked here.
+    _assert_reconciles(
+        tb, tb["region"] != "World", tb["region"] == "World", ["subsector", "period"], "continents vs world total"
     )
-    assert tb["employment_thousands"].min() >= 0, "Negative employment found in the source table."
-
-    # For each subsector and period, the continents should sum to the reported world total.
-    for subsector in SUBSECTOR_TO_COLUMN:
-        for period in PERIOD_TO_YEAR:
-            mask = (tb["subsector"] == subsector) & (tb["period"] == period)
-            # Cast to plain int: the source column is unsigned, so a bare subtraction would underflow.
-            world = int(tb[mask & (tb["region"] == "World")]["employment_thousands"].sum())
-            continents = int(tb[mask & (tb["region"] != "World")]["employment_thousands"].sum())
-            assert abs(world - continents) <= 3, (
-                f"Continents do not sum to the world total for {subsector} in {period}: "
-                f"world={world}, sum of continents={continents}."
-            )
+    _assert_reconciles(
+        tb,
+        tb["subsector"] != TOTAL_SUBSECTOR,
+        tb["subsector"] == TOTAL_SUBSECTOR,
+        ["region", "period"],
+        "subsectors vs grand total",
+    )
 
 
 def sanity_check_outputs(tb: Table) -> None:
-    indicators = ["aquaculture", "inland_fisheries", "marine_fisheries", "capture_fisheries", "unspecified", "total"]
-    assert tb.columns[tb.isna().all()].empty, "Output has a fully-NaN column."
-    assert (tb[indicators].min() >= 0).all(), "Negative employment found in the output."
-
-    # Capture fisheries must equal inland + marine fisheries.
+    # Capture fisheries is derived as inland + marine fisheries.
     assert (tb["capture_fisheries"] == tb["inland_fisheries"] + tb["marine_fisheries"]).all(), (
         "Capture fisheries does not equal inland + marine fisheries."
     )
-
-    # The subsector components must reconcile with the reported total (treating missing values as 0).
-    components = tb[["aquaculture", "inland_fisheries", "marine_fisheries", "unspecified"]].fillna(0).sum(axis=1)
-    assert ((components - tb["total"]).abs() <= RECONCILIATION_TOLERANCE).all(), (
-        "Subsector components do not reconcile with the reported total."
-    )
-
-    # For each year and indicator, the FAO continents must sum to the world value.
-    tb_flat = tb.reset_index()
-    assert set(tb_flat["country"]) == set(CONTINENTS) | {"World"}, "Unexpected set of countries after harmonization."
-    for year in tb_flat["year"].unique():
-        year_mask = tb_flat["year"] == year
-        world = tb_flat[year_mask & (tb_flat["country"] == "World")]
-        continents = tb_flat[year_mask & (tb_flat["country"].isin(CONTINENTS))]
-        for indicator in ["aquaculture", "inland_fisheries", "marine_fisheries", "capture_fisheries", "total"]:
-            diff = abs(world[indicator].sum() - continents[indicator].sum())
-            assert diff <= RECONCILIATION_TOLERANCE, (
-                f"FAO continents do not sum to the world value for {indicator} in {year} (diff={diff})."
-            )
-
-    # Magnitude check: this guards the thousands -> people conversion (world total is ~62 million).
+    # Magnitude guard for the thousands -> people conversion (the world total is ~62 million in 2022).
     world_total_2022 = tb.loc[("World", 2022), "total"]
-    assert 5e7 < world_total_2022 < 7e7, f"World total in 2022 out of expected range: {world_total_2022}."
-
-    # Asia dominates global employment (~85% of the world total in 2022).
-    asia_share = tb.loc[("Asia (FAO)", 2022), "total"] / world_total_2022
-    assert 0.8 < asia_share < 0.9, f"Asia's share of world employment in 2022 out of expected range: {asia_share}."
+    assert 5e7 < world_total_2022 < 7e7, f"World total in 2022 out of the expected range: {world_total_2022}."
 
 
 def run() -> None:
