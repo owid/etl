@@ -1,0 +1,8 @@
+# Known upstream data errors in the GPEI wild-polio-free-countries data, corrected locally until
+# fixed at the source. See etl/data_corrections.py for the format.
+- indicator: year
+  match: {country: Somalia, year: "2000"}
+  action: drop
+  reason: Somalia has two rows in the source; confirmed with GPEI that Somalia's last wild polio case was in 2002, so the earlier (2000) row is dropped.
+  provider: Global Polio Eradication Initiative
+  status: acknowledged

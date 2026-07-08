@@ -307,8 +307,8 @@ def run() -> None:
     # drinks and cigarettes are topcoded to 97, we treat them as 97 rather than 97+
     # drinks: 116 rows with maximum value of 97
     # cigarettes: 45 rows with maximum value of 97
-    # drinks has one entry which is 4.5. We treat this as 5 (the scale is in whole numbers, so this is likely a data error).
-    tb["drinks"] = tb["drinks"].astype(float).replace(4.5, 5)
+    tb["drinks"] = tb["drinks"].astype(float)
+    tb = paths.apply_corrections(tb)
 
     tb_scored_97 = average_scored(tb, groups=GROUPS, cols=["cigarettes", "drinks"])
 

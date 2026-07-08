@@ -410,10 +410,10 @@ tables:
           - Latin America (WID)
           - Europe (WID)
           - Russia and Central Asia (WID)
-          - MENA (WID)
+          - Middle East and North Africa (WID)
           - Sub-Saharan Africa (WID)
           - East Asia (WID)
-          - South & South-East Asia (WID)
+          - South and South-East Asia (WID)
           - Oceania (WID)
         origins:
           - *origins_wid
@@ -428,10 +428,10 @@ tables:
                   "Latin America (WID)": "Latin America"
                   "Europe (WID)": "Europe"
                   "Russia and Central Asia (WID)": "Russia and Central Asia"
-                  "MENA (WID)": "MENA"
+                  "Middle East and North Africa (WID)": "Middle East and North Africa"
                   "Sub-Saharan Africa (WID)": "Sub-Saharan Africa"
                   "East Asia (WID)": "East Asia"
-                  "South & South-East Asia (WID)": "South & South-East Asia"
+                  "South and South-East Asia (WID)": "South and South-East Asia"
                   "Oceania (WID)": "Oceania"
                 customHiddenCategories:
                   "No data": true
