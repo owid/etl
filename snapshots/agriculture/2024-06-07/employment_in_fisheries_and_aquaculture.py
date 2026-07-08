@@ -1,23 +1,8 @@
 """Snapshot of employment in the primary sector of fisheries and aquaculture (FAO SOFIA 2024, Table 10).
 
-The values below are transcribed manually from Table 10 ("Employment in the primary sector of
-fisheries and aquaculture by geographical region and subsector, 1995-2022"), on page 61 of the print
-edition of The State of World Fisheries and Aquaculture 2024:
+The values below are extracted by Claude (and visually inspected by a human) from Table 10 ("Employment in the primary sector of fisheries and aquaculture by geographical region and subsector, 1995-2022"), on page 61 of the print edition of The State of World Fisheries and Aquaculture 2024:
 https://openknowledge.fao.org/handle/20.500.14283/cd0683en
 
-This is a raw passthrough of the table:
-- Values are kept in the source unit (thousands of people).
-- Period labels are kept verbatim. "2000s" and "2010s" are decade averages in the source; "1995",
-  "2020" and "2022" are single years. Converting these labels to years happens in the garden step.
-- Region labels are kept verbatim. The bold subsector rows (with no region label) are the world
-  totals for that subsector, and are stored here as region "World".
-- The derived "Share of sector in total, 2022 (%)" column of the source table is not stored (it is
-  trivially recomputed downstream).
-- Blank source cells (Northern America / Unspecified for 1995 and 2000s) are omitted.
-
-The newer SOFIA 2026 edition does not republish this table: it only reports employment by region for
-a single year (2024, Table 1.11) and a world-level subsector time series as a chart (Figure 1.26),
-neither of which provides the region-by-subsector-by-period grid below.
 """
 
 import pandas as pd

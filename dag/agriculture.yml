@@ -167,9 +167,7 @@ steps:
         #
         # Employment in fisheries and aquaculture (FAO, SOFIA 2024).
         #
-        data://meadow/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
-                - snapshot://agriculture/2024-06-07/employment_in_fisheries_and_aquaculture.csv
-        data://garden/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
-                - data://meadow/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture
         data://grapher/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
-                - data://garden/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture
+                - data://garden/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
+                          - data://meadow/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
+                                    - snapshot://agriculture/2024-06-07/employment_in_fisheries_and_aquaculture.csv

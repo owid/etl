@@ -1,6 +1,4 @@
-"""Load the employment in fisheries and aquaculture meadow dataset and create a garden dataset.
-
-"""
+"""Load the employment in fisheries and aquaculture meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
 
@@ -18,18 +16,26 @@ PERIOD_TO_YEAR = {
     "2022": 2022,
 }
 
-# Map FAO's continental regions to their OWID entity names (FAO's own regional groupings).
-REGION_TO_COUNTRY = {
-    "Africa": "Africa (FAO)",
-    "Asia": "Asia (FAO)",
-    "Europe": "Europe (FAO)",
-    "Latin America and the Caribbean": "Latin America and the Caribbean (FAO)",
-    "Northern America": "Northern America (FAO)",
-    "Oceania": "Oceania (FAO)",
-    "World": "World",
+# Regions as labeled in the source table, before harmonization (see the .countries.json mapping,
+# which relabels them with FAO's "(FAO)" suffix). Used to sanity-check the source hasn't changed.
+SOURCE_REGIONS = {
+    "Africa",
+    "Asia",
+    "Europe",
+    "Latin America and the Caribbean",
+    "Northern America",
+    "Oceania",
+    "World",
 }
-# Continental regions only (i.e. excluding the world aggregate), used in sanity checks.
-CONTINENTS = [v for k, v in REGION_TO_COUNTRY.items() if k != "World"]
+# FAO's continental regions after harmonization (i.e. excluding the world aggregate). Used in checks.
+CONTINENTS = [
+    "Africa (FAO)",
+    "Asia (FAO)",
+    "Europe (FAO)",
+    "Latin America and the Caribbean (FAO)",
+    "Northern America (FAO)",
+    "Oceania (FAO)",
+]
 
 # Map the source's subsector labels to indicator column names.
 SUBSECTOR_TO_COLUMN = {
@@ -47,7 +53,7 @@ RECONCILIATION_TOLERANCE = 3000
 
 def sanity_check_inputs(tb: Table) -> None:
     assert set(tb["subsector"]) == set(SUBSECTOR_TO_COLUMN), "Unexpected set of subsectors in the source table."
-    assert set(tb["region"]) == set(REGION_TO_COUNTRY), "Unexpected set of regions in the source table."
+    assert set(tb["region"]) == SOURCE_REGIONS, "Unexpected set of regions in the source table."
     assert set(tb["period"]) == set(PERIOD_TO_YEAR), "Unexpected set of periods in the source table."
     assert not tb.duplicated(subset=["region", "subsector", "period"]).any(), (
         "Duplicate (region, subsector, period) rows."
@@ -85,6 +91,7 @@ def sanity_check_outputs(tb: Table) -> None:
 
     # For each year and indicator, the FAO continents must sum to the world value.
     tb_flat = tb.reset_index()
+    assert set(tb_flat["country"]) == set(CONTINENTS) | {"World"}, "Unexpected set of countries after harmonization."
     for year in tb_flat["year"].unique():
         year_mask = tb_flat["year"] == year
         world = tb_flat[year_mask & (tb_flat["country"] == "World")]
@@ -120,8 +127,12 @@ def run() -> None:
     # source values are read as UInt16, which would overflow when multiplied by 1000.
     tb["employment"] = tb["employment_thousands"].astype("Int64") * 1000
 
-    # Relabel regions, periods and subsectors (these are key columns, not indicators).
-    tb["country"] = tb["region"].astype("string").map(REGION_TO_COUNTRY)
+    # Harmonize FAO's region names to their OWID entity names (see the .countries.json mapping).
+    tb["region"] = tb["region"].astype("string")
+    tb = tb.rename(columns={"region": "country"})
+    tb = paths.regions.harmonize_names(tb, countries_file=paths.country_mapping_path)
+
+    # Relabel periods and subsectors (key columns, not indicators).
     tb["year"] = tb["period"].astype("string").map(PERIOD_TO_YEAR).astype(int)
     tb["subsector"] = tb["subsector"].astype("string").map(SUBSECTOR_TO_COLUMN)
 
