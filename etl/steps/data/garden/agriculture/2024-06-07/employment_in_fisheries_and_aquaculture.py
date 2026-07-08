@@ -28,10 +28,6 @@ SUBSECTOR_TO_COLUMN = {
 # Label of the source row that holds the grand total across subsectors.
 TOTAL_SUBSECTOR = "Fisheries and aquaculture, total"
 
-# Reconciliation tolerance, in thousands of people: the source is rounded to thousands, so summed
-# parts can differ from a reported total by a couple of thousand.
-RECONCILIATION_TOLERANCE = 3
-
 
 def _assert_reconciles(tb: Table, part_mask, total_mask, groupby: list[str], what: str) -> None:
     """Assert the summed parts equal the reported totals in every group, within tolerance."""
@@ -39,7 +35,8 @@ def _assert_reconciles(tb: Table, part_mask, total_mask, groupby: list[str], wha
     totals = tb[total_mask].set_index(groupby)["employment_thousands"].reindex(parts.index)
     # Cast to signed numpy ints: the source column is unsigned, so a bare subtraction would underflow.
     diff = parts.to_numpy().astype("int64") - totals.to_numpy().astype("int64")
-    assert (abs(diff) <= RECONCILIATION_TOLERANCE).all(), f"Reconciliation failed: {what}."
+    # Reconciliation tolerance, in thousands of people: the source is rounded to thousands, so summed parts can differ from a reported total by a couple of thousand.
+    assert (abs(diff) <= 3).all(), f"Reconciliation failed: {what}."
 
 
 def sanity_check_inputs(tb: Table) -> None:
