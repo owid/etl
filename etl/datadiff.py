@@ -10,6 +10,7 @@ from typing import Any, cast
 
 import numpy as np
 import pandas as pd
+import requests
 import rich
 import rich_click as click
 import structlog
@@ -22,6 +23,15 @@ from rich.syntax import Syntax
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from etl.dag_helpers import load_dag
+from etl.datadiff_report import (
+    SAMPLE_LIMIT,
+    ColumnDiffResult,
+    DatasetDiffResult,
+    DiffReport,
+    TableDiffResult,
+    ValueDiff,
+    render_html,
+)
 from etl.files import yaml_dump
 from etl.git_helpers import get_changed_files
 from etl.http import session as http_session
@@ -48,6 +58,7 @@ class DatasetDiff:
         print: Callable = rich.print,
         snippet: bool = False,
         country: str | None = None,
+        details: bool = False,
     ):
         """
         :param cols: Only compare columns matching pattern
@@ -55,6 +66,7 @@ class DatasetDiff:
         :param print: Function to print the diff summary. Defaults to rich.print.
         :param snippet: Print snippet for loading both tables
         :param country: Filter tables by country if it is in the index
+        :param details: Compute value-level diffs for the structured `result` even without verbose
         """
         assert ds_a or ds_b, "At least one Dataset must be provided"
         self.ds_a = ds_a
@@ -65,6 +77,9 @@ class DatasetDiff:
         self.tables = tables
         self.snippet = snippet
         self.country = country
+        self.details = details
+        # Structured mirror of the printed summary, filled in by summary().
+        self.result = DatasetDiffResult(path=dataset_uri(ds_b or ds_a), kind="identical")  # type: ignore[arg-type]
 
     def _filter_table_by_country(self, table: Table) -> Table:
         """Filter table by country if country is in the index."""
@@ -82,23 +97,32 @@ class DatasetDiff:
             assert ds_short_name
 
             new_version = " (new version)" if ds_a.metadata.version != ds_b.metadata.version else ""
+            self.result.is_new_version = bool(new_version)
 
             # compare dataset metadata
-            diff = _dict_diff(_dataset_metadata_dict(ds_a), _dataset_metadata_dict(ds_b), tabs=2)
+            meta_a, meta_b = _dataset_metadata_dict(ds_a), _dataset_metadata_dict(ds_b)
+            diff = _dict_diff(meta_a, meta_b, tabs=2)
             if diff:
+                self.result.kind = "changed"
+                self.result.meta_diff = _dict_diff(meta_a, meta_b, tabs=0, color=False)
                 self.p(f"[yellow]~ Dataset [b]{dataset_uri(ds_b)}[/b]{new_version}")
                 if self.verbose:
                     self.p(diff)
             else:
                 self.p(f"[white]= Dataset [b]{dataset_uri(ds_b)}{new_version}[/b]")
         elif ds_a:
+            self.result.kind = "removed"
             self.p(f"[red]- Dataset [b]{dataset_uri(ds_a)}[/b]")
         elif ds_b:
+            self.result.kind = "new"
             self.p(f"[green]+ Dataset [b]{dataset_uri(ds_b)}[/b]")
             for table_name in ds_b.table_names:
                 self.p(f"\t[green]+ Table [b]{table_name}[/b]")
+                tab_res = TableDiffResult(name=table_name, kind="new")
+                self.result.tables.append(tab_res)
                 for col in ds_b[table_name].columns:
                     self.p(f"\t\t[green]+ Column [b]{col}[/b]")
+                    tab_res.columns.append(ColumnDiffResult(name=col, kind="new"))
 
     def _snippet(self, ds_a: Dataset, ds_b: Dataset, table_name: str) -> Panel:
         """Print code for loading both tables."""
@@ -127,12 +151,18 @@ tb = {_snippet_dataset(ds_b, table_name)}
 
         if table_name not in ds_b.table_names:
             self.p(f"\t[red]- Table [b]{table_name}[/b]")
+            tab_res = TableDiffResult(name=table_name, kind="removed")
+            self.result.tables.append(tab_res)
             for col in ds_a[table_name].columns:
                 self.p(f"\t\t[red]- Column [b]{col}[/b]")
+                tab_res.columns.append(ColumnDiffResult(name=col, kind="removed"))
         elif table_name not in ds_a.table_names:
             self.p(f"\t[green]+ Table [b]{table_name}[/b]")
+            tab_res = TableDiffResult(name=table_name, kind="new")
+            self.result.tables.append(tab_res)
             for col in ds_b[table_name].columns:
                 self.p(f"\t\t[green]+ Column [b]{col}[/b]")
+                tab_res.columns.append(ColumnDiffResult(name=col, kind="new"))
         else:
             # get both tables in parallel
             with ThreadPoolExecutor() as executor:
@@ -191,8 +221,12 @@ tb = {_snippet_dataset(ds_b, table_name)}
             removed_index = cast(pd.Series, removed_index.reset_index(drop=True))
 
             # compare table metadata
-            diff = _dict_diff(_table_metadata_dict(table_a), _table_metadata_dict(table_b), tabs=3)
+            tab_meta_a, tab_meta_b = _table_metadata_dict(table_a), _table_metadata_dict(table_b)
+            diff = _dict_diff(tab_meta_a, tab_meta_b, tabs=3)
+            tab_res = TableDiffResult(name=table_name, kind="changed" if diff else "identical")
+            self.result.tables.append(tab_res)
             if diff:
+                tab_res.meta_diff = _dict_diff(tab_meta_a, tab_meta_b, tabs=0, color=False)
                 self.p(f"\t[yellow]~ Table [b]{table_name}[/b] (changed [u]metadata[/u])")
 
                 if self.verbose:
@@ -207,9 +241,15 @@ tb = {_snippet_dataset(ds_b, table_name)}
                         self.p(f"\t\t[white]= Dim [b]{dim}[/b]")
                     else:
                         self.p(f"\t\t[yellow]~ Dim [b]{dim}[/b]")
-                        if self.verbose:
+                        dim_res = ColumnDiffResult(name=dim, kind="changed", is_dim=True)
+                        if new_index.any():
+                            dim_res.changes.append("new data")
+                        if removed_index.any():
+                            dim_res.changes.append("removed data")
+                        tab_res.columns.append(dim_res)
+                        if self.verbose or self.details:
                             dims_without_dim = [d for d in dims if d != dim]
-                            out = _data_diff(
+                            out, dim_res.value_diffs = _data_diff(
                                 table_a,
                                 table_b,
                                 dim,
@@ -220,7 +260,7 @@ tb = {_snippet_dataset(ds_b, table_name)}
                                 removed_index,
                                 tabs=4,
                             )
-                            if out:
+                            if self.verbose and out:
                                 self.p(out)
 
             # compare columns
@@ -231,8 +271,10 @@ tb = {_snippet_dataset(ds_b, table_name)}
 
                 if col not in table_a.columns:
                     self.p(f"\t\t[green]+ Column [b]{col}[/b]")
+                    tab_res.columns.append(ColumnDiffResult(name=col, kind="new"))
                 elif col not in table_b.columns:
                     self.p(f"\t\t[red]- Column [b]{col}[/b]")
+                    tab_res.columns.append(ColumnDiffResult(name=col, kind="removed"))
                 else:
                     col_a = table_a[col]
                     col_b = table_b[col]
@@ -245,9 +287,9 @@ tb = {_snippet_dataset(ds_b, table_name)}
                         )
 
                     # metadata diff
-                    meta_diff = _dict_diff(
-                        _column_metadata_dict(col_a.metadata), _column_metadata_dict(col_b.metadata), tabs=4
-                    )
+                    col_meta_a = _column_metadata_dict(col_a.metadata)
+                    col_meta_b = _column_metadata_dict(col_b.metadata)
+                    meta_diff = _dict_diff(col_meta_a, col_meta_b, tabs=4)
 
                     # equality on index and series
                     eq_data = series_equals(table_a[col], table_b[col])
@@ -261,16 +303,27 @@ tb = {_snippet_dataset(ds_b, table_name)}
                         changed.append("changed [u]data[/u]")
 
                     if changed:
+                        col_res = ColumnDiffResult(
+                            name=col,
+                            kind="changed",
+                            changes=[c.replace("[u]", "").replace("[/u]", "") for c in changed],
+                        )
+                        if meta_diff:
+                            col_res.meta_diff = _dict_diff(col_meta_a, col_meta_b, tabs=0, color=False)
+                        tab_res.columns.append(col_res)
                         self.p(f"\t\t[yellow]~ Column [b]{col}[/b] ({', '.join(changed)})")
+                        if self.verbose or self.details:
+                            out = ""
+                            if new_index.any() or removed_index.any() or (~eq_data).any():
+                                out, col_res.value_diffs = _data_diff(
+                                    table_a, table_b, col, dims, eq_data, eq_index, new_index, removed_index, tabs=4
+                                )
                         if self.verbose:
                             if meta_diff:
                                 self.p(meta_diff)
                             if new_index.any() or removed_index.any() or (~eq_data).any():
                                 if meta_diff:
                                     self.p("")
-                                out = _data_diff(
-                                    table_a, table_b, col, dims, eq_data, eq_index, new_index, removed_index, tabs=4
-                                )
                                 if out:
                                     self.p(out)
                     else:
@@ -301,12 +354,15 @@ class RemoteDataset:
         return tb
 
 
-def _data_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
-    """Return True if every local table's feather file is byte-identical to its remote counterpart.
+def _dataset_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
+    """Return True if every local table's feather AND .meta.json file is byte-identical to its
+    remote counterpart.
 
     Compares the local MD5 to the remote object's S3/R2 ETag (which is the file's MD5 for
-    OWID's non-multipart uploads). Used to skip data diffs when ``source_checksum`` cascades
-    from an upstream metadata-only change but the actual feather bytes are unchanged.
+    OWID's non-multipart uploads). Used to skip diffs when ``source_checksum`` cascades
+    from an upstream change but neither the data nor the table metadata changed. Dataset-level
+    metadata (``index.json``) is compared in-memory by the caller — its bytes always differ
+    because they contain the source checksum itself.
     """
     from owid.catalog.core.datasets import checksum_file
 
@@ -315,20 +371,21 @@ def _data_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
 
     local_md5: dict[str, str] = {}
     for t in ds_local.table_names:
-        path = Path(ds_local.path) / f"{t}.feather"
-        if not path.exists():
-            return False
-        local_md5[t] = checksum_file(path.as_posix()).hexdigest()
+        for fname in (f"{t}.feather", f"{t}.meta.json"):
+            path = Path(ds_local.path) / fname
+            if not path.exists():
+                return False
+            local_md5[fname] = checksum_file(path.as_posix()).hexdigest()
 
     base = (
         f"{DEFAULT_CATALOG_URL}{ds_remote.metadata.channel}/{ds_remote.metadata.namespace}/"
         f"{ds_remote.metadata.version}/{ds_remote.metadata.short_name}"
     )
 
-    def _remote_md5(table_name: str) -> str | None:
+    def _remote_md5(fname: str) -> str | None:
         try:
-            r = http_session.head(f"{base}/{table_name}.feather", timeout=10)
-        except Exception:
+            r = http_session.head(f"{base}/{fname}", timeout=10)
+        except requests.RequestException:
             return None
         if r.status_code != 200:
             return None
@@ -337,7 +394,7 @@ def _data_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
     with ThreadPoolExecutor(max_workers=min(8, max(1, len(local_md5)))) as executor:
         remote_md5 = dict(zip(local_md5.keys(), executor.map(_remote_md5, local_md5.keys())))
 
-    return all(local_md5[t] == remote_md5.get(t) for t in local_md5)
+    return all(local_md5[f] == remote_md5.get(f) for f in local_md5)
 
 
 @click.command(name="diff", help=__doc__)
@@ -406,6 +463,16 @@ def _data_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
     help="Use multiple threads.",
     default=1,
 )
+@click.option(
+    "--output-json",
+    type=click.Path(dir_okay=False),
+    help="Write structured diff results as JSON to this path.",
+)
+@click.option(
+    "--output-html",
+    type=click.Path(dir_okay=False),
+    help="Write a self-contained HTML report of the diff to this path.",
+)
 def cli(
     path_a: str,
     path_b: str,
@@ -419,6 +486,8 @@ def cli(
     snippet: bool,
     country: str | None,
     workers: int,
+    output_json: str | None,
+    output_html: str | None,
 ) -> None:
     """Compare all datasets from two catalogs and print out a summary of their differences.
 
@@ -456,12 +525,23 @@ def cli(
     """
     console = Console(tab_size=2, soft_wrap=True)
 
+    report = DiffReport()
+    # collect value-level samples for the structured report even without --verbose
+    details = bool(output_json or output_html)
+
+    def _write_reports() -> None:
+        if output_json:
+            Path(output_json).write_text(report.to_json())
+        if output_html:
+            Path(output_html).write_text(render_html(report))
+
     if changed:
         # Get all changed files in the current git repository
         files_changed = get_changed_files()
         catalog_paths = get_all_changed_catalog_paths(files_changed)
 
         if not catalog_paths:
+            _write_reports()
             console.print("[green]✅ No differences found[/green]")
             exit(0)
 
@@ -482,9 +562,11 @@ def cli(
         path_to_ds_b = {k: v for k, v in path_to_ds_b.items() if k in dag_steps}
 
     if not path_to_ds_a:
+        _write_reports()
         console.print(f"[yellow]❓ No datasets found in {path_a}[/yellow]")
         exit(0)
     if not path_to_ds_b:
+        _write_reports()
         console.print(f"[yellow]❓ No datasets found in {path_b}[/yellow]")
         exit(0)
 
@@ -502,19 +584,26 @@ def cli(
             # to improve performance. Source checksum should be enough
             continue
 
-        # Fast-path: source_checksum differs (typical when an upstream metadata change cascades)
-        # but the feather files are byte-identical. Compare local MD5 to remote S3/R2 ETag and
-        # skip the full data download/diff when they match.
+        # Fast-path: source_checksum differs (typical when an upstream change cascades) but
+        # nothing observable changed. Skip the full download/diff only when dataset-level
+        # metadata is equal AND every table's feather + .meta.json is byte-identical (local MD5
+        # vs remote S3/R2 ETag) — a metadata-only change must still get a full diff.
         if ds_a and ds_b:
             local_ds = ds_b if isinstance(ds_a, RemoteDataset) else ds_a
             remote_ds = ds_a if isinstance(ds_a, RemoteDataset) else (ds_b if isinstance(ds_b, RemoteDataset) else None)
-            if remote_ds is not None and isinstance(local_ds, Dataset) and _data_files_match(local_ds, remote_ds):
+            if (
+                remote_ds is not None
+                and isinstance(local_ds, Dataset)
+                and _dataset_metadata_dict(ds_a) == _dataset_metadata_dict(ds_b)
+                and _dataset_files_match(local_ds, remote_ds)
+            ):
                 skipped_identical_data += 1
                 continue
 
         matched_datasets.append((ds_a, ds_b))
 
     if skipped_identical_data:
+        report.skipped_cascade = skipped_identical_data
         log.info("Skipped datasets with identical data (source_checksum cascade)", count=skipped_identical_data)
 
     if workers > 1:
@@ -534,24 +623,31 @@ def cli(
                         verbose=verbose,
                         snippet=snippet,
                         country=country,
+                        details=details,
                     )
                     differ.summary()
-                    return lines
+                    return lines, differ.result
 
                 futures.append(executor.submit(func, ds_a, ds_b))
 
-            for future in futures:
+            for (ds_a, ds_b), future in zip(matched_datasets, futures):
                 try:
-                    lines = future.result()
+                    lines, result = future.result()
                 except DatasetError as e:
                     # soft fail and continue with another dataset
                     lines = [f"[bold red]⚠ Error: {e}[/bold red]"]
+                    result = DatasetDiffResult(path=dataset_uri(ds_b or ds_a), kind="error", error=str(e))
                 except Exception as e:
                     # soft fail and continue with another dataset
                     log.error("\n".join(traceback.format_exception(type(e), e, e.__traceback__)))
                     any_error = True
+                    report.datasets.append(
+                        DatasetDiffResult(path=dataset_uri(ds_b or ds_a), kind="error", error=str(e))
+                    )
                     lines = []
                     continue
+
+                report.datasets.append(result)
 
                 for line in lines:
                     console.print(line)
@@ -576,20 +672,27 @@ def cli(
                     verbose=verbose,
                     snippet=snippet,
                     country=country,
+                    details=details,
                 )
                 differ.summary()
             except DatasetError as e:
                 # soft fail and continue with another dataset
                 _append_and_print(f"[bold red]⚠ Error: {e}[/bold red]")
+                report.datasets.append(DatasetDiffResult(path=dataset_uri(ds_b or ds_a), kind="error", error=str(e)))
                 continue
             except Exception as e:
                 # soft fail and continue with another dataset
                 log.error("\n".join(traceback.format_exception(type(e), e, e.__traceback__)))
                 any_error = True
+                report.datasets.append(DatasetDiffResult(path=dataset_uri(ds_b or ds_a), kind="error", error=str(e)))
                 continue
+
+            report.datasets.append(differ.result)
 
             if any("~" in line for line in lines if isinstance(line, str)):
                 any_diff = True
+
+    _write_reports()
 
     console.print()
     if not path_to_ds_a and not path_to_ds_b:
@@ -661,6 +764,24 @@ def _df_to_str(df: pd.DataFrame, limit: int = 5) -> list[str]:
     return lines
 
 
+def _df_to_records(df: pd.DataFrame, limit: int = SAMPLE_LIMIT) -> list[dict[str, str]]:
+    """Sample the dataframe and convert it to display-ready records with stringified values."""
+    if len(df) > limit:
+        df_samp = df.sample(limit, random_state=0).sort_index()
+    else:
+        df_samp = df
+
+    def _fmt(v: Any) -> str:
+        try:
+            if pd.isna(v):
+                return "NaN"
+        except (TypeError, ValueError):
+            pass
+        return str(v)
+
+    return [{str(k): _fmt(v) for k, v in row.items()} for row in df_samp.to_dict("records")]
+
+
 def _data_diff(
     table_a: Table,
     table_b: Table,
@@ -671,12 +792,13 @@ def _data_diff(
     new_index: pd.Series,
     removed_index: pd.Series,
     tabs: int = 0,
-) -> str:
-    """Return summary of data differences."""
+) -> tuple[str, list[ValueDiff]]:
+    """Return summary of data differences as text and as structured value diffs."""
     # eq = eq_data & eq_index
     n = (eq_index | new_index).sum()
 
     lines = []
+    value_diffs = []
 
     cols = [d for d in dims if d is not None] + [col]
 
@@ -685,14 +807,24 @@ def _data_diff(
         lines.append(
             f"+ New values: {new_index.sum()} / {n} ({new_index.sum() / n * 100:.2f}%)",
         )
-        lines += _df_to_str(table_b.loc[new_index, cols])
+        new_values = table_b.loc[new_index, cols]
+        lines += _df_to_str(new_values)
+        value_diffs.append(
+            ValueDiff(kind="new", count=int(new_index.sum()), total=int(n), sample=_df_to_records(new_values))
+        )
 
     # removed values
     if removed_index.any():
         lines.append(
             f"- Removed values: {removed_index.sum()} / {n} ({removed_index.sum() / n * 100:.2f}%)",
         )
-        lines += _df_to_str(table_a.loc[removed_index, cols])
+        removed_values = table_a.loc[removed_index, cols]
+        lines += _df_to_str(removed_values)
+        value_diffs.append(
+            ValueDiff(
+                kind="removed", count=int(removed_index.sum()), total=int(n), sample=_df_to_records(removed_values)
+            )
+        )
 
     # changed values
     neq = ~eq_data & eq_index
@@ -707,15 +839,16 @@ def _data_diff(
         else:
             both = samp_a.join(samp_b, lsuffix=" -", rsuffix=" +")
         lines += _df_to_str(both)
+        value_diffs.append(ValueDiff(kind="changed", count=int(neq.sum()), total=int(n), sample=_df_to_records(both)))
 
     # add color
     lines = ["[violet]" + line for line in lines]
 
     if not lines:
-        return ""
+        return "", value_diffs
     else:
         # add tabs
-        return "\t" * tabs + "\n".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+        return "\t" * tabs + "\n".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip(), value_diffs
 
     """OLD CODE, PARTS OF IT COULD BE STILL USEFUL
     # changes in index

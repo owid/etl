@@ -258,7 +258,13 @@ def download_s3_folder(
 
 
 def upload(
-    s3_url: str, filename: str | Path, public: bool = False, quiet: bool = False, downloadable: bool = False
+    s3_url: str,
+    filename: str | Path,
+    public: bool = False,
+    quiet: bool = False,
+    downloadable: bool = False,
+    content_type: str | None = None,
+    cache_control: str | None = None,
 ) -> None:
     """Upload the file at the given local filename to the S3 URL.
 
@@ -268,6 +274,8 @@ def upload(
         public: Whether to make the file publicly readable
         quiet: Whether to suppress log messages
         downloadable: If True, force browsers to download the file instead of displaying it inline. Sets Content-Disposition header to 'attachment; filename="..."'
+        content_type: Content-Type header to set on the object (e.g. 'text/html; charset=utf-8' so browsers render the file inline)
+        cache_control: Cache-Control header to set on the object (e.g. 'max-age=60' for frequently overwritten objects)
     """
     client = connect_r2()
     bucket, key = s3_bucket_key(s3_url)
@@ -277,6 +285,11 @@ def upload(
     if downloadable:
         file_name = Path(filename).name
         extra_args["ContentDisposition"] = f'attachment; filename="{file_name}"'
+
+    if content_type:
+        extra_args["ContentType"] = content_type
+    if cache_control:
+        extra_args["CacheControl"] = cache_control
 
     filename_str = str(filename)
     try:

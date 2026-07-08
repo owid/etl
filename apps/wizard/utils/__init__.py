@@ -33,10 +33,9 @@ from typing_extensions import Self
 from wfork_streamlit_profiler import Profiler
 
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
-from etl.config import OWID_ENV, SENTRY_DSN, enable_sentry
+from etl.config import SENTRY_DSN, enable_sentry
 from etl.dag_helpers import load_dag
 from etl.db import read_sql
-from etl.metadata_export import main as metadata_export
 from etl.paths import (
     APPS_DIR,
     DAG_DIR,
@@ -399,35 +398,6 @@ def load_instructions() -> str:
         return f.read()
 
 
-def _check_env() -> bool:
-    """Check if environment variables are set correctly."""
-    ok = True
-    for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
-        if getattr(OWID_ENV.conf, env_name) is None:
-            ok = False
-            st.warning(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?")
-
-    if ok:
-        st.success("`.env` configured correctly")
-    return ok
-
-
-def _show_environment():
-    """Show environment variables."""
-    st.info(
-        f"""
-    **Environment variables**:
-
-    ```
-    GRAPHER_USER_ID: {OWID_ENV.conf.GRAPHER_USER_ID}
-    DB_USER: {OWID_ENV.conf.DB_USER}
-    DB_NAME: {OWID_ENV.conf.DB_NAME}
-    DB_HOST: {OWID_ENV.conf.DB_HOST}
-    ```
-    """
-    )
-
-
 def clean_empty_dict(d: dict[str, Any] | list[Any]) -> dict[str, Any] | list[Any]:
     """Remove empty values from dict.
 
@@ -491,26 +461,6 @@ def set_states(states_values: dict[str, Any], logging: bool = False, also_if_not
             st.session_state[key] = st.session_state.get(key, value)
         else:
             st.session_state[key] = value
-
-
-def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None, output: str = "") -> str:
-    """Export metadata of a dataset.
-
-    The metadata of the dataset may have changed in run time.
-    """
-    # Handle inputs
-    if dataset:
-        dataset_path = str(dataset.path)
-    elif dataset_path is None:
-        raise ValueError("Either a dataset or a dataset_path must be provided.")
-
-    output_path = metadata_export(
-        path=dataset_path,
-        output=output,  # Will assign the default value
-        show=False,
-        decimals="auto",
-    )
-    return output_path
 
 
 def enable_sentry_for_streamlit():

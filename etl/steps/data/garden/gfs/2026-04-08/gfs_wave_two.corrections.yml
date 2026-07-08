@@ -1,0 +1,9 @@
+# Known upstream data errors in the Gallup World Poll (GFS) wave two data, corrected locally until
+# fixed at the source. See etl/data_corrections.py for the format.
+- indicator: drinks
+  match: {value: 4.5}
+  action: override
+  value: 5
+  reason: The "drinks" scale is reported in whole numbers, so a single respondent's value of 4.5 is likely a data error. Treated as 5.
+  provider: Gallup World Poll
+  status: open
