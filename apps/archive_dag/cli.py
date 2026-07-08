@@ -431,10 +431,27 @@ def _backfill_markers(dag_file: Path, hashes: dict[str, LastSeen], dry_run: bool
 
     Line-based and surgical: existing steps, dependencies, comments and ordering are
     preserved. If a step already has an archived-marker in the contiguous comment block
-    directly above it, the marker is replaced when the recovery hash changed; otherwise
-    a new marker is inserted. This makes the command idempotent and self-correcting.
-    Returns the number of markers inserted or updated.
+    directly above it, the marker is replaced only when its recovery hash is broken
+    (not reachable from ``origin/master`` — e.g. a branch commit dropped by a
+    squash-merge); a differing-but-reachable hash is left alone, since both are valid
+    recovery points and replacing would churn every previously archived entry. Steps
+    with no marker get one inserted. This makes the command idempotent and
+    self-correcting. Returns the number of markers inserted or updated.
     """
+    master_sha = _default_branch_sha()
+    reachable: dict[str, bool] = {}
+
+    def _marker_is_valid(marker_line: str) -> bool:
+        m = MARKER_RE.search(marker_line)
+        if not m:
+            return False
+        if master_sha is None:
+            return True  # no origin/master to validate against — keep what's there
+        sha = m.group(1)
+        if sha not in reachable:
+            reachable[sha] = _is_ancestor(sha, master_sha)
+        return reachable[sha]
+
     lines = dag_file.read_text().splitlines(keepends=True)
     out: list[str] = []
     changed = 0
@@ -452,7 +469,7 @@ def _backfill_markers(dag_file: Path, hashes: dict[str, LastSeen], dry_run: bool
         if is_step and stripped[:-1] in hashes:
             marker_line = f"  {hashes[stripped[:-1]].marker}\n"
             # Look back over the contiguous comment block directly above for an
-            # existing marker to replace (stop at the first non-comment line).
+            # existing marker (stop at the first non-comment line).
             k = len(out) - 1
             existing_idx = None
             while k >= 0 and out[k].lstrip().startswith("#"):
@@ -461,7 +478,7 @@ def _backfill_markers(dag_file: Path, hashes: dict[str, LastSeen], dry_run: bool
                     break
                 k -= 1
             if existing_idx is not None:
-                if out[existing_idx] != marker_line:
+                if out[existing_idx] != marker_line and not _marker_is_valid(out[existing_idx]):
                     out[existing_idx] = marker_line
                     changed += 1
             else:
