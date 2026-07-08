@@ -384,22 +384,39 @@ def _coverage_chip(ds: DatasetDiffResult) -> str:
     return f'<span class="chip cov">− {_e(" · ".join(bits))}</span>'
 
 
-def _top_changes(report: "DiffReport", limit: int = TOP_CHANGES_LIMIT) -> list[tuple[float, float, str, str, str]]:
-    """The indicators to watch: (severity, pct_rows, ds_path, table, column) across all changed
-    datasets, biggest changes first. Dims are excluded — entity-level losses surface via the
-    coverage chip instead."""
-    rows = []
+def _top_changes(
+    report: "DiffReport", limit: int = TOP_CHANGES_LIMIT
+) -> tuple[list[tuple[int, list[str], str, str, str | None]], list[tuple[float, float, str, str, str]]]:
+    """The indicators to watch, as (losses, changes).
+
+    Losses — (n_rows_removed, labels, ds_path, table, dim_or_None) — are data points that existed
+    before and are gone after, the classic silent breakage of a dependency update. They always
+    lead the watch list, regardless of how small they are relative to the dataset.
+
+    Changes — (severity, pct_rows, ds_path, table, column) — are the biggest value changes.
+    """
+    losses = []
+    changes = []
     for ds in report.datasets:
         if ds.change_kind != "changed":
             continue
         for t in ds.tables:
+            if t.removed_row_count:
+                # Link to the dim column whose detail block holds the removed-rows sample.
+                dim = next(
+                    (c.name for c in t.columns if c.is_dim and any(v.kind == "removed" for v in c.value_diffs)),
+                    None,
+                )
+                losses.append((t.removed_row_count, t.removed_labels, ds.path, t.name, dim))
             for c in t.columns:
                 if c.is_dim or c.kind == "identical" or c.severity <= 0.001:
                     continue
                 pct = max((v.pct for v in c.value_diffs if v.kind != "new"), default=0.0)
-                rows.append((c.severity, pct, ds.path, t.name, c.name))
-    rows.sort(key=lambda r: (-r[0], -r[1], r[2]))
-    return rows[:limit]
+                changes.append((c.severity, pct, ds.path, t.name, c.name))
+    losses.sort(key=lambda r: (-r[0], r[2]))
+    changes.sort(key=lambda r: (-r[0], -r[1], r[2]))
+    losses = losses[:limit]
+    return losses, changes[: max(0, limit - len(losses))]
 
 
 def _render_meta_diff(meta_diff: str, label: str) -> str:
@@ -553,10 +570,22 @@ def render_html(report: DiffReport) -> str:
         if strip_bits:
             tier_strip = f'<div class="tier-strip">{" · ".join(strip_bits)} <span class="tier-hint">(by typical change size; coverage loss ⇒ 🔴)</span></div>'
 
-        top = _top_changes(report)
-        if top:
+        losses, changes = _top_changes(report)
+        if losses or changes:
             items = []
-            for severity, pct, ds_path, table, col in top:
+            # Data-point losses lead the list — make it unmistakable that rows disappeared.
+            for n_removed, labels, ds_path, table, dim in losses:
+                shown = ", ".join(labels[:4]) + ("…" if len(labels) > 4 else "")
+                link_open = f'<a href="#{_anchor(ds_path, table, dim)}">' if dim else ""
+                link_close = "</a>" if dim else ""
+                items.append(
+                    f'<li class="loss"><span class="ti">🔴</span> '
+                    f"{link_open}<code>{_e(ds_path)}</code> · <code>{_e(table)}</code>{link_close}"
+                    f'<span class="top-meta loss">− lost {n_removed:,} data point(s)'
+                    + (f": {_e(shown)}" if shown else "")
+                    + "</span></li>"
+                )
+            for severity, pct, ds_path, table, col in changes:
                 tier = _tier(severity)
                 items.append(
                     f'<li><span class="ti">{TIER_ICONS.get(tier, "")}</span> '
@@ -630,6 +659,7 @@ def render_html(report: DiffReport) -> str:
   details.top-changes a {{ text-decoration: none; color: inherit; }}
   details.top-changes a:hover code {{ background: #eef; }}
   .top-meta {{ color: #888; font-size: .78rem; margin-left: .5rem; }}
+  .top-meta.loss {{ color: #b71c1c; font-weight: 600; }}
   .ti {{ margin-right: .15rem; }}
   .tbl {{ margin: .75rem 0 0; }}
   .tbl-head {{ font-size: .9rem; margin-bottom: .25rem; }}

@@ -235,6 +235,29 @@ def test_triage_aids_only_on_big_reports():
     assert 'id="c-garden-n-v-d0-t-a"' in html_big
 
 
+def test_top_changes_lists_data_losses_first():
+    # A dataset that lost rows (removed dim values) plus bigger-magnitude changed datasets:
+    # the loss entry must lead the watch list and say explicitly that data points are gone.
+    dim = ColumnDiffResult(
+        name="country",
+        kind="changed",
+        is_dim=True,
+        value_diffs=[ValueDiff(kind="removed", count=111, total=1000, sample=[{"country": "Low-income countries"}])],
+    )
+    lossy = DatasetDiffResult(
+        path="garden/n/v/lossy",
+        kind="identical",
+        tables=[TableDiffResult(name="t", kind="identical", columns=[dim, _changed_col("a", 0.02)])],
+    )
+    others = [_changed_ds(f"garden/n/v/d{i}", 0.9) for i in range(3)]
+    html = render_html(DiffReport(datasets=[*others, lossy]))
+
+    assert "lost 111 data point(s): Low-income countries" in html
+    # The loss entry leads the watch list, even though the other datasets have larger changes.
+    top_start = html.index("Top changes")
+    assert html.index("lossy", top_start) < html.index("garden/n/v/d0", top_start)
+
+
 def test_report_sorts_by_severity():
     """Datasets, tables and columns render biggest-differences-first."""
 
