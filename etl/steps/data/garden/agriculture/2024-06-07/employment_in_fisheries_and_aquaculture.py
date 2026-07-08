@@ -1,17 +1,5 @@
 """Load the employment in fisheries and aquaculture meadow dataset and create a garden dataset.
 
-The source table (FAO SOFIA 2024, Table 10) reports the number of people employed in the primary
-sector of fisheries and aquaculture, in thousands, by geographical region and subsector. This step:
-
-- Converts the source unit (thousands of people) to number of people.
-- Converts the source's period labels to years. "2000s" and "2010s" are decade averages in the
-  source, and are plotted at the decade midpoint (2005 and 2015 respectively); 1995, 2020 and 2022
-  are single years.
-- Renames FAO's continental regions to their OWID entity names (keeping FAO's own regional
-  groupings, with the "(FAO)" suffix). We have no country-level data, so no OWID-defined aggregates
-  can be built here.
-- Reshapes the table so each subsector becomes its own indicator, and adds a derived "capture
-  fisheries" indicator (inland + marine fisheries).
 """
 
 from owid.catalog import Table
