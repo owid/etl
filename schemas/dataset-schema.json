@@ -411,9 +411,10 @@
         "same_as": {
           "type": "array",
           "title": "Same-dataset reference URLs",
-          "description": "URLs of reference pages that unambiguously identify this same dataset elsewhere (e.g. its GitHub mirror, or its methodology page on ourworldindata.org). Emitted as Schema.org `sameAs` in the catalog JSON-LD; Google Dataset Search uses shared `sameAs` targets to cluster third-party republications of the dataset with our record.",
+          "description": "URLs of reference pages that unambiguously identify this same dataset elsewhere. Emitted as Schema.org `sameAs` in the catalog JSON-LD. Caution: `sameAs` is Google Dataset Search's record-merging signal — any record sharing a target URL (including a third-party mirror claiming our GitHub repo) gets folded into one entry with ours.",
           "guidelines": [
-            "Only list pages that are about this exact dataset — a mirror, codebook, or methodology page. Do not list topic pages, search results, or the upstream sources the dataset is derived from (those belong in origins)."
+            "Leave unset by default so the catalog record stands alone in Google Dataset Search; set it only when merging with a specific copy of the dataset is deliberate.",
+            "Only list pages that are about this exact dataset — a mirror or codebook. Do not list topic pages, search results, or the upstream sources the dataset is derived from (those belong in origins)."
           ],
           "items": {
             "type": "string"

@@ -541,10 +541,11 @@ class DatasetMeta(MetaBase):
     # (canary rollout of the catalog-discovery project; set via `dataset: jsonld: true` in
     # the garden step's .meta.yml)
     jsonld: bool = False
-    # reference URLs that unambiguously identify this same dataset elsewhere (e.g. its GitHub
-    # mirror or its methodology page on ourworldindata.org); emitted as Schema.org `sameAs` in
-    # the catalog JSON-LD, where it is the clustering signal Google Dataset Search uses to
-    # merge third-party republications of the dataset with our record
+    # reference URLs that unambiguously identify this same dataset elsewhere; emitted as
+    # Schema.org `sameAs` in the catalog JSON-LD. CAUTION: sameAs is Google Dataset Search's
+    # record-merging signal — any record sharing a target URL (including a third-party mirror
+    # claiming our GitHub repo) gets folded into one entry with ours. Leave unset to keep our
+    # record standalone; set it only when merging with a specific copy is deliberate.
     same_as: list[str] = field(default_factory=list)
     # OWID team members who maintain this dataset; first entry is the accountable owner
     owners: list[str] = field(default_factory=list)

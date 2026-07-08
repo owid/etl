@@ -109,9 +109,9 @@ def dataset_to_schema_org(
         "thumbnailUrl": DEFAULT_THUMBNAIL_URL,
     }
 
-    # sameAs points at reference pages that identify this same dataset elsewhere (GitHub
-    # mirror, methodology page). Google Dataset Search clusters records sharing a sameAs
-    # target into one entry, so this is what ties third-party republications back to ours.
+    # sameAs points at reference pages that identify this same dataset elsewhere. Google
+    # Dataset Search folds records sharing a sameAs target into one entry, so datasets set
+    # it only when merging with a specific copy is deliberate (see DatasetMeta.same_as).
     if dataset_meta.same_as:
         result["sameAs"] = list(dataset_meta.same_as)
 
