@@ -1,24 +1,29 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Hunger & Undernourishment
+
 dataset:
   title: Prevalence of Undernourishment in Developing Countries - FAO (Food Security Indicators) (2017)
   owners:
-    - Hannah Ritchie  # backport
+    - Hannah Ritchie
+    - Pablo Rosado
+  update_period_days: 0
+
 tables:
   prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017:
     variables:
       prevalence_of_undernourishment_in_developing_countries__fao__food_security_indicators__2017:
-        title: Prevalence of undernourishment in developing countries - FAO (Food Security Indicators) (2017)
+        title: Prevalence of undernourishment in developing countries
         unit: '%'
         short_unit: '%'
-        display:
-          shortUnit: '%'
-          unit: '%'
-        description: Percentage of the population in developing countries defined as undernourished
-    dimensions:
-      - name: year
-        slug: year
-      - name: entity_name
-        slug: entity_name
-      - name: entity_id
-        slug: entity_id
-      - name: entity_code
-        slug: entity_code
+        description_short: Share of people in developing countries whose habitual food consumption is insufficient to provide the dietary energy required to maintain a normal, active and healthy life.
+        description_key:
+          - Undernourishment is solely determined by the sufficiency of energy (calorie) intake. It does not consider the quality or diversity of someone's diet.
+          - |-
+            The FAO maintained a constant definition of "developing countries" throughout the data series, with the following definition: "Includes all countries other than developed countries, namely: all countries in Africa except South Africa, all countries in Asia except Israel and Japan, all countries in Oceania except Australia and New Zealand, and all countries in North and Central America except Canada and USA, and all countries in South America."
+          - FAO has adapted its methodology for estimating undernourishment and no longer updates this long-term series from the 1970s.
+          - Figures for 1970 and 1980 are the average between two FAO estimates from annual "State of Food Insecurity in the World" reports in 2006 and 2010. Therefore, these estimates should be interpreted cautiously but have been included for a longer-term perspective on reduction trends.
+        description_processing: |-
+          The figures for 1970 and 1980 have been taken as the average between two FAO estimates from the annual "State of Food Insecurity in the World" reports of 2006 and 2010. All other years are from FAO's Food Security Indicators.

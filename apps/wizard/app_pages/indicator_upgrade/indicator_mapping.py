@@ -251,16 +251,14 @@ def st_show_indicator_upgrades(
     indicator_ups, pagination_key, indicator_id_to_display, df_data
 ) -> list["IndicatorUpgrade"]:
     """Display indicator upgrades."""
-    # Pagination
+    # Pagination (controls are hidden automatically if there is a single page)
     pagination = Pagination(
         indicator_ups,
         items_per_page=st.session_state["mappings-per-page"],
         pagination_key=pagination_key,
-        on_click=lambda: set_states({"submitted_indicators": False}),
+        on_change=lambda: set_states({"submitted_indicators": False}),
     )
-    ## Show controls only if needed
-    if len(indicator_ups) > st.session_state["mappings-per-page"]:
-        pagination.show_controls("bar")
+    pagination.show_controls()
 
     # Show indicator mapping
     indicator_upgrades_shown = pagination.get_page_items()
