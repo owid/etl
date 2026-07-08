@@ -20,10 +20,6 @@ MAX_DIMENSION_VALUES_LISTED = 40
 # Dimensions that every table has and that are already conveyed by temporalCoverage /
 # spatialCoverage — not worth a PropertyValue of their own.
 ENTITY_TIME_DIMENSIONS = {"country", "year", "date"}
-# An origin must back at least this share of a dataset's variables before its DOI is offered
-# as a related-article citation; below that it's an auxiliary source (population, GDP) whose
-# credit belongs in isBasedOn, not in citation.
-MIN_CITATION_VARIABLE_SHARE = 0.1
 KNOWN_LICENSE_URLS = {
     "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
     "CC-BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
@@ -109,11 +105,10 @@ def dataset_to_schema_org(
         "thumbnailUrl": DEFAULT_THUMBNAIL_URL,
     }
 
-    # sameAs points at reference pages that identify this same dataset elsewhere. Google
-    # Dataset Search folds records sharing a sameAs target into one entry, so datasets set
-    # it only when merging with a specific copy is deliberate (see DatasetMeta.same_as).
-    if dataset_meta.same_as:
-        result["sameAs"] = list(dataset_meta.same_as)
+    # NOTE: we deliberately emit no `sameAs`. It is Google Dataset Search's record-merging
+    # signal — any record sharing a target URL (e.g. a third-party mirror claiming our
+    # GitHub repo) would get folded into one entry with ours, instead of our record
+    # standing alone and competing on ranking.
 
     if resolved_version:
         result["version"] = str(resolved_version)
@@ -132,7 +127,9 @@ def dataset_to_schema_org(
         "url": "https://ourworldindata.org",
     }
 
-    citations = _citations(origins, tables)
+    credited_origins = _based_on_origins(origins)
+
+    citations = _citations(credited_origins)
     if citations:
         result["citation"] = citations[0] if len(citations) == 1 else citations
 
@@ -140,7 +137,7 @@ def dataset_to_schema_org(
     if date_published:
         result["datePublished"] = date_published
 
-    based_on = _is_based_on(origins)
+    based_on = _is_based_on(credited_origins)
     if based_on:
         result["isBasedOn"] = based_on
 
@@ -422,7 +419,7 @@ def _license_to_url(license: License | None) -> str | None:
 _DOI_RE = re.compile(r"(?:https?://(?:dx\.)?doi\.org/|\bdoi:\s*)(10\.\d{4,9}/[^\s\"'\)\]]+)", re.IGNORECASE)
 
 
-def _citations(origins: list[Origin], tables: list[TableSchemaInput]) -> list[str]:
+def _citations(credited_origins: list[Origin]) -> list[str]:
     """Short citation snippets with DOIs for the source papers, main sources first.
 
     Per Google's dataset guidance, ``citation`` identifies *related academic articles*
@@ -430,31 +427,15 @@ def _citations(origins: list[Origin], tables: list[TableSchemaInput]) -> list[st
     Each snippet pairs the origin's short attribution with the first DOI found in its
     full citation.
 
-    Only the dataset's main sources qualify: an origin must back at least
-    ``MIN_CITATION_VARIABLE_SHARE`` of the variables that carry origins. Without that
-    cut-off, an auxiliary source that happens to publish a data paper would headline as
-    the dataset's related article — in owid_energy, the Maddison GDP database (backing 2
-    of 130 variables) used to be the *only* citation, because none of the main energy
-    sources has a DOI. Auxiliary and DOI-less origins keep their provenance credit via
-    ``isBasedOn`` instead.
+    ``credited_origins`` is the same list ``isBasedOn`` renders (see
+    :func:`_based_on_origins`): we only cite the data papers of the sources we credit.
+    A marginal origin that falls below the isBasedOn cut must not have its DOI headlined
+    either — on owid_energy, the Maddison GDP database (backing 2 of 130 variables) used
+    to be the *only* citation, because none of the main energy sources has a DOI.
     """
-    counts: dict[Any, int] = {}
-    n_vars = 0
-    for table in tables:
-        for variable in table.variables.values():
-            if not variable.origins:
-                continue
-            n_vars += 1
-            for origin in variable.origins:
-                key = _origin_key(origin)
-                counts[key] = counts.get(key, 0) + 1
-    min_count = MIN_CITATION_VARIABLE_SHARE * n_vars
-
     citations: list[str] = []
-    for origin in origins:
+    for origin in credited_origins:
         if not origin.citation_full:
-            continue
-        if counts.get(_origin_key(origin), 0) < min_count:
             continue
         match = _DOI_RE.search(origin.citation_full)
         if not match:
@@ -464,7 +445,7 @@ def _citations(origins: list[Origin], tables: list[TableSchemaInput]) -> list[st
         snippet = f"{label.rstrip('.')}. {doi_url}" if label else doi_url
         if snippet not in citations:
             citations.append(snippet)
-    return citations[:5]
+    return citations
 
 
 def _producer_with_year(origin: Origin) -> str | None:
@@ -476,15 +457,28 @@ def _producer_with_year(origin: Origin) -> str | None:
     return origin.producer
 
 
-def _is_based_on(origins: list[Origin]) -> list[dict[str, Any]] | dict[str, Any] | None:
-    items = []
+def _based_on_origins(origins: list[Origin]) -> list[Origin]:
+    """The sources the dataset publicly credits: usage-ordered, URL-deduped, capped at 5.
+
+    This single cut-off decides both which sources appear in ``isBasedOn`` and whose data
+    papers may appear in ``citation`` — an origin too marginal to credit is too marginal
+    to cite.
+    """
+    out = []
     seen = set()
     for origin in origins:
         url = origin.url_main or origin.url_download
         if not url or not _looks_like_url(url) or url in seen:
             continue
         seen.add(url)
-        item: dict[str, Any] = {"@type": "CreativeWork", "url": url}
+        out.append(origin)
+    return out[:5]
+
+
+def _is_based_on(credited_origins: list[Origin]) -> list[dict[str, Any]] | dict[str, Any] | None:
+    items = []
+    for origin in credited_origins:
+        item: dict[str, Any] = {"@type": "CreativeWork", "url": origin.url_main or origin.url_download}
         if origin.title:
             item["name"] = origin.title
         items.append(item)
@@ -492,7 +486,7 @@ def _is_based_on(origins: list[Origin]) -> list[dict[str, Any]] | dict[str, Any]
         return None
     if len(items) == 1:
         return items[0]
-    return items[:5]
+    return items
 
 
 def _temporal_coverage(tables: list[TableSchemaInput]) -> str | None:

@@ -408,18 +408,6 @@
           "title": "Publish catalog landing page / JSON-LD",
           "description": "Opt this dataset into the public catalog landing page with Schema.org Dataset JSON-LD (`etl d publish --jsonld`). Canary rollout of the catalog-discovery project; the dataset must also pass the JSON-LD quality gates."
         },
-        "same_as": {
-          "type": "array",
-          "title": "Same-dataset reference URLs",
-          "description": "URLs of reference pages that unambiguously identify this same dataset elsewhere. Emitted as Schema.org `sameAs` in the catalog JSON-LD. Caution: `sameAs` is Google Dataset Search's record-merging signal — any record sharing a target URL (including a third-party mirror claiming our GitHub repo) gets folded into one entry with ours.",
-          "guidelines": [
-            "Leave unset by default so the catalog record stands alone in Google Dataset Search; set it only when merging with a specific copy of the dataset is deliberate.",
-            "Only list pages that are about this exact dataset — a mirror or codebook. Do not list topic pages, search results, or the upstream sources the dataset is derived from (those belong in origins)."
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
         "licenses": {
           "type": "array",
           "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset.",
