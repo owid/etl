@@ -35,6 +35,8 @@ tables:
       capture_fisheries:
         title: Number of people employed in capture fisheries
         description_short: Number of people employed catching wild aquatic animals, combining inland and marine fisheries.
+        description_processing: Capture fisheries is calculated as the sum of inland fisheries and marine fisheries.
+        processing_level: major
         display:
           name: Capture fisheries
         presentation:
