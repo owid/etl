@@ -154,6 +154,23 @@ def _commit_parent(sha: str, cache: dict[str, tuple[str, int]]) -> tuple[str, in
     return cache[sha]
 
 
+def _default_branch_sha() -> str | None:
+    """SHA of ``origin/master``, or None when the remote-tracking ref is unavailable."""
+    try:
+        return _run_git("rev-parse", "--verify", "origin/master").strip()
+    except subprocess.CalledProcessError:
+        return None
+
+
+def _is_ancestor(sha: str, of: str) -> bool:
+    result = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", sha, of],
+        cwd=paths.BASE_DIR,
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
 class _BlobReader:
     """Read git blobs by content hash via a persistent ``git cat-file --batch`` process.
 
@@ -318,6 +335,15 @@ def _build_last_seen(since: str | None, limit: int | None) -> dict[str, LastSeen
     reader = _BlobReader()
     parent_cache: dict[str, tuple[str, int]] = {}
     removed: dict[str, LastSeen] = {}
+    # Recovery points must survive a squash-merge: branch-local commits disappear from
+    # history once the PR is squashed, leaving `git checkout <sha>` with nothing to check
+    # out. When a removal's parent is not reachable from origin/master, fall back to the
+    # merge-base with origin/master — the last shared commit, which still contains the
+    # step. Steps that only ever existed on the branch have no recoverable state on the
+    # default branch and are skipped entirely.
+    master_sha = _default_branch_sha()
+    reachable: dict[str, bool] = {}
+    merge_base: tuple[str, int, dict[str, tuple[set[str], str]]] | None = None
     try:
         # Seed the previous state from the baseline (the ``since`` commit) so a removal
         # in the very first walked commit is detected. Without this, ``since..HEAD``
@@ -340,6 +366,26 @@ def _build_last_seen(since: str | None, limit: int | None) -> dict[str, LastSeen
                 # ``grapher://`` steps) must not enter the archive graph.
                 deps = {d for d in deps if d.startswith("walden") or _is_parseable_step(d)}
                 rec_sha, rec_ts = _commit_parent(sha, parent_cache)
+                if master_sha is not None:
+                    if rec_sha not in reachable:
+                        reachable[rec_sha] = _is_ancestor(rec_sha, master_sha)
+                    if not reachable[rec_sha]:
+                        if merge_base is None:
+                            mb_sha = _run_git("merge-base", "HEAD", master_sha).strip()
+                            mb_ts = int(_run_git("show", "-s", "--format=%ct", mb_sha).strip())
+                            mb_dag = _active_dag_at(mb_sha, _tree_blob_map(mb_sha), reader)
+                            merge_base = (mb_sha, mb_ts, mb_dag)
+                        mb_sha, mb_ts, mb_dag = merge_base
+                        if step not in mb_dag:
+                            # Branch-only transient step (created and removed within this
+                            # branch): it never shipped, so there is nothing to archive.
+                            log.info("archive_dag.skip_branch_only_step", step=step)
+                            continue
+                        # Record the merge-base state (deps as declared there) so the
+                        # marker points at a commit that survives the squash-merge.
+                        deps, dag_file = mb_dag[step]
+                        deps = {d for d in deps if d.startswith("walden") or _is_parseable_step(d)}
+                        rec_sha, rec_ts = mb_sha, mb_ts
                 removed[step] = LastSeen(sha=rec_sha, timestamp=rec_ts, deps=deps, dag_file=dag_file)
             for step in cur_keys:
                 removed.pop(step, None)  # re-added → no longer archived
