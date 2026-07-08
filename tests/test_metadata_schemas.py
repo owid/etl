@@ -246,19 +246,25 @@ def test_snapshot_schemas():
             raise ValidationError(f"Validation error in file: {meta_file_path}") from e
 
 
-# Matches a top-level (2-space indented) `license:` key — i.e. `meta.license`, the deprecated
-# SnapshotMeta-level field. The current convention is `meta.origin.license` (4-space).
-_TOP_LEVEL_LICENSE_RE = re.compile(r"^  license:", re.MULTILINE)
+# Top-level (2-space indented) license keys — the deprecated SnapshotMeta-level location. This
+# covers `meta.license` and the legacy `meta.license_name` / `meta.license_url`, which
+# `SnapshotMeta.load_from_yaml` also funnels into the top-level `SnapshotMeta.license`. The
+# current convention is `meta.origin.license` (4-space).
+_TOP_LEVEL_LICENSE_KEYS = ("license", "license_name", "license_url")
+_TOP_LEVEL_LICENSE_RE = re.compile(r"^  license(_name|_url)?:", re.MULTILINE)
 
 
 def test_snapshot_license_lives_under_origin():
     """Guardrail: an origin-based snapshot must declare its license under `meta.origin.license`,
-    never as a top-level `meta.license`.
+    never as a top-level `meta.license` (nor the legacy `meta.license_name` / `meta.license_url`).
 
-    Both spots parse without error (they differ only by indentation), but they behave
-    differently: the top-level field populates the dataset/variable license yet leaves
-    `origin.license` empty, so the license doesn't travel with the origin (it's dropped from
-    Grapher's per-origin metadata, which matters for multi-origin datasets). See CLAUDE.md.
+    All spots parse without error, but they behave differently: the top-level fields populate the
+    dataset/variable license yet leave `origin.license` empty, so the license doesn't travel with
+    the origin (it's dropped from Grapher's per-origin metadata, which matters for multi-origin
+    datasets). See CLAUDE.md.
+
+    We check key *presence* (not value) so an explicit `license: null` is caught too, keeping this
+    aligned with the `not` constraint in snapshot-schema.json.
 
     fasttrack and backport snapshots are auto-generated (like in the schema tests above) and
     excluded. Legacy `source:`-based snapshots (no `origin`) keep their own license location.
@@ -270,7 +276,7 @@ def test_snapshot_license_lives_under_origin():
             continue
 
         text = meta_file_path.read_text()
-        # Fast prefilter: skip files without a top-level license key.
+        # Fast prefilter: skip files without any top-level license key.
         if not _TOP_LEVEL_LICENSE_RE.search(text):
             continue
 
@@ -278,12 +284,12 @@ def test_snapshot_license_lives_under_origin():
         # Only origin-based snapshots are in scope; legacy source-based ones have no origin.
         if "origin" not in meta:
             continue
-        if meta.get("license") is not None:
+        if any(key in meta for key in _TOP_LEVEL_LICENSE_KEYS):
             violations.append(rel)
 
     assert not violations, (
-        "These snapshots set a top-level `meta.license` on an origin-based snapshot. Move the "
-        "license block under `meta.origin.license` (indent it +2), dropping the top-level one:\n  "
+        "These snapshots set a top-level license (`meta.license` / `meta.license_name` / "
+        "`meta.license_url`) on an origin-based snapshot. Move it under `meta.origin.license`:\n  "
         + "\n  ".join(sorted(violations))
     )
 
