@@ -654,15 +654,13 @@ def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, targe
         # Information
         # _show_summary_top(chart_diffs)
 
-        # Pagination
+        # Pagination (controls are hidden automatically if there is a single page)
         pagination = Pagination(
             chart_diffs,
             items_per_page=st.session_state["charts-per-page"],
             pagination_key=pagination_key,
         )
-        ## Show controls only if needed
-        if len(chart_diffs) > st.session_state["charts-per-page"]:
-            pagination.show_controls(mode="bar")
+        pagination.show_controls()
 
     # Show charts
     with Session(TARGET_ENGINE) as target_session:

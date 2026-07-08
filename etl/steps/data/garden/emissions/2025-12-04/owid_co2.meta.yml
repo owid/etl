@@ -3,8 +3,8 @@ dataset:
   jsonld: true
   title: OWID CO2 dataset
   description: |-
-    OWID CO2 dataset.
+    Our complete CO2 and Greenhouse Gas Emissions dataset is a collection of key metrics maintained by Our World in Data. It includes data on CO2 emissions (annual, per capita, cumulative, and consumption-based), other greenhouse gases, and energy mix.
 
-    This dataset will be loaded by [the co2-data repository](https://github.com/owid/co2-data), to create a csv file of the dataset that can be downloaded in one click.
+    It is compiled from a variety of secondary sources, including the Global Carbon Project's Global Carbon Budget, Jones et al.'s national contributions to climate change, and the Energy Institute's Statistical Review of World Energy, alongside auxiliary population, income group, and GDP data used to calculate per-capita and per-GDP indicators.
   owners:
     - Pablo Rosado

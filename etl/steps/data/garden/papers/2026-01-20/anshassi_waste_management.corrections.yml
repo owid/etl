@@ -1,0 +1,19 @@
+# Known upstream data errors in the Anshassi et al. waste management data, corrected locally until
+# fixed at the source. See etl/data_corrections.py for the format.
+- indicator: collected
+  match: {country: United Arab Emirates}
+  action: scale
+  factor: 100
+  expect: {lt: 5}
+  reason: UAE's collected/uncollected waste shares appear swapped by a factor of 100 - UAE is classified as a level-2 country so cannot plausibly have such a low share of collected waste.
+  provider: Anshassi et al. (2023)
+  status: open
+
+- indicator: uncollected
+  match: {country: United Arab Emirates}
+  action: scale
+  factor: 0.01
+  expect: {gt: 90}
+  reason: UAE's collected/uncollected waste shares appear swapped by a factor of 100 - UAE is classified as a level-2 country so cannot plausibly have such a high share of uncollected waste.
+  provider: Anshassi et al. (2023)
+  status: open
