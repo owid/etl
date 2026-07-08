@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -243,6 +244,48 @@ def test_snapshot_schemas():
             validator.validate(data)
         except ValidationError as e:
             raise ValidationError(f"Validation error in file: {meta_file_path}") from e
+
+
+# Matches a top-level (2-space indented) `license:` key — i.e. `meta.license`, the deprecated
+# SnapshotMeta-level field. The current convention is `meta.origin.license` (4-space).
+_TOP_LEVEL_LICENSE_RE = re.compile(r"^  license:", re.MULTILINE)
+
+
+def test_snapshot_license_lives_under_origin():
+    """Guardrail: an origin-based snapshot must declare its license under `meta.origin.license`,
+    never as a top-level `meta.license`.
+
+    Both spots parse without error (they differ only by indentation), but they behave
+    differently: the top-level field populates the dataset/variable license yet leaves
+    `origin.license` empty, so the license doesn't travel with the origin (it's dropped from
+    Grapher's per-origin metadata, which matters for multi-origin datasets). See CLAUDE.md.
+
+    fasttrack and backport snapshots are auto-generated (like in the schema tests above) and
+    excluded. Legacy `source:`-based snapshots (no `origin`) keep their own license location.
+    """
+    violations = []
+    for meta_file_path in Path(SNAPSHOTS_DIR).glob("**/*.dvc"):
+        rel = str(meta_file_path.relative_to(SNAPSHOTS_DIR))
+        if "fasttrack/" in rel or "backport/" in rel:
+            continue
+
+        text = meta_file_path.read_text()
+        # Fast prefilter: skip files without a top-level license key.
+        if not _TOP_LEVEL_LICENSE_RE.search(text):
+            continue
+
+        meta = (yaml.safe_load(text) or {}).get("meta") or {}
+        # Only origin-based snapshots are in scope; legacy source-based ones have no origin.
+        if "origin" not in meta:
+            continue
+        if meta.get("license") is not None:
+            violations.append(rel)
+
+    assert not violations, (
+        "These snapshots set a top-level `meta.license` on an origin-based snapshot. Move the "
+        "license block under `meta.origin.license` (indent it +2), dropping the top-level one:\n  "
+        + "\n  ".join(sorted(violations))
+    )
 
 
 # Properties that only exist in the local dataset schema (not in upstream grapher schema).

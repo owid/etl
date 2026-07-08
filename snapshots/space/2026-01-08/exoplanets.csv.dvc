@@ -20,9 +20,9 @@ meta:
     date_accessed: '2026-01-08'
     # Assume publication date is same as access date, since it's regularly updated.
     date_published: '2026-01-08'
-  license:
-    name: Public domain
-    url: https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html
+    license:
+      name: Public domain
+      url: https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html
 outs:
   - md5: b15cbad84a8212fb9bd379f0c1784122
     size: 190547

@@ -19,8 +19,6 @@ meta:
     date_published: '2015-01-01'
     license:
       name: CC BY 4.0
-  license:
-    name: CC BY 4.0
 outs:
   - md5: 6efd02f741de246be79c38567d0db20a
     size: 1455549

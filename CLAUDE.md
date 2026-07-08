@@ -230,6 +230,7 @@ with open(file_path, 'w') as f:
 ### Writing origin / metadata fields
 
 - **Consult the reference** — before writing `.dvc` `origin` or `.meta.yml` fields, look the field up in `schemas/definitions.json` (rendered at the [metadata reference](https://docs.owid.io/projects/etl/architecture/metadata/reference/)) and follow its `guidelines`. They're detailed and per-field: requirement level, good/bad examples, and when to omit optional fields (`title_snapshot`, `description_snapshot`, `attribution` all default to null / auto-generated). Each field has one job — don't fold content that belongs in one field into another.
+- **License goes under `origin`, not at the top level.** In a snapshot `.dvc`, the license is `meta.origin.license` (4-space, inside `origin`) — never the top-level `meta.license` (2-space). Both parse (they differ only by indentation), but the top-level form is a deprecated `SnapshotMeta` field that doesn't travel with the origin, so the license is dropped from Grapher's per-origin metadata (which matters for multi-origin datasets). The wizard cookiecutter already does this correctly; a schema `not`-constraint + `test_snapshot_license_lives_under_origin` enforce it. Each origin in a multi-origin `.dvc` needs its own `license`. Keep the `license.url` pointing at the producer's own license page, never a `creativecommons.org` deed.
 - **American spelling always**.
 
 ### Description fields: `.dvc` vs garden `description_processing`
