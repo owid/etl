@@ -521,16 +521,23 @@ def _spatial_coverage(tables: list[TableSchemaInput]) -> str | None:
 
 
 def _keywords(tables: list[TableSchemaInput]) -> list[str]:
-    keywords = []
+    """Topic tags ordered by how many variables carry each one, most-tagged first.
+
+    Column order would put whichever tag the first column happens to carry in front (e.g.
+    "Economic Growth" leading owid_co2 because the helper gdp column comes early), whereas
+    consumers — like the landing page's "explore the charts" link — treat the first keyword
+    as the dataset's primary topic.
+    """
+    counts: dict[str, int] = {}
     for table in tables:
         for variable in table.variables.values():
             presentation = variable.presentation
             if not presentation:
                 continue
             for tag in presentation.topic_tags:
-                if tag not in keywords:
-                    keywords.append(tag)
-    return keywords
+                counts[tag] = counts.get(tag, 0) + 1
+    # Python's sort is stable, so equal-count tags keep their first-seen order.
+    return sorted(counts, key=lambda tag: -counts[tag])
 
 
 def _variable_title(name: str, meta: VariableMeta) -> str:

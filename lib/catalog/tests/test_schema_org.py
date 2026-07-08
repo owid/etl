@@ -600,3 +600,27 @@ def test_dataset_level_license_wins_over_origin_license() -> None:
         **kwargs,
     )
     assert jsonld["license"] == "https://www.icos-cp.eu/data-services/about-data-portal/data-license"
+
+
+def test_keywords_ordered_by_variable_count_not_column_order() -> None:
+    """keywords[0] is treated as the dataset's primary topic (e.g. by the landing page's
+    charts link), so the most-tagged topic must lead even when a helper column comes first."""
+    gdp_tag = VariablePresentationMeta(topic_tags=["Economic Growth"])
+    co2_tag = VariablePresentationMeta(topic_tags=["CO2 & Greenhouse Gas Emissions"])
+    origin = Origin(producer="Example Producer", title="Origin title")
+    variables = {"gdp": VariableMeta(title="gdp", origins=[origin], presentation=gdp_tag)}
+    for name in ("co2", "co2_per_capita", "cumulative_co2"):
+        variables[name] = VariableMeta(title=name, origins=[origin], presentation=co2_tag)
+    table = TableSchemaInput(
+        short_name="owid_co2",
+        metadata=TableMeta(short_name="owid_co2", title="CO2"),
+        variables=variables,
+        formats=["feather"],
+    )
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/emissions/2025-12-04/owid_co2",
+        page_path="emissions/owid_co2",
+        dataset_meta=DatasetMeta(short_name="owid_co2", title="CO2 dataset", description="Dataset description"),
+        tables=[table],
+    )
+    assert jsonld["keywords"] == ["CO2 & Greenhouse Gas Emissions", "Economic Growth"]
