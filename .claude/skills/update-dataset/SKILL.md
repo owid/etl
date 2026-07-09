@@ -761,7 +761,7 @@ A foundational-dataset update can leave a downstream step **building cleanly whi
 
 `--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. This catches consumers that crash against the new dependency — a failure mode staging hides (the failed step just stays stale in the catalog; data-diff shows it as unchanged and the traceback is buried in the Buildkite log). Use `--workers N` to parallelize a big fan-out.
 
-**2. How much did their outputs change?** The data-diff **triage report** answers this directly — it ranks everything by anomaly score (BARD, the metric Anomalist uses) and makes data loss unmissable, so you read its verdicts instead of scanning the diff yourself:
+**2. How much did their outputs change?** The data-diff **report** answers this directly — it ranks everything by anomaly score (BARD, the metric Anomalist uses) and makes data loss unmissable, so you read its verdicts instead of scanning the diff yourself:
 
 - **On the PR (zero effort):** open owidbot's **data-diff** HTML report (`https://catalog.ourworldindata.org/diffs/<branch>/data-diff.html`) — it compares the staging build (new dependency) against production (old dependency). For a dependency bump the consumers' code is unchanged, so this is a clean old-dep-vs-new-dep comparison.
 - **Locally, after step 1:** `etl diff REMOTE data/ --changed --include garden --output-html data-diff.html`.
@@ -773,6 +773,8 @@ How to read it, in order:
 3. **Filters**: the tier dropdowns isolate 🔴 datasets/indicators; **📝 metadata-only** separates pure metadata edits from value changes.
 
 **Don't diff against stale local builds** — a consumer built at an unknown earlier time (or downloaded from the catalog) conflates code drift with the dependency change and produces false positives; `REMOTE`/production is the trustworthy baseline because CI built it from master.
+
+**Complementary, not a replacement:** data-diff sees every dataset (including ones with no charts), while **[Chart Diff](#final-qa-hand-off--anomalist--chart-diff-in-wizard)** shows how the same changes land on actual published charts and **Anomalist** flags per-country anomalies in the new data — the final QA hand-off (last checklist step) still covers both. Use data-diff to find *which* datasets/indicators to worry about, then Chart Diff to judge what readers would actually see.
 
 - **When you deferred consumers to a follow-up PR:** the checks above belong to that follow-up PR; here just confirm the "Downstream dependencies" list is complete (`etlr --modified --dry-run` shows the affected set).
 
