@@ -233,3 +233,13 @@ steps:
   # archived; last active in ce065ea0a128 on 2023-10-24
   data://garden/animal_welfare/2023-09-08/fur_laws:
     - data://meadow/animal_welfare/2023-09-08/fur_laws
+  # archived; last active in fbf0285a2336 on 2026-07-01
+  data://meadow/animal_welfare/2024-12-17/fur_laws:
+    - snapshot://animal_welfare/2024-12-17/fur_laws.csv
+  # archived; last active in fbf0285a2336 on 2026-07-01
+  data://garden/animal_welfare/2024-12-17/fur_laws:
+    - data://meadow/animal_welfare/2024-12-17/fur_laws
+    - data://garden/regions/2023-01-01/regions
+  # archived; last active in fbf0285a2336 on 2026-07-01
+  data://grapher/animal_welfare/2024-12-17/fur_laws:
+    - data://garden/animal_welfare/2024-12-17/fur_laws

@@ -105,6 +105,15 @@ def dataset_to_schema_org(
         "thumbnailUrl": DEFAULT_THUMBNAIL_URL,
     }
 
+    # NOTE: we deliberately emit no `sameAs`. It is Google Dataset Search's record-merging
+    # signal — any record sharing a target URL (e.g. a third-party mirror claiming our
+    # GitHub repo) would get folded into one entry with ours, instead of our record
+    # standing alone and competing on ranking.
+    # NOTE: we also emit no `citation` (related academic articles): a DOI-mined citation
+    # list kept misrepresenting auxiliary sources as the dataset's primary reference
+    # (e.g. the Maddison GDP paper as owid_energy's only citation). Source credit is
+    # fully covered by `isBasedOn`.
+
     if resolved_version:
         result["version"] = str(resolved_version)
         date_modified = _first_valid_date([resolved_version])
@@ -121,10 +130,6 @@ def dataset_to_schema_org(
         "name": "Our World in Data",
         "url": "https://ourworldindata.org",
     }
-
-    citations = _citations(origins)
-    if citations:
-        result["citation"] = citations[0] if len(citations) == 1 else citations
 
     date_published = _first_valid_date(origin.date_published for origin in origins)
     if date_published:
@@ -365,12 +370,17 @@ def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:
 
 
 def _license_url(dataset_meta: DatasetMeta, origins: list[Origin], tables: list[TableSchemaInput]) -> str | None:
-    for origin in origins:
-        url = _license_to_url(origin.license)
-        if url:
-            return url
+    # The record describes the OWID-compiled dataset, so a dataset-level license declared in
+    # its .meta.yml (e.g. CC BY for owid_co2, matching its GitHub repo) speaks for the whole
+    # artifact and wins. Origin licenses are a per-source fallback: the "first" one is just
+    # the most-referenced source's license, which can misrepresent the compilation (owid_co2
+    # used to advertise GCB's ICOS data license).
     for license in dataset_meta.licenses:
         url = _license_to_url(license)
+        if url:
+            return url
+    for origin in origins:
+        url = _license_to_url(origin.license)
         if url:
             return url
     for table in tables:
@@ -398,42 +408,6 @@ def license_to_url(license: License | None) -> str | None:
 
 def _license_to_url(license: License | None) -> str | None:
     return license_to_url(license)
-
-
-_DOI_RE = re.compile(r"(?:https?://(?:dx\.)?doi\.org/|\bdoi:\s*)(10\.\d{4,9}/[^\s\"'\)\]]+)", re.IGNORECASE)
-
-
-def _citations(origins: list[Origin]) -> list[str]:
-    """Short citation snippets with DOIs for the source papers, main source first.
-
-    Per Google's dataset guidance, ``citation`` identifies *related academic articles*
-    (data papers, data descriptors) — not the dataset itself — and should carry a DOI.
-    Each snippet pairs the origin's short attribution with the first DOI found in its
-    full citation. Origins without a DOI (helper sources like population, web-only data)
-    are covered by ``isBasedOn`` instead.
-    """
-    citations: list[str] = []
-    for origin in origins:
-        if not origin.citation_full:
-            continue
-        match = _DOI_RE.search(origin.citation_full)
-        if not match:
-            continue
-        doi_url = f"https://doi.org/{match.group(1).rstrip('.,;')}"
-        label = origin.attribution or _producer_with_year(origin)
-        snippet = f"{label.rstrip('.')}. {doi_url}" if label else doi_url
-        if snippet not in citations:
-            citations.append(snippet)
-    return citations[:5]
-
-
-def _producer_with_year(origin: Origin) -> str | None:
-    if not origin.producer:
-        return None
-    year = str(origin.date_published or "")[:4]
-    if year.isdigit():
-        return f"{origin.producer} ({year})"
-    return origin.producer
 
 
 def _is_based_on(origins: list[Origin]) -> list[dict[str, Any]] | dict[str, Any] | None:
@@ -481,16 +455,23 @@ def _spatial_coverage(tables: list[TableSchemaInput]) -> str | None:
 
 
 def _keywords(tables: list[TableSchemaInput]) -> list[str]:
-    keywords = []
+    """Topic tags ordered by how many variables carry each one, most-tagged first.
+
+    Column order would put whichever tag the first column happens to carry in front (e.g.
+    "Economic Growth" leading owid_co2 because the helper gdp column comes early), whereas
+    consumers — like the landing page's "explore the charts" link — treat the first keyword
+    as the dataset's primary topic.
+    """
+    counts: dict[str, int] = {}
     for table in tables:
         for variable in table.variables.values():
             presentation = variable.presentation
             if not presentation:
                 continue
             for tag in presentation.topic_tags:
-                if tag not in keywords:
-                    keywords.append(tag)
-    return keywords
+                counts[tag] = counts.get(tag, 0) + 1
+    # Python's sort is stable, so equal-count tags keep their first-seen order.
+    return sorted(counts, key=lambda tag: -counts[tag])
 
 
 def _variable_title(name: str, meta: VariableMeta) -> str:
