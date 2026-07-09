@@ -130,6 +130,11 @@ class ColumnDiffResult:
             return max(v.severity for v in self.value_diffs)
         return 0.0
 
+    @property
+    def is_metadata_only(self) -> bool:
+        """A changed column whose diff carries no value changes at all — only metadata edits."""
+        return self.kind == "changed" and not self.value_diffs
+
 
 @dataclass
 class TableDiffResult:
@@ -254,6 +259,15 @@ class DatasetDiffResult:
         if self.change_kind == "new":
             return "small"
         return _tier(self.severity)
+
+    @property
+    def is_metadata_only(self) -> bool:
+        """A changed dataset whose diff carries no value changes anywhere — only metadata edits.
+
+        Stricter than `tier == "none"`: a dataset whose only change is *added* values also scores
+        0 (additions aren't anomalies) but is not metadata-only.
+        """
+        return self.change_kind == "changed" and not any(c.value_diffs for t in self.tables for c in t.columns)
 
 
 @dataclass
@@ -516,7 +530,8 @@ def _render_column(table_name: str, c: ColumnDiffResult, ds_path: str = "") -> s
     tier = _tier_chip(c.severity, c.kind) if not c.is_dim else ""
     anchor = f' id="{_anchor(ds_path, table_name, c.name)}"' if ds_path else ""
     # Dims are navigation context, not indicators — the indicator tier filter skips them.
-    tier_attr = f' data-tier="{_tier(c.severity)}"' if not c.is_dim else ""
+    # Metadata-only columns get their own filterable category ("meta") instead of a tier.
+    tier_attr = "" if c.is_dim else f' data-tier="{"meta" if c.is_metadata_only else _tier(c.severity)}"'
     parts = [
         f'<div class="col {c.kind}"{anchor}{tier_attr}>'
         f'<div class="col-head"><span class="sym {c.kind}">{_SYMBOLS[c.kind]}</span> '
@@ -575,7 +590,7 @@ def _render_dataset(ds: DatasetDiffResult) -> str:
         [ds.path] + [t.name for t in ds.tables] + [c.name for t in ds.tables for c in t.changed_columns]
     ).lower()
     parts = [
-        f'<details class="ds {kind}" id="{_ds_anchor(ds.path)}" data-tier="{ds.tier}" data-search="{_e(search)}"{open_attr}>'
+        f'<details class="ds {kind}" id="{_ds_anchor(ds.path)}" data-tier="{"meta" if ds.is_metadata_only else ds.tier}" data-search="{_e(search)}"{open_attr}>'
         f'<summary><span class="sym {kind}">{_SYMBOLS[kind]}</span> '
         f'<code class="path">{_e(ds.path)}</code>{new_version}{tier}{_coverage_chip(ds)}'
         f'<span class="ds-note">{_e(_dataset_summary_note(ds))}</span></summary>'
@@ -625,27 +640,37 @@ def render_html(report: DiffReport) -> str:
     # The tier dropdown offers only tiers that exist in the report (with their counts), and is
     # dropped entirely when there are fewer than two to tell apart — a filter with one choice
     # is dead weight.
+    n_meta_only_datasets = sum(1 for ds in report.datasets if ds.is_metadata_only)
     available_tiers = [t for t in ("large", "moderate", "small") if tier_counts[t]]
-    if len(available_tiers) >= 2:
+    if len(available_tiers) + (1 if n_meta_only_datasets else 0) >= 2:
         opts = "".join(f'<option value="{t}">{TIER_ICONS[t]} {t} ({tier_counts[t]})</option>' for t in available_tiers)
+        if n_meta_only_datasets:
+            opts += f'<option value="meta">📝 metadata-only ({n_meta_only_datasets})</option>'
         tier_select = f'<select id="tier-filter"><option value="all">all dataset tiers</option>{opts}</select>'
     else:
         tier_select = ""
 
     # Same for indicators: a dropdown filtering the column blocks by their tier (dims excluded).
     col_tier_counts = {"large": 0, "moderate": 0, "small": 0}
+    n_meta_only_cols = 0
     for ds in report.datasets:
         if ds.change_kind != "changed":
             continue
         for t in ds.tables:
             for c in t.columns:
-                if not c.is_dim and c.kind != "identical" and _tier(c.severity) != "none":
+                if c.is_dim or c.kind == "identical":
+                    continue
+                if c.is_metadata_only:
+                    n_meta_only_cols += 1
+                elif _tier(c.severity) != "none":
                     col_tier_counts[_tier(c.severity)] += 1
     available_col_tiers = [t for t in ("large", "moderate", "small") if col_tier_counts[t]]
-    if len(available_col_tiers) >= 2:
+    if len(available_col_tiers) + (1 if n_meta_only_cols else 0) >= 2:
         opts = "".join(
             f'<option value="{t}">{TIER_ICONS[t]} {t} ({col_tier_counts[t]})</option>' for t in available_col_tiers
         )
+        if n_meta_only_cols:
+            opts += f'<option value="meta">📝 metadata-only ({n_meta_only_cols})</option>'
         ind_tier_select = (
             f'<select id="ind-tier-filter"><option value="all">all indicator tiers</option>{opts}</select>'
         )
@@ -659,10 +684,16 @@ def render_html(report: DiffReport) -> str:
         strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
         # Datasets whose only differences are metadata edits carry no anomaly tier — list them
         # separately so the strip total still matches the headline's differing-dataset count.
-        n_meta_only = sum(1 for ds in report.datasets if ds.change_kind == "changed" and ds.tier == "none")
+        # (A changed dataset can also score 0 from purely *added* values; that gets its own bucket.)
+        n_meta_only = sum(1 for ds in report.datasets if ds.is_metadata_only)
         if n_meta_only:
             strip_bits.append(f"📝 {n_meta_only} metadata-only")
-        n_diff = sum(tier_counts.values()) + n_meta_only
+        n_new_only = sum(
+            1 for ds in report.datasets if ds.change_kind == "changed" and ds.tier == "none" and not ds.is_metadata_only
+        )
+        if n_new_only:
+            strip_bits.append(f"➕ {n_new_only} new-data-only")
+        n_diff = sum(tier_counts.values()) + n_meta_only + n_new_only
         if strip_bits and n_diff:
             tier_strip = (
                 f'<div class="tier-strip">Of the {n_diff:,} dataset{"s" if n_diff != 1 else ""} with '
@@ -680,8 +711,10 @@ def render_html(report: DiffReport) -> str:
                 meta_html = '<span class="top-meta loss">failed to compare</span>'
             elif d.change_kind == "removed":
                 meta_html = '<span class="top-meta loss">removed dataset</span>'
-            elif d.severity <= 0:
+            elif d.is_metadata_only:
                 meta_html = '<span class="top-meta">metadata-only changes</span>'
+            elif d.severity <= 0:
+                meta_html = '<span class="top-meta">new data only</span>'
             else:
                 n_cols = sum(len(t.changed_columns) for t in d.tables)
                 n_tables = sum(1 for t in d.tables if t.any_change)
@@ -689,7 +722,7 @@ def render_html(report: DiffReport) -> str:
                 if d.removed_row_count:
                     meta_html += f'<span class="top-meta loss">− lost {d.removed_row_count:,} data point(s)</span>'
                 meta_html += f'<span class="top-meta">{n_cols} column(s) in {n_tables} table(s)</span>'
-            icon = TIER_ICONS.get(d.tier) or ("📝" if d.severity <= 0 else "")
+            icon = TIER_ICONS.get(d.tier) or ("📝" if d.is_metadata_only else "")
             ds_items.append(
                 f'<li><span class="ti">{icon}</span> '
                 f'<a href="#{_ds_anchor(d.path)}"><code>{_e(d.path)}</code></a>{meta_html}</li>'

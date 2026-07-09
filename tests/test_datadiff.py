@@ -474,5 +474,7 @@ def test_metadata_only_changes_are_not_tiered():
     assert "📝 1 metadata-only" in html
     # The watch list labels it honestly instead of a 0% anomaly score.
     assert "metadata-only changes" in html
-    # And its dataset row carries no score chip.
-    assert 'data-tier="none" data-search="garden/n/v/meta t a"' in html
+    # Its dataset row carries no score chip and a filterable "meta" category, which both
+    # dropdowns offer as an option.
+    assert 'data-tier="meta" data-search="garden/n/v/meta t a"' in html
+    assert html.count('<option value="meta">📝 metadata-only (1)</option>') == 2
