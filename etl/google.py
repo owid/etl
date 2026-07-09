@@ -270,7 +270,11 @@ class GoogleDrive:
         folder = (
             self.drive_service.files()
             .create(
-                body={"name": folder_name, "mimeType": "application/vnd.google-apps.folder", "parents": [parent_folder_id]},
+                body={
+                    "name": folder_name,
+                    "mimeType": "application/vnd.google-apps.folder",
+                    "parents": [parent_folder_id],
+                },
                 fields="id",
             )
             .execute()
