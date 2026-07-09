@@ -15,7 +15,7 @@ Tooling built around the ETL pipeline. Most are exposed as subcommands of the un
 | [`chart_approval`](chart_approval/) | Auto-approve chart diffs where staging matches production | `etl approve` |
 | [`chart_animation`](chart_animation/) | Generate GIFs/videos from a Grapher chart URL | `etl chart-animation` |
 | [`anomalist`](anomalist/) | Detect anomalies in indicator time series | `etl anomalist` |
-| [`inspector`](inspector/) | Audit OWID metadata quality | `etl inspector` |
+| [`inspector`](inspector/) | Flag typos and semantic issues in public-facing content (gather/lint/store; LLM pass runs via the `inspector` skill) | `etl inspector` |
 | [`indicator_upgrade`](indicator_upgrade/) | Match and remap indicators between old/new dataset versions | `etl indicator-upgrade` |
 | [`autoupdate`](autoupdate/) | Refresh autoupdate-enabled snapshots and open PRs on changes | `etl autoupdate` |
 | [`owidbot`](owidbot/) | GitHub bot that posts ETL/chart/data diffs on PRs | `etl owidbot` |
