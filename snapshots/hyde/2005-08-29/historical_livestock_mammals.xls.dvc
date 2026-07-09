@@ -15,6 +15,7 @@ meta:
       Klein Goldewijk, K. (2005). Historical livestock counts. History Database of the Global Environment (HYDE), PBL Netherlands Environmental Assessment Agency.
 
       Pre-1961 figures are derived from B.R. Mitchell's International Historical Statistics: The Americas 1750-1988 (1993), and Europe 1750-1993 and Africa, Asia & Oceania 1750-1993 (1998). Figures from 1961 onwards are from the Food and Agriculture Organization of the United Nations (FAOSTAT).
+    attribution: HYDE (2005)
     attribution_short: HYDE
 
     # Files
