@@ -596,8 +596,13 @@ def render_html(report: DiffReport) -> str:
     top_block = ""
     if report.n_changed >= TRIAGE_MIN_DATASETS:
         strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
-        if strip_bits:
-            tier_strip = f'<div class="tier-strip">{" · ".join(strip_bits)} <span class="tier-hint">(by median anomaly score; coverage loss ⇒ 🔴)</span></div>'
+        n_tiered = sum(tier_counts.values())
+        if strip_bits and n_tiered:
+            tier_strip = (
+                f'<div class="tier-strip">Of the {n_tiered:,} dataset{"s" if n_tiered != 1 else ""} with '
+                f"differences, the changes are: {' · '.join(strip_bits)} "
+                f'<span class="tier-hint">(tiered by median anomaly score; coverage loss ⇒ 🔴)</span></div>'
+            )
 
         # Datasets to watch: tier first, and within a tier data loss (or a failed/removed
         # dataset) outranks a bigger-but-benign change; then change size.
