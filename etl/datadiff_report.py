@@ -494,8 +494,10 @@ def _render_column(table_name: str, c: ColumnDiffResult, ds_path: str = "") -> s
     dim = '<span class="chip dim">dim</span>' if c.is_dim else ""
     tier = _tier_chip(c.severity, c.kind) if not c.is_dim else ""
     anchor = f' id="{_anchor(ds_path, table_name, c.name)}"' if ds_path else ""
+    # Dims are navigation context, not indicators — the indicator tier filter skips them.
+    tier_attr = f' data-tier="{_tier(c.severity)}"' if not c.is_dim else ""
     parts = [
-        f'<div class="col {c.kind}"{anchor}>'
+        f'<div class="col {c.kind}"{anchor}{tier_attr}>'
         f'<div class="col-head"><span class="sym {c.kind}">{_SYMBOLS[c.kind]}</span> '
         f"<code>{_e(table_name)}.{_e(c.name)}</code> {dim}{tier}{chips}</div>"
     ]
@@ -605,9 +607,29 @@ def render_html(report: DiffReport) -> str:
     available_tiers = [t for t in ("large", "moderate", "small") if tier_counts[t]]
     if len(available_tiers) >= 2:
         opts = "".join(f'<option value="{t}">{TIER_ICONS[t]} {t} ({tier_counts[t]})</option>' for t in available_tiers)
-        tier_select = f'<select id="tier-filter"><option value="all">all tiers</option>{opts}</select>'
+        tier_select = f'<select id="tier-filter"><option value="all">all dataset tiers</option>{opts}</select>'
     else:
         tier_select = ""
+
+    # Same for indicators: a dropdown filtering the column blocks by their tier (dims excluded).
+    col_tier_counts = {"large": 0, "moderate": 0, "small": 0}
+    for ds in report.datasets:
+        if ds.change_kind != "changed":
+            continue
+        for t in ds.tables:
+            for c in t.columns:
+                if not c.is_dim and c.kind != "identical" and _tier(c.severity) != "none":
+                    col_tier_counts[_tier(c.severity)] += 1
+    available_col_tiers = [t for t in ("large", "moderate", "small") if col_tier_counts[t]]
+    if len(available_col_tiers) >= 2:
+        opts = "".join(
+            f'<option value="{t}">{TIER_ICONS[t]} {t} ({col_tier_counts[t]})</option>' for t in available_col_tiers
+        )
+        ind_tier_select = (
+            f'<select id="ind-tier-filter"><option value="all">all indicator tiers</option>{opts}</select>'
+        )
+    else:
+        ind_tier_select = ""
 
     # Triage aids — only when the report is big enough to need them.
     tier_strip = ""
@@ -729,6 +751,7 @@ def render_html(report: DiffReport) -> str:
   body.show-identical details.ds.identical {{ display: block; }}
   details.ds.identical.match-visible {{ display: block; }}
   details.ds.hidden {{ display: none !important; }}
+  div.col.hidden {{ display: none; }}
   select {{ padding: .45rem .5rem; border: 1px solid #ccc; border-radius: 6px; font-size: .85rem; background: #fff; }}
   .match-count {{ color: #999; font-size: .8rem; margin-left: auto; }}
   .ds-body {{ padding: .25rem 1rem 1rem; border-top: 1px solid #f0f0f0; }}
@@ -801,6 +824,7 @@ def render_html(report: DiffReport) -> str:
   <div class="controls">
     <input type="search" id="filter" placeholder="Filter datasets (path, table, column…)">
     {tier_select}
+    {ind_tier_select}
     {identical_toggle}
     <span class="match-count" id="match-count"></span>
   </div>
@@ -810,6 +834,8 @@ def render_html(report: DiffReport) -> str:
   const dsBlocks = Array.from(document.querySelectorAll('details.ds'));
   const filterInput = document.getElementById('filter');
   const tierSelect = document.getElementById('tier-filter');
+  const indTierSelect = document.getElementById('ind-tier-filter');
+  const colBlocks = Array.from(document.querySelectorAll('div.col[data-tier]'));
   const showIdentical = document.getElementById('show-identical');
   const matchCount = document.getElementById('match-count');
 
@@ -840,6 +866,12 @@ def render_html(report: DiffReport) -> str:
   }}
   filterInput.addEventListener('input', applyFilters);
   if (tierSelect) tierSelect.addEventListener('change', applyFilters);
+  if (indTierSelect) {{
+    indTierSelect.addEventListener('change', () => {{
+      const t = indTierSelect.value;
+      colBlocks.forEach(c => c.classList.toggle('hidden', t !== 'all' && c.dataset.tier !== t));
+    }});
+  }}
   document.querySelectorAll('.show-more').forEach(btn => {{
     btn.addEventListener('click', () => {{
       const ol = btn.previousElementSibling;

@@ -264,8 +264,17 @@ def test_filter_attributes():
     html_mixed = render_html(mixed)
     assert "show 1 identical dataset<" in html_mixed
     assert 'id="tier-filter"' in html_mixed
+    assert "all dataset tiers" in html_mixed
     assert "🔴 large (1)" in html_mixed and "🟡 moderate (1)" in html_mixed
     assert "🟢 small" not in html_mixed.split('id="tier-filter"')[1].split("</select>")[0]
+
+    # The indicator tier dropdown follows the same rules, counting non-dim changed columns;
+    # column blocks carry data-tier for it to filter on.
+    assert 'id="ind-tier-filter"' in html_mixed
+    assert "all indicator tiers" in html_mixed
+    assert '<div class="col changed" id="c-garden-n-v-a-t-a" data-tier="large">' in html_mixed
+    # Single-tier report -> no indicator dropdown either.
+    assert 'id="ind-tier-filter"' not in html
 
 
 def test_top_changes_show_more():
