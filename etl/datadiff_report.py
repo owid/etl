@@ -689,8 +689,9 @@ def render_html(report: DiffReport) -> str:
                 if d.removed_row_count:
                     meta_html += f'<span class="top-meta loss">− lost {d.removed_row_count:,} data point(s)</span>'
                 meta_html += f'<span class="top-meta">{n_cols} column(s) in {n_tables} table(s)</span>'
+            icon = TIER_ICONS.get(d.tier) or ("📝" if d.severity <= 0 else "")
             ds_items.append(
-                f'<li><span class="ti">{TIER_ICONS.get(d.tier, "")}</span> '
+                f'<li><span class="ti">{icon}</span> '
                 f'<a href="#{_ds_anchor(d.path)}"><code>{_e(d.path)}</code></a>{meta_html}</li>'
             )
 
