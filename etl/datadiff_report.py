@@ -477,7 +477,20 @@ def _render_meta_diff(meta_diff: str, label: str) -> str:
 
 def _render_value_diff(v: ValueDiff) -> str:
     label = {"new": "New values", "removed": "Removed values", "changed": "Changed values"}[v.kind]
-    head = f'<div class="vd-head {v.kind}">{_e(v.symbol)} {label}: {v.count:,} / {v.total:,} ({v.pct:.2f}%)</div>'
+    # Say up front that the table is a sample — a note below a 100-row scrollable table is only
+    # discovered after scrolling past rows the reader didn't know were truncated.
+    head_note = ""
+    if v.count > len(v.sample):
+        what = (
+            f"the {len(v.sample):,} most anomalous rows"
+            if v.sorted_by_score
+            else f"a random sample of {len(v.sample):,} rows"
+        )
+        head_note = f' <span class="head-note">— showing {what}</span>'
+    head = (
+        f'<div class="vd-head {v.kind}">{_e(v.symbol)} {label}: '
+        f"{v.count:,} / {v.total:,} ({v.pct:.2f}%){head_note}</div>"
+    )
     if not v.sample:
         return f'<div class="vd">{head}</div>'
 
@@ -492,14 +505,9 @@ def _render_value_diff(v: ValueDiff) -> str:
             for c in cols
         )
         trs.append(f"<tr>{tds}</tr>")
-    if v.count > len(v.sample):
-        what = "most anomalous" if v.sorted_by_score else "rows"
-        note = f'<div class="note">showing the {len(v.sample):,} {what} of {v.count:,} rows</div>'
-    else:
-        note = ""
     return (
         f'<div class="vd">{head}<div class="table-wrap"><table><thead><tr>{ths}</tr></thead>'
-        f"<tbody>{''.join(trs)}</tbody></table></div>{note}</div>"
+        f"<tbody>{''.join(trs)}</tbody></table></div></div>"
     )
 
 
@@ -808,6 +816,7 @@ def render_html(report: DiffReport) -> str:
   .vd-head.new {{ color: #2e7d32; }}
   .vd-head.removed {{ color: #c62828; }}
   .vd-head.changed {{ color: #8a6d00; }}
+  .vd-head .head-note {{ color: #888; font-weight: 400; font-size: .75rem; }}
   .table-wrap {{ overflow-x: auto; max-height: 420px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; display: inline-block; max-width: 100%; }}
   .vd table {{ border-collapse: collapse; font-size: .78rem; }}
   .vd th, .vd td {{ padding: .3rem .6rem; border-bottom: 1px solid #f0f0f0; text-align: left; white-space: nowrap; }}

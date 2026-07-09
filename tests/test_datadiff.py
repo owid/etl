@@ -421,3 +421,27 @@ def test_render_html(tmp_path):
     # old/new sample values are rendered in the table
     assert ">US<" in html
     assert "2 more dataset(s) skipped" in html
+
+
+def test_sample_note_in_header():
+    # Truncated samples announce it up front, in the header line — not below the table.
+    col = ColumnDiffResult(
+        name="a",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[
+            ValueDiff(
+                kind="changed",
+                count=18479,
+                total=119537,
+                sample=[{"country": "FR", "a -": "1", "a +": "2", "anomaly score": "33%"}],
+                sorted_by_score=True,
+                median_bard=0.2,
+            )
+        ],
+    )
+    ds = DatasetDiffResult(
+        path="garden/n/v/x", kind="identical", tables=[TableDiffResult(name="t", kind="identical", columns=[col])]
+    )
+    html = render_html(DiffReport(datasets=[ds]))
+    assert '(15.46%) <span class="head-note">— showing the 1 most anomalous rows</span>' in html
