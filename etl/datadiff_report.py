@@ -262,12 +262,23 @@ class DatasetDiffResult:
 
     @property
     def is_metadata_only(self) -> bool:
-        """A changed dataset whose diff carries no value changes anywhere — only metadata edits.
+        """A changed dataset whose diff is purely metadata edits: no value changes anywhere and
+        no structural changes (added/removed tables or columns) either.
 
         Stricter than `tier == "none"`: a dataset whose only change is *added* values also scores
-        0 (additions aren't anomalies) but is not metadata-only.
+        0 (additions aren't anomalies) but is not metadata-only. Structural changes matter too —
+        a removed table/column is coverage loss (🔴), and classifying it "meta" would let the
+        tier filter hide it.
         """
-        return self.change_kind == "changed" and not any(c.value_diffs for t in self.tables for c in t.columns)
+        if self.change_kind != "changed":
+            return False
+        for t in self.tables:
+            if t.kind in ("new", "removed"):
+                return False
+            for c in t.columns:
+                if c.kind in ("new", "removed") or c.value_diffs:
+                    return False
+        return True
 
 
 @dataclass

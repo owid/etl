@@ -478,3 +478,32 @@ def test_metadata_only_changes_are_not_tiered():
     # dropdowns offer as an option.
     assert 'data-tier="meta" data-search="garden/n/v/meta t a"' in html
     assert html.count('<option value="meta">📝 metadata-only (1)</option>') == 2
+
+
+def test_structural_changes_are_not_metadata_only():
+    # A removed column is coverage loss (🔴) — classifying it "meta" would let the tier filter
+    # hide it. Added/removed tables and columns carry no value_diffs but are structural.
+    removed_col = DatasetDiffResult(
+        path="garden/n/v/dropped_col",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="t",
+                kind="identical",
+                columns=[ColumnDiffResult(name="gone", kind="removed")],
+            )
+        ],
+    )
+    assert not removed_col.is_metadata_only
+    assert removed_col.has_coverage_loss
+    assert removed_col.tier == "large"
+    html = render_html(DiffReport(datasets=[removed_col]))
+    assert 'data-tier="large"' in html
+    assert 'data-tier="meta"' not in html
+
+    new_table = DatasetDiffResult(
+        path="garden/n/v/new_table",
+        kind="identical",
+        tables=[TableDiffResult(name="extra", kind="new", columns=[ColumnDiffResult(name="a", kind="new")])],
+    )
+    assert not new_table.is_metadata_only
