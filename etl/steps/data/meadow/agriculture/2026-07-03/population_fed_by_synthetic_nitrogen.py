@@ -18,7 +18,7 @@ def run() -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["year"], short_name=paths.short_name)
+    tb = tb.format(["year"])
 
     #
     # Save outputs.
