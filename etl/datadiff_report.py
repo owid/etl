@@ -31,6 +31,7 @@ TIER_ICONS = {"large": "🔴", "moderate": "🟡", "small": "🟢"}
 
 # Entries shown in the "Top changes" watch list at the head of the report.
 TOP_CHANGES_LIMIT = 15
+TOP_DATASETS_LIMIT = 10
 # The triage aids (Top changes section, tier strip) only appear when there's something to
 # triage: a report with a couple of changed datasets is already scannable, and on the common
 # single-dataset PR they'd be redundant noise. Per-row tier chips render at any size.
@@ -340,11 +341,17 @@ def _dataset_from_dict(d: dict[str, Any]) -> DatasetDiffResult:
 
 _SYMBOLS = {"new": "+", "removed": "-", "changed": "~", "identical": "=", "error": "⚠"}
 
-_STATUS_HEADLINE = {
-    "clean": "✅ No differences found",
-    "changed": "❌ Found differences",
-    "error": "⚠ Found errors",
-}
+
+def _headline(report: "DiffReport") -> str:
+    """Status headline. All counts in this report are about datasets — say so explicitly."""
+    n = len(report.datasets)
+    total = f"{n:,} compared dataset{'s' if n != 1 else ''}"
+    if report.status == "error":
+        return f"⚠ {report.n_errors:,} of {total} failed to compare"
+    if report.status == "changed":
+        n_diff = report.n_changed + report.n_new + report.n_removed
+        return f"❌ Found differences in {n_diff:,} of {total}"
+    return f"✅ No differences found across {total}"
 
 
 def _e(s: Any) -> str:
@@ -354,6 +361,11 @@ def _e(s: Any) -> str:
 def _anchor(ds_path: str, table: str, col: str) -> str:
     """Stable element id for a column's detail block, so the Top changes list can link to it."""
     return "c-" + re.sub(r"[^a-z0-9]+", "-", f"{ds_path}-{table}-{col}".lower()).strip("-")
+
+
+def _ds_anchor(ds_path: str) -> str:
+    """Stable element id for a dataset's detail block, so the Datasets watch list can link to it."""
+    return "d-" + re.sub(r"[^a-z0-9]+", "-", ds_path.lower()).strip("-")
 
 
 def _tier_chip(severity: float, kind: ChangeKind = "changed") -> str:
@@ -516,7 +528,7 @@ def _render_dataset(ds: DatasetDiffResult) -> str:
     new_version = ' <span class="chip">new version</span>' if ds.is_new_version else ""
     tier = _tier_chip(ds.severity, kind) if kind == "changed" else ""
     parts = [
-        f'<details class="ds {kind}"{open_attr}>'
+        f'<details class="ds {kind}" id="{_ds_anchor(ds.path)}"{open_attr}>'
         f'<summary><span class="sym {kind}">{_SYMBOLS[kind]}</span> '
         f'<code class="path">{_e(ds.path)}</code>{new_version}{tier}{_coverage_chip(ds)}'
         f'<span class="ds-note">{_e(_dataset_summary_note(ds))}</span></summary>'
@@ -570,32 +582,65 @@ def render_html(report: DiffReport) -> str:
         if strip_bits:
             tier_strip = f'<div class="tier-strip">{" · ".join(strip_bits)} <span class="tier-hint">(by typical change size; coverage loss ⇒ 🔴)</span></div>'
 
-        losses, changes = _top_changes(report)
-        if losses or changes:
-            items = []
-            # Data-point losses lead the list — make it unmistakable that rows disappeared.
-            for n_removed, labels, ds_path, table, dim in losses:
-                shown = ", ".join(labels[:4]) + ("…" if len(labels) > 4 else "")
-                link_open = f'<a href="#{_anchor(ds_path, table, dim)}">' if dim else ""
-                link_close = "</a>" if dim else ""
-                items.append(
-                    f'<li class="loss"><span class="ti">🔴</span> '
-                    f"{link_open}<code>{_e(ds_path)}</code> · <code>{_e(table)}</code>{link_close}"
-                    f'<span class="top-meta loss">− lost {n_removed:,} data point(s)'
-                    + (f": {_e(shown)}" if shown else "")
-                    + "</span></li>"
-                )
-            for severity, pct, ds_path, table, col in changes:
-                tier = _tier(severity)
-                items.append(
-                    f'<li><span class="ti">{TIER_ICONS.get(tier, "")}</span> '
-                    f'<a href="#{_anchor(ds_path, table, col)}"><code>{_e(ds_path)}</code> · <code>{_e(table)}.{_e(col)}</code></a>'
-                    f'<span class="top-meta">typical change {_e(_bard_to_rel(severity))} · {pct:.0f}% of rows</span></li>'
-                )
-            top_block = (
-                '<details class="top-changes" open><summary><b>Top changes — indicators to watch</b></summary>'
-                f"<ol>{''.join(items)}</ol></details>"
+        # Datasets to watch: tier first, and within a tier data loss (or a failed/removed
+        # dataset) outranks a bigger-but-benign change; then change size.
+        tier_rank = {"large": 0, "moderate": 1, "small": 2, "none": 3}
+
+        def _watch_key(d: DatasetDiffResult) -> tuple:
+            lossy_first = 0 if (d.change_kind in ("error", "removed") or d.has_coverage_loss) else 1
+            return (tier_rank[d.tier], lossy_first, -d.severity, d.path)
+
+        watch = sorted((d for d in datasets if d.change_kind in ("changed", "error", "removed")), key=_watch_key)
+        ds_items = []
+        for d in watch[:TOP_DATASETS_LIMIT]:
+            if d.change_kind == "error":
+                meta = "failed to compare"
+            elif d.change_kind == "removed":
+                meta = "removed dataset"
+            else:
+                bits = [f"typical change {_bard_to_rel(d.severity)}"]
+                if d.removed_row_count:
+                    bits.append(f"− lost {d.removed_row_count:,} data point(s)")
+                n_cols = sum(len(t.changed_columns) for t in d.tables)
+                n_tables = sum(1 for t in d.tables if t.any_change)
+                bits.append(f"{n_cols} column(s) in {n_tables} table(s)")
+                meta = " · ".join(bits)
+            loss_cls = " loss" if d.change_kind != "changed" or d.has_coverage_loss else ""
+            ds_items.append(
+                f'<li><span class="ti">{TIER_ICONS.get(d.tier, "")}</span> '
+                f'<a href="#{_ds_anchor(d.path)}"><code>{_e(d.path)}</code></a>'
+                f'<span class="top-meta{loss_cls}">{_e(meta)}</span></li>'
             )
+
+        losses, changes = _top_changes(report)
+        items = []
+        # Data-point losses lead the indicators list — make it unmistakable that rows disappeared.
+        for n_removed, labels, ds_path, table, dim in losses:
+            shown = ", ".join(labels[:4]) + ("…" if len(labels) > 4 else "")
+            link_open = f'<a href="#{_anchor(ds_path, table, dim)}">' if dim else ""
+            link_close = "</a>" if dim else ""
+            items.append(
+                f'<li class="loss"><span class="ti">🔴</span> '
+                f"{link_open}<code>{_e(ds_path)}</code> · <code>{_e(table)}</code>{link_close}"
+                f'<span class="top-meta loss">− lost {n_removed:,} data point(s)'
+                + (f": {_e(shown)}" if shown else "")
+                + "</span></li>"
+            )
+        for severity, pct, ds_path, table, col in changes:
+            tier = _tier(severity)
+            items.append(
+                f'<li><span class="ti">{TIER_ICONS.get(tier, "")}</span> '
+                f'<a href="#{_anchor(ds_path, table, col)}"><code>{_e(ds_path)}</code> · <code>{_e(table)}.{_e(col)}</code></a>'
+                f'<span class="top-meta">typical change {_e(_bard_to_rel(severity))} · {pct:.0f}% of rows</span></li>'
+            )
+        if ds_items or items:
+            parts = ['<details class="top-changes" open><summary><b>Top changes — what to watch</b></summary>']
+            if ds_items:
+                parts.append(f"<div class='tc-h'>Datasets</div><ol>{''.join(ds_items)}</ol>")
+            if items:
+                parts.append(f"<div class='tc-h'>Indicators</div><ol>{''.join(items)}</ol>")
+            parts.append("</details>")
+            top_block = "".join(parts)
 
     skipped_note = (
         f'<div class="skipped-note">= {report.skipped_cascade:,} more dataset(s) skipped: '
@@ -661,6 +706,8 @@ def render_html(report: DiffReport) -> str:
   .top-meta {{ color: #888; font-size: .78rem; margin-left: .5rem; }}
   .top-meta.loss {{ color: #b71c1c; font-weight: 600; }}
   .ti {{ margin-right: .15rem; }}
+  .tc-h {{ font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #999; margin: .6rem 0 .1rem; }}
+  .cards-caption {{ color: #aaa; font-size: .72rem; margin: -1.25rem 0 1.25rem; }}
   .tbl {{ margin: .75rem 0 0; }}
   .tbl-head {{ font-size: .9rem; margin-bottom: .25rem; }}
   .col {{ margin: .5rem 0 .5rem 1.5rem; }}
@@ -690,8 +737,9 @@ def render_html(report: DiffReport) -> str:
 <body>
   <h1>data-diff</h1>
   <div class="sub">generated {generated_at} · <code>etl diff</code> report</div>
-  <div class="headline">{_STATUS_HEADLINE[report.status]}</div>
+  <div class="headline">{_headline(report)}</div>
   <div class="cards">{"".join(cards)}</div>
+  <div class="cards-caption">counts are datasets</div>
   {tier_strip}
   {top_block}
   <div class="controls">

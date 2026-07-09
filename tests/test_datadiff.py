@@ -233,6 +233,26 @@ def test_triage_aids_only_on_big_reports():
     # Watch-list entries link to the column detail blocks (anchor present in both places).
     assert 'href="#c-garden-n-v-d0-t-a"' in html_big
     assert 'id="c-garden-n-v-d0-t-a"' in html_big
+    # Both perspectives: a Datasets sub-list (linking to dataset blocks) and an Indicators one.
+    assert ">Datasets<" in html_big and ">Indicators<" in html_big
+    assert 'href="#d-garden-n-v-d0"' in html_big
+    assert 'id="d-garden-n-v-d0"' in html_big
+
+
+def test_headline_counts_datasets():
+    one = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
+    assert "❌ Found differences in 1 of 1 compared dataset" in render_html(one)
+
+    mixed = DiffReport(
+        datasets=[
+            _changed_ds("garden/n/v/a", 0.5),
+            DatasetDiffResult(path="garden/n/v/b", kind="identical"),
+        ]
+    )
+    assert "❌ Found differences in 1 of 2 compared datasets" in render_html(mixed)
+
+    clean = DiffReport(datasets=[DatasetDiffResult(path="garden/n/v/b", kind="identical")])
+    assert "✅ No differences found across 1 compared dataset" in render_html(clean)
 
 
 def test_top_changes_lists_data_losses_first():
@@ -253,9 +273,12 @@ def test_top_changes_lists_data_losses_first():
     html = render_html(DiffReport(datasets=[*others, lossy]))
 
     assert "lost 111 data point(s): Low-income countries" in html
-    # The loss entry leads the watch list, even though the other datasets have larger changes.
-    top_start = html.index("Top changes")
-    assert html.index("lossy", top_start) < html.index("garden/n/v/d0", top_start)
+    # The loss entry leads the Indicators list, even though other datasets have larger changes.
+    ind_start = html.index(">Indicators<")
+    assert html.index("lossy", ind_start) < html.index("garden/n/v/d0", ind_start)
+    # And the lossy dataset (🔴 via coverage loss) leads the Datasets list despite its small severity.
+    ds_start = html.index(">Datasets<")
+    assert html.index("lossy", ds_start) < html.index("garden/n/v/d0", ds_start)
 
 
 def test_report_sorts_by_severity():
