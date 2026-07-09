@@ -211,10 +211,12 @@ def test_coverage_loss_forces_large_tier():
     assert ds.removed_labels == ["Vietnam", "Philippines"]
     assert ds.tier == "large"
 
-    # The coverage chip is rendered on the dataset summary line.
+    # The coverage chip is rendered on the dataset summary line, and the tier chip agrees with
+    # the forced 🔴 tier (not the severity-derived 🟡/🟢) so the row matches the filters.
     html = render_html(DiffReport(datasets=[ds]))
     assert "row(s) removed" in html
     assert "Vietnam" in html
+    assert 'class="chip tier large">🔴 median anomaly score' in html
 
 
 def test_triage_aids_only_on_big_reports():

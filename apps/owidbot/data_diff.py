@@ -18,7 +18,7 @@ import structlog
 from botocore.exceptions import BotoCoreError
 from owid.catalog import s3_utils
 
-from etl.datadiff_report import ColumnDiffResult, DatasetDiffResult, DiffReport
+from etl.datadiff_report import ColumnDiffResult, DatasetDiffResult, DiffReport, dataset_watch_key
 from etl.paths import BASE_DIR
 
 log = structlog.get_logger()
@@ -79,10 +79,9 @@ def upload_html_report(html_path: Path, branch: str) -> str | None:
 def format_comment(report: DiffReport, report_url: str | None) -> str:
     summary = _format_summary(report, report_url)
 
-    # Biggest differences first, same ordering as the HTML report.
-    changed = sorted(
-        (ds for ds in report.datasets if ds.change_kind != "identical"), key=lambda ds: (-ds.severity, ds.path)
-    )
+    # Triage order, same as the HTML report's watch list: tier first, data loss ahead of
+    # bigger-but-benign changes — so truncation (MAX_DIFF_CHARS) never drops a lossy dataset.
+    changed = sorted((ds for ds in report.datasets if ds.change_kind != "identical"), key=dataset_watch_key)
     diff = "\n".join(line for ds in changed for line in _format_dataset(ds))
     diff = _truncate_diff(diff)
 

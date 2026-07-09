@@ -372,9 +372,23 @@ def _ds_anchor(ds_path: str) -> str:
     return "d-" + re.sub(r"[^a-z0-9]+", "-", ds_path.lower()).strip("-")
 
 
-def _tier_chip(severity: float, kind: ChangeKind = "changed") -> str:
-    """Colored triage chip: tier icon + the typical relative change it corresponds to."""
-    tier = _tier(severity)
+def dataset_watch_key(ds: DatasetDiffResult) -> tuple:
+    """Triage sort key for dataset summaries (watch list, owidbot PR comment): tier first, and
+    within a tier data loss (or a failed/removed dataset) outranks a bigger-but-benign change;
+    then change size. Plain severity ordering would let a truncated summary drop a small-but-lossy
+    dataset below big value changes — defeating the "data loss is unmissable" signal."""
+    tier_rank = {"large": 0, "moderate": 1, "small": 2, "none": 3}
+    lossy_first = 0 if (ds.change_kind in ("error", "removed") or ds.has_coverage_loss) else 1
+    return (tier_rank[ds.tier], lossy_first, -ds.severity, ds.path)
+
+
+def _tier_chip(severity: float, kind: ChangeKind = "changed", tier: Tier | None = None) -> str:
+    """Colored triage chip: tier icon + the score it corresponds to.
+
+    Pass `tier` to override the severity-derived tier — a dataset with coverage loss is forced
+    🔴 by `DatasetDiffResult.tier`, and its chip must agree with the tier strip and filters.
+    """
+    tier = tier or _tier(severity)
     if tier == "none":
         return ""
     label = {"removed": "removed", "new": "new"}.get(kind) or f"median anomaly score {format_score(severity)}"
@@ -547,7 +561,7 @@ def _render_dataset(ds: DatasetDiffResult) -> str:
     kind = ds.change_kind
     open_attr = " open" if kind in ("changed", "error") else ""
     new_version = ' <span class="chip">new version</span>' if ds.is_new_version else ""
-    tier = _tier_chip(ds.severity, kind) if kind == "changed" else ""
+    tier = _tier_chip(ds.severity, kind, tier=ds.tier) if kind == "changed" else ""
     # What the filter box matches against: names only (path, tables, changed columns) — matching
     # the full text would make queries hit sample values and scores, which is pure noise.
     search = " ".join(
@@ -644,15 +658,8 @@ def render_html(report: DiffReport) -> str:
                 f'<span class="tier-hint">(tiered by median anomaly score; coverage loss ⇒ 🔴)</span></div>'
             )
 
-        # Datasets to watch: tier first, and within a tier data loss (or a failed/removed
-        # dataset) outranks a bigger-but-benign change; then change size.
-        tier_rank = {"large": 0, "moderate": 1, "small": 2, "none": 3}
-
-        def _watch_key(d: DatasetDiffResult) -> tuple:
-            lossy_first = 0 if (d.change_kind in ("error", "removed") or d.has_coverage_loss) else 1
-            return (tier_rank[d.tier], lossy_first, -d.severity, d.path)
-
-        watch = sorted((d for d in datasets if d.change_kind in ("changed", "error", "removed")), key=_watch_key)
+        # Datasets to watch, in triage order (see dataset_watch_key).
+        watch = sorted((d for d in datasets if d.change_kind in ("changed", "error", "removed")), key=dataset_watch_key)
         ds_items = []
         for d in watch[:TOP_DATASETS_MAX]:
             # Red is reserved for the alarming part only: the data-loss fragment (or a dataset
