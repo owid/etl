@@ -117,9 +117,9 @@ def test_structured_result(tmp_path):
     assert value_diffs["new"].count == 1
     assert value_diffs["new"].total == 3
     assert value_diffs["new"].sample == [{"country": "FR", "a": "3"}]
-    # Numeric changed samples carry an absolute "Δ %" display column and are marked delta-sorted.
-    assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2", "Δ %": "33.3%"}]
-    assert value_diffs["changed"].sorted_by_delta
+    # Numeric changed samples carry an "anomaly score" (BARD) display column, sorted by it.
+    assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2", "anomaly score": "0.20"}]
+    assert value_diffs["changed"].sorted_by_score
     # 3 -> 2: BARD = |3-2| / (3+2) = 0.2
     assert value_diffs["changed"].median_bard == pytest.approx(0.2)
 
@@ -140,11 +140,11 @@ def test_changed_records_sorts_numeric_by_change_size():
             "a +": [101.0, 250.0, 5.0],  # BARD ≈ 0.005, 0.43, 1.0
         }
     )
-    records, sorted_by_delta, median_bard = _changed_records(both, "a")
-    assert sorted_by_delta
-    # Biggest changes (by BARD) first; growth from zero is a maximal change and ranks on top.
+    records, sorted_by_score, median_bard = _changed_records(both, "a")
+    assert sorted_by_score
+    # Biggest changes (by anomaly score = BARD) first; growth from zero is maximal (score 1).
     assert [r["country"] for r in records] == ["from_zero", "big", "small"]
-    assert [r["Δ %"] for r in records] == ["∞%", "150.0%", "1.0%"]
+    assert [r["anomaly score"] for r in records] == ["1.00", "0.43", "0.005"]
     # Median BARD across all changed rows: median(0.005, 0.43, 1.0) ≈ 0.43.
     assert median_bard == pytest.approx(150 / 350, abs=1e-6)
 
@@ -155,10 +155,10 @@ def test_changed_records_sorts_numeric_by_change_size():
 
 def test_changed_records_non_numeric_falls_back_to_random_sample():
     both = pd.DataFrame({"country": ["UK", "US"], "a -": ["x", "y"], "a +": ["y", "z"]})
-    records, sorted_by_delta, median_bard = _changed_records(both, "a")
-    assert not sorted_by_delta
+    records, sorted_by_score, median_bard = _changed_records(both, "a")
+    assert not sorted_by_score
     assert median_bard is None
-    assert all("Δ %" not in r for r in records)
+    assert all("anomaly score" not in r for r in records)
     assert len(records) == 2
 
 
@@ -224,7 +224,7 @@ def test_triage_aids_only_on_big_reports():
     # (Assert on rendered elements, not bare class names — those always appear in the stylesheet.)
     assert "Top changes" not in html_small
     assert '<div class="tier-strip">' not in html_small
-    assert "typical change" in html_small
+    assert "anomaly score" in html_small
 
     big = DiffReport(datasets=[_changed_ds(f"garden/n/v/d{i}", 0.5 - i * 0.1) for i in range(4)])
     html_big = render_html(big)

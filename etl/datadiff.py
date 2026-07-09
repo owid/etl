@@ -31,6 +31,7 @@ from etl.datadiff_report import (
     DiffReport,
     TableDiffResult,
     ValueDiff,
+    format_score,
     render_html,
 )
 from etl.files import yaml_dump
@@ -788,14 +789,14 @@ def _changed_records(
 ) -> tuple[list[dict[str, str]], bool, float | None]:
     """Sample records for a changed-values diff.
 
-    For numeric columns, keep the rows with the largest changes (largest first) and append a
-    "Δ %" display column, so the report surfaces the biggest moves instead of a random sample.
-    Rows are ranked by BARD (`etl.data_helpers.misc.bard`, the same metric Anomalist scores
+    For numeric columns, keep the most anomalous rows (largest first) and append an
+    "anomaly score" display column, so the report surfaces the biggest moves instead of a random
+    sample. The score is BARD (`etl.data_helpers.misc.bard`, the same metric Anomalist scores
     changes with): bounded in [0, 1], symmetric, and resistant to blow-ups on tiny values. A
-    value appearing or disappearing (NaN on one side) counts as a maximal change. Other dtypes
-    keep the plain random sample.
+    value appearing or disappearing (NaN on one side) counts as a maximal change (score 1). Other
+    dtypes keep the plain random sample.
 
-    Returns (records, sorted_by_delta, median_bard), where median_bard is the median BARD across
+    Returns (records, sorted_by_score, median_bard), where median_bard is the median score across
     ALL changed rows (not just the sample) — the report uses it to sort columns, tables and
     datasets by how big their differences typically are. None for non-numeric columns.
     """
@@ -813,16 +814,7 @@ def _changed_records(
     # Positional (iloc) selection is safe even if `both` has a non-unique index.
     order = np.argsort(-score, kind="stable")[:limit]
     top = both.iloc[order].copy()
-
-    def _fmt_delta(o: float, n: float) -> str:
-        # Absolute relative change — direction is already visible in the old/new columns.
-        if pd.isna(o) or pd.isna(n):
-            return "—"
-        if o == 0:
-            return "∞%"
-        return f"{abs(n - o) / abs(o) * 100:.1f}%"
-
-    top["Δ %"] = [_fmt_delta(o, n) for o, n in zip(old.iloc[order], new.iloc[order])]
+    top["anomaly score"] = [format_score(s) for s in score[order]]
     return _df_to_records(top, limit=limit), True, median_bard
 
 
@@ -883,14 +875,14 @@ def _data_diff(
         else:
             both = samp_a.join(samp_b, lsuffix=" -", rsuffix=" +")
         lines += _df_to_str(both)
-        records, sorted_by_delta, median_bard = _changed_records(both, col)
+        records, sorted_by_score, median_bard = _changed_records(both, col)
         value_diffs.append(
             ValueDiff(
                 kind="changed",
                 count=int(neq.sum()),
                 total=int(n),
                 sample=records,
-                sorted_by_delta=sorted_by_delta,
+                sorted_by_score=sorted_by_score,
                 median_bard=median_bard,
             )
         )

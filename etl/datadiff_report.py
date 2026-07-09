@@ -48,16 +48,14 @@ def _tier(severity: float) -> Tier:
     return "none"
 
 
-def _bard_to_rel(severity: float) -> str:
-    """Human-readable typical relative change for a BARD-based severity.
+def format_score(score: float) -> str:
+    """Display format for an anomaly score (BARD, in [0, 1]).
 
-    For same-sign values, BARD t corresponds to a relative change of 2t/(1-t) — e.g. t=0.2 is a
-    ~50% change. Above ~0.83 the equivalent exceeds 1000%, where a precise number stops being
-    informative.
+    Two decimals normally; three below 0.01 so the "small" tier doesn't collapse to 0.00. As a
+    rule of thumb for same-sign values, a score t corresponds to a relative change of 2t/(1-t):
+    0.01 ≈ 2%, 0.15 ≈ 35%, 0.5 ≈ 200%.
     """
-    if severity >= 0.83:
-        return ">1000%"
-    return f"~{200 * severity / (1 - severity):.0f}%"
+    return f"{score:.2f}" if score >= 0.01 else f"{score:.3f}"
 
 
 @dataclass
@@ -69,9 +67,9 @@ class ValueDiff:
     total: int
     # Display-ready records; rows of a "changed" diff have "<col> -" (old) and "<col> +" (new) keys.
     sample: list[dict[str, str]] = field(default_factory=list)
-    # True when the sample of a numeric "changed" diff is sorted by change size (largest first)
-    # and carries a "Δ %" display column; non-numeric samples stay random and unsorted.
-    sorted_by_delta: bool = False
+    # True when the sample of a numeric "changed" diff is sorted by anomaly score (largest first)
+    # and carries an "anomaly score" display column; non-numeric samples stay random and unsorted.
+    sorted_by_score: bool = False
     # Median BARD (|a-b| / (|a|+|b|), see `etl.data_helpers.misc.bard`) across ALL changed rows
     # of a numeric column — the typical size of the change, bounded in [0, 1]. None when the
     # column is non-numeric (or the diff is not of kind "changed").
@@ -373,7 +371,7 @@ def _tier_chip(severity: float, kind: ChangeKind = "changed") -> str:
     tier = _tier(severity)
     if tier == "none":
         return ""
-    label = {"removed": "removed", "new": "new"}.get(kind) or f"typical change {_bard_to_rel(severity)}"
+    label = {"removed": "removed", "new": "new"}.get(kind) or f"anomaly score {format_score(severity)}"
     return f'<span class="chip tier {tier}">{TIER_ICONS[tier]} {_e(label)}</span>'
 
 
@@ -460,8 +458,8 @@ def _render_value_diff(v: ValueDiff) -> str:
         )
         trs.append(f"<tr>{tds}</tr>")
     if v.count > len(v.sample):
-        what = "largest relative changes" if v.sorted_by_delta else "rows"
-        note = f'<div class="note">showing {len(v.sample):,} {what} of {v.count:,} rows</div>'
+        what = "most anomalous" if v.sorted_by_score else "rows"
+        note = f'<div class="note">showing the {len(v.sample):,} {what} of {v.count:,} rows</div>'
     else:
         note = ""
     return (
@@ -580,7 +578,7 @@ def render_html(report: DiffReport) -> str:
                 tier_counts[ds.tier] += 1
         strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
         if strip_bits:
-            tier_strip = f'<div class="tier-strip">{" · ".join(strip_bits)} <span class="tier-hint">(by typical change size; coverage loss ⇒ 🔴)</span></div>'
+            tier_strip = f'<div class="tier-strip">{" · ".join(strip_bits)} <span class="tier-hint">(by anomaly score; coverage loss ⇒ 🔴)</span></div>'
 
         # Datasets to watch: tier first, and within a tier data loss (or a failed/removed
         # dataset) outranks a bigger-but-benign change; then change size.
@@ -598,7 +596,7 @@ def render_html(report: DiffReport) -> str:
             elif d.change_kind == "removed":
                 meta = "removed dataset"
             else:
-                bits = [f"typical change {_bard_to_rel(d.severity)}"]
+                bits = [f"anomaly score {format_score(d.severity)}"]
                 if d.removed_row_count:
                     bits.append(f"− lost {d.removed_row_count:,} data point(s)")
                 n_cols = sum(len(t.changed_columns) for t in d.tables)
@@ -631,7 +629,7 @@ def render_html(report: DiffReport) -> str:
             items.append(
                 f'<li><span class="ti">{TIER_ICONS.get(tier, "")}</span> '
                 f'<a href="#{_anchor(ds_path, table, col)}"><code>{_e(ds_path)}</code> · <code>{_e(table)}.{_e(col)}</code></a>'
-                f'<span class="top-meta">typical change {_e(_bard_to_rel(severity))} · {pct:.0f}% of rows</span></li>'
+                f'<span class="top-meta">anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows</span></li>'
             )
         if ds_items or items:
             parts = ['<details class="top-changes" open><summary><b>Top changes — what to watch</b></summary>']

@@ -187,7 +187,8 @@ def _format_row(row: dict[str, str], col: str) -> str:
     old = row.get(f"{col} -")
     new = row.get(f"{col} +")
     val = row.get(col)
-    dims = " ".join(v for k, v in row.items() if k not in (col, f"{col} -", f"{col} +"))
+    # "anomaly score" is a display column of the HTML report, not a dim.
+    dims = " ".join(v for k, v in row.items() if k not in (col, f"{col} -", f"{col} +", "anomaly score"))
     if old is not None or new is not None:
         return f"{dims}: {old} → {new}" if dims else f"{old} → {new}"
     if val is not None:
