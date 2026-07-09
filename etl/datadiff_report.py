@@ -21,9 +21,9 @@ ChangeKind = Literal["new", "removed", "changed", "identical", "error"]
 # can afford more).
 SAMPLE_LIMIT = 100
 
-# Severity tiers (thresholds on the BARD-based severity score in [0, 1]): they tell a reviewer
-# where to stop reading. In "typical relative change" terms: large ≳ 35%, moderate ≳ 2%,
-# small = anything non-zero below that (usually rounding-level noise).
+# Severity tiers (thresholds on the BARD-based anomaly score, stored in [0, 1] and displayed
+# as a percentage): they tell a reviewer where to stop reading. large = score ≥ 15%, moderate
+# ≥ 1%, small = anything non-zero below that (usually rounding-level noise).
 Tier = Literal["large", "moderate", "small", "none"]
 TIER_LARGE = 0.15
 TIER_MODERATE = 0.01
@@ -49,13 +49,16 @@ def _tier(severity: float) -> Tier:
 
 
 def format_score(score: float) -> str:
-    """Display format for an anomaly score (BARD, in [0, 1]).
+    """Display format for an anomaly score: a percentage in [0, 100], like Anomalist shows it.
 
-    Two decimals normally; three below 0.01 so the "small" tier doesn't collapse to 0.00. As a
-    rule of thumb for same-sign values, a score t corresponds to a relative change of 2t/(1-t):
-    0.01 ≈ 2%, 0.15 ≈ 35%, 0.5 ≈ 200%.
+    Integer above 10%, more precision below so the smaller tiers don't collapse to 0%. As a rule
+    of thumb for same-sign values, a score of s% corresponds to a relative change of roughly
+    2s/(100-s): 1% ≈ 2%, 15% ≈ 35%, 50% ≈ 200%.
     """
-    return f"{score:.2f}" if score >= 0.01 else f"{score:.3f}"
+    pct = 100 * score
+    if pct >= 10:
+        return f"{pct:.0f}%"
+    return f"{pct:.1f}%" if pct >= 1 else f"{pct:.2f}%"
 
 
 @dataclass
@@ -371,7 +374,7 @@ def _tier_chip(severity: float, kind: ChangeKind = "changed") -> str:
     tier = _tier(severity)
     if tier == "none":
         return ""
-    label = {"removed": "removed", "new": "new"}.get(kind) or f"anomaly score {format_score(severity)}"
+    label = {"removed": "removed", "new": "new"}.get(kind) or f"median anomaly score {format_score(severity)}"
     return f'<span class="chip tier {tier}">{TIER_ICONS[tier]} {_e(label)}</span>'
 
 
@@ -583,7 +586,7 @@ def render_html(report: DiffReport) -> str:
                 tier_counts[ds.tier] += 1
         strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
         if strip_bits:
-            tier_strip = f'<div class="tier-strip">{" · ".join(strip_bits)} <span class="tier-hint">(by anomaly score; coverage loss ⇒ 🔴)</span></div>'
+            tier_strip = f'<div class="tier-strip">{" · ".join(strip_bits)} <span class="tier-hint">(by median anomaly score; coverage loss ⇒ 🔴)</span></div>'
 
         # Datasets to watch: tier first, and within a tier data loss (or a failed/removed
         # dataset) outranks a bigger-but-benign change; then change size.
@@ -601,7 +604,7 @@ def render_html(report: DiffReport) -> str:
             elif d.change_kind == "removed":
                 meta = "removed dataset"
             else:
-                bits = [f"anomaly score {format_score(d.severity)}"]
+                bits = [f"median anomaly score {format_score(d.severity)}"]
                 if d.removed_row_count:
                     bits.append(f"− lost {d.removed_row_count:,} data point(s)")
                 n_cols = sum(len(t.changed_columns) for t in d.tables)
@@ -634,7 +637,7 @@ def render_html(report: DiffReport) -> str:
             items.append(
                 f'<li><span class="ti">{TIER_ICONS.get(tier, "")}</span> '
                 f'<a href="#{_anchor(ds_path, table, col)}"><code>{_e(ds_path)}</code> · <code>{_e(table)}.{_e(col)}</code></a>'
-                f'<span class="top-meta">anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows</span></li>'
+                f'<span class="top-meta">median anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows</span></li>'
             )
         if ds_items or items:
             parts = ['<details class="top-changes" open><summary><b>Top changes — what to watch</b></summary>']
@@ -650,6 +653,16 @@ def render_html(report: DiffReport) -> str:
         "their data files are byte-identical, the source checksum changed only because an upstream "
         "metadata change cascaded.</div>"
         if report.skipped_cascade
+        else ""
+    )
+
+    # Identical datasets render at the bottom (severity 0) and are hidden by default; carry the
+    # count in the label so the toggle's effect is discoverable, and drop it when there's nothing
+    # to show.
+    identical_toggle = (
+        f'<label><input type="checkbox" id="show-identical"> '
+        f"show {report.n_identical:,} identical dataset{'s' if report.n_identical != 1 else ''}</label>"
+        if report.n_identical
         else ""
     )
 
@@ -756,7 +769,7 @@ def render_html(report: DiffReport) -> str:
       <option value="moderate">🟡 moderate</option>
       <option value="small">🟢 small</option>
     </select>
-    <label><input type="checkbox" id="show-identical"> show identical datasets</label>
+    {identical_toggle}
     <span class="match-count" id="match-count"></span>
   </div>
   {sections}
@@ -781,16 +794,18 @@ def render_html(report: DiffReport) -> str:
       // An active filter reveals matching identical datasets even when the toggle is off —
       // searching for a dataset you know was compared should always find it.
       d.classList.toggle('match-visible', match && filtering);
-      const visible = match && (!d.classList.contains('identical') || showIdentical.checked || filtering);
+      const visible = match && (!d.classList.contains('identical') || (showIdentical && showIdentical.checked) || filtering);
       if (visible) shown++;
     }});
     matchCount.textContent = `${{shown}} of ${{dsBlocks.length}} datasets shown`;
   }}
 
-  showIdentical.addEventListener('change', (e) => {{
-    document.body.classList.toggle('show-identical', e.target.checked);
-    applyFilters();
-  }});
+  if (showIdentical) {{
+    showIdentical.addEventListener('change', (e) => {{
+      document.body.classList.toggle('show-identical', e.target.checked);
+      applyFilters();
+    }});
+  }}
   filterInput.addEventListener('input', applyFilters);
   tierSelect.addEventListener('change', applyFilters);
   applyFilters();

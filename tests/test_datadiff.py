@@ -118,7 +118,7 @@ def test_structured_result(tmp_path):
     assert value_diffs["new"].total == 3
     assert value_diffs["new"].sample == [{"country": "FR", "a": "3"}]
     # Numeric changed samples carry an "anomaly score" (BARD) display column, sorted by it.
-    assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2", "anomaly score": "0.20"}]
+    assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2", "anomaly score": "20%"}]
     assert value_diffs["changed"].sorted_by_score
     # 3 -> 2: BARD = |3-2| / (3+2) = 0.2
     assert value_diffs["changed"].median_bard == pytest.approx(0.2)
@@ -144,7 +144,7 @@ def test_changed_records_sorts_numeric_by_change_size():
     assert sorted_by_score
     # Biggest changes (by anomaly score = BARD) first; growth from zero is maximal (score 1).
     assert [r["country"] for r in records] == ["from_zero", "big", "small"]
-    assert [r["anomaly score"] for r in records] == ["1.00", "0.43", "0.005"]
+    assert [r["anomaly score"] for r in records] == ["100%", "43%", "0.50%"]
     # Median BARD across all changed rows: median(0.005, 0.43, 1.0) ≈ 0.43.
     assert median_bard == pytest.approx(150 / 350, abs=1e-6)
 
@@ -248,6 +248,13 @@ def test_filter_attributes():
     assert 'data-tier="large"' in html
     assert 'id="tier-filter"' in html
     assert 'id="match-count"' in html
+    # No identical datasets -> the show-identical toggle is dropped entirely.
+    assert 'id="show-identical"' not in html
+
+    # With identical datasets, the toggle carries the count so its effect is discoverable.
+    mixed = DiffReport(datasets=[ds, DatasetDiffResult(path="garden/n/v/same", kind="identical")])
+    html_mixed = render_html(mixed)
+    assert "show 1 identical dataset<" in html_mixed
 
 
 def test_headline_counts_datasets():
