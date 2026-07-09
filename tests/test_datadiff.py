@@ -219,13 +219,15 @@ def test_coverage_loss_forces_large_tier():
     assert 'class="chip tier large">🔴 median anomaly score' in html
 
 
-def test_triage_aids_only_on_big_reports():
+def test_triage_aids_render_at_any_size():
+    # One format for every report size: even a single-dataset diff gets the tier strip and the
+    # watch lists (its Indicators list is exactly where a many-column dataset needs ranking).
+    # (Assert on rendered elements, not bare class names — those always appear in the stylesheet.)
     small = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
     html_small = render_html(small)
-    # A single changed dataset: no watch list, no tier strip — but the row chip still renders.
-    # (Assert on rendered elements, not bare class names — those always appear in the stylesheet.)
-    assert "Top changes" not in html_small
-    assert '<div class="tier-strip">' not in html_small
+    assert "Top changes" in html_small
+    assert '<div class="tier-strip">' in html_small
+    assert "Of the 1 dataset with differences" in html_small
     assert "anomaly score" in html_small
 
     big = DiffReport(datasets=[_changed_ds(f"garden/n/v/d{i}", 0.5 - i * 0.1) for i in range(4)])

@@ -35,10 +35,6 @@ TOP_CHANGES_LIMIT = 15
 TOP_DATASETS_LIMIT = 10
 TOP_CHANGES_MAX = 100
 TOP_DATASETS_MAX = 50
-# The triage aids (Top changes section, tier strip) only appear when there's something to
-# triage: a report with a couple of changed datasets is already scannable, and on the common
-# single-dataset PR they'd be redundant noise. Per-row tier chips render at any size.
-TRIAGE_MIN_DATASETS = 3
 
 
 def _tier(severity: float) -> Tier:
@@ -688,86 +684,86 @@ def render_html(report: DiffReport) -> str:
     else:
         ind_tier_select = ""
 
-    # Triage aids — only when the report is big enough to need them.
+    # Triage aids — one format for every report size; content-based gating on the controls
+    # (dropdowns, toggles, show-more) already prevents dead UI on small diffs.
     tier_strip = ""
     top_block = ""
-    if report.n_changed >= TRIAGE_MIN_DATASETS:
-        strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
-        # Datasets whose only differences are metadata edits carry no anomaly tier — list them
-        # separately so the strip total still matches the headline's differing-dataset count.
-        # (A changed dataset can also score 0 from purely *added* values; that gets its own bucket.)
-        n_meta_only = sum(1 for ds in report.datasets if ds.is_metadata_only)
-        if n_meta_only:
-            strip_bits.append(f"📝 {n_meta_only} metadata-only")
-        n_new_only = sum(
-            1 for ds in report.datasets if ds.change_kind == "changed" and ds.tier == "none" and not ds.is_metadata_only
+    strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
+    # Datasets whose only differences are metadata edits carry no anomaly tier — list them
+    # separately so the strip total still matches the headline's differing-dataset count.
+    # (A changed dataset can also score 0 from purely *added* values; that gets its own bucket.)
+    n_meta_only = sum(1 for ds in report.datasets if ds.is_metadata_only)
+    if n_meta_only:
+        strip_bits.append(f"📝 {n_meta_only} metadata-only")
+    n_new_only = sum(
+        1 for ds in report.datasets if ds.change_kind == "changed" and ds.tier == "none" and not ds.is_metadata_only
+    )
+    if n_new_only:
+        strip_bits.append(f"➕ {n_new_only} new-data-only")
+    n_diff = sum(tier_counts.values()) + n_meta_only + n_new_only
+    if strip_bits and n_diff:
+        tier_strip = (
+            f'<div class="tier-strip">Of the {n_diff:,} dataset{"s" if n_diff != 1 else ""} with '
+            f"differences, the changes are: {' · '.join(strip_bits)} "
+            f'<span class="tier-hint">(tiered by median anomaly score; coverage loss ⇒ 🔴)</span></div>'
         )
-        if n_new_only:
-            strip_bits.append(f"➕ {n_new_only} new-data-only")
-        n_diff = sum(tier_counts.values()) + n_meta_only + n_new_only
-        if strip_bits and n_diff:
-            tier_strip = (
-                f'<div class="tier-strip">Of the {n_diff:,} dataset{"s" if n_diff != 1 else ""} with '
-                f"differences, the changes are: {' · '.join(strip_bits)} "
-                f'<span class="tier-hint">(tiered by median anomaly score; coverage loss ⇒ 🔴)</span></div>'
-            )
 
-        # Datasets to watch, in triage order (see dataset_watch_key).
-        watch = sorted((d for d in datasets if d.change_kind in ("changed", "error", "removed")), key=dataset_watch_key)
-        ds_items = []
-        for d in watch[:TOP_DATASETS_MAX]:
-            # Red is reserved for the alarming part only: the data-loss fragment (or a dataset
-            # that failed to compare / was removed) — not the whole meta line.
-            if d.change_kind == "error":
-                meta_html = '<span class="top-meta loss">failed to compare</span>'
-            elif d.change_kind == "removed":
-                meta_html = '<span class="top-meta loss">removed dataset</span>'
-            elif d.is_metadata_only:
-                meta_html = '<span class="top-meta">metadata-only changes</span>'
-            elif d.severity <= 0:
-                meta_html = '<span class="top-meta">new data only</span>'
-            else:
-                n_cols = sum(len(t.changed_columns) for t in d.tables)
-                n_tables = sum(1 for t in d.tables if t.any_change)
-                meta_html = f'<span class="top-meta">median anomaly score {_e(format_score(d.severity))}</span>'
-                if d.removed_row_count:
-                    meta_html += f'<span class="top-meta loss">− lost {d.removed_row_count:,} data point(s)</span>'
-                meta_html += f'<span class="top-meta">{n_cols} column(s) in {n_tables} table(s)</span>'
-            icon = TIER_ICONS.get(d.tier) or ("📝" if d.is_metadata_only else "")
-            ds_items.append(
-                f'<li><span class="ti">{icon}</span> '
-                f'<a href="#{_ds_anchor(d.path)}"><code>{_e(d.path)}</code></a>{meta_html}</li>'
-            )
+    # Datasets to watch, in triage order (see dataset_watch_key).
+    watch = sorted((d for d in datasets if d.change_kind in ("changed", "error", "removed")), key=dataset_watch_key)
+    ds_items = []
+    for d in watch[:TOP_DATASETS_MAX]:
+        # Red is reserved for the alarming part only: the data-loss fragment (or a dataset
+        # that failed to compare / was removed) — not the whole meta line.
+        if d.change_kind == "error":
+            meta_html = '<span class="top-meta loss">failed to compare</span>'
+        elif d.change_kind == "removed":
+            meta_html = '<span class="top-meta loss">removed dataset</span>'
+        elif d.is_metadata_only:
+            meta_html = '<span class="top-meta">metadata-only changes</span>'
+        elif d.severity <= 0:
+            meta_html = '<span class="top-meta">new data only</span>'
+        else:
+            n_cols = sum(len(t.changed_columns) for t in d.tables)
+            n_tables = sum(1 for t in d.tables if t.any_change)
+            meta_html = f'<span class="top-meta">median anomaly score {_e(format_score(d.severity))}</span>'
+            if d.removed_row_count:
+                meta_html += f'<span class="top-meta loss">− lost {d.removed_row_count:,} data point(s)</span>'
+            meta_html += f'<span class="top-meta">{n_cols} column(s) in {n_tables} table(s)</span>'
+        icon = TIER_ICONS.get(d.tier) or ("📝" if d.is_metadata_only else "")
+        ds_items.append(
+            f'<li><span class="ti">{icon}</span> '
+            f'<a href="#{_ds_anchor(d.path)}"><code>{_e(d.path)}</code></a>{meta_html}</li>'
+        )
 
-        losses, changes = _top_changes(report, limit=TOP_CHANGES_MAX)
-        items = []
-        # Data-point losses lead the indicators list — make it unmistakable that rows disappeared.
-        for n_removed, labels, ds_path, table, dim in losses:
-            shown = ", ".join(labels[:4]) + ("…" if len(labels) > 4 else "")
-            link_open = f'<a href="#{_anchor(ds_path, table, dim)}">' if dim else ""
-            link_close = "</a>" if dim else ""
-            items.append(
-                f'<li class="loss"><span class="ti">🔴</span> '
-                f"{link_open}<code>{_e(ds_path)}</code> · <code>{_e(table)}</code>{link_close}"
-                f'<span class="top-meta loss">− lost {n_removed:,} data point(s)'
-                + (f": {_e(shown)}" if shown else "")
-                + "</span></li>"
-            )
-        for severity, pct, ds_path, table, col in changes:
-            tier = _tier(severity)
-            items.append(
-                f'<li><span class="ti">{TIER_ICONS.get(tier, "")}</span> '
-                f'<a href="#{_anchor(ds_path, table, col)}"><code>{_e(ds_path)}</code> · <code>{_e(table)}.{_e(col)}</code></a>'
-                f'<span class="top-meta">median anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows</span></li>'
-            )
-        if ds_items or items:
-            parts = ['<details class="top-changes" open><summary><b>Top changes — what to watch</b></summary>']
-            if ds_items:
-                parts.append(f"<div class='tc-h'>Datasets</div>{_expandable_list(ds_items, TOP_DATASETS_LIMIT)}")
-            if items:
-                parts.append(f"<div class='tc-h'>Indicators</div>{_expandable_list(items, TOP_CHANGES_LIMIT)}")
-            parts.append("</details>")
-            top_block = "".join(parts)
+    losses, changes = _top_changes(report, limit=TOP_CHANGES_MAX)
+    items = []
+    # Data-point losses lead the indicators list — make it unmistakable that rows disappeared.
+    for n_removed, labels, ds_path, table, dim in losses:
+        shown = ", ".join(labels[:4]) + ("…" if len(labels) > 4 else "")
+        link_open = f'<a href="#{_anchor(ds_path, table, dim)}">' if dim else ""
+        link_close = "</a>" if dim else ""
+        items.append(
+            f'<li class="loss"><span class="ti">🔴</span> '
+            f"{link_open}<code>{_e(ds_path)}</code> · <code>{_e(table)}</code>{link_close}"
+            f'<span class="top-meta loss">− lost {n_removed:,} data point(s)'
+            + (f": {_e(shown)}" if shown else "")
+            + "</span></li>"
+        )
+    for severity, pct, ds_path, table, col in changes:
+        tier = _tier(severity)
+        items.append(
+            f'<li><span class="ti">{TIER_ICONS.get(tier, "")}</span> '
+            f'<a href="#{_anchor(ds_path, table, col)}"><code>{_e(ds_path)}</code> · <code>{_e(table)}.{_e(col)}</code></a>'
+            f'<span class="top-meta">median anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows</span></li>'
+        )
+    if ds_items or items:
+        parts = ['<details class="top-changes" open><summary><b>Top changes — what to watch</b></summary>']
+        if ds_items:
+            parts.append(f"<div class='tc-h'>Datasets</div>{_expandable_list(ds_items, TOP_DATASETS_LIMIT)}")
+        if items:
+            parts.append(f"<div class='tc-h'>Indicators</div>{_expandable_list(items, TOP_CHANGES_LIMIT)}")
+        parts.append("</details>")
+        top_block = "".join(parts)
 
     skipped_note = (
         f'<div class="skipped-note">= {report.skipped_cascade:,} more dataset(s) skipped: '
