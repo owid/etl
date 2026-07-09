@@ -367,13 +367,26 @@ _SYMBOLS = {"new": "+", "removed": "-", "changed": "~", "identical": "=", "error
 
 
 def _headline(report: "DiffReport") -> str:
-    """Status headline. All counts in this report are about datasets — say so explicitly."""
+    """Status headline. All counts in this report are about datasets — say so explicitly.
+
+    Trivial ratios read awkwardly, so "1 of 1" becomes "the compared dataset" and "N of N"
+    becomes "all N compared datasets".
+    """
     n = len(report.datasets)
-    total = f"{n:,} compared dataset{'s' if n != 1 else ''}"
+    if n == 1:
+        if report.status == "error":
+            return "⚠ The compared dataset failed to compare"
+        if report.status == "changed":
+            return "❌ Found differences in the compared dataset"
+        return "✅ No differences found in the compared dataset"
+
+    total = f"{n:,} compared datasets"
     if report.status == "error":
         return f"⚠ {report.n_errors:,} of {total} failed to compare"
     if report.status == "changed":
         n_diff = report.n_changed + report.n_new + report.n_removed
+        if n_diff == n:
+            return f"❌ Found differences in all {total}"
         return f"❌ Found differences in {n_diff:,} of {total}"
     return f"✅ No differences found across {total}"
 

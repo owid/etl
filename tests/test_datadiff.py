@@ -317,7 +317,7 @@ def test_top_changes_show_more():
 
 def test_headline_counts_datasets():
     one = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
-    assert "❌ Found differences in 1 of 1 compared dataset" in render_html(one)
+    assert "❌ Found differences in the compared dataset" in render_html(one)
 
     mixed = DiffReport(
         datasets=[
@@ -328,7 +328,10 @@ def test_headline_counts_datasets():
     assert "❌ Found differences in 1 of 2 compared datasets" in render_html(mixed)
 
     clean = DiffReport(datasets=[DatasetDiffResult(path="garden/n/v/b", kind="identical")])
-    assert "✅ No differences found across 1 compared dataset" in render_html(clean)
+    assert "✅ No differences found in the compared dataset" in render_html(clean)
+
+    all_changed = DiffReport(datasets=[_changed_ds(f"garden/n/v/d{i}", 0.5) for i in range(3)])
+    assert "❌ Found differences in all 3 compared datasets" in render_html(all_changed)
 
 
 def test_top_changes_lists_data_losses_first():
