@@ -73,7 +73,7 @@ class GoogleDrive:
         # Create and edit docs.
         "https://www.googleapis.com/auth/documents",
         # Only access files created by the app.
-        "https://www.googleapis.com/auth/drive.file",
+        "https://www.googleapis.com/auth/drive",
         # Read and write Google Sheets.
         "https://www.googleapis.com/auth/spreadsheets",
     ]
@@ -238,6 +238,44 @@ class GoogleDrive:
                 break
 
         return files
+
+    def get_or_create_subfolder(self, parent_folder_id: str, folder_name: str) -> str:
+        """
+        Return the ID of a subfolder with the given name inside the parent folder.
+        Creates it if it doesn't exist.
+
+        Parameters
+        ----------
+        parent_folder_id : str
+            ID of the parent folder.
+        folder_name : str
+            Name of the subfolder to find or create.
+
+        Returns
+        -------
+        str
+            ID of the subfolder.
+
+        """
+        query = (
+            f"'{parent_folder_id}' in parents"
+            f" and name = '{folder_name}'"
+            f" and mimeType = 'application/vnd.google-apps.folder'"
+            f" and trashed = false"
+        )
+        response = self.drive_service.files().list(q=query, spaces="drive", fields="files(id, name)").execute()
+        files = response.get("files", [])
+        if files:
+            return files[0]["id"]
+        folder = (
+            self.drive_service.files()
+            .create(
+                body={"name": folder_name, "mimeType": "application/vnd.google-apps.folder", "parents": [parent_folder_id]},
+                fields="id",
+            )
+            .execute()
+        )
+        return folder["id"]
 
     def set_file_permissions(
         self,

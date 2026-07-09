@@ -168,9 +168,16 @@ class Report:
         self.min_date = f"{year}-{PERIODS[period]['min_date']}"
         self.max_date = f"{year}-{PERIODS[period]['max_date']}"
 
+        # Determine the period subfolder name, e.g. "Y-2025 Data provider reports"
+        self.subfolder_name = f"{period}-{year} Data provider reports"
+
         # Check if this report already exists in Google Drive
         google_drive = GoogleDrive()
-        files = google_drive.list_files_in_folder(folder_id=DATA_PRODUCER_REPORT_FOLDER_ID)
+        self.subfolder_id = google_drive.get_or_create_subfolder(
+            parent_folder_id=DATA_PRODUCER_REPORT_FOLDER_ID,
+            folder_name=self.subfolder_name,
+        )
+        files = google_drive.list_files_in_folder(folder_id=self.subfolder_id)
 
         self.doc_id: str | None = None
         self.pdf_id: str | None = None
@@ -225,7 +232,7 @@ class Report:
     @property
     def folder_link(self) -> str:
         """Get the folder link where reports are stored."""
-        return f"https://drive.google.com/drive/folders/{DATA_PRODUCER_REPORT_FOLDER_ID}"
+        return f"https://drive.google.com/drive/folders/{self.subfolder_id}"
 
     @property
     def exists(self) -> bool:
@@ -266,9 +273,12 @@ class Report:
         if not self.analytics:
             raise ValueError("Analytics must be gathered before creating the document")
 
-        # Initialize Google Drive and copy template.
+        # Initialize Google Drive and copy template into the period subfolder.
         google_drive = GoogleDrive()
-        self.doc_id = google_drive.copy(file_id=DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID, body={"name": self.title})
+        self.doc_id = google_drive.copy(
+            file_id=DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID,
+            body={"name": self.title, "parents": [self.subfolder_id]},
+        )
         self.google_doc = GoogleDoc(doc_id=self.doc_id)
 
         # Populate the document.
@@ -427,12 +437,6 @@ class Report:
         """Create a complete report from scratch."""
         self.gather_analytics()
 
-        # Get impact highlights for all producer names
-        highlights = get_impact_highlights(
-            producers=self.all_producer_names, min_date=self.min_date, max_date=self.max_date
-        )
-        print_impact_highlights(highlights=highlights)
-
         # Create the report
         self.create_google_doc()
         self.create_pdf(overwrite=overwrite_pdf)
@@ -533,6 +537,12 @@ def run(producer, aliases, period, year, overwrite_pdf, grant_permissions):
     # Report doesn't exist, create it from scratch
     log.info(f"Creating new report for {producer} {period} {year}")
     report.create_full_report(overwrite_pdf=overwrite_pdf, grant_permissions=grant_permissions)
+
+    # Get impact highlights for all producer names
+    highlights = get_impact_highlights(
+        producers=report.all_producer_names, min_date=report.min_date, max_date=report.max_date
+    )
+    print_impact_highlights(highlights=highlights)
 
     # Add new entry in the status sheet.
     df = pd.DataFrame(

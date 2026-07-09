@@ -1,0 +1,38 @@
+YEAR: 2025
+PERIOD: "Y"
+PROVIDERS:
+  - name: "Uppsala Conflict Data Program"
+    alias: ["Uppsala Conflict Data Program and Peace Research Institute Oslo"]
+  - name: "WDI"
+    alias: []
+  - name: "Global Carbon Project"
+    alias: []
+  - name: "WHO Mortality Database"
+    alias: []
+  - name: "IHME, Global Burden of Disease"
+    alias: []
+  - name: "Epoch AI"
+    alias: []
+  - name: "Ember"
+    alias: []
+  - name: "EM-DAT"
+    alias: []
+  - name: "V-Dem"
+    alias: []
+  - name: "Equaldex"
+    alias: []
+  - name: "Luxembourg Income Study"
+    alias: []
+  - name: "Rupert Way"
+    alias: []
+ADDITIONAL_PROVIDERS: # providers that don't get a report now but might get one in the future
+  - name: "Cherry Blossom Researcher"
+    alias: []
+  - name: "Global.health (Mpox)"
+    alias: []
+  - name: "Save the Children"
+    alias: []
+  - name: "Water, Sanitation and Hygiene (WASH) - WHO and UNICEF Joint Programme"
+    alias: []
+
+
