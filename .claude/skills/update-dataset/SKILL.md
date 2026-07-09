@@ -751,7 +751,7 @@ If downstream dependents exist, **decide with the user** whether to bump them in
 
 ## Silent-breakage check (downstream builds + value diff)
 
-A foundational-dataset update can leave a downstream step **building cleanly while quietly dropping data** — a region whose aggregate can no longer be computed goes NaN, a reclassified country disappears, a join stops matching. Nothing raises; the feather is written; the gap only surfaces on a chart weeks later. (One common cause — a `countries_that_must_have_data` entry that is no longer a member of its group — now hard-fails in `geo.add_region_aggregates`. But not every silent drop comes from that one helper, so verify the actual outputs.) Two existing commands cover it — no bespoke tool:
+A foundational-dataset update can leave a downstream step **building cleanly while quietly dropping data** — a region whose aggregate can no longer be computed goes NaN, a reclassified country disappears, a join stops matching. Nothing raises; the feather is written; the gap only surfaces on a chart weeks later. Two existing commands cover it — no bespoke tool:
 
 **1. Do all downstream consumers still build?** Run locally after repointing, before pushing:
 
@@ -768,7 +768,7 @@ A foundational-dataset update can leave a downstream step **building cleanly whi
 
 How to read it, in order:
 
-1. **"Top changes — what to watch"**: red **"− lost N data point(s): labels…"** entries lead both the Datasets and Indicators lists — each one is a coverage loss (the silent-breakage signature) and must be triaged: legitimate churn, or a repeat of the must-have bug class? Below the losses come the biggest value changes with their median anomaly scores.
+1. **"Top changes — what to watch"**: red **"− lost N data point(s): labels…"** entries lead both the Datasets and Indicators lists — each one is a coverage loss (the silent-breakage signature) and must be triaged: legitimate churn, or a silent drop? Below the losses come the biggest value changes with their median anomaly scores.
 2. **Tier strip + coverage chips**: 🔴 datasets (score ≥ 15% or any coverage loss) need review; 🟡 a skim; 🟢 is rounding-level noise. A red `− N row(s) removed: …` chip on a dataset row always means data points disappeared, regardless of how small the share.
 3. **Filters**: the tier dropdowns isolate 🔴 datasets/indicators; **📝 metadata-only** separates pure metadata edits from value changes.
 
