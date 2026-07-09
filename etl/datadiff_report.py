@@ -599,23 +599,22 @@ def render_html(report: DiffReport) -> str:
         watch = sorted((d for d in datasets if d.change_kind in ("changed", "error", "removed")), key=_watch_key)
         ds_items = []
         for d in watch[:TOP_DATASETS_LIMIT]:
+            # Red is reserved for the alarming part only: the data-loss fragment (or a dataset
+            # that failed to compare / was removed) — not the whole meta line.
             if d.change_kind == "error":
-                meta = "failed to compare"
+                meta_html = '<span class="top-meta loss">failed to compare</span>'
             elif d.change_kind == "removed":
-                meta = "removed dataset"
+                meta_html = '<span class="top-meta loss">removed dataset</span>'
             else:
-                bits = [f"median anomaly score {format_score(d.severity)}"]
-                if d.removed_row_count:
-                    bits.append(f"− lost {d.removed_row_count:,} data point(s)")
                 n_cols = sum(len(t.changed_columns) for t in d.tables)
                 n_tables = sum(1 for t in d.tables if t.any_change)
-                bits.append(f"{n_cols} column(s) in {n_tables} table(s)")
-                meta = " · ".join(bits)
-            loss_cls = " loss" if d.change_kind != "changed" or d.has_coverage_loss else ""
+                meta_html = f'<span class="top-meta">median anomaly score {_e(format_score(d.severity))}</span>'
+                if d.removed_row_count:
+                    meta_html += f'<span class="top-meta loss">− lost {d.removed_row_count:,} data point(s)</span>'
+                meta_html += f'<span class="top-meta">{n_cols} column(s) in {n_tables} table(s)</span>'
             ds_items.append(
                 f'<li><span class="ti">{TIER_ICONS.get(d.tier, "")}</span> '
-                f'<a href="#{_ds_anchor(d.path)}"><code>{_e(d.path)}</code></a>'
-                f'<span class="top-meta{loss_cls}">{_e(meta)}</span></li>'
+                f'<a href="#{_ds_anchor(d.path)}"><code>{_e(d.path)}</code></a>{meta_html}</li>'
             )
 
         losses, changes = _top_changes(report)
