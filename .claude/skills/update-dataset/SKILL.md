@@ -50,7 +50,7 @@ Assumptions:
 - [ ] Draft public-facing "Data update" post for OWID /latest, get the user's sign-off on the markdown, create the Google Doc in /Data updates, and hand the user the link (not added to the PR)
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
-- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: `etlr --modified --continue-on-failure --private` (all downstream consumers still build), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section)
+- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: `.venv/bin/etlr --modified --continue-on-failure --private` (all downstream consumers still build), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section)
 - [ ] Ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot (see "Removing the old version & reordering the DAG") — don't forget this step
 - [ ] Hand off the QA links to the user (Anomalist + Chart Diff on the staging branch, plus the data-diff report) — this is the final step
 
@@ -763,8 +763,8 @@ A foundational-dataset update can leave a downstream step **building cleanly whi
 
 **2. How much did their outputs change?** The data-diff **report** answers this directly — it ranks everything by anomaly score (BARD, the metric Anomalist uses) and makes data loss unmissable, so you read its verdicts instead of scanning the diff yourself:
 
-- **On the PR (zero effort):** open owidbot's **data-diff** HTML report (`https://catalog.ourworldindata.org/diffs/<branch>/data-diff.html`) — it compares the staging build (new dependency) against production (old dependency). For a dependency bump the consumers' code is unchanged, so this is a clean old-dep-vs-new-dep comparison.
-- **Locally, after step 1:** `etl diff REMOTE data/ --changed --include garden --output-html data-diff.html`.
+- **On the PR (zero effort):** open owidbot's **data-diff** HTML report (`https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html`, easiest via the **full report** link in owidbot's PR comment — the path uses the branch name with `/`, `.`, `_` replaced by `-`) — it compares the staging build (new dependency) against production (old dependency). For a dependency bump the consumers' code is unchanged, so this is a clean old-dep-vs-new-dep comparison.
+- **Locally, after step 1:** `.venv/bin/etl diff REMOTE data/ --changed --include garden --output-html data-diff.html`.
 
 How to read it, in order:
 
@@ -776,7 +776,7 @@ How to read it, in order:
 
 **Complementary, not a replacement:** data-diff sees every dataset (including ones with no charts), while **[Chart Diff](#final-qa-hand-off--anomalist-chart-diff-and-data-diff)** shows how the same changes land on actual published charts and **Anomalist** flags per-country anomalies in the new data — the final QA hand-off (last checklist step) covers all three. Use data-diff to find *which* datasets/indicators to worry about, then Chart Diff to judge what readers would actually see.
 
-- **When you deferred consumers to a follow-up PR:** the checks above belong to that follow-up PR; here just confirm the "Downstream dependencies" list is complete (`etlr --modified --dry-run` shows the affected set).
+- **When you deferred consumers to a follow-up PR:** the checks above belong to that follow-up PR; here just confirm the "Downstream dependencies" list is complete (`.venv/bin/etlr --modified --dry-run` shows the affected set).
 
 ## Removing the old version & reordering the DAG
 
