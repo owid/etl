@@ -268,6 +268,18 @@ def test_filter_attributes():
     assert "🟢 small" not in html_mixed.split('id="tier-filter"')[1].split("</select>")[0]
 
 
+def test_top_changes_show_more():
+    # 12 changed datasets: the Datasets watch list shows 10 and hides 2 behind "show 2 more";
+    # 12 indicators fit within the visible limit (15), so only one toggle renders.
+    report = DiffReport(datasets=[_changed_ds(f"garden/n/v/d{i:02d}", 0.9 - i * 0.01) for i in range(12)])
+    html = render_html(report)
+    assert html.count('<button class="show-more"') == 1
+    assert 'data-more="2">show 2 more</button>' in html
+    # The hidden entries carry the extra class and are the lowest-ranked ones.
+    assert html.count('<li class="extra">') == 2
+    assert 'class="extra"><span class="ti">🔴</span> <a href="#d-garden-n-v-d11"' in html
+
+
 def test_headline_counts_datasets():
     one = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
     assert "❌ Found differences in 1 of 1 compared dataset" in render_html(one)

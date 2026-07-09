@@ -29,9 +29,12 @@ TIER_LARGE = 0.15
 TIER_MODERATE = 0.01
 TIER_ICONS = {"large": "🔴", "moderate": "🟡", "small": "🟢"}
 
-# Entries shown in the "Top changes" watch list at the head of the report.
+# Entries shown in the "Top changes" watch list at the head of the report before the
+# "show more" toggle, and the hard cap on how many are rendered (hidden) behind it.
 TOP_CHANGES_LIMIT = 15
 TOP_DATASETS_LIMIT = 10
+TOP_CHANGES_MAX = 100
+TOP_DATASETS_MAX = 50
 # The triage aids (Top changes section, tier strip) only appear when there's something to
 # triage: a report with a couple of changed datasets is already scannable, and on the common
 # single-dataset PR they'd be redundant noise. Per-row tier chips render at any size.
@@ -432,6 +435,21 @@ def _top_changes(
     return losses, changes[: max(0, limit - len(losses))]
 
 
+def _expandable_list(items: list[str], visible: int) -> str:
+    """An <ol> of rendered <li> strings; entries beyond `visible` hide behind a show-more toggle."""
+    if len(items) <= visible:
+        return f"<ol>{''.join(items)}</ol>"
+
+    def _mark_extra(li: str) -> str:
+        if li.startswith('<li class="'):
+            return li.replace('<li class="', '<li class="extra ', 1)
+        return li.replace("<li>", '<li class="extra">', 1)
+
+    lis = "".join(items[:visible]) + "".join(_mark_extra(li) for li in items[visible:])
+    n_extra = len(items) - visible
+    return f'<ol>{lis}</ol><button class="show-more" data-more="{n_extra}">show {n_extra} more</button>'
+
+
 def _render_meta_diff(meta_diff: str, label: str) -> str:
     """Render an ndiff metadata diff as a collapsible block with +/- lines colored."""
     if not meta_diff:
@@ -614,7 +632,7 @@ def render_html(report: DiffReport) -> str:
 
         watch = sorted((d for d in datasets if d.change_kind in ("changed", "error", "removed")), key=_watch_key)
         ds_items = []
-        for d in watch[:TOP_DATASETS_LIMIT]:
+        for d in watch[:TOP_DATASETS_MAX]:
             # Red is reserved for the alarming part only: the data-loss fragment (or a dataset
             # that failed to compare / was removed) — not the whole meta line.
             if d.change_kind == "error":
@@ -633,7 +651,7 @@ def render_html(report: DiffReport) -> str:
                 f'<a href="#{_ds_anchor(d.path)}"><code>{_e(d.path)}</code></a>{meta_html}</li>'
             )
 
-        losses, changes = _top_changes(report)
+        losses, changes = _top_changes(report, limit=TOP_CHANGES_MAX)
         items = []
         # Data-point losses lead the indicators list — make it unmistakable that rows disappeared.
         for n_removed, labels, ds_path, table, dim in losses:
@@ -657,9 +675,9 @@ def render_html(report: DiffReport) -> str:
         if ds_items or items:
             parts = ['<details class="top-changes" open><summary><b>Top changes — what to watch</b></summary>']
             if ds_items:
-                parts.append(f"<div class='tc-h'>Datasets</div><ol>{''.join(ds_items)}</ol>")
+                parts.append(f"<div class='tc-h'>Datasets</div>{_expandable_list(ds_items, TOP_DATASETS_LIMIT)}")
             if items:
-                parts.append(f"<div class='tc-h'>Indicators</div><ol>{''.join(items)}</ol>")
+                parts.append(f"<div class='tc-h'>Indicators</div>{_expandable_list(items, TOP_CHANGES_LIMIT)}")
             parts.append("</details>")
             top_block = "".join(parts)
 
@@ -741,6 +759,10 @@ def render_html(report: DiffReport) -> str:
   .top-meta.loss {{ color: #b71c1c; font-weight: 600; }}
   .ti {{ margin-right: .15rem; }}
   .tc-h {{ font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #999; margin: .6rem 0 .1rem; }}
+  .top-changes li.extra {{ display: none; }}
+  .top-changes ol.expanded li.extra {{ display: list-item; }}
+  .show-more {{ background: none; border: none; color: #3949ab; font-size: .8rem; cursor: pointer; padding: 0 0 .2rem 1.5rem; }}
+  .show-more:hover {{ text-decoration: underline; }}
   .cards-caption {{ color: #aaa; font-size: .72rem; margin: -1.25rem 0 1.25rem; }}
   .tbl {{ margin: .75rem 0 0; }}
   .tbl-head {{ font-size: .9rem; margin-bottom: .25rem; }}
@@ -818,6 +840,13 @@ def render_html(report: DiffReport) -> str:
   }}
   filterInput.addEventListener('input', applyFilters);
   if (tierSelect) tierSelect.addEventListener('change', applyFilters);
+  document.querySelectorAll('.show-more').forEach(btn => {{
+    btn.addEventListener('click', () => {{
+      const ol = btn.previousElementSibling;
+      const expanded = ol.classList.toggle('expanded');
+      btn.textContent = expanded ? 'show fewer' : `show ${{btn.dataset.more}} more`;
+    }});
+  }});
   applyFilters();
 </script>
 </body>
