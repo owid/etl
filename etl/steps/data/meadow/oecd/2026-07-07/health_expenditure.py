@@ -40,13 +40,16 @@ def keep_relevant_columns(tb: Table) -> Table:
     Keep only the columns that are needed and rename them.
     """
 
-    # Keep only the columns that are needed
+    # Keep only the columns that are needed.
+    # BASE_PER (reference year of the constant-price series) is kept so that garden can
+    # assert the PPP base year hasn't changed between releases.
     cols_to_keep = [
         "Reference area",
         "Unit of measure",
         "Financing scheme",
         "TIME_PERIOD",
         "OBS_VALUE",
+        "BASE_PER",
         "Observation status",
         "Observation status 2",
         "Observation status 3",
@@ -59,6 +62,7 @@ def keep_relevant_columns(tb: Table) -> Table:
             "Reference area": "country",
             "TIME_PERIOD": "year",
             "OBS_VALUE": "value",
+            "BASE_PER": "base_period",
             "Unit of measure": "indicator",
         }
     )

@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 import numpy as np
 import streamlit as st
@@ -258,26 +258,23 @@ def tag_in_md(tag_name: str, color: str, icon: str | None = None):
 class Pagination:
     """Use pagination to show a list of items in Streamlit.
 
+    Thin wrapper around `st.pagination` that also slices the item list to the current page.
+
     Example:
 
     def st_show(item):
         # Function to render item
         ...
 
-    # Parameters
-    items = []
-    items_per_page = 10
-
     # Define pagination
     pagination = Pagination(
         items=items,
-        items_per_page=items_per_page,
-        pagination_key="pagination-demo",
+        items_per_page=10,
+        pagination_key="pagination-example",
     )
 
-    # Show controls only if needed
-    if len(items) > items_per_page:
-        pagination.show_controls(mode="bar")
+    # Show controls (hidden automatically if there is a single page)
+    pagination.show_controls()
 
     # Show items (only current page)
     for item in pagination.get_page_items():
@@ -290,8 +287,7 @@ class Pagination:
         items: list[Any],
         items_per_page: int,
         pagination_key: str,
-        on_click: Callable | None = None,
-        save_in_query: bool = False,
+        on_change: Callable | None = None,
     ):
         """Construct Pagination.
 
@@ -303,108 +299,38 @@ class Pagination:
             Number of items per page.
         pagination_key : str
             Key to store the current page in session state.
-        on_click : Optional[Callable], optional
-            Action to perform when interacting with any of the buttons, by default None
-        save_in_query : bool, optional
-            Whether to save the current page in the query string, by default False
+        on_change : Optional[Callable], optional
+            Action to perform when the page changes, by default None
         """
         self.items = items
         self.items_per_page = items_per_page
         self.pagination_key = pagination_key
-        self.save_in_query = save_in_query
-        # Action to perform when interacting with any of the buttons.
-        ## Example: Change the value of certain state in session_state
-        self.on_click = on_click
-        # Initialize session state for the current page
-        if self.pagination_key not in st.session_state:
-            # Get page from query parameters
-            if self.save_in_query and self.pagination_key in st.query_params:
-                self.page = int(st.query_params[self.pagination_key])
-            else:
-                self.page = 1
+        self.on_change = on_change
 
     @property
-    def page(self):
-        value = st.session_state[self.pagination_key]
-        return value
-
-    @page.setter
-    def page(self, value):
-        st.session_state[self.pagination_key] = value
+    def page(self) -> int:
+        return st.session_state.get(self.pagination_key, 1)
 
     @property
     def total_pages(self) -> int:
-        return (len(self.items) - 1) // self.items_per_page + 1
+        return max(1, (len(self.items) - 1) // self.items_per_page + 1)
 
     def get_page_items(self) -> list[Any]:
-        page = self.page
-        start_idx = (page - 1) * self.items_per_page
+        start_idx = (self.page - 1) * self.items_per_page
         end_idx = start_idx + self.items_per_page
         return self.items[start_idx:end_idx]
 
-    def show_controls(self, mode: Literal["buttons", "bar"] = "buttons") -> None:
-        if mode == "bar":
-            self.show_controls_bar()
-        elif mode == "buttons":
-            self.show_controls_buttons()
-        else:
-            raise ValueError("Mode must be either 'buttons' or 'bar'.")
-
-    def show_controls_buttons(self):
-        # Pagination controls
-        # col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
-
-        with st.container(border=True):
-            with st_horizontal():
-                # with col1:
-                key = f"previous-{self.pagination_key}"
-                if self.page > 1:
-                    if st.button("⏮️ Previous", key=key):
-                        self.page -= 1
-                        if self.on_click is not None:
-                            self.on_click()
-                        st.rerun()
-                else:
-                    st.button("⏮️ Previous", disabled=True, key=key)
-
-                s = st.empty()
-
-                # with col3:
-                key = f"next-{self.pagination_key}"
-                if self.page < self.total_pages:
-                    if st.button("Next ⏭️", key=key):
-                        self.page += 1
-                        if self.on_click is not None:
-                            self.on_click()
-                        st.rerun()
-                else:
-                    st.button("Next ⏭️", disabled=True, key=key)
-
-                # with col2:
-                s.text(f"Page {self.page} of {self.total_pages}")
-
-    def show_controls_bar(self) -> None:
-        def _change_page():
-            # Internal action
-            if self.save_in_query:
-                if self.page == 1:
-                    st.query_params.pop(self.pagination_key)
-                else:
-                    st.query_params.update({self.pagination_key: self.page})
-
-            # External action
-            if self.on_click is not None:
-                self.on_click()
-
-        with st_horizontal():
-            st.number_input(
-                label=f"**Go to page** (results per page: {self.items_per_page}; total pages: {self.total_pages})",
-                min_value=1,
-                max_value=self.total_pages,
-                # value=self.page,
-                on_change=_change_page,
-                key=self.pagination_key,
-            )
+    def show_controls(self) -> None:
+        if self.total_pages == 1:
+            return
+        # If the item list shrank (e.g. filters changed), the remembered page may be out of range.
+        if self.page > self.total_pages:
+            st.session_state[self.pagination_key] = 1
+        st.pagination(
+            self.total_pages,
+            key=self.pagination_key,
+            on_change=self.on_change,
+        )
 
 
 def st_multiselect_wider(num_px: int = 1000):

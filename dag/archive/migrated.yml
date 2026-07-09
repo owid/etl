@@ -371,6 +371,10 @@ steps:
   data://grapher/agriculture/2017-08-10/forestry_area__fao__2017:
     - data://garden/agriculture/2017-08-10/forestry_area__fao__2017:
       - snapshot://agriculture/2017-08-10/forestry_area__fao__2017.feather
+  # archived; last active in cb28bd953aef on 2026-07-08
+  data-private://grapher/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
+    - data-private://garden/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
+      - snapshot-private://fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021.feather
   # archived; last active in bc11d6451c60 on 2026-07-07
   data-private://grapher/artificial_intelligence/2022-12-01/ai_index_report__2022:
     - data-private://garden/artificial_intelligence/2022-12-01/ai_index_report__2022:
