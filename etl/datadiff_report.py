@@ -120,14 +120,15 @@ class ColumnDiffResult:
     @property
     def severity(self) -> float:
         """Biggest change among the column's value diffs; removed columns are maximal, new ones
-        minimal, metadata-only changes just above identical."""
+        minimal. Metadata-only changes score 0 — they are not anomalies, so they get no tier and
+        no score chip (they surface as "metadata-only" instead)."""
         if self.kind == "removed":
             return 1.0
         if self.kind == "new":
             return 0.0
         if self.value_diffs:
             return max(v.severity for v in self.value_diffs)
-        return 0.001 if self.kind != "identical" else 0.0
+        return 0.0
 
 
 @dataclass
@@ -148,10 +149,8 @@ class TableDiffResult:
 
     @property
     def severity(self) -> float:
-        """A table is as critical as its most-changed column."""
-        s = max((c.severity for c in self.columns), default=0.0)
-        # Metadata-only table changes rank just above identical.
-        return max(s, 0.001) if self.kind != "identical" else s
+        """A table is as critical as its most-changed column (metadata-only changes score 0)."""
+        return max((c.severity for c in self.columns), default=0.0)
 
     @property
     def removed_row_count(self) -> int:
@@ -439,7 +438,7 @@ def _top_changes(
                 )
                 losses.append((t.removed_row_count, t.removed_labels, ds.path, t.name, dim))
             for c in t.columns:
-                if c.is_dim or c.kind == "identical" or c.severity <= 0.001:
+                if c.is_dim or c.kind == "identical" or c.severity <= 0:
                     continue
                 pct = max((v.pct for v in c.value_diffs if v.kind != "new"), default=0.0)
                 changes.append((c.severity, pct, ds.path, t.name, c.name))
@@ -658,10 +657,15 @@ def render_html(report: DiffReport) -> str:
     top_block = ""
     if report.n_changed >= TRIAGE_MIN_DATASETS:
         strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
-        n_tiered = sum(tier_counts.values())
-        if strip_bits and n_tiered:
+        # Datasets whose only differences are metadata edits carry no anomaly tier — list them
+        # separately so the strip total still matches the headline's differing-dataset count.
+        n_meta_only = sum(1 for ds in report.datasets if ds.change_kind == "changed" and ds.tier == "none")
+        if n_meta_only:
+            strip_bits.append(f"📝 {n_meta_only} metadata-only")
+        n_diff = sum(tier_counts.values()) + n_meta_only
+        if strip_bits and n_diff:
             tier_strip = (
-                f'<div class="tier-strip">Of the {n_tiered:,} dataset{"s" if n_tiered != 1 else ""} with '
+                f'<div class="tier-strip">Of the {n_diff:,} dataset{"s" if n_diff != 1 else ""} with '
                 f"differences, the changes are: {' · '.join(strip_bits)} "
                 f'<span class="tier-hint">(tiered by median anomaly score; coverage loss ⇒ 🔴)</span></div>'
             )
@@ -676,6 +680,8 @@ def render_html(report: DiffReport) -> str:
                 meta_html = '<span class="top-meta loss">failed to compare</span>'
             elif d.change_kind == "removed":
                 meta_html = '<span class="top-meta loss">removed dataset</span>'
+            elif d.severity <= 0:
+                meta_html = '<span class="top-meta">metadata-only changes</span>'
             else:
                 n_cols = sum(len(t.changed_columns) for t in d.tables)
                 n_tables = sum(1 for t in d.tables if t.any_change)

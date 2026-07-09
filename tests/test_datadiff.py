@@ -445,3 +445,34 @@ def test_sample_note_in_header():
     )
     html = render_html(DiffReport(datasets=[ds]))
     assert '(15.46%) <span class="head-note">— showing the 1 most anomalous rows</span>' in html
+
+
+def test_metadata_only_changes_are_not_tiered():
+    # A metadata-only change is not an anomaly: no tier, no score chip, no tier-strip count —
+    # it surfaces as "metadata-only" instead.
+    meta_only = DatasetDiffResult(
+        path="garden/n/v/meta",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="t",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(name="a", kind="changed", changes=["changed metadata"], meta_diff="- x\n+ y")
+                ],
+            )
+        ],
+    )
+    assert meta_only.change_kind == "changed"
+    assert meta_only.severity == 0.0
+    assert meta_only.tier == "none"
+
+    others = [_changed_ds(f"garden/n/v/d{i}", 0.5) for i in range(3)]
+    html = render_html(DiffReport(datasets=[*others, meta_only]))
+    # Strip total matches the headline (4 differing datasets) and lists the metadata-only one.
+    assert "Of the 4 datasets with differences" in html
+    assert "📝 1 metadata-only" in html
+    # The watch list labels it honestly instead of a 0% anomaly score.
+    assert "metadata-only changes" in html
+    # And its dataset row carries no score chip.
+    assert 'data-tier="none" data-search="garden/n/v/meta t a"' in html
