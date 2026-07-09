@@ -51,7 +51,7 @@ tables:
         processing_level: major
       population_not_fed_by_synthetic_nitrogen:
         title: World population supported without synthetic nitrogen fertilizers
-        description_short: Estimated number of people that could be supported without the use of synthetic nitrogen fertilizers, produced via the Haber-Bosch process.
+        description_short: Estimated number of people who could be supported without the use of synthetic nitrogen fertilizers, produced via the Haber-Bosch process.
         description_key: *description-key
         description_processing: *description-processing
         display:
