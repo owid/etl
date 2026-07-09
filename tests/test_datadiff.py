@@ -219,16 +219,38 @@ def test_coverage_loss_forces_large_tier():
     assert 'class="chip tier large">🔴 median anomaly score' in html
 
 
-def test_triage_aids_render_at_any_size():
-    # One format for every report size: even a single-dataset diff gets the tier strip and the
-    # watch lists (its Indicators list is exactly where a many-column dataset needs ranking).
+def test_triage_aids_gate_on_content():
+    # Each triage element renders only when it can discriminate.
     # (Assert on rendered elements, not bare class names — those always appear in the stylesheet.)
-    small = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
-    html_small = render_html(small)
-    assert "Top changes" in html_small
-    assert '<div class="tier-strip">' in html_small
-    assert "Of the 1 dataset with differences" in html_small
-    assert "anomaly score" in html_small
+
+    # One dataset, ONE indicator: nothing to rank — no watch list, no tier strip; chips only.
+    tiny = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
+    html_tiny = render_html(tiny)
+    assert "Top changes" not in html_tiny
+    assert '<div class="tier-strip">' not in html_tiny
+    assert "anomaly score" in html_tiny
+
+    # One dataset, MANY indicators: the Indicators list ranks them (that's where it helps most),
+    # but the singleton Datasets sub-list and the "Of the 1 dataset" strip stay hidden.
+    many_cols = DiffReport(
+        datasets=[
+            DatasetDiffResult(
+                path="garden/n/v/wide",
+                kind="identical",
+                tables=[
+                    TableDiffResult(
+                        name="t",
+                        kind="identical",
+                        columns=[_changed_col(f"c{i}", 0.5 - i * 0.1) for i in range(4)],
+                    )
+                ],
+            )
+        ]
+    )
+    html_many = render_html(many_cols)
+    assert ">Indicators<" in html_many
+    assert ">Datasets<" not in html_many
+    assert '<div class="tier-strip">' not in html_many
 
     big = DiffReport(datasets=[_changed_ds(f"garden/n/v/d{i}", 0.5 - i * 0.1) for i in range(4)])
     html_big = render_html(big)

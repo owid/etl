@@ -684,8 +684,9 @@ def render_html(report: DiffReport) -> str:
     else:
         ind_tier_select = ""
 
-    # Triage aids — one format for every report size; content-based gating on the controls
-    # (dropdowns, toggles, show-more) already prevents dead UI on small diffs.
+    # Triage aids gate on content, not report size: each element renders only when it can
+    # discriminate — the strip needs >= 2 differing datasets ("Of the 1 dataset…" restates the
+    # headline), and a watch sub-list needs >= 2 entries (a ranking of one thing ranks nothing).
     tier_strip = ""
     top_block = ""
     strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
@@ -701,7 +702,7 @@ def render_html(report: DiffReport) -> str:
     if n_new_only:
         strip_bits.append(f"➕ {n_new_only} new-data-only")
     n_diff = sum(tier_counts.values()) + n_meta_only + n_new_only
-    if strip_bits and n_diff:
+    if strip_bits and n_diff >= 2:
         tier_strip = (
             f'<div class="tier-strip">Of the {n_diff:,} dataset{"s" if n_diff != 1 else ""} with '
             f"differences, the changes are: {' · '.join(strip_bits)} "
@@ -756,11 +757,13 @@ def render_html(report: DiffReport) -> str:
             f'<a href="#{_anchor(ds_path, table, col)}"><code>{_e(ds_path)}</code> · <code>{_e(table)}.{_e(col)}</code></a>'
             f'<span class="top-meta">median anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows</span></li>'
         )
-    if ds_items or items:
+    show_datasets = len(ds_items) >= 2
+    show_indicators = len(items) >= 2
+    if show_datasets or show_indicators:
         parts = ['<details class="top-changes" open><summary><b>Top changes — what to watch</b></summary>']
-        if ds_items:
+        if show_datasets:
             parts.append(f"<div class='tc-h'>Datasets</div>{_expandable_list(ds_items, TOP_DATASETS_LIMIT)}")
-        if items:
+        if show_indicators:
             parts.append(f"<div class='tc-h'>Indicators</div>{_expandable_list(items, TOP_CHANGES_LIMIT)}")
         parts.append("</details>")
         top_block = "".join(parts)
