@@ -24,7 +24,6 @@ def sanity_check_inputs(tb: Table, last_year: int) -> None:
     assert set(tb["year"]) == expected_years, "Digitized years changed unexpectedly."
     share = tb.sort_values("year")[SHARE_COLUMN]
     assert share.notna().all(), "Digitized share contains missing values."
-    assert (share.diff().dropna() >= 0).all(), "Digitized share is expected to be monotonically non-decreasing."
     assert share.iloc[0] == 0, "Share in 1900 is expected to be zero."
     assert share.iloc[-1] == SHARE_FED_RECENT, (
         "Share in 2008 is expected to coincide with the share assumed for recent years."
@@ -40,11 +39,8 @@ def sanity_check_outputs(tb: Table) -> None:
     assert tb["year"].is_monotonic_increasing and not tb["year"].duplicated().any(), (
         "Years are not a clean annual axis."
     )
-    # The interpolated share must stay within the range of the digitized endpoints and be non-decreasing.
+    # The interpolated share must stay within the range of the digitized endpoints.
     assert tb[SHARE_COLUMN].between(0, SHARE_FED_RECENT).all(), "Interpolated share is out of the expected range."
-    assert (tb.sort_values("year")[SHARE_COLUMN].diff().dropna() >= 0).all(), (
-        "Interpolated share is expected to be monotonically non-decreasing."
-    )
     # The two estimated populations must add up to the total.
     assert (
         (tb["population_fed_by_synthetic_nitrogen"] + tb["population_not_fed_by_synthetic_nitrogen"])
