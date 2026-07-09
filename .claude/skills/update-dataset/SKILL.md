@@ -50,7 +50,7 @@ Assumptions:
 - [ ] Draft public-facing "Data update" post for OWID /latest, get the user's sign-off on the markdown, create the Google Doc in /Data updates, and hand the user the link (not added to the PR)
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
-- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: `etlr --modified --continue-on-failure --private` (all downstream consumers still build), then read the data-diff report (owidbot comment / `etl diff REMOTE data/ --changed --output-html`) for dropped entities/columns or all-NaN series (see "Silent-breakage check" section)
+- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: `etlr --modified --continue-on-failure --private` (all downstream consumers still build), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section)
 - [ ] Ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot (see "Removing the old version & reordering the DAG") — don't forget this step
 - [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
 
@@ -761,12 +761,18 @@ A foundational-dataset update can leave a downstream step **building cleanly whi
 
 `--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. This catches consumers that crash against the new dependency — a failure mode staging hides (the failed step just stays stale in the catalog; data-diff shows it as unchanged and the traceback is buried in the Buildkite log). Use `--workers N` to parallelize a big fan-out.
 
-**2. How much did their outputs change?** Value-level comparison via datadiff:
+**2. How much did their outputs change?** The data-diff **triage report** answers this directly — it ranks everything by anomaly score (BARD, the metric Anomalist uses) and makes data loss unmissable, so you read its verdicts instead of scanning the diff yourself:
 
-- **On the PR (zero effort):** read owidbot's **data-diff** comment + its sidecar HTML report (`https://catalog.ourworldindata.org/diffs/<branch>/data-diff.html`) — it compares the staging build (new dependency) against production (old dependency) with per-column changed-value counts and old→new sample rows. For a dependency bump the consumers' code is unchanged, so this is a clean old-dep-vs-new-dep comparison.
+- **On the PR (zero effort):** open owidbot's **data-diff** HTML report (`https://catalog.ourworldindata.org/diffs/<branch>/data-diff.html`) — it compares the staging build (new dependency) against production (old dependency). For a dependency bump the consumers' code is unchanged, so this is a clean old-dep-vs-new-dep comparison.
 - **Locally, after step 1:** `etl diff REMOTE data/ --changed --include garden --output-html data-diff.html`.
 
-Read the diff for the silent-drop signatures: a column or entity that vanished, a series that went all-NaN, a region aggregate whose values collapsed. **Don't diff against stale local builds** — a consumer built at an unknown earlier time (or downloaded from the catalog) conflates code drift with the dependency change and produces false positives; `REMOTE`/production is the trustworthy baseline because CI built it from master.
+How to read it, in order:
+
+1. **"Top changes — what to watch"**: red **"− lost N data point(s): labels…"** entries lead both the Datasets and Indicators lists — each one is a coverage loss (the silent-breakage signature) and must be triaged: legitimate churn, or a repeat of the must-have bug class? Below the losses come the biggest value changes with their median anomaly scores.
+2. **Tier strip + coverage chips**: 🔴 datasets (score ≥ 15% or any coverage loss) need review; 🟡 a skim; 🟢 is rounding-level noise. A red `− N row(s) removed: …` chip on a dataset row always means data points disappeared, regardless of how small the share.
+3. **Filters**: the tier dropdowns isolate 🔴 datasets/indicators; **📝 metadata-only** separates pure metadata edits from value changes.
+
+**Don't diff against stale local builds** — a consumer built at an unknown earlier time (or downloaded from the catalog) conflates code drift with the dependency change and produces false positives; `REMOTE`/production is the trustworthy baseline because CI built it from master.
 
 - **When you deferred consumers to a follow-up PR:** the checks above belong to that follow-up PR; here just confirm the "Downstream dependencies" list is complete (`etlr --modified --dry-run` shows the affected set).
 
