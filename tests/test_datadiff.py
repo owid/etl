@@ -246,15 +246,26 @@ def test_filter_attributes():
     html = render_html(DiffReport(datasets=[ds]))
     assert 'data-search="garden/n/v/a t a"' in html
     assert 'data-tier="large"' in html
-    assert 'id="tier-filter"' in html
     assert 'id="match-count"' in html
-    # No identical datasets -> the show-identical toggle is dropped entirely.
+    # No identical datasets -> the show-identical toggle is dropped entirely; a single tier ->
+    # the tier dropdown is dropped too (a filter with one choice is dead weight).
     assert 'id="show-identical"' not in html
+    assert 'id="tier-filter"' not in html
 
-    # With identical datasets, the toggle carries the count so its effect is discoverable.
-    mixed = DiffReport(datasets=[ds, DatasetDiffResult(path="garden/n/v/same", kind="identical")])
+    # With identical datasets, the toggle carries the count so its effect is discoverable; with
+    # two tiers present, the dropdown appears offering exactly those (with counts).
+    mixed = DiffReport(
+        datasets=[
+            ds,
+            _changed_ds("garden/n/v/b", 0.05),
+            DatasetDiffResult(path="garden/n/v/same", kind="identical"),
+        ]
+    )
     html_mixed = render_html(mixed)
     assert "show 1 identical dataset<" in html_mixed
+    assert 'id="tier-filter"' in html_mixed
+    assert "🔴 large (1)" in html_mixed and "🟡 moderate (1)" in html_mixed
+    assert "🟢 small" not in html_mixed.split('id="tier-filter"')[1].split("</select>")[0]
 
 
 def test_headline_counts_datasets():

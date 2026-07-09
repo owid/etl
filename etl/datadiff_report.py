@@ -576,14 +576,25 @@ def render_html(report: DiffReport) -> str:
     datasets = sorted(report.datasets, key=lambda ds: (-ds.severity, ds.path))
     sections = "".join(_render_dataset(ds) for ds in datasets)
 
+    tier_counts = {"large": 0, "moderate": 0, "small": 0}
+    for ds in report.datasets:
+        if ds.change_kind != "identical" and ds.tier != "none":
+            tier_counts[ds.tier] += 1
+
+    # The tier dropdown offers only tiers that exist in the report (with their counts), and is
+    # dropped entirely when there are fewer than two to tell apart — a filter with one choice
+    # is dead weight.
+    available_tiers = [t for t in ("large", "moderate", "small") if tier_counts[t]]
+    if len(available_tiers) >= 2:
+        opts = "".join(f'<option value="{t}">{TIER_ICONS[t]} {t} ({tier_counts[t]})</option>' for t in available_tiers)
+        tier_select = f'<select id="tier-filter"><option value="all">all tiers</option>{opts}</select>'
+    else:
+        tier_select = ""
+
     # Triage aids — only when the report is big enough to need them.
     tier_strip = ""
     top_block = ""
     if report.n_changed >= TRIAGE_MIN_DATASETS:
-        tier_counts = {"large": 0, "moderate": 0, "small": 0}
-        for ds in report.datasets:
-            if ds.change_kind != "identical" and ds.tier != "none":
-                tier_counts[ds.tier] += 1
         strip_bits = [f"{TIER_ICONS[t]} {n} {t}" for t, n in tier_counts.items() if n]
         if strip_bits:
             tier_strip = f'<div class="tier-strip">{" · ".join(strip_bits)} <span class="tier-hint">(by median anomaly score; coverage loss ⇒ 🔴)</span></div>'
@@ -762,12 +773,7 @@ def render_html(report: DiffReport) -> str:
   {top_block}
   <div class="controls">
     <input type="search" id="filter" placeholder="Filter datasets (path, table, column…)">
-    <select id="tier-filter">
-      <option value="all">all tiers</option>
-      <option value="large">🔴 large</option>
-      <option value="moderate">🟡 moderate</option>
-      <option value="small">🟢 small</option>
-    </select>
+    {tier_select}
     {identical_toggle}
     <span class="match-count" id="match-count"></span>
   </div>
@@ -783,7 +789,7 @@ def render_html(report: DiffReport) -> str:
   function applyFilters() {{
     // Multi-term AND over names only (path + table + changed-column names, via data-search).
     const terms = filterInput.value.toLowerCase().split(/\\s+/).filter(Boolean);
-    const tier = tierSelect.value;
+    const tier = tierSelect ? tierSelect.value : 'all';
     const filtering = terms.length > 0 || tier !== 'all';
     let shown = 0;
     dsBlocks.forEach(d => {{
@@ -806,7 +812,7 @@ def render_html(report: DiffReport) -> str:
     }});
   }}
   filterInput.addEventListener('input', applyFilters);
-  tierSelect.addEventListener('change', applyFilters);
+  if (tierSelect) tierSelect.addEventListener('change', applyFilters);
   applyFilters();
 </script>
 </body>
