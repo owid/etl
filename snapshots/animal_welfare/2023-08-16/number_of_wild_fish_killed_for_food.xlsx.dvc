@@ -11,8 +11,8 @@ meta:
       http://fishcount.org.uk/studydatascreens/2016/fishcount_estimated_wild_fish_2007-2016.xlsx
     date_published: 2019-01-21
     date_accessed: 2023-08-16
-  license:
-    name: CC BY
+    license:
+      name: CC BY
 wdir: ../../../data/snapshots/animal_welfare/2023-08-16
 outs:
 - md5: 1ba53c61c560e33042789dbab49f64de

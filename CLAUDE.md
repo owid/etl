@@ -8,6 +8,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
+- **Never delete a step without archiving it.** Removing or superseding an active step (new version, retirement, replacement) obligates you to archive it — deleting the files alone is a bug. Procedure: remove its `dag/*.yml` entry and delete its files → **commit** → run `etl archive-dag` (it reads *committed* history, so the removal must be committed first) → commit the regenerated `dag/archive/*.yml`. If `archive-dag` sweeps in unrelated steps others left un-archived, `git checkout` those files to keep your PR scoped (never hand-edit the archive). For a migrated/backport dataset, also delete its now-orphaned `snapshots/backport/latest/dataset_<id>_*` mirror files.
 - **Never push, commit, or open PRs** unless explicitly told to
 - **Ask the user** if unsure - don't guess
 - **Always run `make check` before committing**
@@ -238,6 +239,7 @@ with open(file_path, 'w') as f:
 ### Writing origin / metadata fields
 
 - **Consult the reference** — before writing `.dvc` `origin` or `.meta.yml` fields, look the field up in `schemas/definitions.json` (rendered at the [metadata reference](https://docs.owid.io/projects/etl/architecture/metadata/reference/)) and follow its `guidelines`. They're detailed and per-field: requirement level, good/bad examples, and when to omit optional fields (`title_snapshot`, `description_snapshot`, `attribution` all default to null / auto-generated). Each field has one job — don't fold content that belongs in one field into another.
+- **License goes under `origin`, not at the top level.** In a snapshot `.dvc`, the license is `meta.origin.license` (4-space, inside `origin`) — never the top-level `meta.license` (2-space). Both parse (they differ only by indentation), but the top-level form is a deprecated `SnapshotMeta` field that doesn't travel with the origin, so the license is dropped from Grapher's per-origin metadata (which matters for multi-origin datasets). The wizard cookiecutter already does this correctly; a schema `not`-constraint + `test_snapshot_license_lives_under_origin` enforce it. Each origin in a multi-origin `.dvc` needs its own `license`.
 - **`license.url` points to the producer's own license statement** — the page or PDF download link where the producer states the terms (often the same landing page as `url_main`). Never a `creativecommons.org` deed or other generic license page. If the producer states no license anywhere, leave `url` empty (don't fall back to the dataset's main page).
 - **American spelling always**.
 

@@ -11,9 +11,9 @@ meta:
     citation_full: |-
       United States Space Force - Number of objects in space (2025). 18th Space Defense Squadron.
     url_main: https://www.space-track.org/
-  license:
-    name: USSPACECOM Basic SSA Data, redistribution allowed with attribution
-    url: https://www.space-track.org/documentation#/odr
+    license:
+      name: USSPACECOM Basic SSA Data, redistribution allowed with attribution
+      url: https://www.space-track.org/documentation#/odr
 
 outs:
   - md5: e45cb1499568e3ea8f4c1cb2a4b1e7ed

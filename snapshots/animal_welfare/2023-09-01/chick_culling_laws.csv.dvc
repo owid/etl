@@ -115,8 +115,8 @@ meta:
     url_main: https://animallaweurope.com/news/
     date_accessed: '2023-09-01'
     date_published: '2023-09-01'
-  license:
-    name: CC BY 4.0
+    license:
+      name: CC BY 4.0
 wdir: ../../../data/snapshots/animal_welfare/2023-09-01
 outs:
 - md5: 2afcdd6c0c3ade182cf69b24ab684db3

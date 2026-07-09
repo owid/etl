@@ -1281,7 +1281,7 @@ steps:
   data://grapher/un/2025-04-25/long_run_child_mortality:
     - data://garden/un/2025-04-25/long_run_child_mortality
 
-  # archived; last active in b0d22bce86f9 on 2026-06-30
+  # archived; last active in 1c12a82b704c on 2026-07-01
   data://grapher/wvs/2023-06-25/longitudinal_wvs:
     - data://garden/wvs/2023-06-25/longitudinal_wvs:
       - data://meadow/wvs/2023-06-25/longitudinal_wvs:
