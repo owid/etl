@@ -525,8 +525,13 @@ def _render_dataset(ds: DatasetDiffResult) -> str:
     open_attr = " open" if kind in ("changed", "error") else ""
     new_version = ' <span class="chip">new version</span>' if ds.is_new_version else ""
     tier = _tier_chip(ds.severity, kind) if kind == "changed" else ""
+    # What the filter box matches against: names only (path, tables, changed columns) — matching
+    # the full text would make queries hit sample values and scores, which is pure noise.
+    search = " ".join(
+        [ds.path] + [t.name for t in ds.tables] + [c.name for t in ds.tables for c in t.changed_columns]
+    ).lower()
     parts = [
-        f'<details class="ds {kind}" id="{_ds_anchor(ds.path)}"{open_attr}>'
+        f'<details class="ds {kind}" id="{_ds_anchor(ds.path)}" data-tier="{ds.tier}" data-search="{_e(search)}"{open_attr}>'
         f'<summary><span class="sym {kind}">{_SYMBOLS[kind]}</span> '
         f'<code class="path">{_e(ds.path)}</code>{new_version}{tier}{_coverage_chip(ds)}'
         f'<span class="ds-note">{_e(_dataset_summary_note(ds))}</span></summary>'
@@ -676,7 +681,10 @@ def render_html(report: DiffReport) -> str:
   details.ds > summary:hover {{ background: #fcfcff; }}
   details.ds.identical {{ display: none; }}
   body.show-identical details.ds.identical {{ display: block; }}
+  details.ds.identical.match-visible {{ display: block; }}
   details.ds.hidden {{ display: none !important; }}
+  select {{ padding: .45rem .5rem; border: 1px solid #ccc; border-radius: 6px; font-size: .85rem; background: #fff; }}
+  .match-count {{ color: #999; font-size: .8rem; margin-left: auto; }}
   .ds-body {{ padding: .25rem 1rem 1rem; border-top: 1px solid #f0f0f0; }}
   .ds-note {{ margin-left: auto; color: #999; font-size: .8rem; }}
   code {{ font-size: .82rem; background: #f3f3f3; padding: .1rem .3rem; border-radius: 3px; }}
@@ -742,19 +750,50 @@ def render_html(report: DiffReport) -> str:
   {top_block}
   <div class="controls">
     <input type="search" id="filter" placeholder="Filter datasets (path, table, column…)">
+    <select id="tier-filter">
+      <option value="all">all tiers</option>
+      <option value="large">🔴 large</option>
+      <option value="moderate">🟡 moderate</option>
+      <option value="small">🟢 small</option>
+    </select>
     <label><input type="checkbox" id="show-identical"> show identical datasets</label>
+    <span class="match-count" id="match-count"></span>
   </div>
   {sections}
   {skipped_note}
 <script>
   const dsBlocks = Array.from(document.querySelectorAll('details.ds'));
-  document.getElementById('show-identical').addEventListener('change', (e) => {{
+  const filterInput = document.getElementById('filter');
+  const tierSelect = document.getElementById('tier-filter');
+  const showIdentical = document.getElementById('show-identical');
+  const matchCount = document.getElementById('match-count');
+
+  function applyFilters() {{
+    // Multi-term AND over names only (path + table + changed-column names, via data-search).
+    const terms = filterInput.value.toLowerCase().split(/\\s+/).filter(Boolean);
+    const tier = tierSelect.value;
+    const filtering = terms.length > 0 || tier !== 'all';
+    let shown = 0;
+    dsBlocks.forEach(d => {{
+      const hay = d.dataset.search || '';
+      const match = terms.every(t => hay.includes(t)) && (tier === 'all' || d.dataset.tier === tier);
+      d.classList.toggle('hidden', !match);
+      // An active filter reveals matching identical datasets even when the toggle is off —
+      // searching for a dataset you know was compared should always find it.
+      d.classList.toggle('match-visible', match && filtering);
+      const visible = match && (!d.classList.contains('identical') || showIdentical.checked || filtering);
+      if (visible) shown++;
+    }});
+    matchCount.textContent = `${{shown}} of ${{dsBlocks.length}} datasets shown`;
+  }}
+
+  showIdentical.addEventListener('change', (e) => {{
     document.body.classList.toggle('show-identical', e.target.checked);
+    applyFilters();
   }});
-  document.getElementById('filter').addEventListener('input', (e) => {{
-    const q = e.target.value.toLowerCase();
-    dsBlocks.forEach(d => d.classList.toggle('hidden', !d.textContent.toLowerCase().includes(q)));
-  }});
+  filterInput.addEventListener('input', applyFilters);
+  tierSelect.addEventListener('change', applyFilters);
+  applyFilters();
 </script>
 </body>
 </html>

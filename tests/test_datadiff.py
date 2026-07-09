@@ -239,6 +239,17 @@ def test_triage_aids_only_on_big_reports():
     assert 'id="d-garden-n-v-d0"' in html_big
 
 
+def test_filter_attributes():
+    # The filter box matches on names only, via data-search (path + tables + changed columns);
+    # data-tier feeds the tier dropdown.
+    ds = _changed_ds("garden/n/v/a", 0.5)
+    html = render_html(DiffReport(datasets=[ds]))
+    assert 'data-search="garden/n/v/a t a"' in html
+    assert 'data-tier="large"' in html
+    assert 'id="tier-filter"' in html
+    assert 'id="match-count"' in html
+
+
 def test_headline_counts_datasets():
     one = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
     assert "❌ Found differences in 1 of 1 compared dataset" in render_html(one)
@@ -304,8 +315,9 @@ def test_report_sorts_by_severity():
 
     # Dataset with the biggest change first.
     assert html.index("garden/n/v/big") < html.index("garden/n/v/small")
-    # Within a dataset, the most-changed table first; within a table, the most-changed column first.
-    assert html.index("major") < html.index("minor")
+    # Within a dataset, the most-changed table first; within a table, the most-changed column
+    # first. (Match the rendered markup, not bare names — those also occur in data-search attrs.)
+    assert html.index("Table <b>major</b>") < html.index("Table <b>minor</b>")
     assert html.index("major.huge") < html.index("major.tiny")
     # Severity levels: dataset takes the max of its tables.
     assert ds_big.severity == pytest.approx(0.9)
