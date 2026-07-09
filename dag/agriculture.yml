@@ -174,3 +174,10 @@ steps:
                           - data://meadow/agriculture/2026-07-03/population_fed_by_synthetic_nitrogen:
                                     - snapshot://agriculture/2026-07-03/population_fed_by_synthetic_nitrogen.csv
                           - data://garden/demography/2024-07-15/population
+        #
+        # Employment in fisheries and aquaculture (FAO, SOFIA 2024).
+        #
+        data://grapher/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
+                - data://garden/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
+                          - data://meadow/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
+                                    - snapshot://agriculture/2024-06-07/employment_in_fisheries_and_aquaculture.csv

@@ -369,6 +369,13 @@ yarn fixLintChanged     # lint the changed files; yarn fixFormatChanged to forma
 ```
 Confirm the provider appears in `regionGroupLabels` and the relevant label record(s), and that typecheck is clean (a missing entry in a `Record<RegionDataProvider, …>` / `Record<TooltipKey, …>` registry is a compile error — that's your safety net). Open a PR in `owid-grapher` (title like `🔨 update regions file`), with the disclosure blockquote in the body.
 
+### Renaming existing regions (not a fresh add)
+
+Occasionally you're not adding a provider but **renaming** its already-published regions (e.g. WID's `MENA (WID)` → `Middle East and North Africa (WID)`, or `&` → `and`). The Step 9 flow is the same, with two wrinkles:
+
+- **Finish with `runRegionsUpdater` from prod — never merge on a hand-edit.** Renaming a region's `name` shifts the derived name / `RegionDataProvider` union types, so it's tempting to hand-edit the `name`s directly in `regions.data.ts` to keep `yarn typecheck` green before the prod catalog has rebuilt. That stopgap is **always incomplete**: the updater also regenerates each region's `shortName` and `slug` *from* the name, which a hand-edit silently misses (on the WID rename the stopgap kept the stale `mena-wid` slug and dropped MENA's `shortName`). Once the rename is live on prod, run `runRegionsUpdater` and let it overwrite the file — the diff exposes any derived field the stopgap got wrong. Treat the regenerated file as the source of truth, not the hand-edit.
+- **Ignore the "set up redirects" message for provider regions.** The updater unconditionally prints *"Be sure to set up redirects for any slugs that have changed"* on **any** change to `regions.data.ts`. But a `slug` only drives a URL for a **country** profile page (`/country/<slug>`, baked only for `regionType: "country"` — see `countries` in `regionsUtils.ts`). Provider regions are `regionType: "aggregate"` and have no country page, so their slug changes need **no** redirect. Only act on that warning if a real *country's* slug changed.
+
 ---
 
 ## Step 10 — Add the provider to the world-region-map-definitions article
