@@ -1,0 +1,32 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical livestock counts (mammals)
+    description: |-
+      Regional estimates of the number of livestock for eight domestic mammal species (asses, buffalo, cattle, goats, horses, mules, pigs and sheep), compiled as part of the History Database of the Global Environment (HYDE). The historical compilation covers only these mammals; no bird species are included.
+
+      Figures for the period 1890 to 1960 are based on B.R. Mitchell's International Historical Statistics, while figures from 1961 onwards are taken from FAOSTAT. The Mitchell series were scaled in 1961 to match the FAO data, and gaps between the reported years were filled by linear interpolation. Estimates are reported at ten-year intervals (plus a final 1998 value), for 19 world sub-regions and the world total, in thousands of animals.
+    date_published: "2005-08-29"
+    version_producer: Summary 2.2
+
+    # Citation
+    producer: PBL Netherlands Environmental Assessment Agency
+    citation_full: |-
+      Klein Goldewijk, K. (2005). Historical livestock counts. History Database of the Global Environment (HYDE), PBL Netherlands Environmental Assessment Agency.
+
+      Pre-1961 figures are derived from B.R. Mitchell's International Historical Statistics: The Americas 1750-1988 (1993), and Europe 1750-1993 and Africa, Asia & Oceania 1750-1993 (1998). Figures from 1961 onwards are from the Food and Agriculture Organization of the United Nations (FAOSTAT).
+    attribution_short: HYDE
+
+    # Files
+    url_main: http://web.archive.org/web/20181117155908/http://themasites.pbl.nl/tridion/en/themasites/hyde/landusedata/livestock/index-2.html
+    url_download: https://web.archive.org/web/20180509081100/http://themasites.pbl.nl/images/livestock_table_tcm61-36136.xls
+    date_accessed: "2026-07-08"
+
+    # License
+    license:
+      name: CC BY-NC 4.0
+      url: https://creativecommons.org/licenses/by-nc/4.0/
+outs:
+  - md5: 1302536bd7eea19e5618c2db965dd599
+    size: 69632
+    path: historical_livestock_mammals.xls

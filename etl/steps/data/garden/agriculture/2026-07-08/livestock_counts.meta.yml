@@ -1,0 +1,156 @@
+definitions:
+  common:
+    processing_level: major
+    unit: animals
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Meat & Dairy Production
+    description_processing: |-
+      We combine data from the UN Food and Agriculture Organization (FAOSTAT), available from 1961 onwards, with long-run historical estimates from the HYDE database for the period 1890 to 1950.
+
+      HYDE reports figures for its own set of world sub-regions, which we aggregate into continents and a world total. We compared this aggregation against FAOSTAT's regional data over the years where the two overlap (1961 to 1998) and found close agreement, confirming that HYDE's sub-regions correspond to the standard continents. HYDE groups the entire former Soviet Union into Europe, which is consistent with the way FAOSTAT reported the USSR as a single country assigned to Europe until its dissolution in 1991.
+
+      HYDE reports counts in thousands of animals, which we convert to the number of animals.
+
+      Only eight mammal species (asses, buffalo, cattle, goats, horses, mules, pigs and sheep) have data before 1961, because the historical HYDE compilation covers only these mammals. All other species, and all individual countries other than Canada, the United States and Japan, begin in 1961.
+
+dataset:
+  title: Livestock counts (HYDE and FAOSTAT)
+  update_period_days: 365
+  description: |-
+    Long-run estimates of the number of live farmed animals by species, for individual countries and for regions (the world, continents, and FAO's continental regions).
+
+    Figures up to 1950 come from the History Database of the Global Environment (HYDE) and cover eight mammal species; figures from 1961 onwards come from the UN Food and Agriculture Organization (FAOSTAT) and cover all species.
+
+tables:
+  livestock_counts:
+    variables:
+      asses:
+        title: Number of asses
+        description_short: The number of asses (donkeys), measured as the count of live animals at a single point in the year.
+        display:
+          name: Asses
+        presentation:
+          title_public: Number of asses
+      buffalo:
+        title: Number of buffalo
+        description_short: The number of buffalo, measured as the count of live animals at a single point in the year.
+        display:
+          name: Buffalo
+        presentation:
+          title_public: Number of buffalo
+      camels:
+        title: Number of camels
+        description_short: The number of camels, measured as the count of live animals at a single point in the year.
+        display:
+          name: Camels
+        presentation:
+          title_public: Number of camels
+      cattle:
+        title: Number of cattle
+        description_short: The number of cattle, measured as the count of live animals at a single point in the year.
+        display:
+          name: Cattle
+        presentation:
+          title_public: Number of cattle
+      chickens:
+        title: Number of chickens
+        description_short: The number of chickens, measured as the count of live animals at a single point in the year.
+        display:
+          name: Chickens
+        presentation:
+          title_public: Number of chickens
+      ducks:
+        title: Number of ducks
+        description_short: The number of ducks, measured as the count of live animals at a single point in the year.
+        display:
+          name: Ducks
+        presentation:
+          title_public: Number of ducks
+      geese:
+        title: Number of geese
+        description_short: The number of geese (and guinea fowls), measured as the count of live animals at a single point in the year.
+        display:
+          name: Geese
+        presentation:
+          title_public: Number of geese
+      goats:
+        title: Number of goats
+        description_short: The number of goats, measured as the count of live animals at a single point in the year.
+        display:
+          name: Goats
+        presentation:
+          title_public: Number of goats
+      horses:
+        title: Number of horses
+        description_short: The number of horses, measured as the count of live animals at a single point in the year.
+        display:
+          name: Horses
+        presentation:
+          title_public: Number of horses
+      mules:
+        title: Number of mules
+        description_short: The number of mules and hinnies, measured as the count of live animals at a single point in the year.
+        display:
+          name: Mules
+        presentation:
+          title_public: Number of mules
+      other_birds:
+        title: Number of other birds
+        description_short: The number of other poultry birds not counted elsewhere, measured as the count of live animals at a single point in the year.
+        display:
+          name: Other birds
+        presentation:
+          title_public: Number of other birds
+      other_camelids:
+        title: Number of other camelids
+        description_short: The number of other camelids (such as llamas and alpacas), measured as the count of live animals at a single point in the year.
+        display:
+          name: Other camelids
+        presentation:
+          title_public: Number of other camelids
+      other_rodents:
+        title: Number of other rodents
+        description_short: The number of other rodents farmed for food (such as guinea pigs), measured as the count of live animals at a single point in the year.
+        display:
+          name: Other rodents
+        presentation:
+          title_public: Number of other rodents
+      poultry:
+        title: Number of poultry
+        description_short: The total number of poultry birds, measured as the count of live animals at a single point in the year.
+        display:
+          name: Poultry
+        presentation:
+          title_public: Number of poultry
+      rabbits:
+        title: Number of rabbits
+        description_short: The number of rabbits and hares, measured as the count of live animals at a single point in the year.
+        display:
+          name: Rabbits
+        presentation:
+          title_public: Number of rabbits
+      sheep:
+        title: Number of sheep
+        description_short: The number of sheep, measured as the count of live animals at a single point in the year.
+        display:
+          name: Sheep
+        presentation:
+          title_public: Number of sheep
+      pigs:
+        title: Number of pigs
+        description_short: The number of pigs, measured as the count of live animals at a single point in the year.
+        display:
+          name: Pigs
+        presentation:
+          title_public: Number of pigs
+      turkeys:
+        title: Number of turkeys
+        description_short: The number of turkeys, measured as the count of live animals at a single point in the year.
+        display:
+          name: Turkeys
+        presentation:
+          title_public: Number of turkeys
