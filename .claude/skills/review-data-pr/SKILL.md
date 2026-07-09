@@ -240,7 +240,7 @@ A **clean Codex review has a different shape**: no inline comments and zero revi
 - **Editing/adding comments inside a *pending* review** (the author's in-progress review) needs GraphQL, not REST: REST `PATCH pulls/comments/{id}` 404s on a draft, and `POST pulls/{n}/comments` errors `one pending review per pull request`. Add with `addPullRequestReviewThread(input:{pullRequestReviewId, path, line, side:RIGHT, body})`, edit with `updatePullRequestReviewComment(input:{pullRequestReviewCommentId, body})`. Get the pending review id via `reviews(first:50, states:PENDING)` and a draft comment's node id via that review's `comments`.
 - **Disclosure on review comments.** Open any inline review comment you author with `> _Written by Claude Code — @<handle> at the wheel._` (handle = the human directing the work), same as PR descriptions. Skip it only on genuinely trivial one-liners (an `@codex review` ping).
 
-**Out of scope for review:** Slack announcement and Anomalist + Chart Diff hand-off are author-side concerns, not reviewer checks.
+**Out of scope for review:** Slack announcement and the QA hand-off (Anomalist, Chart Diff, data-diff report) are author-side concerns, not reviewer checks.
 
 **Producer-docs vs. data consistency.** If the PR description notes a discrepancy between the producer's documentation (codebook, methodology page, README, release notes — whatever is available) and the actual file shipped, that's a 🟢 informational item — the author has surfaced it for producer follow-up. **Don't ask them to "fix" the data to match the docs**; the PR should preserve what the source shipped and flag the discrepancy.
 
