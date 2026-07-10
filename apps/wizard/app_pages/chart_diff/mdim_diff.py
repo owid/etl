@@ -18,6 +18,7 @@ from apps.wizard.app_pages.chart_diff.utils import (
     TARGET,
     _display_view_options,
     _fill_missing_dimensions,
+    prettify_date,
     st_display_option,
     truncate_lines,
 )
@@ -132,6 +133,8 @@ def _display_comparison(
         st.warning("This MDIM has no views.")
         return
 
+    st.markdown("##### :material/visibility: Preview")
+
     assert source_mdim.slug
     view = _display_view_options(source_mdim.slug, views)
 
@@ -143,47 +146,44 @@ def _display_comparison(
 
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Production")
         if target_mdim is None:
+            st.markdown("**Production**")
             st.info("This MDIM does not exist in production yet.")
         elif target_mdim.published:
+            st.markdown(f"**Production** :material/event: {prettify_date(target_mdim)}")
             mdim_chart(f"{TARGET.site}/grapher/{target_mdim.slug}", **kwargs)
         else:
             # Unpublished in production: use the admin preview (requires being logged in to the prod admin).
-            st.caption("Not published in production — showing the admin preview (requires admin login).")
+            st.markdown("**Production** :gray[:small[(unpublished — admin preview, requires login)]]")
             mdim_chart(f"{TARGET.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}", **kwargs)
 
     with col2:
-        st.subheader("Staging")
+        st.markdown(f":green[**Staging** :material/today: {prettify_date(source_mdim)}]")
         # Use the admin preview: it always reflects the current DB config, even if the MDIM
         # has not been published or baked yet.
         mdim_chart(f"{SOURCE.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}", **kwargs)
 
 
-def _display_config_diff(config_source: dict, config_target: dict | None) -> None:
-    """Display MDIM config diff."""
+def _display_config(config_source: dict, config_target: dict | None) -> None:
+    """Display MDIM config: the diff, plus each section side by side."""
     # Import here to avoid a hard dependency at module import time (chart_diff_show pulls in heavier deps).
     from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 
-    st.subheader("Config diff")
+    st.markdown("##### :material/data_object: Config")
 
-    diff_str = compare_strings(
-        yaml_dump(config_target) if config_target else "",  # ty: ignore
-        yaml_dump(config_source),  # ty: ignore
-        fromfile="production",
-        tofile="staging",
-    )
-    if diff_str == "":
-        st.success("No differences found.")
-    else:
-        st_show_diff(truncate_lines(diff_str, MAX_DIFF_LINES))
+    tab_diff, tab_base, tab_dimensions, tab_views = st.tabs(["Diff", "Base config", "Dimensions", "Views"])
 
-
-def _display_config_in_tabs(config_source: dict, config_target: dict | None, max_lines: int) -> None:
-    """Display config sections in tabs for easy comparison."""
-    st.subheader("Config sections")
-
-    tab_base, tab_dimensions, tab_views = st.tabs(["Base config", "Dimensions", "Views"])
+    with tab_diff:
+        diff_str = compare_strings(
+            yaml_dump(config_target) if config_target else "",  # ty: ignore
+            yaml_dump(config_source),  # ty: ignore
+            fromfile="production",
+            tofile="staging",
+        )
+        if diff_str == "":
+            st.success("No differences found.")
+        else:
+            st_show_diff(truncate_lines(diff_str, MAX_DIFF_LINES))
 
     def display_section(tab, section_key: str | None = None):
         with tab:
@@ -206,14 +206,14 @@ def _display_config_in_tabs(config_source: dict, config_target: dict | None, max
             with col1:
                 st.markdown("**Production**")
                 st.code(
-                    truncate_lines(yaml_dump(content_target), max_lines),  # ty: ignore
+                    truncate_lines(yaml_dump(content_target), MAX_DIFF_LINES),  # ty: ignore
                     line_numbers=True,
                     language="yaml",
                 )
             with col2:
                 st.markdown("**Staging**")
                 st.code(
-                    truncate_lines(yaml_dump(content_source), max_lines),  # ty: ignore
+                    truncate_lines(yaml_dump(content_source), MAX_DIFF_LINES),  # ty: ignore
                     line_numbers=True,
                     language="yaml",
                 )
@@ -225,44 +225,42 @@ def _display_config_in_tabs(config_source: dict, config_target: dict | None, max
 
 def st_show_mdim_diffs(source_engine: Engine, target_engine: Engine) -> None:
     """Render the MDIM diff section of the chart-diff app."""
-    st.caption(
-        "MDIM configs are fully defined in ETL, so there is nothing to approve here — merging your PR "
-        "redeploys them. Use this section to review how your changes affect each MDIM."
-    )
-
     df_changes = get_mdim_changes(source_engine, target_engine)
     if df_changes.empty:
         st.warning("No MDIMs found in the staging environment.")
         return
 
-    col1, col2 = st.columns(2, vertical_alignment="bottom")
-    with col1:
+    # Top row: selection (primary) + options
+    col_select, col_hide, col_display = st.columns([2.5, 1, 1], vertical_alignment="bottom")
+    with col_hide:
         url_persist(st.toggle)(
-            "**Hide** MDIMs with no change",
+            "**Hide** unchanged",
             key="hide_unchanged_mdims",
             value=True,
-            help="Show only MDIMs whose config differs between staging and production.",
+            help="Only list MDIMs whose config differs between staging and production.",
         )
-    with col2:
+    with col_display:
         st_display_option()
     hide_unchanged = bool(st.session_state.get("hide_unchanged_mdims", True))
+    with col_select:
+        catalog_path = _display_selection(df_changes, hide_unchanged)
 
     n_changed = int(df_changes["changed"].sum())
-    st.markdown(f"ℹ️ {n_changed}/{len(df_changes)} MDIMs with changes")
+    st.caption(
+        f"{n_changed} of {len(df_changes)} MDIMs on this staging server differ from production."
+        + (" Only the changed ones are listed." if hide_unchanged else ""),
+        help="MDIM configs are fully defined in ETL, so there is nothing to approve here — merging your PR "
+        "redeploys them. Use this section to review how your changes affect each MDIM.",
+    )
 
-    # Step 1: Select an MDIM
-    catalog_path = _display_selection(df_changes, hide_unchanged)
     if not catalog_path:
         return
 
-    # Step 2: Fetch it from both environments
+    # Fetch the MDIM from both environments
     source_mdim, target_mdim = _fetch_mdims(source_engine, target_engine, catalog_path)
 
-    # Step 3: Side-by-side comparison
+    # Side-by-side preview
     _display_comparison(source_mdim, target_mdim, catalog_path)
 
-    # Step 4: Config diff
-    _display_config_diff(source_mdim.config, target_mdim.config if target_mdim else None)
-
-    # Step 5: Config sections side by side
-    _display_config_in_tabs(source_mdim.config, target_mdim.config if target_mdim else None, MAX_DIFF_LINES)
+    # Config diff + sections
+    _display_config(source_mdim.config, target_mdim.config if target_mdim else None)

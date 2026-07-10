@@ -71,19 +71,6 @@ def truncate_lines(s: str, max_lines: int) -> str:
     return s
 
 
-def _extract_all_dimensions(views: list[dict]) -> dict[str, list]:
-    dim_names = list(views[0].keys())
-
-    # Extract all unique dimensions across views
-    all_dimensions = {dim: set() for dim in dim_names}
-    for view in views:
-        for dim in dim_names:
-            all_dimensions[dim].add(view[dim])
-
-    # Convert sets to lists for selectboxes
-    return {dim: sorted(list(values)) for dim, values in all_dimensions.items()}
-
-
 def _fill_missing_dimensions(views: list[dict]) -> list[dict]:
     """Fill missing dimensions in views with '-'.
 
@@ -98,42 +85,40 @@ def _fill_missing_dimensions(views: list[dict]) -> list[dict]:
 
 
 def _display_view_options(slug: str, views: list[dict]) -> dict:
-    """Display view options UI and return the selected view (used for explorers and MDIMs)."""
-    all_dimensions = _extract_all_dimensions(views)
+    """Display cascading view selectors and return the selected view (used for explorers and MDIMs).
 
-    st.subheader("Select view options")
+    The options of each dimension are restricted to combinations that actually exist in `views`
+    (given the dimensions selected so far), so the returned selection always corresponds to a
+    real view.
+    """
+    dim_names = list(views[0].keys())
+    cols = st.columns(len(dim_names) + 1, vertical_alignment="bottom")
 
-    # Create random view button
-    if st.button(f"🎲 Random view ({len(views)} views available)"):
-        if views:
+    view: dict = {}
+    remaining = views
+    for i, dim in enumerate(dim_names):
+        values = sorted({v[dim] for v in remaining})
+        key = f"{slug}_{dim}"
+
+        # Drop stale selections that became invalid given the dimensions chosen above.
+        if key in st.session_state and st.session_state[key] not in values:
+            del st.session_state[key]
+        if key not in st.session_state:
+            param = st.query_params.get(key)
+            if param is not None and param not in values:
+                st.query_params.pop(key)
+
+        choice = url_persist(cols[i].selectbox)(dim, options=values, key=key)
+        view[dim] = choice
+        remaining = [v for v in remaining if v[dim] == choice]
+
+    # Random view
+    with cols[-1]:
+        if st.button("🎲", key=f"{slug}-random-view", help=f"Pick a random view ({len(views)} available)."):
             random_view = random.choice(views)
-            # Update session state with the random view values
             for dim, val in random_view.items():
                 st.session_state[f"{slug}_{dim}"] = val
-            # Rerun to apply the changes
             st.rerun(scope="fragment")
-
-    # Arrange selectboxes horizontally using columns
-    cols = st.columns(len(all_dimensions)) if all_dimensions else []
-
-    selected_options = {}
-    for i, (dim, values) in enumerate(all_dimensions.items()):
-        selected_options[dim] = url_persist(cols[i].selectbox)(f"{dim}", options=values, key=f"{slug}_{dim}")
-
-    view = selected_options if selected_options else (views[0] if views else {})
-
-    # Check if the selected combination exists in any of the views
-    combination_exists = False
-    for candidate in views:
-        if all(dim in candidate and candidate[dim] == val for dim, val in view.items()):
-            combination_exists = True
-            break
-
-    # Display warning if combination doesn't exist
-    if not combination_exists and view:
-        st.warning(
-            "⚠️ This specific combination of options does not exist in the views. It may show unexpected results."
-        )
 
     return view
 

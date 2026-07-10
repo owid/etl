@@ -137,6 +137,8 @@ def _display_comparison(source_engine: Engine, explorer_slug: str) -> None:
         st.warning("This explorer has no views.")
         return
 
+    st.markdown("##### :material/visibility: Preview")
+
     view = _display_view_options(explorer_slug, views)
 
     # Remember which URL params belong to this explorer's view selectors, so they can be
@@ -147,11 +149,11 @@ def _display_comparison(source_engine: Engine, explorer_slug: str) -> None:
 
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Production")
+        st.markdown("**Production**")
         # This is the non-preview (published) version of the explorer
         explorer_chart(base_url=f"{TARGET.site}/explorers", **kwargs)
     with col2:
-        st.subheader("Staging")
+        st.markdown(":green[**Staging**]")
         # Show the admin preview from staging to see changes instantly
         explorer_chart(base_url=f"{SOURCE.site}/admin/explorers/preview", **kwargs)
 
@@ -180,9 +182,11 @@ def _display_explorer_diffs(source_data, target_data) -> None:
     # Import here to avoid a hard dependency at module import time (chart_diff_show pulls in heavier deps).
     from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 
+    st.markdown("##### :material/data_object: TSV config")
+
     target_tsv = target_data.tsv if target_data is not None else ""
 
-    tsv_tab, side_by_side = st.tabs(["TSV diff", "TSV side by side"])
+    tsv_tab, side_by_side = st.tabs(["Diff", "Side by side"])
 
     with tsv_tab:
         diff_str = compare_strings(target_tsv, source_data.tsv, fromfile="production", tofile="staging")
@@ -203,39 +207,40 @@ def _display_explorer_diffs(source_data, target_data) -> None:
 
 def st_show_explorer_diffs(source_engine: Engine, target_engine: Engine) -> None:
     """Render the explorer diff section of the chart-diff app."""
-    st.caption(
-        "Explorer configs are not synced by chart-sync, so there is nothing to approve here — ETL-managed "
-        "explorers redeploy when your PR merges. Use this section to review how your changes affect each explorer."
-    )
-
     df_changes = get_explorer_changes(source_engine, target_engine)
     if df_changes.empty:
         st.warning("No published explorers found in the staging environment.")
         return
 
-    col1, col2 = st.columns(2, vertical_alignment="bottom")
-    with col1:
+    # Top row: selection (primary) + options
+    col_select, col_hide, col_display = st.columns([2.5, 1, 1], vertical_alignment="bottom")
+    with col_hide:
         url_persist(st.toggle)(
-            "**Hide** explorers with no change",
+            "**Hide** unchanged",
             key="hide_unchanged_explorers",
             value=True,
-            help="Show only explorers whose TSV differs between staging and production.",
+            help="Only list explorers whose TSV differs between staging and production.",
         )
-    with col2:
+    with col_display:
         st_display_option()
     hide_unchanged = bool(st.session_state.get("hide_unchanged_explorers", True))
+    with col_select:
+        explorer_slug = _display_selection(df_changes, hide_unchanged)
 
     n_changed = int(df_changes["changed"].sum())
-    st.markdown(f"ℹ️ {n_changed}/{len(df_changes)} explorers with changes")
+    st.caption(
+        f"{n_changed} of {len(df_changes)} published explorers on this staging server differ from production."
+        + (" Only the changed ones are listed." if hide_unchanged else ""),
+        help="Explorer configs are not synced by chart-sync, so there is nothing to approve here — ETL-managed "
+        "explorers redeploy when your PR merges. Use this section to review how your changes affect each explorer.",
+    )
 
-    # Step 1: Select an explorer
-    explorer_slug = _display_selection(df_changes, hide_unchanged)
     if not explorer_slug:
         return
 
-    # Step 2: Side-by-side comparison
+    # Side-by-side preview
     _display_comparison(source_engine, explorer_slug)
 
-    # Step 3: TSV diffs
+    # TSV diffs
     source_data, target_data = _fetch_explorer_data(source_engine, target_engine, explorer_slug)
     _display_explorer_diffs(source_data, target_data)
