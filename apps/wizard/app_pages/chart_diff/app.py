@@ -468,8 +468,8 @@ def _show_options():
         _show_options_misc()
 
 
-def _show_summary_top(chart_diffs: list[ChartDiff]):
-    """Text summarizing the state of the revision."""
+def _show_summary_top(chart_diffs: list[ChartDiff]) -> int:
+    """One-line summary of the review state. Returns the number of pending charts."""
     # Review status
     num_charts_total = len(st.session_state.chart_diffs)
     num_charts_listed = len(chart_diffs)
@@ -479,16 +479,9 @@ def _show_summary_top(chart_diffs: list[ChartDiff]):
     num_charts_pending = num_charts_total - num_charts_reviewed
     text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed :small[:gray[(:material/thumb_up: {num_charts_approved} :material/thumb_down: {num_charts_rejected})]]"
 
-    # Show CLI tip if there are many pending charts
-    if num_charts_pending > 50:
-        st.info(
-            f"💡 **Tip:** You have {num_charts_pending} charts pending review. "
-            "You can use the CLI command `etl approve --dry-run` to automatically approve charts with identical configs & data."
-        )
-
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:
-        text_warning = f"{num_charts_total - num_charts_listed} charts are hidden (already reviewed, or filtered)."
+        text_warning = f"{num_charts_total - num_charts_listed} hidden (reviewed or filtered)"
         text += f" :orange-badge[:small[{text_warning}]]"
         st.markdown(
             text,
@@ -496,6 +489,8 @@ def _show_summary_top(chart_diffs: list[ChartDiff]):
         )
     else:
         st.markdown(text, help="The number of reviewed charts is only updated when the page is loaded.")
+
+    return num_charts_pending
 
 
 def render_app():
@@ -510,51 +505,51 @@ def render_app():
     # Filter based on query params
     filter_chart_diffs()
 
-    # Summary and options
-    col1, col2 = st.columns([1, 1], vertical_alignment="top")
-    with col2:
+    chart_diffs_filtered = list(st.session_state.chart_diffs_filtered.values())
+
+    # Top row: summary | pagination | options
+    col_summary, col_pagination, col_options = st.columns([2.4, 1.8, 1], vertical_alignment="center")
+    # NOTE: options render first so that the charts-per-page widget state exists for Pagination
+    with col_options:
         _show_options()
-    with col1:
-        with st.container(border=True):
-            _show_summary_top(list(st.session_state.chart_diffs_filtered.values()))
+    pagination = Pagination(
+        chart_diffs_filtered,
+        items_per_page=st.session_state["charts-per-page"],
+        pagination_key="pagination",
+    )
+    with col_summary:
+        num_charts_pending = _show_summary_top(chart_diffs_filtered)
+    with col_pagination:
+        pagination.show_controls()
+
+    # Show CLI tip if there are many pending charts
+    if num_charts_pending > 50:
+        st.info(
+            f"💡 **Tip:** You have {num_charts_pending} charts pending review. "
+            "You can use the CLI command `etl approve --dry-run` to automatically approve charts with identical configs & data."
+        )
 
     # Show diffs
-    if st.session_state.chart_diffs_filtered:
+    if chart_diffs_filtered:
         with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
-            show_chart_diffs(
-                list(st.session_state.chart_diffs_filtered.values()),
-                "pagination",
-                source_session,
-                target_session,
-            )
+            show_chart_diffs(pagination, source_session, target_session)
     else:
         st.warning("No charts to be shown. Try changing the filters in the Options menu.")
 
 
-def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
-    """Display chart diffs."""
-    # Pagination menu (controls are hidden automatically if there is a single page)
-    with st.container(border=True):
-        pagination = Pagination(
-            chart_diffs,
-            items_per_page=st.session_state["charts-per-page"],
-            pagination_key=pagination_key,
-        )
-        pagination.show_controls()
-
-    # Show charts
+def show_chart_diffs(pagination: Pagination, source_session: Session, target_session: Session) -> None:
+    """Display chart diffs (current page only)."""
     for chart_diff in pagination.get_page_items():
         st_show(chart_diff, source_session, target_session)
 
     # Repeat pagination controls at the bottom, so long lists don't require scrolling back up
-    with st.container(border=True):
-        pagination.show_controls(position="bottom")
+    pagination.show_controls(position="bottom")
 
 
 def st_docs():
     # Chart sync documentation
     # TODO: keep this in sync with `etl chart-sync` CLI docs
-    with st.expander("📋 What gets synced when you merge your PR?", expanded=False):
+    with st.popover("📋 What gets synced on merge?", width="stretch"):
         st.markdown("""
         When you merge your PR to master, the **chart-sync** process automatically runs and syncs approved charts from your staging environment to production. Here's what happens:
 
@@ -598,27 +593,31 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
 """,
     )
 
-    # Section switcher: charts (approval workflow) vs MDIMs / explorers (review-only)
-    section = url_persist(st.segmented_control)(
-        label="Section",
-        options=["charts", "mdims", "explorers"],
-        format_func=lambda x: {
-            "charts": ":material/show_chart: Charts",
-            "mdims": ":material/dashboard: MDIMs",
-            "explorers": ":material/explore: Explorers",
-        }[x],
-        key="diff-type",
-        value="charts",
-        label_visibility="collapsed",
-    )
+    # Top row: section switcher (charts vs MDIMs / explorers) + chart-sync docs
+    col_switcher, col_docs = st.columns([3, 1], vertical_alignment="center")
+    with col_switcher:
+        section = url_persist(st.segmented_control)(
+            label="Section",
+            options=["charts", "mdims", "explorers"],
+            format_func=lambda x: {
+                "charts": ":material/show_chart: Charts",
+                "mdims": ":material/dashboard: MDIMs",
+                "explorers": ":material/explore: Explorers",
+            }[x],
+            key="diff-type",
+            value="charts",
+            label_visibility="collapsed",
+        )
+    with col_docs:
+        # Docs concern the chart approval/sync workflow only
+        if section not in ("mdims", "explorers"):
+            st_docs()
 
     if section == "mdims":
         st_show_mdim_diffs(SOURCE_ENGINE, TARGET_ENGINE)
     elif section == "explorers":
         st_show_explorer_diffs(SOURCE_ENGINE, TARGET_ENGINE)
     else:
-        st_docs()
-
         # Get actual charts
         get_chart_diffs()
 

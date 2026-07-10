@@ -362,29 +362,25 @@ class ChartDiffShow:
                 help=help_txt,
             )
 
-        # Refresh chart
+        # Actions: refresh + metadata diff
         with col3:
             st.button(
-                label="Refresh charts",
+                label="Refresh",
                 icon=":material/refresh:",
                 key=f"refresh-btn-{self.diff.chart_id}",
-                help="Get the latest version of the chart from the staging server.",
+                help="Get the latest version of the chart from the staging and production servers.",
                 on_click=self._refresh_chart_diff,
                 type="secondary",
             )
-
-    def _show_metadata_diff(self) -> None:
-        """Show metadata diff (if applicable).
-
-        Come chart-diffs might be triggered by changes in metadata. This allows the user to explore this changes.
-
-        Note that to access the metadata, one needs to retrieve the JSON metadata files from the S3 bucket.
-        """
-        if st.button(
-            "🔎 Metadata differences",
-            f"btn-meta-diff-{self.diff.chart_id}",
-        ):
-            self._show_metadata_diff_modal()
+            if "metadata" in self.diff.change_types:
+                # NOTE: opens a dialog (rather than a tab) so the S3 metadata is only fetched on demand
+                if st.button(
+                    "Metadata diff",
+                    icon=":material/manage_search:",
+                    key=f"btn-meta-diff-{self.diff.chart_id}",
+                    help="Inspect the metadata changes of the indicators used in this chart.",
+                ):
+                    self._show_metadata_diff_modal()
 
     def _show_tags_if_changed(self, chart, session):
         """Show tags as gray badges if there are tag changes."""
@@ -741,11 +737,8 @@ class ChartDiffShow:
         if self.diff.error:
             st.error(f"⚠️ Error: {self.diff.error}")
 
-        # Show header: approval/reject controls, refresh btn, scores
+        # Show header: approval/reject controls, scores, action buttons
         self._show_chart_diff_header()
-
-        if "metadata" in self.diff.change_types:
-            self._show_metadata_diff()
 
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
@@ -777,12 +770,12 @@ class ChartDiffShow:
             if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
                 url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"
                 st.caption(
-                    body=url,
+                    body=f":material/link: {url}",
                     help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
                 )
             else:
                 url = f"{OWID_ENV.wizard_url}/chart-diff?{query_params}"
-                st.caption(body=url)
+                st.caption(body=f":material/link: {url}")
 
     def _show_deferred_toast(self) -> None:
         """Show toast message if one was queued by a status change callback."""
