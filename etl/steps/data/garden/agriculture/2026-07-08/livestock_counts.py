@@ -1,13 +1,13 @@
 """Combine historical (pre-1961) HYDE mammal counts with FAOSTAT livestock stocks (1961 onwards).
 
 This produces a long-run "Livestock counts" dataset: the number of live animals by species, for
-individual countries and for regions (World, OWID continents, and FAO's own continental regions),
-from 1890 to the latest FAOSTAT year.
+individual countries and for regions (World and OWID continents), from 1890 to the latest FAOSTAT
+year.
 
 Two sources are spliced:
 
-- FAOSTAT QCL provides annual stocks from 1961 onwards, for every country, every FAO/OWID region,
-  and every livestock species.
+- FAOSTAT QCL provides annual stocks from 1961 onwards, for every country, every OWID region, and
+  every livestock species.
 - The HYDE historical livestock table (Klein Goldewijk, 2005) provides decadal figures (1890-1950
   used here) for eight mammal species only. We use it to extend backwards those entities that HYDE
   can fill: World, the continents, and the three single countries HYDE reports (Canada, United
@@ -58,50 +58,28 @@ FAOSTAT_SPECIES = {
     "turkeys": "turkeys",
 }
 
-# HYDE historical entities and the sub-regions that make them up. The same continents appear under
-# both OWID names and FAO "(FAO)" names because HYDE's regions match both (validated); note the two
-# schemes differ only for the Americas (OWID's "North America" includes Central America and the
-# Caribbean, while FAO's "Northern America" does not). HYDE's "CIS" (former USSR) goes to Europe,
-# consistent with FAOSTAT reporting the USSR as a single European entity until its 1991 dissolution.
-_AFRICA = ["N.Africa", "W.Africa", "E.Africa", "S.Africa"]
-_ASIA = ["M.East", "S.Asia", "E.Asia", "SE.Asia", "Japan"]
-_EUROPE = ["W.Europe", "E.Europe", "CIS"]
+# HYDE historical entities and the sub-regions that make them up. We only build OWID continents (not
+# FAO's own regions): HYDE's regions were validated to match both, but extending FAO regions with
+# HYDE data would make them no longer FAO's own aggregates, and they coincide with the OWID ones
+# anyway. HYDE's "CIS" (former USSR) goes to Europe, consistent with FAOSTAT reporting the USSR as a
+# single European entity until its 1991 dissolution.
 HYDE_ENTITY_TO_SUBREGIONS = {
     # OWID continents.
-    "Africa": _AFRICA,
-    "Asia": _ASIA,
-    "Europe": _EUROPE,
+    "Africa": ["N.Africa", "W.Africa", "E.Africa", "S.Africa"],
+    "Asia": ["M.East", "S.Asia", "E.Asia", "SE.Asia", "Japan"],
+    "Europe": ["W.Europe", "E.Europe", "CIS"],
     "North America": ["Canada", "USA", "C.America", "Greenland"],
     "South America": ["S.America"],
     "Oceania": ["Oceania"],
-    # FAO continental regions.
-    "Africa (FAO)": _AFRICA,
-    "Asia (FAO)": _ASIA,
-    "Europe (FAO)": _EUROPE,
-    "Northern America (FAO)": ["Canada", "USA", "Greenland"],
-    "South America (FAO)": ["S.America"],
-    "Oceania (FAO)": ["Oceania"],
     # Single countries HYDE reports (mapped to OWID country names).
     "Canada": ["Canada"],
     "United States": ["USA"],
     "Japan": ["Japan"],
 }
 
-# FAO continental regions to keep from FAOSTAT (individual countries and OWID continents are kept
-# automatically; see select_faostat_entities). Non-geographic FAO aggregates (income groups, FAO
-# sub-regions, historical composites like "Belgium-Luxembourg (FAO)") are dropped.
-FAO_REGIONS_TO_KEEP = {
-    "Africa (FAO)",
-    "Asia (FAO)",
-    "Europe (FAO)",
-    "Oceania (FAO)",
-    "Northern America (FAO)",
-    "Central America (FAO)",
-    "Caribbean (FAO)",
-    "South America (FAO)",
-}
-
-# Non-geographic aggregates that carry no "(FAO)" suffix and must be excluded explicitly.
+# Regional aggregates to exclude from FAOSTAT: all of FAO's own regions (they mix badly with HYDE and
+# duplicate the OWID continents) and the non-geographic OWID aggregates. Everything else (individual
+# countries, OWID continents, and World) is kept.
 OWID_AGGREGATES_TO_DROP = {
     "European Union (27)",
     "High-income countries",
@@ -112,14 +90,9 @@ OWID_AGGREGATES_TO_DROP = {
 
 
 def select_faostat_entities(countries: set) -> list:
-    """Keep individual countries, OWID continents and World (non-"(FAO)", non-aggregate), plus the
-    chosen FAO continental regions."""
-    keep = []
-    for country in countries:
-        is_fao = "(FAO)" in country
-        if (not is_fao and country not in OWID_AGGREGATES_TO_DROP) or (country in FAO_REGIONS_TO_KEEP):
-            keep.append(country)
-    return keep
+    """Keep individual countries, OWID continents and World; drop FAO's own regions and the
+    non-geographic OWID aggregates."""
+    return [c for c in countries if "(FAO)" not in c and c not in OWID_AGGREGATES_TO_DROP]
 
 
 def prepare_faostat(tb: Table) -> Table:
