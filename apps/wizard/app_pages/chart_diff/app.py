@@ -1,8 +1,9 @@
-"""Chart Diff: review changes to charts and MDIMs between production and this staging server.
+"""Chart Diff: review changes to charts, MDIMs and explorers between production and this staging server.
 
-The app has two sections (selectable at the top, persisted in the URL as `diff-type`):
+The app has three sections (selectable at the top, persisted in the URL as `diff-type`):
 - Charts: list of chart diffs with an approval workflow (approvals gate `etl chart-sync` on merge).
 - MDIMs: review-only diffs of multi-dimensional data pages (their config is deployed via ETL).
+- Explorers: review-only diffs of explorer TSVs.
 """
 
 import re
@@ -14,14 +15,13 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, get_chart_diffs_from_grapher
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
+from apps.wizard.app_pages.chart_diff.explorer_diff import st_show_explorer_diffs
 from apps.wizard.app_pages.chart_diff.mdim_diff import st_show_mdim_diffs
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
 from apps.wizard.utils import set_states
 from apps.wizard.utils.components import (
     Pagination,
-    st_horizontal,
     st_title_with_expert,
-    st_wizard_page_link,
     url_persist,
 )
 from etl.config import FORCE_DATASETTE, OWID_ENV
@@ -586,23 +586,23 @@ def main():
         title="Chart Diff",
         icon=":material/difference:",
         help=f"""
-**Chart diff** is a living page that compares all ongoing charts and MDIMs between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
+**Chart diff** is a living page that compares all ongoing charts, MDIMs and explorers between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
 
-It lists all those charts (and MDIMs) that have been modified in the `{OWID_ENV.name}` environment.
+It lists all those charts (MDIMs, explorers) that have been modified in the `{OWID_ENV.name}` environment.
 
 If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `production`, you can approve them by clicking on the toggle button.
 """,
     )
 
-    with st_horizontal(vertical_alignment="center"):
-        st.markdown("Other links: ")
-        st_wizard_page_link("explorer-diff")
-
-    # Section switcher: charts (approval workflow) vs MDIMs (review-only)
+    # Section switcher: charts (approval workflow) vs MDIMs / explorers (review-only)
     section = url_persist(st.segmented_control)(
         label="Section",
-        options=["charts", "mdims"],
-        format_func=lambda x: {"charts": ":material/show_chart: Charts", "mdims": ":material/dashboard: MDIMs"}[x],
+        options=["charts", "mdims", "explorers"],
+        format_func=lambda x: {
+            "charts": ":material/show_chart: Charts",
+            "mdims": ":material/dashboard: MDIMs",
+            "explorers": ":material/explore: Explorers",
+        }[x],
         key="diff-type",
         value="charts",
         label_visibility="collapsed",
@@ -610,6 +610,8 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
 
     if section == "mdims":
         st_show_mdim_diffs(SOURCE_ENGINE, TARGET_ENGINE)
+    elif section == "explorers":
+        st_show_explorer_diffs(SOURCE_ENGINE, TARGET_ENGINE)
     else:
         st_docs()
 

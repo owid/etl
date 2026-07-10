@@ -13,10 +13,12 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
-from apps.wizard.app_pages.explorer_diff.utils import (
+from apps.wizard.app_pages.chart_diff.utils import (
+    SOURCE,
+    TARGET,
     _display_view_options,
     _fill_missing_dimensions,
+    st_display_option,
     truncate_lines,
 )
 from apps.wizard.utils.components import mdim_chart, url_persist
@@ -233,12 +235,16 @@ def st_show_mdim_diffs(source_engine: Engine, target_engine: Engine) -> None:
         st.warning("No MDIMs found in the staging environment.")
         return
 
-    url_persist(st.toggle)(
-        "**Hide** MDIMs with no change",
-        key="hide_unchanged_mdims",
-        value=True,
-        help="Show only MDIMs whose config differs between staging and production.",
-    )
+    col1, col2 = st.columns(2, vertical_alignment="bottom")
+    with col1:
+        url_persist(st.toggle)(
+            "**Hide** MDIMs with no change",
+            key="hide_unchanged_mdims",
+            value=True,
+            help="Show only MDIMs whose config differs between staging and production.",
+        )
+    with col2:
+        st_display_option()
     hide_unchanged = bool(st.session_state.get("hide_unchanged_mdims", True))
 
     n_changed = int(df_changes["changed"].sum())
