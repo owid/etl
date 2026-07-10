@@ -22,8 +22,10 @@ Everything you post to GitHub or Slack goes out under a **human's identity**. An
 1. **Attribute the work.** Put this blockquote as the *first line* of the content:
 
    ```
-   > _Written by Claude Code — @<handle> at the wheel._
+   > _Written by <model name> — @<handle> at the wheel._
    ```
+
+   Replace `<model name>` with the human-readable name of the model actually generating the content (e.g. "Sonnet 5", "Opus 4.8", "Fable 5", "Haiku 4.5") — not the literal string "Claude Code".
 
    It applies to **every** surface, **every** time you post:
    - PR descriptions / bodies
