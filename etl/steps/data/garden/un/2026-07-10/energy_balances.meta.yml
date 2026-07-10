@@ -1,0 +1,52 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+tables:
+  energy_balances:
+    title: Energy balances
+    variables:
+      value:
+        title: Energy flow
+        unit: terajoules
+        short_unit: TJ
+        description_short: |-
+          Value of the energy flow (given by the transaction dimension) of the given commodity, expressed in terajoules.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+  share_of_final_energy_consumed_by_agriculture_forestry_and_fishing:
+    title: Share of final energy consumed by agriculture, forestry and fishing
+    variables:
+      share_of_final_energy_consumed_by_agriculture_forestry_and_fishing:
+        title: Share of final energy consumption used by agriculture, forestry and fishing
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Energy consumed by agriculture, forestry and fishing as a percentage of total final energy consumption.
+        description_key:
+          - This indicator measures the direct energy use of the agriculture, forestry and fishing sector — the fuels, electricity and heat it consumes — as a share of an economy's total final energy consumption. It does not include indirect energy embedded in inputs such as fertilizers or farm machinery manufacturing.
+          - Total final energy consumption excludes non-energy uses of fuels (for example, oil used as a chemical feedstock) and the energy sector's own use.
+          - Key fuels are missing from Germany's reported agricultural energy use for long stretches (most notably oil products between 1999 and 2017), so German values are artificially low over that period and rise about 19-fold between 2004 and 2021 as the missing fuels return to the series. This reflects changes in sector allocation in German energy reporting rather than real changes in energy use, so German values (and to a small degree European aggregates) are not comparable over time.
+          - A few other countries show similar reporting discontinuities, where a major fuel disappears from the agriculture flow for a stretch of years (for example, oil products drop out of Switzerland's series from 2000 and Venezuela's from 2008). Treat sharp level shifts in individual countries with caution.
+          - India's value for 2023 is not shown, because agricultural electricity — the dominant energy source of the sector in India, at around 867,000 terajoules in 2022 — is missing from the source data for that year, which would artificially collapse the indicator.
+          - India's reported agricultural use of oil products spikes in 2006 and 2013; treat single-year changes for India with caution.
+        description_processing: |-
+          We compute this indicator from the UNSD Energy Balances as the energy consumed by agriculture, forestry and fishing (the "Agriculture, forestry and fishing" flow of total energy) divided by total final energy consumption (the "Final Energy Consumption" flow, which excludes non-energy uses of fuels), both expressed in terajoules.
+
+          Unlike the discontinued FAO indicator of energy used in agriculture, which covered agriculture and forestry only, this indicator also includes fishing.
+
+          For regions (continents, income groups, and the World), we sum both flows across the countries of the region that report the agriculture flow, and then take the ratio. A regional value is only shown for years when those countries account for at least 70% of the region's total reported final energy consumption.
+
+          We exclude country-years in the two most recent years of data where the dominant fuel of the agriculture flow drops to exactly zero or goes missing while total final energy consumption continues to be reported, since this indicates an incomplete data delivery (for example, India in 2023).
+        presentation:
+          title_public: Share of final energy consumption used by agriculture, forestry and fishing
+          topic_tags:
+            - Agricultural Production
+            - Energy
+        display:
+          name: Share of energy used by agriculture, forestry and fishing
+          numDecimalPlaces: 1

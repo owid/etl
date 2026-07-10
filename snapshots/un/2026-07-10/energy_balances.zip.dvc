@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Energy Balances"
+    description: |-
+      The Energy Balances, available at UNdata, show the overall picture of the yearly production, trade, transformation and consumption of energy products for more than 200 countries and areas, with all flows expressed in a common energy unit (terajoules). They are compiled by the United Nations Statistics Division from the same underlying data as the Energy Statistics Database, and cover the years from 1990 onwards.
+
+      - [Details on how the energy statistics are compiled](https://unstats.un.org/unsd/energystats/questionnaire/documents/Energy-Questionnaire-Guidelines.pdf).
+      - [Energy balances publications](https://unstats.un.org/unsd/energystats/pubs/balance/).
+    date_published: "2025"
+
+    # Citation
+    producer: United Nations Statistics Division
+    citation_full: |-
+      Energy Balances, United Nations Statistics Division via UNdata (2025).
+
+    # Files
+    url_main: http://data.un.org/Explorer.aspx
+    date_accessed: '2026-07-10'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://data.un.org/Host.aspx?Content=UNdataUse
+outs:
+  - md5: 9c71cd5d42fbe0232dd2faca92a98078
+    size: 9126982
+    path: energy_balances.zip
