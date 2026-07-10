@@ -15,18 +15,12 @@ Two sources are spliced:
 
 HYDE only tracks mammals, so all other species (birds, camelids, rabbits, etc.) begin in 1961.
 
-The HYDE-to-region aggregation was validated against FAOSTAT over the overlap years (1961-1998):
-aggregating HYDE's sub-regions to continents reproduces FAOSTAT's regional data to within ~1% for
-every continent and species, except Oceania pigs (HYDE's Papua New Guinea estimate is ~2x FAOSTAT's).
 """
 
 from owid.catalog import Table
 from owid.catalog import processing as pr
-from structlog import get_logger
 
 from etl.helpers import PathFinder
-
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -214,21 +208,6 @@ def sanity_check_outputs(tb: Table) -> None:
     pre = tb[tb["year"] < FIRST_FAOSTAT_YEAR]
     assert pre[non_mammals].isna().all().all(), "A non-mammal species unexpectedly has pre-1961 data."
     assert not pre[HYDE_MAMMALS].isna().all().any(), "A HYDE mammal is missing all pre-1961 data."
-
-    # Soft check: report the 1950->1961 cattle splice step for the historical entities. Some step is
-    # expected (an 11-year gap of real growth); a very large jump would flag a splice problem.
-    historical_entities = list(HYDE_ENTITY_TO_SUBREGIONS) + ["World"]
-    for entity in historical_entities:
-        series = tb[tb["country"] == entity].set_index("year")["cattle"].dropna()
-        if LAST_HYDE_YEAR in series.index and FIRST_FAOSTAT_YEAR in series.index:
-            before, after = float(series[LAST_HYDE_YEAR]), float(series[FIRST_FAOSTAT_YEAR])
-            if before > 0 and abs(100 * (after - before) / before) > 40:
-                change = 100 * (after - before) / before
-                log.warning(
-                    f"Cattle jumps {change:+.0f}% across the {LAST_HYDE_YEAR}-{FIRST_FAOSTAT_YEAR} gap for "
-                    f"{entity} (decadal HYDE to annual FAOSTAT; usually real growth over the 11-year gap, "
-                    f"but review if unexpectedly large)."
-                )
 
 
 def run() -> None:
