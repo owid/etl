@@ -854,6 +854,20 @@ class TestAddRegionAggregates:
         region_2021 = df_half[(df_half["country"] == "Region 1") & (df_half["year"] == 2021)]
         assert not region_2021.empty and region_2021["var_01"].notna().all()
 
+        # Zero-threshold edge case: every listed country is a non-member and frac=0 — the requirement
+        # is vacuously satisfiable, the stale entries get excluded (emptying the list), and the check
+        # must treat the empty list as "no constraint" instead of dividing by zero.
+        df_zero = geo.add_region_aggregates(
+            df=self.df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 3"],
+            frac_countries_that_must_have_data=0,
+            country_col="country",
+            year_col="year",
+        )
+        assert "Region 1" in df_zero["country"].values
+
         with pytest.raises(ValueError, match="impossible to compute"):
             geo.add_region_aggregates(
                 df=self.df_in,

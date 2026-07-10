@@ -422,6 +422,11 @@ def add_region_aggregates(
     df_countries = df[df[country_col].isin(countries_in_region)]
 
     def _check_countries_must_have_data(countries):
+        # An empty must-have list is no constraint — it can be empty as passed by the caller, or
+        # become empty after stale non-members are excluded above; either way the fraction check
+        # below would divide by zero.
+        if not countries_that_must_have_data:
+            return True
         # Get set of countries with data
         countries_with_data = set(list(countries))
         if frac_countries_that_must_have_data is None:
