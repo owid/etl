@@ -155,34 +155,12 @@ def grapher_chart_from_url(chart_url: str, height=600):
 def explorer_chart(
     base_url: str, explorer_slug: str, view: dict, height: int = 600, default_display: str | None = None
 ):
-    # First HTML definition with parameters
-    url = f"{base_url}/{explorer_slug}"
-
-    params = {
-        # "Metric": "Confirmed cases",
-        # "Frequency": "7-day average",
-        # "Relative to population": "false",
-        # "country": "COD~BDI~UGA~CAF",
-        "hideControls": "true",
-        **view,
-    }
-    if default_display is not None:
-        dd = default_display.lower()
-        if dd in ["map", "table", "chart"]:
-            params["tab"] = dd
-
-    query_string = "?" + urllib.parse.urlencode(params)
-
-    HTML = f"""
-    <!-- Redirect to the external URL -->
-    <meta http-equiv="refresh" content="0; url={url}{query_string}">
-    """
-
-    # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
+    """Embed an explorer view in an iframe."""
+    return mdim_chart(f"{base_url}/{explorer_slug}", view=view, height=height, default_display=default_display)
 
 
 def mdim_chart(url: str, view: dict, height: int = 600, default_display: str | None = None):
+    """Embed an MDIM (or explorer) view in an iframe."""
     params = {
         "hideControls": "true",
         **view,
@@ -194,13 +172,7 @@ def mdim_chart(url: str, view: dict, height: int = 600, default_display: str | N
 
     query_string = "?" + urllib.parse.urlencode(params)
 
-    HTML = f"""
-    <!-- Redirect to the external URL -->
-    <meta http-equiv="refresh" content="0; url={url}{query_string}">
-    """
-
-    # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
+    return st.iframe(f"{url}{query_string}", height=height, width=int(1.6 * height))
 
 
 def _chart_html(chart_config: dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):

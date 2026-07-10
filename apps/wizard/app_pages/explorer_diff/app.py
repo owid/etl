@@ -262,7 +262,6 @@ def main():
     with st_horizontal(vertical_alignment="center"):
         st.markdown("Other links: ")
         st_wizard_page_link("chart-diff")
-        st_wizard_page_link("mdim-diff")
 
     _show_options()
 

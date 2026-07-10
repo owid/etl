@@ -30,10 +30,10 @@ def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
 
 
 def _display_view_options(slug: str, views: list[dict]) -> dict:
-    """Display explorer view options UI and return the selected view."""
+    """Display view options UI and return the selected view (used for explorers and MDIMs)."""
     all_dimensions = _extract_all_dimensions(views)
 
-    st.subheader("Select Explorer View Options")
+    st.subheader("Select view options")
 
     # Create random view button
     if st.button(f"🎲 Random view ({len(views)} views available)"):
