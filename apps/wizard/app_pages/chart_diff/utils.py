@@ -1,4 +1,5 @@
 import random
+from collections.abc import Callable
 from datetime import datetime
 
 import streamlit as st
@@ -84,15 +85,18 @@ def _fill_missing_dimensions(views: list[dict]) -> list[dict]:
     return views
 
 
-def _display_view_options(slug: str, views: list[dict]) -> dict:
+def _display_view_options(slug: str, views: list[dict], get_has_map: Callable | None = None) -> dict:
     """Display cascading view selectors and return the selected view (used for explorers and MDIMs).
 
     The options of each dimension are restricted to combinations that actually exist in `views`
     (given the dimensions selected so far), so the returned selection always corresponds to a
     real view.
+
+    `get_has_map` (optional) takes the selected view and returns whether it has a map tab
+    (or None if unknown); it is used to only offer valid "Open on" tabs.
     """
     dim_names = list(views[0].keys())
-    cols = st.columns(len(dim_names) + 1, vertical_alignment="bottom")
+    cols = st.columns(len(dim_names) + 2, vertical_alignment="bottom")
 
     view: dict = {}
     remaining = views
@@ -112,6 +116,10 @@ def _display_view_options(slug: str, views: list[dict]) -> dict:
         view[dim] = choice
         remaining = [v for v in remaining if v[dim] == choice]
 
+    # Tab to open the previews on (only offer tabs that exist for the selected view)
+    with cols[-2]:
+        st_display_option(has_map=get_has_map(view) if get_has_map else None)
+
     # Random view
     with cols[-1]:
         if st.button("🎲", key=f"{slug}-random-view", help=f"Pick a random view ({len(views)} available)."):
@@ -123,12 +131,28 @@ def _display_view_options(slug: str, views: list[dict]) -> dict:
     return view
 
 
-def st_display_option() -> None:
-    """Selectbox for the default tab (map/table/chart) used when embedding MDIM/explorer views."""
+def st_display_option(has_map: bool | None = None) -> None:
+    """Selectbox for the tab (map/table/chart) the embedded MDIM/explorer previews open on.
+
+    If `has_map` is False, the Map option is not offered.
+    """
+    options = ["Default", "Map", "Table", "Chart"]
+    if has_map is False:
+        options.remove("Map")
+
+    # Drop a stale selection that is invalid for the current view (e.g. Map on a map-less view).
+    key = "default_display"
+    if key in st.session_state and st.session_state[key] not in options:
+        del st.session_state[key]
+    if key not in st.session_state:
+        param = st.query_params.get(key)
+        if param is not None and param not in options:
+            st.query_params.pop(key)
+
     url_persist(st.selectbox)(
-        "Display",
+        "Open previews on",
         value="Default",
-        options=["Default", "Map", "Table", "Chart"],
-        key="default_display",
-        help="Tab to open the embedded views on.",
+        options=options,
+        key=key,
+        help="Tab the previews below open on (map, data table, or chart). 'Default' uses the view's own default tab.",
     )

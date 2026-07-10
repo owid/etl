@@ -19,7 +19,6 @@ from apps.wizard.app_pages.chart_diff.utils import (
     TARGET,
     _display_view_options,
     _fill_missing_dimensions,
-    st_display_option,
     truncate_lines,
 )
 from apps.wizard.utils.components import explorer_chart, url_persist
@@ -65,9 +64,9 @@ def _clear_explorer_view_params() -> None:
         st.query_params.pop(key, None)
 
 
-def _display_selection(df_changes: pd.DataFrame, hide_unchanged: bool) -> str | None:
+def _display_selection(df_changes: pd.DataFrame, show_unchanged: bool) -> str | None:
     """Display explorer selection UI and return the selected explorer slug."""
-    df = df_changes[df_changes["changed"]] if hide_unchanged else df_changes
+    df = df_changes if show_unchanged else df_changes[df_changes["changed"]]
     options = df.index.tolist()
 
     # Keep a deep-linked (or previously selected) explorer selectable even if it is filtered out.
@@ -92,8 +91,8 @@ def _display_selection(df_changes: pd.DataFrame, hide_unchanged: bool) -> str | 
     )
 
     if not explorer_slug:
-        if hide_unchanged:
-            st.info('No explorers with changes. Turn off "Hide explorers with no change" to browse all of them.')
+        if not show_unchanged:
+            st.info('No explorers with changes. Turn on "Show unchanged" to browse all of them.')
         else:
             st.info("Select an explorer.")
         return None
@@ -101,8 +100,10 @@ def _display_selection(df_changes: pd.DataFrame, hide_unchanged: bool) -> str | 
     return explorer_slug
 
 
-def _fetch_explorer_views(source_engine: Engine, slug: str) -> list[dict]:
-    """Return a list of views for the explorer, e.g.
+def _fetch_explorer_views(source_engine: Engine, slug: str) -> tuple[list[dict], list[bool]]:
+    """Return the views of the explorer plus, per view, whether it has a map tab.
+
+    Views look like:
 
     [{
         'Metric': 'Confirmed cases',
@@ -116,6 +117,7 @@ def _fetch_explorer_views(source_engine: Engine, slug: str) -> list[dict]:
     config = json.loads(df.iloc[0].config)
 
     views = []
+    has_maps = []
     for block in config["blocks"]:
         for view in block.get("block", []) or []:
             dims = {}
@@ -125,37 +127,50 @@ def _fetch_explorer_views(source_engine: Engine, slug: str) -> list[dict]:
                         dims[k.replace(comp, "").strip()] = v
             if dims:
                 views.append(dims)
+                # Explorers only show a map when the row sets hasMapTab to true
+                has_maps.append(str(view.get("hasMapTab", "")).lower() == "true")
 
-    return _fill_missing_dimensions(views)
+    return _fill_missing_dimensions(views), has_maps
 
 
 @st.fragment
 def _display_comparison(source_engine: Engine, explorer_slug: str) -> None:
     """Display view selector and side-by-side comparison of an explorer."""
-    views = _fetch_explorer_views(source_engine, explorer_slug)
+    views, has_maps = _fetch_explorer_views(source_engine, explorer_slug)
     if not views:
         st.warning("This explorer has no views.")
         return
 
-    st.markdown("##### :material/visibility: Preview")
+    with st.container(border=True):
+        st.markdown("##### :material/visibility: Preview")
 
-    view = _display_view_options(explorer_slug, views)
+        view = _display_view_options(
+            explorer_slug,
+            views,
+            get_has_map=lambda selection: next(
+                (has_map for dims, has_map in zip(views, has_maps) if dims == selection), None
+            ),
+        )
 
-    # Remember which URL params belong to this explorer's view selectors, so they can be
-    # cleaned up when another explorer is selected.
-    st.session_state["explorer-view-param-keys"] = [f"{explorer_slug}_{dim}" for dim in views[0].keys()]
+        # Remember which URL params belong to this explorer's view selectors, so they can be
+        # cleaned up when another explorer is selected.
+        st.session_state["explorer-view-param-keys"] = [f"{explorer_slug}_{dim}" for dim in views[0].keys()]
 
-    kwargs = {"explorer_slug": explorer_slug, "view": view, "default_display": st.session_state.get("default_display")}
+        kwargs = {
+            "explorer_slug": explorer_slug,
+            "view": view,
+            "default_display": st.session_state.get("default_display"),
+        }
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("**Production**")
-        # This is the non-preview (published) version of the explorer
-        explorer_chart(base_url=f"{TARGET.site}/explorers", **kwargs)
-    with col2:
-        st.markdown(":green[**Staging**]")
-        # Show the admin preview from staging to see changes instantly
-        explorer_chart(base_url=f"{SOURCE.site}/admin/explorers/preview", **kwargs)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**Production**")
+            # This is the non-preview (published) version of the explorer
+            explorer_chart(base_url=f"{TARGET.site}/explorers", **kwargs)
+        with col2:
+            st.markdown(":green[**Staging**]")
+            # Show the admin preview from staging to see changes instantly
+            explorer_chart(base_url=f"{SOURCE.site}/admin/explorers/preview", **kwargs)
 
 
 def _fetch_explorer_data(source_engine: Engine, target_engine: Engine, explorer_slug: str):
@@ -182,11 +197,13 @@ def _display_explorer_diffs(source_data, target_data) -> None:
     # Import here to avoid a hard dependency at module import time (chart_diff_show pulls in heavier deps).
     from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 
-    st.markdown("##### :material/data_object: TSV config")
+    container = st.container(border=True)
+    with container:
+        st.markdown("##### :material/data_object: TSV config")
 
-    target_tsv = target_data.tsv if target_data is not None else ""
+        target_tsv = target_data.tsv if target_data is not None else ""
 
-    tsv_tab, side_by_side = st.tabs(["Diff", "Side by side"])
+        tsv_tab, side_by_side = st.tabs(["Diff", "Side by side"])
 
     with tsv_tab:
         diff_str = compare_strings(target_tsv, source_data.tsv, fromfile="production", tofile="staging")
@@ -213,24 +230,22 @@ def st_show_explorer_diffs(source_engine: Engine, target_engine: Engine) -> None
         return
 
     # Top row: selection (primary) + options
-    col_select, col_hide, col_display = st.columns([2.5, 1, 1], vertical_alignment="bottom")
-    with col_hide:
+    col_select, col_show = st.columns([3, 1], vertical_alignment="bottom")
+    with col_show:
         url_persist(st.toggle)(
-            "**Hide** unchanged",
-            key="hide_unchanged_explorers",
-            value=True,
-            help="Only list explorers whose TSV differs between staging and production.",
+            "Show unchanged",
+            key="show_unchanged_explorers",
+            value=False,
+            help="Also list explorers whose TSV is identical in staging and production.",
         )
-    with col_display:
-        st_display_option()
-    hide_unchanged = bool(st.session_state.get("hide_unchanged_explorers", True))
+    show_unchanged = bool(st.session_state.get("show_unchanged_explorers", False))
     with col_select:
-        explorer_slug = _display_selection(df_changes, hide_unchanged)
+        explorer_slug = _display_selection(df_changes, show_unchanged)
 
     n_changed = int(df_changes["changed"].sum())
     st.caption(
         f"{n_changed} of {len(df_changes)} published explorers on this staging server differ from production."
-        + (" Only the changed ones are listed." if hide_unchanged else ""),
+        + ("" if show_unchanged else " Only the changed ones are listed."),
         help="Explorer configs are not synced by chart-sync, so there is nothing to approve here — ETL-managed "
         "explorers redeploy when your PR merges. Use this section to review how your changes affect each explorer.",
     )

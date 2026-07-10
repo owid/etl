@@ -19,7 +19,6 @@ from apps.wizard.app_pages.chart_diff.utils import (
     _display_view_options,
     _fill_missing_dimensions,
     prettify_date,
-    st_display_option,
     truncate_lines,
 )
 from apps.wizard.utils.components import mdim_chart, url_persist
@@ -67,9 +66,9 @@ def _clear_mdim_view_params() -> None:
         st.query_params.pop(key, None)
 
 
-def _display_selection(df_changes: pd.DataFrame, hide_unchanged: bool) -> str | None:
+def _display_selection(df_changes: pd.DataFrame, show_unchanged: bool) -> str | None:
     """Display MDIM selection UI and return the selected MDIM catalog path."""
-    df = df_changes[df_changes["changed"]] if hide_unchanged else df_changes
+    df = df_changes if show_unchanged else df_changes[df_changes["changed"]]
     options = df.index.tolist()
 
     # Keep a deep-linked (or previously selected) MDIM selectable even if it is filtered out.
@@ -94,8 +93,8 @@ def _display_selection(df_changes: pd.DataFrame, hide_unchanged: bool) -> str | 
     )
 
     if not mdim_catalog_path:
-        if hide_unchanged:
-            st.info('No MDIMs with changes. Turn off "Hide MDIMs with no change" to browse all of them.')
+        if not show_unchanged:
+            st.info('No MDIMs with changes. Turn on "Show unchanged" to browse all of them.')
         else:
             st.info("Select an MDIM.")
         return None
@@ -122,46 +121,63 @@ def _fetch_mdims(
     return source_mdim, target_mdim
 
 
+def _view_has_map(views: list[dict], view_entries: list[dict], selection: dict) -> bool | None:
+    """Whether the selected view has a map tab (None if it can't be determined)."""
+    for dims, entry in zip(views, view_entries):
+        if dims == selection:
+            config = entry.get("config") or {}
+            if "hasMapTab" in config:
+                return bool(config["hasMapTab"])
+            return None
+    return None
+
+
 @st.fragment
 def _display_comparison(
     source_mdim: gm.MultiDimDataPage, target_mdim: gm.MultiDimDataPage | None, catalog_path: str
 ) -> None:
     """Display view selector and side-by-side comparison of an MDIM."""
-    views = [v["dimensions"] for v in source_mdim.config.get("views", [])]
+    view_entries = source_mdim.config.get("views", [])
+    views = [v["dimensions"] for v in view_entries]
     views = _fill_missing_dimensions(views)
     if not views:
         st.warning("This MDIM has no views.")
         return
 
-    st.markdown("##### :material/visibility: Preview")
+    with st.container(border=True):
+        st.markdown("##### :material/visibility: Preview")
 
-    assert source_mdim.slug
-    view = _display_view_options(source_mdim.slug, views)
+        assert source_mdim.slug
+        view = _display_view_options(
+            source_mdim.slug,
+            views,
+            get_has_map=lambda selection: _view_has_map(views, view_entries, selection),
+        )
 
-    # Remember which URL params belong to this MDIM's view selectors, so they can be
-    # cleaned up when another MDIM is selected.
-    st.session_state["mdim-view-param-keys"] = [f"{source_mdim.slug}_{dim}" for dim in views[0].keys()]
+        # Remember which URL params belong to this MDIM's view selectors, so they can be
+        # cleaned up when another MDIM is selected.
+        st.session_state["mdim-view-param-keys"] = [f"{source_mdim.slug}_{dim}" for dim in views[0].keys()]
 
-    kwargs = {"view": view, "default_display": st.session_state.get("default_display")}
+        kwargs = {"view": view, "default_display": st.session_state.get("default_display")}
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if target_mdim is None:
-            st.markdown("**Production**")
-            st.info("This MDIM does not exist in production yet.")
-        elif target_mdim.published:
-            st.markdown(f"**Production** :material/event: {prettify_date(target_mdim)}")
-            mdim_chart(f"{TARGET.site}/grapher/{target_mdim.slug}", **kwargs)
-        else:
-            # Unpublished in production: use the admin preview (requires being logged in to the prod admin).
-            st.markdown("**Production** :gray[:small[(unpublished — admin preview, requires login)]]")
-            mdim_chart(f"{TARGET.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}", **kwargs)
+        col1, col2 = st.columns(2)
+        with col1:
+            if target_mdim is None:
+                st.markdown("**Production**")
+                st.info("This MDIM does not exist in production yet.")
+            elif target_mdim.published:
+                st.markdown(f"**Production** :material/event: {prettify_date(target_mdim)}")
+                mdim_chart(f"{TARGET.site}/grapher/{target_mdim.slug}", **kwargs)
+            else:
+                # Unpublished in production: use the admin preview (requires being logged in to the prod admin).
+                st.markdown("**Production** :gray[:small[(unpublished — admin preview, requires login)]]")
+                mdim_chart(f"{TARGET.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}", **kwargs)
 
-    with col2:
-        st.markdown(f":green[**Staging** :material/today: {prettify_date(source_mdim)}]")
-        # Use the admin preview: it always reflects the current DB config, even if the MDIM
-        # has not been published or baked yet.
-        mdim_chart(f"{SOURCE.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}", **kwargs)
+        with col2:
+            st.markdown(f":green[**Staging** :material/today: {prettify_date(source_mdim)}]")
+            # Use the admin preview: it always reflects the current DB config, even if the MDIM
+            # has not been published or baked yet.
+            mdim_chart(f"{SOURCE.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}", **kwargs)
 
 
 def _display_config(config_source: dict, config_target: dict | None) -> None:
@@ -169,9 +185,11 @@ def _display_config(config_source: dict, config_target: dict | None) -> None:
     # Import here to avoid a hard dependency at module import time (chart_diff_show pulls in heavier deps).
     from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 
-    st.markdown("##### :material/data_object: Config")
+    container = st.container(border=True)
+    with container:
+        st.markdown("##### :material/data_object: Config")
 
-    tab_diff, tab_base, tab_dimensions, tab_views = st.tabs(["Diff", "Base config", "Dimensions", "Views"])
+        tab_diff, tab_base, tab_dimensions, tab_views = st.tabs(["Diff", "Base config", "Dimensions", "Views"])
 
     with tab_diff:
         diff_str = compare_strings(
@@ -231,24 +249,22 @@ def st_show_mdim_diffs(source_engine: Engine, target_engine: Engine) -> None:
         return
 
     # Top row: selection (primary) + options
-    col_select, col_hide, col_display = st.columns([2.5, 1, 1], vertical_alignment="bottom")
-    with col_hide:
+    col_select, col_show = st.columns([3, 1], vertical_alignment="bottom")
+    with col_show:
         url_persist(st.toggle)(
-            "**Hide** unchanged",
-            key="hide_unchanged_mdims",
-            value=True,
-            help="Only list MDIMs whose config differs between staging and production.",
+            "Show unchanged",
+            key="show_unchanged_mdims",
+            value=False,
+            help="Also list MDIMs whose config is identical in staging and production.",
         )
-    with col_display:
-        st_display_option()
-    hide_unchanged = bool(st.session_state.get("hide_unchanged_mdims", True))
+    show_unchanged = bool(st.session_state.get("show_unchanged_mdims", False))
     with col_select:
-        catalog_path = _display_selection(df_changes, hide_unchanged)
+        catalog_path = _display_selection(df_changes, show_unchanged)
 
     n_changed = int(df_changes["changed"].sum())
     st.caption(
         f"{n_changed} of {len(df_changes)} MDIMs on this staging server differ from production."
-        + (" Only the changed ones are listed." if hide_unchanged else ""),
+        + ("" if show_unchanged else " Only the changed ones are listed."),
         help="MDIM configs are fully defined in ETL, so there is nothing to approve here — merging your PR "
         "redeploys them. Use this section to review how your changes affect each MDIM.",
     )
