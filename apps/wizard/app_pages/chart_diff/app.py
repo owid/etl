@@ -546,6 +546,10 @@ def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, targe
     for chart_diff in pagination.get_page_items():
         st_show(chart_diff, source_session, target_session)
 
+    # Repeat pagination controls at the bottom, so long lists don't require scrolling back up
+    with st.container(border=True):
+        pagination.show_controls(position="bottom")
+
 
 def st_docs():
     # Chart sync documentation

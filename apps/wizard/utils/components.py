@@ -292,16 +292,36 @@ class Pagination:
         end_idx = start_idx + self.items_per_page
         return self.items[start_idx:end_idx]
 
-    def show_controls(self) -> None:
+    def show_controls(self, position: str = "top") -> None:
+        """Show pagination controls.
+
+        Can be called more than once per page (e.g. above and below the item list) — pass a
+        distinct `position` for each call; all copies stay in sync. The "top" copy's key is
+        the canonical page state.
+        """
         if self.total_pages == 1:
             return
         # If the item list shrank (e.g. filters changed), the remembered page may be out of range.
         if self.page > self.total_pages:
             st.session_state[self.pagination_key] = 1
+
+        if position == "top":
+            key = self.pagination_key
+        else:
+            key = f"{self.pagination_key}--{position}"
+            # Mirror the canonical page before instantiating this copy.
+            st.session_state[key] = self.page
+
+        def _on_change():
+            # Keep the canonical key in sync when a secondary copy is used (no-op for "top").
+            st.session_state[self.pagination_key] = st.session_state[key]
+            if self.on_change:
+                self.on_change()
+
         st.pagination(
             self.total_pages,
-            key=self.pagination_key,
-            on_change=self.on_change,
+            key=key,
+            on_change=_on_change,
         )
 
 
