@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 import streamlit as st
 from sqlalchemy.engine.base import Engine
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
@@ -135,7 +136,7 @@ def _fetch_explorer_views(source_engine: Engine, slug: str) -> tuple[list[dict],
 
 
 @st.fragment
-def _display_comparison(source_engine: Engine, explorer_slug: str) -> None:
+def _display_comparison(source_engine: Engine, explorer_slug: str, is_new: bool = False) -> None:
     """Display view selector and side-by-side comparison of an explorer."""
     views, has_maps = _fetch_explorer_views(source_engine, explorer_slug)
     if not views:
@@ -166,8 +167,11 @@ def _display_comparison(source_engine: Engine, explorer_slug: str) -> None:
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("**Production**")
-            # This is the non-preview (published) version of the explorer
-            explorer_chart(base_url=f"{TARGET.site}/explorers", **kwargs)
+            if is_new:
+                st.info("This explorer does not exist in production yet.")
+            else:
+                # This is the non-preview (published) version of the explorer
+                explorer_chart(base_url=f"{TARGET.site}/explorers", **kwargs)
         with col2:
             st.markdown(":green[**Staging**]")
             # Show the admin preview from staging to see changes instantly
@@ -179,7 +183,11 @@ def _fetch_explorer_data(source_engine: Engine, target_engine: Engine, explorer_
 
     def load_explorer_data(engine: Engine):
         with Session(engine) as session:
-            return gm.Explorer.load_explorer(session, explorer_slug, columns=["tsv", "config"])
+            try:
+                return gm.Explorer.load_explorer(session, explorer_slug, columns=["tsv", "config"])
+            except NoResultFound:
+                # Explorer doesn't exist in this environment (e.g. it is new on staging)
+                return None
 
     # NOTE: loading data for some explorers can take >10s, hence parallel fetch
     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -255,7 +263,7 @@ def st_show_explorer_diffs(source_engine: Engine, target_engine: Engine) -> None
         return
 
     # Side-by-side preview
-    _display_comparison(source_engine, explorer_slug)
+    _display_comparison(source_engine, explorer_slug, is_new=bool(df_changes.loc[explorer_slug, "is_new"]))
 
     # TSV diffs
     source_data, target_data = _fetch_explorer_data(source_engine, target_engine, explorer_slug)
