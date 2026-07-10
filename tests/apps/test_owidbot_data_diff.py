@@ -82,3 +82,52 @@ def test_format_comment_error():
 
     assert "⚠️ 1 error(s)" in body
     assert "! garden/n/v/ds — error: Index must be unique." in body
+
+
+def test_format_comment_puts_data_losses_first():
+    # A small-severity dataset with coverage loss must lead the (truncatable) comment, ahead of
+    # a big-but-benign value change — same triage order as the HTML report's watch list.
+    lossy = DatasetDiffResult(
+        path="garden/n/v/lossy",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="t",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(
+                        name="country",
+                        kind="changed",
+                        is_dim=True,
+                        value_diffs=[ValueDiff(kind="removed", count=2, total=1000, sample=[{"country": "Vietnam"}])],
+                    ),
+                    ColumnDiffResult(
+                        name="a",
+                        kind="changed",
+                        changes=["changed data"],
+                        value_diffs=[ValueDiff(kind="changed", count=10, total=100, median_bard=0.001)],
+                    ),
+                ],
+            )
+        ],
+    )
+    big = DatasetDiffResult(
+        path="garden/n/v/big",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="t",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(
+                        name="a",
+                        kind="changed",
+                        changes=["changed data"],
+                        value_diffs=[ValueDiff(kind="changed", count=10, total=100, median_bard=0.9)],
+                    )
+                ],
+            )
+        ],
+    )
+    body = format_comment(DiffReport(datasets=[big, lossy]), None)
+    assert body.index("garden/n/v/lossy") < body.index("garden/n/v/big")

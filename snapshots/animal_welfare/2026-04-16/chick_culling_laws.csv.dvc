@@ -44,8 +44,8 @@ meta:
     url_main: https://animallaweurope.com/news/
     date_accessed: '2026-04-16'
     date_published: '2026-04-16'
-  license:
-    name: CC BY 4.0
+    license:
+      name: CC BY 4.0
 outs:
   - md5: cf21f36ed5c0fe0d2997e6194b617f4b
     size: 6519

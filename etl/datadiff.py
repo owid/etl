@@ -23,6 +23,7 @@ from rich.syntax import Syntax
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from etl.dag_helpers import load_dag
+from etl.data_helpers.misc import bard
 from etl.datadiff_report import (
     SAMPLE_LIMIT,
     ColumnDiffResult,
@@ -30,6 +31,7 @@ from etl.datadiff_report import (
     DiffReport,
     TableDiffResult,
     ValueDiff,
+    format_score,
     render_html,
 )
 from etl.files import yaml_dump
@@ -782,6 +784,40 @@ def _df_to_records(df: pd.DataFrame, limit: int = SAMPLE_LIMIT) -> list[dict[str
     return [{str(k): _fmt(v) for k, v in row.items()} for row in df_samp.to_dict("records")]
 
 
+def _changed_records(
+    both: pd.DataFrame, col: str, limit: int = SAMPLE_LIMIT
+) -> tuple[list[dict[str, str]], bool, float | None]:
+    """Sample records for a changed-values diff.
+
+    For numeric columns, keep the most anomalous rows (largest first) and append an
+    "anomaly score" display column, so the report surfaces the biggest moves instead of a random
+    sample. The score is BARD (`etl.data_helpers.misc.bard`, the same metric Anomalist scores
+    changes with): bounded in [0, 1], symmetric, and resistant to blow-ups on tiny values. A
+    value appearing or disappearing (NaN on one side) counts as a maximal change (score 1). Other
+    dtypes keep the plain random sample.
+
+    Returns (records, sorted_by_score, median_bard), where median_bard is the median score across
+    ALL changed rows (not just the sample) — the report uses it to sort columns, tables and
+    datasets by how big their differences typically are. None for non-numeric columns.
+    """
+    old_col, new_col = f"{col} -", f"{col} +"
+    if not (pd.api.types.is_numeric_dtype(both[old_col]) and pd.api.types.is_numeric_dtype(both[new_col])):
+        return _df_to_records(both, limit=limit), False, None
+
+    old = both[old_col].astype("float64")
+    new = both[new_col].astype("float64")
+    score = bard(old.to_numpy(), new.to_numpy())
+    # One-sided NaN = a value appeared or disappeared = maximal change.
+    score = np.where(np.isnan(score), 1.0, score)
+    median_bard = float(np.median(score)) if len(score) else None
+
+    # Positional (iloc) selection is safe even if `both` has a non-unique index.
+    order = np.argsort(-score, kind="stable")[:limit]
+    top = both.iloc[order].copy()
+    top["anomaly score"] = [format_score(s) for s in score[order]]
+    return _df_to_records(top, limit=limit), True, median_bard
+
+
 def _data_diff(
     table_a: Table,
     table_b: Table,
@@ -839,7 +875,17 @@ def _data_diff(
         else:
             both = samp_a.join(samp_b, lsuffix=" -", rsuffix=" +")
         lines += _df_to_str(both)
-        value_diffs.append(ValueDiff(kind="changed", count=int(neq.sum()), total=int(n), sample=_df_to_records(both)))
+        records, sorted_by_score, median_bard = _changed_records(both, col)
+        value_diffs.append(
+            ValueDiff(
+                kind="changed",
+                count=int(neq.sum()),
+                total=int(n),
+                sample=records,
+                sorted_by_score=sorted_by_score,
+                median_bard=median_bard,
+            )
+        )
 
     # add color
     lines = ["[violet]" + line for line in lines]
