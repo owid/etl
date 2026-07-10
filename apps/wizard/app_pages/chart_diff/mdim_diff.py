@@ -19,6 +19,7 @@ from apps.wizard.app_pages.chart_diff.utils import (
     _display_view_options,
     _fill_missing_dimensions,
     prettify_date,
+    st_display_option,
     truncate_lines,
 )
 from apps.wizard.utils.components import mdim_chart, url_persist
@@ -145,14 +146,16 @@ def _display_comparison(
         return
 
     with st.container(border=True):
-        st.markdown("##### :material/visibility: Preview")
+        # Header row: title + tab to open the previews on (conceptually a rendering option,
+        # not a view dimension, hence not in the dimensions row).
+        col_head, col_open = st.columns([3, 1], vertical_alignment="bottom")
+        with col_head:
+            st.markdown("##### :material/visibility: Preview")
 
         assert source_mdim.slug
-        view = _display_view_options(
-            source_mdim.slug,
-            views,
-            get_has_map=lambda selection: _view_has_map(views, view_entries, selection),
-        )
+        view = _display_view_options(source_mdim.slug, views)
+        with col_open:
+            st_display_option(has_map=_view_has_map(views, view_entries, view))
 
         # Remember which URL params belong to this MDIM's view selectors, so they can be
         # cleaned up when another MDIM is selected.

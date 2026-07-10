@@ -19,6 +19,7 @@ from apps.wizard.app_pages.chart_diff.utils import (
     TARGET,
     _display_view_options,
     _fill_missing_dimensions,
+    st_display_option,
     truncate_lines,
 )
 from apps.wizard.utils.components import explorer_chart, url_persist
@@ -142,15 +143,15 @@ def _display_comparison(source_engine: Engine, explorer_slug: str) -> None:
         return
 
     with st.container(border=True):
-        st.markdown("##### :material/visibility: Preview")
+        # Header row: title + tab to open the previews on (conceptually a rendering option,
+        # not a view dimension, hence not in the dimensions row).
+        col_head, col_open = st.columns([3, 1], vertical_alignment="bottom")
+        with col_head:
+            st.markdown("##### :material/visibility: Preview")
 
-        view = _display_view_options(
-            explorer_slug,
-            views,
-            get_has_map=lambda selection: next(
-                (has_map for dims, has_map in zip(views, has_maps) if dims == selection), None
-            ),
-        )
+        view = _display_view_options(explorer_slug, views)
+        with col_open:
+            st_display_option(has_map=next((has_map for dims, has_map in zip(views, has_maps) if dims == view), None))
 
         # Remember which URL params belong to this explorer's view selectors, so they can be
         # cleaned up when another explorer is selected.

@@ -1,5 +1,4 @@
 import random
-from collections.abc import Callable
 from datetime import datetime
 
 import streamlit as st
@@ -85,18 +84,15 @@ def _fill_missing_dimensions(views: list[dict]) -> list[dict]:
     return views
 
 
-def _display_view_options(slug: str, views: list[dict], get_has_map: Callable | None = None) -> dict:
+def _display_view_options(slug: str, views: list[dict]) -> dict:
     """Display cascading view selectors and return the selected view (used for explorers and MDIMs).
 
     The options of each dimension are restricted to combinations that actually exist in `views`
     (given the dimensions selected so far), so the returned selection always corresponds to a
     real view.
-
-    `get_has_map` (optional) takes the selected view and returns whether it has a map tab
-    (or None if unknown); it is used to only offer valid "Open on" tabs.
     """
     dim_names = list(views[0].keys())
-    cols = st.columns(len(dim_names) + 2, vertical_alignment="bottom")
+    cols = st.columns(len(dim_names) + 1, vertical_alignment="bottom")
 
     view: dict = {}
     remaining = views
@@ -115,10 +111,6 @@ def _display_view_options(slug: str, views: list[dict], get_has_map: Callable | 
         choice = url_persist(cols[i].selectbox)(dim, options=values, key=key)
         view[dim] = choice
         remaining = [v for v in remaining if v[dim] == choice]
-
-    # Tab to open the previews on (only offer tabs that exist for the selected view)
-    with cols[-2]:
-        st_display_option(has_map=get_has_map(view) if get_has_map else None)
 
     # Random view
     with cols[-1]:
