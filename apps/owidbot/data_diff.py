@@ -248,8 +248,12 @@ def call_etl_diff(include: str, output_json: Path, output_html: Path) -> None:
     # Remove all warnings from stderr
     stderr = re.sub(r"^.*WARNING.*", "", stderr, flags=re.MULTILINE).strip()
 
-    if result.returncode == 1 and "Found differences" in stdout:
-        log.info("etl diff found differences", returncode=result.returncode)
+    # `etl diff` exits 1 for any completed run with findings; when a dataset fails to compare,
+    # the summary line is "⚠ Found errors, create an issue please" *instead of* "Found
+    # differences". The JSON/HTML reports are fully written before it exits either way (error
+    # datasets are included with an ⚠ icon), so both outcomes must be posted, not raised.
+    if result.returncode == 1 and ("Found differences" in stdout or "Found errors" in stdout):
+        log.info("etl diff found differences or errors", returncode=result.returncode)
     elif result.returncode != 0:
         details = [f"etl diff failed (exit {result.returncode})", f"Command: {cmd_str}"]
         if stderr:

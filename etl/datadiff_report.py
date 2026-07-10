@@ -21,6 +21,15 @@ ChangeKind = Literal["new", "removed", "changed", "identical", "error"]
 # can afford more).
 SAMPLE_LIMIT = 100
 
+# Cap on the total sample rows rendered into the HTML report. PRs that touch hundreds of
+# datasets (e.g. a regions or income-groups update) can otherwise produce a >100 MB page that
+# no browser opens. When over budget, each value diff renders only its first rows (the most
+# anomalous ones when the sample is score-sorted) with an explicit note; the JSON output always
+# keeps the full samples.
+HTML_SAMPLE_ROW_BUDGET = 50_000
+# Never render fewer than this many rows per value diff, however big the report.
+HTML_SAMPLE_ROW_MIN = 5
+
 # Severity tiers (thresholds on the BARD-based anomaly score, stored in [0, 1] and displayed
 # as a percentage): they tell a reviewer where to stop reading. large = score ≥ 15%, moderate
 # ≥ 1%, small = anything non-zero below that (usually rounding-level noise).
@@ -508,31 +517,37 @@ def _render_meta_diff(meta_diff: str, label: str) -> str:
     return f'<details class="meta"><summary>{_e(label)}</summary><pre>{chr(10).join(lines)}</pre></details>'
 
 
-def _render_value_diff(v: ValueDiff) -> str:
+def _render_value_diff(v: ValueDiff, sample_cap: int = SAMPLE_LIMIT) -> str:
     label = {"new": "New values", "removed": "Removed values", "changed": "Changed values"}[v.kind]
+    shown = v.sample[:sample_cap]
     # Say up front that the table is a sample — a note below a 100-row scrollable table is only
     # discovered after scrolling past rows the reader didn't know were truncated.
     head_note = ""
-    if v.count > len(v.sample):
+    if v.count > len(shown):
         what = (
-            f"the {len(v.sample):,} most anomalous rows"
+            f"the {len(shown):,} most anomalous rows"
             if v.sorted_by_score
-            else f"a random sample of {len(v.sample):,} rows"
+            else f"a random sample of {len(shown):,} rows"
         )
-        head_note = f' <span class="head-note">— showing {what}</span>'
+        capped = (
+            f" (of {len(v.sample):,} sampled — display capped to keep this report loadable)"
+            if len(shown) < len(v.sample)
+            else ""
+        )
+        head_note = f' <span class="head-note">— showing {what}{capped}</span>'
     head = (
         f'<div class="vd-head {v.kind}">{_e(v.symbol)} {label}: '
         f"{v.count:,} / {v.total:,} ({v.pct:.2f}%){head_note}</div>"
     )
-    if not v.sample:
+    if not shown:
         return f'<div class="vd">{head}</div>'
 
-    cols = list(v.sample[0].keys())
+    cols = list(shown[0].keys())
     ths = "".join(
         f'<th class="{"old" if c.endswith(" -") else "new" if c.endswith(" +") else ""}">{_e(c)}</th>' for c in cols
     )
     trs = []
-    for row in v.sample:
+    for row in shown:
         tds = "".join(
             f'<td class="{"old" if c.endswith(" -") else "new" if c.endswith(" +") else ""}">{_e(row.get(c, ""))}</td>'
             for c in cols
@@ -544,7 +559,7 @@ def _render_value_diff(v: ValueDiff) -> str:
     )
 
 
-def _render_column(table_name: str, c: ColumnDiffResult, ds_path: str = "") -> str:
+def _render_column(table_name: str, c: ColumnDiffResult, ds_path: str = "", sample_cap: int = SAMPLE_LIMIT) -> str:
     chips = "".join(f'<span class="chip">{_e(ch)}</span>' for ch in c.changes)
     dim = '<span class="chip dim">dim</span>' if c.is_dim else ""
     tier = _tier_chip(c.severity, c.kind) if not c.is_dim else ""
@@ -560,12 +575,12 @@ def _render_column(table_name: str, c: ColumnDiffResult, ds_path: str = "") -> s
     if c.meta_diff:
         parts.append(_render_meta_diff(c.meta_diff, "metadata diff"))
     for v in c.value_diffs:
-        parts.append(_render_value_diff(v))
+        parts.append(_render_value_diff(v, sample_cap))
     parts.append("</div>")
     return "".join(parts)
 
 
-def _render_table(t: TableDiffResult, ds_path: str = "") -> str:
+def _render_table(t: TableDiffResult, ds_path: str = "", sample_cap: int = SAMPLE_LIMIT) -> str:
     parts = [
         f'<div class="tbl"><div class="tbl-head"><span class="sym {t.kind}">{_SYMBOLS[t.kind]}</span> '
         f"Table <b>{_e(t.name)}</b>{_tier_chip(t.severity, t.kind)}</div>"
@@ -576,7 +591,7 @@ def _render_table(t: TableDiffResult, ds_path: str = "") -> str:
     for c in sorted(t.columns, key=lambda c: -c.severity):
         if c.kind == "identical":
             continue
-        parts.append(_render_column(t.name, c, ds_path))
+        parts.append(_render_column(t.name, c, ds_path, sample_cap))
     parts.append("</div>")
     return "".join(parts)
 
@@ -599,7 +614,7 @@ def _dataset_summary_note(ds: DatasetDiffResult) -> str:
     return ", ".join(notes) if notes else "identical"
 
 
-def _render_dataset(ds: DatasetDiffResult) -> str:
+def _render_dataset(ds: DatasetDiffResult, sample_cap: int = SAMPLE_LIMIT) -> str:
     kind = ds.change_kind
     open_attr = " open" if kind in ("changed", "error") else ""
     new_version = ' <span class="chip">new version</span>' if ds.is_new_version else ""
@@ -623,7 +638,7 @@ def _render_dataset(ds: DatasetDiffResult) -> str:
     # Most-changed tables first (stable: ties keep collection order).
     for t in sorted(ds.tables, key=lambda t: -t.severity):
         if t.any_change or ds.kind in ("new", "removed"):
-            parts.append(_render_table(t, ds.path))
+            parts.append(_render_table(t, ds.path, sample_cap))
     parts.append("</div></details>")
     return "".join(parts)
 
@@ -650,7 +665,19 @@ def render_html(report: DiffReport) -> str:
     # changed datasets ranked by the size of their changes (median BARD of the most-changed
     # column), then new datasets; identical last. Path as tie-break for determinism.
     datasets = sorted(report.datasets, key=lambda ds: (-ds.severity, ds.path))
-    sections = "".join(_render_dataset(ds) for ds in datasets)
+
+    # Spread the HTML sample-row budget evenly over all sampled value diffs; small reports keep
+    # their full samples, huge ones (hundreds of changed datasets) get capped per diff so the
+    # page stays openable in a browser.
+    sampled_counts = [
+        len(v.sample) for ds in datasets for t in ds.tables for c in t.columns for v in c.value_diffs if v.sample
+    ]
+    if sum(sampled_counts) > HTML_SAMPLE_ROW_BUDGET:
+        sample_cap = max(HTML_SAMPLE_ROW_MIN, HTML_SAMPLE_ROW_BUDGET // len(sampled_counts))
+    else:
+        sample_cap = SAMPLE_LIMIT
+
+    sections = "".join(_render_dataset(ds, sample_cap) for ds in datasets)
 
     tier_counts = {"large": 0, "moderate": 0, "small": 0}
     for ds in report.datasets:

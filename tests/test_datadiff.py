@@ -9,6 +9,7 @@ from owid.catalog import Dataset, DatasetMeta, Table
 
 from etl.datadiff import DatasetDiff, RemoteDataset, _changed_records, _dataset_files_match
 from etl.datadiff_report import (
+    HTML_SAMPLE_ROW_BUDGET,
     ColumnDiffResult,
     DatasetDiffResult,
     DiffReport,
@@ -534,3 +535,38 @@ def test_structural_changes_are_not_metadata_only():
         tables=[TableDiffResult(name="extra", kind="new", columns=[ColumnDiffResult(name="a", kind="new")])],
     )
     assert not new_table.is_metadata_only
+
+
+def _sampled_ds(path, n_diffs, rows_per_diff):
+    sample = [{"country": f"c{i}", "year": "2020", "x -": "1", "x +": "2"} for i in range(rows_per_diff)]
+    cols = [
+        ColumnDiffResult(
+            name=f"col{j}",
+            kind="changed",
+            changes=["changed data"],
+            value_diffs=[ValueDiff(kind="changed", count=rows_per_diff, total=10_000, sample=list(sample))],
+        )
+        for j in range(n_diffs)
+    ]
+    return DatasetDiffResult(
+        path=path, kind="identical", tables=[TableDiffResult(name="t", kind="identical", columns=cols)]
+    )
+
+
+def test_html_sample_rows_capped_on_huge_reports():
+    # 1,200 value diffs x 100 rows = 120,000 sampled rows — over the budget, so each diff
+    # renders only its first rows with an explicit note.
+    report = DiffReport(datasets=[_sampled_ds(f"garden/n/v/ds{i}", n_diffs=120, rows_per_diff=100) for i in range(10)])
+    html = render_html(report)
+    per_diff = max(5, HTML_SAMPLE_ROW_BUDGET // 1200)
+    assert "of 100 sampled — display capped" in html
+    # The first rows survive, anything past the cap is dropped.
+    assert ">c0<" in html
+    assert f">c{per_diff - 1}<" in html
+    assert f">c{per_diff}<" not in html
+
+    # A small report keeps its full samples, with no cap note.
+    small = DiffReport(datasets=[_sampled_ds("garden/n/v/small", n_diffs=2, rows_per_diff=100)])
+    small_html = render_html(small)
+    assert "display capped" not in small_html
+    assert "c99" in small_html
