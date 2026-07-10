@@ -408,6 +408,13 @@ def add_region_aggregates(
                 c for c in countries_that_must_have_data if c not in _must_have_non_members
             ]
 
+    # Validate the threshold up front — the per-group check below can be skipped entirely (e.g. an
+    # empty must-have list), which must not silently accept an invalid fraction.
+    if frac_countries_that_must_have_data is not None and frac_countries_that_must_have_data > 1:
+        raise ValueError(
+            f"`frac_countries_that_must_have_data` must be between 0 and 1, got {frac_countries_that_must_have_data}."
+        )
+
     if index_columns is None:
         index_columns = [country_col, year_col]
 
@@ -431,10 +438,6 @@ def add_region_aggregates(
         countries_with_data = set(list(countries))
         if frac_countries_that_must_have_data is None:
             return set(countries_that_must_have_data).issubset(countries_with_data)
-        elif frac_countries_that_must_have_data > 1:
-            raise ValueError(
-                f"`frac_countries_that_must_have_data` must be between 0 and 1, got {frac_countries_that_must_have_data}."
-            )
         else:
             # If a fraction of countries that must have data is defined, check that the fraction of countries that
             # have data is larger than the defined fraction.

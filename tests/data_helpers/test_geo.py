@@ -868,6 +868,19 @@ class TestAddRegionAggregates:
         )
         assert "Region 1" in df_zero["country"].values
 
+        # An invalid threshold must fail loudly even when the per-group check would be skipped
+        # (e.g. an empty must-have list).
+        with pytest.raises(ValueError, match="must be between 0 and 1"):
+            geo.add_region_aggregates(
+                df=self.df_in,
+                region="Region 1",
+                countries_in_region=["Country 1", "Country 2"],
+                countries_that_must_have_data=[],
+                frac_countries_that_must_have_data=2,
+                country_col="country",
+                year_col="year",
+            )
+
         with pytest.raises(ValueError, match="impossible to compute"):
             geo.add_region_aggregates(
                 df=self.df_in,
