@@ -10,7 +10,7 @@ definitions:
       numDecimalPlaces: 0
     description_processing: |-
       - Values correspond to the world totals published in Table 4.12 of the report, converted from million hectares to hectares.
-      - The 2012 base year is shared by the three scenarios.
+      - The projections start from a 2012 base year (1,567 million hectares, shared by the three scenarios), which is not shown in charts, to avoid overlapping with the observed data.
   # Shared bullets, and descriptions of each scenario (condensed from Chapter 2 of the report, FAO 2018).
   description_key_cropland: &description-key-cropland |-
     Cropland — called "arable land" in the source — is the physical area used to grow crops, including both temporary and permanent crops.
