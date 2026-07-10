@@ -9,21 +9,13 @@ definitions:
       topic_tags:
         - Meat & Dairy Production
     description_processing: |-
-      We combine data from the UN Food and Agriculture Organization (FAOSTAT), available from 1961 onwards, with long-run historical estimates from the HYDE database for the period 1890 to 1950.
-
-      HYDE reports figures for its own set of world sub-regions, which we aggregate into continents and a world total. We compared this aggregation against FAOSTAT's regional data over the years where the two overlap (1961 to 1998) and found close agreement, confirming that HYDE's sub-regions correspond to the standard continents. HYDE groups the entire former Soviet Union into Europe, which is consistent with the way FAOSTAT reported the USSR as a single country assigned to Europe until its dissolution in 1991.
-
+      We combine data from the UN Food and Agriculture Organization (FAOSTAT), available from 1961 onwards, with long-run historical estimates from HYDE for the period 1890 to 1950.
+      HYDE reports figures for its own set of world sub-regions, which we aggregate into continents and a world total.
       HYDE reports counts in thousands of animals, which we convert to the number of animals.
-
-      Only eight mammal species (asses, buffalo, cattle, goats, horses, mules, pigs and sheep) have data before 1961, because the historical HYDE compilation covers only these mammals. All other species, and all individual countries other than Canada, the United States and Japan, begin in 1961.
 
 dataset:
   title: Livestock counts (HYDE and FAOSTAT)
   update_period_days: 365
-  description: |-
-    Long-run estimates of the number of livestock by species, for individual countries and for regions (the world, continents, and FAO's continental regions).
-
-    Figures up to 1950 come from the History Database of the Global Environment (HYDE) and cover eight mammal species; figures from 1961 onwards come from the UN Food and Agriculture Organization (FAOSTAT) and cover all species.
 
 tables:
   livestock_counts:
