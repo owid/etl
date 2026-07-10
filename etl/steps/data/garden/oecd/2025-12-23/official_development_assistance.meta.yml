@@ -203,13 +203,6 @@ definitions:
     We calculate non-humanitarian aid as the difference between total aid and humanitarian aid.
     <%- endif -%>
 
-  processing_level_by_sector: &processing_level_by_sector |-
-    <% if sector == "Non-humanitarian aid" %>
-    major
-    <% else %>
-    minor
-    <%- endif -%>
-
   description_short_oda_net_disbursements: &description_short_oda_net_disbursements |-
     {definitions.short_oda} {definitions.short_net_disbursements} {definitions.short_constant_usd}
 
@@ -1872,7 +1865,10 @@ tables:
           - "{definitions.key_sector}"
           - "{definitions.key_commitments_sectors}"
           - "{definitions.key_constant_usd}"
-        processing_level: *processing_level_by_sector
+        # NOTE: must be a literal (minor/major), never a Jinja template — owid-catalog validates
+        # this field during indicator operations (e.g. in `etl diff`), before any rendering.
+        # Per-capita indicators are major processing regardless of sector.
+        processing_level: major
         description_processing: |-
           {definitions.processing_per_capita_2}
 
