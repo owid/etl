@@ -8,6 +8,7 @@ from __future__ import annotations
 import copy
 import json
 import os
+import re
 from collections import defaultdict
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
@@ -748,11 +749,13 @@ def combine_indicators_processing_level(indicators: list[Indicator]) -> PROCESSI
         # keep the template so it still renders per dimension downstream.
         return cast(PROCESSING_LEVELS, templates[0])
 
-    # A template's rendered value is unknown here, but it can only produce the level names
-    # spelled out in its text — count the highest of those, so combining with a literal never
-    # understates the result (a maybe-major template + "minor" must combine to "major", since
-    # processing_level feeds licensing downstream).
-    template_levels = [level for template in templates for level in PROCESSING_LEVELS_ORDER if level in template]
+    # A template's rendered value is unknown here, but its possible outputs are the literal text
+    # outside its `<% ... %>` statement tags (conditions never render, so a level name inside
+    # e.g. `sector == "major donors"` doesn't count) — take the highest level named there, so
+    # combining with a literal never understates the result (a maybe-major template + "minor"
+    # must combine to "major", since processing_level feeds licensing downstream).
+    rendered_text = " ".join(re.sub(r"<%.*?%>", " ", template, flags=re.DOTALL) for template in templates)
+    template_levels = [level for level in PROCESSING_LEVELS_ORDER if level in rendered_text]
 
     candidate_levels = literal_levels + template_levels
     if not candidate_levels:

@@ -666,6 +666,9 @@ def test_combine_indicators_processing_level_with_jinja_templates() -> None:
     assert combine_indicators_processing_level([_var(template), _var("minor")]) == "major"
     only_minor = '<% if sector == "X" %>minor<% else %>minor<%- endif -%>'
     assert combine_indicators_processing_level([_var(only_minor), _var("minor")]) == "minor"
+    # Level names inside statement tags (conditions) never render, so they don't count.
+    tricky = '<% if sector == "major donors" %>minor<% else %>minor<% endif %>'
+    assert combine_indicators_processing_level([_var(tricky), _var("minor")]) == "minor"
     # Different templates with no literals combine to the highest renderable level.
     assert combine_indicators_processing_level([_var(template), _var(only_minor)]) == "major"
     # Templates that spell out no known level can't be combined.
