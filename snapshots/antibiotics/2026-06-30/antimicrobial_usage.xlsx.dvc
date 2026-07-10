@@ -7,7 +7,7 @@ meta:
     title_snapshot: WHO GLASS - Global Antimicrobial Use data
     citation_full: |-
       Antimicrobial Resistance and Use Surveillance System (GLASS) 2025: Antimicrobial Use data contextual information and antimicrobial use estimates by ATC4 subgroup and AWaRe, 2016-2023. Geneva, World Health Organization; 2025, https://worldhealthorg.shinyapps.io/glass-dashboard/_w_053a572c/#!/amu.
-    attribution_short: WHO GLASS AMU
+    attribution_short: WHO
     url_main: https://worldhealthorg.shinyapps.io/glass-dashboard/_w_053a572c/#!/amu
     url_download: https://worldhealthorg.shinyapps.io/glass-dashboard/_w_053a572c/_w_835096db614945dcb3d9593bd5591da4/data/global/GLASS-AMU_2016-23_dataset_20251019.xlsx
     date_accessed: '2026-06-30'
