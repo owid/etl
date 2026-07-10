@@ -145,7 +145,7 @@ def _display_comparison(source_engine: Engine, explorer_slug: str) -> None:
     with st.container(border=True):
         # Header row: title + tab to open the previews on (conceptually a rendering option,
         # not a view dimension, hence not in the dimensions row).
-        col_head, col_open = st.columns([3, 1], vertical_alignment="bottom")
+        col_head, col_open = st.columns([3, 1], vertical_alignment="center")
         with col_head:
             st.markdown("##### :material/visibility: Preview")
 
