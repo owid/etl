@@ -596,16 +596,31 @@ tables:
       fao_3_region:
         title: World regions according to FAO (3)
         description_short: |-
-          Level-3 (most granular) regions defined by the Food and Agriculture Organization of the United Nations (FAO).
+          Level-3 (most detailed) regions defined by the Food and Agriculture Organization of the United Nations (FAO). Sub-Saharan Africa and Latin America and the Caribbean are broken into their finer regions; subregions with no finer breakdown are shown as in level 2.
         type: ordinal
         sort:
-          - "Central America (FAO)"
-          - "Caribbean (FAO)"
-          - "South America (FAO)"
-          - "Western Africa (FAO)"
+          - "Northern Africa (FAO)"
+          - "Eastern Africa (FAO)"
           - "Middle Africa (FAO)"
           - "Southern Africa (FAO)"
-          - "Eastern Africa (FAO)"
+          - "Western Africa (FAO)"
+          - "Northern America (FAO)"
+          - "Caribbean (FAO)"
+          - "Central America (FAO)"
+          - "South America (FAO)"
+          - "Western Asia (FAO)"
+          - "Central Asia (FAO)"
+          - "Southern Asia (FAO)"
+          - "Eastern Asia (FAO)"
+          - "South-eastern Asia (FAO)"
+          - "Southern Europe (FAO)"
+          - "Western Europe (FAO)"
+          - "Northern Europe (FAO)"
+          - "Eastern Europe (FAO)"
+          - "Australia and New Zealand (FAO)"
+          - "Melanesia (FAO)"
+          - "Micronesia (FAO)"
+          - "Polynesia (FAO)"
         origins:
           - *origins_fao
         presentation:
@@ -615,12 +630,27 @@ tables:
             map:
               colorScale:
                 customCategoryLabels:
-                  "Central America (FAO)": "Central America"
-                  "Caribbean (FAO)": "Caribbean"
-                  "South America (FAO)": "South America"
-                  "Western Africa (FAO)": "Western Africa"
+                  "Northern Africa (FAO)": "Northern Africa"
+                  "Eastern Africa (FAO)": "Eastern Africa"
                   "Middle Africa (FAO)": "Middle Africa"
                   "Southern Africa (FAO)": "Southern Africa"
-                  "Eastern Africa (FAO)": "Eastern Africa"
+                  "Western Africa (FAO)": "Western Africa"
+                  "Northern America (FAO)": "Northern America"
+                  "Caribbean (FAO)": "Caribbean"
+                  "Central America (FAO)": "Central America"
+                  "South America (FAO)": "South America"
+                  "Western Asia (FAO)": "Western Asia"
+                  "Central Asia (FAO)": "Central Asia"
+                  "Southern Asia (FAO)": "Southern Asia"
+                  "Eastern Asia (FAO)": "Eastern Asia"
+                  "South-eastern Asia (FAO)": "South-eastern Asia"
+                  "Southern Europe (FAO)": "Southern Europe"
+                  "Western Europe (FAO)": "Western Europe"
+                  "Northern Europe (FAO)": "Northern Europe"
+                  "Eastern Europe (FAO)": "Eastern Europe"
+                  "Australia and New Zealand (FAO)": "Australia and New Zealand"
+                  "Melanesia (FAO)": "Melanesia"
+                  "Micronesia (FAO)": "Micronesia"
+                  "Polynesia (FAO)": "Polynesia"
                 customHiddenCategories:
                   "No data": true

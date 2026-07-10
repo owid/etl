@@ -85,6 +85,15 @@ def run() -> None:
         mask = tb_regions["ilo_2_region"].isna() & (tb_regions["ilo_1_region"] == "Arab States (ILO)")
         tb_regions.loc[mask, "ilo_2_region"] = tb_regions.loc[mask, "ilo_1_region"]
 
+    # FAO only breaks Sub-Saharan Africa and Latin America and the Caribbean into finer (fao_3) regions.
+    # Backfill the remaining fao_2 subregions into the fao_3 map so it becomes the complete 22-region
+    # partition, which is the split most FAOSTAT domains actually report data for (they publish
+    # Northern/Eastern/Middle/Southern/Western Africa etc. directly, without the Sub-Saharan Africa and
+    # Latin America and the Caribbean umbrella groups, which only appear in the food security domains).
+    if {"fao_2_region", "fao_3_region"} <= set(tb_regions.columns):
+        mask = tb_regions["fao_3_region"].isna() & tb_regions["fao_2_region"].notna()
+        tb_regions.loc[mask, "fao_3_region"] = tb_regions.loc[mask, "fao_2_region"]
+
     # Remove unnecessary columns.
     tb_regions = tb_regions.drop(
         columns=["code", "is_historical", "region_type", "defined_by", "members"], errors="raise"
