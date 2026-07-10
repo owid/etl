@@ -133,9 +133,6 @@ steps:
   data://grapher/agriculture/2017/share_of_landowners_who_are_female__fao__2017:
     - data://garden/agriculture/2017/share_of_landowners_who_are_female__fao__2017:
       - snapshot://agriculture/2017/share_of_landowners_who_are_female__fao__2017.feather
-  data://grapher/agriculture/2017/livestock_counts__hyde_and_fao__2017:
-    - data://garden/agriculture/2017/livestock_counts__hyde_and_fao__2017:
-      - snapshot://agriculture/2017/livestock_counts__hyde_and_fao__2017.feather
   data://grapher/health/2020/wellcome_global_monitor_2020__covid_19__trust_questions:
     - data://garden/health/2020/wellcome_global_monitor_2020__covid_19__trust_questions:
       - snapshot://health/2020/wellcome_global_monitor_2020__covid_19__trust_questions.feather
