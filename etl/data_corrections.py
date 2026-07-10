@@ -34,6 +34,14 @@ Rows can also be located by their current value instead of entity+years::
       value: 5
       ...
 
+A `match` value can also reference another column of the *same row* instead of a literal, to express
+a relationship between two columns rather than a fixed constant::
+
+    - indicator: barn
+      match: {country: Belgium, year: 2025, value: {column: free_range}}
+      action: drop                                # drop the row where barn == free_range
+      ...
+
 Actions:
 - ``drop``     — remove the matched rows (use for long/tidy tables, where a row *is* one data point).
 - ``override`` — replace the indicator value of the matched rows with ``value``. Set ``value: null``
@@ -69,6 +77,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 import yaml
 from owid.catalog import Table
 from structlog import get_logger
@@ -85,6 +94,14 @@ VALID_ACTIONS = {"drop", "override", "scale", "flag"}
 VALID_STATUSES = {"open", "reported", "acknowledged", "fixed_upstream"}
 
 # Comparison operators allowed in an `expect:` guard, mapping to the function applied elementwise.
+#
+# `expect`'s threshold is deliberately literal-only (unlike `match`, which also accepts a
+# `{column: <name>}` reference — see `_resolve`). No correction needs a cross-column `expect` yet, and
+# wiring it up isn't free: `_resolve` returns a table-length array, but `_check_expectation` compares
+# against `tb.loc[mask, indicator]` (already mask-narrowed), so the resolved array would need slicing
+# by the same `mask` before the elementwise comparison — an extra step with no test coverage today. If
+# this is ever needed: resolve the threshold via `_resolve(tb, threshold, index_names, label)`, then
+# index it with `mask` before passing it to the operator lambda.
 EXPECT_OPERATORS = {
     "eq": lambda values, threshold: values == threshold,
     "ne": lambda values, threshold: values != threshold,
@@ -158,9 +175,26 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
         # (they would be silently ignored), so reject the combination.
         mixed = {"entity", "years"} & set(correction)
         assert not mixed, f"Correction [{label}]: do not combine 'match' with {sorted(mixed)}."
+        # A match value may reference another column of the same row (`{column: <name>}`) instead of a
+        # literal. Reject any other dict shape now, rather than letting it silently build an all-false
+        # mask (a literal `==` against a dict never matches) that only surfaces as a confusing
+        # "matched no rows" at apply time.
+        for key, value in match.items():
+            if isinstance(value, dict):
+                assert set(value) == {"column"} and isinstance(value.get("column"), str) and value["column"], (
+                    f"Correction [{label}]: match.{key} must be a literal or {{'column': <name>}}, got {value!r}."
+                )
 
     if action == "override":
         assert "value" in correction, f"Correction [{label}]: action 'override' requires a 'value'."
+        # `{column: ...}` references are only resolved inside `match` (to compare two columns of the
+        # same row); resolving one as the top-level override target isn't implemented, so a value
+        # shaped that way would be assigned into every matched cell as a literal dict — reject it.
+        value = correction["value"]
+        assert not (isinstance(value, dict) and "column" in value), (
+            f"Correction [{label}]: action 'override' does not support a {{'column': ...}} reference as "
+            f"'value' — that form is only resolved inside 'match'."
+        )
 
     if action == "scale":
         factor = correction.get("factor")
@@ -227,6 +261,30 @@ def _year_mask(years: Any, year_values: np.ndarray, label: str) -> np.ndarray:
     )
 
 
+def _eq_mask(values: np.ndarray, target: Any) -> np.ndarray:
+    """Elementwise equality that treats missing values as non-matching rather than raising.
+
+    `values` may be an object array holding `pd.NA`/`None` (e.g. a nullable string column) — comparing
+    those to a scalar with plain `==` yields `pd.NA` instead of `False`, which blows up a later `&=`
+    with a `TypeError: boolean value of NA is ambiguous`. `target` may itself be an array (see
+    `_resolve`), in which case this compares elementwise position-by-position, same as against a scalar.
+    """
+    return pd.Series(values).eq(target).fillna(False).to_numpy()
+
+
+def _resolve(tb: Table, spec: Any, index_names: list[str], label: str) -> Any:
+    """Resolve a `match` operand: `{"column": <name>}` resolves to that column's full array, so the
+    caller ends up comparing two columns of the same row elementwise instead of a column against a
+    fixed constant. Anything else is returned unchanged (the literal case).
+    """
+    if isinstance(spec, dict):
+        assert "column" in spec, (
+            f"Correction [{label}]: expected a column reference like {{'column': <name>}}, got {spec!r}."
+        )
+        return _column_values(tb, spec["column"], index_names)
+    return spec
+
+
 def _row_mask(tb: Table, correction: dict[str, Any], country_col: str, year_col: str) -> np.ndarray:
     """Return a positional boolean mask over `tb` selecting the rows a correction targets."""
     index_names = [name for name in tb.index.names if name is not None]
@@ -237,10 +295,11 @@ def _row_mask(tb: Table, correction: dict[str, Any], country_col: str, year_col:
         for key, value in correction["match"].items():
             # `value` is shorthand for the indicator column; any other key matches that column by name.
             col = correction["indicator"] if key == "value" else key
-            mask &= _column_values(tb, col, index_names) == value
+            target = _resolve(tb, value, index_names, label)
+            mask &= _eq_mask(_column_values(tb, col, index_names), target)
         return mask
 
-    entity_mask = _column_values(tb, country_col, index_names) == correction["entity"]
+    entity_mask = _eq_mask(_column_values(tb, country_col, index_names), correction["entity"])
     year_values = _column_values(tb, year_col, index_names)
     return entity_mask & _year_mask(correction["years"], year_values, label)
 
@@ -335,6 +394,19 @@ def _to_float(value: Any) -> float | None:
     return None if f != f else f  # drop NaN
 
 
+def _to_int(value: Any) -> int | None:
+    """Coerce a value to int, or None if it's not a whole-number label.
+
+    Some tables carry non-integer year labels for rows unrelated to a given correction (e.g. a
+    reporting-period range like "1872-6") — those points simply can't be placed on the audit's
+    year axis, so they're dropped rather than raising.
+    """
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def audit_path_for(corrections_path: Path | str) -> Path:
     """Where the audit JSON for a given `.corrections.yml` lives (under the gitignored data/ tree)."""
     rel = Path(corrections_path).resolve().relative_to(STEP_DIR.resolve())  # data/<channel>/.../x.corrections.yml
@@ -366,6 +438,10 @@ def build_audit(
         mask = _row_mask(tb, correction, country_col, year_col)
         action = correction["action"]
         factor = correction.get("factor")
+        # `correction.get("value")` here is the top-level override target, not a `match`-nested
+        # `{column: ...}` reference (those live inside `match["value"]`, a different dict) — the two
+        # `"value"` keys never collide, so `_to_float` seeing a real reference dict can't happen for a
+        # correction that's valid per `_validate_correction`.
         override_value = _to_float(correction.get("value"))
 
         any_numeric = False
@@ -373,16 +449,20 @@ def build_audit(
         for ent in sorted(set(entity_vals[mask].tolist())):
             ent_mask = entity_vals == ent
             series = sorted(
-                [int(y), fv]
+                [y_int, fv]
                 for y, v in zip(year_vals[ent_mask].tolist(), ind_vals[ent_mask].tolist())
-                if (fv := _to_float(v)) is not None
+                if (fv := _to_float(v)) is not None and (y_int := _to_int(y)) is not None
             )
             any_numeric = any_numeric or bool(series)
             affected = []
-            for y, v in sorted(zip(year_vals[(ent_mask & mask)].tolist(), ind_vals[(ent_mask & mask)].tolist())):
+            for y, v in sorted(
+                zip(year_vals[(ent_mask & mask)].tolist(), ind_vals[(ent_mask & mask)].tolist()),
+                key=lambda pair: str(pair[0]),
+            ):
                 before = _to_float(v)
-                if before is None:
-                    continue  # a matched-but-empty cell carries no value to show
+                y_int = _to_int(y)
+                if before is None or y_int is None:
+                    continue  # a matched-but-empty cell, or a non-integer year label, carries nothing to plot
                 if action == "drop":
                     after = None
                 elif action == "override":
@@ -391,7 +471,7 @@ def build_audit(
                     after = before * float(factor) if before is not None else None
                 else:
                     after = before
-                affected.append([int(y), before, after])
+                affected.append([y_int, before, after])
             entities.append({"entity": ent, "series": series, "affected": affected})
 
         records.append(

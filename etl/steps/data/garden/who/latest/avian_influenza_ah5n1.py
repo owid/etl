@@ -44,9 +44,7 @@ def run() -> None:
     ## Yearly data
     tb_year = tb_year.rename(columns={"month": "date"})
     ## Monthly data
-    ## FIXES
-    ## Fix "225" should be "2025"
-    tb_month["month"] = tb_month["month"].str.replace("12/1/225", "12/1/2025")
+    tb_month = paths.apply_corrections(tb_month)
     # date_1 = pd.to_datetime(tb_month["month"], format="%b-%y", errors="coerce")
     # date_2 = pd.to_datetime(tb_month["month"], format="%y-%b", errors="coerce")
     # date_3 = pd.to_datetime("200" + tb_month["month"].astype(str), format="%Y-%b", errors="coerce")

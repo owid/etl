@@ -1,0 +1,69 @@
+definitions:
+  common:
+    unit: people
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Fertilizers
+  description_key: &description-key
+    - "Synthetic nitrogen fertilizers are made from ammonia produced using the Haber-Bosch process."
+    - "The Haber-Bosch process was invented in the early 20th century. It enabled the large-scale production of synthetic nitrogen fertilizers and greatly increased the amount of food that can be grown."
+  description_processing: &description-processing |-
+    - "The share of the world population fed by synthetic nitrogen fertilizers was read off Figure 1 of [Erisman et al. (2008)](https://doi.org/10.1038/ngeo325), who estimated that this share grew from 0% in 1900 to 44% in 2000, and 48% in 2008. This is broadly consistent with [Smil (2002)](https://doi.org/10.1579/0044-7447-31.2.126), who estimated that the Haber-Bosch process provided the very means of survival for about 40% of humanity around 2000."
+    - For years after 2008, we assume that the share of the world population fed by synthetic nitrogen fertilizers has remained constant at 48%. This is consistent with [Rosa & Gabrielli (2023)](https://doi.org/10.1088/1748-9326/aca815), who estimated that about 3.8 billion people (roughly half of the global population) were fed by synthetic nitrogen fertilizers in 2019. Under this assumption, changes in the number of people fed by synthetic nitrogen fertilizers after 2008 are driven solely by population growth.
+    - We linearly interpolate between these years to obtain a value for every year.
+    - To estimate the number of people fed by synthetic nitrogen fertilizers, we multiplied this annual share by Our World in Data's [long-run world population series](https://ourworldindata.org/population-sources).
+
+dataset:
+  update_period_days: 365
+  title: Population fed by synthetic nitrogen fertilizers
+  owners:
+    - Pablo Rosado
+
+tables:
+  population_fed_by_synthetic_nitrogen:
+    title: Population fed by synthetic nitrogen fertilizers
+    variables:
+      share_of_population_fed_by_synthetic_nitrogen:
+        title: Share of the world population fed by synthetic nitrogen fertilizers
+        unit: "%"
+        short_unit: "%"
+        description_short: Estimated share of the world population whose food supply relies on synthetic nitrogen fertilizers, produced via the Haber-Bosch process.
+        description_key: *description-key
+        description_processing: *description-processing
+        display:
+          name: Share of the world population fed by synthetic nitrogen fertilizers
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of the world population fed by synthetic nitrogen fertilizers
+        processing_level: major
+      population_fed_by_synthetic_nitrogen:
+        title: World population fed by synthetic nitrogen fertilizers
+        description_short: Estimated number of people whose food supply relies on synthetic nitrogen fertilizers, produced via the Haber-Bosch process.
+        description_key: *description-key
+        description_processing: *description-processing
+        display:
+          name: Population fed by synthetic nitrogen fertilizers
+        presentation:
+          title_public: World population fed by synthetic nitrogen fertilizers
+        processing_level: major
+      population_not_fed_by_synthetic_nitrogen:
+        title: World population supported without synthetic nitrogen fertilizers
+        description_short: Estimated number of people who could be supported without the use of synthetic nitrogen fertilizers, produced via the Haber-Bosch process.
+        description_key: *description-key
+        description_processing: *description-processing
+        display:
+          name: Population supported without synthetic nitrogen fertilizers
+        presentation:
+          title_public: World population supported without synthetic nitrogen fertilizers
+        processing_level: major
+      world_population:
+        title: World population
+        description_short: Total world population.
+        display:
+          name: World population
+        presentation:
+          title_public: World population
+        processing_level: minor

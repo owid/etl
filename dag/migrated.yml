@@ -187,9 +187,6 @@ steps:
   data-private://grapher/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
     - data-private://garden/labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018:
       - snapshot-private://labor/2018/average_effective_age_of_retirement__by_gender__oecd__2018.feather
-  data://grapher/agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017:
-    - data://garden/agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017:
-      - snapshot://agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017.feather
   data://grapher/health/2011/air_pollution_by_city__fouquet_and_dpcc__2011:
     - data://garden/health/2011/air_pollution_by_city__fouquet_and_dpcc__2011:
       - snapshot://health/2011/air_pollution_by_city__fouquet_and_dpcc__2011.feather
@@ -634,9 +631,6 @@ steps:
   data-private://grapher/health/2021-09-01/lead_concentrations_in_paint__ipen__2021:
     - data-private://garden/health/2021-09-01/lead_concentrations_in_paint__ipen__2021:
       - snapshot-private://health/2021-09-01/lead_concentrations_in_paint__ipen__2021.feather
-  data-private://grapher/artificial_intelligence/2022-12-01/ai_index_report__2022:
-    - data-private://garden/artificial_intelligence/2022-12-01/ai_index_report__2022:
-      - snapshot-private://artificial_intelligence/2022-12-01/ai_index_report__2022.feather
   data://grapher/health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017:
     - data://garden/health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017:
       - snapshot://health/2017-11-11/antibiotic_use_in_livestock_2030__boeckel_et_al__2017.feather
@@ -769,9 +763,6 @@ steps:
   data://grapher/forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017:
     - data://garden/forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017:
       - snapshot://forests/2020-11-15/drivers_of_forest_loss_in_brazil_legal_amazon__tyukavina_et_al__2017.feather
-  data-private://grapher/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
-    - data-private://garden/fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021:
-      - snapshot-private://fao/2021-07-30/employment_in_fisheries_and_aquaculture__un_fao__2021.feather
   data://grapher/labor/2016-02-18/child_labor_italy__historic__toniolo__g__and__vecchi__g__2007:
     - data://garden/labor/2016-02-18/child_labor_italy__historic__toniolo__g__and__vecchi__g__2007:
       - snapshot://labor/2016-02-18/child_labor_italy__historic__toniolo__g__and__vecchi__g__2007.feather

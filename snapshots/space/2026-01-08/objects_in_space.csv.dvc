@@ -16,9 +16,9 @@ meta:
     date_accessed: '2026-01-08'
     # NOTE: The data seems to be updated regularly, so it's safe to assume that date_published equals date_accessed.
     date_published: '2026-01-08'
-  license:
-    name: USSPACECOM Basic SSA Data, redistribution allowed with attribution
-    url: https://www.space-track.org/documentation#/odr
+    license:
+      name: USSPACECOM Basic SSA Data, redistribution allowed with attribution
+      url: https://www.space-track.org/documentation#/odr
 outs:
   - md5: 233e786cfe0275a2c336d54f688aa3c3
     size: 38111265

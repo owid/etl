@@ -8,6 +8,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
+- **Never delete a step without archiving it.** Removing or superseding an active step (new version, retirement, replacement) obligates you to archive it — deleting the files alone is a bug. Procedure: remove its `dag/*.yml` entry and delete its files → **commit** → run `etl archive-dag` (it reads *committed* history, so the removal must be committed first) → commit the regenerated `dag/archive/*.yml`. If `archive-dag` sweeps in unrelated steps others left un-archived, `git checkout` those files to keep your PR scoped (never hand-edit the archive). For a migrated/backport dataset, also delete its now-orphaned `snapshots/backport/latest/dataset_<id>_*` mirror files.
 - **Never push, commit, or open PRs** unless explicitly told to
 - **Ask the user** if unsure - don't guess
 - **Always run `make check` before committing**
@@ -17,15 +18,23 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 
 ## Team
 
-When generating user-facing prose (PR descriptions, Slack messages, PR comments, review responses, etc.):
+Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it."
 
-1. **Attribute the work** with a single italicized blockquote at the very top of the PR body, and as the opening line of any standalone Slack draft or long PR comment you generate:
+1. **Attribute the work.** Put this blockquote as the *first line* of the content:
 
    ```
    > _Written by Claude Code — @<handle> at the wheel._
    ```
 
-   Use the handle of the human directing the work (usually the current git user; fall back to asking if ambiguous). Skip the disclosure on tiny mechanical comments (e.g. a one-line `@codex review` ping) — it's meant for substantive prose.
+   It applies to **every** surface, **every** time you post:
+   - PR descriptions / bodies
+   - PR issue-level comments
+   - **Inline review comments _and_ replies to review comments** (e.g. answering Codex / Copilot / a reviewer)
+   - Standalone Slack messages or drafts
+
+   Use the handle of the human directing the work (usually the current git user; ask if ambiguous).
+
+   **The only exception** is a comment that is a bare mechanical token with *no prose* — a lone `@codex review` ping or a 👍. The moment your comment contains a sentence of explanation, it needs the line. When in doubt, include it.
 
 2. **Use exact handles** from the table below when tagging colleagues. Don't guess — a wrong tag pings a real person. If a name isn't in this table, write the plain name (e.g. "Bastian") instead of `@`-tagging, and ask the user for the handle.
 
@@ -240,6 +249,8 @@ with open(file_path, 'w') as f:
 ### Writing origin / metadata fields
 
 - **Consult the reference** — before writing `.dvc` `origin` or `.meta.yml` fields, look the field up in `schemas/definitions.json` (rendered at the [metadata reference](https://docs.owid.io/projects/etl/architecture/metadata/reference/)) and follow its `guidelines`. They're detailed and per-field: requirement level, good/bad examples, and when to omit optional fields (`title_snapshot`, `description_snapshot`, `attribution` all default to null / auto-generated). Each field has one job — don't fold content that belongs in one field into another.
+- **License goes under `origin`, not at the top level.** In a snapshot `.dvc`, the license is `meta.origin.license` (4-space, inside `origin`) — never the top-level `meta.license` (2-space). Both parse (they differ only by indentation), but the top-level form is a deprecated `SnapshotMeta` field that doesn't travel with the origin, so the license is dropped from Grapher's per-origin metadata (which matters for multi-origin datasets). The wizard cookiecutter already does this correctly; a schema `not`-constraint + `test_snapshot_license_lives_under_origin` enforce it. Each origin in a multi-origin `.dvc` needs its own `license`.
+- **`license.url` points to the producer's own license statement** — the page or PDF download link where the producer states the terms (often the same landing page as `url_main`). Never a `creativecommons.org` deed or other generic license page. If the producer states no license anywhere, leave `url` empty (don't fall back to the dataset's main page).
 - **American spelling always**.
 
 ### Description fields: `.dvc` vs garden `description_processing`
