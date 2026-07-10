@@ -1,15 +1,12 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical livestock counts (mammals)
+    title: Historical counts of livestock mammals
     description: |-
       Historical estimates of livestock numbers for eight domestic mammal species (asses, buffalo, cattle, goats, horses, mules, pigs and sheep), assembled by Kees Klein Goldewijk for the History Database of the Global Environment (HYDE). No bird species are included.
 
-      HYDE did not collect these counts itself; it built the long-run series by combining two existing sources. For the period before 1961 it used the historical statistics compiled by B.R. Mitchell (International Historical Statistics), and from 1961 onwards it used data from the UN Food and Agriculture Organization (FAOSTAT). Mitchell's figures were rescaled in 1961 to match the FAO data, and the years between the available benchmarks were filled by linear interpolation.
-
-      Estimates are reported at ten-year intervals (plus a final value for 1998), for 18 world sub-regions and the world total, in thousands of animals.
+      HYDE built the long-run series by combining two existing sources. For the period before 1961 it used the historical statistics compiled by B.R. Mitchell (International Historical Statistics), and from 1961 onwards it used data from the UN Food and Agriculture Organization (FAOSTAT).
     date_published: "2005-08-29"
-    version_producer: Summary 2.2
 
     # Citation
     producer: PBL Netherlands Environmental Assessment Agency
