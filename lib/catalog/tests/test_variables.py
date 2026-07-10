@@ -661,10 +661,15 @@ def test_combine_indicators_processing_level_with_jinja_templates() -> None:
 
     # Identical templates (e.g. comparing two versions of the same column) are kept.
     assert combine_indicators_processing_level([_var(template), _var(template)]) == template
-    # Templates mixed with literals: the highest literal wins.
-    assert combine_indicators_processing_level([_var(template), _var("minor")]) == "minor"
-    # Different templates with no literals can't be combined.
-    assert combine_indicators_processing_level([_var(template), _var(template.replace("minor", "major"))]) is None
+    # A template counts as the highest level it can render: maybe-major + minor -> major
+    # (understating would mislabel licensing downstream).
+    assert combine_indicators_processing_level([_var(template), _var("minor")]) == "major"
+    only_minor = '<% if sector == "X" %>minor<% else %>minor<%- endif -%>'
+    assert combine_indicators_processing_level([_var(only_minor), _var("minor")]) == "minor"
+    # Different templates with no literals combine to the highest renderable level.
+    assert combine_indicators_processing_level([_var(template), _var(only_minor)]) == "major"
+    # Templates that spell out no known level can't be combined.
+    assert combine_indicators_processing_level([_var("<% weird %>"), _var("<% weirder %>")]) is None
     # Literal levels behave as before.
     assert combine_indicators_processing_level([_var("minor"), _var("major")]) == "major"
     # Unknown literal levels still fail loudly.

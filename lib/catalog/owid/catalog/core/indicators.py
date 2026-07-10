@@ -743,13 +743,24 @@ def combine_indicators_processing_level(indicators: list[Indicator]) -> PROCESSI
     unknown_processing_levels = set(literal_levels) - set(PROCESSING_LEVELS_ORDER)
     assert len(unknown_processing_levels) == 0, f"Unknown processing levels: {unknown_processing_levels}"
 
-    if not literal_levels:
-        # Only templates: keep the template when all indicators share the same one (e.g. when
-        # comparing two versions of the same column), otherwise there is no sensible combination.
-        return cast(PROCESSING_LEVELS, templates[0]) if len(set(templates)) == 1 else None
+    if not literal_levels and len(set(templates)) == 1:
+        # Only templates and all identical (e.g. comparing two versions of the same column):
+        # keep the template so it still renders per dimension downstream.
+        return cast(PROCESSING_LEVELS, templates[0])
 
-    # If any of the indicators has a literal processing level, take the highest level.
-    maximum_level = max([PROCESSING_LEVELS_ORDER[level] for level in literal_levels])
+    # A template's rendered value is unknown here, but it can only produce the level names
+    # spelled out in its text — count the highest of those, so combining with a literal never
+    # understates the result (a maybe-major template + "minor" must combine to "major", since
+    # processing_level feeds licensing downstream).
+    template_levels = [level for template in templates for level in PROCESSING_LEVELS_ORDER if level in template]
+
+    candidate_levels = literal_levels + template_levels
+    if not candidate_levels:
+        # Distinct templates that spell out no known level — there is no sensible combination.
+        return None
+
+    # Take the highest level any of the indicators has (or could render).
+    maximum_level = max([PROCESSING_LEVELS_ORDER[level] for level in candidate_levels])
 
     # Return the maximum level as a string.
     combined_processing_level = {value: key for key, value in PROCESSING_LEVELS_ORDER.items()}[maximum_level]
