@@ -383,6 +383,14 @@ steps:
   data://grapher/agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017:
     - data://garden/agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017:
       - snapshot://agriculture/2017/population_fed_by_haber_bosch_fertilizers__fao__2017.feather
+  # archived; last active in e4939299b108 on 2026-07-10
+  data://grapher/food/2018/global_meat_projections_to_2050__fao:
+    - data://garden/food/2018/global_meat_projections_to_2050__fao:
+      - snapshot://food/2018/global_meat_projections_to_2050__fao.feather
+  # archived; last active in e4939299b108 on 2026-07-10
+  data://grapher/fao/2017-01-01/fao_2030_50_projections_of_arable_land__fao__2017:
+    - data://garden/fao/2017-01-01/fao_2030_50_projections_of_arable_land__fao__2017:
+      - snapshot://fao/2017-01-01/fao_2030_50_projections_of_arable_land__fao__2017.feather
 data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
   - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
     - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather

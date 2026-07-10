@@ -11,16 +11,16 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset()
+    ds_garden = paths.load_dataset("meat_projections")
 
     # Read table from garden dataset.
-    tb = ds_garden["fao_2030_50_projections_of_arable_land__fao__2017"]
+    tb = ds_garden.read("meat_projections", reset_index=False)
 
     #
     # Save outputs.
     #
-    # Create a new grapher dataset with the same metadata as the garden dataset.
+    # Initialize a new grapher dataset.
     ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
 
-    # Save changes in the new grapher dataset.
+    # Save grapher dataset.
     ds_grapher.save()

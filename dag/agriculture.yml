@@ -181,3 +181,18 @@ steps:
                 - data://garden/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
                           - data://meadow/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
                                     - snapshot://agriculture/2024-06-07/employment_in_fisheries_and_aquaculture.csv
+        #
+        # FAO - Cropland projections to 2050.
+        #
+        data://grapher/agriculture/2026-07-03/cropland_projections:
+                - data://garden/agriculture/2026-07-03/cropland_projections:
+                          - data://meadow/agriculture/2026-07-03/future_of_food_and_agriculture_arable_land:
+                                    - snapshot://agriculture/2026-07-03/future_of_food_and_agriculture_arable_land.csv
+        #
+        # FAO - Global meat consumption, with projections to 2050.
+        #
+        data://grapher/agriculture/2026-07-03/meat_projections:
+                - data://garden/agriculture/2026-07-03/meat_projections:
+                          - data://meadow/agriculture/2026-07-03/future_of_food_and_agriculture_regions:
+                                    - snapshot://agriculture/2026-07-03/future_of_food_and_agriculture_regions.csv
+                          - data://garden/faostat/2026-02-25/faostat_fbsc
