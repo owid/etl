@@ -80,8 +80,7 @@ steps:
   #
   data://garden/climate/2026-07-10/surface_temperature:
     - data://meadow/climate/2026-07-10/surface_temperature:
-      # NOTE: Temporarily using the previous snapshot, since the new one could not be created (missing CDS API credentials).
-      - snapshot://climate/2026-06-19/surface_temperature.zip
+      - snapshot://climate/2026-07-10/surface_temperature.zip
       - snapshot://countries/2023-12-27/world_bank.zip
       - snapshot://countries/2025-03-22/continents_oceans.zip
   data://grapher/climate/2026-07-10/surface_temperature_anomalies:
@@ -102,8 +101,7 @@ steps:
   data://grapher/climate/2026-07-10/total_precipitation_annual:
     - data://garden/climate/2026-07-10/total_precipitation:
       - data://meadow/climate/2026-07-10/total_precipitation:
-        # NOTE: Temporarily using the previous snapshot, since the new one could not be created (missing CDS API credentials).
-        - snapshot://climate/2026-06-19/total_precipitation.zip
+        - snapshot://climate/2026-07-10/total_precipitation.zip
         - snapshot://countries/2023-12-27/world_bank.zip
   #
   # Global Wildfire Information System - Weekly wildfires.
