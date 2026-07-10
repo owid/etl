@@ -9,13 +9,15 @@ definitions:
       topic_tags:
         - Meat & Dairy Production
     description_processing: |-
-      We combine data from the UN Food and Agriculture Organization (FAOSTAT), available from 1961 onwards, with long-run historical estimates from HYDE for the period 1890 to 1950.
-      HYDE reports figures for its own set of world sub-regions, which we aggregate into continents and a world total.
-      HYDE reports counts in thousands of animals, which we convert to the number of animals.
+      - We combine data from the UN Food and Agriculture Organization (FAOSTAT), available from 1961 onwards, with long-run historical estimates from HYDE for the period 1890 to 1950.
+      - HYDE reports figures for its own set of world sub-regions, which we aggregate into continents and a world total.
+      - HYDE reports counts in thousands of animals, which we convert to the number of animals.
 
 dataset:
-  title: Livestock counts (HYDE and FAOSTAT)
+  title: Livestock counts
   update_period_days: 365
+  owners:
+    - Pablo Rosado
 
 tables:
   livestock_counts:
