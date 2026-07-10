@@ -1,0 +1,160 @@
+definitions:
+  common:
+    processing_level: major
+    unit: animals
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Meat & Dairy Production
+  # Only the eight mammal species that are spliced with HYDE carry this; the FAOSTAT-only species
+  # (birds, camels, rabbits, etc.) are taken directly from FAOSTAT and do not.
+  description_processing_hyde: &description_processing_hyde |-
+    - We combine data from the UN Food and Agriculture Organization (FAOSTAT), available from 1961 onwards, with long-run historical estimates from HYDE for the period 1890 to 1950.
+    - HYDE reports figures for its own set of world sub-regions, which we aggregate into continents and a world total.
+    - HYDE reports counts in thousands of animals, which we convert to the number of animals.
+
+dataset:
+  title: Livestock counts
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  livestock_counts:
+    variables:
+      asses:
+        title: Number of donkeys
+        description_short: The number of donkeys alive at a given time.
+        description_processing: *description_processing_hyde
+        display:
+          name: Donkeys
+        presentation:
+          title_public: Number of donkeys
+      buffalo:
+        title: Number of buffalo
+        description_short: The number of buffalo alive at a given time.
+        description_processing: *description_processing_hyde
+        display:
+          name: Buffalo
+        presentation:
+          title_public: Number of buffalo
+      camels:
+        title: Number of camels
+        description_short: The number of camels alive at a given time.
+        display:
+          name: Camels
+        presentation:
+          title_public: Number of camels
+      cattle:
+        title: Number of cattle
+        description_short: The number of cattle alive at a given time.
+        description_processing: *description_processing_hyde
+        display:
+          name: Cattle
+        presentation:
+          title_public: Number of cattle
+      chickens:
+        title: Number of chickens
+        description_short: The number of chickens alive at a given time.
+        display:
+          name: Chickens
+        presentation:
+          title_public: Number of chickens
+      ducks:
+        title: Number of ducks
+        description_short: The number of ducks alive at a given time.
+        display:
+          name: Ducks
+        presentation:
+          title_public: Number of ducks
+      geese:
+        title: Number of geese
+        description_short: The number of geese (and guinea fowls) alive at a given time.
+        display:
+          name: Geese
+        presentation:
+          title_public: Number of geese
+      goats:
+        title: Number of goats
+        description_short: The number of goats alive at a given time.
+        description_processing: *description_processing_hyde
+        display:
+          name: Goats
+        presentation:
+          title_public: Number of goats
+      horses:
+        title: Number of horses
+        description_short: The number of horses alive at a given time.
+        description_processing: *description_processing_hyde
+        display:
+          name: Horses
+        presentation:
+          title_public: Number of horses
+      mules:
+        title: Number of mules
+        description_short: The number of mules and hinnies alive at a given time.
+        description_processing: *description_processing_hyde
+        display:
+          name: Mules
+        presentation:
+          title_public: Number of mules
+      other_birds:
+        title: Number of other birds
+        description_short: The number of other poultry birds not counted elsewhere alive at a given time.
+        display:
+          name: Other birds
+        presentation:
+          title_public: Number of other birds
+      other_camelids:
+        title: Number of other camelids
+        description_short: The number of other camelids (such as llamas and alpacas) alive at a given time.
+        display:
+          name: Other camelids
+        presentation:
+          title_public: Number of other camelids
+      other_rodents:
+        title: Number of other rodents
+        description_short: The number of other rodents farmed for food (such as guinea pigs) alive at a given time.
+        display:
+          name: Other rodents
+        presentation:
+          title_public: Number of other rodents
+      poultry:
+        title: Number of poultry
+        description_short: The total number of poultry birds alive at a given time.
+        display:
+          name: Poultry
+        presentation:
+          title_public: Number of poultry
+      rabbits:
+        title: Number of rabbits
+        description_short: The number of rabbits and hares alive at a given time.
+        display:
+          name: Rabbits
+        presentation:
+          title_public: Number of rabbits
+      sheep:
+        title: Number of sheep
+        description_short: The number of sheep alive at a given time.
+        description_processing: *description_processing_hyde
+        display:
+          name: Sheep
+        presentation:
+          title_public: Number of sheep
+      pigs:
+        title: Number of pigs
+        description_short: The number of pigs alive at a given time.
+        description_processing: *description_processing_hyde
+        display:
+          name: Pigs
+        presentation:
+          title_public: Number of pigs
+      turkeys:
+        title: Number of turkeys
+        description_short: The number of turkeys alive at a given time.
+        display:
+          name: Turkeys
+        presentation:
+          title_public: Number of turkeys

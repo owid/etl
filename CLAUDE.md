@@ -8,7 +8,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
-- **Never push, commit, or open PRs** unless explicitly told to
+- **Never delete a step without archiving it.** Removing or superseding an active step (new version, retirement, replacement) obligates you to archive it — deleting the files alone is a bug. Procedure: remove its `dag/*.yml` entry and delete its files → **commit** → run `etl archive-dag` (it reads *committed* history, so the removal must be committed first) → commit the regenerated `dag/archive/*.yml`. If `archive-dag` sweeps in unrelated steps others left un-archived, `git checkout` those files to keep your PR scoped (never hand-edit the archive). For a migrated/backport dataset, also delete its now-orphaned `snapshots/backport/latest/dataset_<id>_*` mirror files.
 - **Ask the user** if unsure - don't guess
 - **Always run `make check` before committing**
 - If not told otherwise, save outputs to `ai/` directory.
@@ -104,6 +104,7 @@ Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run)
 ```
 
 **Important:**
+- **Snapshot scripts need no `__main__` guard** — the `etls` CLI imports the module and invokes its click command `run` directly, so don't add `if __name__ == "__main__":` boilerplate. Many old scripts still carry it; don't copy them.
 - **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
 - **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
 - **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code. It also **fails with `AccessDenied` when the target version isn't in the catalog yet** (e.g. a version you just created) — use it only to fetch already-published upstream deps, never for the new step you're building locally.
@@ -154,6 +155,15 @@ To run the full **review → wait → fix → re-review** loop hands-off (and wa
 Add 🤖 after emoji for AI-written code: `🔨🤖 Refactor country mapping`
 
 ## Code Patterns
+
+### Descriptive short names
+
+Step, table, and indicator short names must be readable by any OWID colleague without context. Spell terms out instead of coining acronyms or initialisms:
+
+- Steps: `future_of_food_and_agriculture_arable_land`, not `fofa_2050_arable_land`
+- Indicators: `cropland_business_as_usual` / `cropland_stratified_societies`, not `cropland_bau` / `cropland_sss`
+
+Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style producer acronyms that OWID already uses). If the source uses an internal acronym for a scenario, product, or variable, expand it in our short names — the acronym can live in titles/descriptions where there's room to define it.
 
 ### Preserving metadata/origins in steps
 
@@ -238,6 +248,7 @@ with open(file_path, 'w') as f:
 ### Writing origin / metadata fields
 
 - **Consult the reference** — before writing `.dvc` `origin` or `.meta.yml` fields, look the field up in `schemas/definitions.json` (rendered at the [metadata reference](https://docs.owid.io/projects/etl/architecture/metadata/reference/)) and follow its `guidelines`. They're detailed and per-field: requirement level, good/bad examples, and when to omit optional fields (`title_snapshot`, `description_snapshot`, `attribution` all default to null / auto-generated). Each field has one job — don't fold content that belongs in one field into another.
+- **License goes under `origin`, not at the top level.** In a snapshot `.dvc`, the license is `meta.origin.license` (4-space, inside `origin`) — never the top-level `meta.license` (2-space). Both parse (they differ only by indentation), but the top-level form is a deprecated `SnapshotMeta` field that doesn't travel with the origin, so the license is dropped from Grapher's per-origin metadata (which matters for multi-origin datasets). The wizard cookiecutter already does this correctly; a schema `not`-constraint + `test_snapshot_license_lives_under_origin` enforce it. Each origin in a multi-origin `.dvc` needs its own `license`.
 - **`license.url` points to the producer's own license statement** — the page or PDF download link where the producer states the terms (often the same landing page as `url_main`). Never a `creativecommons.org` deed or other generic license page. If the producer states no license anywhere, leave `url` empty (don't fall back to the dataset's main page).
 - **American spelling always**.
 
@@ -249,6 +260,17 @@ Two different descriptions, two different jobs. Don't mix them:
 - **Garden `description_processing`** describes what **OWID** does to that data — aggregation, relabeling, deduplication, derivations, date conversion.
 
 If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
+
+### Origin metadata fields: follow the metadata reference
+
+When writing or editing `.dvc` origin fields, follow the ETL metadata reference — `schemas/definitions.json` in this repo (rendered at https://docs.owid.io/projects/etl/architecture/metadata/reference/). It defines, per field, the requirement level, formatting guidelines, and good/bad examples. Don't infer field usage by copying other `.dvc` files — they may use optional fields for reasons that don't apply to your snapshot.
+
+Mistakes the reference already covers but that keep happening:
+
+- **`title_snapshot` / `description_snapshot`**: default to omitting both. Only use them when several snapshots are created from the same data product and need disambiguation. If a data product maps to a single snapshot — even one that is a subset of the product — describe that subset in `description` instead.
+- **`attribution`**: omit — grapher builds `producer (year)` automatically. Only set it when that automatic format is genuinely uninformative (e.g. a well-known data product title should be cited alongside the producer).
+- **`citation_full`**: follow the producer's requested citation, but with appropriate minor edits: don't fold other metadata fields into it — e.g. license text like "Licence: CC BY-NC-SA 3.0 IGO" belongs in `license`, not in the citation.
+- **American spelling, always** — even when the producer's own text uses British spelling (adapting it is one of the "minor edits" the reference allows).
 
 ## Sanity checks
 

@@ -1,5 +1,15 @@
 steps:
         #
+        # Livestock counts - HYDE (historical) spliced with FAOSTAT (1961 onwards).
+        #
+        data://meadow/hyde/2005-08-29/historical_livestock_mammals:
+                - snapshot://hyde/2005-08-29/historical_livestock_mammals.xls
+        data://garden/agriculture/2026-07-08/livestock_counts:
+                - data://meadow/hyde/2005-08-29/historical_livestock_mammals
+                - data://garden/faostat/2026-02-25/faostat_qcl
+        data://grapher/agriculture/2026-07-08/livestock_counts:
+                - data://garden/agriculture/2026-07-08/livestock_counts
+        #
         # Food expenditure - USDA
         # NOTE: On every update, the USDA adds a year and removes the oldest year.
         # That's why we keep old snapshots to be able to collect as much data as possible.
@@ -165,9 +175,34 @@ steps:
                 - data-private://grapher/food/2018/food_emissions_by_life_cycle_stage__poore_and_nemecek__2018
                 - data://grapher/food/2026-05-06/clark_et_al_2022
         #
+        # Population fed by synthetic nitrogen fertilizers - Erisman et al. (2008).
+        # NOTE: The share of the world population fed (digitized from Figure 1 of Erisman et al. (2008)) is not
+        # updateable, but the population dataset is; recent years assume a constant share.
+        #
+        data://grapher/agriculture/2026-07-03/population_fed_by_synthetic_nitrogen:
+                - data://garden/agriculture/2026-07-03/population_fed_by_synthetic_nitrogen:
+                          - data://meadow/agriculture/2026-07-03/population_fed_by_synthetic_nitrogen:
+                                    - snapshot://agriculture/2026-07-03/population_fed_by_synthetic_nitrogen.csv
+                          - data://garden/demography/2024-07-15/population
+        #
         # Employment in fisheries and aquaculture (FAO, SOFIA 2024).
         #
         data://grapher/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
                 - data://garden/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
                           - data://meadow/agriculture/2024-06-07/employment_in_fisheries_and_aquaculture:
                                     - snapshot://agriculture/2024-06-07/employment_in_fisheries_and_aquaculture.csv
+        #
+        # FAO - Cropland projections to 2050.
+        #
+        data://grapher/agriculture/2026-07-03/cropland_projections:
+                - data://garden/agriculture/2026-07-03/cropland_projections:
+                          - data://meadow/agriculture/2026-07-03/future_of_food_and_agriculture_arable_land:
+                                    - snapshot://agriculture/2026-07-03/future_of_food_and_agriculture_arable_land.csv
+        #
+        # FAO - Global meat consumption, with projections to 2050.
+        #
+        data://grapher/agriculture/2026-07-03/meat_projections:
+                - data://garden/agriculture/2026-07-03/meat_projections:
+                          - data://meadow/agriculture/2026-07-03/future_of_food_and_agriculture_regions:
+                                    - snapshot://agriculture/2026-07-03/future_of_food_and_agriculture_regions.csv
+                          - data://garden/faostat/2026-02-25/faostat_fbsc

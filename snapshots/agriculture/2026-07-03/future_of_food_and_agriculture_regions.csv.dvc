@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: The future of food and agriculture - Alternative pathways to 2050
+    description: |-
+      FAO's Global Perspectives Studies report "The future of food and agriculture - Alternative pathways to 2050" explores three scenarios of global food and agriculture up to 2050, based on simulations with the FAO Global Agriculture Perspectives System (GAPS) model:
+      - Business As Usual (BAU): a continuation of historical trends.
+      - Towards Sustainability (TSS): a shift towards more sustainable food systems.
+      - Stratified Societies (SSS): a future of increased inequality.
+    title_snapshot: The future of food and agriculture - Alternative pathways to 2050 - Regional data
+    citation_full: |-
+      Food and Agriculture Organization of the United Nations. 2018. The future of food and agriculture - Alternative pathways to 2050. Rome.
+    url_main: https://www.fao.org/global-perspectives-studies/food-agriculture-projections-to-2050/en/
+    url_download: https://www.fao.org/fileadmin/user_upload/global-perspective/csv/FOFA2050RegionsData_all.csv
+    date_accessed: '2026-07-03'
+    date_published: '2018'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://openknowledge.fao.org/handle/20.500.14283/I8429EN
+outs:
+  - md5: 2c294aac56d6842698469a4c94fb1c4d
+    size: 16982166
+    path: future_of_food_and_agriculture_regions.csv
