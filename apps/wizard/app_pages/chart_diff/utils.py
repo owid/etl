@@ -142,13 +142,13 @@ def st_display_option(has_map: bool | None = None) -> None:
             st.query_params.pop(key)
 
     url_persist(st.selectbox)(
-        "Open previews on",
+        "Open previews on tab",
         value="Default",
         options=options,
         key=key,
         help="Tab the previews below open on (map, data table, or chart). 'Default' uses the view's own default tab.",
         # The label is folded into the displayed value so the widget stays a single line
         # (it sits next to a one-line heading).
-        format_func=lambda x: f"Open on: {x}",
+        format_func=lambda x: f"Tab on: {x}",
         label_visibility="collapsed",
     )
