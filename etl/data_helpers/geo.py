@@ -375,16 +375,30 @@ def add_region_aggregates(
     # dropped — and downstream indicators that divide by it lose that region/group with no error at all.
     # This typically happens after a reclassification (e.g. the World Bank moves a country to a different
     # income group, or a country leaves a region's member list). Fail loudly so the caller fixes the list.
-    if isinstance(countries_that_must_have_data, list):
+    if isinstance(countries_that_must_have_data, list) and countries_that_must_have_data:
         _must_have_non_members = [c for c in countries_that_must_have_data if c not in set(countries_in_region)]
         if _must_have_non_members:
-            raise ValueError(
+            # With a fractional requirement (frac_countries_that_must_have_data < 1), non-members only
+            # make the aggregate impossible when even full data for every member in the list can't reach
+            # the threshold; a satisfiable stale pin is a warning, not an error.
+            _max_achievable_frac = 1 - len(_must_have_non_members) / len(countries_that_must_have_data)
+            _required_frac = (
+                1.0 if frac_countries_that_must_have_data is None else min(frac_countries_that_must_have_data, 1.0)
+            )
+            if _max_achievable_frac < _required_frac:
+                raise ValueError(
+                    f"add_region_aggregates: for region {region!r}, countries_that_must_have_data contains "
+                    f"{_must_have_non_members}, which are not members of the region. With the required "
+                    f"coverage ({_required_frac:.0%} of the list), the aggregate is impossible to compute, "
+                    f"so it would be silently set to NaN and dropped. This usually means the country was "
+                    f"reclassified (e.g. it changed income group) or left the region — remove it from "
+                    f"countries_that_must_have_data, or move it to the group it now belongs to."
+                )
+            log.warning(
                 f"add_region_aggregates: for region {region!r}, countries_that_must_have_data contains "
-                f"{_must_have_non_members}, which are not members of the region. A required country that is "
-                f"not a member makes the aggregate impossible to compute, so it would be silently set to NaN "
-                f"and dropped. This usually means the country was reclassified (e.g. it changed income group) "
-                f"or left the region — remove it from countries_that_must_have_data, or move it to the group "
-                f"it now belongs to."
+                f"non-members {_must_have_non_members}. The fractional requirement "
+                f"({_required_frac:.0%}) is still satisfiable, but these entries are stale — "
+                f"remove them or move them to the group they now belong to."
             )
 
     if index_columns is None:

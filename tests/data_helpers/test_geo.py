@@ -824,6 +824,32 @@ class TestAddRegionAggregates:
                 year_col="year",
             )
 
+    def test_add_region_fractional_must_have_with_non_member(self):
+        # With a fractional requirement, a non-member in the must-have list doesn't necessarily make
+        # the aggregate impossible: members {1,2} + must-have {1,2,3} + frac 2/3 is satisfiable, so it
+        # must aggregate (with a stale-pin warning), while an unreachable fraction must still raise.
+        df_out = geo.add_region_aggregates(
+            df=self.df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 1", "Country 2", "Country 3"],
+            frac_countries_that_must_have_data=2 / 3,
+            country_col="country",
+            year_col="year",
+        )
+        assert "Region 1" in df_out["country"].values
+
+        with pytest.raises(ValueError, match="impossible to compute"):
+            geo.add_region_aggregates(
+                df=self.df_in,
+                region="Region 1",
+                countries_in_region=["Country 1", "Country 2"],
+                countries_that_must_have_data=["Country 1", "Country 2", "Country 3"],
+                frac_countries_that_must_have_data=0.9,
+                country_col="country",
+                year_col="year",
+            )
+
 
 class MockRegionsDataset:
     def __getitem__(self, name: str) -> Table:
