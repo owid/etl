@@ -839,6 +839,21 @@ class TestAddRegionAggregates:
         )
         assert "Region 1" in df_out["country"].values
 
+        # The stale non-member must also be excluded from the check's denominator: in 2021 only
+        # Country 1 has data, which passes frac 0.5 over the two members (1/2) but would be nulled
+        # if Country 3 stayed in the list (1/3) — the aggregate for 2021 must survive.
+        df_half = geo.add_region_aggregates(
+            df=self.df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 1", "Country 2", "Country 3"],
+            frac_countries_that_must_have_data=0.5,
+            country_col="country",
+            year_col="year",
+        )
+        region_2021 = df_half[(df_half["country"] == "Region 1") & (df_half["year"] == 2021)]
+        assert not region_2021.empty and region_2021["var_01"].notna().all()
+
         with pytest.raises(ValueError, match="impossible to compute"):
             geo.add_region_aggregates(
                 df=self.df_in,

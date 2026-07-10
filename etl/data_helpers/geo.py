@@ -398,8 +398,15 @@ def add_region_aggregates(
                 f"add_region_aggregates: for region {region!r}, countries_that_must_have_data contains "
                 f"non-members {_must_have_non_members}. The fractional requirement "
                 f"({_required_frac:.0%}) is still satisfiable, but these entries are stale — "
-                f"remove them or move them to the group they now belong to."
+                f"remove them or move them to the group they now belong to. They are excluded from "
+                f"the must-have check so they don't inflate its denominator."
             )
+            # A non-member can never have data within the region subset; leaving it in the list
+            # would penalize every year through the denominator of the fraction check (years that
+            # a cleaned list would keep get silently nulled). Check against members only.
+            countries_that_must_have_data = [
+                c for c in countries_that_must_have_data if c not in _must_have_non_members
+            ]
 
     if index_columns is None:
         index_columns = [country_col, year_col]
