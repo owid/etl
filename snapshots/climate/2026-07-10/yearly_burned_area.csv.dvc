@@ -15,7 +15,7 @@ meta:
     citation_full: Global Wildfire Information System
     attribution_short: GWIS (MODIS)
     url_main: https://gwis.jrc.ec.europa.eu/apps/country.profile/downloads
-    date_accessed: '2026-06-19'
+    date_accessed: '2026-07-10'
     date_published: '2026'
     license:
       name: CC BY 4.0

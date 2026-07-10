@@ -12,11 +12,11 @@ meta:
     version_producer: Version 1
     url_main: https://climate.rutgers.edu/snowcover/table_area.php?ui_set=1&ui_sort=0
     url_download: https://climate.rutgers.edu/snowcover/files/moncov.nhland.txt
-    date_accessed: '2026-06-19'
-    date_published: '2026-06-19'
+    date_accessed: '2026-07-10'
+    date_published: '2026-07-10'
     license:
       name: CC BY 4.0
 outs:
-  - md5: 94ad037992c9bd70d33eb6030a8b4c8f
-    size: 13207
+  - md5: 379c29050ab45ac84246c4c59cc39f0b
+    size: 13225
     path: snow_cover_extent_northern_hemisphere.csv

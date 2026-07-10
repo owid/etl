@@ -10,7 +10,7 @@ meta:
     attribution_short: NASA
     url_main: http://ozonewatch.gsfc.nasa.gov/meteorology/annual_data.html
     url_download: https://ozonewatch.gsfc.nasa.gov/statistics/annual_data.txt
-    date_accessed: '2026-06-19'
+    date_accessed: '2026-07-10'
     date_published: '2025-10-20'
     license:
       name: CC BY

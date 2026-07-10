@@ -15,12 +15,12 @@ meta:
     version_producer: 4.2.0.0
     url_main: https://www.metoffice.gov.uk/hadobs/hadsst4/
     url_download: https://www.metoffice.gov.uk/hadobs/hadsst4/data/data/HadSST.4.2.0.0_monthly_GLOBE.csv
-    date_accessed: '2026-06-19'
-    date_published: '2026-06-16'
+    date_accessed: '2026-07-10'
+    date_published: '2026-07-09'
     license:
       name: Open Government Licence v3
       url: https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
 outs:
-  - md5: 16cbc8bd4600aba7937c91dc58868357
-    size: 172060
+  - md5: 17ae3b6a6163081b23b803acd486854e
+    size: 172139
     path: sea_surface_temperature_world.csv

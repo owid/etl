@@ -12,12 +12,12 @@ meta:
     attribution_short: NOAA/GML
     url_main: https://gml.noaa.gov/ccgg/trends_ch4/
     url_download: https://gml.noaa.gov/webdata/ccgg/trends/ch4/ch4_mm_gl.csv
-    date_accessed: '2026-06-19'
-    date_published: '2026-06-05'
+    date_accessed: '2026-07-10'
+    date_published: '2026-07-05'
     license:
       name: CC BY 4.0
       url: https://gml.noaa.gov/about/disclaimer.html
 outs:
-  - md5: ef2b9275d4547d0989065f49ab22cfb9
-    size: 23829
+  - md5: 94ff052de1dda3438c01dfa4e756626a
+    size: 23873
     path: ch4_concentration_monthly.csv
