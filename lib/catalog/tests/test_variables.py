@@ -11,6 +11,7 @@ from owid.catalog.core.indicators import (
     License,
     Variable,
     combine_indicators_metadata,
+    combine_indicators_processing_level,
     get_unique_licenses_from_indicators,
     get_unique_origins_from_indicators,
 )
@@ -646,3 +647,26 @@ def test_variable_to_frame_with_custom_name() -> None:
     # Note: Metadata is not automatically copied when renaming via name parameter
     # This is consistent with pandas Series.to_frame() behavior
     # If you need to preserve metadata when renaming, copy it manually after conversion
+
+
+def test_combine_indicators_processing_level_with_jinja_templates() -> None:
+    # The dataset schema allows unrendered Jinja templates in processing_level (they render per
+    # dimension at grapher time), so combining indicators must not choke on them.
+    template = '<% if sector == "Non-humanitarian aid" %>major<% else %>minor<%- endif -%>'
+
+    def _var(processing_level: str):
+        v = Variable([1, 2], name="v")
+        v.metadata.processing_level = processing_level  # type: ignore[assignment]
+        return v
+
+    # Identical templates (e.g. comparing two versions of the same column) are kept.
+    assert combine_indicators_processing_level([_var(template), _var(template)]) == template
+    # Templates mixed with literals: the highest literal wins.
+    assert combine_indicators_processing_level([_var(template), _var("minor")]) == "minor"
+    # Different templates with no literals can't be combined.
+    assert combine_indicators_processing_level([_var(template), _var(template.replace("minor", "major"))]) is None
+    # Literal levels behave as before.
+    assert combine_indicators_processing_level([_var("minor"), _var("major")]) == "major"
+    # Unknown literal levels still fail loudly.
+    with pytest.raises(AssertionError):
+        combine_indicators_processing_level([_var("mjor")])

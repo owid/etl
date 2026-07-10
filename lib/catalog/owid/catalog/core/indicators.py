@@ -733,12 +733,23 @@ def combine_indicators_processing_level(indicators: list[Indicator]) -> PROCESSI
         # If there are no processing levels, return None.
         return None
 
-    # Ensure that all processing levels are known.
-    unknown_processing_levels = {level for level in processing_levels} - set(PROCESSING_LEVELS_ORDER)
+    # Unrendered Jinja templates are valid processing levels at authoring time (the dataset
+    # schema allows "<%"-patterned strings, rendered per dimension at grapher time), but they
+    # can't participate in the level comparison below.
+    templates = [level for level in processing_levels if "<%" in level]
+    literal_levels = [level for level in processing_levels if "<%" not in level]
+
+    # Ensure that all literal processing levels are known.
+    unknown_processing_levels = set(literal_levels) - set(PROCESSING_LEVELS_ORDER)
     assert len(unknown_processing_levels) == 0, f"Unknown processing levels: {unknown_processing_levels}"
 
-    # If any of the indicators has a processing level, take the highest level.
-    maximum_level = max([PROCESSING_LEVELS_ORDER[level] for level in processing_levels])
+    if not literal_levels:
+        # Only templates: keep the template when all indicators share the same one (e.g. when
+        # comparing two versions of the same column), otherwise there is no sensible combination.
+        return cast(PROCESSING_LEVELS, templates[0]) if len(set(templates)) == 1 else None
+
+    # If any of the indicators has a literal processing level, take the highest level.
+    maximum_level = max([PROCESSING_LEVELS_ORDER[level] for level in literal_levels])
 
     # Return the maximum level as a string.
     combined_processing_level = {value: key for key, value in PROCESSING_LEVELS_ORDER.items()}[maximum_level]
