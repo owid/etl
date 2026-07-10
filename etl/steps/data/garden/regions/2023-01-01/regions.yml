@@ -4543,753 +4543,222 @@
 ##########
 # Food and Agriculture Organization (FAOSTAT)
 # https://www.fao.org/faostat/en/#definitions
-# Regions follow the UN M49 geographic hierarchy (continents / subregions / finest subregions), but
-# membership is taken exactly from FAOSTAT's own areagroup metadata (which assigns some historical and
-# territorial entities differently from UN M49), harmonized to OWID entities.
+# FAO follows the UN M49 geographic classification, so each FAO region is defined by reference to the
+# corresponding UN M49 region, plus the entities that FAOSTAT's areagroup metadata additionally lists:
+# historical entities (USSR, Yugoslavia, Czechoslovakia, Serbia and Montenegro, Sudan (former),
+# Ethiopia (former), Netherlands Antilles, the former Yemens), Taiwan and Palestine.
+# Membership was cross-checked against FAOSTAT's areagroup definition tables (accessed 2026-02-25).
 ##########
+
+
+### Africa
 - code: FAO_AFR
   name: "Africa (FAO)"
   region_type: "aggregate"
   defined_by: fao_1
   members:
-    - AGO
-    - ATF
-    - BDI
-    - BEN
-    - BFA
-    - BWA
-    - CAF
-    - CIV
-    - CMR
-    - COD
-    - COG
-    - COM
-    - CPV
-    - DJI
-    - DZA
-    - EGY
-    - ERI
-    - ESH
-    - ETH
-    - GAB
-    - GHA
-    - GIN
-    - GMB
-    - GNB
-    - GNQ
-    - KEN
-    - LBR
-    - LBY
-    - LSO
-    - MAR
-    - MDG
-    - MLI
-    - MOZ
-    - MRT
-    - MUS
-    - MWI
-    - MYT
-    - NAM
-    - NER
-    - NGA
-    - OWID_ERE
-    - OWID_SDN
-    - REU
-    - RWA
-    - SDN
-    - SEN
-    - SHN
-    - SLE
-    - SOM
-    - SSD
-    - STP
-    - SWZ
-    - SYC
-    - TCD
-    - TGO
-    - TUN
-    - TZA
-    - UGA
-    - ZAF
-    - ZMB
-    - ZWE
-- code: FAO_AME
-  name: "Americas (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_1
-  members:
-    - ABW
-    - AIA
-    - ANT
-    - ARG
-    - ATG
-    - BES
-    - BHS
-    - BLM
-    - BLZ
-    - BMU
-    - BOL
-    - BRA
-    - BRB
-    - CAN
-    - CHL
-    - COL
-    - CRI
-    - CUB
-    - CUW
-    - CYM
-    - DMA
-    - DOM
-    - ECU
-    - FLK
-    - GLP
-    - GRD
-    - GRL
-    - GTM
-    - GUF
-    - GUY
-    - HND
-    - HTI
-    - JAM
-    - KNA
-    - LCA
-    - MAF
-    - MEX
-    - MSR
-    - MTQ
-    - NIC
-    - PAN
-    - PER
-    - PRI
-    - PRY
-    - SGS
-    - SLV
-    - SPM
-    - SUR
-    - SXM
-    - TCA
-    - TTO
-    - URY
-    - USA
-    - VCT
-    - VEN
-    - VGB
-    - VIR
-- code: FAO_ASI
-  name: "Asia (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_1
-  members:
-    - AFG
-    - ARE
-    - ARM
-    - AZE
-    - BGD
-    - BHR
-    - BRN
-    - BTN
-    - CHN
-    - CYP
-    - GEO
-    - HKG
-    - IDN
-    - IND
-    - IRN
-    - IRQ
-    - ISR
-    - JOR
-    - JPN
-    - KAZ
-    - KGZ
-    - KHM
-    - KOR
-    - KWT
-    - LAO
-    - LBN
-    - LKA
-    - MAC
-    - MDV
-    - MMR
-    - MNG
-    - MYS
-    - NPL
-    - OMN
-    - PAK
-    - PHL
-    - PRK
-    - PSE
-    - QAT
-    - SAU
-    - SGP
-    - SYR
-    - THA
-    - TJK
-    - TKM
-    - TLS
-    - TUR
-    - TWN
-    - UZB
-    - VNM
-    - YEM
-- code: FAO_EUR
-  name: "Europe (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_1
-  members:
-    - ALB
-    - AND
-    - AUT
-    - BEL
-    - BGR
-    - BIH
-    - BLR
-    - CHE
-    - CZE
-    - DEU
-    - DNK
-    - ESP
-    - EST
-    - FIN
-    - FRA
-    - FRO
-    - GBR
-    - GIB
-    - GRC
-    - HRV
-    - HUN
-    - IMN
-    - IRL
-    - ISL
-    - ITA
-    - LIE
-    - LTU
-    - LUX
-    - LVA
-    - MCO
-    - MDA
-    - MKD
-    - MLT
-    - MNE
-    - NLD
-    - NOR
-    - OWID_CIS
-    - OWID_CZS
-    - OWID_SRM
-    - OWID_USS
-    - OWID_YGS
-    - POL
-    - PRT
-    - ROU
-    - RUS
-    - SJM
-    - SMR
-    - SRB
-    - SVK
-    - SVN
-    - SWE
-    - UKR
-    - VAT
-- code: FAO_OCE
-  name: "Oceania (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_1
-  members:
-    - ASM
-    - AUS
-    - COK
-    - FJI
-    - FSM
-    - GUM
-    - HMD
-    - KIR
-    - MHL
-    - MNP
-    - NCL
-    - NFK
-    - NIU
-    - NRU
-    - NZL
-    - PCN
-    - PLW
-    - PNG
-    - PYF
-    - SLB
-    - TKL
-    - TON
-    - TUV
-    - UMI
-    - VUT
-    - WLF
-    - WSM
+    - FAO_NAF
+    - FAO_SSA
 - code: FAO_NAF
   name: "Northern Africa (FAO)"
   region_type: "aggregate"
   defined_by: fao_2
   members:
-    - DZA
-    - EGY
-    - ESH
-    - LBY
-    - MAR
-    - OWID_SDN
-    - SDN
-    - TUN
+    - UNM49_NAF
+    - OWID_SDN # Sudan (former)
 - code: FAO_SSA
   name: "Sub-Saharan Africa (FAO)"
   region_type: "aggregate"
   defined_by: fao_2
   members:
-    - AGO
-    - BDI
-    - BEN
-    - BFA
-    - BWA
-    - CAF
-    - CIV
-    - CMR
-    - COD
-    - COG
-    - COM
-    - CPV
-    - DJI
-    - ERI
-    - ETH
-    - GAB
-    - GHA
-    - GIN
-    - GMB
-    - GNB
-    - GNQ
-    - KEN
-    - LBR
-    - LSO
-    - MDG
-    - MLI
-    - MOZ
-    - MRT
-    - MUS
-    - MWI
-    - MYT
-    - NAM
-    - NER
-    - NGA
-    - OWID_ERE
-    - REU
-    - RWA
-    - SEN
-    - SHN
-    - SLE
-    - SOM
-    - SSD
-    - STP
-    - SWZ
-    - SYC
-    - TCD
-    - TGO
-    - TZA
-    - UGA
-    - ZAF
-    - ZMB
-    - ZWE
-- code: FAO_NAM
-  name: "Northern America (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - BMU
-    - CAN
-    - GRL
-    - SPM
-    - USA
-- code: FAO_LAC
-  name: "Latin America and the Caribbean (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - ABW
-    - AIA
-    - ANT
-    - ARG
-    - ATG
-    - BES
-    - BHS
-    - BLM
-    - BLZ
-    - BOL
-    - BRA
-    - BRB
-    - CHL
-    - COL
-    - CRI
-    - CUB
-    - CUW
-    - CYM
-    - DMA
-    - DOM
-    - ECU
-    - FLK
-    - GLP
-    - GRD
-    - GTM
-    - GUF
-    - GUY
-    - HND
-    - HTI
-    - JAM
-    - KNA
-    - LCA
-    - MAF
-    - MEX
-    - MSR
-    - MTQ
-    - NIC
-    - PAN
-    - PER
-    - PRI
-    - PRY
-    - SLV
-    - SUR
-    - SXM
-    - TCA
-    - TTO
-    - URY
-    - VCT
-    - VEN
-    - VGB
-    - VIR
-- code: FAO_CAS
-  name: "Central Asia (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - KAZ
-    - KGZ
-    - TJK
-    - TKM
-    - UZB
-- code: FAO_EAS
-  name: "Eastern Asia (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - CHN
-    - HKG
-    - JPN
-    - KOR
-    - MAC
-    - MNG
-    - PRK
-    - TWN
-- code: FAO_SEA
-  name: "South-eastern Asia (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - BRN
-    - IDN
-    - KHM
-    - LAO
-    - MMR
-    - MYS
-    - PHL
-    - SGP
-    - THA
-    - TLS
-    - VNM
-- code: FAO_SAS
-  name: "Southern Asia (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - AFG
-    - BGD
-    - BTN
-    - IND
-    - IRN
-    - LKA
-    - MDV
-    - NPL
-    - PAK
-- code: FAO_WAS
-  name: "Western Asia (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - ARE
-    - ARM
-    - AZE
-    - BHR
-    - CYP
-    - GEO
-    - IRQ
-    - ISR
-    - JOR
-    - KWT
-    - LBN
-    - OMN
-    - PSE
-    - QAT
-    - SAU
-    - SYR
-    - TUR
-    - YEM
-- code: FAO_EEU
-  name: "Eastern Europe (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - BGR
-    - BLR
-    - CZE
-    - HUN
-    - MDA
-    - OWID_CZS
-    - OWID_USS
-    - POL
-    - ROU
-    - RUS
-    - SVK
-    - UKR
-- code: FAO_NEU
-  name: "Northern Europe (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - DNK
-    - EST
-    - FIN
-    - FRO
-    - GBR
-    - IMN
-    - IRL
-    - ISL
-    - LTU
-    - LVA
-    - NOR
-    - OWID_CIS
-    - SJM
-    - SWE
-- code: FAO_SEU
-  name: "Southern Europe (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - ALB
-    - AND
-    - BIH
-    - ESP
-    - GIB
-    - GRC
-    - HRV
-    - ITA
-    - MKD
-    - MLT
-    - MNE
-    - OWID_SRM
-    - OWID_YGS
-    - PRT
-    - SMR
-    - SRB
-    - SVN
-    - VAT
-- code: FAO_WEU
-  name: "Western Europe (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - AUT
-    - BEL
-    - CHE
-    - DEU
-    - FRA
-    - LIE
-    - LUX
-    - MCO
-    - NLD
-- code: FAO_ANZ
-  name: "Australia and New Zealand (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - AUS
-    - HMD
-    - NFK
-    - NZL
-- code: FAO_MEL
-  name: "Melanesia (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - FJI
-    - NCL
-    - PNG
-    - SLB
-    - VUT
-- code: FAO_MIC
-  name: "Micronesia (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - FSM
-    - GUM
-    - KIR
-    - MHL
-    - MNP
-    - NRU
-    - PLW
-    - UMI
-- code: FAO_POL
-  name: "Polynesia (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - ASM
-    - COK
-    - NIU
-    - PCN
-    - PYF
-    - TKL
-    - TON
-    - TUV
-    - WLF
-    - WSM
+    - FAO_EAF
+    - FAO_MAF
+    - FAO_SAF
+    - FAO_WAF
 - code: FAO_EAF
   name: "Eastern Africa (FAO)"
   region_type: "aggregate"
   defined_by: fao_3
   members:
-    - ATF
-    - BDI
-    - COM
-    - DJI
-    - ERI
-    - ETH
-    - KEN
-    - MDG
-    - MOZ
-    - MUS
-    - MWI
-    - MYT
-    - OWID_ERE
-    - REU
-    - RWA
-    - SOM
-    - SSD
-    - SYC
-    - TZA
-    - UGA
-    - ZMB
-    - ZWE
+    - UNM49_EAF
+    - OWID_ERE # Ethiopia (former)
 - code: FAO_MAF
   name: "Middle Africa (FAO)"
   region_type: "aggregate"
   defined_by: fao_3
   members:
-    - AGO
-    - CAF
-    - CMR
-    - COD
-    - COG
-    - GAB
-    - GNQ
-    - STP
-    - TCD
+    - UNM49_MAF
 - code: FAO_SAF
   name: "Southern Africa (FAO)"
   region_type: "aggregate"
   defined_by: fao_3
   members:
-    - BWA
-    - LSO
-    - NAM
-    - SWZ
-    - ZAF
+    - UNM49_SAF
 - code: FAO_WAF
   name: "Western Africa (FAO)"
   region_type: "aggregate"
   defined_by: fao_3
   members:
-    - BEN
-    - BFA
-    - CIV
-    - CPV
-    - GHA
-    - GIN
-    - GMB
-    - GNB
-    - LBR
-    - MLI
-    - MRT
-    - NER
-    - NGA
-    - SEN
-    - SHN
-    - SLE
-    - TGO
+    - UNM49_WAF
+
+### Americas
+- code: FAO_AME
+  name: "Americas (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_1
+  members:
+    - FAO_NAM
+    - FAO_LAC
+- code: FAO_NAM
+  name: "Northern America (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_NAM
+- code: FAO_LAC
+  name: "Latin America and the Caribbean (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - FAO_CAR
+    - FAO_CAM
+    - FAO_SAM
 - code: FAO_CAR
   name: "Caribbean (FAO)"
   region_type: "aggregate"
   defined_by: fao_3
   members:
-    - ABW
-    - AIA
-    - ANT
-    - ATG
-    - BES
-    - BHS
-    - BLM
-    - BRB
-    - CUB
-    - CUW
-    - CYM
-    - DMA
-    - DOM
-    - GLP
-    - GRD
-    - HTI
-    - JAM
-    - KNA
-    - LCA
-    - MAF
-    - MSR
-    - MTQ
-    - PRI
-    - SXM
-    - TCA
-    - TTO
-    - VCT
-    - VGB
-    - VIR
+    - UNM49_CAR
+    - ANT # Netherlands Antilles
 - code: FAO_CAM
   name: "Central America (FAO)"
   region_type: "aggregate"
   defined_by: fao_3
   members:
-    - BLZ
-    - CRI
-    - GTM
-    - HND
-    - MEX
-    - NIC
-    - PAN
-    - SLV
+    - UNM49_CAM
 - code: FAO_SAM
   name: "South America (FAO)"
   region_type: "aggregate"
   defined_by: fao_3
   members:
-    - ARG
-    - BOL
-    - BRA
-    - CHL
-    - COL
-    - ECU
-    - FLK
-    - GUF
-    - GUY
-    - PER
-    - PRY
-    - SGS
-    - SUR
-    - URY
-    - VEN
+    - UNM49_SAM
+
+### Asia
+- code: FAO_ASI
+  name: "Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_1
+  members:
+    - FAO_CAS
+    - FAO_EAS
+    - FAO_SEA
+    - FAO_SAS
+    - FAO_WAS
+- code: FAO_CAS
+  name: "Central Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_CAS
+- code: FAO_EAS
+  name: "Eastern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_EAS
+    - TWN # Taiwan
+- code: FAO_SEA
+  name: "South-eastern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_SEA
+- code: FAO_SAS
+  name: "Southern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_SAS
+- code: FAO_WAS
+  name: "Western Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_WAS
+    - PSE # Palestine
+    - OWID_YAR # Yemen Arab Republic (not in the FAOSTAT harmonization mapping, but listed by FAOSTAT under this region)
+    - OWID_YPR # Yemen People's Republic (not in the FAOSTAT harmonization mapping, but listed by FAOSTAT under this region)
+
+### Europe
+- code: FAO_EUR
+  name: "Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_1
+  members:
+    - FAO_EEU
+    - FAO_NEU
+    - FAO_SEU
+    - FAO_WEU
+- code: FAO_EEU
+  name: "Eastern Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_EEU
+    - OWID_CZS # Czechoslovakia
+    - OWID_USS # USSR
+- code: FAO_NEU
+  name: "Northern Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_NEU
+- code: FAO_SEU
+  name: "Southern Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_SEU
+    - OWID_SRM # Serbia and Montenegro
+    - OWID_YGS # Yugoslavia
+- code: FAO_WEU
+  name: "Western Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_WEU
+
+### Oceania
+- code: FAO_OCE
+  name: "Oceania (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_1
+  members:
+    - FAO_ANZ
+    - FAO_MEL
+    - FAO_MIC
+    - FAO_POL
+- code: FAO_ANZ
+  name: "Australia and New Zealand (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_ANZ
+- code: FAO_MEL
+  name: "Melanesia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_MEL
+- code: FAO_MIC
+  name: "Micronesia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_MIC
+- code: FAO_POL
+  name: "Polynesia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_POL

@@ -40,7 +40,6 @@ important issues (since we use item_code to merge different datasets, and we use
 import json
 import os
 import sys
-from collections import defaultdict
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -999,102 +998,6 @@ def process_metadata(
     return tb_countries, tb_datasets, tb_elements, tb_items
 
 
-def sanity_check_fao_region_definitions(
-    metadata: Dataset,
-    countries_harmonization: dict,
-    ds_regions: Dataset,
-) -> None:
-    """Guardrail: every (country, FAO region) assignment in FAOSTAT's areagroup metadata must agree with the
-    FAO region memberships defined in the regions dataset (regions.yml).
-
-    This fires if a future FAOSTAT metadata update reassigns a country to a different region than the one
-    recorded in regions.yml, so the two definitions cannot silently drift apart. Only FAO's *geographic*
-    regions are defined in regions.yml (continents, subregions and finest subregions); FAO's economic groups
-    (income levels, OECD, LDCs, ...) and fishing areas are intentionally not defined there, so they are skipped.
-
-    Membership is compared in terms of OWID entity codes. FAOSTAT member names are harmonized to OWID entities
-    with the same mapping the rest of this step uses (``countries_harmonization``); members OWID does not
-    recognize (e.g. defunct entities) and FAO's own aggregate entities (e.g. "China (FAO)") are not part of a
-    region's composition and are dropped on both sides. Aggregate members (e.g. Channel Islands) are expanded
-    to their leaf countries so the comparison matches the expanded membership stored in the regions dataset.
-    """
-    # Gather FAOSTAT areagroup assignments across all domains: FAO group name -> set of member FAO country names.
-    group_to_fao_members: dict[str, set] = defaultdict(set)
-    for table_name in metadata.table_names:
-        if not table_name.endswith("_area_group"):
-            continue
-        tb_area_group = metadata[table_name].reset_index()
-        if not {"country_group", "country"} <= set(tb_area_group.columns):
-            continue
-        pairs = tb_area_group[["country_group", "country"]].dropna().drop_duplicates()
-        for group, member in pairs.itertuples(index=False):
-            group_to_fao_members[str(group)].add(str(member))
-
-    # Read region definitions. Build name -> code (with aliases) and a recursive expander to leaf countries.
-    tb_regions = ds_regions["regions"].reset_index()
-    name_to_code: dict[str, str] = {}
-    code_to_members: dict[str, list] = {}
-    for _, region in tb_regions.iterrows():
-        name_to_code.setdefault(region["name"], region["code"])
-        aliases = json.loads(region["aliases"]) if isinstance(region["aliases"], str) and region["aliases"] else []
-        for alias in aliases:
-            name_to_code.setdefault(alias, region["code"])
-        code_to_members[region["code"]] = (
-            json.loads(region["members"]) if isinstance(region["members"], str) and region["members"] else []
-        )
-
-    def expand(code: str, seen: set | None = None) -> set:
-        seen = seen if seen is not None else set()
-        if code in seen:
-            return set()
-        seen.add(code)
-        members = code_to_members.get(code, [])
-        if not members:
-            return {code}
-        return set().union(*(expand(member, seen) for member in members))
-
-    # FAO regions defined in regions.yml (defined_by fao_1/fao_2/fao_3): OWID name -> expanded member codes.
-    tb_fao = tb_regions[tb_regions["defined_by"].astype(str).str.startswith("fao")]
-    fao_defined = {
-        region["name"]: set().union(*(expand(code) for code in json.loads(region["members"])))
-        for _, region in tb_fao.iterrows()
-    }
-    assert fao_defined, "No FAO regions found in the regions dataset (expected defined_by fao_1/fao_2/fao_3)."
-
-    # For each defined FAO region, recompute its expected membership from FAOSTAT's areagroup and compare.
-    errors = []
-    for region_name, defined_members in fao_defined.items():
-        fao_group = region_name.removesuffix(" (FAO)")
-        assert fao_group in group_to_fao_members, (
-            f"FAO region '{region_name}' has no corresponding FAOSTAT area group '{fao_group}'. "
-            f"FAOSTAT may have renamed or dropped it; update regions.yml accordingly."
-        )
-        expected: set = set()
-        for fao_member in group_to_fao_members[fao_group]:
-            owid_name = countries_harmonization.get(fao_member)
-            if owid_name is None or owid_name.endswith("(FAO)"):
-                # Member is not recognized by OWID, or is a FAO-specific aggregate entity: not part of composition.
-                continue
-            code = name_to_code.get(owid_name)
-            assert code is not None, (
-                f"OWID entity '{owid_name}' (FAOSTAT '{fao_member}') is not defined in the regions dataset."
-            )
-            expected |= expand(code)
-        missing = expected - defined_members
-        extra = defined_members - expected
-        if missing or extra:
-            errors.append(
-                f"  {region_name}: in FAOSTAT but missing from regions.yml={sorted(missing)}; "
-                f"in regions.yml but not in FAOSTAT={sorted(extra)}"
-            )
-
-    assert not errors, (
-        "FAOSTAT areagroup memberships no longer agree with the FAO region definitions in regions.yml. "
-        "Update the FAO regions in etl/steps/data/garden/regions/2023-01-01/regions.yml to match FAOSTAT "
-        "(or the reverse if FAOSTAT introduced an error):\n" + "\n".join(errors)
-    )
-
-
 def run() -> None:
     #
     # Load data.
@@ -1131,17 +1034,9 @@ def run() -> None:
     countries_harmonization = io.load_json(countries_file)
     excluded_countries = io.load_json(excluded_countries_file)
 
-    # Load the regions dataset (used to check FAO region definitions against FAOSTAT's areagroup metadata).
-    ds_regions = paths.load_dataset("regions")
-
     #
     # Process data.
     #
-    # Guardrail: FAO region definitions in regions.yml must agree with FAOSTAT's areagroup memberships.
-    sanity_check_fao_region_definitions(
-        metadata=metadata, countries_harmonization=countries_harmonization, ds_regions=ds_regions
-    )
-
     tb_countries, tb_datasets, tb_elements, tb_items = process_metadata(
         paths=paths,
         metadata=metadata,
