@@ -749,13 +749,19 @@ def combine_indicators_processing_level(indicators: list[Indicator]) -> PROCESSI
         # keep the template so it still renders per dimension downstream.
         return cast(PROCESSING_LEVELS, templates[0])
 
-    # A template's rendered value is unknown here, but its possible outputs are the literal text
+    # A template's rendered value is unknown here. Its possible outputs are the literal text
     # outside its `<% ... %>` statement tags (conditions never render, so a level name inside
     # e.g. `sector == "major donors"` doesn't count) — take the highest level named there, so
     # combining with a literal never understates the result (a maybe-major template + "minor"
-    # must combine to "major", since processing_level feeds licensing downstream).
-    rendered_text = " ".join(re.sub(r"<%.*?%>", " ", template, flags=re.DOTALL) for template in templates)
-    template_levels = [level for level in PROCESSING_LEVELS_ORDER if level in rendered_text]
+    # must combine to "major", since processing_level feeds licensing downstream). When the
+    # output is routed through a variable (e.g. `<% set level = "major" if ... %><< level >>`)
+    # the output text names no level — fall back to scanning the whole source, deliberately
+    # overstating rather than understating.
+    template_levels: list[str] = []
+    for template in templates:
+        rendered_text = re.sub(r"<%.*?%>", " ", template, flags=re.DOTALL)
+        levels = [level for level in PROCESSING_LEVELS_ORDER if level in rendered_text]
+        template_levels += levels or [level for level in PROCESSING_LEVELS_ORDER if level in template]
 
     candidate_levels = literal_levels + template_levels
     if not candidate_levels:
