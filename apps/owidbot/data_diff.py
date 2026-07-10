@@ -18,7 +18,7 @@ import structlog
 from botocore.exceptions import BotoCoreError
 from owid.catalog import s3_utils
 
-from etl.datadiff_report import ColumnDiffResult, DatasetDiffResult, DiffReport
+from etl.datadiff_report import ColumnDiffResult, DatasetDiffResult, DiffReport, dataset_watch_key
 from etl.paths import BASE_DIR
 
 log = structlog.get_logger()
@@ -79,7 +79,9 @@ def upload_html_report(html_path: Path, branch: str) -> str | None:
 def format_comment(report: DiffReport, report_url: str | None) -> str:
     summary = _format_summary(report, report_url)
 
-    changed = [ds for ds in report.datasets if ds.change_kind != "identical"]
+    # Triage order, same as the HTML report's watch list: tier first, data loss ahead of
+    # bigger-but-benign changes — so truncation (MAX_DIFF_CHARS) never drops a lossy dataset.
+    changed = sorted((ds for ds in report.datasets if ds.change_kind != "identical"), key=dataset_watch_key)
     diff = "\n".join(line for ds in changed for line in _format_dataset(ds))
     diff = _truncate_diff(diff)
 
@@ -184,7 +186,8 @@ def _format_row(row: dict[str, str], col: str) -> str:
     old = row.get(f"{col} -")
     new = row.get(f"{col} +")
     val = row.get(col)
-    dims = " ".join(v for k, v in row.items() if k not in (col, f"{col} -", f"{col} +"))
+    # "anomaly score" is a display column of the HTML report, not a dim.
+    dims = " ".join(v for k, v in row.items() if k not in (col, f"{col} -", f"{col} +", "anomaly score"))
     if old is not None or new is not None:
         return f"{dims}: {old} → {new}" if dims else f"{old} → {new}"
     if val is not None:
@@ -245,8 +248,12 @@ def call_etl_diff(include: str, output_json: Path, output_html: Path) -> None:
     # Remove all warnings from stderr
     stderr = re.sub(r"^.*WARNING.*", "", stderr, flags=re.MULTILINE).strip()
 
-    if result.returncode == 1 and "Found differences" in stdout:
-        log.info("etl diff found differences", returncode=result.returncode)
+    # `etl diff` exits 1 for any completed run with findings; when a dataset fails to compare,
+    # the summary line is "⚠ Found errors, create an issue please" *instead of* "Found
+    # differences". The JSON/HTML reports are fully written before it exits either way (error
+    # datasets are included with an ⚠ icon), so both outcomes must be posted, not raised.
+    if result.returncode == 1 and ("Found differences" in stdout or "Found errors" in stdout):
+        log.info("etl diff found differences or errors", returncode=result.returncode)
     elif result.returncode != 0:
         details = [f"etl diff failed (exit {result.returncode})", f"Command: {cmd_str}"]
         if stderr:

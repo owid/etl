@@ -42,7 +42,8 @@ main:
     maintainer:
       - "@bobbie"
       - "@lucas"
-    entrypoint: app_pages/analytics.py
+    # External URLs are rendered as plain links in the navigation menu.
+    entrypoint: http://metabase.owid.io
     icon: ":material/bar_chart:"
 
 # ETL steps

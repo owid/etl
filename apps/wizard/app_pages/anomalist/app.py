@@ -890,16 +890,15 @@ if st.session_state.anomalist_df is not None:
         pagination = Pagination(
             items=items,
             items_per_page=items_per_page,
-            pagination_key="pagination-demo",
+            pagination_key="pagination-anomalist",
         )
 
         # Show items (only current page)
         for item in pagination.get_page_items():
             show_anomaly_compact(index=item[0], df=item[1])
 
-        # Show controls only if needed
-        if len(items) > items_per_page:
-            pagination.show_controls(mode="bar")
+        # Show controls (hidden automatically if there is a single page)
+        pagination.show_controls()
 else:
     st.success("Ha! We did not find any no anomalies in the selected datasets! What were the odds of that?")
 # Reset state
