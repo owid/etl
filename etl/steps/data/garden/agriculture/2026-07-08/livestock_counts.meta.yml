@@ -8,10 +8,12 @@ definitions:
     presentation:
       topic_tags:
         - Meat & Dairy Production
-    description_processing: |-
-      - We combine data from the UN Food and Agriculture Organization (FAOSTAT), available from 1961 onwards, with long-run historical estimates from HYDE for the period 1890 to 1950.
-      - HYDE reports figures for its own set of world sub-regions, which we aggregate into continents and a world total.
-      - HYDE reports counts in thousands of animals, which we convert to the number of animals.
+  # Only the eight mammal species that are spliced with HYDE carry this; the FAOSTAT-only species
+  # (birds, camels, rabbits, etc.) are taken directly from FAOSTAT and do not.
+  description_processing_hyde: &description_processing_hyde |-
+    - We combine data from the UN Food and Agriculture Organization (FAOSTAT), available from 1961 onwards, with long-run historical estimates from HYDE for the period 1890 to 1950.
+    - HYDE reports figures for its own set of world sub-regions, which we aggregate into continents and a world total.
+    - HYDE reports counts in thousands of animals, which we convert to the number of animals.
 
 dataset:
   title: Livestock counts
@@ -25,6 +27,7 @@ tables:
       asses:
         title: Number of donkeys
         description_short: The number of donkeys alive at a given time.
+        description_processing: *description_processing_hyde
         display:
           name: Donkeys
         presentation:
@@ -32,6 +35,7 @@ tables:
       buffalo:
         title: Number of buffalo
         description_short: The number of buffalo alive at a given time.
+        description_processing: *description_processing_hyde
         display:
           name: Buffalo
         presentation:
@@ -46,6 +50,7 @@ tables:
       cattle:
         title: Number of cattle
         description_short: The number of cattle alive at a given time.
+        description_processing: *description_processing_hyde
         display:
           name: Cattle
         presentation:
@@ -74,6 +79,7 @@ tables:
       goats:
         title: Number of goats
         description_short: The number of goats alive at a given time.
+        description_processing: *description_processing_hyde
         display:
           name: Goats
         presentation:
@@ -81,6 +87,7 @@ tables:
       horses:
         title: Number of horses
         description_short: The number of horses alive at a given time.
+        description_processing: *description_processing_hyde
         display:
           name: Horses
         presentation:
@@ -88,6 +95,7 @@ tables:
       mules:
         title: Number of mules
         description_short: The number of mules and hinnies alive at a given time.
+        description_processing: *description_processing_hyde
         display:
           name: Mules
         presentation:
@@ -130,6 +138,7 @@ tables:
       sheep:
         title: Number of sheep
         description_short: The number of sheep alive at a given time.
+        description_processing: *description_processing_hyde
         display:
           name: Sheep
         presentation:
@@ -137,6 +146,7 @@ tables:
       pigs:
         title: Number of pigs
         description_short: The number of pigs alive at a given time.
+        description_processing: *description_processing_hyde
         display:
           name: Pigs
         presentation:
