@@ -765,7 +765,7 @@ A foundational-dataset update can leave a downstream step **building cleanly whi
 
 **2. How much did their outputs change?** The data-diff **report** answers this directly — it ranks everything by anomaly score (BARD, the metric Anomalist uses) and makes data loss unmissable, so you read its verdicts instead of scanning the diff yourself:
 
-- **On the PR (zero effort):** open owidbot's **data-diff** HTML report (`https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html`, easiest via the **full report** link in owidbot's PR comment — the path uses the branch name with `/`, `.`, `_` replaced by `-`) — it compares the staging build (new dependency) against production (old dependency). For a dependency bump the consumers' code is unchanged, so this is a clean old-dep-vs-new-dep comparison.
+- **On the PR (zero effort):** open owidbot's **data-diff** HTML report (`https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html`, easiest via the **full report** link in owidbot's PR comment — the path keeps the branch name's dots and underscores and replaces only characters outside `[A-Za-z0-9._-]` (e.g. `/`) with `-` — unlike the staging *subdomain*, which does replace `.`/`_`) — it compares the staging build (new dependency) against production (old dependency). For a dependency bump the consumers' code is unchanged, so this is a clean old-dep-vs-new-dep comparison.
 - **Locally, after step 1:** `.venv/bin/etl diff REMOTE data/ --changed --include garden --output-html data-diff.html`.
 
 How to read it, in order:
@@ -837,7 +837,7 @@ This is the **last step**, after the DAG archive has been committed. Don't auto-
   ```
   http://staging-site-<container_branch>/etl/wizard/chart-diff
   ```
-- **data-diff report** — dataset/indicator-level value comparison of the staging build against production, ranked by anomaly score, with data-point losses leading its Top-changes list and coverage loss forcing the 🔴 tier (see "Silent-breakage check" for how to read it). Covers every dataset the update touched, including ones with no charts — the perspective Anomalist and Chart Diff don't have. Easiest access: the **full report** link in owidbot's data-diff PR comment. The direct URL uses the branch name with `/`, `.`, `_` replaced by `-` (not the truncated container name):
+- **data-diff report** — dataset/indicator-level value comparison of the staging build against production, ranked by anomaly score, with data-point losses leading its Top-changes list and coverage loss forcing the 🔴 tier (see "Silent-breakage check" for how to read it). Covers every dataset the update touched, including ones with no charts — the perspective Anomalist and Chart Diff don't have. Easiest access: the **full report** link in owidbot's data-diff PR comment. The direct URL keeps the branch name's dots and underscores and replaces only characters outside `[A-Za-z0-9._-]` (e.g. `/`) with `-` — unlike the staging subdomain, which does replace `.`/`_` (and it is not the truncated container name either):
   ```
   https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html
   ```
