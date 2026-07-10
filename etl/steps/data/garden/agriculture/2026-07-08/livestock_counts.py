@@ -89,12 +89,6 @@ OWID_AGGREGATES_TO_DROP = {
 }
 
 
-def select_faostat_entities(countries: set) -> list:
-    """Keep individual countries, OWID continents and World; drop FAO's own regions and the
-    non-geographic OWID aggregates."""
-    return [c for c in countries if "(FAO)" not in c and c not in OWID_AGGREGATES_TO_DROP]
-
-
 def prepare_faostat(tb: Table) -> Table:
     """Select livestock stocks (number of animals) for all species and the chosen entities."""
     tb = tb.reset_index()
@@ -113,7 +107,7 @@ def prepare_faostat(tb: Table) -> Table:
     tb = tb[["country", "year"] + list(rename)].rename(columns=rename, errors="raise")
 
     # Keep the chosen entities and years from 1961 onwards.
-    entities = select_faostat_entities(set(tb["country"]))
+    entities = [c for c in set(tb["country"]) if "(FAO)" not in c and c not in OWID_AGGREGATES_TO_DROP]
     tb = tb[(tb["country"].isin(entities)) & (tb["year"] >= FIRST_FAOSTAT_YEAR)].reset_index(drop=True)
 
     return tb
@@ -214,6 +208,7 @@ def run() -> None:
 
     sanity_check_outputs(tb)
 
+    # Improve table format.
     tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     #
