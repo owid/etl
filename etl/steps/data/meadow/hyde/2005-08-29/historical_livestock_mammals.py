@@ -42,10 +42,6 @@ def run() -> None:
     tb = tb.melt(id_vars=["country", "animal"], value_vars=YEARS, var_name="year", value_name="value")
     tb["animal"] = tb["animal"].replace({"Buffaloe": "Buffalo"})
     tb = tb.pivot(index=["country", "year"], columns="animal", values="value", join_column_levels_with="_")
-
-    # Improve column names and types.
-    tb = tb.underscore()
-    tb["country"] = tb["country"].astype("category")
     tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     #

@@ -21,12 +21,12 @@ tables:
   livestock_counts:
     variables:
       asses:
-        title: Number of asses
-        description_short: The number of asses (donkeys) alive at a given time.
+        title: Number of donkeys
+        description_short: The number of donkeys alive at a given time.
         display:
-          name: Asses
+          name: Donkeys
         presentation:
-          title_public: Number of asses
+          title_public: Number of donkeys
       buffalo:
         title: Number of buffalo
         description_short: The number of buffalo alive at a given time.
