@@ -1086,17 +1086,38 @@ steps:
   # archived; last active in e55e11ac1138 on 2026-07-06
   data://grapher/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
     - data://garden/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
-        - data://garden/regions/2023-01-01/regions
-        - data://meadow/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
-            - snapshot://neglected_tropical_diseases/2025-08-20/lymphatic_filariasis.xlsx
+      - data://garden/regions/2023-01-01/regions
+      - data://meadow/neglected_tropical_diseases/2025-08-20/lymphatic_filariasis:
+        - snapshot://neglected_tropical_diseases/2025-08-20/lymphatic_filariasis.xlsx
 
   # Schistosomiasis
   # archived; last active in e55e11ac1138 on 2026-07-06
   data://grapher/neglected_tropical_diseases/2025-08-20/schistosomiasis:
     - data://garden/neglected_tropical_diseases/2025-08-20/schistosomiasis:
-        - data://garden/regions/2023-01-01/regions
-        - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis:
-            - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
+      - data://garden/regions/2023-01-01/regions
+      - data://meadow/neglected_tropical_diseases/2025-08-20/schistosomiasis:
+        - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
+
+      # WHO Antimicrobial usage
+  # archived; last active in 9487a51236a5 on 2026-07-08
+  data://grapher/antibiotics/2024-11-12/antimicrobial_usage:
+    - data://garden/antibiotics/2024-11-12/antimicrobial_usage:
+      - data://meadow/antibiotics/2024-11-12/antimicrobial_usage:
+        - snapshot://antibiotics/2024-11-12/antimicrobial_usage.xlsx
+  # WHO Antibiotic testing coverage
+  # archived; last active in 9487a51236a5 on 2026-07-08
+  data://grapher/antibiotics/2024-11-15/testing_coverage:
+    - data://garden/antibiotics/2024-11-15/testing_coverage:
+      - data://meadow/antibiotics/2024-11-15/testing_coverage:
+        - snapshot://antibiotics/2024-11-15/testing_coverage.zip
+
+
+    # Antibiotic resistance data - WHO GLASS
+  # archived; last active in 9487a51236a5 on 2026-07-08
+  data://grapher/antibiotics/2024-10-18/who_glass_by_antibiotic:
+    - data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic:
+      - data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic:
+        - snapshot://antibiotics/2024-10-18/who_glass_by_antibiotic.zip
 
   # Neglected Tropical Diseases Funding (2025 update)
   # archived; last active in e38a68d79527 on 2026-07-02
@@ -1105,3 +1126,8 @@ steps:
       - data://meadow/neglected_tropical_diseases/2025-08-20/funding:
         - snapshot://neglected_tropical_diseases/2025-08-20/funding.xlsx
 
+  # archived; last active in a6a7fbaabae4 on 2026-07-07
+  data://grapher/antibiotics/2026-06-30/glass_enrolment:
+    - data://garden/antibiotics/2026-06-30/glass_enrolment:
+      - data://meadow/antibiotics/2026-06-30/glass_enrolment:
+        - snapshot://antibiotics/2026-06-30/glass_enrolment.xlsx

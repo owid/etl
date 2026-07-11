@@ -132,6 +132,7 @@ dev = [
     "pytest-asyncio>=1.0.0",
     "sqlacodegen>=3.1.0",
     "codespell>=2.4.1",
+    "playwright>=1.60.0",
 ]
 
 [project.optional-dependencies]

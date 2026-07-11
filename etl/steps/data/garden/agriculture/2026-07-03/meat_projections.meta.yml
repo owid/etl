@@ -1,0 +1,42 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Meat & Dairy Production
+    unit: tonnes
+    short_unit: t
+    processing_level: major
+    display:
+      numDecimalPlaces: 0
+    description_key:
+      - Consumption here means the quantity of food available for human consumption, as reported in FAOSTAT Food Balance Sheets. It includes food that is wasted at the household level and not eaten.
+      - Values up to the present are observed data from FAOSTAT Food Balance Sheets; later values are projections from FAO's report "The future of food and agriculture - Alternative pathways to 2050", under its Business As Usual scenario.
+      - In the Business As Usual scenario, the world develops according to socio-economic, technological and environmental patterns that fail to address many challenges of food and agriculture, despite efforts to achieve Sustainable Development Goal targets. Economic growth is moderate but uneven across countries, and policies provide only limited incentives to move towards sustainability.
+    description_processing: |-
+      - We combine the data from the FAOSTAT Food Balance Sheets with the projected consumption from FAO's 2018 report "The future of food and agriculture - Alternative pathways to 2050" (Business As Usual scenario), without any adjustment. The projections are calibrated to FAOSTAT Food Balance Sheets in their 2012 base year, where both sources agree within a few percent.
+
+dataset:
+  title: Global meat consumption, with projections to 2050
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  meat_projections:
+    variables:
+      beef_and_buffalo:
+        title: Consumption of beef and buffalo meat, with projections
+        description_short: |-
+          Quantity of beef and buffalo meat available for human consumption, with projections up to 2050.
+      pigmeat:
+        title: Consumption of pig meat, with projections
+        description_short: |-
+          Quantity of pig meat available for human consumption, with projections up to 2050.
+      poultry:
+        title: Consumption of poultry meat, with projections
+        description_short: |-
+          Quantity of poultry meat available for human consumption, with projections up to 2050.
+      sheep_and_goat:
+        title: Consumption of sheep and goat meat, with projections
+        description_short: |-
+          Quantity of sheep and goat meat available for human consumption, with projections up to 2050.

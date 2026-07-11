@@ -66,7 +66,7 @@ steps:
     - data://meadow/covid/latest/cases_deaths:
       - snapshot://covid/latest/cases_deaths.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
@@ -87,7 +87,7 @@ steps:
       - snapshot://covid/latest/oxcgrt_policy_national_2020.csv
       - snapshot://covid/latest/oxcgrt_policy_national_2021.csv
       - snapshot://covid/latest/oxcgrt_policy_national_2022.csv
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
 
   # YouGov
@@ -177,7 +177,7 @@ steps:
   data://garden/covid/latest/vaccinations_global:
     - data://meadow/covid/latest/vaccinations_global
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/vaccinations_global:
     - data://garden/covid/latest/vaccinations_global

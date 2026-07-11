@@ -57,7 +57,7 @@ steps:
   #
   data://grapher/irena/2025-06-20/renewable_energy_patents:
     - data://garden/irena/2025-06-20/renewable_energy_patents:
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
       - data://meadow/irena/2025-06-20/renewable_energy_patents:
         - snapshot://irena/2025-06-20/renewable_energy_patents.csv
       - data://garden/regions/2023-01-01/regions
@@ -66,7 +66,7 @@ steps:
   #
   data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://meadow/energy_institute/2025-06-27/statistical_review_of_world_energy:
       - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.csv
       - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.xlsx
@@ -81,7 +81,7 @@ steps:
     # EIA - International Energy archive (frozen 2022 export of indicators EIA no longer publishes).
     - data://meadow/eia/2026-05-05/international_energy_archive:
       - snapshot://eia/2026-05-05/international_energy_archive.zip
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # Energy - Fossil fuels explorer.
@@ -92,7 +92,7 @@ steps:
       - data://garden/energy/2026-05-05/fossil_fuels:
         - data://garden/eia/2026-05-05/international_energy
         - data://garden/demography/2024-07-15/population
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
         - data://garden/regions/2023-01-01/regions
   #
   # Energy - Energy mix.
@@ -100,7 +100,7 @@ steps:
   data://garden/energy/2025-06-27/energy_mix:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
     - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   data://grapher/energy/2025-06-27/energy_mix:
     - data://garden/energy/2025-06-27/energy_mix
   #
@@ -118,7 +118,7 @@ steps:
     - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels:
       - data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels:
         - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
     # Smil - Global primary energy (2017), used to extend World coal production before 1900.
     - data://garden/papers/2023-12-12/smil_2017
@@ -154,7 +154,7 @@ steps:
   #
   data://garden/irena/2025-07-18/renewable_energy_statistics:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://meadow/irena/2025-07-18/renewable_energy_statistics:
       - snapshot://irena/2025-07-18/renewable_energy_statistics.xlsx
   data://grapher/irena/2025-07-18/renewable_capacity_by_technology:
@@ -245,7 +245,7 @@ steps:
     - data://meadow/un/2026-02-11/energy_statistics_database:
       - snapshot://un/2026-02-11/energy_statistics_database.zip
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   #
   # Ember - Yearly electricity data.
   #
@@ -255,7 +255,7 @@ steps:
     - data://meadow/ember/2026-04-24/yearly_electricity:
       - snapshot://ember/2026-04-24/yearly_electricity__europe.csv
       - snapshot://ember/2026-04-24/yearly_electricity__global.csv
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   #
   # Energy - Electricity mix (EI & Ember).
   #
