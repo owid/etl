@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-07-10T14:31:51.884491Z"
+exclude-newer = "2026-07-10T14:41:18.868218Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -1434,7 +1434,7 @@ requires-dist = [
     { name = "pyhumps", specifier = ">=3.8.0" },
     { name = "pymysql", specifier = ">=1.1.1" },
     { name = "pyopenssl", specifier = ">=26.0.0" },
-    { name = "pypdf", specifier = ">=6.13.3" },
+    { name = "pypdf", specifier = ">=6.14.2" },
     { name = "pyproj", specifier = ">=3.7.1" },
     { name = "pyreadr", specifier = ">=0.5.2" },
     { name = "python-docx", specifier = ">=1.1.2" },
