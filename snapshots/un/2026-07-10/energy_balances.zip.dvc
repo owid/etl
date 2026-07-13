@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: "Energy Balances"
     description: |-
-      The Energy Balances, available at UNdata, show the overall picture of the yearly production, trade, transformation and consumption of energy products for more than 200 countries and areas, with all flows expressed in a common energy unit. They are compiled by the United Nations Statistics Division from the same underlying data as the Energy Statistics Database.
+      The Energy Balances show the overall picture of the yearly production, trade, transformation and consumption of energy products for more than 200 countries and areas, with all flows expressed in a common energy unit. They are compiled by the United Nations Statistics Division from the same underlying data as the Energy Statistics Database.
 
       - [Details on how the energy statistics are compiled](https://unstats.un.org/unsd/energystats/questionnaire/documents/Energy-Questionnaire-Guidelines.pdf).
       - [Energy balances publications](https://unstats.un.org/unsd/energystats/pubs/balance/).
@@ -17,7 +17,7 @@ meta:
       Energy Balances, United Nations Statistics Division via UNdata (2025).
 
     # Files
-    url_main: http://data.un.org/Explorer.aspx
+    url_main: https://unstats.un.org/unsd/energystats/dataPortal/
     date_accessed: '2026-07-10'
 
     # License
