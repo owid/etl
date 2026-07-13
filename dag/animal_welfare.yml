@@ -14,7 +14,7 @@ steps:
         - snapshot://animal_welfare/2024-12-12/farmed_finfishes_used_for_food.zip
       - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2024-12-12/number_of_farmed_fish:
     - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
@@ -26,7 +26,7 @@ steps:
       - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_global.pdf
       - snapshot://animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food_by_country.pdf
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
     - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
@@ -37,7 +37,7 @@ steps:
     - data://meadow/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
       - snapshot://animal_welfare/2025-01-23/number_of_farmed_crustaceans.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
     - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans

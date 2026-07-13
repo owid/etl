@@ -108,25 +108,7 @@ sections:
       - title: "Chart Diff"
         alias: chart-diff
         entrypoint: app_pages/chart_diff/app.py
-        description: Compare charts in staging and prod
-        maintainer: "@mojmir"
-        icon: ":material/difference:"
-        image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
-        disable:
-          production: True
-      - title: "Explorer Diff"
-        alias: explorer-diff
-        entrypoint: app_pages/explorer_diff/app.py
-        description: Compare explorer in staging and prod
-        maintainer: "@mojmir"
-        icon: ":material/difference:"
-        image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
-        disable:
-          production: True
-      - title: "MDIM Diff"
-        alias: mdim-diff
-        entrypoint: app_pages/mdim_diff/app.py
-        description: Compare MDIMs in staging and prod
+        description: Compare charts, MDIMs & explorers in staging and prod
         maintainer: "@mojmir"
         icon: ":material/difference:"
         image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
