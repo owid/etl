@@ -6,7 +6,7 @@ definitions:
   definition_status_not_signed: |-
     The status "Not signed" means that the country has neither signed nor committed to a treaty.
   definition_russia_ctbt: |-
-    Russia ratified the Comprehensive Nuclear-Test-Ban Treaty in 2000, but revoked its ratification in 2023. Since it remains a signatory, with the same obligations as countries that have signed but not approved the treaty, it is shown as "Signed" from 2023 onward.
+    Russia ratified the Comprehensive Nuclear-Test-Ban Treaty in 2000, but withdrew its ratification in 2023. Since it remains a signatory, with the same obligations as countries that have signed but not approved the treaty, it is classified as "Signed" from 2023 onward.
   definition_all_statuses: |-
     A country's position on a treaty can be ["Not signed"](#dod:treaty-status-not-signed), ["Signed"](#dod:treaty-status-signed), or ["Approved"](#dod:treaty-status-committed).
   common:
@@ -20,7 +20,7 @@ definitions:
     description_processing: |-
       - Countries are classified as "Approved" if they have either a "Ratification", "Accession", or "Succession" action (as defined by UNODA).
       - Countries are classified as "Signed" if they only have a "Signatory" action (as defined by UNODA).
-      - Countries with a "Withdrawal" action (as defined by UNODA) are classified as "Signed" if they remain signatories of the treaty. This is currently only the case for Russia, which revoked its ratification of the Comprehensive Nuclear-Test-Ban Treaty in 2023 but remains a signatory.
+      - Countries with a "Withdrawal" action (as defined by UNODA) are classified as "Signed" if they remain signatories of the treaty. This is currently only the case for Russia, which withdrew its ratification of the Comprehensive Nuclear-Test-Ban Treaty in 2023 but remains a signatory.
       - Countries are classified as "Not signed" if they have none of the previous actions.
     description_key:
       - "{definitions.definition_status_signed}"
