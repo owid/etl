@@ -50,6 +50,8 @@ Everything you post to GitHub or Slack goes out under a **human's identity**. An
 
    The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the `/latest` data-update post on ourworldindata.org) — those are authored by the named human, not by Claude.
 
+3. **This repo is public — keep internal context out of it.** PR descriptions, commit messages, and issue/review comments must never identify people who contact us (no names, roles, or employers — say "a reader pointed out ..." instead), and must not reference internal discussions (Slack threads, Notion docs) or who suggested what internally. Motivate changes using public facts only; internal context stays internal.
+
 ## Pipeline Overview
 
 **snapshot** → **meadow** → **garden** → **grapher** → **export**
