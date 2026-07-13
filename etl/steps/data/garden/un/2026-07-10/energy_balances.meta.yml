@@ -1,10 +1,8 @@
-# NOTE: To learn more about the fields, hover over their names.
-definitions:
-  common:
-    processing_level: major
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 tables:
   energy_balances:
     title: Energy balances
@@ -25,21 +23,18 @@ tables:
         title: Share of final energy consumption used by agriculture, forestry and fishing
         unit: "%"
         short_unit: "%"
+        processing_level: major
         description_short: |-
           Energy consumed by agriculture, forestry and fishing as a percentage of total final energy consumption.
         description_key:
           - This indicator measures the energy directly consumed by agriculture, forestry and fishing, such as fuels and electricity. It does not include energy embedded in inputs like fertilizers or machinery.
         description_processing: |-
-          We compute this indicator by dividing the energy consumed by agriculture, forestry and fishing by total final energy consumption (which excludes non-energy uses of fuels).
-
-          For regions, we sum both flows across the countries that report agricultural energy use, and then take the ratio. Regional values are only shown for years when those countries account for at least 70% of the region's reported final energy consumption.
-
-          We exclude a small number of country-years in the most recent years of data where agricultural energy use collapses due to incomplete source data (for example, India in 2023).
+          - We compute this indicator by dividing the energy consumed by agriculture, forestry and fishing by total final energy consumption (which excludes non-energy uses of fuels).
+          - For regions, we sum both flows across the countries that report agricultural energy use, and then take the ratio. Regional values are only shown for years when those countries account for at least 70% of the region's reported final energy consumption.
+          - We exclude a small number of country-years in the most recent years of data where agricultural energy use collapses due to incomplete source data (for example, India in 2023).
         presentation:
-          title_public: Share of final energy consumption used by agriculture, forestry and fishing
           topic_tags:
             - Agricultural Production
             - Energy
         display:
-          name: Share of energy used by agriculture, forestry and fishing
           numDecimalPlaces: 1
