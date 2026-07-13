@@ -103,7 +103,6 @@ def find_reporting_breaks(tb: Table) -> list[tuple[str, int]]:
         (tb["transaction"] == TRANSACTION_AGRICULTURE)
         & (~tb["commodity"].isin([COMMODITY_TOTAL_ENERGY, COMMODITY_RENEWABLES_MEMO]))
     ][["country", "year", "commodity", "value"]].dropna(subset=["value"])
-    fuels = fuels.astype({"country": str, "commodity": str})
 
     # Total agriculture flow per country-year.
     totals = (
@@ -111,13 +110,12 @@ def find_reporting_breaks(tb: Table) -> list[tuple[str, int]]:
         .dropna(subset=["value"])[["country", "year", "value"]]
         .rename(columns={"value": "total"})
     )
-    totals = totals.astype({"country": str})
 
     # Country-years where total final energy consumption is reported.
     fec = tb[
         (tb["transaction"] == TRANSACTION_FINAL_ENERGY_CONSUMPTION) & (tb["commodity"] == COMMODITY_TOTAL_ENERGY)
     ].dropna(subset=["value"])
-    fec_reported = set(zip(fec["country"].astype(str), fec["year"]))
+    fec_reported = set(zip(fec["country"], fec["year"]))
 
     # Compare each fuel reported in one year with its value in the following year (missing if not reported).
     previous = fuels.rename(columns={"value": "value_previous"}).copy()
@@ -201,7 +199,6 @@ def create_share_table(tb: Table) -> Table:
         (tb["commodity"] == COMMODITY_TOTAL_ENERGY)
         & (tb["transaction"].isin([TRANSACTION_AGRICULTURE, TRANSACTION_FINAL_ENERGY_CONSUMPTION]))
     ][["country", "year", "transaction", "value"]].copy()
-    tb_total["transaction"] = tb_total["transaction"].astype(str)
     tb_wide = tb_total.pivot(
         index=["country", "year"], columns="transaction", values="value", join_column_levels_with="_"
     ).rename(
@@ -251,7 +248,7 @@ def create_share_table(tb: Table) -> Table:
     coverage = tb_wide["final_energy_consumption_of_agriculture_reporters"] / tb_wide["final_energy_consumption"]
     insufficient = tb_wide["country"].isin(REGIONS) & (coverage < MINIMUM_COVERAGE_OF_FINAL_CONSUMPTION)
     if insufficient.any():
-        dropped = tb_wide[insufficient].groupby("country", observed=True)["year"].agg(["min", "max", "count"])
+        dropped = tb_wide[insufficient].groupby("country")["year"].agg(["min", "max", "count"])
         log.warning(f"Region-years dropped for insufficient coverage of the agriculture flow:\n{dropped}")
     tb_wide.loc[insufficient, SHARE_COLUMN] = None
 
@@ -295,7 +292,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("energy_balances")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("energy_balances", safe_types=False)
+    tb = ds_meadow.read("energy_balances")
 
     #
     # Process data.

@@ -5,6 +5,7 @@ from xml.etree import ElementTree
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
+from owid.datautils import dataframes
 
 from etl.helpers import PathFinder
 
@@ -23,9 +24,6 @@ CODELISTS = {
     "TRANSACTION": "CL_TRANS_ENERGY_BALANCE_UNDATA",
     "UNIT": "CL_UNIT_ENERGY_UNDATA",
 }
-
-# Expected number of observations (approximate, to catch major data issues).
-EXPECTED_MIN_ROWS = 1_000_000
 
 
 def parse_codelists(structure_xml: bytes) -> dict[str, dict[str, str]]:
@@ -87,7 +85,7 @@ def read_snapshot(snap) -> tuple[Table, dict[str, dict[str, str]]]:
 
 def sanity_check_inputs(tb: Table, codelists: dict[str, dict[str, str]]) -> None:
     """Check raw data before processing."""
-    assert len(tb) > EXPECTED_MIN_ROWS, f"Expected at least {EXPECTED_MIN_ROWS} rows, got {len(tb)}"
+    assert len(tb) > 1e6, f"Expected at least a million rows, got {len(tb)}"
     for dimension in ["REF_AREA", "COMMODITY", "TRANSACTION", "UNIT"]:
         unmapped = set(tb[dimension]) - set(codelists[dimension])
         assert not unmapped, f"Unmapped {dimension} codes: {unmapped}"
@@ -111,17 +109,20 @@ def run() -> None:
     # Process data.
     #
     # Map coded dimensions to human-readable names using codelists.
-    tb["country"] = tb["REF_AREA"].map(codelists["REF_AREA"])
-    tb["commodity"] = tb["COMMODITY"].map(codelists["COMMODITY"])
-    tb["transaction"] = tb["TRANSACTION"].map(codelists["TRANSACTION"])
-    tb["unit"] = tb["UNIT"].map(codelists["UNIT"])
+    # NOTE: warn_on_unused_mappings is left off because codelists legitimately contain many codes absent from the data.
+    tb["country"] = dataframes.map_series(tb["REF_AREA"], mapping=codelists["REF_AREA"], warn_on_missing_mappings=True)
+    tb["commodity"] = dataframes.map_series(
+        tb["COMMODITY"], mapping=codelists["COMMODITY"], warn_on_missing_mappings=True
+    )
+    tb["transaction"] = dataframes.map_series(
+        tb["TRANSACTION"], mapping=codelists["TRANSACTION"], warn_on_missing_mappings=True
+    )
+    tb["unit"] = dataframes.map_series(tb["UNIT"], mapping=codelists["UNIT"], warn_on_missing_mappings=True)
     tb["estimate"] = tb["ESTIMATE"]
 
-    # Parse types; use categoricals for low-cardinality string columns.
+    # Parse types.
     tb["year"] = pr.to_numeric(tb["year"], downcast="integer")
     tb["value"] = pr.to_numeric(tb["value"])
-    for column in ["country", "commodity", "transaction", "unit", "estimate"]:
-        tb[column] = tb[column].astype("category")
 
     # Keep only the resolved columns and the value.
     tb = tb[["country", "year", "commodity", "transaction", "unit", "estimate", "value"]].copy()
