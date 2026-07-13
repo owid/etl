@@ -7,6 +7,10 @@ definitions:
         - Economic Growth
   description_processing_splice: |-
     This indicator combines two sources: recent estimates from the World Bank's World Development Indicators, and a compilation of historical sources built by Our World in Data, based on the dataset published by Herrendorf, Rogerson and Valentinyi (2014) and updated with the GGDC 10-Sector Database (January 2015 release) and the Swedish Historical National Accounts. For each country, World Bank data is used from its first available year onwards; historical sources only inform earlier years. To preserve a consistent series between the historical estimates and the World Bank data available from 1991 onwards, the years 1986-1990 are not included.
+  description_processing_shares: |-
+    This indicator combines two series published by the World Bank's World Development Indicators: ILO-modeled employment shares, available from 1991 onwards, and — for France, Italy, the Netherlands, Poland and the United Kingdom — employment shares around 1980 from an archived edition, which the World Bank later replaced with the ILO-modeled series.
+  description_key_archive: |-
+    For five European countries (France, Italy, the Netherlands, Poland and the United Kingdom), earlier values around 1980 come from an archived edition of the World Development Indicators, which the World Bank later replaced with the ILO-modeled series.
   description_key_utilities: |-
     In the historical estimates, utilities (electricity, gas and water) are counted within services, following Herrendorf, Rogerson and Valentinyi (2014). The World Bank counts them within industry. This creates a small definitional break between the historical and recent segments of the industry and services series.
   description_key_employment_concepts: |-
@@ -28,11 +32,12 @@ tables:
         description_short: Share of working people employed in agriculture, including hunting, forestry and fishing.
         description_key:
           - Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, measuring agricultural employment as a share of total employment.
-          - Earlier estimates for ten countries (Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States) are derived from historical reconstructions of the number of people working in each sector. For five European countries (France, Italy, the Netherlands, Poland and the United Kingdom), benchmark estimates from Broadberry and Gardner (2013) reach back as far as 1300; these measure the share of the total labor force, which also includes unemployed people.
+          - "{definitions.description_key_archive}"
+          - For the same five countries, benchmark estimates between 1300 and 1800 come from Broadberry and Gardner (2013); these measure the share of the total labor force, which also includes unemployed people.
         description_processing: |-
-          {definitions.description_processing_splice}
+          {definitions.description_processing_shares}
 
-          Employment shares before the first World Bank year are calculated from the compilation's employment numbers, as agricultural employment divided by total employment across the three sectors. Benchmark estimates of the share of the labor force in agriculture from Broadberry and Gardner (2013) are used for years and countries the compilation does not cover.
+          For the same five countries, benchmark estimates of the share of the labor force employed in agriculture between 1300 and 1800 come from Broadberry and Gardner (2013).
         presentation:
           topic_tags:
             - Employment in Agriculture
@@ -48,12 +53,9 @@ tables:
         description_short: Share of working people employed in industry, including mining, manufacturing and construction.
         description_key:
           - Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, measuring industrial employment as a share of total employment.
-          - Earlier estimates for ten countries (Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States) are derived from historical reconstructions of the number of people working in each sector.
-          - "{definitions.description_key_utilities}"
+          - "{definitions.description_key_archive}"
         description_processing: |-
-          {definitions.description_processing_splice}
-
-          Employment shares before the first World Bank year are calculated from the compilation's employment numbers, as industrial employment divided by total employment across the three sectors.
+          {definitions.description_processing_shares}
         display:
           name: Industry
           numDecimalPlaces: 1
@@ -66,12 +68,9 @@ tables:
         description_short: Share of working people employed in services.
         description_key:
           - Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, measuring services employment as a share of total employment.
-          - Earlier estimates for ten countries (Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States) are derived from historical reconstructions of the number of people working in each sector.
-          - "{definitions.description_key_utilities}"
+          - "{definitions.description_key_archive}"
         description_processing: |-
-          {definitions.description_processing_splice}
-
-          Employment shares before the first World Bank year are calculated from the compilation's employment numbers, as services employment divided by total employment across the three sectors.
+          {definitions.description_processing_shares}
         display:
           name: Services
           numDecimalPlaces: 1

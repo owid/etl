@@ -117,4 +117,6 @@ steps:
       - data://garden/growth/2026-07-02/structural_transformation_historical
       - data://meadow/papers/2026-07-02/broadberry_gardner:
         - snapshot://papers/2026-07-02/broadberry_gardner.csv
+      - data://meadow/wb/2026-07-02/wdi_employment_by_sector_archive:
+        - snapshot://wb/2026-07-02/wdi_employment_by_sector_archive.csv
       - data://garden/worldbank_wdi/2026-02-27/wdi

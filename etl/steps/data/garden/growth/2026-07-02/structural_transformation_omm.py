@@ -7,18 +7,24 @@ Combines three sources:
     Rogerson and Valentinyi 2014, updated with the GGDC 10-Sector Database and the Swedish
     Historical National Accounts), covering ten countries since 1800 (Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States).
   - Broadberry and Gardner (2013): benchmark estimates of the share of the labor force
-    employed in agriculture in five European countries (France, Italy, the Netherlands, Poland and the United Kingdom), 1300-1981.
+    employed in agriculture in five European countries (France, Italy, the Netherlands,
+    Poland and the United Kingdom), 1300-1800, joined with employment shares in all three
+    sectors around 1980 for the same countries from an archived edition of the WDI (the
+    World Bank later replaced those series with ILO-modeled estimates that begin in
+    1991).
 
-The indicators splice the historical compilation with WDI: for each country and indicator,
-WDI is used from its first available year onwards; historical sources only contribute
-years strictly before that. This avoids mixing definitions within the modern segment of a
+The employment numbers splice the historical compilation with WDI: for each country, WDI
+is used from its first available year onwards; the compilation only contributes years
+strictly before that. This avoids mixing definitions within the modern segment of a
 series. The years 1986-1990 are excluded from the historical series: the definitional
 break between the historical persons-engaged data and the ILO-modeled data from 1991 is
 large for some countries (e.g. Japan, United States), and excluding these years keeps the
 transition between the two sources consistent (see
-https://ourworldindata.org/agri-employment-sources). Precedence among historical sources
-for employment shares: shares derived from the compilation's employment numbers first,
-then the Broadberry and Gardner benchmarks.
+https://ourworldindata.org/agri-employment-sources).
+
+The employment shares join the benchmark estimates with WDI from 1991: for agriculture,
+Broadberry and Gardner (1300-1800) plus the values around 1980 from the archived WDI
+release; for industry and services, the values around 1980 only.
 
 The compilation's value added shares by sector are not published here; they remain
 available in structural_transformation_historical.
@@ -72,27 +78,32 @@ def run() -> None:
     #
     ds_historical = paths.load_dataset("structural_transformation_historical")
     ds_broadberry = paths.load_dataset("broadberry_gardner")
+    ds_archive = paths.load_dataset("wdi_employment_by_sector_archive")
     ds_wdi = paths.load_dataset("wdi")
 
     tb_historical = ds_historical.read("structural_transformation_historical")
     tb_broadberry = ds_broadberry.read("broadberry_gardner")
+    tb_archive = ds_archive.read("wdi_employment_by_sector_archive")
     tb_wdi = ds_wdi.read("wdi", safe_types=False)
 
     #
     # Process data.
     #
-    sanity_check_inputs(tb_historical=tb_historical, tb_broadberry=tb_broadberry, tb_wdi=tb_wdi)
+    sanity_check_inputs(tb_historical=tb_historical, tb_broadberry=tb_broadberry, tb_archive=tb_archive, tb_wdi=tb_wdi)
 
-    # Route the Broadberry and Gardner labels through the harmonization mapping, for
-    # transparency (they are identity mappings).
-    tb_broadberry = paths.regions.harmonize_names(tb=tb_broadberry)
+    # Benchmark estimates of the employment shares: Broadberry and Gardner (agriculture,
+    # 1300-1800) joined with the three-sector values around 1980 from the archived WDI
+    # release. Both are routed through the harmonization mapping for transparency
+    # (identity mappings).
+    tb_benchmarks = pr.concat([tb_broadberry, tb_archive], ignore_index=True)
+    tb_benchmarks = paths.regions.harmonize_names(tb=tb_benchmarks)
 
     tb_wdi = prepare_wdi(tb_wdi)
     tb_historical = prepare_historical(tb_historical)
 
     report_splice_discontinuities(tb_wdi=tb_wdi, tb_historical=tb_historical)
 
-    tb = combine_sources(tb_wdi=tb_wdi, tb_historical=tb_historical, tb_broadberry=tb_broadberry)
+    tb = combine_sources(tb_wdi=tb_wdi, tb_historical=tb_historical, tb_benchmarks=tb_benchmarks)
 
     sanity_check_outputs(tb)
 
@@ -124,35 +135,23 @@ def prepare_wdi(tb: Table) -> Table:
 
 
 def prepare_historical(tb: Table) -> Table:
-    """Derive employment shares from the compilation's employment numbers."""
+    """Keep the compilation's employment numbers for the years before the WDI era."""
     tb = tb.copy()
 
     # Exclude 1986-1990 to keep the transition to the ILO-modeled series (from 1991)
     # consistent; see the module docstring.
     tb = tb[~tb["year"].between(1986, 1990)].reset_index(drop=True)
 
-    number_employed_total = tb[NUMBER_EMPLOYED_COLUMNS].sum(axis=1, min_count=len(NUMBER_EMPLOYED_COLUMNS))
-    for sector in SECTORS:
-        tb[f"share_employed_{sector}"] = tb[f"number_employed_{sector}"] / number_employed_total * 100
-
-    return tb[["country", "year"] + INDICATOR_COLUMNS]
+    return tb[["country", "year"] + NUMBER_EMPLOYED_COLUMNS]
 
 
-def combine_sources(tb_wdi: Table, tb_historical: Table, tb_broadberry: Table) -> Table:
+def combine_sources(tb_wdi: Table, tb_historical: Table, tb_benchmarks: Table) -> Table:
     """Combine the historical sources with WDI, using WDI from its first year per country."""
     tb = pr.merge(tb_wdi, tb_historical, on=["country", "year"], how="outer", suffixes=("", "_hist"))
 
-    # Broadberry and Gardner benchmarks: lowest precedence for the agriculture employment share.
-    tb_broadberry = tb_broadberry.rename(columns={"share_employed_agriculture": "share_employed_agriculture_bg"})
-    tb = pr.merge(tb, tb_broadberry, on=["country", "year"], how="outer")
-    origins_bg = tb["share_employed_agriculture_bg"].m.origins
-    tb["share_employed_agriculture_hist"] = tb["share_employed_agriculture_hist"].combine_first(
-        tb["share_employed_agriculture_bg"]
-    )
-    tb["share_employed_agriculture_hist"].m.origins = union_origins(
-        tb["share_employed_agriculture_hist"].m.origins, origins_bg
-    )
-    tb = tb.drop(columns=["share_employed_agriculture_bg"])
+    # Benchmark estimates: the only pre-WDI values of the employment shares.
+    tb_benchmarks = tb_benchmarks.rename(columns={column: f"{column}_hist" for column in SHARE_EMPLOYED_COLUMNS})
+    tb = pr.merge(tb, tb_benchmarks, on=["country", "year"], how="outer")
 
     for column in INDICATOR_COLUMNS:
         # First year with WDI data, per country.
@@ -194,7 +193,7 @@ def report_splice_discontinuities(tb_wdi: Table, tb_historical: Table) -> None:
     for country in tb_historical["country"].unique():
         tb_hist_country = tb_historical[tb_historical["country"] == country]
         tb_wdi_country = tb_wdi[tb_wdi["country"] == country]
-        for column in INDICATOR_COLUMNS:
+        for column in NUMBER_EMPLOYED_COLUMNS:
             hist_values = tb_hist_country.dropna(subset=[column])
             wdi_values = tb_wdi_country.dropna(subset=[column])
             if hist_values.empty or wdi_values.empty:
@@ -221,12 +220,17 @@ def report_splice_discontinuities(tb_wdi: Table, tb_historical: Table) -> None:
                 )
 
 
-def sanity_check_inputs(tb_historical: Table, tb_broadberry: Table, tb_wdi: Table) -> None:
+def sanity_check_inputs(tb_historical: Table, tb_broadberry: Table, tb_archive: Table, tb_wdi: Table) -> None:
     error = "Historical compilation does not contain the expected countries."
     assert set(tb_historical["country"]) == set(COMPILATION_COUNTRIES), error
 
     error = "Broadberry and Gardner data does not contain the expected countries."
     assert set(tb_broadberry["country"]) == {"France", "Italy", "Netherlands", "Poland", "United Kingdom"}, error
+
+    error = "Archived WDI values should cover the same five countries around 1980, for all three sectors."
+    assert set(tb_archive["country"]) == set(tb_broadberry["country"]), error
+    assert set(tb_archive["year"]) == {1980, 1981}, error
+    assert tb_archive[SHARE_EMPLOYED_COLUMNS].notna().all().all(), error
 
     error = "WDI table is missing expected columns."
     assert set(list(WDI_COLUMNS) + ["number_employed"]) <= set(tb_wdi.columns), error
@@ -259,23 +263,37 @@ def sanity_check_outputs(tb: Table) -> None:
     # the compilation countries: each employment series should be continuous at the splice.
     for country in COMPILATION_COUNTRIES:
         tb_country = tb[tb["country"] == country]
-        for column in INDICATOR_COLUMNS:
+        for column in NUMBER_EMPLOYED_COLUMNS:
             years = tb_country.dropna(subset=[column])["year"]
             error = f"Gap around the splice point in {country}, {column}."
             recent = years[years.between(1985, 2000)]
             assert set(range(1991, 2000)) <= set(recent), error
 
-    error = "Broadberry and Gardner benchmark years must survive the splice."
-    for country, year in [("Poland", 1500), ("Italy", 1300), ("Poland", 1981)]:
+    error = "Benchmark years must survive the splice."
+    for country, year in [("Poland", 1500), ("Italy", 1300), ("Poland", 1981), ("Italy", 1980)]:
         assert tb.loc[(tb["country"] == country) & (tb["year"] == year), "share_employed_agriculture"].notna().all(), (
             error
         )
 
-    # Spot checks: derived historical share and a Broadberry benchmark.
-    value = tb.loc[(tb["country"] == "United Kingdom") & (tb["year"] == 1801), "share_employed_agriculture"].iloc[0]
-    error = f"UK 1801 derived employment share in agriculture = {value}, expected ~30.8."
-    assert abs(value - 30.8) < 0.5, error
+    # The employment shares before 1991 only hold the benchmark estimates: Broadberry and
+    # Gardner (29 agriculture values, 1300-1800) plus the archived WDI values around 1980
+    # (5 values for each of the three sectors).
+    pre_wdi = tb[tb["year"] < 1991]
+    error = "Unexpected pre-1991 agriculture employment shares beyond the benchmark estimates."
+    assert int(pre_wdi["share_employed_agriculture"].notna().sum()) == 34, error
+    error = "Pre-1991 industry and services employment shares should only hold the archived WDI values."
+    assert int(pre_wdi["share_employed_industry"].notna().sum()) == 5, error
+    assert int(pre_wdi["share_employed_services"].notna().sum()) == 5, error
 
+    # Spot checks on the benchmark estimates.
     value = tb.loc[(tb["country"] == "Poland") & (tb["year"] == 1500), "share_employed_agriculture"].iloc[0]
     error = f"Poland 1500 Broadberry benchmark = {value}, expected 75.3."
     assert abs(value - 75.3) < 0.01, error
+
+    value = tb.loc[(tb["country"] == "Italy") & (tb["year"] == 1980), "share_employed_agriculture"].iloc[0]
+    error = f"Italy 1980 archived WDI value = {value}, expected 14.0."
+    assert abs(value - 14.0) < 0.01, error
+
+    value = tb.loc[(tb["country"] == "Poland") & (tb["year"] == 1981), "share_employed_industry"].iloc[0]
+    error = f"Poland 1981 archived WDI industry value = {value}, expected 38.9."
+    assert abs(value - 38.9) < 0.01, error
