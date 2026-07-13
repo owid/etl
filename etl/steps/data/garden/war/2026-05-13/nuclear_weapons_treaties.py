@@ -28,13 +28,13 @@ LABEL_AGREED = "Signed"
 # NOTE: A priori it may be possible that a country inherits the status "Signatory" from a predecessor, but later on I
 # check that this is never the case.
 LABEL_COMMITTED = "Approved"
-# Label for the exceptional status "Withdrawal", which denotes a country that had approved the treaty but later
-# withdrew its approval (e.g. by revoking its ratification). Such a country remains a signatory, with the same
-# obligations as countries that have signed but not approved the treaty. The only known case is Russia, which revoked
-# its ratification of the Comprehensive Nuclear-Test-Ban Treaty in 2023 while explicitly remaining a signatory.
-LABEL_WITHDRAWN = "Approval withdrawn"
 # Label for all countries-years that are not posterior to either an agreement or a commitment.
 LABEL_NOT_SIGNED = "Not signed"
+# NOTE: There is one more exceptional action, "Withdrawal", which denotes a country that had approved the treaty but
+# later withdrew its approval (e.g. by revoking its ratification). Such a country remains a signatory, with the same
+# obligations as countries that have signed but not approved the treaty, so we assign it LABEL_AGREED again.
+# The only known case is Russia, which revoked its ratification of the Comprehensive Nuclear-Test-Ban Treaty in 2023
+# while explicitly remaining a signatory (as stated in its note verbale to the UN Secretary-General).
 
 # List of known withdrawals of any treaty.
 WITHDRAWALS = [{"treaty": "Comprehensive Nuclear-Test-Ban Treaty", "country": "Russia", "date": "2023-11-03"}]
@@ -64,14 +64,11 @@ def run_sanity_checks(tb: Table) -> None:
 
 def prioritize_status(statuses):
     # Prioritize the status of a country.
-    if LABEL_WITHDRAWN in statuses:
-        # I assume that a country does not withdraw from a treaty in the same year that it joins, and that it
-        # doesn't rejoin the treaty in the same year.
-        assert set(statuses) == {LABEL_WITHDRAWN}
-        return LABEL_WITHDRAWN
-
+    # NOTE: A withdrawal of approval in the same year as a ratification would be mis-prioritized as LABEL_COMMITTED.
+    # This cannot currently happen: the WITHDRAWALS sanity check pins the only known withdrawal (Russia, 2023, having
+    # ratified in 2000), and any new withdrawal will make run_sanity_checks fail, forcing us to revisit this logic.
     if LABEL_COMMITTED in statuses:
-        # If a country commits, that should be the final status (unless there is a withdrawal).
+        # If a country commits, that should be the final status (unless there is a later withdrawal of approval).
         return LABEL_COMMITTED
     else:
         # If not withdrawn or committed, the only possible status should be agreed. Check that.
@@ -141,7 +138,9 @@ def run() -> None:
     # For simplicity, rename the status of a country to simpler terms.
     tb.loc[tb["status"] == "Signatory", "status"] = LABEL_AGREED
     tb.loc[tb["status"].isin(["Succession", "Accession", "Ratification"]), "status"] = LABEL_COMMITTED
-    tb.loc[tb["status"] == "Withdrawal", "status"] = LABEL_WITHDRAWN
+    # A "Withdrawal" action means the country withdrew its approval while remaining a signatory, so it goes back to
+    # the "Signed" status (see NOTE next to LABEL_NOT_SIGNED above).
+    tb.loc[tb["status"] == "Withdrawal", "status"] = LABEL_AGREED
 
     # Add a column for the year of each event.
     tb["year"] = tb["date"].str[:4].astype(int)
