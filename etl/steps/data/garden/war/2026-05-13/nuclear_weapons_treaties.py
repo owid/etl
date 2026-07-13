@@ -28,8 +28,11 @@ LABEL_AGREED = "Signed"
 # NOTE: A priori it may be possible that a country inherits the status "Signatory" from a predecessor, but later on I
 # check that this is never the case.
 LABEL_COMMITTED = "Approved"
-# Label for the exceptional status "Withdrawal", which denotes a country that has withdrawn from the legal commitment.
-LABEL_WITHDRAWN = "Withdrawn"
+# Label for the exceptional status "Withdrawal", which denotes a country that had approved the treaty but later
+# withdrew its approval (e.g. by revoking its ratification). Such a country remains a signatory, with the same
+# obligations as countries that have signed but not approved the treaty. The only known case is Russia, which revoked
+# its ratification of the Comprehensive Nuclear-Test-Ban Treaty in 2023 while explicitly remaining a signatory.
+LABEL_WITHDRAWN = "Approval withdrawn"
 # Label for all countries-years that are not posterior to either an agreement or a commitment.
 LABEL_NOT_SIGNED = "Not signed"
 
