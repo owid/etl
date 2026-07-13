@@ -118,7 +118,59 @@ def run() -> None:
         )
     ]
 
+    # Set an explicit title on every single-source view. Otherwise grapher falls back to the
+    # indicator's display name (e.g. the annual-change indicators inherit "Total energy supply"),
+    # which mislabels the view. Grouped (stacked) views already carry a title from group_views.
+    set_view_titles(c)
+
     #
     # Save outputs.
     #
     c.save()
+
+
+# Natural-language source names for view titles (lower-case, to read inside a sentence).
+SOURCE_TITLE_NAMES = {
+    "total": "total energy supply",
+    "coal": "coal",
+    "oil": "oil",
+    "gas": "gas",
+    "fossil_fuels": "fossil fuels",
+    "nuclear": "nuclear",
+    "hydro": "hydropower",
+    "wind": "wind",
+    "solar": "solar",
+    "solar_and_wind": "solar and wind",
+    "renewables": "renewables",
+    "other_renewables": "other renewables",
+    "biofuels": "biofuels",
+    "low_carbon_energy": "low-carbon energy",
+}
+
+
+def _view_title(source: str, metric: str) -> str:
+    if source == "total":
+        return {
+            "total": "Total energy supply",
+            "per_capita": "Total energy supply per person",
+            "share": "Total energy supply",
+            "annual_change": "Annual change in total energy supply",
+        }[metric]
+    name = SOURCE_TITLE_NAMES[source]
+    return {
+        "total": f"Energy supply from {name}",
+        "per_capita": f"Energy supply from {name} per person",
+        "share": f"Share of energy supply from {name}",
+        "annual_change": f"Annual change in energy supply from {name}",
+    }[metric]
+
+
+def set_view_titles(c) -> None:
+    for v in c.views:
+        source = v.dimensions["source"]
+        if source not in SOURCE_TITLE_NAMES:
+            # Grouped/stacked views already have a title from group_views.
+            continue
+        config = dict(v.config or {})
+        config["title"] = _view_title(source, v.dimensions["metric"])
+        v.config = config

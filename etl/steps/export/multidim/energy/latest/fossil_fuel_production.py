@@ -74,7 +74,34 @@ def run() -> None:
         v for v in c.views if not (v.dimensions["fuel"] == "all_fuels" and v.dimensions["metric"] == "reserves_ratio")
     ]
 
+    # Set an explicit title on every single-fuel view, so grapher does not fall back to the
+    # indicator display name. The grouped (stacked) view already carries a title from group_views.
+    set_view_titles(c)
+
     #
     # Save outputs.
     #
     c.save()
+
+
+FUEL_TITLE_NAMES = {"coal": "coal", "oil": "oil", "gas": "gas"}
+
+
+def _view_title(fuel: str, metric: str) -> str:
+    name = FUEL_TITLE_NAMES[fuel]
+    return {
+        "production": f"{name.capitalize()} production",
+        "per_capita": f"{name.capitalize()} production per person",
+        "reserves_ratio": f"Reserves-to-production ratio for {name}",
+    }[metric]
+
+
+def set_view_titles(c) -> None:
+    for v in c.views:
+        fuel = v.dimensions["fuel"]
+        if fuel not in FUEL_TITLE_NAMES:
+            # Grouped/stacked view already has a title from group_views.
+            continue
+        config = dict(v.config or {})
+        config["title"] = _view_title(fuel, v.dimensions["metric"])
+        v.config = config
