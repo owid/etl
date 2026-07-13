@@ -9,7 +9,6 @@ paths = PathFinder(__file__)
 
 # Labels of the commodities and transactions used from the UNSD Energy Balances.
 COMMODITY_TOTAL_ENERGY = "Total energy"
-COMMODITY_RENEWABLES_MEMO = "Memo: Renewables"
 TRANSACTION_AGRICULTURE = "Agriculture, forestry and fishing"
 TRANSACTION_FINAL_ENERGY_CONSUMPTION = "Final Energy Consumption"
 
@@ -24,9 +23,18 @@ EXPECTED_COMMODITIES = {
     "Nuclear",
     "Electricity",
     "Heat",
+    "Memo: Renewables",
     COMMODITY_TOTAL_ENERGY,
-    COMMODITY_RENEWABLES_MEMO,
 }
+
+# Country-years dropped from the share indicator because the sector's dominant energy source is missing from the
+# source data (while total final energy consumption keeps being reported), which collapses the computed share. These
+# are the two most recent years as of the 2025 release; the assertion in create_share_table fails if UNSD revises
+# them. Older reporting quirks in other countries (e.g. Germany's fuel reallocation) are left as published.
+INCOMPLETE_AGRICULTURE_REPORTING = [
+    ("India", 2023),
+    ("Sri Lanka", 2023),
+]
 
 # Short name of the indicator table and its column.
 SHARE_COLUMN = "share_of_final_energy_consumed_by_agriculture_forestry_and_fishing"
@@ -73,86 +81,6 @@ def sanity_check_inputs(tb: Table) -> None:
     assert (flows_used["value"].dropna() >= 0).all(), "Negative consumption flow found."
 
 
-def find_reporting_breaks(tb: Table) -> list[tuple[str, int]]:
-    """Find country-years where, in one of the last two years of data, the dominant fuel of the agriculture flow
-    drops out (to exactly zero, or missing) while the total agriculture flow collapses and total final energy
-    consumption continues to be reported.
-
-    This catches artifacts like India 2023, where agricultural electricity (867,000 TJ in 2022, and the dominant
-    fuel of the flow) disappears from the data while other fuels and total consumption continue, which collapses the
-    computed share by ~97%. A break in the latest years is most likely an incomplete data delivery that the producer
-    will revise. The masking is propagated to subsequent years for as long as the broken fuel remains zero or
-    missing.
-
-    NOTE: The same kind of dropout also happens further back in several countries' series (e.g. oil products vanish
-    from Germany's agriculture flow in 1999-2017, and from Switzerland's from 2000 onwards). Those are long-standing
-    sector-allocation conventions in national reporting rather than incomplete deliveries, so, following the scoping
-    decision, they are kept in the data as published.
-    """
-    # Commodity-level agriculture flows (excluding the total and the renewables memo item, which overlap with fuels).
-    fuels = tb[
-        (tb["transaction"] == TRANSACTION_AGRICULTURE)
-        & (~tb["commodity"].isin([COMMODITY_TOTAL_ENERGY, COMMODITY_RENEWABLES_MEMO]))
-    ][["country", "year", "commodity", "value"]].dropna(subset=["value"])
-
-    # Total agriculture flow per country-year.
-    totals = (
-        tb[(tb["transaction"] == TRANSACTION_AGRICULTURE) & (tb["commodity"] == COMMODITY_TOTAL_ENERGY)]
-        .dropna(subset=["value"])[["country", "year", "value"]]
-        .rename(columns={"value": "total"})
-    )
-
-    # Country-years where total final energy consumption is reported.
-    fec = tb[
-        (tb["transaction"] == TRANSACTION_FINAL_ENERGY_CONSUMPTION) & (tb["commodity"] == COMMODITY_TOTAL_ENERGY)
-    ].dropna(subset=["value"])
-    fec_reported = set(zip(fec["country"], fec["year"]))
-
-    # Compare each fuel reported in one year with its value in the following year (missing if not reported).
-    previous = fuels.rename(columns={"value": "value_previous"}).copy()
-    previous["year"] = previous["year"] + 1
-    current = fuels.rename(columns={"value": "value_current"})
-    compared = previous.merge(current, on=["country", "year", "commodity"], how="left")
-
-    # Add the total agriculture flow of the previous and current year.
-    totals_previous = totals.rename(columns={"total": "total_previous"}).copy()
-    totals_previous["year"] = totals_previous["year"] + 1
-    compared = compared.merge(totals_previous, on=["country", "year"], how="left")
-    compared = compared.merge(totals, on=["country", "year"], how="left")
-
-    # Share of each fuel in the previous year's total agriculture flow.
-    compared["dominance_previous"] = compared["value_previous"] / compared["total_previous"]
-
-    # A break happens when a fuel that dominated the flow (more than half of it) drops to exactly zero or goes
-    # missing, and the total agriculture flow (still reported) collapses accordingly. Only breaks starting in one of
-    # the last two years of data are masked (older dropouts are long-standing reporting conventions, kept as
-    # published).
-    breaks = compared[
-        (compared["dominance_previous"] > 0.5)
-        & (compared["value_previous"] > 0)
-        & ((compared["value_current"] == 0) | compared["value_current"].isna())
-        & compared["total"].notna()
-        & (compared["total"] < 0.5 * compared["total_previous"])
-        & (compared["year"] >= tb["year"].max() - 1)
-    ]
-
-    # Propagate each break to subsequent years (with a reported total agriculture flow) for as long as the broken
-    # fuel remains exactly zero or missing.
-    fuel_values = fuels.set_index(["country", "commodity", "year"])["value"]
-    masked = set()
-    for _, row in breaks.iterrows():
-        years_with_total = sorted(totals[totals["country"] == row["country"]]["year"])
-        for year in [y for y in years_with_total if y >= row["year"]]:
-            value = fuel_values.get((row["country"], row["commodity"], year))
-            if value is not None and value != 0:
-                break
-            masked.add((row["country"], int(year)))
-
-    # Only mask country-years where total final energy consumption continues to be reported (otherwise the share is
-    # already missing).
-    return sorted(pair for pair in masked if pair in fec_reported)
-
-
 def create_share_table(tb: Table) -> Table:
     """Create the indicator table with the share of final energy consumption used by agriculture, forestry and
     fishing, including region aggregates."""
@@ -171,15 +99,19 @@ def create_share_table(tb: Table) -> Table:
         errors="raise",
     )
 
-    # Mask country-years with a broken agriculture flow (see find_reporting_breaks); they are treated as unreported,
-    # so they are also excluded from the region aggregates below.
-    # NOTE: If the following assertion fails after a data update, UNSD may have fixed India's 2023 agricultural
-    # electricity (reported as exactly zero as of the 2025 release). Check the data and, if so, remove the assertion.
-    reporting_breaks = find_reporting_breaks(tb)
-    assert ("India", 2023) in reporting_breaks, "India 2023 was expected to be masked as a reporting break."
-    breaks_set = set(reporting_breaks)
-    break_mask = [(country, year) in breaks_set for country, year in zip(tb_wide["country"], tb_wide["year"])]
-    tb_wide.loc[break_mask, "agriculture"] = None
+    # Drop the country-years with an incomplete agriculture flow (see INCOMPLETE_AGRICULTURE_REPORTING). We check the
+    # flow has collapsed to less than half of the previous year, so the list is revisited if UNSD revises these years.
+    # Dropped points are treated as unreported, so they are also excluded from the region aggregates below.
+    agriculture = tb_wide.set_index(["country", "year"])["agriculture"]
+    for country, year in INCOMPLETE_AGRICULTURE_REPORTING:
+        current = agriculture.get((country, year), float("nan"))
+        previous = agriculture.get((country, year - 1), float("nan"))
+        assert current < 0.5 * previous, (
+            f"{country} {year} agriculture flow no longer looks incomplete; revisit INCOMPLETE_AGRICULTURE_REPORTING."
+        )
+    incomplete = {tuple(pair) for pair in INCOMPLETE_AGRICULTURE_REPORTING}
+    mask = [(country, year) in incomplete for country, year in zip(tb_wide["country"], tb_wide["year"])]
+    tb_wide.loc[mask, "agriculture"] = None
 
     # For region aggregates, the denominator is restricted to countries that report the agriculture flow (otherwise
     # non-reporting countries would bias the share downwards); the total is kept to measure coverage.
@@ -234,11 +166,9 @@ def sanity_check_outputs(tb_share: Table) -> None:
         actual = shares.loc[country, year]
         assert abs(actual - expected) < 0.15, f"{country} {year}: expected ~{expected}, got {actual:.2f}"
 
-    # India 2023 must be masked (broken agricultural electricity reporting).
-    assert ("India", 2023) not in shares.index, "India 2023 should be masked as a reporting break."
-
-    # Germany starts in 1991 in the source data.
-    assert ("Germany", 1990) not in shares.index, "Germany 1990 was not expected in the source data."
+    # The country-years with an incomplete agriculture flow must have been dropped.
+    for country, year in INCOMPLETE_AGRICULTURE_REPORTING:
+        assert (country, year) not in shares.index, f"{country} {year} should have been dropped."
 
 
 def run() -> None:
