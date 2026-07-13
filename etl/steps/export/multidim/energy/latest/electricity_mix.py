@@ -79,6 +79,38 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
+    # Add stacked breakdown views: all individual sources, and the fossil/nuclear/renewables split.
+    # NOTE: "other_renewables" includes bioenergy, so the standalone "bioenergy" choice is left out
+    # of the breakdown to avoid double counting.
+    stacked_view_config = {
+        "chartTypes": ["StackedArea"],
+        "tab": "chart",
+        "hasMapTab": False,
+        "title": "{title}",
+    }
+    metric_titles = {
+        "generation": "Electricity generation by source",
+        "per_capita": "Per capita electricity generation by source",
+        "share_of_generation": "Share of electricity generation by source",
+    }
+    c.group_views(
+        groups=[
+            {
+                "dimension": "source",
+                "choices": ["coal", "oil", "gas", "nuclear", "hydro", "wind", "solar", "other_renewables"],
+                "choice_new_slug": "all_sources",
+                "view_config": stacked_view_config,
+            },
+            {
+                "dimension": "source",
+                "choices": ["fossil", "nuclear", "renewables"],
+                "choice_new_slug": "fossil_nuclear_renewables",
+                "view_config": stacked_view_config,
+            },
+        ],
+        params={"title": lambda view: metric_titles[view.dimensions["metric"]]},
+    )
+
     #
     # Save outputs.
     #

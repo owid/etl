@@ -47,6 +47,33 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
+    # Add a stacked breakdown view with all three fuels.
+    metric_titles = {
+        "production": "Fossil fuel production by fuel",
+        "per_capita": "Per capita fossil fuel production by fuel",
+        "reserves_ratio": "Reserves-to-production ratio",
+    }
+    c.group_views(
+        groups=[
+            {
+                "dimension": "fuel",
+                "choices": ["coal", "oil", "gas"],
+                "choice_new_slug": "all_fuels",
+                "view_config": {
+                    "chartTypes": ["StackedArea"],
+                    "tab": "chart",
+                    "hasMapTab": False,
+                    "title": "{title}",
+                },
+            },
+        ],
+        params={"title": lambda view: metric_titles[view.dimensions["metric"]]},
+    )
+    # Stacking reserves-to-production ratios (years of production left) makes no sense; drop that combination.
+    c.views = [
+        v for v in c.views if not (v.dimensions["fuel"] == "all_fuels" and v.dimensions["metric"] == "reserves_ratio")
+    ]
+
     #
     # Save outputs.
     #

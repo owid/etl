@@ -68,6 +68,56 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
+    # Add stacked breakdown views: all individual sources, and the fossil/nuclear/renewables split.
+    stacked_view_config = {
+        "chartTypes": ["StackedArea"],
+        "tab": "chart",
+        "hasMapTab": False,
+        "title": "{title}",
+    }
+    metric_titles = {
+        "total": "Total energy supply by source",
+        "per_capita": "Energy supply per person, by source",
+        "share": "Share of total energy supply, by source",
+        "annual_change": "Annual change in energy supply, by source",
+    }
+    c.group_views(
+        groups=[
+            {
+                "dimension": "source",
+                "choices": [
+                    "coal",
+                    "oil",
+                    "gas",
+                    "nuclear",
+                    "hydro",
+                    "wind",
+                    "solar",
+                    "biofuels",
+                    "other_renewables",
+                ],
+                "choice_new_slug": "all_sources",
+                "view_config": stacked_view_config,
+            },
+            {
+                "dimension": "source",
+                "choices": ["fossil_fuels", "nuclear", "renewables"],
+                "choice_new_slug": "fossil_nuclear_renewables",
+                "view_config": stacked_view_config,
+            },
+        ],
+        params={"title": lambda view: metric_titles[view.dimensions["metric"]]},
+    )
+    # Stacked areas of year-on-year changes are unreadable; keep breakdowns only for level metrics.
+    c.views = [
+        v
+        for v in c.views
+        if not (
+            v.dimensions["source"] in ("all_sources", "fossil_nuclear_renewables")
+            and v.dimensions["metric"] == "annual_change"
+        )
+    ]
+
     #
     # Save outputs.
     #

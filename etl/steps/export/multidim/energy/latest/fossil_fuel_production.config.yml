@@ -16,6 +16,9 @@ dimensions:
         name: "Oil"
       - slug: "gas"
         name: "Gas"
+      - slug: "all_fuels"
+        name: "All fuels (breakdown)"
+        description: "Coal, oil and gas, stacked"
   - slug: "metric"
     name: "Metric"
     choices:
