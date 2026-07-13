@@ -10,9 +10,7 @@ The dataflow is DF_UNData_EnergyBalance (UNSD, v1.0) with dimensions:
   4. UNIT - Unit of measurement code
   5. TIME_PERIOD - Year
 
-Unlike the Energy Statistics Database (commodity data, which the API serves as CSV), this dataflow only supports
-SDMX-ML responses (requests with a CSV Accept header fail with a server error). The snapshot therefore stores the raw
-API responses in a zip archive:
+The snapshot stores the raw API responses in a zip archive:
   - energy_balances.xml: full data in SDMX-ML GenericData format.
   - structure.xml: dataflow structure, including the codelists that map dimension codes to human-readable names
     (CL_AREA, CL_COMMODITY_ENERGY_BALANCE_UNDATA, CL_TRANS_ENERGY_BALANCE_UNDATA, CL_UNIT_ENERGY_UNDATA).
