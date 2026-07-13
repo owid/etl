@@ -1,11 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
-from structlog import get_logger
 
 from etl.helpers import PathFinder
-
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -57,11 +54,6 @@ REGIONS = [
 # least this fraction of the region's total reported final energy consumption.
 MINIMUM_COVERAGE_OF_FINAL_CONSUMPTION = 0.7
 
-# Warn about year-over-year changes in a country's agriculture flow larger than this factor (e.g. 1.5 means +-50%),
-# when the flow is large enough to matter.
-YEAR_ON_YEAR_WARNING_FACTOR = 1.5
-YEAR_ON_YEAR_WARNING_MINIMUM_TJ = 10_000
-
 
 def sanity_check_inputs(tb: Table) -> None:
     """Check meadow data before processing."""
@@ -94,9 +86,8 @@ def find_reporting_breaks(tb: Table) -> list[tuple[str, int]]:
 
     NOTE: The same kind of dropout also happens further back in several countries' series (e.g. oil products vanish
     from Germany's agriculture flow in 1999-2017, and from Switzerland's from 2000 onwards). Those are long-standing
-    sector-allocation conventions in national reporting rather than incomplete deliveries; following the scoping
-    decision, they are kept in the data, warned about (see warn_on_large_year_on_year_changes) and documented in the
-    indicator's description_key.
+    sector-allocation conventions in national reporting rather than incomplete deliveries, so, following the scoping
+    decision, they are kept in the data as published.
     """
     # Commodity-level agriculture flows (excluding the total and the renewables memo item, which overlap with fuels).
     fuels = tb[
@@ -159,36 +150,7 @@ def find_reporting_breaks(tb: Table) -> list[tuple[str, int]]:
 
     # Only mask country-years where total final energy consumption continues to be reported (otherwise the share is
     # already missing).
-    masked = sorted(pair for pair in masked if pair in fec_reported)
-    if masked:
-        log.warning(f"Masking country-years with a broken agriculture flow (dominant fuel drops out): {masked}")
-    return masked
-
-
-def warn_on_large_year_on_year_changes(tb_wide: Table) -> None:
-    """Warn about large year-over-year changes in a country's agriculture flow.
-
-    Known and accepted cases (left in the data, and documented in the indicator's description_key):
-    - Germany's agriculture flow rises 19-fold between 2004 (8,200 TJ) and 2021 (157,000 TJ), a sector reallocation
-      in German reporting.
-    - India's oil-products line spikes to 341,000 TJ (2006) and 407,000 TJ (2013), against ~0-30,000 TJ in normal
-      years.
-    """
-    current = tb_wide[["country", "year", "agriculture"]].dropna(subset=["agriculture"])
-    previous = current.rename(columns={"agriculture": "agriculture_previous"}).copy()
-    previous["year"] = previous["year"] + 1
-    compared = current.merge(previous, on=["country", "year"], how="inner")
-    compared["factor"] = compared["agriculture"] / compared["agriculture_previous"]
-    large = compared[
-        ((compared["factor"] > YEAR_ON_YEAR_WARNING_FACTOR) | (compared["factor"] < 1 / YEAR_ON_YEAR_WARNING_FACTOR))
-        & (compared[["agriculture", "agriculture_previous"]].max(axis=1) > YEAR_ON_YEAR_WARNING_MINIMUM_TJ)
-    ]
-    if len(large) > 0:
-        largest = large.sort_values("factor", ascending=False).head(10)
-        cases = [f"{row['country']} {row['year']} (x{row['factor']:.2f})" for _, row in largest.iterrows()]
-        log.warning(
-            f"{len(large)} large year-over-year changes (>+-50%) in the agriculture flow; largest: {'; '.join(cases)}"
-        )
+    return sorted(pair for pair in masked if pair in fec_reported)
 
 
 def create_share_table(tb: Table) -> Table:
@@ -219,9 +181,6 @@ def create_share_table(tb: Table) -> Table:
     break_mask = [(country, year) in breaks_set for country, year in zip(tb_wide["country"], tb_wide["year"])]
     tb_wide.loc[break_mask, "agriculture"] = None
 
-    # Warn about large year-over-year changes in the agriculture flow (known cases are documented in the metadata).
-    warn_on_large_year_on_year_changes(tb_wide)
-
     # For region aggregates, the denominator is restricted to countries that report the agriculture flow (otherwise
     # non-reporting countries would bias the share downwards); the total is kept to measure coverage.
     tb_wide["final_energy_consumption_of_agriculture_reporters"] = tb_wide["final_energy_consumption"].where(
@@ -244,12 +203,10 @@ def create_share_table(tb: Table) -> Table:
     tb_wide[SHARE_COLUMN] = 100 * tb_wide["agriculture"] / tb_wide["final_energy_consumption_of_agriculture_reporters"]
 
     # Coverage guard: only publish a region-year when countries reporting the agriculture flow account for most of
-    # the region's total reported final energy consumption.
+    # the region's total reported final energy consumption (otherwise the regional share is not representative). This
+    # drops the earliest years of a few sparsely-reported income groups.
     coverage = tb_wide["final_energy_consumption_of_agriculture_reporters"] / tb_wide["final_energy_consumption"]
     insufficient = tb_wide["country"].isin(REGIONS) & (coverage < MINIMUM_COVERAGE_OF_FINAL_CONSUMPTION)
-    if insufficient.any():
-        dropped = tb_wide[insufficient].groupby("country")["year"].agg(["min", "max", "count"])
-        log.warning(f"Region-years dropped for insufficient coverage of the agriculture flow:\n{dropped}")
     tb_wide.loc[insufficient, SHARE_COLUMN] = None
 
     tb_share = tb_wide[["country", "year", SHARE_COLUMN]].dropna(subset=[SHARE_COLUMN]).reset_index(drop=True)
