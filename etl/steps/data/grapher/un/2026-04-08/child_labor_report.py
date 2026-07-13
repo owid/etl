@@ -26,7 +26,7 @@ def run() -> None:
     # household chores).
     assert (tb_by_sex["country"] == "World").all(), "Expected only World rows in child_labor_by_sex."
     tb_by_sex = tb_by_sex.drop(columns=["country"]).rename(columns={"sex": "country"})
-    tb_by_sex["country"] = tb_by_sex["country"].replace({"total": "All", "boys": "Boys", "girls": "Girls"})
+    tb_by_sex["country"] = tb_by_sex["country"].replace({"boys": "Boys", "girls": "Girls"})
     tb_by_sex = tb_by_sex.format(["country", "year", "age"], short_name="child_labor_by_sex")
 
     #

@@ -461,27 +461,24 @@ def _build_by_sex_table(tb_main: Table) -> Table:
     Sex stays a dimension here; the grapher step turns it into the chart entity so charts
     can show one row per sex (e.g. a dumbbell comparing both definitions).
     """
+    # NOTE: The report only publishes the including-chores series by sex (page 8 chart), and
+    # dumbbell charts drop entities that are missing either indicator — so sex="total" is excluded.
     tb = tb_main.reset_index()
     tb = tb[
         (tb["country"] == "World")
-        & tb["sex"].isin(["total", "boys", "girls"])
+        & tb["sex"].isin(["boys", "girls"])
         & tb["age"].isin(["5-11", "12-14", "5-14"])
         & (tb["year"] == LATEST_YEAR)
     ]
     tb = tb[["country", "year", "sex", "age", "share_child_labor", "share_child_labor_incl_household_chores"]]
 
-    # Sanity checks: full sex × age coverage, no missing values in the excluding-chores share.
-    # NOTE: The report only publishes the including-chores series by sex (page 8 chart),
-    # so it is expected to be missing for sex="total".
-    assert set(tb["sex"]) == {"total", "boys", "girls"}, f"Unexpected sexes in by-sex table: {set(tb['sex'])}"
+    # Sanity checks: full sex × age coverage, both indicators present on every row.
+    assert set(tb["sex"]) == {"boys", "girls"}, f"Unexpected sexes in by-sex table: {set(tb['sex'])}"
     assert set(tb["age"]) == {"5-11", "12-14", "5-14"}, f"Unexpected ages in by-sex table: {set(tb['age'])}"
-    assert len(tb) == 9, f"Expected 9 rows (3 sexes × 3 ages) in by-sex table, got {len(tb)}."
+    assert len(tb) == 6, f"Expected 6 rows (2 sexes × 3 ages) in by-sex table, got {len(tb)}."
     assert tb["share_child_labor"].notna().all(), "Missing share_child_labor values in by-sex table."
-    assert tb.loc[tb["sex"] != "total", "share_child_labor_incl_household_chores"].notna().all(), (
+    assert tb["share_child_labor_incl_household_chores"].notna().all(), (
         "Missing household chores shares for boys/girls in by-sex table."
-    )
-    assert tb.loc[tb["sex"] == "total", "share_child_labor_incl_household_chores"].isna().all(), (
-        "Unexpected household chores shares for sex='total' — the report only publishes them by sex."
     )
 
     tb = tb.format(["country", "year", "sex", "age"], short_name="child_labor_by_sex")
