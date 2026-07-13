@@ -182,3 +182,11 @@ steps:
     - data://garden/rff/2026-06-10/emissions_weighted_carbon_price:
       - data://meadow/rff/2026-06-10/emissions_weighted_carbon_price:
         - snapshot://rff/2026-06-10/emissions_weighted_carbon_price.zip
+  data://meadow/emissions/2026-07-13/net_zero_tracker:
+    - snapshot://emissions/2026-07-13/net_zero_tracker.xlsx
+  data://garden/emissions/2026-07-13/net_zero_tracker:
+    - data://meadow/emissions/2026-07-13/net_zero_tracker
+
+  # Net zero tracker.
+  data://grapher/emissions/2026-07-13/net_zero_tracker:
+    - data://garden/emissions/2026-07-13/net_zero_tracker
