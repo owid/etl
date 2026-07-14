@@ -29,6 +29,7 @@ from owid.catalog.core.meta import (
     Origin,
     VariableMeta,
     VariablePresentationMeta,
+    description_key_to_string,
 )
 from owid.catalog.core.properties import metadata_property
 
@@ -657,30 +658,35 @@ def get_unique_licenses_from_indicators(indicators: list[Indicator]) -> list[Lic
     return licenses
 
 
-def get_unique_description_key_points_from_indicators(indicators: list[Indicator]) -> list[str]:
-    """Get unique description key points from a list of indicators.
+def get_unique_description_key_points_from_indicators(indicators: list[Indicator]) -> str | list[str] | None:
+    """Combine the description_key of a list of indicators.
 
-    Collects all unique key points from the description_key field of multiple indicators,
-    preserving order of first occurrence.
+    Indicators sharing an identical description_key (the common case, e.g. any
+    operation on a single indicator) contribute it only once, and the value is
+    returned unchanged. When several distinct description_keys are combined,
+    each is converted to markdown text and they are concatenated in order of
+    first occurrence.
 
     Args:
-        indicators: List of Indicator objects to extract description key points from.
+        indicators: List of Indicator objects to combine description_key from.
 
     Returns:
-        List of unique description key points in order of first appearance.
-
-    Example:
-        ```python
-        key_points = get_unique_description_key_points_from_indicators([ind1, ind2])
-        for point in key_points:
-            print(f"- {point}")
-        ```
+        The combined description_key, or None if no indicator has one.
     """
-    # Make a list of all description key points of all indicators.
-    description_key_points = []
+    uniques: list[str | list[str]] = []
     for indicator in indicators:
-        description_key_points += [k for k in indicator.metadata.description_key if k not in description_key_points]
-    return description_key_points
+        description_key = indicator.metadata.description_key
+        if description_key and description_key not in uniques:
+            uniques.append(description_key)
+    if not uniques:
+        return None
+    if len(uniques) == 1:
+        return uniques[0]
+    texts = [
+        description_key_to_string(description_key) if isinstance(description_key, list) else description_key
+        for description_key in uniques
+    ]
+    return "\n\n".join(text for text in texts if text) or None
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:

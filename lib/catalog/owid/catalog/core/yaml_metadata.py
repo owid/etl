@@ -110,14 +110,14 @@ def update_metadata_from_dict(
         variable_dict = (t_annot.get("variables") or {}).get(v_short_name, {})
         meta_dict = _merge_variable_metadata(meta_dict, variable_dict, if_origins_exist=if_origins_exist)
 
-        if "description_key" in meta_dict:
-            # a bare (multiline) string is treated as a single key item, rendered
-            # as free-form markdown instead of a bulleted list
-            if isinstance(meta_dict["description_key"], str):
-                meta_dict["description_key"] = [meta_dict["description_key"]]
-            else:
-                # we allow `- *descriptions` which needs to be flattened
-                meta_dict["description_key"] = _flatten(meta_dict["description_key"])
+        # description_key is a free-form markdown string; a YAML list (possibly
+        # with `- *anchor` nesting) is authoring sugar for a markdown list. The
+        # list is kept as-is here — items may contain Jinja with whitespace
+        # control that must render per-item — and is converted to a string
+        # after Jinja rendering, in `update_variable_metadata`.
+        if isinstance(meta_dict.get("description_key"), list):
+            # we allow `- *descriptions` which needs to be flattened
+            meta_dict["description_key"] = _flatten(meta_dict["description_key"])
 
             # make sure all elements are strings
             # NOTE: this could be further flattened if we run into it

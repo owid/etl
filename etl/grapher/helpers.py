@@ -705,7 +705,6 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
             assert tab[col].m.origins, f"Column `{col}` must have at least one origin"
 
-            _validate_description_key(tab[col].m.description_key, col)
             _validate_ordinal_variables(tab, col)
             _validate_grapher_config(tab, col)
 
@@ -751,13 +750,6 @@ def _validate_grapher_config(tab: Table, col: str) -> None:
             validate(grapher_config, schema)
         except ValidationError as e:
             raise ValueError(f"Invalid grapher_config for column `{col}`: {e}") from None
-
-
-def _validate_description_key(description_key: list[str], col: str) -> None:
-    if description_key:
-        assert not all(len(x) == 1 for x in description_key), (
-            f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
-        )
 
 
 def _validate_ordinal_variables(tab: Table, col: str) -> None:
