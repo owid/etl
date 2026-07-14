@@ -22,10 +22,6 @@ NO_TARGET_END_TARGET = "No target"
 # Label shown for those countries (distinct from "no data" = countries the tracker does not cover).
 NO_TARGET_LABEL = "No target"
 
-# Countries assessed as having no target have no target year; place them at the snapshot's reference
-# year so they appear on the (timeline-hidden) maps.
-SNAPSHOT_YEAR = 2026
-
 # Possible net-zero target statuses in the Net Zero Tracker codebook, plus the "No target" label.
 EXPECTED_STATUSES = {
     "Achieved (externally validated)",
@@ -65,8 +61,10 @@ def run() -> None:
     tb = tb[(tb["net_zero_status"].notna() & tb["year"].notna()) | no_target].reset_index(drop=True)
     no_target = tb["end_target"] == NO_TARGET_END_TARGET
 
-    # "No target" countries have no target year; place them at the snapshot's reference year.
-    tb.loc[no_target, "year"] = SNAPSHOT_YEAR
+    # "No target" countries have no target year; place them at the data's publication year (read from
+    # the origin) so they appear on the (timeline-hidden) maps.
+    snapshot_year = int(tb["net_zero_status"].metadata.origins[0].date_published[:4])
+    tb.loc[no_target, "year"] = snapshot_year
     tb["year"] = tb["year"].astype(int)
 
     # The source status is categorical, so cast to string to be able to label "no target" countries.
