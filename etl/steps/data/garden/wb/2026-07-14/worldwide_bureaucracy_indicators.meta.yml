@@ -25,5 +25,21 @@ tables:
   worldwide_bureaucracy_indicators:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
-    variables: {}
+    # NOTE: Most indicator metadata is generated programmatically in the step code from the producer's
+    # indicator names and series definitions. Indicators curated for charts are defined explicitly below.
+    variables:
+      bi_emp_totl_pb_zs:
+        title: Public sector employment, as a share of total employment
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of all employed people who work in the public sector, including central and sub-national government and publicly owned companies.
+        description_key:
+          - The public sector includes employees of central and sub-national government as well as publicly owned companies and enterprises.
+          - The share is measured relative to total employment, which counts all employed people, including the self-employed. The dataset also reports public sector employment relative to paid employees only, which gives higher shares — especially in countries where many people are self-employed, such as in much of South Asia and Sub-Saharan Africa.
+          - Estimates are derived from nationally representative household and labor force surveys harmonized by the World Bank, so values depend on how respondents report their employer and may not be fully comparable across countries.
+          - Survey availability differs across countries, so the most recent data point can refer to different years in different countries.
+        display:
+          name: Public sector employment
+          numDecimalPlaces: 1
+          tolerance: 5
 
