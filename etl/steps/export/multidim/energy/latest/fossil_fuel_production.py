@@ -96,6 +96,9 @@ def _view_title(fuel: str, metric: str) -> str:
     }[metric]
 
 
+FUEL_MAP_SCHEME = {"coal": "Greys", "oil": "Oranges", "gas": "OrRd"}
+
+
 def set_view_titles(c) -> None:
     for v in c.views:
         fuel = v.dimensions["fuel"]
@@ -104,4 +107,5 @@ def set_view_titles(c) -> None:
             continue
         config = dict(v.config or {})
         config["title"] = _view_title(fuel, v.dimensions["metric"])
+        config["map"] = {"colorScale": {"baseColorScheme": FUEL_MAP_SCHEME[fuel]}, "timeTolerance": 3}
         v.config = config

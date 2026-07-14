@@ -165,12 +165,42 @@ def _view_title(source: str, metric: str) -> str:
     }[metric]
 
 
+# Map color scheme per source, so views are not all the same green. Signed metrics use a diverging
+# scheme (matching the pre-existing energy charts, e.g. abs-change-energy-consumption used BrBG inverted).
+SOURCE_MAP_SCHEME = {
+    "total": "GnBu",
+    "coal": "Greys",
+    "oil": "Oranges",
+    "gas": "OrRd",
+    "fossil_fuels": "Greys",
+    "nuclear": "Purples",
+    "hydro": "Blues",
+    "wind": "GnBu",
+    "solar": "YlOrRd",
+    "solar_and_wind": "BuGn",
+    "renewables": "Greens",
+    "other_renewables": "YlGn",
+    "biofuels": "YlGn",
+    "low_carbon_energy": "Greens",
+}
+
+
+def _map_config(source: str, metric: str) -> dict:
+    # timeTolerance fills the newest map year for countries whose latest data is a year or two old
+    # (e.g. EIA-extended countries end in 2024 while the Statistical Review reaches 2025).
+    if metric == "annual_change":
+        return {"colorScale": {"baseColorScheme": "BrBG", "colorSchemeInvert": True}, "timeTolerance": 3}
+    return {"colorScale": {"baseColorScheme": SOURCE_MAP_SCHEME.get(source, "GnBu")}, "timeTolerance": 3}
+
+
 def set_view_titles(c) -> None:
     for v in c.views:
         source = v.dimensions["source"]
         if source not in SOURCE_TITLE_NAMES:
             # Grouped/stacked views already have a title from group_views.
             continue
+        metric = v.dimensions["metric"]
         config = dict(v.config or {})
-        config["title"] = _view_title(source, v.dimensions["metric"])
+        config["title"] = _view_title(source, metric)
+        config["map"] = _map_config(source, metric)
         v.config = config

@@ -166,12 +166,42 @@ def _view_title(source: str, metric: str) -> str:
     }[metric]
 
 
+# Map color scheme per source, so views are not all the same green. Signed metrics (net imports)
+# use a diverging scheme; carbon intensity uses a "more is worse" red ramp.
+SOURCE_MAP_SCHEME = {
+    "total": "GnBu",
+    "coal": "Greys",
+    "oil": "Oranges",
+    "gas": "OrRd",
+    "fossil": "Greys",
+    "nuclear": "Purples",
+    "hydro": "Blues",
+    "wind": "GnBu",
+    "solar": "YlOrRd",
+    "solar_and_wind": "BuGn",
+    "renewables": "Greens",
+    "other_renewables": "YlGn",
+    "bioenergy": "YlGn",
+    "low_carbon": "Greens",
+}
+
+
+def _map_config(source: str, metric: str) -> dict:
+    if metric in ("net_imports", "imports_share"):
+        return {"colorScale": {"baseColorScheme": "BrBG", "colorSchemeInvert": True}, "timeTolerance": 3}
+    if metric == "carbon_intensity":
+        return {"colorScale": {"baseColorScheme": "OrRd"}, "timeTolerance": 3}
+    return {"colorScale": {"baseColorScheme": SOURCE_MAP_SCHEME.get(source, "GnBu")}, "timeTolerance": 3}
+
+
 def set_view_titles(c) -> None:
     for v in c.views:
         source = v.dimensions["source"]
         if source not in SOURCE_TITLE_NAMES:
             # Grouped/stacked views already have a title from group_views.
             continue
+        metric = v.dimensions["metric"]
         config = dict(v.config or {})
-        config["title"] = _view_title(source, v.dimensions["metric"])
+        config["title"] = _view_title(source, metric)
+        config["map"] = _map_config(source, metric)
         v.config = config

@@ -10,7 +10,6 @@ It consolidates what used to be three separate steps:
 - global_primary_energy: the World long-run, extended back with Smil (2017).  [added in a later step]
 """
 
-import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
@@ -142,8 +141,12 @@ def extend_total_with_eia(tb: Table, tb_eia: Table) -> Table:
     # Statistical Review (OWID regions); EIA is used only to extend country coverage.
     tb_eia = tb_eia[~tb_eia["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
 
-    # Combine, prioritizing the Statistical Review (placed last) on overlapping country-years.
-    tb = pr.concat([tb_eia, tb], ignore_index=True).drop_duplicates(subset=["country", "year"], keep="last")
+    # Combine, prioritizing the Statistical Review *per value*: keep its total energy supply where it has
+    # one, fall back to EIA where it is missing, and add EIA-only country-years. Using a plain concat +
+    # drop_duplicates(keep="last") would instead let the Statistical Review's NaN totals override EIA for
+    # countries it lists for other fuels but not for total energy supply (e.g. Nigeria, Angola, Libya),
+    # silently dropping them from the map.
+    tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_eia, index_columns=["country", "year"])
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
     return tb
 
