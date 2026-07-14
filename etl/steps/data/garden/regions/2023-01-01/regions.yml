@@ -4543,11 +4543,13 @@
 ##########
 # Food and Agriculture Organization (FAOSTAT)
 # https://www.fao.org/faostat/en/#definitions
-# FAO follows the UN M49 geographic classification, so each FAO region is defined by reference to the
-# corresponding UN M49 region, plus the entities that FAOSTAT's areagroup metadata additionally lists:
-# historical entities (USSR, Yugoslavia, Czechoslovakia, Serbia and Montenegro, Sudan (former),
-# Ethiopia (former), Netherlands Antilles, the former Yemens), Taiwan and Palestine.
-# Membership was cross-checked against FAOSTAT's areagroup definition tables (accessed 2026-02-25).
+# FAO follows the UN M49 geographic classification with two nested levels: 5 continents (fao_1) and
+# 22 subregions (fao_2). Each region is defined by reference to the corresponding UN M49 region, plus
+# the entities FAOSTAT's areagroup metadata additionally lists: historical entities (USSR, Yugoslavia,
+# Czechoslovakia, Serbia and Montenegro, Sudan (former), Ethiopia (former), Netherlands Antilles, the
+# former Yemens), Taiwan and Palestine. Membership cross-checked against FAOSTAT's areagroup tables
+# (accessed 2026-02-25). FAO also reports the UN SDG regional grouping in its food-security domains;
+# those SDG regions are intentionally not defined here yet (pending a separate pass).
 ##########
 
 
@@ -4558,7 +4560,10 @@
   defined_by: fao_1
   members:
     - FAO_NAF
-    - FAO_SSA
+    - FAO_EAF
+    - FAO_MAF
+    - FAO_SAF
+    - FAO_WAF
 - code: FAO_NAF
   name: "Northern Africa (FAO)"
   region_type: "aggregate"
@@ -4566,38 +4571,29 @@
   members:
     - UNM49_NAF
     - OWID_SDN # Sudan (former)
-- code: FAO_SSA
-  name: "Sub-Saharan Africa (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - FAO_EAF
-    - FAO_MAF
-    - FAO_SAF
-    - FAO_WAF
 - code: FAO_EAF
   name: "Eastern Africa (FAO)"
   region_type: "aggregate"
-  defined_by: fao_3
+  defined_by: fao_2
   members:
     - UNM49_EAF
     - OWID_ERE # Ethiopia (former)
 - code: FAO_MAF
   name: "Middle Africa (FAO)"
   region_type: "aggregate"
-  defined_by: fao_3
+  defined_by: fao_2
   members:
     - UNM49_MAF
 - code: FAO_SAF
   name: "Southern Africa (FAO)"
   region_type: "aggregate"
-  defined_by: fao_3
+  defined_by: fao_2
   members:
     - UNM49_SAF
 - code: FAO_WAF
   name: "Western Africa (FAO)"
   region_type: "aggregate"
-  defined_by: fao_3
+  defined_by: fao_2
   members:
     - UNM49_WAF
 
@@ -4608,38 +4604,32 @@
   defined_by: fao_1
   members:
     - FAO_NAM
-    - FAO_LAC
+    - FAO_CAM
+    - FAO_CAR
+    - FAO_SAM
 - code: FAO_NAM
   name: "Northern America (FAO)"
   region_type: "aggregate"
   defined_by: fao_2
   members:
     - UNM49_NAM
-- code: FAO_LAC
-  name: "Latin America and the Caribbean (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_2
-  members:
-    - FAO_CAR
-    - FAO_CAM
-    - FAO_SAM
-- code: FAO_CAR
-  name: "Caribbean (FAO)"
-  region_type: "aggregate"
-  defined_by: fao_3
-  members:
-    - UNM49_CAR
-    - ANT # Netherlands Antilles
 - code: FAO_CAM
   name: "Central America (FAO)"
   region_type: "aggregate"
-  defined_by: fao_3
+  defined_by: fao_2
   members:
     - UNM49_CAM
+- code: FAO_CAR
+  name: "Caribbean (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_CAR
+    - ANT # Netherlands Antilles
 - code: FAO_SAM
   name: "South America (FAO)"
   region_type: "aggregate"
-  defined_by: fao_3
+  defined_by: fao_2
   members:
     - UNM49_SAM
 
@@ -4686,8 +4676,8 @@
   members:
     - UNM49_WAS
     - PSE # Palestine
-    - OWID_YAR # Yemen Arab Republic (not in the FAOSTAT harmonization mapping, but listed by FAOSTAT under this region)
-    - OWID_YPR # Yemen People's Republic (not in the FAOSTAT harmonization mapping, but listed by FAOSTAT under this region)
+    - OWID_YAR # Yemen Arab Republic (listed by FAOSTAT under this region)
+    - OWID_YPR # Yemen People's Republic (listed by FAOSTAT under this region)
 
 ### Europe
 - code: FAO_EUR
