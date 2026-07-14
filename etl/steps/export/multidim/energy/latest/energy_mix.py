@@ -74,6 +74,7 @@ def run() -> None:
         "tab": "chart",
         "hasMapTab": False,
         "title": "{title}",
+        "subtitle": "{subtitle}",
     }
     metric_titles = {
         "total": "Total energy supply by source",
@@ -81,32 +82,44 @@ def run() -> None:
         "share": "Share of total energy supply, by source",
         "annual_change": "Annual change in energy supply, by source",
     }
+    metric_subtitles = {
+        "total": "Measured in [terawatt-hours](#dod:watt-hours).",
+        "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
+        "share": "Share of total energy supply that comes from each source.",
+        "annual_change": "Measured in [terawatt-hours](#dod:watt-hours).",
+    }
+    # NOTE: choices are listed top-to-bottom because grapher's StackedArea renders the first series at
+    # the top. Listing the smallest source first puts it at the top and the largest at the bottom,
+    # matching the original charts (e.g. coal at the bottom, other renewables at the top).
     c.group_views(
         groups=[
             {
                 "dimension": "source",
                 "choices": [
-                    "coal",
-                    "oil",
-                    "gas",
-                    "nuclear",
-                    "hydro",
-                    "wind",
-                    "solar",
-                    "biofuels",
                     "other_renewables",
+                    "biofuels",
+                    "solar",
+                    "wind",
+                    "hydro",
+                    "nuclear",
+                    "gas",
+                    "oil",
+                    "coal",
                 ],
                 "choice_new_slug": "all_sources",
                 "view_config": stacked_view_config,
             },
             {
                 "dimension": "source",
-                "choices": ["fossil_fuels", "nuclear", "renewables"],
+                "choices": ["renewables", "nuclear", "fossil_fuels"],
                 "choice_new_slug": "fossil_nuclear_renewables",
                 "view_config": stacked_view_config,
             },
         ],
-        params={"title": lambda view: metric_titles[view.dimensions["metric"]]},
+        params={
+            "title": lambda view: metric_titles[view.dimensions["metric"]],
+            "subtitle": lambda view: metric_subtitles[view.dimensions["metric"]],
+        },
     )
     # Stacked areas of year-on-year changes are unreadable; keep breakdowns only for level metrics.
     c.views = [
@@ -165,32 +178,85 @@ def _view_title(source: str, metric: str) -> str:
     }[metric]
 
 
-# Map color scheme per source, so views are not all the same green. Signed metrics use a diverging
-# scheme (matching the pre-existing energy charts, e.g. abs-change-energy-consumption used BrBG inverted).
-SOURCE_MAP_SCHEME = {
-    "total": "GnBu",
-    "coal": "Greys",
-    "oil": "Oranges",
-    "gas": "OrRd",
-    "fossil_fuels": "Greys",
-    "nuclear": "Purples",
-    "hydro": "Blues",
-    "wind": "GnBu",
+# Map color scheme per (source, metric), copied from the original production charts each view replaces
+# (fetched from their chart configs) so the new maps look like the ones users already know. Views with
+# no pre-existing chart fall back to a per-source family below.
+ORIGINAL_MAP_SCHEMES = {
+    ("coal", "annual_change"): {"baseColorScheme": "BrBG", "colorSchemeInvert": True},
+    ("coal", "per_capita"): {"baseColorScheme": "OrRd"},
+    ("coal", "share"): {"baseColorScheme": "YlOrBr"},
+    ("fossil_fuels", "annual_change"): {"baseColorScheme": "BrBG", "colorSchemeInvert": True},
+    ("fossil_fuels", "per_capita"): {"baseColorScheme": "YlOrBr"},
+    ("fossil_fuels", "share"): {"baseColorScheme": "YlOrBr"},
+    ("fossil_fuels", "total"): {"baseColorScheme": "YlOrBr"},
+    ("gas", "annual_change"): {"baseColorScheme": "PiYG", "colorSchemeInvert": True},
+    ("gas", "per_capita"): {"baseColorScheme": "BuPu"},
+    ("gas", "share"): {"baseColorScheme": "Blues"},
+    ("hydro", "annual_change"): {"baseColorScheme": "RdYlBu"},
+    ("hydro", "per_capita"): {"baseColorScheme": "PuBu"},
+    ("hydro", "share"): {"baseColorScheme": "PuBu"},
+    ("hydro", "total"): {"baseColorScheme": "GnBu"},
+    ("low_carbon_energy", "annual_change"): {"baseColorScheme": "PuOr"},
+    ("low_carbon_energy", "per_capita"): {"baseColorScheme": "Purples"},
+    ("low_carbon_energy", "share"): {"baseColorScheme": "Greens"},
+    ("low_carbon_energy", "total"): {"baseColorScheme": "GnBu"},
+    ("nuclear", "annual_change"): {"baseColorScheme": "RdYlBu"},
+    ("nuclear", "per_capita"): {"baseColorScheme": "PuBuGn"},
+    ("nuclear", "share"): {"baseColorScheme": "BuPu"},
+    ("nuclear", "total"): {"baseColorScheme": "BuPu"},
+    ("oil", "annual_change"): {"baseColorScheme": "PRGn", "colorSchemeInvert": True},
+    ("oil", "per_capita"): {"baseColorScheme": "OrRd"},
+    ("oil", "share"): {"baseColorScheme": "YlOrRd"},
+    ("renewables", "annual_change"): {"baseColorScheme": "RdBu"},
+    ("renewables", "per_capita"): {"baseColorScheme": "YlGnBu"},
+    ("renewables", "share"): {"baseColorScheme": "Greens"},
+    ("renewables", "total"): {"baseColorScheme": "YlGn"},
+    ("solar", "annual_change"): {"baseColorScheme": "RdBu"},
+    ("solar", "per_capita"): {"baseColorScheme": "PuBu"},
+    ("solar", "share"): {"baseColorScheme": "YlOrRd"},
+    ("solar", "total"): {"baseColorScheme": "YlOrRd"},
+    ("solar_and_wind", "annual_change"): {"baseColorScheme": "RdBu"},
+    ("solar_and_wind", "per_capita"): {"baseColorScheme": "BuGn"},
+    ("solar_and_wind", "share"): {"baseColorScheme": "BuGn"},
+    ("solar_and_wind", "total"): {"baseColorScheme": "YlOrRd"},
+    ("total", "annual_change"): {"baseColorScheme": "BrBG", "colorSchemeInvert": True},
+    ("total", "per_capita"): {"baseColorScheme": "OrRd"},
+    ("total", "total"): {"baseColorScheme": "YlGnBu"},
+    ("wind", "annual_change"): {"baseColorScheme": "PRGn"},
+    ("wind", "per_capita"): {"baseColorScheme": "YlGn"},
+    ("wind", "share"): {"baseColorScheme": "PuBuGn"},
+    ("wind", "total"): {"baseColorScheme": "PuBuGn"},
+}
+
+# Per-source fallback for views without a pre-existing chart, so those maps are not all the same color.
+SOURCE_FALLBACK_SCHEME = {
+    "total": "YlGnBu",
+    "coal": "YlOrBr",
+    "oil": "OrRd",
+    "gas": "BuPu",
+    "fossil_fuels": "YlOrBr",
+    "nuclear": "BuPu",
+    "hydro": "PuBu",
+    "wind": "PuBuGn",
     "solar": "YlOrRd",
     "solar_and_wind": "BuGn",
     "renewables": "Greens",
     "other_renewables": "YlGn",
     "biofuels": "YlGn",
-    "low_carbon_energy": "Greens",
+    "low_carbon_energy": "GnBu",
 }
 
 
 def _map_config(source: str, metric: str) -> dict:
     # timeTolerance fills the newest map year for countries whose latest data is a year or two old
     # (e.g. EIA-extended countries end in 2024 while the Statistical Review reaches 2025).
-    if metric == "annual_change":
-        return {"colorScale": {"baseColorScheme": "BrBG", "colorSchemeInvert": True}, "timeTolerance": 3}
-    return {"colorScale": {"baseColorScheme": SOURCE_MAP_SCHEME.get(source, "GnBu")}, "timeTolerance": 3}
+    scheme = ORIGINAL_MAP_SCHEMES.get((source, metric))
+    if scheme is None:
+        if metric == "annual_change":
+            scheme = {"baseColorScheme": "BrBG", "colorSchemeInvert": True}
+        else:
+            scheme = {"baseColorScheme": SOURCE_FALLBACK_SCHEME.get(source, "YlGnBu")}
+    return {"colorScale": scheme, "timeTolerance": 3}
 
 
 def set_view_titles(c) -> None:

@@ -12,6 +12,7 @@ definitions:
       - The World series is extended back to 1800 using Vaclav Smil's historical estimates (2017), for years before the Statistical Review begins (1965). Only commercially-traded energy sources are included (traditional biomass, which Smil reports but the Statistical Review does not, is excluded so the series stays on a single basis with no step at the splice).
 
 dataset:
+  title: Energy mix
   update_period_days: 365
   owners:
     - Pablo Rosado

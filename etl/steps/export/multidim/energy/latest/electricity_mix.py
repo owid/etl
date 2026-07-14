@@ -87,28 +87,40 @@ def run() -> None:
         "tab": "chart",
         "hasMapTab": False,
         "title": "{title}",
+        "subtitle": "{subtitle}",
     }
     metric_titles = {
         "generation": "Electricity generation by source",
         "per_capita": "Per capita electricity generation by source",
         "share_of_generation": "Share of electricity generation by source",
     }
+    metric_subtitles = {
+        "generation": "Measured in [terawatt-hours](#dod:watt-hours).",
+        "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
+        "share_of_generation": "Share of electricity generation that comes from each source.",
+    }
+    # NOTE: choices are listed top-to-bottom because grapher's StackedArea renders the first series at
+    # the top. Listing the smallest source first puts it at the top and the largest at the bottom,
+    # matching the original charts (e.g. coal at the bottom, other renewables at the top).
     c.group_views(
         groups=[
             {
                 "dimension": "source",
-                "choices": ["coal", "oil", "gas", "nuclear", "hydro", "wind", "solar", "other_renewables"],
+                "choices": ["other_renewables", "solar", "wind", "hydro", "nuclear", "gas", "oil", "coal"],
                 "choice_new_slug": "all_sources",
                 "view_config": stacked_view_config,
             },
             {
                 "dimension": "source",
-                "choices": ["fossil", "nuclear", "renewables"],
+                "choices": ["renewables", "nuclear", "fossil"],
                 "choice_new_slug": "fossil_nuclear_renewables",
                 "view_config": stacked_view_config,
             },
         ],
-        params={"title": lambda view: metric_titles[view.dimensions["metric"]]},
+        params={
+            "title": lambda view: metric_titles[view.dimensions["metric"]],
+            "subtitle": lambda view: metric_subtitles[view.dimensions["metric"]],
+        },
     )
 
     # Set an explicit title on every single-source view, so grapher does not fall back to the
@@ -166,32 +178,81 @@ def _view_title(source: str, metric: str) -> str:
     }[metric]
 
 
-# Map color scheme per source, so views are not all the same green. Signed metrics (net imports)
-# use a diverging scheme; carbon intensity uses a "more is worse" red ramp.
-SOURCE_MAP_SCHEME = {
-    "total": "GnBu",
-    "coal": "Greys",
-    "oil": "Oranges",
-    "gas": "OrRd",
-    "fossil": "Greys",
-    "nuclear": "Purples",
-    "hydro": "Blues",
-    "wind": "GnBu",
+# Map color scheme per (source, metric), copied from the original production charts each view replaces
+# (fetched from their chart configs) so the new maps look like the ones users already know. Views with
+# no pre-existing chart fall back to a per-source family below.
+ORIGINAL_MAP_SCHEMES = {
+    ("bioenergy", "share_of_generation"): {"baseColorScheme": "BuGn"},
+    ("coal", "generation"): {"baseColorScheme": "Oranges"},
+    ("coal", "per_capita"): {"baseColorScheme": "YlOrBr"},
+    ("coal", "share_of_generation"): {"baseColorScheme": "Oranges"},
+    ("fossil", "generation"): {"baseColorScheme": "YlOrBr"},
+    ("fossil", "per_capita"): {"baseColorScheme": "Oranges"},
+    ("fossil", "share_of_generation"): {"baseColorScheme": "OrRd"},
+    ("gas", "generation"): {"baseColorScheme": "Purples"},
+    ("gas", "per_capita"): {"baseColorScheme": "BuPu"},
+    ("gas", "share_of_generation"): {"baseColorScheme": "GnBu"},
+    ("hydro", "generation"): {"baseColorScheme": "GnBu"},
+    ("hydro", "per_capita"): {"baseColorScheme": "GnBu"},
+    ("hydro", "share_of_generation"): {"baseColorScheme": "PuBu"},
+    ("low_carbon", "generation"): {"baseColorScheme": "BuGn"},
+    ("low_carbon", "share_of_generation"): {"baseColorScheme": "YlGn"},
+    ("nuclear", "generation"): {"baseColorScheme": "GnBu"},
+    ("nuclear", "per_capita"): {"baseColorScheme": "PuBuGn"},
+    ("nuclear", "share_of_generation"): {"baseColorScheme": "YlGnBu"},
+    ("oil", "generation"): {"baseColorScheme": "Reds"},
+    ("oil", "per_capita"): {"baseColorScheme": "OrRd"},
+    ("oil", "share_of_generation"): {"baseColorScheme": "Oranges"},
+    ("renewables", "generation"): {"baseColorScheme": "GnBu"},
+    ("renewables", "per_capita"): {"baseColorScheme": "YlGn"},
+    ("renewables", "share_of_generation"): {"baseColorScheme": "BuGn"},
+    ("solar", "generation"): {"baseColorScheme": "YlOrRd"},
+    ("solar", "per_capita"): {"baseColorScheme": "YlOrRd"},
+    ("solar", "share_of_generation"): {"baseColorScheme": "YlGnBu"},
+    ("solar_and_wind", "generation"): {"baseColorScheme": "YlOrRd"},
+    ("solar_and_wind", "per_capita"): {"baseColorScheme": "YlGnBu"},
+    ("solar_and_wind", "share_of_generation"): {"baseColorScheme": "Greens"},
+    ("total", "carbon_intensity"): {"baseColorScheme": "YlOrBr"},
+    ("total", "demand"): {"baseColorScheme": "YlGnBu"},
+    ("total", "demand_per_capita"): {"baseColorScheme": "PuBuGn"},
+    ("total", "generation"): {"baseColorScheme": "YlGnBu"},
+    ("total", "imports_share"): {"baseColorScheme": "RdBu"},
+    ("total", "net_imports"): {"baseColorScheme": "RdBu", "colorSchemeInvert": True},
+    ("total", "per_capita"): {"baseColorScheme": "PuBuGn"},
+    ("wind", "generation"): {"baseColorScheme": "PuBu"},
+    ("wind", "per_capita"): {"baseColorScheme": "PuBuGn"},
+    ("wind", "share_of_generation"): {"baseColorScheme": "PuBuGn"},
+}
+
+# Per-source fallback for views without a pre-existing chart, so those maps are not all the same color.
+SOURCE_FALLBACK_SCHEME = {
+    "total": "YlGnBu",
+    "coal": "Oranges",
+    "oil": "OrRd",
+    "gas": "Purples",
+    "fossil": "YlOrBr",
+    "nuclear": "GnBu",
+    "hydro": "GnBu",
+    "wind": "PuBuGn",
     "solar": "YlOrRd",
-    "solar_and_wind": "BuGn",
-    "renewables": "Greens",
+    "solar_and_wind": "YlOrRd",
+    "renewables": "GnBu",
     "other_renewables": "YlGn",
-    "bioenergy": "YlGn",
-    "low_carbon": "Greens",
+    "bioenergy": "BuGn",
+    "low_carbon": "BuGn",
 }
 
 
 def _map_config(source: str, metric: str) -> dict:
-    if metric in ("net_imports", "imports_share"):
-        return {"colorScale": {"baseColorScheme": "BrBG", "colorSchemeInvert": True}, "timeTolerance": 3}
-    if metric == "carbon_intensity":
-        return {"colorScale": {"baseColorScheme": "OrRd"}, "timeTolerance": 3}
-    return {"colorScale": {"baseColorScheme": SOURCE_MAP_SCHEME.get(source, "GnBu")}, "timeTolerance": 3}
+    scheme = ORIGINAL_MAP_SCHEMES.get((source, metric))
+    if scheme is None:
+        if metric in ("net_imports", "imports_share"):
+            scheme = {"baseColorScheme": "RdBu", "colorSchemeInvert": True}
+        elif metric == "carbon_intensity":
+            scheme = {"baseColorScheme": "YlOrBr"}
+        else:
+            scheme = {"baseColorScheme": SOURCE_FALLBACK_SCHEME.get(source, "YlGnBu")}
+    return {"colorScale": scheme, "timeTolerance": 3}
 
 
 def set_view_titles(c) -> None:

@@ -30,6 +30,7 @@ definitions:
       {definitions.description_processing_electricity_generation_origins}
 
 dataset:
+  title: Electricity mix
   update_period_days: 365
 
   owners:

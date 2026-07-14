@@ -53,21 +53,32 @@ def run() -> None:
         "per_capita": "Per capita fossil fuel production by fuel",
         "reserves_ratio": "Reserves-to-production ratio",
     }
+    metric_subtitles = {
+        "production": "Measured in [terawatt-hours](#dod:watt-hours).",
+        "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
+        "reserves_ratio": "Number of years of production left at current rates.",
+    }
+    # NOTE: choices are listed top-to-bottom because grapher's StackedArea renders the first series at
+    # the top, so listing coal last puts it at the bottom, matching the original charts.
     c.group_views(
         groups=[
             {
                 "dimension": "fuel",
-                "choices": ["coal", "oil", "gas"],
+                "choices": ["gas", "oil", "coal"],
                 "choice_new_slug": "all_fuels",
                 "view_config": {
                     "chartTypes": ["StackedArea"],
                     "tab": "chart",
                     "hasMapTab": False,
                     "title": "{title}",
+                    "subtitle": "{subtitle}",
                 },
             },
         ],
-        params={"title": lambda view: metric_titles[view.dimensions["metric"]]},
+        params={
+            "title": lambda view: metric_titles[view.dimensions["metric"]],
+            "subtitle": lambda view: metric_subtitles[view.dimensions["metric"]],
+        },
     )
     # Stacking reserves-to-production ratios (years of production left) makes no sense; drop that combination.
     c.views = [
@@ -96,7 +107,25 @@ def _view_title(fuel: str, metric: str) -> str:
     }[metric]
 
 
-FUEL_MAP_SCHEME = {"coal": "Greys", "oil": "Oranges", "gas": "OrRd"}
+# Map color scheme per (fuel, metric), copied from the original production charts each view replaces
+# (fetched from their chart configs) so the new maps look like the ones users already know. Views with
+# no pre-existing chart fall back to a per-fuel family below.
+ORIGINAL_MAP_SCHEMES = {
+    ("coal", "per_capita"): {"baseColorScheme": "YlOrBr"},
+    ("coal", "production"): {"baseColorScheme": "OrRd"},
+    ("gas", "per_capita"): {"baseColorScheme": "BuPu"},
+    ("gas", "production"): {"baseColorScheme": "Purples"},
+    ("oil", "per_capita"): {"baseColorScheme": "YlOrRd"},
+    ("oil", "production"): {"baseColorScheme": "YlOrRd"},
+}
+
+# Per-fuel fallback for views without a pre-existing chart (e.g. the reserves-to-production ratio).
+FUEL_FALLBACK_SCHEME = {"coal": "OrRd", "oil": "YlOrRd", "gas": "Purples"}
+
+
+def _map_config(fuel: str, metric: str) -> dict:
+    scheme = ORIGINAL_MAP_SCHEMES.get((fuel, metric)) or {"baseColorScheme": FUEL_FALLBACK_SCHEME[fuel]}
+    return {"colorScale": scheme, "timeTolerance": 3}
 
 
 def set_view_titles(c) -> None:
@@ -107,5 +136,5 @@ def set_view_titles(c) -> None:
             continue
         config = dict(v.config or {})
         config["title"] = _view_title(fuel, v.dimensions["metric"])
-        config["map"] = {"colorScale": {"baseColorScheme": FUEL_MAP_SCHEME[fuel]}, "timeTolerance": 3}
+        config["map"] = _map_config(fuel, v.dimensions["metric"])
         v.config = config
