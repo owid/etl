@@ -7,9 +7,8 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Columns to read from the main table, and how to rename them.
-# NOTE: The producer renamed some columns in 2026 (actor_type -> Entity_type, end_target_status ->
-#  Status_of_end_target); end_target is read only to identify countries assessed as having no target.
+# Columns to read from the main table, and how to rename them. end_target is read only to identify
+# countries assessed as having no target.
 COLUMNS = {
     "name": "country",
     "end_target_year": "year",
@@ -58,12 +57,10 @@ def run() -> None:
     # Select only rows that correspond to countries.
     tb = tb[tb["actor_type"] == "Country"].drop(columns=["actor_type"]).reset_index(drop=True)
 
-    # Keep the countries the original step kept (those with a target status and a target year), and
-    # ALSO keep countries the tracker explicitly assessed as having no target. This is the one change
-    # from the original logic: it lets "no target" (e.g. the United States) be distinguished from
-    # "no data" (countries the tracker does not cover, which remain missing on charts).
-    # NOTE: Countries with a target but no recorded status (e.g. Chad in 2026) are still dropped, as
-    #  in the original step; they show as missing data.
+    # Keep countries with both a target status and a target year, plus countries the tracker explicitly
+    # assessed as having no target. Keeping the latter lets "no target" be distinguished from "no data"
+    # (countries the tracker does not cover, which stay missing on charts). Countries with a target but
+    # no recorded status are dropped and show as missing data.
     no_target = tb["end_target"] == NO_TARGET_END_TARGET
     tb = tb[(tb["net_zero_status"].notna() & tb["year"].notna()) | no_target].reset_index(drop=True)
     no_target = tb["end_target"] == NO_TARGET_END_TARGET
@@ -72,23 +69,19 @@ def run() -> None:
     tb.loc[no_target, "year"] = SNAPSHOT_YEAR
     tb["year"] = tb["year"].astype(int)
 
-    # Label the status of "no target" countries explicitly (they have no status in the source).
-    net_zero_status_metadata = tb["net_zero_status"].metadata
+    # The source status is categorical, so cast to string to be able to label "no target" countries.
     tb["net_zero_status"] = tb["net_zero_status"].astype("string")
     tb.loc[no_target, "net_zero_status"] = NO_TARGET_LABEL
-    tb["net_zero_status"].metadata = net_zero_status_metadata
 
     tb = tb.drop(columns=["end_target"])
 
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
 
-    # Add a column that indicates whether the country has set a net-zero target.
-    # NOTE: As in the original step, every country with a target is labelled here; countries assessed as
-    #  having no target are labelled "No target".
+    # Flag whether the country has set a net-zero target; countries assessed as having no target are
+    # labelled "No target".
     tb["has_net_zero_target"] = "Net-zero achieved or pledged"
     tb.loc[no_target, "has_net_zero_target"] = NO_TARGET_LABEL
-    # Copy metadata from another variable.
     tb["has_net_zero_target"] = tb["has_net_zero_target"].copy_metadata(tb["net_zero_status"])
 
     sanity_check_outputs(tb)
