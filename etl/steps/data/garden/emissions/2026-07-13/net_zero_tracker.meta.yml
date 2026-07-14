@@ -2,7 +2,9 @@ definitions:
   common:
     description_key:
       - |-
-        A country's net-zero status reflects the most firmly established form its commitment has taken. From strongest to weakest, the possible statuses are: achieved (externally validated), achieved (self-declared), in law, in policy document, declaration or pledge, and proposed or in discussion. Countries the tracker has assessed as having no net-zero target are shown as "No target".
+        The Net Zero Tracker groups each country's climate target into one of three types: a net-zero (or similar) target, some other emissions target (such as a plain emissions-reduction pledge that does not amount to net zero), or no target at all.
+      - |-
+        For countries with a net-zero target, its status reflects the most firmly established form the commitment has taken. From strongest to weakest, the possible statuses are: achieved (externally validated), achieved (self-declared), in law, in policy document, declaration or pledge, and proposed or in discussion.
       - The inclusion criteria for net-zero commitments may vary from country to country. For example, the inclusion of international aviation emissions, or the acceptance of carbon offsets.
     description_from_producer: "More detail about each indicator is available in [the Tracker Codebook](https://docs.google.com/document/d/13bGE8FCOeF5QweoOvyMPZi3XbZrGLEPL2aM04LuZQcc/edit?usp=sharing)."
     presentation:
@@ -23,21 +25,21 @@ tables:
       net_zero_status:
         title: Status of net-zero carbon emissions targets
         description_short: |-
-          The status of each country's commitment to 'net-zero' emissions. The specifics of this commitment can vary, with some countries pledging to reach net-zero greenhouse gas emissions, while others define this as carbon emissions only. Countries assessed as having no net-zero target are shown as "No target".
+          The status of each country's net-zero (or equivalent) emissions target, from "proposed or in discussion" up to "in law" or "achieved". Countries with a different kind of emissions target are shown as "Other target", and those assessed as having no target as "No target".
         processing_level: minor
       has_net_zero_target:
         title: Countries that have set a net-zero emissions target
         description_short: |-
-          Whether a country has set a net-zero emissions target. Countries have a net-zero target if they have achieved net-zero already, have a target written in law or in a policy document, or have made a public pledge. Countries the tracker assessed as having no target are shown as "No target".
+          Whether a country has set a net-zero (or similar) emissions target, some other emissions target that does not amount to net zero ("Other target"), or no target at all ("No target").
         processing_level: major
         description_processing: |-
-          Each country the Net Zero Tracker covers is classified as having set a net-zero target or as having no target ("No target"). Countries the tracker does not cover are left blank (shown as missing on charts), so that "no target" is distinguishable from "no data".
+          Each country the Net Zero Tracker covers is classified into one of three groups based on the type of end target it records: a net-zero (or similar) target, an "Other target", or "No target". Countries the tracker does not cover are left blank (shown as missing on charts), so that "no target" is distinguishable from "no data".
       net_zero_target_year:
         title: Year by which the country aims to reach net-zero emissions
         unit: ""
         short_unit: ""
         description_short: |-
-          The target year by which each country aims to reach its net-zero (or equivalent) emissions goal. Only shown for countries that have set a target.
+          The target year by which each country aims to reach its net-zero (or equivalent) emissions goal. Only shown for countries that have set a net-zero target.
         processing_level: minor
         display:
           numDecimalPlaces: 0

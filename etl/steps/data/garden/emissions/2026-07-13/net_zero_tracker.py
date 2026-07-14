@@ -22,20 +22,30 @@ COLUMNS = {
     "end_target_year": "net_zero_target_year",
 }
 
-# Value the source uses for countries it has assessed as having no net-zero target.
+# End-target types the Net Zero Tracker treats as "net zero (or similar)" (per its README / methodology).
+# On the tracker's website these map to the "Net zero (or similar)" target type. Any other target that
+# is not "No target" (e.g. a plain emissions-reduction NDC) is shown by the tracker as an "Other target",
+# which is NOT a net-zero commitment.
+NET_ZERO_TARGET_TYPES = {
+    "Net zero",
+    "Zero carbon",
+    "Climate neutral",
+    "Carbon neutral(ity)",
+    "GHG neutral(ity)",
+    "Carbon negative",
+    "Net negative",
+}
+# Value the source uses in the end_target column for countries assessed as having no target.
+NO_TARGET_END_TARGET = "No target"
+
+# Category labels used in the output indicators (mirroring the tracker's three target-type groups).
+NET_ZERO_TARGET_LABEL = "Net-zero (or similar) target"
+OTHER_TARGET_LABEL = "Other target"
 NO_TARGET_LABEL = "No target"
 
-# Countries that have a target but a blank status cell in the source. This is a known provider data
-# gap that we leave as missing ("no data") pending confirmation from the producer. The sanity check
-# asserts this set is unchanged, so a fix (or a new gap) surfaces at build time for re-investigation.
-# NOTE: Chad has a documented emissions-reduction target (19.3% by 2030, in its NDC) but no status.
-#  It was reclassified from a "Net zero" pledge ("Proposed / in discussion" in 2023) to an
-#  "Emissions reduction target" in 2026, and the status was left blank. Its comparable peers (NDC-based
-#  emissions-reduction targets) are almost all "In policy document".
-KNOWN_TARGET_WITHOUT_STATUS = {"Chad"}
-
-# Possible net-zero target statuses for countries, as defined in the Net Zero Tracker codebook, plus
-# the "No target" label we assign to countries the tracker assessed as having no target.
+# Net-zero target statuses defined in the Net Zero Tracker codebook, plus the two labels we assign to
+# countries without a net-zero target, so every country the tracker covers has a value on the status
+# map (and "no target" / "other target" are distinguishable from "no data").
 EXPECTED_STATUSES = {
     "Achieved (externally validated)",
     "Achieved (self-declared)",
@@ -43,6 +53,7 @@ EXPECTED_STATUSES = {
     "In policy document",
     "Declaration / pledge",
     "Proposed / in discussion",
+    OTHER_TARGET_LABEL,
     NO_TARGET_LABEL,
 }
 
@@ -66,26 +77,35 @@ def run() -> None:
     # Keep only country-level entities (the source also tracks regions, cities and companies).
     tb = tb[tb["actor_type"] == "Country"].drop(columns=["actor_type"]).reset_index(drop=True)
 
-    # Every country the tracker covers is assessed as either having a target or explicitly having none.
-    # We keep both, so that "no target" (e.g. the United States) is distinguishable from "no data"
-    # (countries the tracker does not cover, which show as missing on charts).
-    no_target = tb["end_target"] == NO_TARGET_LABEL
+    # Classify each country by the type of end target the tracker records, mirroring the three
+    # target-type groups shown on the Net Zero Tracker website:
+    #   - a net-zero (or similar) target,
+    #   - some other emissions target (e.g. a plain emissions-reduction NDC), which is NOT net zero,
+    #   - no target at all (e.g. the United States).
+    # Keeping all three lets "other target" and "no target" be distinguished from "no data" (countries
+    # the tracker does not cover, which show as missing on charts).
+    has_net_zero = tb["end_target"].isin(NET_ZERO_TARGET_TYPES)
+    no_target = tb["end_target"] == NO_TARGET_END_TARGET
+    other_target = ~has_net_zero & ~no_target
 
-    # Whether the country has set a net-zero target at all.
-    tb["has_net_zero_target"] = "Has set a net-zero target"
+    # Whether the country has set a net-zero target (three-way, covering every country the tracker tracks).
+    tb["has_net_zero_target"] = pd.Series(pd.NA, index=tb.index, dtype="string")
+    tb.loc[has_net_zero, "has_net_zero_target"] = NET_ZERO_TARGET_LABEL
+    tb.loc[other_target, "has_net_zero_target"] = OTHER_TARGET_LABEL
     tb.loc[no_target, "has_net_zero_target"] = NO_TARGET_LABEL
     tb["has_net_zero_target"] = tb["has_net_zero_target"].copy_metadata(tb["net_zero_status"])
 
-    # The status of the target. Countries assessed as having no target are labelled "No target".
-    # Countries that have a target but no status recorded in the source (see KNOWN_TARGET_WITHOUT_STATUS)
-    # keep a missing status and show as "no data" on the status map.
-    net_zero_status_metadata = tb["net_zero_status"].metadata
+    # Status of the net-zero target. For net-zero-target countries this is the recorded status; for the
+    # others we show why there is no status ("Other target" or "No target"), so a country the tracker has
+    # assessed never appears as "no data".
+    status_metadata = tb["net_zero_status"].metadata
     tb["net_zero_status"] = tb["net_zero_status"].astype("string")
+    tb.loc[other_target, "net_zero_status"] = OTHER_TARGET_LABEL
     tb.loc[no_target, "net_zero_status"] = NO_TARGET_LABEL
-    tb["net_zero_status"].metadata = net_zero_status_metadata
+    tb["net_zero_status"].metadata = status_metadata
 
-    # The target year only makes sense for countries that have a target.
-    tb.loc[no_target, "net_zero_target_year"] = pd.NA
+    # The target year is shown only for countries with a net-zero target.
+    tb.loc[~has_net_zero, "net_zero_target_year"] = pd.NA
     tb["net_zero_target_year"] = tb["net_zero_target_year"].astype("Int64")
 
     tb = tb.drop(columns=["end_target"])
@@ -121,30 +141,27 @@ def sanity_check_outputs(tb: Table) -> None:
     assert not tb.empty, "Output table is empty."
     # Each country should appear only once.
     assert not tb.duplicated(subset=["country"]).any(), "Duplicate country rows."
-    # Statuses (where set) must be within the expected set.
-    unexpected = set(tb["net_zero_status"].dropna()) - EXPECTED_STATUSES
+    # Every country the tracker covers must have a status value (a net-zero status, or "Other target" /
+    # "No target"); none should silently drop off the status map as "no data".
+    assert tb["net_zero_status"].notna().all(), "A country has no net_zero_status (a net-zero target with a blank status?)."
+    unexpected = set(tb["net_zero_status"]) - EXPECTED_STATUSES
     assert not unexpected, f"Unexpected net-zero status values: {unexpected}"
-    # The only countries left without a status must be the known provider data gap (a target but a
-    # blank status cell). If this set changes, the producer may have fixed it or a new gap appeared.
-    target_without_status = set(tb.loc[tb["net_zero_status"].isna(), "country"])
-    assert target_without_status == KNOWN_TARGET_WITHOUT_STATUS, (
-        f"Countries with a target but no status changed from {KNOWN_TARGET_WITHOUT_STATUS} to {target_without_status}; re-investigate."
-    )
-    # has_net_zero_target is a two-category flag covering every assessed country.
-    assert set(tb["has_net_zero_target"]) == {"Has set a net-zero target", NO_TARGET_LABEL}, (
+    # has_net_zero_target is the three-way target-type classification, covering every country.
+    assert set(tb["has_net_zero_target"]) == {NET_ZERO_TARGET_LABEL, OTHER_TARGET_LABEL, NO_TARGET_LABEL}, (
         "Unexpected has_net_zero_target values."
     )
-    # "No target" must be consistent between the two categorical indicators.
-    assert ((tb["net_zero_status"] == NO_TARGET_LABEL) == (tb["has_net_zero_target"] == NO_TARGET_LABEL)).all(), (
-        "Mismatch between 'No target' rows in net_zero_status and has_net_zero_target."
+    # The two categorical indicators must agree on which countries have a net-zero target.
+    is_net_zero_status = ~tb["net_zero_status"].isin([OTHER_TARGET_LABEL, NO_TARGET_LABEL])
+    is_net_zero_type = tb["has_net_zero_target"] == NET_ZERO_TARGET_LABEL
+    assert (is_net_zero_status == is_net_zero_type).all(), (
+        "net_zero_status and has_net_zero_target disagree on which countries have a net-zero target."
     )
-    # Target years, where present, should be plausible.
+    # A target year should be present only for net-zero-target countries, and be plausible.
+    assert tb.loc[~is_net_zero_type, "net_zero_target_year"].isna().all(), (
+        "A country without a net-zero target has a target year."
+    )
     years = tb["net_zero_target_year"].dropna()
     assert years.between(2000, 2100).all(), "Target year outside the plausible 2000-2100 range."
-    # A "No target" country must not carry a target year.
-    assert tb.loc[tb["has_net_zero_target"] == NO_TARGET_LABEL, "net_zero_target_year"].isna().all(), (
-        "A 'No target' country has a target year."
-    )
     # Coverage should not collapse (a sudden drop signals a parsing/mapping regression).
     n_countries = tb["country"].nunique()
     assert n_countries >= 150, f"Only {n_countries} countries; possible parsing/mapping regression."
