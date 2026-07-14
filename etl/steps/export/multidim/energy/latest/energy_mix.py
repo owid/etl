@@ -82,12 +82,6 @@ def run() -> None:
         "share": "Share of total energy supply, by source",
         "annual_change": "Annual change in energy supply, by source",
     }
-    metric_subtitles = {
-        "total": "Measured in [terawatt-hours](#dod:watt-hours).",
-        "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
-        "share": "Share of total energy supply that comes from each source.",
-        "annual_change": "Measured in [terawatt-hours](#dod:watt-hours).",
-    }
     # NOTE: choices are listed top-to-bottom because grapher's StackedArea renders the first series at
     # the top. Listing the smallest source first puts it at the top and the largest at the bottom,
     # matching the original charts (e.g. coal at the bottom, other renewables at the top).
@@ -118,7 +112,7 @@ def run() -> None:
         ],
         params={
             "title": lambda view: metric_titles[view.dimensions["metric"]],
-            "subtitle": lambda view: metric_subtitles[view.dimensions["metric"]],
+            "subtitle": _grouped_subtitle,
         },
     )
     # Stacked areas of year-on-year changes are unreadable; keep breakdowns only for level metrics.
@@ -176,6 +170,42 @@ def _view_title(source: str, metric: str) -> str:
         "share": f"Share of energy supply from {name}",
         "annual_change": f"Annual change in energy supply from {name}",
     }[metric]
+
+
+# Unit phrase per metric, and composition notes for composite sources. The original charts spelled out
+# what each grouping contains (e.g. which renewables are included); we keep those notes but drop the
+# "primary energy / substitution method" wording, which no longer applies to Total Energy Supply.
+METRIC_UNIT_PHRASE = {
+    "total": "Measured in [terawatt-hours](#dod:watt-hours).",
+    "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
+    "share": "Measured as a percentage of total energy supply.",
+    "annual_change": "Year-on-year change in energy supply, measured in [terawatt-hours](#dod:watt-hours).",
+}
+SOURCE_COMPOSITION = {
+    "fossil_fuels": "Fossil fuels are the sum of coal, oil, and gas.",
+    "renewables": "Renewables include hydropower, solar, wind, geothermal, wave and tidal, and bioenergy.",
+    "low_carbon_energy": "Low-carbon energy is the sum of nuclear and renewables.",
+    "other_renewables": "Other renewables include geothermal, wave, and tidal energy.",
+    "solar_and_wind": "Combined energy supply from solar and wind.",
+}
+
+
+def _view_subtitle(source: str, metric: str) -> str:
+    unit = METRIC_UNIT_PHRASE[metric]
+    note = SOURCE_COMPOSITION.get(source)
+    return f"{unit} {note}" if note else unit
+
+
+def _grouped_subtitle(view) -> str:
+    """Subtitle for the stacked breakdown views."""
+    metric = view.dimensions["metric"]
+    unit = METRIC_UNIT_PHRASE[metric]
+    if view.dimensions["source"] == "fossil_nuclear_renewables":
+        return (
+            f"{unit} Fossil fuels are coal, oil, and gas; renewables include hydropower, solar, wind, "
+            "geothermal, wave and tidal, and bioenergy."
+        )
+    return unit
 
 
 # Map color scheme per (source, metric), copied from the original production charts each view replaces
@@ -268,5 +298,6 @@ def set_view_titles(c) -> None:
         metric = v.dimensions["metric"]
         config = dict(v.config or {})
         config["title"] = _view_title(source, metric)
+        config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric)
         v.config = config

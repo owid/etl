@@ -94,11 +94,6 @@ def run() -> None:
         "per_capita": "Per capita electricity generation by source",
         "share_of_generation": "Share of electricity generation by source",
     }
-    metric_subtitles = {
-        "generation": "Measured in [terawatt-hours](#dod:watt-hours).",
-        "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
-        "share_of_generation": "Share of electricity generation that comes from each source.",
-    }
     # NOTE: choices are listed top-to-bottom because grapher's StackedArea renders the first series at
     # the top. Listing the smallest source first puts it at the top and the largest at the bottom,
     # matching the original charts (e.g. coal at the bottom, other renewables at the top).
@@ -119,7 +114,7 @@ def run() -> None:
         ],
         params={
             "title": lambda view: metric_titles[view.dimensions["metric"]],
-            "subtitle": lambda view: metric_subtitles[view.dimensions["metric"]],
+            "subtitle": _grouped_subtitle,
         },
     )
 
@@ -176,6 +171,51 @@ def _view_title(source: str, metric: str) -> str:
         "per_capita": f"Electricity generation from {name} per person",
         "share_of_generation": f"Share of electricity generation from {name}",
     }[metric]
+
+
+# Unit phrase per metric, and composition notes for composite sources. The original charts spelled out
+# what each grouping contains (e.g. which renewables are included); we keep those notes.
+METRIC_UNIT_PHRASE = {
+    "generation": "Measured in [terawatt-hours](#dod:watt-hours).",
+    "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
+    "share_of_generation": "Measured as a percentage of total electricity generation.",
+}
+SOURCE_COMPOSITION = {
+    "fossil": "Fossil fuels include coal, oil, and gas.",
+    "renewables": "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.",
+    "low_carbon": "Low-carbon sources are the sum of nuclear and renewables.",
+    "other_renewables": "Other renewables include bioenergy, geothermal, wave, and tidal.",
+    "solar_and_wind": "Combined electricity generation from solar and wind.",
+    "wind": "Includes both onshore and offshore wind.",
+}
+# Total-only metrics have a single fixed subtitle (they only exist for source "total").
+TOTAL_ONLY_SUBTITLES = {
+    "demand": "Total electricity generation, adjusted for imports and exports. Measured in [terawatt-hours](#dod:watt-hours).",
+    "demand_per_capita": "Electricity generation adjusted for imports and exports. Measured in [kilowatt-hours](#dod:watt-hours) per person.",
+    "net_imports": "Electricity imports minus exports, measured in [terawatt-hours](#dod:watt-hours). Positive values are net importers; negative values are net exporters.",
+    "imports_share": "Electricity imports minus exports, as a share of demand. Positive values are net importers; negative values are net exporters.",
+    "carbon_intensity": "Measured in grams of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per [kilowatt-hour](#dod:watt-hours), on a lifecycle basis.",
+}
+
+
+def _view_subtitle(source: str, metric: str) -> str:
+    if metric in TOTAL_ONLY_SUBTITLES:
+        return TOTAL_ONLY_SUBTITLES[metric]
+    unit = METRIC_UNIT_PHRASE[metric]
+    note = SOURCE_COMPOSITION.get(source)
+    return f"{unit} {note}" if note else unit
+
+
+def _grouped_subtitle(view) -> str:
+    """Subtitle for the stacked breakdown views."""
+    metric = view.dimensions["metric"]
+    unit = METRIC_UNIT_PHRASE[metric]
+    if view.dimensions["source"] == "fossil_nuclear_renewables":
+        return (
+            f"{unit} Fossil fuels are coal, oil, and gas; renewables include solar, wind, hydropower, "
+            "bioenergy, geothermal, wave, and tidal."
+        )
+    return unit
 
 
 # Map color scheme per (source, metric), copied from the original production charts each view replaces
@@ -264,5 +304,6 @@ def set_view_titles(c) -> None:
         metric = v.dimensions["metric"]
         config = dict(v.config or {})
         config["title"] = _view_title(source, metric)
+        config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric)
         v.config = config

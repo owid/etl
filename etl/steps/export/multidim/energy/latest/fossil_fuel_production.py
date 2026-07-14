@@ -53,11 +53,6 @@ def run() -> None:
         "per_capita": "Per capita fossil fuel production by fuel",
         "reserves_ratio": "Reserves-to-production ratio",
     }
-    metric_subtitles = {
-        "production": "Measured in [terawatt-hours](#dod:watt-hours).",
-        "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
-        "reserves_ratio": "Number of years of production left at current rates.",
-    }
     # NOTE: choices are listed top-to-bottom because grapher's StackedArea renders the first series at
     # the top, so listing coal last puts it at the bottom, matching the original charts.
     c.group_views(
@@ -77,7 +72,7 @@ def run() -> None:
         ],
         params={
             "title": lambda view: metric_titles[view.dimensions["metric"]],
-            "subtitle": lambda view: metric_subtitles[view.dimensions["metric"]],
+            "subtitle": lambda view: METRIC_UNIT_PHRASE[view.dimensions["metric"]],
         },
     )
     # Stacking reserves-to-production ratios (years of production left) makes no sense; drop that combination.
@@ -96,6 +91,13 @@ def run() -> None:
 
 
 FUEL_TITLE_NAMES = {"coal": "coal", "oil": "oil", "gas": "gas"}
+
+# Unit phrase per metric, used for both single-fuel and stacked views.
+METRIC_UNIT_PHRASE = {
+    "production": "Measured in [terawatt-hours](#dod:watt-hours).",
+    "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
+    "reserves_ratio": "Number of years of production left at current reserves and production rates.",
+}
 
 
 def _view_title(fuel: str, metric: str) -> str:
@@ -136,5 +138,6 @@ def set_view_titles(c) -> None:
             continue
         config = dict(v.config or {})
         config["title"] = _view_title(fuel, v.dimensions["metric"])
+        config["subtitle"] = METRIC_UNIT_PHRASE[v.dimensions["metric"]]
         config["map"] = _map_config(fuel, v.dimensions["metric"])
         v.config = config
