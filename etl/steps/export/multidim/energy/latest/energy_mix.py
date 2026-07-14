@@ -50,6 +50,11 @@ def run() -> None:
                 column_dimensions[column] = {"source": source_slug, "metric": metric_slug}
 
     tb = tb[list(column_dimensions)]
+    # Data max per (source, metric), used to place the top map bin below the max so it renders
+    # as an open-ended bracket for unbounded magnitudes (see set_view_titles / _map_config).
+    dims_max = {
+        (dims["source"], dims["metric"]): float(tb[column].quantile(0.99)) for column, dims in column_dimensions.items()
+    }
     for column, dims in column_dimensions.items():
         tb[column].m.dimensions = dims
         tb[column].m.original_short_name = "energy"
@@ -130,7 +135,7 @@ def run() -> None:
     # Set an explicit title on every single-source view. Otherwise grapher falls back to the
     # indicator's display name (e.g. the annual-change indicators inherit "Total energy supply"),
     # which mislabels the view. Grouped (stacked) views already carry a title from group_views.
-    set_view_titles(c)
+    set_view_titles(c, dims_max)
 
     #
     # Save outputs.
@@ -279,7 +284,27 @@ SOURCE_FALLBACK_SCHEME = {
 }
 
 
-def _map_config(source: str, metric: str) -> dict:
+# Metrics that are unbounded positive magnitudes: their map should use log-spaced bins with an
+# open-ended top bracket (">X"). Percentages (share) stay closed, and annual_change is diverging.
+LOG_METRICS = {"total", "per_capita"}
+
+
+def _log_thresholds(vmax: float | None, max_bins: int = 7) -> list[float] | None:
+    """1-2-5 log-spaced bin edges from 0 up to the largest ladder value strictly below vmax.
+
+    Keeping the top edge below the data max makes grapher render an open-ended top bin
+    (isOpenRight = last edge < data max), matching the original charts' brackets.
+    """
+    if vmax is None or not (vmax > 0):
+        return None
+    ladder = [m * 10**p for p in range(0, 13) for m in (1, 2, 5)]
+    below = [v for v in ladder if v < vmax]
+    if len(below) < 2:
+        return None
+    return [0] + below[-(max_bins - 1) :]
+
+
+def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
     # timeTolerance fills the newest map year for countries whose latest data is a year or two old
     # (e.g. EIA-extended countries end in 2024 while the Statistical Review reaches 2025).
     scheme = ORIGINAL_MAP_SCHEMES.get((source, metric))
@@ -288,10 +313,16 @@ def _map_config(source: str, metric: str) -> dict:
             scheme = {"baseColorScheme": "BrBG", "colorSchemeInvert": True}
         else:
             scheme = {"baseColorScheme": SOURCE_FALLBACK_SCHEME.get(source, "YlGnBu")}
-    return {"colorScale": scheme, "timeTolerance": 3}
+    color_scale = dict(scheme)
+    if metric in LOG_METRICS:
+        edges = _log_thresholds(vmax)
+        if edges:
+            color_scale["binningStrategy"] = "manual"
+            color_scale["customNumericValues"] = edges
+    return {"colorScale": color_scale, "timeTolerance": 3}
 
 
-def set_view_titles(c) -> None:
+def set_view_titles(c, dims_max: dict) -> None:
     for v in c.views:
         source = v.dimensions["source"]
         if source not in SOURCE_TITLE_NAMES:
@@ -301,5 +332,5 @@ def set_view_titles(c) -> None:
         config = dict(v.config or {})
         config["title"] = _view_title(source, metric)
         config["subtitle"] = _view_subtitle(source, metric)
-        config["map"] = _map_config(source, metric)
+        config["map"] = _map_config(source, metric, dims_max.get((source, metric)))
         v.config = config

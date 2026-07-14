@@ -28,6 +28,11 @@ def run() -> None:
     #
     # Keep only the columns that map to a (fuel, metric) view, and set their dimensions.
     tb = tb[list(COLUMN_DIMENSIONS)]
+    # Data max per (fuel, metric), used to place the top map bin below the max so it renders as an
+    # open-ended bracket for these unbounded magnitudes (see set_view_titles / _map_config).
+    dims_max = {
+        (dims["fuel"], dims["metric"]): float(tb[column].quantile(0.99)) for column, dims in COLUMN_DIMENSIONS.items()
+    }
     for column, dims in COLUMN_DIMENSIONS.items():
         tb[column].m.dimensions = dims
         tb[column].m.original_short_name = "fossil_fuel_production"
@@ -84,7 +89,7 @@ def run() -> None:
 
     # Set an explicit title on every single-fuel view, so grapher does not fall back to the
     # indicator display name. The grouped (stacked) view already carries a title from group_views.
-    set_view_titles(c)
+    set_view_titles(c, dims_max)
 
     #
     # Save outputs.
@@ -126,20 +131,46 @@ ORIGINAL_MAP_SCHEMES = {
 # Per-fuel fallback for views without a pre-existing chart (e.g. the reserves-to-production ratio).
 FUEL_FALLBACK_SCHEME = {"coal": "OrRd", "oil": "YlOrRd", "gas": "Purples"}
 
+# All fossil-fuel metrics are unbounded positive magnitudes, so every map uses log-spaced bins with
+# an open-ended top bracket (">X").
+LOG_METRICS = {"production", "per_capita", "reserves_ratio"}
 
-def _map_config(fuel: str, metric: str) -> dict:
+
+def _log_thresholds(vmax: float | None, max_bins: int = 7) -> list[float] | None:
+    """1-2-5 log-spaced bin edges from 0 up to the largest ladder value strictly below vmax.
+
+    Keeping the top edge below the data max makes grapher render an open-ended top bin
+    (isOpenRight = last edge < data max), matching the original charts' brackets.
+    """
+    if vmax is None or not (vmax > 0):
+        return None
+    ladder = [m * 10**p for p in range(0, 13) for m in (1, 2, 5)]
+    below = [v for v in ladder if v < vmax]
+    if len(below) < 2:
+        return None
+    return [0] + below[-(max_bins - 1) :]
+
+
+def _map_config(fuel: str, metric: str, vmax: float | None = None) -> dict:
     scheme = ORIGINAL_MAP_SCHEMES.get((fuel, metric)) or {"baseColorScheme": FUEL_FALLBACK_SCHEME[fuel]}
-    return {"colorScale": scheme, "timeTolerance": 3}
+    color_scale = dict(scheme)
+    if metric in LOG_METRICS:
+        edges = _log_thresholds(vmax)
+        if edges:
+            color_scale["binningStrategy"] = "manual"
+            color_scale["customNumericValues"] = edges
+    return {"colorScale": color_scale, "timeTolerance": 3}
 
 
-def set_view_titles(c) -> None:
+def set_view_titles(c, dims_max: dict) -> None:
     for v in c.views:
         fuel = v.dimensions["fuel"]
         if fuel not in FUEL_TITLE_NAMES:
             # Grouped/stacked view already has a title from group_views.
             continue
+        metric = v.dimensions["metric"]
         config = dict(v.config or {})
-        config["title"] = _view_title(fuel, v.dimensions["metric"])
-        config["subtitle"] = METRIC_UNIT_PHRASE[v.dimensions["metric"]]
-        config["map"] = _map_config(fuel, v.dimensions["metric"])
+        config["title"] = _view_title(fuel, metric)
+        config["subtitle"] = METRIC_UNIT_PHRASE[metric]
+        config["map"] = _map_config(fuel, metric, dims_max.get((fuel, metric)))
         v.config = config
