@@ -4,8 +4,9 @@ Combines three sources:
   - World Bank World Development Indicators (WDI): sector employment shares (ILO-modeled,
     1991 onwards) and total employment.
   - The historical compilation built in structural_transformation_historical (Herrendorf,
-    Rogerson and Valentinyi 2014, updated with the GGDC 10-Sector Database and the Swedish
-    Historical National Accounts), covering ten countries since 1800 (Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States).
+    Rogerson and Valentinyi 2014, updated with the GGDC 10-Sector Database), covering ten
+    countries since 1800 (Belgium, Finland, France, Japan, the Netherlands, South Korea,
+    Spain, Sweden, the United Kingdom and the United States).
   - Broadberry and Gardner (2013): benchmark estimates of the share of the labor force
     employed in agriculture in five European countries (France, Italy, the Netherlands,
     Poland and the United Kingdom), 1300-1800, joined with employment shares in all three

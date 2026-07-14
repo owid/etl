@@ -6,7 +6,7 @@ definitions:
       topic_tags:
         - Economic Growth
   description_processing_splice: |-
-    This indicator combines two sources: recent estimates from the World Bank's World Development Indicators, and a compilation of historical sources built by Our World in Data, based on the dataset published by Herrendorf, Rogerson and Valentinyi (2014) and updated with the GGDC 10-Sector Database (January 2015 release) and the Swedish Historical National Accounts. For each country, World Bank data is used from its first available year onwards; historical sources only inform earlier years. To preserve a consistent series between the historical estimates and the World Bank data available from 1991 onwards, the years 1986-1990 are not included.
+    This indicator combines two sources: recent estimates from the World Bank's World Development Indicators, and a compilation of historical sources built by Our World in Data, based on the dataset published by Herrendorf, Rogerson and Valentinyi (2014) and updated with the GGDC 10-Sector Database (January 2015 release). For each country, World Bank data is used from its first available year onwards; historical sources only inform earlier years. To preserve a consistent series between the historical estimates and the World Bank data available from 1991 onwards, the years 1986-1990 are not included.
   description_processing_shares: |-
     This indicator combines two series published by the World Bank's World Development Indicators: ILO-modeled employment shares, available from 1991 onwards, and — for France, Italy, the Netherlands, Poland and the United Kingdom — employment shares around 1980 from an archived edition, which the World Bank later replaced with the ILO-modeled series.
   description_key_archive: |-

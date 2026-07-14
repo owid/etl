@@ -3,10 +3,10 @@
 This step combines several sources into long-run series of employment numbers and value
 added shares by broad economic sector. The base is the dataset published by Herrendorf,
 Rogerson and Valentinyi (2014), updated country by country with the GGDC 10-Sector
-Database (January 2015 release), the Swedish Historical National Accounts, and BEA's GDP
-by industry statistics for the United States (the historical statistics for 1947-1997 and
-the current accounts from 1998 onwards). The country-by-country combination follows the
-methodology described in
+Database (January 2015 release), the Swedish Historical National Accounts (value added
+only; see the NOTE in the recipe below), and BEA's GDP by industry statistics for the
+United States (the historical statistics for 1947-1997 and the current accounts from 1998
+onwards). The country-by-country combination follows the methodology described in
 https://assets.ourworldindata.org/uploads/2017/10/Documentation-for-Historical-employment-and-output-by-sector-%E2%80%93-OWID-2017.pdf
 
 Employment years from 1991 onwards are superseded by World Bank data in the combined
@@ -47,7 +47,14 @@ RECIPE = {
     # GGDC only from 1963 (the same year as the employment switch), so 1963 is used here.
     "South Korea": {"va": [("ggdc", 1963, None)], "emp": [("ggdc", 1963, None)]},
     "Netherlands": {"va": [("ggdc", 1970, None)], "emp": [("ggdc", 1949, 1949), ("ggdc", 1960, None)]},
-    "Sweden": {"replace_all": True},
+    # NOTE: The methodology documentation replaces all of Sweden with the Swedish Historical
+    # National Accounts. The previously published employment values correspond to the Krantz
+    # and Schön (2007) series embedded in Herrendorf et al. (the sources documented at
+    # https://ourworldindata.org/agri-employment-sources), and the current SHNA release
+    # revised historical employment levels upwards by 10-30% (rebased to a Statistics Sweden
+    # benchmark in 2023), so the SHNA replaces value added only and employment stays with the
+    # base source.
+    "Sweden": {"va": [("lund", 1800, None)]},
     "United Kingdom": {"va": [("ggdc", 1960, None)], "emp": [("ggdc", 1948, None)]},
     "United States": {"va": [("bea", 1947, None)], "emp_drop_years": [1800, 1810, 1820, 1830]},
 }
@@ -155,7 +162,7 @@ def run() -> None:
     tb_lund = paths.regions.harmonize_names(tb=tb_lund)
     tb_bea = paths.regions.harmonize_names(tb=tb_bea)
 
-    tb = apply_recipe(tb_hrv=tb_hrv, overrides={"ggdc": tb_ggdc, "bea": tb_bea}, tb_lund=tb_lund)
+    tb = apply_recipe(tb_hrv=tb_hrv, overrides={"ggdc": tb_ggdc, "bea": tb_bea, "lund": tb_lund})
 
     # Round employment to whole persons.
     tb[EMPLOYMENT_COLUMNS] = tb[EMPLOYMENT_COLUMNS].round()
@@ -165,7 +172,6 @@ def run() -> None:
         [
             tb_hrv["number_employed_agriculture"],
             tb_ggdc["number_employed_agriculture"],
-            tb_lund["number_employed_agriculture"],
         ]
     )
     share_origins = union_source_origins(
@@ -328,20 +334,17 @@ def prepare_bea(tb: Table) -> Table:
     return tb[["country", "year"] + SHARE_COLUMNS]
 
 
-def apply_recipe(tb_hrv: Table, overrides: dict, tb_lund: Table) -> Table:
+def apply_recipe(tb_hrv: Table, overrides: dict) -> Table:
     """Apply the country-by-country combination recipe."""
     tables = []
     for country, rules in RECIPE.items():
-        if rules.get("replace_all"):
-            tb_country = tb_lund[tb_lund["country"] == country].copy()
-        else:
-            tb_country = tb_hrv[tb_hrv["country"] == country].copy()
-            tb_country = apply_overrides(tb_country, overrides, country, rules.get("emp", []), EMPLOYMENT_COLUMNS)
-            tb_country = apply_overrides(tb_country, overrides, country, rules.get("va", []), SHARE_COLUMNS)
-            for year in rules.get("va_drop_years", []):
-                tb_country.loc[tb_country["year"] == year, SHARE_COLUMNS] = float("nan")
-            for year in rules.get("emp_drop_years", []):
-                tb_country.loc[tb_country["year"] == year, EMPLOYMENT_COLUMNS] = float("nan")
+        tb_country = tb_hrv[tb_hrv["country"] == country].copy()
+        tb_country = apply_overrides(tb_country, overrides, country, rules.get("emp", []), EMPLOYMENT_COLUMNS)
+        tb_country = apply_overrides(tb_country, overrides, country, rules.get("va", []), SHARE_COLUMNS)
+        for year in rules.get("va_drop_years", []):
+            tb_country.loc[tb_country["year"] == year, SHARE_COLUMNS] = float("nan")
+        for year in rules.get("emp_drop_years", []):
+            tb_country.loc[tb_country["year"] == year, EMPLOYMENT_COLUMNS] = float("nan")
         tables.append(tb_country)
 
     tb = pr.concat(tables, ignore_index=True)
@@ -463,6 +466,9 @@ def sanity_check_outputs(tb: Table) -> None:
         ("Belgium", 1846, "number_employed_agriculture", 681000, 1),
         ("United Kingdom", 1801, "number_employed_agriculture", 1426000, 1),
         ("Japan", 1953, "number_employed_agriculture", 17081689, 2),
+        # Sweden employment stays with the Krantz and Schön (2007) series embedded in
+        # Herrendorf et al. (see the NOTE in the recipe).
+        ("Sweden", 1900, "number_employed_agriculture", 1089129, 1),
         ("South Korea", 1963, "share_gdp_agriculture", 41.41, 0.1),
         # BEA-sourced (the frozen value is 6.6, rounded to one decimal in the BEA source).
         ("United States", 1950, "share_gdp_agriculture", 6.6, 0.15),
