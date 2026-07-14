@@ -11,8 +11,6 @@ definitions:
     This indicator combines two series published by the World Bank's World Development Indicators: ILO-modeled employment shares, available from 1991 onwards, and — for France, Italy, the Netherlands, Poland and the United Kingdom — employment shares around 1980 from an archived edition, which the World Bank later replaced with the ILO-modeled series.
   description_key_archive: |-
     For five European countries (France, Italy, the Netherlands, Poland and the United Kingdom), earlier values around 1980 come from an archived edition of the World Development Indicators, which the World Bank later replaced with the ILO-modeled series.
-  description_key_utilities: |-
-    In the historical estimates, utilities (electricity, gas and water) are counted within services, following Herrendorf, Rogerson and Valentinyi (2014). The World Bank counts them within industry. This creates a small definitional break between the historical and recent segments of the industry and services series.
   description_key_employment_concepts: |-
     Historical estimates count the number of persons engaged in each sector, based on national historical statistics. Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, based on employment of people aged 15 and over.
 
@@ -94,35 +92,3 @@ tables:
         display:
           name: Agriculture
           numDecimalPlaces: 0
-      number_employed_industry:
-        title: Number of people employed in industry
-        unit: people
-        description_short: Number of people working in industry, including mining, manufacturing and construction.
-        description_key:
-          - "{definitions.description_key_employment_concepts}"
-          - "{definitions.description_key_utilities}"
-        description_processing: |-
-          {definitions.description_processing_splice}
-
-          For recent years, the number is calculated as the World Bank's industrial share of employment multiplied by the total number of employed people, which is derived in turn from the ILO-modeled employment-to-population ratio and the United Nations estimate of the population aged 15 and over.
-        display:
-          name: Industry
-          numDecimalPlaces: 0
-        presentation:
-          title_public: Number of people employed in industry
-      number_employed_services:
-        title: Number of people employed in services
-        unit: people
-        description_short: Number of people working in services.
-        description_key:
-          - "{definitions.description_key_employment_concepts}"
-          - "{definitions.description_key_utilities}"
-        description_processing: |-
-          {definitions.description_processing_splice}
-
-          For recent years, the number is calculated as the World Bank's services share of employment multiplied by the total number of employed people, which is derived in turn from the ILO-modeled employment-to-population ratio and the United Nations estimate of the population aged 15 and over.
-        display:
-          name: Services
-          numDecimalPlaces: 0
-        presentation:
-          title_public: Number of people employed in services

@@ -14,14 +14,17 @@ Combines three sources:
     World Bank later replaced those series with ILO-modeled estimates that begin in
     1991).
 
-The employment numbers splice the historical compilation with WDI: for each country, WDI
-is used from its first available year onwards; the compilation only contributes years
-strictly before that. This avoids mixing definitions within the modern segment of a
-series. The years 1986-1990 are excluded from the historical series: the definitional
-break between the historical persons-engaged data and the ILO-modeled data from 1991 is
-large for some countries (e.g. Japan, United States), and excluding these years keeps the
-transition between the two sources consistent (see
-https://ourworldindata.org/agri-employment-sources).
+The agriculture employment numbers splice the historical compilation with WDI,
+replicating the design of the previously published dataset (see
+https://ourworldindata.org/agri-employment-sources): for each country, WDI is used from
+its first available year onwards; the compilation only contributes years strictly before
+that. This avoids mixing definitions within the modern segment of a series. The years
+1986-1990 are excluded from the historical series: the definitional break between the
+historical persons-engaged data and the ILO-modeled data from 1991 is large for some
+countries, and excluding these years keeps the transition between the two sources
+consistent. Employment numbers for industry and services could be built with the same
+methodology, but they are not published for now; the compilation's industry and services
+numbers remain available in structural_transformation_historical.
 
 The employment shares join the benchmark estimates with WDI from 1991: for agriculture,
 Broadberry and Gardner (1300-1800) plus the values around 1980 from the archived WDI
@@ -44,8 +47,8 @@ paths = PathFinder(__file__)
 
 SECTORS = ["agriculture", "industry", "services"]
 SHARE_EMPLOYED_COLUMNS = [f"share_employed_{sector}" for sector in SECTORS]
-NUMBER_EMPLOYED_COLUMNS = [f"number_employed_{sector}" for sector in SECTORS]
-INDICATOR_COLUMNS = SHARE_EMPLOYED_COLUMNS + NUMBER_EMPLOYED_COLUMNS
+# Employment numbers are only published for agriculture (see the module docstring).
+INDICATOR_COLUMNS = SHARE_EMPLOYED_COLUMNS + ["number_employed_agriculture"]
 
 # WDI indicators used (columns of the wide wdi table, named after the WDI codes).
 WDI_COLUMNS = {
@@ -68,9 +71,8 @@ COMPILATION_COUNTRIES = [
     "United States",
 ]
 
-# Thresholds for the splice discontinuity report.
-JUMP_THRESHOLD_SHARES = 15  # percentage points
-JUMP_THRESHOLD_NUMBERS = 0.3  # relative change
+# Threshold for the splice discontinuity report (relative change).
+JUMP_THRESHOLD_NUMBERS = 0.3
 
 
 def run() -> None:
@@ -119,15 +121,14 @@ def run() -> None:
 
 
 def prepare_wdi(tb: Table) -> Table:
-    """Select the WDI indicators and derive the number employed by sector."""
+    """Select the WDI indicators and derive the number employed in agriculture."""
     tb = tb[["country", "year", "number_employed"] + list(WDI_COLUMNS)].copy()
     tb = tb.rename(columns=WDI_COLUMNS, errors="raise")
 
-    # Number employed by sector: sector share of total employment times total employment
-    # (derived in the WDI garden step from the ILO-modeled employment-to-population ratio
-    # and the UN population aged 15 and over).
-    for sector in SECTORS:
-        tb[f"number_employed_{sector}"] = (tb[f"share_employed_{sector}"] / 100 * tb["number_employed"]).round()
+    # Number employed in agriculture: the agriculture share of total employment times total
+    # employment (derived in the WDI garden step from the ILO-modeled employment-to-population
+    # ratio and the UN population aged 15 and over).
+    tb["number_employed_agriculture"] = (tb["share_employed_agriculture"] / 100 * tb["number_employed"]).round()
     tb = tb.drop(columns=["number_employed"])
 
     tb = tb.dropna(subset=INDICATOR_COLUMNS, how="all").reset_index(drop=True)
@@ -136,14 +137,14 @@ def prepare_wdi(tb: Table) -> Table:
 
 
 def prepare_historical(tb: Table) -> Table:
-    """Keep the compilation's employment numbers for the years before the WDI era."""
+    """Keep the compilation's agriculture employment numbers for the years before the WDI era."""
     tb = tb.copy()
 
     # Exclude 1986-1990 to keep the transition to the ILO-modeled series (from 1991)
     # consistent; see the module docstring.
     tb = tb[~tb["year"].between(1986, 1990)].reset_index(drop=True)
 
-    return tb[["country", "year"] + NUMBER_EMPLOYED_COLUMNS]
+    return tb[["country", "year", "number_employed_agriculture"]]
 
 
 def combine_sources(tb_wdi: Table, tb_historical: Table, tb_benchmarks: Table) -> Table:
@@ -154,7 +155,10 @@ def combine_sources(tb_wdi: Table, tb_historical: Table, tb_benchmarks: Table) -
     tb_benchmarks = tb_benchmarks.rename(columns={column: f"{column}_hist" for column in SHARE_EMPLOYED_COLUMNS})
     tb = pr.merge(tb, tb_benchmarks, on=["country", "year"], how="outer")
 
-    for column in INDICATOR_COLUMNS:
+    # Columns with a historical segment; the industry and services employment numbers are
+    # computed from WDI only (see the module docstring).
+    spliced_columns = SHARE_EMPLOYED_COLUMNS + ["number_employed_agriculture"]
+    for column in spliced_columns:
         # First year with WDI data, per country.
         first_wdi_year = tb[tb[column].notna()].groupby("country", observed=True)["year"].min()
         cutoff = tb["country"].map(first_wdi_year)
@@ -168,7 +172,7 @@ def combine_sources(tb_wdi: Table, tb_historical: Table, tb_benchmarks: Table) -
         tb[column] = tb[column].combine_first(historical)
         tb[column].m.origins = origins
 
-    tb = tb.drop(columns=[f"{column}_hist" for column in INDICATOR_COLUMNS])
+    tb = tb.drop(columns=[f"{column}_hist" for column in spliced_columns])
     tb = tb.dropna(subset=INDICATOR_COLUMNS, how="all").reset_index(drop=True)
 
     return tb
@@ -186,39 +190,29 @@ def union_origins(origins_a: list, origins_b: list) -> list:
 def report_splice_discontinuities(tb_wdi: Table, tb_historical: Table) -> None:
     """Warn about large jumps between the last historical value and the first WDI value.
 
-    Some jumps are expected: utilities move from services (historical convention) to
-    industry (WDI/ISIC) at the splice, and historical employment covers persons engaged
-    while WDI covers ILO-modeled employment aged 15 and over. The warnings surface them
-    for review, they are not errors.
+    Some jumps are expected: historical employment covers persons engaged while WDI covers
+    ILO-modeled employment aged 15 and over. The warnings surface them for review, they
+    are not errors.
     """
+    column = "number_employed_agriculture"
     for country in tb_historical["country"].unique():
-        tb_hist_country = tb_historical[tb_historical["country"] == country]
-        tb_wdi_country = tb_wdi[tb_wdi["country"] == country]
-        for column in NUMBER_EMPLOYED_COLUMNS:
-            hist_values = tb_hist_country.dropna(subset=[column])
-            wdi_values = tb_wdi_country.dropna(subset=[column])
-            if hist_values.empty or wdi_values.empty:
-                continue
-            first_wdi_year = wdi_values["year"].min()
-            hist_before = hist_values[hist_values["year"] < first_wdi_year]
-            if hist_before.empty:
-                continue
-            last_hist_year = hist_before["year"].max()
-            wdi_value = wdi_values.loc[wdi_values["year"] == first_wdi_year, column].iloc[0]
-            hist_value = hist_before.loc[hist_before["year"] == last_hist_year, column].iloc[0]
-            if column in NUMBER_EMPLOYED_COLUMNS:
-                jump = abs(wdi_value - hist_value) / hist_value
-                threshold = JUMP_THRESHOLD_NUMBERS
-                unit = ""
-            else:
-                jump = abs(wdi_value - hist_value)
-                threshold = JUMP_THRESHOLD_SHARES
-                unit = " pp"
-            if jump > threshold:
-                log.warning(
-                    f"Splice discontinuity in {country}, {column}: {hist_value:.0f} ({int(last_hist_year)}) -> "
-                    f"{wdi_value:.0f} ({int(first_wdi_year)}), jump of {jump:.2f}{unit}."
-                )
+        hist_values = tb_historical[tb_historical["country"] == country].dropna(subset=[column])
+        wdi_values = tb_wdi[tb_wdi["country"] == country].dropna(subset=[column])
+        if hist_values.empty or wdi_values.empty:
+            continue
+        first_wdi_year = wdi_values["year"].min()
+        hist_before = hist_values[hist_values["year"] < first_wdi_year]
+        if hist_before.empty:
+            continue
+        last_hist_year = hist_before["year"].max()
+        wdi_value = wdi_values.loc[wdi_values["year"] == first_wdi_year, column].iloc[0]
+        hist_value = hist_before.loc[hist_before["year"] == last_hist_year, column].iloc[0]
+        jump = abs(wdi_value - hist_value) / hist_value
+        if jump > JUMP_THRESHOLD_NUMBERS:
+            log.warning(
+                f"Splice discontinuity in {country}, {column}: {hist_value:.0f} ({int(last_hist_year)}) -> "
+                f"{wdi_value:.0f} ({int(first_wdi_year)}), jump of {jump:.2f}."
+            )
 
 
 def sanity_check_inputs(tb_historical: Table, tb_broadberry: Table, tb_archive: Table, tb_wdi: Table) -> None:
@@ -250,9 +244,8 @@ def sanity_check_outputs(tb: Table) -> None:
         error = f"{column} has exact zeros, which would be placeholder values."
         assert (tb[column].dropna() != 0).all(), error
 
-    for column in NUMBER_EMPLOYED_COLUMNS:
-        error = f"{column} has negative or zero values."
-        assert (tb[column].dropna() > 0).all(), error
+    error = "number_employed_agriculture has negative or zero values."
+    assert (tb["number_employed_agriculture"].dropna() > 0).all(), error
 
     error = "Modern era should cover most countries in the world."
     assert tb[tb["year"] == 2019]["share_employed_agriculture"].notna().sum() > 150, error
@@ -261,14 +254,14 @@ def sanity_check_outputs(tb: Table) -> None:
     assert tb[tb["year"].between(1986, 1990)].empty, error
 
     # No gap between the end of the historical series and the start of the WDI series for
-    # the compilation countries: each employment series should be continuous at the splice.
+    # the compilation countries: the agriculture employment series should be continuous at
+    # the splice.
     for country in COMPILATION_COUNTRIES:
         tb_country = tb[tb["country"] == country]
-        for column in NUMBER_EMPLOYED_COLUMNS:
-            years = tb_country.dropna(subset=[column])["year"]
-            error = f"Gap around the splice point in {country}, {column}."
-            recent = years[years.between(1985, 2000)]
-            assert set(range(1991, 2000)) <= set(recent), error
+        years = tb_country.dropna(subset=["number_employed_agriculture"])["year"]
+        error = f"Gap around the splice point in {country}, number_employed_agriculture."
+        recent = years[years.between(1985, 2000)]
+        assert set(range(1991, 2000)) <= set(recent), error
 
     error = "Benchmark years must survive the splice."
     for country, year in [("Poland", 1500), ("Italy", 1300), ("Poland", 1981), ("Italy", 1980)]:
