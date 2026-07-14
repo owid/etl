@@ -51,16 +51,44 @@ def create_metadata_table(legacy_json: dict, series_csv) -> Table:
     - WDISeries.csv (inside the WDI zip): per-field rich metadata. WB keeps this
       in sync with their data portal display, while the DDH API lags. CSV `Source`
       and `Topic` are intentionally omitted here — legacy v2 wins for those.
+
+    - NOTE: The legacy v2 API occasionally 404s for an indicator that still has
+      real data and a WDISeries.csv entry (seen 2026-07-14: SE.LPV.PRIM.SD, which
+      has 364 non-null values but vanished from the legacy JSON, dropping legacy's
+      total from 1516 to 1497 indicators). For series present in the CSV but
+      missing from legacy, backfill indicator_name/source/topic/unit from the CSV
+      so the row isn't silently dropped (an outer join keeps it; a left join on
+      legacy would lose it, and the garden step would raise "Missing metadata in
+      WDISeries.csv" despite the CSV actually having an entry).
     """
     # Legacy JSON → core join-key columns.
     df_legacy = pd.DataFrame(legacy_json["data"])
     df_legacy.rename(columns={"indicator_code": "series_code"}, inplace=True)
 
-    # WDISeries.csv → rich glossary fields, snake_cased to the garden-expected names.
-    df_csv = pd.read_csv(series_csv, usecols=["Series Code", *WDI_SERIES_RICH_COLUMNS.keys()])
-    df_csv = df_csv.rename(columns={"Series Code": "series_code", **WDI_SERIES_RICH_COLUMNS})
+    # WDISeries.csv → rich glossary fields, snake_cased to the garden-expected names,
+    # plus the core fields (Indicator Name/Source/Topic/Unit) kept aside as a fallback
+    # for series codes missing from the legacy JSON.
+    fallback_columns = {
+        "Indicator Name": "indicator_name",
+        "Source": "source",
+        "Topic": "topic",
+        "Unit of measure": "unit",
+    }
+    df_csv = pd.read_csv(series_csv, usecols=["Series Code", *WDI_SERIES_RICH_COLUMNS.keys(), *fallback_columns.keys()])
+    df_csv = df_csv.rename(
+        columns={"Series Code": "series_code", **WDI_SERIES_RICH_COLUMNS, **fallback_columns}
+    )
+    fallback_cols = list(fallback_columns.values())
+    df_csv_fallback = df_csv[["series_code", *fallback_cols]].rename(
+        columns={c: f"{c}_csv_fallback" for c in fallback_cols}
+    )
+    df_csv_rich = df_csv.drop(columns=fallback_cols)
 
-    df_meta = df_legacy.merge(df_csv, on="series_code", how="left")
+    df_meta = df_legacy.merge(df_csv_rich, on="series_code", how="outer")
+    df_meta = df_meta.merge(df_csv_fallback, on="series_code", how="left")
+    for col in fallback_cols:
+        df_meta[col] = df_meta[col].fillna(df_meta[f"{col}_csv_fallback"])
+    df_meta = df_meta.drop(columns=[f"{col}_csv_fallback" for col in fallback_cols])
 
     return Table(df_meta, short_name="wdi_metadata", underscore=True)
 

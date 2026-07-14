@@ -2878,5 +2878,217 @@
     "rawName": "Universal Health Coverage Dataset, World Health Organization (WHO) [WHO], uri: https://www.who.int/data/gho/data/indicators/indicator-details/GHO/uhc-index-of-service-coverage",
     "name": "Universal Health Coverage Dataset, WHO, via World Bank",
     "dataPublisherSource": ""
+  },
+  {
+    "rawName": "Alkire, S., Mishra, R., Selden, L. and Suppa, N. (2025). ‘The global Multidimensional Poverty Index (MPI) 2025: Country results and methodological note’, OPHI MPI Methodological Note 61, Oxford Poverty and Human Development Initiative (OPHI), University of Oxford.url: https://ophi.org.uk/publications/MN-61, uri: https://ophi.org.uk/publications/MN-61, publisher: Oxford Poverty and Human Development Initiative (OPHI)",
+    "name": "Oxford Poverty and Human Development Initiative (OPHI), University of Oxford, via World Bank"
+  },
+  {
+    "rawName": "Country official statistics, National Statistical Offices (NSOs);\nNational Accounts data files, Central Banks;\nStaff estimates, World Bank (WB)",
+    "name": "National statistical organizations and central banks, OECD national accounts, and World Bank staff estimates"
+  },
+  {
+    "rawName": "DHS API, Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: HC_HHHD_H_FEM; \tIndicator name from the original source: Female-headed households, publisher: DHS Program (ICF), type: API, date accessed: 2024-06-14",
+    "name": "DHS Program (ICF) (DHS API), via World Bank"
+  },
+  {
+    "rawName": "Data API, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources, note: The data are obtained through the UIS API.  Detailed documentation is available at: https://api.uis.unesco.org/api/public/documentation/, publisher: UNESCO Institute for Statistics (UIS), date accessed: 2026-03-19, date published: 2026-02",
+    "name": "UNESCO UIS Data API, via World Bank"
+  },
+  {
+    "rawName": "Data API, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources, note: The data are obtained through the UIS API.  Detailed documentation is available at: https://api.uis.unesco.org/api/public/documentation/, publisher: UNESCO Institute for Statistics (UIS), type: Bulk file (csv), date accessed: 2026-03-19, date published: 2026-02",
+    "name": "UNESCO Institute for Statistics (UIS) Data API, via World Bank"
+  },
+  {
+    "rawName": "Data API, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources, note: The data are obtained through the UIS API.  Detailed documentation is available at: https://api.uis.unesco.org/api/public/documentation/, publisher: UNESCO Institute for Statistics (UIS), type: Bulk file, date accessed: 2026-03-19, date published: 2026-02",
+    "name": "UNESCO UIS Data API, via World Bank"
+  },
+  {
+    "rawName": "Data API, UN Educational, Scientific and Cultural Organization (UNESCO), uri: https://databrowser.uis.unesco.org/resources, note: The data are obtained through the UIS API.  Detailed documentation is available at: https://api.uis.unesco.org/api/public/documentation/, publisher: UNESCO Institute for Statistics (UIS), type: Excel (bulk file), date accessed: 2026-03-19, date published: 2026-02",
+    "name": "UNESCO UIS Data API, via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_AGR; \tIndicator name from the original source: Wife beating justified for at least one specific reason [Women], publisher: The DHS Program (ICF), type: API, date accessed: 46155",
+    "name": "Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_ARG; \tIndicator name from the original source: Wife beating justified if she argues with him [Women], publisher: The DHS Program (ICF), type: API, date accessed: 46155",
+    "name": "Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_BFD; \tIndicator name from the original source: Wife beating justified if she burns the food [Women], publisher: The DHS Program (ICF), type: API, date accessed: 46155",
+    "name": "Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_NEG; \tIndicator name from the original source: Wife beating justified if she neglects the children [Women], publisher: The DHS Program (ICF), type: API, date accessed: 46155",
+    "name": "Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_OUT; \tIndicator name from the original source: Wife beating justified if she goes out without telling him [Women], publisher: The DHS Program (ICF), type: API, date accessed: 46155",
+    "name": "Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_AWBT_W_REF; \tIndicator name from the original source: Wife beating justified if she refuses to have sex with him [Women], publisher: The DHS Program (ICF), type: API, date accessed: 46155",
+    "name": "Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: WE_DMAK_W_3DC; \tIndicator name from the original source: Final say in all of the decisions [Women], publisher: The DHS program (ICF), type: API, date accessed: 2023-08-18",
+    "name": "Demographic and Health Surveys (DHS), The DHS Program (ICF), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), uri: FP_NADM_W_PDM, date accessed: 2026-06-15",
+    "name": "Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys compiled by United Nations Population Fund, United Nations (UN), uri: https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html, note: Indicator code from the original source: SH_FPL_INFM; \tIndicator name from the original source: Proportion of women aged 15–49 years who make their own informed decisions regarding sexual relations, contraceptive use and reproductive health care, publisher: UN Statistics Division, type: API, date accessed: 2026-06-17, date published: 2026-03-27",
+    "name": "Demographic and Health Surveys (DHS) and UN Statistics Division, via World Bank"
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, , uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: JRC European Commission, date published: 2024;\nEuropean Forest Observatory, uri: https://edgar.jrc.ec.europa.eu/dataset_ghg2024, publisher: European Commission (EC), date published: 2024",
+    "name": "Joint Research Centre (European Commission) and European Forest Observatory, via World Bank"
+  },
+  {
+    "rawName": "Education and Mismatch Indicators database (EMI), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: March 30, 2026",
+    "name": "Education and Mismatch Indicators, via World Bank"
+  },
+  {
+    "rawName": "Enterprise Surveys , World Bank Group (WBG), uri: https://www.enterprisesurveys.org/en/data",
+    "name": "Enterprise Surveys - World Bank"
+  },
+  {
+    "rawName": "Enterprise Surveys, World Bank (WB), uri: https://www.enterprisesurveys.org/en/data , note: All surveys were administered using the Enterprise Surveys methodology as outlined in the Methodology page which can be found from www.enterprisesurveys.org.",
+    "name": "Enterprise Surveys - World Bank"
+  },
+  {
+    "rawName": "Enterprise Surveys, World Bank Group (WBG), uri: https://www.enterprisesurveys.org/en/data",
+    "name": "Enterprise Surveys - World Bank"
+  },
+  {
+    "rawName": "FishBase database, FishBase, uri: https://www.fishbase.org/, date published: 2008",
+    "name": "FishBase (Froese and Pauly, 2008), via World Bank"
+  },
+  {
+    "rawName": "Global Burden of Disease Study 2023 (GBD 2023) Air Pollution Exposure Estimates and Risk Curves 1990-2023, GBD Collaborator Network, uri: https://ghdx.healthdata.org/record/ihme-data/gbd-2023-air-pollution-exposure-estimates-1990-2023, note: Need to create account to retrieve data., publisher: Institute for Health Metrics and Evaluation (IHME), date accessed: 2026-04-03, date published: 2026-01-23",
+    "name": "Global Burden of Disease Study 2023, Institute for Health Metrics and Evaluation (IHME), via World Bank"
+  },
+  {
+    "rawName": "Global Health Estimates, World Health Organization (WHO), uri: https://www.who.int/data/gho/data/themes/mortality-and-global-health-estimates/ghe-leading-causes-of-death, note: Derived based on the data from Global Health Estimates  Deaths by Cause, Age, Sex, by Country and by Region, 2000-2021",
+    "name": "World Health Organization Global Health Estimates, via World Bank"
+  },
+  {
+    "rawName": "Global Health Expenditure Database, updated December 12th, 2025, World Health Organization (WHO), uri: http://apps.who.int/nha/database",
+    "name": "Global Health Expenditure Database, WHO, via World Bank"
+  },
+  {
+    "rawName": "International Comparison Program (ICP), World Bank (WB), note: This information is for PPP conversion factors., publisher: International Comparison Program (ICP), date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, note: This information is for PPP conversion factors., publisher: Eurostat;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-explorer.oecd.org/, note: This information is for PPP conversion factors., publisher: OECD;\nStaff estimates, World Bank (WB), note: This information is for households and NPISHs Final consumption expenditure per capita.;\nNational Accounts data files, Organisation for Economic Co-operation and Development (OECD), note: This information is for households and NPISHs Final consumption expenditure per capita.;\nWorld Economic Outlook database, International Monetary Fund (IMF), note: This information is for households and NPISHs Final consumption expenditure per capita.",
+    "name": "Eurostat, OECD, IMF, and World Bank"
+  },
+  {
+    "rawName": "International Comparison Program (ICP), World Bank (WB), note: This information is for PPP conversion factors., publisher: International Comparison Program (ICP), date published: May 30, 2024;\nThe Eurostat PPP Programme, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/databrowser/explore/all/all_themes, note: This information is for PPP conversion factors., publisher: Eurostat;\nThe OECD PPP Programme, Organisation for Economic Co-operation and Development (OECD), uri: https://data-explorer.oecd.org/, publisher: OECD;\nStaff estimates, World Bank (WB), note: This information is for households and NPISHs Final consumption expenditure per capita.;\nNational Accounts data files, Organisation for Economic Co-operation and Development (OECD), note: This information is for households and NPISHs Final consumption expenditure per capita.;\nWorld Economic Outlook database, International Monetary Fund (IMF), note: This information is for households and NPISHs Final consumption expenditure per capita.",
+    "name": "Eurostat, OECD, IMF, and World Bank"
+  },
+  {
+    "rawName": "Labour Force Statistics database (LFS), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: June 22, 2026",
+    "name": "Labour Force Statistics, via World Bank"
+  },
+  {
+    "rawName": "Labour Market-related SDG Indicators database (ILOSDG), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: June 22, 2026",
+    "name": "Labour Market-related SDG Indicators, via World Bank"
+  },
+  {
+    "rawName": "Maternal Mortality Estimation Inter-Agency Group (MMEIG), World Health Organization (WHO), note: The country data compiled, adjusted and used in the estimation model by the Maternal Mortality Estimation Inter-Agency Group (MMEIG). The country data were compiled from the following sources:  civil registration and vital statistics; specialized studies on maternal mortality; population based surveys and censuses; other available data sources including data from surveillance sites.;\nUN Children's Fund (UNICEF), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nUN Population Fund (UNFPA), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nWorld Bank Group (WBG), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nUnited Nations (UN), note: Maternal Mortality Estimation Inter-Agency Group (MMEIG);\nPan American Health Organization (PAHO), note: Core Indicators Portal;\nDemographic and Health Surveys (DHS) Program, note: The DHS Program, Demographic and Health Surveys",
+    "name": "UN Maternal Mortality Estimation Inter-Agency Group (MMEIG), via World Bank"
+  },
+  {
+    "rawName": "Monthly ranking of women in national parliaments, Inter-Parliamentary Union (IPU), uri: https://data.ipu.org/women-ranking/, note: For the year of 1998, the data is as of August 10, 1998., type: Excel, date accessed: 2026-03-29",
+    "name": "Inter-Parliamentary Union (IPU) monthly ranking of women in national parliaments, via World Bank"
+  },
+  {
+    "rawName": "National statistical offices or national database and publications compiled by United Nations Statistics Division., United Nations (UN), uri: https://unstats.un.org/sdgs/dataportal/database, note: Indicator code from the original source: SH_FPL_INFM; \tIndicator name from the original source: Proportion of time spent on unpaid domestic chores and care work, by sex, age and location (%), publisher: UN Statistics Division, type: Excel, date accessed: 46190, date published: 2026-03-27",
+    "name": "United Nations Statistics Division and national statistical offices, via World Bank"
+  },
+  {
+    "rawName": "National statistical offices or national database and publications, United Nations (UN), uri: https://unstats.un.org/sdgs/dataportal/database, note: Indicator code from the original source: SH_FPL_INFM; \tIndicator name from the original source: Proportion of time spent on unpaid domestic chores and care work, by sex, age and location (%), publisher: UN Statistics Division, type: Excel, date accessed: 46190, date published: 2026-03-27",
+    "name": "National statistical offices and UN Statistics Division, via World Bank"
+  },
+  {
+    "rawName": "State of the World's Children, UN Children's Fund (UNICEF);\nChildinfo, UN Children's Fund (UNICEF);\nDemographic and Health Surveys (DHS) Program, Demographic and Health Surveys (DHS) Program",
+    "name": "Demographic and Health Surveys (DHS) and UNICEF, via World Bank"
+  },
+  {
+    "rawName": "State of the World's Children, UN Children's Fund (UNICEF);\nChildinfo, UN Children's Fund (UNICEF);\nDemographic and Health Surveys, Demographic and Health Surveys (DHS) Program",
+    "name": "Demographic and Health Surveys (DHS) and UNICEF, via World Bank"
+  },
+  {
+    "rawName": "The Worldwide Governance Indicators: Revised Methodology for Measuring Governance Using Perception Data., World Bank Group (WBG), uri: https://www.worldbank.org/en/publication/worldwide-governance-indicators, note: Detailed documentation of the WGI, interactive tools for exploring the data, and full access to the underlying source data available at www.govindicators.org. Worldwide Governance Indicators, 2025 Revision, World Bank (www.govindicators.org), Accessed on 12/15/2025. And: World Bank (2025). “The Worldwide Governance Indicators: Revised Methodology for Measuring Governance Using Perception Data.” Washington, DC: World Bank Group. The 2025 revision builds upon the original WGI methodology which was introduced in 1999 and summarized by the following paper: Kaufmann, Daniel & Aart C. Kraay. (2024). “The Worldwide Governance Indicators: Methodology and 2024 Update.” Policy Research Working Paper. Washington, DC: World Bank Group., date accessed: 2026-06-03, date published: 2025",
+    "name": "Worldwide Governance Indicators, World Bank Group (WBG)"
+  },
+  {
+    "rawName": "Tracking SDG 7: The Energy Progress Report, ACRA Europe, uri: https://trackingsdg7.esmap.org/, note: License: Creative Commons Attribution—NonCommercial 3.0 IGO (CC BY-NC 3.0 IGO), publisher: International Energy Agency (IEA), International Renewable Energy Agency (IRENA), United Nations Statistical Division (UNSD), World Bank, World Health Organization (WHO), date published: 2025-06;\nInternational Renewable Energy Agency (IRENA), note: Tracking SDG 7: The Energy Progress Report;\nUnited Nations (UN), note: Tracking SDG 7: The Energy Progress Report, publisher: UN Statistics Division;\nWorld Bank (WB), note: Tracking SDG 7: The Energy Progress Report;\nWorld Health Organization (WHO), note: Tracking SDG 7: The Energy Progress Report",
+    "name": "Tracking SDG 7: The Energy Progress Report, via World Bank"
+  },
+  {
+    "rawName": "UNICEF DATA, UN Children's Fund (UNICEF), uri: https://sdmx.data.unicef.org/overview.html, note: Indicator code from the original source: PT_F_15-49_FGM; \tIndicator name from the original source: Percentage of girls and women (aged 15-49 years) who have undergone female genital mutilation (FGM), type: API, date accessed: 2023-12-07;\nDemographic and Health Surveys (DHS), Multiple Indicator Cluster Surveys (MICS) and other surverys, Demographic and Health Surveys (DHS) Program, uri: https://sdmx.data.unicef.org/overview.html, note: Indicator code from the original source: PT_F_15-49_FGM; \tIndicator name from the original source: Percentage of girls and women (aged 15-49 years) who have undergone female genital mutilation (FGM), publisher: The DHS Program (ICF), type: API, date accessed: 2023-12-07;\nDHS API, Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: PT_F_15-49_FGM; \tIndicator name from the original source: Percentage of girls and women (aged 15-49 years) who have undergone female genital mutilation (FGM), date accessed: 2023-12-07",
+    "name": "UNICEF, Demographic and Health Surveys (DHS), and Multiple Indicator Cluster Surveys (MICS), via World Bank"
+  },
+  {
+    "rawName": "UNICEF Data, UN Children's Fund (UNICEF), uri: https://sdmx.data.unicef.org/overview.html, note: Indicator code from the original source: PT_F_20-24_MRD_U15; \tIndicator name from the original source: Percentage of women (aged 20-24 years) married or in union before age 15, type: API;\nDHS API, Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: MA_MBAG_W_B15; \tIndicator name from the original source: Women first married by exact age 15, type: API",
+    "name": "UNICEF and Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "UNICEF Data, UN Children's Fund (UNICEF), uri: https://sdmx.data.unicef.org/overview.html, note: Indicator code from the original source: PT_F_20-24_MRD_U18; \tIndicator name from the original source: Percentage of women (aged 20-24 years) married or in union before age 18, type: API;\nDHS API, Demographic and Health Surveys (DHS) Program, uri: https://api.dhsprogram.com/#/index.html, note: Indicator code from the original source: MA_MBAG_W_B18; \tIndicator name from the original source: Women first married by exact age 18, type: API",
+    "name": "UNICEF and The DHS Program (ICF), via World Bank"
+  },
+  {
+    "rawName": "Universal Health Coverage Dataset, World Health Organization (WHO), uri: https://www.who.int/data/gho/data/indicators/indicator-details/GHO/uhc-index-of-service-coverage",
+    "name": "Universal Health Coverage Dataset, WHO, via World Bank"
+  },
+  {
+    "rawName": "Universal Health Coverage Dataset, World Health Organization (WHO);\nWorld Bank (WB), note: Universal Health Coverage Dataset",
+    "name": "Universal Health Coverage Dataset, WHO and World Bank, via World Bank"
+  },
+  {
+    "rawName": "Universal Health Coverage Dataset, World Health Organization (WHO);\nWorld Bank (WB), note: World Health Organization ( WHO )",
+    "name": "Universal Health Coverage Dataset, WHO and World Bank, via World Bank"
+  },
+  {
+    "rawName": "Wages and Working Time Statistics database (COND), International Labour Organization (ILO), uri: https://ilostat.ilo.org/data/bulk/, publisher: ILOSTAT, type: external database, date accessed: June 22, 2026",
+    "name": "Wages and Working Time Statistics, via World Bank"
+  },
+  {
+    "rawName": "Women, Business and the Law, World Bank (WB), uri: https://wbl.worldbank.org/en/wbl-data, date accessed: 2026-03-24, date published: 2026-02-24",
+    "name": "Women, Business and the Law, World Bank (WB), via World Bank"
+  },
+  {
+    "rawName": "World Development Indicators, World Bank (WB), uri: https://databank.worldbank.org/source/world-development-indicators, publisher: World Development Indicators",
+    "name": "World Development Indicators - World Bank"
+  },
+  {
+    "rawName": "World Population Prospects, United Nations (UN), note: Derived from total population, publisher: UN Population Division;\nStatistical databases and publications from national statistical offices, National Statistical Offices (NSOs), note: Derived from total population;\nDemographic Statistics, Eurostat (ESTAT), note: Derived from total population;\nPopulation and Vital Statistics Report (various years), United Nations (UN), note: Derived from total population, publisher: UN Statistical Division",
+    "name": "United Nations Population Division, national statistical offices, Eurostat, and United Nations Statistical Division, via World Bank"
+  },
+  {
+    "rawName": "World Population Prospects, United Nations (UN), publisher: UN Population Division;\nHuman Mortality Database, Max Planck Institute for Demographic Research (MPIDR), uri: www.mortality.org;\nUniversity of California, Berkeley (USA), uri: www.mortality.org, note: Human Mortality Database;\nFrench Institute for Demographic Studies (INED), uri: www.mortality.org, note: Human Mortality Database",
+    "name": "UN Population Division (World Population Prospects) and Human Mortality Database, via World Bank"
+  },
+  {
+    "rawName": "World Population Prospects, United Nations (UN), publisher: UN Population Division;\nHuman Mortality Database, Max Planck Institute for Demographic Research, uri: www.mortality.org;\nUniversity of California, Berkeley, uri: www.mortality.org, note: Human Mortality Database;\nFrench Institute for Demographic Studies (INED), uri: www.mortality.org, note: Human Mortality Database",
+    "name": "UN Population Division (World Population Prospects) and Human Mortality Database, via World Bank"
+  },
+  {
+    "rawName": "World Population Prospects, United Nations (UN), publisher: UN Population Division;\nStatistical databases and publications from national statistical offices, National Statistical Offices (NSOs);\nDemographic Statistics, Eurostat (ESTAT)",
+    "name": "United Nations Population Division, national statistical offices, and Eurostat, via World Bank"
+  },
+  {
+    "rawName": "World Population Prospects, United Nations (UN), publisher: UN Population Division;\nStatistical databases and publications from national statistical offices, National Statistical Offices (NSOs);\nDemographic Statistics, Eurostat (ESTAT);\nPopulation and Vital Statistics Report (various years), United Nations (UN), publisher: UN Statistical Division",
+    "name": "United Nations Population Division, national statistical offices, Eurostat, and World Bank"
+  },
+  {
+    "rawName": "World Population Prospects, United Nations (UN), uri: UN Population Division;\nStatistical databases and publications from national statistical offices, National Statistical Offices (NSOs), note: Derived from male and female life expectancy at birth from sources such as statistical databases and publications from national statistical offices.;\nDemographic Statistics, Eurostat (ESTAT), note: Derived from male and female life expectancy at birth from sources such as Eurostat: Demographic Statistics.",
+    "name": "United Nations Population Division (World Population Prospects), national statistical offices, and Eurostat, via World Bank"
+  },
+  {
+    "rawName": "World Population Prospects, United Nations (UN), uri: https://population.un.org/wpp/, publisher: UN Population Division;\nStatistical databases and publications from national statistical offices, National Statistical Offices (NSOs), uri: https://unstats.un.org/home/nso_sites/, publisher: National Statistical Offices;\nEurostat: Demographic Statistics, Eurostat (ESTAT), uri: https://ec.europa.eu/eurostat/data/database?node_code=earn_ses_monthly, publisher: Eurostat;\nPopulation and Vital Statistics Report (various years), United Nations (UN), uri: https://unstats.un.org, publisher: UN Statistics Division",
+    "name": "United Nations Population Division, national statistical offices, and Eurostat, via World Bank"
   }
 ]

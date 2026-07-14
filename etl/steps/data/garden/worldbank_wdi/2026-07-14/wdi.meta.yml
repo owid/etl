@@ -2335,12 +2335,8 @@ tables:
         title: PPP conversion factor, GDP (LCU per international $)
         short_unit: LCU
         unit: LCU per international $
-      pa_nus_pppc_rf:
-        title: Price level ratio of PPP conversion factor (GDP) to market exchange rate
-        short_unit: GDP
-        unit: GDP
       pa_nus_prvt_pp:
-        title: PPP conversion factor, private consumption (LCU per international $)
+        title: PPP conversion factor, households and NPISHs Final consumption expenditure (LCU per international $)
         short_unit: LCU
         unit: LCU per international $
       per_allsp_adq_pop_tot:
@@ -2998,8 +2994,6 @@ tables:
         title: Proportion of seats held by women in national parliaments (%)
         short_unit: '%'
         unit: '%'
-      sg_law_indx:
-        title: Women Business and the Law Index Score (scale 1-100)
       sg_tim_uwrk_fe:
         title: Proportion of time spent on unpaid domestic and care work, female (% of 24 hour day)
         short_unit: '%'
@@ -4837,66 +4831,6 @@ tables:
       omm_goods_exp_share_gdp: {}
       omm_tax_rev_percap: {}
       omm_net_savings_percap: {}
-      cc_est:
-        title: 'Control of Corruption: Estimate'
-      cc_no_src:
-        title: 'Control of Corruption: Number of Sources'
-      cc_per_rnk:
-        title: 'Control of Corruption: Percentile Rank'
-      cc_per_rnk_lower:
-        title: 'Control of Corruption: Percentile Rank, Lower Bound of 90% Confidence Interval'
-      cc_per_rnk_upper:
-        title: 'Control of Corruption: Percentile Rank, Upper Bound of 90% Confidence Interval'
-      cc_std_err:
-        title: 'Control of Corruption: Standard Error'
-      ge_est:
-        title: 'Government Effectiveness: Estimate'
-      ge_no_src:
-        title: 'Government Effectiveness: Number of Sources'
-      ge_per_rnk:
-        title: 'Government Effectiveness: Percentile Rank'
-      ge_per_rnk_lower:
-        title: 'Government Effectiveness: Percentile Rank, Lower Bound of 90% Confidence Interval'
-      ge_per_rnk_upper:
-        title: 'Government Effectiveness: Percentile Rank, Upper Bound of 90% Confidence Interval'
-      ge_std_err:
-        title: 'Government Effectiveness: Standard Error'
-      pv_est:
-        title: 'Political Stability and Absence of Violence/Terrorism: Estimate'
-      pv_no_src:
-        title: 'Political Stability and Absence of Violence/Terrorism: Number of Sources'
-      pv_per_rnk:
-        title: 'Political Stability and Absence of Violence/Terrorism: Percentile Rank'
-      pv_per_rnk_lower:
-        title: 'Political Stability and Absence of Violence/Terrorism: Percentile Rank, Lower Bound of 90% Confidence Interval'
-      pv_per_rnk_upper:
-        title: 'Political Stability and Absence of Violence/Terrorism: Percentile Rank, Upper Bound of 90% Confidence Interval'
-      pv_std_err:
-        title: 'Political Stability and Absence of Violence/Terrorism: Standard Error'
-      rl_est:
-        title: 'Rule of Law: Estimate'
-      rl_no_src:
-        title: 'Rule of Law: Number of Sources'
-      rl_per_rnk:
-        title: 'Rule of Law: Percentile Rank'
-      rl_per_rnk_lower:
-        title: 'Rule of Law: Percentile Rank, Lower Bound of 90% Confidence Interval'
-      rl_per_rnk_upper:
-        title: 'Rule of Law: Percentile Rank, Upper Bound of 90% Confidence Interval'
-      rl_std_err:
-        title: 'Rule of Law: Standard Error'
-      rq_est:
-        title: 'Regulatory Quality: Estimate'
-      rq_no_src:
-        title: 'Regulatory Quality: Number of Sources'
-      rq_per_rnk:
-        title: 'Regulatory Quality: Percentile Rank'
-      rq_per_rnk_lower:
-        title: 'Regulatory Quality: Percentile Rank, Lower Bound of 90% Confidence Interval'
-      rq_per_rnk_upper:
-        title: 'Regulatory Quality: Percentile Rank, Upper Bound of 90% Confidence Interval'
-      rq_std_err:
-        title: 'Regulatory Quality: Standard Error'
       se_lpv_prim:
         title: 'Learning poverty: Share of Children at the End-of-Primary age below minimum reading proficiency adjusted by Out-of-School Children (%)'
       se_lpv_prim_fe:
@@ -4915,18 +4849,6 @@ tables:
         title: Female primary school age children out-of-school (%)
       se_lpv_prim_sd_ma:
         title: Male primary school age children out-of-school (%)
-      va_est:
-        title: 'Voice and Accountability: Estimate'
-      va_no_src:
-        title: 'Voice and Accountability: Number of Sources'
-      va_per_rnk:
-        title: 'Voice and Accountability: Percentile Rank'
-      va_per_rnk_lower:
-        title: 'Voice and Accountability: Percentile Rank, Lower Bound of 90% Confidence Interval'
-      va_per_rnk_upper:
-        title: 'Voice and Accountability: Percentile Rank, Upper Bound of 90% Confidence Interval'
-      va_std_err:
-        title: 'Voice and Accountability: Standard Error'
       dc_dac_estl_cd:
         title: Net bilateral aid flows from DAC donors, Estonia (current US$)
       dc_dac_ltul_cd:
@@ -4954,7 +4876,7 @@ tables:
       it_net_user_ma_zs:
         title: Individuals using the Internet, male (% of male population)
       si_pov_mpun:
-        title: Multidimensional poverty headcount ratio (UNDP) (% of population)
+        title: Multidimensional poverty headcount ratio (UNDP & OPHI) (% of population)
       si_pov_mpwb:
         title: Multidimensional poverty headcount ratio (World Bank) (% of population)
       si_pov_sopo:
@@ -5293,7 +5215,43 @@ tables:
         title: Number of people out of the labor force
         unit: ''
         description_short: Number of people aged 15+ who are not in the labor force.
-      population:
-        title: Population
-        unit: ''
-        description_short: Total population, from the population dataset used for per-capita calculations.
+      gd_wbl_ovl_enf:
+        title: 'WBL: Enforcement Perceptions Index (scale 0-100)'
+      gd_wbl_ovl_law:
+        title: 'WBL: Legal Framework Index (scale 0-100)'
+      gd_wbl_ovl_sfr:
+        title: 'WBL: Supportive Framework Index (scale 0-100)'
+      gov_wgi_cc_est:
+        title: Control of Corruption - Governance estimate (approx. -2.5 to +2.5)
+      gov_wgi_cc_sc:
+        title: Control of Corruption - Governance score (0-100)
+      gov_wgi_ge_est:
+        title: Government Effectiveness - Governance estimate (approx. -2.5 to +2.5)
+      gov_wgi_ge_sc:
+        title: Government Effectiveness - Governance score (0-100)
+      gov_wgi_pv_est:
+        title: Political Stability - Governance estimate (approx. -2.5 to +2.5)
+      gov_wgi_pv_sc:
+        title: Political Stability - Governance score (0-100)
+      gov_wgi_rl_est:
+        title: Rule of Law - Governance estimate (approx. -2.5 to +2.5)
+      gov_wgi_rl_sc:
+        title: Rule of Law - Governance score (0-100)
+      gov_wgi_rq_est:
+        title: Regulatory Quality - Governance estimate (approx. -2.5 to +2.5)
+      gov_wgi_rq_sc:
+        title: Regulatory Quality - Governance score (0-100)
+      gov_wgi_va_est:
+        title: Voice and Accountability - Governance estimate (approx. -2.5 to +2.5)
+      gov_wgi_va_sc:
+        title: Voice and Accountability - Governance score (0-100)
+      ne_con_pcap_pp_cd:
+        title: Households and NPISHs Final consumption expenditure per capita, PPP (current international $)
+      ne_con_pcap_pp_kd:
+        title: Households and NPISHs Final consumption expenditure per capita, PPP (constant 2021 international $)
+      pa_nus_gdp_pli:
+        title: Price level index (GDP)
+      pa_nus_prvt_pli:
+        title: Price level index (Households and NPISHs Final consumption expenditure)
+      sh_dth_ocvd_zs:
+        title: Cause of death, by other COVID-19 pandemic-related outcomes (% of total)

@@ -31,13 +31,24 @@ from etl.paths import DATA_DIR
 
 console = Console()
 
-# OMM and other patterns to keep even if not in current dataset
+# OMM and other patterns to keep even if not in current dataset.
+# These are columns the garden step computes from raw WDI indicators (not present
+# verbatim in the meadow table), so a naive diff against meadow columns always
+# flags them for deletion — every cycle, unless the pattern is listed here.
 KEEP_PATTERNS = {
     "armed_forces_share_population",
     "eg_cft_.*",
     "eg_elc_.*",
     "articles_per_million_people",
     "patents_per_million_people",
+    "labor_force",
+    "number_below_working_age",
+    "number_employed",
+    "number_out_of_labor_force",
+    "number_unemployed",
+    "ny_gdp_mktp_cd_adjusted",
+    "ny_gdp_pcap_cd_adjusted",
+    ".*_ilo_modeling_comparison_absolute",
 }
 
 
