@@ -75,9 +75,7 @@ def create_metadata_table(legacy_json: dict, series_csv) -> Table:
         "Unit of measure": "unit",
     }
     df_csv = pd.read_csv(series_csv, usecols=["Series Code", *WDI_SERIES_RICH_COLUMNS.keys(), *fallback_columns.keys()])
-    df_csv = df_csv.rename(
-        columns={"Series Code": "series_code", **WDI_SERIES_RICH_COLUMNS, **fallback_columns}
-    )
+    df_csv = df_csv.rename(columns={"Series Code": "series_code", **WDI_SERIES_RICH_COLUMNS, **fallback_columns})
     fallback_cols = list(fallback_columns.values())
     df_csv_fallback = df_csv[["series_code", *fallback_cols]].rename(
         columns={c: f"{c}_csv_fallback" for c in fallback_cols}
