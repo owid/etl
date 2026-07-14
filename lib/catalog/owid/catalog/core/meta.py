@@ -402,21 +402,44 @@ class VariablePresentationMeta(MetaBase):
     faqs: list[FaqLink] = field(default_factory=list)
 
 
+_MARKDOWN_LIST_MARKER = re.compile(r"([-*+]|\d+[.)])\s")
+
+
+def _collapse_description_key_item(item: str) -> str:
+    """Collapse a multi-line bullet item into a single line, the way the old
+    renderer effectively did (it unwrapped paragraphs inside list items, so
+    line and paragraph breaks displayed as plain spaces). Lines starting a
+    markdown list are kept and indented, as those rendered as nested lists.
+    """
+    parts: list[str] = []
+    for raw_line in item.split("\n"):
+        line = raw_line.strip()
+        if not line:
+            continue
+        if not parts:
+            parts.append(line)
+        elif _MARKDOWN_LIST_MARKER.match(line):
+            parts.append("\n  " + line)
+        else:
+            parts.append(" " + line)
+    return "".join(parts)
+
+
 def description_key_to_string(items: list[str]) -> str | None:
     """Convert a legacy description_key list of bullet points into a single
     markdown string.
 
     The conversion preserves how the grapher rendered lists before
     description_key became free-form markdown: a single item was rendered as
-    prose, several items as a bulleted list.
+    prose (full markdown, paragraphs included), several items as a bulleted
+    list with line breaks inside items flattened.
     """
     cleaned = [item.strip() for item in items if item and item.strip()]
     if not cleaned:
         return None
     if len(cleaned) == 1:
         return cleaned[0]
-    # Indent continuation lines so multi-line items stay inside their bullet.
-    return "\n".join("- " + item.replace("\n", "\n  ") for item in cleaned)
+    return "\n".join("- " + _collapse_description_key_item(item) for item in cleaned)
 
 
 @pruned_json

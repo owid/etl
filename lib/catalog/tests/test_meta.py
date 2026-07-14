@@ -149,6 +149,19 @@ def test_render():
     assert rendered_meta.title == "Title X"
 
 
+def test_description_key_to_string_flattens_multiline_items():
+    # Line and paragraph breaks inside items are flattened to spaces, matching
+    # how the old renderer displayed them (paragraphs unwrapped inside <li>).
+    assert meta.description_key_to_string(["**Rationale:**\nMortality does not.", "Other."]) == (
+        "- **Rationale:** Mortality does not.\n- Other."
+    )
+    assert meta.description_key_to_string(["Para one.\n\nPara two.", "Other."]) == ("- Para one. Para two.\n- Other.")
+    # Markdown lists inside an item rendered as nested lists — keep them nested.
+    assert meta.description_key_to_string(["Includes:\n- a\n- b", "Other."]) == ("- Includes:\n  - a\n  - b\n- Other.")
+    # A single item passes through unchanged (it was rendered as full markdown).
+    assert meta.description_key_to_string(["Para one.\n\nPara two."]) == "Para one.\n\nPara two."
+
+
 def test_update_variable_metadata_converts_description_key_list():
     # A list of bullet points is converted to a markdown string after Jinja rendering.
     m = meta.VariableMeta(description_key=["Point 1", "Point 2"])
