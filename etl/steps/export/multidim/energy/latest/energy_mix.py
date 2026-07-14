@@ -183,10 +183,10 @@ def _view_title(source: str, metric: str) -> str:
 # what each grouping contains (e.g. which renewables are included); we keep those notes but drop the
 # "primary energy / substitution method" wording, which no longer applies to Total Energy Supply.
 METRIC_UNIT_PHRASE = {
-    "total": "Measured in [terawatt-hours](#dod:watt-hours).",
-    "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
-    "share": "Measured as a percentage of total energy supply.",
-    "annual_change": "Year-on-year change in energy supply, measured in [terawatt-hours](#dod:watt-hours).",
+    "total": "Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).",
+    "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.",
+    "share": "Measured as a percentage of [total energy supply](#dod:total-energy-supply).",
+    "annual_change": "Year-on-year change in [total energy supply](#dod:total-energy-supply), measured in [terawatt-hours](#dod:watt-hours).",
 }
 SOURCE_COMPOSITION = {
     "fossil_fuels": "Fossil fuels are the sum of coal, oil, and gas.",
