@@ -25,8 +25,13 @@ COLUMNS = {
 # Value the source uses for countries it has assessed as having no net-zero target.
 NO_TARGET_LABEL = "No target"
 
+# Label for countries that have a target but for which the source has not recorded a status. Without
+# this they would be indistinguishable from countries the tracker does not cover ("no data").
+STATUS_NOT_SPECIFIED_LABEL = "Status not specified"
+
 # Possible net-zero target statuses for countries, as defined in the Net Zero Tracker codebook, plus
-# the "No target" label we assign to countries the tracker assessed as having no target.
+# the two labels we assign so that every country the tracker covers has a status (and none silently
+# drops off the map): "No target", and "Status not specified" (has a target, but no status recorded).
 EXPECTED_STATUSES = {
     "Achieved (externally validated)",
     "Achieved (self-declared)",
@@ -35,6 +40,7 @@ EXPECTED_STATUSES = {
     "Declaration / pledge",
     "Proposed / in discussion",
     NO_TARGET_LABEL,
+    STATUS_NOT_SPECIFIED_LABEL,
 }
 
 
@@ -67,11 +73,15 @@ def run() -> None:
     tb.loc[no_target, "has_net_zero_target"] = NO_TARGET_LABEL
     tb["has_net_zero_target"] = tb["has_net_zero_target"].copy_metadata(tb["net_zero_status"])
 
-    # The status of the target. Label "no target" countries explicitly; countries that have a target
-    # but whose status the tracker has not yet assessed keep a missing status (shown as no data).
+    # The status of the target, defined for every country the tracker covers so that none silently
+    # drops off the map: "No target" for countries assessed as having none, and "Status not specified"
+    # for countries that have a target but for which the source recorded no status (e.g. Chad, which
+    # has an emissions-reduction target for 2030 but a blank status cell).
     net_zero_status_metadata = tb["net_zero_status"].metadata
     tb["net_zero_status"] = tb["net_zero_status"].astype("string")
+    target_without_status = ~no_target & tb["net_zero_status"].isna()
     tb.loc[no_target, "net_zero_status"] = NO_TARGET_LABEL
+    tb.loc[target_without_status, "net_zero_status"] = STATUS_NOT_SPECIFIED_LABEL
     tb["net_zero_status"].metadata = net_zero_status_metadata
 
     # The target year only makes sense for countries that have a target.
@@ -111,17 +121,19 @@ def sanity_check_outputs(tb: Table) -> None:
     assert not tb.empty, "Output table is empty."
     # Each country should appear only once.
     assert not tb.duplicated(subset=["country"]).any(), "Duplicate country rows."
-    # Statuses (where set) must be within the expected set.
-    unexpected = set(tb["net_zero_status"].dropna()) - EXPECTED_STATUSES
+    # Every covered country must have a status (no country silently drops off the map).
+    assert tb["net_zero_status"].notna().all(), "Some country has no net_zero_status value."
+    # Statuses must be within the expected set.
+    unexpected = set(tb["net_zero_status"]) - EXPECTED_STATUSES
     assert not unexpected, f"Unexpected net-zero status values: {unexpected}"
     # has_net_zero_target is a two-category flag covering every assessed country.
     assert set(tb["has_net_zero_target"]) == {"Has set a net-zero target", NO_TARGET_LABEL}, (
         "Unexpected has_net_zero_target values."
     )
     # "No target" must be consistent between the two categorical indicators.
-    assert (
-        (tb["net_zero_status"] == NO_TARGET_LABEL) == (tb["has_net_zero_target"] == NO_TARGET_LABEL)
-    ).all(), "Mismatch between 'No target' rows in net_zero_status and has_net_zero_target."
+    assert ((tb["net_zero_status"] == NO_TARGET_LABEL) == (tb["has_net_zero_target"] == NO_TARGET_LABEL)).all(), (
+        "Mismatch between 'No target' rows in net_zero_status and has_net_zero_target."
+    )
     # Target years, where present, should be plausible.
     years = tb["net_zero_target_year"].dropna()
     assert years.between(2000, 2100).all(), "Target year outside the plausible 2000-2100 range."
