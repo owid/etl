@@ -58,7 +58,18 @@ def run() -> None:
     # (countries the tracker does not cover, which stay missing on charts). Countries with a target but
     # no recorded status are dropped and show as missing data.
     no_target = tb["end_target"] == NO_TARGET_END_TARGET
-    tb = tb[(tb["net_zero_status"].notna() & tb["year"].notna()) | no_target].reset_index(drop=True)
+    keep = (tb["net_zero_status"].notna() & tb["year"].notna()) | no_target
+
+    # NOTE: Chad has an emissions-reduction target (2030) but the tracker records no status for it, so it
+    #  is dropped and shows as no data. This matches zerotracker.net, where Chad's "Target Status" row is
+    #  blank. It is the only country with a target but no status; this assert trips if that ever changes
+    #  (the producer fills it in, or a new country lands in the same situation), prompting a re-check.
+    target_without_status = set(tb.loc[~keep, "country"])
+    assert target_without_status <= {"Chad"}, (
+        f"New country with a target but no recorded status (was only Chad): {target_without_status - {'Chad'}}"
+    )
+
+    tb = tb[keep].reset_index(drop=True)
     no_target = tb["end_target"] == NO_TARGET_END_TARGET
 
     # "No target" countries have no target year; place them at the data's publication year (read from
