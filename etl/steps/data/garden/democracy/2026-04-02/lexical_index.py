@@ -113,6 +113,10 @@ def run() -> None:
     # Initial cleaning
     tb = preprocess(tb)
 
+    # Correct known errors in the source data (see lexical_index.corrections.yml). Applied on the raw
+    # suffrage columns so the fix propagates to every derived indicator built below.
+    tb = paths.apply_corrections(tb)
+
     # Create variable distinguishing between democracies and autocracies:
     tb = add_is_democracy(tb)
 

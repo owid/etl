@@ -22,8 +22,10 @@ Everything you post to GitHub or Slack goes out under a **human's identity**. An
 1. **Attribute the work.** Put this blockquote as the *first line* of the content:
 
    ```
-   > _Written by Claude Code — @<handle> at the wheel._
+   > _Written by Claude <model name> — @<handle> at the wheel._
    ```
+
+   Replace `<model name>` with the human-readable name of the model actually generating the content (e.g. "Sonnet 5", "Opus 4.8", "Fable 5", "Haiku 4.5") — not the literal string "Code". Keeping the "Claude" prefix makes the attribution recognizable even to readers unfamiliar with individual model names.
 
    It applies to **every** surface, **every** time you post:
    - PR descriptions / bodies
@@ -49,6 +51,8 @@ Everything you post to GitHub or Slack goes out under a **human's identity**. An
    | Edouard Mathieu | `@edomt` |
 
    The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the `/latest` data-update post on ourworldindata.org) — those are authored by the named human, not by Claude.
+
+3. **This repo is public — keep internal context out of it.** PR descriptions, commit messages, and issue/review comments must never identify people who contact us (no names, roles, or employers — say "a reader pointed out ..." instead), and must not reference internal discussions (Slack threads, Notion docs) or who suggested what internally. Motivate changes using public facts only; internal context stays internal.
 
 ## Pipeline Overview
 

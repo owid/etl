@@ -14,6 +14,7 @@ dataset:
 
   owners:
     - Lucas Rodés-Guirao
+    - Edouard Mathieu
 tables:
   epoch_benchmark_data:
     variables:
