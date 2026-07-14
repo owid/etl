@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -84,15 +85,36 @@ def reformat_table(tb: Table) -> tuple[Table, dict]:
 
 
 def extract_producer_definitions(tb_series: Table) -> dict:
-    """Map indicator codes to the producer's long definition from the WWBISeries.csv metadata file."""
+    """Map indicator codes to the producer's per-indicator metadata from the WWBISeries.csv file.
+
+    Composes the long definition and the producer's source note. The remaining populated fields are
+    covered elsewhere or not applicable: "Unit of measure" feeds unit/short_unit in
+    add_metadata_from_dict, "Statistical concept and methodology" is a single dataset-level paragraph
+    already carried by the origin description, "License Type" lives in the origin license, and
+    "Aggregation method" describes the producer's own regional aggregates, which this dataset does not include.
+    """
 
     tb_series = tb_series.copy()
     tb_series["series_code"] = tb_series["series_code"].str.lower().str.replace(".", "_", regex=False)
 
     # Normalize whitespace in the producer text (some definitions contain double spaces).
-    tb_series["long_definition"] = tb_series["long_definition"].str.replace(r"\s+", " ", regex=True).str.strip()
+    for col in ["long_definition", "source"]:
+        tb_series[col] = tb_series[col].str.replace(r"\s+", " ", regex=True).str.strip()
 
-    return tb_series.dropna(subset=["long_definition"]).set_index("series_code")["long_definition"].to_dict()
+    definitions = {}
+    for row in tb_series.itertuples():
+        parts = []
+        if pd.notna(row.long_definition) and row.long_definition:
+            text = str(row.long_definition)
+            if not text.endswith("."):
+                text += "."
+            parts.append(text)
+        if pd.notna(row.source) and row.source:
+            parts.append(f"Source: {row.source}")
+        if parts:
+            definitions[row.series_code] = "\n\n".join(parts)
+
+    return definitions
 
 
 def add_metadata_from_dict(tb: Table, indicator_dict: dict, definitions_dict: dict) -> Table:
