@@ -247,6 +247,15 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2026-07-01/income_groups
   #
+  # UN: Energy Balances
+  #
+  data://grapher/un/2026-07-10/energy_balances:
+    - data://garden/un/2026-07-10/energy_balances:
+      - data://meadow/un/2026-07-10/energy_balances:
+        - snapshot://un/2026-07-10/energy_balances.zip
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+  #
   # Ember - Yearly electricity data.
   #
   data://garden/ember/2026-04-24/yearly_electricity:
