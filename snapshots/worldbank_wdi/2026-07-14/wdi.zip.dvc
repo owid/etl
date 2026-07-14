@@ -9,7 +9,11 @@ meta:
     url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
     url_download: https://databankfiles.worldbank.org/public/ddpext_download/WDI_CSV.zip
     date_accessed: '2026-07-14'
-    date_published: '2026-01-28'
+    date_published: '2026-07-01'
     license:
       name: CC BY 4.0
       url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+outs:
+  - md5: e7e4e512bf056bd8646a2a03717d3c84
+    size: 283864295
+    path: wdi.zip

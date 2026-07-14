@@ -71,7 +71,9 @@ import click
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
 from tqdm import tqdm
+from urllib3.util.retry import Retry
 
 from etl.config import memory
 from etl.snapshot import Snapshot
@@ -85,8 +87,28 @@ URL_METADATA = "https://ddh-openapi.worldbank.org/dataset/download?dataset_uniqu
 # Legacy API for individual indicator metadata (used by garden step)
 LEGACY_API_BASE_URL = "https://api.worldbank.org/v2/indicator"
 
-# Number of parallel workers for fetching legacy metadata
-MAX_WORKERS = 20
+# Number of parallel workers for fetching legacy metadata.
+# api.worldbank.org's legacy indicator endpoint 502s persistently under ~20-way parallel load
+# (observed repeatedly during the 2026-07-14 update, a different indicator failing each time,
+# surviving 5 HTTP-level retries with backoff). Lowering concurrency reduces load on the endpoint
+# directly, on top of the retry/backoff below.
+MAX_WORKERS = 6
+
+# Retry transient 5xx at the HTTP-adapter level (same pattern as etl/git_api_helpers.py's
+# GITHUB_RETRY) so one flaky response doesn't abort the whole batch of ~1500 fetches via
+# future.result() and waste the already-cached progress (fetch_single_indicator_metadata is
+# @memory.cache'd, so a re-run only re-fetches what previously failed).
+_retry_session = requests.Session()
+_retry_adapter = HTTPAdapter(
+    max_retries=Retry(
+        total=8,
+        backoff_factor=1.5,
+        status_forcelist=list(range(500, 600)),
+        allowed_methods=["GET"],
+    )
+)
+_retry_session.mount("https://", _retry_adapter)
+_retry_session.mount("http://", _retry_adapter)
 
 
 @click.command()
@@ -130,7 +152,7 @@ def fetch_single_indicator_metadata(indicator_code: str) -> dict | None:
     """
     api_url = f"{LEGACY_API_BASE_URL}/{indicator_code}?format=json"
 
-    response = requests.get(api_url, timeout=30)
+    response = _retry_session.get(api_url, timeout=30)
     if response.status_code == 404:
         return None
     response.raise_for_status()
