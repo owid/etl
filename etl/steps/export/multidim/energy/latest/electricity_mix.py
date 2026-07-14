@@ -68,7 +68,9 @@ def run() -> None:
     common_view_config = {
         "hasMapTab": True,
         "tab": "map",
-        "chartTypes": ["LineChart"],
+        # Line + bar tabs (grapher's default), so single-source views keep the bar tab the
+        # original charts had.
+        "chartTypes": ["LineChart", "DiscreteBar"],
     }
 
     c = paths.create_collection(

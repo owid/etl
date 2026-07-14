@@ -35,7 +35,9 @@ def run() -> None:
     common_view_config = {
         "hasMapTab": True,
         "tab": "map",
-        "chartTypes": ["LineChart"],
+        # Line + bar tabs (grapher's default), so single-fuel views keep the bar tab the
+        # original charts had.
+        "chartTypes": ["LineChart", "DiscreteBar"],
         "yAxis": {"min": 0},
     }
 
