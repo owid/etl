@@ -30,6 +30,34 @@ tables:
     assert t.a.metadata.description_key == ["Text 1", "Text 2", "Text 2", "Text 3"]
 
 
+def test_update_metadata_from_yaml_description_key_string(tmp_path):
+    """A bare (multiline) string is allowed and treated as a single key item,
+    which the grapher renders as free-form markdown instead of a bulleted list.
+    """
+    yaml_text = """
+tables:
+  test:
+    variables:
+      a:
+        description_key: |-
+          First paragraph.
+
+          Second paragraph with a markdown list:
+          - item 1
+          - item 2
+""".strip()
+
+    path = tmp_path / "test.yaml"
+    with open(path, "w") as f:
+        f.write(yaml_text)
+
+    t = Table({"a": [1, 2, 3]})
+    ym.update_metadata_from_yaml(t, path, "test")
+    assert t.a.metadata.description_key == [
+        "First paragraph.\n\nSecond paragraph with a markdown list:\n- item 1\n- item 2"
+    ]
+
+
 def test_update_metadata_from_yaml_common(tmp_path):
     yaml_text = """
 definitions:

@@ -110,9 +110,14 @@ def update_metadata_from_dict(
         variable_dict = (t_annot.get("variables") or {}).get(v_short_name, {})
         meta_dict = _merge_variable_metadata(meta_dict, variable_dict, if_origins_exist=if_origins_exist)
 
-        # we allow `- *descriptions` which needs to be flattened
         if "description_key" in meta_dict:
-            meta_dict["description_key"] = _flatten(meta_dict["description_key"])
+            # a bare (multiline) string is treated as a single key item, rendered
+            # as free-form markdown instead of a bulleted list
+            if isinstance(meta_dict["description_key"], str):
+                meta_dict["description_key"] = [meta_dict["description_key"]]
+            else:
+                # we allow `- *descriptions` which needs to be flattened
+                meta_dict["description_key"] = _flatten(meta_dict["description_key"])
 
             # make sure all elements are strings
             # NOTE: this could be further flattened if we run into it

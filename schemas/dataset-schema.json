@@ -612,30 +612,37 @@
                 },
                 "description_key": {
                   "title": "Indicator's key information",
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        ]
                       }
-                    ]
-                  },
-                  "description": "List of key pieces of information about the indicator.",
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "description": "Key pieces of information about the indicator. Either a list of short paragraphs (rendered as bullet points) or a single free-form markdown text (rendered as prose).",
                   "requirement_level": "recommended (for curated indicators)",
                   "guidelines": [
                     [
-                      "Must be a list of one or more short paragraphs.",
+                      "Must be a list of one or more short paragraphs, or a single free-form markdown text.",
                       {
                         "type": "list",
                         "value": [
-                          "Each paragraph must start with a capital letter.",
-                          "Each paragraph must end with a period."
+                          "A list is rendered as bullet points; each paragraph must start with a capital letter and end with a period.",
+                          "A free-form text is rendered as markdown prose (paragraphs, links and markdown lists are supported)."
                         ]
                       }
                     ],

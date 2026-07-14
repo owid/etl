@@ -709,6 +709,9 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
 
     # Prune empty fields from description_key
     if meta.description_key:
+        # normalize a bare string (e.g. set programmatically in a step) to a single-item list
+        if isinstance(meta.description_key, str):
+            meta.description_key = [meta.description_key]
         meta.description_key = [x for x in meta.description_key if x.strip()]
 
     # Convert from string to proper type when it comes from YAML
