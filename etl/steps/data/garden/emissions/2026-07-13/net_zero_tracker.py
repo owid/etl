@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -7,15 +8,25 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Reference year for the snapshot. The tracker is a rolling database with no time dimension of its own,
+# so we place every assessed country at this single "as of" year. The year each country aims to reach
+# net-zero is kept separately, in the net_zero_target_year indicator.
+AS_OF_YEAR = 2026
+
 # Columns to read from the main table, and how to rename them.
 COLUMNS = {
     "name": "country",
-    "end_target_year": "year",
-    "status_of_end_target": "net_zero_status",
     "entity_type": "actor_type",
+    "end_target": "end_target",
+    "status_of_end_target": "net_zero_status",
+    "end_target_year": "net_zero_target_year",
 }
 
-# Possible net-zero target statuses for countries, as defined in the Net Zero Tracker codebook.
+# Value the source uses for countries it has assessed as having no net-zero target.
+NO_TARGET_LABEL = "No target"
+
+# Possible net-zero target statuses for countries, as defined in the Net Zero Tracker codebook, plus
+# the "No target" label we assign to countries the tracker assessed as having no target.
 EXPECTED_STATUSES = {
     "Achieved (externally validated)",
     "Achieved (self-declared)",
@@ -23,6 +34,7 @@ EXPECTED_STATUSES = {
     "In policy document",
     "Declaration / pledge",
     "Proposed / in discussion",
+    NO_TARGET_LABEL,
 }
 
 
@@ -42,27 +54,37 @@ def run() -> None:
     # Select and rename columns.
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
-    # Select only rows that correspond to countries.
+    # Keep only country-level entities (the source also tracks regions, cities and companies).
     tb = tb[tb["actor_type"] == "Country"].drop(columns=["actor_type"]).reset_index(drop=True)
 
-    # Remove rows with incomplete data (no target status and/or no target year).
-    # NOTE: Some countries are dropped because they lack a status and/or target year. In this snapshot
-    #  these include the United States (whose end target is now "No target"), Bolivia, Chad, Guinea,
-    #  Libya and Syria.
-    tb = tb.dropna(how="any").reset_index(drop=True)
+    # Every country the tracker covers is assessed as either having a target or explicitly having none.
+    # We keep both, so that "no target" (e.g. the United States) is distinguishable from "no data"
+    # (countries the tracker does not cover, which show as missing on charts).
+    no_target = tb["end_target"] == NO_TARGET_LABEL
 
-    # The target year is the year by which the country aims to reach net-zero; store it as an integer.
-    tb["year"] = tb["year"].astype(int)
+    # Whether the country has set a net-zero target at all.
+    tb["has_net_zero_target"] = "Has set a net-zero target"
+    tb.loc[no_target, "has_net_zero_target"] = NO_TARGET_LABEL
+    tb["has_net_zero_target"] = tb["has_net_zero_target"].copy_metadata(tb["net_zero_status"])
+
+    # The status of the target. Label "no target" countries explicitly; countries that have a target
+    # but whose status the tracker has not yet assessed keep a missing status (shown as no data).
+    net_zero_status_metadata = tb["net_zero_status"].metadata
+    tb["net_zero_status"] = tb["net_zero_status"].astype("string")
+    tb.loc[no_target, "net_zero_status"] = NO_TARGET_LABEL
+    tb["net_zero_status"].metadata = net_zero_status_metadata
+
+    # The target year only makes sense for countries that have a target.
+    tb.loc[no_target, "net_zero_target_year"] = pd.NA
+    tb["net_zero_target_year"] = tb["net_zero_target_year"].astype("Int64")
+
+    tb = tb.drop(columns=["end_target"])
+
+    # Place every country at the snapshot's reference year.
+    tb["year"] = AS_OF_YEAR
 
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
-
-    # Add a column that simply indicates whether the country has a net-zero target.
-    # NOTE: All countries remaining in the table have set a net-zero target. Countries without one are
-    #  absent from the table (and show as missing data in charts).
-    tb["has_net_zero_target"] = "Net-zero achieved or pledged"
-    # Copy metadata from another variable.
-    tb["has_net_zero_target"] = tb["has_net_zero_target"].copy_metadata(tb["net_zero_status"])
 
     sanity_check_outputs(tb)
 
@@ -87,15 +109,26 @@ def sanity_check_inputs(tb: Table) -> None:
 
 def sanity_check_outputs(tb: Table) -> None:
     assert not tb.empty, "Output table is empty."
-    # Each country should appear only once (a single net-zero target year).
-    assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows."
-    # Statuses must be within the codebook's set of possible values.
-    unexpected = set(tb["net_zero_status"]) - EXPECTED_STATUSES
+    # Each country should appear only once.
+    assert not tb.duplicated(subset=["country"]).any(), "Duplicate country rows."
+    # Statuses (where set) must be within the expected set.
+    unexpected = set(tb["net_zero_status"].dropna()) - EXPECTED_STATUSES
     assert not unexpected, f"Unexpected net-zero status values: {unexpected}"
-    # Target years should be plausible.
-    assert tb["year"].between(2000, 2100).all(), "Target year outside the plausible 2000-2100 range."
-    # The has_net_zero_target flag is a single constant category.
-    assert set(tb["has_net_zero_target"]) == {"Net-zero achieved or pledged"}, "Unexpected has_net_zero_target values."
+    # has_net_zero_target is a two-category flag covering every assessed country.
+    assert set(tb["has_net_zero_target"]) == {"Has set a net-zero target", NO_TARGET_LABEL}, (
+        "Unexpected has_net_zero_target values."
+    )
+    # "No target" must be consistent between the two categorical indicators.
+    assert (
+        (tb["net_zero_status"] == NO_TARGET_LABEL) == (tb["has_net_zero_target"] == NO_TARGET_LABEL)
+    ).all(), "Mismatch between 'No target' rows in net_zero_status and has_net_zero_target."
+    # Target years, where present, should be plausible.
+    years = tb["net_zero_target_year"].dropna()
+    assert years.between(2000, 2100).all(), "Target year outside the plausible 2000-2100 range."
+    # A "No target" country must not carry a target year.
+    assert tb.loc[tb["has_net_zero_target"] == NO_TARGET_LABEL, "net_zero_target_year"].isna().all(), (
+        "A 'No target' country has a target year."
+    )
     # Coverage should not collapse (a sudden drop signals a parsing/mapping regression).
     n_countries = tb["country"].nunique()
     assert n_countries >= 150, f"Only {n_countries} countries; possible parsing/mapping regression."
