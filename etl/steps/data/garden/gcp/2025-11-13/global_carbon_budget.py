@@ -23,14 +23,6 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Expected outliers in consumption-based emissions (with negative emissions in the original data, that will be removed).
-# NOTE: This issue has been reported to the data providers, and will hopefully be fixed in a coming version.
-OUTLIERS_IN_CONSUMPTION_DF = [
-    ("Panama", 2006),
-    ("Panama", 2008),
-    ("Panama", 2016),
-]
-
 # Regions and income groups to create by aggregating contributions from member countries.
 # In the following dictionary, if nothing is stated, the region is supposed to be a default continent/income group.
 # Otherwise, the dictionary can have "regions_included", "regions_excluded", "countries_included", and
@@ -493,20 +485,9 @@ def prepare_consumption_emissions(tb_consumption: Table) -> Table:
     for column in tb_consumption.drop(columns=["country", "year"]).columns:
         tb_consumption[column] *= MILLION_TONNES_OF_CARBON_TO_TONNES_OF_CO2
 
-    # List indexes of rows in tb_consumption corresponding to outliers (defined above in OUTLIERS_IN_tb_consumption).
-    outlier_indexes = [
-        tb_consumption[(tb_consumption["country"] == outlier[0]) & (tb_consumption["year"] == outlier[1])].index.item()
-        for outlier in OUTLIERS_IN_CONSUMPTION_DF
-    ]
-
-    error = (
-        "Outliers were expected to have negative consumption emissions. "
-        "Maybe outliers have been fixed (and should be removed from the code)."
-    )
-    assert (tb_consumption.loc[outlier_indexes]["consumption_emissions"] < 0).all(), error
-
-    # Remove outliers.
-    tb_consumption = tb_consumption.drop(outlier_indexes).reset_index(drop=True)
+    # Remove known upstream data errors (e.g. Panama's negative consumption emissions), declared in
+    # global_carbon_budget.corrections.yml.
+    tb_consumption = paths.apply_corrections(tb_consumption)
 
     return tb_consumption
 

@@ -35,8 +35,8 @@ meta:
     url_main: https://www.hsi.org/news-resources/bullfighting/
     date_accessed: '2024-06-04'
     date_published: '2023-09-05'
-  license:
-    name: CC BY 4.0
+    license:
+      name: CC BY 4.0
 outs:
   - md5: 778ac4ae1ea023d7a91947d252580e73
     size: 7119

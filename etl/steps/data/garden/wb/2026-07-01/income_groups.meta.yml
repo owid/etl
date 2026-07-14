@@ -1,0 +1,61 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+      attribution_short: World Bank
+    processing_level: minor
+    description_from_producer: |-
+      For the current 2027 fiscal year, low-income economies are defined as those with a GNI per capita, calculated using the [World Bank Atlas method](https://datahelpdesk.worldbank.org/knowledgebase/articles/378832-what-is-the-world-bank-atlas-method), of $1,175 or less in 2025; lower middle-income economies are those with a GNI per capita between $1,176 and $4,635; upper middle-income economies are those with a GNI per capita between $4,636 and $14,375; high-income economies are those with more than a GNI per capita of $14,375.
+
+      Please note: Regions in this table include economies at all income levels. The term country, used interchangeably with economy, does not imply political independence but refers to any territory for which authorities report separate social or economic statistics. Click [here](https://datahelpdesk.worldbank.org/knowledgebase/articles/378834-how-does-the-world-bank-classify-countries) for information about how the World Bank classifies countries.
+
+    description_key:
+      - The World Bank creates a yearly classification of countries by income, for all countries with population over 30,000.
+      - This classification stays the same throughout the World Bank's fiscal year (from July 1 to June 30) even if the income data for a country changes.
+      - Low-income countries are those with a gross national income (GNI) per capita of $1,175 or less in 2025.
+      - Lower-middle-income countries are those with a GNI per capita between $1,176 and $4,635 in 2025.
+      - Upper-middle-income countries are those with a GNI per capita between $4,636 and $14,375 in 2025.
+      - High-income countries are those with a GNI per capita of more than $14,375 in 2025.
+      - When the World Bank lacks recent income data for a country, it can leave that country temporarily unclassified. Venezuela had no classification from 2021 to 2024, and Ethiopia had none in 2024.
+
+  description_processing_count_population: We count the countries in each income group and also calculate the total population in them by using a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
+
+  classification_sort: &classification_sort
+    - Low-income countries
+    - Lower-middle-income countries
+    - Upper-middle-income countries
+    - High-income countries
+
+dataset:
+  title: World Bank's income classification
+  update_period_days: 365
+
+  owners:
+    - Pablo Arriagada
+tables:
+  income_groups:
+    title: World Bank's income classification
+    variables:
+      classification:
+        title: World Bank's income classification
+        unit: ""
+        description_short: Income classification based on the country's income each year.
+        type: ordinal
+        sort: *classification_sort
+
+  income_groups_latest:
+    title: World Bank's latest income classification
+    variables:
+      classification:
+        title: World Bank's latest income classification
+        unit: ""
+        description_short: Income classification based on the country's income for the latest available year.
+        type: ordinal
+        display:
+          name: World Bank's {year_world_bank_classification} income classification
+          # Assign an arbitrarily large tolerance to be able to show the income groups for all years in the Table tab.
+          tolerance: 1000
+        sort: *classification_sort
+
+

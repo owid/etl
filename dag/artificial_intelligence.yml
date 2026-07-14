@@ -6,12 +6,6 @@ steps:
       - data://meadow/artificial_intelligence/2026-01-30/frontiermath:
         - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
 
-  # MMLU Benchmark by country of origin (EPOCH)
-  data://grapher/artificial_intelligence/2026-01-30/mmlu:
-    - data://garden/artificial_intelligence/2026-01-30/mmlu:
-      - data://meadow/artificial_intelligence/2026-01-30/mmlu:
-        - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
-
   # Stack Overflow Developer Survey – AI tool usage
   data://grapher/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
     - data://garden/artificial_intelligence/2026-02-05/stackoverflow_ai_usage:
@@ -31,11 +25,6 @@ steps:
     - data://garden/artificial_intelligence/2025-03-12/epoch_regressions:
       - data://garden/artificial_intelligence/2025-03-12/epoch
 
-  # EPOCH aggregates by domain
-  data://grapher/artificial_intelligence/2025-03-12/epoch_aggregates_domain:
-    - data://garden/artificial_intelligence/2025-03-12/epoch_aggregates_domain:
-      - data://meadow/artificial_intelligence/2025-03-12/epoch
-
   # EPOCH aggregates by researcher affiliaiton
   data://grapher/artificial_intelligence/2025-03-12/epoch_aggregates_affiliation:
     - data://garden/artificial_intelligence/2025-03-12/epoch_aggregates_affiliation:
@@ -53,24 +42,8 @@ steps:
     - data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_countries:
       - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
 
-  # EPOCH dataset on Compute Intensive AI, aggregates by domain
-  data://grapher/artificial_intelligence/2025-03-12/epoch_compute_intensive_domain:
-    - data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_domain:
-      - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
-
   ############### OTHERS #####################################################################################
 
-  # Large Language Models and Compute (EPOCH)
-  data://grapher/artificial_intelligence/2024-02-15/epoch_llms:
-    - data://garden/artificial_intelligence/2024-02-15/epoch_llms:
-      - snapshot://artificial_intelligence/2024-02-15/epoch_llms.csv
-
-  # EPOCH dataset on Machine Learning Hardware Trends
-  data://grapher/artificial_intelligence/2025-10-10/epoch_gpus:
-    - data://garden/artificial_intelligence/2025-10-10/epoch_gpus:
-      - data://meadow/artificial_intelligence/2025-10-10/epoch_gpus:
-        - snapshot://artificial_intelligence/2025-10-10/epoch_gpus.csv
-      - data://garden/bls/2026-03-20/us_consumer_prices
 
   # Dataset on AI performance across different benchmarks from Dynabench
   data://grapher/artificial_intelligence/2024-04-02/dynabench:
@@ -78,11 +51,6 @@ steps:
       - data://meadow/artificial_intelligence/2024-04-02/dynabench:
         - snapshot://artificial_intelligence/2024-04-02/dynabench.xlsx
 
-  # EPOCH dataset on AI training cost
-  data://grapher/artificial_intelligence/2025-10-22/epoch_compute_cost:
-    - data://garden/artificial_intelligence/2025-10-22/epoch_compute_cost:
-      - data://meadow/artificial_intelligence/2025-10-22/epoch_compute_cost:
-        - snapshot://artificial_intelligence/2025-10-22/epoch_compute_cost.csv
 
   # Chess dataset (ELO ratings)
   data://grapher/artificial_intelligence/2024-02-05/chess:
@@ -91,15 +59,6 @@ steps:
   #
   # AI polls
   #
-  # World Risk Poll
-  data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021:
-    - data://meadow/world_risk_poll/2023-06-26/wrp_2021:
-      - snapshot://world_risk_poll/2023-06-26/wrp_2021.zip
-  data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021:
-    - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
-  data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped:
-    - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped:
-      - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
 
   # YouGov AI surveys
   data://grapher/artificial_intelligence/2026-03-23/yougov_robots:
@@ -111,12 +70,6 @@ steps:
       - data://meadow/artificial_intelligence/2026-03-23/yougov_job_automation:
         - snapshot://artificial_intelligence/2026-03-23/yougov_job_automation.xlsx
 
-
-  # CSET data on semiconductor supply chain
-  data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
-    - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset:
-      - data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset:
-        - snapshot://artificial_intelligence/2023-07-07/semiconductors_cset.csv
 
 
   # Datacenter construction spending (U.S. Census Bureau)

@@ -87,6 +87,7 @@ items:
   - display: Cassava
     item_codes:
       125: Cassava, fresh
+      128: Cassava, dry
   - display: Cauliflower and broccoli
     item_codes:
       393: Cauliflowers and broccoli

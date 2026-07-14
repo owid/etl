@@ -14,7 +14,6 @@ lists below and must be kept in sync by hand when someone joins or leaves.
 OWID_DATA_TEAM: list[str] = [
     "Pablo Rosado",
     "Pablo Arriagada",
-    "Veronika Samborska",
     "Mojmír Vinkler",
     "Lucas Rodés-Guirao",
     "Tuna Acisu",
@@ -56,6 +55,7 @@ OWID_LEGACY_CREATORS: list[str] = [
     "Daniel Bachler",
     # Former OWID engineer; original author of several legacy garden steps.
     "Lars Yencken",
+    "Veronika Samborska",
 ]
 
 # Union of the two lists — used by the schema-enum guard and by lookups

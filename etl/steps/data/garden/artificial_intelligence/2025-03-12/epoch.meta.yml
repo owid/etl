@@ -13,7 +13,8 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
-    - Veronika Samborska
+    - Lucas Rodés-Guirao
+    - Edouard Mathieu
 tables:
   epoch:
     variables:

@@ -113,7 +113,6 @@ Pages to help us improve our charts (e.g. keeping them up to date). The current 
 
 ### Assistant
 
-- **Insighter**: Generate insights from a chart using LLMs.
 - **Chart animation**: Animate a chart over time and export it as a GIF.
 
 ### Search (experimental)
@@ -122,15 +121,8 @@ Pages to help us improve our charts (e.g. keeping them up to date). The current 
 - **Related charts**: Given a chart, find related charts based on semantic similarity.
 
 
-### Explorers
-
-- **Map Bracketer**: Define map brackets for explorers smartly.
-- **ID to Path**: Convert an explorer that is ID-based to a path-based explorer.
-
 ### Misc
 
-- **News**: Brief summary of the latest activity in the ETL repository. This is only available in production.
-- **owidle**: Daily challenge where you have to guess the country based on the data provided.
 - **Servers dashboard**: Track the status of all our servers.
 <!--
 ### Metadata

@@ -108,9 +108,9 @@ definitions:
 
   description_key_welfare_type: |-
     <% if welfare_type == "dhi" %>
-    Income is measured after taxes have been paid and most government benefits have been received.
+    Income is measured after taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received.
     <%- elif welfare_type == "mi" %>
-    Income is measured before taxes have been paid and most government benefits have been received.
+    Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. LIS includes private pensions, meaning a retired person’s before-tax income depends on how their country organizes pensions.
     <%- endif %>
 
   description_key_equivalence_scale: |-
@@ -1101,7 +1101,10 @@ tables:
         description_short: |-
           The share of income received by the poorest 50% of the population.
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
         display:
           name: Share (bottom 50%) ({definitions.welfare_type})
@@ -1130,6 +1133,8 @@ tables:
         description_short: |-
           The share of income received by the richest 10% of the population.
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"
@@ -1160,6 +1165,8 @@ tables:
         description_short: |-
           The share of income received by the middle 40% of the population. The middle 40% is the share of the population whose income lies between the poorest 50% and the richest 10%.
         description_key:
+          - "{definitions.description_key_inequality}"
+          - "{definitions.description_key_share}"
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_lis}"
           - "{definitions.description_key_equivalence_scale}"

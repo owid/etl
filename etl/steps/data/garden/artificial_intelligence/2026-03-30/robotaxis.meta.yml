@@ -16,7 +16,8 @@ dataset:
 
 
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
+    - Edouard Mathieu
 tables:
   robotaxis:
     variables:

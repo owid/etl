@@ -1,7 +1,7 @@
 dataset:
   title: Historical numeracy and years of schooling estimates (Clio Infra)
   owners:
-    - Veronika Samborska
+    - Tuna Acisu
 tables:
   clio_infra_education:
     variables:

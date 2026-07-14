@@ -1,7 +1,8 @@
 # Writing and style guide
 
-> Source: OWID Notion page — [Writing and style guide](https://www.notion.so/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c).
-> Keep this file in sync with the Notion page. Refresh it via a PR whenever the Notion page is edited.
+> Source: OWID Notion page — [Writing and style guide](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c).
+> Last synced from Notion: 2026-07-07
+> The check-metadata-style skill verifies this date on every run and refreshes this file from Notion when it is more than two months old. Commit refreshes via a PR.
 
 This guide establishes a uniform style for all OWID content to ensure consistency, clarity, and accuracy across our publications. The rules in this guide apply to all writing we do on OWID, whether in articles, topic pages, or charts.
 
@@ -228,6 +229,8 @@ Always use double quotes for quotations and titles. Single quotes are used only 
 
 ### Use curly apostrophes and quotation marks
 
+> NOTE: local addition (PR #6171) — an OWID-agreed rule not yet on the Notion page. Keep this section during refreshes until Notion covers the same rule.
+
 Use curly (“typographic”) apostrophes and quotation marks, not straight ones. Word processors curl these automatically, but LLMs and code editors emit the straight versions — so a mix of straight and curly marks in the same text is a tell-tale sign of pasted machine output.
 
 - Apostrophe: `’` (U+2019), not `'`
@@ -281,7 +284,6 @@ Spell out the full form of an acronym the first time it is used in a text, follo
 - **tonnes**, not tons. We always use what's called the "tonne" or "metric ton" across OWID, equivalent to 1,000 kg — but we always write it as "tonne". We never use the American "short ton" or "long ton".
 - **acknowledgments**, not acknowledgements.
 - **sub-Saharan Africa**, not Sub-Saharan Africa.
-- **Corn**, not maize.
 - **COVID-19**, not Covid-19 or COVID.
 - **The Internet**, not the internet.
 - **vs.**, not vs
