@@ -47,14 +47,15 @@ The deep per-indicator work (metadata claim review + online cross-checks) costs 
 **Never cap silently.** The report's Part 2 must list every skipped indicator with its rank — a truncated review that reads as complete is itself a factual error.
 
 ```python
+from etl.analytics.config import SEMANTIC_LAYER_SCHEMA as S  # tables must be schema-qualified for BigQuery
 from etl.analytics.data import read_analytics  # Metabase; auto-falls back to analytics Datasette without creds
 
 NS, SHORT = "<namespace>", "<short_name>"
-ind = read_analytics("SELECT indicator_id, catalog_path FROM indicators WHERE catalog_path IS NOT NULL")
+ind = read_analytics(f"SELECT indicator_id, catalog_path FROM {S}.indicators WHERE catalog_path IS NOT NULL")
 # Match namespace + short_name across ANY version — before the PR merges, live charts still point at the OLD version.
 ind = ind[ind["catalog_path"].str.contains(f"/{NS}/") & ind["catalog_path"].str.contains(f"/{SHORT}/")]
-cxi = read_analytics("SELECT chart_slug, indicator_id FROM charts_x_indicators")
-charts = read_analytics("SELECT chart_slug, views_365d FROM charts").drop_duplicates("chart_slug")
+cxi = read_analytics(f"SELECT chart_slug, indicator_id FROM {S}.charts_x_indicators")
+charts = read_analytics(f"SELECT chart_slug, views_365d FROM {S}.charts").drop_duplicates("chart_slug")
 usage = (
     ind.merge(cxi, on="indicator_id").merge(charts, on="chart_slug")
     .groupby("catalog_path")
@@ -118,10 +119,10 @@ for tname in ds.table_names:
             if mx > 150: findings.append((tname, col, "UNIT", f"% column max={mx:.3g} — can it exceed 100?"))
         if mn < 0 and any(w in unit for w in ("people", "number", "deaths", "tonnes", "count")):
             findings.append((tname, col, "SIGN", f"negative min={mn:.3g} in count-like unit"))
-        # 2. Robust per-country outliers (median/MAD z-score)
+        # 2. Robust per-country outliers (median/MAD z-score; skip short series — MAD is unstable under ~8 points)
         g = s.groupby("country")[col]
         mad = g.transform(lambda x: (x - x.median()).abs().median()).replace(0, np.nan)
-        z = (s[col] - g.transform("median")) / mad
+        z = ((s[col] - g.transform("median")) / mad).where(g.transform("count") >= 8)
         for _, r in s[z.abs() > 6].head(20).iterrows():
             findings.append((tname, col, "OUTLIER", f"{r['country']} {r[year_col]}: {r[col]:.4g} (|z|>6)"))
         # 3. Trend breaks with a unit-error signature (~×10/×100/×1000 jumps)
