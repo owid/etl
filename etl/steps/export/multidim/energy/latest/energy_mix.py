@@ -98,7 +98,7 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
-    # Add stacked breakdown views: all individual sources, and the fossil/nuclear/renewables split.
+    # Add a stacked breakdown view combining all individual sources.
     stacked_view_config = {
         "chartTypes": ["StackedArea"],
         "tab": "chart",
