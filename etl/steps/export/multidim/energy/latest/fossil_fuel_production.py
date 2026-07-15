@@ -96,6 +96,8 @@ def run() -> None:
                     "hasMapTab": False,
                     "title": "{title}",
                     "subtitle": "{subtitle}",
+                    # Show grapher's relative toggle so users can flip the stack to share-of-total (100%).
+                    "hideRelativeToggle": False,
                 },
             },
         ],

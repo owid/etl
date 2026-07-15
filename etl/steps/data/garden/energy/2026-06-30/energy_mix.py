@@ -209,6 +209,12 @@ def add_variable_metadata(tb: Table) -> Table:
                     tb[column].metadata.title = title_template.format(name=name, name_lower=name.lower())
                     tb[column].metadata.unit = unit
                     tb[column].metadata.short_unit = short_unit
+                    # Set display.name to the source's clean name, so stacked-chart series are labelled
+                    # correctly. Aggregates (e.g. renewables) otherwise inherit a stray display.name from
+                    # the arithmetic that built them (renewables was showing up as "Biofuels").
+                    display = dict(tb[column].metadata.display or {})
+                    display["name"] = name
+                    tb[column].metadata.display = display
     # Per-GDP variable.
     if "total_energy_supply_per_gdp_kwh_per_dollar" in tb.columns:
         tb["total_energy_supply_per_gdp_kwh_per_dollar"].metadata.title = "Total energy supply per unit of GDP"
