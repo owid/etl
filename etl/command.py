@@ -253,6 +253,14 @@ def main_cli(
             if not steps:
                 click.echo("No steps modified relative to origin/master.")
                 return
+            # `--modified` surfaces modified export steps (multidim/explorer recipes) by design, but
+            # they're only buildable in export mode. When a branch edits only such a recipe (e.g. a
+            # single `<explorer>.<key>.config.yml`), the modified set is export-only; without this we
+            # would exclude it downstream and crash with "No steps matched". Enable export (which also
+            # un-excludes the grapher deps the export step needs) so the explorer actually rebuilds.
+            if not export and any(s.startswith("export://") for s in steps):
+                export = True
+                click.echo("Detected modified export step(s); enabling --export for this run.")
             click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
             # We matched modified catalog paths as substrings, so disable exact matching downstream.
             exact_match = False
@@ -329,20 +337,26 @@ def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]
     Reuses the same machinery as chart-diff (`get_changed_files` + `get_all_changed_catalog_paths`),
     so the selection matches what chart-diff considers affected. If `includes` is non-empty, the
     result is narrowed to changed paths that also match one of those patterns.
+
+    Export steps (e.g. `export://multidim/...`) are included too, so `--modified` can pick the
+    multidims/explorers a branch affects via their upstream data steps. Data steps are returned
+    URI-less (e.g. "garden/foo/bar"); export steps keep their full URI so `export://...` patterns
+    match them.
     """
     from etl.git_helpers import get_changed_files
     from etl.io import get_all_changed_catalog_paths
 
     # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
-    changed_paths = get_all_changed_catalog_paths(get_changed_files(include_diff=False))
+    changed_paths = get_all_changed_catalog_paths(get_changed_files(include_diff=False), include_export=True)
 
     # Narrow to those also matching the explicit STEPS arguments.
     if includes:
         if exact_match:
-            # changed_paths are URI-less catalog paths (e.g. "garden/foo/bar"), while exact-match
-            # includes are full step URIs (e.g. "data://garden/foo/bar"); compare on the path part.
+            # changed_paths are URI-less for data steps (e.g. "garden/foo/bar") but full URIs for
+            # export steps; exact-match includes are full step URIs (e.g. "data://garden/foo/bar").
+            # Compare on the scheme-less path part of both sides.
             wanted = {i.split("://", 1)[-1] for i in includes}
-            changed_paths = [p for p in changed_paths if p in wanted]
+            changed_paths = [p for p in changed_paths if p.split("://", 1)[-1] in wanted]
         else:
             patterns = [re.compile(p) for p in includes]
             changed_paths = [p for p in changed_paths if any(pat.search(p) for pat in patterns)]

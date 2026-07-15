@@ -55,17 +55,17 @@ steps:
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
     - data://garden/worldbank_wdi/2026-02-27/wdi
     - data://garden/un/2024-07-12/un_wpp
-    - data://garden/un/2025-03-25/igme
+    - data://garden/un/2026-06-09/igme
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality
     - data://garden/wash/2025-12-08/household
     - data://garden/tourism/2026-01-21/unwto
     - data://garden/ggdc/2025-10-09/penn_world_table
     - data://garden/education/2025-08-20/harmonized_scores
     - data://grapher/wb/2025-09-08/gender_statistics
-    - data://garden/unesco/2025-05-01/education_sdgs
+    - data://garden/unesco/2026-05-12/education_sdgs
     - data://garden/happiness/2026-03-16/happiness
     - data://garden/who/2026-05-22/gho
-    - data://garden/wb/2026-03-24/world_bank_pip
+    - data://garden/wb/2026-06-26/world_bank_pip
     - data://garden/un/2025-05-07/undp_hdr
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
@@ -96,3 +96,27 @@ steps:
   data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data:
     - data://meadow/bank_of_england/2026-01-21/millennium_macroeconomic_data:
       - snapshot://bank_of_england/2026-01-21/millennium_macroeconomic_data.xlsx
+
+  #
+  # Long-run structural transformation: sector employment and GDP shares (historical sources + WDI)
+  #
+  data://garden/growth/2026-07-02/structural_transformation_historical:
+    - data://meadow/papers/2026-07-02/herrendorf_rogerson_valentinyi:
+      - snapshot://papers/2026-07-02/herrendorf_rogerson_valentinyi.zip
+    - data://meadow/ggdc/2026-07-02/ggdc_10_sector:
+      - snapshot://ggdc/2026-07-02/ggdc_10_sector.xlsx
+    - data://meadow/lund_university/2026-07-02/swedish_historical_national_accounts:
+      - snapshot://lund_university/2026-07-02/swedish_historical_national_accounts_value_added.xlsx
+      - snapshot://lund_university/2026-07-02/swedish_historical_national_accounts_employment.xlsx
+    - data://meadow/bea/2026-07-02/gdp_by_industry_historical:
+      - snapshot://bea/2026-07-02/gdp_by_industry_historical.zip
+    - data://meadow/bea/2026-07-02/gdp_by_industry:
+      - snapshot://bea/2026-07-02/gdp_by_industry.zip
+  data://grapher/growth/2026-07-02/structural_transformation_omm:
+    - data://garden/growth/2026-07-02/structural_transformation_omm:
+      - data://garden/growth/2026-07-02/structural_transformation_historical
+      - data://meadow/papers/2026-07-02/broadberry_gardner:
+        - snapshot://papers/2026-07-02/broadberry_gardner.csv
+      - data://meadow/wb/2026-07-02/wdi_employment_by_sector_archive:
+        - snapshot://wb/2026-07-02/wdi_employment_by_sector_archive.csv
+      - data://garden/worldbank_wdi/2026-02-27/wdi

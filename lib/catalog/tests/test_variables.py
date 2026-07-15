@@ -11,6 +11,7 @@ from owid.catalog.core.indicators import (
     License,
     Variable,
     combine_indicators_metadata,
+    combine_indicators_processing_level,
     get_unique_licenses_from_indicators,
     get_unique_origins_from_indicators,
 )
@@ -646,3 +647,38 @@ def test_variable_to_frame_with_custom_name() -> None:
     # Note: Metadata is not automatically copied when renaming via name parameter
     # This is consistent with pandas Series.to_frame() behavior
     # If you need to preserve metadata when renaming, copy it manually after conversion
+
+
+def test_combine_indicators_processing_level_with_jinja_templates() -> None:
+    # The dataset schema allows unrendered Jinja templates in processing_level (they render per
+    # dimension at grapher time), so combining indicators must not choke on them.
+    template = '<% if sector == "Non-humanitarian aid" %>major<% else %>minor<%- endif -%>'
+
+    def _var(processing_level: str):
+        v = Variable([1, 2], name="v")
+        v.metadata.processing_level = processing_level  # type: ignore[assignment]
+        return v
+
+    # Identical templates (e.g. comparing two versions of the same column) are kept.
+    assert combine_indicators_processing_level([_var(template), _var(template)]) == template
+    # A template counts as the highest level it can render: maybe-major + minor -> major
+    # (understating would mislabel licensing downstream).
+    assert combine_indicators_processing_level([_var(template), _var("minor")]) == "major"
+    only_minor = '<% if sector == "X" %>minor<% else %>minor<%- endif -%>'
+    assert combine_indicators_processing_level([_var(only_minor), _var("minor")]) == "minor"
+    # Level names inside statement tags (conditions) never render, so they don't count.
+    tricky = '<% if sector == "major donors" %>minor<% else %>minor<% endif %>'
+    assert combine_indicators_processing_level([_var(tricky), _var("minor")]) == "minor"
+    # When the output is routed through a variable, the output text names no level: fall back to
+    # a whole-source scan, deliberately overstating rather than understating.
+    routed = '<% set level = "major" if sector == "x" else "minor" %><< level >>'
+    assert combine_indicators_processing_level([_var(routed), _var("minor")]) == "major"
+    # Different templates with no literals combine to the highest renderable level.
+    assert combine_indicators_processing_level([_var(template), _var(only_minor)]) == "major"
+    # Templates that spell out no known level can't be combined.
+    assert combine_indicators_processing_level([_var("<% weird %>"), _var("<% weirder %>")]) is None
+    # Literal levels behave as before.
+    assert combine_indicators_processing_level([_var("minor"), _var("major")]) == "major"
+    # Unknown literal levels still fail loudly.
+    with pytest.raises(AssertionError):
+        combine_indicators_processing_level([_var("mjor")])

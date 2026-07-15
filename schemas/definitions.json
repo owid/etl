@@ -332,7 +332,13 @@
             "Must start with a capital letter."
           ],
           [
-            "Must end with a period."
+            "Must end with a period, unless it ends with a URL.",
+            {
+              "type": "list",
+              "value": [
+                "Do not add a period after a trailing URL, since the period would be copied as part of the link."
+              ]
+            }
           ],
           [
             "Must include (wherever is appropriate) the year of publication, i.e. the year given in `date_published`."

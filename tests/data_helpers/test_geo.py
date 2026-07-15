@@ -810,6 +810,88 @@ class TestAddRegionAggregates:
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
         assert df.var_01.m.title == "Var 01"
 
+    def test_add_region_raises_when_must_have_country_not_a_member(self):
+        # A "must-have" country that is not a member of the region can never satisfy the subset check,
+        # so the aggregate would be silently set to NaN and dropped. The guard must raise instead
+        # (this is the failure mode that silently nulled income-group aggregates after a reclassification).
+        with pytest.raises(ValueError, match="not members of the region"):
+            geo.add_region_aggregates(
+                df=self.df_in,
+                region="Region 2",
+                countries_in_region=["Country 3"],
+                countries_that_must_have_data=["Country 1"],  # not a member of Region 2
+                country_col="country",
+                year_col="year",
+            )
+
+    def test_add_region_fractional_must_have_with_non_member(self):
+        # With a fractional requirement, a non-member in the must-have list doesn't necessarily make
+        # the aggregate impossible: members {1,2} + must-have {1,2,3} + frac 2/3 is satisfiable, so it
+        # must aggregate (with a stale-pin warning), while an unreachable fraction must still raise.
+        df_out = geo.add_region_aggregates(
+            df=self.df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 1", "Country 2", "Country 3"],
+            frac_countries_that_must_have_data=2 / 3,
+            country_col="country",
+            year_col="year",
+        )
+        assert "Region 1" in df_out["country"].values
+
+        # The stale non-member must also be excluded from the check's denominator: in 2021 only
+        # Country 1 has data, which passes frac 0.5 over the two members (1/2) but would be nulled
+        # if Country 3 stayed in the list (1/3) — the aggregate for 2021 must survive.
+        df_half = geo.add_region_aggregates(
+            df=self.df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 1", "Country 2", "Country 3"],
+            frac_countries_that_must_have_data=0.5,
+            country_col="country",
+            year_col="year",
+        )
+        region_2021 = df_half[(df_half["country"] == "Region 1") & (df_half["year"] == 2021)]
+        assert not region_2021.empty and region_2021["var_01"].notna().all()
+
+        # Zero-threshold edge case: every listed country is a non-member and frac=0 — the requirement
+        # is vacuously satisfiable, the stale entries get excluded (emptying the list), and the check
+        # must treat the empty list as "no constraint" instead of dividing by zero.
+        df_zero = geo.add_region_aggregates(
+            df=self.df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 3"],
+            frac_countries_that_must_have_data=0,
+            country_col="country",
+            year_col="year",
+        )
+        assert "Region 1" in df_zero["country"].values
+
+        # An invalid threshold must fail loudly even when the per-group check would be skipped
+        # (e.g. an empty must-have list).
+        with pytest.raises(ValueError, match="must be between 0 and 1"):
+            geo.add_region_aggregates(
+                df=self.df_in,
+                region="Region 1",
+                countries_in_region=["Country 1", "Country 2"],
+                countries_that_must_have_data=[],
+                frac_countries_that_must_have_data=2,
+                country_col="country",
+                year_col="year",
+            )
+
+        with pytest.raises(ValueError, match="impossible to compute"):
+            geo.add_region_aggregates(
+                df=self.df_in,
+                region="Region 1",
+                countries_in_region=["Country 1", "Country 2"],
+                countries_that_must_have_data=["Country 1", "Country 2", "Country 3"],
+                frac_countries_that_must_have_data=0.9,
+                country_col="country",
+                year_col="year",
+            )
+
 
 class MockRegionsDataset:
     def __getitem__(self, name: str) -> Table:
@@ -914,6 +996,26 @@ class MockPopulationDataset:
             return mock_tb_population
         else:
             raise KeyError(f"Table {name} not found.")
+
+
+class MockPopulationDatasetEurope:
+    """Mock population dataset covering the mock Europe members across several years (for coverage tests)."""
+
+    def __init__(self):
+        self.table_names = ["population"]
+
+    def __getitem__(self, name: str) -> Table:
+        return self.read(name)
+
+    def read(self, name: str, safe_types: bool = True) -> Table:
+        if name != "population":
+            raise KeyError(f"Table {name} not found.")
+        # Constant population per country across years, in arbitrary units. "Europe" is the region total
+        # (sum of the five members, 329), read directly as the denominator for min_frac_population.
+        populations = {"France": 67, "Italy": 60, "Spain": 47, "Russia": 146, "Belarus": 9, "Europe": 329}
+        years = [2020, 2021, 2022, 2023]
+        rows = [(country, year, pop) for country, pop in populations.items() for year in years]
+        return Table(pd.DataFrame(rows, columns=["country", "year", "population"]))
 
 
 class TestAddRegionsToTable(unittest.TestCase):
@@ -3893,6 +3995,131 @@ class TestRegionAggregator(unittest.TestCase):
 
         # 2023 should have value
         self.assertEqual(europe_lenient[europe_lenient["year"] == 2023]["value"].iloc[0], 380)
+
+    def test_min_frac_population_basic(self):
+        """Test min_frac_population gates region-years by the population covered by countries with data."""
+        # Europe members and (mock) populations: France 67, Italy 60, Spain 47, Russia 146, Belarus 9 -> total 329.
+        # Coverage per year:
+        #   2020: all five report     -> 329/329 = 1.000
+        #   2021: France+Italy+Spain   -> 174/329 = 0.529
+        #   2022: France+Russia        -> 213/329 = 0.647
+        #   2023: France only          -> 67/329  = 0.204
+        tb_test = Table(
+            {
+                "country": [
+                    "France",
+                    "Italy",
+                    "Spain",
+                    "Russia",
+                    "Belarus",
+                    "France",
+                    "Italy",
+                    "Spain",
+                    "France",
+                    "Russia",
+                    "France",
+                ],
+                "year": [2020, 2020, 2020, 2020, 2020, 2021, 2021, 2021, 2022, 2022, 2023],
+                "value": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            }
+        )
+
+        aggregator = geo.RegionAggregator(
+            ds_regions=self.ds_regions,
+            regions_all=self.regions_all,
+            regions=["Europe"],
+            aggregations={"value": "sum"},
+            ds_income_groups=self.ds_income_groups,
+            ds_population=cast(Dataset, MockPopulationDatasetEurope()),
+        )
+
+        # With a 0.6 threshold, only 2020 (1.000) and 2022 (0.647) survive.
+        result = aggregator.add_aggregates(tb_test, min_frac_population=0.6, check_for_region_overlaps=False)
+        europe = result[result["country"] == "Europe"].set_index("year")["value"]
+
+        self.assertFalse(pd.isna(europe.loc[2020]))
+        self.assertTrue(pd.isna(europe.loc[2021]))
+        self.assertFalse(pd.isna(europe.loc[2022]))
+        self.assertTrue(pd.isna(europe.loc[2023]))
+
+    def test_min_frac_population_counts_countries_without_data(self):
+        """A member country with population but no data counts against coverage (it is in the denominator).
+
+        Belarus (population 9) never reports. In 2020 the other four members (France+Italy+Spain+Russia = 320)
+        report, while the region total is 329, so coverage is 320/329 = 0.973. A 0.99 threshold drops the
+        aggregate; a 0.95 threshold keeps it.
+        """
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia"],
+                "year": [2020, 2020, 2020, 2020],
+                "value": [1, 1, 1, 1],
+            }
+        )
+
+        def _europe_value(threshold):
+            aggregator = geo.RegionAggregator(
+                ds_regions=self.ds_regions,
+                regions_all=self.regions_all,
+                regions=["Europe"],
+                aggregations={"value": "sum"},
+                ds_income_groups=self.ds_income_groups,
+                ds_population=cast(Dataset, MockPopulationDatasetEurope()),
+            )
+            result = aggregator.add_aggregates(tb_test, min_frac_population=threshold, check_for_region_overlaps=False)
+            return result[result["country"] == "Europe"].set_index("year")["value"].loc[2020]
+
+        # Coverage 0.973 < 0.99 -> dropped.
+        self.assertTrue(pd.isna(_europe_value(0.99)))
+        # Coverage 0.973 >= 0.95 -> kept.
+        self.assertFalse(pd.isna(_europe_value(0.95)))
+
+    def test_min_frac_population_warns_on_missing_population(self):
+        """Missing population is surfaced via add_population_to_table and silenced by warn_on_missing_population=False."""
+
+        class _PopWithoutBelarus:
+            def __getitem__(self, name):
+                return self.read(name)
+
+            def read(self, name, safe_types=True):
+                # Belarus is a member of (mock) Europe but is deliberately absent from the population dataset.
+                populations = {"France": 67, "Italy": 60, "Spain": 47, "Russia": 146, "Europe": 329}
+                rows = [(country, 2020, pop) for country, pop in populations.items()]
+                return Table(pd.DataFrame(rows, columns=["country", "year", "population"]))
+
+        tb_test = Table(
+            {
+                "country": ["France", "Italy", "Spain", "Russia", "Belarus"],
+                "year": [2020] * 5,
+                "value": [1, 1, 1, 1, 1],
+            }
+        )
+
+        def _run(warn):
+            aggregator = geo.RegionAggregator(
+                ds_regions=self.ds_regions,
+                regions_all=self.regions_all,
+                regions=["Europe"],
+                aggregations={"value": "sum"},
+                ds_income_groups=self.ds_income_groups,
+                ds_population=cast(Dataset, _PopWithoutBelarus()),
+            )
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always")
+                result = aggregator.add_aggregates(
+                    tb_test, min_frac_population=0.5, warn_on_missing_population=warn, check_for_region_overlaps=False
+                )
+            return result, [str(w.message) for w in caught]
+
+        # By default the missing-population entity (Belarus) is surfaced.
+        result, messages = _run(True)
+        assert any("Belarus" in message for message in messages), "Expected a warning naming the missing entity."
+        # Belarus is counted as zero population; the other four cover 320/329 = 0.973 >= 0.5, so 2020 is kept.
+        self.assertFalse(pd.isna(result[result["country"] == "Europe"].set_index("year")["value"].loc[2020]))
+
+        # With the flag off, the warning is silenced.
+        _, messages_off = _run(False)
+        assert not any("Belarus" in message for message in messages_off), "Warning should be silenced."
 
     def test_min_num_and_frac_countries_informed_combined(self):
         """Test both min_num_countries_informed and min_frac_countries_informed together."""

@@ -23,7 +23,6 @@ def run() -> None:
     tb = ds_garden.read("migrant_stock_dest_origin")
     regions = ds_regions.read("regions")
     countries = regions[regions["region_type"] == "country"]["name"].unique()
-
     #
     # Create table where indicator is split into immigrants and emigrants instead of having country_origin and country_destination
     #

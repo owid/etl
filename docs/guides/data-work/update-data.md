@@ -26,8 +26,8 @@ This guide explains the general workflow to update a dataset that already exists
         - Use Indicator Upgrader to update the charts (so they use the new variables instead of the old ones).
             - If needed, adapt existing charts or create new ones on the staging server.
         - Use Chart Diff to approve changes in charts and newly created charts.
-    - **Archive unused steps**
-        - Use the ETL Dashboard to archive old steps (this will move old steps from the active dag to the archive dag).
+    - **Remove unused steps**
+        - Delete the old steps from the active dag and their files; `etl archive-dag` records them in the archive dag.
     - **Submit your work for review**
         - Commit all your final work and set your PR to be ready for review.
             - Select which commits need to be reviewed omitting the very first one (so that reviewer only sees the changes with respect to the old version of the step).
@@ -182,23 +182,13 @@ Review all changes in existing charts, and also new charts.
         <figcaption>Chart diff flow. You'll be shown any chart that you've changed in your staging server (either via indicator upgrader or manually in the admin) compared to production. Here, you need to approve and/or reject the differences.</figcaption>
     </figure>
 
-## 4. Archive unused steps
+## 4. Remove unused steps
 
-After your updates, the old steps are no longer relevant. Therefore, we move these to the archive dag. By doing this, we minimize the risk of using outdated steps by mistake.
+After your updates, the old steps are no longer relevant. Remove them so we don't use outdated steps by mistake.
 
-- **Archive old steps using the ETL Dashboard**:
-    - Go to ETL Dashboard in your local Wizard.
-    - On the Steps table, select the old step (the one that you have just updated, and that now should appear as "Archivable"), and click on "Add selected steps to the Operations list".
-    - Scroll down to the Operations list, and click on "Add all dependencies".
-    - Scroll down and expand the "Additional parameters to archive steps" box, to deactivate the "Dry run" option. You can keep "Include usages" activated (it will never archive a step that is used by a chart), but you may want to deactivate it if you created a step that is not yet used by any charts (to avoid archiving it).
-    - Then click on "Archive X steps" (in this case, X equals 6).
-
-    <figure markdown="span">
-        ![Chart Upgrader](../../assets/etl-dashboard-archive-steps.gif)
-        <figcaption>Archive ETL steps.</figcaption>
-    </figure>
-
-- **Sanity-check your archived steps**: To ensure nothing has been archived by mistake, you can run `etl d version-tracker`.
+- **Delete the old steps from the active dag** (`dag/*.yml`) and delete their files (`etl/steps/...`, `snapshots/...`).
+- **`etl archive-dag`** then reconstructs the archive dag from git history, recording each removed step together with the commit where it was last active — so it can be recovered later with `git checkout <commit>`. There is no manual archiving step.
+- **Sanity-check** with `etl d version-tracker` to ensure no active step still depends on something you removed.
 - **Commit the changes in the dag files**.
 
 ## 5. Submit your work for review

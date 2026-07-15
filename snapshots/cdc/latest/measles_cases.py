@@ -24,7 +24,9 @@ def main(upload: bool) -> None:
     # snap.create_snapshot(upload=upload)
     snap = modify_metadata(snap, date)
     # Add the file to DVC and optionally upload it to S3, based on the `upload` parameter.
-    snap.create_snapshot(upload=upload)
+    # cdc.gov's Akamai WAF blocks browser-like User-Agents (our download default) on this
+    # endpoint but allows honest client UAs, so send the real `python-requests` UA here.
+    snap.create_snapshot(upload=upload, user_agent=requests.utils.default_user_agent())
 
 
 def modify_metadata(snap: Snapshot, date: str) -> Snapshot:

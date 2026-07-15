@@ -2,7 +2,7 @@ import streamlit.components.v1 as components
 from st_aggrid import AgGrid, ColumnsAutoSizeMode, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
-from apps.step_update.cli import UpdateState
+from etl.version_tracker import UpdateState
 
 # Custom JS code
 JSCODE_UPDATE_DAYS = JsCode(
@@ -44,8 +44,6 @@ JSCODE_UPDATE_STATE = JsCode(
             return {{'color': 'black', 'backgroundColor': 'red'}}
         }} else if (params.value === "{UpdateState.MINOR_UPDATE.value}") {{
             return {{'color': 'black', 'backgroundColor': 'orange'}}
-        }} else if (params.value === "{UpdateState.ARCHIVABLE.value}") {{
-            return {{'color': 'black', 'backgroundColor': 'blue'}}
         }} else if (params.value === "{UpdateState.UNUSED.value}") {{
             return {{'color': 'black', 'backgroundColor': 'lightblue'}}
         }} else {{
@@ -286,7 +284,7 @@ def _config_grid_columns(gb):
         field="update_state",
         cellStyle=JSCODE_UPDATE_STATE,
         width=150,
-        headerTooltip=f'Update state of the step: "{UpdateState.UP_TO_DATE.value}" (up to date), "{UpdateState.MINOR_UPDATE.value}" (a dependency is outdated, but all origins are up to date), "{UpdateState.MAJOR_UPDATE.value}" (an origin is outdated), "{UpdateState.OUTDATED.value}" (there is a newer version of the step), "{UpdateState.ARCHIVABLE.value}" (the step is outdated and not used in charts, therefore can safely be archived).',
+        headerTooltip=f'Update state of the step: "{UpdateState.UP_TO_DATE.value}" (up to date), "{UpdateState.MINOR_UPDATE.value}" (a dependency is outdated, but all origins are up to date), "{UpdateState.MAJOR_UPDATE.value}" (an origin is outdated), "{UpdateState.OUTDATED.value}" (there is a newer version of the step).',
     )
     ## Create a column with grapher dataset names that are clickable and open in a new tab.
     _config_column(

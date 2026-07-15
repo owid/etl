@@ -14,10 +14,6 @@ def mock_dag():
             "e": set(),
             "f": set(),
         },
-        "archive": {
-            "g": set(["f"]),
-            "h": set(["i", "j"]),
-        },
     }
 
     return mock_dag_dict
@@ -47,7 +43,7 @@ def mock_expected_usages():
         "c": set(["a"]),
         "d": set(["b", "a"]),
         "e": set(["d", "b", "a"]),
-        "f": set(["d", "b", "a", "g"]),
+        "f": set(["d", "b", "a"]),
     }
 
     return mock_expected_usages_dict
@@ -62,7 +58,7 @@ def mock_expected_direct_usages():
         "c": set(["a"]),
         "d": set(["b"]),
         "e": set(["d", "b"]),
-        "f": set(["d", "g"]),
+        "f": set(["d"]),
     }
 
     return mock_expected_direct_usages_dict

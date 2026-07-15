@@ -10,11 +10,18 @@ on:
     # https://crontab.guru/every-hour
     - cron: '0 * * * *'
 
+permissions:
+  contents: write
+  pull-requests: write
+  # Required for issues.addLabels, used to apply automerge_fail_label on a
+  # failed scheduled merge — pull-requests: write alone silently no-ops.
+  issues: write
+
 jobs:
   merge_schedule:
     runs-on: ubuntu-latest
     steps:
-      - uses: gr2m/merge-schedule-action@v2
+      - uses: gr2m/merge-schedule-action@a9b6ddcf1282dfd66907bda8e7941dff59f03bad # v2.7.0
         with:
           # Merge method to use. Possible values are merge, squash or
           # rebase. Default is merge.

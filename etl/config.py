@@ -432,8 +432,8 @@ class OWIDEnv:
             # production
             if self.conf.DB_NAME == "live_grapher":
                 self._env_remote = "production"
-            # local
-            elif self.conf.DB_NAME == "grapher" and self.conf.DB_USER == "grapher":
+            # local (the standard user is `grapher`, but local setups with e.g. `root` are common)
+            elif self.conf.DB_NAME == "grapher":
                 self._env_remote = "dev"
             # other
             elif self.conf.DB_NAME == "owid" and self.conf.DB_USER == "owid":
@@ -513,12 +513,13 @@ class OWIDEnv:
 
     @property
     def name(self) -> str:
-        """Get site."""
+        """Get a human-readable name of the environment."""
         if self.env_remote in {"production", "dev"}:
             return self.env_remote
         elif self.env_remote == "staging":
             return f"{self.conf.DB_HOST}"
-        raise ValueError(f"Unknown env_remote (DB_NAME/DB_USER={self.conf.DB_NAME}/{self.conf.DB_USER})")
+        # Unrecognized setup (e.g. a custom local DB): don't crash UI pages that display the name.
+        return f"{self.conf.DB_USER}@{self.conf.DB_HOST}/{self.conf.DB_NAME}"
 
     @property
     def base_site(self) -> str | None:
@@ -724,7 +725,9 @@ for env_var in env_vars:
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
 METABASE_API_KEY_ADMIN = os.environ.get("METABASE_API_KEY_ADMIN")
 METABASE_URL = os.environ.get("METABASE_URL")
-METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+# Semantic layer = the `prod_semantic` dataset on the "Data warehouse (BigQuery)" connection (id 3).
+# The old DuckDB semantic-layer connection (id 2) was retired (owid/analytics#735).
+METABASE_SEMANTIC_LAYER_DATABASE_ID = 3
 METABASE_URL_LOCAL = os.environ.get("METABASE_URL", "http://localhost:3000")
 METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
 

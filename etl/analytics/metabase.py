@@ -9,6 +9,8 @@ from io import BytesIO
 import pandas as pd
 import requests
 from metabase_api import Metabase_API
+from structlog import get_logger
+from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from etl.config import (
     METABASE_API_KEY,
@@ -19,9 +21,24 @@ from etl.config import (
     OWID_ENV,
 )
 
+log = get_logger()
+
 # Config
 COLLECTION_EXPERT_ID = 61  # Expert collection
-DATABASE_ID = 2  # Semantic Layer database
+# Default DB for created questions = the semantic layer (now the prod_semantic dataset on the
+# BigQuery "Data warehouse" connection; the old DuckDB connection (id 2) was retired). Single
+# source of truth with the read path.
+DATABASE_ID = METABASE_SEMANTIC_LAYER_DATABASE_ID
+
+# HTTP status codes that indicate Metabase is temporarily unavailable rather than a permanent error.
+# Metabase is restarted by the analytics pipeline whenever the DuckDB mirrors are rebuilt (daily, plus
+# on every push to the analytics / owid-grapher main branches), so its nginx front-end briefly returns
+# 502/503/504 while the JVM reboots. These are worth retrying; a 4xx is not.
+RETRYABLE_STATUS_CODES = frozenset({502, 503, 504})
+
+
+class MetabaseTransientError(RuntimeError):
+    """Metabase upstream was temporarily unavailable (e.g. mid-restart). Safe to retry."""
 
 
 def mb_cli(domain: str | None = None, key: str | None = None):
@@ -87,7 +104,7 @@ def read_metabase(
     }
     body = {
         "query": {
-            # Database corresponding to the Semantic Layer (DuckDB).
+            # Database corresponding to the Semantic Layer (BigQuery).
             "database": database_id,
             "type": "native",
             "native": {"query": re.sub(r"\s+", " ", sql.strip())},
@@ -99,21 +116,51 @@ def read_metabase(
     # I cannot get the /api/dataset/csv endpoint to work when sending a dict (or json.dumps(dict)) to the POST body,
     # so I instead urlencode the body. The url encoding is a little awkward – we cannot simply use urllib.parse.urlencode(body)
     # b/c python dict single quotes need to be changed to double quotes. But we can't naively change all single quotes to
-    # double quotes b/c the sql query might include single quotes (and DuckDB doesn't allow double quotes). So the line below
+    # double quotes b/c the sql query might include single quotes (and double quotes mean identifiers, not strings). So the line below
     # executes the url encoding without replacing any quotes within the sql query.
     urlencoded = "&".join([f"{k}={urllib.parse.quote_plus(json.dumps(v))}" for k, v in body.items()])
 
     # Send request.
     if mb_url is None:
         mb_url = METABASE_URL
-    response = requests.post(
-        f"{mb_url}/api/dataset/csv",
-        headers=headers,
-        data=urlencoded,
-        timeout=30,
-    )
-    if not response.ok:
-        raise RuntimeError(f"Metabase API request failed with status code {response.status_code}: {response.text}")
+    url = f"{mb_url}/api/dataset/csv"
+
+    # Retry transient failures with exponential backoff. Metabase is restarted regularly by the
+    # analytics pipeline (see RETRYABLE_STATUS_CODES), which can otherwise hard-fail an entire owidbot
+    # run on a single 502 that resolves within a minute. Connection/timeout errors are retried too;
+    # a permanent error (4xx, parse failure) is reraised immediately without retrying.
+    def _request() -> requests.Response:
+        response = requests.post(url, headers=headers, data=urlencoded, timeout=30)
+        if response.status_code in RETRYABLE_STATUS_CODES:
+            raise MetabaseTransientError(
+                f"Metabase API temporarily unavailable (status code {response.status_code}). "
+                "It is likely being restarted; retrying."
+            )
+        if not response.ok:
+            raise RuntimeError(f"Metabase API request failed with status code {response.status_code}: {response.text}")
+        return response
+
+    def _log_retry(retry_state) -> None:
+        # Logged at debug level on purpose: a transient 502/503/504 mid-restart is expected and
+        # resolves on retry, so it shouldn't surface in Sentry. If all attempts are exhausted,
+        # reraise=True propagates the exception, which is a genuine failure worth alerting on.
+        log.debug(
+            "metabase.request_retry",
+            attempt=retry_state.attempt_number,
+            error=str(retry_state.outcome.exception()),
+        )
+
+    for attempt in Retrying(
+        retry=retry_if_exception_type(
+            (MetabaseTransientError, requests.exceptions.ConnectionError, requests.exceptions.Timeout)
+        ),
+        stop=stop_after_attempt(5),
+        wait=wait_exponential(multiplier=2, min=2, max=60),
+        before_sleep=_log_retry,
+        reraise=True,
+    ):
+        with attempt:
+            response = _request()
 
     # Create a dataframe with the returned data.
     df = pd.read_csv(BytesIO(response.content))
@@ -159,10 +206,10 @@ def create_question(
 ):
     """Create a question in Metabase with the given SQL query and title.
 
-    This tool should be used once we are sure that the query is valid in Datasette.
+    This tool should be used once we are sure that the query is valid (i.e. it ran successfully against the semantic layer).
 
     Args:
-        query: Query user for Datasette/Metabase.
+        query: SQL query (BigQuery / GoogleSQL) for the Metabase question.
         title: Title that describes what the query does. Should be short, but concise.
     Returns:
         Question object from Metabase API.

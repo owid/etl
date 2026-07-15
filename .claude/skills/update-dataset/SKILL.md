@@ -37,7 +37,8 @@ Assumptions:
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
 - [ ] Review `sanity_checks` output (enable log flag, re-run, scan log, revert flag) — if none found and the garden step does non-trivial logic, recommend adding them; if present but missing value bounds (positive / [0,1] / [0,100] per indicator type), suggest those too (see 5b-bis)
-- [ ] Country harmonization audit: validate `.countries.json` against canonical regions, audit `.excluded_countries.json`, scan garden log for missing/unused/unknown warnings
+- [ ] Country harmonization audit: validate `.countries.json` against canonical regions (flag provider regions not yet in the regions dataset → `/add-provider-regions`), audit `.excluded_countries.json`, scan garden log for missing/unused/unknown warnings
+- [ ] Region-provider drift: if this dataset's aggregates are in `regions.yml` (`defined_by: <provider>`), check whether the new version changed the provider's region set or country membership; if so, update `regions.yml` and re-propagate via `/add-provider-regions`
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
@@ -45,12 +46,13 @@ Assumptions:
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
-- [ ] Render Slack announcement via `data-updates-comms`, add to PR description, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
-- [ ] Draft public-facing "Data update" post for OWID /latest, add to PR description, hand to user for review and publication
+- [ ] Render Slack announcement via `data-updates-comms`, save to workbench, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
+- [ ] Draft public-facing "Data update" post for OWID /latest, get the user's sign-off on the markdown, create the Google Doc in /Data updates, and hand the user the link (not added to the PR)
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
-- [ ] Ask the user whether to archive the old DAG entries; if yes, move them to `dag/archive/` AND relocate the new entries into the old slot (see "DAG archiving & reordering") — don't forget this step
-- [ ] Hand off Wizard QA links to the user (Anomalist + Chart Diff on the staging branch) — this is the final step
+- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure --private` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
+- [ ] Ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot (see "Removing the old version & reordering the DAG") — don't forget this step
+- [ ] Hand off the QA links to the user (Anomalist + Chart Diff on the staging branch, plus the data-diff report) — this is the final step
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -88,7 +90,7 @@ Some updates carry structural changes that make the standard rename-only flow th
 **Workflow adjustments:**
 
 1. **Skip `etl update`.** The rename-only flow copies the old step files into a new folder — useless when the schema is different. Author the new step chain by hand, using the old version as inspiration but not as a starting copy.
-2. **Add the new chain to the DAG before archiving the old.** Leave both chains active while you build and validate v2; archive the v1 entries only once v2 is on staging and the chart remap is queued or done.
+2. **Add the new chain to the DAG before removing the old.** Leave both chains active while you build and validate v2; remove the v1 entries only once v2 is on staging and the chart remap is queued or done.
 3. **Decide on naming convention upfront.** Ask the user whether to preserve v1 short_names where they map cleanly, or to adopt the source's fresh naming scheme. Fresh naming is cleaner but means the auto-Indicator-Upgrader can't help.
 4. **Hand-curate the v1 → v2 indicator mapping.** When short_names change entirely, the auto-upgrader has nothing to match on, but the Indicator Upgrader also matches on **`title`** — so if v2 titles are descriptive (full sentences rather than the bare short_name), you can hand the user a table of v1 title → v2 title pairs and they can drive the chart remap from there. Generate this table from the v1 meta.yml + the v2 grapher catalog.
 5. **Defer the Slack and `/latest` announcements until charts have been remapped.** Both posts depend on `charts.published_count` and `charts.selected_views` from the v2 chain. Drafting them before the remap gives the wrong count (zero) and no representative views. Tell the user to ping you when the chart remap is done, then run steps 8 / 9 / 9b.
@@ -114,10 +116,15 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        ```
        etl update snapshot://<ns>/<old_v>/<short>.<ext> --include-usages
        ```
+     - **Foundational / widely-used datasets (e.g. `wb/*/income_groups`, `regions`, `population`): add `--direct-only`.** Plain `--include-usages` follows usages *transitively* and would try to version-bump every downstream consumer (income_groups has ~85 across 15 dag files). `--direct-only` restricts the bump to steps sharing the dataset's own `namespace/version/short_name`, i.e. just its chain. Caveat: `--direct-only` **excludes sibling steps with a different short_name** that belong to the same chain (e.g. `income_groups_aggregations`, which the grapher step also depends on) — pass those as **extra seed steps** so the grapher doesn't end up mixing a new-version garden with an old-version sibling. Dry-run and confirm the proposed set is exactly the chain before executing:
+       ```
+       etl update snapshot://<ns>/<old_v>/<short>.<ext> data://garden/<ns>/<old_v>/<sibling> --include-usages --direct-only --dry-run
+       ```
      - If only garden logic / metadata is changing and the source data is unchanged, run from the **garden URI**. This bumps garden and grapher only; snapshot and meadow stay on the old version.
    - Either way, run `etl update` **once**. Don't call it separately per channel — that leaves stale version references in the DAG (e.g., new garden pointing to old meadow).
    - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
-   - After running, **always verify `dag/main.yml`**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow).
+   - After running, **always verify the dag file**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow).
+   - **`etl update` writes the new entries in the *flat* DAG form — convert them to the nested (compact) form now**, while you're in the file, rather than leaving it until archiving (otherwise the flat block tends to survive the whole update unnoticed). See the example and `load_dag()` parse-check under "DAG archiving & reordering" step 4.
 
 1a-bis) Add yourself to `dataset.owners` in the new garden `.meta.yml`
 
@@ -131,6 +138,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - After `etl update` creates new step files, run the `/check-outdated-practices` skill on **every** new step file — including helper modules that `etl update` doesn't generate but you copied by hand (e.g. `*_omms.py`), since those carry legacy patterns too
    - The skill reads the extension as the source of truth for the full pattern set (the `geo.add_*` aggregation/population helpers are flagged, not just `geo.harmonize_countries`) — don't rely on a remembered subset
    - Fix any findings before proceeding — this avoids propagating legacy patterns into new versions
+   - **`geo.harmonize_countries` → `paths.regions.harmonize_names`** is mechanical and safe. **`geo.add_regions_to_table` → `paths.regions.add_aggregates`** changes the aggregation core — prove equivalence with a *controlled A/B test*, not a diff against the old feather. Build the new garden **both ways against the same current catalog** (swap the call, rebuild, save output; revert, rebuild, save output) and diff the two. Do NOT conclude "the helper shifts aggregates across all years" from a new-vs-old-feather diff — that conflates the helper with upstream-dataset drift (see step 5). In practice the two helpers are equivalent bar tiny historical edge cases (e.g. one region-year's population residual); if so, modernize. `add_aggregates` also auto-resolves income groups from the DAG, so it's the right tool when you later need WB income-group aggregates.
 
 1c) Catalog `# NOTE:` / `# TODO:` comments in the copied step files (don't resolve yet)
    - Run `rg -n "#\s*(NOTE|TODO|FIXME|HACK|XXX):" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/`.
@@ -162,13 +170,25 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 3) Snapshot run & compare (snapshot-runner subagent)
    - Inputs: `<namespace>/<new_version>/<short_name>` and `<old_version>`
 
+   **Hand-maintained snapshots + editorial data edits.** Some snapshots have no `url_download` — the `.py` prompts for `--path-to-file` and the docstring says the data was "provided by email" / curated by hand. When the update is a small editorial correction (the user gives you the facts directly, e.g. "country X did Y in year Z"), you can produce the new snapshot yourself: copy the *previous* version's data file (`data/snapshots/<ns>/<old_version>/<file>`), change only the specific cells, and **assert in a quick script exactly which rows/cells changed** (and that all others are byte-identical) before running `etls ... --path-to-file <edited>`. Then update the `.py` docstring to document the edit and bump the `.dvc` `date_published` / `citation_full` year (ask the user whether it's a new producer release or an OWID-applied edit — see step 6c). **Verify the user's stated facts against the existing data first** — some may already be encoded from a prior release (in this update, one of the two reported events was already in the live snapshot; only the other was a genuine change). Tell the user what's already present rather than blindly re-adding it.
+
 4) Meadow step repair/verify (step-fixer subagent, channel=meadow)
    - Run, fix, re-run; produce diffs
    - Save diffs and summaries
+   - **Watch for meadow input checks keyed on absolute row/column positions.** Producers quietly restructure their files (e.g. this session, the WB dropped the legend rows above the first country, shifting the row count 239→234 and moving "Afghanistan" from row 10 to row 5). Data extraction that keys off content (drop rows without an id, then melt) survives, but hardcoded `tb.loc[N]` / exact-row-count asserts break — update them to the new positions/counts and drop a `# NOTE` so the next maintainer re-checks. The break is the check doing its job; don't loosen it into uselessness.
 
 5) Garden step repair/verify (step-fixer subagent, channel=garden)
    - Run, fix, re-run; produce diffs
    - Save diffs and summaries
+
+   **Diff against a freshly-rebuilt old version, not the stale feather on disk.** The old version's `data/garden/.../` feather was built whenever it last ran — possibly against an *earlier* snapshot of a shared upstream dataset (population, regions, income_groups). A fresh build of the new version uses the *current* upstream, so a naive new-vs-old-feather diff shows differences in **every population-weighted cell across all years and regions** — pure upstream drift that has nothing to do with your change. Before trusting any diff, rebuild the old version on the current catalog and diff against *that*:
+   ```bash
+   .venv/bin/etlr data://meadow/<ns>/<old_version>/<short> --private --force --only
+   .venv/bin/etlr data://garden/<ns>/<old_version>/<short> --private --force --only
+   ```
+   The apples-to-apples diff should collapse to just your intended change. Mention the drift separately in the PR (Chart Diff on staging *will* show it, because the live data is also stale relative to current upstream). This bit me twice in one update — don't skip it.
+
+   **When NaN can appear on one side, don't let `.fillna(False)` hide it.** In a cell-by-cell diff, `(a - b).abs() <= tol` evaluates to `NaN` when exactly one side is NaN; a downstream `.fillna(False)` then silently drops that real one-sided change. Treat "one side NaN, other side not" as a difference explicitly.
 
 5b) Review sanity-checks output (only if step 1d catalogued any)
    Handling depends on the form catalogued in step 1d.
@@ -213,6 +233,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    | Coverage | country-count floors (≥ previous version); a drop is usually a parsing/mapping regression — re-audit before bumping the constant |
 
    Implementation conventions: constants at the top, `run()` first, check functions **below** `run()`; `sanity_check_inputs(tb)` right after loading meadow, `sanity_check_outputs(tb)` right before `paths.create_dataset(...)`; plain `assert` with messages that name the offending values. Reference example: [`imf/2026-06-12/public_finances_modern_history.py`](../../../etl/steps/data/garden/imf/2026-06-12/public_finances_modern_history.py).
+
+   **`sanity_check_outputs` runs *before* `tb.format(...)`, so column names are still as the code produced them — `format()` lowercases/underscores them afterward.** If the step builds columns like `f"{col}_{status}_pop"` where `status` is `"Legal"`/`"Illegal"`/`"missing"`, the pre-format columns are `status_Legal_pop` (mixed case), not `status_legal_pop`. Select such columns case-robustly (e.g. `[c for c in tb.columns if c.endswith("_pop")]` then filter on `c.lower()`), or you'll get a `KeyError` that only surfaces at runtime. Keep update-specific facts (e.g. "country X is Legal in year Y") out of the committed checks — verify those via the garden diff at update time so the checks stay valid across future releases.
 
    **Negative-test the checks**: after the step passes on real data, simulate each failure mode (rename a column, corrupt a flag, push a value out of bounds) and confirm the matching assertion fires — a check that never trips is untested code.
 
@@ -282,8 +304,16 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
       mapping = json.loads(Path("etl/steps/data/garden/<namespace>/<new_version>/<short_name>.countries.json").read_text())
       not_in_canonical = sorted({v for v in mapping.values() if v and v not in canonical})
       print("Targets not in OWID's canonical regions or income groups:", not_in_canonical)
+
+      # Provider regional groupings the source ships (e.g. "Europe (WB)", "Asia and the Pacific (ILO)")
+      # surface here when OWID hasn't added that provider's regions yet. Flag the "(Provider)"-suffixed ones:
+      import re
+      provider_region_candidates = [v for v in not_in_canonical if re.search(r"\([\w .&-]+\)$", str(v))]
+      print("Look like provider regions not yet in the regions dataset:", provider_region_candidates)
       ```
-      A non-empty `not_in_canonical` list means the mapping points at entities that aren't registered in either the regions catalog or the income-groups dataset. This isn't automatically a bug — it's a heads-up. **Stop and decide with the user before proceeding** — same pattern as the global "Checkpoints — when to pause" section at the top of this skill. Common causes (in order from "fix" to "accept"): typo, retired alias used as canonical, casing/whitespace mismatch, or a legitimately custom aggregate the source defines that OWID has no equivalent for (e.g. ILO's `" (ILO)"`-suffixed regions, World Bank's `" (WB)"`-suffixed sub-Saharan splits, BRICS, G7, G20). For typos/casing — fix the JSON. For legitimately custom aggregates — accept and note in the PR description that those entities live outside the canonical system and won't merge with population/regions infrastructure. For a real new historical region — add an entry to `regions.yml` in a separate PR.
+      A non-empty `not_in_canonical` list means the mapping points at entities that aren't registered in either the regions catalog or the income-groups dataset. This isn't automatically a bug — it's a heads-up. **Stop and decide with the user before proceeding** — same pattern as the global "Checkpoints — when to pause" section at the top of this skill. Common causes (in order from "fix" to "accept"): typo, retired alias used as canonical, casing/whitespace mismatch, or a custom aggregate the source defines that OWID has no equivalent for. For typos/casing — fix the JSON.
+
+      **If the unmatched targets are a provider's regional grouping that OWID doesn't define yet** — the `provider_region_candidates` above (`"(Provider)"`-suffixed names like `"Europe (WB)"`, `"Sub-Saharan Africa (ILO)"`), or the source ships a `region`/`subregion` column feeding these — don't just accept them as outside-the-system. The proper fix is to **add that provider's regions to the regions dataset with the `/add-provider-regions` skill** (separate PR): they then become canonical, merge with regions/population infrastructure, and get a `{provider}_region` map indicator, instead of living outside the system. Surface this to the user and offer to run `/add-provider-regions`. Only for genuinely one-off, non-geographic groupings the regions system shouldn't own (BRICS, G7, G20) — accept and note in the PR description that those live outside the canonical system. For a real new historical region — add an entry to `regions.yml` in a separate PR.
 
    4. **Audit `.excluded_countries.json`.** The file is optional; skip if it doesn't exist:
       ```python
@@ -333,7 +363,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
       - `## Excluded entries matching canonical regions` — possible over-exclusion (Python check #4) — list each
       - `## Garden output entities not in OWID's canonical regions or income groups` — distinct `country` values found in the built garden tables that aren't in canonical regions or income groups (Python check #5) — list each entity
 
-   7. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections, before the Slack announcement) **with the same listings**, not just a summary. Empty sections can be omitted.
+   7. **Surface in PR.** If any section was populated, add a collapsed "Harmonization audit" section to the PR description (after the per-step sections) **with the same listings**, not just a summary. Empty sections can be omitted.
 
    **When you report progress to the user during the workflow, never just give a count — always include the list (or grouped categories) so they can judge in one glance.**
 
@@ -341,6 +371,14 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - "Targets not in OWID's canonical regions or income groups" or "Garden output entities not in OWID's canonical regions or income groups" or "Missing in mapping" non-empty ⇒ stop, decide with user.
    - "Excluded entries matching canonical regions" non-empty ⇒ stop, ask whether each exclusion is intentional.
    - "Unused mappings" or "Unknown excluded entries" non-empty ⇒ surface in PR description; not a blocker.
+
+5d) Region-provider drift — if this dataset *defines* OWID regions, propagate the change
+   The harmonization audit (5c-3) catches providers **not yet** in `regions.yml`. This check is the counterpart: a provider whose aggregates are **already** in `regions.yml` can change its regions on a version bump (new/removed/renamed regions, or shifted country membership), and `regions.yml` won't update itself.
+
+   - **Does this dataset own regions?** `grep "defined_by: <provider>" etl/steps/data/garden/regions/2023-01-01/regions.yml` (e.g. `ilo_1`/`ilo_2`, `maddison`, `wid`, `wb`, `who`). No matches ⇒ skip this step.
+   - **Re-extract** the provider's region→country mapping from the **new** version — from the same source the regions were originally derived from (a `region`/`subregion` column, region entities, or a table-of-contents tier; see `/add-provider-regions` Step 1) — and **diff it against `regions.yml`** (`defined_by: <provider>` members), set-equality per region, plus new/removed/renamed regions. If the new version no longer carries the composition, the provider's section in the [world-region-map-definitions](https://ourworldindata.org/world-region-map-definitions) article links to the defining source — use it to re-derive the provider's **existing** regions (regions newly introduced by this update won't be documented there yet — get those from the source or ask the user).
+   - **If it drifted:** **stop and decide with the user** (composition changes move every region-aggregated value downstream), then update `regions.yml` and re-propagate via **`/add-provider-regions`** — rebuild garden regions, refresh the `{provider}_region` grapher indicators + metadata, regenerate owid-grapher `regions.data.ts` (`runRegionsUpdater`), and update the article section.
+   - **If unchanged:** note it and move on.
 
 6) Grapher step run/verify (step-fixer subagent, channel=grapher, add --grapher)
    - Skip diff
@@ -361,7 +399,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    - **Typos** — `/check-metadata-typos` scoped to the current step. Run on each of the new `.meta.yml` files (garden first, then grapher). Accept or skip each suggested fix.
    - **Jinja spacing** — `/check-metadata-spacing` on the built garden and grapher datasets. Catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering.
-   - **Style guide** — `/check-metadata-style` on the grapher step. Audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is needed — but if the guide looks out of date, refresh that file from Notion in a separate PR.
+   - **Style guide** — `/check-metadata-style` on the grapher step. Audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is usually needed — the skill checks the file's `Last synced from Notion` date and refreshes it from Notion (in a separate PR) when it is more than two months old.
    - **Clarity for a general audience** — read every user-facing field with non-specialist eyes. The other three skills enforce structure and style; this one judges whether the text is *understandable*.
 
    ### Clarity checklist (do manually, no skill yet)
@@ -398,6 +436,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    The other quality checks catch *content* issues; this step catches *missing fields* and *broken URLs* before they reach review.
 
    **Snapshot DVC freshness.** `etl update` clones the previous snapshot's `.dvc` content verbatim except for `date_accessed`. Always re-check `date_published` and the year in `citation_full` / `attribution` under `snapshots/<ns>/<new_version>/*.dvc` — they will otherwise silently ship the old version's values. Set `date_published` to the producer's real release date when discoverable; otherwise copy `date_accessed`. Bump the year in `citation_full` and `attribution` to match.
+
+   - **Citation year vs `date_published` year.** After setting both, check whether the year inside `citation_full` / `attribution` matches `date_published`'s year. If they differ, confirm it's intentional before shipping: it's legitimate when the producer labels the release by *edition* rather than publish date (e.g. UN IGME's "2025 report" published `2026-03-17` → `citation_full` `(2025)`, `date_published` `2026`), but otherwise it's a stale citation. When the gap is deliberate, leave a one-line note for the reviewer so they don't re-flag it.
 
    - **`Last-Modified` header as `date_published` source.** When the producer's page states no release date (common on fully JS-rendered sites like the IMF Datamapper), the download URL's HTTP `Last-Modified` header is a defensible source — it's the server's own timestamp for the file, not an inference. Corroborate it against a release-named filename (e.g. `…Dec 2025.xlsx` + `Last-Modified: Fri, 12 Dec 2025`) and note the provenance when reporting to the user.
    - **Stale producer description on a JS-rendered page.** If the `.dvc` `meta.origin.description` is producer text that may have changed but the page is an SPA shell (static HTML empty, WebFetch 403s, Wayback archives only the shell), don't burn time probing API endpoints and don't rewrite the producer's text to match the data — the blurb can legitimately lag their own releases (FPP shipped 153 countries while the page said 151). **Ask the user to paste the page text from their browser**, then diff it against the existing `.dvc` text and apply only the substantive changes. Clipboard pastes flatten typography (curly quotes → straight, en-dashes → hyphens) — keep the existing typographic punctuation unless the words themselves changed.
@@ -464,6 +504,13 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      ```bash
      STAGING=<branch> .venv/bin/etlr data://grapher/<namespace>/<new_version>/<short_name> --grapher --private
      ```
+     **Then confirm the variables actually landed in MySQL** — `data://grapher/... --grapher` sometimes only builds the feather without upserting (observed: 0 rows in `variables` afterward). If the count is 0, run the separate `grapher://` step, which does the MySQL upsert:
+     ```bash
+     # verify
+     STAGING=<branch> .venv/bin/python -c "from etl.config import OWIDEnv; print(OWIDEnv.from_staging('<branch>').read_sql(\"SELECT COUNT(*) n FROM variables WHERE catalogPath LIKE %(p)s\", params={'p':'%<namespace>/<new_version>/<short_name>%'}).n[0])"
+     # if 0, force the upsert:
+     STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher --private
+     ```
    - Then run the automatic upgrader:
      ```bash
      STAGING=<branch> .venv/bin/etl indicator-upgrade auto
@@ -510,6 +557,17 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      ncs = [nc for nc in ncs if nc.id in {<stale_nc_ids>}]
      errors = push_new_narrative_charts_cli(ncs, {<old_var_id>: <new_var_id>})
      ```
+   - **Pick `<new_var_id>` by matching the PARENT chart, not by short_name.** A stale narrative pin is often a *legacy, pre-dimensional* variable — an old PPP year, or a flat short_name like `headcount_215` — with **no short_name twin** in the new dataset, so the version-bump mapping (and any `shortName` join) can't reach it. A narrative chart is just a framing of its parent, so the correct target is **whatever indicator the parent chart uses now** (after the regular-chart upgrade has run). Read the parent's current `variableId`s and map each stale pin to the parent's equivalent by indicator role:
+     ```python
+     import json
+     pc = OWID_ENV.read_sql("SELECT cc.full FROM charts c JOIN chart_configs cc ON c.configId=cc.id WHERE c.id=%(i)s", params={"i": <parent_chart_id>})["full"].iloc[0]
+     parent_var_ids = [d["variableId"] for d in json.loads(pc)["dimensions"]]  # the targets to map onto
+     ```
+     Different narrative charts (and even one chart's multiple pins) can come from *different* stale versions, so build the mapping **per parent**, not with one global dict. In a real run this meant e.g. a $2.15/2017-PPP legacy pin → the parent's current $3/2021-PPP variable.
+   - **`push_new_narrative_charts_cli` takes the mapping directly** (no `WizardDB.add_variable_mapping` needed) — pass `{stale_id: parent_var_id}`.
+   - **The auto `upgrade` only visits narrative charts when ≥1 regular chart is upgraded in the *same* run.** Re-running `etl indicator-upgrade` after the regular charts are already remapped is a silent no-op for narratives — call `push_new_narrative_charts_cli` directly instead.
+   - **Verify with the merged config, not the stored one:** `AdminAPI(OWID_ENV).get_narrative_chart(id)["configFull"]` reflects the live (parent+patch) state; `chart_configs.full` can be stale and will mislead you into thinking nothing changed.
+   - **Watch for stale FAUST overrides.** These charts often also pin an old subtitle/footnote (e.g. "$2.15 per day" / "2017 prices") that no longer matches the parent. `push_new_narrative_charts_cli` migrates the *indicator* but only **warns** about the text — the fix is to reset the flagged field to the parent's exact text to restore inheritance (identical values drop out of the patch). **Always ask the user before changing FAUST**: it's reader-facing editorial text (Footnote, Axis, Unit, Subtitle, Title), so confirm the reset/rewrite first — never fold a FAUST change silently into the indicator upgrade. (Use `_find_stale_faust_overrides(patch, parent_config, mapping)` to list exactly which fields are stale; set only those to the parent's value and PUT via `AdminAPI.update_narrative_chart`. Leave numeric display overrides like `tolerance` alone unless asked — they may be intentional.)
      Then re-run the scan and confirm it's empty.
 
 8) Update context for public announcement
@@ -591,21 +649,21 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      - **Skip**: population-weighted variants (harder to read quickly), within-regime breakdowns (too niche), country-specific views
    - Add snippets for the editorial prompts from source metadata, garden/grapher metadata, resolved sanity-check/workaround notes, and non-routine PR changes. Keep these as snippets/facts, not polished Slack prose.
 
-9) Slack announcement & PR update
+9) Slack announcement
    - Run the `data-updates-comms` skill with `workbench/<short_name>/update-context.yml` as input. `data-updates-comms` is the canonical owner of the Slack form wording, copy-paste format, editorial framing, search URL, and any standalone fallback gathering. Do not duplicate that rendering logic here.
    - Save the rendered draft to `workbench/<short_name>/slack-announcement.md`.
    - If `data-updates-comms` reports missing mechanical fields, gather them, update `update-context.yml`, and re-render rather than inventing values. Ask the user if a missing field requires judgment.
-   - **Add the announcement to the PR description** as a collapsed `<details>` section titled "Slack Announcement", with the file content embedded inside a triple-backtick `markdown` fence.
+   - **Do not put the announcement in the PR at all** — no embed and no pointer. The draft stays as the `workbench/<short_name>/slack-announcement.md` file (the user copies from there); comms drafts are internal and are kept out of the public data-update PR.
    - **Post `@codex review` as a separate PR comment** (not in the PR description) to trigger an automated code review. Use:
      ```bash
      gh pr comment <pr_number> --body "@codex review"
      ```
-   - Tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Slack announcement drafted at [workbench/<short_name>/slack-announcement.md](workbench/<short_name>/slack-announcement.md) and added to the PR description. Please review and post it to #data-updates-comms."` Always render the path as a markdown link `[…](…)`, not as inline-code — the chat UI renders it as clickable that way.
+   - At the end of the update, tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Slack announcement drafted at [workbench/<short_name>/slack-announcement.md](workbench/<short_name>/slack-announcement.md). Please review and post it to #data-updates-comms."` Always render the path as a markdown link `[…](…)`, not as inline-code — the chat UI renders it as clickable that way. (Slack can't be auto-posted — the user posts it.)
 
 9b) Data update post (for OWID /latest)
    Draft the short reader-facing post that gets published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest). The team drafts these in **Google Docs** in the shared `/Data updates` Drive folder (`https://drive.google.com/drive/folders/1oL0uLHKI6f2qi1rJA6-qFFRYEBw_-rfm`), and OWID's CMS ingests the doc into the published feed.
 
-   **The skill's job is to produce paste-ready Google Doc content** in the exact CMS format the team uses (frontmatter `title` / `excerpt` / `type` / `authors` / `kicker` → `\[+body\]` marker → body prose with inline markdown links → `{.cta}` block → `{.image}` block → `\[\]` end marker). Don't invent your own format — every published post in the Drive folder follows the same shape.
+   **The skill's job is to produce paste-ready Google Doc content** in the exact CMS format the team uses (frontmatter `title` / `excerpt` / `type` / `authors` / `kicker` → `[+body]` marker → body prose with inline markdown links → `{.cta}` block → `{.image}` block → `[]` end marker). Don't invent your own format — every published post in the Drive folder follows the same shape.
 
    This is **separate from the Slack announcement** — that one is a 10-field form for the internal channel; this one is a mini-blog-post for OWID readers, and the format is structured for CMS ingestion.
 
@@ -624,8 +682,15 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **CTA text** — descriptive: "Explore the updated data in our interactive charts" (default), "Explore all of the updated data in our interactive charts" (broad), "Explore the interactive version of this chart" (single chart), "Explore this data going back to YYYY in our interactive chart" (single chart with date depth).
    - **Image filename** — `YYYY-MM-data-update-<slug>.png` (e.g. `2026-04-data-update-h5n1-flu.png`). The skill doesn't generate the image; the user adds it to the Doc separately.
    - Save the draft to `workbench/<short_name>/data-update.md`.
-   - **Add a collapsed `<details>` section titled "Data update post (for OWID /latest)"** to the PR description, placed *after* the Slack-announcement section, with the file content embedded inside a triple-backtick `markdown` fence.
-   - Tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Data update post drafted at [workbench/<short_name>/data-update.md](workbench/<short_name>/data-update.md) in the Google Docs CMS format. Please create a new Google Doc in /Data updates, paste the draft, attach the chart screenshot, and share for review."` Always render `workbench/<short_name>/data-update.md` as a markdown link `[…](…)` rather than as a bare path or inline-code path — the chat UI renders it as clickable that way.
+   - **Propose the draft as markdown and get sign-off before creating the Doc.** Show the user the full post rendered as markdown (in chat) so they can read it and request edits inline, and ask whether they're happy to publish it as a Google Doc. Iterate on `workbench/<short_name>/data-update.md` until they approve — *then* create the Doc. This ordering matters: the Drive API can't edit or delete a Doc once created, so getting the content approved first avoids orphaned drafts. (Like the Slack draft, the /latest post is **not** added to the PR.)
+   - **Once the user approves, create the Google Doc** in the `/Data updates` folder so they don't have to copy-paste, using the Drive MCP `create_file` tool. Match the folder's title convention (e.g. "2026-06 Data update: Homicides").
+     - **Upload styled HTML** (`contentMimeType: "text/html"`), applying the OWID CMS colors and indents from the template's "OWID CMS Doc styling" table (blue keys, black frontmatter values, grey body, orange `[+body]`/`[]`, green `{...}` markers, blue-underline links; body indent 10pt, `url:`/`text:`/`filename:` 20pt). Verified: HTML import preserves colors + `margin-left` indents + hyperlinks, and lands a fully-styled doc that needs no add-on pass. This is preferred over a `text/markdown` upload (which gives hyperlinks but no OWID colors/indents).
+     - **Encode all non-ASCII as HTML entities** (e.g. `&mdash;` for an em-dash). Entities decode correctly on import; **raw 4-byte chars (emoji) mojibake** to `ð`, so use the entity form (`&#NNNNN;`) if you ever need one.
+     - Each CMS line is its own `<p>` (one paragraph per line, no empty "spacer" paragraphs — the team's docs are compact). Empty `<p></p>` between sections is fine and matches the reference docs.
+     - **Verify** with `download_file_content(exportMimeType="text/html")` and confirm the `color:` / `margin-left:` styles survived. The MCP has **no delete or edit-content tool**, so get it right on the first `create_file`; a bad create leaves an orphan Doc the user must delete manually — don't recreate on a trivial issue (tell the user the one-line fix instead).
+     - The **OWID GDocs Add-on** (Extensions menu in the Doc) is the team's canonical formatter; it can't be run via the API, so it's an optional human validation pass on top of the styled upload. If the shared folder rejects the write, create in My Drive and share the link.
+   - **Register the Doc in the CMS.** A Google Doc only reaches the `/latest` feed once it's added at the OWID admin GDocs page — [https://admin.owid.io/admin/gdocs](https://admin.owid.io/admin/gdocs) — where the doc ID is registered so it can be previewed and published. This is a human action (admin login required); the skill can't do it via the API, so include it in the handoff.
+   - At the end of the update, tell the user with **markdown links** to both the created Doc and the local draft, and **make clear it's a first draft for people to modify** (not a finished post): `"Data update post created at [<Doc title>](<doc viewUrl>) in /Data updates — this is a first draft for you and the team to review and edit. Please refine the copy as needed, add the chart screenshot, add the doc at https://admin.owid.io/admin/gdocs to bring it into the CMS, then preview, publish, and share. Draft source: [workbench/<short_name>/data-update.md](workbench/<short_name>/data-update.md)."`
 
 10) Codex review: address comments and resolve threads
    - **Codex's delivery channel depends on the verdict — poll both.** A **clean pass** arrives as an *issue comment* ("Didn't find any major issues") from `chatgpt-codex-connector[bot]`, with zero inline comments and no formal review object. A review **with findings** arrives as a formal review ("💡 Codex Review") with inline comments, and *no* issue comment. A watcher polling only one channel waits forever on the other outcome — treat a hit on either as completion.
@@ -664,7 +729,6 @@ At the end of the workflow, update the PR description with:
 - A **tracking-issue link** as the first line of the Summary — e.g. `Tracks: [owid/owid-issues#NNNN](https://github.com/owid/owid-issues/issues/NNNN)`. Most data updates have a corresponding `owid-issues` ticket; try to find it by searching the title or `<short_name>` first, and **ask the user for the issue number if you can't locate one** rather than skipping the link silently.
 - A summary of key changes at the top
 - Collapsed `<details>` sections **only for the pipeline steps that changed in a non-obvious way**. Skip any step that's just the boilerplate generated by `etl update` — don't add a placeholder like "unchanged from boilerplate". The Summary already explains the why; per-step sections are only for the how, when the how isn't obvious from the diff.
-- A collapsed section for the Slack announcement
 
 ## Downstream dependency check
 
@@ -676,25 +740,87 @@ rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/arch
 
 Filter out the old dataset's own DAG entries (snapshot → meadow → garden → grapher chain). Any remaining references are **downstream dependents** that still point to the old version.
 
-If downstream dependents exist:
-- **Tell the user** which datasets depend on the old version and need updating in a follow-up PR
-- **Add a "Downstream dependencies" section to the PR description** (not collapsed — this is important) listing the dependent datasets with a note that they should be updated to point to the new version in a follow-up PR
+If downstream dependents exist, **decide with the user** whether to bump them in this PR or defer to a follow-up:
+- **Tell the user** which datasets depend on the old version.
+- **Follow-up PR (default for a big fan-out):** add a "Downstream dependencies" section to the PR description (not collapsed) listing the dependents, to be repointed in a separate PR. This mirrors the historical two-PR pattern for foundational datasets (e.g. income_groups: chain-update PR, then a "🐝 Update all datasets to latest …" bulk-bump PR).
+- **Bump in this PR (if the user wants it self-contained):** repoint every downstream ref and remove/archive the old chain in the same PR. Mechanics that bit this session:
+  - Bulk-replace with a **negative-lookahead** so a prefix match doesn't corrupt sibling short_names — e.g. `re.sub(r"garden/wb/<old_v>/income_groups(?!_)", "garden/wb/<new_v>/income_groups", text)` leaves `income_groups_aggregations` alone.
+  - **Remove the old own-chain block from `dag/main.yml` *before* the bulk sweep**, or the sweep turns the old definition into a duplicate of the new key. Relocate the new block into the old slot (nested form) as part of the same edit.
+  - Downstream datasets **keep their own version and variable IDs** — only their *dependency* on the updated dataset changes — so **no chart remapping is needed for them**; their aggregates just recompute against the new data (visible in Chart Diff). The indicator upgrade (step 7) still only concerns charts that use the updated dataset's *own* variables.
+  - This is the only case where "Removing the old version" happens in the same PR — otherwise the old chain must stay until the follow-up repoints its consumers.
 
-## DAG archiving & reordering
+## Silent-breakage check (downstream builds + value diff)
 
-After the ETL update, `etl update` appends the new version entries to the **bottom** of the main DAG file while the old version's entries stay in their original slot. **Always ask the user** whether to archive — but never skip this checklist item, and when the user agrees, always do the reorder too (not just the archive).
+A foundational-dataset update can leave a downstream step **building cleanly while quietly dropping data** — a region whose aggregate can no longer be computed goes NaN, a reclassified country disappears, a join stops matching. Nothing raises; the feather is written; the gap only surfaces on a chart weeks later. Two existing commands cover it — no bespoke tool:
+
+**1. Do all downstream consumers still build?** Staging answers this on every push — run the command locally only when you want the answer before pushing:
+
+```bash
+.venv/bin/etlr --modified --continue-on-failure --private              # add --dry-run to list scope first
+```
+
+`--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. **Staging runs the same check on every push**: its bake (`ops/templates/owid-site-staging/etl-build.sh`) is `etl run garden grapher explorers --modified --grapher --private --continue-on-failure` with `PREFER_DOWNLOAD=1`, and `--continue-on-failure` re-raises the first failure at the end — so any consumer crash turns the **`buildkite/etl-automated-staging-environment`** PR check red. That makes the local run optional fast feedback, not the primary net. The caveat that matters: **while that check is red, the data-diff report under-reports** — dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged. Always confirm the check is green before trusting the report. Use `--workers N` to parallelize a big local fan-out.
+
+**Size the fan-out first** (`--dry-run` lists the scope). Small (≲50 steps): the local run gives you the crash check in minutes, before burning a staging cycle. Foundational-dataset scale (hundreds of steps — an income-groups bump is ~560): skip the local build and rely on the staging check — locally it costs ~35 min and ~7 GB of `data/` to duplicate what the bake does anyway (if you do run it, delete the builds afterwards; `data/` is regenerable cache). Skip the **local** `etl diff` at that scale too — another ~25 min and a JSON in the hundreds of MB; owidbot's hosted report on the PR is the same comparison for free.
+
+**2. How much did their outputs change?** The data-diff **report** answers this directly — it ranks everything by anomaly score (BARD, the metric Anomalist uses) and makes data loss unmissable, so you read its verdicts instead of scanning the diff yourself:
+
+- **On the PR (zero effort):** open owidbot's **data-diff** HTML report (`https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html`, easiest via the **full report** link in owidbot's PR comment — the path keeps the branch name's dots and underscores and replaces only characters outside `[A-Za-z0-9._-]` (e.g. `/`) with `-` — unlike the staging *subdomain*, which does replace `.`/`_`) — it compares the staging build (new dependency) against production (old dependency). For a dependency bump the consumers' code is unchanged, so this is a clean old-dep-vs-new-dep comparison.
+- **Locally, after step 1:** `.venv/bin/etl diff REMOTE data/ --changed --include garden --output-html data-diff.html`.
+
+How to read it, in order:
+
+1. **"Top changes — what to watch"**: red **"− lost N data point(s): labels…"** entries lead both the Datasets and Indicators lists — each one is a coverage loss (the silent-breakage signature) and must be triaged: legitimate churn, or a silent drop? Below the losses come the biggest value changes with their median anomaly scores.
+2. **Tier strip + coverage chips**: 🔴 datasets (score ≥ 15% or any coverage loss) need review; 🟡 a skim; 🟢 is rounding-level noise. A red `− N row(s) removed: …` chip on a dataset row always means data points disappeared, regardless of how small the share.
+3. **Filters**: the tier dropdowns isolate 🔴 datasets/indicators; **📝 metadata-only** separates pure metadata edits from value changes.
+
+**Full-report audit — deciding whether code changes are needed.** For a dependency bump, "churn or bug?" is answerable mechanically, because only the dependency changed and consumer code didn't. Load the report JSON (`DiffReport.from_json`) and run these probes over **all** changed datasets, not just the Top-changes lists — each should come back empty or confined to dep-derived entities; anything else is a code-change candidate:
+
+1. **Structural**: new/removed tables or columns anywhere → a dep bump must never do this.
+2. **"World" rows changed** → some step computes World by summing the dep's groups (anti-pattern: World should come from the source or the full country set).
+3. **Raw-country rows changed** → consumer code entangled with the dep beyond aggregation. (In bilateral datasets, verify every changed pair has an aggregate side; the country names that show up in samples are often just other dimension values — disaster types, element codes, age groups — so check dim *columns*, not string looks.)
+4. **Any indicator with >30% of rows changed** → more than the aggregate rows moved.
+5. **Wipe vs edge, for every coverage loss**: does the lossy entity still hold rows in the new build? Losing a few % at sparse edges (an aggregate-year-item combo emptying because members moved out, or dropping below a coverage threshold) is churn; an entity losing **all** its rows or going all-NaN is the bug signature — see the must-have trap below.
+
+The samples cap at ~100 rows/diff, so pair the probes with the mechanism argument (only the dep changed) rather than treating them as a row-by-row proof.
+
+**The must-have trap (real case: `population` + `unaids`, FY2027 income groups).** Some steps pin specific member countries as *required* for a group's aggregate. When the producer reclassifies a pinned country out of its group, the **entire aggregate nulls for all years** — a total-entity wipe, not edge churn. Two nets catch it: the geo must-have guard raises `ValueError` at build time (so the build check above fails loudly), and probe 5 is the backstop. The fix is updating the pinned list to the new membership — so whenever bumping income groups, check the repointed consumers' pinned member lists up front. Beware the rationalization risk: a wiped income-group aggregate *looks like* the expected churn the rest of the report is full of, and on a foundational dataset (population) it also announces itself as a dataset-count explosion — hundreds of consumers suddenly changed. Run probe 5 on every loss, however plausible the churn story.
+
+**Don't diff against stale local builds** — a consumer built at an unknown earlier time (or downloaded from the catalog) conflates code drift with the dependency change and produces false positives; `REMOTE`/production is the trustworthy baseline because CI built it from master.
+
+**Complementary, not a replacement:** data-diff sees every dataset (including ones with no charts), while **[Chart Diff](#final-qa-hand-off--anomalist-chart-diff-and-data-diff)** shows how the same changes land on actual published charts and **Anomalist** flags per-country anomalies in the new data — the final QA hand-off (last checklist step) covers all three. Use data-diff to find *which* datasets/indicators to worry about, then Chart Diff to judge what readers would actually see.
+
+- **When you deferred consumers to a follow-up PR:** the checks above belong to that follow-up PR; here just confirm the "Downstream dependencies" list is complete (`.venv/bin/etlr --modified --dry-run` shows the affected set).
+
+## Removing the old version & reordering the DAG
+
+After the ETL update, `etl update` appends the new version entries to the **bottom** of the main DAG file while the old version's entries stay in their original slot. **Always ask the user** whether to remove the old version — but never skip this checklist item, and when the user agrees, always do the reorder too.
 
 Workflow when the user agrees:
 
-1. **Archive the old version.** Move its entries (snapshot → meadow → garden → grapher) from the main DAG file (e.g., `dag/poverty_inequality.yml`) to the **bottom** of the corresponding archive file (`dag/archive/<same_file>.yml`). Include the original section comment (e.g., `# 1000 Binned Global Distribution (World Bank PIP)`) above the archived entries.
+1. **Delete the old version.** Remove its entries (snapshot → meadow → garden → grapher) from the main DAG file (e.g., `dag/poverty_inequality.yml`) and delete its files (`etl/steps/...`, `snapshots/...`). The archive dag (`dag/archive/*.yml`) is **not** edited by hand — `etl archive-dag` reconstructs it from git history, recording each removed step with the commit where it was last active (for recovery via `git checkout`).
+   - **Commit the removal BEFORE running `etl archive-dag`.** The tool reconstructs from *committed* git history — an uncommitted working-tree removal is invisible to it, and it will instead pick up whatever earlier removals are already committed. Sequence: edit dag + delete files → commit → `etl archive-dag` → scope → commit the archive.
+   - **Branch runs are squash-safe (since #6412).** When run on a feature branch, the recovery marker points at the merge-base with `origin/master` (a master commit that survives the squash-merge), branch-only transient steps (created and reverted within the PR) are skipped automatically (`archive_dag.skip_branch_only_step` in the log), and re-runs don't churn markers that are already valid — only markers whose SHA is unreachable from master get replaced. No post-merge fixup pass is needed; committing more to the PR after archiving is fine.
+   - **`etl archive-dag` reconciles the *entire* archive, not just your dataset.** If the archive was stale, one run can append **hundreds of unrelated lines** (e.g. this session pulled in ~180 lines across `climate.yml`/`education.yml`/etc. plus marker comments) — noise that doesn't belong in a data-update PR and that Codex will question. Keep the commit scoped: after running it, `git checkout -- dag/archive/` to drop the unrelated files, then re-add **only** your dataset's block to `dag/archive/main.yml` (copy the exact entry `archive-dag` generated, including its `# archived; last active in <sha> on <date>` marker). The block you keep is genuine tool output, so it stays consistent with future full regenerations.
 2. **Move the new entries into the old slot** so the dataset stays grouped with its neighbours and section comment. The new entries should not remain at the bottom of the main DAG.
 3. Preserve the original section comment (same indentation as the old block) above the new entries.
-4. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
-5. Run `make check` and commit with `🔨🤖 Archive old <name> entries and reorder DAG`.
+4. **Prefer the nested (compact) DAG format.** `etl update` emits the *flat* form (each step a separate top-level key with a flat dep list); the loader (`etl/dag_helpers.py:_parse_dag_yaml`) also accepts the **nested** form, where the chain is declared inline and flattens to the same graph. The nested form is the team's preferred style and is usually what the archived old block already used:
+   ```yaml
+   data://grapher/<ns>/<v>/<short>:
+     - data://garden/<ns>/<v>/<short>:
+       - data://garden/regions/2023-01-01/regions
+       - data://meadow/<ns>/<v>/<short>:
+         - snapshot://<ns>/<v>/<short>.csv
+   ```
+   Convert the relocated new entries to nested while reordering, so the active and archived blocks match. Verify it parses with `python -c "from etl.dag_helpers import load_dag; load_dag()"` (a malformed nesting raises).
+5. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
+6. Run `make check` and commit with `🔨🤖 Remove old <name> entries and reorder DAG`.
 
-## Final QA hand-off — Anomalist + Chart Diff in Wizard
+**Expect a Codex false-positive on the archive edit.** Because this step touches `dag/archive/*.yml`, Codex often flags it ("avoid updating archived DAG entries" — the AGENTS.md rule against editing archived files). This is expected: archiving *is* the explicitly-requested workflow step, and the rule's own "unless explicitly asked" exception applies. Reply citing that and resolve the thread — don't revert the archive.
 
-This is the **last step**, after the DAG archive has been committed. Don't auto-run these — they're human-judgment tools. Hand off the two staging links so the user can review and click through:
+## Final QA hand-off — Anomalist, Chart Diff and data-diff
+
+This is the **last step**, after the DAG archive has been committed. Don't auto-run these — they're human-judgment tools. Hand off the three links so the user can review and click through:
 
 - **Anomalist** — flags variables whose new values diverge from the old version beyond statistical thresholds. Catches accidental scale changes, base-year rebases that propagated the wrong way, and silent drops.
   ```
@@ -711,6 +837,10 @@ This is the **last step**, after the DAG archive has been committed. Don't auto-
   ```
   http://staging-site-<container_branch>/etl/wizard/chart-diff
   ```
+- **data-diff report** — dataset/indicator-level value comparison of the staging build against production, ranked by anomaly score, with data-point losses leading its Top-changes list and coverage loss forcing the 🔴 tier (see "Silent-breakage check" for how to read it). Covers every dataset the update touched, including ones with no charts — the perspective Anomalist and Chart Diff don't have. Easiest access: the **full report** link in owidbot's data-diff PR comment. The direct URL keeps the branch name's dots and underscores and replaces only characters outside `[A-Za-z0-9._-]` (e.g. `/`) with `-` — unlike the staging subdomain, which does replace `.`/`_` (and it is not the truncated container name either):
+  ```
+  https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html
+  ```
 
 **Important: derive `<container_branch>` correctly.** The staging hostname is **not** simply `staging-site-<branch>`. The container name is produced by `get_container_name(branch)` in `etl/config.py`:
 
@@ -725,12 +855,16 @@ Branches over 28 chars therefore get clipped. Example: `data-military-expenditur
 .venv/bin/python -c "from etl.config import get_container_name; print(get_container_name('<branch>'))"
 ```
 
-Tell the user something like: "Final QA: please review **[Anomalist](http://<container_name>/etl/wizard/anomalist)** and **[Chart Diff](http://<container_name>/etl/wizard/chart-diff)** in the Wizard. If anything looks off, let me know and I'll investigate."
+Include owidbot's data-diff summary in the hand-off so the user knows the scale before clicking: pull the `<summary><b>data-diff</b>: …</summary>` line from owidbot's PR comment (`gh pr view <num> --json comments`) — e.g. `❌ 21 changed · 2 new · 4 identical · 16 skipped`. If it reports removed datasets or errors, call those out explicitly.
+
+Tell the user something like: "Final QA: please review **[Anomalist](http://<container_name>/etl/wizard/anomalist)** and **[Chart Diff](http://<container_name>/etl/wizard/chart-diff)** in the Wizard, and the **[data-diff report](https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html)** for the dataset-level view — owidbot's summary: *❌ 21 changed · 2 new · 4 identical · 16 skipped*. If anything looks off, let me know and I'll investigate."
 
 These pages need a fresh staging build, so they're only meaningful after the PR's grapher upload to staging has completed and the staging server has rebuilt.
 
 ## Guardrails and tips
 
+- **`END_YEAR` / "as of" framing for status/event datasets.** When a dataset records *events* (and derives a status time series) and its latest event year lags the release date, you face a choice: forward-fill the latest status to the release year, or stop the series at the last event year and note the "as of" date in metadata. **Prefer the latter** — forward-filling invents data points for years with no source information (and shifts an `END_YEAR`-style constant ripples through the whole series). Keep the series at the last real year and add the currency note to `description_processing` and a `description_key` bullet (e.g. "The legal status shown for each country reflects the situation as of <Month Year>."). Confirm the choice with the user; they may change their mind (in this update we forward-filled to the release year, then reverted to the last event year + an "as of" note).
+- **OECD SDMX dataflow versions bump on new releases — a pinned URL goes 404/`NoRecordsFound`.** The Data Explorer's "Developer API" links pin `df[vs]`/the REST path to a dataflow version (e.g. `DSD_SHA@DF_SHA,1.0`); when the producer publishes a new edition they may mint `1.1` and empty the old version, so last cycle's known-good URL returns `NoRecordsFound`. On that error, list versions with `GET /public/rest/dataflow/<agency>/<id>/all` and retry with the newest. For reader-facing links (url_main, /latest posts) prefer the **version-less** explorer deep link (`data-explorer.oecd.org/vis?df[ds]=DisseminateFinalDMZ&df[id]=<id>&df[ag]=<agency>`), which always resolves to the latest release; in the snapshot's `url_download`, pinning the version is fine (deterministic) — just expect to bump it each cycle.
 - **Re-test "manual upload" snapshots — the blocking may be inverse-UA.** When a snapshot's docstring says the file is uploaded manually because "the website blocks the download request", verify that claim before carrying it into the new version. Some hosts (e.g. the IMF Datamapper) reject *browser-like* User-Agents with 403 while letting plain, honestly-identified clients through — the inverse of the usual bot-blocking — and the ETL downloader's default UA (`DEFAULT_USER_AGENT` in `etl/download_helpers.py`) is browser-like, so the original author may have misdiagnosed an automatable source. Test both directions (plain `requests` vs. browser UA) against the direct file URL. If the plain UA works: set `url_download` in the `.dvc` and pass `user_agent="owid-etl/1.0 (https://ourworldindata.org)"` (or similar plain UA) to `snap.create_snapshot(...)`. **Keep the snapshot `.py` script in that case** — the script-less `.dvc`-only path (`run_snapshot_dvc_only`) calls `create_snapshot()` without a `user_agent` and would 403 — and say so in the docstring so nobody deletes it as "redundant".
 - **DAG consistency**: After `etl update`, always verify that all new steps in `dag/main.yml` reference each other with the new version. A common bug is garden depending on old meadow or old snapshot — this silently loads stale data.
 - Never return empty tables or comment out logic as a workaround — fix the parsing/transformations instead.

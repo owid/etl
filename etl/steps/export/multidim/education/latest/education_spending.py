@@ -20,6 +20,7 @@ MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
     "addCountryMode": "add-country",
+    "sortBy": "custom",
 }
 
 # Common grouped view configuration

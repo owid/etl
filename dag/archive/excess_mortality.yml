@@ -1,0 +1,26 @@
+steps:
+  # archived; last active in cf2b4cd63de6 on 2023-02-17
+  data://meadow/excess_mortality/2023-01-27/hmd_stmf:
+    - snapshot://excess_mortality/2023-01-27/hmd_stmf.csv
+  # archived; last active in cf2b4cd63de6 on 2023-02-17
+  data://meadow/excess_mortality/2023-01-27/wmd:
+    - snapshot://excess_mortality/2023-01-27/wmd.csv
+  # archived; last active in cf2b4cd63de6 on 2023-02-17
+  data://meadow/excess_mortality/2023-01-27/xm_karlinsky_kobak:
+    - snapshot://excess_mortality/2023-01-27/xm_karlinsky_kobak.ages.csv
+    - snapshot://excess_mortality/2023-01-27/xm_karlinsky_kobak.csv
+  # archived; last active in cf2b4cd63de6 on 2023-02-17
+  data://garden/excess_mortality/2023-01-27/hmd_stmf:
+    - data://meadow/excess_mortality/2023-01-27/hmd_stmf
+  # archived; last active in cf2b4cd63de6 on 2023-02-17
+  data://garden/excess_mortality/2023-01-27/wmd:
+    - data://meadow/excess_mortality/2023-01-27/wmd
+  # archived; last active in cf2b4cd63de6 on 2023-02-17
+  data://garden/excess_mortality/2023-01-27/xm_karlinsky_kobak:
+    - data://meadow/excess_mortality/2023-01-27/xm_karlinsky_kobak
+  # archived; last active in cf2b4cd63de6 on 2023-02-17
+  data://garden/excess_mortality/2023-01-27/excess_mortality:
+    - data://garden/owid/latest/key_indicators
+    - data://garden/excess_mortality/2023-01-27/wmd
+    - data://garden/excess_mortality/2023-01-27/xm_karlinsky_kobak
+    - data://garden/excess_mortality/2023-01-27/hmd_stmf

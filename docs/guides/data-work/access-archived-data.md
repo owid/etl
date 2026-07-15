@@ -5,17 +5,16 @@ icon: lucide/package-open
 ---
 
 # Access archived data
-Sometimes, you may need to access archived datasets or snapshots and compare them with current datasets. Below, we present three strategies for different use cases.
+Sometimes, you may need to access an archived dataset or snapshot and compare it with the current one. Archived steps are no longer kept as code in the repository — instead, `dag/archive/*.yml` records each step that was once active, with a marker comment carrying the commit where it was last active. You recover a step by checking out that commit.
 
 
 ### Git History
 
-The simplest way to access older datasets is by checking out a previous Git commit and running the ETL process from that point in time.
+The simplest way to access an older dataset is by checking out the commit where the step was last active and running the ETL from there.
 
 1. **Find the commit of interest**:
-   - Open the file in GitHub.
-   - Click the `History` button.
-   - Select the desired commit and copy its SHA (click the copy button).
+   - Look up the step in `dag/archive/*.yml`. Its marker comment gives the recovery commit, e.g. `# archived; last active in 4e6b5dfb9cb7 on 2026-05-11`.
+   - (Alternatively, open the file in GitHub, click `History`, and copy the SHA of the desired commit.)
 
 2. **Checkout the commit**:
    ```bash

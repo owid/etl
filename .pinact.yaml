@@ -1,0 +1,20 @@
+version: 3
+
+# Setting `files` replaces pinact's defaults, so the root patterns are listed
+# explicitly alongside the nested ones. Globs use explicit depth (no `**`), so
+# each subpackage level is matched with `*`.
+files:
+  - pattern: .github/workflows/*.yml
+  - pattern: .github/workflows/*.yaml
+  - pattern: .github/actions/*/action.yml
+  - pattern: .github/actions/*/action.yaml
+  - pattern: lib/*/.github/workflows/*.yml
+  - pattern: lib/*/.github/workflows/*.yaml
+  - pattern: lib/*/.github/actions/*/action.yml
+  - pattern: lib/*/.github/actions/*/action.yaml
+
+# Our own actions (https://github.com/owid/actions) are referenced by branch and
+# are intentionally left unpinned.
+ignore_actions:
+  - name: owid/actions/.*
+    ref: .*
