@@ -90,6 +90,8 @@ Read both `.dvc` files (old and new) and produce a side-by-side table for these 
 | `url_download` | Status check; OK to remove if data is now fetched via API |
 | `license.url` | Status check |
 
+- **Freshness check for scraped snapshots.** When the snapshot `.py` scrapes the producer's page or a chart platform's endpoint, re-fetch the *producer's page* and compare against the committed snapshot — the endpoint the script reads can lag the page (e.g. a Datawrapper chart CDN trailing the page's own `<noscript>` data tables by a full release, so the committed snapshot silently misses the newest wave). The committed data must match the page's current tables; a missing latest row/wave is a 🔴 (see `/update-dataset` Guardrails, "Scraped chart embeds").
+
 ### 6. Verify all links
 
 Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.dvc` and `.meta.yml` files. A curl non-2xx is a *signal*, not proof — Cloudflare-fronted hosts return false 404s to curl. Apply the same escalation as `/update-dataset` § 6c: re-check with `WebFetch`, then the Wayback Machine. Only a URL that fails **all three** is a 🔴 blocker; a curl-only failure that WebFetch resolves is 🟢 informational.
