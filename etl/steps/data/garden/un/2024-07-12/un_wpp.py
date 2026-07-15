@@ -331,7 +331,15 @@ def process_population_peak(tb: Table) -> Table:
     tb_peak.loc[tb_peak["year_peak"] == year_max, column] = "Before peak"
     tb_peak[column] = tb_peak[column].copy_metadata(tb_peak["population"])
 
-    return tb_peak[["country", "year", column]]
+    # Numeric companion (-1=Before peak, 0=Peak year, 1=After peak): grapher's line-chart color
+    # dimension only accepts numeric indicators, so the ordinal alone can't color a timeseries.
+    column_code = "population_peak_status_code"
+    tb_peak[column_code] = -1
+    tb_peak.loc[tb_peak[column] == "Peak year", column_code] = 0
+    tb_peak.loc[tb_peak[column] == "After peak", column_code] = 1
+    tb_peak[column_code] = tb_peak[column_code].copy_metadata(tb_peak["population"])
+
+    return tb_peak[["country", "year", column, column_code]]
 
 
 def process_dependency(tb: Table) -> Table:
