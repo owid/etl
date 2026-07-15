@@ -1298,3 +1298,8 @@ steps:
   data://grapher/artificial_intelligence/2025-03-12/epoch_compute_intensive_domain:
     - data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_domain:
       - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
+  # archived; last active in f531144579e8 on 2026-07-15
+  data://grapher/gallup/2026-04-03/ai_indicator:
+    - data://garden/gallup/2026-04-03/ai_indicator:
+      - data://meadow/gallup/2026-04-03/ai_indicator:
+        - snapshot://gallup/2026-04-03/ai_indicator.csv
