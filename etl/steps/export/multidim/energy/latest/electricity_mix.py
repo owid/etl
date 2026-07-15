@@ -5,6 +5,24 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# OWID and Energy-Institute aggregate entities, excluded when sizing the map color scale (grapher
+# leaves them off the map, and their values would otherwise push the top bin above every country).
+# Entities with an "(EI)" suffix are the Statistical Review's own regions and are excluded by suffix.
+AGGREGATE_ENTITIES = {
+    "World",
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "South America",
+    "Oceania",
+    "European Union (27)",
+    "High-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "Low-income countries",
+}
+
 # Map each source dimension slug to its column prefix in the electricity_mix grapher table.
 SOURCE_COLUMN_PREFIX = {
     "total": "total",
@@ -61,10 +79,14 @@ def run() -> None:
             column_dimensions[column] = {"source": "total", "metric": metric_slug}
 
     tb = tb[list(column_dimensions)]
-    # Data max per (source, metric), used to place the top map bin below the max so it renders
-    # as an open-ended bracket for unbounded magnitudes (see set_view_titles / _map_config).
+    # Reference magnitude per (source, metric) for sizing the map's log bins: the 99th percentile
+    # across countries only (aggregates excluded, single outliers ignored). See set_view_titles.
+    country_level = tb.index.get_level_values("country")
+    is_country = ~(country_level.isin(AGGREGATE_ENTITIES) | country_level.str.contains("(EI)", regex=False))
+    tb_countries = tb[is_country]
     dims_max = {
-        (dims["source"], dims["metric"]): float(tb[column].quantile(0.99)) for column, dims in column_dimensions.items()
+        (dims["source"], dims["metric"]): float(tb_countries[column].astype("float64").quantile(0.99))
+        for column, dims in column_dimensions.items()
     }
     for column, dims in column_dimensions.items():
         tb[column].m.dimensions = dims
@@ -325,7 +347,9 @@ def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
         edges = _log_thresholds(vmax)
         if edges:
             color_scale["binningStrategy"] = "manual"
-            color_scale["customNumericValues"] = edges
+            # Trailing sentinel (smaller than the top edge) forces grapher to render an open-ended
+            # top bracket (">X"), independent of where the top edge sits relative to the data max.
+            color_scale["customNumericValues"] = edges + [1]
     return {"colorScale": color_scale, "timeTolerance": 3}
 
 

@@ -5,6 +5,24 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# OWID and Energy-Institute aggregate entities, excluded when sizing the map color scale (grapher
+# leaves them off the map, and their values would otherwise push the top bin above every country).
+# Entities with an "(EI)" suffix are the Statistical Review's own regions and are excluded by suffix.
+AGGREGATE_ENTITIES = {
+    "World",
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "South America",
+    "Oceania",
+    "European Union (27)",
+    "High-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "Low-income countries",
+}
+
 # Map each grapher column to its (fuel, metric) dimensions.
 COLUMN_DIMENSIONS = {
     **{f"{fuel}_production_twh": {"fuel": fuel, "metric": "production"} for fuel in ["coal", "oil", "gas"]},
@@ -28,10 +46,14 @@ def run() -> None:
     #
     # Keep only the columns that map to a (fuel, metric) view, and set their dimensions.
     tb = tb[list(COLUMN_DIMENSIONS)]
-    # Data max per (fuel, metric), used to place the top map bin below the max so it renders as an
-    # open-ended bracket for these unbounded magnitudes (see set_view_titles / _map_config).
+    # Reference magnitude per (fuel, metric) for sizing the map's log bins: the 99th percentile
+    # across countries only (aggregates excluded, single outliers ignored). See set_view_titles.
+    country_level = tb.index.get_level_values("country")
+    is_country = ~(country_level.isin(AGGREGATE_ENTITIES) | country_level.str.contains("(EI)", regex=False))
+    tb_countries = tb[is_country]
     dims_max = {
-        (dims["fuel"], dims["metric"]): float(tb[column].quantile(0.99)) for column, dims in COLUMN_DIMENSIONS.items()
+        (dims["fuel"], dims["metric"]): float(tb_countries[column].astype("float64").quantile(0.99))
+        for column, dims in COLUMN_DIMENSIONS.items()
     }
     for column, dims in COLUMN_DIMENSIONS.items():
         tb[column].m.dimensions = dims
@@ -158,7 +180,9 @@ def _map_config(fuel: str, metric: str, vmax: float | None = None) -> dict:
         edges = _log_thresholds(vmax)
         if edges:
             color_scale["binningStrategy"] = "manual"
-            color_scale["customNumericValues"] = edges
+            # Trailing sentinel (smaller than the top edge) forces grapher to render an open-ended
+            # top bracket (">X"), independent of where the top edge sits relative to the data max.
+            color_scale["customNumericValues"] = edges + [1]
     return {"colorScale": color_scale, "timeTolerance": 3}
 
 
