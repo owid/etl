@@ -38,6 +38,31 @@ def get_affected_charts_cli(indicator_mapping: dict[int, int]) -> list[gm.Chart]
     return charts
 
 
+def _fetch_single_indicator_config(chart_config: dict, indicator_mapping: dict[int, int]) -> dict | None:
+    """Fetch the ETL grapher config of a chart's own indicator, if it uses exactly one.
+
+    This is the baseline a single-indicator, inheritance-enabled chart inherits from, used
+    by `compute_inheritance_patch` to strip only the fields that would resolve to the same
+    value anyway (see #5911 and its follow-up fix). Returns None for multi-indicator charts,
+    since merging several indicators' inherited defaults isn't handled here -- those charts
+    fall back to the conservative keep-everything behavior.
+    """
+    variable_ids = {dim.get("variableId") for dim in chart_config.get("dimensions", []) if dim.get("variableId")}
+    if len(variable_ids) != 1:
+        return None
+    variable_id = indicator_mapping.get(next(iter(variable_ids)), next(iter(variable_ids)))
+
+    df = read_sql(
+        "SELECT cc.full FROM variables v JOIN chart_configs cc ON cc.id = v.grapherConfigIdETL WHERE v.id = %(vid)s",
+        engine=get_engine(),
+        params={"vid": int(variable_id)},
+    )
+    if df.empty:
+        return None
+    full = df.iloc[0]["full"]
+    return json.loads(full) if isinstance(full, (str, bytes)) else full
+
+
 def _update_single_chart(
     chart: gm.Chart, indicator_mapping: dict[int, int], api: AdminAPI, user_id: int | None = None
 ) -> int:
@@ -47,6 +72,7 @@ def _update_single_chart(
         chart.config,
         indicator_mapping,
         get_schema_from_url(chart.config["$schema"]),
+        indicator_config=_fetch_single_indicator_config(chart.config, indicator_mapping),
     )
 
     # Get chart ID

@@ -13,6 +13,7 @@ from structlog import get_logger
 import etl.grapher.model as gm
 from etl.db import get_engine
 from etl.indicator_upgrade.schema import (
+    compute_inheritance_patch,
     fix_errors_in_schema,
     validate_chart_config_and_remove_defaults,
     validate_chart_config_and_set_defaults,
@@ -117,14 +118,18 @@ def update_chart_config(
     config: dict[str, Any],
     indicator_mapping: dict[int, int],
     schema: dict[str, Any],
+    indicator_config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Update indicator references to the new ones.
 
     The chart config contains some fields that point to the indicators in use. In the attempt to migrating these, we should update all references to the new indicators.
+
+    `indicator_config` is the ETL grapher config of the chart's (single) indicator, used to
+    correctly strip defaults from inheritance-enabled charts -- see ChartIndicatorUpdater.run.
     """
     is_inheritance_enabled = config.get("isInheritanceEnabled", False)
     updater = ChartIndicatorUpdater(indicator_mapping, schema, is_inheritance_enabled=is_inheritance_enabled)
-    config_new = updater.run(deepcopy(config))
+    config_new = updater.run(deepcopy(config), indicator_config=indicator_config)
     return config_new
 
 
@@ -146,22 +151,38 @@ class ChartIndicatorUpdater:
         schema : Optional[Dict[str, Any]]
             Schema of the chart configuration. Defaults to None.
         is_inheritance_enabled : bool
-            Whether chart inheritance is enabled. When True, we skip stripping
-            schema-default values from the config, because the admin API needs
-            the full config to correctly compute the patch against the indicator's
-            ETL config. Without this, properties like hasMapTab=false (a schema
-            default that overrides the indicator's hasMapTab=true) would be
-            stripped, causing the chart to re-inherit the indicator's value.
+            Whether chart inheritance is enabled. When True, stripping schema-default
+            values naively would silently revert genuine overrides that happen to match
+            the schema default but differ from the indicator's own value (e.g.
+            hasMapTab=false overriding the indicator's hasMapTab=true) -- see #5911. See
+            `run`'s `indicator_config` parameter for how this is now handled precisely.
         """
         # Variable mapping dictionary: Old variable ID -> New variable ID
         self.indicator_mapping = indicator_mapping
         self.schema = schema
         self.is_inheritance_enabled = is_inheritance_enabled
 
-    def run(self, config: dict[str, Any]) -> dict[str, Any]:
-        """Run the chart variable updater."""
+    def run(self, config: dict[str, Any], indicator_config: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Run the chart variable updater.
+
+        Parameters
+        ----------
+        indicator_config : Optional[Dict[str, Any]]
+            The ETL grapher config of the chart's own indicator (only meaningful for
+            inheritance-enabled, single-indicator charts). When provided, defaults are
+            stripped by comparing against this actual inherited baseline (see
+            `compute_inheritance_patch`) rather than against the generic schema default,
+            so genuine overrides that happen to equal the schema default -- but differ
+            from the indicator's value -- are preserved. When inheritance is enabled but
+            no `indicator_config` is available (e.g. multi-indicator charts, where the
+            merge semantics across indicators aren't handled here), we conservatively fall
+            back to keeping every field, exactly as before #5911's fix, to avoid regressing
+            it.
+        """
         # Fix errors in schema
         config_new = fix_errors_in_schema(config)
+        # Remember which paths were explicitly present before defaults get filled in below.
+        original_config = config_new
         # Validate config agains schema
         config_new = validate_chart_config_and_set_defaults(config_new, self.schema)
         # Update map tab
@@ -171,12 +192,13 @@ class ChartIndicatorUpdater:
         # Update sorting
         config_new = update_chart_config_sort(config_new, self.indicator_mapping)
         # Validate the configuration of the chart and remove default values (if any).
-        # Skip this for inheritance-enabled charts: the admin API computes the patch
-        # by diffing the full config against the indicator's ETL config. If we strip
-        # schema-default values here, overrides that happen to match the schema default
-        # (e.g. hasMapTab=false) but differ from the indicator default (hasMapTab=true)
-        # would be lost, causing the chart to re-inherit the indicator's value.
-        if not self.is_inheritance_enabled:
+        if self.is_inheritance_enabled:
+            if indicator_config is not None:
+                config_new = compute_inheritance_patch(
+                    config_new, indicator_config, self.schema, original_config=original_config
+                )
+            # else: no indicator config available -- keep everything (see docstring above).
+        else:
             config_new = validate_chart_config_and_remove_defaults(config_new, self.schema)
         return config_new
 
@@ -190,10 +212,18 @@ def update_chart_config_map(
     # Proceed only if chart uses map and has `map` field
     if config["hasMapTab"] and "map" in config:
         log.info("variable_update: chart uses map")
-        # Get map.columnSlug
+        # Get map.columnSlug. It's stored as a string in the config (unlike
+        # dimensions[*].variableId, which is an int), so it must be cast before comparing
+        # against indicator_mapping's int keys -- otherwise the `in` check below always
+        # fails silently, leaving the map tab pinned to the old variable even though
+        # every other part of the chart (dimensions, etc.) gets upgraded correctly.
         map_var_id = config["map"].get(
             "columnSlug", config["dimensions"][0]["variableId"]
         )  # chart.config["dimensions"][0]["variableId"]
+        try:
+            map_var_id = int(map_var_id)
+        except (TypeError, ValueError):
+            return config
         # Proceed only if variable ID used for map is in variable_mapping (i.e. needs update)
         if map_var_id in indicator_mapping:
             # Get and set new map variable ID in the chart config

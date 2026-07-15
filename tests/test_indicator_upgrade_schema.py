@@ -15,6 +15,44 @@ def test_validate_chart_config_ignores_chart_table_fields():
     assert config_new == {"title": "A chart"}
 
 
+def test_map_column_slug_is_updated_when_stored_as_string():
+    """Regression test: map.columnSlug is stored as a string in the config, unlike
+    dimensions[*].variableId (an int). update_chart_config_map used to compare it
+    directly against indicator_mapping's int keys, so the `in` check always failed and
+    the map tab silently kept pointing at the old variable even though dimensions (and
+    therefore every other view of the chart) were upgraded correctly.
+    """
+    schema = {
+        "type": "object",
+        "properties": {
+            "$schema": {"type": "string"},
+            "id": {"type": "integer"},
+            "hasMapTab": {"type": "boolean", "default": False},
+            "dimensions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {"variableId": {"type": "integer"}, "property": {"type": "string"}},
+                },
+            },
+            "map": {"type": "object", "properties": {"columnSlug": {"type": "string"}}},
+        },
+    }
+
+    config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "id": 755,
+        "hasMapTab": True,
+        "map": {"columnSlug": "100"},  # stored as a string, as it is in real configs
+        "dimensions": [{"variableId": 100, "property": "y"}],
+    }
+
+    config_new = update_chart_config(config, {100: 200}, schema)
+
+    assert config_new["map"]["columnSlug"] == "200"
+    assert config_new["dimensions"][0]["variableId"] == 200
+
+
 def test_inheritance_preserves_schema_default_overrides():
     """When inheritance is enabled, properties that match schema defaults but override
     indicator defaults should be preserved (not stripped).
@@ -71,6 +109,124 @@ def test_inheritance_preserves_schema_default_overrides():
         "this would cause the map to be re-enabled via inheritance"
     )
     # Variable ID should be updated
+    assert config_new["dimensions"][0]["variableId"] == 200
+
+
+def _inheritance_schema():
+    return {
+        "type": "object",
+        "properties": {
+            "$schema": {"type": "string"},
+            "id": {"type": "integer"},
+            "version": {"type": "integer", "default": 1},
+            "hasMapTab": {"type": "boolean", "default": False},
+            "hideLogo": {"type": "boolean", "default": False},
+            "dimensions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "variableId": {"type": "integer"},
+                        "property": {"type": "string"},
+                    },
+                },
+            },
+            "map": {
+                "type": "object",
+                "properties": {
+                    "colorScale": {
+                        "type": "object",
+                        "properties": {
+                            "midpoint": {"type": "integer", "default": 0},
+                        },
+                    },
+                },
+            },
+        },
+    }
+
+
+def test_inheritance_with_indicator_config_preserves_real_overrides():
+    """With an indicator_config available, a genuine override that happens to equal the
+    schema default (hasMapTab=false) but differs from the indicator's own value
+    (hasMapTab=true) must still be preserved.
+    """
+    schema = _inheritance_schema()
+
+    config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "id": 7742,
+        "version": 1,
+        "isInheritanceEnabled": True,
+        "hasMapTab": False,  # user's explicit override
+        "dimensions": [{"variableId": 100, "property": "y"}],
+    }
+    indicator_config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "hasMapTab": True,
+    }
+
+    config_new = update_chart_config(config, {100: 200}, schema, indicator_config=indicator_config)
+
+    assert config_new.get("hasMapTab") is False
+    assert config_new["dimensions"][0]["variableId"] == 200
+
+
+def test_inheritance_with_indicator_config_strips_untouched_fields():
+    """With an indicator_config available, fields neither the chart nor the indicator ever
+    touched should be stripped -- not kept just because inheritance is enabled (the #5911
+    fix's blanket "keep everything" fallback shouldn't apply once a real baseline exists).
+    """
+    schema = _inheritance_schema()
+
+    config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "id": 7742,
+        "version": 1,
+        "isInheritanceEnabled": True,
+        "dimensions": [{"variableId": 100, "property": "y"}],
+        "map": {"colorScale": {}},
+    }
+    # Indicator never sets hideLogo or map.colorScale.midpoint either -- both should
+    # resolve to their schema defaults on both sides and therefore get stripped.
+    indicator_config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "hasMapTab": True,
+    }
+
+    config_new = update_chart_config(config, {100: 200}, schema, indicator_config=indicator_config)
+
+    assert "hideLogo" not in config_new
+    assert "midpoint" not in config_new.get("map", {}).get("colorScale", {})
+    assert config_new["dimensions"][0]["variableId"] == 200
+    # hasMapTab was never set on the chart itself -- only the indicator set it -- so it
+    # must not appear at all; the chart should keep inheriting it via the admin API.
+    assert "hasMapTab" not in config_new
+
+
+def test_inheritance_with_indicator_config_strips_redundant_explicit_match():
+    """A field the chart explicitly set, but whose value coincidentally matches what the
+    indicator itself already provides (not just the generic schema default), carries no
+    information and should still be stripped -- it resolves to the same thing either way.
+    """
+    schema = _inheritance_schema()
+
+    config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "id": 7742,
+        "version": 1,
+        "isInheritanceEnabled": True,
+        "hasMapTab": True,  # explicit, but happens to equal the indicator's own value
+        "dimensions": [{"variableId": 100, "property": "y"}],
+    }
+    indicator_config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "hasMapTab": True,
+    }
+
+    config_new = update_chart_config(config, {100: 200}, schema, indicator_config=indicator_config)
+
+    assert "hasMapTab" not in config_new
     assert config_new["dimensions"][0]["variableId"] == 200
 
 
