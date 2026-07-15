@@ -15,10 +15,6 @@ dimensions:
       - slug: "total"
         name: "Total"
         group: "Aggregates"
-      - slug: "all_sources"
-        name: "All sources (breakdown)"
-        description: "Each individual source, stacked"
-        group: "Aggregates"
       - slug: "fossil_fuels"
         name: "Fossil fuels"
         description: "Coal, oil and gas"
@@ -77,6 +73,12 @@ dimensions:
       - slug: "annual_change"
         name: "Annual change"
         description: "Year-on-year change, in terawatt-hours"
+      - slug: "by_source"
+        name: "By source"
+        description: "Broken down into constituent sources, stacked"
+      - slug: "by_source_per_capita"
+        name: "By source, per capita"
+        description: "Constituent sources per person, stacked"
 views:
   # Views are generated programmatically in the step.
   []
