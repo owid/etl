@@ -31,6 +31,12 @@ def run() -> None:
                 tb[col] = tb[col].astype(str).str.replace(",", "")
                 tb[col] = tb[col].replace("", np.nan)
                 tb[col] = pd.to_numeric(tb[col], errors="coerce")
+                # The snapshot already drops rows with empty values in these columns, so anything
+                # that fails to parse here is an unexpected token (e.g. a redaction marker) that would
+                # otherwise flow into garden's sum() as a silent zero — fail loudly instead.
+                assert tb[col].notna().all(), (
+                    f"Non-numeric values in {col} (possible redactions) — investigate before publishing."
+                )
                 tb[col].metadata.origins = tb["Year"].metadata.origins
         # Drop rows that are completely identical across all columns
         tb = tb.drop_duplicates()
