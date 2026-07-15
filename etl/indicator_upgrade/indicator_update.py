@@ -15,6 +15,7 @@ from etl.db import get_engine
 from etl.indicator_upgrade.schema import (
     compute_inheritance_patch,
     fix_errors_in_schema,
+    prune_dimension_displays,
     validate_chart_config_and_remove_defaults,
     validate_chart_config_and_set_defaults,
 )
@@ -119,6 +120,7 @@ def update_chart_config(
     indicator_mapping: dict[int, int],
     schema: dict[str, Any],
     indicator_config: dict[str, Any] | None = None,
+    dimension_display_baselines: dict[int, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Update indicator references to the new ones.
 
@@ -126,10 +128,15 @@ def update_chart_config(
 
     `indicator_config` is the ETL grapher config of the chart's (single) indicator, used to
     correctly strip defaults from inheritance-enabled charts -- see ChartIndicatorUpdater.run.
+    `dimension_display_baselines` maps each dimension's (new) variable ID to that variable's
+    own `display` metadata, used to strip the same kind of redundant defaults from
+    `dimensions[*].display` -- a separate inheritance path, see prune_dimension_displays.
     """
     is_inheritance_enabled = config.get("isInheritanceEnabled", False)
     updater = ChartIndicatorUpdater(indicator_mapping, schema, is_inheritance_enabled=is_inheritance_enabled)
-    config_new = updater.run(deepcopy(config), indicator_config=indicator_config)
+    config_new = updater.run(
+        deepcopy(config), indicator_config=indicator_config, dimension_display_baselines=dimension_display_baselines
+    )
     return config_new
 
 
@@ -162,7 +169,12 @@ class ChartIndicatorUpdater:
         self.schema = schema
         self.is_inheritance_enabled = is_inheritance_enabled
 
-    def run(self, config: dict[str, Any], indicator_config: dict[str, Any] | None = None) -> dict[str, Any]:
+    def run(
+        self,
+        config: dict[str, Any],
+        indicator_config: dict[str, Any] | None = None,
+        dimension_display_baselines: dict[int, dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
         """Run the chart variable updater.
 
         Parameters
@@ -178,6 +190,13 @@ class ChartIndicatorUpdater:
             merge semantics across indicators aren't handled here), we conservatively fall
             back to keeping every field, exactly as before #5911's fix, to avoid regressing
             it.
+        dimension_display_baselines : Optional[Dict[int, Dict[str, Any]]]
+            Maps each dimension's (new) variable ID to that variable's own `display`
+            metadata, used to strip the same kind of redundant defaults from
+            `dimensions[*].display` -- a separate inheritance path from `indicator_config`
+            above (see `prune_dimension_displays`). Applied regardless of
+            `is_inheritance_enabled`, since dimension display always inherits from the
+            variable's own display metadata.
         """
         # Fix errors in schema
         config_new = fix_errors_in_schema(config)
@@ -200,6 +219,8 @@ class ChartIndicatorUpdater:
             # else: no indicator config available -- keep everything (see docstring above).
         else:
             config_new = validate_chart_config_and_remove_defaults(config_new, self.schema)
+        if dimension_display_baselines:
+            config_new = prune_dimension_displays(config_new, dimension_display_baselines, original_config)
         return config_new
 
 

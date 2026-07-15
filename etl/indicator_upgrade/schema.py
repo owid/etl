@@ -239,3 +239,46 @@ def compute_inheritance_patch(
             result[field] = config[field]
 
     return result
+
+
+def prune_dimension_displays(
+    config: dict[str, Any],
+    display_baselines: dict[int, dict[str, Any]],
+    original_config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Strip `dimensions[*].display` fields that resolve to the same value as the
+    corresponding variable's own `display` metadata.
+
+    This is a *separate* inheritance path from `compute_inheritance_patch`'s
+    grapherConfigETL-based one: a chart dimension's `display` object (tolerance,
+    numDecimalPlaces, unit, ...) inherits from that indicator's own `variables.display`
+    column, not from its `grapherConfigETL`. Left unhandled, this pocket of bloat
+    (`zeroDay`, `isProjection`, `roundingMode`, `numSignificantFigures`, ...) survives
+    `compute_inheritance_patch` untouched, since indicator configs have no per-dimension
+    `display` to compare against.
+
+    `display_baselines` maps each dimension's (already-remapped) variable ID to that
+    variable's `display` metadata. Dimensions are matched to `original_config` by
+    position, since their `variableId` itself changes across the remap.
+    """
+    if original_config is None:
+        original_config = config
+
+    config = copy.deepcopy(config)
+    original_dimensions = original_config.get("dimensions", [])
+
+    for i, dimension in enumerate(config.get("dimensions", [])):
+        if "display" not in dimension:
+            continue
+        baseline_display = display_baselines.get(dimension.get("variableId"))
+        if baseline_display is None:
+            continue
+        original_dimension = original_dimensions[i] if i < len(original_dimensions) else {}
+        explicit_display = _collect_explicit_leaves(original_dimension.get("display", {}))
+        pruned_display = _prune_to_explicit(dimension["display"], explicit_display, baseline_display)
+        if isinstance(pruned_display, dict) and pruned_display:
+            dimension["display"] = pruned_display
+        else:
+            del dimension["display"]
+
+    return config
