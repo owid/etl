@@ -1,19 +1,18 @@
 """Script to create a snapshot of Gallup's AI-use-at-work indicator.
 
 The data is the chart "1 in 10 U.S. Employees Use AI Daily in Their Role" on Gallup's
-AI indicator page (url_main in the .dvc). The chart is a Datawrapper embed (chart id
-`a42MU`) whose data is served from Datawrapper's CDN: the pinned embed URL redirects
-client-side to the latest published chart version, and that version's `dataset.csv`
-(tab-separated) holds the same rows and column labels as the page's manual
-"Get the data" download, which earlier versions of this snapshot used.
+AI indicator page (url_main in the .dvc). The page server-renders each chart's data as
+an HTML fallback table, and this script parses the one whose header matches the
+chart's column labels — the same rows and labels as the page's manual "Get the data"
+download, which earlier versions of this snapshot used.
 
-If the fetch breaks (e.g. Gallup rebuilds the chart under a new id), re-derive the
-chart id from the page source — look for the Datawrapper embed of the AI-use trend
-chart (data-src="https://datawrapper.dwcdn.net/<id>/...") — and update CHART_ID.
+NOTE: don't fetch the chart's Datawrapper CDN endpoint (datawrapper.dwcdn.net/a42MU/...)
+instead — the published chart version there can lag the page's own data tables by a full
+survey wave (observed 2026-07: the page tables already carried the May 2026 wave while
+the latest published chart version still ended at February 2026).
 """
 
 import io
-import re
 
 import click
 import pandas as pd
@@ -23,11 +22,10 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# Datawrapper chart id of "1 in 10 U.S. Employees Use AI Daily in Their Role" on the
-# Gallup AI indicator page.
-CHART_ID = "a42MU"
+# Gallup's AI indicator page (same as url_main in the .dvc).
+URL_MAIN = "https://www.gallup.com/699797/indicator-artificial-intelligence.aspx"
 
-# Expected column labels, as shipped by Gallup's chart.
+# Expected column labels of the AI-use trend chart, as shipped by Gallup.
 EXPECTED_COLUMNS = ["Use of AI", "Daily AI users", "Frequent AI users", "Total AI users"]
 
 TIMEOUT = 30
@@ -45,23 +43,19 @@ def run(upload: bool = True) -> None:
 
 
 def fetch_chart_data() -> pd.DataFrame:
-    # The pinned embed URL carries a client-side redirect to the latest published
-    # version of the chart; resolve it to fetch the current data.
-    embed = requests.get(f"https://datawrapper.dwcdn.net/{CHART_ID}/1/", timeout=TIMEOUT)
-    embed.raise_for_status()
-    match = re.search(rf"url=https://datawrapper\.dwcdn\.net/{CHART_ID}/(\d+)/", embed.text)
-    assert match, f"Could not resolve the latest version of Datawrapper chart {CHART_ID}."
-    version = match.group(1)
+    resp = requests.get(URL_MAIN, timeout=TIMEOUT)
+    resp.raise_for_status()
 
-    data = requests.get(f"https://datawrapper.dwcdn.net/{CHART_ID}/{version}/dataset.csv", timeout=TIMEOUT)
-    data.raise_for_status()
+    # The page holds one fallback table per embedded chart; select ours by its header.
+    tables = pd.read_html(io.StringIO(resp.text))
+    matches = [tb for tb in tables if list(tb.columns) == EXPECTED_COLUMNS]
+    assert len(matches) == 1, f"Expected exactly one table with columns {EXPECTED_COLUMNS}, found {len(matches)}."
 
-    return pd.read_csv(io.StringIO(data.text), sep="\t")
+    return matches[0]
 
 
 def sanity_check(df: pd.DataFrame) -> None:
-    assert list(df.columns) == EXPECTED_COLUMNS, f"Unexpected columns: {list(df.columns)}."
-    assert len(df) >= 6, f"Expected at least the 6 survey waves published up to February 2026, got {len(df)} rows."
+    assert len(df) >= 7, f"Expected at least the 7 survey waves published up to May 2026, got {len(df)} rows."
     dates = pd.to_datetime(df["Use of AI"], format="%m/%d/%y")
     assert dates.is_monotonic_increasing and not dates.duplicated().any(), "Survey dates are not sorted and unique."
     shares = df[EXPECTED_COLUMNS[1:]]
