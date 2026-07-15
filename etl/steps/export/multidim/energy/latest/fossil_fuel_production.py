@@ -86,7 +86,7 @@ def run() -> None:
     # indicator display name.
     set_view_titles(c, dims_max)
 
-    # Add "by fuel" stacked views that decompose total fossil fuel production into coal, oil and gas.
+    # Add "by fuel" stacked views that decompose total fossil fuel production into coal, oil, and gas.
     add_decomposition_views(c)
 
     #
@@ -143,7 +143,7 @@ def _decomposition_title(base_metric: str) -> str:
 
 
 def add_decomposition_views(c) -> None:
-    """Add stacked "by fuel" views that break total fossil fuel production into coal, oil and gas."""
+    """Add stacked "by fuel" views that break total fossil fuel production into coal, oil, and gas."""
     base_config = {"chartTypes": ["StackedArea"], "tab": "chart", "hasMapTab": False, "hideRelativeToggle": False}
     single_views = {(v.dimensions.get("fuel"), v.dimensions.get("metric")): v for v in c.views}
     for source, constituents in AGGREGATE_DECOMPOSITION.items():

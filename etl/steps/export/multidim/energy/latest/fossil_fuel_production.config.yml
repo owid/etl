@@ -12,7 +12,7 @@ dimensions:
     choices:
       - slug: "total"
         name: "Total"
-        description: "All fossil fuels (coal, oil and gas)"
+        description: "All fossil fuels (coal, oil, and gas)"
       - slug: "coal"
         name: "Coal"
       - slug: "oil"
