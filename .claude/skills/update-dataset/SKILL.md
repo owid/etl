@@ -15,6 +15,7 @@ Use this skill to run a complete dataset update with Claude Code subagents, keep
 
 - `<namespace>/<old_version>/<name>`
 - Get `<new_version>` as today's date by running `date -u +"%Y-%m-%d"`
+- A bare `<short_name>` (no namespace/version) is also valid — it's what owid-issues reminder bodies use. Resolve it to `<namespace>/<old_version>/<short_name>` via the DAG (`rg "/<short_name>$" dag/ -g "*.yml"`, take the latest active version); ask the user if the short name is ambiguous across namespaces. Several space-separated short names (`/update-dataset <short_name1> <short_name2>`) mean a grouped update of related datasets: run the full workflow for each, on one shared branch/PR.
 
 Optional trailing args:
 - branch: The working branch name (defaults to current branch)
@@ -43,6 +44,7 @@ Assumptions:
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
 - [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim — bump to the producer's real release date / year, or to `date_accessed` / current year if the source doesn't publish one), and that all URLs resolve (HEAD-check)
+- [ ] Scheduled-issue workflow check (owid-issues): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>`; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
@@ -499,6 +501,35 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE '%<ns>/<v>/<short_name>%'"
    ```
 
+6d) Scheduled-issue workflow check (owid-issues)
+   Every recurring data update is driven by a scheduled GitHub Actions workflow in the `owid/owid-issues` repo (`.github/workflows/update-*.yml`) that periodically opens a "Data update" issue. The conventions live in the Notion page ["Scheduled data issues"](https://app.notion.com/p/owid/Scheduled-data-issues-f166359059634634b0053f78101bca81): schedule anything updated at least once per year but less than daily; filename `update-{namespace}-{short_name}.yml`; a cron `schedule:` trigger + `imjohnbo/issue-bot` creating the issue. This step runs now because 6c just established the two cadence facts the cron must match — `dataset.update_period_days` and the producer's actual release rhythm (`source.release_date` / `next_release` in `update-context.yml`).
+
+   **Locate the workflow.** The filename convention is loosely followed in practice, so search in widening circles — a miss on the exact name proves nothing:
+   1. Use the local checkout `~/owid-issues` if present (`git -C ~/owid-issues pull` first); otherwise browse via `gh api repos/owid/owid-issues/contents/.github/workflows --jq '.[].name'`.
+   2. Exact conventional name `update-<namespace>-<short_name>.yml` → fuzzy filename match (hyphen/underscore swaps, dataset-title words — e.g. `update-gallup-ai-indicator.yml` covers `gallup/ai_indicator`) → content grep (`rg -il "<short_name>|<namespace>|<title words>" ~/owid-issues/.github/workflows/`).
+   3. **Group workflows count.** One workflow may cover a family of related datasets (e.g. `update-climate.yml` → `/climate-update`; the quarterly `update-war-ucdp-preview-q*.yml` set; an "… + OMM" title covering a derived chain). If a group workflow covers this dataset, verify that workflow — don't create a per-dataset duplicate.
+
+   **If found, verify three things:**
+   1. **Frequency + timing.** Parse the `cron:` line. The implied period must be consistent with `update_period_days` *and* with the release cadence observed this update. Check the timing within the cycle too: the issue should fire shortly **after** the producer's expected publication window, never before (existing precedents: Gallup `0 8 15 */3 *` — mid-month, just after the wave publishes; OECD health expenditure `0 0 8 7 *` — right after the early-July release). If this update revealed that the cadence or window shifted, propose a new cron with a `#` comment in the YAML explaining the timing choice (matching the existing style) — **cron changes need user sign-off before committing**.
+   2. **Naming.** The filename should be `update-{namespace}-{short_name}.yml`. Deviations → flag in the report only; don't rename (churn, and behavior doesn't depend on the filename). Exception: a file missing its `.yml`/`.yaml` extension is genuinely broken — GitHub Actions silently ignores it — fix that without asking.
+   3. **Actionable issue body.** The body should name the dataset (no version — versions go stale) and tell the next updater to activate the Claude skill:
+      ````yaml
+      title: "Data update: <dataset title>"
+      body: |
+        Update the <dataset title> dataset (`<namespace>/<short_name>`).
+
+        To run the update with Claude Code, run:
+
+        ```
+        /update-dataset <short_name>
+        ```
+      ````
+      For group workflows, keep it a **single command listing every member dataset** — `/update-dataset <short_name1> <short_name2>` — or point at the family skill (e.g. `/climate-update`). If the body lacks the `/update-dataset` pointer or references a renamed path, refresh it — body/title fixes are auto-applied and reported afterwards, no need to ask. Also check `assignees:` still points at the dataset's current owner; flag a mismatch, don't auto-change.
+
+   **If not found:** per the Notion rule, any dataset with `update_period_days` roughly in [2, 366] should have a scheduled issue (err on the side of scheduling too much). Propose creating one: copy an existing workflow as template (`imjohnbo/issue-bot@v3.3.6` shape; keep `close-previous: false` and its WARNING comment), cron shortly after the expected release window, `assignees:` = the GitHub handle of the human directing this update (team table in CLAUDE.md), filename per the convention, title/body per the template above. If this update touched several related datasets, propose **one grouped workflow** rather than several. **Creating a new workflow needs user sign-off.**
+
+   **Committing.** Commit in `~/owid-issues` straight to `main` — the standing exception to the branch-first rule; no branch, no PR — with an emoji+🤖 message (e.g. `🔨🤖 Point <short_name> update issue at /update-dataset`), and push. Record the outcome (workflow file, cron, verdict, changes made) in `progress.md` and set `source.scheduled_issue_workflow` in `update-context.yml`. Nothing about this lands in the etl PR body beyond the existing tracking-issue link.
+
 7) Indicator upgrade (optional, staging only)
    - First upload the new grapher dataset to the staging DB (required before the upgrader can detect it):
      ```bash
@@ -587,6 +618,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        next_release: <best-effort, or null>
        url_main: <source page, if known>
        citation_full: <citation, if known>
+       scheduled_issue_workflow: <owid-issues update-*.yml filename, or null (from 6d)>
      coverage:
        year_min: <garden min year>
        year_max: <garden max year>
