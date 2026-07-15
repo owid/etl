@@ -130,10 +130,10 @@ steps:
         - snapshot://eurostat/2026-04-07/generative_ai_use.gz
 
   # Gallup - Artificial Intelligence indicator
-  data://grapher/gallup/2026-04-03/ai_indicator:
-    - data://garden/gallup/2026-04-03/ai_indicator:
-      - data://meadow/gallup/2026-04-03/ai_indicator:
-        - snapshot://gallup/2026-04-03/ai_indicator.csv
+  data://grapher/gallup/2026-07-15/ai_indicator:
+    - data://garden/gallup/2026-07-15/ai_indicator:
+      - data://meadow/gallup/2026-07-15/ai_indicator:
+        - snapshot://gallup/2026-07-15/ai_indicator.csv
   ########################
   # AI Index Report 2026
   ############################
@@ -157,8 +157,3 @@ steps:
       - data://garden/bls/2026-03-20/us_consumer_prices
       - data://meadow/artificial_intelligence/2026-04-27/cset:
         - snapshot://artificial_intelligence/2026-04-27/cset.zip
-  # Gallup - Artificial Intelligence indicator
-  data://grapher/gallup/2026-07-15/ai_indicator:
-    - data://garden/gallup/2026-07-15/ai_indicator:
-      - data://meadow/gallup/2026-07-15/ai_indicator:
-        - snapshot://gallup/2026-07-15/ai_indicator.csv
