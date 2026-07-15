@@ -62,10 +62,6 @@ dimensions:
       - slug: "solar_and_wind"
         name: "Solar and wind"
         group: "Aggregates"
-      - slug: "fossil_nuclear_renewables"
-        name: "Fossil fuels, nuclear and renewables"
-        description: "The three main groups of sources, stacked"
-        group: "Aggregates"
   - slug: "metric"
     name: "Metric"
     choices:

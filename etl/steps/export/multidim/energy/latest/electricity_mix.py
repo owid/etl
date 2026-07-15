@@ -136,12 +136,6 @@ def run() -> None:
                 "choice_new_slug": "all_sources",
                 "view_config": stacked_view_config,
             },
-            {
-                "dimension": "source",
-                "choices": ["renewables", "nuclear", "fossil"],
-                "choice_new_slug": "fossil_nuclear_renewables",
-                "view_config": stacked_view_config,
-            },
         ],
         params={
             "title": lambda view: metric_titles[view.dimensions["metric"]],
@@ -239,14 +233,7 @@ def _view_subtitle(source: str, metric: str) -> str:
 
 def _grouped_subtitle(view) -> str:
     """Subtitle for the stacked breakdown views."""
-    metric = view.dimensions["metric"]
-    unit = METRIC_UNIT_PHRASE[metric]
-    if view.dimensions["source"] == "fossil_nuclear_renewables":
-        return (
-            f"{unit} Fossil fuels are coal, oil, and gas; renewables include solar, wind, hydropower, "
-            "bioenergy, geothermal, wave, and tidal."
-        )
-    return unit
+    return METRIC_UNIT_PHRASE[view.dimensions["metric"]]
 
 
 # Map color scheme per (source, metric), copied from the original production charts each view replaces

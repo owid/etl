@@ -135,26 +135,17 @@ def run() -> None:
                 "choice_new_slug": "all_sources",
                 "view_config": stacked_view_config,
             },
-            {
-                "dimension": "source",
-                "choices": ["renewables", "nuclear", "fossil_fuels"],
-                "choice_new_slug": "fossil_nuclear_renewables",
-                "view_config": stacked_view_config,
-            },
         ],
         params={
             "title": lambda view: metric_titles[view.dimensions["metric"]],
             "subtitle": _grouped_subtitle,
         },
     )
-    # Stacked areas of year-on-year changes are unreadable; keep breakdowns only for level metrics.
+    # Stacked areas of year-on-year changes are unreadable; keep the breakdown only for level metrics.
     c.views = [
         v
         for v in c.views
-        if not (
-            v.dimensions["source"] in ("all_sources", "fossil_nuclear_renewables")
-            and v.dimensions["metric"] == "annual_change"
-        )
+        if not (v.dimensions["source"] == "all_sources" and v.dimensions["metric"] == "annual_change")
     ]
 
     # Set an explicit title on every single-source view. Otherwise grapher falls back to the
@@ -230,14 +221,7 @@ def _view_subtitle(source: str, metric: str) -> str:
 
 def _grouped_subtitle(view) -> str:
     """Subtitle for the stacked breakdown views."""
-    metric = view.dimensions["metric"]
-    unit = METRIC_UNIT_PHRASE[metric]
-    if view.dimensions["source"] == "fossil_nuclear_renewables":
-        return (
-            f"{unit} Fossil fuels are coal, oil, and gas; renewables include hydropower, solar, wind, "
-            "geothermal, wave and tidal, and bioenergy."
-        )
-    return unit
+    return METRIC_UNIT_PHRASE[view.dimensions["metric"]]
 
 
 # Map color scheme per (source, metric), copied from the original production charts each view replaces
