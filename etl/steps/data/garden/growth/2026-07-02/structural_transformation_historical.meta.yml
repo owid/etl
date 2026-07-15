@@ -1,0 +1,60 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    description_processing: |-
+      This data combines several sources into long-run series of employment numbers and value added shares by broad economic sector for ten countries: Belgium, Finland, France, Japan, the Netherlands, South Korea, Spain, Sweden, the United Kingdom and the United States. The base is the dataset published by Herrendorf, Rogerson and Valentinyi (2014), updated country by country with the GGDC 10-Sector Database (January 2015 release), the Swedish Historical National Accounts (Sweden's value added; Sweden's employment follows Herrendorf, Rogerson and Valentinyi's published series, based on Krantz and Schön), and the Bureau of Economic Analysis' GDP by industry statistics for the United States. The country-by-country combination follows the methodology described in https://assets.ourworldindata.org/uploads/2017/10/Documentation-for-Historical-employment-and-output-by-sector-%E2%80%93-OWID-2017.pdf.
+    description_key:
+      - Following Herrendorf, Rogerson and Valentinyi (2014), economic activities are classified into agriculture, industry and services, with utilities included within services rather than industry.
+    presentation:
+      topic_tags:
+        - Economic Growth
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Long-run employment and GDP shares by sector (historical compilation)
+  update_period_days: 0
+
+tables:
+  structural_transformation_historical:
+    variables:
+      number_employed_agriculture:
+        title: Number of people employed in agriculture (historical)
+        unit: people
+        description_short: Number of people employed in agriculture, hunting, forestry and fishing.
+        display:
+          numDecimalPlaces: 0
+      number_employed_industry:
+        title: Number of people employed in industry (historical)
+        unit: people
+        description_short: Number of people employed in mining, manufacturing and construction.
+        display:
+          numDecimalPlaces: 0
+      number_employed_services:
+        title: Number of people employed in services (historical)
+        unit: people
+        description_short: Number of people employed in services, including utilities.
+        display:
+          numDecimalPlaces: 0
+      share_gdp_agriculture:
+        title: Share of agriculture in GDP at current prices (historical)
+        unit: "%"
+        short_unit: "%"
+        description_short: Value added of agriculture as a share of the total value added of the three broad sectors, at current prices.
+        display:
+          numDecimalPlaces: 1
+      share_gdp_industry:
+        title: Share of industry in GDP at current prices (historical)
+        unit: "%"
+        short_unit: "%"
+        description_short: Value added of industry as a share of the total value added of the three broad sectors, at current prices.
+        display:
+          numDecimalPlaces: 1
+      share_gdp_services:
+        title: Share of services in GDP at current prices (historical)
+        unit: "%"
+        short_unit: "%"
+        description_short: Value added of services (including utilities) as a share of the total value added of the three broad sectors, at current prices.
+        display:
+          numDecimalPlaces: 1

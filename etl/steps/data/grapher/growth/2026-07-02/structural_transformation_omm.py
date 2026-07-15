@@ -11,16 +11,16 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset()
+    ds_garden = paths.load_dataset("structural_transformation_omm")
 
     # Read table from garden dataset.
-    tb = ds_garden["shares_and_numbers_employed_by_sector__world_bank_and_historical_sources"]
+    tb = ds_garden.read("structural_transformation_omm", reset_index=False)
 
     #
     # Save outputs.
     #
-    # Create a new grapher dataset with the same metadata as the garden dataset.
+    # Initialize a new grapher dataset.
     ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
 
-    # Save changes in the new grapher dataset.
+    # Save grapher dataset.
     ds_grapher.save()

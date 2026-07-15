@@ -28,9 +28,6 @@ steps:
   data://grapher/health/2019-05-14/human_height__ncd_risc__2017:
     - data://garden/health/2019-05-14/human_height__ncd_risc__2017:
         - snapshot://health/2019-05-14/human_height__ncd_risc__2017.feather
-  data-private://grapher/labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources:
-    - data-private://garden/labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources:
-        - snapshot-private://labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources.feather
   data-private://grapher/bank_of_england/2020-01-21/a_millennium_of_macroeconomic_data__bank_of_england__2016:
     - data-private://garden/bank_of_england/2020-01-21/a_millennium_of_macroeconomic_data__bank_of_england__2016:
         - snapshot-private://bank_of_england/2020-01-21/a_millennium_of_macroeconomic_data__bank_of_england__2016.feather
