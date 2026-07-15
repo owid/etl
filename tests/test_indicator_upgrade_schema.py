@@ -371,3 +371,50 @@ def test_no_inheritance_strips_schema_defaults():
     # Without inheritance, hasMapTab=false should be stripped (matches schema default)
     assert "hasMapTab" not in config_new
     assert config_new["dimensions"][0]["variableId"] == 200
+
+
+def test_fetch_single_indicator_config_uses_y_dimension_and_empty_baseline(monkeypatch):
+    """Regression test: `_fetch_single_indicator_config` used to give up (return None,
+    triggering the conservative "keep everything" fallback) for any chart with more than
+    one dimension -- e.g. a `color` dimension besides `y` -- even though title/subtitle/map
+    inheritance is really driven by the `y` indicator alone. It also returned None when the
+    indicator simply has no `grapherConfigETL` row, which is indistinguishable downstream
+    from "we don't know the baseline at all" -- but "no ETL config" really means "inherits
+    nothing", i.e. the baseline *is* the plain schema defaults, which should return `{}` so
+    `compute_inheritance_patch` can safely strip schema-default bloat.
+
+    Found via a real chart (gdp-per-capita-worldbank, id 225) that has a `color` dimension
+    and was getting its entire resolved config (map/yAxis/etc. schema defaults included)
+    pinned as if every field were a deliberate override.
+    """
+    import pandas as pd
+
+    from apps.indicator_upgrade import upgrade as upgrade_module
+
+    calls = []
+
+    def fake_read_sql(sql, engine, params: dict):
+        calls.append(params)
+        if params["vid"] == 900801:
+            raise AssertionError("should query the y-dimension's variable, not the color one")
+        if params["vid"] == 1292289:
+            return pd.DataFrame([{"full": '{"title": "GDP per capita"}'}])
+        return pd.DataFrame()  # no grapherConfigETL for this variable
+
+    monkeypatch.setattr(upgrade_module, "read_sql", fake_read_sql)
+    monkeypatch.setattr(upgrade_module, "get_engine", lambda: None)
+
+    chart_config = {
+        "dimensions": [
+            {"property": "y", "variableId": 1204826},
+            {"property": "color", "variableId": 900801},
+        ]
+    }
+    result = upgrade_module._fetch_single_indicator_config(chart_config, {1204826: 1292289})
+    assert result == {"title": "GDP per capita"}
+    assert len(calls) == 1
+
+    # Single dimension, but its variable has no grapherConfigETL at all.
+    chart_config_no_config = {"dimensions": [{"property": "y", "variableId": 1204331}]}
+    result_no_config = upgrade_module._fetch_single_indicator_config(chart_config_no_config, {1204331: 1291785})
+    assert result_no_config == {}

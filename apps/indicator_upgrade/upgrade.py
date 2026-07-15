@@ -39,18 +39,31 @@ def get_affected_charts_cli(indicator_mapping: dict[int, int]) -> list[gm.Chart]
 
 
 def _fetch_single_indicator_config(chart_config: dict, indicator_mapping: dict[int, int]) -> dict | None:
-    """Fetch the ETL grapher config of a chart's own indicator, if it uses exactly one.
+    """Fetch the ETL grapher config of a chart's own (primary) indicator.
 
-    This is the baseline a single-indicator, inheritance-enabled chart inherits from, used
-    by `compute_inheritance_patch` to strip only the fields that would resolve to the same
-    value anyway (see #5911 and its follow-up fix). Returns None for multi-indicator charts,
-    since merging several indicators' inherited defaults isn't handled here -- those charts
-    fall back to the conservative keep-everything behavior.
+    This is the baseline an inheritance-enabled chart inherits from, used by
+    `compute_inheritance_patch` to strip only the fields that would resolve to the same
+    value anyway (see #5911 and its follow-up fix).
+
+    For a chart with more than one dimension (e.g. a `color` or `size` variable besides
+    `y`), title/subtitle/map/etc. inheritance is driven by the `y` dimension's own
+    indicator, not the secondary ones -- so we use that one specifically rather than
+    giving up. Falls back to the first dimension with a variable ID if there's no `y`
+    dimension (e.g. scatter plots with only x/y numeric axes and no property named "y").
+
+    Returns `{}` -- not None -- when the (single) indicator has no `grapherConfigETL` at
+    all: that means inheritance provides nothing, so the effective baseline *is* just the
+    generic schema defaults, which `compute_inheritance_patch` handles safely (as opposed
+    to None, which triggers the separate, more conservative "no baseline known at all"
+    keep-everything fallback in `ChartIndicatorUpdater.run`).
+    Returns None only when the chart has no dimension with a variable ID to look up at all.
     """
-    variable_ids = {dim.get("variableId") for dim in chart_config.get("dimensions", []) if dim.get("variableId")}
-    if len(variable_ids) != 1:
+    dimensions = chart_config.get("dimensions", [])
+    y_dims = [dim for dim in dimensions if dim.get("property") == "y" and dim.get("variableId")]
+    candidates = y_dims or [dim for dim in dimensions if dim.get("variableId")]
+    if not candidates:
         return None
-    variable_id = indicator_mapping.get(next(iter(variable_ids)), next(iter(variable_ids)))
+    variable_id = indicator_mapping.get(candidates[0]["variableId"], candidates[0]["variableId"])
 
     df = read_sql(
         "SELECT cc.full FROM variables v JOIN chart_configs cc ON cc.id = v.grapherConfigIdETL WHERE v.id = %(vid)s",
@@ -58,7 +71,7 @@ def _fetch_single_indicator_config(chart_config: dict, indicator_mapping: dict[i
         params={"vid": int(variable_id)},
     )
     if df.empty:
-        return None
+        return {}
     full = df.iloc[0]["full"]
     return json.loads(full) if isinstance(full, (str, bytes)) else full
 
