@@ -65,7 +65,7 @@ dimensions:
         name: "Energy supply"
         description: "Energy supply, in terawatt-hours"
       - slug: "per_capita"
-        name: "Per capita"
+        name: "Per capita supply"
         description: "Energy supply per person, in kilowatt-hours"
       - slug: "share"
         name: "Share of total"

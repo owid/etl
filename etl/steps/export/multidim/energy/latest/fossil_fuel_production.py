@@ -117,6 +117,16 @@ def _view_title(fuel: str, metric: str) -> str:
     }[metric]
 
 
+# Composition note appended to the total (all fossil fuels) views, so the subtitle spells out what
+# "fossil fuels" covers.
+FOSSIL_FUELS_NOTE = "Fossil fuels include coal, oil, and gas."
+
+
+def _view_subtitle(fuel: str, metric: str) -> str:
+    unit = METRIC_UNIT_PHRASE[metric]
+    return f"{unit} {FOSSIL_FUELS_NOTE}" if fuel == "total" else unit
+
+
 # Aggregates that can be decomposed "by fuel" (only the total), mapped to their constituent fuels
 # (listed top-to-bottom for the stacked chart, so coal sits at the bottom).
 AGGREGATE_DECOMPOSITION = {"total": ["gas", "oil", "coal"]}
@@ -216,6 +226,6 @@ def set_view_titles(c, dims_max: dict) -> None:
         metric = v.dimensions["metric"]
         config = dict(v.config or {})
         config["title"] = _view_title(fuel, metric)
-        config["subtitle"] = METRIC_UNIT_PHRASE[metric]
+        config["subtitle"] = _view_subtitle(fuel, metric)
         config["map"] = _map_config(fuel, metric, dims_max.get((fuel, metric)))
         v.config = config

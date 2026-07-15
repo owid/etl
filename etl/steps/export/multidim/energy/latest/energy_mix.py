@@ -147,10 +147,10 @@ def _view_title(source: str, metric: str) -> str:
         }[metric]
     name = SOURCE_TITLE_NAMES[source]
     return {
-        "total": f"Energy supply from {name}",
-        "per_capita": f"Energy supply from {name} per person",
-        "share": f"Share of energy supply from {name}",
-        "annual_change": f"Annual change in energy supply from {name}",
+        "total": f"Total energy supply from {name}",
+        "per_capita": f"Total energy supply from {name} per person",
+        "share": f"Share of total energy supply from {name}",
+        "annual_change": f"Annual change in total energy supply from {name}",
     }[metric]
 
 
