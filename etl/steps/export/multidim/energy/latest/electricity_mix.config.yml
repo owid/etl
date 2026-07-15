@@ -87,10 +87,10 @@ dimensions:
         description: "Carbon intensity of electricity, in grams of CO2 per kilowatt-hour"
       - slug: "by_source"
         name: "By source"
-        description: "Broken down into constituent sources, stacked"
+        description: "Electricity generation broken down by source, stacked"
       - slug: "by_source_per_capita"
         name: "By source, per capita"
-        description: "Constituent sources per person, stacked"
+        description: "Electricity generation per person, broken down by source, stacked"
 views:
   # Views are generated programmatically in the step.
   []

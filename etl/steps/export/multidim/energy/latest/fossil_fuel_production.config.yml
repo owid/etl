@@ -33,10 +33,10 @@ dimensions:
         description: "Years of production left at current rates (World only)"
       - slug: "by_fuel"
         name: "By fuel"
-        description: "Broken down into coal, oil and gas, stacked"
+        description: "Fossil fuel production broken down by fuel, stacked"
       - slug: "by_fuel_per_capita"
         name: "By fuel, per capita"
-        description: "Coal, oil and gas per person, stacked"
+        description: "Fossil fuel production per person, broken down by fuel, stacked"
 views:
   # Views are generated programmatically in the step.
   []
