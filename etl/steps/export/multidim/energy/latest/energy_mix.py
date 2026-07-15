@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from etl.collection.model.view import View, ViewIndicators
+from etl.collection.model.view import Indicator, View, ViewIndicators
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -109,6 +109,9 @@ def run() -> None:
     # Add "by source" stacked views that decompose each aggregate into its constituent sources.
     add_decomposition_views(c)
 
+    # Add the carbon-intensity-of-energy view (Total only), from the Global Carbon Budget.
+    add_carbon_intensity_view(c)
+
     #
     # Save outputs.
     #
@@ -200,6 +203,32 @@ _DECOMPOSITION_STEM = {
 def _decomposition_title(source: str, base_metric: str) -> str:
     stem = _DECOMPOSITION_STEM[source]
     return f"{stem} per person, by source" if base_metric == "per_capita" else f"{stem} by source"
+
+
+# Carbon intensity of energy (CO2 per unit of total energy supply) lives in the Global Carbon Budget,
+# which already divides emissions by this same TES. Referenced by short path, expanded via the dep.
+CARBON_INTENSITY_INDICATOR = "global_carbon_budget#emissions_total_per_unit_energy"
+
+
+def add_carbon_intensity_view(c) -> None:
+    """Add the Total-only carbon-intensity view, sourced from the Global Carbon Budget."""
+    config = {
+        "hasMapTab": True,
+        "tab": "map",
+        "chartTypes": ["LineChart", "DiscreteBar"],
+        "title": "Carbon intensity of energy",
+        "subtitle": (
+            "Measured in grams of CO₂ emitted per [kilowatt-hour](#dod:watt-hours) of "
+            "[total energy supply](#dod:total-energy-supply)."
+        ),
+        "map": {"colorScale": {"baseColorScheme": "YlOrBr"}, "timeTolerance": 3},
+    }
+    view = View(
+        dimensions={"source": "total", "metric": "carbon_intensity"},
+        indicators=ViewIndicators(y=[Indicator(catalogPath=CARBON_INTENSITY_INDICATOR)]),
+        config=config,
+    )
+    c.views.append(view)
 
 
 def add_decomposition_views(c) -> None:

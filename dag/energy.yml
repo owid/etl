@@ -127,6 +127,10 @@ steps:
     - data://garden/energy/2026-06-30/energy_mix
   export://multidim/energy/latest/energy_mix:
     - data://grapher/energy/2026-06-30/energy_mix
+    # Carbon intensity of energy (CO2 per unit of total energy supply) comes from the Global Carbon
+    # Budget, which itself divides emissions by the energy_mix TES. Referencing it here (downstream of
+    # both) is a diamond, not a cycle.
+    - data://grapher/gcp/2025-11-13/global_carbon_budget
   #
   # Energy - Fossil fuel production (2026 Statistical Review, incl. reserves-to-production ratio).
   #

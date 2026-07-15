@@ -79,6 +79,9 @@ dimensions:
       - slug: "by_source_per_capita"
         name: "By source, per capita"
         description: "Constituent sources per person, stacked"
+      - slug: "carbon_intensity"
+        name: "Carbon intensity"
+        description: "CO2 emitted per unit of total energy supply"
 views:
   # Views are generated programmatically in the step.
   []
