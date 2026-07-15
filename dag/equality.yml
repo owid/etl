@@ -1,10 +1,10 @@
 steps:
 
-  # LGBTI National Policy Dataset (Velasco, 2026)
-  data://grapher/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
-    - data://garden/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
-      - data://meadow/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
-        - snapshot://lgbt_rights/2026-05-11/lgbti_national_policy_dataset.csv
+  # LGBTI National Policy Dataset (Velasco, 2026) — 2026-06-12 OSF revision
+  data://grapher/lgbt_rights/2026-07-15/lgbti_national_policy_dataset:
+    - data://garden/lgbt_rights/2026-07-15/lgbti_national_policy_dataset:
+      - data://meadow/lgbt_rights/2026-07-15/lgbti_national_policy_dataset:
+        - snapshot://lgbt_rights/2026-07-15/lgbti_national_policy_dataset.csv
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
       - data://garden/wb/2026-07-01/income_groups
@@ -55,11 +55,3 @@ steps:
     - data://garden/wb/2026-07-01/income_groups
   data://grapher/pew/2026-06-03/same_sex_marriage:
     - data://garden/pew/2026-06-03/same_sex_marriage
-  # LGBTI National Policy Dataset (Velasco, 2026) — 2026-06-12 OSF revision
-  data://grapher/lgbt_rights/2026-07-15/lgbti_national_policy_dataset:
-    - data://garden/lgbt_rights/2026-07-15/lgbti_national_policy_dataset:
-      - data://meadow/lgbt_rights/2026-07-15/lgbti_national_policy_dataset:
-        - snapshot://lgbt_rights/2026-07-15/lgbti_national_policy_dataset.csv
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/demography/2024-07-15/population
-      - data://garden/wb/2026-07-01/income_groups

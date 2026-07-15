@@ -18,9 +18,11 @@ meta:
     # Proportion cells vs the 2026-03-23 release) while keeping the "Version 2.0" label — the
     # version_producer field can't distinguish revisions; compare file dates on OSF when updating.
     date_published: '2026-06-12'
+    # NOTE: The OSF project declares no license (verified 2026-07-15, and in the April 2026 Wayback
+    # capture) and the producer's site states none, so the earlier "CC BY 4.0" claim was unsupported.
+    # Producer copyright is the conservative default until Velasco confirms terms — update on reply.
     license:
-      name: CC BY 4.0
-      url: https://osf.io/wta9p/overview
+      name: © Kristopher Velasco
 outs:
   - md5: c39c9aac33547de3320e0be62b40c091
     size: 83399301
