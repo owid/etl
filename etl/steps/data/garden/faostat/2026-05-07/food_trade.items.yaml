@@ -29,7 +29,6 @@ items:
   - display: Apricots
     item_codes:
       526: Apricots
-      527: Apricots, dried
   - display: Artichokes
     item_codes:
       366: Artichokes
@@ -195,7 +194,6 @@ items:
   - display: Grapes
     item_codes:
       560: Grapes
-      561: Raisins
   - display: Green beans
     item_codes:
       414: Other beans, green
@@ -349,7 +347,6 @@ items:
   - display: Plums
     item_codes:
       536: Plums and sloes
-      537: Plums, dried
   - display: Poppy seed
     item_codes:
       296: Poppy seed
