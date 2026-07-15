@@ -81,7 +81,7 @@ Read both `.dvc` files (old and new) and produce a side-by-side table for these 
 |---|---|
 | `title` | Reasonable update if scope changed |
 | `description` | Updated to reflect new source / scope |
-| `date_published` | **Must differ from `date_accessed`** — source from `url_main` or the file. If unsure, ask. |
+| `date_published` | **Should normally differ from `date_accessed`** — source from `url_main` or the file. Equality is legitimate only as the documented fallback when no producer release date is discoverable (e.g. a scraped page carries fresh rows but no updated stamp — see `/update-dataset` Guardrails, "Scraped chart embeds"); expect a `.dvc` comment explaining it, and flag 🟡 for the author to confirm rather than 🔴. Bare equality with no rationale: ask. |
 | `date_accessed` | Updated to today (or run-date) |
 | `producer` / `attribution_short` | Same source, same values (unless changed deliberately) |
 | `citation_full` / `attribution` | **Year bumped to the new release year** — `etl update` copies both verbatim from the old `.dvc`, so a stale year ships silently. 🔴 if still the old version's year. |
