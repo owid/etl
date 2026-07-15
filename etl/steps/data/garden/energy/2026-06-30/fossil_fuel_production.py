@@ -185,6 +185,30 @@ def add_variable_metadata(tb: Table) -> Table:
                 tb[column].metadata.title = title
                 tb[column].metadata.unit = unit
                 tb[column].metadata.short_unit = short_unit
+                # Set display.name to the fuel's clean name so stacked-chart series read "Coal", not
+                # "Coal production" (some columns otherwise inherit the full title as display.name).
+                display = dict(tb[column].metadata.display or {})
+                display["name"] = name
+                tb[column].metadata.display = display
+    return tb
+
+
+def add_total_fossil_fuels(tb: Table) -> Table:
+    """Add total fossil fuel production (coal + oil + gas), absolute and per capita."""
+    specs = {
+        "production_twh": ("Fossil fuel production", "terawatt-hours", "TWh"),
+        "production_per_capita_kwh": ("Fossil fuel production per capita", "kilowatt-hours per person", "kWh"),
+    }
+    for suffix, (title, unit, short_unit) in specs.items():
+        cols = [f"{fuel}_{suffix}" for fuel in FUELS]
+        # Table.sum(axis=1) preserves the columns' metadata/origins. min_count=1 keeps NaN only where
+        # every fuel is missing (a coal-only producer's total is just its coal production).
+        tb[f"total_{suffix}"] = tb[cols].sum(axis=1, min_count=1)
+        meta = tb[f"total_{suffix}"].metadata
+        meta.title = title
+        meta.unit = unit
+        meta.short_unit = short_unit
+        meta.display = {"name": "Fossil fuels"}
     return tb
 
 
@@ -244,6 +268,9 @@ def run() -> None:
     # Add annual change and per-capita variables.
     tb = add_annual_change(tb=tb)
     tb = add_per_capita(tb=tb)
+
+    # Add total fossil fuel production (coal + oil + gas), absolute and per capita.
+    tb = add_total_fossil_fuels(tb=tb)
 
     # Add World reserves-to-production ratios.
     tb = add_reserves_to_production_ratio(tb=tb, tb_review=tb_review)

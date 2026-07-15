@@ -1,5 +1,8 @@
 """Multidim for fossil fuel production (fuel x metric)."""
 
+from copy import deepcopy
+
+from etl.collection.model.view import View, ViewIndicators
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -31,6 +34,9 @@ COLUMN_DIMENSIONS = {
         f"{fuel}_reserves_to_production_ratio": {"fuel": fuel, "metric": "reserves_ratio"}
         for fuel in ["coal", "oil", "gas"]
     },
+    # Total fossil fuel production (the aggregate that the "by fuel" breakdown decomposes).
+    "total_production_twh": {"fuel": "total", "metric": "production"},
+    "total_production_per_capita_kwh": {"fuel": "total", "metric": "per_capita"},
 }
 
 
@@ -76,44 +82,12 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
-    # Add a stacked breakdown view with all three fuels.
-    metric_titles = {
-        "production": "Fossil fuel production by fuel",
-        "per_capita": "Per capita fossil fuel production by fuel",
-        "reserves_ratio": "Reserves-to-production ratio",
-    }
-    # NOTE: choices are listed top-to-bottom because grapher's StackedArea renders the first series at
-    # the top, so listing coal last puts it at the bottom, matching the original charts.
-    c.group_views(
-        groups=[
-            {
-                "dimension": "fuel",
-                "choices": ["gas", "oil", "coal"],
-                "choice_new_slug": "all_fuels",
-                "view_config": {
-                    "chartTypes": ["StackedArea"],
-                    "tab": "chart",
-                    "hasMapTab": False,
-                    "title": "{title}",
-                    "subtitle": "{subtitle}",
-                    # Show grapher's relative toggle so users can flip the stack to share-of-total (100%).
-                    "hideRelativeToggle": False,
-                },
-            },
-        ],
-        params={
-            "title": lambda view: metric_titles[view.dimensions["metric"]],
-            "subtitle": lambda view: METRIC_UNIT_PHRASE[view.dimensions["metric"]],
-        },
-    )
-    # Stacking reserves-to-production ratios (years of production left) makes no sense; drop that combination.
-    c.views = [
-        v for v in c.views if not (v.dimensions["fuel"] == "all_fuels" and v.dimensions["metric"] == "reserves_ratio")
-    ]
-
     # Set an explicit title on every single-fuel view, so grapher does not fall back to the
-    # indicator display name. The grouped (stacked) view already carries a title from group_views.
+    # indicator display name.
     set_view_titles(c, dims_max)
+
+    # Add "by fuel" stacked views that decompose total fossil fuel production into coal, oil and gas.
+    add_decomposition_views(c)
 
     #
     # Save outputs.
@@ -121,7 +95,8 @@ def run() -> None:
     c.save()
 
 
-FUEL_TITLE_NAMES = {"coal": "coal", "oil": "oil", "gas": "gas"}
+# Single-fuel views (coal/oil/gas) plus the "total" aggregate get an explicit title/subtitle/map.
+FUEL_TITLE_NAMES = {"total": "fossil fuels", "coal": "coal", "oil": "oil", "gas": "gas"}
 
 # Unit phrase per metric, used for both single-fuel and stacked views.
 METRIC_UNIT_PHRASE = {
@@ -132,12 +107,56 @@ METRIC_UNIT_PHRASE = {
 
 
 def _view_title(fuel: str, metric: str) -> str:
+    if fuel == "total":
+        return {"production": "Fossil fuel production", "per_capita": "Fossil fuel production per person"}[metric]
     name = FUEL_TITLE_NAMES[fuel]
     return {
         "production": f"{name.capitalize()} production",
         "per_capita": f"{name.capitalize()} production per person",
         "reserves_ratio": f"Reserves-to-production ratio for {name}",
     }[metric]
+
+
+# Aggregates that can be decomposed "by fuel" (only the total), mapped to their constituent fuels
+# (listed top-to-bottom for the stacked chart, so coal sits at the bottom).
+AGGREGATE_DECOMPOSITION = {"total": ["gas", "oil", "coal"]}
+# Base metric each decomposition is built from -> the metric slug it becomes.
+_DECOMPOSITION_METRICS = {"production": "by_fuel", "per_capita": "by_fuel_per_capita"}
+
+
+def _decomposition_title(base_metric: str) -> str:
+    return (
+        "Fossil fuel production per person, by fuel"
+        if base_metric == "per_capita"
+        else "Fossil fuel production by fuel"
+    )
+
+
+def add_decomposition_views(c) -> None:
+    """Add stacked "by fuel" views that break total fossil fuel production into coal, oil and gas."""
+    base_config = {"chartTypes": ["StackedArea"], "tab": "chart", "hasMapTab": False, "hideRelativeToggle": False}
+    single_views = {(v.dimensions.get("fuel"), v.dimensions.get("metric")): v for v in c.views}
+    for source, constituents in AGGREGATE_DECOMPOSITION.items():
+        for base_metric, new_metric in _DECOMPOSITION_METRICS.items():
+            indicators = []
+            for constituent in constituents:
+                view = single_views.get((constituent, base_metric))
+                if view is not None and view.indicators.y:
+                    indicators.extend(deepcopy(view.indicators.y))
+            if not indicators:
+                continue
+            config = {
+                **base_config,
+                "title": _decomposition_title(base_metric),
+                "subtitle": METRIC_UNIT_PHRASE[base_metric],
+            }
+            new_view = View(
+                dimensions={"fuel": source, "metric": new_metric},
+                indicators=ViewIndicators(y=indicators),
+                config=config,
+            )
+            new_view.mark_as_grouped()
+            c.views.append(new_view)
 
 
 # Map color scheme per (fuel, metric), copied from the original production charts each view replaces
@@ -152,8 +171,8 @@ ORIGINAL_MAP_SCHEMES = {
     ("oil", "production"): {"baseColorScheme": "YlOrRd"},
 }
 
-# Per-fuel fallback for views without a pre-existing chart (e.g. the reserves-to-production ratio).
-FUEL_FALLBACK_SCHEME = {"coal": "OrRd", "oil": "YlOrRd", "gas": "Purples"}
+# Per-fuel fallback for views without a pre-existing chart (e.g. total, and reserves-to-production).
+FUEL_FALLBACK_SCHEME = {"total": "YlOrBr", "coal": "OrRd", "oil": "YlOrRd", "gas": "Purples"}
 
 # All fossil-fuel metrics are unbounded positive magnitudes, so every map uses log-spaced bins with
 # an open-ended top bracket (">X").

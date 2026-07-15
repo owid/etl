@@ -10,15 +10,15 @@ dimensions:
   - slug: "fuel"
     name: "Fuel"
     choices:
+      - slug: "total"
+        name: "Total"
+        description: "All fossil fuels (coal, oil and gas)"
       - slug: "coal"
         name: "Coal"
       - slug: "oil"
         name: "Oil"
       - slug: "gas"
         name: "Gas"
-      - slug: "all_fuels"
-        name: "All fuels (breakdown)"
-        description: "Coal, oil and gas, stacked"
   - slug: "metric"
     name: "Metric"
     choices:
@@ -31,6 +31,12 @@ dimensions:
       - slug: "reserves_ratio"
         name: "Reserves-to-production ratio"
         description: "Years of production left at current rates (World only)"
+      - slug: "by_fuel"
+        name: "By fuel"
+        description: "Broken down into coal, oil and gas, stacked"
+      - slug: "by_fuel_per_capita"
+        name: "By fuel, per capita"
+        description: "Coal, oil and gas per person, stacked"
 views:
   # Views are generated programmatically in the step.
   []

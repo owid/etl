@@ -1,5 +1,8 @@
 """Multidim for the electricity mix (source x metric, plus total-only metrics)."""
 
+from copy import deepcopy
+
+from etl.collection.model.view import View, ViewIndicators
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -108,44 +111,12 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
-    # Add a stacked breakdown view combining all individual sources.
-    # NOTE: "other_renewables" includes bioenergy, so the standalone "bioenergy" choice is left out
-    # of the breakdown to avoid double counting.
-    stacked_view_config = {
-        "chartTypes": ["StackedArea"],
-        "tab": "chart",
-        "hasMapTab": False,
-        "title": "{title}",
-        "subtitle": "{subtitle}",
-        # Show grapher's relative toggle so users can flip the stack to share-of-total (100%).
-        "hideRelativeToggle": False,
-    }
-    metric_titles = {
-        "generation": "Electricity generation by source",
-        "per_capita": "Per capita electricity generation by source",
-        "share_of_generation": "Share of electricity generation by source",
-    }
-    # NOTE: choices are listed top-to-bottom because grapher's StackedArea renders the first series at
-    # the top. Listing the smallest source first puts it at the top and the largest at the bottom,
-    # matching the original charts (e.g. coal at the bottom, other renewables at the top).
-    c.group_views(
-        groups=[
-            {
-                "dimension": "source",
-                "choices": ["other_renewables", "solar", "wind", "hydro", "nuclear", "gas", "oil", "coal"],
-                "choice_new_slug": "all_sources",
-                "view_config": stacked_view_config,
-            },
-        ],
-        params={
-            "title": lambda view: metric_titles[view.dimensions["metric"]],
-            "subtitle": _grouped_subtitle,
-        },
-    )
-
     # Set an explicit title on every single-source view, so grapher does not fall back to the
-    # indicator display name. Grouped (stacked) views already carry a title from group_views.
+    # indicator display name.
     set_view_titles(c, dims_max)
+
+    # Add "by source" stacked views that decompose each aggregate into its constituent sources.
+    add_decomposition_views(c)
 
     #
     # Save outputs.
@@ -231,9 +202,62 @@ def _view_subtitle(source: str, metric: str) -> str:
     return f"{unit} {note}" if note else unit
 
 
-def _grouped_subtitle(view) -> str:
-    """Subtitle for the stacked breakdown views."""
-    return METRIC_UNIT_PHRASE[view.dimensions["metric"]]
+# Aggregates that can be decomposed "by source", mapped to their constituent individual sources.
+# Constituents are listed top-to-bottom for the stacked chart (grapher renders the first series at the
+# top). "other_renewables" already includes bioenergy, so "bioenergy" is left out to avoid double count.
+AGGREGATE_DECOMPOSITION = {
+    "total": ["other_renewables", "solar", "wind", "hydro", "nuclear", "gas", "oil", "coal"],
+    "fossil": ["gas", "oil", "coal"],
+    "renewables": ["other_renewables", "solar", "wind", "hydro"],
+    "low_carbon": ["other_renewables", "solar", "wind", "hydro", "nuclear"],
+    "solar_and_wind": ["solar", "wind"],
+}
+# Base metric each decomposition is built from -> the metric slug it becomes.
+_DECOMPOSITION_METRICS = {"generation": "by_source", "per_capita": "by_source_per_capita"}
+# Title stem per aggregate.
+_DECOMPOSITION_STEM = {
+    "total": "Electricity generation",
+    "fossil": "Electricity from fossil fuels",
+    "renewables": "Electricity from renewables",
+    "low_carbon": "Electricity from low-carbon sources",
+    "solar_and_wind": "Electricity from solar and wind",
+}
+
+
+def _decomposition_title(source: str, base_metric: str) -> str:
+    stem = _DECOMPOSITION_STEM[source]
+    return f"{stem} per person, by source" if base_metric == "per_capita" else f"{stem} by source"
+
+
+def add_decomposition_views(c) -> None:
+    """Add stacked "by source" views that break each aggregate into its constituent sources.
+
+    These live on the metric dimension (by_source / by_source_per_capita) and only exist for
+    aggregates, so grapher hides the metric when an individual source is selected.
+    """
+    base_config = {"chartTypes": ["StackedArea"], "tab": "chart", "hasMapTab": False, "hideRelativeToggle": False}
+    single_views = {(v.dimensions.get("source"), v.dimensions.get("metric")): v for v in c.views}
+    for source, constituents in AGGREGATE_DECOMPOSITION.items():
+        for base_metric, new_metric in _DECOMPOSITION_METRICS.items():
+            indicators = []
+            for constituent in constituents:
+                view = single_views.get((constituent, base_metric))
+                if view is not None and view.indicators.y:
+                    indicators.extend(deepcopy(view.indicators.y))
+            if not indicators:
+                continue
+            config = {
+                **base_config,
+                "title": _decomposition_title(source, base_metric),
+                "subtitle": METRIC_UNIT_PHRASE[base_metric],
+            }
+            new_view = View(
+                dimensions={"source": source, "metric": new_metric},
+                indicators=ViewIndicators(y=indicators),
+                config=config,
+            )
+            new_view.mark_as_grouped()
+            c.views.append(new_view)
 
 
 # Map color scheme per (source, metric), copied from the original production charts each view replaces
