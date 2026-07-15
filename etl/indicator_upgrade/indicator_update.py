@@ -121,6 +121,7 @@ def update_chart_config(
     schema: dict[str, Any],
     indicator_config: dict[str, Any] | None = None,
     dimension_display_baselines: dict[int, dict[str, Any]] | None = None,
+    original_patch: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Update indicator references to the new ones.
 
@@ -131,11 +132,16 @@ def update_chart_config(
     `dimension_display_baselines` maps each dimension's (new) variable ID to that variable's
     own `display` metadata, used to strip the same kind of redundant defaults from
     `dimensions[*].display` -- a separate inheritance path, see prune_dimension_displays.
+    `original_patch` is the chart's own stored `chart_configs.patch` (not `.full`) -- see
+    ChartIndicatorUpdater.run for why this matters for inheritance-enabled charts.
     """
     is_inheritance_enabled = config.get("isInheritanceEnabled", False)
     updater = ChartIndicatorUpdater(indicator_mapping, schema, is_inheritance_enabled=is_inheritance_enabled)
     config_new = updater.run(
-        deepcopy(config), indicator_config=indicator_config, dimension_display_baselines=dimension_display_baselines
+        deepcopy(config),
+        indicator_config=indicator_config,
+        dimension_display_baselines=dimension_display_baselines,
+        original_patch=original_patch,
     )
     return config_new
 
@@ -174,6 +180,7 @@ class ChartIndicatorUpdater:
         config: dict[str, Any],
         indicator_config: dict[str, Any] | None = None,
         dimension_display_baselines: dict[int, dict[str, Any]] | None = None,
+        original_patch: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Run the chart variable updater.
 
@@ -197,11 +204,27 @@ class ChartIndicatorUpdater:
             above (see `prune_dimension_displays`). Applied regardless of
             `is_inheritance_enabled`, since dimension display always inherits from the
             variable's own display metadata.
+        original_patch : Optional[Dict[str, Any]]
+            The chart's own stored `chart_configs.patch` (not `.full`). `config` itself is
+            normally `chart.config`, which SQLAlchemy builds from `.full` -- the fully
+            resolved config, with every value the chart *inherits* from its indicator
+            already merged in. If we tracked "explicitly set" paths from `config` directly,
+            an inherited field the chart never touched (e.g. its title, pulled from the
+            *old* indicator) would be misread as an explicit override, and compared against
+            the *new* indicator's (possibly different) value in `compute_inheritance_patch`
+            -- pinning a stale value as a fake chart-level override instead of letting the
+            chart continue inheriting the new indicator's current value. Using the real
+            stored patch instead means only genuine overrides are ever considered explicit.
+            Falls back to `config` itself (the old, incorrect-for-this-purpose behavior)
+            when not provided, so existing callers that only have `chart.config` available
+            keep working -- just without this protection.
         """
         # Fix errors in schema
         config_new = fix_errors_in_schema(config)
         # Remember which paths were explicitly present before defaults get filled in below.
-        original_config = config_new
+        # Prefer the chart's actual stored patch over `config` itself -- see the
+        # `original_patch` parameter docstring above for why this distinction matters.
+        original_config = fix_errors_in_schema(original_patch) if original_patch is not None else config_new
         # Validate config agains schema
         config_new = validate_chart_config_and_set_defaults(config_new, self.schema)
         # Update map tab

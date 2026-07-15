@@ -114,6 +114,48 @@ def test_dimension_display_stripped_against_variable_baseline():
     assert "numDecimalPlaces" not in display
 
 
+def test_inheritance_pruning_uses_patch_not_full_config():
+    """Regression test (Codex-flagged): `config` passed to update_chart_config is normally
+    `chart.config`, which is built from `chart_configs.full` -- the fully *resolved* config,
+    with every value the chart inherits from its old indicator already merged in. If
+    explicit-field tracking were based on that (rather than the actual stored patch), an
+    inherited title the chart never touched would look "explicit" and get compared against
+    the new indicator's (possibly different) title -- pinning the stale value as a fake
+    chart-level override instead of letting the chart keep inheriting.
+    """
+    schema = _inheritance_schema()
+    schema["properties"]["title"] = {"type": "string"}
+
+    # `full`: the resolved config as chart.config would present it -- title is present only
+    # because it's inherited from the *old* indicator, never set by the chart itself.
+    full_config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "id": 755,
+        "isInheritanceEnabled": True,
+        "title": "Old indicator title",
+        "dimensions": [{"variableId": 100, "property": "y"}],
+    }
+    # The chart's *actual* stored patch never touched title at all.
+    original_patch = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "id": 755,
+        "dimensions": [{"variableId": 100, "property": "y"}],
+    }
+    # The new indicator has since renamed its title.
+    indicator_config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "title": "New indicator title",
+    }
+
+    config_new = update_chart_config(
+        full_config, {100: 200}, schema, indicator_config=indicator_config, original_patch=original_patch
+    )
+
+    # title was never explicitly set by the chart -- it must not be pinned as an override,
+    # so the chart keeps inheriting the indicator's (now-updated) title.
+    assert "title" not in config_new
+
+
 def test_inheritance_preserves_schema_default_overrides():
     """When inheritance is enabled, properties that match schema defaults but override
     indicator defaults should be preserved (not stripped).

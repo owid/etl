@@ -100,6 +100,11 @@ def _update_single_chart(
         get_schema_from_url(chart.config["$schema"]),
         indicator_config=_fetch_single_indicator_config(chart.config, indicator_mapping),
         dimension_display_baselines=_fetch_dimension_display_baselines(chart.config, indicator_mapping),
+        # chart.config is chart_configs.full (the fully resolved config, inherited values
+        # included) -- pass the real stored patch too so inheritance pruning can tell
+        # "genuinely explicit" apart from "just showing through via inheritance from the
+        # old indicator" (see ChartIndicatorUpdater.run's original_patch docstring).
+        original_patch=chart.chart_config.patch,
     )
 
     # Get chart ID
