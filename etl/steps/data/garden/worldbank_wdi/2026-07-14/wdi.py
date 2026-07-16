@@ -45,17 +45,6 @@ REGIONS = [
     "World",
 ]
 
-REGIONS_AGG = [
-    "South Asia (WB)",
-    "North America (WB)",
-    "Sub-Saharan Africa (WB)",
-    "East Asia and Pacific (WB)",
-    "Middle East, North Africa, Afghanistan and Pakistan (WB)",
-    "Europe and Central Asia (WB)",
-    "Latin America and Caribbean (WB)",
-    "World",
-]
-
 # Define the fraction of allowed NaNs per year for the population weighted aggregations
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
@@ -129,20 +118,6 @@ def run() -> None:
     tb_garden = add_ilo_modeling_comparison_indicators(tb_garden)
 
     tb_garden = add_labor_force_breakdown_data(tb=tb_garden, tb_population_wpp=tb_population_wpp)
-
-    # NOTE: This version of WDI doesn't have regional aggregates for internet users (it_net_user_zs).
-    #  I tried to calculate them myself, but some large countries such as India have missing values and
-    #  the time-series looks jagged. It's better to wait for the next WDI release and hope
-    #  they'll bring back aggregations.
-    #
-    # Add population-weighted regional aggregations for internet users
-    # tb_garden = (
-    #     paths.regions.aggregator(regions=REGIONS_AGG, aggregations={"it_net_user_zs": "mean_weighted_by_population"})
-    #     .add_aggregates(
-    #         tb_garden.reset_index(),
-    #     )
-    #     .format(["country", "year"])
-    # )
 
     # Add population-weighted regional aggregations for sh_h2o_basw_zs and sh_sta_bass_zs
     tb_garden = (

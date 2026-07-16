@@ -44,11 +44,11 @@ It's easier to do it in two steps:
 
 ## Next update:
 
-- Indicator `it_net_user_zs` (chart 755) still uses old version because the new one doesn't have regional aggregates.
-  Is it still the case? If we calculate them ourselves, do they look ok?
 - Write a script to auto-approve charts with no changes.
 - ✅ Replaced update_metadata.ipynb with CLI tool (update_wdi_metadata.py) - see above for usage
-- "dataPublisherSource" is no longer returned by WDI. Remove it if that's the case.
+- ✅ Regional aggregates for `it_net_user_zs` are back in the raw source as of the 2026-07-14 release
+  (World, Sub-Saharan Africa (WB), etc. all have real values through 2024) - removed the garden step's
+  dormant custom-aggregation workaround and the now-stale note about chart 755.
 - Check old WDI version and try to switch their charts to new indicators and archive them.
 
 """
