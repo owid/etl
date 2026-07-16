@@ -27,8 +27,9 @@ Any rewrites you propose use American spelling.
 
 ## Inputs
 
-- A step path `garden/<namespace>/<version>/<short_name>` (the `data://` URI form also works), or a bare `<short_name>` — resolve via the DAG like `/update-dataset` does (`rg "/<short_name>:?$" dag/ -g "*.yml" | grep -v "^dag/archive"`, latest active version, ask the user if ambiguous).
+- A step path `garden/<namespace>/<version>/<short_name>` (the `data://` URI form also works), a bare `<short_name>` — resolve via the DAG like `/update-dataset` does (`rg "/<short_name>:?$" dag/ -g "*.yml" | grep -v "^dag/archive"`, latest active version, ask the user if ambiguous).
 - Optional: `--top N` (deep-review cap, default 10) or `--full` (deep-review every indicator regardless of chart usage).
+- Also accepts a **single chart** (slug or id) as the target: scope the whole review to that chart's indicator(s) — verify every displayed country-category/value for the latest year, compare against the previous dataset version, and review the chart's own FAUST text as claims. Drafts count (find them in the staging DB; they have no production row).
 - Precondition: the garden dataset is built locally (`.venv/bin/etlr data://garden/<ns>/<version>/<short_name> --private`; `PREFER_DOWNLOAD=1` is fine for already-published upstream deps).
 
 Scope by calling context:
@@ -45,6 +46,8 @@ Scope by calling context:
 The deep per-indicator work (metadata claim review + online cross-checks) costs real time (~25–45 web calls on a typical dataset), so scope it: deep-review the **top N indicators (default 10) ranked by summed 365-day views of the charts that use them, plus every indicator the anomaly scan flags**. For a brand-new dataset with no charts, review all indicators.
 
 **Never cap silently.** The report's Part 2 must list every skipped indicator with its rank — a truncated review that reads as complete is itself a factual error.
+
+**Views rank prioritization; the DB defines coverage.** Analytics only sees *published* charts — when the task is "all charted indicators" (or the chart under review is a draft), inventory usage from the grapher/staging DB instead (`chart_dimensions` JOIN `variables` on catalogPath, no `publishedAt` filter), then rank the published subset by views.
 
 ```python
 from etl.analytics.config import SEMANTIC_LAYER_SCHEMA as S  # tables must be schema-qualified for BigQuery
@@ -85,10 +88,12 @@ Establish what you're looking at before criticizing anything. Investigative, not
    ```bash
    rg --no-filename -No "https?://[^\"' )>]+" snapshots/<ns>/<version>/ etl/steps/data/{meadow,garden,grapher}/<ns>/<version>/
    ```
-2. **Fetch and READ the producer's own documentation** — methodology pages, indicator definitions, codebooks/data dictionaries, release notes. Not secondary commentary, not a blog post about the source: the source itself. Follow the links from `url_main` to the actual methodology document when the landing page is thin. Access escalation per repo convention: curl → WebFetch → Wayback Machine before treating a 4xx as real.
-3. **Check for an existing `<short_name>.corrections.yml`** next to the garden step. Its entries are *known, already-handled* source errors — acknowledge them in Part 0 of the report; never re-flag them as new findings.
-4. **Establish the pipeline.** For each metric under review: what does the source publish (exact indicator name, unit, definition, granularity, upstream data — official statistics, modeled, survey)? What does OWID add on top (read `description_processing`, the garden step code, and the corrections file)? Every later critique must state whose layer it targets.
-5. **Field-placement audit.** The `.dvc` `meta.origin.description` must carry *producer* content only; garden `description_processing` must carry *OWID* content only; `description_from_producer` must be **verbatim** producer text — diff it against the fetched docs (typography-only drift is fine, paraphrase is not). Beyond placement, each field must be factually consistent with what the docs actually say (units, scope, coverage, method).
+2. **Compare the source's file-modification dates/hashes against our snapshot's `date_accessed`/md5** (e.g. the OSF API lists `date_modified` and hashes per file). Producers replace files in place without bumping version labels — an unchanged version string proves nothing, and an in-place revision is the single highest-yield thing this phase can find.
+3. **Fetch and READ the producer's own documentation** — methodology pages, indicator definitions, codebooks/data dictionaries, release notes. Not secondary commentary, not a blog post about the source: the source itself. Follow the links from `url_main` to the actual methodology document when the landing page is thin. Access escalation per repo convention: curl → WebFetch → Wayback Machine before treating a 4xx as real.
+4. **Check for an existing `<short_name>.corrections.yml`** next to the garden step. Its entries are *known, already-handled* source errors — acknowledge them in Part 0 of the report; never re-flag them as new findings.
+5. **Establish the pipeline.** For each metric under review: what does the source publish (exact indicator name, unit, definition, granularity, upstream data — official statistics, modeled, survey)? What does OWID add on top (read `description_processing`, the garden step code, and the corrections file)? Every later critique must state whose layer it targets.
+   While reading, harvest the codebook's **worked examples as test vectors**: any country/value/date the documentation itself cites must match the data — a codebook example contradicting the shipped file is the strongest class of source error (provable entirely from the producer's own materials).
+6. **Field-placement audit.** The `.dvc` `meta.origin.description` must carry *producer* content only; garden `description_processing` must carry *OWID* content only; `description_from_producer` must be **verbatim** producer text — diff it against the fetched docs (typography-only drift is fine, paraphrase is not). Beyond placement, each field must be factually consistent with what the docs actually say (units, scope, coverage, method).
 
 **HARD RULE — proportionality.** The severity of any provenance or factual critique must be proportional to the depth of verification you achieved. If you read the documentation and confirmed a gap, make a strong claim. If the docs were unreachable after the full escalation, cap the language at "I was unable to verify … — worth checking before merge" and the severity at 🟢. Never assert an error you couldn't check.
 
@@ -171,6 +176,7 @@ Treat each prioritized indicator's user-facing text as a set of claims and attac
 - Does the title / `description_short` overclaim scope — "global" when the source covers reporting countries only, "countries" when it's high-income countries?
 - Does `description_key` state contested definitions as settled, or omit a caveat the producer's own docs (or your Phase-2 literature search) prominently state — coverage gaps, comparability breaks, denominator choices?
 - Are causal or certainty words ("shows", "proves", "leads to", "drives") backed by the source's methodology, or do they smuggle in an interpretation?
+- For categorical indicators built from label maps, list the distinct source labels and verify each maps **explicitly** — values routed to a fallback bucket ("unknown", "other") are silent misclassifications, because the fallback is an existing category and no validation fires. Recommend an `observed labels ⊆ map keys` assert where one is missing.
 - For Jinja-templated metadata, spot-check the *rendered* text readers actually see: `Dataset("data/grapher/<ns>/<version>/<short_name>").read(t, load_data=False)[col].metadata`.
 
 Lead with the concrete rewrite, not the objection. "Add a link" is a valid fix. Match the register and length of the original — prefer a word swap over an added clause.
@@ -231,4 +237,5 @@ In author flows, apply the 🔴 fixes immediately (they're why the skill ran bef
 - Separate data-level from text-level findings — a legitimate metric can sit under overclaiming text, and carefully hedged text can sit on top of broken data.
 - Methodology differences are not errors. Name the specific mechanism before calling a mismatch an error.
 - Factual accuracy only — no style/typo/spacing duplication (see Scope).
+- corrections.yml `override` values on categorical columns must come from the source's *current* vocabulary — assigning a retired label fails with `Cannot setitem on a Categorical`; choose the current-vocabulary value that yields the same published output.
 - No persistent files beyond the `ai/` report — plus, in author flows, the metadata/corrections edits themselves. Ad-hoc analysis scripts run from the session and are not committed.
