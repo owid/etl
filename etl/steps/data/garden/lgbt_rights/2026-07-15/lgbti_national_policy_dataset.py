@@ -906,6 +906,15 @@ def _build_gmc_combined(wide):
         "Surgery+Sterilization": "Surgery and sterilization required",
     }
 
+    # Only a blank requirement may fall into "Legally possible, requirement unknown" — a *labeled*
+    # requirement outside the codebook §4.5 vocabulary means the source changed and REQ_LABELS
+    # must be extended, not silently published as unknown (this bit us in the June 2026 revision).
+    unknown_labels = set(req.dropna().unique()) - set(REQ_LABELS)
+    assert not unknown_labels, (
+        f"Unmapped Gender_Change_Requirement label(s) {sorted(unknown_labels)} — extend REQ_LABELS; "
+        "otherwise these country-years silently publish as 'Legally possible, requirement unknown'."
+    )
+
     def classify(p, r):
         if p == 0:
             return "Not legally possible"
