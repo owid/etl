@@ -4549,7 +4549,7 @@
 # Czechoslovakia, Serbia and Montenegro, Sudan (former), Ethiopia (former), Netherlands Antilles, the
 # former Yemens), Taiwan and Palestine. Membership cross-checked against FAOSTAT's areagroup tables
 # (accessed 2026-02-25). FAO also reports the UN SDG regional grouping in its food-security domains;
-# those SDG regions are intentionally not defined here yet (pending a separate pass).
+# those SDG regions are defined below as a third tier (defined_by fao_sdg).
 ##########
 
 
