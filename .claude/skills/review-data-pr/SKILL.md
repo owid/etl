@@ -89,6 +89,7 @@ Read both `.dvc` files (old and new) and produce a side-by-side table for these 
 | `url_main` | Status check — see step 6 |
 | `url_download` | Status check; OK to remove if data is now fetched via API |
 | `license.url` | Status check |
+| `version_producer` | **Unchanged label + changed payload = in-place revision.** If the producer's version label is the same as the old `.dvc` but the data changed, confirm the author verified the revision against the source's file-modification dates/hashes (not the label) and documented the behavior in a `.dvc` NOTE; `date_published` should be the replacement date. Missing NOTE on a known in-place reviser: 🟡. |
 
 - **Freshness check for scraped snapshots.** When the snapshot `.py` scrapes the producer's page or a chart platform's endpoint, re-fetch the *producer's page* and compare against the committed snapshot — the endpoint the script reads can lag the page (e.g. a Datawrapper chart CDN trailing the page's own `<noscript>` data tables by a full release, so the committed snapshot silently misses the newest wave). The committed data must match the page's current tables; a missing latest row/wave is a 🔴 (see `/update-dataset` Guardrails, "Scraped chart embeds").
 
@@ -182,6 +183,8 @@ Any `NULL` row is a 🔴.
 ### 10. Metadata quality skills
 
 Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / spacing / style + a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
+
+Also grep the metadata **prose** for numbers carried over from the previous release (country counts, category counts, year ranges in `description_key`/descriptions): validated fields are covered by checks, prose numbers are not — a panel-composition change (dropped country, new category set) silently strands them (see `/update-dataset` Guardrails, "Grep metadata prose"). Stale prose count: 🟡.
 
 ### 11. DAG checks
 
