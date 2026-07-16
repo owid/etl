@@ -110,6 +110,31 @@ def add_annual_change(tb: Table) -> Table:
     return tb
 
 
+def add_physical_production(tb: Table, tb_review: Table) -> Table:
+    """Add fossil fuel production in physical units, from the Statistical Review only.
+
+    Coal and oil are reported in million tonnes, gas in billion cubic meters. These units differ by
+    fuel and cannot be summed across fuels (unlike the energy-content series in terawatt-hours), so they
+    back a separate multidim. Only the Statistical Review reports them, so coverage begins in 1965.
+    """
+    tb_review = tb_review.reset_index()
+    columns = ["coal_production_mt", "oil_production_mt", "gas_production_bcm"]
+    tb = tb.merge(tb_review[["country", "year"] + columns], on=["country", "year"], how="left")
+    return tb
+
+
+def add_reserves(tb: Table, tb_review: Table) -> Table:
+    """Add fossil fuel reserves in physical units, from the Statistical Review only.
+
+    Coal in million tonnes, oil in billion barrels, gas in trillion cubic meters. The Energy Institute
+    reports reserves only through 2020 (and coal reserves for 2020 alone), so this series ends in 2020.
+    """
+    tb_review = tb_review.reset_index()
+    columns = ["coal_reserves_mt", "oil_reserves_bbl", "gas_reserves_tcm"]
+    tb = tb.merge(tb_review[["country", "year"] + columns], on=["country", "year"], how="left")
+    return tb
+
+
 def add_per_capita(tb: Table) -> Table:
     expected_countries_without_population = [
         country for country in tb["country"].unique() if ("(EI)" in country) or ("(EIA)" in country)
@@ -122,6 +147,13 @@ def add_per_capita(tb: Table) -> Table:
     )
     for fuel in FUELS:
         tb[f"{fuel}_production_per_capita_kwh"] = tb[f"{fuel}_production_twh"] / tb["population"] * TWH_TO_KWH
+    # Per-capita production in physical units (Statistical Review only): coal and oil in tonnes, gas in
+    # cubic meters.
+    tb["coal_production_per_capita_tonnes"] = tb["coal_production_mt"] * MILLION_TONNES_TO_TONNES / tb["population"]
+    tb["oil_production_per_capita_tonnes"] = tb["oil_production_mt"] * MILLION_TONNES_TO_TONNES / tb["population"]
+    tb["gas_production_per_capita_m3"] = (
+        tb["gas_production_bcm"] * BILLION_CUBIC_METERS_TO_CUBIC_METERS / tb["population"]
+    )
     tb = tb.drop(columns=["population"], errors="raise")
     return tb
 
@@ -190,6 +222,34 @@ def add_variable_metadata(tb: Table) -> Table:
                 display = dict(tb[column].metadata.display or {})
                 display["name"] = name
                 tb[column].metadata.display = display
+
+    # Physical-unit production columns have per-fuel units (tonnes for coal and oil, cubic meters for
+    # gas), so they can't use the uniform loop above.
+    # Titles carry the unit to stay unique from the energy-content columns (grapher requires unique
+    # variable titles per dataset). The multidim overrides the view titles, so this only shows in the admin.
+    physical_specs = {
+        "coal_production_mt": ("Coal production (million tonnes)", "million tonnes", "Mt", "Coal"),
+        "oil_production_mt": ("Oil production (million tonnes)", "million tonnes", "Mt", "Oil"),
+        "gas_production_bcm": ("Gas production (billion cubic meters)", "billion cubic meters", "bcm", "Gas"),
+        "coal_production_per_capita_tonnes": ("Coal production per capita (tonnes)", "tonnes per person", "t", "Coal"),
+        "oil_production_per_capita_tonnes": ("Oil production per capita (tonnes)", "tonnes per person", "t", "Oil"),
+        "gas_production_per_capita_m3": (
+            "Gas production per capita (cubic meters)",
+            "cubic meters per person",
+            "m³",
+            "Gas",
+        ),
+        "coal_reserves_mt": ("Coal reserves", "million tonnes", "Mt", "Coal"),
+        "oil_reserves_bbl": ("Oil reserves", "billion barrels", "bbl", "Oil"),
+        "gas_reserves_tcm": ("Gas reserves", "trillion cubic meters", "tcm", "Gas"),
+    }
+    for column, (title, unit, short_unit, name) in physical_specs.items():
+        tb[column].metadata.title = title
+        tb[column].metadata.unit = unit
+        tb[column].metadata.short_unit = short_unit
+        display = dict(tb[column].metadata.display or {})
+        display["name"] = name
+        tb[column].metadata.display = display
     return tb
 
 
@@ -216,6 +276,16 @@ def sanity_check_outputs(tb: Table) -> None:
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in output."
     for fuel in FUELS:
         assert (tb[f"{fuel}_production_twh"].dropna() >= 0).all(), f"Negative {fuel} production found."
+    # Physical-unit production and reserves must be non-negative too.
+    for column in [
+        "coal_production_mt",
+        "oil_production_mt",
+        "gas_production_bcm",
+        "coal_reserves_mt",
+        "oil_reserves_bbl",
+        "gas_reserves_tcm",
+    ]:
+        assert (tb[column].dropna() >= 0).all(), f"Negative {column} found."
 
     # Coal coverage after extending with historical data: World from 1800, United Kingdom from 1700.
     coal = tb.dropna(subset=["coal_production_twh"])
@@ -265,8 +335,10 @@ def run() -> None:
         tb_review=tb_review_prod, tb_etemad=tb_etemad, tb_eia=tb_eia, tb_historical=tb_historical
     )
 
-    # Add annual change and per-capita variables.
+    # Add annual change, physical-unit production and reserves (Statistical Review only), and per-capita.
     tb = add_annual_change(tb=tb)
+    tb = add_physical_production(tb=tb, tb_review=tb_review)
+    tb = add_reserves(tb=tb, tb_review=tb_review)
     tb = add_per_capita(tb=tb)
 
     # Add total fossil fuel production (coal + oil + gas), absolute and per capita.

@@ -34,6 +34,18 @@ COLUMN_DIMENSIONS = {
         f"{fuel}_reserves_to_production_ratio": {"fuel": fuel, "metric": "reserves_ratio"}
         for fuel in ["coal", "oil", "gas"]
     },
+    # Production in physical units (Statistical Review only): coal and oil in tonnes, gas in cubic meters.
+    # Units differ per fuel, so there is no "total" here (they can't be summed).
+    "coal_production_mt": {"fuel": "coal", "metric": "production_physical"},
+    "oil_production_mt": {"fuel": "oil", "metric": "production_physical"},
+    "gas_production_bcm": {"fuel": "gas", "metric": "production_physical"},
+    "coal_production_per_capita_tonnes": {"fuel": "coal", "metric": "per_capita_physical"},
+    "oil_production_per_capita_tonnes": {"fuel": "oil", "metric": "per_capita_physical"},
+    "gas_production_per_capita_m3": {"fuel": "gas", "metric": "per_capita_physical"},
+    # Reserves in physical units (Statistical Review only, ends 2020; coal only for 2020).
+    "coal_reserves_mt": {"fuel": "coal", "metric": "reserves"},
+    "oil_reserves_bbl": {"fuel": "oil", "metric": "reserves"},
+    "gas_reserves_tcm": {"fuel": "gas", "metric": "reserves"},
     # Total fossil fuel production (the aggregate that the "by fuel" breakdown decomposes).
     "total_production_twh": {"fuel": "total", "metric": "production"},
     "total_production_per_capita_kwh": {"fuel": "total", "metric": "per_capita"},
@@ -110,9 +122,13 @@ def _view_title(fuel: str, metric: str) -> str:
     if fuel == "total":
         return {"production": "Fossil fuel production", "per_capita": "Fossil fuel production per person"}[metric]
     name = FUEL_TITLE_NAMES[fuel]
+    # The physical-unit views share the energy views' titles (the subtitle and axis carry the unit).
     return {
         "production": f"{name.capitalize()} production",
         "per_capita": f"{name.capitalize()} production per person",
+        "production_physical": f"{name.capitalize()} production",
+        "per_capita_physical": f"{name.capitalize()} production per person",
+        "reserves": f"{name.capitalize()} reserves",
         "reserves_ratio": f"Reserves-to-production ratio for {name}",
     }[metric]
 
@@ -121,8 +137,24 @@ def _view_title(fuel: str, metric: str) -> str:
 # "fossil fuels" covers.
 FOSSIL_FUELS_NOTE = "Fossil fuels include coal, oil, and gas."
 
+# Physical-unit production has per-fuel units (tonnes for coal and oil, cubic meters for gas), so its
+# subtitle depends on the fuel, not just the metric.
+PHYSICAL_UNIT = {
+    ("coal", "production_physical"): "million tonnes",
+    ("oil", "production_physical"): "million tonnes",
+    ("gas", "production_physical"): "billion cubic meters",
+    ("coal", "per_capita_physical"): "tonnes per person",
+    ("oil", "per_capita_physical"): "tonnes per person",
+    ("gas", "per_capita_physical"): "cubic meters per person",
+    ("coal", "reserves"): "million tonnes",
+    ("oil", "reserves"): "billion barrels",
+    ("gas", "reserves"): "trillion cubic meters",
+}
+
 
 def _view_subtitle(fuel: str, metric: str) -> str:
+    if metric in ("production_physical", "per_capita_physical", "reserves"):
+        return f"Measured in {PHYSICAL_UNIT[(fuel, metric)]}."
     unit = METRIC_UNIT_PHRASE[metric]
     return f"{unit} {FOSSIL_FUELS_NOTE}" if fuel == "total" else unit
 
@@ -186,7 +218,7 @@ FUEL_FALLBACK_SCHEME = {"total": "YlOrBr", "coal": "OrRd", "oil": "YlOrRd", "gas
 
 # All fossil-fuel metrics are unbounded positive magnitudes, so every map uses log-spaced bins with
 # an open-ended top bracket (">X").
-LOG_METRICS = {"production", "per_capita", "reserves_ratio"}
+LOG_METRICS = {"production", "per_capita", "reserves_ratio", "production_physical", "per_capita_physical", "reserves"}
 
 
 def _log_thresholds(vmax: float | None, max_bins: int = 7) -> list[float] | None:
