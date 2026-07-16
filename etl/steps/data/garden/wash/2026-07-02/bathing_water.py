@@ -73,6 +73,7 @@ def make_pct_ex_c(df: pd.DataFrame) -> pd.DataFrame:
     total = make_nr_c(df).rename(columns={"sdg_14_40_nr_c": "_total"})
     excellent = make_nr_ex_c(df).rename(columns={"sdg_14_40_nr_ex_c": "_excellent"})
     merged = total.merge(excellent, on=["country", "year"], how="left")
+    merged["_excellent"] = merged["_excellent"].fillna(0)
     merged["sdg_14_40_pct_ex_c"] = merged["_excellent"] / merged["_total"] * 100
     return merged[["country", "year", "sdg_14_40_pct_ex_c"]]
 
@@ -92,6 +93,7 @@ def make_pct_ex_in(df: pd.DataFrame) -> pd.DataFrame:
     total = make_nr_in(df).rename(columns={"sdg_14_40_nr_in": "_total"})
     excellent = make_nr_ex_in(df).rename(columns={"sdg_14_40_nr_ex_in": "_excellent"})
     merged = total.merge(excellent, on=["country", "year"], how="left")
+    merged["_excellent"] = merged["_excellent"].fillna(0)
     merged["sdg_14_40_pct_ex_in"] = merged["_excellent"] / merged["_total"] * 100
     return merged[["country", "year", "sdg_14_40_pct_ex_in"]]
 
@@ -185,6 +187,15 @@ def run() -> None:
     combined = indicator_tables[0]
     for t in indicator_tables[1:]:
         combined = combined.merge(t, on=["country", "year"], how="outer")
+
+    # A country/year with sites but zero excellent ones has no row from make_nr_ex_*,
+    # so the outer merge leaves the count as NaN. Fill with 0 where the total is known.
+    combined.loc[combined["sdg_14_40_nr_c"].notna(), "sdg_14_40_nr_ex_c"] = combined.loc[
+        combined["sdg_14_40_nr_c"].notna(), "sdg_14_40_nr_ex_c"
+    ].fillna(0)
+    combined.loc[combined["sdg_14_40_nr_in"].notna(), "sdg_14_40_nr_ex_in"] = combined.loc[
+        combined["sdg_14_40_nr_in"].notna(), "sdg_14_40_nr_ex_in"
+    ].fillna(0)
 
     eu27 = make_eu27_aggregate(combined)
     combined = pr.concat([combined, eu27], ignore_index=True)
