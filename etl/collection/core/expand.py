@@ -15,6 +15,9 @@ def expand_config(
     indicator_as_dimension: bool = False,
     indicators_slug: str | None = None,
     expand_path_mode: Literal["table", "dataset", "full"] = "table",
+    indicator_x: str | None = None,
+    indicator_size: str | None = None,
+    indicator_color: str | None = None,
 ) -> dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
 
@@ -48,7 +51,8 @@ def expand_config(
         - Out-of-the box sorting for dimension values.
             - Example: This could be alphabetically ascending or descending, or numerically ascending or descending.
             - IDEA: We could pass strings as values directly to the keys in dimensions dictionary, e.g. `dimensions={"sex": "alph_desc", "age": "numerical_desc", "cause": ["aids", "cancer"]}`. To some extent, we already support the function "*" (i.e. show all values without sorting).
-        - Support using charts with 'x', 'size' and 'color' indicators. Also support display settings for each indicator.
+        - Support display settings for each indicator.
+        - Support 'x', 'size' and 'color' indicators that vary per view (currently the same indicator is applied to all views).
 
     Parameters:
     -----------
@@ -78,6 +82,12 @@ def expand_config(
         Set to True to keep the indicator as a dimension. For instance, if you expand a table with multiple - dimensional - indicators (e.g. 'population', 'population_density'), a dimension is added in the config that specifies the indicator. If there are more than one indicators being expanded, the indicator information is kept as a dimension regardless of this flag.
     indicators_slug: str
         Name to use as the slug for the indicator dimension. Default is 'indicator'. This is used to identify the indicator in a view using dimensional information.
+    indicator_x : str | None
+        Indicator to use on the x-axis of every generated view (e.g. for scatter plots). Give either the name of a column in `tb` (its path is expanded like the y-indicator paths, following `expand_path_mode`), or a catalog path containing '#' (e.g. 'population#population'), which is used as given (short forms are resolved against the collection dependencies when saving).
+    indicator_size : str | None
+        Indicator to use for the marker size of every generated view. Same format as `indicator_x`.
+    indicator_color : str | None
+        Indicator to use for the marker color of every generated view. Same format as `indicator_x`.
 
     EXAMPLES
     --------
@@ -154,6 +164,9 @@ def expand_config(
     config_partial["views"] = expander.build_views(
         common_view_config=common_view_config,
         dimension_choices=dimension_choices,
+        indicator_x=indicator_x,
+        indicator_size=indicator_size,
+        indicator_color=indicator_color,
     )
 
     return config_partial
@@ -293,6 +306,9 @@ class CollectionConfigExpander:
         self,
         dimension_choices: dict[str, list[str]] | None = None,
         common_view_config: dict[str, Any] | None = None,
+        indicator_x: str | None = None,
+        indicator_size: str | None = None,
+        indicator_color: str | None = None,
     ):
         """Generate one view for each indicator in the table."""
         df_dims_filt = self.df_dims.copy()
@@ -302,15 +318,21 @@ class CollectionConfigExpander:
             for dim_name, choices in dimension_choices.items():
                 df_dims_filt = df_dims_filt[df_dims_filt[dim_name].isin(choices)]
 
+        # Indicators shared by all views, on dimensions other than 'y' (e.g. for scatter plots).
+        indicators_extra = {
+            dim: self._expand_extra_indicator_path(indicator)
+            for dim, indicator in [("x", indicator_x), ("size", indicator_size), ("color", indicator_color)]
+            if indicator is not None
+        }
+
         # Filter to only relevant dimensions
         config_views = []
         for _, indicator in df_dims_filt.iterrows():
             view = {
                 "dimensions": {dim_name: indicator[dim_name] for dim_name in self.dimension_names},
                 "indicators": {
-                    "y": self._expand_indicator_path(
-                        indicator.short_name
-                    ),  # TODO: Add support for (i) support "x", "color", "size"; (ii) display settings
+                    "y": self._expand_indicator_path(indicator.short_name),  # TODO: support display settings
+                    **indicators_extra,
                 },
             }
             if common_view_config:
@@ -329,6 +351,21 @@ class CollectionConfigExpander:
         else:
             raise ValueError(f"Unknown expand_path_mode: {self.expand_path_mode}")
         return f"{table_path}#{indicator_slug}"
+
+    def _expand_extra_indicator_path(self, indicator: str) -> str:
+        """Resolve an x/size/color indicator given either as a column of the table or as a catalog path.
+
+        A value containing '#' is treated as a catalog path and used as given (short forms like
+        'table#indicator' are resolved against the collection dependencies when saving). Otherwise,
+        it must be a column of the table, and its path is expanded following `expand_path_mode`.
+        """
+        if "#" in indicator:
+            return indicator
+        assert indicator in self.tb.columns, (
+            f"Indicator `{indicator}` not found in table `{self.table_name}`. Give either a column of the table, "
+            "or a catalog path (containing '#')."
+        )
+        return self._expand_indicator_path(indicator)
 
     def build_df_dims(self, tb: Table, indicator_names: str | list[str] | None):
         """Build dataframe with dimensional information from table tb.

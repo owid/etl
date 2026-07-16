@@ -248,6 +248,67 @@ class TestExpandConfig:
         indicator_path_full = config_full["views"][0]["indicators"]["y"]
         assert indicator_path_full == "garden/test/2024/test_dataset/test_table#deaths__sex_male"
 
+    def test_extra_indicators_from_table_columns(self):
+        """Test expand_config with x/size/color indicators given as columns of the table.
+
+        Their paths should be expanded like the y-indicator paths, following `expand_path_mode`.
+        """
+        tb = create_test_table()
+
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            indicator_x="cases__sex_male",
+            indicator_size="cases__sex_female",
+        )
+
+        # All views share the same x/size indicators, with expanded paths
+        assert len(config["views"]) == 2
+        for view in config["views"]:
+            assert view["indicators"]["x"] == "test_table#cases__sex_male"
+            assert view["indicators"]["size"] == "test_table#cases__sex_female"
+            # 'color' was not requested
+            assert "color" not in view["indicators"]
+
+    def test_extra_indicators_from_catalog_paths(self):
+        """Test expand_config with x/size/color indicators given as catalog paths.
+
+        Paths (values containing '#') should be used as given.
+        """
+        tb = create_test_table()
+
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            indicator_size="population#population",
+            indicator_color="grapher/regions/2023-01-01/regions/regions#owid_region",
+        )
+
+        for view in config["views"]:
+            assert view["indicators"]["size"] == "population#population"
+            assert view["indicators"]["color"] == "grapher/regions/2023-01-01/regions/regions#owid_region"
+
+    def test_extra_indicators_follow_expand_path_mode(self):
+        """Test that x/size/color indicators given as columns follow `expand_path_mode`."""
+        tb = create_table_with_metadata()
+
+        config = expand_config(
+            tb,
+            indicator_names="deaths",
+            expand_path_mode="full",
+            indicator_x="cases__sex_male",
+        )
+
+        for view in config["views"]:
+            assert view["indicators"]["x"] == "garden/test/2024/test_dataset/test_table#cases__sex_male"
+
+    def test_extra_indicator_unknown_column_error(self):
+        """Test error when an x/size/color indicator is neither a table column nor a catalog path."""
+        tb = create_test_table()
+
+        with pytest.raises(AssertionError, match="not found in table"):
+            expand_config(tb, indicator_names="deaths", indicator_x="nonexistent_column")
+
     def test_auto_indicator_detection(self):
         """Test expand_config auto-detects single indicator when none specified."""
         tb = create_test_table()
