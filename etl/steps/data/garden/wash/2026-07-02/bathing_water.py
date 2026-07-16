@@ -1,8 +1,12 @@
 """Load a snapshot and create a garden dataset."""
 
 import pandas as pd
+from owid.catalog import processing as pr
+from structlog import get_logger
 
 from etl.helpers import PathFinder
+
+log = get_logger()
 
 paths = PathFinder(__file__)
 
@@ -103,6 +107,60 @@ def make_eu27_aggregate(combined: pd.DataFrame) -> pd.DataFrame:
     return agg
 
 
+def sanity_check_inputs(df: pd.DataFrame) -> None:
+    # All EU27 member codes must be present in the raw data — the aggregate would silently use a partial set otherwise.
+    missing_eu27 = EU27_CODES - set(df["country"].unique())
+    assert not missing_eu27, f"EU27 member codes missing from source: {missing_eu27}"
+
+    # The excellent-quality label we filter on must exist in the data.
+    assert EXCELLENT_QUALITY in df["quality"].values, f"Quality label '{EXCELLENT_QUALITY}' not found in source data."
+
+    # All four expected water-type categories must be present.
+    known_types = COASTAL_TYPES | INLAND_TYPES
+    missing_types = known_types - set(df["bathingWaterType"].unique())
+    assert not missing_types, f"Expected water type categories missing from source: {missing_types}"
+
+
+def sanity_check_outputs(combined: pd.DataFrame) -> None:
+    # No duplicate (country, year) pairs.
+    assert not combined.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in output."
+
+    # Percentages must be in [0, 100].
+    for col in ["sdg_14_40_pct_ex_c", "sdg_14_40_pct_ex_in"]:
+        vals = combined[col].dropna()
+        assert (vals >= 0).all() and (vals <= 100).all(), f"{col} has values outside [0, 100]."
+
+    # Count columns must be non-negative.
+    for col in ["sdg_14_40_nr_c", "sdg_14_40_nr_ex_c", "sdg_14_40_nr_in", "sdg_14_40_nr_ex_in"]:
+        vals = combined[col].dropna()
+        assert (vals >= 0).all(), f"{col} has negative values."
+
+    # EU27 aggregate count must be ≥ the largest individual member state for each count column.
+    eu27_rows = combined[combined["country"] == EU27_NAME]
+    member_rows = combined[combined["country"].isin(EU27_CODES)]
+    for col in ["sdg_14_40_nr_c", "sdg_14_40_nr_ex_c", "sdg_14_40_nr_in", "sdg_14_40_nr_ex_in"]:
+        eu27_max = eu27_rows[col].max()
+        member_max = member_rows[col].max()
+        if pd.notna(eu27_max) and pd.notna(member_max):
+            assert eu27_max >= member_max, (
+                f"EU27 aggregate for {col} ({eu27_max:.0f}) is smaller than the largest member state ({member_max:.0f})."
+            )
+
+    # The most recent year encoded in the source file path must be present in the output.
+    expected_latest_year = int(FILE_NAME.split("_")[-1].split(".")[0].split("-")[-1])
+    assert expected_latest_year in combined["year"].values, (
+        f"Expected latest year {expected_latest_year} not found in output."
+    )
+
+    # Soft signal: flag countries that dropped to zero in the latest year.
+    latest_year = combined["year"].max()
+    zero_pct_c = combined.loc[
+        (combined["year"] == latest_year) & (combined["sdg_14_40_pct_ex_c"] == 0), "country"
+    ].tolist()
+    if zero_pct_c:
+        log.warning(f"Countries with 0% excellent coastal quality in {latest_year}: {zero_pct_c}")
+
+
 def run() -> None:
     snap = paths.load_snapshot("bathing_water.zip")
 
@@ -112,6 +170,8 @@ def run() -> None:
     df = tb[["countryCode", "bathingWaterIdentifier", "bathingWaterType", "season", "quality"]].rename(
         columns={"countryCode": "country", "season": "year"}
     )
+
+    sanity_check_inputs(df)
 
     indicator_tables = [
         make_nr_c(df),
@@ -127,7 +187,9 @@ def run() -> None:
         combined = combined.merge(t, on=["country", "year"], how="outer")
 
     eu27 = make_eu27_aggregate(combined)
-    combined = pd.concat([combined, eu27], ignore_index=True)
+    combined = pr.concat([combined, eu27], ignore_index=True)
+
+    sanity_check_outputs(combined)
 
     tb = snap.read_from_df(combined)
     tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
