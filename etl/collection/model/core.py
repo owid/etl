@@ -45,6 +45,46 @@ from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 # Logging
 log = get_logger()
 
+# Query params that Grapher itself reads from a chart URL. On a multidim/explorer page, dimension
+# slugs are also encoded as query params, so a dimension slug that collides with one of these would
+# clash with Grapher's own URL state (see https://github.com/owid/etl/issues/5737).
+# Keep in sync with `GRAPHER_QUERY_PARAM_KEYS` in owid-grapher
+# (packages/@ourworldindata/types/src/grapherTypes/GrapherTypes.ts), which includes the legacy
+# `year` param; `hideControls` is added on top (an embed/explorer-level param not in that list).
+GRAPHER_RESERVED_QUERY_PARAMS = {
+    "country",
+    "endpointsOnly",
+    "facet",
+    "focus",
+    "globe",
+    "globeRotation",
+    "globeZoom",
+    "hideControls",
+    "mapSelect",
+    "overlay",
+    "peerCountries",
+    "region",
+    "showNoDataArea",
+    "showSelectionOnlyInTable",
+    "stackMode",
+    "tab",
+    "tableFilter",
+    "tableSearch",
+    "time",
+    "uniformYAxis",
+    "xScale",
+    "yScale",
+    "year",
+    "zoomToSelection",
+}
+
+# Collections that already used a reserved slug before this validation existed, kept working so
+# their published URLs don't change. Frozen list: do not add new entries — rename the dimension
+# slug instead.
+_RESERVED_QUERY_PARAM_EXCEPTIONS = {
+    ("emissions/latest/ipcc_scenarios#ipcc-scenarios", "region"),
+}
+
 
 class _GroupedViewsEntry(TypedDict):
     overwrite: bool
@@ -225,6 +265,9 @@ class Collection(MDIMBase):
 
         # Check that no choice name or slug is repeated
         self.validate_dimension_uniqueness()
+
+        # Check that no dimension slug collides with a query param reserved by Grapher
+        self.validate_dimension_slugs_not_grapher_query_params()
 
         # Validate that datasets used are part of the dependencies
         indicators = self.indicators_in_use(tolerate_extra_indicators)
@@ -559,6 +602,23 @@ class Collection(MDIMBase):
 
             # Add slug to set
             slugs.add(dim.slug)
+
+    def validate_dimension_slugs_not_grapher_query_params(self):
+        """Validate that no dimension slug collides with a query param reserved by Grapher.
+
+        Dimension choices are encoded as query params on multidim/explorer pages (e.g.
+        ``?sex=female``), in the same URL where Grapher reads its own params (``time``,
+        ``country``, ``tab``, ...). A colliding slug would break one or the other.
+        """
+        for dim in self.dimensions:
+            if dim.slug in GRAPHER_RESERVED_QUERY_PARAMS:
+                if (self.catalog_path, dim.slug) in _RESERVED_QUERY_PARAM_EXCEPTIONS:
+                    continue
+                raise ValueError(
+                    f"Dimension slug '{dim.slug}' in collection '{self.catalog_path}' collides with a query param "
+                    f"reserved by Grapher. Rename the dimension slug. Reserved names: "
+                    f"{sorted(GRAPHER_RESERVED_QUERY_PARAMS)}"
+                )
 
     def validate_indicators_are_from_dependencies(self, indicators):
         """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
