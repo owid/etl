@@ -38,12 +38,7 @@ def run() -> None:
     #
     # Harmonize country names.
     #
-    tb = paths.regions.harmonize_names(
-        tb,
-        country_col="country",
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-    )
+    tb = paths.regions.harmonize_names(tb)
 
     #
     # Format and save.

@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Jonathan Fink-Jensen
+    producer: Jonathan Fink-Jensen, IISH Data Collection
     title: Book Titles per Capita
     description: |-
       Number of new book titles published per year, per million inhabitants, for countries over the period 1500–2009. Compiled from a combination of datasets and publications on book production for different regions and periods, including CLIO Infra data.
