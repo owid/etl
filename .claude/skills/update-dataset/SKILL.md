@@ -734,7 +734,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      ```
    - **Codex posts in one of two places — always check both.** When it finds issues, it leaves *inline review comments* (the endpoint above) with resolvable threads. When it finds **nothing**, it posts a single top-level **PR (issue) comment** instead — no inline comments, no threads — e.g. "Codex Review: Didn't find any major issues. Keep it up!". So if the inline-comments endpoint is empty, check the issue comments before concluding Codex hasn't run yet. A third shape exists: a findings review whose finding lives **only in the review body** (no inline comments, no resolvable threads) — list `gh api repos/owid/etl/pulls/<n>/reviews` and read each new review's `body`; polling only the two comment endpoints misses it (there is no thread to resolve — reply via a normal PR comment instead):
      ```bash
+     # clean-pass summaries land in the issue comments:
      gh api repos/owid/etl/issues/<pr_number>/comments \
+       --jq '.[] | select(.user.login | test("codex";"i")) | .body'
+     # review-body-only findings (the third shape) — no thread, no issue comment:
+     gh api repos/owid/etl/pulls/<pr_number>/reviews \
        --jq '.[] | select(.user.login | test("codex";"i")) | .body'
      ```
      A "no issues" / 👍 comment from `chatgpt-codex-connector[bot]` means the review is done and there's nothing to address — don't keep polling for inline comments that will never come.
