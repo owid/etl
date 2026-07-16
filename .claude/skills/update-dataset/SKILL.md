@@ -886,6 +886,19 @@ This is the **last step**, after the DAG archive has been committed. Don't auto-
   https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html
   ```
 
+**Bulk-approve the easy chart diffs with `etl approve` before handing the rest to the human.** On a dataset with many charts (e.g. WDI has 400+), most pending diffs exist only because the update changed no values a human needs to eyeball — either the underlying data is byte-identical (a version bump minted new variable IDs but the values didn't change) or it changed by a negligible source-revision amount. Reviewing those by hand in Chart Diff is wasted effort; let `etl approve` clear them first:
+
+```bash
+.venv/bin/etl approve --dry-run                        # exact data match only — safe default, see counts first
+.venv/bin/etl approve --dry-run --allow-small-changes   # also count tiny source revisions (see below)
+.venv/bin/etl approve --allow-small-changes             # apply for real once the dry-run counts look right
+```
+
+- Plain `etl approve` only approves a chart when every dimension's underlying data is byte-identical between staging and prod (it hashes each dimension's actual data, not the raw variable ID — so a version bump that changed no values still gets approved).
+- `--allow-small-changes` additionally approves charts where the only remaining difference is a handful of small-magnitude value changes (typical source revisions) — tune with `--tolerance-pct` (default 1% relative change per point), `--tolerance-abs-floor` (default 1e-6, guards near-zero values), and `--max-changed-points` (default 5 per dimension, above which it's sent to manual review regardless of magnitude). It still requires every other part of the chart's config (title, subtitle, everything but the dimension values) to be identical.
+- `--show-data-diff` prints the actual before/after values for skipped charts (per dimension: y/x/size/color) instead of just a hash mismatch — useful to see *why* a specific chart didn't qualify, or to sanity-check whether raising `--tolerance-pct` would be safe. Combine with `--chart-id <id>` to inspect one chart.
+- Whatever's left after `etl approve` is what's actually worth a human's attention in Chart Diff — genuine content changes, added/removed country-year coverage, or other config differences.
+
 **Important: derive `<container_branch>` correctly.** The staging hostname is **not** simply `staging-site-<branch>`. The container name is produced by `get_container_name(branch)` in `etl/config.py`:
 
 1. Replace `/`, `.`, `_` with `-` in the branch name.
