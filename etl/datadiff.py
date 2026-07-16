@@ -608,7 +608,9 @@ def cli(
 
     matched_datasets = []
     skipped_identical_data = 0
-    for path in sorted(set(path_to_ds_a.keys()) | set(path_to_ds_b.keys())):
+    all_paths = sorted(set(path_to_ds_a.keys()) | set(path_to_ds_b.keys()))
+    all_paths = [p for p in all_paths if not _is_superseded_remote_predecessor(p, path_to_ds_b)]
+    for path in all_paths:
         ds_a = _match_dataset(path_to_ds_a, path)
         ds_b = _match_dataset(path_to_ds_b, path)
 
@@ -1108,6 +1110,26 @@ def _match_dataset(path_to_ds: dict[str, Any], path: str) -> Dataset | None:
                 return None
         else:
             return None
+
+
+def _is_superseded_remote_predecessor(path: str, path_to_ds_b: dict[str, Any]) -> bool:
+    """True if `path` is only in scope as a REMOTE-side fallback match for a newer local version.
+
+    `--changed` adds a changed dataset's predecessor version to the shared `--include` filter so
+    the REMOTE fetch includes it — `_match_dataset` then falls back to it when diffing the new
+    local version against something. But the union-of-keys loop in `cli()` also visits the
+    predecessor's own path directly; if that exact version isn't *also* built locally (the normal
+    case — only the new version was run), it compares against nothing and gets reported as a
+    separate, false "removed dataset", right back to the bug this scoping exists to avoid. Skip a
+    path here when it's absent locally but a newer version of the same
+    channel/namespace/short_name is present — `_match_dataset` already reaches it as a fallback
+    for that newer path, so it needs no standalone entry of its own.
+    """
+    if path in path_to_ds_b:
+        return False
+    channel, namespace, version, short_name = path.split("/")
+    pattern = re.compile(rf"^{re.escape(channel)}/{re.escape(namespace)}/([^/]+)/{re.escape(short_name)}$")
+    return any((match := pattern.match(k)) and match.group(1) > version for k in path_to_ds_b)
 
 
 def _load_catalog_datasets(

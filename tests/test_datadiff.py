@@ -16,6 +16,7 @@ from etl.datadiff import (
     _changed_records,
     _dataset_files_match,
     _diff_lines,
+    _is_superseded_remote_predecessor,
     _table_metadata_dict,
 )
 from etl.datadiff_report import (
@@ -759,3 +760,30 @@ def test_diff_lines_wraps_long_lines_so_a_trailing_change_stays_small():
     assert not any("Global Information System" in line for line in diff_lines)
     assert any("2026-02-27" in line for line in diff_lines)
     assert any("2026-07-14" in line for line in diff_lines)
+
+
+def test_is_superseded_remote_predecessor():
+    # Regression test (caught in review): a changed dataset's predecessor version is added to the
+    # shared --include filter so the REMOTE fetch includes it (`_match_dataset` then falls back to
+    # it when diffing the new local version against something). But the predecessor's own path is
+    # *also* a key of path_to_ds_a (from REMOTE) and would otherwise get its own entry in the
+    # union-of-keys comparison loop. If it isn't *also* built locally — the normal case when only
+    # the new version was run — comparing it against nothing reports it as a false "removed
+    # dataset", reintroducing the exact bug this scoping exists to avoid.
+    new_only_locally = {"garden/worldbank_wdi/2026-07-14/wdi": object()}
+
+    # The predecessor isn't built locally, but a newer version of the same dataset is: it's
+    # reachable as _match_dataset's fallback for that newer path and needs no standalone entry.
+    assert _is_superseded_remote_predecessor("garden/worldbank_wdi/2026-02-27/wdi", new_only_locally)
+
+    # The predecessor *is* also built locally: it gets its own (normal, exact-match) comparison,
+    # so it must not be suppressed.
+    both_built_locally = {**new_only_locally, "garden/worldbank_wdi/2026-02-27/wdi": object()}
+    assert not _is_superseded_remote_predecessor("garden/worldbank_wdi/2026-02-27/wdi", both_built_locally)
+
+    # A genuinely removed dataset (no newer local version of the same channel/namespace/short_name
+    # exists at all) must still be reported as removed, not silently suppressed.
+    assert not _is_superseded_remote_predecessor("garden/worldbank_wdi/2026-02-27/wdi", {})
+    assert not _is_superseded_remote_predecessor(
+        "garden/worldbank_wdi/2026-02-27/wdi", {"garden/other/2024-01-01/other": object()}
+    )
