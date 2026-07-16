@@ -225,7 +225,18 @@ def compute_inheritance_patch(
     if original_config is None:
         original_config = config
 
-    baseline_full = validate_chart_config_and_set_defaults(indicator_config, schema)
+    # `indicator_config` is `{}` when the indicator has no `grapherConfigETL` at all (an
+    # explicit "inherits nothing" baseline, see `_fetch_single_indicator_config`) -- but the
+    # schema's own top-level `required` fields (e.g. `$schema`, `dimensions`) have no
+    # "default" to fall back on, so validating a bare `{}` against it fails and crashes here.
+    # Borrow those required fields from `config` (which is already a valid, fully-formed
+    # chart config) purely so validation succeeds; they don't affect the comparison below,
+    # since `_prune_to_explicit` only ever looks at paths present in `explicit`.
+    baseline_input = {**indicator_config}
+    for field in schema.get("required", []):
+        if field not in baseline_input and field in config:
+            baseline_input[field] = config[field]
+    baseline_full = validate_chart_config_and_set_defaults(baseline_input, schema)
     explicit = _collect_explicit_leaves(original_config)
 
     pruned = _prune_to_explicit(config, explicit, baseline_full)

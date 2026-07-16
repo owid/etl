@@ -333,6 +333,35 @@ def test_inheritance_with_indicator_config_strips_redundant_explicit_match():
     assert config_new["dimensions"][0]["variableId"] == 200
 
 
+def test_inheritance_with_empty_indicator_config_does_not_crash():
+    """Regression test (caught by Codex review): an empty indicator_config (`{}`, meaning
+    "the indicator has no grapherConfigETL at all -- inherits nothing") used to crash
+    `compute_inheritance_patch` on any real grapher schema, which declares top-level
+    `required` fields (`$schema`, `dimensions`) with no "default" to fall back on --
+    validating a bare `{}` against it raises, and the exception handler crashes a second
+    time trying to read `config["id"]` off that same empty dict, masking the real error.
+    """
+    schema = _inheritance_schema()
+    schema["required"] = ["$schema", "dimensions"]
+
+    config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "id": 7742,
+        "version": 1,
+        "isInheritanceEnabled": True,
+        "hasMapTab": True,  # explicit override -- empty baseline means schema default (False)
+        "dimensions": [{"variableId": 100, "property": "y"}],
+    }
+
+    config_new = update_chart_config(config, {100: 200}, schema, indicator_config={})
+
+    # hasMapTab differs from the schema default (False) -- an empty baseline means "plain
+    # schema defaults", so this is a genuine override and must be kept.
+    assert config_new.get("hasMapTab") is True
+    assert config_new["dimensions"][0]["variableId"] == 200
+    assert config_new["$schema"] == config["$schema"]
+
+
 def test_no_inheritance_strips_schema_defaults():
     """Without inheritance, schema-default values should still be stripped
     to keep configs lean (existing behavior)."""
