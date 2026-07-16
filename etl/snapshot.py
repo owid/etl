@@ -697,6 +697,11 @@ class SnapshotMeta(MetaBase):
     name: str | None = None
     description: str | None = None
 
+    # DEPRECATED top-level license. The license belongs under `origin.license` so it travels with
+    # the origin (and reaches Grapher's per-origin metadata). This field only exists for backward
+    # compatibility; new snapshots must set `meta.origin.license`, not `meta.license`. Enforced by
+    # `tests/test_metadata_schemas.py::test_snapshot_license_lives_under_origin` and the `not`
+    # constraint in `schemas/snapshot-schema.json`.
     license: License | None = None
 
     access_notes: str | None = None

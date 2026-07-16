@@ -42,7 +42,7 @@ def test_create_empty():
         assert exists(join(dirname, "index.json"))
         with open(join(dirname, "index.json")) as istream:
             doc = json.load(istream)
-        assert doc == {"is_public": True, "non_redistributable": False}
+        assert doc == {"is_public": True, "non_redistributable": False, "jsonld": False}
 
         assert len(ds.index()) == 0
 
@@ -75,7 +75,8 @@ def test_create_overwrites_entire_folder():
         open(d._index_file).read().strip()
         == """{
   "is_public": true,
-  "non_redistributable": false
+  "non_redistributable": false,
+  "jsonld": false
 }"""
     )
 

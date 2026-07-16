@@ -8,6 +8,10 @@ child_labor_trends) into two output tables:
     and a computed 5-14 age bracket.
   - sector: Distribution of child labor and hazardous work across economic sectors
     (agriculture, industry, services) by country, year, sex, and age.
+  - child_labor_by_sex: World-level child labor shares excluding vs including household
+    chores, for the ages where chores enter the definition (5-11, 12-14, 5-14). Kept as
+    a separate table so the grapher step can use sex as the chart entity (e.g. dumbbell
+    charts with one row per sex).
 """
 
 import owid.catalog.processing as pr
@@ -52,6 +56,7 @@ def run() -> None:
     # Build output tables.
     tb_main = _build_main_table(tb_cl, tb_hw, tb_trends)
     tb_sector = _build_sector_table(tb_cl, tb_hw, tb_trends)
+    tb_by_sex = _build_by_sex_table(tb_main)
 
     # Convert number columns from thousands to actual values.
     for tb in [tb_main, tb_sector]:
@@ -61,7 +66,7 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb_main, tb_sector], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb_main, tb_sector, tb_by_sex], default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
 
@@ -444,5 +449,38 @@ def _build_sector_table(tb_cl: Table, tb_hw: Table, tb_trends: Table) -> Table:
     )
 
     tb = tb.format(["country", "year", "sector", "sex", "age"], short_name="sector")
+
+    return tb
+
+
+def _build_by_sex_table(tb_main: Table) -> Table:
+    """Build the child_labor_by_sex output table from the formatted main table.
+
+    Keeps World-level child labor shares excluding vs including household chores for
+    the ages where household chores enter the child labor definition (5-11, 12-14, 5-14).
+    Sex stays a dimension here; the grapher step turns it into the chart entity so charts
+    can show one row per sex (e.g. a dumbbell comparing both definitions).
+    """
+    # NOTE: The report only publishes the including-chores series by sex (page 8 chart), and
+    # dumbbell charts drop entities that are missing either indicator — so sex="total" is excluded.
+    tb = tb_main.reset_index()
+    tb = tb[
+        (tb["country"] == "World")
+        & tb["sex"].isin(["boys", "girls"])
+        & tb["age"].isin(["5-11", "12-14", "5-14"])
+        & (tb["year"] == LATEST_YEAR)
+    ]
+    tb = tb[["country", "year", "sex", "age", "share_child_labor", "share_child_labor_incl_household_chores"]]
+
+    # Sanity checks: full sex × age coverage, both indicators present on every row.
+    assert set(tb["sex"]) == {"boys", "girls"}, f"Unexpected sexes in by-sex table: {set(tb['sex'])}"
+    assert set(tb["age"]) == {"5-11", "12-14", "5-14"}, f"Unexpected ages in by-sex table: {set(tb['age'])}"
+    assert len(tb) == 6, f"Expected 6 rows (2 sexes × 3 ages) in by-sex table, got {len(tb)}."
+    assert tb["share_child_labor"].notna().all(), "Missing share_child_labor values in by-sex table."
+    assert tb["share_child_labor_incl_household_chores"].notna().all(), (
+        "Missing household chores shares for boys/girls in by-sex table."
+    )
+
+    tb = tb.format(["country", "year", "sex", "age"], short_name="child_labor_by_sex")
 
     return tb

@@ -29,15 +29,26 @@ pages = {}
 # Initial apps (etl steps)
 pages_ = []
 for step in WIZARD_CONFIG["main"].values():
-    pages_.append(
-        st.Page(
-            page=str(step["entrypoint"]),
-            title=step["title"],
-            icon=step["icon"],
-            url_path=step["title"].lower(),
-            default=step["title"] == "Home",
+    entrypoint = str(step["entrypoint"])
+    if entrypoint.startswith(("http://", "https://")):
+        # External URLs are shown as plain links in the navigation menu.
+        pages_.append(
+            st.Page(
+                page=entrypoint,
+                title=step["title"],
+                icon=step["icon"],
+            )
         )
-    )
+    else:
+        pages_.append(
+            st.Page(
+                page=entrypoint,
+                title=step["title"],
+                icon=step["icon"],
+                url_path=step["title"].lower(),
+                default=step["title"] == "Home",
+            )
+        )
 pages["Overview"] = pages_
 
 # ETL steps

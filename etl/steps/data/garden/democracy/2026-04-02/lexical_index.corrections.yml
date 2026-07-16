@@ -1,0 +1,32 @@
+# Known errors in the Lexical Index source data (Skaaning et al.), patched locally until the
+# provider ships the fix. See etl/data_corrections.py for the format.
+#
+# India's universal right to vote (men and women) is coded as beginning in 1947 (independence),
+# but it began in 1950, when the Constitution came into force. Confirmed with Svend-Erik Skaaning;
+# the fix is due in the next annual release (2027). Correcting the two raw suffrage columns here
+# propagates to every derived indicator (suffrage_lied, suffrage_in_practice_lied,
+# suffrage_in_practice_trich_lied, and the num_* region counts).
+- indicator: male_suffrage_lied
+  entity: India
+  years: {from: 1947, to: 1949}
+  action: override
+  value: 0
+  expect: {eq: 1} # still coded as 1 (the error); fails loudly once the 2027 release fixes it
+  reason: >-
+    Universal male suffrage in India is coded as beginning in 1947 (independence), but it began in
+    1950 (Constitution in force). Confirmed with Svend-Erik Skaaning; fix due in the 2027 release.
+  provider: Lexical Index
+  reported: "2026-07-09"
+  status: acknowledged
+- indicator: female_suffrage_lied
+  entity: India
+  years: {from: 1947, to: 1949}
+  action: override
+  value: 0
+  expect: {eq: 1} # still coded as 1 (the error); fails loudly once the 2027 release fixes it
+  reason: >-
+    Universal female suffrage in India is coded as beginning in 1947 (independence), but it began in
+    1950 (Constitution in force). Confirmed with Svend-Erik Skaaning; fix due in the 2027 release.
+  provider: Lexical Index
+  reported: "2026-07-09"
+  status: acknowledged

@@ -316,6 +316,7 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 - Don't auto-write the optional caveats / interesting-notes fields with generic prose ("This dataset offers important insights into…"). Leave them as prompts.
 - Don't query the staging DB without the `publishedAt IS NOT NULL` filter — drafts in the count would mislead.
 - Don't use the producer's homepage URL as the search link. The Slack template specifically wants `ourworldindata.org/search?datasetProducts=…`.
+- Don't tout the dataset's full indicator count when OWID publishes only one or a few of its indicators. Size claims to what we actually chart — "302 indicators" reads as overselling when the update affects one published chart (user feedback, WWBI 2026-07). Mentioning the count in internal-facing fields is fine only when it's genuinely load-bearing for Charlie.
 - Don't fold this skill into `update-dataset` — keep it standalone so users can invoke it after manual updates too. `update-dataset` should gather reusable facts in `update-context.yml` and step 9 should delegate here, not duplicate the Slack rendering logic.
 
 ## Related

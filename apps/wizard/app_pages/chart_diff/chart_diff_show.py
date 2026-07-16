@@ -7,10 +7,12 @@ If you want to learn more about it, start from its `show` method.
 import difflib
 import json
 import os
+from functools import cached_property
 from typing import Any, cast
 
 import pandas as pd
 import streamlit as st
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
@@ -139,34 +141,69 @@ class ChartDiffShow:
         status = [s for s in status if s not in {gm.ChartStatus.REJECTED.value}]
         return status
 
+    @cached_property
+    def approval_history(self) -> pd.DataFrame:
+        """History of approvals of this chart diff, freshly loaded from the DB."""
+        approvals = self.diff.get_all_approvals(self.source_session)
+        return pd.DataFrame([{"updatedAt": a.updatedAt, "status": a.status} for a in approvals])
+
+    @cached_property
+    def last_approved_revision(self) -> gm.ChartRevisions | None:
+        """Chart revision on staging at the time of the last approval (if any).
+
+        Lets the reviewer compare the current staging chart against the version they last approved,
+        instead of against production.
+        """
+        if self.diff.is_approved:
+            return None
+        df = self.approval_history
+        if df.empty:
+            return None
+        approved = df[df["status"] == gm.ChartStatus.APPROVED.value]
+        if approved.empty:
+            return None
+        try:
+            return self.diff.get_last_chart_revision(self.source_session, approved["updatedAt"].max())
+        except NoResultFound:
+            # Chart has no revisions on staging (e.g. it was never edited via the admin).
+            return None
+
+    def _invalidate_history_cache(self) -> None:
+        """Drop cached approval history so the next render reloads it from the DB."""
+        self.__dict__.pop("approval_history", None)
+        self.__dict__.pop("last_approved_revision", None)
+
     def _push_status(self, session: Session | None = None) -> None:
         """Change state of the ChartDiff based on session state."""
         if session is None:
             session = self.source_session
         status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
+        # Deselecting the current option in the segmented control yields None; treat it as "pending".
+        if status is None:
+            status = gm.ChartStatus.PENDING.value
         self.diff.set_status(session=session, status=status)
         self.diff._clean_cache()
+        self._invalidate_history_cache()
         # Store toast message in session state to display after fragment reruns
         # (displaying elements in fragment callbacks causes duplication bugs)
         st.session_state[f"toast-{self.diff.chart_id}"] = status
 
-    def _push_status_binary(self, session: Session | None = None) -> None:
-        """Change state of the ChartDiff based on session state."""
-        if session is None:
-            session = self.source_session
-        status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
-        self.diff.set_status(session=session, status=status)
-        self.diff._clean_cache()
-        # Store toast message in session state to display after fragment reruns
-        st.session_state[f"toast-{self.diff.chart_id}"] = status
-
     def _refresh_chart_diff(self):
         """Get latest chart version from database."""
-        diff_new = ChartDiffsLoader(self.source_session.get_bind(), self.target_session.get_bind()).get_diffs(  # ty: ignore
-            sync=True, chart_ids=[self.diff.chart_id]
-        )[0]
-        st.session_state.chart_diffs[self.diff.chart_id] = diff_new
-        self.diff = diff_new
+        diffs = ChartDiffsLoader(
+            self.source_session.get_bind(),  # ty: ignore
+            self.target_session.get_bind(),  # ty: ignore
+            chart_ids=[self.diff.chart_id],
+        ).get_diffs(config=True, data=True, metadata=True, tags=True)
+        self._invalidate_history_cache()
+        if diffs:
+            diff_new = diffs[0]
+            st.session_state.chart_diffs[self.diff.chart_id] = diff_new
+            self.diff = diff_new
+        else:
+            # The chart no longer differs between environments (e.g. the change was reverted).
+            st.session_state.chart_diffs.pop(self.diff.chart_id, None)
+            st.session_state[f"chart-diff-gone-{self.diff.chart_id}"] = True
 
     @property
     def _header_production_chart(self):
@@ -226,7 +263,7 @@ class ChartDiffShow:
             st.button(
                 key=f"resolve-conflicts-{self.diff.chart_id}",
                 label="⚠️ Mark as resolved: Accept all changes from staging",
-                help="Click to resolve the conflict by accepting all changes from staging. The changes from production will be ignored. This can be useul if you're happy with the changes in staging as they are.",
+                help="Click to resolve the conflict by accepting all changes from staging. The changes from production will be ignored. This can be useful if you're happy with the changes in staging as they are.",
                 on_click=_mark_as_resolved,
             )
 
@@ -274,7 +311,7 @@ class ChartDiffShow:
                         f":{DISPLAY_STATE_OPTIONS_BINARY[x]['color']}-background[{DISPLAY_STATE_OPTIONS_BINARY[x]['label']}]"
                     ),
                     index=self.status_names_binary.index(self.diff.approval_status),  # ty: ignore
-                    on_change=self._push_status_binary,
+                    on_change=self._push_status,
                     help="Note that the changes in the chart come from ETL changes (metadata/data) and therefore there is no way to reject them at this stage. If you are not happy with the changes, please look at the ETL steps involved. We present them to you here as a sanity check, and ask you to review them for correctness.",
                 )
             else:
@@ -324,44 +361,26 @@ class ChartDiffShow:
                 self.diff.scores.to_md(),
                 help=help_txt,
             )
-            # with st.popover(
-            #     self.diff.scores.to_md(),
-            # ):
-            #     st.markdown(help_txt)
 
-            # scores = {}
-            # if self.diff.scores.chart_views is not None:
-            #     scores["chart_views"] = self.diff.scores.chart_views
-            # if self.diff.scores.anomaly is not None:
-            #     scores["anomaly"] = round(self.diff.scores.anomaly, 2)
-            # text = ""
-            # for score_name, score in scores.items():
-            #     text += f"**{score_name}**: {score}\n"
-            # st.markdown(text)
-
-        # Refresh chart
+        # Actions: refresh + metadata diff
         with col3:
             st.button(
-                label="Refresh charts",
+                label="Refresh",
                 icon=":material/refresh:",
                 key=f"refresh-btn-{self.diff.chart_id}",
-                help="Get the latest version of the chart from the staging server.",
+                help="Get the latest version of the chart from the staging and production servers.",
                 on_click=self._refresh_chart_diff,
                 type="secondary",
             )
-
-    def _show_metadata_diff(self) -> None:
-        """Show metadata diff (if applicable).
-
-        Come chart-diffs might be triggered by changes in metadata. This allows the user to explore this changes.
-
-        Note that to access the metadata, one needs to retrieve the JSON metadata files from the S3 bucket.
-        """
-        if st.button(
-            "🔎 Metadata differences",
-            f"btn-meta-diff-{self.diff.chart_id}",
-        ):
-            self._show_metadata_diff_modal()
+            if "metadata" in self.diff.change_types:
+                # NOTE: opens a dialog (rather than a tab) so the S3 metadata is only fetched on demand
+                if st.button(
+                    "Metadata diff",
+                    icon=":material/manage_search:",
+                    key=f"btn-meta-diff-{self.diff.chart_id}",
+                    help="Inspect the metadata changes of the indicators used in this chart.",
+                ):
+                    self._show_metadata_diff_modal()
 
     def _show_tags_if_changed(self, chart, session):
         """Show tags as gray badges if there are tag changes."""
@@ -389,81 +408,120 @@ class ChartDiffShow:
             st.warning(
                 f"List of indicators in source and target differs. Can't render this section.\n\nSOURCE: {source_ids}\n\nTARGET: {target_ids}"
             )
-        elif source_ids:
-            # Get metadata from S3
-            with st.spinner("Getting metadata from S3..."):
-                # Get metadata from source & target
-                metadata_source = variable_metadata_df_from_s3(source_ids, env=SOURCE)
-                metadata_target = variable_metadata_df_from_s3(source_ids, env=TARGET)
+            return
+        if not source_ids:
+            return
 
-            # Generate diffs
-            meta_diffs = {}
-            for source, target, indicator_id in zip(metadata_source, metadata_target, source_ids):
-                # Filter fields not relevant for comparison
-                source = filter_out_fields_in_metadata_for_checksum(source)
-                target = filter_out_fields_in_metadata_for_checksum(target)
+        # Get metadata from S3 (results are aligned with source_ids)
+        with st.spinner("Getting metadata from S3..."):
+            metadata_source = variable_metadata_df_from_s3(source_ids, workers=10, env=SOURCE)
+            metadata_target = variable_metadata_df_from_s3(source_ids, workers=10, env=TARGET)
 
-                # PROD is the base; STAGING is what the user is proposing to merge — pass
-                # `target` (prod) first so the diff reads as `production → staging` and
-                # the staging branch shows up as additions/modifications.
-                meta_diff = compare_dictionaries(target, source, fromfile="production", tofile="staging")
-                if meta_diff:
-                    meta_diffs[indicator_id] = meta_diff
+        # Generate diffs
+        meta_diffs = {}
+        catalog_paths = {}
+        for source, target, indicator_id in zip(metadata_source, metadata_target, source_ids):
+            catalog_paths[indicator_id] = source.get("catalogPath", "")
 
-            # Placeholder for GPT summary
-            container = st.container()
+            # Filter fields not relevant for comparison
+            source = filter_out_fields_in_metadata_for_checksum(source)
+            target = filter_out_fields_in_metadata_for_checksum(target)
 
-            # Show diffs
-            with st.expander("See complete diff", expanded=True):
-                for (indicator_id, meta_diff), source in zip(meta_diffs.items(), metadata_source):
-                    st.markdown(f"**Indicator ID: {indicator_id}**")
-                    if ("catalogPath" in source) and (source["catalogPath"] != ""):
-                        st.caption(source["catalogPath"])
-                    st_show_diff(meta_diff)
+            # PROD is the base; STAGING is what the user is proposing to merge — pass
+            # `target` (prod) first so the diff reads as `production → staging` and
+            # the staging branch shows up as additions/modifications.
+            meta_diff = compare_dictionaries(target, source, fromfile="production", tofile="staging")
+            if meta_diff:
+                meta_diffs[indicator_id] = meta_diff
 
-            with container:
-                self._show_metadata_diff_gpt_summary(meta_diffs)
+        if not meta_diffs:
+            st.success("No differences found in the metadata fields relevant for comparison.")
+            return
 
-    @st.cache_data(show_spinner=False)
-    def _show_metadata_diff_gpt_summary(_self, meta_diffs) -> None:
+        # Placeholder for GPT summary (filled after the diffs render, so the user isn't blocked on the LLM)
+        container = st.container()
+
+        # Show diffs
+        with st.expander("See complete diff", expanded=True):
+            for indicator_id, meta_diff in meta_diffs.items():
+                st.markdown(f"**Indicator ID: {indicator_id}**")
+                if catalog_paths[indicator_id]:
+                    st.caption(catalog_paths[indicator_id])
+                st_show_diff(meta_diff)
+
+        with container:
+            self._show_metadata_diff_gpt_summary(meta_diffs)
+
+    def _show_metadata_diff_gpt_summary(self, meta_diffs: dict[int, str]) -> None:
         """Summarise differences in metadata using GPT."""
-        if _self.openai_api is not None:
-            api = OpenAIWrapper()
-            with st.chat_message("assistant"):
-                # Ask GPT (stream)
+        if self.openai_api is None:
+            st.info("Set `OPENAI_API_KEY` in your `.env` to get an AI summary of the metadata changes.")
+            return
+
+        # Cache the summary in session state, keyed by the diff content, so re-opening the dialog
+        # doesn't re-query the API but a changed diff does.
+        # NOTE: Don't use `st.cache_data` here — caching a function that *renders* UI (and returns
+        # None) makes the summary render once and then vanish on subsequent calls.
+        cache_key = f"gpt-metadata-summary-{self.diff.chart_id}-{hash(tuple(sorted(meta_diffs.items())))}"
+        cached = st.session_state.get(cache_key)
+
+        with st.chat_message("assistant"):
+            if cached is not None:
+                response, cost_msg = cached
+                st.markdown(response)
+            else:
                 messages = [
                     {
                         "role": "system",
-                        "content": "You will be presented with the diffs of various indicator config files. Please summarise at a high-level what the main differences are. The diffs are given by means of a dictionary, with key (indicator ID) and value (indicator config diff).",
+                        "content": (
+                            "You will be presented with the metadata diffs of various indicators, as a dictionary "
+                            "mapping indicator ID to a unified diff (production → staging). Summarise the main "
+                            "changes at a high level, in a few short bullet points. Group similar changes across "
+                            "indicators, and ignore trivial ones (e.g. version bumps or ID changes)."
+                        ),
                     },
                     {
                         "role": "user",
                         "content": str(meta_diffs),
                     },
                 ]
-                stream = api.chat.completions.create(
-                    model=MODEL_DEFAULT,
-                    messages=messages,  # ty: ignore
-                    max_completion_tokens=1000,
-                    stream=True,
-                )
-                response = cast(str, st.write_stream(stream))
+                try:
+                    stream = self.openai_api.chat.completions.create(
+                        model=MODEL_DEFAULT,
+                        messages=messages,  # ty: ignore
+                        # NOTE: gpt-5 is a reasoning model and reasoning tokens count towards this
+                        # limit; keep it well above the expected summary length or the visible
+                        # output may be empty.
+                        max_completion_tokens=4000,
+                        reasoning_effort="low",
+                        stream=True,
+                    )
+                    response = cast(str, st.write_stream(stream))
+                except Exception as e:
+                    st.error(f"AI summary failed: {e}")
+                    return
 
-            # Print cost information
-            text_in = "\n".join([m["content"] for m in messages])
-            cost, num_tokens = get_cost_and_tokens(text_in, response, MODEL_DEFAULT)
-            cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
-            st.info(cost_msg)
+                if not response:
+                    st.warning("The model returned an empty summary.")
+                    return
+
+                # Cost information (estimated with tiktoken, hence lower bounds)
+                text_in = "\n".join([m["content"] for m in messages])
+                cost, num_tokens = get_cost_and_tokens(text_in, response, MODEL_DEFAULT)
+                cost_msg = f"Cost: ≥{cost} USD. Tokens: ≥{num_tokens}."
+                st.session_state[cache_key] = (response, cost_msg)
+        st.caption(cost_msg)
 
     def _show_chart_comparison(self) -> tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
 
         def _show_chart_old():
-            if (self.diff.last_chart_revision_approved is not None) and (not self.diff.in_conflict):
+            last_approved_revision = self.last_approved_revision
+            if (last_approved_revision is not None) and (not self.diff.in_conflict):
                 with st.container(height=40, border=False):
                     options = {
                         "prod": self._header_production_chart_plain,
-                        "last": f"Last approved on staging ({prettify_date(self.diff.last_chart_revision_approved)} - REV {self.diff.last_chart_revision_approved.id})",
+                        "last": f"Last approved on staging ({prettify_date(last_approved_revision)} - REV {last_approved_revision.id})",
                     }
                     option = st.selectbox(
                         "Chart revision",
@@ -478,8 +536,8 @@ class ChartDiffShow:
                     assert self.diff.target_chart is not None
                     grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
                 elif option == "last":
-                    grapher_chart(chart_config=self.diff.last_chart_revision_approved.config, owid_env=SOURCE)
-                    return self.diff.last_chart_revision_approved.config, False
+                    grapher_chart(chart_config=last_approved_revision.config, owid_env=SOURCE)
+                    return last_approved_revision.config, False
             else:
                 if self.diff.in_conflict:
                     st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
@@ -495,7 +553,7 @@ class ChartDiffShow:
             return self.diff.target_chart.config, True
 
         def _show_chart_new():
-            if self.diff.last_chart_revision_approved is None:
+            if self.last_approved_revision is None:
                 st.markdown(self._header_staging_chart)
             else:
                 with st.container(height=40, border=False):
@@ -549,7 +607,6 @@ class ChartDiffShow:
             st.toggle(
                 "Arrange charts vertically",
                 key=f"arrange-charts-vertically-{self.diff.chart_id}",
-                # on_change=None,
             )
 
         return config_ref, is_prod
@@ -564,29 +621,30 @@ class ChartDiffShow:
 
         _show_dict_diff(config_ref, config_2, fromfile=fromfile)
 
-    def _show_approval_history(self, df: pd.DataFrame):
+    def _show_approval_history(self):
         """Show history of approvals of a chart-diff."""
-        df = df.sort_values("updatedAt", ascending=False)
-        df["status"] = df["status"].apply(lambda x: f"{DISPLAY_STATE_OPTIONS[str(x)]['icon']} {x}")
-
+        df = self.approval_history
         if df.empty:
             st.markdown("No approval history found!")
-        else:
-            st.dataframe(
-                df,
-                column_order=["updatedAt", "status"],
-                column_config={
-                    "updatedAt": st.column_config.DatetimeColumn(
-                        "Updated",
-                        format="D MMM YYYY, hh:mm:ss",
-                        step=60,
-                    ),
-                    "status": st.column_config.Column(
-                        "Status",
-                    ),
-                },
-                hide_index=True,
-            )
+            return
+
+        df = df.sort_values("updatedAt", ascending=False)
+        df["status"] = df["status"].apply(lambda x: f"{DISPLAY_STATE_OPTIONS[str(x)]['icon']} {x}")
+        st.dataframe(
+            df,
+            column_order=["updatedAt", "status"],
+            column_config={
+                "updatedAt": st.column_config.DatetimeColumn(
+                    "Updated",
+                    format="D MMM YYYY, hh:mm:ss",
+                    step=60,
+                ),
+                "status": st.column_config.Column(
+                    "Status",
+                ),
+            },
+            hide_index=True,
+        )
 
     def _show_narrative_charts(self) -> None:
         """Show narrative charts that use this chart as parent, with side-by-side comparison."""
@@ -675,31 +733,12 @@ class ChartDiffShow:
         if self.diff.in_conflict:
             with st.popover("⚠️ Resolve conflict"):
                 self._show_conflict_resolver()
-        else:
-            st.empty()
 
         if self.diff.error:
             st.error(f"⚠️ Error: {self.diff.error}")
-        else:
-            st.empty()
 
-        # Show header: approval/reject controls, refresh btn, scores
+        # Show header: approval/reject controls, scores, action buttons
         self._show_chart_diff_header()
-
-        if "metadata" in self.diff.change_types:
-            self._show_metadata_diff()
-
-        # Get approval history
-        # df_approvals = self.diff.get_all_approvals_df()
-
-        # Get latest approved revision
-        # chart_revision_last_approved = None
-        # if not self.diff.is_approved and not df_approvals.empty:
-        #     df_approvals_past = df_approvals.loc[df_approvals["status"] == "approved"]
-        #     if not df_approvals_past.empty:
-        #         timestamp = df_approvals_past["updatedAt"].max()
-        #         # Find the revision that was approved
-        #         chart_revision_last_approved = self.diff.get_last_chart_revision(self.source_session, timestamp)
 
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
@@ -709,7 +748,7 @@ class ChartDiffShow:
             with tab2:
                 self._show_config_diff(config_ref, "production" if is_prod else "last revision")
             with tab3:
-                self._show_approval_history(self.diff.df_approvals)
+                self._show_approval_history()
 
         # SHOW NEW CHART
         elif self.diff.is_new:
@@ -717,7 +756,7 @@ class ChartDiffShow:
             with tab1:
                 _ = self._show_chart_comparison()
             with tab2:
-                self._show_approval_history(self.diff.df_approvals)
+                self._show_approval_history()
 
         # SHOW NARRATIVE CHARTS
         self._show_narrative_charts()
@@ -727,18 +766,16 @@ class ChartDiffShow:
 
         # Copy link
         if self.show_link:
-            # with col3:
             query_params = f"chart_id={self.diff.chart_id}&show_reviewed="
-            # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
             if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
                 url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"
                 st.caption(
-                    body=url,
+                    body=f":material/link: {url}",
                     help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
                 )
             else:
                 url = f"{OWID_ENV.wizard_url}/chart-diff?{query_params}"
-                st.caption(body=url)
+                st.caption(body=f":material/link: {url}")
 
     def _show_deferred_toast(self) -> None:
         """Show toast message if one was queued by a status change callback."""
@@ -756,6 +793,14 @@ class ChartDiffShow:
     @st.fragment
     def show(self):
         """Show chart diff."""
+        # Chart diff no longer exists (e.g. after a refresh found no differences)
+        if st.session_state.pop(f"chart-diff-gone-{self.diff.chart_id}", False):
+            st.info(
+                f"Chart {self.diff.chart_id} no longer differs between staging and production. "
+                "Reload the page to update the list."
+            )
+            return
+
         # Show deferred toast from previous status change (must be outside callback to avoid duplication bug)
         self._show_deferred_toast()
 

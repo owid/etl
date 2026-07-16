@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: The State of World Fisheries and Aquaculture 2024
+    description: |-
+      The State of World Fisheries and Aquaculture (SOFIA) is FAO's flagship publication on the status, trends and outlook of world fisheries and aquaculture.
+    citation_full: |-
+      Food and Agriculture Organization of the United Nations - The State of World Fisheries and Aquaculture 2024. Blue Transformation in action. Rome. https://doi.org/10.4060/cd0683en
+    attribution_short: FAO
+    url_main: https://openknowledge.fao.org/handle/20.500.14283/cd0683en
+    date_accessed: '2026-07-08'
+    date_published: '2024-06-07'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://openknowledge.fao.org/handle/20.500.14283/cd0683en
+outs:
+  - md5: 5d3d3d8bb452fed6f37a6178e8d43ef1
+    size: 6959
+    path: employment_in_fisheries_and_aquaculture.csv

@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 import numpy as np
 import streamlit as st
@@ -155,34 +155,12 @@ def grapher_chart_from_url(chart_url: str, height=600):
 def explorer_chart(
     base_url: str, explorer_slug: str, view: dict, height: int = 600, default_display: str | None = None
 ):
-    # First HTML definition with parameters
-    url = f"{base_url}/{explorer_slug}"
-
-    params = {
-        # "Metric": "Confirmed cases",
-        # "Frequency": "7-day average",
-        # "Relative to population": "false",
-        # "country": "COD~BDI~UGA~CAF",
-        "hideControls": "true",
-        **view,
-    }
-    if default_display is not None:
-        dd = default_display.lower()
-        if dd in ["map", "table", "chart"]:
-            params["tab"] = dd
-
-    query_string = "?" + urllib.parse.urlencode(params)
-
-    HTML = f"""
-    <!-- Redirect to the external URL -->
-    <meta http-equiv="refresh" content="0; url={url}{query_string}">
-    """
-
-    # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
+    """Embed an explorer view in an iframe."""
+    return mdim_chart(f"{base_url}/{explorer_slug}", view=view, height=height, default_display=default_display)
 
 
 def mdim_chart(url: str, view: dict, height: int = 600, default_display: str | None = None):
+    """Embed an MDIM (or explorer) view in an iframe."""
     params = {
         "hideControls": "true",
         **view,
@@ -194,13 +172,7 @@ def mdim_chart(url: str, view: dict, height: int = 600, default_display: str | N
 
     query_string = "?" + urllib.parse.urlencode(params)
 
-    HTML = f"""
-    <!-- Redirect to the external URL -->
-    <meta http-equiv="refresh" content="0; url={url}{query_string}">
-    """
-
-    # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
+    return st.iframe(f"{url}{query_string}", height=height, width=int(1.6 * height))
 
 
 def _chart_html(chart_config: dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
@@ -255,23 +227,10 @@ def tag_in_md(tag_name: str, color: str, icon: str | None = None):
         return f":{color}-background[{tag_name}]"
 
 
-def st_tag(tag_name: str, color: str, icon: str):
-    """Create a custom HTML tag.
-
-    Parameters
-    ----------
-    tag_name : str
-        Tag name.
-    color : str
-        Color of the tag. Must be replaced with any of the following supported colors: blue, green, orange, red, violet, gray/grey, rainbow
-    icon: str
-        Icon of the tag. Can be material (e.g. ':material/upgrade:') or emoji (e.g. '🪄').
-    """
-    st.markdown(tag_in_md(tag_name, color, icon))
-
-
 class Pagination:
     """Use pagination to show a list of items in Streamlit.
+
+    Thin wrapper around `st.pagination` that also slices the item list to the current page.
 
     Example:
 
@@ -279,20 +238,15 @@ class Pagination:
         # Function to render item
         ...
 
-    # Parameters
-    items = []
-    items_per_page = 10
-
     # Define pagination
     pagination = Pagination(
         items=items,
-        items_per_page=items_per_page,
-        pagination_key="pagination-demo",
+        items_per_page=10,
+        pagination_key="pagination-example",
     )
 
-    # Show controls only if needed
-    if len(items) > items_per_page:
-        pagination.show_controls(mode="bar")
+    # Show controls (hidden automatically if there is a single page)
+    pagination.show_controls()
 
     # Show items (only current page)
     for item in pagination.get_page_items():
@@ -305,8 +259,7 @@ class Pagination:
         items: list[Any],
         items_per_page: int,
         pagination_key: str,
-        on_click: Callable | None = None,
-        save_in_query: bool = False,
+        on_change: Callable | None = None,
     ):
         """Construct Pagination.
 
@@ -318,108 +271,58 @@ class Pagination:
             Number of items per page.
         pagination_key : str
             Key to store the current page in session state.
-        on_click : Optional[Callable], optional
-            Action to perform when interacting with any of the buttons, by default None
-        save_in_query : bool, optional
-            Whether to save the current page in the query string, by default False
+        on_change : Optional[Callable], optional
+            Action to perform when the page changes, by default None
         """
         self.items = items
         self.items_per_page = items_per_page
         self.pagination_key = pagination_key
-        self.save_in_query = save_in_query
-        # Action to perform when interacting with any of the buttons.
-        ## Example: Change the value of certain state in session_state
-        self.on_click = on_click
-        # Initialize session state for the current page
-        if self.pagination_key not in st.session_state:
-            # Get page from query parameters
-            if self.save_in_query and self.pagination_key in st.query_params:
-                self.page = int(st.query_params[self.pagination_key])
-            else:
-                self.page = 1
+        self.on_change = on_change
 
     @property
-    def page(self):
-        value = st.session_state[self.pagination_key]
-        return value
-
-    @page.setter
-    def page(self, value):
-        st.session_state[self.pagination_key] = value
+    def page(self) -> int:
+        return st.session_state.get(self.pagination_key, 1)
 
     @property
     def total_pages(self) -> int:
-        return (len(self.items) - 1) // self.items_per_page + 1
+        return max(1, (len(self.items) - 1) // self.items_per_page + 1)
 
     def get_page_items(self) -> list[Any]:
-        page = self.page
-        start_idx = (page - 1) * self.items_per_page
+        start_idx = (self.page - 1) * self.items_per_page
         end_idx = start_idx + self.items_per_page
         return self.items[start_idx:end_idx]
 
-    def show_controls(self, mode: Literal["buttons", "bar"] = "buttons") -> None:
-        if mode == "bar":
-            self.show_controls_bar()
-        elif mode == "buttons":
-            self.show_controls_buttons()
+    def show_controls(self, position: str = "top") -> None:
+        """Show pagination controls.
+
+        Can be called more than once per page (e.g. above and below the item list) — pass a
+        distinct `position` for each call; all copies stay in sync. The "top" copy's key is
+        the canonical page state.
+        """
+        if self.total_pages == 1:
+            return
+        # If the item list shrank (e.g. filters changed), the remembered page may be out of range.
+        if self.page > self.total_pages:
+            st.session_state[self.pagination_key] = 1
+
+        if position == "top":
+            key = self.pagination_key
         else:
-            raise ValueError("Mode must be either 'buttons' or 'bar'.")
+            key = f"{self.pagination_key}--{position}"
+            # Mirror the canonical page before instantiating this copy.
+            st.session_state[key] = self.page
 
-    def show_controls_buttons(self):
-        # Pagination controls
-        # col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
+        def _on_change():
+            # Keep the canonical key in sync when a secondary copy is used (no-op for "top").
+            st.session_state[self.pagination_key] = st.session_state[key]
+            if self.on_change:
+                self.on_change()
 
-        with st.container(border=True):
-            with st_horizontal():
-                # with col1:
-                key = f"previous-{self.pagination_key}"
-                if self.page > 1:
-                    if st.button("⏮️ Previous", key=key):
-                        self.page -= 1
-                        if self.on_click is not None:
-                            self.on_click()
-                        st.rerun()
-                else:
-                    st.button("⏮️ Previous", disabled=True, key=key)
-
-                s = st.empty()
-
-                # with col3:
-                key = f"next-{self.pagination_key}"
-                if self.page < self.total_pages:
-                    if st.button("Next ⏭️", key=key):
-                        self.page += 1
-                        if self.on_click is not None:
-                            self.on_click()
-                        st.rerun()
-                else:
-                    st.button("Next ⏭️", disabled=True, key=key)
-
-                # with col2:
-                s.text(f"Page {self.page} of {self.total_pages}")
-
-    def show_controls_bar(self) -> None:
-        def _change_page():
-            # Internal action
-            if self.save_in_query:
-                if self.page == 1:
-                    st.query_params.pop(self.pagination_key)
-                else:
-                    st.query_params.update({self.pagination_key: self.page})
-
-            # External action
-            if self.on_click is not None:
-                self.on_click()
-
-        with st_horizontal():
-            st.number_input(
-                label=f"**Go to page** (results per page: {self.items_per_page}; total pages: {self.total_pages})",
-                min_value=1,
-                max_value=self.total_pages,
-                # value=self.page,
-                on_change=_change_page,
-                key=self.pagination_key,
-            )
+        st.pagination(
+            self.total_pages,
+            key=key,
+            on_change=_on_change,
+        )
 
 
 def st_multiselect_wider(num_px: int = 1000):
@@ -651,11 +554,6 @@ def preview_file(
 def st_toast_error(message: str) -> None:
     """Show error message."""
     st.toast(f"❌ :red[{message}]")
-
-
-def st_toast_success(message: str) -> None:
-    """Show success message."""
-    st.toast(f"✅ :green[{message}]")
 
 
 def update_query_params(key: str, side_effect: Callable[[], None] | None = None):

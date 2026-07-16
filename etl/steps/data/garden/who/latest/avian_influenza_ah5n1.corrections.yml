@@ -1,0 +1,9 @@
+# Known upstream data errors in the WHO avian influenza (H5N1) data, corrected locally until fixed
+# at the source. See etl/data_corrections.py for the format.
+- indicator: month
+  match: {value: "12/1/225"}
+  action: override
+  value: "12/1/2025"
+  reason: "Month label is missing a digit in the year (\"225\" instead of \"2025\")."
+  provider: World Health Organization
+  status: open

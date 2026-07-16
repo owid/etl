@@ -1,0 +1,20 @@
+# Known upstream data errors in the EU laying-hens-keeping-methods data, corrected locally until
+# fixed at the source. See etl/data_corrections.py for the format.
+- indicator: barn
+  match: {country: Belgium, year: 2025, value: {column: free_range}}
+  action: drop
+  reason: The Belgium 2025 barn value is a copy of the free_range value, which makes the total
+    inconsistent with the EU eggs dashboard's reported ~5.27M barn / ~11.34M total for the same
+    notification (https://agriculture.ec.europa.eu/document/download/9bdf9842-1eb6-41a2-8845-49738b812b2b_en).
+  provider: European Commission (eggs dashboard)
+  status: open
+
+- indicator: total
+  entity: Greece
+  years: [2013]
+  action: drop
+  expect: {lt: 100000}
+  reason: Greece's 2013 total of 23,166 hens is far below its other years (~4-5 million); most
+    likely an incomplete notification.
+  provider: European Commission (eggs dashboard)
+  status: open

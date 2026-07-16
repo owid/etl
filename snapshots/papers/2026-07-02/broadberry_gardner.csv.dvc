@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Africa's Growth Prospects in a European Mirror
+    title_snapshot: Africa's Growth Prospects in a European Mirror - Agricultural labor force shares
+    description: |-
+      Drawing on recent quantitative research on Europe reaching back to the medieval period, and noting a relationship between the quality of institutions and economic growth, this paper offers a reassessment of Africa's growth prospects. Periods of positive growth driven by trade, followed by growth reversals which wiped out the gains of the previous boom, characterized pre-modern Europe as well as twentieth century Africa. Since per capita incomes in much of sub-Saharan Africa are currently at the level of medieval Europe, which did not make the breakthrough to modern economic growth until the nineteenth century, we caution against too optimistic a reading of Africa's recent growth experience. Without the institutional changes necessary to facilitate structural change, growth reversals continue to pose a serious threat to African prosperity. Only if growth continues after a downturn in Africa's terms of trade can we be sure that the corner has been turned.
+    description_snapshot: |-
+      Benchmark estimates of the share of the labor force employed in agriculture in five European countries (Great Britain, France, Italy, the Netherlands and Poland) between 1300 and 1800, as reported in Table 3 of the paper. The estimates draw on historical reconstructions of the sectoral distribution of the labor force: Broadberry, Campbell and van Leeuwen (2013) for Britain and Allen (2000) for other European countries.
+
+      The estimates were transcribed from the paper by Our World in Data. Estimates for England/Great Britain are labeled as United Kingdom.
+    date_published: "2013-09-27"
+
+    # Citation
+    producer: Broadberry and Gardner
+    citation_full: |-
+      Broadberry, Stephen and Gardner, Leigh (2013) Africa's growth prospects in a European mirror: a historical perspective. Working Paper. Coventry, UK: Department of Economics, University of Warwick. (CAGE Online Working Paper Series No. 172).
+
+    # Files
+    url_main: https://wrap.warwick.ac.uk/59340/
+    date_accessed: '2026-07-13'
+
+    # License
+    license:
+      name: © Broadberry and Gardner (2013)
+      url: https://wrap.warwick.ac.uk/59340/
+outs:
+  - md5: 7c8796c8b29db668da6b94c3f174ea51
+    size: 583
+    path: broadberry_gardner.csv

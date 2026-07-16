@@ -18,7 +18,8 @@ dataset:
   update_period_days: 30
 
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
+    - Edouard Mathieu
 tables:
   datacenter_construction:
     variables:

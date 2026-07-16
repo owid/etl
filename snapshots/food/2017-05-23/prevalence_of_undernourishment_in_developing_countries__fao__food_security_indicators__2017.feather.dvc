@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: FAO
+    producer: Food and Agriculture Organization of the United Nations
     title: Food Security Indicators
     title_snapshot: Food Security Indicators - Prevalence of undernourishment in developing countries
     description_snapshot: |-
@@ -14,17 +14,27 @@ meta:
 
       The aggregates are computed using a weighted population average.
 
-      Earlier estimates for the prevalence of undernourishment in developing countries for 1970 and 1980. Over this period, methodological methods for the estimation of undernourishment have been refined for use in tracking progress on MDGs from 1990 onwards- this means earlier estimates have a higher level of uncertainty. Figures given here for 1970 and 1980 have been taken as the average between two FAO estimates from annual "State of Food Insecurity in the World" reports in 2006 and 2010 (referenced below). These estimates should therefore be utilised with caution, but have been included for longer-term perspective on reduction trends.
+      Earlier estimates of the prevalence of undernourishment in developing countries are also given for 1970 and 1980. Over this period, the methods for estimating undernourishment have been refined for use in tracking progress on the MDGs from 1990 onwards; this means the earlier estimates have a higher level of uncertainty. The figures given here for 1970 and 1980 have been taken as the average between two FAO estimates from the annual "State of Food Insecurity in the World" reports of 2006 and 2010 (referenced below). These estimates should therefore be used with caution, but have been included for a longer-term perspective on reduction trends.
 
       References:
 
       FAO. 2006. The State of Food Insecurity in the World 2006. Rome. Available at: http://www.fao.org/docrep/009/a0750e/a0750e00.htm
 
       FAO, 2010. The State of Food Insecurity in the World: Addressing food insecurity in protracted crises. Rome. Available at: http://www.fao.org/docrep/016/i3027e/i3027e.pdf
-    citation_full: FAO (2017). Food Security Indicators.
+    citation_full: |-
+      Food and Agriculture Organization of the United Nations (2017). Food Security Indicators.
+
+      The estimates for 1970 and 1980 are the average of two figures published in:
+
+      - Food and Agriculture Organization of the United Nations (2006). The State of Food Insecurity in the World 2006. Rome.
+      - Food and Agriculture Organization of the United Nations (2010). The State of Food Insecurity in the World: Addressing food insecurity in protracted crises. Rome.
+    attribution_short: FAO
     url_main: http://www.fao.org/economic/ess/ess-fs/ess-fadata/en/
     date_accessed: '2017-05-23'
     date_published: '2017'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
 outs:
   - md5: 49bd5c3852a40726f824c45c70b83d1b
     size: 3586
