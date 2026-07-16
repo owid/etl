@@ -1,23 +1,19 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     presentation:
       topic_tags:
         - Clean Water
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 365
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
     - Fiona Spooner
+    - Tuna Acisu
+
+
 tables:
   bathing_water:
-    # Learn more about the available fields:
-    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       sdg_14_40_nr_c:
         title: Number of coastal bathing sites
