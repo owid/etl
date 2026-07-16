@@ -305,14 +305,19 @@ def dimension_diff_within_tolerance(
     tolerance_pct: float,
     tolerance_abs_floor: float,
     max_changed_points: int,
+    max_new_points: int = 1000,
 ) -> bool:
     """Check whether a dimension's data diff (from diff_chart_dimension_data) is small enough to auto-approve.
 
     A dimension passes if:
-    - no points were removed relative to production (n_only_b == 0) — points *added* in staging
-      (n_only_a, e.g. a new year of coverage) are expected from a routine update and don't block approval;
-      points missing from staging that existed in production are a coverage regression and always require
-      manual review, however small max_changed_points/tolerance_pct are set
+    - no points were removed relative to production (n_only_b == 0) — points missing from staging
+      that existed in production are a coverage regression and always require manual review, however
+      small max_changed_points/tolerance_pct are set
+    - at most max_new_points points were added in staging (n_only_a, e.g. a new year of coverage) —
+      expected from a routine update and given a generous allowance, but not unbounded: an
+      unexpectedly large jump in coverage (e.g. an accidental variable swap that happens to look like
+      "all new points" against the old one) can visibly change the chart and still deserves a human
+      look, however small max_changed_points/tolerance_pct are set
     - at most max_changed_points points changed
     - every changed point's relative difference is within tolerance_pct, using tolerance_abs_floor as a
       floor on the denominator (and to short-circuit differences smaller than the floor) so tiny values
@@ -324,11 +329,15 @@ def dimension_diff_within_tolerance(
         tolerance_abs_floor: Absolute floor used both to short-circuit negligible diffs and as the minimum
             denominator for the relative-change calculation
         max_changed_points: Max number of changed points allowed before requiring manual review
+        max_new_points: Max number of newly-added points (present in staging only) allowed before
+            requiring manual review
 
     Returns:
         True if the dimension's diff is within tolerance, False otherwise
     """
     if dim_diff["n_only_b"]:
+        return False
+    if dim_diff["n_only_a"] > max_new_points:
         return False
     if dim_diff["n_changed"] > max_changed_points:
         return False
@@ -373,20 +382,46 @@ def diff_chart_dimension_data(
     config_a = get_chart_config(chart_id, engine_a)
     config_b = get_chart_config(chart_id, engine_b)
 
-    dimensions_a = {d["property"]: d["variableId"] for d in config_a.get("dimensions", []) if "variableId" in d}
-    dimensions_b = {d["property"]: d["variableId"] for d in config_b.get("dimensions", []) if "variableId" in d}
+    # A property can appear more than once (e.g. a multi-series chart with several
+    # `property: "y"` dimensions) -- keep every variable ID per property, not just the last
+    # one a dict comprehension would happen to keep, or an earlier series' change could be
+    # silently dropped from the comparison entirely.
+    dimensions_a: dict[str, list[int]] = {}
+    for d in config_a.get("dimensions", []):
+        if "variableId" in d:
+            dimensions_a.setdefault(d["property"], []).append(d["variableId"])
+    dimensions_b: dict[str, list[int]] = {}
+    for d in config_b.get("dimensions", []):
+        if "variableId" in d:
+            dimensions_b.setdefault(d["property"], []).append(d["variableId"])
 
     results = []
     for prop in dimensions_a.keys() & dimensions_b.keys():
-        variable_id_a = dimensions_a[prop]
-        variable_id_b = dimensions_b[prop]
+        ids_a, ids_b = dimensions_a[prop], dimensions_b[prop]
+        # A changed series count for this property is itself a structural change worth
+        # manual review, not something to silently truncate away via zip().
+        if len(ids_a) != len(ids_b):
+            results.append(
+                {
+                    "property": prop,
+                    "n_changed": 0,
+                    "n_common": 0,
+                    "n_only_a": len(ids_a),
+                    "n_only_b": len(ids_b),
+                    "examples_changed": [],
+                    "variable_id_a": ids_a,
+                    "variable_id_b": ids_b,
+                }
+            )
+            continue
 
-        diff = summarize_variable_data_diff(
-            variable_id_a, env_a, variable_id_b, env_b, round_values=round_values, max_examples=max_examples
-        )
-        if diff["n_changed"] or diff["n_only_a"] or diff["n_only_b"]:
-            diff["property"] = prop
-            results.append(diff)
+        for variable_id_a, variable_id_b in zip(ids_a, ids_b):
+            diff = summarize_variable_data_diff(
+                variable_id_a, env_a, variable_id_b, env_b, round_values=round_values, max_examples=max_examples
+            )
+            if diff["n_changed"] or diff["n_only_a"] or diff["n_only_b"]:
+                diff["property"] = prop
+                results.append(diff)
 
     return results
 
