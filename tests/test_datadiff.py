@@ -739,3 +739,23 @@ def test_changed_include_regex_does_not_match_paths_as_substrings():
         "garden", ["garden/worldbank_wdi/2026-07-14/wdi", "meadow/wb/2026-07-01/income_groups"]
     )
     assert not re.search(meadow_only, "meadow/wb/2026-07-01/income_groups")
+
+
+def test_diff_lines_wraps_long_lines_so_a_trailing_change_stays_small():
+    # Regression test: a long single-line YAML string (e.g. a producer `citation_full`, which
+    # `yaml_dump`'s own `width` doesn't wrap — that only applies to folded/plain scalars, not
+    # literal block scalars) that differs only in its last few words used to make the *entire*
+    # line register as changed, duplicating the whole paragraph in both the removed and added
+    # sides. A single such boilerplate citation repeated across WDI's ~1,500 origins, each only
+    # differing in a trailing "Accessed on <date>", is what blew the table metadata diff up to
+    # megabytes. Wrapping before the line-level diff keeps only the truly-changed chunk.
+    boilerplate = "AQUASTAT - FAO's Global Information System on Water and Agriculture, " * 3
+    old = {"citation_full": f"{boilerplate}Accessed on 2026-02-27."}
+    new = {"citation_full": f"{boilerplate}Accessed on 2026-07-14."}
+
+    diff_lines = _diff_lines(old, new)
+
+    assert len(diff_lines) == 2
+    assert not any("Global Information System" in line for line in diff_lines)
+    assert any("2026-02-27" in line for line in diff_lines)
+    assert any("2026-07-14" in line for line in diff_lines)

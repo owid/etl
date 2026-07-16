@@ -1,6 +1,7 @@
 import difflib
 import os
 import re
+import textwrap
 import traceback
 import urllib.error
 from collections.abc import Callable, Iterable
@@ -761,6 +762,36 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
     return index_a.equals(index_b)
 
 
+_DIFF_LINE_WRAP_WIDTH = 100
+
+
+def _wrap_long_lines(text: str, width: int = _DIFF_LINE_WRAP_WIDTH) -> list[str]:
+    """Split a YAML dump into diff-friendly lines, word-wrapping long ones.
+
+    `yaml_dump`'s own `width` only wraps folded/plain scalars — literal block scalars (`|-`,
+    used for any string containing no newlines of its own, e.g. `citation_full`) are emitted
+    verbatim on one line however long. A single-word change at the end of an otherwise-identical
+    few-hundred-character producer citation (a common shape: boilerplate text ending in
+    "Accessed on <date>") then makes the *entire* line register as changed by the line-level diff
+    below, duplicating the whole paragraph in both the removed and added sides. Wrapping first
+    lets the line-level diff match all the unchanged wrapped chunks and only report the one that
+    actually differs.
+    """
+    lines = []
+    for line in text.splitlines(keepends=True):
+        stripped = line.rstrip("\n")
+        newline = line[len(stripped) :]
+        indent = len(stripped) - len(stripped.lstrip(" "))
+        if len(stripped) <= width:
+            lines.append(line)
+            continue
+        wrapped = textwrap.wrap(
+            stripped, width=width, subsequent_indent=" " * indent, break_long_words=False, break_on_hyphens=False
+        )
+        lines.extend(w + (newline if i == len(wrapped) - 1 else "\n") for i, w in enumerate(wrapped))
+    return lines
+
+
 def _diff_lines(dict_a: dict[str, Any], dict_b: dict[str, Any], **kwargs) -> list[str]:
     """Convert dictionaries into YAML and return the added/removed lines between them.
 
@@ -772,8 +803,8 @@ def _diff_lines(dict_a: dict[str, Any], dict_b: dict[str, Any], **kwargs) -> lis
     meta_a = yaml_dump(dict_a, **kwargs)
     meta_b = yaml_dump(dict_b, **kwargs)
 
-    a_lines = meta_a.splitlines(keepends=True)
-    b_lines = meta_b.splitlines(keepends=True)
+    a_lines = _wrap_long_lines(meta_a)
+    b_lines = _wrap_long_lines(meta_b)
 
     lines = []
     for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a_lines, b_lines).get_opcodes():
