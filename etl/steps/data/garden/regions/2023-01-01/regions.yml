@@ -4752,3 +4752,67 @@
   defined_by: fao_2
   members:
     - UNM49_POL
+
+##########
+# FAO SDG regional grouping (used in FAO's food-security domains, e.g. faostat_fs and faostat_sdgb).
+# These are the UN SDG regions FAO adopts for SDG reporting: an orthogonal coarsening of the fao_2
+# subregions (they cross continents, e.g. Northern America and Europe). Australia and New Zealand is the
+# 8th SDG region but is a fao_2 subregion, so it is tagged fao_2 and back-filled into the fao_sdg map.
+##########
+
+- code: FAO_SSA
+  name: "Sub-Saharan Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_EAF
+    - FAO_MAF
+    - FAO_SAF
+    - FAO_WAF
+- code: FAO_LAC
+  name: "Latin America and the Caribbean (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_CAM
+    - FAO_CAR
+    - FAO_SAM
+- code: FAO_NAE
+  name: "Northern America and Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_NAM
+    - FAO_EEU
+    - FAO_NEU
+    - FAO_SEU
+    - FAO_WEU
+- code: FAO_WANA
+  name: "Western Asia and Northern Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_WAS
+    - FAO_NAF
+- code: FAO_CSA
+  name: "Central Asia and Southern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_CAS
+    - FAO_SAS
+- code: FAO_ESEA
+  name: "Eastern Asia and South-eastern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_EAS
+    - FAO_SEA
+- code: FAO_OCX
+  name: "Oceania excluding Australia and New Zealand (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_MEL
+    - FAO_MIC
+    - FAO_POL

@@ -85,6 +85,12 @@ def run() -> None:
         mask = tb_regions["ilo_2_region"].isna() & (tb_regions["ilo_1_region"] == "Arab States (ILO)")
         tb_regions.loc[mask, "ilo_2_region"] = tb_regions.loc[mask, "ilo_1_region"]
 
+    # Australia and New Zealand is one of FAO's 8 SDG regions, but it is also a fao_2 subregion, so it is
+    # tagged fao_2. Backfill it into the fao_sdg map so that partition is complete (mirrors the ILO case above).
+    if {"fao_2_region", "fao_sdg_region"} <= set(tb_regions.columns):
+        mask = tb_regions["fao_sdg_region"].isna() & (tb_regions["fao_2_region"] == "Australia and New Zealand (FAO)")
+        tb_regions.loc[mask, "fao_sdg_region"] = tb_regions.loc[mask, "fao_2_region"]
+
     # Remove unnecessary columns.
     tb_regions = tb_regions.drop(
         columns=["code", "is_historical", "region_type", "defined_by", "members"], errors="raise"
