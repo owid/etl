@@ -1287,7 +1287,7 @@ steps:
       - data://meadow/wvs/2023-06-25/longitudinal_wvs:
         - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
         - data://garden/regions/2023-01-01/regions
-  # archived; last active in 7f465a71b4a2 on 2026-07-01
+  # archived; last active in f08d01d5bf75 on 2026-07-10
   data://grapher/wb/2025-07-01/income_groups:
     - data://garden/wb/2025-07-01/income_groups_aggregations:
       - data://garden/wb/2025-07-01/income_groups:
