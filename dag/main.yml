@@ -570,6 +570,15 @@ steps:
       - data://meadow/worldbank_wdi/2026-01-29/wdi:
         - snapshot://worldbank_wdi/2026-01-29/wdi.zip
 
+  data://grapher/worldbank_wdi/2026-07-14/wdi:
+    - data://garden/worldbank_wdi/2026-07-14/wdi:
+      - data://meadow/worldbank_wdi/2026-07-14/wdi:
+        - snapshot://worldbank_wdi/2026-07-14/wdi.zip
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/regions/2023-01-01/regions
+      - snapshot://worldbank_wdi/2026-07-14/wdi.zip
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
 
   #
   # Trust in US government - Pew Research Center
@@ -651,18 +660,6 @@ steps:
     - data://garden/itopf/2026-05-06/oil_spills:
       - data://meadow/itopf/2026-05-06/oil_spills:
         - snapshot://itopf/2026-05-06/oil_spills.pdf
-  # World Development Indicators - WDI
-  data://garden/worldbank_wdi/2026-07-14/wdi:
-    - data://meadow/worldbank_wdi/2026-07-14/wdi:
-      - snapshot://worldbank_wdi/2026-07-14/wdi.zip
-    - data://garden/un/2024-07-12/un_wpp
-    - data://garden/regions/2023-01-01/regions
-    - snapshot://worldbank_wdi/2026-07-14/wdi.zip
-    - data://garden/wb/2026-07-01/income_groups
-    - data://garden/demography/2024-07-15/population
-
-  data://grapher/worldbank_wdi/2026-07-14/wdi:
-    - data://garden/worldbank_wdi/2026-07-14/wdi
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
