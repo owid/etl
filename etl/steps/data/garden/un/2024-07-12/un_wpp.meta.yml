@@ -182,6 +182,45 @@ tables:
       #     grapher_config:
       #       subtitle: *pop2_description_short
 
+  population_peak:
+    variables:
+      population_peak_status:
+        title: Population peak status
+        unit: ""
+        type: ordinal
+        sort:
+          - Before peak
+          - Peak year
+          - After peak
+        description_short: |-
+          Whether the population has passed its peak — its highest value between 1950 and 2100, based on UN estimates and medium-scenario projections.
+        description_key:
+          - The peak year is the year in which the population reaches its highest value over the period 1950–2100, combining UN estimates for 1950–2023 with [medium-scenario](#dod:un-projection-scenarios) projections for 2024–2100.
+          - Populations that are still growing in 2100 are labeled "Before peak" for all years, since their peak lies beyond the UN's projection horizon.
+        description_processing: |-
+          We combine the UN's population estimates (1950–2023) with its medium-scenario projections (2024–2100) and identify the year in which each population reaches its highest value. Years before that peak are labeled "Before peak", the peak year itself is labeled "Peak year", and later years are labeled "After peak". If the highest value occurs in more than one year, the first is used as the peak year. Populations that are still growing in 2100 are labeled "Before peak" throughout.
+        presentation:
+          title_public: Population peak status
+          grapher_config:
+            subtitle: |-
+              Whether the population has passed its highest value between 1950 and 2100, based on UN estimates and [medium-scenario](#dod:un-projection-scenarios) projections.
+      population_peak_status_code:
+        title: Population peak status (numeric code)
+        unit: ""
+        description_short: |-
+          Whether the population has passed its peak — its highest value between 1950 and 2100, based on UN estimates and medium-scenario projections. Years before the peak are coded -1, the peak year 0, and years after the peak 1.
+        description_key:
+          - This is a numeric version of the population peak status, coded as -1 ("Before peak"), 0 ("Peak year"), and 1 ("After peak").
+          - The peak year is the year in which the population reaches its highest value over the period 1950–2100, combining UN estimates for 1950–2023 with [medium-scenario](#dod:un-projection-scenarios) projections for 2024–2100.
+          - Populations that are still growing in 2100 are coded -1 ("Before peak") for all years, since their peak lies beyond the UN's projection horizon.
+        description_processing: |-
+          We combine the UN's population estimates (1950–2023) with its medium-scenario projections (2024–2100) and identify the year in which each population reaches its highest value. Years before that peak are coded -1 ("Before peak"), the peak year itself is coded 0 ("Peak year"), and later years are coded 1 ("After peak"). If the highest value occurs in more than one year, the first is used as the peak year. Populations that are still growing in 2100 are coded -1 throughout.
+        display:
+          name: Population peak status
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Population peak status
+
   growth_rate:
     variables:
       growth_rate:

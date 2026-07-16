@@ -164,10 +164,11 @@ steps:
       - data://garden/demography/2023-03-31/population
 
   # World Bank - Worldwide Bureaucracy Indicators
-  data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
-    - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
-      - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
-        - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+  data://grapher/wb/2026-07-14/worldwide_bureaucracy_indicators:
+    - data://garden/wb/2026-07-14/worldwide_bureaucracy_indicators:
+      - data://meadow/wb/2026-07-14/worldwide_bureaucracy_indicators:
+        - snapshot://wb/2026-07-14/worldwide_bureaucracy_indicators.zip
+      - data://garden/regions/2023-01-01/regions
 
   # Information Capacity Dataset
   data://grapher/state_capacity/2023-11-20/information_capacity_dataset:

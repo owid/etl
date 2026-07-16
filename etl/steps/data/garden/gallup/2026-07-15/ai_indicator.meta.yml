@@ -3,6 +3,7 @@ definitions:
   common:
     processing_level: minor
     presentation:
+      attribution_short: Gallup
       topic_tags:
         - Artificial Intelligence
 
