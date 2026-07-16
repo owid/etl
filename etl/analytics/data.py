@@ -336,6 +336,73 @@ def get_post_views_by_url(
     return df_views
 
 
+def get_explorer_views_by_url(
+    urls: list[str] | None = None,
+    date_min: str = DATE_MIN,
+    date_max: str = DATE_MAX,
+) -> pd.DataFrame:
+    """
+    Fetch number of views for explorer pages for a list of URLs from Metabase.
+
+    Parameters
+    ----------
+    urls : list of str, optional
+        List of explorer URLs to filter the results. If None, all explorer views are included.
+    date_min : str, optional
+        Minimum date to filter the results.
+    date_max : str, optional
+        Maximum date to filter the results.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the number of explorer views per URL, with columns:
+        url, title, views, n_days, views_daily.
+    """
+    query = f"""
+    SELECT
+        url,
+        SUM(views) AS views
+    FROM {SEMANTIC_LAYER_SCHEMA}.views_detailed
+    JOIN {SEMANTIC_LAYER_SCHEMA}.pages USING(url)
+    WHERE day >= '{date_min}'
+    AND day <= '{date_max}'
+    AND type = 'explorer'
+    AND url IS NOT NULL
+    """
+    if urls:
+        url_list = ", ".join(f"'{url}'" for url in urls)
+        query += f" AND url IN ({url_list})"
+    query += """
+    GROUP BY url
+    ORDER BY views DESC
+    """
+    df_views = read_analytics(sql=query)
+
+    df_views["n_days"] = get_number_of_days(
+        date_min=date_min,
+        date_max=date_max,
+        table_name="views_detailed",
+        day_column_name="day",
+    )
+    df_views["views_daily"] = df_views["views"] / df_views["n_days"]
+    df_views.loc[df_views["views_daily"] == float("inf"), "views_daily"] = 0
+
+    # Fetch explorer titles from the OWID DB by joining on slug derived from URL.
+    explorer_base_url = POST_LINK_TYPES_TO_URL["explorer"]
+    df_views["slug"] = df_views["url"].str.removeprefix(explorer_base_url).str.split("?").str[0]
+    df_titles = OWID_ENV.read_sql(
+        "SELECT slug, JSON_UNQUOTE(JSON_EXTRACT(config, '$.explorerTitle')) AS title FROM explorers"
+    )
+    df_views = df_views.merge(df_titles, on="slug", how="left").drop(columns=["slug"])
+
+    # Reorder columns for convenience.
+    cols = ["url", "title", "views", "n_days", "views_daily"]
+    df_views = df_views[cols]
+
+    return df_views
+
+
 def _get_post_references_of_charts_and_redirected_charts(
     chart_ids: list[int] | None = None, component_types: list[str] | None = None
 ) -> pd.DataFrame:

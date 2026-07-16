@@ -1,12 +1,13 @@
-YEAR: 2025
-PERIOD: "Y"
+YEAR: 2026
+PERIOD: "H1"
 PROVIDERS:
   - name: "Uppsala Conflict Data Program"
-    alias: ["Uppsala Conflict Data Program and Peace Research Institute Oslo"]
-  - name: "WDI"
-    alias: []
+    alias:
+      - "Uppsala Conflict Data Program and Peace Research Institute Oslo"
+    explorer_links: []
   - name: "Global Carbon Project"
     alias: []
+    explorer_links: []
   - name: "WHO Mortality Database"
     alias: []
   - name: "IHME, Global Burden of Disease"
@@ -23,8 +24,10 @@ PROVIDERS:
     alias: []
   - name: "Luxembourg Income Study"
     alias: []
-  - name: "Rupert Way"
-    alias: []
+    explorer_links:
+      - "https://ourworldindata.org/explorers/incomes-across-distribution-lis"
+      - "https://ourworldindata.org/explorers/poverty-lis"
+      - "https://ourworldindata.org/explorers/inequality-lis"
 ADDITIONAL_PROVIDERS: # providers that don't get a report now but might get one in the future
   - name: "Cherry Blossom Researcher"
     alias: []
@@ -33,6 +36,11 @@ ADDITIONAL_PROVIDERS: # providers that don't get a report now but might get one 
   - name: "Save the Children"
     alias: []
   - name: "Water, Sanitation and Hygiene (WASH) - WHO and UNICEF Joint Programme"
+    alias: []
+  - name: "Rupert Way"
+    alias: []
+  # WDI producers are now the original data collectors/ producers "via World Bank" (e.g. UN, FAO, WHO, etc.) and not the World Bank itself. If we want to report this it's probably easier via indicator path etc
+  - name: "WDI"
     alias: []
 
 

@@ -243,6 +243,8 @@ def get_impact_highlights(
     # Name of column containing the date.
     if df is None:
         df = get_notion_table_period(min_date=min_date, max_date=max_date, max_rows=max_rows)
+    else:
+        df = df.copy()
 
     if producers is not None:
         # Find indexes of rows where the given producers are mentioned.

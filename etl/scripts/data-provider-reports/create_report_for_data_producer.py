@@ -1,6 +1,7 @@
 """Script to generate an analytics report for a data producer."""
 
 import re
+import urllib.parse
 from datetime import datetime
 
 import click
@@ -10,6 +11,7 @@ from structlog import get_logger
 
 from etl.analytics.data import (
     get_chart_views_by_chart_id,
+    get_explorer_views_by_url,
     get_post_views_by_chart_id,
     get_visualizations_using_data_by_producer,
 )
@@ -40,6 +42,29 @@ PERIODS = {
     "H2": {"name": "second half", "min_date": "07-01", "max_date": "12-31"},
     "Y": {"name": "year", "min_date": "01-01", "max_date": "12-31"},
 }
+
+
+def get_mb_table_url(producer, period, year, type="chart") -> str:
+    """Get the URL of the chart view table in Metabase for a given producer and period.
+    URLs look like this:
+    chart view: http://metabase.owid.io/question/1687-chart-views-by-producer?producer=IHME%2C%20Global%20Burden%20of%20Disease&date_min=2025-01-01&date_max=2025-12-31
+    page view: http://metabase.owid.io/question/1688-page-views-per-producer?producer=IHME%2C%20Global%20Burden%20of%20Disease&date_min=2025-01-01&date_max=2025-12-01
+    """
+    # Get the min and max dates for the given period and year.
+    min_date = f"{year}-{PERIODS[period]['min_date']}"
+    max_date = f"{year}-{PERIODS[period]['max_date']}"
+
+    url_encoded_producer = urllib.parse.quote(producer)
+
+    # Construct the Metabase URL.
+    if type == "chart":
+        mb_url = f"http://metabase.owid.io/question/1687-chart-views-by-producer?producer={url_encoded_producer}&date_min={min_date}&date_max={max_date}"
+    elif type == "page":
+        mb_url = f"http://metabase.owid.io/question/1688-page-views-per-producer?producer={url_encoded_producer}&date_min={min_date}&date_max={max_date}"
+    else:
+        raise ValueError(f"Unknown type: {type}, expected 'chart' or 'page'.")
+
+    return mb_url
 
 
 def get_chart_title_from_url(chart_url: str) -> str:
@@ -151,6 +176,23 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
 
     # Remove the original placeholder text.
     google_doc.replace_text(mapping={placeholder: ""})
+
+
+def get_explorer_views(explorer_links: list[str], min_date: str, max_date: str) -> pd.DataFrame:
+    """Get views for a list of explorer links."""
+    rows = []
+    for link in explorer_links:
+        # Extract the explorer name from the URL.
+        explorer_name = link.split("/")[-1]
+        # Get the views for the explorer.
+        df_views = get_explorer_views_by_url(urls=[link], date_min=min_date, date_max=max_date).rename(
+            columns={"url": "url", "views": "views"}
+        )
+        df_views["explorer_name"] = explorer_name
+        rows.append(df_views)
+
+    df_explorer_views = pd.concat(rows, ignore_index=True)
+    return df_explorer_views
 
 
 class Report:
@@ -544,6 +586,9 @@ def run(producer, aliases, period, year, overwrite_pdf, grant_permissions):
     )
     print_impact_highlights(highlights=highlights)
 
+    mb_chart_url = get_mb_table_url(producer=producer, period=period, year=year, type="chart")
+    mb_page_url = get_mb_table_url(producer=producer, period=period, year=year, type="page")
+
     # Add new entry in the status sheet.
     df = pd.DataFrame(
         {
@@ -552,6 +597,8 @@ def run(producer, aliases, period, year, overwrite_pdf, grant_permissions):
             "period": [period],
             "report": [report.pdf_link],
             "gdoc": [report.doc_link],
+            "mb chart url": [mb_chart_url],
+            "mb page url": [mb_page_url],
             "reviewed": [0],
             "shared with producer on": [None],
         }
