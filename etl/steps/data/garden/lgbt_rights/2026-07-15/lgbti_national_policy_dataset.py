@@ -884,10 +884,14 @@ def _build_gmc_combined(wide):
       - Not legally possible            : proportion = 0
       - Varies by region             : 0 < proportion < 1
       - Self-declaration                : proportion = 1, requirement in {Self-ID, Self-Declaration}
-      - Medical/psychological diagnosis : proportion = 1, requirement = Medical/Psychological
-      - Surgery required                : proportion = 1, requirement = Surgery
+      - Medical/psychological diagnosis : proportion = 1, requirement in {Medical/Psychological, Medical Diagnosis}
+      - Surgery required                : proportion = 1, requirement in {Surgery, Mixed (Surgery + Medical/Psychological)}
       - Surgery and sterilization       : proportion = 1, requirement = Surgery+Sterilization
       - Legally possible, requirement unknown : proportion = 1, requirement is NaN
+
+    The label set follows codebook §4.5 (Gender_Change_Requirement vocabulary); per §5.1.5 the
+    "Mixed (Surgery + Medical/Psychological)" regimes sit in the Surgery tier, so they map to
+    "Surgery required".
     """
     prop = wide["gender_marker_change__legal"]
     req = wide["gender_marker_change_requirement"]
@@ -896,7 +900,9 @@ def _build_gmc_combined(wide):
         "Self-ID": "Self-declaration is enough",
         "Self-Declaration": "Self-declaration is enough",
         "Medical/Psychological": "Diagnosis required",
+        "Medical Diagnosis": "Diagnosis required",
         "Surgery": "Surgery required",
+        "Mixed (Surgery + Medical/Psychological)": "Surgery required",
         "Surgery+Sterilization": "Surgery and sterilization required",
     }
 
