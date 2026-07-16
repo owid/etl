@@ -1,0 +1,44 @@
+# Known errors in the producer's 2026-06-12 in-place revision of v2.0, corrected locally until
+# fixed upstream. All three were introduced by the revision's Gender_Change_Requirement relabel
+# wave (the 2026-03-23 release carried the correct labels). The value-match locator scopes exactly
+# the mislabeled rows (only post-reform years carry the wrong label), and apply_corrections fails
+# loudly once the producer fixes them (zero-match assert).
+#
+# Verification: full evidence in the adversarial reviews on PR #6454
+# (ai/adversarial-review-gender-marker-chart-2026-07-16.md).
+
+- indicator: gender_change_requirement
+  match: {country: France, law: gender_marker_change, status: legal, value: Medical/Psychological}
+  action: override
+  value: Self-ID
+  reason: >-
+    France's Law 2016-1547 (Civil Code Art. 61-5) explicitly removed all medical requirements for
+    legal gender change (confirmed by Amnesty, Equaldex, and the A.P./Garçon/Nicot ECHR literature);
+    the 2026-06-12 revision relabeled 2017+ from Self-ID to Medical/Psychological.
+  provider: Velasco
+  status: open
+
+- indicator: gender_change_requirement
+  match: {country: Greece, law: gender_marker_change, status: legal, value: Medical/Psychological}
+  action: override
+  # The March release labeled these rows "Self-Declaration", but the June revision's controlled
+  # vocabulary (codebook §4.5) only defines "Self-ID" — both map to the same published category.
+  value: Self-ID
+  reason: >-
+    Greece's Law 4491/2017 abolished all medical conditions (surgery, sterilization, diagnosis) for
+    legal gender recognition (gov.gr, HRW); the 2026-06-12 revision relabeled 2017+ from
+    Self-Declaration to Medical/Psychological.
+  provider: Velasco
+  status: open
+
+- indicator: gender_change_requirement
+  match: {country: India, law: gender_marker_change, status: legal, value: Medical/Psychological}
+  action: override
+  value: Surgery
+  reason: >-
+    The producer's own codebook (§6.11) documents India's Gender_Change_Requirement regressing to
+    Surgery in 2019 (Transgender Persons Act 2019 §7 requires a surgery certificate for male/female
+    marker changes), and the 2026-03-23 release carried Surgery; the 2026-06-12 revision relabeled
+    2019+ to Medical/Psychological, contradicting its own documentation.
+  provider: Velasco
+  status: open

@@ -10,8 +10,12 @@ definitions:
     description_key:
       - "{definitions.description_key_dataset}"
 
+      - "{definitions.description_key_binding_instrument}"
   description_key_dataset: |-
-    This data comes from the LGBTI National Policy Dataset, compiled by Kristopher Velasco at Princeton University. It tracks the adoption, scope, and enforcement of 27 LGBTI-related policies across 197 countries, with annual data starting in 1991.
+    This data comes from the LGBTI National Policy Dataset, compiled by Kristopher Velasco at Princeton University. It tracks the adoption, scope, and enforcement of 27 LGBTI-related policies across 196 countries, with annual data starting in 1991.
+
+  description_key_binding_instrument: |-
+    The dataset counts policies established by binding legal instruments — statutes, constitutional provisions, decrees and regulations with the force of law, and binding court rulings. Non-binding guidance and policies operating only in practice are not counted, with narrow exceptions such as health-authority rules that determine public funding of gender-affirming care.
 
   proportion_methodology: |-
     The score ranges from 0 (the policy does not exist in any jurisdiction) to 1 (the policy is in effect at the national level). Fractional values reflect subnational adoption in federal or decentralized countries (e.g., the United States, Australia, Brazil, India), weighted by constant 2000/2001 Census population shares so that changes over time reflect policy shifts rather than demographic change.
@@ -61,7 +65,7 @@ definitions:
     <% elif law == "conversion_therapies" %>
     Whether conversion therapy is banned by law, executive order, or judicial ruling.
     <% elif law == "death_penalty" %>
-    Whether the death penalty is a codified or de facto punishment for same-sex sexual acts.
+    Whether the death penalty is a legally codified punishment for same-sex sexual acts.
     <% elif law == "employment_discrimination_gender_identity" %>
     Whether national law prohibits employment discrimination based on gender identity.
     <% elif law == "employment_discrimination_sexual_orientation" %>
@@ -198,6 +202,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "{definitions.proportion_methodology}"
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -216,6 +221,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
+          - "{definitions.description_key_binding_instrument}"
         processing_level: major
         description_processing: |-
           From the country-level policy scores, we classified each country-year as having full implementation when the score equals 1, then counted these countries within each region. {definitions.description_regions_processing}
@@ -233,6 +239,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
+          - "{definitions.description_key_binding_instrument}"
         processing_level: major
         description_processing: |-
           From the country-level policy scores, we classified each country-year as not fully implemented when the score is below 1 (no policy, or subnational adoption only), then counted these countries within each region. {definitions.description_regions_processing}
@@ -250,6 +257,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
+          - "{definitions.description_key_binding_instrument}"
         processing_level: major
         description_processing: |-
           From the country-level policy scores, we identified countries where the score equals 1 (full national implementation) and summed their populations within each region. {definitions.description_regions_processing}
@@ -267,6 +275,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "{definitions.description_key_full_implementation}"
+          - "{definitions.description_key_binding_instrument}"
         processing_level: major
         description_processing: |-
           From the country-level policy scores, we identified countries where the score is below 1 (no policy, or subnational adoption only) and summed their populations within each region. {definitions.description_regions_processing}
@@ -286,6 +295,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "The indicator is coded as follows: **_Equal_** (age of consent is equal for same-sex and different-sex partners under national law), **_Varies by region_** (rules differ between subnational jurisdictions), **_No legal provisions_** (no national law regulating the age of consent for same-sex and different-sex partners) and **_Unequal_** (age of consent is higher for same-sex than different-sex partners under national law)."
+          - "{definitions.description_key_binding_instrument}"
         processing_level: major
         description_processing: "{definitions.derivation_age_of_consent}"
         unit: ""
@@ -307,6 +317,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "The indicator is coded as follows: **_Legal_** (marriage equality is fully implemented under national law; civil unions may also exist), **_Civil unions only_** (a national civil union or registered partnership is recognized, but same-sex marriage is not), **_Varies by region_** (marriage equality, the marriage ban, or civil unions are only partially in effect across subnational jurisdictions), **_No legal provisions_** (no national law regulating same-sex marriage or civil unions) and **_Banned_** (marriage equality is banned and the ban is fully implemented, with no civil unions)."
+          - "{definitions.description_key_binding_instrument}"
         processing_level: major
         description_processing: "{definitions.derivation_marriage}"
         unit: ""
@@ -329,6 +340,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "The indicator is coded as follows: **_Allowed_** (LGB people are allowed to serve in the military), **_No policy_** (no national policy allowing or banning LGB military service) and **_Banned_** (LGB people are banned from serving in the military)."
+          - "{definitions.description_key_binding_instrument}"
         processing_level: major
         description_processing: "{definitions.derivation_lgb_military_join}"
         unit: ""
@@ -350,6 +362,7 @@ tables:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Legal_** (consensual same-sex sexual acts are legal under national law), **_Varies by region_** (laws differ between subnational jurisdictions), **_No legal provisions_** (no national law specifically addresses consensual same-sex sexual acts), **_Criminalized but not enforced_** (consensual same-sex sexual acts are criminalized under national law but the dataset records the criminalization as not enforced) and **_Criminalized_** (consensual same-sex sexual acts are criminalized under national law).'
           - "{definitions.derivation_enforcement_refinement}"
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -372,6 +385,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_No MSM restrictions_** (men who have sex with men may donate blood without specific restriction), **_No policy_** (no national rule on blood donation by men who have sex with men) and **_Deferral or ban_** (men who have sex with men face a deferral period or a lifetime ban on blood donation).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -392,6 +406,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Allowed_** (transgender people may serve openly in the military), **_No policy_** (no national policy allowing or banning transgender military service) and **_Banned_** (transgender people are banned from serving openly in the military).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -412,6 +427,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Legally recognized_** (same-sex couples have access to a legally recognized partnership distinct from marriage), **_Varies by region_** (recognition differs between subnational jurisdictions) and **_Not recognized_** (no legal recognition of same-sex partnerships at the national level).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -432,6 +448,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Allowed_** (same-sex couples may jointly adopt children under national law), **_Varies by region_** (rules differ between subnational jurisdictions) and **_Not allowed_** (national law does not permit joint adoption by same-sex couples).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -452,6 +469,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Constitutionally protected_** (sexual orientation is named in the constitution or established as a protected characteristic through binding constitutional court interpretation) and **_Not protected_** (no national constitutional protection for sexual orientation).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -471,6 +489,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Constitutionally protected_** (gender identity is named in the constitution or established as a protected characteristic through binding constitutional court interpretation) and **_Not protected_** (no national constitutional protection for gender identity).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -490,6 +509,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Covered by hate crime laws_** (sexual orientation is a protected characteristic in national hate crime legislation that imposes enhanced penalties), **_Varies by region_** (coverage differs between subnational jurisdictions) and **_Not covered_** (sexual orientation is not covered by national hate crime legislation).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -510,6 +530,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Covered by hate crime laws_** (gender identity is a protected characteristic in national hate crime legislation that imposes enhanced penalties), **_Varies by region_** (coverage differs between subnational jurisdictions) and **_Not covered_** (gender identity is not covered by national hate crime legislation).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -530,6 +551,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Prohibited_** (incitement to hatred based on sexual orientation or gender identity is prohibited under national law), **_Varies by region_** (prohibitions differ between subnational jurisdictions) and **_Not prohibited_** (no national law prohibits incitement to hatred based on sexual orientation or gender identity).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -550,6 +572,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Recognized_** (a third gender marker or non-binary category is legally recognized on official identity documents), **_Varies by region_** (recognition differs between subnational jurisdictions) and **_Not recognized_** (no legal recognition of a third gender marker or non-binary category).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -570,6 +593,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Discrimination prohibited_** (national law prohibits employment discrimination based on sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions) and **_No protection_** (no national law prohibits employment discrimination based on sexual orientation).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -590,6 +614,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Discrimination prohibited_** (national law prohibits employment discrimination based on gender identity), **_Varies by region_** (protections differ between subnational jurisdictions) and **_No protection_** (no national law prohibits employment discrimination based on gender identity).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -610,6 +635,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Discrimination prohibited_** (national law prohibits discrimination in the provision of goods and services based on sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions) and **_No protection_** (no national law prohibits goods and services discrimination based on sexual orientation).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -630,6 +656,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Discrimination prohibited_** (national law prohibits discrimination in the provision of goods and services based on gender identity), **_Varies by region_** (protections differ between subnational jurisdictions) and **_No protection_** (no national law prohibits goods and services discrimination based on gender identity).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -650,6 +677,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Banned_** (conversion therapy is banned by law, executive order, or judicial ruling), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on conversion therapy).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -670,6 +698,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Banned_** (non-consensual gender assignment surgeries on intersex children are banned under national law), **_Varies by region_** (bans differ between subnational jurisdictions) and **_Not banned_** (no national ban on non-consensual gender assignment surgeries on intersex children).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -686,10 +715,12 @@ tables:
       death_penalty:
         title: Death penalty for same-sex acts
         description_short: |-
-          Whether the death penalty is a codified or de facto punishment for same-sex sexual acts.
+          Whether the death penalty is a legally codified punishment for same-sex sexual acts.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_No death penalty_** (the death penalty does not apply to same-sex sexual acts), **_Varies by region_** (application differs between subnational jurisdictions) and **_Death penalty applies_** (the death penalty is a codified or de facto punishment for same-sex sexual acts).'
+          - 'The indicator is coded as follows: **_No death penalty_** (no binding legal instrument makes same-sex sexual acts punishable by death), **_Varies by region_** (application differs between subnational jurisdictions) and **_Death penalty applies_** (the death penalty is a codified punishment for same-sex sexual acts).'
+          - "{definitions.description_key_binding_instrument}"
+          - Countries where a death penalty operates only through uncodified religious law, or where it is a contested legal possibility without a citable binding instrument (for example Pakistan, Somalia, and the United Arab Emirates as of 2025), are counted as not having the death penalty.
         unit: ""
         short_unit: ""
         display:
@@ -711,6 +742,7 @@ tables:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_No restrictions_** (no national law restricts the public expression of LGBTI identities), **_Laws vary by region_** (restrictions differ between subnational jurisdictions), **_Restrictions exist but not enforced_** (national law restricts the public expression of LGBTI identities, but the dataset records the restrictions as not enforced) and **_Restrictions exist_** (national law restricts the public expression of LGBTI identities, e.g. so-called "gay propaganda" or morality provisions).'
           - "{definitions.derivation_enforcement_refinement}"
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -732,6 +764,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_No restrictions_** (no national law restricts the formation, registration, operation, or funding of LGBTQ+ civil society organizations), **_Varies by region_** (restrictions differ between subnational jurisdictions) and **_Restrictions in effect_** (national law explicitly restricts the formation, registration, operation, or funding of LGBTQ+ civil society organizations).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -752,6 +785,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_No religious exemptions_** (no national law allows refusal of services to LGBTQ+ people on religious or conscientious grounds, beyond standard clergy exemptions), **_Varies by region_** (exemptions differ between subnational jurisdictions) and **_Religious exemptions in effect_** (national law allows individuals, businesses, or organizations to refuse services to LGBTQ+ people on religious or conscientious grounds).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -775,6 +809,7 @@ tables:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (national law prohibits employment discrimination on both sexual orientation and gender identity), **_Sexual orientation only_** (national law prohibits employment discrimination on sexual orientation but not gender identity), **_Gender identity only_** (national law prohibits employment discrimination on gender identity but not sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_No protection_** (national law does not prohibit employment discrimination on either ground).'
           - "{definitions.description_key_so_gi_partial_note}"
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -798,6 +833,7 @@ tables:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (national law prohibits goods and services discrimination on both sexual orientation and gender identity), **_Sexual orientation only_** (national law prohibits goods and services discrimination on sexual orientation but not gender identity), **_Gender identity only_** (national law prohibits goods and services discrimination on gender identity but not sexual orientation), **_Varies by region_** (protections differ between subnational jurisdictions for either ground) and **_No protection_** (national law does not prohibit goods and services discrimination on either ground).'
           - "{definitions.description_key_so_gi_partial_note}"
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -821,6 +857,7 @@ tables:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both covered_** (national hate crime legislation covers both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is covered by national hate crime legislation), **_Varies by region_** (coverage differs between subnational jurisdictions for either ground) and **_Not covered_** (national hate crime legislation does not cover either ground).'
           - "{definitions.description_key_so_gi_partial_note}"
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -843,6 +880,7 @@ tables:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Both protected_** (the constitution explicitly, or via binding court interpretation, protects both sexual orientation and gender identity), **_Sexual orientation only_** (only sexual orientation is protected) and **_Not protected_** (the constitution does not protect either ground).'
           - "{definitions.description_key_so_gi_partial_note}"
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -865,6 +903,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Covered for adults and minors_** (gender-affirming healthcare is publicly funded for both adults and minors), **_Covered for adults or minors only_** (gender-affirming healthcare is publicly funded for one of the two groups, with no national policy for the other), **_Adults covered, minors restricted_** (gender-affirming healthcare is publicly funded for adults but explicitly restricted or banned for minors), **_Neither covered nor restricted_** (no national policy explicitly funds or restricts gender-affirming healthcare for either group), **_Varies by region or other_** (rules differ between subnational jurisdictions, or both coverage and restriction are recorded in the same year because of a mid-year policy change) and **_Restricted for both_** (gender-affirming healthcare is explicitly restricted or banned for both adults and minors).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -890,6 +929,7 @@ tables:
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Self-declaration is enough_** (legal change of the gender marker is possible based on self-declaration), **_Diagnosis required_** (legal change requires a medical or psychological diagnosis), **_Surgery required_** (legal change requires gender-affirming surgery), **_Surgery and sterilization required_** (legal change requires both gender-affirming surgery and sterilization), **_Legally possible, requirement unknown_** (legal change is in effect but the procedural requirement is not recorded in the source), **_Varies by region_** (rules differ between subnational jurisdictions, or legal change is only partially in effect) and **_Not legally possible_** (no legal procedure exists to change the gender marker on official identity documents).'
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -914,6 +954,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "This indicator combines `LGB military service` and `Transgender military service` into a single categorical, with one label per real combination that occurs in the data. **_Open service permitted_** (both can serve openly), **_Allowed for LGB only_** (LGB can serve openly, no national policy on transgender service), **_Allowed for transgender only_** (transgender can serve openly, no national policy on LGB service), **_Mixed (LGB allowed, transgender banned)_** (LGB can serve openly while transgender people are banned), **_No policy_** (no national policy on either group), **_Banned for transgender only_** (transgender people banned, no national policy on LGB service), **_Banned for LGB only_** (LGB banned, no national policy on transgender service) and **_Service banned_** (both banned)."
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:
@@ -939,6 +980,7 @@ tables:
         description_key:
           - "{definitions.description_key_dataset}"
           - "This indicator combines `LGB military service` and `Transgender military service` into a single categorical, with one label per real combination that occurs in the data. **_Open service permitted_** (both can serve openly), **_Allowed for LGB only_** (LGB can serve openly, no national policy on transgender service), **_Allowed for transgender only_** (transgender can serve openly, no national policy on LGB service), **_Mixed (LGB allowed, transgender banned)_** (LGB can serve openly while transgender people are banned), **_No policy_** (no national policy on either group), **_Banned for transgender only_** (transgender people banned, no national policy on LGB service), **_Banned for LGB only_** (LGB banned, no national policy on transgender service) and **_Service banned_** (both banned)."
+          - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
         display:

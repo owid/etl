@@ -668,7 +668,12 @@ def run() -> None:
     # Harmonize country names
     tb = paths.regions.harmonize_names(tb=tb)
 
+    # Apply declared corrections for known upstream errors (see lgbti_national_policy_dataset.corrections.yml).
+    tb = paths.apply_corrections(tb)
+
     # Repair a status misfile the producer introduced in the 2026-06-12 revision (see function docstring).
+    # (Kept in code rather than corrections.yml: it's a rule-based proportion swap across two status
+    # rows, which the declarative format can't express.)
     tb = _fix_misfiled_incitement_status(tb)
 
     # Drop structural-placeholder (law, status) combinations — combos that are all-zero per the codebook.
