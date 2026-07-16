@@ -119,7 +119,7 @@ steps:
         - data://garden/regions/2023-01-01/regions
         - data://meadow/health/2023-08-22/unaids_deaths_averted_art:
             - snapshot://health/2023-08-22/unaids_deaths_averted_art.xlsx
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
         - data://garden/demography/2024-07-15/population
 
   # OECD Road accidents & passenger travel
@@ -182,7 +182,7 @@ steps:
         - data://garden/who/2024-04-09/polio_historical:
             - data://meadow/who/2024-04-09/polio_historical:
                 - snapshot://who/2024-04-09/polio_historical.xls
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
         - data://garden/regions/2023-01-01/regions
         - data://garden/demography/2023-03-31/population
         - snapshot://fasttrack/latest/gpei.csv
@@ -384,11 +384,6 @@ steps:
         - data://meadow/cancer/2024-10-13/gco_cancer_today_cervical:
             - snapshot://cancer/2024-10-13/gco_cancer_today_cervical.csv
 
-  # Antibiotic resistance data - WHO GLASS
-  data://grapher/antibiotics/2024-10-18/who_glass_by_antibiotic:
-    - data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic:
-        - data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic:
-            - snapshot://antibiotics/2024-10-18/who_glass_by_antibiotic.zip
 
   # ANIMUSE - antibiotic use in animals
   data://grapher/antibiotics/2024-10-23/animuse_year:
@@ -413,16 +408,6 @@ steps:
     - data://garden/antibiotics/2024-10-23/tracss:
         - data://meadow/antibiotics/2024-10-23/tracss:
             - snapshot://antibiotics/2024-10-23/tracss.xlsx
-  # WHO Antimicrobial usage
-  data://grapher/antibiotics/2024-11-12/antimicrobial_usage:
-    - data://garden/antibiotics/2024-11-12/antimicrobial_usage:
-        - data://meadow/antibiotics/2024-11-12/antimicrobial_usage:
-            - snapshot://antibiotics/2024-11-12/antimicrobial_usage.xlsx
-  # WHO Antibiotic testing coverage
-  data://grapher/antibiotics/2024-11-15/testing_coverage:
-    - data://garden/antibiotics/2024-11-15/testing_coverage:
-        - data://meadow/antibiotics/2024-11-15/testing_coverage:
-            - snapshot://antibiotics/2024-11-15/testing_coverage.zip
 
   # IHME Neonatal all infectious syndromes
   data-private://meadow/antibiotics/2024-11-20/microbe:
@@ -454,11 +439,6 @@ steps:
     - data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream:
         - snapshot-private://antibiotics/2024-12-02/total_pathogen_bloodstream.csv
 
-  # WHO GLASS Enrolment
-  data://grapher/antibiotics/2024-12-03/glass_enrolment:
-    - data://garden/antibiotics/2024-12-03/glass_enrolment:
-        - data://meadow/antibiotics/2024-12-03/glass_enrolment:
-            - snapshot://antibiotics/2024-12-03/glass_enrolment.xlsx
   # MICROBE - total deaths by pathogen and amr resistance
   data-private://grapher/antibiotics/2024-12-04/microbe_total_pathogens_amr:
     - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens_amr:
@@ -671,7 +651,7 @@ steps:
     - data://grapher/who/2025-07-15/vaccination_coverage:
         - data://garden/who/2025-07-15/vaccination_coverage:
             - data://garden/un/2024-07-12/un_wpp
-            - data://garden/wb/2025-07-01/income_groups
+            - data://garden/wb/2026-07-01/income_groups
             - data://garden/regions/2023-01-01/regions
             - data://meadow/who/2025-07-15/vaccination_coverage
             - data://garden/demography/2024-07-15/population
@@ -785,7 +765,7 @@ steps:
       # Global Health Observatory (GHO) from WHO
         - data://garden/who/2026-05-22/gho
         - data://garden/regions/2023-01-01/regions
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
         - data://garden/un/2024-07-12/un_wpp
 
   #
@@ -892,6 +872,28 @@ steps:
       - data://meadow/neglected_tropical_diseases/2026-06-25/funding:
         - snapshot://neglected_tropical_diseases/2026-06-25/funding.xlsx
 
+  # WHO Preventive Chemotherapy - Neglected Tropical Diseases (2026 update)
+  # Lymphatic filariasis
+  data://grapher/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
+    - data://garden/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
+            - snapshot://neglected_tropical_diseases/2026-06-25/lymphatic_filariasis.xlsx
+
+  # Schistosomiasis
+  data://grapher/neglected_tropical_diseases/2026-06-25/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2026-06-25/schistosomiasis:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2026-06-25/schistosomiasis:
+            - snapshot://neglected_tropical_diseases/2026-06-25/schistosomiasis.xlsx
+
+  # Soil-transmitted helminthiases
+  data://grapher/neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases:
+    - data://garden/neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases:
+            - snapshot://neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases.xlsx
+
   # GBD 2023 data for bespoke treemap project
   data://garden/ihme_gbd/2025-10-13/gbd_treemap:
     - data://meadow/ihme_gbd/2025-10-13/gbd_treemap:
@@ -923,7 +925,7 @@ steps:
     - data://meadow/un/2024-07-08/maternal_mortality:
         - snapshot://un/2024-07-08/maternal_mortality.zip
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   data://grapher/un/2024-07-08/maternal_mortality:
     - data://garden/un/2024-07-08/maternal_mortality
 
@@ -936,7 +938,7 @@ steps:
     - data://garden/un/2024-07-08/maternal_mortality
     - data://garden/who/2025-04-17/mortality_database
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/demography/2024-07-15/population
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
@@ -960,7 +962,7 @@ steps:
             - snapshot://tuberculosis/2026-02-05/drug_resistance_surveillance.csv
         - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
         - data://garden/regions/2023-01-01/regions
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
   # Tuberculosis budget - WHO
   data://grapher/tuberculosis/2026-02-05/budget:
     - data://garden/tuberculosis/2026-02-05/budget:
@@ -968,7 +970,7 @@ steps:
             - snapshot://tuberculosis/2026-02-05/budget.csv
         - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
         - data://garden/regions/2023-01-01/regions
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
   # Tuberculosis laboratories - WHO
   data://grapher/tuberculosis/2026-02-05/laboratories:
     - data://garden/tuberculosis/2026-02-05/laboratories:
@@ -977,12 +979,12 @@ steps:
         - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
         - data://garden/un/2024-07-12/un_wpp
         - data://garden/regions/2023-01-01/regions
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
   # Tuberculosis burden estimates - WHO
   data://grapher/tuberculosis/2026-02-05/burden_estimates:
     - data://garden/tuberculosis/2026-02-05/burden_estimates:
         - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
         - data://meadow/tuberculosis/2026-02-05/burden_estimates:
             - snapshot://tuberculosis/2026-02-05/burden_estimates.csv
         - data://garden/regions/2023-01-01/regions
@@ -991,7 +993,7 @@ steps:
   data://grapher/tuberculosis/2026-02-05/burden_disaggregated:
     - data://garden/tuberculosis/2026-02-05/burden_disaggregated:
         - snapshot://tuberculosis/2026-02-05/data_dictionary.csv
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
         - data://meadow/tuberculosis/2026-02-05/burden_disaggregated:
             - snapshot://tuberculosis/2026-02-05/burden_disaggregated.csv
         - data://garden/regions/2023-01-01/regions
@@ -1067,7 +1069,7 @@ steps:
     - data://meadow/washu/2026-04-22/pm25_air_pollution
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   data://grapher/washu/2026-04-22/pm25_air_pollution:
     - data://garden/washu/2026-04-22/pm25_air_pollution
 
@@ -1078,7 +1080,7 @@ steps:
     - data://meadow/aqli/2026-03-30/air_quality_life_index
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   data://grapher/aqli/2026-03-30/air_quality_life_index:
     - data://garden/aqli/2026-03-30/air_quality_life_index
 
@@ -1088,28 +1090,33 @@ steps:
   data://garden/health/2026-06-01/deaths_karlinsky:
     - data://garden/demography/2024-07-15/population
     - data://meadow/health/2026-06-01/deaths_karlinsky
+
   # Death completion (Karlinsky, 2024)
   data://grapher/health/2026-06-01/deaths_karlinsky:
     - data://garden/health/2026-06-01/deaths_karlinsky
 
-  # WHO Preventive Chemotherapy - Neglected Tropical Diseases (2026 update)
-  # Lymphatic filariasis
-  data://grapher/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
-    - data://garden/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
-        - data://garden/regions/2023-01-01/regions
-        - data://meadow/neglected_tropical_diseases/2026-06-25/lymphatic_filariasis:
-            - snapshot://neglected_tropical_diseases/2026-06-25/lymphatic_filariasis.xlsx
+  # WHO GLASS - Antimicrobial usage
+  data://grapher/antibiotics/2026-06-30/antimicrobial_usage:
+  - data://garden/antibiotics/2026-06-30/antimicrobial_usage:
+    - data://meadow/antibiotics/2026-06-30/antimicrobial_usage:
+        - snapshot://antibiotics/2026-06-30/antimicrobial_usage.xlsx
 
-  # Schistosomiasis
-  data://grapher/neglected_tropical_diseases/2026-06-25/schistosomiasis:
-    - data://garden/neglected_tropical_diseases/2026-06-25/schistosomiasis:
-        - data://garden/regions/2023-01-01/regions
-        - data://meadow/neglected_tropical_diseases/2026-06-25/schistosomiasis:
-            - snapshot://neglected_tropical_diseases/2026-06-25/schistosomiasis.xlsx
+  # WHO GLASS - Antibiotic testing coverage
+  data://grapher/antibiotics/2026-06-30/testing_coverage:
+  - data://garden/antibiotics/2026-06-30/testing_coverage:
+      - data://meadow/antibiotics/2026-06-30/testing_coverage:
+          - snapshot://antibiotics/2026-06-30/testing_coverage.zip
 
-  # Soil-transmitted helminthiases
-  data://grapher/neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases:
-    - data://garden/neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases:
-        - data://garden/regions/2023-01-01/regions
-        - data://meadow/neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases:
-            - snapshot://neglected_tropical_diseases/2026-06-25/soil_transmitted_helminthiases.xlsx
+
+  # WHO GLASS - Country enrolment
+  data://grapher/antibiotics/2024-12-03/glass_enrolment:
+    - data://garden/antibiotics/2024-12-03/glass_enrolment:
+      - data://meadow/antibiotics/2024-12-03/glass_enrolment:
+          - snapshot://antibiotics/2024-12-03/glass_enrolment.xlsx
+
+
+  # WHO GLASS - Testing coverage by infection and antibiotic
+  data://grapher/antibiotics/2026-06-30/who_glass_by_antibiotic:
+    - data://garden/antibiotics/2026-06-30/who_glass_by_antibiotic:
+      - data://meadow/antibiotics/2026-06-30/who_glass_by_antibiotic:
+        - snapshot://antibiotics/2026-06-30/who_glass_by_antibiotic.zip

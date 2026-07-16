@@ -46,7 +46,7 @@ steps:
       - data://meadow/un/2025-09-25/plastic_waste_2023_2024:
         - snapshot://un/2025-09-25/plastic_waste_2023_2024.csv
       - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
       - data://garden/demography/2024-07-15/population
       # UN Comstat plastic trade dataset
       - data://garden/un/2023-10-09/plastic_waste:
@@ -55,7 +55,7 @@ steps:
           - snapshot://un/2023-10-09/plastic_waste_1999_2010.csv
           - snapshot://un/2023-10-09/plastic_waste_2011_2022.csv
         - data://garden/regions/2023-01-01/regions
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
         - data://garden/demography/2023-03-31/population
   export://multidim/plastic_waste/latest/plastic_waste_trade:
     - data://grapher/un/2025-09-25/plastic_waste_2023_2024

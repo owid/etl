@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: GDP by Industry
+    title_snapshot: GDP by Industry - Value added by industry
+    description: |-
+      An industry-by-industry breakdown of gross domestic product. In addition to showing each industry's contribution to the U.S. economy, known as its value added, these statistics include industries' compensation of employees, gross operating surplus, and taxes.
+
+      GDP by industry statistics are released with the third estimate of GDP each quarter.
+    description_snapshot: |-
+      The data behind BEA's "Value Added by Industry" interactive tables. The value added workbook (ValueAdded.xlsx) reports annual and quarterly value added by industry at current prices in millions of dollars from 1997 onwards, together with shares of GDP, components of value added, and chain-type quantity and price indexes.
+    date_published: "2026-06-25"
+
+    # Citation
+    producer: U.S. Bureau of Economic Analysis
+    citation_full: |-
+      U.S. Bureau of Economic Analysis, "Value Added by Industry," https://apps.bea.gov/iTable/?reqid=150&step=2&isuri=1&categories=gdpxind (accessed July 3, 2026).
+    attribution_short: BEA
+
+    # Files
+    url_main: https://www.bea.gov/data/gdp/gdp-industry
+    url_download: https://apps.bea.gov/industry/Release/ZIP/GdpByInd.zip
+    date_accessed: '2026-07-03'
+
+    # License
+    license:
+      name: Public domain (U.S. government work)
+      url: https://www.bea.gov/help/guidelines-for-citing-bea
+outs:
+  - md5: 6ca48d0c93ce736ff360683fe3ddc6ff
+    size: 2426699
+    path: gdp_by_industry.zip

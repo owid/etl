@@ -96,3 +96,27 @@ steps:
   data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data:
     - data://meadow/bank_of_england/2026-01-21/millennium_macroeconomic_data:
       - snapshot://bank_of_england/2026-01-21/millennium_macroeconomic_data.xlsx
+
+  #
+  # Long-run structural transformation: sector employment and GDP shares (historical sources + WDI)
+  #
+  data://garden/growth/2026-07-02/structural_transformation_historical:
+    - data://meadow/papers/2026-07-02/herrendorf_rogerson_valentinyi:
+      - snapshot://papers/2026-07-02/herrendorf_rogerson_valentinyi.zip
+    - data://meadow/ggdc/2026-07-02/ggdc_10_sector:
+      - snapshot://ggdc/2026-07-02/ggdc_10_sector.xlsx
+    - data://meadow/lund_university/2026-07-02/swedish_historical_national_accounts:
+      - snapshot://lund_university/2026-07-02/swedish_historical_national_accounts_value_added.xlsx
+      - snapshot://lund_university/2026-07-02/swedish_historical_national_accounts_employment.xlsx
+    - data://meadow/bea/2026-07-02/gdp_by_industry_historical:
+      - snapshot://bea/2026-07-02/gdp_by_industry_historical.zip
+    - data://meadow/bea/2026-07-02/gdp_by_industry:
+      - snapshot://bea/2026-07-02/gdp_by_industry.zip
+  data://grapher/growth/2026-07-02/structural_transformation_omm:
+    - data://garden/growth/2026-07-02/structural_transformation_omm:
+      - data://garden/growth/2026-07-02/structural_transformation_historical
+      - data://meadow/papers/2026-07-02/broadberry_gardner:
+        - snapshot://papers/2026-07-02/broadberry_gardner.csv
+      - data://meadow/wb/2026-07-02/wdi_employment_by_sector_archive:
+        - snapshot://wb/2026-07-02/wdi_employment_by_sector_archive.csv
+      - data://garden/worldbank_wdi/2026-02-27/wdi

@@ -1281,12 +1281,26 @@ steps:
   data://grapher/un/2025-04-25/long_run_child_mortality:
     - data://garden/un/2025-04-25/long_run_child_mortality
 
-  # archived; last active in b0d22bce86f9 on 2026-06-30
+  # archived; last active in 1c12a82b704c on 2026-07-01
   data://grapher/wvs/2023-06-25/longitudinal_wvs:
     - data://garden/wvs/2023-06-25/longitudinal_wvs:
       - data://meadow/wvs/2023-06-25/longitudinal_wvs:
         - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
         - data://garden/regions/2023-01-01/regions
+  # archived; last active in f08d01d5bf75 on 2026-07-10
+  data://grapher/wb/2025-07-01/income_groups:
+    - data://garden/wb/2025-07-01/income_groups_aggregations:
+      - data://garden/wb/2025-07-01/income_groups:
+        - data://meadow/wb/2025-07-01/income_groups:
+          - snapshot://wb/2025-07-01/income_groups.xlsx
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2025-07-01/income_groups
+  # archived; last active in 3f9e92d13c77 on 2026-07-14
+  data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
+      - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
+        - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

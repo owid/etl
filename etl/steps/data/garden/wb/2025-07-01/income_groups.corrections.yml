@@ -1,9 +1,0 @@
-# Known upstream data errors in the World Bank income groups, corrected locally until fixed at the
-# source. See etl/data_corrections.py for the format.
-- indicator: classification
-  entity: Ethiopia
-  years: latest
-  action: drop
-  reason: Ethiopia's latest-year classification is included in the source file but officially has a temporary status of unclassification, so we drop it.
-  provider: World Bank
-  status: open

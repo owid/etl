@@ -11,9 +11,9 @@ meta:
     url_download: https://static.cambridge.org/content/id/urn%3Acambridge.org%3Aid%3Aarticle%3AS0962728624000071/resource/name/S0962728624000071sup004.pdf
     date_published: 2024-02-08
     date_accessed: 2024-12-12
-  license:
-    name: CC BY
-    url: https://s100.copyright.com/AppDispatchServlet?publisherName=CUP&publication=AWF&title=Estimating%20global%20numbers%20of%20fishes%20caught%20from%20the%20wild%20annually%20from%202000%20to%202019
+    license:
+      name: CC BY
+      url: https://s100.copyright.com/AppDispatchServlet?publisherName=CUP&publication=AWF&title=Estimating%20global%20numbers%20of%20fishes%20caught%20from%20the%20wild%20annually%20from%202000%20to%202019
 outs:
   - md5: ae68222d6aca31ef083562dde8111955
     size: 196957

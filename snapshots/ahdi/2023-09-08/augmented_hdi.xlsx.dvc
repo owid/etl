@@ -37,10 +37,10 @@ meta:
       https://frdelpino.es/investigacion/wp-content/uploads/2023/02/AHDI_countries_1870-2020.xlsx
     date_published: 2021
     date_accessed: 2023-09-08
-  license:
-    url:
-      https://frdelpino.es/investigacion/en/category/01_social-sciences/02_world-economy/03_human-development-world-economy/
-    name: Creative Commons BY 4.0
+    license:
+      url:
+        https://frdelpino.es/investigacion/en/category/01_social-sciences/02_world-economy/03_human-development-world-economy/
+      name: Creative Commons BY 4.0
 wdir: ../../../data/snapshots/ahdi/2023-09-08
 outs:
 - md5: d187329001384e104e019a3e08d533c6

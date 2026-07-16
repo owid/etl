@@ -87,9 +87,10 @@ class ChartDiffScores:
 
         relevance = 0
         for w, r, p in zip(weights, regularization, params):
-            if p is not None:
-                assert p > 0 or p == 0, f"p={p} should be >= 0"
-                relevance += w * p / r
+            if p is None or pd.isna(p):
+                continue
+            assert p >= 0, f"p={p} should be >= 0"
+            relevance += w * p / r
 
         relevance /= sum(weights)
         self._relevance = relevance
@@ -147,7 +148,6 @@ class ChartDiff:
         target_chart: gm.Chart | None,
         approval: gm.ChartDiffApprovals | None,
         conflict: gm.ChartDiffConflicts | None,
-        # approval_status: gm.CHART_DIFF_STATUS | str,
         modified_checksum: pd.DataFrame | None = None,
         edited_in_staging: bool | None = None,
         tags_edited: bool | None = None,
@@ -155,7 +155,7 @@ class ChartDiff:
         chart_views: float | None = None,
         score_indicators_anomalies: float | None = None,
         article_refs: list[ArticleRef] | None = None,
-        df_approvals: pd.DataFrame | None = None,
+        staging_created_at: dt.datetime | None = None,
     ):
         """Constructor of ChartDiff.
 
@@ -172,13 +172,8 @@ class ChartDiff:
         self.modified_checksum = modified_checksum
         self.edited_in_staging = edited_in_staging
         self.tags_edited = tags_edited
-
-        # Get revisions
-        if df_approvals is None:
-            self.df_approvals = pd.DataFrame()
-        else:
-            self.df_approvals = df_approvals
-        self.last_chart_revision_approved = None
+        # Creation time of the staging server (used to detect edits in production)
+        self._staging_created_at = staging_created_at
 
         # Analytics, anomalies and other scores
         self.article_refs = article_refs if article_refs else []
@@ -291,8 +286,13 @@ class ChartDiff:
                 return False
 
             # Check if chart has been edited in production
-            with Session(OWID_ENV.engine) as session:
-                chart_edited_in_prod = self.target_chart.updatedAt > get_staging_creation_time(session)
+            if self._staging_created_at is not None:
+                staging_created_at = self._staging_created_at
+            else:
+                # Fallback for ChartDiff objects created outside of `from_charts_df`.
+                with Session(OWID_ENV.engine) as session:
+                    staging_created_at = get_staging_creation_time(session)
+            chart_edited_in_prod = self.target_chart.updatedAt > staging_created_at
 
             # If edited, check if conflict was resolved
             if chart_edited_in_prod:
@@ -335,9 +335,6 @@ class ChartDiff:
                 if self.tags_edited:
                     self._change_types.append("tags")
 
-                # TODO: Should uncomment this maybe?
-                # assert self._change_types != [], "No changes detected!"
-
         return self._change_types
 
     @classmethod
@@ -350,17 +347,16 @@ class ChartDiff:
         ignore_conflicts: bool = False,
         skip_analytics: bool = False,
     ) -> list["ChartDiff"]:
-        """Get chart diffs from chart ids.
-
-        NOTE: I am a bit confused. I see we have df_charts, which has already some information on whether the
-        metadata, data, config fields were edited. However, we estimate this again with all the checksums code. Couldn't we just use the info from df_charts?
-        """
+        """Get chart diffs from chart ids."""
 
         # Return empty list if no chart difference is found
         if df_charts.empty:
             return []
 
         chart_ids = list(set(df_charts.index))
+
+        # Staging server creation time (computed once, reused by all diffs to detect conflicts)
+        staging_created_at = get_staging_creation_time(source_session)
 
         # Get charts from SOURCE db and save them in memory as dictionaries: chart_id -> chart
         source_charts = gm.Chart.load_charts(source_session, chart_ids=chart_ids)
@@ -371,7 +367,6 @@ class ChartDiff:
         target_charts = cls._get_target_charts(target_session, source_charts)
 
         # Get approval status
-        # approval_statuses = cls._get_approval_statuses(source_session, chart_ids, source_charts, target_charts)
         approvals = cls._get_approvals(source_session, chart_ids, source_charts, target_charts, ignore_conflicts)
 
         # Get conflicts
@@ -384,25 +379,24 @@ class ChartDiff:
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # ty: ignore
 
         # Get chart views, anomalies, and articles (skip if not needed for performance)
-        if skip_analytics:
-            chart_views_all = {}
-            chart_anomalies_all = {}
-            article_refs_all = {}
-        else:
-            # Get chart views
-            chart_views_all = get_chart_views_cached(chart_ids)
-
-            # Anomalies
-            chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
-
-            # Articles
-            article_refs_all = get_chart_in_article_views_cached(chart_ids)
-
-        # Get approvals
-        df_approvals_all = read_sql(
-            "SELECT * FROM chart_diff_approvals WHERE chartId IN %(chart_ids)s",
-            params={"chart_ids": chart_ids},
-        )
+        # NOTE: These rely on external services (Metabase/Datasette, Anomalist tables). A failure there
+        # should degrade the scores, not break chart-diff entirely.
+        chart_views_all: dict[int, float] = {}
+        chart_anomalies_all: dict[int, float] = {}
+        article_refs_all: dict[int, list[ArticleRef]] = {}
+        if not skip_analytics:
+            try:
+                chart_views_all = get_chart_views_cached(chart_ids)
+            except Exception as e:
+                log.warning(f"Could not fetch chart views, skipping: {e}")
+            try:
+                chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
+            except Exception as e:
+                log.warning(f"Could not fetch anomaly scores, skipping: {e}")
+            try:
+                article_refs_all = get_chart_in_article_views_cached(chart_ids)
+            except Exception as e:
+                log.warning(f"Could not fetch article references, skipping: {e}")
 
         # Build chart diffs
         chart_diffs = []
@@ -419,7 +413,7 @@ class ChartDiff:
             approval = approvals[chart_id]
 
             # Conflict
-            assert chart_id in approvals, f"Conflict not found for chart {chart_id}"
+            assert chart_id in conflicts, f"Conflict not found for chart {chart_id}"
             conflict = conflicts[chart_id]
 
             # Checksums
@@ -449,9 +443,6 @@ class ChartDiff:
             # Article refs
             article_refs = article_refs_all.get(chart_id, [])
 
-            # Get approval history
-            df_approvals = df_approvals_all[df_approvals_all["chartId"] == chart_id]
-
             # Build Chart Diff object
             chart_diff: ChartDiff = cls(
                 source_chart=source_chart,
@@ -465,11 +456,8 @@ class ChartDiff:
                 chart_views=chart_views_score,
                 score_indicators_anomalies=chart_anomalies_score,
                 article_refs=article_refs,
-                df_approvals=df_approvals,
+                staging_created_at=staging_created_at,
             )
-
-            # Add last revision
-            chart_diff.set_last_approved_chart_revision(source_session)
 
             chart_diffs.append(chart_diff)
 
@@ -541,8 +529,9 @@ class ChartDiff:
             session.add(approval)
             session.commit()
 
-            # Add approval to object
+            # Update object so that in-memory state reflects the DB without a page reload
             self.approval = approval
+            self._approval_status = status
 
     def set_conflict_to_resolved(self, session: Session) -> None:
         """Update the state of the chart diff."""
@@ -560,8 +549,9 @@ class ChartDiff:
         session.add(conflict)
         session.commit()
 
-        # Add conflict to object
+        # Update object so that in-memory state reflects the DB without a page reload
         self.conflict = conflict
+        self._in_conflict = False
 
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
@@ -693,14 +683,6 @@ class ChartDiff:
 
         return checksums_diff
 
-    def set_last_approved_chart_revision(self, session):
-        if not self.is_approved and not self.df_approvals.empty:
-            df_approvals_past = self.df_approvals.loc[self.df_approvals["status"] == "approved"]
-            if not df_approvals_past.empty:
-                timestamp = df_approvals_past["updatedAt"].max()
-                # Find the revision that was approved
-                self.last_chart_revision_approved = self.get_last_chart_revision(session, timestamp)
-
 
 class ChartDiffsLoader:
     """Detect charts that differ between staging and production and load them."""
@@ -718,10 +700,6 @@ class ChartDiffsLoader:
         with Session(self.source_engine) as source_session:
             with Session(self.target_engine) as target_session:
                 return modified_charts_on_staging(source_session, target_session, chart_ids=chart_ids)
-
-    @property
-    def chart_ids_all(self):
-        return set(self.df.index[self.df.any(axis=1)])
 
     def get_charts_df(
         self,
@@ -751,7 +729,7 @@ class ChartDiffsLoader:
         ignore_conflicts: bool = False,
         skip_analytics: bool = False,
     ) -> list[ChartDiff]:
-        """Optimised version of get_diffs."""
+        """Get chart diffs with the selected change types."""
         if chart_ids:
             assert sync, "If chart_ids are provided, sync must be True."
         if sync:
@@ -1053,20 +1031,6 @@ def _modified_tags_on_staging(
     diff["tagsEdited"] = diff["tagsEdited"] | (source_df["tagIds"].isnull() != target_df["tagIds"].isnull())
 
     return diff[["tagsEdited"]]
-
-
-def get_chart_id_slug_pairs(session: Session) -> set[tuple[int, str]]:
-    """Get all (chart_id, slug) pairs from a database as a set for efficient operations."""
-    from sqlalchemy import text
-
-    query = text("""
-    SELECT c.id, cc.slug
-    FROM charts c
-    JOIN chart_configs cc ON c.configId = cc.id
-    WHERE cc.slug IS NOT NULL
-    """)
-    result = session.execute(query).fetchall()
-    return set((row[0], row[1]) for row in result)
 
 
 def get_deleted_charts(source_session: Session, target_session: Session) -> list[dict]:

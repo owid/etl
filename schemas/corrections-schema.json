@@ -2,6 +2,22 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ETL data corrections",
   "description": "Declarative corrections for known upstream data errors. See etl/data_corrections.py.",
+  "definitions": {
+    "matchValue": {
+      "description": "A literal to match, or {column: <name>} to compare elementwise against another column of the same row.",
+      "oneOf": [
+        { "type": ["string", "number", "boolean", "null"] },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["column"],
+          "properties": {
+            "column": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    }
+  },
   "type": "array",
   "items": {
     "type": "object",
@@ -42,7 +58,8 @@
       "match": {
         "type": "object",
         "minProperties": 1,
-        "description": "Locate rows by their current value(s), e.g. {value: 4.5}. Mutually exclusive with entity/years."
+        "additionalProperties": { "$ref": "#/definitions/matchValue" },
+        "description": "Locate rows by their current value(s), e.g. {value: 4.5}, or by comparison to another column of the same row, e.g. {value: {column: free_range}}. Mutually exclusive with entity/years."
       },
       "action": {
         "enum": ["drop", "override", "scale", "flag"],
