@@ -35,6 +35,7 @@ def approve_identical_chart_diffs(
     tolerance_pct: float = 1.0,
     tolerance_abs_floor: float = 1e-6,
     max_changed_points: int = 5,
+    max_new_points: int = 1000,
 ):
     """Core function to approve chart diffs with identical configurations.
 
@@ -48,11 +49,14 @@ def approve_identical_chart_diffs(
             differ between environments per dimension (y/x/size/color), not just config hashes
         allow_small_changes: If True, also approve charts whose config is otherwise identical (same
             fields, same dimension slots) but whose dimension data differs only by small amounts —
-            see tolerance_pct / tolerance_abs_floor / max_changed_points
+            see tolerance_pct / tolerance_abs_floor / max_changed_points / max_new_points
         tolerance_pct: Max relative change (%) allowed per changed data point for allow_small_changes
         tolerance_abs_floor: Absolute floor for the tolerance check, to avoid huge relative % near zero
         max_changed_points: Max number of changed points per dimension allowed for allow_small_changes;
             charts with more changed points are still sent to manual review
+        max_new_points: Max number of newly-added points (present in staging only, e.g. a new year of
+            coverage) per dimension allowed for allow_small_changes; charts with more are still sent to
+            manual review, since an unexpectedly large coverage jump can visibly change the chart
 
     Returns:
         Tuple of (approved_count, checked_count)
@@ -207,7 +211,9 @@ def approve_identical_chart_diffs(
             needs_tolerance_check[chart_id]
             and dimension_diffs is not None
             and all(
-                dimension_diff_within_tolerance(d, tolerance_pct, tolerance_abs_floor, max_changed_points)
+                dimension_diff_within_tolerance(
+                    d, tolerance_pct, tolerance_abs_floor, max_changed_points, max_new_points
+                )
                 for d in dimension_diffs
             )
         )
@@ -356,6 +362,14 @@ def approve_identical_chart_diffs(
     help="With --allow-small-changes: max number of changed points per dimension allowed before the "
     "chart is still sent to manual review.",
 )
+@click.option(
+    "--max-new-points",
+    type=int,
+    default=1000,
+    help="With --allow-small-changes: max number of newly-added points (present in staging only, e.g. "
+    "a new year of coverage) per dimension allowed before the chart is still sent to manual review — "
+    "an unexpectedly large coverage jump can visibly change the chart even with no other value changes.",
+)
 def cli(
     dry_run: bool,
     chart_id: tuple[int, ...],
@@ -367,6 +381,7 @@ def cli(
     tolerance_pct: float,
     tolerance_abs_floor: float,
     max_changed_points: int,
+    max_new_points: int,
 ) -> None:
     """Automatically approve chart diffs with identical data. This is done by taking their configs and replacing variable IDs with hashes of their data.
 
@@ -390,6 +405,7 @@ def cli(
         tolerance_pct=tolerance_pct,
         tolerance_abs_floor=tolerance_abs_floor,
         max_changed_points=max_changed_points,
+        max_new_points=max_new_points,
     )
 
 
