@@ -86,7 +86,7 @@ steps:
     - data://garden/sipri/2026-04-27/military_expenditure:
       - data://meadow/sipri/2026-04-27/military_expenditure:
         - snapshot://sipri/2026-04-27/military_expenditure.xlsx
-      - data://garden/worldbank_wdi/2026-02-27/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
 
   # Global Military Spending Dataset
   data://grapher/harvard/2025-04-28/global_military_spending_dataset:

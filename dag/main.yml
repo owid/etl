@@ -13,7 +13,7 @@ steps:
   data://external/owid_grapher/latest/population:
     - data://grapher/demography/2024-07-15/population
   data://external/owid_grapher/latest/gdp:
-    - data://grapher/worldbank_wdi/2025-09-08/wdi
+    - data://grapher/worldbank_wdi/2026-07-14/wdi
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -31,7 +31,7 @@ steps:
   # Malnutrition
   data://grapher/malnutrition/2024-12-16/malnutrition:
     - data://garden/malnutrition/2024-12-16/malnutrition:
-      - data://garden/worldbank_wdi/2026-02-27/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
       - data://garden/un/2024-07-12/un_wpp
 
   #
@@ -48,7 +48,7 @@ steps:
   # Internet
   data://grapher/technology/2024-12-23/internet:
     - data://garden/technology/2024-12-23/internet:
-      - data://garden/worldbank_wdi/2026-02-27/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
@@ -250,7 +250,7 @@ steps:
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_period.csv
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics.csv
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_nature.csv
-      - data://garden/worldbank_wdi/2026-02-27/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
 
   # Homicide - OMM
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
@@ -481,7 +481,7 @@ steps:
       - data://meadow/imf/2025-07-08/trade:
         - snapshot://imf/2025-07-08/trade.csv
       - data://garden/regions/2023-01-01/regions
-      - data://garden/worldbank_wdi/2025-09-08/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
 
   #
   # Trade Volume Index - WTO Trade Growth

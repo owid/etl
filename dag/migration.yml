@@ -80,7 +80,7 @@ steps:
     - data://grapher/un/2025-03-12/migrant_stock:
       - data://garden/un/2025-03-12/migrant_stock
     - data://grapher/un/2024-07-12/un_wpp
-    - data://grapher/worldbank_wdi/2025-09-08/wdi
+    - data://grapher/worldbank_wdi/2026-07-14/wdi
     # IDMC Internal Displacement Data (2025 update)
     - data://grapher/idmc/2026-01-19/internal_displacement:
       - data://garden/idmc/2026-01-19/internal_displacement:
