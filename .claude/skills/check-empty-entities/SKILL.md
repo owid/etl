@@ -63,7 +63,7 @@ Same selection-vs-availability check on their configs:
 For every finding, fetch the same chart's **production** y-variables (chart ids are shared; get prod `chart_dimensions` via public Datasette) and their entity lists from the production API:
 
 - Selection had data on production, none on staging → **regression from this update**. Author: fix before merge (remap the view or restore the entities). Reviewer: 🔴.
-- Gap identical on production → **pre-existing**. List it in the PR body (or hand to content follow-up for gdoc edits); don't block the PR. Reviewer: 🟢, confirm it's documented.
+- Gap identical on production → **pre-existing**. It still needs fixing — it just doesn't block this PR: list it in the PR body and hand it to content follow-up (gdoc edits) or fix the chart config directly. Reviewer: 🟡, confirm the fix is documented or underway.
 - Public Datasette covers only ~80% of chart ids — when a chart has no baseline, say so instead of silently classifying it as pre-existing.
 
 ## Script skeleton
@@ -113,7 +113,7 @@ Repeat the loop shape over `multi_dim_x_chart_configs`/`narrative_charts` config
 ## Report format
 
 - **Regressions** (block): view, surface, entities lost, prod evidence.
-- **Pre-existing gaps** (document): table of citation (scroll-to-highlight link), chart (staging grapher link, `http://staging-site-<branch>/grapher/<slug>`), and dead entities — the common pattern is old URLs using unsuffixed WB region / income-group names while data lives under `(WB)`-suffixed entities.
+- **Pre-existing gaps** (🟡 — still need fixing, just not necessarily in this PR): table of citation (scroll-to-highlight link), chart (staging grapher link, `http://staging-site-<branch>/grapher/<slug>`), and dead entities — the common pattern is old URLs using unsuffixed WB region / income-group names while data lives under `(WB)`-suffixed entities.
 - **Coverage caveats**: charts with no production baseline; variables whose metadata fetch failed (don't count fetch failures as empty).
 
 Reference run (WDI 2026-07, PR #6439): 480 charts, 37 MDim views, 18 narrative charts, 585 gdoc references — zero regressions, 10 pre-existing gaps handed to content follow-up.
