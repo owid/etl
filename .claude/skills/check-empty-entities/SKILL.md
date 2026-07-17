@@ -58,6 +58,7 @@ Same selection-vs-availability check on their configs:
 - Match `posts_gdocs_links.target` through `chart_slug_redirects` too — embeds often use old slugs.
 - Only a **fully dead selection** is a finding — the link opens an empty chart. A partial gap still renders the remaining entities (report at most as an aside).
 - For content hand-off, link each citation with a scroll-to-highlight URL — reuse `find_chart_citations_in_content` from `apps/wizard/app_pages/chart_diff/citations.py`. Caveats: its embedded-chart pass only scans **top-level** body blocks (recurse yourself for charts nested in layout containers), most `country=` references turn out to be *hyperlinks* (its second pass, which does recurse), and data insights may store the chart reference where neither pass looks — fall back to the data-insight page URL. Wrap fragment URLs in `<angle brackets>` in markdown (they can contain parentheses).
+- **Verifying a gdoc fix: check the live article page, not the mirror.** Public Datasette's `posts_gdocs_links` lags and can show the stale `queryString` well after the edit is live — fetch the published article URL and grep its grapher URLs / `country=` params instead (e.g. a fixed data-insight `grapher-url` showed on ourworldindata.org minutes before the mirror caught up).
 
 ### 5. Grade against production
 
