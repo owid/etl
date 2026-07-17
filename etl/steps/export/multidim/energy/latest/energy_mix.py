@@ -172,7 +172,23 @@ SOURCE_COMPOSITION = {
 }
 
 
+# The total-energy-supply views get a definitional subtitle (title and subtitle read as one idea)
+# instead of the generic unit phrase, so we explain what TES means and surface "primary". One shared
+# definition clause, with the unit tail adapted per metric.
+_TES_DEFINITION = (
+    "[Total energy supply](#dod:total-energy-supply) is the primary energy a country uses after "
+    "accounting for imports and exports"
+)
+TOTAL_SUPPLY_SUBTITLE = {
+    "total": f"{_TES_DEFINITION}, measured in [terawatt-hours](#dod:watt-hours).",
+    "per_capita": f"{_TES_DEFINITION}, measured in [kilowatt-hours](#dod:watt-hours) per person.",
+    "annual_change": f"{_TES_DEFINITION}; this shows the year-on-year change in [terawatt-hours](#dod:watt-hours).",
+}
+
+
 def _view_subtitle(source: str, metric: str) -> str:
+    if source == "total" and metric in TOTAL_SUPPLY_SUBTITLE:
+        return TOTAL_SUPPLY_SUBTITLE[metric]
     unit = METRIC_UNIT_PHRASE[metric]
     note = SOURCE_COMPOSITION.get(source)
     return f"{unit} {note}" if note else unit
@@ -251,7 +267,9 @@ def add_decomposition_views(c) -> None:
             config = {
                 **base_config,
                 "title": _decomposition_title(source, base_metric),
-                "subtitle": METRIC_UNIT_PHRASE[base_metric],
+                "subtitle": (
+                    TOTAL_SUPPLY_SUBTITLE[base_metric] if source == "total" else METRIC_UNIT_PHRASE[base_metric]
+                ),
             }
             new_view = View(
                 dimensions={"source": source, "metric": new_metric},
