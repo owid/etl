@@ -149,7 +149,7 @@ If the garden step doesn't use the harmonizer at all (no `.countries.json`; `cou
 
 ### 8d. Empty-entity audit (review side)
 
-Run the **`check-empty-entities` skill** against the PR's staging branch and new dataset — it audits charts (entity selections + map `columnSlug`), MDim views, narrative charts, and published-gdoc `country=` references, grading each finding against production. As reviewer, verify the **outcome**: a selection that had data on production but none on staging is a 🔴 regression from the update; a gap identical on production is 🟡 pre-existing — it still needs fixing (chart-config edit or content follow-up on the gdoc), just not necessarily in this PR, so confirm the PR body documents it and a fix is planned.
+Run the **`check-empty-entities` skill** against the PR's staging branch and new dataset — it audits charts (entity selections + map `columnSlug`), MDim views, explorer views, narrative charts, and published-gdoc `country=` references, grading each finding against production. As reviewer, verify the **outcome**: a selection that had data on production but none on staging is a 🔴 regression from the update; a gap identical on production is 🟡 pre-existing — it still needs fixing (chart-config edit or content follow-up on the gdoc), just not necessarily in this PR, so confirm the PR body documents it and a fix is planned.
 
 ### 9. Indicator metadata coverage & dataset block
 

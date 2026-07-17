@@ -1,6 +1,6 @@
 ---
 name: check-empty-entities
-description: Audit every surface that renders a dataset's indicators — charts, map tabs, MDim views, narrative charts, and article references — for views whose pinned entity selection has no data in the new indicators (they render as empty charts with no error anywhere). Grades findings against production to separate update regressions from pre-existing gaps. Use after an indicator upgrade on staging, when the user asks to "check for empty entities/views/charts", or as the audit step called from /update-dataset (step 7) and /review-data-pr (§8d).
+description: Audit every surface that renders a dataset's indicators — charts, map tabs, MDim views, explorer views, narrative charts, and article references — for views whose pinned entity selection has no data in the new indicators (they render as empty charts with no error anywhere). Grades findings against production to separate update regressions from pre-existing gaps. Use after an indicator upgrade on staging, when the user asks to "check for empty entities/views/charts", or as the audit step called from /update-dataset (step 7) and /review-data-pr (§8d).
 metadata:
   internal: true
 ---
@@ -38,14 +38,15 @@ For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`
 
 ### 2. Map tabs
 
-For every chart with `hasMapTab`, assert `map.columnSlug` is one of the chart's dimension variable ids. It's stored as a **string** — str-cast before comparing (the int-vs-string mismatch is exactly how the upgrader left map tabs pinned to old variables for years; see #6457). A `columnSlug` that resolves to a variable outside the chart's dimensions, or to a dangling id, is a finding.
+For every chart with `hasMapTab`, validate `map.columnSlug` **only when it is set** — an absent `columnSlug` is valid (grapher defaults the map to the first y variable), so flagging `None` produces false blockers. When present it must be one of the chart's dimension variable ids; it's stored as a **string** — str-cast before comparing (the int-vs-string mismatch is exactly how the upgrader left map tabs pinned to old variables for years; see #6457). A set `columnSlug` that resolves to a variable outside the chart's dimensions, or to a dangling id, is a finding.
 
-### 3. MDim views and narrative charts
+### 3. MDim views, explorer views, and narrative charts
 
 Same selection-vs-availability check on their configs:
 
 - MDim views: `multi_dim_x_chart_configs` → `chart_configs` (all MDims, not just the dataset's own — other MDims can carry this dataset's variables in y-dimensions).
-- Narrative charts: audit the **merged parent+patch config, not the stored one**. `narrative_charts.chartConfigId` → `chart_configs` holds the patch (and a `full` that can be stale), so a narrative chart inheriting `selectedEntityNames` or dimensions from its parent can falsely pass — use `AdminAPI(OWID_ENV).get_narrative_chart(id)["configFull"]` (same gotcha as the narrative FAUST verification in `/update-dataset` step 7).
+- Explorer views: `explorer_views` → `chart_configs` (join `explorers` for `isPublished`) — explorer panels render grapher configs and can pin `selectedEntityNames` too, so an upgraded explorer view can be empty while everything else passes. `explorer_variables` tells you which explorers carry the dataset's variables at all.
+- Narrative charts: audit the **merged parent+patch config, not the stored one**. `narrative_charts.chartConfigId` → `chart_configs` holds the patch (and a `full` that can be stale), so a narrative chart inheriting `selectedEntityNames` or dimensions from its parent can falsely pass — use `AdminAPI(OWIDEnv.from_staging("<branch>")).get_narrative_chart(id)["configFull"]` (same gotcha as the narrative FAUST verification in `/update-dataset` step 7). Pass the **staging** env explicitly — the global `OWID_ENV` points at your local/default environment unless the process was launched with `STAGING=<branch>`, and reading narrative configs from the wrong DB silently hides staging-only regressions.
 
 ### 4. Article references (gdoc embeds and hyperlinks)
 
@@ -100,7 +101,9 @@ for _, row in cfgs.iterrows():
     sel = cfg.get("selectedEntityNames") or []
     y_ids = [d["variableId"] for d in cfg.get("dimensions", []) if d.get("property") == "y"]
     if cfg.get("hasMapTab"):
-        assert str((cfg.get("map") or {}).get("columnSlug")) in {str(d["variableId"]) for d in cfg["dimensions"]}
+        slug = (cfg.get("map") or {}).get("columnSlug")
+        if slug is not None:  # absent = grapher defaults to the first y variable (valid)
+            assert str(slug) in {str(d["variableId"]) for d in cfg["dimensions"]}
     if types and types[0] in ("ScatterPlot", "Marimekko"):
         continue
     avail = set().union(*(entities(v) or set() for v in y_ids)) if y_ids else set()
