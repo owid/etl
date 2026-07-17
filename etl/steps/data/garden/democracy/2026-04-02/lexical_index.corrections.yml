@@ -30,3 +30,41 @@
   provider: Lexical Index
   reported: "2026-07-09"
   status: acknowledged
+# India's political regime classification carries the same 1947-vs-1950 dating error as the suffrage
+# columns above: it is coded as an electoral democracy / polyarchy from independence in 1947, but
+# India held no competitive multi-party elections under universal suffrage until 1951-52 (after the
+# Constitution came into force in 1950). It should instead be a multi-party autocracy (score 3) from
+# 1947 to 1949. Both the reduced (LIED, 0-6) and full (LIED+, 0-7) classifications are corrected so the
+# fix propagates consistently to every derived indicator (democracy_lied, is_electoral_democracy,
+# is_full_democracy, the age/experience counts and the num_*/pop_* region aggregates).
+- indicator: regime_redux_lied
+  entity: India
+  years: {from: 1947, to: 1949}
+  action: override
+  value: 3
+  expect: {eq: 6} # still coded as electoral democracy (the error); fails loudly once fixed upstream
+  reason: >-
+    India's reduced Lexical Index (LIED) classification is coded as electoral democracy (6) from 1947
+    (independence), but India held no competitive multi-party elections under universal suffrage until
+    1951-52; it should be a multi-party autocracy (3) from 1947 to 1949. Same upstream dating error as
+    the India suffrage corrections above; fix due in the 2027 release.
+  provider: Lexical Index
+  reported: "2026-07-09"
+  status: acknowledged
+- indicator: regime_lied
+  entity: India
+  years: {from: 1947, to: 1949}
+  action: override
+  value: 3
+  # Currently 6 in 1947 and 7 (polyarchy) in 1948-1949; `ge: 6` guards the whole range and fails
+  # loudly once the classification is corrected downward upstream.
+  expect: {ge: 6}
+  reason: >-
+    India's full Lexical Index (LIED+) classification is coded as electoral democracy (6) in 1947 and
+    polyarchy (7) in 1948-1949, dating from independence in 1947. But India held no competitive
+    multi-party elections under universal suffrage until 1951-52; it should be a multi-party autocracy
+    (3) from 1947 to 1949. Same upstream dating error as the India suffrage corrections above; fix due
+    in the 2027 release.
+  provider: Lexical Index
+  reported: "2026-07-09"
+  status: acknowledged
