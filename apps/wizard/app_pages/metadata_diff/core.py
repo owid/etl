@@ -263,9 +263,7 @@ def diff_preview_html(view_diff: ViewDiff, max_fields: int = 3, max_chars: int =
                 o = old_list[i] if i < len(old_list) else ""
                 n = new_list[i] if i < len(new_list) else ""
                 if _normalize(o) != _normalize(n):
-                    bullet_bits.append(
-                        f"<li>{_truncate_html(inline_diff_html(str(o), str(n)), max_chars)}</li>"
-                    )
+                    bullet_bits.append(f"<li>{_truncate_html(inline_diff_html(str(o), str(n)), max_chars)}</li>")
             body = f'<ul class="mdd-bullets">{"".join(bullet_bits)}</ul>'
         else:
             body = _truncate_html(inline_diff_html(str(old), str(new)), max_chars)
