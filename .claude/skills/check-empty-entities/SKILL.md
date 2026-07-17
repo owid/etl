@@ -20,10 +20,10 @@ After an indicator upgrade, a view can end up pinned to entities that have no da
 
 A variable's entities-with-data come from the indicators API `metadata.json` — **not** MySQL (indicator data lives outside the DB):
 
-- Staging: `https://api-staging.owid.io/staging-site-<branch>/v1/indicators/<id>.metadata.json` → `dimensions.entities.values[].name`
+- Staging: `OWIDEnv.from_staging(branch).indicators_url` + `/<id>.metadata.json` → `dimensions.entities.values[].name`. **Don't hand-build the `staging-site-<branch>` prefix** — branch names with `/`, `.`, `_` or over 28 characters get normalized/truncated (`etl.config.get_container_name()`), and a wrong prefix silently serves another environment instead of 404ing.
 - Production: `https://api.ourworldindata.org/v1/indicators/<id>.metadata.json`
 
-Cache per variable id and fetch in parallel (a large dataset means hundreds of variables). The path prefix is `staging-site-<branch>`, not the bare branch name — a wrong prefix silently serves another environment.
+Cache per variable id and fetch in parallel (a large dataset means hundreds of variables). A failed fetch is **unknown availability, not an empty set** — track those variable ids separately and report them as coverage caveats; never grade a view on them.
 
 ## Checks
 
@@ -78,12 +78,13 @@ from etl.config import OWIDEnv
 from etl.http import session as http_session
 
 env = OWIDEnv.from_staging("<branch>")
+PREFIX = env.indicators_url  # normalized container name — never hand-build staging-site-<branch>
 cache = {}
 
-def entities(var_id, prefix="https://api-staging.owid.io/staging-site-<branch>"):
+def entities(var_id, prefix=PREFIX):
     key = (prefix, var_id)
     if key not in cache:
-        r = http_session.get(f"{prefix}/v1/indicators/{var_id}.metadata.json", timeout=60)
+        r = http_session.get(f"{prefix}/{var_id}.metadata.json", timeout=60)
         cache[key] = {e["name"] for e in r.json()["dimensions"]["entities"]["values"]} if r.ok else None
     return cache[key]
 
@@ -106,7 +107,11 @@ for _, row in cfgs.iterrows():
             assert str(slug) in {str(d["variableId"]) for d in cfg["dimensions"]}
     if types and types[0] in ("ScatterPlot", "Marimekko"):
         continue
-    avail = set().union(*(entities(v) or set() for v in y_ids)) if y_ids else set()
+    ents = [entities(v) for v in y_ids]
+    if any(e is None for e in ents):
+        unknown.append(row["slug"])  # fetch failed = unknown availability — coverage caveat, never a finding
+        continue
+    avail = set().union(*ents) if ents else set()
     if sel and not (set(sel) & avail):
         ...  # finding -> grade against production
 ```
