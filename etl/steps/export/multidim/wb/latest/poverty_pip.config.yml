@@ -23,6 +23,18 @@ definitions:
   common_views:
     - config:
         originUrl: ourworldindata.org/poverty
+    # TEMPORARY: dry-run test of editing a single view's description_key from the
+    # MDIM config. Overrides only the first bullet of the "Number in poverty,
+    # $4.20 a day, no breaks" view; remaining bullets are kept from the
+    # indicator's metadata (view metadata is deep-merged element-wise on the
+    # site). To be reverted after the test.
+    - dimensions:
+        indicator: headcount
+        poverty_line: "420"
+        survey_comparability: No spells
+      metadata:
+        description_key:
+          - JOE TEST!! A poverty line of $4.20 per day represents definitions of national poverty lines in lower-middle-income countries.
 
   # Detailed colors:
   color_0_to_100: &color_0_to_100 "#D73027"
