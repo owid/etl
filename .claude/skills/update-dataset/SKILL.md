@@ -199,6 +199,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **New in meadow but missing from garden** → the pipeline drops it (explicit column selection or `.drop(columns=...)` in garden): surface it as "the source now ships X — currently dropped" and let the user decide deliberately whether to keep it.
    - **Paired `+ Column` / `− Column`** → usually a **rename**, not an addition — route it to the indicator-upgrade mapping (step 7) instead.
 
+   **Long-format tables hide additions from the column diff.** When a table keys its series by a dimension column (`indicator`, `metric`, `question`, …) with a stable `value` column, a new series adds *rows*, not columns — the column-set diff stays empty. Also diff the distinct values of each identifying dimension (`set(tb_new[dim].unique()) - set(tb_old[dim].unique())`). The grapher step expands dimension values into separate variables, so the step-7 shortName pairing surfaces these too — but catch them here, before staging.
+
    If the **meadow step itself selects a hardcoded column subset** (`tb[[...]]`, `usecols=`, `.drop(columns=...)`), a new source column never reaches any diff — grep the meadow step for such selections and, when present, compare the raw **snapshot** column set old-vs-new (`snap.read_*().columns`) to catch additions dropped at the door.
 
 5b) Review sanity-checks output (only if step 1d catalogued any)
@@ -504,7 +506,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        | sed -E 's/[).,;:>]+$//' | sort -u | rg '#'); do
        page="${url%%#*}"; frag="${url#*#}"
        case "$frag" in *=*|*/*|'!'*) continue;; esac  # non-DOM fragments — see below
-       if curl -sL --max-time 20 -A 'Mozilla/5.0' "$page" | grep -qE "(id|name)=[\"']${frag}[\"']"; then
+       # grep -F: fragments may contain regex metacharacters (#section.2) — ERE would false-OK id="section-2"
+       if curl -sL --max-time 20 -A 'Mozilla/5.0' "$page" | grep -qF -e "id=\"$frag\"" -e "id='$frag'" -e "name=\"$frag\"" -e "name='$frag'"; then
            printf "OK         %s\n" "$url"
        else
            printf "NO-ANCHOR  %s\n" "$url"
