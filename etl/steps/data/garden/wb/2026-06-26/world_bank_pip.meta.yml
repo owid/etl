@@ -211,7 +211,7 @@ definitions:
     <%- endif %>
     <%- endif %>
 
-  description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for that by adding the estimated value of non-market income, like food grown by subsistence farmers for their own use.
+  description_key_not_market_income: This data accounts for that by adding the estimated value of non-market income, like food grown by subsistence farmers for their own use.
 
   description_key_nowcasts: |-
     <% if survey_comparability is not defined or survey_comparability == "No spells" %>
