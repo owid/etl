@@ -149,12 +149,7 @@ If the garden step doesn't use the harmonizer at all (no `.countries.json`; `cou
 
 ### 8d. Empty-entity audit (review side)
 
-`/update-dataset` §7 ("Empty-entity audit") defines the full procedure. As reviewer, verify the **outcome** on staging: no view of the new dataset renders empty because its pinned entities have no data in the new indicators.
-
-- **Charts**: for every chart on the new dataset, `selectedEntityNames` (from `chart_configs.full`) must intersect the union of its y-variables' entities-with-data (staging indicators API `.metadata.json` → `dimensions.entities.values`). Skip ScatterPlot/Marimekko — no selection by design; a missing selection on other chart types is only a finding if production's config differs.
-- **Map tabs**: every `hasMapTab` chart's `map.columnSlug` must be one of its dimension variable ids (stored as a string — str-cast before comparing).
-- **MDim views, narrative charts, and published-gdoc references** (`posts_gdocs_links` with `country=` query strings; match targets through `chart_slug_redirects`): same selection-vs-availability check. For gdoc references only a fully dead selection counts — partial gaps still render.
-- **Grade against production**: a selection that had data on production but none on staging is a 🔴 regression from the update. A gap identical on production is 🟢 pre-existing — confirm the PR body (or a content follow-up) lists it, and don't ask for a fix in this PR.
+Run the **`check-empty-entities` skill** against the PR's staging branch and new dataset — it audits charts (entity selections + map `columnSlug`), MDim views, narrative charts, and published-gdoc `country=` references, grading each finding against production. As reviewer, verify the **outcome**: a selection that had data on production but none on staging is a 🔴 regression from the update; a gap identical on production is 🟢 pre-existing — confirm the PR body (or a content follow-up) lists it, and don't ask for a fix in this PR.
 
 ### 9. Indicator metadata coverage & dataset block
 
