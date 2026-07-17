@@ -430,8 +430,12 @@ def run() -> None:
         if "income" not in country
         if country not in ["European Union (27)", "World"]
     ]
-    error = "The list of additional countries excluded from region aggregates has changed."
-    assert set(other_countries_excluded_from_aggregates) - set(OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES) == set(), error
+    newly_excluded = sorted(set(other_countries_excluded_from_aggregates) - set(OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES))
+    error = (
+        "The list of additional countries excluded from region aggregates has changed. "
+        f"Newly excluded (review, then add to OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES if the change is expected): {newly_excluded}"
+    )
+    assert not newly_excluded, error
 
     # Uncomment to visually inspect all changes.
     # plot_adjusted_data(tb=tb)
