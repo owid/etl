@@ -209,7 +209,7 @@ steps:
     - data://garden/health/2024-04-22/gpei_funding:
         - data://meadow/health/2024-04-22/gpei_funding:
             - snapshot://health/2024-04-22/gpei_funding.xlsx
-        - data://garden/worldbank_wdi/2026-02-27/wdi
+        - data://garden/worldbank_wdi/2026-07-14/wdi
 
   # GBD 2023 - GBD Mental Health Burden
   data-private://grapher/ihme_gbd/2026-02-07/gbd_mental_health_burden_dalys:
