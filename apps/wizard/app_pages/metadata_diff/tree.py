@@ -2,20 +2,21 @@
 
 Renders the views of an MDIM as a horizontal tree following the order of the MDIM's
 dimensions (first control = first fork). Nodes are colored by whether any view
-underneath them changed; leaves link to the View diff page and show a hover preview
-of the change. All interactivity (collapse, filter, tooltips) is inline JS with no
-external dependencies, so the component is fully deterministic.
+underneath them changed; leaves are real links to the View diff page and show a hover
+preview of the change. All interactivity (collapse, filter, tooltips, self-resizing)
+is inline JS with no external dependencies, so the component is fully deterministic.
 """
 
 import html
 import json
+import urllib.parse
 from typing import Any
 
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_preview_html
 
-# Layout constants used to estimate the component height.
-LEAF_HEIGHT_PX = 34
-MAX_HEIGHT_PX = 1000
+# The component iframe grows to fit its content up to this cap; beyond it, the tree
+# scrolls internally.
+MAX_HEIGHT_PX = 4000
 
 
 def _build_tree(
@@ -61,7 +62,7 @@ def _build_tree(
     return group(list(range(len(view_diffs))), 0)
 
 
-def _render_node(node: dict[str, Any], view_diffs: list[ViewDiff]) -> str:
+def _render_node(node: dict[str, Any], view_diffs: list[ViewDiff], leaf_hrefs: list[str]) -> str:
     changed = node["changed"] > 0
     status = "changed" if changed else "unchanged"
 
@@ -70,14 +71,17 @@ def _render_node(node: dict[str, Any], view_diffs: list[ViewDiff]) -> str:
         is_new = view_diffs[i].is_new
         cls = f"mdd-box mdd-leaf mdd-{status}" + (" mdd-newview" if is_new else "")
         badge = '<span class="mdd-badge-new">new</span>' if is_new else ""
+        # A real link: srcdoc iframes resolve relative URLs against the parent page, so
+        # "?query" navigates the Wizard app itself (target=_top escapes the iframe).
         return (
             f'<div class="mdd-node mdd-leafnode mdd-n-{status}">'
-            f'<a class="{cls}" data-view="{i}" href="javascript:void(0)">{html.escape(node["name"])}{badge}</a>'
+            f'<a class="{cls}" data-view="{i}" href="{html.escape(leaf_hrefs[i])}" target="_top">'
+            f'{html.escape(node["name"])}{badge}<span class="mdd-golink">&#8599;</span></a>'
             f"</div>"
         )
 
     counter = f'<span class="mdd-count">{node["changed"]}/{node["total"]}</span>' if changed else ""
-    children = "".join(_render_node(child, view_diffs) for child in node["children"])
+    children = "".join(_render_node(child, view_diffs, leaf_hrefs) for child in node["children"])
     return (
         f'<div class="mdd-node mdd-n-{status}">'
         f'<div class="mdd-box mdd-branch mdd-{status}" role="button" title="Click to collapse/expand">'
@@ -88,25 +92,34 @@ def _render_node(node: dict[str, Any], view_diffs: list[ViewDiff]) -> str:
 
 
 def render_tree_html(
+    catalog_path: str,
     dimensions: list[dict[str, Any]],
     view_diffs: list[ViewDiff],
     dim_param_prefix: str = "d_",
 ) -> tuple[str, int]:
-    """Render the Blast Radius component. Returns (html, suggested_height_px)."""
+    """Render the Blast Radius component. Returns (html, initial_height_px).
+
+    The component resizes its own iframe to fit its content (collapse, filter), so the
+    returned height is only the initial estimate.
+    """
     tree = _build_tree(dimensions, view_diffs)
     n_changed = sum(1 for v in view_diffs if v.changed)
 
     previews = [diff_preview_html(v) for v in view_diffs]
-    view_params = [
-        {(dim_param_prefix + slug): choice for slug, choice in v.dimensions.items()} for v in view_diffs
+    leaf_hrefs = [
+        "?"
+        + urllib.parse.urlencode(
+            {"mdim": catalog_path, "mode": "view", **{(dim_param_prefix + s): c for s, c in v.dimensions.items()}}
+        )
+        for v in view_diffs
     ]
 
     dim_names = " &#8594; ".join(html.escape(d.get("name") or d["slug"]) for d in dimensions)
-    body = "".join(_render_node(node, view_diffs) for node in tree)
+    body = "".join(_render_node(node, view_diffs, leaf_hrefs) for node in tree)
 
     show_unchanged_default = "false" if n_changed else "true"
     visible_leaves = n_changed if n_changed else len(view_diffs)
-    height = min(MAX_HEIGHT_PX, 170 + visible_leaves * LEAF_HEIGHT_PX)
+    initial_height = min(MAX_HEIGHT_PX, 170 + visible_leaves * 38)
 
     return (
         f"""
@@ -117,13 +130,13 @@ def render_tree_html(
     #mdd-root .mdd-dims {{ color: #777; }}
     #mdd-root .mdd-legend span {{ margin-right: 12px; }}
     #mdd-root .mdd-dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 4px; }}
-    #mdd-root .mdd-tree {{ overflow: auto; max-height: {MAX_HEIGHT_PX - 120}px; padding: 4px; }}
+    #mdd-root .mdd-tree {{ overflow: auto; padding: 4px; }}
     #mdd-root .mdd-node {{ display: flex; align-items: flex-start; margin: 2px 0; }}
     #mdd-root .mdd-children {{ display: flex; flex-direction: column; border-left: 2px solid #e3e3e3;
                                margin-left: 10px; padding-left: 14px; }}
     #mdd-root .mdd-box {{ border: 1.5px solid; border-radius: 6px; padding: 4px 10px; margin: 2px 0;
                           white-space: nowrap; cursor: pointer; text-decoration: none; color: inherit;
-                          background: #fff; flex-shrink: 0; }}
+                          background: #fff; flex-shrink: 0; display: inline-block; }}
     #mdd-root .mdd-unchanged {{ border-color: #d9d9d9; color: #999; background: #fafafa; }}
     #mdd-root .mdd-changed {{ border-color: #e8590c; border-width: 2px; background: #fff4e6; font-weight: 600; }}
     #mdd-root .mdd-newview {{ border-color: #1971c2; background: #e7f5ff; }}
@@ -132,10 +145,12 @@ def render_tree_html(
     #mdd-root .mdd-badge-new {{ margin-left: 7px; font-size: 10px; color: #1971c2; background: #d0ebff;
                                 border-radius: 8px; padding: 1px 6px; }}
     #mdd-root .mdd-caret {{ display: inline-block; margin-right: 6px; transition: transform .15s; }}
+    #mdd-root .mdd-golink {{ margin-left: 7px; color: #1971c2; font-size: 12px; }}
+    #mdd-root .mdd-leaf {{ text-decoration: none; }}
+    #mdd-root .mdd-leaf:hover {{ box-shadow: 0 1px 5px rgba(0,0,0,.25); text-decoration: underline; }}
     #mdd-root .mdd-collapsed > .mdd-box .mdd-caret {{ transform: rotate(-90deg); }}
     #mdd-root .mdd-collapsed > .mdd-children {{ display: none; }}
     #mdd-root.mdd-hide-unchanged .mdd-n-unchanged {{ display: none; }}
-    #mdd-root .mdd-leaf:hover {{ box-shadow: 0 1px 5px rgba(0,0,0,.25); }}
     #mdd-tooltip {{ position: fixed; display: none; z-index: 10; max-width: 460px; background: #fff;
                     border: 1px solid #bbb; border-radius: 6px; box-shadow: 0 3px 14px rgba(0,0,0,.2);
                     padding: 10px 12px; font-size: 12.5px; line-height: 1.45; white-space: normal; }}
@@ -159,33 +174,45 @@ def render_tree_html(
   <div id="mdd-tooltip"></div>
   <script>
     const PREVIEWS = {json.dumps(previews)};
-    const VIEW_PARAMS = {json.dumps(view_params)};
-    const DIM_PREFIX = {json.dumps(dim_param_prefix)};
+    const MAX_HEIGHT = {MAX_HEIGHT_PX};
     const root = document.getElementById("mdd-root");
     const tooltip = document.getElementById("mdd-tooltip");
+    const treeEl = root.querySelector(".mdd-tree");
+
+    // Resize the component's iframe to fit the content (Streamlit renders this in a
+    // same-origin iframe, so we can set our own frame height). Beyond MAX_HEIGHT the
+    // tree scrolls internally.
+    const fit = () => {{
+      const fe = window.frameElement;
+      if (!fe) return;
+      treeEl.style.maxHeight = "none";
+      const wanted = document.documentElement.scrollHeight + 24;
+      if (wanted > MAX_HEIGHT) {{
+        treeEl.style.maxHeight = (MAX_HEIGHT - 100) + "px";
+        fe.style.height = MAX_HEIGHT + "px";
+      }} else {{
+        fe.style.height = wanted + "px";
+      }}
+    }};
 
     const checkbox = document.getElementById("mdd-show-unchanged");
     checkbox.checked = {show_unchanged_default};
-    const applyFilter = () => root.classList.toggle("mdd-hide-unchanged", !checkbox.checked);
+    const applyFilter = () => {{
+      root.classList.toggle("mdd-hide-unchanged", !checkbox.checked);
+      fit();
+    }};
     checkbox.addEventListener("change", applyFilter);
     applyFilter();
 
     root.querySelectorAll(".mdd-branch").forEach(box => {{
-      box.addEventListener("click", () => box.parentElement.classList.toggle("mdd-collapsed"));
+      box.addEventListener("click", () => {{
+        box.parentElement.classList.toggle("mdd-collapsed");
+        fit();
+      }});
     }});
 
     root.querySelectorAll(".mdd-leaf").forEach(leaf => {{
       const i = parseInt(leaf.dataset.view);
-      leaf.addEventListener("click", () => {{
-        try {{
-          const url = new URL(window.parent.location.href);
-          // Drop the previous view selection, keep everything else (mdim, filters).
-          [...url.searchParams.keys()].filter(k => k.startsWith(DIM_PREFIX)).forEach(k => url.searchParams.delete(k));
-          Object.entries(VIEW_PARAMS[i]).forEach(([k, v]) => url.searchParams.set(k, v));
-          url.searchParams.set("mode", "view");
-          window.parent.location.href = url.toString();
-        }} catch (e) {{ console.error(e); }}
-      }});
       leaf.addEventListener("mousemove", (ev) => {{
         tooltip.innerHTML = PREVIEWS[i];
         tooltip.style.display = "block";
@@ -199,8 +226,11 @@ def render_tree_html(
       }});
       leaf.addEventListener("mouseleave", () => {{ tooltip.style.display = "none"; }});
     }});
+
+    window.addEventListener("load", fit);
+    fit();
   </script>
 </div>
 """,
-        height,
+        initial_height,
     )

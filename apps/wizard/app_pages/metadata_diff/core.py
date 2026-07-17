@@ -37,31 +37,24 @@ CHART_FIELDS = {
 CHART_FIELD_PREFIX = "chart."
 
 
-def lodash_merge(dst: Any, src: Any) -> Any:
-    """Merge `src` into `dst` following lodash's `merge` semantics (non-mutating).
+def owid_merge(dst: Any, src: Any) -> Any:
+    """Merge `src` into `dst` the way the grapher site does (non-mutating).
 
-    This mirrors how the grapher site merges view-level metadata overrides over the
-    indicator metadata (`MultiDimDataPageConfig.mergeViewMetadata`): dicts merge
-    recursively, lists merge element by element (a shorter source list only overrides
-    the first elements and keeps the tail of the destination), scalars override.
+    This mirrors the site's custom `merge` (`@ourworldindata/utils` `Util.ts`), which is
+    used to merge view-level metadata overrides over the indicator metadata
+    (`MultiDimDataPageConfig.mergeViewMetadata`): dicts merge recursively, but — unlike
+    plain lodash merge — **arrays are overwritten completely instead of merged**. So a
+    one-element `description_key` override replaces the whole bullet list.
     """
     if isinstance(dst, dict) and isinstance(src, dict):
         out = dict(dst)
         for k, v in src.items():
             if k in out:
-                out[k] = lodash_merge(out[k], v)
+                out[k] = owid_merge(out[k], v)
             else:
                 out[k] = v
         return out
-    if isinstance(dst, list) and isinstance(src, list):
-        out = list(dst)
-        for i, v in enumerate(src):
-            if i < len(out):
-                out[i] = lodash_merge(out[i], v)
-            else:
-                out.append(v)
-        return out
-    # Mirror lodash: undefined (absent) sources never reach here; None overrides.
+    # Arrays and scalars: the source value wins wholesale.
     return src
 
 
@@ -143,7 +136,7 @@ def build_view_bundle(
     merged = base
     for override in (config_metadata, view.get("metadata")):
         if override:
-            merged = lodash_merge(merged, _flatten_metadata_override(override))
+            merged = owid_merge(merged, _flatten_metadata_override(override))
 
     chart = {}
     if chart_config:

@@ -285,7 +285,9 @@ def main() -> None:
         n_changed = sum(1 for v in view_diffs if v.changed)
         if n_changed == 0:
             st.success("No metadata changes in any view of this MDIM. The tree below shows all views.")
-        tree_html, height = render_tree_html(dimensions, view_diffs, dim_param_prefix=DIM_PARAM_PREFIX)
+        tree_html, height = render_tree_html(
+            catalog_path, dimensions, view_diffs, dim_param_prefix=DIM_PARAM_PREFIX
+        )
         components.html(tree_html, height=height, scrolling=True)
         st.caption(
             "Hover over a view to preview its changes; click it to open the View diff. "
