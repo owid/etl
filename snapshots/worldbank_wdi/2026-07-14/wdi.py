@@ -266,13 +266,11 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
     snap.metadata.origin.citation_full = (
         f"World Development Indicators (WDI), The World Bank ({snap.metadata.origin.date_published.split('-')[0]})."  # ty: ignore
     )
+    # Update the producer's version number, so it doesn't go stale on future updates.
+    snap.metadata.origin.version_producer = meta_orig["reference_system"]["version"]
 
     # Sanity checks.
     error = "Citation has changed. Review the new citation and adjust the code."
     assert meta_orig["identification"]["citation"] == "World Development Indicators, The World Bank", error
     error = "License has changed. Review the new license and adjust the code."
     assert meta_orig["constraints"]["license"]["license_id"] == "Creative Commons Attribution 4.0", error
-
-
-if __name__ == "__main__":
-    main()
