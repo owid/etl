@@ -132,9 +132,9 @@ steps:
     # both) is a diamond, not a cycle.
     - data://grapher/gcp/2025-11-13/global_carbon_budget
   #
-  # Energy - Fossil fuel production (2026 Statistical Review, incl. reserves-to-production ratio).
+  # Energy - Fossil fuels (production, trade, consumption and reserves; 2026 Statistical Review + EIA).
   #
-  data://garden/energy/2026-06-30/fossil_fuel_production:
+  data://garden/energy/2026-06-30/fossil_fuels:
     - data://garden/energy_institute/2026-06-30/statistical_review_of_world_energy
     - data://garden/eia/2026-05-05/international_energy
     # Smil - Global primary energy (2017), used to extend World coal production before 1900.
@@ -146,10 +146,10 @@ steps:
     - data://garden/papers/2026-06-30/etemad_luciani:
       - data://meadow/papers/2026-06-30/etemad_luciani:
         - snapshot://papers/2026-06-30/etemad_luciani.csv
-  data://grapher/energy/2026-06-30/fossil_fuel_production:
-    - data://garden/energy/2026-06-30/fossil_fuel_production
-  export://multidim/energy/latest/fossil_fuel_production:
-    - data://grapher/energy/2026-06-30/fossil_fuel_production
+  data://grapher/energy/2026-06-30/fossil_fuels:
+    - data://garden/energy/2026-06-30/fossil_fuels
+  export://multidim/energy/latest/fossil_fuels:
+    - data://grapher/energy/2026-06-30/fossil_fuels
   #
   # Energy - Fossil fuel reserves/production ratio.
   #

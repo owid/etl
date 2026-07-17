@@ -1,4 +1,4 @@
-"""Grapher step for the fossil fuel production dataset."""
+"""Grapher step for the fossil fuels dataset."""
 
 from etl.helpers import PathFinder
 
@@ -10,8 +10,8 @@ def run() -> None:
     #
     # Load data.
     #
-    ds_garden = paths.load_dataset("fossil_fuel_production")
-    tb = ds_garden.read("fossil_fuel_production", reset_index=False)
+    ds_garden = paths.load_dataset("fossil_fuels")
+    tb = ds_garden.read("fossil_fuels", reset_index=False)
 
     #
     # Save outputs.

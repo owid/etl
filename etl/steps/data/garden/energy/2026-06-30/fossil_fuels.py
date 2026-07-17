@@ -1,4 +1,4 @@
-"""Garden step for fossil fuel production, combining several sources by priority.
+"""Garden step for fossil fuels: production, trade, consumption, and reserves.
 
 Coal, oil and gas production come from (in priority order):
 - Energy Institute Statistical Review of World Energy (from 1965).
@@ -12,7 +12,10 @@ Coal, oil and gas production come from (in priority order):
 Etemad is prioritized over EIA for the pre-1965 fill so the historical series joins the Statistical
 Review without the step that EIA's (slightly higher) values would introduce at the 1965 splice.
 
-The dataset also includes the World reserves-to-production ratio for each fossil fuel.
+The dataset also includes:
+- Production in physical units, from the Statistical Review.
+- Proved reserves, trade (imports, exports, net imports), and consumption in physical units, from EIA.
+- The World reserves-to-production ratio for each fossil fuel.
 """
 
 import owid.catalog.processing as pr
@@ -32,6 +35,13 @@ BILLION_BARRELS_TO_TONNES = 1e9 * 0.1364
 MILLION_TONNES_TO_TONNES = 1e6
 TRILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e12
 BILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e9
+MILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e6
+# A barrel is a volume unit, so barrels convert to cubic meters exactly (no density assumption).
+BARREL_TO_CUBIC_METERS = 0.1589873
+BILLION_BARRELS_TO_BILLION_CUBIC_METERS = BARREL_TO_CUBIC_METERS
+# EIA reports oil trade and consumption in thousand barrels per day; convert to million cubic meters
+# per year.
+KBPD_TO_MILLION_CUBIC_METERS_PER_YEAR = 1000 * 365.25 * BARREL_TO_CUBIC_METERS / 1e6
 
 # Year from which the Statistical Review covers fossil fuel production.
 STATISTICAL_REVIEW_FIRST_YEAR = 1965
@@ -114,8 +124,8 @@ def add_physical_production(tb: Table, tb_review: Table) -> Table:
     """Add fossil fuel production in physical units, from the Statistical Review only.
 
     Coal and oil are reported in million tonnes, gas in billion cubic meters. These units differ by
-    fuel and cannot be summed across fuels (unlike the energy-content series in terawatt-hours), so they
-    back a separate multidim. Only the Statistical Review reports them, so coverage begins in 1965.
+    fuel and cannot be summed across fuels (unlike the energy-content series in terawatt-hours), so
+    there is no cross-fuel total. Only the Statistical Review reports them, so coverage begins in 1965.
     """
     tb_review = tb_review.reset_index()
     columns = ["coal_production_mt", "oil_production_mt", "gas_production_bcm"]
@@ -123,15 +133,68 @@ def add_physical_production(tb: Table, tb_review: Table) -> Table:
     return tb
 
 
-def add_reserves(tb: Table, tb_review: Table) -> Table:
-    """Add fossil fuel reserves in physical units, from the Statistical Review only.
+def add_reserves(tb: Table, tb_eia: Table) -> Table:
+    """Add fossil fuel proved reserves in physical units, from EIA.
 
-    Coal in million tonnes, oil in billion barrels, gas in trillion cubic meters. The Energy Institute
-    reports reserves only through 2020 (and coal reserves for 2020 alone), so this series ends in 2020.
+    Coal in million tonnes, oil and gas in cubic meters (oil is reported in billion barrels and
+    converted exactly, since barrels are a volume unit). EIA is preferred over the Statistical Review
+    for reserves: it covers roughly three times as many countries, extends further (oil and gas
+    through 2021, coal through 2023, versus 2020 for the Statistical Review, with coal for 2020
+    alone), and matches the numbers previously published in the fossil fuels explorer.
     """
-    tb_review = tb_review.reset_index()
-    columns = ["coal_reserves_mt", "oil_reserves_bbl", "gas_reserves_tcm"]
-    tb = tb.merge(tb_review[["country", "year"] + columns], on=["country", "year"], how="left")
+    columns = {
+        "coal_reserves": "coal_reserves_mt",
+        "oil_reserves": "oil_reserves_bbl",
+        "natural_gas_reserves": "gas_reserves_tcm",
+    }
+    tb_eia = tb_eia.reset_index()[["country", "year"] + list(columns)].rename(columns=columns, errors="raise")
+    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix).
+    tb_eia = tb_eia[~tb_eia["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
+    tb_eia["oil_reserves_bcm"] = tb_eia["oil_reserves_bbl"] * BILLION_BARRELS_TO_BILLION_CUBIC_METERS
+    tb_eia = tb_eia.drop(columns=["oil_reserves_bbl"], errors="raise")
+    tb_eia = tb_eia.dropna(subset=[c for c in tb_eia.columns if c not in ["country", "year"]], how="all")
+    tb = tb.merge(tb_eia, on=["country", "year"], how="outer")
+    return tb
+
+
+# EIA columns with trade and consumption in physical units, mapped to output columns.
+# Coal comes in million tonnes and gas in billion cubic meters (EIA-native); oil comes in thousand
+# barrels per day and is converted to million cubic meters per year below.
+EIA_TRADE_AND_CONSUMPTION_COLUMNS = {
+    "coal_consumption_mt": "coal_consumption_mt",
+    "coal_imports_mt": "coal_imports_mt",
+    "coal_exports_mt": "coal_exports_mt",
+    "natural_gas_consumption": "gas_consumption_bcm",
+    "natural_gas_imports": "gas_imports_bcm",
+    "natural_gas_exports": "gas_exports_bcm",
+    "petroleum_consumption": "oil_consumption_mcm",
+    "crude_oil_imports": "oil_imports_mcm",
+    "crude_oil_exports": "oil_exports_mcm",
+}
+# Per-fuel column suffix of the trade and consumption columns.
+TRADE_SUFFIXES = {"coal": "mt", "gas": "bcm", "oil": "mcm"}
+
+
+def add_trade_and_consumption(tb: Table, tb_eia: Table) -> Table:
+    """Add trade (imports, exports, net imports) and consumption in physical units, from EIA.
+
+    Coal in million tonnes, gas in billion cubic meters, oil in million cubic meters per year. Oil
+    consumption covers all refined petroleum products, while oil trade covers crude oil (including
+    lease condensate).
+    """
+    tb_eia = tb_eia.reset_index()[["country", "year"] + list(EIA_TRADE_AND_CONSUMPTION_COLUMNS)].rename(
+        columns=EIA_TRADE_AND_CONSUMPTION_COLUMNS, errors="raise"
+    )
+    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix).
+    tb_eia = tb_eia[~tb_eia["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
+    for column in ["oil_consumption_mcm", "oil_imports_mcm", "oil_exports_mcm"]:
+        tb_eia[column] *= KBPD_TO_MILLION_CUBIC_METERS_PER_YEAR
+    # Net imports = imports - exports.
+    for fuel, suffix in TRADE_SUFFIXES.items():
+        tb_eia[f"{fuel}_net_imports_{suffix}"] = tb_eia[f"{fuel}_imports_{suffix}"] - tb_eia[f"{fuel}_exports_{suffix}"]
+    tb_eia = tb_eia.dropna(subset=[c for c in tb_eia.columns if c not in ["country", "year"]], how="all")
+    # Outer merge, so countries with trade data but no production of their own are kept.
+    tb = tb.merge(tb_eia, on=["country", "year"], how="outer")
     return tb
 
 
@@ -154,6 +217,19 @@ def add_per_capita(tb: Table) -> Table:
     tb["gas_production_per_capita_m3"] = (
         tb["gas_production_bcm"] * BILLION_CUBIC_METERS_TO_CUBIC_METERS / tb["population"]
     )
+    # Per-capita trade and consumption: coal in tonnes, oil and gas in cubic meters per person.
+    for metric in ["consumption", "imports", "exports", "net_imports"]:
+        tb[f"coal_{metric}_per_capita_tonnes"] = tb[f"coal_{metric}_mt"] * MILLION_TONNES_TO_TONNES / tb["population"]
+        tb[f"gas_{metric}_per_capita_m3"] = (
+            tb[f"gas_{metric}_bcm"] * BILLION_CUBIC_METERS_TO_CUBIC_METERS / tb["population"]
+        )
+        tb[f"oil_{metric}_per_capita_m3"] = (
+            tb[f"oil_{metric}_mcm"] * MILLION_CUBIC_METERS_TO_CUBIC_METERS / tb["population"]
+        )
+    # Per-capita reserves: coal in tonnes, oil and gas in cubic meters per person.
+    tb["coal_reserves_per_capita_tonnes"] = tb["coal_reserves_mt"] * MILLION_TONNES_TO_TONNES / tb["population"]
+    tb["oil_reserves_per_capita_m3"] = tb["oil_reserves_bcm"] * BILLION_CUBIC_METERS_TO_CUBIC_METERS / tb["population"]
+    tb["gas_reserves_per_capita_m3"] = tb["gas_reserves_tcm"] * TRILLION_CUBIC_METERS_TO_CUBIC_METERS / tb["population"]
     tb = tb.drop(columns=["population"], errors="raise")
     return tb
 
@@ -240,9 +316,36 @@ def add_variable_metadata(tb: Table) -> Table:
             "Gas",
         ),
         "coal_reserves_mt": ("Coal reserves", "million tonnes", "Mt", "Coal"),
-        "oil_reserves_bbl": ("Oil reserves", "billion barrels", "bbl", "Oil"),
+        "oil_reserves_bcm": ("Oil reserves", "billion cubic meters", "bcm", "Oil"),
         "gas_reserves_tcm": ("Gas reserves", "trillion cubic meters", "tcm", "Gas"),
+        "coal_reserves_per_capita_tonnes": ("Coal reserves per capita", "tonnes per person", "t", "Coal"),
+        "oil_reserves_per_capita_m3": ("Oil reserves per capita", "cubic meters per person", "m³", "Oil"),
+        "gas_reserves_per_capita_m3": ("Gas reserves per capita", "cubic meters per person", "m³", "Gas"),
     }
+    # Trade and consumption columns (from EIA): totals and per-capita variants, with per-fuel units.
+    trade_units = {
+        "coal": ("million tonnes", "Mt", "tonnes per person", "t"),
+        "gas": ("billion cubic meters", "bcm", "cubic meters per person", "m³"),
+        "oil": ("million cubic meters", "Mm³", "cubic meters per person", "m³"),
+    }
+    trade_metric_names = {
+        "consumption": "consumption",
+        "imports": "imports",
+        "exports": "exports",
+        "net_imports": "net imports",
+    }
+    for fuel, (unit, short_unit, unit_pc, short_unit_pc) in trade_units.items():
+        suffix = TRADE_SUFFIXES[fuel]
+        pc_suffix = {"mt": "tonnes", "bcm": "m3", "mcm": "m3"}[suffix]
+        for metric, metric_name in trade_metric_names.items():
+            name = fuel_names[fuel]
+            physical_specs[f"{fuel}_{metric}_{suffix}"] = (f"{name} {metric_name}", unit, short_unit, name)
+            physical_specs[f"{fuel}_{metric}_per_capita_{pc_suffix}"] = (
+                f"{name} {metric_name} per capita",
+                unit_pc,
+                short_unit_pc,
+                name,
+            )
     for column, (title, unit, short_unit, name) in physical_specs.items():
         tb[column].metadata.title = title
         tb[column].metadata.unit = unit
@@ -276,16 +379,26 @@ def sanity_check_outputs(tb: Table) -> None:
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in output."
     for fuel in FUELS:
         assert (tb[f"{fuel}_production_twh"].dropna() >= 0).all(), f"Negative {fuel} production found."
-    # Physical-unit production and reserves must be non-negative too.
+    # Physical-unit production, reserves, trade and consumption must be non-negative too (net imports
+    # are legitimately negative for net exporters, so they are not checked).
     for column in [
         "coal_production_mt",
         "oil_production_mt",
         "gas_production_bcm",
         "coal_reserves_mt",
-        "oil_reserves_bbl",
+        "oil_reserves_bcm",
         "gas_reserves_tcm",
+    ] + [
+        f"{fuel}_{metric}_{suffix}"
+        for fuel, suffix in TRADE_SUFFIXES.items()
+        for metric in ["consumption", "imports", "exports"]
     ]:
         assert (tb[column].dropna() >= 0).all(), f"Negative {column} found."
+
+    # Guard the kb/d -> million cubic meters per year conversion for oil: US petroleum consumption has
+    # been roughly 1,100-1,300 million cubic meters per year for the last decades.
+    us_oil = tb[(tb["country"] == "United States") & (tb["year"] == 2019)]["oil_consumption_mcm"]
+    assert 900 < us_oil.item() < 1500, "US oil consumption outside the expected range; check the kb/d conversion."
 
     # Coal coverage after extending with historical data: World from 1800, United Kingdom from 1700.
     coal = tb.dropna(subset=["coal_production_twh"])
@@ -322,7 +435,7 @@ def run() -> None:
     #
     tb_review_prod = prepare_statistical_review_data(tb_review=tb_review)
     tb_etemad = prepare_etemad_data(tb_etemad=tb_etemad)
-    tb_eia = prepare_eia_data(tb_eia=tb_eia)
+    tb_eia_prod = prepare_eia_data(tb_eia=tb_eia)
 
     # Historical coal (Smil for the World, Fouquet for the UK), restricted to before 1900.
     tb_smil = prepare_smil_data(tb_smil=tb_smil)
@@ -332,13 +445,15 @@ def run() -> None:
 
     # Combine all production sources.
     tb = combine_production_data(
-        tb_review=tb_review_prod, tb_etemad=tb_etemad, tb_eia=tb_eia, tb_historical=tb_historical
+        tb_review=tb_review_prod, tb_etemad=tb_etemad, tb_eia=tb_eia_prod, tb_historical=tb_historical
     )
 
-    # Add annual change, physical-unit production and reserves (Statistical Review only), and per-capita.
+    # Add annual change, physical-unit production and reserves (Statistical Review only), trade and
+    # consumption (EIA), and per-capita.
     tb = add_annual_change(tb=tb)
     tb = add_physical_production(tb=tb, tb_review=tb_review)
-    tb = add_reserves(tb=tb, tb_review=tb_review)
+    tb = add_reserves(tb=tb, tb_eia=tb_eia)
+    tb = add_trade_and_consumption(tb=tb, tb_eia=tb_eia)
     tb = add_per_capita(tb=tb)
 
     # Add total fossil fuel production (coal + oil + gas), absolute and per capita.
