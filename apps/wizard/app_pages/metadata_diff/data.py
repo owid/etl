@@ -82,7 +82,8 @@ def fetch_variable_rows(engine: Engine, variable_ids: list[int]) -> dict[int, di
             params=tuple(chunk),
         )
         for record in df.to_dict("records"):
-            rows[int(record["id"])] = record
+            # to_dict returns Hashable keys; our columns are all strings.
+            rows[int(record["id"])] = {str(k): v for k, v in record.items()}
     return rows
 
 
