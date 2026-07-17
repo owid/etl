@@ -147,6 +147,15 @@ Run after the §4 pipeline build. Three checks:
 
 If the garden step doesn't use the harmonizer at all (no `.countries.json`; `country` assigned inline), checks #2 and #3 still apply — #2 is the only thing that catches non-canonical inline values.
 
+### 8d. Empty-entity audit (review side)
+
+`/update-dataset` §7 ("Empty-entity audit") defines the full procedure. As reviewer, verify the **outcome** on staging: no view of the new dataset renders empty because its pinned entities have no data in the new indicators.
+
+- **Charts**: for every chart on the new dataset, `selectedEntityNames` (from `chart_configs.full`) must intersect the union of its y-variables' entities-with-data (staging indicators API `.metadata.json` → `dimensions.entities.values`). Skip ScatterPlot/Marimekko — no selection by design; a missing selection on other chart types is only a finding if production's config differs.
+- **Map tabs**: every `hasMapTab` chart's `map.columnSlug` must be one of its dimension variable ids (stored as a string — str-cast before comparing).
+- **MDim views, narrative charts, and published-gdoc references** (`posts_gdocs_links` with `country=` query strings; match targets through `chart_slug_redirects`): same selection-vs-availability check. For gdoc references only a fully dead selection counts — partial gaps still render.
+- **Grade against production**: a selection that had data on production but none on staging is a 🔴 regression from the update. A gap identical on production is 🟢 pre-existing — confirm the PR body (or a content follow-up) lists it, and don't ask for a fix in this PR.
+
 ### 9. Indicator metadata coverage & dataset block
 
 The mandatory-fields checklist, the `dataset.update_period_days` requirement, and the `presentation.attribution_short` non-inheritance gotcha all live in `/update-dataset` § 6c. As reviewer, build the indicator × field matrix from that checklist and flag any missing field as 🔴.
@@ -266,7 +275,7 @@ Structure the review with:
 
 ## Severity rubric
 
-- 🔴 **Blocker**: missing mandatory metadata field, genuinely broken link (fails curl + WebFetch + Wayback), failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, stale year in `citation_full`/`attribution`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, explorer/MDim still referencing old-version variables on staging, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data, downstream consumer that fails to build or silently lost coverage after a same-PR repoint (a "− lost N data point(s)" entry / red coverage chip in the data-diff report) without triage in the PR body
+- 🔴 **Blocker**: missing mandatory metadata field, genuinely broken link (fails curl + WebFetch + Wayback), failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, stale year in `citation_full`/`attribution`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, explorer/MDim still referencing old-version variables on staging, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data, downstream consumer that fails to build or silently lost coverage after a same-PR repoint (a "− lost N data point(s)" entry / red coverage chip in the data-diff report) without triage in the PR body, upgraded view (chart, MDim view, narrative chart, or article link) whose pinned entity selection has data on production but none on staging (renders empty)
 - 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues, undocumented sanity-check findings, phantom `sort:` labels with no backing value, over-exclusion of a canonical region, undocumented `missing values in mapping` countries, count series mis-routed into a rate/average aggregation branch, `citation_full` year ≠ `date_published` year (verify), pre-existing inherited metadata gap (`update_period_days`/`attributionShort`/`description_short` already missing in the prior version), PR author missing from `dataset.owners`, missing tracking-issue link in the PR body, owid-issues scheduled workflow missing, mis-timed, or not pointing at `/update-dataset`
 - 🟢 **Informational**: things to be aware of but not action items
 
