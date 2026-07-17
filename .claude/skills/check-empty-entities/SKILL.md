@@ -111,12 +111,15 @@ for _, row in cfgs.iterrows():
     if any(e is None for e in ents):
         unknown.append(row["slug"])  # fetch failed = unknown availability — coverage caveat, never a finding
         continue
+    dead_vars = [v for v, e in zip(y_ids, ents) if not e]
+    if dead_vars:
+        ...  # broken indicator (zero entities) — a finding regardless of any pinned selection
     avail = set().union(*ents) if ents else set()
     if sel and not (set(sel) & avail):
         ...  # finding -> grade against production
 ```
 
-Repeat the loop shape over `multi_dim_x_chart_configs`/`narrative_charts` configs and over parsed `posts_gdocs_links` query strings. Query gotcha: pymysql `%`-formats break on quoted literals and `LIKE` patterns — parameterize everything (`params={...}`), and use `CHAR_LENGTH(x) = 0` instead of `x = ''`.
+Repeat the loop shape over `multi_dim_x_chart_configs`, `explorer_views`, and `narrative_charts` configs (merged parent+patch for the latter) and over parsed `posts_gdocs_links` query strings. Query gotcha: pymysql `%`-formats break on quoted literals and `LIKE` patterns — parameterize everything (`params={...}`), and use `CHAR_LENGTH(x) = 0` instead of `x = ''`.
 
 ## Report format
 
