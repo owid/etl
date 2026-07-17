@@ -50,7 +50,7 @@ Same selection-vs-availability check on their configs:
 
 ### 4. Article references (gdoc embeds and hyperlinks)
 
-`posts_gdocs_links` rows (`linkType='grapher'`, **published** gdocs only) whose `queryString` carries `country=` pin entities in the URL — the upgrader never rewrites these. Parsing rules learned the hard way:
+`posts_gdocs_links` rows (`linkType IN ('grapher', 'guided-chart')`, **published** gdocs only) whose `queryString` carries `country=` pin entities in the URL — the upgrader never rewrites these. (`linkType='url'` rows pointing at `/grapher/` are `archive.ourworldindata.org` snapshots — frozen at a point in time, so entity availability doesn't apply; leave them out.) Parsing rules learned the hard way:
 
 - Entities are `~`-separated; **legacy URLs use `+`**, which `parse_qs` decodes to spaces — a chunk with spaces may itself be one entity name ("South Asia"), so try a full-chunk match first, then greedy multi-word matching against the `entities` table.
 - Skip `$entityCode` / `$entityName` template placeholders (country-page dynamic embeds).
@@ -105,15 +105,15 @@ for _, row in cfgs.iterrows():
         slug = (cfg.get("map") or {}).get("columnSlug")
         if slug is not None:  # absent = grapher defaults to the first y variable (valid)
             assert str(slug) in {str(d["variableId"]) for d in cfg["dimensions"]}
-    if types and types[0] in ("ScatterPlot", "Marimekko"):
-        continue
     ents = [entities(v) for v in y_ids]
     if any(e is None for e in ents):
         unknown.append(row["slug"])  # fetch failed = unknown availability — coverage caveat, never a finding
         continue
     dead_vars = [v for v, e in zip(y_ids, ents) if not e]
     if dead_vars:
-        ...  # broken indicator (zero entities) — a finding regardless of any pinned selection
+        ...  # broken indicator (zero entities) — a finding on EVERY chart type, so check before the scatter skip
+    if types and types[0] in ("ScatterPlot", "Marimekko"):
+        continue  # no pinned selection to check
     avail = set().union(*ents) if ents else set()
     if sel and not (set(sel) & avail):
         ...  # finding -> grade against production
