@@ -115,8 +115,9 @@ def download_and_extract_csv_files(urls: list[str]) -> list[pd.DataFrame]:
                     if df["TotalPMT"].replace("", pd.NA).replace(r"^\s*$", pd.NA, regex=True).dropna().empty:
                         continue
 
-                    # Extract only required columns if they exist
-                    required_cols = ["Year", "Month", "TotalTrips", "TotalPassengersCarried", "TotalPMT"]
+                    # Extract only required columns if they exist. Keep TCPID so the carrier
+                    # mapping below works even when the CSV filename carries no PSG permit id.
+                    required_cols = ["Year", "Month", "TotalTrips", "TotalPassengersCarried", "TotalPMT", "TCPID"]
                     available_cols = [col for col in required_cols if col in df.columns]
 
                     df = df[available_cols].copy()

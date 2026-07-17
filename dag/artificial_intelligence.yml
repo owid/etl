@@ -106,10 +106,10 @@ steps:
           - snapshot://ifr/2026-01-14/robot_density.xlsx
 
   # Robotaxis dataset
-  data://grapher/artificial_intelligence/2026-03-30/robotaxis:
-    - data://garden/artificial_intelligence/2026-03-30/robotaxis:
-      - data://meadow/artificial_intelligence/2026-03-30/robotaxis:
-        - snapshot://artificial_intelligence/2026-03-30/robotaxis.csv
+  data://grapher/artificial_intelligence/2026-07-15/robotaxis:
+    - data://garden/artificial_intelligence/2026-07-15/robotaxis:
+      - data://meadow/artificial_intelligence/2026-07-15/robotaxis:
+        - snapshot://artificial_intelligence/2026-07-15/robotaxis.csv
 
   # NVIDIA quarterly revenue dataset
   data://grapher/artificial_intelligence/2026-06-08/nvidia_revenue:

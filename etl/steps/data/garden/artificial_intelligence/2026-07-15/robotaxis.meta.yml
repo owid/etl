@@ -30,8 +30,10 @@ tables:
           - This counts completed passenger trips in California's paid robotaxi services that are approved to operate.
           - Only includes trips where passengers actually rode in the vehicle and paid for the service.
           - Excludes empty cars driving between pickups, test rides, and any non-passenger travel.
+          - Before August 2023, the data mixes two kinds of paid service — Waymo rides with a safety driver on board, and, from June 2022, Cruise's limited driverless nighttime service in San Francisco. In August 2023, regulators first allowed both companies to charge for fully driverless rides without time restrictions.
           - Both Cruise and Waymo reported data until October 2023, when California regulators made Cruise suspend its service following a safety incident. All subsequent data is from Waymo only.
         display:
+          name: Completed trips
           numDecimalPlaces: 0
 
       totalpassengerscarried:
@@ -44,8 +46,10 @@ tables:
           - Each person is counted once per trip, so if someone takes multiple trips, they're counted multiple times.
           - For shared rides, each passenger in the vehicle is counted separately. Safety drivers (when present) are not counted as passengers.
           - Excludes empty cars driving between pickups, test rides, and any non-passenger travel.
+          - Before August 2023, the data mixes two kinds of paid service — Waymo rides with a safety driver on board, and, from June 2022, Cruise's limited driverless nighttime service in San Francisco. In August 2023, regulators first allowed both companies to charge for fully driverless rides without time restrictions.
           - Both Cruise and Waymo reported data until October 2023, when California regulators made Cruise suspend its service following a safety incident. All subsequent data is from Waymo only.
         display:
+          name: Passengers carried
           numDecimalPlaces: 0
 
       totalpmt:
@@ -61,6 +65,8 @@ tables:
           - This indicator tracks the total distance traveled by paying passengers in robotaxi trips operated by licensed services in California, expressed in passenger-kilometers.
           - A passenger-kilometer is one kilometer traveled by one passenger. For example, a five-kilometer trip with two passengers equals ten passenger-kilometers. If passengers join or leave during a trip, each segment is counted separately based on the number of passengers in the vehicle.
           - Only passenger-carrying trips are included. Empty vehicles traveling between pickups and test rides are excluded.
+          - Before August 2023, the data mixes two kinds of paid service — Waymo rides with a safety driver on board, and, from June 2022, Cruise's limited driverless nighttime service in San Francisco. In August 2023, regulators first allowed both companies to charge for fully driverless rides without time restrictions.
           - Both Cruise and Waymo reported data until October 2023, when California regulators made Cruise suspend its service following a safety incident. All subsequent data is from Waymo only.
         display:
+          name: Passenger-kilometers
           numDecimalPlaces: 0
