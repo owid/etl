@@ -1,13 +1,15 @@
 ---
 name: create-snapshot
-description: Create a new snapshot (DVC file + Python script) from a url_main and optional url_download. Fetches the page, extracts metadata with AI, confirms with user, writes files, and runs the snapshot. Use when the user wants to add a new data source or create a snapshot from a URL.
+description: Create a new snapshot (DVC file, plus a Python script only when one is needed) from a url_main and optional url_download. Fetches the page, extracts metadata with AI, confirms with user, writes files, and runs the snapshot. Use when the user wants to add a new data source or create a snapshot from a URL.
 metadata:
   internal: true
 ---
 
 # Create Snapshot
 
-Create a new ETL snapshot from a source URL: fetch the page, infer metadata, confirm with the user, write the `.dvc` and `.py` files, then run the snapshot.
+Create a new ETL snapshot from a source URL: fetch the page, infer metadata, confirm with the user, write the `.dvc` file (plus a `.py` script only when one is genuinely needed), then run the snapshot.
+
+> **Paired skill — keep in sync.** [`/create-dataset`](../create-dataset/SKILL.md) consumes the conventions defined here (its Step 4 builds the snapshot for a full dataset chain): whenever you change the `.dvc` field guidance, the script templates, or the workflow in this file, check whether `create-dataset/SKILL.md` needs a matching edit (and make it in the same commit if so). The reverse also holds — see the mirror note there. The update-side skills are part of the same family: the fields written here are exactly what [`/update-dataset`](../update-dataset/SKILL.md) §6c re-checks on every version bump and what [`/review-data-pr`](../review-data-pr/SKILL.md) §5 compares old-vs-new at review time — keep the field guidance consistent across all of them.
 
 ## Inputs
 
@@ -30,7 +32,7 @@ Use WebFetch to fetch `url_main`. From the page content, extract as much metadat
 | `producer` | Organisation name, data owner, author |
 | `citation_full` | The producer's recommended citation, copied **verbatim** (light copyedits only — fixing a typo, stray spacing, or encoding artifacts; never rephrasing) — look for "cite as" / "suggested citation" / "please make the following reference" blocks on the page, an "Original citation" on repository pages (e.g. WRAP), NBER's suggested citation, or "Reference:" headers inside the data files themselves. Sites often have a dedicated "how to cite" / citation page separate from the dataset landing page — browse the site's navigation for one. Only construct a citation in standard format when the producer provides none |
 | `attribution_short` | Short org name / acronym |
-| `date_published` | Publication date or last-updated date. Not on the landing page? Look on other pages of the site (news/release notes, documentation), in the paper itself (title page and abstract often carry the exact date, e.g. "27 September 2013"), or in the files (file names like `10sd_jan15_2014.xlsx` or `shna2025tablesiii.xlsx` encode the release, and notes/readme sheets or PDF metadata may state it). Use a partial date ("YYYY" or "YYYY-MM") if that's all the source supports; never default it to `date_accessed`. Ask the user if still unsure |
+| `date_published` | Publication date or last-updated date. Not on the landing page? Look on other pages of the site (news/release notes, documentation), in the paper itself (title page and abstract often carry the exact date, e.g. "27 September 2013"), or in the files (file names like `10sd_jan15_2014.xlsx` or `shna2025tablesiii.xlsx` encode the release, and notes/readme sheets or PDF metadata may state it). On a fully JS-rendered page that states no date, the download URL's HTTP `Last-Modified` header is a defensible source — corroborate it against a release-named filename (see `/update-dataset` §6c). Use a partial date ("YYYY" or "YYYY-MM") if that's all the source supports; never silently default it to `date_accessed` — ask the user if still unsure, and only if they confirm the producer publishes no date anywhere, fall back to `date_accessed` with a `#` comment in the `.dvc` documenting why (`/review-data-pr` §5 looks for exactly that comment) |
 | `license_name` | License section (e.g. "CC BY 4.0", "Open Government Licence"). Not on the landing page? Also check the documentation (sources & methods documents, notes/readme sheets inside the data files, repository cover sheets like WRAP) and other pages within the same website — producers often have a dedicated licensing / terms-of-use / "about the data" section reachable from the site navigation. If no license is stated anywhere, **warn the user explicitly** and fall back to rights-reserved `© <producer> (<year>)` — never invent permissive terms like "Free to use" |
 | `license_url` | Link to the license, or to the page/document where the terms are stated |
 | `file_extension` | Infer from `url_download` if provided (csv, xlsx, xls, zip, json…); default `csv` |
@@ -67,10 +69,18 @@ Once the user confirms, compute:
 ```
 snapshot_dir = snapshots/<namespace>/<version>/
 dvc_path     = snapshots/<namespace>/<version>/<short_name>.<file_extension>.dvc
-py_path      = snapshots/<namespace>/<version>/<short_name>.py
+py_path      = snapshots/<namespace>/<version>/<short_name>.py   # only when a script is needed — see below
 ```
 
 Create the directory if it doesn't exist.
+
+**Decide whether a `.py` script is needed** (CLAUDE.md, "No `.py` for simple downloads"):
+
+- **Plain `url_download`, no custom logic** → write **only the `.dvc`**. `etls <namespace>/<version>/<short_name>` runs it straight from the `.dvc`. This is the default case — `/review-data-pr` §3/§7 treat the script as optional, so don't add one "for completeness".
+- **Manual import** (`dataset_manual_import: true`) → write the manual-import script below.
+- **Download needing custom code** (API pagination, auth, scraping, multi-file assembly, non-trivial parsing before storing) → write the automatic-download script below with the custom logic inside `run()`.
+
+Either script is a plain `run()` — **no `click` decorators and no `if __name__ == "__main__":` block**. The `etls` CLI imports the module and invokes `run` itself, supplying `--path-to-file` for manual imports. (Many old scripts still carry the boilerplate; don't copy them.)
 
 **Write the DVC file** (`<short_name>.<file_extension>.dvc`):
 
@@ -112,9 +122,9 @@ outs:
     path: <short_name>.<file_extension>
 ```
 
-**Write the Python script** (`<short_name>.py`):
+**Write the Python script** (`<short_name>.py`) — only in the two cases above:
 
-If `dataset_manual_import` is `false` (automatic download via `url_download`):
+If the download runs automatically but needs custom code:
 ```python
 """Script to create a snapshot of dataset."""
 
@@ -130,35 +140,26 @@ def run(upload: bool = True) -> None:
         upload: Whether to upload the snapshot to S3.
     """
     snap = paths.init_snapshot()
+    # ... custom fetch/assembly logic here ...
     snap.create_snapshot(upload=upload)
 ```
 
-If `dataset_manual_import` is `true` (no direct download link):
+If `dataset_manual_import` is `true` (no direct download link) — same template as `/create-dataset` Step 4:
 ```python
 """Script to create a snapshot of dataset.
 
-Steps to download the data manually:
+The data file is provided manually. Steps to obtain it:
   1. Go to <url_main>
   2. Download the data file and save it locally.
-  3. Run: python snapshots/<namespace>/<version>/<short_name>.py --path-to-file <path>
+  3. Run: etls <namespace>/<version>/<short_name> --path-to-file <path>
 """
-
-from pathlib import Path
 
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
-def run(upload: bool = True, path_to_file: str | None = None) -> None:
-    """Create a new snapshot.
 
-    Args:
-        upload: Whether to upload the snapshot to S3.
-        path_to_file: Path to local data file.
-    """
+def run(upload: bool = True, path_to_file: str | None = None) -> None:
     snap = paths.init_snapshot()
     snap.create_snapshot(filename=path_to_file, upload=upload)
 ```
@@ -168,19 +169,24 @@ def run(upload: bool = True, path_to_file: str | None = None) -> None:
 After writing the files, run:
 
 ```bash
-.venv/bin/etl snapshot <namespace>/<version>/<short_name>
+.venv/bin/etls <namespace>/<version>/<short_name>
 ```
 
 - If `dataset_manual_import` is `true`, tell the user to download the file manually and re-run with `--path-to-file <path>`.
 - If the snapshot run fails, diagnose and fix the issue. Common problems:
   - Wrong `file_extension` — check what the download URL actually serves
   - Missing or wrong `url_download` — verify with the user
-  - Auth/captcha required — flag to user, switch to `dataset_manual_import = true`
+  - Auth/captcha required — first test a plain, honestly-identified User-Agent against the direct file URL (some hosts reject *browser-like* UAs only — see the inverse-UA note under Notes); if genuinely blocked, flag to user and switch to `dataset_manual_import = true`
 
-### 5. Report to the user
+### 5. Verify links and field consistency
+
+- **Links**: run the HEAD-check loop from `/update-dataset` §6c ("Link verification") on every URL in the new `.dvc` (`url_main`, `url_download`, `license.url`, and any URL inside `description`). A curl non-2xx is a *signal*, not proof — Cloudflare-fronted hosts return false 404s to curl. Escalate with WebFetch, then the Wayback Machine, before treating a link as broken; never swap a link for an alternative on a curl-only failure.
+- **Citation year vs `date_published` year**: the year inside `citation_full` should normally match `date_published`'s year. A deliberate mismatch is fine when the producer labels the release by *edition* rather than publish date (e.g. a "2025 report" published 2026-03-17) — leave a one-line `#` comment in the `.dvc` so the next reviewer doesn't re-flag it (`/review-data-pr` §5 checks exactly this pair).
+
+### 6. Report to the user
 
 Show:
-- The paths of the two files created
+- The paths of the files created (`.dvc`, plus the `.py` if one was needed)
 - Whether the snapshot ran successfully
 - Next steps: "You can now create a meadow step for `<namespace>/<version>/<short_name>`"
 
@@ -188,6 +194,8 @@ Show:
 
 - `date_accessed` in the DVC file should always equal the snapshot `version` date (the date you ran the snapshot).
 - If `url_download` is not provided and cannot be inferred, always set `dataset_manual_import = true`.
+- **Data living in an embedded chart (Datawrapper and similar): parse the page's own fallback tables, never the chart platform's CDN endpoint.** The chart CDN's latest published version can trail the page's data by a full release. Producer pages server-render each embed's data as an HTML `<noscript>` table — parse that instead: whole-page `pd.read_html(io.StringIO(resp.text))`, select the table whose columns exactly match the expected header, assert exactly one match. See `/update-dataset` Guardrails, "Scraped chart embeds".
+- **Before accepting manual import because "the site blocks downloads": test a plain UA.** Some hosts reject *browser-like* User-Agents while letting plain, honestly-identified clients through (the inverse of the usual bot-blocking). Test both directions against the direct file URL; if a plain UA works, keep `url_download` in the `.dvc` and pass `user_agent="owid-etl/1.0 (https://ourworldindata.org)"` to `snap.create_snapshot(...)` — and keep the `.py` in that case (the script-less path can't set a UA), saying so in the docstring. Also re-check the producer's download page/API for a stable direct endpoint before carrying a manual flow forward. See `/update-dataset` Guardrails.
 - The `outs` block `md5` and `size` fields are filled in automatically by DVC when the snapshot runs — just set them to empty/zero in the template.
 - Omit optional YAML fields entirely (don't leave them blank) to keep the DVC file clean.
 - Never guess at citation text — if you can't find it on the page, leave a placeholder like `<TO BE FILLED>` and ask the user.
