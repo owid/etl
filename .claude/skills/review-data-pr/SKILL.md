@@ -99,6 +99,7 @@ Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.d
 
 - **`docs.google.com` 200 ≠ publicly viewable.** Google Sheets/Docs links return HTTP 200 even when they're behind a permission wall (the 200 is the "request access"/sign-in page). When a user-facing `description_key`/`description_processing` links a Google Sheet, confirm real public access with `WebFetch` (ask whether the page shows data or a "you need access"/sign-in wall) — curl status alone will pass a private sheet.
 - **Cross-check the same sheet is cited consistently.** If a dataset links a "source per data point" sheet from more than one field, verify they're the *same* sheet ID — divergent IDs (one current, one stale) is a 🟡.
+- **HTTP 200 ≠ anchor exists.** For URLs carrying a `#fragment`, run the anchor pass from `/update-dataset` § 6c: the fragment must match an `id`/`name` attribute in the page HTML (skip non-DOM fragments: `:~:text=`, `gid=`, `page=`, `#/`, `#!`). Rule out client-side rendering and Cloudflare challenge bodies (WebFetch de-slugged-heading check) before flagging. A confirmed missing anchor on an otherwise-working page is 🟡 — the page loads, the reader just lands at the top; escalate to 🔴 only if the linked section genuinely no longer exists and the link's claim depends on it.
 
 ### 7. Code clarity & docs
 
@@ -183,6 +184,7 @@ Any `NULL` row is a 🔴.
   # compare `present` against the `sort:` labels in the .meta.yml
   ```
   Any `sort:`/map label with no backing value is 🟡 — author should drop it from `sort:`/`description_key` (or from the map if it can never occur). Re-check on every refresh: phantoms reappear when a category drops out upstream.
+- **New indicators surfaced.** Diff the indicator set against the previous version — shortName anti-join across the two grapher dataset ids, or the `+ Column` lines in the data-diff (the HTML report buries additions at severity 0; read the text/JSON output). Check the **meadow** diff too: a column new in meadow that never reaches garden was dropped by the pipeline — confirm the author surfaced that choice rather than losing it silently (and when meadow hardcodes a column subset, additions won't appear in any diff — spot-check the snapshot's columns). If the update adds indicators, verify (a) the PR body lists them under "New indicators" (author side: `/update-dataset` step 5) and (b) they meet the same metadata-coverage bar as the rest. New indicators present but nowhere mentioned: 🟡. A `+`/`−` pair that is really a rename must have gone through the indicator-upgrade mapping, not the new-indicator list.
 
 ### 10. Metadata quality skills
 

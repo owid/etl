@@ -180,7 +180,7 @@ After writing the files, run:
 
 ### 5. Verify links and field consistency
 
-- **Links**: run the HEAD-check loop from `/update-dataset` §6c ("Link verification") on every URL in the new `.dvc` (`url_main`, `url_download`, `license.url`, and any URL inside `description`). A curl non-2xx is a *signal*, not proof — Cloudflare-fronted hosts return false 404s to curl. Escalate with WebFetch, then the Wayback Machine, before treating a link as broken; never swap a link for an alternative on a curl-only failure.
+- **Links**: run the HEAD-check loop from `/update-dataset` §6c ("Link verification") on every URL in the new `.dvc` (`url_main`, `url_download`, `license.url`, and any URL inside `description`). A curl non-2xx is a *signal*, not proof — Cloudflare-fronted hosts return false 404s to curl. Escalate with WebFetch, then the Wayback Machine, before treating a link as broken; never swap a link for an alternative on a curl-only failure. URLs carrying a `#fragment` also need §6c's anchor pass — HTTP status alone can't validate a fragment.
 - **Citation year vs `date_published` year**: the year inside `citation_full` should normally match `date_published`'s year. A deliberate mismatch is fine when the producer labels the release by *edition* rather than publish date (e.g. a "2025 report" published 2026-03-17) — leave a one-line `#` comment in the `.dvc` so the next reviewer doesn't re-flag it (`/review-data-pr` §5 checks exactly this pair).
 
 ### 6. Report to the user

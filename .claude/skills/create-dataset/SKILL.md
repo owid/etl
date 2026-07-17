@@ -186,7 +186,7 @@ Confirm the upsert actually succeeded before moving on: it should print the data
 
 ### Step 7 — Commit, push, and hand off for review
 
-1. **Quality pass before handoff.** Run `/check-metadata-typos`, `/check-metadata-spacing`, and `/check-metadata-style` on the new garden + grapher `.meta.yml` files, and walk the general-audience clarity checklist — full procedure in `/update-dataset` §6b. Then run the link-verification loop from `/update-dataset` §6c on every URL in the new `.dvc` and `.meta.yml` files (a curl non-2xx is a *signal*, not proof — escalate WebFetch → Wayback before trusting it). After any `.meta.yml` edit, re-run the affected step (`--grapher` for grapher) so the built catalog and staging reflect it.
+1. **Quality pass before handoff.** Run `/check-metadata-typos`, `/check-metadata-spacing`, and `/check-metadata-style` on the new garden + grapher `.meta.yml` files, and walk the general-audience clarity checklist — full procedure in `/update-dataset` §6b. Then run the link-verification loop from `/update-dataset` §6c on every URL in the new `.dvc` and `.meta.yml` files, including its anchor-fragment pass for URLs with `#…` (a curl non-2xx is a *signal*, not proof — escalate WebFetch → Wayback before trusting it). After any `.meta.yml` edit, re-run the affected step (`--grapher` for grapher) so the built catalog and staging reflect it.
 2. Run `make check`, confirm you're still on the work branch (`git branch --show-current` — a branch switch in the user's IDE silently moves your shell too), then commit and push:
    ```bash
    git add .
