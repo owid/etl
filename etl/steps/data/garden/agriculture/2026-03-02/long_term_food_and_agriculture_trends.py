@@ -92,12 +92,17 @@ OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES = [
     "Democratic Republic of Congo",
     "Libya",
     "Marshall Islands",
+    # Melanesia and Polynesia are FAO subregions (not countries), so they are excluded from country
+    # aggregates. Listed by their bare names so the check holds whether or not FAOSTAT has been
+    # re-harmonized to the "... (FAO)" names (a countries.json edit does not force faostat_fbsc to rebuild).
+    "Melanesia",
     "Micronesia (country)",
     "Nauru",
     "Netherlands Antilles",
     "North Korea",
     "Oman",
     "Papua New Guinea",
+    "Polynesia",
     "Qatar",
     "Seychelles",
     "Somalia",
@@ -430,7 +435,9 @@ def run() -> None:
         if "income" not in country
         if country not in ["European Union (27)", "World"]
     ]
-    newly_excluded = sorted(set(other_countries_excluded_from_aggregates) - set(OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES))
+    newly_excluded = sorted(
+        set(other_countries_excluded_from_aggregates) - set(OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES)
+    )
     error = (
         "The list of additional countries excluded from region aggregates has changed. "
         f"Newly excluded (review, then add to OTHER_COUNTRIES_EXCLUDED_FROM_AGGREGATES if the change is expected): {newly_excluded}"
