@@ -45,7 +45,7 @@ For every chart with `hasMapTab`, assert `map.columnSlug` is one of the chart's 
 Same selection-vs-availability check on their configs:
 
 - MDim views: `multi_dim_x_chart_configs` → `chart_configs` (all MDims, not just the dataset's own — other MDims can carry this dataset's variables in y-dimensions).
-- Narrative charts: `narrative_charts.chartConfigId` → `chart_configs`.
+- Narrative charts: audit the **merged parent+patch config, not the stored one**. `narrative_charts.chartConfigId` → `chart_configs` holds the patch (and a `full` that can be stale), so a narrative chart inheriting `selectedEntityNames` or dimensions from its parent can falsely pass — use `AdminAPI(OWID_ENV).get_narrative_chart(id)["configFull"]` (same gotcha as the narrative FAUST verification in `/update-dataset` step 7).
 
 ### 4. Article references (gdoc embeds and hyperlinks)
 
