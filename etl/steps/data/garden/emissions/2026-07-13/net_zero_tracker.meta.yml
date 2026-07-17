@@ -25,10 +25,25 @@ tables:
         description_short: |-
           The status of each country's commitment to 'net-zero' emissions. The specifics of this commitment can vary, with some countries pledging to reach net-zero greenhouse gas emissions, while others define this as carbon emissions only. Countries assessed as having no net-zero target are shown as "No target".
         processing_level: minor
+        # Order the legend from least to most firmly established commitment. Only categories present in
+        # the data are listed; listing an absent one (e.g. "Achieved (externally validated)") would add
+        # an empty phantom entry to the legend.
+        type: ordinal
+        sort:
+          - "No target"
+          - "Proposed / in discussion"
+          - "Declaration / pledge"
+          - "In policy document"
+          - "In law"
+          - "Achieved (self-declared)"
       has_net_zero_target:
         title: Countries that have set a net-zero emissions target
         description_short: |-
           Countries have a net-zero emissions target if they: have achieved net-zero already; have a target written in law; have it in their policy document; or have made a public pledge. Countries assessed as having no target are shown as "No target".
         processing_level: major
+        type: ordinal
+        sort:
+          - "No target"
+          - "Net-zero achieved or pledged"
         description_processing: |-
           A country is labelled as having a net-zero target if it appears in the Net Zero Tracker with a target that has a defined status and target year. Countries the tracker assessed as having no target are labelled "No target". Countries the tracker does not cover are left blank (shown as missing on charts), so that "no target" is distinguishable from "no data".
