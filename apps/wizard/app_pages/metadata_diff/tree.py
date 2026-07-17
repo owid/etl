@@ -72,10 +72,12 @@ def _render_node(node: dict[str, Any], view_diffs: list[ViewDiff], leaf_hrefs: l
         cls = f"mdd-box mdd-leaf mdd-{status}" + (" mdd-newview" if is_new else "")
         badge = '<span class="mdd-badge-new">new</span>' if is_new else ""
         # A real link: srcdoc iframes resolve relative URLs against the parent page, so
-        # "?query" navigates the Wizard app itself (target=_top escapes the iframe).
+        # "?query" points at the Wizard app itself. target=_blank because the component
+        # sandbox only allows user-initiated popups, not top-page navigation — a plain
+        # click on a _top link is silently blocked.
         return (
             f'<div class="mdd-node mdd-leafnode mdd-n-{status}">'
-            f'<a class="{cls}" data-view="{i}" href="{html.escape(leaf_hrefs[i])}" target="_top">'
+            f'<a class="{cls}" data-view="{i}" href="{html.escape(leaf_hrefs[i])}" target="_blank" rel="noopener">'
             f'{html.escape(node["name"])}{badge}<span class="mdd-golink">&#8599;</span></a>'
             f"</div>"
         )
@@ -128,6 +130,7 @@ def render_tree_html(
     #mdd-root {{ font-family: -apple-system, system-ui, sans-serif; font-size: 13px; color: #333; }}
     #mdd-root .mdd-toolbar {{ margin-bottom: 10px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }}
     #mdd-root .mdd-dims {{ color: #777; }}
+    #mdd-root .mdd-hint {{ color: #999; font-size: 12px; margin-bottom: 8px; }}
     #mdd-root .mdd-legend span {{ margin-right: 12px; }}
     #mdd-root .mdd-dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 4px; }}
     #mdd-root .mdd-tree {{ overflow: auto; padding: 4px; }}
@@ -170,6 +173,8 @@ def render_tree_html(
     <span class="mdd-dims">Controls: {dim_names}</span>
     <span><b>{n_changed}</b> of {len(view_diffs)} views changed</span>
   </div>
+  <div class="mdd-hint">Hover over a view to preview its changes; click it to open the View diff in a
+    new tab. Click a branch to collapse/expand it.</div>
   <div class="mdd-tree">{body}</div>
   <div id="mdd-tooltip"></div>
   <script>
@@ -187,12 +192,12 @@ def render_tree_html(
       if (!fe) return;
       treeEl.style.maxHeight = "none";
       const wanted = document.documentElement.scrollHeight + 24;
-      if (wanted > MAX_HEIGHT) {{
-        treeEl.style.maxHeight = (MAX_HEIGHT - 100) + "px";
-        fe.style.height = MAX_HEIGHT + "px";
-      }} else {{
-        fe.style.height = wanted + "px";
-      }}
+      const h = Math.min(wanted, MAX_HEIGHT);
+      if (wanted > MAX_HEIGHT) treeEl.style.maxHeight = (MAX_HEIGHT - 100) + "px";
+      // Set both the style and the height attribute so Streamlit's layout pushes the
+      // content below the component down instead of letting it overlap the tree.
+      fe.style.height = h + "px";
+      fe.setAttribute("height", h);
     }};
 
     const checkbox = document.getElementById("mdd-show-unchanged");

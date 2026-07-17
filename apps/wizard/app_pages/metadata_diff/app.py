@@ -288,11 +288,9 @@ def main() -> None:
         tree_html, height = render_tree_html(
             catalog_path, dimensions, view_diffs, dim_param_prefix=DIM_PARAM_PREFIX
         )
+        # NOTE: nothing should be rendered below the component — it resizes itself to its
+        # content, and Streamlit-rendered siblings would overlap during the resize.
         components.html(tree_html, height=height, scrolling=True)
-        st.caption(
-            "Hover over a view to preview its changes; click it to open the View diff. "
-            "Click a branch to collapse/expand it."
-        )
 
 
 main()
