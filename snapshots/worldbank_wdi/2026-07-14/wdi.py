@@ -55,6 +55,7 @@ It's easier to do it in two steps:
 
 import datetime as dt
 import json
+import re
 import tempfile
 import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -257,9 +258,16 @@ def update_snapshot_metadata(snap: Snapshot) -> None:
         snap.metadata.origin.url_download = api_download_url
 
     # Update the description (in case it changed).
-    snap.metadata.origin.description = BeautifulSoup(
-        meta_orig.get("identification").get("description"), features="html.parser"
-    ).get_text()
+    # NOTE: the source HTML has no whitespace between adjacent block tags (e.g. "</p><p>"), so
+    # get_text() with no separator glues sentences across paragraph breaks together (e.g.
+    # "several decades.WDI serves"). A separator fixes that but also inserts stray spaces around
+    # inline tags (e.g. "World Bank ,"), so both are normalized away below.
+    description = BeautifulSoup(meta_orig.get("identification").get("description"), features="html.parser").get_text(
+        separator=" "
+    )
+    description = re.sub(r"\s+", " ", description).strip()
+    description = re.sub(r"\s+([,.;:!?])", r"\1", description)
+    snap.metadata.origin.description = description
     # Update the access date.
     snap.metadata.origin.date_accessed = dt.datetime.now().strftime("%Y-%m-%d")
     # Update the full citation.

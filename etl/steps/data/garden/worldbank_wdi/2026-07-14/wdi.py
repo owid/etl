@@ -75,7 +75,11 @@ def run() -> None:
 
     tb_cust = mk_custom_entities(tb)
     assert all([col in tb.columns for col in tb_cust.columns])
-    tb = pd.concat([tb, tb_cust], axis=0).copy_metadata(tb)  # ty: ignore
+    tb = (
+        pr.concat([tb.reset_index(), Table(tb_cust).reset_index()], axis=0)
+        .copy_metadata(tb)
+        .format(["country", "year"])
+    )
 
     tb_garden = tb
 
@@ -246,7 +250,7 @@ def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_gro
 
 def mk_omms(table: Table) -> Table:
     """calculates custom variables (aka "owid-maintained metrics")"""
-    df = pd.DataFrame(table)
+    df = table
     orig_df_shape = df.shape[0]
     omms = []
     tb_omm = Table()
