@@ -503,7 +503,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    for url in $(rg --no-filename -No "https?://[^\"' ]+" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/ \
        | sed -E 's/[).,;:>]+$//' | sort -u | rg '#'); do
        page="${url%%#*}"; frag="${url#*#}"
-       case "$frag" in ':~:text='*|'gid='*|'page='*|'/'*|'!'*) continue;; esac  # non-DOM fragments — see below
+       case "$frag" in *=*|*/*|'!'*) continue;; esac  # non-DOM fragments — see below
        if curl -sL --max-time 20 -A 'Mozilla/5.0' "$page" | grep -qE "(id|name)=[\"']${frag}[\"']"; then
            printf "OK         %s\n" "$url"
        else
@@ -511,7 +511,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        fi
    done
    ```
-   - **Skip non-DOM fragments** (the `case` list): `#:~:text=` scroll-to-text fragments, Google Sheets `#gid=…`, PDF `#page=…`, SPA routes `#/…`, and hashbangs `#!…` don't correspond to an element `id` and would all false-alarm.
+   - **Skip non-DOM fragments** (the `case` list): anything containing `=` (scroll-to-text `#:~:text=`, Google Sheets `#gid=…`, PDF `#page=…`) or `/` (hash-route state, whether slash-prefixed `#/dashboard` or not — e.g. FAOSTAT's `#data/FBS`), plus `#!…` hashbangs — none correspond to an element `id` and all would false-alarm. Real anchors are heading slugs and never contain `=` or `/`.
    - **`NO-ANCHOR` is a signal, not proof** — same epistemics as the curl false-404 note above. Two false-positive modes: the page renders its anchors client-side (the raw HTML lacks the `id`), or curl got a Cloudflare challenge page instead of the real body. Confirm before flagging: check the fetched body is the real page (grep for `</html>` and a plausible `<title>`), then ask `WebFetch` whether the page has a section/heading matching the de-slugged fragment (`key-insights` → "Key insights") — OWID heading anchors are slugged headings, so heading-text presence is the authoritative check.
    - **On a confirmed missing anchor** the reader still lands on the right page, just at the top — fix the fragment (grep the body's `id="` values for the nearest real anchor) or drop it. Apply the same restraint as above: **flag and ask before rewriting** — the section may exist under a different slug, or the page may not have rebuilt yet.
 
