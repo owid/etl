@@ -14,7 +14,7 @@ steps:
       - data://garden/ggdc/2022-12-23/maddison_database:
         - data://meadow/ggdc/2022-12-23/maddison_database:
           - snapshot://ggdc/2022-12-23/maddison_database.xlsx
-      - data://grapher/worldbank_wdi/2026-02-27/wdi
+      - data://grapher/worldbank_wdi/2026-07-14/wdi
 
   # Penn World Table
   data://garden/ggdc/2025-10-09/penn_world_table:
@@ -53,7 +53,7 @@ steps:
     # GDP per capita vs. living conditions indicators
     # NOTE: Don't forget to run with --private to access the GBD risk factors data
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
-    - data://garden/worldbank_wdi/2026-02-27/wdi
+    - data://garden/worldbank_wdi/2026-07-14/wdi
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/un/2026-06-09/igme
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality
@@ -119,4 +119,4 @@ steps:
         - snapshot://papers/2026-07-02/broadberry_gardner.csv
       - data://meadow/wb/2026-07-02/wdi_employment_by_sector_archive:
         - snapshot://wb/2026-07-02/wdi_employment_by_sector_archive.csv
-      - data://garden/worldbank_wdi/2026-02-27/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
