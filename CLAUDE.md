@@ -140,6 +140,8 @@ gh pr edit <number> --body "..."
 
 **Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
 
+**After `etl pr --worktree`, verify the branch is current AND actually pushed.** Worktree creation can branch off a stale local `master` (missing recent merges → `_check_dag_completeness` "not in the DAG" errors on steps that should already exist) — fix with `git fetch origin master && git rebase origin/master`. That rebase then needs its own push: check `gh pr view --json additions,deletions` isn't `0`/`0` before assuming the PR reflects your commits.
+
 **Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
 
 To run the full **review → wait → fix → re-review** loop hands-off (and watch CI) in the background while you keep working, use the `pr-babysitter` skill — it spawns a background agent that triggers Codex, judges and fixes the valid findings, and loops to a cap (never merges). Fire it proactively after pushing a substantial chunk to a PR branch.

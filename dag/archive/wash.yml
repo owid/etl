@@ -16,3 +16,12 @@ steps:
   # archived; last active in 43a0a88d0468 on 2025-04-16
   data://explorers/wash/2024-01-06/who:
     - data://garden/wash/2024-01-06/who
+  # archived; last active in c886d68ebf5c on 2026-07-16
+  data://grapher/wash/2024-02-15/bathing_water:
+    - data://garden/wash/2024-02-15/bathing_water
+  # archived; last active in c886d68ebf5c on 2026-07-16
+  data://garden/wash/2024-02-15/bathing_water:
+    - data://meadow/wash/2024-02-15/bathing_water
+  # archived; last active in c886d68ebf5c on 2026-07-16
+  data://meadow/wash/2024-02-15/bathing_water:
+    - snapshot://wash/2024-02-15/bathing_water.zip

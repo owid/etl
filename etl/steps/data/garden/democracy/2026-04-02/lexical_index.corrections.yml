@@ -30,3 +30,70 @@
   provider: Lexical Index
   reported: "2026-07-09"
   status: acknowledged
+# India's political regime classification carries the same 1947-vs-1950 dating error as the suffrage
+# columns above: it is coded as an electoral democracy / polyarchy from independence in 1947, but
+# India held no competitive multi-party elections under universal suffrage until 1951-52 (after the
+# Constitution came into force in 1950). It should instead be a multi-party autocracy (score 3) from
+# 1947 to 1949.
+#
+# The Lexical Index is a deterministic function of its binary components (see the LIED formula in
+# lexical_index.meta.yml): score 3 is defined as legislative + multi-party + executive elections but
+# NO competitive elections (competitive_elections=0). So the fix touches three columns that the source
+# keeps mutually inconsistent for these years:
+#   - competition_lied: the source still codes competitive elections as held (=1); we set it to 0, both
+#     because India held none before 1951-52 and so the component agrees with the score-3 regime type
+#     (a regime defined by the *absence* of competitive elections).
+#   - regime_redux_lied / regime_lied: the aggregate scores, overridden to 3.
+# We override the two aggregate scores directly rather than re-deriving every regime value from its
+# components, because the source deliberately diverges from the formula for a few unrelated
+# country-years (e.g. Cambodia 1946, Cyprus 1973, Norway 1913) that a blanket re-derivation would
+# silently rewrite. With competition_lied=0 and male/female suffrage=0 (above), the corrected
+# components are exactly consistent with the score of 3, and the fix propagates to every derived
+# indicator (democracy_lied, is_electoral_democracy, is_full_democracy, the age/experience counts and
+# the num_*/pop_* region aggregates).
+- indicator: competition_lied
+  entity: India
+  years: {from: 1947, to: 1949}
+  action: override
+  value: 0
+  expect: {eq: 1} # still coded as competitive (the error); fails loudly once fixed upstream
+  reason: >-
+    India is coded as holding competitive elections from 1947 (independence), but its first
+    competitive multi-party elections were held in 1951-52. Setting competitive_elections=0 for
+    1947-1949 keeps the component consistent with the corrected multi-party autocracy (score 3), which
+    is defined by the absence of competitive elections. Same upstream dating error as the India
+    suffrage corrections above; fix due in the 2027 release.
+  provider: Lexical Index
+  reported: "2026-07-09"
+  status: acknowledged
+- indicator: regime_redux_lied
+  entity: India
+  years: {from: 1947, to: 1949}
+  action: override
+  value: 3
+  expect: {eq: 6} # still coded as electoral democracy (the error); fails loudly once fixed upstream
+  reason: >-
+    India's reduced Lexical Index (LIED) classification is coded as electoral democracy (6) from 1947
+    (independence), but India held no competitive multi-party elections under universal suffrage until
+    1951-52; it should be a multi-party autocracy (3) from 1947 to 1949. Same upstream dating error as
+    the India suffrage corrections above; fix due in the 2027 release.
+  provider: Lexical Index
+  reported: "2026-07-09"
+  status: acknowledged
+- indicator: regime_lied
+  entity: India
+  years: {from: 1947, to: 1949}
+  action: override
+  value: 3
+  # Currently 6 in 1947 and 7 (polyarchy) in 1948-1949; `ge: 6` guards the whole range and fails
+  # loudly once the classification is corrected downward upstream.
+  expect: {ge: 6}
+  reason: >-
+    India's full Lexical Index (LIED+) classification is coded as electoral democracy (6) in 1947 and
+    polyarchy (7) in 1948-1949, dating from independence in 1947. But India held no competitive
+    multi-party elections under universal suffrage until 1951-52; it should be a multi-party autocracy
+    (3) from 1947 to 1949. Same upstream dating error as the India suffrage corrections above; fix due
+    in the 2027 release.
+  provider: Lexical Index
+  reported: "2026-07-09"
+  status: acknowledged

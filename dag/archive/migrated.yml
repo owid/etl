@@ -399,6 +399,10 @@ steps:
   data-private://grapher/labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources:
     - data-private://garden/labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources:
       - snapshot-private://labor/2024-01-03/shares_and_numbers_employed_by_sector__world_bank_and_historical_sources.feather
+  # archived; last active in c886d68ebf5c on 2026-07-16
+  data://grapher/clio_infra/2017-09-09/clio_infra__human_capital:
+    - data://garden/clio_infra/2017-09-09/clio_infra__human_capital:
+      - snapshot://clio_infra/2017-09-09/clio_infra__human_capital.feather
 data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
   - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
     - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather

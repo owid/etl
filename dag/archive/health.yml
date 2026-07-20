@@ -1099,13 +1099,13 @@ steps:
         - snapshot://neglected_tropical_diseases/2025-08-20/schistosomiasis.xlsx
 
       # WHO Antimicrobial usage
-  # archived; last active in 9487a51236a5 on 2026-07-08
+  # archived; last active in 989b42d67ae8 on 2026-07-10
   data://grapher/antibiotics/2024-11-12/antimicrobial_usage:
     - data://garden/antibiotics/2024-11-12/antimicrobial_usage:
       - data://meadow/antibiotics/2024-11-12/antimicrobial_usage:
         - snapshot://antibiotics/2024-11-12/antimicrobial_usage.xlsx
   # WHO Antibiotic testing coverage
-  # archived; last active in 9487a51236a5 on 2026-07-08
+  # archived; last active in 989b42d67ae8 on 2026-07-10
   data://grapher/antibiotics/2024-11-15/testing_coverage:
     - data://garden/antibiotics/2024-11-15/testing_coverage:
       - data://meadow/antibiotics/2024-11-15/testing_coverage:
@@ -1113,7 +1113,7 @@ steps:
 
 
     # Antibiotic resistance data - WHO GLASS
-  # archived; last active in 9487a51236a5 on 2026-07-08
+  # archived; last active in 989b42d67ae8 on 2026-07-10
   data://grapher/antibiotics/2024-10-18/who_glass_by_antibiotic:
     - data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic:
       - data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic:

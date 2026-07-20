@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from structlog import get_logger
@@ -84,13 +85,51 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], incl
     # And that would give you only the steps that are affected by the changed files. That would be ultimately what we need. But I
     # understand that loading steps_df is very slow.
 
-    # Add all downstream dependencies of those datasets.
     DAG = load_dag()
+
+    # A version bump only touches files under the new version's folder, so `dataset_catalog_paths`
+    # so far contains only the new version's path. If we stopped here, callers that turn this list
+    # into an --include filter (e.g. datadiff's `--changed`) would filter the previous version's
+    # catalog path out of the comparison entirely, and `etl diff` would report the bump as a
+    # brand-new dataset instead of diffing it against the old version. Pull in just the closest
+    # *preceding* version of the same channel/namespace/short_name so it stays in scope for
+    # comparison.
+    #
+    # Only the immediate predecessor is added — not every other active version. Some datasets
+    # (e.g. WDI) keep several vintages active in parallel for different downstream consumers
+    # rather than superseding one in place; matching all of them would sweep unrelated, untouched
+    # datasets into the comparison. Since those aren't part of `dataset_catalog_paths` and usually
+    # aren't built locally either, `etl diff` would report each one as falsely "removed".
+    all_data_steps = {s.split("://", 1)[1] for s in DAG if s.startswith("data://")}
+    sibling_versions = []
+    for ds_path in dataset_catalog_paths:
+        parts = ds_path.split("/")
+        if len(parts) != 4:
+            # Not a channel/namespace/version/short_name data step (e.g. a snapshot path).
+            continue
+        channel, namespace, version, short_name = parts
+        pattern = re.compile(rf"^{re.escape(channel)}/{re.escape(namespace)}/([^/]+)/{re.escape(short_name)}$")
+        # Versions are (almost always) ISO dates, so the lexicographically-largest one that's
+        # still less than the new version is its closest predecessor.
+        preceding = [
+            (match.group(1), candidate)
+            for candidate in all_data_steps
+            if candidate != ds_path and (match := pattern.match(candidate)) and match.group(1) < version
+        ]
+        if preceding:
+            sibling_versions.append(max(preceding, key=lambda p: p[0])[1])
+    # Add all downstream dependencies of the originally-changed datasets only. Siblings are added
+    # afterward as comparison targets, not as subgraph-expansion inputs — otherwise every real
+    # downstream consumer of an old sibling version (and their own upstream dependencies) would be
+    # swept into the result too, even though only the new version is actually changing.
     dag_steps = list(filter_to_subgraph(DAG, dataset_catalog_paths, downstream=True).keys())
 
     # From data://... extract catalogPath
     # TODO: use StepPath from https://github.com/owid/etl/pull/3165 to refactor this
     catalog_paths = [step.split("://")[1] for step in dag_steps if step.startswith("data://")]
+    for sibling in sibling_versions:
+        if sibling not in catalog_paths:
+            catalog_paths.append(sibling)
 
     # Optionally also return export steps, keeping their full URI so callers can match them with
     # `export://...` include patterns (export steps have no data:// catalogPath). This covers both
