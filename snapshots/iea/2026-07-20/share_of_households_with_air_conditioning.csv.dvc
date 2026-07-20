@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Share of households with air conditioning
+    description: |-
+      The International Energy Agency (IEA) tracks the adoption of air conditioning across major economies and regions as part of its analysis of cooling and electricity demand. This data reports the share of households equipped with air conditioning in selected countries and regions.
+
+      The adoption of air conditioning has been accelerating around the world, driven by rising incomes in hot-climate economies and by record-breaking heatwaves in regions that previously had limited cooling demand. Cooling is one of the fastest-growing sources of electricity demand in buildings.
+    date_published: "2026-07-10"
+
+    # Citation
+    producer: International Energy Agency
+    citation_full: |-
+      International Energy Agency (2026). Cooling a hotter world: El Niño meets strong growth in global electricity demand. IEA, Paris.
+
+      Supplemented with 2018 estimates from: International Energy Agency (2018). Percentage of households equipped with AC in selected countries, 2018. IEA, Paris.
+    attribution_short: IEA
+
+    # Files
+    url_main: https://www.iea.org/commentaries/cooling-a-hotter-world-el-nino-meets-strong-growth-in-global-electricity-demand
+    date_accessed: '2026-07-20'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.iea.org/terms
+outs:
+  - md5: fe3e98c91a308b19097c74591c5fa747
+    size: 1309
+    path: share_of_households_with_air_conditioning.csv
