@@ -8,6 +8,15 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# PPI series used for inflation adjustment. General offices are deflated with the office-construction
+# PPI; data centers with a composite that equally weights the industrial and warehouse construction
+# PPIs, following the approach the US Bureau of Economic Analysis adopted in its 2025 annual update.
+PPI_COLUMNS = [
+    "ppi_new_office_construction",
+    "ppi_new_warehouse_construction",
+    "ppi_new_industrial_construction",
+]
+
 
 def run() -> None:
     """Create garden dataset."""
@@ -20,12 +29,13 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("datacenter_construction")
 
-    # Load PPI data for inflation adjustment (monthly only, not annual)
+    # Load PPI data for inflation adjustment. Rows without a month are BLS's own annual averages;
+    # monthly rows are used for deflation and the 2021 annual average as the base.
     ds_ppi = paths.load_dataset("us_ppi_construction")
-    tb_ppi = ds_ppi.read("us_ppi_construction")
-    tb_ppi = tb_ppi[tb_ppi["month"].notna()].reset_index()
+    tb_ppi_all = ds_ppi.read("us_ppi_construction")
+    tb_ppi = tb_ppi_all[tb_ppi_all["month"].notna()].reset_index(drop=True)
 
-    sanity_check_inputs(tb=tb, tb_ppi=tb_ppi)
+    sanity_check_inputs(tb=tb, tb_ppi=tb_ppi, tb_ppi_all=tb_ppi_all)
 
     #
     # Process data.
@@ -36,20 +46,26 @@ def run() -> None:
     tb["general_office_construction_spending"] = tb["general_office_construction_spending"] * 1_000_000
 
     # Merge with PPI data using pr.merge to preserve metadata
-    tb = pr.merge(tb, tb_ppi[["date", "ppi_new_office_construction"]], on=["date"], how="left")
+    tb = pr.merge(tb, tb_ppi[["date"] + PPI_COLUMNS], on=["date"], how="left")
 
-    # Rebase PPI to January 2021 = 100
-    ppi_jan_2021 = tb_ppi[tb_ppi["date"] == "2021-01-01"]["ppi_new_office_construction"].values[0]
-    tb["ppi_rebased"] = (tb["ppi_new_office_construction"] / ppi_jan_2021) * 100
+    # Rebase each PPI so that its 2021 annual average = 100 (BLS's own annual-average rows)
+    base_2021 = tb_ppi_all[(tb_ppi_all["year"] == 2021) & (tb_ppi_all["month"].isna())].iloc[0]
+    for column in PPI_COLUMNS:
+        tb[column] = tb[column] / base_2021[column] * 100
 
-    # Adjust for inflation using PPI (base year January 2021=100)
-    tb["datacenter_construction_spending_real"] = tb["datacenter_construction_spending"] * (100 / tb["ppi_rebased"])
+    # Data center deflator: equal-weight composite of the industrial and warehouse construction PPIs.
+    tb["ppi_datacenter_composite"] = (tb["ppi_new_industrial_construction"] + tb["ppi_new_warehouse_construction"]) / 2
+
+    # Adjust for inflation (base: 2021 annual average = 100)
+    tb["datacenter_construction_spending_real"] = tb["datacenter_construction_spending"] * (
+        100 / tb["ppi_datacenter_composite"]
+    )
     tb["general_office_construction_spending_real"] = tb["general_office_construction_spending"] * (
-        100 / tb["ppi_rebased"]
+        100 / tb["ppi_new_office_construction"]
     )
 
     # Drop the PPI columns as they're not needed in output
-    tb = tb.drop(columns=["ppi_new_office_construction", "ppi_rebased"])
+    tb = tb.drop(columns=PPI_COLUMNS + ["ppi_datacenter_composite"])
 
     # Add country column (this is U.S. data)
     tb["country"] = "United States"
@@ -69,7 +85,7 @@ def run() -> None:
     ds_garden.save()
 
 
-def sanity_check_inputs(tb: Table, tb_ppi: Table) -> None:
+def sanity_check_inputs(tb: Table, tb_ppi: Table, tb_ppi_all: Table) -> None:
     """Check assumptions about the meadow spending table and the PPI table."""
     expected_columns = {"date", "datacenter_construction_spending", "general_office_construction_spending"}
     assert set(tb.columns) == expected_columns, f"Unexpected meadow columns: {set(tb.columns) ^ expected_columns}"
@@ -84,9 +100,15 @@ def sanity_check_inputs(tb: Table, tb_ppi: Table) -> None:
     )
 
     assert not tb_ppi["date"].duplicated().any(), "Duplicate dates in monthly PPI table."
-    assert (tb_ppi["ppi_new_office_construction"] > 0).all(), "Non-positive PPI values."
-    assert (tb_ppi["date"] == "2021-01-01").any(), "PPI base month (January 2021) is missing."
-    # The PPI must cover every spending month, otherwise the inflation-adjusted series silently ends early.
+    missing_ppi_columns = set(PPI_COLUMNS) - set(tb_ppi.columns)
+    assert not missing_ppi_columns, f"Missing PPI columns: {sorted(missing_ppi_columns)}"
+    for column in PPI_COLUMNS:
+        assert tb_ppi[column].notna().all(), f"NaN values in monthly PPI column {column}."
+        assert (tb_ppi[column] > 0).all(), f"Non-positive values in PPI column {column}."
+    base_rows = tb_ppi_all[(tb_ppi_all["year"] == 2021) & (tb_ppi_all["month"].isna())]
+    assert len(base_rows) == 1, "Expected exactly one BLS annual-average row for the 2021 base year."
+    assert base_rows[PPI_COLUMNS].notna().all().all(), "Missing 2021 annual-average value for a PPI series."
+    # The PPIs must cover every spending month, otherwise the inflation-adjusted series silently ends early.
     uncovered = set(tb["date"]) - set(tb_ppi["date"])
     assert not uncovered, f"Spending months without PPI coverage (real series would be NaN): {sorted(uncovered)}"
 

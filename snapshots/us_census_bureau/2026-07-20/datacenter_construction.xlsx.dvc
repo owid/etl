@@ -6,9 +6,10 @@ meta:
       Monthly construction spending data for private construction in the United States, broken down by construction type.
       The dataset includes datacenter construction spending measured as not seasonally adjusted monthly values in millions of dollars.
 
-      Data is collected through the Survey of Construction (SOC), which provides national and regional statistics on
-      new privately-owned residential construction. The construction spending estimates are based on reports from builders,
-      owners, and architects, along with information from building permits and Census Bureau surveys.
+      Estimates for private nonresidential categories such as data centers and offices come from the Construction Progress
+      Reporting Survey (CPRS), in which owners of sampled construction projects (drawn from Dodge Data & Analytics project
+      lists) report the value of work done each month until completion. Estimates include materials, labor, architectural
+      and engineering costs, overhead, interest and taxes paid during construction, and contractor's profits.
     citation_full: U.S. Census Bureau, Value of Construction Put in Place Survey (VIP), Private Construction Spending Time Series
     url_main: https://www.census.gov/construction/c30/historical_data.html
     url_download: https://www.census.gov/construction/c30/xlsx/privtime.xlsx
