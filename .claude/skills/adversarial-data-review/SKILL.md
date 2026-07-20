@@ -80,6 +80,8 @@ If the analytics layer is entirely unreachable, fall back to the public grapher 
 from etl.http import session  # OWID infra → tagged User-Agent
 
 sql = (
+    # NOTE: variables.catalogPath DOES carry the channel prefix ("grapher/<ns>/<version>/<short>/<table>#<col>");
+    # it's datasets.catalogPath that is channel-less — don't mix the two conventions up.
     "SELECT v.catalogPath, COUNT(DISTINCT cd.chartId) AS n_charts "
     "FROM variables v JOIN chart_dimensions cd ON cd.variableId = v.id "
     "WHERE v.catalogPath LIKE 'grapher/<namespace>/%/<short_name>/%' GROUP BY 1 ORDER BY 2 DESC"
