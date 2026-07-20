@@ -10,7 +10,13 @@ metadata:
 Help an author take metadata texts for an MDIM from rough notes to a reviewed PR. The author
 may be non-technical: explain everything in plain language, never assume they know what
 Jinja, YAML, garden steps, or staging servers are, and do all the technical lifting yourself.
-The author owns the words; you own the plumbing.
+
+**The author owns the words; you own the plumbing.** You are not the writer here. The
+author drafts the texts themselves; your job is to understand the structure they have in
+mind, surface gaps and ambiguities, and translate the agreed rules into templates and
+config. Only draft wording when explicitly asked for help drafting — and then offer it as
+a suggestion for the author to edit and accept into their doc, never as something you
+quietly decide.
 
 The workflow is general to any metadata text field; the examples here use the
 "What you should know about this data" field (`description_key`), which is where it has
@@ -25,12 +31,13 @@ update the doc first (give them the text to paste), then regenerate.
 
 ## Phase 0 — Setup
 
-The author works in a Google Doc with two tabs: **"Input to Claude"** (their notes and
-rules) and **"Output from Claude"** (your structured restatement, pasted back by them).
+The author works in a Google Doc with two tabs: **"Rough input to Claude"** (their notes,
+texts, and rules, in whatever structure suits them) and **"Clean output from Claude"**
+(your structured restatement, pasted back by them once they accept it).
 
-- If they don't have one yet, point them at the team template and ask them to make a copy
-  (File → Make a copy) and share the new doc's link with you:
-  **TEMPLATE-DOC-URL-TO-BE-FILLED-IN**
+- If they don't have one yet, point them at the team template — the link opens a "Use
+  template" page that creates their own copy — and ask them to share their new doc's link:
+  https://docs.google.com/document/d/1Fbg_Ps4y86HoHkBswTKzTuVAuT74627OJ4n1AuDuwLE/template/preview
 - Read the doc directly via the Google Drive connector when the user pastes its link.
   If the connector isn't available in their session, ask them to either enable it or just
   paste the doc's text / attach an exported copy — the workflow is identical from there.
@@ -44,43 +51,60 @@ rules) and **"Output from Claude"** (your structured restatement, pasted back by
    - the garden step's `*.meta.yml` — the Jinja-templated definitions the indicators use;
    - `grep` the exact current sentences across `etl/steps/` — the same text is often
      duplicated in several files, and all copies must be found before promising a change.
-3. Work through their **open questions** first, then run the elicitation checklist:
-   - **Coverage**: enumerate the MDIM's dimension choices; does a rule or the anchor text
-     account for every view? Ask about any combination the doc is silent on.
-   - **Ordering**: is the bullet/paragraph order fixed everywhere, or does it vary?
+3. Work through their **open questions** first, then run the elicitation checklist. The
+   "TEXTS & RULES" section is deliberately free-form: authors structure it however matches
+   the structure in their head, and that structure can be complex — shared blocks composed
+   differently across views, whole families of views with their own texts, rules that key
+   on combinations of controls. Do not force it into a "one base text plus tweaks" shape.
+   Your questions should *elicit* their structure, not impose yours:
+   - **Coverage**: enumerate the MDIM's dimension choices; do the texts and rules account
+     for every view? Ask about any combination the doc is silent on.
+   - **Composition**: which pieces of text appear in which views, and in what order? Does
+     the order vary?
    - **Presentation**: bullets or paragraphs? (See "rich text" note below.)
    - **Links and defined terms**: which must be preserved (`#dod:` terms, article links)?
    - **Exceptions**: confirm each one names a specific view and states the full deviation.
    - **Style**: American spelling; follow the metadata reference guidelines
      (https://docs.owid.io/projects/etl/architecture/metadata/reference/) for the field.
+     Flag style issues as questions for the author — don't rewrite their words.
 
 Ask questions in batches, in plain language, quoting their own words back where possible.
 
 ## Phase 2 — Structure
 
-Produce a **structured restatement** of the rules and ask the author to paste it into the
-"Output from Claude" tab. Iterate until they say it's right; get an explicit "agreed"
-before implementing. The restatement must be complete enough that a colleague could
-implement from it without seeing this chat. Format:
+Produce a **structured restatement** of the author's texts and rules and ask them to paste
+it into the "Clean output from Claude" tab. Iterate until they say it's right; get an
+explicit "agreed" before implementing. Two hard requirements:
+
+- **Verbatim texts.** Every piece of wording in the restatement is the author's, copied
+  exactly (or their explicitly approved edit). Restructure freely; rewrite nothing.
+- **Complete and self-contained.** A colleague could implement from the restatement alone,
+  without seeing this chat.
+
+A shape that often works is *named text blocks + composition rules* — it mirrors how the
+templates work underneath:
 
 ```
 SCOPE: <mdim catalog path> · <field(s)> · <views covered>
-PRESENTATION: <bullets | paragraphs> · <count per view>
+PRESENTATION: <bullets | paragraphs>
 
-BASE TEXT (anchor view: <dimensions>):
-  B1: <text>
-  B2: <text>
+TEXT BLOCKS (author's wording, verbatim):
+  [POVERTY-LINE-ABS]: <text>
+  [INTL-DOLLARS]: <text>
   ...
 
-VARIATION RULES:
-  R1: WHEN <control> = <choice(s)> → <replace B1 with … / drop B3 / append …>
-  R2: ...
+COMPOSITION (which views get which blocks, in what order):
+  WHEN <control> = <choice(s)> → [POVERTY-LINE-ABS] [INTL-DOLLARS] ...
+  WHEN ... → ...
 
 EXCEPTIONS:
   E1: view <dimensions> → <full deviation>
 
 DECISIONS RESOLVED: <one line per open question and its answer>
 ```
+
+But treat that as a starting point, not a straitjacket — adapt the sections to the
+structure the author actually has. Fidelity to their rules beats tidiness of format.
 
 ## Phase 3 — Implement
 
