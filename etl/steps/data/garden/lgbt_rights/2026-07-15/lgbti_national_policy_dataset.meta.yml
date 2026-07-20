@@ -3755,8 +3755,10 @@ tables:
           Values for world regions are population-weighted averages of the countries in each region, computed by Our World in Data using [our region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). Country values come directly from the producer.
         description_key:
           - "{definitions.description_key_dataset}"
-          - The index aggregates 33 policy-status combinations — 23 progressive (such as marriage equality, anti-discrimination protections, or legal gender recognition) and 10 regressive (such as criminalization of same-sex acts, the death penalty, or "propaganda" laws). Each policy's score weighs up to five aspects — population coverage, gender scope, penalty severity, evidence of enforcement, and ease of access — combined via confirmatory factor analysis and normalized within each policy.
-          - Higher values indicate more rights-affirming legal environments; negative values indicate that regressive laws dominate. The empirical range runs from about -4.3 to +18.7.
+          - The index combines 33 policies — 23 that expand rights (such as marriage equality, protections from discrimination, or legal gender recognition) and 10 that restrict them (such as the criminalization of same-sex acts, the death penalty, or "propaganda" laws). Policies that expand rights add to the score; policies that restrict them subtract from it.
+          - Each policy counts for more or less depending on how strongly it operates in practice — how much of the country it covers, whether it applies to all genders, how severe its punishments are, whether it is actually enforced, and how easy the right is to use. Rather than fixing these weights by hand, the producer uses a statistical method (factor analysis) that gives more weight to the aspects that best distinguish countries from each other.
+          - In practice this means a law that exists on paper but is never enforced counts less than one that is actively applied, and a right that requires surgery counts less than one available by self-declaration.
+          - Higher values indicate more rights-affirming legal environments; negative values indicate that restrictive laws dominate. Values range from about -4.3 to +18.7.
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -3787,7 +3789,7 @@ tables:
           The weighted sum of a country's progressive LGBTI-related policy scores, across 23 policy-status combinations.
         description_key:
           - "{definitions.description_key_dataset}"
-          - Progressive policies include marriage equality, civil unions, joint adoption, anti-discrimination protections, hate-crime laws, legal gender recognition, and related rights. Each policy's score weighs population coverage, gender scope, evidence of enforcement, and ease of access, combined via confirmatory factor analysis and normalized within each policy.
+          - Progressive policies include marriage equality, civil unions, joint adoption, protections from discrimination, hate-crime laws, legal gender recognition, and related rights. Each policy counts for more or less depending on how strongly it operates in practice — its coverage, whether it applies to all genders, whether it is enforced, and how easy the right is to use — with weights set by a statistical method (factor analysis).
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -3802,7 +3804,7 @@ tables:
           The weighted sum of a country's regressive LGBTI-related policy scores, across 10 policy-status combinations.
         description_key:
           - "{definitions.description_key_dataset}"
-          - Regressive policies include criminalization of same-sex acts, the death penalty, unequal ages of consent, "propaganda" and morality laws, restrictions on LGBTQ+ civil society, religious exemption laws, and marriage bans. Each policy's score weighs population coverage, gender scope, penalty severity, and evidence of enforcement, combined via confirmatory factor analysis and normalized within each policy.
+          - Regressive policies include the criminalization of same-sex acts, the death penalty, unequal ages of consent, "propaganda" and morality laws, restrictions on LGBTQ+ civil society, religious exemption laws, and marriage bans. Each policy counts for more or less depending on how strongly it operates in practice — its coverage, whether it applies to all genders, how severe its punishments are, and whether it is actually enforced — with weights set by a statistical method (factor analysis).
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
