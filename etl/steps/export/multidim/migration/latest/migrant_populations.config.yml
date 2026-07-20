@@ -1,0 +1,72 @@
+title:
+  title: Immigrants and emigrant populations
+  title_variant: ""
+
+default_selection:
+  - World
+  - United States
+  - Germany
+  - India
+  - Mexico
+
+default_dimensions:
+  metric: immigrants
+  unit: number
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["LineChart"]
+        yAxis:
+          min: 0
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: immigrants
+        name: Immigrants
+        description: People living in a country who were born abroad.
+      - slug: emigrants
+        name: Emigrants
+        description: People born in a country who now live abroad.
+  - slug: unit
+    name: Unit
+    choices:
+      - slug: number
+        name: Number of people
+      - slug: share
+        name: Share of population
+    presentation:
+      type: radio
+
+views:
+  - dimensions:
+      metric: immigrants
+      unit: number
+    indicators:
+      y:
+        - catalogPath: migrant_stock#immigrants_all
+
+  - dimensions:
+      metric: immigrants
+      unit: share
+    indicators:
+      y:
+        - catalogPath: migrant_stock#immigrant_share_of_dest_population_all
+
+  - dimensions:
+      metric: emigrants
+      unit: number
+    indicators:
+      y:
+        - catalogPath: migrant_stock#emigrants_all
+
+  - dimensions:
+      metric: emigrants
+      unit: share
+    indicators:
+      y:
+        - catalogPath: migrant_stock#emigrants_share_of_total_population

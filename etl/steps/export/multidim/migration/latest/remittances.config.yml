@@ -1,0 +1,64 @@
+title:
+  title: Remittances
+  title_variant: ""
+
+default_selection:
+  - World
+  - India
+  - Mexico
+  - Philippines
+  - Nigeria
+
+default_dimensions:
+  metric: share_of_gdp
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["LineChart"]
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: share_of_gdp
+        name: Remittances as a share of GDP
+        description: Personal remittances received, as a share of GDP.
+      - slug: cost_of_sending
+        name: Cost of sending remittances
+        description: The average cost of sending remittances abroad, as a share of the amount sent.
+      - slug: cost_of_receiving
+        name: Cost of receiving remittances
+        description: The average cost of receiving remittances from abroad, as a share of the amount sent.
+    presentation:
+      type: radio
+
+views:
+  - dimensions:
+      metric: share_of_gdp
+    indicators:
+      y:
+        - catalogPath: wdi#bx_trf_pwkr_dt_gd_zs
+    config:
+      title: Remittances as a share of GDP
+      subtitle: Share of GDP that is made up of the sum of all personal remittances sent by migrants to their home countries.
+
+  - dimensions:
+      metric: cost_of_sending
+    indicators:
+      y:
+        - catalogPath: wdi#si_rmt_cost_ob_zs
+    config:
+      title: Average cost of sending remittances from country
+      subtitle: The average transaction cost as a percentage of total remittances sent from this country to abroad, for a single transaction of USD 200.
+
+  - dimensions:
+      metric: cost_of_receiving
+    indicators:
+      y:
+        - catalogPath: wdi#si_rmt_cost_ib_zs
+    config:
+      title: Average cost of sending remittances to country
+      subtitle: The average transaction cost as a percentage of total remittances sent from abroad to this country, for a single transaction of USD 200.

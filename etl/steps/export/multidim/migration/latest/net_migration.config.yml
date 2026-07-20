@@ -1,0 +1,52 @@
+title:
+  title: Net migration
+  title_variant: ""
+
+default_selection:
+  - World
+  - United States
+  - Germany
+  - India
+  - Syria
+
+default_dimensions:
+  metric: net_migration
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["LineChart"]
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: net_migration
+        name: Net migration
+        description: The total number of immigrants minus the number of emigrants.
+      - slug: net_migration_rate
+        name: Net migration rate
+        description: Net migration per 1,000 people in the population.
+    presentation:
+      type: radio
+
+views:
+  - dimensions:
+      metric: net_migration
+    indicators:
+      y:
+        - catalogPath: un_wpp/migration#net_migration__sex_all__age_all__variant_estimates
+    config:
+      title: Net migration
+      subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
+
+  - dimensions:
+      metric: net_migration_rate
+    indicators:
+      y:
+        - catalogPath: un_wpp/migration#net_migration_rate__sex_all__age_all__variant_estimates
+    config:
+      title: Net migration rate
+      subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population.

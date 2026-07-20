@@ -1,0 +1,160 @@
+title:
+  title: Asylum seekers and refugees
+  title_variant: ""
+
+default_selection:
+  - World
+  - Germany
+  - Turkey
+  - Syria
+  - Ukraine
+
+default_dimensions:
+  metric: refugees
+  perspective: asylum
+  unit: total
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["LineChart"]
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: refugees
+        name: Refugees
+        description: People who have fled their country and are recognized as refugees under UNHCR's mandate.
+      - slug: asylum_seekers
+        name: Asylum seekers
+        description: People who have applied for asylum and are awaiting a decision on their claim.
+      - slug: returned_refugees
+        name: Returned refugees
+        description: Former refugees who have returned to their country of origin.
+      - slug: stateless
+        name: Stateless persons
+        description: People who are not considered a citizen of any country.
+  - slug: perspective
+    name: Country perspective
+    choices:
+      - slug: origin
+        name: Country of origin
+        description: The country people fled from.
+      - slug: asylum
+        name: Country of asylum
+        description: The country where people are seeking or have been granted asylum.
+    presentation:
+      type: radio
+  - slug: unit
+    name: Unit
+    choices:
+      - slug: total
+        name: Total number
+      - slug: per_capita
+        name: Per capita
+    presentation:
+      type: radio
+
+views:
+  # Refugees
+  - dimensions:
+      metric: refugees
+      perspective: origin
+      unit: total
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#refugees
+
+  - dimensions:
+      metric: refugees
+      perspective: origin
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#refugees_per_1000
+
+  - dimensions:
+      metric: refugees
+      perspective: asylum
+      unit: total
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#refugees
+
+  - dimensions:
+      metric: refugees
+      perspective: asylum
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#refugees_per_1000
+
+  # Asylum seekers
+  - dimensions:
+      metric: asylum_seekers
+      perspective: origin
+      unit: total
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#asylum_seekers
+
+  - dimensions:
+      metric: asylum_seekers
+      perspective: origin
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#asylum_seekers_per_100k
+
+  - dimensions:
+      metric: asylum_seekers
+      perspective: asylum
+      unit: total
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#asylum_seekers
+
+  - dimensions:
+      metric: asylum_seekers
+      perspective: asylum
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#asylum_seekers_per_100k
+
+  # Returned refugees (per-capita not published for this metric)
+  - dimensions:
+      metric: returned_refugees
+      perspective: origin
+      unit: total
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#returned_refugees
+
+  - dimensions:
+      metric: returned_refugees
+      perspective: asylum
+      unit: total
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#returned_refugees
+
+  # Stateless persons (only reported by country of residence, i.e. "asylum" perspective)
+  - dimensions:
+      metric: stateless
+      perspective: asylum
+      unit: total
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#stateless
+
+  - dimensions:
+      metric: stateless
+      perspective: asylum
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: refugee_data_asylum#stateless_per_100k

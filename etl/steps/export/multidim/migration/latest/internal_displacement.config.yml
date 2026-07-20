@@ -1,0 +1,174 @@
+title:
+  title: Internal displacement
+  title_variant: ""
+
+default_selection:
+  - World
+  - Sudan
+  - Democratic Republic of Congo
+  - Ukraine
+  - Syria
+
+default_dimensions:
+  metric: total
+  period: stock
+  unit: total
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["LineChart"]
+
+dimensions:
+  - slug: metric
+    name: Cause
+    choices:
+      - slug: total
+        name: All causes
+        description: All internal displacements, whether caused by conflict and violence or by disasters.
+      - slug: conflict
+        name: Conflict and violence
+      - slug: disaster
+        name: Disasters
+      - slug: returned
+        name: Returned IDPs
+        description: Internally displaced persons who have returned to their area of origin.
+  - slug: period
+    name: Period
+    choices:
+      - slug: stock
+        name: Living in displacement
+        description: The total number of people living in internal displacement at the end of the year.
+      - slug: new
+        name: New displacements during the year
+        description: The number of new displacements recorded during the year. This can include people displaced more than once.
+    presentation:
+      type: radio
+  - slug: unit
+    name: Unit
+    choices:
+      - slug: total
+        name: Total number
+      - slug: per_capita
+        name: Per 1,000 people
+    presentation:
+      type: radio
+
+views:
+  # All causes
+  - dimensions:
+      metric: total
+      period: stock
+      unit: total
+    indicators:
+      y:
+        - catalogPath: internal_displacement#total_displacement_rounded
+
+  - dimensions:
+      metric: total
+      period: stock
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: internal_displacement#total_displacement_rounded_per_thousand
+
+  - dimensions:
+      metric: total
+      period: new
+      unit: total
+    indicators:
+      y:
+        - catalogPath: internal_displacement#total_new_displacement_rounded
+
+  - dimensions:
+      metric: total
+      period: new
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: internal_displacement#total_new_displacement_rounded_per_thousand
+
+  # Conflict and violence
+  - dimensions:
+      metric: conflict
+      period: stock
+      unit: total
+    indicators:
+      y:
+        - catalogPath: internal_displacement#conflict_total_displacement_rounded
+
+  - dimensions:
+      metric: conflict
+      period: stock
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: internal_displacement#conflict_total_displacement_rounded_per_thousand
+
+  - dimensions:
+      metric: conflict
+      period: new
+      unit: total
+    indicators:
+      y:
+        - catalogPath: internal_displacement#conflict_new_displacement_rounded
+
+  - dimensions:
+      metric: conflict
+      period: new
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: internal_displacement#conflict_new_displacement_rounded_per_thousand
+
+  # Disasters
+  - dimensions:
+      metric: disaster
+      period: stock
+      unit: total
+    indicators:
+      y:
+        - catalogPath: internal_displacement#disaster_total_displacement_rounded
+
+  - dimensions:
+      metric: disaster
+      period: stock
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: internal_displacement#disaster_total_displacement_rounded_per_thousand
+
+  - dimensions:
+      metric: disaster
+      period: new
+      unit: total
+    indicators:
+      y:
+        - catalogPath: internal_displacement#disaster_new_displacement_rounded
+
+  - dimensions:
+      metric: disaster
+      period: new
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: internal_displacement#disaster_new_displacement_rounded_per_thousand
+
+  # Returned IDPs (UNHCR; only reported as an annual flow)
+  - dimensions:
+      metric: returned
+      period: new
+      unit: total
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#returned_idps
+
+  - dimensions:
+      metric: returned
+      period: new
+      unit: per_capita
+    indicators:
+      y:
+        - catalogPath: refugee_data_origin#returned_idps_per_100k
