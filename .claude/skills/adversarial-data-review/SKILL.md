@@ -117,12 +117,12 @@ for tname in ds.table_names:
     tb = ds.read(tname, safe_types=False)  # read() resets the index, so key columns are regular columns
     if tb.index.names != [None]:  # defensive: if keys sit in the index (e.g. the table came via ds[tname]), restore them
         tb = tb.reset_index()
-    year_col = "year" if "year" in tb.columns else "date"
-    has_country = "country" in tb.columns  # year-/date-only tables exist (e.g. gravitational-wave event counts)
+    year_col = "year" if "year" in tb.columns else ("date" if "date" in tb.columns else None)
+    has_country = "country" in tb.columns  # year-only tables exist (gravitational-wave counts), as do static ones (GWP factors)
     vals = [c for c in tb.columns if c not in ("country", year_col) and pd.api.types.is_numeric_dtype(tb[c])]
     for col in vals:
         unit = (tb[col].metadata.unit or "").lower()
-        s = tb[(["country"] if has_country else []) + [year_col, col]].dropna(subset=[col])
+        s = tb[(["country"] if has_country else []) + ([year_col] if year_col else []) + [col]].dropna(subset=[col])
         if s.empty:
             findings.append((tname, col, "EMPTY", "all-NaN column")); continue
         mx, mn = s[col].max(), s[col].min()
@@ -132,8 +132,8 @@ for tname in ds.table_names:
             if mx > 150: findings.append((tname, col, "UNIT", f"% column max={mx:.3g} — can it exceed 100?"))
         if mn < 0 and any(w in unit for w in ("people", "number", "deaths", "tonnes", "count")):
             findings.append((tname, col, "SIGN", f"negative min={mn:.3g} in count-like unit"))
-        if not has_country:
-            continue  # year-only table: only the unit/magnitude sniffs apply; checks 2-6 need a country dimension
+        if not has_country or year_col is None:
+            continue  # year-only or static table: only the unit/magnitude sniffs apply; checks 2-6 need country + time
         # 2. Robust per-country outliers (median/MAD z-score; skip short series — MAD is unstable under ~8 points)
         g = s.groupby("country")[col]
         mad = g.transform(lambda x: (x - x.median()).abs().median()).replace(0, np.nan)
@@ -176,7 +176,7 @@ This is the half that catches the *source's* mistakes — the ones invisible to 
 
 **Tolerance:** rounding, vintage/revision drift, and methodology gaps of a few percent are *not* findings. The targets are magnitude errors (×10/×100/×1000), wrong-year values, sign errors, entity mix-ups, and stale pre-revision values. Declaring a **confirmed source error requires ≥2 independent sources that agree with each other and disagree with ours** beyond methodology tolerance.
 
-**Attribution before routing.** Before routing any confirmed bad value, read the raw snapshot (`from etl.snapshot import Snapshot; Snapshot("<ns>/<version>/<file>").read_csv()`) to determine where it entered: present in the source file → source error (corrections route); absent → our processing introduced it (trace snapshot → meadow → garden and fix the step).
+**Attribution before routing.** Before routing any confirmed bad value, read the raw snapshot (`from etl.snapshot import Snapshot; Snapshot("<ns>/<version>/<file>").read()` — `read()` picks the reader from the file's format; use the format-specific `read_csv`/`read_excel`/`read_json` only when auto-detection needs overriding) to determine where it entered: present in the source file → source error (corrections route); absent → our processing introduced it (trace snapshot → meadow → garden and fix the step).
 
 ## Step 5 — Phase 3: adversarial metadata review (top-N + anomalous indicators only)
 
