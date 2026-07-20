@@ -12,7 +12,7 @@ No transcripts are re-read and no session discovery happens here — this only
 aggregates numbers already computed by cost_report.py, so it's cheap to re-run.
 
 Usage:
-    .venv/bin/python .claude/skills/update-dataset/scripts/aggregate_cost_reports.py \
+    .venv/bin/python .claude/skills/cost-report/scripts/aggregate_cost_reports.py \
         [--workbench-root workbench] [--output workbench/aggregate_cost_report.md]
 
 Step-label rollup only merges rows whose slug strings match exactly across updates —

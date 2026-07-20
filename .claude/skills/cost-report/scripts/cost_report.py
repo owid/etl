@@ -1,8 +1,12 @@
-"""Per-step wall-time & token cost report for the update-dataset workflow.
+"""Retrospective per-step wall-time & token cost report for a past Claude Code task.
 
-Joins the `## Step timing log` section of `workbench/<short_name>/progress.md`
-with the Claude Code session transcripts (`~/.claude/projects/<encoded-cwd>/`)
-and writes a markdown table of duration and token usage per workflow step.
+Joins a `## Step timing log` section in `<workbench_dir>/progress.md` — written
+live during the task, or reconstructed after the fact from a session's own
+narrative (see the `cost-report` skill for how) — with the Claude Code session
+transcripts (`~/.claude/projects/<encoded-cwd>/`), and writes a markdown table
+of duration and token usage per step. Not tied to any particular workflow: it
+works for a `/update-dataset` run, a `/review-data-pr` run, or anything else
+that has session transcripts and a reconstructable timeline.
 
 Attribution model:
 - Every individual API request (main-session and subagent alike) is bucketed
@@ -19,7 +23,7 @@ Attribution model:
   multi-day pause between sessions; active time approximates real work instead.
 
 Usage:
-    .venv/bin/python .claude/skills/update-dataset/scripts/cost_report.py workbench/<short_name> \
+    .venv/bin/python .claude/skills/cost-report/scripts/cost_report.py workbench/<short_name> \
         [--session <session-id> ...] [--project-dir <dir>] [--output <path>]
 
 With no --session, sessions are auto-discovered: every transcript in the

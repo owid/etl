@@ -57,21 +57,12 @@ Assumptions:
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
 - [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure --private` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
 - [ ] Ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot (see "Removing the old version & reordering the DAG") — don't forget this step
-- [ ] Generate the per-step time & token cost report with `scripts/cost_report.py` → `workbench/<short_name>/cost_report.md` (see step 11) — run this **after** the DAG-cleanup item above, not before, so its time/tokens are included
 - [ ] Hand off the QA links to the user (Anomalist + Chart Diff on the staging branch, plus the data-diff report) — this is the final step
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
-- Also maintain a machine-readable `## Step timing log` section at the bottom of `progress.md`: append one `START` line when the workflow begins and one `DONE <step-slug>` line as each checklist item completes, with UTC timestamps from `date -u +"%Y-%m-%dT%H:%M:%SZ"`:
 
-  ```
-  ## Step timing log
-  - 2026-07-20T09:00:01Z START
-  - 2026-07-20T09:14:03Z DONE etl-update
-  - 2026-07-20T09:20:11Z DONE snapshot
-  ```
-
-  Use a short, stable kebab-case slug per checklist item and keep the lines chronological — this log is what `scripts/cost_report.py` (step 11) uses to attribute wall time and tokens to steps. On a resumed update, keep appending to the existing log.
+If you want to know how long or how much an update cost afterwards, use the [`cost-report`](../cost-report/SKILL.md) skill — it reconstructs timing retrospectively from session transcripts, so nothing needs to be logged live during the update itself.
 
 ## Checkpoints — when to pause
 
@@ -807,30 +798,6 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        ```
    - If neither the inline-comments endpoint nor the issue-comments endpoint shows a Codex post after 60 s, wait another 60 s and retry (up to ~5 min total). Codex can take 5–10 min — a clean review often arrives only as the top-level "no issues" comment.
 
-11) Time & token cost report
-   Once the workflow is otherwise finished — **including the old-DAG cleanup decision above, if the user opted in** — generate a per-step breakdown of wall time and token usage. Running this before DAG cleanup would leave that work's time and tokens out of the report; it belongs last, just before the final QA hand-off:
-
-   ```bash
-   .venv/bin/python .claude/skills/update-dataset/scripts/cost_report.py workbench/<short_name>
-   ```
-
-   The script joins the `## Step timing log` in `progress.md` with the Claude Code session transcripts (`~/.claude/projects/<encoded-cwd>/`): every API request (main-session and subagent alike) is bucketed into a step by its own timestamp; a subagent's count is credited to the step it started in, but its token usage still splits by request if it straddles a boundary. It writes `workbench/<short_name>/cost_report.md` with, per step: **wall time** (raw calendar delta between step boundaries), **active time** (sum of gaps between consecutive requests, each capped at 5 minutes — approximates real work and excludes idle waiting), request/agent counts, token categories, and an input-equivalent weighted total (output ×5, cache write ×1.25, cache read ×0.1 — a relative cost proxy, not USD).
-
-   Notes:
-   - Sessions are auto-discovered (any transcript in the project dir that mentions the workbench directory); pass `--session <id>` if the update spanned machines or discovery picks up unrelated sessions. If the update ran in a different worktree than where you run the script, pass `--project-dir` with that worktree's transcript dir.
-   - **Wall time balloons when a step's boundary spans a multi-day pause between sessions** (e.g. resuming an update after the weekend) — read active time as the more reliable cost signal in that case, and wall time as elapsed calendar time including idle waiting. Read the report as "which steps are expensive", not as exact accounting.
-   - Alongside `cost_report.md`, the script also writes a `cost_report.json` sidecar with the same per-step figures — that's what the aggregator below reads.
-
-   **Aggregating across multiple updates.** Once several updates have their own `cost_report.json` (this skill's own workbenches, and/or `review-data-pr`'s `workbench/review-<short_name>/`), roll them up into one summary — cheap to re-run since it only reads the existing JSON sidecars, no transcripts:
-
-   ```bash
-   .venv/bin/python .claude/skills/update-dataset/scripts/aggregate_cost_reports.py
-   ```
-
-   Writes `workbench/aggregate_cost_report.md` with a per-update comparison table and a per-step rollup (e.g. "garden steps across all updates cost X active-minutes / Y tokens on average") — useful for spotting which *kind* of step is consistently expensive, not just within one update. Step rows only merge when their slugs match exactly across updates, so stick to the conventional slugs above.
-   - Never self-report token numbers from memory — the transcript is the only reliable source. If the script fails, say so rather than estimating.
-   - The report is a workbench artifact for the user; don't add it to the PR description.
-
 ## Committing and pushing
 
 Commit and push incrementally as you go — after each step that produces code changes. Don't wait until the end. Use descriptive commit messages with appropriate emojis (the one auto-prepended by `etl pr` for the chosen category + 🤖 for AI-written code).
@@ -1044,7 +1011,6 @@ When the update is review-heavy and you need iterative back-and-forth with a top
 - `workbench/<short_name>/update-context.yml` (canonical facts gathered during the update; consumed by `data-updates-comms`)
 - `workbench/<short_name>/slack-announcement.md`
 - `workbench/<short_name>/data-update.md` (public-facing post draft for OWID /latest, from step 9b)
-- `workbench/<short_name>/cost_report.md` + `cost_report.json` (per-step time & token usage, from step 11)
 
 ## Example usage
 
