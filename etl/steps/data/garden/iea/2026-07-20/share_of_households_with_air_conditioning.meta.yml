@@ -11,6 +11,8 @@ definitions:
 
 dataset:
   update_period_days: 365
+  # IEA data is non-redistributable, so the data download is disabled on charts.
+  non_redistributable: true
   owners:
     - Hannah Ritchie
 
