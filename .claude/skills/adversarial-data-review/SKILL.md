@@ -34,11 +34,14 @@ Any rewrites you propose use American spelling.
 
 Scope by calling context:
 
+In the workflow skills this review is an **optional, offered** step (it can consume many tokens — see the estimates in Step 1); when invoked from one of them, scope accordingly:
+
 | Context | Scope |
 |---|---|
-| `/update-dataset` § 6c-bis | New/changed metadata text + newly added data values (latest wave/year); deep review = top-N + anomalies |
-| `/create-dataset` Step 6b | Everything — all indicators (new datasets are small and have no charts yet) |
-| `/review-data-pr` § 10b | Verify the author ran it; independently spot-check 2–3 findings and 2–3 anchor values |
+| `/update-dataset` § 6c-bis (optional) | New/changed metadata text + newly added data values (latest wave/year); deep review = top-N + anomalies |
+| `/create-dataset` Step 6b (optional) | Everything — all indicators (new datasets are small and have no charts yet) |
+| `/create-snapshot` § 5 (optional) | Phase 0 only — verify the `.dvc` claims against the fetched producer docs (no built dataset yet, so no data cross-checks) |
+| `/review-data-pr` § 10b | Only if the author ran it: verify outcomes and independently spot-check 2–3 findings and 2–3 anchor values |
 | Standalone | Top-N + anomalies (or `--full`) |
 
 ## Step 1 — Prioritize indicators by chart views (heaviness control)

@@ -45,7 +45,7 @@ Assumptions:
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
 - [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim — bump to the producer's real release date / year, or to `date_accessed` / current year if the source doesn't publish one), and that all URLs resolve (HEAD-check) and every `#fragment` matches a real anchor in the target page (anchor pass, see 6c)
-- [ ] Adversarial data & metadata review (`/adversarial-data-review`): verify metadata claims against the producer's fetched documentation, scan the built garden dataset for anomalies, cross-check anomalies + anchor values against independent sources online; route confirmed source errors to `.corrections.yml` (see 6c-bis)
+- [ ] Offer the **optional** adversarial data & metadata review (`/adversarial-data-review`) — verify metadata claims against the producer's fetched documentation and cross-check values against independent sources; skip by default (it can consume many tokens: ~25–45 web calls), run on user opt-in or visible red flags (see 6c-bis)
 - [ ] Scheduled-issue workflow check (owid-issues): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>`; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
@@ -531,8 +531,10 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE '%<ns>/<v>/<short_name>%'"
    ```
 
-6c-bis) Adversarial data & metadata review
-   Run [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) on `garden/<namespace>/<new_version>/<short_name>`. Step 6c verified that the links *resolve*; this step actually **reads the producer's documentation behind them** and cross-checks the data against independent sources online — it's the only step that can catch a mistake made by the source itself (unit slips, wrong-year values, stale pre-revision numbers).
+6c-bis) Adversarial data & metadata review (optional — offer it, don't run it unprompted)
+   Offer to run [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) on `garden/<namespace>/<new_version>/<short_name>`. Step 6c verified that the links *resolve*; this step actually **reads the producer's documentation behind them** and cross-checks the data against independent sources online — it's the only step that can catch a mistake made by the source itself (unit slips, wrong-year values, stale pre-revision numbers).
+
+   **It is optional because it's the heaviest check in the workflow** — fetching methodology docs plus per-value web searches runs ~25–45 web calls and can consume a lot of tokens and time. Skip by default; run it when the user opts in, and *propose* it when the update shows red flags that only this step can chase down: large unexplained value churn in the diffs, an in-place source revision, a producer new to us, or editorial claims riding on specific values.
 
    Scope for an update: focus the metadata claim review on new/changed text, and the value cross-checks on the newly added data (latest wave/year) plus that skill's standard anchors; deep-review the top-viewed indicators + anomaly-flagged ones per its prioritization step. Apply its routing table: metadata fixes → edit and re-run the step; confirmed source errors → `<short_name>.corrections.yml`; unconfirmed suspicions → list under "Not covered in this PR" for the reviewer. Save the report path (`ai/adversarial-review-<short_name>-<date>.md`) in `update-context.yml` and summarize any 🔴/🟡 findings in the PR body. Run this before 6d/commit so the fixes land in this PR.
 
