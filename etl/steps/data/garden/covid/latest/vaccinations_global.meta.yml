@@ -1,7 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common_total_vax: &common_total_vax
-    - Vaccination data reflects the total number of doses administered—covering both primary series and booster doses—and are now sourced exclusively from WHO.
+    - Vaccination data reflects the total number of doses administered — covering both primary series and booster doses — and are now sourced exclusively from WHO.
     - Rapid vaccine development and ongoing updates for emerging variants underline the dynamic nature of COVID-19 vaccination efforts globally.
     - Coverage statistics can exceed 100% if population estimates do not keep pace with migration or demographic changes, leading to inaccuracies in denominators. Also, we rely on population estimates in 2022 by UN WPP.
   common_booster_vax: &common_booster_vax

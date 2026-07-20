@@ -12,6 +12,7 @@ import datetime as dt
 import html
 import json
 import re
+from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
 
@@ -81,10 +82,19 @@ class ValueDiff:
     # True when the sample of a numeric "changed" diff is sorted by anomaly score (largest first)
     # and carries an "anomaly score" display column; non-numeric samples stay random and unsorted.
     sorted_by_score: bool = False
-    # Median BARD (|a-b| / (|a|+|b|), see `etl.data_helpers.misc.bard`) across ALL changed rows
-    # of a numeric column — the typical size of the change, bounded in [0, 1]. None when the
-    # column is non-numeric (or the diff is not of kind "changed").
+    # Median BARD (|a-b| / (|a|+|b|), see `etl.data_helpers.misc.bard`) across all *revised* rows
+    # of a numeric column (both sides non-null) — the typical size of a genuine value change,
+    # bounded in [0, 1]. 0.0 when there are no revised rows (all changes are appeared/disappeared
+    # coverage churn, see below) — only None when the column is non-numeric (or the diff isn't of
+    # kind "changed"), where old/new values can't be told apart from an unscoreable category flip.
     median_bard: float | None = None
+    # Rows where the value appeared (was NaN, now isn't) or disappeared (was a value, now NaN),
+    # within a row index that existed on both sides. Excluded from `median_bard`/`severity` — a
+    # value's presence changing isn't the same kind of event as a value that existed on both
+    # sides moving — and tracked here instead as the separate `coverage_severity` axis. Only set
+    # for numeric "changed" diffs.
+    appeared_count: int = 0
+    disappeared_count: int = 0
 
     @property
     def pct(self) -> float:
@@ -96,12 +106,14 @@ class ValueDiff:
 
     @property
     def severity(self) -> float:
-        """How big the differences are, in [0, 1] — the report's sort key.
+        """How big the genuine value revisions are, in [0, 1] — the report's sort key.
 
-        Numeric changed diffs use their median BARD; non-numeric changes count as a full change
-        (a category flip has no meaningful "size"); removed values scale with the share of rows
-        lost (coverage loss is additionally surfaced by the dataset's coverage chip, which forces
-        the 🔴 tier); purely new values sort last — they're additions, not differences.
+        Numeric changed diffs use their median BARD over revised rows only (appeared/disappeared
+        rows live on the separate `coverage_severity` axis, see below); non-numeric changes count
+        as a full change (a category flip has no meaningful "size"); removed values scale with
+        the share of rows lost (coverage loss is additionally surfaced by the dataset's coverage
+        chip, which forces the 🔴 tier); purely new values sort last — they're additions, not
+        differences.
         """
         if self.kind == "new":
             return 0.0
@@ -110,6 +122,15 @@ class ValueDiff:
         if self.median_bard is not None:
             return self.median_bard
         return 1.0
+
+    @property
+    def coverage_severity(self) -> float:
+        """Share of this diff's rows whose value appeared or disappeared rather than being
+        revised in place — how much the column's *coverage* churned, orthogonal to `severity`
+        (how big its genuine revisions were). Only meaningful for kind "changed"."""
+        if self.kind != "changed" or not self.total:
+            return 0.0
+        return (self.appeared_count + self.disappeared_count) / self.total
 
 
 @dataclass
@@ -133,6 +154,19 @@ class ColumnDiffResult:
             return 0.0
         if self.value_diffs:
             return max(v.severity for v in self.value_diffs)
+        return 0.0
+
+    @property
+    def coverage_severity(self) -> float:
+        """Biggest coverage churn among the column's value diffs — see `ValueDiff.coverage_severity`.
+        Removed columns are wholly a coverage event; new columns aren't (additions don't need
+        flagging, matching `severity`'s treatment of "new")."""
+        if self.kind == "removed":
+            return 1.0
+        if self.kind == "new":
+            return 0.0
+        if self.value_diffs:
+            return max((v.coverage_severity for v in self.value_diffs), default=0.0)
         return 0.0
 
     @property
@@ -425,16 +459,64 @@ def dataset_watch_key(ds: DatasetDiffResult) -> tuple:
 
 
 def _tier_chip(severity: float, kind: ChangeKind = "changed", tier: Tier | None = None) -> str:
-    """Colored triage chip: tier icon + the score it corresponds to.
+    """Colored triage chip for a single column: tier icon + its own median BARD score.
 
-    Pass `tier` to override the severity-derived tier — a dataset with coverage loss is forced
-    🔴 by `DatasetDiffResult.tier`, and its chip must agree with the tier strip and filters.
+    Pass `tier` to override the severity-derived tier — a removed column is forced 🔴 regardless
+    of its (irrelevant) severity value. Column-level severity is a real median over that column's
+    revised rows, so "median anomaly score" is an honest label here. It is NOT used at table/
+    dataset level — see `_rollup_tier_chip`, which a max-of-columns would make say "median" while
+    actually showing the single worst column, and which saturates to 100% on any dataset wide
+    enough that some column always has a genuine full anomaly (WDI-sized: ~1500 columns).
     """
     tier = tier or _tier(severity)
     if tier == "none":
         return ""
     label = {"removed": "removed", "new": "new"}.get(kind) or f"median anomaly score {format_score(severity)}"
     return f'<span class="chip tier {tier}">{TIER_ICONS[tier]} {_e(label)}</span>'
+
+
+def _col_tier_counts(
+    columns: Iterable["ColumnDiffResult"], score: Callable[["ColumnDiffResult"], float] = lambda c: c.severity
+) -> dict[Tier, int]:
+    """Count of non-dim, non-identical, non-metadata-only columns per tier of `score`."""
+    counts: dict[Tier, int] = {"large": 0, "moderate": 0, "small": 0}
+    for c in columns:
+        if c.is_dim or c.kind == "identical" or c.is_metadata_only:
+            continue
+        t = _tier(score(c))
+        if t != "none":
+            counts[t] += 1
+    return counts
+
+
+def _tier_counts_label(counts: dict[Tier, int]) -> str:
+    return " · ".join(f"{TIER_ICONS[t]} {counts[t]}" for t in ("large", "moderate", "small") if counts[t])
+
+
+def _rollup_tier_chip(columns: Iterable["ColumnDiffResult"], tier: Tier) -> str:
+    """Triage chip for a table/dataset: tier *counts* over its columns' own severities, not a
+    single (necessarily worst-case) score. A max saturates to 100% on any dataset with enough
+    columns that one of them always has a genuine full anomaly; counts can't. `tier` colors the
+    chip (the table/dataset's own worst-column tier — still the right signal for sorting/
+    filtering, just not for the number displayed)."""
+    if tier == "none":
+        return ""
+    label = _tier_counts_label(_col_tier_counts(columns))
+    if not label:
+        return ""
+    return f'<span class="chip tier {tier}">{_e(label)} column(s) changed</span>'
+
+
+def _coverage_churn_chip(columns: Iterable["ColumnDiffResult"]) -> str:
+    """How many changed columns had values appear/disappear without being genuine revisions —
+    the coverage axis, kept separate from the anomaly (BARD) chip above so a routine coverage
+    shift (a new year added, a slow-cadence indicator's "latest" datapoint moving) doesn't compete
+    with real revisions for the same score, while still being visible rather than silently
+    dropped."""
+    label = _tier_counts_label(_col_tier_counts(columns, score=lambda c: c.coverage_severity))
+    if not label:
+        return ""
+    return f'<span class="chip cov-churn">↕ {_e(label)} column(s) w/ shifted coverage</span>'
 
 
 def _coverage_chip(ds: DatasetDiffResult) -> str:
@@ -458,14 +540,20 @@ def _coverage_chip(ds: DatasetDiffResult) -> str:
 
 def _top_changes(
     report: "DiffReport", limit: int = TOP_CHANGES_LIMIT
-) -> tuple[list[tuple[int, list[str], str, str, str | None]], list[tuple[float, float, str, str, str]]]:
+) -> tuple[list[tuple[int, list[str], str, str, str | None]], list[tuple[float, float, str, str, str, str]]]:
     """The indicators to watch, as (losses, changes).
 
     Losses — (n_rows_removed, labels, ds_path, table, dim_or_None) — are data points that existed
     before and are gone after, the classic silent breakage of a dependency update. They always
     lead the watch list, regardless of how small they are relative to the dataset.
 
-    Changes — (severity, pct_rows, ds_path, table, column) — are the biggest value changes.
+    Changes — (severity, pct_rows, ds_path, table, column, axis) — are the biggest value changes,
+    "axis" is "anomaly" for a genuine value revision or "coverage" for a column whose values
+    appeared/disappeared without any revision (checked only when there's no revision to report,
+    via `elif` — a column with both gets listed once, by its anomaly score). Coverage-only
+    columns don't score on the anomaly axis at all (see `_changed_records`), so without this
+    they'd silently vanish from the watch list even when, e.g., an indicator's entire history
+    disappeared.
     """
     losses = []
     changes = []
@@ -481,10 +569,13 @@ def _top_changes(
                 )
                 losses.append((t.removed_row_count, t.removed_labels, ds.path, t.name, dim))
             for c in t.columns:
-                if c.is_dim or c.kind == "identical" or c.severity <= 0:
+                if c.is_dim or c.kind == "identical":
                     continue
-                pct = max((v.pct for v in c.value_diffs if v.kind != "new"), default=0.0)
-                changes.append((c.severity, pct, ds.path, t.name, c.name))
+                if c.severity > 0:
+                    pct = max((v.pct for v in c.value_diffs if v.kind != "new"), default=0.0)
+                    changes.append((c.severity, pct, ds.path, t.name, c.name, "anomaly"))
+                elif c.coverage_severity > 0:
+                    changes.append((c.coverage_severity, 0.0, ds.path, t.name, c.name, "coverage"))
     losses.sort(key=lambda r: (-r[0], r[2]))
     changes.sort(key=lambda r: (-r[0], -r[1], r[2]))
     losses = losses[:limit]
@@ -535,9 +626,18 @@ def _render_value_diff(v: ValueDiff, sample_cap: int = SAMPLE_LIMIT) -> str:
             else ""
         )
         head_note = f' <span class="head-note">— showing {what}{capped}</span>'
+    breakdown = ""
+    if v.kind == "changed" and (v.appeared_count or v.disappeared_count):
+        revised = v.count - v.appeared_count - v.disappeared_count
+        bits = [f"{revised:,} revised"]
+        if v.appeared_count:
+            bits.append(f"{v.appeared_count:,} appeared")
+        if v.disappeared_count:
+            bits.append(f"{v.disappeared_count:,} disappeared")
+        breakdown = f' <span class="head-note">({", ".join(bits)})</span>'
     head = (
         f'<div class="vd-head {v.kind}">{_e(v.symbol)} {label}: '
-        f"{v.count:,} / {v.total:,} ({v.pct:.2f}%){head_note}</div>"
+        f"{v.count:,} / {v.total:,} ({v.pct:.2f}%){breakdown}{head_note}</div>"
     )
     if not shown:
         return f'<div class="vd">{head}</div>'
@@ -581,9 +681,15 @@ def _render_column(table_name: str, c: ColumnDiffResult, ds_path: str = "", samp
 
 
 def _render_table(t: TableDiffResult, ds_path: str = "", sample_cap: int = SAMPLE_LIMIT) -> str:
+    if t.kind == "changed":
+        tier_chip = _rollup_tier_chip(t.columns, _tier(t.severity))
+        cov_chip = _coverage_churn_chip(t.columns)
+    else:
+        tier_chip = _tier_chip(t.severity, t.kind)
+        cov_chip = ""
     parts = [
         f'<div class="tbl"><div class="tbl-head"><span class="sym {t.kind}">{_SYMBOLS[t.kind]}</span> '
-        f"Table <b>{_e(t.name)}</b>{_tier_chip(t.severity, t.kind)}</div>"
+        f"Table <b>{_e(t.name)}</b>{tier_chip}{cov_chip}</div>"
     ]
     if t.meta_diff:
         parts.append(_render_meta_diff(t.meta_diff, "table metadata diff"))
@@ -618,7 +724,9 @@ def _render_dataset(ds: DatasetDiffResult, sample_cap: int = SAMPLE_LIMIT) -> st
     kind = ds.change_kind
     open_attr = " open" if kind in ("changed", "error") else ""
     new_version = ' <span class="chip">new version</span>' if ds.is_new_version else ""
-    tier = _tier_chip(ds.severity, kind, tier=ds.tier) if kind == "changed" else ""
+    all_cols = [c for t in ds.tables for c in t.columns]
+    tier = _rollup_tier_chip(all_cols, ds.tier) if kind == "changed" else ""
+    cov_chip = _coverage_churn_chip(all_cols) if kind == "changed" else ""
     # What the filter box matches against: names only (path, tables, changed columns) — matching
     # the full text would make queries hit sample values and scores, which is pure noise.
     search = " ".join(
@@ -627,7 +735,7 @@ def _render_dataset(ds: DatasetDiffResult, sample_cap: int = SAMPLE_LIMIT) -> st
     parts = [
         f'<details class="ds {kind}" id="{_ds_anchor(ds.path)}" data-tier="{"meta" if ds.is_metadata_only else ds.tier}" data-search="{_e(search)}"{open_attr}>'
         f'<summary><span class="sym {kind}">{_SYMBOLS[kind]}</span> '
-        f'<code class="path">{_e(ds.path)}</code>{new_version}{tier}{_coverage_chip(ds)}'
+        f'<code class="path">{_e(ds.path)}</code>{new_version}{tier}{cov_chip}{_coverage_chip(ds)}'
         f'<span class="ds-note">{_e(_dataset_summary_note(ds))}</span></summary>'
         f'<div class="ds-body">'
     ]
@@ -698,19 +806,9 @@ def render_html(report: DiffReport) -> str:
         tier_select = ""
 
     # Same for indicators: a dropdown filtering the column blocks by their tier (dims excluded).
-    col_tier_counts = {"large": 0, "moderate": 0, "small": 0}
-    n_meta_only_cols = 0
-    for ds in report.datasets:
-        if ds.change_kind != "changed":
-            continue
-        for t in ds.tables:
-            for c in t.columns:
-                if c.is_dim or c.kind == "identical":
-                    continue
-                if c.is_metadata_only:
-                    n_meta_only_cols += 1
-                elif _tier(c.severity) != "none":
-                    col_tier_counts[_tier(c.severity)] += 1
+    changed_cols = [c for ds in report.datasets if ds.change_kind == "changed" for t in ds.tables for c in t.columns]
+    col_tier_counts = _col_tier_counts(changed_cols)
+    n_meta_only_cols = sum(1 for c in changed_cols if not c.is_dim and c.kind != "identical" and c.is_metadata_only)
     available_col_tiers = [t for t in ("large", "moderate", "small") if col_tier_counts[t]]
     if len(available_col_tiers) + (1 if n_meta_only_cols else 0) >= 2:
         opts = "".join(
@@ -746,7 +844,7 @@ def render_html(report: DiffReport) -> str:
         tier_strip = (
             f'<div class="tier-strip">Of the {n_diff:,} dataset{"s" if n_diff != 1 else ""} with '
             f"differences, the changes are: {' · '.join(strip_bits)} "
-            f'<span class="tier-hint">(tiered by median anomaly score; coverage loss ⇒ 🔴)</span></div>'
+            f'<span class="tier-hint">(tiered by worst-column anomaly score; coverage loss ⇒ 🔴)</span></div>'
         )
 
     # Datasets to watch, in triage order (see dataset_watch_key).
@@ -762,11 +860,21 @@ def render_html(report: DiffReport) -> str:
         elif d.is_metadata_only:
             meta_html = '<span class="top-meta">metadata-only changes</span>'
         elif d.severity <= 0:
-            meta_html = '<span class="top-meta">new data only</span>'
+            # No genuine revisions -- still worth saying if that's because of coverage churn
+            # (values appearing/disappearing) rather than plain additions.
+            cov_label = _tier_counts_label(
+                _col_tier_counts([c for t in d.tables for c in t.columns], score=lambda c: c.coverage_severity)
+            )
+            meta_html = (
+                f'<span class="top-meta">{_e(cov_label)} column(s) w/ shifted coverage</span>'
+                if cov_label
+                else '<span class="top-meta">new data only</span>'
+            )
         else:
             n_cols = sum(len(t.changed_columns) for t in d.tables)
             n_tables = sum(1 for t in d.tables if t.any_change)
-            meta_html = f'<span class="top-meta">median anomaly score {_e(format_score(d.severity))}</span>'
+            counts_label = _tier_counts_label(_col_tier_counts([c for t in d.tables for c in t.columns]))
+            meta_html = f'<span class="top-meta">{_e(counts_label)} column(s) changed</span>' if counts_label else ""
             if d.removed_row_count:
                 meta_html += f'<span class="top-meta loss">− lost {d.removed_row_count:,} data point(s)</span>'
             meta_html += f'<span class="top-meta">{n_cols} column(s) in {n_tables} table(s)</span>'
@@ -790,12 +898,17 @@ def render_html(report: DiffReport) -> str:
             + (f": {_e(shown)}" if shown else "")
             + "</span></li>"
         )
-    for severity, pct, ds_path, table, col in changes:
-        tier = _tier(severity)
+    for severity, pct, ds_path, table, col, axis in changes:
+        if axis == "coverage":
+            icon = "↕"
+            meta = f"coverage churn {_e(format_score(severity))} (values appeared/disappeared)"
+        else:
+            icon = TIER_ICONS.get(_tier(severity), "")
+            meta = f"median anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows"
         items.append(
-            f'<li><span class="ti">{TIER_ICONS.get(tier, "")}</span> '
+            f'<li><span class="ti">{icon}</span> '
             f'<a href="#{_anchor(ds_path, table, col)}"><code>{_e(ds_path)}</code> · <code>{_e(table)}.{_e(col)}</code></a>'
-            f'<span class="top-meta">median anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows</span></li>'
+            f'<span class="top-meta">{meta}</span></li>'
         )
     show_datasets = len(ds_items) >= 2
     show_indicators = len(items) >= 2
@@ -875,6 +988,7 @@ def render_html(report: DiffReport) -> str:
   .chip.tier.moderate {{ background: #fdf3d7; color: #8a6d00; }}
   .chip.tier.small {{ background: #e9f6ec; color: #1b5e20; }}
   .chip.cov {{ background: #fdeaea; color: #b71c1c; font-weight: 600; }}
+  .chip.cov-churn {{ background: #e8eaf6; color: #3949ab; }}
   .tier-strip {{ font-size: .9rem; margin: -0.75rem 0 1rem; }}
   .tier-strip .tier-hint {{ color: #999; font-size: .78rem; }}
   details.top-changes {{ background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: .6rem 1rem; margin-bottom: 1rem; }}

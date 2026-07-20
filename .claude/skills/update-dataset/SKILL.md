@@ -9,7 +9,7 @@ metadata:
 
 Use this skill to run a complete dataset update with Claude Code subagents, keep a live progress checklist, and pause for user approval only when something needs attention.
 
-> **Paired skill — keep in sync.** [`/review-data-pr`](../review-data-pr/SKILL.md) is the reviewer-side counterpart of this skill: it verifies the *outcomes* of the author-side steps defined here. Whenever you add, remove, or change a workflow step in this file, check whether `review-data-pr/SKILL.md` needs a matching reviewer-side check (and add it in the same commit if so). The reverse also holds — see the mirror note there.
+> **Paired skill — keep in sync.** [`/review-data-pr`](../review-data-pr/SKILL.md) is the reviewer-side counterpart of this skill: it verifies the *outcomes* of the author-side steps defined here. Whenever you add, remove, or change a workflow step in this file, check whether `review-data-pr/SKILL.md` needs a matching reviewer-side check (and add it in the same commit if so). The reverse also holds — see the mirror note there. The creation-side skills [`/create-dataset`](../create-dataset/SKILL.md) and [`/create-snapshot`](../create-snapshot/SKILL.md) belong to the same family: they point into this file's canonical sections (§5b-bis sanity bounds, §5c harmonization audit, §6b metadata quality, §6c metadata checklist + link verification, §6d scheduled issues, and the snapshot-related Guardrails), so when one of those sections changes, check whether the create skills need a matching edit in the same commit too.
 
 ## Inputs
 
@@ -37,16 +37,19 @@ Assumptions:
 - [ ] Update snapshot and compare to previous version; capture summary
 - [ ] Meadow step: run + fix + diff + summarize
 - [ ] Garden step: run + fix + diff + summarize
+- [ ] Surface new indicators: check meadow + garden diffs (and snapshot columns when meadow hardcodes a column subset) for new-version columns absent from the old; warn user + PR body, flag new-but-dropped columns, route rename pairs to the step-7 mapping
 - [ ] Review `sanity_checks` output (enable log flag, re-run, scan log, revert flag) — if none found and the garden step does non-trivial logic, recommend adding them; if present but missing value bounds (positive / [0,1] / [0,100] per indicator type), suggest those too (see 5b-bis)
 - [ ] Country harmonization audit: validate `.countries.json` against canonical regions (flag provider regions not yet in the regions dataset → `/add-provider-regions`), audit `.excluded_countries.json`, scan garden log for missing/unused/unknown warnings
 - [ ] Region-provider drift: if this dataset's aggregates are in `regions.yml` (`defined_by: <provider>`), check whether the new version changed the provider's region set or country membership; if so, update `regions.yml` and re-propagate via `/add-provider-regions`
 - [ ] Grapher step: run + verify (skip diffs), or explicitly mark N/A
 - [ ] Re-evaluate each catalogued `# NOTE:` / `# TODO:` against fresh data; delete resolved workarounds + comments together, or record status in PR body
 - [ ] Check metadata: typos, Jinja spacing, style guide compliance
-- [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim — bump to the producer's real release date / year, or to `date_accessed` / current year if the source doesn't publish one), and that all URLs resolve (HEAD-check)
+- [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim — bump to the producer's real release date / year, or to `date_accessed` / current year if the source doesn't publish one), and that all URLs resolve (HEAD-check) and every `#fragment` matches a real anchor in the target page (anchor pass, see 6c)
+- [ ] Offer the **optional** adversarial data & metadata review (`/adversarial-data-review`) — verify metadata claims against the producer's fetched documentation and cross-check values against independent sources; skip by default (it can consume many tokens: ~25–45 web calls), run on user opt-in or visible red flags (see 6c-bis)
 - [ ] Scheduled-issue workflow check (owid-issues): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>`; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
+- [ ] Offer the **optional** empty-entity audit (`check-empty-entities`) after all remaps — it sweeps every surface (charts, map `columnSlug`, MDim views, explorer views, narrative charts, gdoc `country=` references), which can consume many tokens on widely-charted datasets; run on user opt-in or when the remap touched many views; regressions vs production = fix, pre-existing = document (see step 7)
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
 - [ ] Render Slack announcement via `data-updates-comms`, save to workbench, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
 - [ ] Draft public-facing "Data update" post for OWID /latest, get the user's sign-off on the markdown, create the Google Doc in /Data updates, and hand the user the link (not added to the PR)
@@ -191,6 +194,15 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    The apples-to-apples diff should collapse to just your intended change. Mention the drift separately in the PR (Chart Diff on staging *will* show it, because the live data is also stale relative to current upstream). This bit me twice in one update — don't skip it.
 
    **When NaN can appear on one side, don't let `.fillna(False)` hide it.** In a cell-by-cell diff, `(a - b).abs() <= tol` evaluates to `NaN` when exactly one side is NaN; a downstream `.fillna(False)` then silently drops that real one-sided change. Treat "one side NaN, other side not" as a difference explicitly.
+
+   **Surface new indicators.** Collect columns present in the new version but absent from the old — read **both the meadow diff (step 4) and the garden diff**, because the pipeline may drop columns between the two. `etl diff` prints additions as green `+ Column` lines, but the ranked HTML report scores them at severity 0 — they sort last and will not surface on their own; read the text/JSON output, or compare column sets directly (`set(ds_new[t].columns) - set(ds_old[t].columns)` per table). Classify each find:
+   - **New in meadow and in garden** → genuinely new indicator: warn the user and list it in the PR body under a "New indicators" heading — it appears on no chart until someone curates it, needs the same metadata coverage as the rest (see 6c), and may deserve a mention in the update announcement (step 9).
+   - **New in meadow but missing from garden** → the pipeline drops it (explicit column selection or `.drop(columns=...)` in garden): surface it as "the source now ships X — currently dropped" and let the user decide deliberately whether to keep it.
+   - **Paired `+ Column` / `− Column`** → usually a **rename**, not an addition — route it to the indicator-upgrade mapping (step 7) instead.
+
+   **Long-format tables hide additions from the column diff.** When a table keys its series by a dimension column (`indicator`, `metric`, `question`, …) with a stable `value` column, a new series adds *rows*, not columns — the column-set diff stays empty. Also diff the distinct **combinations** of the identifying dimensions, not each dimension's values separately — a new series can be a new tuple of existing values (e.g. `sex=male` and `metric=count` both existed before, but the `(male, count)` series is new): `set(tb_new.reset_index()[dims].itertuples(index=False, name=None)) - set(tb_old.reset_index()[dims].itertuples(index=False, name=None))` where `dims` is the list of identifying dimension columns — built tables keep them in the index after `Table.format(...)`, hence the `reset_index()` (with a single dimension this reduces to a value-set diff). The grapher step expands dimension values into separate variables, so the step-7 shortName pairing surfaces these too — but catch them here, before staging.
+
+   If the **meadow step itself selects a hardcoded column subset** (`tb[[...]]`, `usecols=`, `.drop(columns=...)`), a new source column never reaches any diff — grep the meadow step for such selections and, when present, compare the raw **snapshot** column set old-vs-new (`snap.read_*().columns`) to catch additions dropped at the door.
 
 5b) Review sanity-checks output (only if step 1d catalogued any)
    Handling depends on the form catalogued in step 1d.
@@ -489,6 +501,24 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    Fix any genuinely-non-2xx hit on `url_main`, `url_download`, `license.url`, or URLs referenced from `description` / `description_key` before continuing. The `sed` strips trailing markdown/punctuation chars (`)`, `.`, `,`, `;`, `:`, `>`) so URLs inside `[text](url)` aren't reported as broken because of a stray closing paren.
 
+   **Anchor fragments — HTTP 200 can't validate them.** Servers ignore everything after `#`, so `https://ourworldindata.org/poverty#key-insightsfdd` (broken anchor) returns the same 200 as the real `#key-insights`. For every checked URL that carries a fragment, run a second pass against the page *body*:
+   ```bash
+   for url in $(rg --no-filename -No "https?://[^\"' ]+" snapshots/<namespace>/<new_version>/ etl/steps/data/{meadow,garden,grapher}/<namespace>/<new_version>/ \
+       | sed -E 's/[).,;:>]+$//' | sort -u | rg '#'); do
+       page="${url%%#*}"; frag="${url#*#}"
+       case "$frag" in *=*|*/*|'!'*) continue;; esac  # non-DOM fragments — see below
+       # grep -F: fragments may contain regex metacharacters (#section.2) — ERE would false-OK id="section-2"
+       if curl -sL --max-time 20 -A 'Mozilla/5.0' "$page" | grep -qF -e "id=\"$frag\"" -e "id='$frag'" -e "name=\"$frag\"" -e "name='$frag'"; then
+           printf "OK         %s\n" "$url"
+       else
+           printf "NO-ANCHOR  %s\n" "$url"
+       fi
+   done
+   ```
+   - **Skip non-DOM fragments** (the `case` list): anything containing `=` (scroll-to-text `#:~:text=`, Google Sheets `#gid=…`, PDF `#page=…`) or `/` (hash-route state, whether slash-prefixed `#/dashboard` or not — e.g. FAOSTAT's `#data/FBS`), plus `#!…` hashbangs — none correspond to an element `id` and all would false-alarm. Real anchors are heading slugs and never contain `=` or `/`.
+   - **`NO-ANCHOR` is a signal, not proof** — same epistemics as the curl false-404 note above. Two false-positive modes: the page renders its anchors client-side (the raw HTML lacks the `id`), or curl got a Cloudflare challenge page instead of the real body. Confirm before flagging: check the fetched body is the real page (grep for `</html>` and a plausible `<title>`), then ask `WebFetch` whether the page has a section/heading matching the de-slugged fragment (`key-insights` → "Key insights") — OWID heading anchors are slugged headings, so heading-text presence is the authoritative check.
+   - **On a confirmed missing anchor** the reader still lands on the right page, just at the top — fix the fragment (grep the body's `id="` values for the nearest real anchor) or drop it. Apply the same restraint as above: **flag and ask before rewriting** — the section may exist under a different slug, or the page may not have rebuilt yet.
+
    **Verification.** After editing, re-run the affected step (with `--grapher` if grapher) so the catalog reflects the changes. Then confirm `presentation.attribution_short` actually landed:
    ```python
    from owid.catalog import Dataset
@@ -500,6 +530,13 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    ```bash
    make query SQL="SELECT shortName, attributionShort FROM variables WHERE catalogPath LIKE '%<ns>/<v>/<short_name>%'"
    ```
+
+6c-bis) Adversarial data & metadata review (optional — offer it, don't run it unprompted)
+   Offer to run [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) on `garden/<namespace>/<new_version>/<short_name>`. Step 6c verified that the links *resolve*; this step actually **reads the producer's documentation behind them** and cross-checks the data against independent sources online — it's the only step that can catch a mistake made by the source itself (unit slips, wrong-year values, stale pre-revision numbers).
+
+   **It is optional because it's the heaviest check in the workflow** — fetching methodology docs plus per-value web searches runs ~25–45 web calls and can consume a lot of tokens and time. Skip by default; run it when the user opts in, and *propose* it when the update shows red flags that only this step can chase down: large unexplained value churn in the diffs, an in-place source revision, a producer new to us, or editorial claims riding on specific values.
+
+   Scope for an update: focus the metadata claim review on new/changed text, and the value cross-checks on the newly added data (latest wave/year) plus that skill's standard anchors; deep-review the top-viewed indicators + anomaly-flagged ones per its prioritization step. Apply its routing table: metadata fixes → edit and re-run the step; confirmed source errors → `<short_name>.corrections.yml`; unconfirmed suspicions → list under "Not covered in this PR" for the reviewer. Save the report path (`ai/adversarial-review-<short_name>-<date>.md`) in `update-context.yml` and summarize any 🔴/🟡 findings in the PR body. Run this before 6d/commit so the fixes land in this PR.
 
 6d) Scheduled-issue workflow check (owid-issues)
    Every recurring data update is driven by a scheduled GitHub Actions workflow in the `owid/owid-issues` repo (`.github/workflows/update-*.yml`) that periodically opens a "Data update" issue. The conventions live in the Notion page ["Scheduled data issues"](https://app.notion.com/p/owid/Scheduled-data-issues-f166359059634634b0053f78101bca81): schedule anything updated at least once per year but less than daily; filename `update-{namespace}-{short_name}.yml`; a cron `schedule:` trigger + `imjohnbo/issue-bot` creating the issue. This step runs now because 6c just established the two cadence facts the cron must match — `dataset.update_period_days` and the producer's actual release rhythm (`source.release_date` / `next_release` in `update-context.yml`).
@@ -546,7 +583,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      ```bash
      STAGING=<branch> .venv/bin/etl indicator-upgrade auto
      ```
-   - **`auto` can detect nothing for a legitimate version bump** ("No dataset migrations detected. Nothing to do."). Don't conclude there's nothing to remap — fall back to an explicit mapping: pair old/new variable ids by `shortName` across the two dataset ids, store with `WizardDB.add_variable_mapping(...)`, preview with `cli_upgrade_indicators(dry_run=True)`, then apply (mechanics under "Indicator Upgrader CLI for one-shot chart remaps" in Guardrails). Map **all** indicators, not just charted ones — the full mapping is also what gives Anomalist's upgrade detectors complete coverage (see Final QA).
+   - **`auto` can detect nothing for a legitimate version bump** ("No dataset migrations detected. Nothing to do."). Don't conclude there's nothing to remap — fall back to an explicit mapping: pair old/new variable ids by `shortName` across the two dataset ids, store with `WizardDB.add_variable_mapping(...)`, preview with `cli_upgrade_indicators(dry_run=True)`, then apply (mechanics under "Indicator Upgrader CLI for one-shot chart remaps" in Guardrails). Map **all** indicators, not just charted ones — the full mapping is also what gives Anomalist's upgrade detectors complete coverage (see Final QA). The new-version shortNames left **unpaired** by this mapping are exactly the new-indicator list from step 5 — cross-check the two; a mismatch usually means a missed rename.
    - **CRITICAL**: After the upgrader finishes, always verify it actually worked by querying staging:
      ```bash
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
@@ -601,6 +638,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **Verify with the merged config, not the stored one:** `AdminAPI(OWID_ENV).get_narrative_chart(id)["configFull"]` reflects the live (parent+patch) state; `chart_configs.full` can be stale and will mislead you into thinking nothing changed.
    - **Watch for stale FAUST overrides.** These charts often also pin an old subtitle/footnote (e.g. "$2.15 per day" / "2017 prices") that no longer matches the parent. `push_new_narrative_charts_cli` migrates the *indicator* but only **warns** about the text — the fix is to reset the flagged field to the parent's exact text to restore inheritance (identical values drop out of the patch). **Always ask the user before changing FAUST**: it's reader-facing editorial text (Footnote, Axis, Unit, Subtitle, Title), so confirm the reset/rewrite first — never fold a FAUST change silently into the indicator upgrade. (Use `_find_stale_faust_overrides(patch, parent_config, mapping)` to list exactly which fields are stale; set only those to the parent's value and PUT via `AdminAPI.update_narrative_chart`. Leave numeric display overrides like `tolerance` alone unless asked — they may be intentional.)
      Then re-run the scan and confirm it's empty.
+   - **Empty-entity audit (optional — offer it after all remaps).** An upgrade can leave a view pinned to entities that have no data in the new indicators — it renders as an empty chart with no error anywhere. The **`check-empty-entities` skill** audits charts (entity selections + map `columnSlug`), MDim views, explorer views, narrative charts, and published-gdoc `country=` references, and grades every finding against production. It sweeps every surface the dataset touches, so it can consume a lot of tokens on widely-charted datasets — skip by default, run on user opt-in, and *propose* it when the risk is real: many charts remapped, hand-curated (non-auto) mappings, a restructure, or indicators whose country coverage shrank. When it runs: a selection that had data on production and lost it on staging is a **regression from this update — fix it before merge** (remap the view or restore the entities); a gap identical on production is pre-existing — it still needs fixing (chart-config edit or content follow-up on the gdoc), just not necessarily in this PR, so list it in the PR body with a planned fix.
 
 8) Update context for public announcement
    - Maintain `workbench/<short_name>/update-context.yml` as the canonical record of facts discovered during the update. Do not wait until the end if a fact is already known; append/update as each step completes.
@@ -732,9 +770,13 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      gh api repos/owid/etl/issues/<pr_number>/comments | python3 -m json.tool   # clean-pass summary lands here
      gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool    # findings land here as inline comments
      ```
-   - **Codex posts in one of two places — always check both.** When it finds issues, it leaves *inline review comments* (the endpoint above) with resolvable threads. When it finds **nothing**, it posts a single top-level **PR (issue) comment** instead — no inline comments, no threads — e.g. "Codex Review: Didn't find any major issues. Keep it up!". So if the inline-comments endpoint is empty, check the issue comments before concluding Codex hasn't run yet:
+   - **Codex posts in one of two places — always check both.** When it finds issues, it leaves *inline review comments* (the endpoint above) with resolvable threads. When it finds **nothing**, it posts a single top-level **PR (issue) comment** instead — no inline comments, no threads — e.g. "Codex Review: Didn't find any major issues. Keep it up!". So if the inline-comments endpoint is empty, check the issue comments before concluding Codex hasn't run yet. A third shape exists: a findings review whose finding lives **only in the review body** (no inline comments, no resolvable threads) — list `gh api repos/owid/etl/pulls/<n>/reviews` and read each new review's `body`; polling only the two comment endpoints misses it (there is no thread to resolve — reply via a normal PR comment instead):
      ```bash
+     # clean-pass summaries land in the issue comments:
      gh api repos/owid/etl/issues/<pr_number>/comments \
+       --jq '.[] | select(.user.login | test("codex";"i")) | .body'
+     # review-body-only findings (the third shape) — no thread, no issue comment:
+     gh api repos/owid/etl/pulls/<pr_number>/reviews \
        --jq '.[] | select(.user.login | test("codex";"i")) | .body'
      ```
      A "no issues" / 👍 comment from `chatgpt-codex-connector[bot]` means the review is done and there's nothing to address — don't keep polling for inline comments that will never come.
@@ -849,7 +891,7 @@ Workflow when the user agrees:
        - data://meadow/<ns>/<v>/<short>:
          - snapshot://<ns>/<v>/<short>.csv
    ```
-   Convert the relocated new entries to nested while reordering, so the active and archived blocks match. Verify it parses with `python -c "from etl.dag_helpers import load_dag; load_dag()"` (a malformed nesting raises).
+   Convert the relocated new entries to nested while reordering, so the active and archived blocks match. Verify it parses with `.venv/bin/python -c "from etl.dag_helpers import load_dag; load_dag()"` (a malformed nesting raises).
 5. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
 6. Run `make check` and commit with `🔨🤖 Remove old <name> entries and reorder DAG`.
 
@@ -885,6 +927,19 @@ This is the **last step**, after the DAG archive has been committed. Don't auto-
   ```
   https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html
   ```
+
+**Bulk-approve the easy chart diffs with `etl approve` before handing the rest to the human.** On a dataset with many charts (e.g. WDI has 400+), most pending diffs exist only because the update changed no values a human needs to eyeball — either the underlying data is byte-identical (a version bump minted new variable IDs but the values didn't change) or it changed by a negligible source-revision amount. Reviewing those by hand in Chart Diff is wasted effort; let `etl approve` clear them first:
+
+```bash
+.venv/bin/etl approve --dry-run                        # exact data match only — safe default, see counts first
+.venv/bin/etl approve --dry-run --allow-small-changes   # also count tiny source revisions (see below)
+.venv/bin/etl approve --allow-small-changes             # apply for real once the dry-run counts look right
+```
+
+- Plain `etl approve` only approves a chart when every dimension's underlying data is byte-identical between staging and prod (it hashes each dimension's actual data, not the raw variable ID — so a version bump that changed no values still gets approved).
+- `--allow-small-changes` additionally approves charts where the only remaining difference is a handful of small-magnitude value changes (typical source revisions) — tune with `--tolerance-pct` (default 1% relative change per point), `--tolerance-abs-floor` (default 1e-6, guards near-zero values), `--max-changed-points` (default 5 per dimension, above which it's sent to manual review regardless of magnitude), and `--max-new-points` (default 1000 per dimension — new-coverage points, e.g. a fresh year, are given a generous allowance since they're expected from a routine update, but an unexpectedly large coverage jump still gets sent to manual review). It still requires every other part of the chart's config (title, subtitle, everything but the dimension values) to be identical.
+- `--show-data-diff` prints the actual before/after values for skipped charts (per dimension: y/x/size/color) instead of just a hash mismatch — useful to see *why* a specific chart didn't qualify, or to sanity-check whether raising `--tolerance-pct` would be safe. Combine with `--chart-id <id>` to inspect one chart.
+- Whatever's left after `etl approve` is what's actually worth a human's attention in Chart Diff — genuine content changes, added/removed country-year coverage, or other config differences.
 
 **Important: derive `<container_branch>` correctly.** The staging hostname is **not** simply `staging-site-<branch>`. The container name is produced by `get_container_name(branch)` in `etl/config.py`:
 
@@ -923,6 +978,11 @@ These pages need a fresh staging build, so they're only meaningful after the PR'
 - **`paths.regions` auto-resolves DAG dependencies**: `paths.regions.add_population(tb)` and `paths.regions.add_aggregates(tb, regions=[...])` pick up the `population` and `income_groups` datasets directly from the DAG. Don't `paths.load_dataset("population")` and pass it through unless the helper specifically asks for the dataset — the parameter is unused.
 - **WB income-group aggregates**: add the four classification names (`High-income countries`, `Upper-middle-income countries`, `Lower-middle-income countries`, `Low-income countries`) to your `REGIONS` list and add `data://garden/wb/<latest>/income_groups` to the DAG. `paths.regions.add_aggregates(...)` auto-resolves the classification.
 - **Detect structural placeholders dynamically**: when a source ships "balanced panel" rows that are zero everywhere by design (status combos that exist only for completeness), detect them at runtime (`groupby(...).max() == 0`) and assert the count matches the codebook. A coding change in the source then surfaces as a test failure instead of silently shipping noise.
+- **In-place source revisions: compare file dates/hashes, not version labels.** Some producers replace the published file (and codebook) without bumping their stated version and without a changelog. When checking whether a source has a new release, look at the hosting platform's file-modification dates or hashes (e.g. the OSF API's `date_modified` per file) against the previous snapshot's `date_accessed`/md5 — an unchanged version label proves nothing. If you ingest such a revision, set `date_published` to the replacement date and leave a `.dvc` NOTE naming the behavior so the next updater re-checks. (Velasco LGBTI: 6,813 cells changed under the same "Version 2.0" label.)
+- **Category-state churn in combined categorical indicators.** A source revision can add or remove the *states* a categorical indicator takes (a recode wave eliminating an enforcement state, a new cross-combination appearing). The net that catches it is metadata validation failing with "extra variables in YAML file / in table" on per-category regional variables. Fix all four surfaces together — the category map in step code, the `sort:` lists, the coding-description sentences, and the per-category regional `_count`/`_pop` YAML blocks — then re-run the phantom-category audit. Never keep a label the new data cannot produce.
+- **Guard silent catch-all buckets with an assert.** A lookup that routes labeled source values into an *existing* fallback category ("requirement unknown", "other") degrades silently when the source adds a new label — the row lands in the fallback and nothing fires (unlike unmapped values that leak as *new* categories, which metadata validation catches). Assert `observed labels ⊆ map keys`, letting only genuinely-blank values reach the fallback. (LGBTI: two new requirement labels published 40 country-years as "requirement unknown"; Codex caught it, the build didn't.)
+- **Grep metadata prose for numbers carried from the old release.** Validated fields are covered by checks; *prose* numbers in `description_key`/descriptions (country counts, category counts, year ranges) are not. After a revision that changes panel composition, `rg` the new `.meta.yml` for the previous release's counts. (LGBTI: "197 countries" survived in the dataset-level bullet after the Vatican was dropped.)
+- **corrections.yml overrides on categorical columns must use the source's *current* vocabulary.** Assigning a retired label raises `TypeError: Cannot setitem on a Categorical with a new category` — pick the current-vocabulary value that maps to the same published output, and note the substitution in the entry.
 - **Codebook-vs-data inconsistencies**: when the codebook documents one thing but the actual CSV shows another (placeholder claimed but non-zero rows present, etc.), preserve the data as-shipped and flag it in the PR description for the producer to confirm. Don't silently force the data to match the codebook.
 - **Grapher `.meta.yml` only when it adds something**: the grapher step inherits everything via `default_metadata=ds_garden.metadata`, so drop the grapher `.meta.yml` if it only duplicates the garden values. Keep it only for genuine grapher-side overrides.
 - **`processing_level: major` requires `description_processing`**: keep `processing_level: minor` as the common default and override to `major` only on indicators that have a `description_processing` field. Don't blanket-set `major` on the common block and then leave country-level proportions without their own processing note.
@@ -944,6 +1004,7 @@ When the update is review-heavy and you need iterative back-and-forth with a top
 - `workbench/<short_name>/meadow_diff_raw.txt` and `meadow_diff.md`
 - `workbench/<short_name>/garden_diff_raw.txt` and `garden_diff.md`
 - `workbench/<short_name>/harmonization.log` and `harmonization_audit.md` (from step 5c)
+- `ai/adversarial-review-<short_name>-<date>.md` (from step 6c-bis)
 - `workbench/<short_name>/indicator_upgrade.json` (if indicator-upgrader was used)
 - `workbench/<short_name>/update-context.yml` (canonical facts gathered during the update; consumed by `data-updates-comms`)
 - `workbench/<short_name>/slack-announcement.md`

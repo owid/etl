@@ -441,6 +441,7 @@ async def test_run_sql_invalid_column_error():
         # Use raise_on_error=False to get the error in the result instead of raising an exception
         output = await client.call_tool("run_sql", {"query": sql_query})
         error = output.structured_content["error"]  # ty: ignore
+        # We rewrite Datasette/DuckDB's raw binder error into our own friendly message.
         assert "column 'abc' does not exist" in error.lower()
 
 
@@ -453,4 +454,5 @@ async def test_run_sql_syntax_error():
 
         output = await client.call_tool("run_sql", {"query": sql_query})
         error = output.structured_content["error"]  # ty: ignore
-        assert "invalid expression" in error.lower() or "unexpected token" in error.lower()
+        # No special enrichment for generic syntax errors — passed through from Datasette/DuckDB.
+        assert "syntax error" in error.lower() or "parser error" in error.lower()

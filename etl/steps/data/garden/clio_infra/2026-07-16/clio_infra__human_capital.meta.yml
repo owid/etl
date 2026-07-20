@@ -1,0 +1,26 @@
+dataset:
+  title: Book Titles per Capita - Fink-Jensen (2015)
+  update_period_days: 0 #never updated
+  owners:
+    - Tuna Acisu
+tables:
+  clio_infra__human_capital:
+    variables:
+      book_titles_per_capita__fink_jensen_2015:
+        title: New book titles published per million people
+        unit: book titles per million people
+        short_unit: ""
+        description_short: The number of new book titles published per year, per million inhabitants.
+        description_key:
+          - Data is compiled from a combination of bibliographic sources (national bibliographies, library catalogues and UNESCO statistics) that count new book titles, and academic sources (journal articles, working papers, and scholarly reference books) that provide book-production estimates and population figures.
+          - The data includes historical states such as the USSR and Yugoslavia.
+        processing_level: minor
+        display:
+          name: New book titles per million people
+          numDecimalPlaces: 1
+          tolerance: 20
+        presentation:
+          title_public: New book titles published per million people
+          topic_tags:
+            - Books
+          attribution_short: Fink-Jensen (2015)

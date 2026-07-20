@@ -9,7 +9,7 @@ metadata:
 
 End-to-end review of a dataset-update PR. Goes deeper than `/review`: actually runs the steps, compares to the previous version, audits metadata coverage against a fixed checklist, and reports on `/update-dataset` workflow status (Slack draft, Codex review, indicator upgrade, downstream deps).
 
-> **Paired skill — keep in sync.** [`/update-dataset`](../update-dataset/SKILL.md) is the author-side counterpart of this skill: the steps it defines are the outcomes verified here. Whenever you add, remove, or change a check in this file, check whether `update-dataset/SKILL.md` needs a matching author-side step (and add it in the same commit if so). The reverse also holds — see the mirror note there.
+> **Paired skill — keep in sync.** [`/update-dataset`](../update-dataset/SKILL.md) is the author-side counterpart of this skill: the steps it defines are the outcomes verified here. Whenever you add, remove, or change a check in this file, check whether `update-dataset/SKILL.md` needs a matching author-side step (and add it in the same commit if so). The reverse also holds — see the mirror note there. The creation-side skills [`/create-dataset`](../create-dataset/SKILL.md) and [`/create-snapshot`](../create-snapshot/SKILL.md) belong to the same family: the checks here (§5 snapshot fields, §6 links, §7 code clarity, §9 metadata coverage, §10 quality) also gate PRs produced by `/create-dataset`, so when one of them changes, check whether the create skills need a matching edit in the same commit too.
 
 ## Inputs
 
@@ -89,6 +89,7 @@ Read both `.dvc` files (old and new) and produce a side-by-side table for these 
 | `url_main` | Status check — see step 6 |
 | `url_download` | Status check; OK to remove if data is now fetched via API |
 | `license.url` | Status check |
+| `version_producer` | **Unchanged label + changed payload = in-place revision.** If the producer's version label is the same as the old `.dvc` but the data changed, confirm the author verified the revision against the source's file-modification dates/hashes (not the label) and documented the behavior in a `.dvc` NOTE; `date_published` should be the replacement date. Missing NOTE on a known in-place reviser: 🟡. |
 
 - **Freshness check for scraped snapshots.** When the snapshot `.py` scrapes the producer's page or a chart platform's endpoint, re-fetch the *producer's page* and compare against the committed snapshot — the endpoint the script reads can lag the page (e.g. a Datawrapper chart CDN trailing the page's own `<noscript>` data tables by a full release, so the committed snapshot silently misses the newest wave). The committed data must match the page's current tables; a missing latest row/wave is a 🔴 (see `/update-dataset` Guardrails, "Scraped chart embeds").
 
@@ -98,6 +99,7 @@ Run the HEAD-check loop from `/update-dataset` § 6c on every URL in the new `.d
 
 - **`docs.google.com` 200 ≠ publicly viewable.** Google Sheets/Docs links return HTTP 200 even when they're behind a permission wall (the 200 is the "request access"/sign-in page). When a user-facing `description_key`/`description_processing` links a Google Sheet, confirm real public access with `WebFetch` (ask whether the page shows data or a "you need access"/sign-in wall) — curl status alone will pass a private sheet.
 - **Cross-check the same sheet is cited consistently.** If a dataset links a "source per data point" sheet from more than one field, verify they're the *same* sheet ID — divergent IDs (one current, one stale) is a 🟡.
+- **HTTP 200 ≠ anchor exists.** For URLs carrying a `#fragment`, run the anchor pass from `/update-dataset` § 6c: the fragment must match an `id`/`name` attribute in the page HTML (skip non-DOM fragments: any fragment containing `=` or `/` — text fragments, `gid=`, `page=`, hash routes like FAOSTAT's `#data/FBS` — plus `#!` hashbangs). Rule out client-side rendering and Cloudflare challenge bodies (WebFetch de-slugged-heading check) before flagging. A confirmed missing anchor on an otherwise-working page is 🟡 — the page loads, the reader just lands at the top; escalate to 🔴 only if the linked section genuinely no longer exists and the link's claim depends on it.
 
 ### 7. Code clarity & docs
 
@@ -146,6 +148,14 @@ Run after the §4 pipeline build. Three checks:
 
 If the garden step doesn't use the harmonizer at all (no `.countries.json`; `country` assigned inline), checks #2 and #3 still apply — #2 is the only thing that catches non-canonical inline values.
 
+### 8d. Empty-entity audit (optional — offer it)
+
+The author-side audit is an **optional** step in `/update-dataset` (the `check-empty-entities` skill sweeps every chart/MDim/explorer/narrative/gdoc surface, which can consume many tokens) — so a missing audit is not a finding. If the author ran it, verify the **outcome**: a selection that had data on production but none on staging is a 🔴 regression from the update; a gap identical on production is 🟡 pre-existing — it still needs fixing (chart-config edit or content follow-up on the gdoc), just not necessarily in this PR, so confirm the PR body documents it and a fix is planned.
+
+If the author didn't run it, **offer it to the user** as an optional add-on to this review (name the token cost) rather than silently skipping — and recommend accepting when the risk is real: many charts remapped, hand-curated (non-auto) mappings, a restructure, or indicators whose country coverage shrank. Run the full sweep on opt-in.
+
+Either way, do a cheap manual spot-check as part of the base review: open 2–3 of the most-viewed upgraded charts on staging (SVG render is enough) and confirm their pinned entity selections still draw lines — an empty published chart is a 🔴 however it's found, and a spot-check hit is itself a reason to recommend the full sweep.
+
 ### 9. Indicator metadata coverage & dataset block
 
 The mandatory-fields checklist, the `dataset.update_period_days` requirement, and the `presentation.attribution_short` non-inheritance gotcha all live in `/update-dataset` § 6c. As reviewer, build the indicator × field matrix from that checklist and flag any missing field as 🔴.
@@ -178,10 +188,19 @@ Any `NULL` row is a 🔴.
   # compare `present` against the `sort:` labels in the .meta.yml
   ```
   Any `sort:`/map label with no backing value is 🟡 — author should drop it from `sort:`/`description_key` (or from the map if it can never occur). Re-check on every refresh: phantoms reappear when a category drops out upstream.
+- **New indicators surfaced.** Diff the indicator set against the previous version — shortName anti-join across the two grapher dataset ids, or the `+ Column` lines in the data-diff (the HTML report buries additions at severity 0; read the text/JSON output). For long-format tables a new series adds dimension *combinations* (rows), not columns — the grapher-level shortName anti-join still catches it; a column diff alone does not, and per-dimension value diffs miss new combinations of existing values. Check the **meadow** diff too: a column new in meadow that never reaches garden was dropped by the pipeline — confirm the author surfaced that choice rather than losing it silently (and when meadow hardcodes a column subset, additions won't appear in any diff — spot-check the snapshot's columns). If the update adds indicators, verify (a) the PR body lists them under "New indicators" (author side: `/update-dataset` step 5) and (b) they meet the same metadata-coverage bar as the rest. New indicators present but nowhere mentioned: 🟡. A `+`/`−` pair that is really a rename must have gone through the indicator-upgrade mapping, not the new-indicator list.
 
 ### 10. Metadata quality skills
 
 Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / spacing / style + a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
+
+Also grep the metadata **prose** for numbers carried over from the previous release (country counts, category counts, year ranges in `description_key`/descriptions): validated fields are covered by checks, prose numbers are not — a panel-composition change (dropped country, new category set) silently strands them (see `/update-dataset` Guardrails, "Grep metadata prose"). Stale prose count: 🟡.
+
+### 10b. Adversarial data review (optional — offer it)
+
+`/update-dataset` § 6c-bis offers an **optional** adversarial factual review via [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) — optional because it's token-heavy (~25–45 web calls), so **a missing report is not a finding**; don't flag its absence. If the author didn't run it, **offer it to the user** as an optional add-on to this review (name the token cost; in review context it runs in that skill's spot-check scope, not the full author scope) rather than silently skipping — and recommend accepting when the update carries red flags: large unexplained value churn, an in-place source revision, a producer new to us, or editorial claims riding on specific values. Run it on opt-in.
+
+When the PR body (or `workbench/<short_name>/update-context.yml`) does reference an `ai/adversarial-review-<short_name>-<date>.md` report, verify the **outcome**: its 🔴 findings must be resolved — metadata edited, or a `<short_name>.corrections.yml` added with `reason`/`provider`/`status` filled in. Then spot-check independently — don't take the report's word for it: re-verify 2–3 of its findings and 2–3 anchor values (World total + one major country, latest year) against an independent source yourself, following that skill's independence rules (a different producer measuring the same quantity; never OWID republishers or mirrors of the same producer). A value you confirm wrong that the report missed or waved through is 🔴.
 
 ### 11. DAG checks
 
@@ -263,8 +282,8 @@ Structure the review with:
 
 ## Severity rubric
 
-- 🔴 **Blocker**: missing mandatory metadata field, genuinely broken link (fails curl + WebFetch + Wayback), failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, stale year in `citation_full`/`attribution`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, explorer/MDim still referencing old-version variables on staging, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data, downstream consumer that fails to build or silently lost coverage after a same-PR repoint (a "− lost N data point(s)" entry / red coverage chip in the data-diff report) without triage in the PR body
-- 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues, undocumented sanity-check findings, phantom `sort:` labels with no backing value, over-exclusion of a canonical region, undocumented `missing values in mapping` countries, count series mis-routed into a rate/average aggregation branch, `citation_full` year ≠ `date_published` year (verify), pre-existing inherited metadata gap (`update_period_days`/`attributionShort`/`description_short` already missing in the prior version), PR author missing from `dataset.owners`, missing tracking-issue link in the PR body, owid-issues scheduled workflow missing, mis-timed, or not pointing at `/update-dataset`
+- 🔴 **Blocker**: missing mandatory metadata field, genuinely broken link (fails curl + WebFetch + Wayback), failing pipeline step, breaking change to chart data, missing `update_period_days`, missing `presentation.attribution_short`, stale year in `citation_full`/`attribution`, outdated `__main__` block in snapshot, DAG reference to old version that should be archived, new step wired to a stale (old-version) DAG dependency, explorer/MDim still referencing old-version variables on staging, non-canonical garden-output entity that isn't a documented custom aggregate, sanity check that newly raises on the new data, downstream consumer that fails to build or silently lost coverage after a same-PR repoint (a "− lost N data point(s)" entry / red coverage chip in the data-diff report) without triage in the PR body, upgraded view (chart, MDim view, narrative chart, or article link) whose pinned entity selection has data on production but none on staging (renders empty), metadata claim contradicted by the producer's own documentation, data value confirmed wrong by two independent sources without a `corrections.yml` entry or PR-body triage
+- 🟡 **Suggestion**: brittle assertion, hardcoded year that should be dynamic, duplicated grapher meta.yml that could be removed, non-blocking style issues, undocumented sanity-check findings, phantom `sort:` labels with no backing value, over-exclusion of a canonical region, undocumented `missing values in mapping` countries, count series mis-routed into a rate/average aggregation branch, `citation_full` year ≠ `date_published` year (verify), pre-existing inherited metadata gap (`update_period_days`/`attributionShort`/`description_short` already missing in the prior version), PR author missing from `dataset.owners`, missing tracking-issue link in the PR body, owid-issues scheduled workflow missing, mis-timed, or not pointing at `/update-dataset`, pre-existing empty-entity gap surfaced by the optional `check-empty-entities` audit or a spot-check (identical on production — needs a chart-config or gdoc fix via follow-up, just not necessarily in this PR), "verify manually" item from an adversarial-review report left untriaged (only applies when the author ran the optional review)
 - 🟢 **Informational**: things to be aware of but not action items
 
 ## Notes
