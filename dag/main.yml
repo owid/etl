@@ -660,6 +660,9 @@ steps:
     - data://garden/itopf/2026-05-06/oil_spills:
       - data://meadow/itopf/2026-05-06/oil_spills:
         - snapshot://itopf/2026-05-06/oil_spills.pdf
+  # USA PPI New Office Construction (US Bureau of Labor Statistics)
+  data://garden/bls/2026-07-20/us_ppi_construction:
+    - snapshot://bls/2026-07-20/us_ppi_construction.csv
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
