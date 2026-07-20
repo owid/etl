@@ -25,7 +25,7 @@ dimensions:
     choices:
       - slug: share_of_gdp
         name: Remittances as a share of GDP
-        description: Personal remittances received, as a share of GDP.
+        description: Personal remittances that are received in a country, as a share of GDP.
       - slug: cost_of_sending
         name: Cost of sending remittances
         description: The average cost of sending remittances abroad, as a share of the amount sent.

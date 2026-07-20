@@ -10,8 +10,8 @@ default_selection:
   - Syria
 
 default_dimensions:
-  metric: total
-  period: stock
+  cause: total
+  metric: stock
   unit: total
 
 definitions:
@@ -22,7 +22,7 @@ definitions:
         chartTypes: ["LineChart"]
 
 dimensions:
-  - slug: metric
+  - slug: cause
     name: Cause
     choices:
       - slug: total
@@ -32,18 +32,18 @@ dimensions:
         name: Conflict and violence
       - slug: disaster
         name: Disasters
-      - slug: returned
-        name: Returned IDPs
-        description: Internally displaced persons who have returned to their area of origin.
-  - slug: period
-    name: Period
+  - slug: metric
+    name: Metric
     choices:
-      - slug: stock
-        name: Living in displacement
+      - slug: idps
+        name: People living in displacement
         description: The total number of people living in internal displacement at the end of the year.
-      - slug: new
+      - slug: displacements
         name: New displacements during the year
-        description: The number of new displacements recorded during the year. This can include people displaced more than once.
+        description: The number of new displacements recorded during the year. People can get displaced multiple times in a year and get counted multiple times in this metric.
+      - slug: returned
+        name: People who returned after displacement
+        description: The number of internally displaced persons who have returned to their area of origin during the year.
     presentation:
       type: radio
   - slug: unit
@@ -59,32 +59,32 @@ dimensions:
 views:
   # All causes
   - dimensions:
-      metric: total
-      period: stock
+      cause: total
+      metric: idps
       unit: total
     indicators:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded
 
   - dimensions:
-      metric: total
-      period: stock
+      cause: total
+      metric: idps
       unit: per_capita
     indicators:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded_per_thousand
 
   - dimensions:
-      metric: total
-      period: new
+      cause: total
+      metric: displacements
       unit: total
     indicators:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded
 
   - dimensions:
-      metric: total
-      period: new
+      cause: total
+      metric: displacements
       unit: per_capita
     indicators:
       y:
@@ -92,32 +92,32 @@ views:
 
   # Conflict and violence
   - dimensions:
-      metric: conflict
-      period: stock
+      cause: conflict
+      metric: idps
       unit: total
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded
 
   - dimensions:
-      metric: conflict
-      period: stock
+      cause: conflict
+      metric: idps
       unit: per_capita
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded_per_thousand
 
   - dimensions:
-      metric: conflict
-      period: new
+      cause: conflict
+      metric: displacements
       unit: total
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded
 
   - dimensions:
-      metric: conflict
-      period: new
+      cause: conflict
+      metric: displacements
       unit: per_capita
     indicators:
       y:
@@ -125,32 +125,32 @@ views:
 
   # Disasters
   - dimensions:
-      metric: disaster
-      period: stock
+      cause: disaster
+      metric: idps
       unit: total
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded
 
   - dimensions:
-      metric: disaster
-      period: stock
+      cause: disaster
+      metric: idps
       unit: per_capita
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded_per_thousand
 
   - dimensions:
-      metric: disaster
-      period: new
+      cause: disaster
+      metric: displacements
       unit: total
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded
 
   - dimensions:
-      metric: disaster
-      period: new
+      cause: disaster
+      metric: displacements
       unit: per_capita
     indicators:
       y:
@@ -158,16 +158,16 @@ views:
 
   # Returned IDPs (UNHCR; only reported as an annual flow)
   - dimensions:
+      cause: total
       metric: returned
-      period: new
       unit: total
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_idps
 
   - dimensions:
+      cause: total
       metric: returned
-      period: new
       unit: per_capita
     indicators:
       y:
