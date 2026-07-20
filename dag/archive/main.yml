@@ -1301,6 +1301,9 @@ steps:
     - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
       - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
         - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+  # archived; last active in 8ae3ab94ffa3 on 2026-07-20
+  data://garden/bls/2026-03-24/us_ppi_construction:
+    - snapshot://bls/2026-03-24/us_ppi_construction.csv
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
