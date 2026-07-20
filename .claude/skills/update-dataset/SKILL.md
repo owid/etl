@@ -56,8 +56,8 @@ Assumptions:
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
 - [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure --private` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
-- [ ] Generate the per-step time & token cost report with `scripts/cost_report.py` → `workbench/<short_name>/cost_report.md` (see step 11)
 - [ ] Ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot (see "Removing the old version & reordering the DAG") — don't forget this step
+- [ ] Generate the per-step time & token cost report with `scripts/cost_report.py` → `workbench/<short_name>/cost_report.md` (see step 11) — run this **after** the DAG-cleanup item above, not before, so its time/tokens are included
 - [ ] Hand off the QA links to the user (Anomalist + Chart Diff on the staging branch, plus the data-diff report) — this is the final step
 
 Persistence:
@@ -808,7 +808,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - If neither the inline-comments endpoint nor the issue-comments endpoint shows a Codex post after 60 s, wait another 60 s and retry (up to ~5 min total). Codex can take 5–10 min — a clean review often arrives only as the top-level "no issues" comment.
 
 11) Time & token cost report
-   Once the workflow is otherwise finished (run it just before the final QA hand-off), generate a per-step breakdown of wall time and token usage:
+   Once the workflow is otherwise finished — **including the old-DAG cleanup decision above, if the user opted in** — generate a per-step breakdown of wall time and token usage. Running this before DAG cleanup would leave that work's time and tokens out of the report; it belongs last, just before the final QA hand-off:
 
    ```bash
    .venv/bin/python .claude/skills/update-dataset/scripts/cost_report.py workbench/<short_name>

@@ -33,8 +33,14 @@ def fmt_timedelta(seconds: int) -> str:
 
 
 def load_reports(workbench_root: Path) -> list[dict]:
+    # One level deep: workbench/<short_name>/cost_report.json (a normal or --share-workbench update).
+    # Two levels deep: workbench/<branch>/<short_name>/cost_report.json — `etl pr-clean` copies a
+    # worktree's whole workbench/ tree under workbench/<branch>/ before removing the worktree (see
+    # apps/pr/cli.py copy_dir_namespaced), so a cleaned-up worktree update's report lands one level
+    # deeper. Both patterns are distinct on-disk paths, so there's no risk of double-counting.
+    paths = sorted(workbench_root.glob("*/cost_report.json")) + sorted(workbench_root.glob("*/*/cost_report.json"))
     reports = []
-    for path in sorted(workbench_root.glob("*/cost_report.json")):
+    for path in paths:
         try:
             reports.append(json.loads(path.read_text()))
         except json.JSONDecodeError:

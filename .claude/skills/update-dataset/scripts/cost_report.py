@@ -205,6 +205,22 @@ def fmt_wall_time(interval: Interval) -> str:
     return fmt_timedelta(interval.end - interval.start)
 
 
+def is_bookend(label: str) -> bool:
+    """True for the synthetic '(before START)' / '(after last logged step)' intervals.
+
+    These cover requests outside the logged workflow window (e.g. earlier unrelated work in a
+    reused session, or later work in a session resumed after the update finished) and must never
+    be folded into the report — otherwise cost_report.md can overstate the update's cost with
+    unrelated activity, and re-running from a continued session makes the total grow indefinitely.
+    """
+    return label.startswith("(")
+
+
+def excluded_bookend_activity(intervals: list[Interval]) -> list[Interval]:
+    """Bookend intervals that captured real requests — worth a visible warning, not a silent drop."""
+    return [iv for iv in intervals if is_bookend(iv.label) and iv.usage.requests > 0]
+
+
 def usage_dict(usage: Usage) -> dict:
     return {
         "requests": usage.requests,
@@ -223,7 +239,7 @@ def build_report_dict(intervals: list[Interval], sessions: list[str], workbench_
     total = Usage()
     total_active = timedelta()
     for iv in intervals:
-        if iv.usage.requests == 0 and iv.label.startswith("("):
+        if is_bookend(iv.label):
             continue
         total.add(iv.usage)
         active = iv.active_time()
@@ -241,10 +257,13 @@ def build_report_dict(intervals: list[Interval], sessions: list[str], workbench_
         "sessions": sessions,
         "steps": steps,
         "total": {"active_seconds": int(total_active.total_seconds()), **usage_dict(total)},
+        "excluded_bookend_requests": {
+            iv.label: iv.usage.requests for iv in excluded_bookend_activity(intervals)
+        },
     }
 
 
-def build_report(intervals: list[Interval], sessions: list[str], project_dir: Path) -> str:
+def build_report(intervals: list[Interval], sessions: list[str], project_dir: Path, excluded: list[Interval]) -> str:
     lines = [
         "# Update cost report",
         "",
@@ -256,7 +275,7 @@ def build_report(intervals: list[Interval], sessions: list[str], project_dir: Pa
     total = Usage()
     total_active = timedelta()
     for iv in intervals:
-        if iv.usage.requests == 0 and iv.label.startswith("("):
+        if is_bookend(iv.label):
             continue
         total.add(iv.usage)
         active = iv.active_time()
@@ -286,6 +305,17 @@ def build_report(intervals: list[Interval], sessions: list[str], project_dir: Pa
         f"by request if it straddles a step boundary. Transcripts read from `{project_dir}`.",
         "",
     ]
+    if excluded:
+        lines += [
+            "**Excluded from this report:** requests outside the logged workflow window "
+            "(before the `START` line or after the last `DONE` line) are never counted, since they "
+            "belong to unrelated work — e.g. earlier activity in a reused session, or later activity "
+            "in a session resumed after the update finished. This run found:",
+            "",
+        ]
+        for iv in excluded:
+            lines.append(f"- {iv.usage.requests:,} request(s) in `{iv.label}`")
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -337,8 +367,12 @@ def main() -> None:
             iv.usage.add(req.usage)
             iv.request_times.append(req.ts)
 
+    excluded = excluded_bookend_activity(intervals)
+    for iv in excluded:
+        print(f"Warning: excluded {iv.usage.requests} request(s) in '{iv.label}' (outside the logged workflow window).")
+
     output = args.output or args.workbench_dir / "cost_report.md"
-    output.write_text(build_report(intervals, sessions, project_dir))
+    output.write_text(build_report(intervals, sessions, project_dir, excluded))
     json_output = output.with_suffix(".json")
     json_output.write_text(json.dumps(build_report_dict(intervals, sessions, args.workbench_dir), indent=2) + "\n")
     print(f"Wrote {output}")
