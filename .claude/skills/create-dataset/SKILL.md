@@ -80,6 +80,7 @@ Now ask the user **once**, with all your best guesses pre-filled, using `AskUser
 - **Namespace + short_name + dataset title** (show your proposal; let them override).
 - **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). If they give one, fetch it now for citation, license, and column definitions.
 - **License** — show your best guess (default `CC BY 4.0` for academic/IGO sources if unknown) and let them correct.
+- **Other data files the source ships** — when the landing page or repository carries several data files (a companion index, summary tables), list them with a default of "not ingesting these" so the user can opt in with one word; record the skips in the PR body (they're the baseline future updates diff against).
 - **Any column meanings you couldn't infer** — only ask about the genuinely ambiguous ones (e.g. "is `ev_sales_share` a percentage 0–100 or a fraction 0–1?"). Don't ask about columns you're confident on.
 
 Everything else (units you inferred, descriptions, topic tags) you'll fill in and surface for review later — don't ask now.

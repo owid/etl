@@ -189,6 +189,7 @@ After writing the files, run:
 Show:
 - The paths of the files created (`.dvc`, plus the `.py` if one was needed)
 - Whether the snapshot ran successfully
+- **The source's other data files, if any** — when the landing page / repository ships several data files (companion indices, summary panels, codebooks with data), list the ones NOT snapshotted so the user can opt in now or skip deliberately. This inventory is also the baseline future update cycles diff against — a new companion file is invisible to every within-file check (see `/update-dataset`, "Surface new indicators").
 - Next steps: "You can now create a meadow step for `<namespace>/<version>/<short_name>`"
 
 ## Notes
