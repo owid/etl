@@ -814,11 +814,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    .venv/bin/python .claude/skills/update-dataset/scripts/cost_report.py workbench/<short_name>
    ```
 
-   The script joins the `## Step timing log` in `progress.md` with the Claude Code session transcripts (`~/.claude/projects/<encoded-cwd>/`): main-session API requests are bucketed into steps by timestamp, and each subagent transcript (`<session-id>/subagents/agent-*.jsonl`) is attributed to the step during which it started. It writes `workbench/<short_name>/cost_report.md` with per-step duration, request/agent counts, token categories, and an input-equivalent weighted total (output ×5, cache write ×1.25, cache read ×0.1 — a relative cost proxy, not USD).
+   The script joins the `## Step timing log` in `progress.md` with the Claude Code session transcripts (`~/.claude/projects/<encoded-cwd>/`): every API request (main-session and subagent alike) is bucketed into a step by its own timestamp; a subagent's count is credited to the step it started in, but its token usage still splits by request if it straddles a boundary. It writes `workbench/<short_name>/cost_report.md` with, per step: **wall time** (raw calendar delta between step boundaries), **active time** (sum of gaps between consecutive requests, each capped at 5 minutes — approximates real work and excludes idle waiting), request/agent counts, token categories, and an input-equivalent weighted total (output ×5, cache write ×1.25, cache read ×0.1 — a relative cost proxy, not USD).
 
    Notes:
    - Sessions are auto-discovered (any transcript in the project dir that mentions the workbench directory); pass `--session <id>` if the update spanned machines or discovery picks up unrelated sessions. If the update ran in a different worktree than where you run the script, pass `--project-dir` with that worktree's transcript dir.
-   - Wall time includes any time spent waiting for the user; main-session token attribution at step boundaries is approximate. Read the report as "which steps are expensive", not as exact accounting.
+   - **Wall time balloons when a step's boundary spans a multi-day pause between sessions** (e.g. resuming an update after the weekend) — read active time as the more reliable cost signal in that case, and wall time as elapsed calendar time including idle waiting. Read the report as "which steps are expensive", not as exact accounting.
    - Never self-report token numbers from memory — the transcript is the only reliable source. If the script fails, say so rather than estimating.
    - The report is a workbench artifact for the user; don't add it to the PR description.
 

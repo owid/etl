@@ -5,13 +5,18 @@ with the Claude Code session transcripts (`~/.claude/projects/<encoded-cwd>/`)
 and writes a markdown table of duration and token usage per workflow step.
 
 Attribution model:
-- Main-session API requests are bucketed into steps by timestamp (a step covers
-  the interval between the previous log line and its own `DONE` line).
-- Each subagent transcript (`<session-id>/subagents/agent-*.jsonl`) is
-  attributed wholly to the step during which its first request fired.
+- Every individual API request (main-session and subagent alike) is bucketed
+  into a step by its own timestamp — a step covers the interval between the
+  previous log line and its own `DONE` line. A subagent's *count* is credited
+  to the step during which it started, but its token usage is split by request
+  if it happens to straddle a step boundary.
 - Transcript lines are deduplicated by `requestId` — Claude Code writes one
   line per content block, all carrying the same usage object, so naive summing
   over-counts several-fold.
+- Reports both wall time (raw calendar delta between step boundaries) and
+  active time (sum of gaps between consecutive requests, each capped at
+  ACTIVE_GAP_CAP_SECONDS) — wall time balloons when a step's boundary spans a
+  multi-day pause between sessions; active time approximates real work instead.
 
 Usage:
     .venv/bin/python .claude/skills/update-dataset/scripts/cost_report.py workbench/<short_name> \
@@ -25,13 +30,18 @@ import argparse
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # Relative price multipliers vs. one input token (stable across current Claude
 # models: output 5x, cache write 1.25x, cache read 0.1x). They produce a single
 # comparable "input-equivalent tokens" number per step — not a USD estimate.
 WEIGHTS = {"input": 1.0, "output": 5.0, "cache_write": 1.25, "cache_read": 0.1}
+
+# A gap between consecutive requests longer than this is presumed idle (the
+# human stepped away, or a multi-day pause between sessions) rather than real
+# work, and is capped down to this value when summing "active time" per step.
+ACTIVE_GAP_CAP_SECONDS = 300
 
 TIMING_LINE = re.compile(r"^- (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z) (START|DONE)(?: (.*))?$")
 
@@ -75,9 +85,19 @@ class Interval:
     end: datetime | None  # inclusive; None = open
     label: str
     usage: Usage = field(default_factory=Usage)
+    request_times: list[datetime] = field(default_factory=list)
 
     def contains(self, ts: datetime) -> bool:
         return (self.start is None or ts > self.start) and (self.end is None or ts <= self.end)
+
+    def active_time(self) -> timedelta:
+        """Sum of gaps between consecutive requests, each capped at ACTIVE_GAP_CAP_SECONDS."""
+        times = sorted(self.request_times)
+        cap = timedelta(seconds=ACTIVE_GAP_CAP_SECONDS)
+        total = timedelta()
+        for prev, curr in zip(times, times[1:]):
+            total += min(curr - prev, cap)
+        return total
 
 
 def parse_ts(raw: str) -> datetime:
@@ -169,11 +189,15 @@ def assign(intervals: list[Interval], ts: datetime) -> Interval:
     return intervals[-1]
 
 
-def fmt_duration(interval: Interval) -> str:
+def fmt_timedelta(td: timedelta) -> str:
+    secs = int(td.total_seconds())
+    return f"{secs // 3600}:{secs % 3600 // 60:02d}:{secs % 60:02d}"
+
+
+def fmt_wall_time(interval: Interval) -> str:
     if interval.start is None or interval.end is None:
         return "—"
-    secs = int((interval.end - interval.start).total_seconds())
-    return f"{secs // 3600}:{secs % 3600 // 60:02d}:{secs % 60:02d}"
+    return fmt_timedelta(interval.end - interval.start)
 
 
 def build_report(intervals: list[Interval], sessions: list[str], project_dir: Path) -> str:
@@ -182,30 +206,40 @@ def build_report(intervals: list[Interval], sessions: list[str], project_dir: Pa
         "",
         f"Sessions: {', '.join(f'`{s}`' for s in sessions)}",
         "",
-        "| Step | Wall time | Requests | Agents | Input | Output | Cache read | Cache write | Weighted* |",
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+        "| Step | Wall time | Active time | Requests | Agents | Input | Output | Cache read | Cache write | Weighted* |",
+        "|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     total = Usage()
+    total_active = timedelta()
     for iv in intervals:
         if iv.usage.requests == 0 and iv.label.startswith("("):
             continue
         total.add(iv.usage)
+        active = iv.active_time()
+        total_active += active
         lines.append(
-            f"| {iv.label} | {fmt_duration(iv)} | {iv.usage.requests:,} | {iv.usage.agents:,} "
-            f"| {iv.usage.input:,} | {iv.usage.output:,} | {iv.usage.cache_read:,} "
+            f"| {iv.label} | {fmt_wall_time(iv)} | {fmt_timedelta(active)} | {iv.usage.requests:,} "
+            f"| {iv.usage.agents:,} | {iv.usage.input:,} | {iv.usage.output:,} | {iv.usage.cache_read:,} "
             f"| {iv.usage.cache_write:,} | {iv.usage.weighted:,} |"
         )
     lines += [
-        f"| **Total** | | **{total.requests:,}** | **{total.agents:,}** | **{total.input:,}** "
-        f"| **{total.output:,}** | **{total.cache_read:,}** | **{total.cache_write:,}** "
-        f"| **{total.weighted:,}** |",
+        f"| **Total** | | {fmt_timedelta(total_active)} | **{total.requests:,}** | **{total.agents:,}** "
+        f"| **{total.input:,}** | **{total.output:,}** | **{total.cache_read:,}** "
+        f"| **{total.cache_write:,}** | **{total.weighted:,}** |",
         "",
         "\\* Weighted = input-equivalent tokens (output ×5, cache write ×1.25, cache read ×0.1) — "
         "a relative cost proxy, not USD.",
         "",
-        "Caveats: wall time includes waiting for the user; main-session tokens are bucketed by "
-        "timestamp so attribution at step boundaries is approximate; each subagent is attributed "
-        f"to the step during which it started. Transcripts read from `{project_dir}`.",
+        f"Active time sums gaps between consecutive requests, each capped at {ACTIVE_GAP_CAP_SECONDS // 60} "
+        "minutes, to approximate real work and exclude idle waiting — it undercounts a step with a "
+        "genuinely long single operation (e.g. a multi-minute ETL run with no LLM requests in between) "
+        "and its Total can therefore differ from summing per-step wall time.",
+        "",
+        "Caveats: wall time is the raw calendar delta between step boundaries, so it balloons when a "
+        "step's boundary spans a multi-day pause between sessions — active time is the more reliable "
+        "cost signal in that case. Token attribution is per-request by timestamp; a subagent's request "
+        "count is credited to the step during which it started, but its own token usage is still split "
+        f"by request if it straddles a step boundary. Transcripts read from `{project_dir}`.",
         "",
     ]
     return "\n".join(lines)
@@ -242,16 +276,22 @@ def main() -> None:
             agent_requests = parse_transcript(agent_file, seen_requests)
             if not agent_requests:
                 continue
-            agent_usage = Usage(agents=1)
+            # Credit the agent-count to whichever step it started in, but split its token usage
+            # (and feed its own request timestamps into "active time") per request, in case a
+            # long-running subagent happens to straddle a step boundary.
+            assign(intervals, min(req.ts for req in agent_requests)).usage.agents += 1
             for req in agent_requests:
-                agent_usage.add(req.usage)
-            assign(intervals, min(req.ts for req in agent_requests)).usage.add(agent_usage)
+                iv = assign(intervals, req.ts)
+                iv.usage.add(req.usage)
+                iv.request_times.append(req.ts)
 
         main_file = project_dir / f"{session}.jsonl"
         if not main_file.exists():
             raise SystemExit(f"Transcript {main_file} not found.")
         for req in parse_transcript(main_file, seen_requests):
-            assign(intervals, req.ts).usage.add(req.usage)
+            iv = assign(intervals, req.ts)
+            iv.usage.add(req.usage)
+            iv.request_times.append(req.ts)
 
     output = args.output or args.workbench_dir / "cost_report.md"
     output.write_text(build_report(intervals, sessions, project_dir))
