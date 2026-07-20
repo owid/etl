@@ -3743,3 +3743,67 @@ tables:
         display:
           name: Service banned
           numDecimalPlaces: 0
+
+  lgbti_composite_index:
+    variables:
+      composite_index:
+        title: LGBTI Composite Policy Index
+        description_short: |-
+          Summary measure of a country's LGBTI-related laws, calculated by subtracting the weighted sum of regressive policy scores from the weighted sum of progressive policy scores.
+        description_key:
+          - "{definitions.description_key_dataset}"
+          - The index aggregates 33 policy-status combinations — 23 progressive (such as marriage equality, anti-discrimination protections, or legal gender recognition) and 10 regressive (such as criminalization of same-sex acts, the death penalty, or "propaganda" laws). Each policy's score weighs up to five aspects — population coverage, gender scope, penalty severity, evidence of enforcement, and ease of access — combined via confirmatory factor analysis and normalized within each policy.
+          - Higher values indicate more rights-affirming legal environments; negative values indicate that regressive laws dominate. The empirical range runs from about -4.3 to +18.7.
+          - "{definitions.description_key_binding_instrument}"
+        unit: ""
+        short_unit: ""
+        display:
+          name: LGBTI Composite Policy Index
+          numDecimalPlaces: 1
+          tolerance: 0
+
+      unweighted_index:
+        title: LGBTI Policy Index (unweighted)
+        description_short: |-
+          The number of progressive LGBTI-related national laws fully in force minus the number of regressive ones.
+        description_key:
+          - "{definitions.description_key_dataset}"
+          - Each of 23 progressive policy-status combinations contributes +1 when fully in force at the national level, and each of 10 regressive combinations contributes -1. Policies only partially in force (for example, in some subnational jurisdictions) contribute 0.
+          - This raw count takes no account of policy scope, penalty severity, or enforcement — the LGBTI Composite Policy Index is the weighted counterpart. The producer describes this unweighted count as the closest analog to Version 1.0's additive policy index.
+          - "{definitions.description_key_binding_instrument}"
+        unit: ""
+        short_unit: ""
+        display:
+          name: LGBTI Policy Index (unweighted)
+          numDecimalPlaces: 0
+          tolerance: 0
+
+      progressive_score:
+        title: Progressive policy score
+        description_short: |-
+          The weighted sum of a country's progressive LGBTI-related policy scores, across 23 policy-status combinations.
+        description_key:
+          - "{definitions.description_key_dataset}"
+          - Progressive policies include marriage equality, civil unions, joint adoption, anti-discrimination protections, hate-crime laws, legal gender recognition, and related rights. Each policy's score weighs population coverage, gender scope, evidence of enforcement, and ease of access, combined via confirmatory factor analysis and normalized within each policy.
+          - "{definitions.description_key_binding_instrument}"
+        unit: ""
+        short_unit: ""
+        display:
+          name: Progressive policy score
+          numDecimalPlaces: 1
+          tolerance: 0
+
+      regressive_score:
+        title: Regressive policy score
+        description_short: |-
+          The weighted sum of a country's regressive LGBTI-related policy scores, across 10 policy-status combinations.
+        description_key:
+          - "{definitions.description_key_dataset}"
+          - Regressive policies include criminalization of same-sex acts, the death penalty, unequal ages of consent, "propaganda" and morality laws, restrictions on LGBTQ+ civil society, religious exemption laws, and marriage bans. Each policy's score weighs population coverage, gender scope, penalty severity, and evidence of enforcement, combined via confirmatory factor analysis and normalized within each policy.
+          - "{definitions.description_key_binding_instrument}"
+        unit: ""
+        short_unit: ""
+        display:
+          name: Regressive policy score
+          numDecimalPlaces: 1
+          tolerance: 0

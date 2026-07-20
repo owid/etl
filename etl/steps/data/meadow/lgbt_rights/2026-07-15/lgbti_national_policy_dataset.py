@@ -134,8 +134,26 @@ def run() -> None:
     # 4-component index. The natural key is (country, year, law, status).
     tb = tb.format(["country", "year", "law", "status"], sort_columns=True)
 
+    # Companion composite-index file (added in the producer's 2026-06-12 revision): pre-built
+    # country-year index panel with progressive/regressive scores and the two indices.
+    snap_index = paths.load_snapshot("lgbti_composite_index.csv")
+    tb_index = snap_index.read(safe_types=False)
+    tb_index = tb_index.rename(
+        columns={
+            "Country": "country",
+            "ISO": "iso3",
+            "Year": "year",
+            "Progressive_Score": "progressive_score",
+            "Regressive_Score": "regressive_score",
+            "Composite_Index": "composite_index",
+            "Unweighted_Index": "unweighted_index",
+        },
+        errors="raise",
+    )
+    tb_index = tb_index.format(["country", "year"], short_name="lgbti_composite_index", sort_columns=True)
+
     #
     # Save outputs.
     #
-    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb, tb_index], default_metadata=snap.metadata)
     ds_meadow.save()

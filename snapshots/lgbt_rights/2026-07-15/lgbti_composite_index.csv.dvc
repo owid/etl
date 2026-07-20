@@ -1,0 +1,29 @@
+meta:
+  origin:
+    producer: Velasco
+    title: LGBTI National Policy Dataset
+    title_snapshot: LGBTI National Policy Dataset - Composite index
+    description: |-
+      The LGBTI National Policy Dataset (Version 2.0) is a country-year-policy panel tracking the adoption, scope, and enforcement of LGBTI-related policies across 196 countries from 1991 to 2025. The dataset is distributed in long format: each row records one country in one year for one specific policy-status combination. It is designed for use in comparative political research, policy diffusion analysis, and quantitative cross-national studies of LGBTI rights.
+
+      The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy paired with two mutually exclusive status directions). Of these 54 combinations, 37 contain substantive data; the remaining 17 are structural placeholders with all-zero values, included to maintain a fully balanced panel suitable for econometric methods.
+    description_snapshot: |-
+      Pre-built country-year index panel published alongside the policy-level data. For each country and year it carries the Progressive Score (sum of factor scores across 23 progressive policy-status combinations), the Regressive Score (sum across 10 regressive combinations), the Composite Index (Progressive Score minus Regressive Score, built via confirmatory factor analysis over five indicators per policy), and the Unweighted Index (a raw count: +1 per progressive national law fully in force, -1 per regressive one). Produced by the companion script Velasco_LGBTI_Index_Construction.R (codebook §5 and §7).
+    citation_full: |-
+      Velasco, Kristopher. 2026. "LGBTI National Policy Dataset, Version 2.0." Distributed via Open Science Framework: osf.io/wta9p.
+    attribution_short: Velasco
+    version_producer: '2.0'
+    url_main: https://osf.io/wta9p/overview
+    # Stable OSF GUID link for LGBTI_Composite_Index.csv — resolves to the file's latest version.
+    url_download: https://osf.io/download/6v89b/
+    date_accessed: '2026-07-20'
+    # NOTE: The composite-index file first appeared in the producer's 2026-06-12 in-place revision of
+    # Version 2.0 (same caveat as the main snapshot: revisions are not version-labeled — compare OSF
+    # file dates when updating).
+    date_published: '2026-06-12'
+    license:
+      name: © Kristopher Velasco
+outs:
+  - md5: 60f061ac5f82eef83e49e0556044a573
+    size: 243291
+    path: lgbti_composite_index.csv

@@ -699,6 +699,15 @@ def run() -> None:
     # Regional aggregates of the combined-categorical indicators (counts + population by category).
     tb_combined_regions = _build_combined_categorical_regional_aggregates(tb_combined)
 
+    # Composite-index table (pre-built by the producer; see codebook §5 and §7). Passthrough:
+    # harmonize countries, drop the ISO helper column, verify internal consistency.
+    tb_index = ds_meadow.read("lgbti_composite_index", safe_types=False)
+    tb_index = tb_index.drop(columns=["iso3"])
+    # Palestine is in the main panel but absent from the producer's index file (likely dropped by a
+    # COW-code join in the construction script) — suppress the unused-mapping warning it causes.
+    tb_index = paths.regions.harmonize_names(tb=tb_index, warn_on_unused_countries=False)
+    sanity_check_index(tb_index)
+
     # Format and short-name all tables.
     tb_country = tb_country.format(
         ["country", "year", "law", "status"],
@@ -720,12 +729,13 @@ def run() -> None:
         short_name="lgbti_national_policy_dataset_combined_regions",
         sort_columns=True,
     )
+    tb_index = tb_index.format(["country", "year"], short_name="lgbti_composite_index", sort_columns=True)
 
     #
     # Save outputs.
     #
     ds_garden = paths.create_dataset(
-        tables=[tb_country, tb_regions, tb_combined, tb_combined_regions],
+        tables=[tb_country, tb_regions, tb_combined, tb_combined_regions, tb_index],
         default_metadata=ds_meadow.metadata,
     )
     ds_garden.save()
@@ -754,6 +764,22 @@ def _fix_misfiled_incitement_status(tb):
         tb.loc[legal & tb["year"].isin(active_years), "proportion"] = 1.0
         tb.loc[illegal, "proportion"] = 0.0
     return tb
+
+
+def sanity_check_index(tb):
+    """Verify the producer's pre-built composite-index table (codebook §5.4, §5.5, §7.1).
+
+    Bounds are theoretical: the composite sums per-policy factor scores normalized to [0, 1]
+    across 23 progressive and 10 regressive combinations; the unweighted index counts ±1 per
+    fully-in-force national law over the same combinations.
+    """
+    consistency = (tb["composite_index"] - (tb["progressive_score"] - tb["regressive_score"])).abs()
+    assert consistency.max() < 0.001, "Composite index no longer equals progressive minus regressive score."
+    assert tb["progressive_score"].between(0, 23).all(), "Progressive score outside [0, 23]."
+    assert tb["regressive_score"].between(0, 10).all(), "Regressive score outside [0, 10]."
+    assert tb["unweighted_index"].between(-10, 23).all(), "Unweighted index outside its theoretical bounds."
+    assert tb["country"].nunique() >= 195, f"Index coverage shrank: {tb['country'].nunique()} countries (had 195)."
+    assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in index table."
 
 
 def _detect_structural_placeholders(tb):
