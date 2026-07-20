@@ -67,6 +67,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#refugees
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          binningStrategy: manual
+          customNumericValues: [0, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
 
   - dimensions:
       metric: refugees
@@ -75,6 +81,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#refugees_per_1000
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          binningStrategy: manual
+          customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100, 300]
 
   - dimensions:
       metric: refugees
@@ -83,6 +95,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#refugees
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
 
   - dimensions:
       metric: refugees
@@ -91,6 +109,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#refugees_per_1000
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100]
 
   # Asylum seekers
   - dimensions:
@@ -100,6 +124,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#asylum_seekers
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          binningStrategy: manual
+          customNumericValues: [0, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
 
   - dimensions:
       metric: asylum_seekers
@@ -108,6 +138,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#asylum_seekers_per_100k
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          binningStrategy: manual
+          customNumericValues: [0, 10, 20, 50, 100, 200, 500, 1000]
 
   - dimensions:
       metric: asylum_seekers
@@ -116,6 +152,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#asylum_seekers
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
 
   - dimensions:
       metric: asylum_seekers
@@ -124,6 +166,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#asylum_seekers_per_100k
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 1, 3, 10, 30, 100, 300, 1000, 3000]
 
   # Returned refugees (per-capita not published for this metric)
   - dimensions:
@@ -133,6 +181,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_refugees
+    config:
+      map:
+        colorScale:
+          baseColorScheme: BuGn
+          binningStrategy: manual
+          customNumericValues: [0, 10, 100, 1000, 10000, 100000, 1000000]
 
   - dimensions:
       metric: returned_refugees
@@ -141,6 +195,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#returned_refugees
+    config:
+      map:
+        colorScale:
+          baseColorScheme: GnBu
+          binningStrategy: manual
+          customNumericValues: [0, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000]
 
   # Stateless persons (only reported by country of residence, i.e. "asylum" perspective)
   - dimensions:
@@ -150,6 +210,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#stateless
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 10, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
 
   - dimensions:
       metric: stateless
@@ -158,3 +224,9 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#stateless_per_100k
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 0.3, 1, 3, 10, 30, 100, 300, 1000, 3000]

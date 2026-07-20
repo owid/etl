@@ -65,6 +65,13 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+          minValue: 1640
 
   - dimensions:
       cause: total
@@ -73,6 +80,12 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded_per_thousand
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100, 200]
 
   - dimensions:
       cause: total
@@ -81,6 +94,12 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 30000, 100000, 300000, 1000000, 3000000]
 
   - dimensions:
       cause: total
@@ -89,6 +108,12 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded_per_thousand
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100]
 
   # Conflict and violence
   - dimensions:
@@ -98,6 +123,13 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+          minValue: 1640
 
   - dimensions:
       cause: conflict
@@ -106,6 +138,12 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded_per_thousand
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100, 200]
 
   - dimensions:
       cause: conflict
@@ -114,6 +152,13 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
+          minValue: 230
 
   - dimensions:
       cause: conflict
@@ -122,6 +167,12 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded_per_thousand
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100]
 
   # Disasters
   - dimensions:
@@ -131,6 +182,13 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+          minValue: 1640
 
   - dimensions:
       cause: disaster
@@ -139,6 +197,12 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded_per_thousand
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50]
 
   - dimensions:
       cause: disaster
@@ -147,6 +211,13 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
+          minValue: 230
 
   - dimensions:
       cause: disaster
@@ -155,6 +226,12 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded_per_thousand
+    config:
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100]
 
   # Returned IDPs (UNHCR; only reported as an annual flow)
   - dimensions:
@@ -164,6 +241,12 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_idps
+    config:
+      map:
+        colorScale:
+          baseColorScheme: BuGn
+          binningStrategy: manual
+          customNumericValues: [0, 1000, 10000, 100000, 1000000, 10000000]
 
   - dimensions:
       cause: total
@@ -172,3 +255,9 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_idps_per_100k
+    config:
+      map:
+        colorScale:
+          baseColorScheme: BuGn
+          binningStrategy: manual
+          customNumericValues: [0, 0.5, 1, 2, 5, 10, 20, 50, 100]

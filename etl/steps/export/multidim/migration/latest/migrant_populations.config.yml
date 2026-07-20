@@ -49,6 +49,12 @@ views:
     indicators:
       y:
         - catalogPath: migrant_stock#immigrants_all
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 100000, 200000, 500000, 1000000, 2000000, 5000000, 10000000, 20000000]
 
   - dimensions:
       metric: immigrants
@@ -56,6 +62,12 @@ views:
     indicators:
       y:
         - catalogPath: migrant_stock#immigrant_share_of_dest_population_all
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50]
 
   - dimensions:
       metric: emigrants
@@ -63,6 +75,12 @@ views:
     indicators:
       y:
         - catalogPath: migrant_stock#emigrants_all
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 100000, 200000, 500000, 1000000, 2000000, 5000000, 10000000, 0]
 
   - dimensions:
       metric: emigrants
@@ -70,3 +88,9 @@ views:
     indicators:
       y:
         - catalogPath: migrant_stock#emigrants_share_of_total_population
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50]

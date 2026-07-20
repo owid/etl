@@ -44,6 +44,11 @@ views:
     config:
       title: Remittances as a share of GDP
       subtitle: Share of GDP that is made up of the sum of all personal remittances sent by migrants to their home countries.
+      map:
+        colorScale:
+          baseColorScheme: BuPu
+          binningStrategy: manual
+          customNumericValues: [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
 
   - dimensions:
       metric: cost_of_sending
@@ -53,6 +58,12 @@ views:
     config:
       title: Average cost of sending remittances from country
       subtitle: The average transaction cost as a percentage of total remittances sent from this country to abroad, for a single transaction of USD 200.
+      map:
+        colorScale:
+          baseColorScheme: Oranges
+          binningStrategy: manual
+          customNumericValues: [0, 2, 4, 6, 8, 10, 12, 14, 16]
+          minValue: 1.943111
 
   - dimensions:
       metric: cost_of_receiving
@@ -62,3 +73,9 @@ views:
     config:
       title: Average cost of sending remittances to country
       subtitle: The average transaction cost as a percentage of total remittances sent from abroad to this country, for a single transaction of USD 200.
+      map:
+        colorScale:
+          baseColorScheme: Oranges
+          binningStrategy: manual
+          customNumericValues: [0, 2, 4, 6, 8, 10, 12, 14, 16]
+          minValue: 0.996667
