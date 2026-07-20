@@ -30,7 +30,7 @@ Any rewrites you propose use American spelling.
 - A step path `garden/<namespace>/<version>/<short_name>` (the `data://` URI form also works), a bare `<short_name>` — resolve via the DAG like `/update-dataset` does (`rg "/<short_name>:?$" dag/ -g "*.yml" | grep -v "^dag/archive"`, latest active version, ask the user if ambiguous).
 - Optional: `--top N` (deep-review cap, default 10) or `--full` (deep-review every indicator regardless of chart usage).
 - Also accepts a **single chart** (slug or id) as the target: scope the whole review to that chart's indicator(s) — verify every displayed country-category/value for the latest year, compare against the previous dataset version, and review the chart's own FAUST text as claims. Drafts count (find them in the staging DB; they have no production row).
-- Precondition: the garden dataset is built locally (`.venv/bin/etlr data://garden/<ns>/<version>/<short_name> --private`; `PREFER_DOWNLOAD=1` is fine for already-published upstream deps).
+- Precondition: the garden dataset is built locally (`.venv/bin/etlr data://garden/<ns>/<version>/<short_name> --private`; `PREFER_DOWNLOAD=1` is fine for already-published upstream deps). **Exception:** the `/create-snapshot` context runs Phase 0 only against the `.dvc` and the fetched docs — no meadow/garden step exists yet, so skip this precondition (and Steps 1, 3–5) there.
 
 Scope by calling context:
 
@@ -51,6 +51,8 @@ The deep per-indicator work (metadata claim review + online cross-checks) costs 
 **Never cap silently.** The report's Part 2 must list every skipped indicator with its rank — a truncated review that reads as complete is itself a factual error.
 
 **Views rank prioritization; the DB defines coverage.** Analytics only sees *published* charts — when the task is "all charted indicators" (or the chart under review is a draft), inventory usage from the grapher/staging DB instead (`chart_dimensions` JOIN `variables` on catalogPath, no `publishedAt` filter), then rank the published subset by views.
+
+**Map the ranking onto the NEW build before selecting.** Pre-merge, the ranked `catalog_path`s are the *old* version's — extract a version-independent identity (`<table>#<column>`, i.e. everything after the version segment) and join it onto the new garden/grapher build's actual table/column list. Old-charted identities missing from the new build are renames — resolve them via the indicator-upgrade mapping before ranking, or list them explicitly. New-build indicators absent from the ranking are uncharted (including newly added ones) — they are candidates for the anomaly-driven track and must appear in the reviewed-or-SKIPPED inventory, never silently dropped by the chart join.
 
 ```python
 from etl.analytics.config import SEMANTIC_LAYER_SCHEMA as S  # tables must be schema-qualified for BigQuery
@@ -116,10 +118,11 @@ for tname in ds.table_names:
     if tb.index.names != [None]:  # defensive: if keys sit in the index (e.g. the table came via ds[tname]), restore them
         tb = tb.reset_index()
     year_col = "year" if "year" in tb.columns else "date"
+    has_country = "country" in tb.columns  # year-/date-only tables exist (e.g. gravitational-wave event counts)
     vals = [c for c in tb.columns if c not in ("country", year_col) and pd.api.types.is_numeric_dtype(tb[c])]
     for col in vals:
         unit = (tb[col].metadata.unit or "").lower()
-        s = tb[["country", year_col, col]].dropna(subset=[col])
+        s = tb[(["country"] if has_country else []) + [year_col, col]].dropna(subset=[col])
         if s.empty:
             findings.append((tname, col, "EMPTY", "all-NaN column")); continue
         mx, mn = s[col].max(), s[col].min()
@@ -129,6 +132,8 @@ for tname in ds.table_names:
             if mx > 150: findings.append((tname, col, "UNIT", f"% column max={mx:.3g} — can it exceed 100?"))
         if mn < 0 and any(w in unit for w in ("people", "number", "deaths", "tonnes", "count")):
             findings.append((tname, col, "SIGN", f"negative min={mn:.3g} in count-like unit"))
+        if not has_country:
+            continue  # year-only table: only the unit/magnitude sniffs apply; checks 2-6 need a country dimension
         # 2. Robust per-country outliers (median/MAD z-score; skip short series — MAD is unstable under ~8 points)
         g = s.groupby("country")[col]
         mad = g.transform(lambda x: (x - x.median()).abs().median()).replace(0, np.nan)
