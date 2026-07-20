@@ -247,11 +247,22 @@ OIL_NOTES = {
 }
 
 
+# Definition carried over from the original per-fuel reserves charts, which spelled out what a "proved
+# reserve" means. The unit is filled in per fuel.
+RESERVES_DEFINITION = (
+    "Proved reserves, measured in {unit}, are generally those quantities that can be recovered in the "
+    "future from known reservoirs under existing economic and operating conditions, according to "
+    "geological and engineering information."
+)
+
+
 def _view_subtitle(fuel: str, metric: str, count: str) -> str:
     if metric in ("production", "consumption"):
         sentence = ENERGY_UNIT_PHRASE[count]
         if fuel == "total":
             sentence = f"{sentence} {FOSSIL_FUELS_NOTE}"
+    elif metric == "reserves" and count == "total":
+        sentence = RESERVES_DEFINITION.format(unit=PHYSICAL_UNITS[(fuel, metric, count)])
     else:
         sentence = f"Measured in {PHYSICAL_UNITS[(fuel, metric, count)]}."
         if metric == "net_imports":
@@ -361,13 +372,26 @@ def _map_config(fuel: str, metric: str, count: str, stats: tuple[float, float, f
         return {"colorScale": color_scale, "timeTolerance": 3}
     scheme = ORIGINAL_MAP_SCHEMES.get((fuel, metric, count)) or {"baseColorScheme": FUEL_FALLBACK_SCHEME[fuel]}
     color_scale = dict(scheme)
-    edges = _log_thresholds(vmax_q99)
-    if edges:
+    if (fuel, metric, count) in FIXED_MAP_EDGES:
         color_scale["binningStrategy"] = "manual"
-        # Trailing sentinel (smaller than the top edge) forces grapher to render an open-ended
-        # top bracket (">X"), independent of where the top edge sits relative to the data max.
-        color_scale["customNumericValues"] = edges + [1]
+        # Trailing sentinel (smaller than the top edge) makes grapher render an open-ended top bracket.
+        color_scale["customNumericValues"] = FIXED_MAP_EDGES[(fuel, metric, count)] + [1]
+    else:
+        edges = _log_thresholds(vmax_q99)
+        if edges:
+            color_scale["binningStrategy"] = "manual"
+            # Trailing sentinel (smaller than the top edge) forces grapher to render an open-ended
+            # top bracket (">X"), independent of where the top edge sits relative to the data max.
+            color_scale["customNumericValues"] = edges + [1]
     return {"colorScale": color_scale, "timeTolerance": 3}
+
+
+# Hand-set map brackets that beat the auto log-ladder for a given view, carried over from the original
+# chart. Gas reserves span such a wide range that the 1-2-5 ladder looks noisy; the original 100b, 300b,
+# 1t, 3t, 10t, 30t brackets (cubic meters) read far better.
+FIXED_MAP_EDGES = {
+    ("gas", "reserves", "total"): [0, 1e11, 3e11, 1e12, 3e12, 1e13, 3e13],
+}
 
 
 def set_view_titles(c, dims_stats: dict) -> None:

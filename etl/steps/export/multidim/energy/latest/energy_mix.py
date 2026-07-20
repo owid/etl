@@ -73,15 +73,17 @@ def run() -> None:
                 column_dimensions[column] = {"source": source_slug, "metric": metric_slug}
 
     tb = tb[list(column_dimensions)]
-    # Reference magnitude per (source, metric) for sizing the map's log bins: the 99th percentile
-    # across countries only (aggregates excluded, single outliers ignored). See set_view_titles.
+    # Reference magnitude per (source, metric) for sizing the map bins: the 99th percentile across
+    # countries only (aggregates excluded, single outliers ignored). For annual change we use the 99th
+    # percentile of the *absolute* change, to size the symmetric diverging bins. See set_view_titles.
     country_level = tb.index.get_level_values("country")
     is_country = ~(country_level.isin(AGGREGATE_ENTITIES) | country_level.str.contains("(EI)", regex=False))
     tb_countries = tb[is_country]
-    dims_max = {
-        (dims["source"], dims["metric"]): float(tb_countries[column].astype("float64").quantile(0.99))
-        for column, dims in column_dimensions.items()
-    }
+    dims_max = {}
+    for column, dims in column_dimensions.items():
+        series = tb_countries[column].astype("float64")
+        series = series.abs() if dims["metric"] == "annual_change" else series
+        dims_max[(dims["source"], dims["metric"])] = float(series.quantile(0.99))
     for column, dims in column_dimensions.items():
         tb[column].m.dimensions = dims
         tb[column].m.original_short_name = "energy"
@@ -162,7 +164,7 @@ METRIC_UNIT_PHRASE = {
     "total": "Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).",
     "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.",
     "share": "Measured as a percentage of [total energy supply](#dod:total-energy-supply).",
-    "annual_change": "Year-on-year change in [total energy supply](#dod:total-energy-supply), measured in [terawatt-hours](#dod:watt-hours).",
+    "annual_change": "Annual change in [total energy supply](#dod:total-energy-supply) in one year, relative to the previous year.",
 }
 SOURCE_COMPOSITION = {
     "fossil_fuels": "Fossil fuels are the sum of coal, oil, and gas.",
@@ -183,7 +185,11 @@ _TES_DEFINITION = (
 TOTAL_SUPPLY_SUBTITLE = {
     "total": f"{_TES_DEFINITION}, measured in [terawatt-hours](#dod:watt-hours).",
     "per_capita": f"{_TES_DEFINITION}, measured in [kilowatt-hours](#dod:watt-hours) per person.",
-    "annual_change": f"{_TES_DEFINITION}; this shows the year-on-year change in [terawatt-hours](#dod:watt-hours).",
+    "annual_change": (
+        "Annual change in [total energy supply](#dod:total-energy-supply) in one year, relative to the "
+        "previous year. Total energy supply is the primary energy a country uses after accounting for "
+        "imports and exports."
+    ),
 }
 
 
@@ -205,8 +211,14 @@ AGGREGATE_DECOMPOSITION = {
     "low_carbon_energy": ["other_renewables", "biofuels", "solar", "wind", "hydro", "nuclear"],
     "solar_and_wind": ["solar", "wind"],
 }
-# Base metric each decomposition is built from -> the metric slug it becomes.
-_DECOMPOSITION_METRICS = {"total": "by_source", "per_capita": "by_source_per_capita"}
+# Base metric each decomposition is built from -> (metric slug it becomes, chart types). Absolute and
+# per-capita decompositions are stacked areas with a line tab; the share decomposition leads with a line
+# chart (each source's share over time), matching the original "Share of energy consumption by source".
+_DECOMPOSITION_METRICS = {
+    "total": ("by_source", ["StackedArea", "LineChart"]),
+    "per_capita": ("by_source_per_capita", ["StackedArea", "LineChart"]),
+    "share": ("by_source_share", ["LineChart", "StackedArea"]),
+}
 # Title stem per aggregate.
 _DECOMPOSITION_STEM = {
     "total": "Total energy supply",
@@ -215,10 +227,15 @@ _DECOMPOSITION_STEM = {
     "low_carbon_energy": "Low-carbon energy supply",
     "solar_and_wind": "Solar and wind supply",
 }
+# Footnotes for specific "by source" decomposition views.
+_DECOMPOSITION_NOTES = {"renewables": "Traditional biomass is not included."}
 
 
 def _decomposition_title(source: str, base_metric: str) -> str:
     stem = _DECOMPOSITION_STEM[source]
+    if base_metric == "share":
+        # Only built for the total, so the stem is "Total energy supply".
+        return f"Share of {stem[0].lower()}{stem[1:]} by source"
     return f"{stem} per person, by source" if base_metric == "per_capita" else f"{stem} by source"
 
 
@@ -254,10 +271,13 @@ def add_decomposition_views(c) -> None:
     These live on the metric dimension (by_source / by_source_per_capita) and only exist for
     aggregates, so grapher hides the metric when an individual source is selected.
     """
-    base_config = {"chartTypes": ["StackedArea"], "tab": "chart", "hasMapTab": False, "hideRelativeToggle": False}
+    base_config = {"tab": "chart", "hasMapTab": False, "hideRelativeToggle": False}
     single_views = {(v.dimensions.get("source"), v.dimensions.get("metric")): v for v in c.views}
     for source, constituents in AGGREGATE_DECOMPOSITION.items():
-        for base_metric, new_metric in _DECOMPOSITION_METRICS.items():
+        for base_metric, (new_metric, chart_types) in _DECOMPOSITION_METRICS.items():
+            # Share-by-source only makes sense for the total (each source as a share of the whole).
+            if base_metric == "share" and source != "total":
+                continue
             indicators = []
             for constituent in constituents:
                 view = single_views.get((constituent, base_metric))
@@ -265,13 +285,24 @@ def add_decomposition_views(c) -> None:
                     indicators.extend(deepcopy(view.indicators.y))
             if not indicators:
                 continue
+            if base_metric == "share":
+                subtitle = METRIC_UNIT_PHRASE["share"]
+            elif source == "total":
+                subtitle = TOTAL_SUPPLY_SUBTITLE[base_metric]
+            else:
+                subtitle = METRIC_UNIT_PHRASE[base_metric]
             config = {
                 **base_config,
+                "chartTypes": chart_types,
                 "title": _decomposition_title(source, base_metric),
-                "subtitle": (
-                    TOTAL_SUPPLY_SUBTITLE[base_metric] if source == "total" else METRIC_UNIT_PHRASE[base_metric]
-                ),
+                "subtitle": subtitle,
             }
+            # The share lines already sum to ~100%, so the relative toggle would be meaningless.
+            if base_metric == "share":
+                config["hideRelativeToggle"] = True
+            note = _DECOMPOSITION_NOTES.get(source)
+            if note:
+                config["note"] = note
             new_view = View(
                 dimensions={"source": source, "metric": new_metric},
                 indicators=ViewIndicators(y=indicators),
@@ -388,6 +419,26 @@ def _share_thresholds(vmax: float | None) -> tuple[list[float], bool] | None:
     return edges, top < 100
 
 
+def _diverging_thresholds(vabs: float | None, levels: int = 4) -> list[float] | None:
+    """Symmetric 1-3-10 bin edges around zero for a diverging metric (annual change), open both ends.
+
+    A leading value greater than the most-negative edge and a trailing value smaller than the
+    most-positive edge make grapher render open-ended "<" and ">" brackets at both ends, so a source
+    that mostly grows still shows an open bracket for the rare (real) declines, matching the original
+    annual-change charts.
+    """
+    if vabs is None or not (vabs > 0):
+        return None
+    ladder = [m * 10**p for p in range(-3, 13) for m in (1, 3)]
+    below = [v for v in ladder if v <= vabs]
+    if not below:
+        return None
+    pos = [round(v, 6) for v in below[-levels:]]
+    edges = [-v for v in reversed(pos)] + [0] + pos
+    # Sentinels (the innermost non-zero edges) at the array ends force open brackets on both sides.
+    return [-pos[0]] + edges + [pos[0]]
+
+
 def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
     # timeTolerance fills the newest map year for countries whose latest data is a year or two old
     # (e.g. EIA-extended countries end in 2024 while the Statistical Review reaches 2025).
@@ -407,6 +458,13 @@ def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
             color_scale["binningStrategy"] = "manual"
             # The trailing sentinel (smaller than the top edge) makes the top bracket open-ended.
             color_scale["customNumericValues"] = edges + ([edges[1] / 100] if open_top else [])
+    elif metric == "annual_change":
+        # Diverging metric: symmetric decade bins open on both ends, so the lower bracket is open
+        # even for sources that almost always grow (e.g. solar).
+        edges = _diverging_thresholds(vmax)
+        if edges:
+            color_scale["binningStrategy"] = "manual"
+            color_scale["customNumericValues"] = edges
     elif metric in LOG_METRICS:
         edges = _log_thresholds(vmax)
         if edges:
