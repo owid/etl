@@ -189,7 +189,7 @@ After writing the files, run:
 Show:
 - The paths of the files created (`.dvc`, plus the `.py` if one was needed)
 - Whether the snapshot ran successfully
-- **The source's other data files, if any** — when the landing page / repository ships several data files (companion indices, summary panels, codebooks with data), list the ones NOT snapshotted so the user can opt in now or skip deliberately. This inventory is also the baseline future update cycles diff against — a new companion file is invisible to every within-file check (see `/update-dataset`, "Surface new indicators").
+- **The source's other data files, if any** — when the landing page / repository ships several data files (companion indices, summary panels, codebooks with data), list the ones NOT snapshotted so the user can opt in now or skip deliberately. **Persist the inventory in the `.dvc`**, not just in chat — a `# NOTE:` comment above `url_download` listing the release's other data files as of `date_accessed` (e.g. `# NOTE: the release also ships Foo_Index.csv and codebook.pdf — not snapshotted (2026-07-20)`). That comment is the baseline the next `/update-dataset` cycle diffs against when the host has no file-history API; a new companion file is invisible to every within-file check (see `/update-dataset`, "Surface new indicators").
 - Next steps: "You can now create a meadow step for `<namespace>/<version>/<short_name>`"
 
 ## Notes
