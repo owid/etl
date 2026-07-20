@@ -112,7 +112,9 @@ import pandas as pd
 ds = Dataset("data/garden/<ns>/<version>/<short_name>")
 findings = []
 for tname in ds.table_names:
-    tb = ds.read(tname, safe_types=False)
+    tb = ds.read(tname, safe_types=False)  # read() resets the index, so key columns are regular columns
+    if tb.index.names != [None]:  # defensive: if keys sit in the index (e.g. the table came via ds[tname]), restore them
+        tb = tb.reset_index()
     year_col = "year" if "year" in tb.columns else "date"
     vals = [c for c in tb.columns if c not in ("country", year_col) and pd.api.types.is_numeric_dtype(tb[c])]
     for col in vals:
