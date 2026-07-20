@@ -11,7 +11,7 @@ default_selection:
 
 default_dimensions:
   cause: total
-  metric: stock
+  metric: idps
   unit: total
 
 definitions:
