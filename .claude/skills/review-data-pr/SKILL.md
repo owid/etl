@@ -15,6 +15,20 @@ End-to-end review of a dataset-update PR. Goes deeper than `/review`: actually r
 
 - Optional PR number. If omitted, derive it from the current branch via `gh pr list --head <branch>`.
 
+## Persistence & cost logging
+
+This review can burn a lot of tokens (full pipeline run, link checks, several metadata-quality skills, optionally the adversarial review). Track it the same way `/update-dataset` tracks its own cost: maintain `workbench/review-<short_name>/progress.md` with a `## Step timing log` section — a `START` line (UTC timestamp, `date -u +"%Y-%m-%dT%H:%M:%SZ"`) at the beginning, and a `DONE <step-slug>` line as each numbered workflow step below completes. `<short_name>` isn't known until step 3 resolves it — create the workbench dir then, but still log the `START` line with the time you actually began (before steps 1–3 ran), not the directory's creation time.
+
+Step slugs (one per numbered section below): `pr-metadata`, `diff-changed-files`, `locate-dataset`, `update-shape-classification`, `run-pipeline`, `snapshot-field-comparison`, `verify-links`, `code-clarity`, `outdated-practices`, `annotations-sanity-checks`, `harmonization-audit`, `empty-entity-audit`, `metadata-coverage`, `metadata-quality`, `adversarial-review`, `dag-checks`, `downstream-dependency-check`, `workflow-status`, `final-report`.
+
+After step 14, generate the cost report with the same script `/update-dataset` uses — it's fully generic (just reads a `progress.md` timing log and the session transcripts), so no review-specific code is needed:
+
+```bash
+.venv/bin/python .claude/skills/update-dataset/scripts/cost_report.py workbench/review-<short_name>
+```
+
+Tell the user the resulting `workbench/review-<short_name>/cost_report.md` path at the end — it's a workbench artifact for their own reference, not a review finding, so don't post it as a PR comment.
+
 ## Workflow
 
 ### 1. PR metadata
@@ -279,6 +293,8 @@ Structure the review with:
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
 8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
+
+Then log the final `DONE final-report` timing line and run the cost report (see "Persistence & cost logging" above); mention its path to the user.
 
 ## Severity rubric
 
