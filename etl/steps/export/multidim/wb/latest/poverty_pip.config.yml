@@ -23,6 +23,41 @@ definitions:
   common_views:
     - config:
         originUrl: ourworldindata.org/poverty
+    # DEMO: single-view override — adds an explanatory first bullet to the $1/day
+    # number-in-poverty view. Overrides replace the whole list, hence all bullets.
+    - dimensions:
+        indicator: headcount
+        poverty_line: "100"
+        survey_comparability: No spells
+      metadata:
+        description_key:
+          - |-
+            A poverty line of $1 per day is well below the International Poverty Line and captures only the very poorest people in the world.
+          - |-
+            This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+          - |-
+            Many people, today and in the past, have no monetary income. This data accounts for that by adding the estimated value of non-market income, like food grown by subsistence farmers for their own use.
+          - |-
+            The data comes from the World Bank's Poverty and Inequality Platform (PIP), which draws on national household surveys. This gives it wide global coverage, but because it pools surveys with different methodologies and mixes income and consumption data, there are limitations to the comparability of the data points between countries and over time. Regional and global estimates are extrapolated to the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+          - |-
+            Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). These are not perfectly comparable: income equals consumption plus savings, and consumption tends to be more evenly distributed than income. For most countries, we have only one option available. But when both are available, we keep one observation per country and year. You can see these different series by selecting the option to show breaks in the data.
+    # DEMO: single-view override — rewords the first bullet of the $30/day share view.
+    - dimensions:
+        indicator: headcount_ratio
+        poverty_line: "3000"
+        survey_comparability: No spells
+      metadata:
+        description_key:
+          - |-
+            A poverty line of $30 per day is typical of national poverty lines in high-income countries.
+          - |-
+            This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+          - |-
+            Many people, today and in the past, have no monetary income. This data accounts for that by adding the estimated value of non-market income, like food grown by subsistence farmers for their own use.
+          - |-
+            The data comes from the World Bank's Poverty and Inequality Platform (PIP), which draws on national household surveys. This gives it wide global coverage, but because it pools surveys with different methodologies and mixes income and consumption data, there are limitations to the comparability of the data points between countries and over time. Regional and global estimates are extrapolated to the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+          - |-
+            Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). These are not perfectly comparable: income equals consumption plus savings, and consumption tends to be more evenly distributed than income. For most countries, we have only one option available. But when both are available, we keep one observation per country and year. You can see these different series by selecting the option to show breaks in the data.
 
   # Detailed colors:
   color_0_to_100: &color_0_to_100 "#D73027"
@@ -54,7 +89,7 @@ definitions:
   description_key_umic_poverty_line: A poverty line of $8.30 per day represents definitions of national poverty lines in upper-middle-income countries.
 
   description_key_extreme_poverty_additional: |-
-    Two centuries ago, most of the world's population was extremely poor. Many believed that widespread poverty was inevitable. But this turned out to be wrong. Economic growth is possible, and poverty can decline. With this poverty line, we can track whether countries are leaving the worst poverty behind.
+    Two centuries ago, most of the world's population was extremely poor. It was long believed that widespread poverty was inevitable. But this turned out to be wrong. Economic growth is possible, and poverty can decline. With this poverty line, we can track whether countries are leaving the worst poverty behind.
 
   description_key_ppp: |-
     This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
@@ -65,7 +100,7 @@ definitions:
   description_key_welfare_type: |-
     {definitions.description_key_welfare_type_beginning} For most countries, we have only one option available. But when there is a mix of consumption and income data points, we process the data to keep one observation per country and year.
 
-  description_key_not_market_income: This data accounts for that by adding the estimated value of non-market income, like food grown by subsistence farmers for their own use.
+  description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for that by adding the estimated value of non-market income, like food grown by subsistence farmers for their own use.
 
   description_key_nowcasts: Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
 

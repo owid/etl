@@ -132,7 +132,7 @@ Only after the author says "make the PR" (or equivalent):
      moving to allow free rich text (paragraphs, explicit bullets). Follow the author's
      presentation choice, but verify the current schema/renderer actually supports non-list
      content before emitting it; when unsure, default to the list form and tell the author.
-4. **Rules snapshot**: commit the agreed "Output from Claude" content as
+4. **Rules snapshot**: commit the agreed "Clean output from Claude" content as
    `<short_name>.rules.md` next to the MDIM config, headed by the Google Doc link and the
    date. Intent and implementation must travel in the same PR.
 5. **Checks**: run `make check` before committing (and the unit tests if you touched
