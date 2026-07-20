@@ -24,6 +24,11 @@ Usage:
 
 With no --session, sessions are auto-discovered: every transcript in the
 project dir whose text mentions the workbench directory.
+
+Alongside the markdown, writes a `.json` sidecar with the same per-step figures
+(`cost_report.md` -> `cost_report.json`) — `aggregate_cost_reports.py` reads
+these to roll up cost across every instrumented update without re-parsing
+transcripts or markdown tables.
 """
 
 import argparse
@@ -200,6 +205,45 @@ def fmt_wall_time(interval: Interval) -> str:
     return fmt_timedelta(interval.end - interval.start)
 
 
+def usage_dict(usage: Usage) -> dict:
+    return {
+        "requests": usage.requests,
+        "agents": usage.agents,
+        "input": usage.input,
+        "output": usage.output,
+        "cache_read": usage.cache_read,
+        "cache_write": usage.cache_write,
+        "weighted": usage.weighted,
+    }
+
+
+def build_report_dict(intervals: list[Interval], sessions: list[str], workbench_dir: Path) -> dict:
+    """Machine-readable twin of build_report(), for aggregate_cost_reports.py to consume."""
+    steps = []
+    total = Usage()
+    total_active = timedelta()
+    for iv in intervals:
+        if iv.usage.requests == 0 and iv.label.startswith("("):
+            continue
+        total.add(iv.usage)
+        active = iv.active_time()
+        total_active += active
+        steps.append(
+            {
+                "label": iv.label,
+                "wall_seconds": None if (iv.start is None or iv.end is None) else int((iv.end - iv.start).total_seconds()),
+                "active_seconds": int(active.total_seconds()),
+                **usage_dict(iv.usage),
+            }
+        )
+    return {
+        "workbench_dir": str(workbench_dir),
+        "sessions": sessions,
+        "steps": steps,
+        "total": {"active_seconds": int(total_active.total_seconds()), **usage_dict(total)},
+    }
+
+
 def build_report(intervals: list[Interval], sessions: list[str], project_dir: Path) -> str:
     lines = [
         "# Update cost report",
@@ -295,7 +339,10 @@ def main() -> None:
 
     output = args.output or args.workbench_dir / "cost_report.md"
     output.write_text(build_report(intervals, sessions, project_dir))
+    json_output = output.with_suffix(".json")
+    json_output.write_text(json.dumps(build_report_dict(intervals, sessions, args.workbench_dir), indent=2) + "\n")
     print(f"Wrote {output}")
+    print(f"Wrote {json_output}")
 
 
 if __name__ == "__main__":

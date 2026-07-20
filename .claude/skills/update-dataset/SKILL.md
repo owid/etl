@@ -819,6 +819,15 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    Notes:
    - Sessions are auto-discovered (any transcript in the project dir that mentions the workbench directory); pass `--session <id>` if the update spanned machines or discovery picks up unrelated sessions. If the update ran in a different worktree than where you run the script, pass `--project-dir` with that worktree's transcript dir.
    - **Wall time balloons when a step's boundary spans a multi-day pause between sessions** (e.g. resuming an update after the weekend) — read active time as the more reliable cost signal in that case, and wall time as elapsed calendar time including idle waiting. Read the report as "which steps are expensive", not as exact accounting.
+   - Alongside `cost_report.md`, the script also writes a `cost_report.json` sidecar with the same per-step figures — that's what the aggregator below reads.
+
+   **Aggregating across multiple updates.** Once several updates have their own `cost_report.json` (this skill's own workbenches, and/or `review-data-pr`'s `workbench/review-<short_name>/`), roll them up into one summary — cheap to re-run since it only reads the existing JSON sidecars, no transcripts:
+
+   ```bash
+   .venv/bin/python .claude/skills/update-dataset/scripts/aggregate_cost_reports.py
+   ```
+
+   Writes `workbench/aggregate_cost_report.md` with a per-update comparison table and a per-step rollup (e.g. "garden steps across all updates cost X active-minutes / Y tokens on average") — useful for spotting which *kind* of step is consistently expensive, not just within one update. Step rows only merge when their slugs match exactly across updates, so stick to the conventional slugs above.
    - Never self-report token numbers from memory — the transcript is the only reliable source. If the script fails, say so rather than estimating.
    - The report is a workbench artifact for the user; don't add it to the PR description.
 
@@ -1035,7 +1044,7 @@ When the update is review-heavy and you need iterative back-and-forth with a top
 - `workbench/<short_name>/update-context.yml` (canonical facts gathered during the update; consumed by `data-updates-comms`)
 - `workbench/<short_name>/slack-announcement.md`
 - `workbench/<short_name>/data-update.md` (public-facing post draft for OWID /latest, from step 9b)
-- `workbench/<short_name>/cost_report.md` (per-step time & token usage, from step 11)
+- `workbench/<short_name>/cost_report.md` + `cost_report.json` (per-step time & token usage, from step 11)
 
 ## Example usage
 
