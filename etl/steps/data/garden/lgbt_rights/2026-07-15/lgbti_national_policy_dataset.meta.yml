@@ -3750,6 +3750,9 @@ tables:
         title: LGBTI Composite Policy Index
         description_short: |-
           Summary measure of a country's LGBTI-related laws, calculated by subtracting the weighted sum of regressive policy scores from the weighted sum of progressive policy scores.
+        processing_level: major
+        description_processing: |-
+          Values for world regions are population-weighted averages of the countries in each region, computed by Our World in Data using [our region definitions](https://ourworldindata.org/world-region-map-definitions), the [World Bank's income group classification](https://ourworldindata.org/world-bank-income-groups-explained), and our [consolidated population data](https://ourworldindata.org/population-sources). Country values come directly from the producer.
         description_key:
           - "{definitions.description_key_dataset}"
           - The index aggregates 33 policy-status combinations — 23 progressive (such as marriage equality, anti-discrimination protections, or legal gender recognition) and 10 regressive (such as criminalization of same-sex acts, the death penalty, or "propaganda" laws). Each policy's score weighs up to five aspects — population coverage, gender scope, penalty severity, evidence of enforcement, and ease of access — combined via confirmatory factor analysis and normalized within each policy.

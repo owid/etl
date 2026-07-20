@@ -708,6 +708,10 @@ def run() -> None:
     tb_index = paths.regions.harmonize_names(tb=tb_index, warn_on_unused_countries=False)
     sanity_check_index(tb_index)
 
+    # Population-weighted regional means of the composite index (mirrors the retired v1
+    # lgbti_policy_index step, whose regional series the lgbt-rights-index chart displays).
+    tb_index = _add_regional_composite_index(tb_index)
+
     # Format and short-name all tables.
     tb_country = tb_country.format(
         ["country", "year", "law", "status"],
@@ -764,6 +768,30 @@ def _fix_misfiled_incitement_status(tb):
         tb.loc[legal & tb["year"].isin(active_years), "proportion"] = 1.0
         tb.loc[illegal, "proportion"] = 0.0
     return tb
+
+
+def _add_regional_composite_index(tb):
+    """Append population-weighted regional means of `composite_index` for the standard REGIONS.
+
+    Only the composite index gets regional rows (it's what the lgbt-rights-index chart shows,
+    matching the retired v1 step's population-weighted regional policy-index series); the other
+    three columns stay country-only, so region rows carry NaN there.
+    """
+    tb_w = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
+    tb_w["composite_index_weighted"] = tb_w["composite_index"] * tb_w["population"]
+    tb_w = paths.regions.add_aggregates(
+        tb=tb_w,
+        index_columns=["country", "year"],
+        regions=REGIONS,
+        aggregations={"composite_index_weighted": "sum", "population": "sum"},
+    )
+    region_mask = tb_w["country"].isin(REGIONS)
+    tb_w.loc[region_mask, "composite_index"] = (
+        tb_w.loc[region_mask, "composite_index_weighted"] / tb_w.loc[region_mask, "population"]
+    )
+    tb_w = tb_w.drop(columns=["composite_index_weighted", "population"])
+    assert tb_w.loc[region_mask, "composite_index"].notna().all(), "NaN regional composite index."
+    return tb_w
 
 
 def sanity_check_index(tb):
