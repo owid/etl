@@ -28,8 +28,9 @@ AGGREGATE_ENTITIES = {
 }
 
 FUELS = ["coal", "oil", "gas"]
-# Per-fuel column suffixes of the physical trade/consumption columns (mirroring the garden step).
-TRADE_SUFFIX = {"coal": "mt", "oil": "mcm", "gas": "bcm"}
+# Per-fuel column suffixes (base units) of the physical trade/consumption columns (mirroring the
+# garden step). Totals and per-capita variants share the same suffix.
+TRADE_SUFFIX = {"coal": "tonnes", "oil": "m3", "gas": "m3"}
 TRADE_PC_SUFFIX = {"coal": "tonnes", "oil": "m3", "gas": "m3"}
 TRADE_METRICS = ["consumption", "imports", "exports", "net_imports"]
 
@@ -43,22 +44,31 @@ def _column_dimensions() -> dict:
     for fuel in FUELS:
         dims[f"{fuel}_production_twh"] = {"fuel": fuel, "metric": "production", "per_capita": "total"}
         dims[f"{fuel}_production_per_capita_kwh"] = {"fuel": fuel, "metric": "production", "per_capita": "per_capita"}
-        # Trade and consumption in physical units (EIA): coal in million tonnes, oil in million
-        # cubic meters, gas in billion cubic meters.
+        # Consumption in energy units (Statistical Review, extended with EIA — same blend as production).
+        dims[f"{fuel}_consumption_twh"] = {"fuel": fuel, "metric": "consumption", "per_capita": "total"}
+        dims[f"{fuel}_consumption_per_capita_kwh"] = {
+            "fuel": fuel,
+            "metric": "consumption",
+            "per_capita": "per_capita",
+        }
+        # Trade and consumption in physical units (EIA): coal in tonnes, oil and gas in cubic meters.
+        # The physical consumption columns are named "consumption" in the garden but take the
+        # "consumption_physical" metric slug here (the energy-content series owns "consumption").
         for metric in TRADE_METRICS:
-            dims[f"{fuel}_{metric}_{TRADE_SUFFIX[fuel]}"] = {"fuel": fuel, "metric": metric, "per_capita": "total"}
+            slug = "consumption_physical" if metric == "consumption" else metric
+            dims[f"{fuel}_{metric}_{TRADE_SUFFIX[fuel]}"] = {"fuel": fuel, "metric": slug, "per_capita": "total"}
             dims[f"{fuel}_{metric}_per_capita_{TRADE_PC_SUFFIX[fuel]}"] = {
                 "fuel": fuel,
-                "metric": metric,
+                "metric": slug,
                 "per_capita": "per_capita",
             }
     # Production in physical units (Statistical Review): coal and oil in tonnes, gas in cubic meters.
     # Units differ per fuel, so there is no "total" (they can't be summed).
     dims.update(
         {
-            "coal_production_mt": {"fuel": "coal", "metric": "production_physical", "per_capita": "total"},
-            "oil_production_mt": {"fuel": "oil", "metric": "production_physical", "per_capita": "total"},
-            "gas_production_bcm": {"fuel": "gas", "metric": "production_physical", "per_capita": "total"},
+            "coal_production_tonnes": {"fuel": "coal", "metric": "production_physical", "per_capita": "total"},
+            "oil_production_tonnes": {"fuel": "oil", "metric": "production_physical", "per_capita": "total"},
+            "gas_production_m3": {"fuel": "gas", "metric": "production_physical", "per_capita": "total"},
             "coal_production_per_capita_tonnes": {
                 "fuel": "coal",
                 "metric": "production_physical",
@@ -75,15 +85,18 @@ def _column_dimensions() -> dict:
                 "per_capita": "per_capita",
             },
             # Proved reserves in physical units (EIA; oil and gas through 2021, coal through 2023).
-            "coal_reserves_mt": {"fuel": "coal", "metric": "reserves", "per_capita": "total"},
-            "oil_reserves_bcm": {"fuel": "oil", "metric": "reserves", "per_capita": "total"},
-            "gas_reserves_tcm": {"fuel": "gas", "metric": "reserves", "per_capita": "total"},
+            "coal_reserves_tonnes": {"fuel": "coal", "metric": "reserves", "per_capita": "total"},
+            "oil_reserves_m3": {"fuel": "oil", "metric": "reserves", "per_capita": "total"},
+            "gas_reserves_m3": {"fuel": "gas", "metric": "reserves", "per_capita": "total"},
             "coal_reserves_per_capita_tonnes": {"fuel": "coal", "metric": "reserves", "per_capita": "per_capita"},
             "oil_reserves_per_capita_m3": {"fuel": "oil", "metric": "reserves", "per_capita": "per_capita"},
             "gas_reserves_per_capita_m3": {"fuel": "gas", "metric": "reserves", "per_capita": "per_capita"},
-            # Total fossil fuel production (the aggregate that the "by fuel" breakdown decomposes).
+            # Total fossil fuel production (the aggregate that the "by fuel" breakdown decomposes)
+            # and consumption.
             "total_production_twh": {"fuel": "total", "metric": "production", "per_capita": "total"},
             "total_production_per_capita_kwh": {"fuel": "total", "metric": "production", "per_capita": "per_capita"},
+            "total_consumption_twh": {"fuel": "total", "metric": "consumption", "per_capita": "total"},
+            "total_consumption_per_capita_kwh": {"fuel": "total", "metric": "consumption", "per_capita": "per_capita"},
         }
     )
     return dims
@@ -159,7 +172,8 @@ FUEL_TITLE_NAMES = {"total": "fossil fuels", "coal": "coal", "oil": "oil", "gas"
 def _view_title(fuel: str, metric: str, count: str) -> str:
     per_person = " per person" if count == "per_capita" else ""
     if fuel == "total":
-        return f"Fossil fuel production{per_person}"
+        stem = {"production": "Fossil fuel production", "consumption": "Fossil fuel consumption"}[metric]
+        return f"{stem}{per_person}"
     name = FUEL_TITLE_NAMES[fuel]
     if metric == "net_imports":
         return f"Net imports of {name}{per_person}"
@@ -169,6 +183,7 @@ def _view_title(fuel: str, metric: str, count: str) -> str:
         "production": f"{name.capitalize()} production",
         "production_physical": f"{name.capitalize()} production",
         "consumption": f"{name.capitalize()} consumption",
+        "consumption_physical": f"{name.capitalize()} consumption",
         "imports": f"{name.capitalize()} imports",
         "exports": f"{name.capitalize()} exports",
         "reserves": f"{name.capitalize()} reserves",
@@ -186,29 +201,29 @@ ENERGY_UNIT_PHRASE = {
     "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
 }
 
-# Physical units per (fuel, metric, per_capita). Trade and consumption use one unit family per fuel;
-# production and reserves keep the Statistical Review's native units.
+# Physical units per (fuel, metric, per_capita). All physical metrics are stored in base units
+# (tonnes for coal, cubic meters for oil and gas), so grapher applies magnitude prefixes itself.
 PHYSICAL_UNITS = {
-    ("coal", "production_physical", "total"): "million tonnes",
+    ("coal", "production_physical", "total"): "tonnes",
     ("coal", "production_physical", "per_capita"): "tonnes per person",
-    ("oil", "production_physical", "total"): "million tonnes",
+    ("oil", "production_physical", "total"): "tonnes",
     ("oil", "production_physical", "per_capita"): "tonnes per person",
-    ("gas", "production_physical", "total"): "billion cubic meters",
+    ("gas", "production_physical", "total"): "cubic meters",
     ("gas", "production_physical", "per_capita"): "cubic meters per person",
-    ("coal", "reserves", "total"): "million tonnes",
+    ("coal", "reserves", "total"): "tonnes",
     ("coal", "reserves", "per_capita"): "tonnes per person",
-    ("oil", "reserves", "total"): "billion cubic meters",
+    ("oil", "reserves", "total"): "cubic meters",
     ("oil", "reserves", "per_capita"): "cubic meters per person",
-    ("gas", "reserves", "total"): "trillion cubic meters",
+    ("gas", "reserves", "total"): "cubic meters",
     ("gas", "reserves", "per_capita"): "cubic meters per person",
 }
 _TRADE_UNITS = {
-    "coal": ("million tonnes", "tonnes per person"),
-    "oil": ("million cubic meters", "cubic meters per person"),
-    "gas": ("billion cubic meters", "cubic meters per person"),
+    "coal": ("tonnes", "tonnes per person"),
+    "oil": ("cubic meters", "cubic meters per person"),
+    "gas": ("cubic meters", "cubic meters per person"),
 }
 for _fuel, (_unit, _unit_pc) in _TRADE_UNITS.items():
-    for _metric in TRADE_METRICS:
+    for _metric in ["consumption_physical", "imports", "exports", "net_imports"]:
         PHYSICAL_UNITS[(_fuel, _metric, "total")] = _unit
         PHYSICAL_UNITS[(_fuel, _metric, "per_capita")] = _unit_pc
 
@@ -223,7 +238,8 @@ _OIL_TRADE_NOTE = "Includes crude oil and lease condensate; refined petroleum pr
 OIL_NOTES = {
     "production": "Includes crude oil, condensates, natural gas liquids, and other liquid fuels.",
     "production_physical": "Includes crude oil, shale oil, oil sands, condensates, and natural gas liquids.",
-    "consumption": "Includes all petroleum products and other liquid fuels, such as biofuels.",
+    "consumption": "Includes refined petroleum products and other liquid fuels.",
+    "consumption_physical": "Includes all petroleum products and other liquid fuels, such as biofuels.",
     "imports": _OIL_TRADE_NOTE,
     "exports": _OIL_TRADE_NOTE,
     "net_imports": _OIL_TRADE_NOTE,
@@ -232,7 +248,7 @@ OIL_NOTES = {
 
 
 def _view_subtitle(fuel: str, metric: str, count: str) -> str:
-    if metric == "production":
+    if metric in ("production", "consumption"):
         sentence = ENERGY_UNIT_PHRASE[count]
         if fuel == "total":
             sentence = f"{sentence} {FOSSIL_FUELS_NOTE}"

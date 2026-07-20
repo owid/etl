@@ -1,5 +1,6 @@
 """Multidim for the energy mix (source x metric), based on Total Energy Supply."""
 
+import math
 from copy import deepcopy
 
 from etl.collection.model.view import Indicator, View, ViewIndicators
@@ -369,6 +370,24 @@ def _log_thresholds(vmax: float | None, max_bins: int = 7) -> list[float] | None
     return [0] + below[-(max_bins - 1) :]
 
 
+def _share_thresholds(vmax: float | None) -> tuple[list[float], bool] | None:
+    """Bin edges for share-of-total metrics (bounded 0-100), following the original charts.
+
+    Sources that span the full range get decade bins 0..100, closed at both ends (as in
+    fossil-fuels-share-energy). Sources that never come near 100% get a scale capped at the step
+    above the 99th percentile with an open-ended top bracket (as in renewable-share-energy), with
+    the step chosen so the scale keeps roughly 5-10 bins. Returns (edges, open_top).
+    """
+    if vmax is None or not (vmax > 0):
+        return None
+    for step in (10, 5, 2, 1, 0.5, 0.2, 0.1):
+        if math.ceil(vmax / step) >= 5:
+            break
+    top = min(100, math.ceil(vmax / step) * step)
+    edges = [round(i * step, 3) for i in range(int(top / step) + 1)]
+    return edges, top < 100
+
+
 def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
     # timeTolerance fills the newest map year for countries whose latest data is a year or two old
     # (e.g. EIA-extended countries end in 2024 while the Statistical Review reaches 2025).
@@ -379,7 +398,16 @@ def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
         else:
             scheme = {"baseColorScheme": SOURCE_FALLBACK_SCHEME.get(source, "YlGnBu")}
     color_scale = dict(scheme)
-    if metric in LOG_METRICS:
+    if metric == "share":
+        # Bounded metric: never leave it to grapher's automatic (ckmeans) binning, which invents
+        # arbitrary data-driven brackets and an open top on a 0-100 scale.
+        thresholds = _share_thresholds(vmax)
+        if thresholds:
+            edges, open_top = thresholds
+            color_scale["binningStrategy"] = "manual"
+            # The trailing sentinel (smaller than the top edge) makes the top bracket open-ended.
+            color_scale["customNumericValues"] = edges + ([edges[1] / 100] if open_top else [])
+    elif metric in LOG_METRICS:
         edges = _log_thresholds(vmax)
         if edges:
             color_scale["binningStrategy"] = "manual"

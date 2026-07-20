@@ -155,7 +155,9 @@ def add_shares(tb: Table) -> Table:
     """Add the share of each source in total energy supply (as a percentage)."""
     tb = tb.copy()
     for source in ALL_SOURCES:
-        tb[f"{source}_share_pct"] = 100 * tb[f"{source}_twh"] / tb["total_energy_supply_twh"]
+        # Clip to 100: float32 noise otherwise leaves values like 100.000008, which makes grapher
+        # render an open-ended ">100%" bracket on the map legend.
+        tb[f"{source}_share_pct"] = (100 * tb[f"{source}_twh"] / tb["total_energy_supply_twh"]).clip(upper=100)
     return tb
 
 
