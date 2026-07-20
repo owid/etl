@@ -65,7 +65,9 @@ ind = ind[ind["catalog_path"].str.contains(f"/{NS}/") & ind["catalog_path"].str.
 cxi = read_analytics(f"SELECT chart_slug, indicator_id FROM {S}.charts_x_indicators")
 charts = read_analytics(f"SELECT chart_slug, views_365d FROM {S}.charts").drop_duplicates("chart_slug")
 usage = (
-    ind.merge(cxi, on="indicator_id").merge(charts, on="chart_slug")
+    # LEFT-join the views: a newly published or unvisited chart has no analytics row yet, and an
+    # inner join would silently drop its indicators from the charted inventory (they rank at 0 instead).
+    ind.merge(cxi, on="indicator_id").merge(charts, on="chart_slug", how="left")
     .groupby("catalog_path")
     .agg(n_charts=("chart_slug", "nunique"), views_365d=("views_365d", "sum"))
     .sort_values("views_365d", ascending=False)
@@ -149,8 +151,9 @@ for tname in ds.table_names:
         cov = s.groupby(year_col)["country"].nunique()
         if len(cov) > 1 and cov.iloc[-1] < 0.7 * cov.iloc[-2]:
             findings.append((tname, col, "COVERAGE", f"{cov.index[-1]}: {cov.iloc[-1]} countries vs {cov.iloc[-2]}"))
-        # 5. Suspicious constants: long runs of identical non-zero values (source forward-fill?)
-        runs = ss.groupby("country")[col].apply(lambda x: (x == x.shift()).mean())
+        # 5. Suspicious constants: long runs of identical NON-ZERO values (source forward-fill?) —
+        #    repeated zeroes are normal for sparse count/event indicators and must not count.
+        runs = ss.groupby("country")[col].apply(lambda x: ((x == x.shift()) & (x != 0)).mean())
         for ctry in runs[runs > 0.5].index[:10]:
             findings.append((tname, col, "CONSTANT", f"{ctry}: >50% of series identical to previous period"))
         # 6. World vs sum of countries — ONLY for additive units (counts, tonnes, deaths; never rates/shares/indices)
