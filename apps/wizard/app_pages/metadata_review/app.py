@@ -138,28 +138,23 @@ def mdim_page(user) -> None:
         if view is None:
             st.info("No view matches this dimension combination — pick another.")
         else:
-            col_page, col_fields = st.columns([3, 2])
+            # Text gets the room: fields take the wider column; the live page stays
+            # visible in a smaller column while the field rail scrolls internally.
+            col_page, col_fields = st.columns([2, 3], gap="medium")
             with col_page:
-                # The real MDim page (admin preview renders the full page, controls included),
-                # so the reviewer sees exactly what readers see.
                 page_url = f"{OWID_ENV.admin_site}/grapher/{quote(catalog_path, safe='')}?{urlencode(view.dimensions)}"
-                _page_embed(page_url, height=850, hide_page_selectors=True)
-                st.caption("This is the live page — navigate views with the selectors above.")
+                _page_embed(page_url, height=620, hide_page_selectors=True)
+                st.caption("Live page — scroll inside for key information and sources.")
             with col_fields:
-                for field in view.fields:
-                    shared = shared_view_ids(review, field)
-                    # Threads filed on ANY view rendering this same text (even via a
-                    # different expanded indicator of the same garden template).
-                    threads = threads_for_field(review, field, suggestions_by_key)
-                    render_field(
-                        field,
-                        threads,
+                with st.container(height=780, border=False):
+                    _render_grouped_fields(
+                        view.fields,
+                        review,
+                        suggestions_by_key,
                         comments_by_suggestion,
                         users,
                         user,
                         fields_by_key,
-                        shared_views=shared,
-                        mdim_review=review,
                     )
 
     with tab_all:
@@ -238,6 +233,57 @@ frame.addEventListener("load", () => {{
     )
 
 
+# What each field annotates on the page: the chart itself vs the sections below it.
+CHART_TEXT_FIELDS = {
+    "config.title",
+    "config.subtitle",
+    "config.note",
+    "grapher_config.title",
+    "grapher_config.subtitle",
+    "grapher_config.note",
+}
+
+
+def _render_grouped_fields(
+    fields,
+    mdim_review,
+    suggestions_by_key,
+    comments_by_suggestion,
+    users,
+    user,
+    fields_by_key,
+) -> None:
+    """Field boxes grouped by what they annotate: chart text, then data-page metadata."""
+    chart_fields = [f for f in fields if f.field_path in CHART_TEXT_FIELDS]
+    data_fields = [f for f in fields if f.field_path not in CHART_TEXT_FIELDS]
+    groups = [
+        (":material/bar_chart: Chart text — title, subtitle and footnote as rendered on the chart", chart_fields),
+        (":material/description: About the data — shown on the data page below the chart", data_fields),
+    ]
+    for header, group in groups:
+        if not group:
+            continue
+        st.markdown(f"##### {header.split(' — ')[0]}")
+        st.caption(header.split(" — ")[1].capitalize())
+        for field in group:
+            if mdim_review is not None:
+                shared = shared_view_ids(mdim_review, field)
+                threads = threads_for_field(mdim_review, field, suggestions_by_key)
+            else:
+                shared = None
+                threads = suggestions_by_key.get(field.source_key(), [])
+            render_field(
+                field,
+                threads,
+                comments_by_suggestion,
+                users,
+                user,
+                fields_by_key,
+                shared_views=shared,
+                mdim_review=mdim_review,
+            )
+
+
 def _view_browser(review: MdimReview):
     """One selectbox per dimension; returns the matching ViewReview (or None)."""
     cols = st.columns(max(len(review.dimensions), 1))
@@ -307,22 +353,23 @@ def dataset_page(user) -> None:
         label = indicator.name or indicator.catalog_path.split("#")[-1]
         with st.expander(f"{label}" + (f" — :orange[{n_open} open]" if n_open else ""), expanded=False):
             st.caption(f"`{indicator.catalog_path}`")
-            col_page, col_fields = st.columns([3, 2])
+            col_page, col_fields = st.columns([2, 3], gap="medium")
             with col_page:
                 if indicator.variable_id is not None:
                     # The real data page (admin preview), so the reviewer sees exactly
                     # what readers see — key information, sources, and all.
-                    _page_embed(OWID_ENV.data_page_preview(indicator.variable_id), height=850)
+                    _page_embed(OWID_ENV.data_page_preview(indicator.variable_id), height=620)
+                    st.caption("Live data page — scroll inside for key information and sources.")
             with col_fields:
-                for field in indicator.fields:
-                    render_field(
-                        field,
-                        suggestions_by_key.get(field.source_key(), []),
-                        comments_by_suggestion,
-                        users,
-                        user,
-                        fields_by_key,
-                    )
+                _render_grouped_fields(
+                    indicator.fields,
+                    None,
+                    suggestions_by_key,
+                    comments_by_suggestion,
+                    users,
+                    user,
+                    fields_by_key,
+                )
 
     _all_suggestions_tab(suggestions, comments_by_suggestion, users, user, fields_by_key, catalog_path, header=True)
 
