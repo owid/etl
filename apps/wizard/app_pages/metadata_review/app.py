@@ -208,27 +208,38 @@ def _page_embed(url: str, height: int = 850, hide_page_selectors: bool = False) 
     """
     hide_css = ".settings-row__wrapper, .multi-dim-settings { display: none !important; }"
     components.html(
-        f'<iframe id="mr_page_embed" src="{html_lib.escape(url, quote=True)}" loading="lazy" '
-        f'style="width:100%;height:{height - 20}px;border:1px solid #e6e6e6;border-radius:4px;background:#fff;">'
-        "</iframe>"
-        + (
-            f"""
+        f"""
+<div id="mr_rebuilding" style="display:none;padding:0.5rem 0.8rem;margin-bottom:0.4rem;border-radius:6px;
+     background:#fff8e1;border:1px solid #f0dc9a;color:#6d5c1e;font:0.85rem -apple-system,sans-serif;">
+  ⏳ The site preview is rebuilding after a deploy — retrying automatically...
+</div>
+<iframe id="mr_page_embed" src="{html_lib.escape(url, quote=True)}" loading="lazy"
+        style="width:100%;height:{height - 20}px;border:1px solid #e6e6e6;border-radius:4px;background:#fff;"></iframe>
 <script>
 const frame = document.getElementById("mr_page_embed");
+const rebuilding = document.getElementById("mr_rebuilding");
 frame.addEventListener("load", () => {{
     try {{
         const doc = frame.contentDocument;
-        const style = doc.createElement("style");
-        style.textContent = {json.dumps(hide_css)};
-        doc.head.appendChild(style);
+        const text = (doc.body && doc.body.innerText) || "";
+        // Right after a deploy the admin preview 500s until the grapher assets are
+        // rebuilt — detect it and retry instead of showing raw JSON to reviewers.
+        if (text.includes("build manifest") || text.startsWith('{{"error"')) {{
+            rebuilding.style.display = "block";
+            setTimeout(() => {{ frame.src = frame.src; }}, 12000);
+            return;
+        }}
+        rebuilding.style.display = "none";
+        if ({json.dumps(hide_page_selectors)}) {{
+            const style = doc.createElement("style");
+            style.textContent = {json.dumps(hide_css)};
+            doc.head.appendChild(style);
+        }}
     }} catch (e) {{
-        // Cross-origin (e.g. local dev wizard vs. admin) — leave the page's controls visible.
+        // Cross-origin (e.g. local dev wizard vs. admin) — leave the page as is.
     }}
 }});
-</script>"""
-            if hide_page_selectors
-            else ""
-        ),
+</script>""",
         height=height,
     )
 
