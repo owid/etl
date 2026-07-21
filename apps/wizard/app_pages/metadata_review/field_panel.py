@@ -176,20 +176,24 @@ def _render_thread(
                 state.add_comment(proposal.id, user.id, reply.strip())
                 st.rerun()
 
-        control_col, edit_col = st.columns([3, 2], vertical_alignment="center")
-        with control_col:
-            status = st.segmented_control(
-                "Status",
-                options=["open", "implemented", "rejected"],
-                default=proposal.status,
-                key=f"mrs_status_{proposal.id}",
-                label_visibility="collapsed",
-            )
-            if status and status != proposal.status:
-                state.set_status(proposal.id, user.id, status)
-                st.rerun()
-        with edit_col:
+        if st.session_state.get(_key(field, "editing")):
+            # The editor must span the whole section, not sit inside a button column.
             _render_edit_controls(field, user, existing=proposal)
+        else:
+            control_col, edit_col = st.columns([3, 2], vertical_alignment="center")
+            with control_col:
+                status = st.segmented_control(
+                    "Status",
+                    options=["open", "implemented", "rejected"],
+                    default=proposal.status,
+                    key=f"mrs_status_{proposal.id}",
+                    label_visibility="collapsed",
+                )
+                if status and status != proposal.status:
+                    state.set_status(proposal.id, user.id, status)
+                    st.rerun()
+            with edit_col:
+                _render_edit_controls(field, user, existing=proposal)
 
 
 def _render_resolved(
