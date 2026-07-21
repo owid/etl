@@ -149,7 +149,7 @@ TOTAL_ONLY_TITLES = {
     "demand_per_capita": "Electricity demand per person",
     "net_imports": "Net electricity imports",
     "imports_share": "Net electricity imports as a share of demand",
-    "carbon_intensity": "Carbon intensity of electricity",
+    "carbon_intensity": "Lifecycle carbon intensity of electricity",
 }
 
 
@@ -191,7 +191,7 @@ TOTAL_ONLY_SUBTITLES = {
     "demand_per_capita": "Electricity generation adjusted for imports and exports. Measured in [kilowatt-hours](#dod:watt-hours) per person.",
     "net_imports": "Electricity imports minus exports, measured in [terawatt-hours](#dod:watt-hours). Positive values are net importers; negative values are net exporters.",
     "imports_share": "Electricity imports minus exports, as a share of demand. Positive values are net importers; negative values are net exporters.",
-    "carbon_intensity": "Measured in grams of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per [kilowatt-hour](#dod:watt-hours), on a lifecycle basis.",
+    "carbon_intensity": "Measured in grams of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) emitted per [kilowatt-hour](#dod:watt-hours) of electricity generated. Emissions are estimated on a lifecycle basis, including upstream, supply chain and manufacturing stages, and cover all greenhouse gases.",
 }
 
 
@@ -384,6 +384,9 @@ ORIGINAL_MAP_SCHEMES = {
         "customNumericValues": [0, 0, 10, 20, 30, 40, 50, 60, 70],
         "customNumericColors": ["#dedede", None, None, None, None, None, None, None],
         "customNumericLabels": ["No nuclear", "", None, None, None, None, None, None],
+        # Without this flag grapher stores the custom "#dedede" grey but does not apply it, so the
+        # exact-zero "No nuclear" bin falls back to the pale color-scheme yellow. Required to render grey.
+        "customNumericColorsActive": True,
     },
     ("oil", "generation"): {
         "baseColorScheme": "Reds",

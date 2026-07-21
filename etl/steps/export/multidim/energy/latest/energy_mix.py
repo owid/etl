@@ -51,7 +51,11 @@ METRIC_SUFFIXES = {
     "_per_capita_kwh": "per_capita",
     "_share_pct": "share",
     "_annual_change_twh": "annual_change",
+    "_annual_change_pct": "annual_change_pct",
 }
+# Diverging metrics whose map bins are symmetric around zero (sized from the 99th percentile of the
+# absolute change): the absolute year-on-year change and the percentage year-on-year change.
+DIVERGING_METRICS = {"annual_change", "annual_change_pct"}
 
 
 def run() -> None:
@@ -82,7 +86,7 @@ def run() -> None:
     dims_max = {}
     for column, dims in column_dimensions.items():
         series = tb_countries[column].astype("float64")
-        series = series.abs() if dims["metric"] == "annual_change" else series
+        series = series.abs() if dims["metric"] in DIVERGING_METRICS else series
         dims_max[(dims["source"], dims["metric"])] = float(series.quantile(0.99))
     for column, dims in column_dimensions.items():
         tb[column].m.dimensions = dims
@@ -147,6 +151,7 @@ def _view_title(source: str, metric: str) -> str:
             "per_capita": "Total energy supply per person",
             "share": "Total energy supply",
             "annual_change": "Annual change in total energy supply",
+            "annual_change_pct": "Annual percentage change in total energy supply",
         }[metric]
     name = SOURCE_TITLE_NAMES[source]
     return {
@@ -154,6 +159,7 @@ def _view_title(source: str, metric: str) -> str:
         "per_capita": f"Total energy supply from {name} per person",
         "share": f"Share of total energy supply from {name}",
         "annual_change": f"Annual change in total energy supply from {name}",
+        "annual_change_pct": f"Annual percentage change in total energy supply from {name}",
     }[metric]
 
 
@@ -165,6 +171,7 @@ METRIC_UNIT_PHRASE = {
     "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.",
     "share": "Measured as a percentage of [total energy supply](#dod:total-energy-supply).",
     "annual_change": "Annual change in [total energy supply](#dod:total-energy-supply) in one year, relative to the previous year.",
+    "annual_change_pct": "Percentage change in [total energy supply](#dod:total-energy-supply) in one year, relative to the previous year.",
 }
 SOURCE_COMPOSITION = {
     "fossil_fuels": "Fossil fuels are the sum of coal, oil, and gas.",
@@ -187,6 +194,11 @@ TOTAL_SUPPLY_SUBTITLE = {
     "per_capita": f"{_TES_DEFINITION}, measured in [kilowatt-hours](#dod:watt-hours) per person.",
     "annual_change": (
         "Annual change in [total energy supply](#dod:total-energy-supply) in one year, relative to the "
+        "previous year. Total energy supply is the primary energy a country uses after accounting for "
+        "imports and exports."
+    ),
+    "annual_change_pct": (
+        "Percentage change in [total energy supply](#dod:total-energy-supply) in one year, relative to the "
         "previous year. Total energy supply is the primary energy a country uses after accounting for "
         "imports and exports."
     ),
@@ -568,6 +580,66 @@ ORIGINAL_MAP_SCHEMES = {
         "binningStrategy": "manual",
         "customNumericValues": [0, 20, 50, 100, 200, 500, 1000, 1],
     },
+    ("coal", "annual_change_pct"): {
+        "baseColorScheme": "BrBG",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -50, -20, -10, 0, 10, 20, 50, 1],
+        "colorSchemeInvert": True,
+    },
+    ("fossil_fuels", "annual_change_pct"): {
+        "baseColorScheme": "BrBG",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -10, -5, 0, 5, 10, 1],
+        "customNumericColors": [None, None],
+        "colorSchemeInvert": True,
+    },
+    ("gas", "annual_change_pct"): {
+        "baseColorScheme": "PiYG",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -50, -20, -10, 0, 10, 20, 50, 1],
+        "customNumericColors": [None, None],
+        "colorSchemeInvert": True,
+    },
+    ("hydro", "annual_change_pct"): {
+        "baseColorScheme": "PuOr",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -50, -20, -10, 0, 10, 20, 50, 1],
+        "customNumericColors": [None],
+    },
+    ("low_carbon_energy", "annual_change_pct"): {
+        "baseColorScheme": "RdBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [-50, -15, -10, -5, 0, 5, 10, 15, 50],
+        "customNumericColors": [None],
+    },
+    ("nuclear", "annual_change_pct"): {
+        "baseColorScheme": "RdBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -50, -20, -10, 0, 10, 20, 50, 1],
+        "customNumericColors": [None, None],
+    },
+    ("renewables", "annual_change_pct"): {
+        "baseColorScheme": "RdBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -20, -15, -10, -5, 0, 5, 10, 15, 20, 1],
+        "customNumericColors": [None, None],
+    },
+    ("solar", "annual_change_pct"): {
+        "baseColorScheme": "PuOr",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -50, -20, -10, 0, 10, 20, 50, 100],
+    },
+    ("solar_and_wind", "annual_change_pct"): {
+        "baseColorScheme": "RdYlBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -50, -20, -10, 0, 10, 20, 50, 100],
+        "customNumericColors": [None, None, None],
+    },
+    ("wind", "annual_change_pct"): {
+        "baseColorScheme": "PuOr",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -50, -20, -10, 0, 10, 20, 50, 1],
+    },
 }
 
 # Per-source fallback for views without a pre-existing chart, so those maps are not all the same color.
@@ -659,7 +731,7 @@ def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
         color_scale.setdefault("binningStrategy", "manual")
         return {"colorScale": color_scale, "timeTolerance": 3}
     if scheme is None:
-        if metric == "annual_change":
+        if metric in DIVERGING_METRICS:
             scheme = {"baseColorScheme": "BrBG", "colorSchemeInvert": True}
         else:
             scheme = {"baseColorScheme": SOURCE_FALLBACK_SCHEME.get(source, "YlGnBu")}
@@ -673,7 +745,7 @@ def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
             color_scale["binningStrategy"] = "manual"
             # The trailing sentinel (smaller than the top edge) makes the top bracket open-ended.
             color_scale["customNumericValues"] = edges + ([edges[1] / 100] if open_top else [])
-    elif metric == "annual_change":
+    elif metric in DIVERGING_METRICS:
         # Diverging metric: symmetric decade bins open on both ends, so the lower bracket is open
         # even for sources that almost always grow (e.g. solar).
         edges = _diverging_thresholds(vmax)
