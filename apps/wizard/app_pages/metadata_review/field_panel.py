@@ -18,11 +18,7 @@ from apps.metadata_review.targets import MdimReview, ReviewableField
 from apps.wizard.app_pages.metadata_review import state
 from apps.wizard.app_pages.metadata_review.tracked_editor import tracked_editor
 
-PROVENANCE_BADGES = {
-    "override": ("green", "set in the MDim config"),
-    "inherited": ("blue", "inherited from the indicator (garden metadata)"),
-    "missing": ("red", "not set anywhere"),
-}
+PROVENANCE_COLORS = {"override": "green", "inherited": "blue", "missing": "red"}
 STATUS_ICONS = {"open": "💬", "implemented": "✅", "rejected": "🚫"}
 
 DESCRIPTION_KEY_FIELDS = {"metadata.description_key", "description_key"}
@@ -45,7 +41,7 @@ def render_field(
     key_ns: str = "main",
 ) -> None:
     """Render one reviewable field with its consolidated proposal and history."""
-    color, explanation = PROVENANCE_BADGES[field.provenance]
+    color = PROVENANCE_COLORS[field.provenance]
     open_suggestions = [s for s in suggestions if s.status == "open"]
     resolved = [s for s in suggestions if s.status != "open"]
     # At most one open proposal per field going forward; render the newest as
@@ -103,7 +99,7 @@ def render_field(
             st.caption("_(explicitly blank — the view suppresses the inherited text)_")
         else:
             st.markdown(f"> {field.current_value}")
-        st.caption(f"{explanation.capitalize()}. {field.edit_hint}")
+        st.caption(field.edit_hint)
 
         if field.provenance == "override" and field.inherited_value is not None:
             with st.expander("Inherited value this override replaces", expanded=False):
