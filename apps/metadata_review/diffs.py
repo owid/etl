@@ -92,10 +92,12 @@ def word_diff_html(current: str | None, proposed: str | None) -> str:
         else:
             removed = "".join(a[a0:a1]).strip()
             added = "".join(b[b0:b1]).strip()
+            # Leading space so a change never fuses with the preceding word when the
+            # diff consumed the whitespace token (HTML collapses doubled spaces).
             if removed:
-                parts.append(f'<del style="{_DEL_STYLE}">{html.escape(removed)}</del> ')
+                parts.append(f' <del style="{_DEL_STYLE}">{html.escape(removed)}</del> ')
             if added:
-                parts.append(f'<ins style="{_INS_STYLE}">{html.escape(added)}</ins> ')
+                parts.append(f' <ins style="{_INS_STYLE}">{html.escape(added)}</ins> ')
     return "".join(parts).strip()
 
 
