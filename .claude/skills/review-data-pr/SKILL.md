@@ -55,6 +55,7 @@ When it's a restructure:
 
 - **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
 - **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
+- **A chart remapped onto a successor indicator needs a config-vs-shape check.** Verify its pinned `selectedEntityNames` exist in the successor's data (v1 regional aggregates often don't — expect the garden step to rebuild them, mirroring the retired step's method), that pinned `yAxis` bounds don't clip the new range, and that the subtitle doesn't still describe the old construction. Any of the three broken: 🔴 (the default view renders empty, clipped, or mislabeled).
 - **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b), so their absence from the PR is correct — don't flag it.
 
 ### 4. Run the full pipeline end-to-end
