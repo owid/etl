@@ -454,6 +454,83 @@ def suggestions_by_source_key(
     return grouped
 
 
+def parametrize_value(
+    review: MdimReview, view_dims: dict[str, str], value: str | None
+) -> tuple[str, dict[str, str]] | None:
+    """Replace the view's own dimension words in `value` with `{dim}` placeholders.
+
+    Views of one MDim often render a single garden template whose output differs
+    only by dimension-derived words ("Income share of the richest 1%" vs "...the
+    richest 0.1%"). Substituting each dimension's surface form (the choice's human
+    name or slug variants, longest candidate first, case-insensitive) yields the
+    shared pattern; two views connect when their patterns match.
+
+    Returns (pattern, {dim_slug: matched substring}) when at least one dimension
+    word was found, else None.
+    """
+    if not value:
+        return None
+    dims_by_slug = {d.slug: d for d in review.dimensions}
+    pattern = str(value)
+    matches: dict[str, str] = {}
+    for dim_slug, choice_slug in view_dims.items():
+        dim = dims_by_slug.get(dim_slug)
+        candidates = {str(choice_slug), str(choice_slug).replace("_", " "), str(choice_slug).replace("_", "-")}
+        if dim is not None:
+            candidates.add(dim.choice_name(str(choice_slug)))
+        candidates |= {c.lstrip("_ -") for c in set(candidates)}
+        for candidate in sorted({c.strip() for c in candidates if len(c.strip()) >= 2}, key=len, reverse=True):
+            idx = pattern.lower().find(candidate.lower())
+            if idx >= 0:
+                matches[dim_slug] = pattern[idx : idx + len(candidate)]
+                pattern = pattern[:idx] + "{" + dim_slug + "}" + pattern[idx + len(candidate) :]
+                break
+    if not matches:
+        return None
+    return pattern, matches
+
+
+def _field_pattern(review: MdimReview, view: "ViewReview", field: ReviewableField) -> str | None:
+    parametrized = parametrize_value(review, view.dimensions, _norm(field.current_value))
+    return parametrized[0] if parametrized else None
+
+
+def transfer_proposal(
+    review: MdimReview,
+    proposal: gm.MetadataReviewSuggestion,
+    to_field: ReviewableField,
+) -> str | None:
+    """Re-render a pattern-shared proposal for another view.
+
+    Substitutes the filing view's dimension words in the proposed text with the
+    target view's — so a wording change filed on "richest 1%" displays with
+    "richest 0.1%" on that view. Returns None when the proposal edited the
+    dimension words themselves (no faithful transfer possible).
+    """
+    if proposal.suggestedValue is None or to_field.view_id is None:
+        return None
+    views_by_id = {v.view_id: v for v in review.views}
+    filing_view = views_by_id.get(proposal.filedFromViewId or "")
+    target_view = views_by_id.get(to_field.view_id)
+    if filing_view is None or target_view is None:
+        return None
+    source = parametrize_value(review, filing_view.dimensions, _norm(proposal.currentValue))
+    target = parametrize_value(review, target_view.dimensions, _norm(to_field.current_value))
+    if source is None or target is None or source[0] != target[0]:
+        return None
+    transferred = str(proposal.suggestedValue)
+    for dim_slug, source_word in source[1].items():
+        target_word = target[1].get(dim_slug)
+        if target_word is None:
+            return None
+        idx = transferred.lower().find(source_word.lower())
+        if idx < 0:
+            # The proposal changed the dimension word itself — don't transfer.
+            return None
+        transferred = transferred[:idx] + target_word + transferred[idx + len(source_word) :]
+    return transferred
+
+
 def shared_view_ids(review: MdimReview, field: ReviewableField) -> list[str]:
     """View ids (other than the field's own) rendering the same text for this field.
 
@@ -467,12 +544,18 @@ def shared_view_ids(review: MdimReview, field: ReviewableField) -> list[str]:
     if field.view_id is None or field.current_value is None:
         return []
     value = _norm(field.current_value)
+    own_view = next((v for v in review.views if v.view_id == field.view_id), None)
+    pattern = _field_pattern(review, own_view, field) if own_view is not None else None
     shared = []
     for view in review.views:
         if view.view_id == field.view_id:
             continue
         for other in view.fields:
-            if other.field_path == field.field_path and _norm(other.current_value) == value:
+            if other.field_path != field.field_path:
+                continue
+            if _norm(other.current_value) == value or (
+                pattern is not None and _field_pattern(review, view, other) == pattern
+            ):
                 shared.append(view.view_id)
     return shared
 
@@ -492,9 +575,15 @@ def threads_for_field(
     keys = {field.source_key()}
     if field.view_id is not None and field.current_value is not None:
         value = _norm(field.current_value)
+        own_view = next((v for v in review.views if v.view_id == field.view_id), None)
+        pattern = _field_pattern(review, own_view, field) if own_view is not None else None
         for view in review.views:
             for other in view.fields:
-                if other.field_path == field.field_path and _norm(other.current_value) == value:
+                if other.field_path != field.field_path:
+                    continue
+                if _norm(other.current_value) == value or (
+                    pattern is not None and _field_pattern(review, view, other) == pattern
+                ):
                     keys.add(other.source_key())
     seen: dict[int, gm.MetadataReviewSuggestion] = {}
     for key in keys:

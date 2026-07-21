@@ -194,6 +194,117 @@ def test_threads_for_field_borrows_across_indicators():
 
 
 # ---------------------------------------------------------------------------
+# Pattern sharing: same template, different dimension words per view
+# ---------------------------------------------------------------------------
+
+
+def _mdim_with_patterned_titles():
+    from apps.metadata_review.targets import DimensionChoice, DimensionInfo, MdimReview, ViewReview
+
+    review = MdimReview(
+        target_path="wid/latest/incomes#incomes", slug="incomes", title="T", title_variant=None, page_checksum="x"
+    )
+    review.dimensions = [
+        DimensionInfo(
+            slug="quantile",
+            name="Group",
+            choices=[
+                DimensionChoice(slug="richest_1pct", name="Richest 1%"),
+                DimensionChoice(slug="richest_0_1pct", name="Richest 0.1%"),
+            ],
+        ),
+        DimensionInfo(
+            slug="welfare_type",
+            name="Income measure",
+            choices=[DimensionChoice(slug="before_tax", name="before tax")],
+        ),
+    ]
+    titles = {
+        "richest_1pct": "Income share of the richest 1% (before tax)",
+        "richest_0_1pct": "Income share of the richest 0.1% (before tax)",
+    }
+    for quantile, title in titles.items():
+        view_id = f"quantile={quantile}__welfare_type=before_tax"
+        review.views.append(
+            ViewReview(
+                view_id=view_id,
+                dimensions={"quantile": quantile, "welfare_type": "before_tax"},
+                indicator_path=f"grapher/wid/latest/incomes/t#share__{quantile}",
+                fields=[
+                    _field(
+                        view_id=view_id,
+                        field_path="config.title",
+                        provenance="inherited",
+                        current_value=title,
+                        inherited_from=f"grapher/wid/latest/incomes/t#share__{quantile}",
+                    )
+                ],
+            )
+        )
+    return review
+
+
+def test_parametrize_value_uses_choice_names():
+    from apps.metadata_review.resolution import parametrize_value
+
+    review = _mdim_with_patterned_titles()
+    out = parametrize_value(
+        review,
+        {"quantile": "richest_1pct", "welfare_type": "before_tax"},
+        "Income share of the richest 1% (before tax)",
+    )
+    assert out is not None
+    pattern, matches = out
+    assert pattern == "Income share of the {quantile} ({welfare_type})"
+    assert matches == {"quantile": "richest 1%", "welfare_type": "before tax"}
+
+
+def test_pattern_connects_titles_across_views():
+    from apps.metadata_review.resolution import shared_view_ids, suggestions_by_source_key, threads_for_field
+
+    review = _mdim_with_patterned_titles()
+    field_1pct = review.views[0].fields[0]
+    assert shared_view_ids(review, field_1pct) == ["quantile=richest_0_1pct__welfare_type=before_tax"]
+    # A title suggestion filed on the 1% view shows on the 0.1% view.
+    suggestion = gm.MetadataReviewSuggestion(
+        targetType="indicator",
+        targetPath="grapher/wid/latest/incomes/t#share__richest_1pct",
+        fieldPath="grapher_config.title",
+        provenance="inherited",
+        createdBy=1,
+        currentValue="Income share of the richest 1% (before tax)",
+        suggestedValue="Income share received by the richest 1% (before tax)",
+        filedFromViewId="quantile=richest_1pct__welfare_type=before_tax",
+    )
+    suggestion.id = 1
+    grouped = suggestions_by_source_key([suggestion])
+    field_01 = review.views[1].fields[0]
+    # NOTE: view fields map config.title -> indicator key grapher_config.title.
+    assert [s.id for s in threads_for_field(review, field_01, grouped)] == [1]
+
+
+def test_transfer_proposal_rerenders_dimension_words():
+    from apps.metadata_review.resolution import transfer_proposal
+
+    review = _mdim_with_patterned_titles()
+    suggestion = gm.MetadataReviewSuggestion(
+        targetType="indicator",
+        targetPath="grapher/wid/latest/incomes/t#share__richest_1pct",
+        fieldPath="grapher_config.title",
+        provenance="inherited",
+        createdBy=1,
+        currentValue="Income share of the richest 1% (before tax)",
+        suggestedValue="Income share received by the richest 1% (before tax)",
+        filedFromViewId="quantile=richest_1pct__welfare_type=before_tax",
+    )
+    field_01 = review.views[1].fields[0]
+    assert transfer_proposal(review, suggestion, field_01) == "Income share received by the richest 0.1% (before tax)"
+    # Editing the dimension word itself blocks the transfer.
+    suggestion.suggestedValue = "Income share of the wealthiest people (before tax)"
+    assert transfer_proposal(review, suggestion, field_01) is None
+
+
+# ---------------------------------------------------------------------------
 # Bullet diffs (description_key consolidation)
 # ---------------------------------------------------------------------------
 

@@ -13,7 +13,7 @@ import streamlit as st
 
 import etl.grapher.model as gm
 from apps.metadata_review.diffs import bullet_diff, diff_summary, tracked_changes_html
-from apps.metadata_review.resolution import Staleness, check_staleness
+from apps.metadata_review.resolution import Staleness, check_staleness, transfer_proposal
 from apps.metadata_review.targets import MdimReview, ReviewableField
 from apps.wizard.app_pages.metadata_review import state
 from apps.wizard.app_pages.metadata_review.tracked_editor import tracked_editor
@@ -67,16 +67,36 @@ def render_field(
 
         # The field's text, shown ONCE: tracked changes when a proposal exists
         # (deletions struck through, insertions tinted), plain text otherwise.
+        display_value = None
+        transferred = False
         if proposal is not None and proposal.suggestedValue is not None:
+            base_matches = str(proposal.currentValue or "").strip() == str(field.current_value or "").strip()
+            if base_matches:
+                display_value = proposal.suggestedValue
+            elif mdim_review is not None:
+                # Pattern-shared thread filed on a view whose rendered text differs
+                # only by dimension words — re-render the proposal for THIS view.
+                display_value = transfer_proposal(mdim_review, proposal, field)
+                transferred = display_value is not None
+        if proposal is not None and display_value is not None:
             staleness = check_staleness(proposal, fields_by_key)
             if staleness.field_changed:
                 st.warning("The field's text changed since this proposal was filed — re-check the tracked changes.")
             is_bullets = field.field_path in DESCRIPTION_KEY_FIELDS
             if is_bullets:
-                st.caption(
-                    f"Bullet changes ({diff_summary(bullet_diff(field.current_value, proposal.suggestedValue))}):"
-                )
-            st.html(tracked_changes_html(field.current_value, proposal.suggestedValue, is_bullet_list=is_bullets))
+                st.caption(f"Bullet changes ({diff_summary(bullet_diff(field.current_value, display_value))}):")
+            st.html(tracked_changes_html(field.current_value, display_value, is_bullet_list=is_bullets))
+            if transferred:
+                st.caption("↳ Shared pattern — the proposed wording is shown with this view's dimension words.")
+        elif proposal is not None and proposal.suggestedValue is not None:
+            # Connected thread, but the proposal can't be re-rendered for this view
+            # (it changed the dimension words themselves). Show the current text.
+            if field.current_value is not None:
+                st.markdown(f"> {field.current_value}")
+            st.caption(
+                "✏️ A change to this text's shared pattern is proposed on another view — "
+                "open that view to see the tracked wording."
+            )
         elif field.current_value is None:
             st.caption("_(not set — the chart renders without it)_")
         elif str(field.current_value) == "":
