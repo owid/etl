@@ -12,10 +12,11 @@ import hashlib
 import streamlit as st
 
 import etl.grapher.model as gm
-from apps.metadata_review.diffs import bullet_diff, diff_markdown_lines, diff_summary
+from apps.metadata_review.diffs import bullet_diff, diff_summary, tracked_changes_html
 from apps.metadata_review.resolution import Staleness, check_staleness
 from apps.metadata_review.targets import MdimReview, ReviewableField
 from apps.wizard.app_pages.metadata_review import state
+from apps.wizard.app_pages.metadata_review.tracked_editor import tracked_editor
 
 PROVENANCE_BADGES = {
     "override": ("green", "set in the MDim config"),
@@ -95,7 +96,7 @@ def render_field(
                 fields_by_key=fields_by_key,
             )
         elif user is not None:
-            _render_suggestion_form(field, user, existing=None)
+            _render_edit_controls(field, user, existing=None)
 
         for suggestion in resolved:
             _render_resolved(suggestion, comments_by_suggestion.get(suggestion.id, []), users, user)
@@ -132,12 +133,14 @@ def _render_proposal(
 
         if proposal.suggestedValue is None:
             st.caption("_Discussion only — no replacement text proposed yet._")
-        elif field.field_path in DESCRIPTION_KEY_FIELDS:
-            ops = bullet_diff(field.current_value, proposal.suggestedValue)
-            st.caption(f"Bullet changes ({diff_summary(ops)}):")
-            st.markdown("\n".join(diff_markdown_lines(ops)))
         else:
-            st.markdown(f"> {proposal.suggestedValue}")
+            # Tracked changes: the text as it currently reads, with deletions struck
+            # through and insertions tinted (Google-Docs style).
+            is_bullets = field.field_path in DESCRIPTION_KEY_FIELDS
+            if is_bullets:
+                ops = bullet_diff(field.current_value, proposal.suggestedValue)
+                st.caption(f"Bullet changes ({diff_summary(ops)}):")
+            st.html(tracked_changes_html(field.current_value, proposal.suggestedValue, is_bullet_list=is_bullets))
 
         # Thread: comments from the canonical proposal plus any legacy parallel threads.
         comments = list(comments_by_suggestion.get(proposal.id, []))
@@ -179,7 +182,7 @@ def _render_proposal(
                 state.set_status(proposal.id, user.id, status)
                 st.rerun()
         with edit_col:
-            _render_suggestion_form(field, user, existing=proposal)
+            _render_edit_controls(field, user, existing=proposal)
 
 
 def _render_resolved(
@@ -209,52 +212,67 @@ def _render_resolved(
                 st.rerun()
 
 
-def _render_suggestion_form(
+def _render_edit_controls(
     field: ReviewableField,
     user: gm.User,
     existing: gm.MetadataReviewSuggestion | None,
 ) -> None:
-    """Popover to start a proposal, or refine the field's existing one."""
-    label = "✏️ Edit proposed text" if existing is not None else "✏️ Suggest a change / comment"
-    prefill = (
-        existing.suggestedValue
-        if existing is not None and existing.suggestedValue is not None
-        else (str(field.current_value) if field.current_value is not None else "")
-    )
-    with st.popover(label, use_container_width=False):
-        with st.form(key=_key(field, "form"), clear_on_submit=True, border=False):
-            suggested = st.text_area(
-                "Proposed text",
-                value=prefill,
-                key=_key(field, "value"),
-                height=120,
-                help="Edit the text as you think it should read. Leave unchanged for a comment-only entry.",
-            )
-            comment = st.text_area(
-                "Comment (why / context)",
-                key=_key(field, "comment"),
-                height=80,
-                placeholder="Optional: explain the reasoning...",
-            )
-            if st.form_submit_button("Submit"):
-                unchanged = suggested.strip() == prefill.strip()
-                if unchanged and not comment.strip():
-                    st.warning("Nothing to submit — edit the text or add a comment.")
-                elif existing is not None:
+    """In-place tracked-changes editing: the displayed text becomes editable, with a
+    live diff preview; saving files onto the field's consolidated proposal."""
+    editing_key = _key(field, "editing")
+    current = str(field.current_value) if field.current_value is not None else ""
+
+    if st.session_state.get(editing_key):
+        initial = existing.suggestedValue if existing is not None and existing.suggestedValue else current
+        result = tracked_editor(
+            original=current,
+            initial=initial,
+            key=_key(field, "editor"),
+            bullet_list=field.field_path in DESCRIPTION_KEY_FIELDS,
+        )
+        handled_key = _key(field, "nonce")
+        if result and result.get("nonce") != st.session_state.get(handled_key):
+            st.session_state[handled_key] = result.get("nonce")
+            if result.get("action") == "save":
+                text = (result.get("text") or "").strip()
+                comment = (result.get("comment") or "").strip() or None
+                if existing is not None:
                     # Refine the existing thread in place — it may be keyed to another
                     # view's source (borrowed by identical text).
+                    proposal_unchanged = text == (existing.suggestedValue or "").strip()
                     state.update_proposal(
                         existing.id,
                         user_id=user.id,
-                        suggested_value=None if unchanged else suggested.strip(),
-                        comment_text=comment.strip() or None,
+                        suggested_value=None if proposal_unchanged else text,
+                        comment_text=comment,
                     )
-                    st.rerun()
-                else:
+                elif text != current.strip() or comment:
                     state.create_suggestion(
                         field,
                         user_id=user.id,
-                        suggested_value=None if unchanged else suggested.strip(),
-                        comment_text=comment.strip() or None,
+                        suggested_value=None if text == current.strip() else text,
+                        comment_text=comment,
                     )
+            st.session_state[editing_key] = False
+            st.rerun()
+        return
+
+    label = "✏️ Refine proposed text" if existing is not None else "✏️ Suggest an edit"
+    col_edit, col_comment = st.columns([1, 1])
+    with col_edit:
+        if st.button(label, key=_key(field, "editbtn")):
+            st.session_state[editing_key] = True
+            st.rerun()
+    if existing is None:
+        with col_comment, st.popover("💬 Comment only"):
+            with st.form(key=_key(field, "cform"), clear_on_submit=True, border=False):
+                comment = st.text_area(
+                    "Comment",
+                    key=_key(field, "comment"),
+                    height=80,
+                    label_visibility="collapsed",
+                    placeholder="A remark without proposing text...",
+                )
+                if st.form_submit_button("Post") and comment.strip():
+                    state.create_suggestion(field, user_id=user.id, suggested_value=None, comment_text=comment.strip())
                     st.rerun()

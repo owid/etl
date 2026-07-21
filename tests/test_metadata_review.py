@@ -228,6 +228,29 @@ def test_bullet_diff_only_changed_bullets():
     assert not any("Keep me" in line for line in lines)
 
 
+def test_word_diff_html_tracks_changes_inline():
+    from apps.metadata_review.diffs import word_diff_html
+
+    out = word_diff_html("The mean income per person.", "The median income per capita.")
+    assert "<del" in out and "mean" in out
+    assert "<ins" in out and "median" in out
+    assert "income" in out  # unchanged words kept as plain text
+    # HTML in field text must be escaped, not rendered.
+    assert "<b>" not in word_diff_html("a <b>bold</b> word", "a <b>bold</b> word changed")
+
+
+def test_tracked_changes_html_bullets():
+    from apps.metadata_review.diffs import tracked_changes_html
+
+    out = tracked_changes_html(
+        "- Keep\n- Old wording here\n- Tail", "- Keep\n- New wording here\n- Tail", is_bullet_list=True
+    )
+    # The changed bullet is ONE bullet with inline word tracking, not a remove+add pair.
+    assert out.count("<li>") == 1
+    assert "<del" in out and "Old" in out and "<ins" in out and "New" in out
+    assert "unchanged" in out  # kept bullets collapsed
+
+
 def test_bullet_diff_no_changes():
     from apps.metadata_review.diffs import bullet_diff, diff_summary
 
