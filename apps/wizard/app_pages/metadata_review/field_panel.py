@@ -28,9 +28,9 @@ STATUS_ICONS = {"open": "💬", "implemented": "✅", "rejected": "🚫"}
 DESCRIPTION_KEY_FIELDS = {"metadata.description_key", "description_key"}
 
 
-def _key(field: ReviewableField, suffix: str) -> str:
+def _key(field: ReviewableField, suffix: str, ns: str = "main") -> str:
     digest = hashlib.md5("|".join(str(p) for p in field.source_key()).encode()).hexdigest()[:12]
-    return f"mrf_{digest}_{suffix}"
+    return f"mrf_{ns}_{digest}_{suffix}"
 
 
 def render_field(
@@ -42,6 +42,7 @@ def render_field(
     fields_by_key: dict[tuple, ReviewableField],
     shared_views: list[str] | None = None,
     mdim_review: MdimReview | None = None,
+    key_ns: str = "main",
 ) -> None:
     """Render one reviewable field with its consolidated proposal and history."""
     color, explanation = PROVENANCE_BADGES[field.provenance]
@@ -107,12 +108,13 @@ def render_field(
                 user=user,
                 fields_by_key=fields_by_key,
                 n_shared_views=len(shared_views) if shared_views else 0,
+                key_ns=key_ns,
             )
         elif user is not None:
-            _render_edit_controls(field, user, existing=None)
+            _render_edit_controls(field, user, existing=None, key_ns=key_ns)
 
         for suggestion in resolved:
-            _render_resolved(suggestion, comments_by_suggestion.get(suggestion.id, []), users, user)
+            _render_resolved(suggestion, comments_by_suggestion.get(suggestion.id, []), users, user, key_ns=key_ns)
 
 
 def _render_thread(
@@ -124,6 +126,7 @@ def _render_thread(
     user: gm.User | None,
     fields_by_key: dict[tuple, ReviewableField],
     n_shared_views: int = 0,
+    key_ns: str = "main",
 ) -> None:
     """The compact discussion strip under the field's (tracked) text.
 
@@ -167,7 +170,7 @@ def _render_thread(
             st.caption("Sign-in not detected — reply/status controls disabled.")
             return
 
-        reply_key = f"mrs_reply_{proposal.id}"
+        reply_key = f"mrs_reply_{key_ns}_{proposal.id}"
         with st.form(key=f"{reply_key}_form", clear_on_submit=True, border=False):
             reply = st.text_area(
                 "Reply", key=reply_key, height=80, label_visibility="collapsed", placeholder="Reply..."
@@ -176,9 +179,9 @@ def _render_thread(
                 state.add_comment(proposal.id, user.id, reply.strip())
                 st.rerun()
 
-        if st.session_state.get(_key(field, "editing")):
+        if st.session_state.get(_key(field, "editing", key_ns)):
             # The editor must span the whole section, not sit inside a button column.
-            _render_edit_controls(field, user, existing=proposal)
+            _render_edit_controls(field, user, existing=proposal, key_ns=key_ns)
         else:
             control_col, edit_col = st.columns([3, 2], vertical_alignment="center")
             with control_col:
@@ -186,14 +189,14 @@ def _render_thread(
                     "Status",
                     options=["open", "implemented", "rejected"],
                     default=proposal.status,
-                    key=f"mrs_status_{proposal.id}",
+                    key=f"mrs_status_{key_ns}_{proposal.id}",
                     label_visibility="collapsed",
                 )
                 if status and status != proposal.status:
                     state.set_status(proposal.id, user.id, status)
                     st.rerun()
             with edit_col:
-                _render_edit_controls(field, user, existing=proposal)
+                _render_edit_controls(field, user, existing=proposal, key_ns=key_ns)
 
 
 def _render_resolved(
@@ -201,6 +204,7 @@ def _render_resolved(
     comments: list,
     users: dict[int, str],
     user: gm.User | None,
+    key_ns: str = "main",
 ) -> None:
     """Resolved proposals collapse to a single history line."""
     icon = STATUS_ICONS.get(suggestion.status, "💬")
@@ -218,7 +222,7 @@ def _render_resolved(
             else:
                 st.markdown(f"**{comment_author}** · {when}: {comment.text}")
         if user is not None:
-            if st.button("Reopen", key=f"mrs_reopen_{suggestion.id}"):
+            if st.button("Reopen", key=f"mrs_reopen_{key_ns}_{suggestion.id}"):
                 state.set_status(suggestion.id, user.id, "open")
                 st.rerun()
 
@@ -227,10 +231,11 @@ def _render_edit_controls(
     field: ReviewableField,
     user: gm.User,
     existing: gm.MetadataReviewSuggestion | None,
+    key_ns: str = "main",
 ) -> None:
     """In-place tracked-changes editing: the displayed text becomes editable, with a
     live diff preview; saving files onto the field's consolidated proposal."""
-    editing_key = _key(field, "editing")
+    editing_key = _key(field, "editing", key_ns)
     current = str(field.current_value) if field.current_value is not None else ""
 
     if st.session_state.get(editing_key):
@@ -238,10 +243,10 @@ def _render_edit_controls(
         result = tracked_editor(
             original=current,
             initial=initial,
-            key=_key(field, "editor"),
+            key=_key(field, "editor", key_ns),
             bullet_list=field.field_path in DESCRIPTION_KEY_FIELDS,
         )
-        handled_key = _key(field, "nonce")
+        handled_key = _key(field, "nonce", key_ns)
         if result and result.get("nonce") != st.session_state.get(handled_key):
             st.session_state[handled_key] = result.get("nonce")
             if result.get("action") == "save":
@@ -271,15 +276,15 @@ def _render_edit_controls(
     label = "✏️ Refine proposed text" if existing is not None else "✏️ Suggest an edit"
     col_edit, col_comment = st.columns([1, 1])
     with col_edit:
-        if st.button(label, key=_key(field, "editbtn")):
+        if st.button(label, key=_key(field, "editbtn", key_ns)):
             st.session_state[editing_key] = True
             st.rerun()
     if existing is None:
         with col_comment, st.popover("💬 Comment only"):
-            with st.form(key=_key(field, "cform"), clear_on_submit=True, border=False):
+            with st.form(key=_key(field, "cform", key_ns), clear_on_submit=True, border=False):
                 comment = st.text_area(
                     "Comment",
-                    key=_key(field, "comment"),
+                    key=_key(field, "comment", key_ns),
                     height=80,
                     label_visibility="collapsed",
                     placeholder="A remark without proposing text...",

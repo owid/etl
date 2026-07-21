@@ -163,7 +163,9 @@ def mdim_page(user) -> None:
                     )
 
     with tab_all:
-        _all_suggestions_tab(suggestions, comments_by_suggestion, users, user, fields_by_key, catalog_path)
+        _all_suggestions_tab(
+            suggestions, comments_by_suggestion, users, user, fields_by_key, catalog_path, mdim_review=review
+        )
 
 
 def _open_overview() -> None:
@@ -337,8 +339,11 @@ def _all_suggestions_tab(
     user,
     fields_by_key,
     export_target: str,
+    mdim_review=None,
     header: bool = False,
 ) -> None:
+    """The worklist: every field with suggestions, rendered with the SAME component
+    as the main tab (tracked text, thread strip, controls), grouped by field."""
     if header:
         st.divider()
         st.subheader("All suggestions")
@@ -351,19 +356,46 @@ def _all_suggestions_tab(
     filtered = [s for s in suggestions if s.status in status_filter]
     if not filtered:
         st.info("No suggestions with the selected status.")
+
+    # One entry per field (source key), newest activity first.
+    grouped: dict[tuple, list] = {}
     for suggestion in filtered:
-        author = users.get(suggestion.createdBy, f"user {suggestion.createdBy}")
-        with st.container(border=True):
-            st.markdown(
-                f"**#{suggestion.id}** `{suggestion.fieldPath}` on `{suggestion.targetPath}`"
-                + (f" (view `{suggestion.viewId}`)" if suggestion.viewId else "")
-            )
-            st.caption(f"{suggestion.status} · by {author} · {suggestion.createdAt:%Y-%m-%d}")
-            if suggestion.suggestedValue:
-                st.markdown(f"> {suggestion.suggestedValue}")
-            for comment in comments_by_suggestion.get(suggestion.id, []):
-                if comment.kind == "comment":
-                    st.caption(f"💬 {users.get(comment.userId, '?')}: {comment.text}")
+        key = (suggestion.targetType, suggestion.targetPath, suggestion.viewId, suggestion.fieldPath)
+        grouped.setdefault(key, []).append(suggestion)
+    ordered = sorted(grouped.items(), key=lambda kv: max(s.updatedAt for s in kv[1]), reverse=True)
+
+    for key, threads in ordered:
+        field = fields_by_key.get(key)
+        if field is None:
+            # The view/indicator no longer exists on this page — compact stale card.
+            with st.container(border=True):
+                st.markdown(f"**#{threads[0].id}** `{key[3]}` on `{key[1]}`")
+                st.warning("The view/indicator this suggestion targets no longer exists on this page.")
+                for suggestion in threads:
+                    if suggestion.suggestedValue:
+                        st.markdown(f"> {suggestion.suggestedValue}")
+            continue
+        # Where the field lives (human-readable view selection for MDims).
+        view_id = field.view_id or threads[0].filedFromViewId
+        if mdim_review is not None and view_id:
+            view = next((v for v in mdim_review.views if v.view_id == view_id), None)
+            if view is not None:
+                dims = mdim_review.human_dimensions(view.dimensions)
+                st.caption("View: " + " · ".join(f"**{k}:** {v}" for k, v in dims.items()))
+        elif field.target_type == "indicator":
+            st.caption(f"Indicator: `{field.target_path}`")
+        shared = shared_view_ids(mdim_review, field) if mdim_review is not None else None
+        render_field(
+            field,
+            threads,
+            comments_by_suggestion,
+            users,
+            user,
+            fields_by_key,
+            shared_views=shared,
+            mdim_review=mdim_review,
+            key_ns="all",
+        )
 
     st.divider()
     st.markdown("**Implementing these suggestions?** Export them with resolved edit locations:")
