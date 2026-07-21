@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.collection import combine_collections
+from etl.collection.download_package import build_download_package
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -287,6 +288,21 @@ def run() -> None:
             }
 
         edit_indicator_displays(view)
+
+    #
+    # PROTOTYPE (mdim-downloads project): build the "download complete
+    # dataset" package -- a wide CSV + manifest + README covering every
+    # dimension combination, zipped. Real deployment would upload the zip
+    # to R2 and use that URL; this prototype writes it to the step's own
+    # export dir and points at a local dev URL for demoing end-to-end.
+    #
+    pkg = build_download_package(
+        tables=[tb_undp, tb_opri, tb_gender_stats],
+        dest_dir=paths.dest_dir / "download_package",
+        title=config["title"]["title"],
+        slug=paths.short_name,
+    )
+    c.download_package = pkg.to_config(url=f"/mdim-download-prototype/{paths.short_name}.zip")
 
     #
     # Save garden dataset.
