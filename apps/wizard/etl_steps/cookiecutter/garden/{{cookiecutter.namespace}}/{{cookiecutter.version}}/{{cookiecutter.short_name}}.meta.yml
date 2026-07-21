@@ -60,7 +60,7 @@ tables:
       #     tableDisplay:
       #       hideAbsoluteChange:
       #       hideRelativeChange:
-      #     yearIsDay: false
+      #     timeInterval: day  # day | week | month | quarter | year | decade; omit for yearly data. Sub-yearly data is encoded as days-since-zeroDay integers.
       #     zeroDay:
       #     roundingMode:
       #     numSignificantFigures:

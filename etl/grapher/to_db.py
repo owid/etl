@@ -534,8 +534,9 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
 
 
 def _get_timespan(table: pd.DataFrame, variable_meta: VariableMeta) -> str:
-    # Timespan does not work for yearIsDay variables
-    if (variable_meta.display or {}).get("yearIsDay"):
+    display = variable_meta.display or {}
+    # Timespan does not work for sub-yearly data
+    if display.get("yearIsDay") or display.get("timeInterval") in {"day", "week", "month", "quarter"}:
         return ""
     else:
         years = table.year.unique()
