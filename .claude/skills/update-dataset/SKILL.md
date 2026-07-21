@@ -248,7 +248,6 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    | Categorical flags / codes | exact value set (e.g. `<= {0, 1}`) and non-null |
    | Input schema | set-equality on expected columns — catches the next source rename (PFMH: `debt` → `d`) with a clear message |
    | Coverage | country-count floors (≥ previous version); a drop is usually a parsing/mapping regression — re-audit before bumping the constant |
-   | Related indicators (an index and its components, a weighted and an unweighted variant) | **Cross-indicator invariants beat per-value bounds**: arithmetic identities (`composite ≡ progressive − regressive`), a correlation floor between two measures of the same construct (ground it in the observed range first), integer-valuedness of counts, and weighted-means-lie-within-the-range-they-average. These trip on structural breakage that value bounds can't see. |
 
    Implementation conventions: constants at the top, `run()` first, check functions **below** `run()`; `sanity_check_inputs(tb)` right after loading meadow, `sanity_check_outputs(tb)` right before `paths.create_dataset(...)`; plain `assert` with messages that name the offending values. Reference example: [`imf/2026-06-12/public_finances_modern_history.py`](../../../etl/steps/data/garden/imf/2026-06-12/public_finances_modern_history.py).
 
