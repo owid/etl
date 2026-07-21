@@ -64,7 +64,19 @@ def render_field(
                 badges.append(f":gray-badge[appears in {len(shared_views) + 1} views]")
             st.markdown(" ".join(badges))
 
-        if field.current_value is None:
+        # The field's text, shown ONCE: tracked changes when a proposal exists
+        # (deletions struck through, insertions tinted), plain text otherwise.
+        if proposal is not None and proposal.suggestedValue is not None:
+            staleness = check_staleness(proposal, fields_by_key)
+            if staleness.field_changed:
+                st.warning("The field's text changed since this proposal was filed — re-check the tracked changes.")
+            is_bullets = field.field_path in DESCRIPTION_KEY_FIELDS
+            if is_bullets:
+                st.caption(
+                    f"Bullet changes ({diff_summary(bullet_diff(field.current_value, proposal.suggestedValue))}):"
+                )
+            st.html(tracked_changes_html(field.current_value, proposal.suggestedValue, is_bullet_list=is_bullets))
+        elif field.current_value is None:
             st.caption("_(not set — the chart renders without it)_")
         elif str(field.current_value) == "":
             st.caption("_(explicitly blank — the view suppresses the inherited text)_")
@@ -86,7 +98,7 @@ def render_field(
                     st.markdown("- " + (" · ".join(f"**{k}:** {v}" for k, v in dims.items()) or view_id))
 
         if proposal is not None:
-            _render_proposal(
+            _render_thread(
                 field,
                 proposal,
                 extra_threads=open_suggestions[1:],
@@ -94,6 +106,7 @@ def render_field(
                 users=users,
                 user=user,
                 fields_by_key=fields_by_key,
+                n_shared_views=len(shared_views) if shared_views else 0,
             )
         elif user is not None:
             _render_edit_controls(field, user, existing=None)
@@ -102,7 +115,7 @@ def render_field(
             _render_resolved(suggestion, comments_by_suggestion.get(suggestion.id, []), users, user)
 
 
-def _render_proposal(
+def _render_thread(
     field: ReviewableField,
     proposal: gm.MetadataReviewSuggestion,
     extra_threads: list[gm.MetadataReviewSuggestion],
@@ -110,37 +123,31 @@ def _render_proposal(
     users: dict[int, str],
     user: gm.User | None,
     fields_by_key: dict[tuple, ReviewableField],
+    n_shared_views: int = 0,
 ) -> None:
-    """The single consolidated proposal block for a field."""
+    """The compact discussion strip under the field's (tracked) text.
+
+    The proposed text itself is NOT repeated here — the field's main text block
+    above already shows it as tracked changes.
+    """
     staleness: Staleness = check_staleness(proposal, fields_by_key)
     author = users.get(proposal.createdBy, f"user {proposal.createdBy}")
 
     with st.container(border=True):
-        header = f"**✏️ Proposed change** — started by {author}, {proposal.createdAt:%Y-%m-%d}"
-        if staleness.is_stale:
-            header += " · :orange-badge[⚠️ page changed since]"
-        st.markdown(header)
+        meta = f"✏️ Proposed by **{author}**, {proposal.createdAt:%Y-%m-%d}"
+        if n_shared_views:
+            noun = "view" if n_shared_views == 1 else "views"
+            meta += f" — this change applies here and in **{n_shared_views}** other {noun}"
+        st.markdown(meta)
 
         if staleness.target_gone:
             st.warning("The view/indicator this proposal was filed on no longer exists on this page.")
         elif staleness.field_changed:
-            st.warning(
-                "The field's text changed since this proposal was filed — "
-                "re-check the proposal against the current text above."
-            )
             with st.expander("Text when the proposal was filed", expanded=False):
                 st.markdown(f"> {proposal.currentValue or '_(not set)_'}")
 
         if proposal.suggestedValue is None:
             st.caption("_Discussion only — no replacement text proposed yet._")
-        else:
-            # Tracked changes: the text as it currently reads, with deletions struck
-            # through and insertions tinted (Google-Docs style).
-            is_bullets = field.field_path in DESCRIPTION_KEY_FIELDS
-            if is_bullets:
-                ops = bullet_diff(field.current_value, proposal.suggestedValue)
-                st.caption(f"Bullet changes ({diff_summary(ops)}):")
-            st.html(tracked_changes_html(field.current_value, proposal.suggestedValue, is_bullet_list=is_bullets))
 
         # Thread: comments from the canonical proposal plus any legacy parallel threads.
         comments = list(comments_by_suggestion.get(proposal.id, []))
