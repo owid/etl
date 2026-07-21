@@ -6,9 +6,11 @@ file field-level suggestions with threaded comments. The data scientist exports
 them with `etl metadata-review export <target>` and implements the changes in ETL.
 """
 
+import html as html_lib
 from urllib.parse import quote, urlencode
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Wizard: Metadata Review", page_icon="🪄", layout="wide")
 
@@ -128,7 +130,7 @@ def mdim_page(user) -> None:
                 # The real MDim page (admin preview renders the full page, controls included),
                 # so the reviewer sees exactly what readers see.
                 page_url = f"{OWID_ENV.admin_site}/grapher/{quote(catalog_path, safe='')}?{urlencode(view.dimensions)}"
-                st.iframe(page_url, height=850)
+                _page_embed(page_url, height=850)
                 st.caption(
                     "This is the live page. Note: changing the dropdowns *inside* the page won't move the "
                     "field panel — use the selectors above to switch views."
@@ -156,6 +158,22 @@ def mdim_page(user) -> None:
 
     with tab_all:
         _all_suggestions_tab(suggestions, comments_by_suggestion, users, user, fields_by_key, catalog_path)
+
+
+def _page_embed(url: str, height: int = 850) -> None:
+    """Embed a live page in an iframe that reliably reloads when the URL changes.
+
+    `st.iframe` keeps the same component instance across reruns, and the embedded
+    MDim page rewrites its own query params client-side — so swapping the `src`
+    prop doesn't always navigate. Rendering the iframe as raw HTML makes the
+    component content change with the URL, forcing a remount.
+    """
+    components.html(
+        f'<iframe src="{html_lib.escape(url, quote=True)}" loading="lazy" '
+        f'style="width:100%;height:{height - 20}px;border:1px solid #e6e6e6;border-radius:4px;background:#fff;">'
+        "</iframe>",
+        height=height,
+    )
 
 
 def _view_browser(review: MdimReview):
@@ -231,7 +249,7 @@ def dataset_page(user) -> None:
                 if indicator.variable_id is not None:
                     # The real data page (admin preview), so the reviewer sees exactly
                     # what readers see — key information, sources, and all.
-                    st.iframe(OWID_ENV.data_page_preview(indicator.variable_id), height=850)
+                    _page_embed(OWID_ENV.data_page_preview(indicator.variable_id), height=850)
             with col_fields:
                 for field in indicator.fields:
                     render_field(
