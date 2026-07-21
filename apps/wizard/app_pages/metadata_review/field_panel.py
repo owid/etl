@@ -274,7 +274,9 @@ def _render_edit_controls(
     current = str(field.current_value) if field.current_value is not None else ""
 
     if st.session_state.get(editing_key):
-        initial = existing.suggestedValue if existing is not None and existing.suggestedValue else current
+        # `is not None`, not truthiness: an empty string is a real proposal (clear the
+        # field) and must survive a refine round-trip.
+        initial = existing.suggestedValue if existing is not None and existing.suggestedValue is not None else current
         result = tracked_editor(
             original=current,
             initial=initial,
