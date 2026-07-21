@@ -40,7 +40,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "js-yaml": "^4.2.0"
+    "js-yaml": "^5.2.1"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
@@ -49,7 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^8.57.1",
     "@typescript-eslint/parser": "^8.57.1",
     "esbuild": "^0.28.1",
-    "eslint": "^9.39.4",
+    "eslint": "^10.7.0",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.3"
   }
