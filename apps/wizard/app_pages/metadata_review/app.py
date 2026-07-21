@@ -82,7 +82,12 @@ def mdim_page(user) -> None:
     options = [m["catalog_path"] for m in mdims]
     labels = {}
     for m in mdims:
-        label = f"{m['slug'] or m['catalog_path']}" + ("" if m["published"] else " (unpublished)")
+        label = m["title"] or m["slug"] or m["catalog_path"]
+        if m["title_variant"]:
+            label += f" · {m['title_variant']}"
+        label += f"  ({m['slug'] or m['catalog_path']})"
+        if not m["published"]:
+            label += " (unpublished)"
         n_open = open_counts.get(m["catalog_path"], 0)
         if n_open:
             label += f" — 💬 {n_open} open"
@@ -100,7 +105,12 @@ def mdim_page(user) -> None:
         st.stop()
 
     review = state.cached_resolve_mdim(catalog_path)
-    suggestions, comments_by_suggestion, users = state.load_suggestions([catalog_path] + review.indicator_paths)
+    # Widen to the whole grapher dataset(s): threads filed on sibling MDims built
+    # from the same metadata (e.g. incomes_wid <-> palma_ratio_wid) surface here too.
+    prefixes = sorted({"/".join(p.split("/")[:4]) for p in review.indicator_paths})
+    suggestions, comments_by_suggestion, users = state.load_suggestions(
+        [catalog_path] + review.indicator_paths, path_prefixes=prefixes
+    )
     suggestions_by_key = suggestions_by_source_key(suggestions)
     fields_by_key: dict[tuple, ReviewableField] = {}
     for field in review.all_fields:
@@ -146,16 +156,15 @@ def mdim_page(user) -> None:
                 _page_embed(page_url, height=620, hide_page_selectors=True)
                 st.caption("Live page — scroll inside for key information and sources.")
             with col_fields:
-                with st.container(height=780, border=False):
-                    _render_grouped_fields(
-                        view.fields,
-                        review,
-                        suggestions_by_key,
-                        comments_by_suggestion,
-                        users,
-                        user,
-                        fields_by_key,
-                    )
+                _render_grouped_fields(
+                    view.fields,
+                    review,
+                    suggestions_by_key,
+                    comments_by_suggestion,
+                    users,
+                    user,
+                    fields_by_key,
+                )
 
     with tab_all:
         _all_suggestions_tab(
@@ -264,35 +273,30 @@ def _render_grouped_fields(
     user,
     fields_by_key,
 ) -> None:
-    """Field boxes grouped by what they annotate: chart text, then data-page metadata."""
+    """Field boxes split into tabs by what they annotate — chart text vs data-page
+    metadata — so neither list needs its own scroll."""
     chart_fields = [f for f in fields if f.field_path in CHART_TEXT_FIELDS]
     data_fields = [f for f in fields if f.field_path not in CHART_TEXT_FIELDS]
-    groups = [
-        (":material/bar_chart: Chart text — title, subtitle and footnote as rendered on the chart", chart_fields),
-        (":material/description: About the data — shown on the data page below the chart", data_fields),
-    ]
-    for header, group in groups:
-        if not group:
-            continue
-        st.markdown(f"##### {header.split(' — ')[0]}")
-        st.caption(header.split(" — ")[1].capitalize())
-        for field in group:
-            if mdim_review is not None:
-                shared = shared_view_ids(mdim_review, field)
+    tab_chart, tab_data = st.tabs([":material/bar_chart: Chart text", ":material/description: About the data"])
+    for tab, caption, group in [
+        (tab_chart, "Title, subtitle and footnote as rendered on the chart.", chart_fields),
+        (tab_data, "Shown on the data page below the chart.", data_fields),
+    ]:
+        with tab:
+            st.caption(caption)
+            for field in group:
+                shared = shared_view_ids(mdim_review, field) if mdim_review is not None else None
                 threads = threads_for_field(mdim_review, field, suggestions_by_key)
-            else:
-                shared = None
-                threads = suggestions_by_key.get(field.source_key(), [])
-            render_field(
-                field,
-                threads,
-                comments_by_suggestion,
-                users,
-                user,
-                fields_by_key,
-                shared_views=shared,
-                mdim_review=mdim_review,
-            )
+                render_field(
+                    field,
+                    threads,
+                    comments_by_suggestion,
+                    users,
+                    user,
+                    fields_by_key,
+                    shared_views=shared,
+                    mdim_review=mdim_review,
+                )
 
 
 def _view_browser(review: MdimReview):
@@ -336,7 +340,8 @@ def dataset_page(user) -> None:
         st.stop()
 
     review = state.cached_resolve_dataset(catalog_path)
-    suggestions, comments_by_suggestion, users = state.load_suggestions(review.indicator_paths)
+    prefixes = sorted({"/".join(p.split("/")[:4]) for p in review.indicator_paths})
+    suggestions, comments_by_suggestion, users = state.load_suggestions(review.indicator_paths, path_prefixes=prefixes)
     suggestions_by_key = suggestions_by_source_key(suggestions)
     fields_by_key: dict[tuple, ReviewableField] = {}
     for indicator in review.indicators:
@@ -414,25 +419,22 @@ def _all_suggestions_tab(
     filtered = [s for s in suggestions if s.status in status_filter]
     if not filtered:
         st.info("No suggestions with the selected status.")
+    filtered_ids = {s.id for s in filtered}
 
-    # One entry per field (source key), newest activity first.
-    grouped: dict[tuple, list] = {}
-    for suggestion in filtered:
-        key = (suggestion.targetType, suggestion.targetPath, suggestion.viewId, suggestion.fieldPath)
-        grouped.setdefault(key, []).append(suggestion)
-    ordered = sorted(grouped.items(), key=lambda kv: max(s.updatedAt for s in kv[1]), reverse=True)
-
-    for key, threads in ordered:
-        field = fields_by_key.get(key)
-        if field is None:
-            # The view/indicator no longer exists on this page — compact stale card.
-            with st.container(border=True):
-                st.markdown(f"**#{threads[0].id}** `{key[3]}` on `{key[1]}`")
-                st.warning("The view/indicator this suggestion targets no longer exists on this page.")
-                for suggestion in threads:
-                    if suggestion.suggestedValue:
-                        st.markdown(f"> {suggestion.suggestedValue}")
+    # One entry per FIELD with threads (same component as the main tab); threads
+    # borrowed across views/pages land under the field that displays them.
+    suggestions_by_key = suggestions_by_source_key(suggestions)
+    claimed: set[int] = set()
+    entries = []
+    for field in fields_by_key.values():
+        threads = [t for t in threads_for_field(mdim_review, field, suggestions_by_key) if t.id in filtered_ids]
+        if not threads or all(t.id in claimed for t in threads):
             continue
+        claimed.update(t.id for t in threads)
+        entries.append((field, threads, max(t.updatedAt for t in threads)))
+    entries.sort(key=lambda e: e[2], reverse=True)
+
+    for field, threads, _ts in entries:
         # Where the field lives (human-readable view selection for MDims).
         view_id = field.view_id or threads[0].filedFromViewId
         if mdim_review is not None and view_id:
@@ -454,6 +456,14 @@ def _all_suggestions_tab(
             mdim_review=mdim_review,
             key_ns="all",
         )
+
+    # Suggestions no field on this page displays (their target vanished).
+    for suggestion in [s for s in filtered if s.id not in claimed]:
+        with st.container(border=True):
+            st.markdown(f"**#{suggestion.id}** `{suggestion.fieldPath}` on `{suggestion.targetPath}`")
+            st.warning("No field on this page currently renders the text this suggestion targets.")
+            if suggestion.suggestedValue:
+                st.markdown(f"> {suggestion.suggestedValue}")
 
     st.divider()
     st.markdown("**Implementing these suggestions?** Export them with resolved edit locations:")

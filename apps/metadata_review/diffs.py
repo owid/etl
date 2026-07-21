@@ -112,8 +112,7 @@ def tracked_changes_html(current: str | None, proposed: str | None, is_bullet_li
         return f'<div style="line-height:1.55;font-size:0.95rem;">{body}</div>'
 
     lines: list[str] = []
-    ops = bullet_diff(current, proposed)
-    i, keep_run = 0, 0
+    keep_run = 0
 
     def flush_keeps() -> None:
         nonlocal keep_run
@@ -122,26 +121,118 @@ def tracked_changes_html(current: str | None, proposed: str | None, is_bullet_li
             lines.append(f'<li style="color:#888;list-style:none;">… {keep_run} unchanged {noun}</li>')
             keep_run = 0
 
-    while i < len(ops):
-        op = ops[i]
-        if op.op == "keep":
+    for kind, removed, added in paired_ops(bullet_diff(current, proposed)):
+        if kind == "keep":
             keep_run += 1
-            i += 1
-        elif op.op == "remove" and i + 1 < len(ops) and ops[i + 1].op == "add":
+        elif kind == "pair":
             # A changed bullet: render as one bullet with inline word tracking.
             flush_keeps()
-            lines.append(f"<li>{word_diff_html(op.text, ops[i + 1].text)}</li>")
-            i += 2
-        elif op.op == "remove":
+            lines.append(f"<li>{word_diff_html(removed, added)}</li>")
+        elif kind == "remove":
             flush_keeps()
-            lines.append(f'<li><del style="{_DEL_STYLE}">{html.escape(op.text)}</del></li>')
-            i += 1
+            lines.append(f'<li><del style="{_DEL_STYLE}">{html.escape(removed or "")}</del></li>')
         else:
             flush_keeps()
-            lines.append(f'<li><ins style="{_INS_STYLE}">{html.escape(op.text)}</ins></li>')
-            i += 1
+            lines.append(f'<li><ins style="{_INS_STYLE}">{html.escape(added or "")}</ins></li>')
     flush_keeps()
     return '<ul style="line-height:1.55;font-size:0.95rem;margin:0;padding-left:1.2rem;">' + "".join(lines) + "</ul>"
+
+
+def paired_ops(ops: list[BulletDiff]) -> list[tuple[str, str | None, str | None]]:
+    """Regroup a bullet-diff into edit units, pairing removes with adds positionally.
+
+    SequenceMatcher emits a replace block as ALL removes followed by ALL adds;
+    pairing them index-wise turns that into per-bullet rewrites. Yields tuples
+    ("keep", text, None) | ("pair", removed, added) | ("remove", removed, None)
+    | ("add", None, added).
+    """
+    units: list[tuple[str, str | None, str | None]] = []
+    i = 0
+    while i < len(ops):
+        if ops[i].op == "keep":
+            units.append(("keep", ops[i].text, None))
+            i += 1
+            continue
+        removes: list[str] = []
+        adds: list[str] = []
+        while i < len(ops) and ops[i].op == "remove":
+            removes.append(ops[i].text)
+            i += 1
+        while i < len(ops) and ops[i].op == "add":
+            adds.append(ops[i].text)
+            i += 1
+        for j in range(max(len(removes), len(adds))):
+            removed = removes[j] if j < len(removes) else None
+            added = adds[j] if j < len(adds) else None
+            if removed is not None and added is not None:
+                units.append(("pair", removed, added))
+            elif removed is not None:
+                units.append(("remove", removed, None))
+            else:
+                units.append(("add", None, added))
+    return units
+
+
+def apply_bullet_edits(
+    proposal_current: str | None,
+    proposal_suggested: str | None,
+    target_current: str | None,
+) -> tuple[str, int, int] | None:
+    """Re-apply a bullet-list proposal to ANOTHER field's bullet list.
+
+    Different pages (e.g. two MDims built from the same garden metadata) often
+    share individual bullets via YAML anchors while their full lists differ. Each
+    edit unit (a bullet rewrite/removal, or an addition anchored after a bullet)
+    carries over when its bullet exists verbatim in the target list; units
+    touching page-specific bullets are skipped. Returns
+    (transferred text, edits applied, edits in the proposal), or None when
+    nothing applies.
+    """
+    ops = bullet_diff(proposal_current, proposal_suggested)
+    if all(op.op == "keep" for op in ops):
+        return None
+    target = split_bullets(target_current)
+
+    def find(bullet: str) -> int:
+        try:
+            return target.index(bullet)
+        except ValueError:
+            return -1
+
+    anchor = -1  # last position in `target` we matched or touched.
+    anchored = False
+    applied, total = 0, 0
+    for kind, removed, added in paired_ops(ops):
+        if kind == "keep":
+            pos = find(removed or "")
+            if pos >= 0:
+                anchor = pos
+                anchored = True
+            continue
+        total += 1
+        if kind in ("pair", "remove"):
+            pos = find(removed or "")
+            if pos < 0:
+                continue  # page-specific bullet — this edit doesn't apply here.
+            if kind == "pair" and added is not None:
+                target[pos] = added
+                anchor = pos
+            else:
+                del target[pos]
+                anchor = pos - 1
+            anchored = True
+            applied += 1
+        elif added is not None:  # pure addition
+            if not anchored:
+                continue  # no shared context to anchor the new bullet to.
+            target.insert(anchor + 1, added)
+            anchor += 1
+            applied += 1
+
+    if applied == 0:
+        return None
+    text = target[0] if len(target) == 1 else "\n".join(f"- {b}" for b in target)
+    return text, applied, total
 
 
 def diff_markdown_lines(ops: list[BulletDiff], collapse_keeps: bool = True) -> list[str]:

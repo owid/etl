@@ -12,7 +12,7 @@ import hashlib
 import streamlit as st
 
 import etl.grapher.model as gm
-from apps.metadata_review.diffs import bullet_diff, diff_summary, tracked_changes_html
+from apps.metadata_review.diffs import apply_bullet_edits, bullet_diff, diff_summary, tracked_changes_html
 from apps.metadata_review.resolution import Staleness, check_staleness, transfer_proposal
 from apps.metadata_review.targets import MdimReview, ReviewableField
 from apps.wizard.app_pages.metadata_review import state
@@ -75,26 +75,41 @@ def render_field(
         # The field's text, shown ONCE: tracked changes when a proposal exists
         # (deletions struck through, insertions tinted), plain text otherwise.
         display_value = None
-        transferred = False
+        transfer_note = None
         if proposal is not None and proposal.suggestedValue is not None:
             base_matches = str(proposal.currentValue or "").strip() == str(field.current_value or "").strip()
             if base_matches:
                 display_value = proposal.suggestedValue
+            elif field.field_path in DESCRIPTION_KEY_FIELDS:
+                # Bullet lists share individual bullets across pages — re-apply the
+                # proposal's bullet edits to THIS field's list (partially if needed).
+                transfer = apply_bullet_edits(
+                    proposal.currentValue, proposal.suggestedValue, str(field.current_value or "")
+                )
+                if transfer is not None:
+                    display_value, n_applied, n_total = transfer
+                    transfer_note = "↳ Shared bullets — the proposal's edits are applied to this page's list."
+                    if n_applied < n_total:
+                        transfer_note = (
+                            f"↳ {n_applied} of {n_total} bullet edits apply here — "
+                            "the rest touch bullets this page doesn't have."
+                        )
             elif mdim_review is not None:
                 # Pattern-shared thread filed on a view whose rendered text differs
                 # only by dimension words — re-render the proposal for THIS view.
                 display_value = transfer_proposal(mdim_review, proposal, field)
-                transferred = display_value is not None
+                if display_value is not None:
+                    transfer_note = "↳ Shared pattern — the proposed wording is shown with this view's dimension words."
         if proposal is not None and display_value is not None:
-            staleness = check_staleness(proposal, fields_by_key)
+            staleness = check_staleness(proposal, fields_by_key, display_field=field)
             if staleness.field_changed:
                 st.warning("The field's text changed since this proposal was filed — re-check the tracked changes.")
             is_bullets = field.field_path in DESCRIPTION_KEY_FIELDS
             if is_bullets:
                 st.caption(f"Bullet changes ({diff_summary(bullet_diff(field.current_value, display_value))}):")
             st.html(tracked_changes_html(field.current_value, display_value, is_bullet_list=is_bullets))
-            if transferred:
-                st.caption("↳ Shared pattern — the proposed wording is shown with this view's dimension words.")
+            if transfer_note:
+                st.caption(transfer_note)
         elif proposal is not None and proposal.suggestedValue is not None:
             # Connected thread, but the proposal can't be re-rendered for this view
             # (it changed the dimension words themselves). Show the current text.
@@ -150,10 +165,14 @@ def _render_thread(
     The proposed text itself is NOT repeated here — the field's main text block
     above already shows it as tracked changes.
     """
-    staleness: Staleness = check_staleness(proposal, fields_by_key)
+    staleness: Staleness = check_staleness(proposal, fields_by_key, display_field=field)
     author = users.get(proposal.createdBy, f"user {proposal.createdBy}")
 
-    st.caption(f"✏️ Proposed by **{author}**, {proposal.createdAt:%Y-%m-%d}")
+    meta = f"✏️ Proposed by **{author}**, {proposal.createdAt:%Y-%m-%d}"
+    if proposal.filedFromPath and proposal.filedFromPath != field.target_path:
+        # Cross-page thread (e.g. filed on a sibling MDim sharing this metadata).
+        meta += f" — filed on `{proposal.filedFromPath}`"
+    st.caption(meta)
 
     if staleness.target_gone:
         st.warning("The view/indicator this proposal was filed on no longer exists on this page.")

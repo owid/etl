@@ -283,6 +283,34 @@ def test_pattern_connects_titles_across_views():
     assert [s.id for s in threads_for_field(review, field_01, grouped)] == [1]
 
 
+def test_threads_borrow_across_pages_by_snapshot_text():
+    """A thread filed on another MDim's indicator (same garden metadata, identical
+    text) surfaces on this page's matching field."""
+    from apps.metadata_review.resolution import check_staleness, suggestions_by_source_key, threads_for_field
+
+    review = _mdim_with_shared_text()
+    foreign = gm.MetadataReviewSuggestion(
+        targetType="indicator",
+        # An indicator NOT used by any view of this MDim (sibling MDim's source).
+        targetPath="grapher/ns/latest/ds/other_table#palma",
+        fieldPath="grapher_config.subtitle",
+        provenance="inherited",
+        createdBy=1,
+        currentValue="Shared subtitle.",
+        filedFromPath="ns/latest/other#other",
+    )
+    foreign.id = 99
+    grouped = suggestions_by_source_key([foreign])
+    field_a = review.views[0].fields[0]
+    assert [s.id for s in threads_for_field(review, field_a, grouped)] == [99]
+    # Different text on view c -> not borrowed there.
+    assert threads_for_field(review, review.views[2].fields[0], grouped) == []
+    # Staleness judged against the displaying field, not flagged target_gone.
+    fields_by_key = {field_a.source_key(): field_a}
+    staleness = check_staleness(foreign, fields_by_key, display_field=field_a)
+    assert not staleness.target_gone and not staleness.field_changed
+
+
 def test_transfer_proposal_rerenders_dimension_words():
     from apps.metadata_review.resolution import transfer_proposal
 
@@ -360,6 +388,34 @@ def test_tracked_changes_html_bullets():
     assert out.count("<li>") == 1
     assert "<del" in out and "Old" in out and "<ins" in out and "New" in out
     assert "unchanged" in out  # kept bullets collapsed
+
+
+def test_apply_bullet_edits_transfers_shared_bullet():
+    from apps.metadata_review.diffs import apply_bullet_edits
+
+    # The proposal edits a shared (anchored) bullet inside a DIFFERENT list.
+    out = apply_bullet_edits(
+        "- Own bullet A\n- Shared warning\n- Own bullet B",
+        "- Own bullet A\n- Shared warning, reworded\n- Own bullet B",
+        "- Other page intro\n- Shared warning\n- Other page outro",
+    )
+    assert out == ("- Other page intro\n- Shared warning, reworded\n- Other page outro", 1, 1)
+    # Editing a bullet the target list doesn't have -> no transfer.
+    assert apply_bullet_edits("- Not shared", "- Not shared, changed", "- Something else entirely") is None
+    # A no-op proposal never transfers.
+    assert apply_bullet_edits("- A", "- A", "- A\n- B") is None
+
+
+def test_apply_bullet_edits_partial_transfer():
+    from apps.metadata_review.diffs import apply_bullet_edits
+
+    # One edited bullet is shared, the other is page-specific -> partial carry.
+    out = apply_bullet_edits(
+        "- Page-specific intro\n- Shared source note",
+        "- Page-specific intro, reworded\n- Shared source note, reworded",
+        "- DIFFERENT intro\n- Shared source note\n- Extra bullet",
+    )
+    assert out == ("- DIFFERENT intro\n- Shared source note, reworded\n- Extra bullet", 1, 2)
 
 
 def test_bullet_diff_no_changes():

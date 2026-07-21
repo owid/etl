@@ -22,10 +22,11 @@ from typing import Any
 from urllib.parse import quote, urlencode
 
 import structlog
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
+from apps.metadata_review.diffs import apply_bullet_edits
 from apps.metadata_review.targets import (
     FIELD_LABELS,
     VIEW_TO_INDICATOR_FIELD,
@@ -409,18 +410,33 @@ def resolve_dataset(session: Session, dataset_catalog_path: str, owid_env: OWIDE
 
 
 def list_mdims(session: Session) -> list[dict[str, Any]]:
-    """All MDims with a catalogPath: [{catalog_path, slug, published, updated_at}]."""
+    """All MDims with a catalogPath: [{catalog_path, slug, title, title_variant, published, updated_at}].
+
+    Title fields are extracted server-side (JSON_EXTRACT) so the big config
+    columns never leave the database.
+    """
     rows = session.execute(
         select(
             gm.MultiDimDataPage.catalogPath,
             gm.MultiDimDataPage.slug,
+            func.json_unquote(func.json_extract(gm.MultiDimDataPage.config, "$.title.title")),
+            func.json_unquote(func.json_extract(gm.MultiDimDataPage.config, "$.title.titleVariant")),
             gm.MultiDimDataPage.published,
             gm.MultiDimDataPage.updatedAt,
         ).where(gm.MultiDimDataPage.catalogPath.is_not(None))
     ).all()
     return [
-        {"catalog_path": catalog_path, "slug": slug, "published": bool(published), "updated_at": updated_at}
-        for catalog_path, slug, published, updated_at in sorted(rows, key=lambda r: r[3], reverse=True)
+        {
+            "catalog_path": catalog_path,
+            "slug": slug,
+            "title": title,
+            "title_variant": title_variant,
+            "published": bool(published),
+            "updated_at": updated_at,
+        }
+        for catalog_path, slug, title, title_variant, published, updated_at in sorted(
+            rows, key=lambda r: r[5], reverse=True
+        )
     ]
 
 
@@ -561,19 +577,21 @@ def shared_view_ids(review: MdimReview, field: ReviewableField) -> list[str]:
 
 
 def threads_for_field(
-    review: MdimReview,
+    review: MdimReview | None,
     field: ReviewableField,
     suggestions_by_key: dict[tuple[str, str, str | None, str], list[gm.MetadataReviewSuggestion]],
 ) -> list[gm.MetadataReviewSuggestion]:
     """All suggestion threads that belong on this field's panel.
 
     Includes the field's own source-keyed threads plus threads filed on any other
-    view's field (same field, identical rendered text) — even when those views
-    inherit from *different* expanded indicators of the same garden template.
-    Deduplicated by suggestion id, oldest first.
+    view's field (same field, identical rendered text or matching dimension
+    pattern) — even when those views inherit from *different* expanded indicators
+    of the same garden template — plus text-matched threads keyed to indicators of
+    sibling pages (e.g. another MDim built from the same garden metadata).
+    Deduplicated by suggestion id, oldest first. `review` may be None (dataset mode).
     """
     keys = {field.source_key()}
-    if field.view_id is not None and field.current_value is not None:
+    if review is not None and field.view_id is not None and field.current_value is not None:
         value = _norm(field.current_value)
         own_view = next((v for v in review.views if v.view_id == field.view_id), None)
         pattern = _field_pattern(review, own_view, field) if own_view is not None else None
@@ -589,6 +607,27 @@ def threads_for_field(
     for key in keys:
         for suggestion in suggestions_by_key.get(key, []):
             seen[suggestion.id] = suggestion
+
+    # Cross-page sharing: threads keyed to indicators NOT used by this page (e.g.
+    # filed on another MDim built from the same garden metadata) still belong here
+    # when they target the equivalent field and either their text snapshot matches
+    # ours, or — for bullet lists — the bullets they edit exist in our list too
+    # (lists share individual bullets via YAML anchors while differing as a whole).
+    if field.current_value is not None:
+        value = _norm(field.current_value)
+        indicator_field = VIEW_TO_INDICATOR_FIELD.get(field.field_path, field.field_path)
+        is_bullets = indicator_field == "description_key"
+        for key, threads in suggestions_by_key.items():
+            if key in keys or key[0] != "indicator" or key[3] != indicator_field:
+                continue
+            for suggestion in threads:
+                if _norm(suggestion.currentValue) == value or (
+                    is_bullets
+                    and suggestion.suggestedValue is not None
+                    and apply_bullet_edits(suggestion.currentValue, suggestion.suggestedValue, field.current_value)
+                    is not None
+                ):
+                    seen.setdefault(suggestion.id, suggestion)
     return sorted(seen.values(), key=lambda s: s.createdAt)
 
 
@@ -610,15 +649,20 @@ class Staleness:
 def check_staleness(
     suggestion: gm.MetadataReviewSuggestion,
     current_fields_by_key: dict[tuple[str, str, str | None, str], ReviewableField],
+    display_field: ReviewableField | None = None,
 ) -> Staleness:
     """Field-level staleness: the suggestion's snapshot vs the live resolved field.
 
     `current_fields_by_key` maps `ReviewableField.source_key()` of every field on the
     page being rendered. A suggestion whose key is absent points at a view/indicator
-    that no longer exists (`target_gone`).
+    that isn't on this page — that's `target_gone`, unless `display_field` is given
+    (a cross-page borrowed thread shown on a text-matched field), in which case
+    staleness is judged against the field actually displaying it.
     """
     key = (suggestion.targetType, suggestion.targetPath, suggestion.viewId, suggestion.fieldPath)
     field = current_fields_by_key.get(key)
+    if field is None:
+        field = display_field
     if field is None:
         return Staleness(target_gone=True)
     return Staleness(

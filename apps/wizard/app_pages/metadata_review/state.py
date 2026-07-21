@@ -53,10 +53,14 @@ def cached_resolve_dataset(catalog_path: str) -> DatasetReview:
         return resolve_dataset(session, catalog_path)
 
 
-def load_suggestions(target_paths: list[str]) -> tuple[list, dict[int, list], dict[int, str]]:
-    """Suggestions for the given paths + their comments + user id -> name map. Uncached."""
+def load_suggestions(
+    target_paths: list[str], path_prefixes: list[str] | None = None
+) -> tuple[list, dict[int, list], dict[int, str]]:
+    """Suggestions for the given paths (plus, optionally, whole grapher datasets by
+    prefix — so threads filed on sibling MDims sharing the metadata surface here)
+    + their comments + user id -> name map. Uncached."""
     with Session(get_engine()) as session:
-        suggestions = gm.MetadataReviewSuggestion.load_for_paths(session, target_paths)
+        suggestions = gm.MetadataReviewSuggestion.load_for_paths(session, target_paths, path_prefixes=path_prefixes)
         comments = gm.MetadataReviewComment.load_for_suggestions(session, [s.id for s in suggestions])
         comments_by_suggestion: dict[int, list] = {}
         for comment in comments:

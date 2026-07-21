@@ -1968,11 +1968,20 @@ class MetadataReviewSuggestion(Base):
         session: Session,
         target_paths: list[str],
         statuses: list[str] | None = None,
+        path_prefixes: list[str] | None = None,
     ) -> list["MetadataReviewSuggestion"]:
-        """Load suggestions for a set of target paths (an MDim page plus all its source indicators)."""
-        if not target_paths:
+        """Load suggestions for a set of target paths (an MDim page plus all its source
+        indicators). `path_prefixes` widens the scope to sibling indicators of the same
+        grapher dataset(s), so threads filed on another MDim built from the same
+        metadata can surface here too."""
+        if not target_paths and not path_prefixes:
             return []
-        q = select(cls).where(cls.targetPath.in_(target_paths))
+        conditions = []
+        if target_paths:
+            conditions.append(cls.targetPath.in_(target_paths))
+        for prefix in path_prefixes or []:
+            conditions.append(cls.targetPath.like(prefix.replace("%", r"\%") + "%"))
+        q = select(cls).where(or_(*conditions))
         if statuses:
             q = q.where(cls.status.in_(statuses))
         return list(session.scalars(q.order_by(cls.createdAt.asc())).all())
