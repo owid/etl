@@ -820,7 +820,9 @@ def _add_regional_composite_index(tb):
     out_of_range = regions_yr[
         (regions_yr["composite_index"] < regions_yr["c_min"]) | (regions_yr["composite_index"] > regions_yr["c_max"])
     ]
-    assert out_of_range.empty, f"Regional composite index outside country range in years {sorted(set(out_of_range['year']))}."
+    assert out_of_range.empty, (
+        f"Regional composite index outside country range in years {sorted(set(out_of_range['year']))}."
+    )
     return tb_w
 
 
@@ -840,9 +842,7 @@ def sanity_check_index(tb):
     assert (tb["unweighted_index"] % 1 == 0).all(), "Unweighted index has non-integer values (it's a ±1 count)."
     # The two indices measure the same construct — the codebook (§7.2) reports yearly Pearson
     # correlations of 0.96-0.99; a collapse below 0.9 means one of them broke.
-    worst_corr = min(
-        float(g["composite_index"].corr(g["unweighted_index"])) for _, g in tb.groupby("year")
-    )
+    worst_corr = min(float(g["composite_index"].corr(g["unweighted_index"])) for _, g in tb.groupby("year"))
     assert worst_corr > 0.9, f"Composite and unweighted index diverged (min yearly correlation {worst_corr:.3f} < 0.9)."
     assert tb["country"].nunique() >= 195, f"Index coverage shrank: {tb['country'].nunique()} countries (had 195)."
     per_year = tb.groupby("year")["country"].nunique()
