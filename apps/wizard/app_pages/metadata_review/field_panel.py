@@ -49,6 +49,17 @@ def render_field(
     open_suggestions.sort(key=lambda s: s.createdAt, reverse=True)
     proposal = open_suggestions[0] if open_suggestions else None
 
+    # The list of other views rendering this same text lives in a hover tooltip.
+    shared_tooltip = None
+    if shared_views and mdim_review is not None:
+        views_by_id = {v.view_id: v for v in mdim_review.views}
+        lines = []
+        for view_id in shared_views:
+            view = views_by_id.get(view_id)
+            dims = mdim_review.human_dimensions(view.dimensions) if view else {}
+            lines.append("- " + (" · ".join(f"{k}: {v}" for k, v in dims.items()) or view_id))
+        shared_tooltip = "Also shown in:\n\n" + "\n".join(lines)
+
     with st.container(border=True):
         title_col, badge_col = st.columns([4, 2], vertical_alignment="center")
         with title_col:
@@ -58,8 +69,8 @@ def render_field(
             if proposal is not None:
                 badges.append(":orange-badge[open proposal]")
             if shared_views:
-                badges.append(f":gray-badge[appears in {len(shared_views) + 1} views]")
-            st.markdown(" ".join(badges))
+                badges.append(f":gray-badge[in {len(shared_views) + 1} views]")
+            st.markdown(" ".join(badges), help=shared_tooltip)
 
         # The field's text, shown ONCE: tracked changes when a proposal exists
         # (deletions struck through, insertions tinted), plain text otherwise.
@@ -99,20 +110,12 @@ def render_field(
             st.caption("_(explicitly blank — the view suppresses the inherited text)_")
         else:
             st.markdown(f"> {field.current_value}")
-        st.caption(field.edit_hint)
-
+        inherited_tooltip = None
         if field.provenance == "override" and field.inherited_value is not None:
-            with st.expander("Inherited value this override replaces", expanded=False):
-                st.markdown(f"> {field.inherited_value}")
-                st.caption(f"From `{field.inherited_from}`")
-
-        if shared_views and mdim_review is not None:
-            with st.expander(f"Also shown in {len(shared_views)} other view(s)", expanded=False):
-                views_by_id = {v.view_id: v for v in mdim_review.views}
-                for view_id in shared_views:
-                    view = views_by_id.get(view_id)
-                    dims = mdim_review.human_dimensions(view.dimensions) if view else {}
-                    st.markdown("- " + (" · ".join(f"**{k}:** {v}" for k, v in dims.items()) or view_id))
+            inherited_tooltip = (
+                f"Inherited value this override replaces:\n\n{field.inherited_value}\n\n(from `{field.inherited_from}`)"
+            )
+        st.caption(field.edit_hint, help=inherited_tooltip)
 
         if proposal is not None:
             _render_thread(
@@ -123,7 +126,6 @@ def render_field(
                 users=users,
                 user=user,
                 fields_by_key=fields_by_key,
-                n_shared_views=len(shared_views) if shared_views else 0,
                 key_ns=key_ns,
             )
         elif user is not None:
@@ -141,7 +143,6 @@ def _render_thread(
     users: dict[int, str],
     user: gm.User | None,
     fields_by_key: dict[tuple, ReviewableField],
-    n_shared_views: int = 0,
     key_ns: str = "main",
 ) -> None:
     """The compact discussion strip under the field's (tracked) text.
@@ -152,67 +153,62 @@ def _render_thread(
     staleness: Staleness = check_staleness(proposal, fields_by_key)
     author = users.get(proposal.createdBy, f"user {proposal.createdBy}")
 
-    with st.container(border=True):
-        meta = f"✏️ Proposed by **{author}**, {proposal.createdAt:%Y-%m-%d}"
-        if n_shared_views:
-            noun = "view" if n_shared_views == 1 else "views"
-            meta += f" — this change applies here and in **{n_shared_views}** other {noun}"
-        st.markdown(meta)
+    st.caption(f"✏️ Proposed by **{author}**, {proposal.createdAt:%Y-%m-%d}")
 
-        if staleness.target_gone:
-            st.warning("The view/indicator this proposal was filed on no longer exists on this page.")
-        elif staleness.field_changed:
-            with st.expander("Text when the proposal was filed", expanded=False):
-                st.markdown(f"> {proposal.currentValue or '_(not set)_'}")
+    if staleness.target_gone:
+        st.warning("The view/indicator this proposal was filed on no longer exists on this page.")
+    elif staleness.field_changed:
+        with st.expander("Text when the proposal was filed", expanded=False):
+            st.markdown(f"> {proposal.currentValue or '_(not set)_'}")
 
-        if proposal.suggestedValue is None:
-            st.caption("_Discussion only — no replacement text proposed yet._")
+    if proposal.suggestedValue is None:
+        st.caption("_Discussion only — no replacement text proposed yet._")
 
-        # Thread: comments from the canonical proposal plus any legacy parallel threads.
-        comments = list(comments_by_suggestion.get(proposal.id, []))
-        for legacy in extra_threads:
-            comments += comments_by_suggestion.get(legacy.id, [])
-        comments.sort(key=lambda c: c.createdAt)
-        for comment in comments:
-            comment_author = users.get(comment.userId, f"user {comment.userId}")
-            when = comment.createdAt.strftime("%Y-%m-%d %H:%M")
-            if comment.kind in ("status_change", "revision"):
-                st.caption(f"_{comment.text}_ — {comment_author}, {when}")
-            else:
-                st.markdown(f"**{comment_author}** · {when}")
-                st.markdown(comment.text)
-
-        if user is None:
-            st.caption("Sign-in not detected — reply/status controls disabled.")
-            return
-
-        reply_key = f"mrs_reply_{key_ns}_{proposal.id}"
-        with st.form(key=f"{reply_key}_form", clear_on_submit=True, border=False):
-            reply = st.text_area(
-                "Reply", key=reply_key, height=80, label_visibility="collapsed", placeholder="Reply..."
-            )
-            if st.form_submit_button("Reply") and reply.strip():
-                state.add_comment(proposal.id, user.id, reply.strip())
-                st.rerun()
-
-        if st.session_state.get(_key(field, "editing", key_ns)):
-            # The editor must span the whole section, not sit inside a button column.
-            _render_edit_controls(field, user, existing=proposal, key_ns=key_ns)
+    # Thread: comments from the canonical proposal plus any legacy parallel threads.
+    comments = list(comments_by_suggestion.get(proposal.id, []))
+    for legacy in extra_threads:
+        comments += comments_by_suggestion.get(legacy.id, [])
+    comments.sort(key=lambda c: c.createdAt)
+    for comment in comments:
+        comment_author = users.get(comment.userId, f"user {comment.userId}")
+        when = comment.createdAt.strftime("%Y-%m-%d %H:%M")
+        if comment.kind in ("status_change", "revision"):
+            st.caption(f"_{comment.text}_ — {comment_author}, {when}")
         else:
-            control_col, edit_col = st.columns([3, 2], vertical_alignment="center")
-            with control_col:
-                status = st.segmented_control(
-                    "Status",
-                    options=["open", "implemented", "rejected"],
-                    default=proposal.status,
-                    key=f"mrs_status_{key_ns}_{proposal.id}",
-                    label_visibility="collapsed",
+            st.markdown(f"**{comment_author}** · {when}: {comment.text}")
+
+    if user is None:
+        st.caption("Sign-in not detected — reply/status controls disabled.")
+        return
+
+    if st.session_state.get(_key(field, "editing", key_ns)):
+        # The editor must span the whole section, not sit inside a button column.
+        _render_edit_controls(field, user, existing=proposal, key_ns=key_ns)
+    else:
+        # One slim controls row: reply (popover), status, refine.
+        reply_col, status_col, edit_col = st.columns([1.1, 2.2, 1.7], vertical_alignment="center")
+        with reply_col, st.popover("💬 Reply"):
+            reply_key = f"mrs_reply_{key_ns}_{proposal.id}"
+            with st.form(key=f"{reply_key}_form", clear_on_submit=True, border=False):
+                reply = st.text_area(
+                    "Reply", key=reply_key, height=80, label_visibility="collapsed", placeholder="Reply..."
                 )
-                if status and status != proposal.status:
-                    state.set_status(proposal.id, user.id, status)
+                if st.form_submit_button("Send") and reply.strip():
+                    state.add_comment(proposal.id, user.id, reply.strip())
                     st.rerun()
-            with edit_col:
-                _render_edit_controls(field, user, existing=proposal, key_ns=key_ns)
+        with status_col:
+            status = st.segmented_control(
+                "Status",
+                options=["open", "implemented", "rejected"],
+                default=proposal.status,
+                key=f"mrs_status_{key_ns}_{proposal.id}",
+                label_visibility="collapsed",
+            )
+            if status and status != proposal.status:
+                state.set_status(proposal.id, user.id, status)
+                st.rerun()
+        with edit_col:
+            _render_edit_controls(field, user, existing=proposal, key_ns=key_ns)
 
 
 def _render_resolved(
