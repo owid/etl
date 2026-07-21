@@ -213,6 +213,19 @@ AGGREGATE_DECOMPOSITION = {
     "low_carbon": ["other_renewables", "solar", "wind", "hydro", "nuclear"],
     "solar_and_wind": ["solar", "wind"],
 }
+# Canonical OWID per-source colors, copied from the original "Electricity production by source" chart so
+# the stacked "by source" views keep the colors users know (hydropower blue, coal dark red, etc.).
+SOURCE_COLORS = {
+    "coal": "#883039",
+    "oil": "#c15065",
+    "gas": "#6d3e91",
+    "nuclear": "#00847e",
+    "hydro": "#286bbb",
+    "solar": "#e56e5a",
+    "wind": "#00295b",
+    "bioenergy": "#bc8e5a",
+    "other_renewables": "#578145",
+}
 # Base metric each decomposition is built from -> the metric slug it becomes.
 _DECOMPOSITION_METRICS = {"generation": "by_source", "per_capita": "by_source_per_capita"}
 # Title stem per aggregate.
@@ -244,7 +257,11 @@ def add_decomposition_views(c) -> None:
             for constituent in constituents:
                 view = single_views.get((constituent, base_metric))
                 if view is not None and view.indicators.y:
-                    indicators.extend(deepcopy(view.indicators.y))
+                    for indicator in deepcopy(view.indicators.y):
+                        color = SOURCE_COLORS.get(constituent)
+                        if color:
+                            indicator.update_display({"color": color})
+                        indicators.append(indicator)
             if not indicators:
                 continue
             config = {
@@ -261,50 +278,234 @@ def add_decomposition_views(c) -> None:
             c.views.append(new_view)
 
 
-# Map color scheme per (source, metric), copied from the original production charts each view replaces
-# (fetched from their chart configs) so the new maps look like the ones users already know. Views with
-# no pre-existing chart fall back to a per-source family below.
+# Map colorScale per (source, metric), copied verbatim from the original production charts each view
+# replaces (fetched from their chart configs) so the new maps reproduce the brackets, color schemes, and
+# special bins (e.g. the nuclear "No nuclear" =0 bucket) users already know. When an entry carries explicit
+# customNumericValues, _map_config uses them as-is; entries with only a color scheme, or views with no
+# pre-existing chart, fall back to a per-source family + auto-sized bins below.
 ORIGINAL_MAP_SCHEMES = {
-    ("bioenergy", "share_of_generation"): {"baseColorScheme": "BuGn"},
-    ("coal", "generation"): {"baseColorScheme": "Oranges"},
-    ("coal", "per_capita"): {"baseColorScheme": "YlOrBr"},
-    ("coal", "share_of_generation"): {"baseColorScheme": "Oranges"},
-    ("fossil", "generation"): {"baseColorScheme": "YlOrBr"},
-    ("fossil", "per_capita"): {"baseColorScheme": "Oranges"},
-    ("fossil", "share_of_generation"): {"baseColorScheme": "OrRd"},
-    ("gas", "generation"): {"baseColorScheme": "Purples"},
-    ("gas", "per_capita"): {"baseColorScheme": "BuPu"},
-    ("gas", "share_of_generation"): {"baseColorScheme": "GnBu"},
-    ("hydro", "generation"): {"baseColorScheme": "GnBu"},
-    ("hydro", "per_capita"): {"baseColorScheme": "GnBu"},
-    ("hydro", "share_of_generation"): {"baseColorScheme": "PuBu"},
-    ("low_carbon", "generation"): {"baseColorScheme": "BuGn"},
-    ("low_carbon", "share_of_generation"): {"baseColorScheme": "YlGn"},
-    ("nuclear", "generation"): {"baseColorScheme": "GnBu"},
-    ("nuclear", "per_capita"): {"baseColorScheme": "PuBuGn"},
-    ("nuclear", "share_of_generation"): {"baseColorScheme": "YlGnBu"},
-    ("oil", "generation"): {"baseColorScheme": "Reds"},
-    ("oil", "per_capita"): {"baseColorScheme": "OrRd"},
-    ("oil", "share_of_generation"): {"baseColorScheme": "Oranges"},
-    ("renewables", "generation"): {"baseColorScheme": "GnBu"},
-    ("renewables", "per_capita"): {"baseColorScheme": "YlGn"},
-    ("renewables", "share_of_generation"): {"baseColorScheme": "BuGn"},
-    ("solar", "generation"): {"baseColorScheme": "YlOrRd"},
-    ("solar", "per_capita"): {"baseColorScheme": "YlOrRd"},
-    ("solar", "share_of_generation"): {"baseColorScheme": "YlGnBu"},
-    ("solar_and_wind", "generation"): {"baseColorScheme": "YlOrRd"},
-    ("solar_and_wind", "per_capita"): {"baseColorScheme": "YlGnBu"},
-    ("solar_and_wind", "share_of_generation"): {"baseColorScheme": "Greens"},
-    ("total", "carbon_intensity"): {"baseColorScheme": "YlOrBr"},
-    ("total", "demand"): {"baseColorScheme": "YlGnBu"},
-    ("total", "demand_per_capita"): {"baseColorScheme": "PuBuGn"},
-    ("total", "generation"): {"baseColorScheme": "YlGnBu"},
-    ("total", "imports_share"): {"baseColorScheme": "RdBu"},
-    ("total", "net_imports"): {"baseColorScheme": "RdBu", "colorSchemeInvert": True},
-    ("total", "per_capita"): {"baseColorScheme": "PuBuGn"},
-    ("wind", "generation"): {"baseColorScheme": "PuBu"},
-    ("wind", "per_capita"): {"baseColorScheme": "PuBuGn"},
-    ("wind", "share_of_generation"): {"baseColorScheme": "PuBuGn"},
+    ("coal", "generation"): {
+        "baseColorScheme": "Oranges",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1],
+        "customNumericColors": [None],
+    },
+    ("coal", "per_capita"): {
+        "baseColorScheme": "YlOrBr",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 1],
+    },
+    ("coal", "share_of_generation"): {
+        "baseColorScheme": "Oranges",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+        "customNumericColors": [None, None, None],
+    },
+    ("fossil", "generation"): {
+        "baseColorScheme": "YlOrBr",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1],
+        "customNumericColors": [None, None, None, None, None],
+    },
+    ("fossil", "per_capita"): {
+        "baseColorScheme": "Oranges",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 10000, 1],
+        "customNumericColors": [None, None, None],
+    },
+    ("fossil", "share_of_generation"): {
+        "baseColorScheme": "OrRd",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100.001],
+        "customNumericColors": [None, None, None, None, None],
+        "customNumericLabels": [None, None, None, None, None, None, None, None, "", ""],
+    },
+    ("gas", "generation"): {
+        "baseColorScheme": "Purples",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 30, 100, 300, 1000, 1],
+    },
+    ("gas", "per_capita"): {
+        "baseColorScheme": "BuPu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 10000, 1],
+        "customNumericColors": [None],
+    },
+    ("gas", "share_of_generation"): {
+        "baseColorScheme": "GnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100.001],
+    },
+    ("hydro", "generation"): {
+        "baseColorScheme": "GnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 50, 100, 200, 500, 1000, 1],
+    },
+    ("hydro", "per_capita"): {
+        "baseColorScheme": "GnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 1],
+        "customNumericColors": [None],
+    },
+    ("hydro", "share_of_generation"): {
+        "baseColorScheme": "PuBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100.00001],
+    },
+    ("low_carbon", "generation"): {
+        "baseColorScheme": "BuGn",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 20, 50, 100, 200, 500, 1000, 2000, 1],
+        "customNumericColors": [None],
+    },
+    ("low_carbon", "per_capita"): {
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 1],
+        "customNumericColors": [None],
+    },
+    ("low_carbon", "share_of_generation"): {
+        "baseColorScheme": "YlGn",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100.001],
+    },
+    ("nuclear", "generation"): {
+        "baseColorScheme": "GnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 50, 100, 200, 500, 1],
+    },
+    ("nuclear", "per_capita"): {
+        "baseColorScheme": "PuBuGn",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 1],
+    },
+    ("nuclear", "share_of_generation"): {
+        "baseColorScheme": "YlGnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 0, 10, 20, 30, 40, 50, 60, 70],
+        "customNumericColors": ["#dedede", None, None, None, None, None, None, None],
+        "customNumericLabels": ["No nuclear", "", None, None, None, None, None, None],
+    },
+    ("oil", "generation"): {
+        "baseColorScheme": "Reds",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 2, 5, 10, 20, 50, 100, 1],
+    },
+    ("oil", "per_capita"): {
+        "baseColorScheme": "OrRd",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 30, 100, 300, 1000, 3000, 10000],
+    },
+    ("oil", "share_of_generation"): {
+        "baseColorScheme": "Oranges",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 1, 2, 5, 10, 20, 50, 1],
+        "customNumericColors": [None, None],
+    },
+    ("renewables", "generation"): {
+        "baseColorScheme": "GnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1],
+    },
+    ("renewables", "per_capita"): {
+        "baseColorScheme": "YlGn",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 1],
+    },
+    ("renewables", "share_of_generation"): {
+        "baseColorScheme": "BuGn",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100.0001],
+        "customNumericColors": [None, None, None],
+    },
+    ("solar", "generation"): {
+        "baseColorScheme": "YlOrRd",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1],
+        "customNumericColors": [None],
+    },
+    ("solar", "per_capita"): {
+        "baseColorScheme": "YlOrRd",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 50, 100, 200, 500, 1000, 1],
+    },
+    ("solar", "share_of_generation"): {
+        "baseColorScheme": "YlGnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 1, 2, 5, 10, 20, 1],
+        "customNumericColors": [None],
+    },
+    ("solar_and_wind", "generation"): {
+        "baseColorScheme": "YlOrRd",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 0.1, 0.3, 1, 3, 10, 30, 100, 300],
+    },
+    ("solar_and_wind", "per_capita"): {
+        "baseColorScheme": "YlGnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 20, 50, 100, 200, 500, 1000, 2000, 1],
+    },
+    ("solar_and_wind", "share_of_generation"): {
+        "baseColorScheme": "Greens",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 30, 40, 50, 60],
+    },
+    ("total", "carbon_intensity"): {
+        "baseColorScheme": "YlOrBr",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1],
+        "customNumericColors": [None, None],
+    },
+    ("total", "demand"): {
+        "baseColorScheme": "YlGnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 1],
+    },
+    ("total", "demand_per_capita"): {
+        "baseColorScheme": "PuBuGn",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 200, 500, 1000, 2000, 5000, 10000, 20000, 1],
+    },
+    ("total", "generation"): {
+        "baseColorScheme": "YlGnBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 1],
+        "customNumericColors": [None],
+    },
+    ("total", "imports_share"): {
+        "baseColorScheme": "RdBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [-50, -20, -10, -5, 0, 5, 10, 20, 50],
+    },
+    ("total", "net_imports"): {
+        "baseColorScheme": "RdBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [-1, -40, -30, -20, -10, 0, 10, 20, 30, 40, 1],
+        "customNumericColors": [None, None],
+        "colorSchemeInvert": True,
+    },
+    ("total", "per_capita"): {
+        "baseColorScheme": "PuBuGn",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 200, 500, 1000, 2000, 5000, 10000, 20000, 1],
+        "customNumericLabels": ["", "", "", "", "", "", "", "", "", ""],
+    },
+    ("wind", "generation"): {
+        "baseColorScheme": "PuBu",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1],
+    },
+    ("wind", "per_capita"): {
+        "baseColorScheme": "PuBuGn",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 10, 20, 50, 100, 200, 500, 1000, 2000, 1],
+        "customNumericColors": [None],
+    },
+    ("wind", "share_of_generation"): {
+        "baseColorScheme": "PuBuGn",
+        "binningStrategy": "manual",
+        "customNumericValues": [0, 1, 2, 5, 10, 20, 50, 100],
+        "customNumericColors": [None, None, None, None],
+    },
 }
 
 # Per-source fallback for views without a pre-existing chart, so those maps are not all the same color.
@@ -366,6 +567,13 @@ def _share_thresholds(vmax: float | None) -> tuple[list[float], bool] | None:
 
 def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
     scheme = ORIGINAL_MAP_SCHEMES.get((source, metric))
+    if scheme is not None and len(scheme.get("customNumericValues", [])) >= 3:
+        # The original chart had explicit manual brackets: reproduce them verbatim, so the brackets,
+        # color scheme, open-ended bins, and special bins (e.g. the nuclear "No nuclear" =0 bucket) all
+        # match the maps users already know. Only views with no pre-existing chart get auto-sized bins.
+        color_scale = dict(scheme)
+        color_scale.setdefault("binningStrategy", "manual")
+        return {"colorScale": color_scale, "timeTolerance": 3}
     if scheme is None:
         if metric in ("net_imports", "imports_share"):
             scheme = {"baseColorScheme": "RdBu", "colorSchemeInvert": True}
