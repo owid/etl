@@ -1310,7 +1310,10 @@ def _convert_description_key_lists(config: dict[str, Any]) -> None:
     metadatas = [config.get("metadata"), *(view.get("metadata") for view in config.get("views", []))]
     for metadata in metadatas:
         if metadata and isinstance(metadata.get("description_key"), list):
-            metadata["description_key"] = description_key_to_string(metadata["description_key"])
+            # `- *anchor` authoring produces nested lists; flatten them like
+            # dataset YAML metadata does before converting.
+            flat = [item for sub in metadata["description_key"] for item in ([sub] if isinstance(sub, str) else sub)]
+            metadata["description_key"] = description_key_to_string(flat)
 
 
 # model.core
