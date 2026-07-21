@@ -210,7 +210,10 @@ def _view_subtitle(source: str, metric: str) -> str:
         return TOTAL_SUPPLY_SUBTITLE[metric]
     unit = METRIC_UNIT_PHRASE[metric]
     note = SOURCE_COMPOSITION.get(source)
-    return f"{unit} {note}" if note else unit
+    # Lead with what the series is (the composition note), then the unit, so the subtitle reads as
+    # "Combined energy supply from solar and wind. Measured as a percentage of..." rather than the
+    # reverse. A period keeps it robust across all metrics (the annual-change unit is not a "Measured…").
+    return f"{note} {unit}" if note else unit
 
 
 # Aggregates that can be decomposed "by source", mapped to their constituent individual sources.
@@ -447,8 +450,12 @@ ORIGINAL_MAP_SCHEMES = {
     ("nuclear", "share"): {
         "baseColorScheme": "BuPu",
         "binningStrategy": "manual",
-        "customNumericValues": [0, 5, 10, 15, 20, 25, 30, 35],
-        "customNumericColors": [None],
+        # Leading [0, 0] bin: countries with no nuclear read as a distinct grey "No nuclear", not the
+        # lowest shade (which would imply a sliver of nuclear). Mirrors the electricity nuclear-share map.
+        "customNumericValues": [0, 0, 5, 10, 15, 20, 25, 30, 35],
+        "customNumericColors": ["#dedede", None, None, None, None, None, None, None],
+        "customNumericLabels": ["No nuclear", "", None, None, None, None, None, None],
+        "customNumericColorsActive": True,
     },
     ("nuclear", "total"): {
         "baseColorScheme": "BuPu",

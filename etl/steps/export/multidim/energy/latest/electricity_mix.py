@@ -200,7 +200,10 @@ def _view_subtitle(source: str, metric: str) -> str:
         return TOTAL_ONLY_SUBTITLES[metric]
     unit = METRIC_UNIT_PHRASE[metric]
     note = SOURCE_COMPOSITION.get(source)
-    return f"{unit} {note}" if note else unit
+    # Lead with what the series is (the composition note), then the unit, so the subtitle reads as
+    # "Combined electricity generation from solar and wind. Measured as a percentage of..." rather than
+    # the reverse.
+    return f"{note} {unit}" if note else unit
 
 
 # Aggregates that can be decomposed "by source", mapped to their constituent individual sources.
