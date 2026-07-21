@@ -717,7 +717,19 @@
       "yearIsDay": {
         "type": "boolean",
         "default": false,
-        "description": "Switch to indicate if the number in the year column represents a day (since zeroDay) or a year."
+        "description": "Deprecated: use `timeInterval` instead. Switch to indicate if the number in the year column represents a day (since zeroDay) or a year."
+      },
+      "timeInterval": {
+        "type": "string",
+        "description": "Interval that each value in the year/time column represents. Sub-yearly intervals (day, week, month, quarter) are encoded as days-since-`zeroDay` integers.",
+        "enum": [
+          "day",
+          "week",
+          "month",
+          "quarter",
+          "year",
+          "decade"
+        ]
       },
       "color": {
         "type": "string",

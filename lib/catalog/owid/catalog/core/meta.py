@@ -448,7 +448,8 @@ class VariableMeta(MetaBase):
     """Allowed fields for `display` attribute used for grapher:
         name
         zeroDay
-        yearIsDay
+        yearIsDay  # deprecated, use timeInterval instead
+        timeInterval  # one of: day, week, month, quarter, year, decade
         includeInTable
         numDecimalPlaces
         conversionFactor
