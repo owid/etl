@@ -22,8 +22,10 @@ Everything you post to GitHub or Slack goes out under a **human's identity**. An
 1. **Attribute the work.** Put this blockquote as the *first line* of the content:
 
    ```
-   > _Written by Claude Code — @<handle> at the wheel._
+   > _Written by Claude <model name> — @<handle> at the wheel._
    ```
+
+   Replace `<model name>` with the human-readable name of the model actually generating the content (e.g. "Sonnet 5", "Opus 4.8", "Fable 5", "Haiku 4.5") — not the literal string "Code". Keeping the "Claude" prefix makes the attribution recognizable even to readers unfamiliar with individual model names.
 
    It applies to **every** surface, **every** time you post:
    - PR descriptions / bodies
@@ -112,6 +114,7 @@ Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run)
 - **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code. It also **fails with `AccessDenied` when the target version isn't in the catalog yet** (e.g. a version you just created) — use it only to fetch already-published upstream deps, never for the new step you're building locally.
 - For `grapher://` steps, always add `--grapher` flag
 - **Pushing to the grapher DB:** running a `data://grapher/...` step (even with `--grapher`) only builds the dataset feather. The MySQL upsert is the separate `grapher://...` step. If a metadata-only change (`display`, `description_key`, etc.) isn't showing up in the grapher DB, run `etlr grapher://grapher/<path> --grapher` explicitly to force the variable upsert.
+- **`STAGING=1`** — makes `etlr` target the current branch's staging server: `STAGING=1 .venv/bin/etlr grapher://grapher/<path> --grapher` upserts the indicators straight to `staging-site-<branch>`'s DB. Optional: staging rebuilds automatically after you push, so you only need this when you want a change reflected there right away, or when the automatic rebuild is unusually slow (rare, e.g. edits to the regions or FAOSTAT datasets that invalidate a large part of the DAG). `STAGING=<name>` targets another branch's staging server.
 - **Version-bumping a grapher step mints new variable IDs**, so existing charts referencing the old indicators become ghost variables and must be remapped on staging (see the `remapping-ghost-variables` skill / `indicator_upgrade` CLI). Budget for this whenever you rename or re-version a grapher dataset.
 - **Versioning hygiene for derived/OMM steps:** an OMM's version reflects when its combining logic was written, not its inputs — but when you repoint a derived step to a newer-dated dependency, bump the step's own version folder too. Leaving a step dated before the data it ingests is confusing and should be fixed when noticed.
 - Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
@@ -137,6 +140,8 @@ gh pr edit <number> --body "..."
 ```
 
 **Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
+
+**After `etl pr --worktree`, verify the branch is current AND actually pushed.** Worktree creation can branch off a stale local `master` (missing recent merges → `_check_dag_completeness` "not in the DAG" errors on steps that should already exist) — fix with `git fetch origin master && git rebase origin/master`. That rebase then needs its own push: check `gh pr view --json additions,deletions` isn't `0`/`0` before assuming the PR reflects your commits.
 
 **Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
 

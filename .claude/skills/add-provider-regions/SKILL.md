@@ -294,7 +294,7 @@ git add etl/steps/data/garden/regions/2023-01-01/regions.yml \
 git commit -m "📊🤖 Add <Provider> regions to regions dataset"
 ```
 
-If not already on a feature branch, create one and a PR with `etl pr "Add <Provider> regions" data`, then push. In the PR body, open with the disclosure blockquote (`> _Written by Claude Code — @<handle> at the wheel._`) and keep any reviewer attribution out of committed code/YAML.
+If not already on a feature branch, create one and a PR with `etl pr "Add <Provider> regions" data`, then push. In the PR body, open with the disclosure blockquote (`> _Written by Claude <model name> — @<handle> at the wheel._`, model name = the model actually generating the content) and keep any reviewer attribution out of committed code/YAML.
 
 > **Heads-up:** once this merges, the post-merge deploy is **slow** — editing the regions dataset invalidates much of the DAG, so it can take hours for the new regions to reach the production catalog. The owid-grapher follow-up (Step 9) can't start until they do, so don't expect to chain straight into it.
 

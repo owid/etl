@@ -1,0 +1,42 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Swedish Historical National Accounts
+    title_snapshot: Swedish Historical National Accounts - Value added by sector
+    description: |-
+      The Swedish Historical National Accounts 1560–2010, released in 2015 and updated in 2020, 2023 and 2025, presents a database with an extended and revised version of SHNA 1560–2022. Principles for revisions and extension of data 1560-1800 are found in Schön & Krantz (2015), "New Swedish Historical National Accounts since the 16th Century in Constant and Current Prices", Lund Papers in Economic History 140, Lund University.
+
+      Comprehensive accounts of data and revisions of the 2007 version of SHNA 1800-2000 are to be found as well in Schön & Krantz (2012), "Swedish Historical National Accounts 1560–2010", Lund Papers in Economic History 123, Lund University. Description and specification of the latest 2023 update can be found in Nilsson, et al. (2023), "Swedish Historical National Accounts. 2023 Update, Revision and Underlying Principles".
+    description_snapshot: |-
+      This file is Table III of the database: value added of the main sectors of the Swedish economy and GDP at factor prices, 1800-2022, in millions of SEK at current and constant (1910/12) prices. The main sectors are agriculture, manufacturing industry, building and construction, transport and communication, private services, public services, and services of dwellings.
+    date_published: "2025"
+    version_producer: 2025 update
+
+    # Citation
+    producer: Schön and Krantz
+    citation_full: |-
+      Krantz, O. & Schön, L. (2007), Swedish Historical National Accounts 1800-2000, Lund Studies in Economic History 41, Lund.
+
+      Schön, L. & Krantz, O. (2012), "Swedish Historical National Accounts 1560-2010." Lund Papers in Economic History 123, Lund University.
+
+      Schön, L. & Krantz, O. (2015), "New Swedish Historical National Accounts since the 16th Century in Constant and Current Prices." Lund Papers in Economic History 140, Lund University.
+
+      Nilsson, C., Enflo, K., Lobell, H. and Krantz, O. (2023) "Swedish Historical National Accounts. 2023 Update, Revision and Underlying Principles." Mimeo, Department of Economic History, Lund University.
+
+      Lobell, H. (2025) "On the 2025 Update of SHNA 1993-2022." Mimeo, Department of Economic History, Lund University.
+
+    # Files
+    url_main: https://www.lusem.lu.se/organisation/department-economic-history/research-department-economic-history/databases-department-economic-history/economic-history-data/swedish-historical-national-accounts-1300-2022
+    url_download: https://lu.box.com/index.php?rm=box_download_shared_file&shared_name=q97u5awv6e7vbtji0expuyjnec9dgq3h&file_id=f_1799876858097
+    date_accessed: '2026-07-02'
+
+    # License
+    license:
+      name: © Department of Economic History, Lund University
+      url: https://www.lusem.lu.se/organisation/department-economic-history/research-department-economic-history/databases-department-economic-history/economic-history-data/swedish-historical-national-accounts-1300-2022
+outs:
+  - md5: 5f8e9515ddb8e06946156a4e20120680
+    size: 68639
+    path: swedish_historical_national_accounts_value_added.xlsx

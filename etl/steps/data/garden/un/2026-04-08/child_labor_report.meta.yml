@@ -264,6 +264,54 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
 
+  # Table where sex is meant to become the grapher entity (one chart row per sex),
+  # so all text is sex-neutral and only <<age>> is available as a dimension.
+  child_labor_by_sex:
+    variables:
+      share_child_labor:
+        title: Share of children in child labor, excluding household chores (<<age>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of children aged <<age>> who are either working at an age that is too young for them to be employed, or doing work that — by its nature or conditions — is likely to harm their health, safety, or morals. Household chores are not counted as work.
+        description_key:
+          - "{definitions.description_key_child_labor_economic_activity}"
+          - "{definitions.description_key_child_labor_hazardous_work}"
+          - "{definitions.description_key_household_chores_not_included}"
+          - "{definitions.description_key_worst_forms_not_included}"
+          - "{definitions.description_key_modelled_data}"
+        presentation:
+          title_public: Share of children aged <<age>> in child labor, excluding household chores
+          grapher_config:
+            note: "{definitions.note_excluding_household_chores}"
+            entityType: group
+            entityTypePlural: groups
+        display:
+          name: Excluding household chores
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      share_child_labor_incl_household_chores:
+        title: Share of children in child labor, including household chores (<<age>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of children aged <<age>> in [child labor](#dod:child-labor), including household chores performed for 21 or more hours per week.
+        description_key:
+          - "{definitions.description_key_child_labor_household_chores}"
+          - "{definitions.description_key_child_labor_hazardous_work}"
+          - "{definitions.description_key_household_chores_definition}"
+          - "{definitions.description_key_worst_forms_not_included}"
+          - "{definitions.description_key_modelled_data}"
+        presentation:
+          title_public: Share of children aged <<age>> in child labor, including household chores
+          grapher_config:
+            note: "{definitions.note_including_household_chores}"
+            entityType: group
+            entityTypePlural: groups
+        display:
+          name: Including household chores
+          numDecimalPlaces: 1
+          <<: *common_display
+
   sector:
     variables:
       share_child_labor:

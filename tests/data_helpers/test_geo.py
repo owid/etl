@@ -810,6 +810,88 @@ class TestAddRegionAggregates:
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
         assert df.var_01.m.title == "Var 01"
 
+    def test_add_region_raises_when_must_have_country_not_a_member(self):
+        # A "must-have" country that is not a member of the region can never satisfy the subset check,
+        # so the aggregate would be silently set to NaN and dropped. The guard must raise instead
+        # (this is the failure mode that silently nulled income-group aggregates after a reclassification).
+        with pytest.raises(ValueError, match="not members of the region"):
+            geo.add_region_aggregates(
+                df=self.df_in,
+                region="Region 2",
+                countries_in_region=["Country 3"],
+                countries_that_must_have_data=["Country 1"],  # not a member of Region 2
+                country_col="country",
+                year_col="year",
+            )
+
+    def test_add_region_fractional_must_have_with_non_member(self):
+        # With a fractional requirement, a non-member in the must-have list doesn't necessarily make
+        # the aggregate impossible: members {1,2} + must-have {1,2,3} + frac 2/3 is satisfiable, so it
+        # must aggregate (with a stale-pin warning), while an unreachable fraction must still raise.
+        df_out = geo.add_region_aggregates(
+            df=self.df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 1", "Country 2", "Country 3"],
+            frac_countries_that_must_have_data=2 / 3,
+            country_col="country",
+            year_col="year",
+        )
+        assert "Region 1" in df_out["country"].values
+
+        # The stale non-member must also be excluded from the check's denominator: in 2021 only
+        # Country 1 has data, which passes frac 0.5 over the two members (1/2) but would be nulled
+        # if Country 3 stayed in the list (1/3) — the aggregate for 2021 must survive.
+        df_half = geo.add_region_aggregates(
+            df=self.df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 1", "Country 2", "Country 3"],
+            frac_countries_that_must_have_data=0.5,
+            country_col="country",
+            year_col="year",
+        )
+        region_2021 = df_half[(df_half["country"] == "Region 1") & (df_half["year"] == 2021)]
+        assert not region_2021.empty and region_2021["var_01"].notna().all()
+
+        # Zero-threshold edge case: every listed country is a non-member and frac=0 — the requirement
+        # is vacuously satisfiable, the stale entries get excluded (emptying the list), and the check
+        # must treat the empty list as "no constraint" instead of dividing by zero.
+        df_zero = geo.add_region_aggregates(
+            df=self.df_in,
+            region="Region 1",
+            countries_in_region=["Country 1", "Country 2"],
+            countries_that_must_have_data=["Country 3"],
+            frac_countries_that_must_have_data=0,
+            country_col="country",
+            year_col="year",
+        )
+        assert "Region 1" in df_zero["country"].values
+
+        # An invalid threshold must fail loudly even when the per-group check would be skipped
+        # (e.g. an empty must-have list).
+        with pytest.raises(ValueError, match="must be between 0 and 1"):
+            geo.add_region_aggregates(
+                df=self.df_in,
+                region="Region 1",
+                countries_in_region=["Country 1", "Country 2"],
+                countries_that_must_have_data=[],
+                frac_countries_that_must_have_data=2,
+                country_col="country",
+                year_col="year",
+            )
+
+        with pytest.raises(ValueError, match="impossible to compute"):
+            geo.add_region_aggregates(
+                df=self.df_in,
+                region="Region 1",
+                countries_in_region=["Country 1", "Country 2"],
+                countries_that_must_have_data=["Country 1", "Country 2", "Country 3"],
+                frac_countries_that_must_have_data=0.9,
+                country_col="country",
+                year_col="year",
+            )
+
 
 class MockRegionsDataset:
     def __getitem__(self, name: str) -> Table:
