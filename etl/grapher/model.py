@@ -64,7 +64,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import NoResultFound, ProgrammingError
+from sqlalchemy.exc import IntegrityError, NoResultFound, ProgrammingError
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # ty: ignore
     DeclarativeBase,
@@ -1860,6 +1860,9 @@ class MetadataReviewSuggestion(Base):
             mysql_length={"targetPath": 191, "viewId": 191, "fieldPath": 64},
         ),
         Index("idx_mrs_status", "status"),
+        # One OPEN thread per field, enforced at the database level: the generated
+        # column is NULL for resolved rows (NULLs never collide in a unique index).
+        Index("idx_mrs_open_unique", "openKeyHash", unique=True),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
@@ -1890,6 +1893,14 @@ class MetadataReviewSuggestion(Base):
     updatedAt: Mapped[datetime] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
     )
+    openKeyHash: Mapped[str | None] = mapped_column(
+        CHAR(32),
+        Computed(
+            "(IF(status = 'open', MD5(CONCAT_WS('|', targetType, targetPath, IFNULL(viewId, ''), fieldPath)), NULL))",
+            persisted=True,
+        ),
+        init=False,
+    )
 
     @classmethod
     def file_or_update(
@@ -1915,19 +1926,24 @@ class MetadataReviewSuggestion(Base):
         exists for the same source key, the new proposed text replaces it (the
         edit is recorded as a `revision` comment) and any comment joins the same
         thread — instead of piling up parallel threads that each repeat the text.
+        The unique `openKeyHash` index enforces this at the database level; a
+        concurrent filing that loses the race merges into the winner's thread.
         """
-        existing = session.scalars(
-            select(cls)
-            .where(
-                cls.targetType == target_type,
-                cls.targetPath == target_path,
-                cls.viewId.is_(None) if view_id is None else cls.viewId == view_id,
-                cls.fieldPath == field_path,
-                cls.status == "open",
-            )
-            .order_by(cls.createdAt.desc())
-        ).first()
 
+        def find_open() -> "MetadataReviewSuggestion | None":
+            return session.scalars(
+                select(cls)
+                .where(
+                    cls.targetType == target_type,
+                    cls.targetPath == target_path,
+                    cls.viewId.is_(None) if view_id is None else cls.viewId == view_id,
+                    cls.fieldPath == field_path,
+                    cls.status == "open",
+                )
+                .order_by(cls.createdAt.desc())
+            ).first()
+
+        existing = find_open()
         if existing is None:
             suggestion = cls(
                 targetType=target_type,
@@ -1944,8 +1960,16 @@ class MetadataReviewSuggestion(Base):
                 pageChecksum=page_checksum,
             )
             session.add(suggestion)
-            session.commit()
-        else:
+            try:
+                session.commit()
+            except IntegrityError:
+                # Lost a concurrent-filing race: merge into the winner's thread.
+                session.rollback()
+                existing = find_open()
+                if existing is None:
+                    raise
+
+        if existing is not None:
             suggestion = existing
             if suggested_value is not None and suggested_value != suggestion.suggestedValue:
                 had_proposal = suggestion.suggestedValue is not None
