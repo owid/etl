@@ -58,6 +58,7 @@ from sqlalchemy.dialects.mysql import (
     ENUM,
     LONGBLOB,
     LONGTEXT,
+    MEDIUMTEXT,
     TEXT,
     TINYINT,
     VARCHAR,
@@ -1820,6 +1821,176 @@ class ChartDiffConflicts(Base):
         assert len(chart_ids) == len(conflicts), "Length of chart_ids and conflicts must be the same."
 
         return conflicts
+
+
+METADATA_REVIEW_STATUS = Literal["open", "implemented", "rejected"]
+
+
+class MetadataReviewSuggestion(Base):
+    """A field-level suggestion/comment on the user-facing metadata of an MDim or indicator.
+
+    Filed from the Metadata Review wizard app; consumed by `etl metadata-review export`.
+
+    Addressing is environment-agnostic (catalog paths, MDim view ids — never numeric
+    chart/variable ids, which diverge between staging and production databases).
+    A suggestion attaches to the *underlying parameter*, not the page where it was filed:
+    inherited fields are stored against the source indicator (`targetType='indicator'`),
+    so the same thread surfaces on every MDim view and data page rendering that text;
+    the MDim view the reviewer was looking at is kept in `filedFromPath`/`filedFromViewId`.
+
+    Staleness is detected by re-resolving the field and comparing against the
+    `currentValue`/`provenance` snapshot (not by timestamp matching as in chart-diff),
+    so rows are mutable; status changes append a `status_change` comment for history.
+    """
+
+    __tablename__ = "metadata_review_suggestions"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["createdBy"], ["users.id"], ondelete="RESTRICT", name="metadata_review_suggestions_createdBy_fk"
+        ),
+        ForeignKeyConstraint(
+            ["resolvedBy"], ["users.id"], ondelete="RESTRICT", name="metadata_review_suggestions_resolvedBy_fk"
+        ),
+        Index("idx_mrs_target", "targetType", "targetPath", mysql_length={"targetPath": 191}),
+        Index(
+            "idx_mrs_field",
+            "targetPath",
+            "viewId",
+            "fieldPath",
+            mysql_length={"targetPath": 191, "viewId": 191, "fieldPath": 64},
+        ),
+        Index("idx_mrs_status", "status"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    # 'mdim' or 'indicator'.
+    targetType: Mapped[str] = mapped_column(VARCHAR(32))
+    # MDim: multi_dim_data_pages.catalogPath; indicator: variables.catalogPath.
+    targetPath: Mapped[str] = mapped_column(VARCHAR(767))
+    # e.g. 'config.subtitle', 'description_short', 'dimensions.<dim>.choices.<choice>.name'.
+    fieldPath: Mapped[str] = mapped_column(VARCHAR(255))
+    # 'override' / 'inherited' / 'missing' at suggestion time.
+    provenance: Mapped[str] = mapped_column(VARCHAR(16))
+    createdBy: Mapped[int] = mapped_column(Integer)
+    # Normalized dimensionsToViewId string; only for MDim view-scoped fields.
+    viewId: Mapped[str | None] = mapped_column(VARCHAR(512), default=None)
+    # Indicator catalogPath the value inherits from (when filed on an MDim view).
+    inheritedFromPath: Mapped[str | None] = mapped_column(VARCHAR(767), default=None)
+    filedFromPath: Mapped[str | None] = mapped_column(VARCHAR(767), default=None)
+    filedFromViewId: Mapped[str | None] = mapped_column(VARCHAR(512), default=None)
+    currentValue: Mapped[str | None] = mapped_column(MEDIUMTEXT, default=None)
+    # NULL means a comment-only thread anchored to the field.
+    suggestedValue: Mapped[str | None] = mapped_column(MEDIUMTEXT, default=None)
+    # MDim configMd5 or variables.metadataChecksum at suggestion time.
+    pageChecksum: Mapped[str | None] = mapped_column(VARCHAR(64), default=None)
+    status: Mapped[METADATA_REVIEW_STATUS] = mapped_column(VARCHAR(32), default="open")
+    resolvedBy: Mapped[int | None] = mapped_column(Integer, default=None)
+    resolvedAt: Mapped[datetime | None] = mapped_column(DateTime, default=None)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
+
+    @classmethod
+    def load_for_paths(
+        cls,
+        session: Session,
+        target_paths: list[str],
+        statuses: list[str] | None = None,
+    ) -> list["MetadataReviewSuggestion"]:
+        """Load suggestions for a set of target paths (an MDim page plus all its source indicators)."""
+        if not target_paths:
+            return []
+        q = select(cls).where(cls.targetPath.in_(target_paths))
+        if statuses:
+            q = q.where(cls.status.in_(statuses))
+        return list(session.scalars(q.order_by(cls.createdAt.asc())).all())
+
+    @classmethod
+    def counts_by_status(cls, session: Session, target_paths: list[str]) -> builtins.dict[str, int]:
+        if not target_paths:
+            return {}
+        rows = session.execute(
+            select(cls.status, func.count()).where(cls.targetPath.in_(target_paths)).group_by(cls.status)
+        ).all()
+        return {status: n for status, n in rows}
+
+    def set_status(self, session: Session, status: METADATA_REVIEW_STATUS, user_id: int) -> None:
+        """Set the resolution status and record who did it as a status_change comment."""
+        assert status in get_args(METADATA_REVIEW_STATUS), f"Invalid status: {status}"
+        self.status = status
+        if status == "open":
+            self.resolvedBy = None
+            self.resolvedAt = None
+        else:
+            self.resolvedBy = user_id
+            self.resolvedAt = datetime.now(timezone.utc)
+        session.add(self)
+        self.add_comment(session, user_id=user_id, text=f"Status set to {status}.", kind="status_change")
+
+    def add_comment(
+        self,
+        session: Session,
+        user_id: int,
+        text: str,
+        parent_comment_id: int | None = None,
+        kind: str = "comment",
+    ) -> "MetadataReviewComment":
+        assert self.id is not None, "Suggestion must be persisted before commenting."
+        comment = MetadataReviewComment(
+            suggestionId=self.id,
+            userId=user_id,
+            text=text,
+            parentCommentId=parent_comment_id,
+            kind=kind,
+        )
+        session.add(comment)
+        session.commit()
+        return comment
+
+
+class MetadataReviewComment(Base):
+    """A threaded comment under a MetadataReviewSuggestion."""
+
+    __tablename__ = "metadata_review_comments"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["suggestionId"],
+            ["metadata_review_suggestions.id"],
+            ondelete="CASCADE",
+            name="metadata_review_comments_suggestionId_fk",
+        ),
+        ForeignKeyConstraint(
+            ["parentCommentId"],
+            ["metadata_review_comments.id"],
+            ondelete="CASCADE",
+            name="metadata_review_comments_parentCommentId_fk",
+        ),
+        ForeignKeyConstraint(["userId"], ["users.id"], ondelete="RESTRICT", name="metadata_review_comments_userId_fk"),
+        Index("idx_mrc_suggestion", "suggestionId"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    suggestionId: Mapped[int] = mapped_column(Integer)
+    userId: Mapped[int] = mapped_column(Integer)
+    # NOTE: this column shadows sqlalchemy's `text()` inside the class body; keep
+    # timestamp defaults func-based below.
+    text: Mapped[str] = mapped_column(MEDIUMTEXT)
+    parentCommentId: Mapped[int | None] = mapped_column(Integer, default=None)
+    # 'comment' or 'status_change' (auto-comment recording a status flip).
+    kind: Mapped[str] = mapped_column(VARCHAR(32), default="comment")
+    createdAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp(), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, default=func.utc_timestamp(), onupdate=func.utc_timestamp(), init=False
+    )
+
+    @classmethod
+    def load_for_suggestions(cls, session: Session, suggestion_ids: list[int]) -> list["MetadataReviewComment"]:
+        if not suggestion_ids:
+            return []
+        return list(
+            session.scalars(select(cls).where(cls.suggestionId.in_(suggestion_ids)).order_by(cls.createdAt.asc())).all()
+        )
 
 
 class MultiDimDataPage(Base):

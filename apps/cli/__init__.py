@@ -157,6 +157,7 @@ GROUPS = (
             "name": "Metadata",
             "commands": {
                 "metadata-export": "etl.metadata_export.cli",
+                "metadata-review": "apps.metadata_review.cli.cli",
             },
         },
         {
