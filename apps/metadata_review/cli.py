@@ -78,5 +78,8 @@ def resolve_cli(suggestion_id: int, status: str) -> None:
         suggestion = session.get(gm.MetadataReviewSuggestion, suggestion_id)
         if suggestion is None:
             raise click.ClickException(f"No suggestion with id {suggestion_id}.")
-        suggestion.set_status(session, status, user_id=int(config.GRAPHER_USER_ID))  # type: ignore[arg-type]
+        try:
+            suggestion.set_status(session, status, user_id=int(config.GRAPHER_USER_ID))  # type: ignore[arg-type]
+        except ValueError as e:
+            raise click.ClickException(str(e))
     console.print(f"[green]Suggestion {suggestion_id} set to {status}.[/green]")

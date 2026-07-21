@@ -2024,7 +2024,11 @@ class MetadataReviewSuggestion(Base):
         return {status: n for status, n in rows}
 
     def set_status(self, session: Session, status: METADATA_REVIEW_STATUS, user_id: int) -> None:
-        """Set the resolution status and record who did it as a status_change comment."""
+        """Set the resolution status and record who did it as a status_change comment.
+
+        Raises ValueError when reopening would collide with a newer open thread on
+        the same field (the unique openKeyHash index is authoritative).
+        """
         assert status in get_args(METADATA_REVIEW_STATUS), f"Invalid status: {status}"
         self.status = status
         if status == "open":
@@ -2034,6 +2038,13 @@ class MetadataReviewSuggestion(Base):
             self.resolvedBy = user_id
             self.resolvedAt = datetime.now(timezone.utc)
         session.add(self)
+        try:
+            session.commit()
+        except IntegrityError:
+            session.rollback()
+            raise ValueError(
+                "This field already has a newer open proposal — reply there instead of reopening this thread."
+            )
         self.add_comment(session, user_id=user_id, text=f"Status set to {status}.", kind="status_change")
 
     def add_comment(

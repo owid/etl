@@ -254,8 +254,12 @@ def _render_resolved(
                 st.markdown(f"**{comment_author}** · {when}: {comment.text}")
         if user is not None:
             if st.button("Reopen", key=f"mrs_reopen_{key_ns}_{suggestion.id}"):
-                state.set_status(suggestion.id, user.id, "open")
-                st.rerun()
+                try:
+                    state.set_status(suggestion.id, user.id, "open")
+                except ValueError as e:
+                    st.warning(str(e))
+                else:
+                    st.rerun()
 
 
 def _render_edit_controls(
