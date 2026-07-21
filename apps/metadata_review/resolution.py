@@ -455,27 +455,52 @@ def suggestions_by_source_key(
 
 
 def shared_view_ids(review: MdimReview, field: ReviewableField) -> list[str]:
-    """View ids (other than the field's own) rendering the same parameter.
+    """View ids (other than the field's own) rendering the same text for this field.
 
-    Non-overridden fields share their source indicator; overridden fields share by
-    identical resolved value (shared `common_views` / generated blocks arrive in the
-    DB config as per-view copies, so value equality is the detectable signal).
+    Sharing is by identical rendered value, regardless of provenance or source
+    indicator: MDims commonly fan one garden Jinja template out into a different
+    expanded indicator per view, all rendering the same text — a suggestion on
+    that text belongs to every one of those views. (Shared `common_views` /
+    generated overrides likewise arrive in the DB config as per-view copies, so
+    value equality is the detectable signal there too.)
     """
-    if field.view_id is None:
+    if field.view_id is None or field.current_value is None:
         return []
+    value = _norm(field.current_value)
     shared = []
     for view in review.views:
         if view.view_id == field.view_id:
             continue
         for other in view.fields:
-            if other.field_path != field.field_path:
-                continue
-            if field.provenance != "override":
-                if other.provenance != "override" and other.inherited_from == field.inherited_from:
-                    shared.append(view.view_id)
-            elif other.provenance == "override" and other.current_value == field.current_value:
+            if other.field_path == field.field_path and _norm(other.current_value) == value:
                 shared.append(view.view_id)
     return shared
+
+
+def threads_for_field(
+    review: MdimReview,
+    field: ReviewableField,
+    suggestions_by_key: dict[tuple[str, str, str | None, str], list[gm.MetadataReviewSuggestion]],
+) -> list[gm.MetadataReviewSuggestion]:
+    """All suggestion threads that belong on this field's panel.
+
+    Includes the field's own source-keyed threads plus threads filed on any other
+    view's field (same field, identical rendered text) — even when those views
+    inherit from *different* expanded indicators of the same garden template.
+    Deduplicated by suggestion id, oldest first.
+    """
+    keys = {field.source_key()}
+    if field.view_id is not None and field.current_value is not None:
+        value = _norm(field.current_value)
+        for view in review.views:
+            for other in view.fields:
+                if other.field_path == field.field_path and _norm(other.current_value) == value:
+                    keys.add(other.source_key())
+    seen: dict[int, gm.MetadataReviewSuggestion] = {}
+    for key in keys:
+        for suggestion in suggestions_by_key.get(key, []):
+            seen[suggestion.id] = suggestion
+    return sorted(seen.values(), key=lambda s: s.createdAt)
 
 
 @dataclass

@@ -15,7 +15,11 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Wizard: Metadata Review", page_icon="🪄", layout="wide")
 
-from apps.metadata_review.resolution import shared_view_ids, suggestions_by_source_key  # noqa: E402
+from apps.metadata_review.resolution import (  # noqa: E402
+    shared_view_ids,
+    suggestions_by_source_key,
+    threads_for_field,
+)
 from apps.metadata_review.targets import MdimReview, ReviewableField  # noqa: E402
 from apps.wizard.app_pages.metadata_review import state  # noqa: E402
 from apps.wizard.app_pages.metadata_review.field_panel import render_field  # noqa: E402
@@ -144,13 +148,9 @@ def mdim_page(user) -> None:
             with col_fields:
                 for field in view.fields:
                     shared = shared_view_ids(review, field)
-                    threads = list(suggestions_by_key.get(field.source_key(), []))
-                    # Overridden fields also show threads filed on other views sharing the same text.
-                    if field.provenance == "override":
-                        for other_view_id in shared:
-                            threads += suggestions_by_key.get(
-                                ("mdim", catalog_path, other_view_id, field.field_path), []
-                            )
+                    # Threads filed on ANY view rendering this same text (even via a
+                    # different expanded indicator of the same garden template).
+                    threads = threads_for_field(review, field, suggestions_by_key)
                     render_field(
                         field,
                         threads,

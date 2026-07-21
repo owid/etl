@@ -126,6 +126,74 @@ def test_suggestions_by_source_key_groups():
 
 
 # ---------------------------------------------------------------------------
+# Shared text across views (different expanded indicators, same rendered value)
+# ---------------------------------------------------------------------------
+
+
+def _mdim_with_shared_text():
+    from apps.metadata_review.targets import MdimReview, ViewReview
+
+    def view_field(view_id, indicator, value):
+        return _field(
+            view_id=view_id,
+            provenance="inherited",
+            current_value=value,
+            inherited_from=indicator,
+            field_path="config.subtitle",
+        )
+
+    review = MdimReview(
+        target_path="ns/latest/thing#thing", slug="thing", title="T", title_variant=None, page_checksum="x"
+    )
+    # Views a and b render the SAME text via DIFFERENT expanded indicators; c differs.
+    for view_id, indicator, value in [
+        ("metric=a", "grapher/ns/latest/ds/t#col__a", "Shared subtitle."),
+        ("metric=b", "grapher/ns/latest/ds/t#col__b", "Shared subtitle."),
+        ("metric=c", "grapher/ns/latest/ds/t#col__c", "Different subtitle."),
+    ]:
+        review.views.append(
+            ViewReview(
+                view_id=view_id,
+                dimensions={"metric": view_id.split("=")[1]},
+                indicator_path=indicator,
+                fields=[view_field(view_id, indicator, value)],
+            )
+        )
+    return review
+
+
+def test_shared_view_ids_matches_by_value_across_indicators():
+    from apps.metadata_review.resolution import shared_view_ids
+
+    review = _mdim_with_shared_text()
+    field_a = review.views[0].fields[0]
+    assert shared_view_ids(review, field_a) == ["metric=b"]
+    field_c = review.views[2].fields[0]
+    assert shared_view_ids(review, field_c) == []
+
+
+def test_threads_for_field_borrows_across_indicators():
+    from apps.metadata_review.resolution import suggestions_by_source_key, threads_for_field
+
+    review = _mdim_with_shared_text()
+    # A suggestion filed on view a's indicator must show on view b's identical field.
+    suggestion = gm.MetadataReviewSuggestion(
+        targetType="indicator",
+        targetPath="grapher/ns/latest/ds/t#col__a",
+        fieldPath="grapher_config.subtitle",
+        provenance="inherited",
+        createdBy=1,
+        currentValue="Shared subtitle.",
+    )
+    suggestion.id = 1
+    grouped = suggestions_by_source_key([suggestion])
+    field_b = review.views[1].fields[0]
+    assert [s.id for s in threads_for_field(review, field_b, grouped)] == [1]
+    field_c = review.views[2].fields[0]
+    assert threads_for_field(review, field_c, grouped) == []
+
+
+# ---------------------------------------------------------------------------
 # Bullet diffs (description_key consolidation)
 # ---------------------------------------------------------------------------
 

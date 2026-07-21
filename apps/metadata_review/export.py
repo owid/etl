@@ -241,14 +241,29 @@ def _affected_views(
     review: MdimReview,
     live_field: ReviewableField | None,
 ) -> list[str]:
-    """All surfaces rendering the suggestion's parameter — one edit fixes them all."""
+    """All surfaces rendering the suggestion's text — one edit fixes them all.
+
+    Matched by identical rendered value (not only the same source indicator):
+    MDims fan one garden template out into a different expanded indicator per
+    view, all rendering the same text.
+    """
     if suggestion.targetType == "indicator":
-        views = [
-            view.view_id
-            for view in review.views
-            if view.indicator_path == suggestion.targetPath
-            and any(f.source_key()[3] == suggestion.fieldPath and f.provenance != "override" for f in view.fields)
-        ]
+        views = []
+        for view in review.views:
+            for field in view.fields:
+                if field.source_key() == (
+                    suggestion.targetType,
+                    suggestion.targetPath,
+                    suggestion.viewId,
+                    suggestion.fieldPath,
+                ) or (
+                    live_field is not None
+                    and field.field_path == live_field.field_path
+                    and field.current_value is not None
+                    and str(field.current_value).strip() == str(live_field.current_value or "").strip()
+                ):
+                    views.append(view.view_id)
+                    break
         return views + [f"data page of {suggestion.targetPath}"]
     if suggestion.viewId and live_field is not None:
         return [suggestion.viewId] + shared_view_ids(review, live_field)

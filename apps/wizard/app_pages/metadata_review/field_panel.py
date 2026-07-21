@@ -240,6 +240,16 @@ def _render_suggestion_form(
                 unchanged = suggested.strip() == prefill.strip()
                 if unchanged and not comment.strip():
                     st.warning("Nothing to submit — edit the text or add a comment.")
+                elif existing is not None:
+                    # Refine the existing thread in place — it may be keyed to another
+                    # view's source (borrowed by identical text).
+                    state.update_proposal(
+                        existing.id,
+                        user_id=user.id,
+                        suggested_value=None if unchanged else suggested.strip(),
+                        comment_text=comment.strip() or None,
+                    )
+                    st.rerun()
                 else:
                     state.create_suggestion(
                         field,

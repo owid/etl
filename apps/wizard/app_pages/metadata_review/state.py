@@ -141,6 +141,31 @@ def create_suggestion(
         )
 
 
+def update_proposal(suggestion_id: int, user_id: int, suggested_value: str | None, comment_text: str | None) -> None:
+    """Refine an existing proposal in place (revision-tracked).
+
+    Used when the thread being refined may have been filed from a different view
+    (borrowed by identical text) — the update must land on that same row, not
+    open a new thread keyed to the current view's source.
+    """
+    with Session(get_engine()) as session:
+        suggestion = session.get(gm.MetadataReviewSuggestion, suggestion_id)
+        assert suggestion is not None
+        if suggested_value is not None and suggested_value != suggestion.suggestedValue:
+            had_proposal = suggestion.suggestedValue is not None
+            suggestion.suggestedValue = suggested_value
+            session.add(suggestion)
+            session.commit()
+            suggestion.add_comment(
+                session,
+                user_id=user_id,
+                text="Updated the proposed text." if had_proposal else "Added a proposed text.",
+                kind="revision",
+            )
+        if comment_text:
+            suggestion.add_comment(session, user_id=user_id, text=comment_text)
+
+
 def add_comment(suggestion_id: int, user_id: int, text: str) -> None:
     with Session(get_engine()) as session:
         suggestion = session.get(gm.MetadataReviewSuggestion, suggestion_id)
