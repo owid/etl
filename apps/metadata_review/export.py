@@ -14,13 +14,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
+from apps.metadata_review.diffs import apply_bullet_edits
 from apps.metadata_review.resolution import (
     check_staleness,
     resolve_dataset,
     resolve_mdim,
     shared_view_ids,
 )
-from apps.metadata_review.targets import MdimReview, ReviewableField
+from apps.metadata_review.targets import VIEW_TO_INDICATOR_FIELD, MdimReview, ReviewableField
 from apps.metadata_review.trace import EditCandidate, trace_indicator_field, trace_mdim_field
 from etl.config import OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
@@ -68,7 +69,10 @@ def build_export(
         paths = review.indicator_paths
         target_info = {"type": "dataset", "catalog_path": target_path, "name": review.name}
 
-    suggestions = gm.MetadataReviewSuggestion.load_for_paths(session, paths, statuses=statuses)
+    # Widen to the whole grapher dataset(s), matching the wizard's loading: threads
+    # filed on sibling pages built from the same metadata belong in this export too.
+    prefixes = sorted({"/".join(p.split("/")[:4]) for p in review.indicator_paths})
+    suggestions = gm.MetadataReviewSuggestion.load_for_paths(session, paths, statuses=statuses, path_prefixes=prefixes)
     comments = gm.MetadataReviewComment.load_for_suggestions(session, [s.id for s in suggestions])
     comments_by_suggestion: dict[int, list[gm.MetadataReviewComment]] = {}
     for comment in comments:
@@ -160,9 +164,13 @@ def _export_suggestion(
     users: dict[int, str],
     trace_cache: dict[tuple, list[EditCandidate]],
 ) -> dict[str, Any]:
-    staleness = check_staleness(suggestion, fields_by_key)
     key = (suggestion.targetType, suggestion.targetPath, suggestion.viewId, suggestion.fieldPath)
     live_field = fields_by_key.get(key)
+    if live_field is None:
+        # A thread borrowed from a sibling page: judge it against the field on THIS
+        # page that displays it (text-matched), not as target-gone.
+        live_field = _matching_display_field(suggestion, fields_by_key.values())
+    staleness = check_staleness(suggestion, fields_by_key, display_field=live_field)
     trace_value = live_field.current_value if live_field is not None else suggestion.currentValue
 
     if key not in trace_cache:
@@ -234,6 +242,24 @@ def _export_suggestion(
         for c in comments
     ]
     return entry
+
+
+def _matching_display_field(suggestion: gm.MetadataReviewSuggestion, fields) -> ReviewableField | None:
+    """The field on this page that displays a borrowed (cross-page) thread, if any."""
+    for field in fields:
+        mapped = VIEW_TO_INDICATOR_FIELD.get(field.field_path, field.field_path)
+        if mapped != suggestion.fieldPath or field.current_value is None:
+            continue
+        if str(field.current_value).strip() == str(suggestion.currentValue or "").strip():
+            return field
+        if (
+            mapped == "description_key"
+            and suggestion.suggestedValue is not None
+            and apply_bullet_edits(suggestion.currentValue, suggestion.suggestedValue, str(field.current_value))
+            is not None
+        ):
+            return field
+    return None
 
 
 def _affected_views(

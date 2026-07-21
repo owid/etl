@@ -136,7 +136,9 @@ def create_suggestion(
             user_id=user_id,
             provenance=field.provenance,
             current_value=str(field.current_value) if field.current_value is not None else None,
-            suggested_value=suggested_value or None,
+            # NOTE: an empty string is a real proposal (e.g. clearing an inherited
+            # footnote) — only None means "comment-only thread".
+            suggested_value=suggested_value,
             comment_text=comment_text,
             inherited_from_path=field.inherited_from,
             filed_from_path=field.target_path,
