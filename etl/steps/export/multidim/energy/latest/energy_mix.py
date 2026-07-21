@@ -147,19 +147,19 @@ SOURCE_TITLE_NAMES = {
 def _view_title(source: str, metric: str) -> str:
     if source == "total":
         return {
-            "total": "Total energy supply",
-            "per_capita": "Total energy supply per person",
-            "share": "Total energy supply",
-            "annual_change": "Annual change in total energy supply",
-            "annual_change_pct": "Annual percentage change in total energy supply",
+            "total": "Primary energy",
+            "per_capita": "Primary energy per person",
+            "share": "Primary energy",
+            "annual_change": "Annual change in primary energy",
+            "annual_change_pct": "Annual percentage change in primary energy",
         }[metric]
     name = SOURCE_TITLE_NAMES[source]
     return {
-        "total": f"Total energy supply from {name}",
-        "per_capita": f"Total energy supply from {name} per person",
-        "share": f"Share of total energy supply from {name}",
-        "annual_change": f"Annual change in total energy supply from {name}",
-        "annual_change_pct": f"Annual percentage change in total energy supply from {name}",
+        "total": f"Primary energy from {name}",
+        "per_capita": f"Primary energy from {name} per person",
+        "share": f"Share of primary energy from {name}",
+        "annual_change": f"Annual change in primary energy from {name}",
+        "annual_change_pct": f"Annual percentage change in primary energy from {name}",
     }[metric]
 
 
@@ -182,32 +182,7 @@ SOURCE_COMPOSITION = {
 }
 
 
-# The total-energy-supply views get a definitional subtitle (title and subtitle read as one idea)
-# instead of the generic unit phrase, so we explain what TES means and surface "primary". One shared
-# definition clause, with the unit tail adapted per metric.
-_TES_DEFINITION = (
-    "[Total energy supply](#dod:total-energy-supply) is the primary energy a country uses after "
-    "accounting for imports and exports"
-)
-TOTAL_SUPPLY_SUBTITLE = {
-    "total": f"{_TES_DEFINITION}, measured in [terawatt-hours](#dod:watt-hours).",
-    "per_capita": f"{_TES_DEFINITION}, measured in [kilowatt-hours](#dod:watt-hours) per person.",
-    "annual_change": (
-        "Annual change in [total energy supply](#dod:total-energy-supply) in one year, relative to the "
-        "previous year. Total energy supply is the primary energy a country uses after accounting for "
-        "imports and exports."
-    ),
-    "annual_change_pct": (
-        "Percentage change in [total energy supply](#dod:total-energy-supply) in one year, relative to the "
-        "previous year. Total energy supply is the primary energy a country uses after accounting for "
-        "imports and exports."
-    ),
-}
-
-
 def _view_subtitle(source: str, metric: str) -> str:
-    if source == "total" and metric in TOTAL_SUPPLY_SUBTITLE:
-        return TOTAL_SUPPLY_SUBTITLE[metric]
     unit = METRIC_UNIT_PHRASE[metric]
     note = SOURCE_COMPOSITION.get(source)
     # Lead with what the series is (the composition note), then the unit, so the subtitle reads as
@@ -244,7 +219,7 @@ SOURCE_COLORS = {
 _DECOMPOSITION_METRICS = {"total": "by_source", "per_capita": "by_source_per_capita"}
 # Title stem per aggregate.
 _DECOMPOSITION_STEM = {
-    "total": "Total energy supply",
+    "total": "Primary energy",
     "fossil_fuels": "Fossil fuel supply",
     "renewables": "Renewable energy supply",
     "low_carbon_energy": "Low-carbon energy supply",
@@ -309,9 +284,7 @@ def add_decomposition_views(c) -> None:
             config = {
                 **base_config,
                 "title": _decomposition_title(source, base_metric),
-                "subtitle": (
-                    TOTAL_SUPPLY_SUBTITLE[base_metric] if source == "total" else METRIC_UNIT_PHRASE[base_metric]
-                ),
+                "subtitle": METRIC_UNIT_PHRASE[base_metric],
             }
             note = _DECOMPOSITION_NOTES.get(source)
             if note:

@@ -91,8 +91,8 @@ def _column_dimensions() -> dict:
             "coal_reserves_per_capita_tonnes": {"fuel": "coal", "metric": "reserves", "per_capita": "per_capita"},
             "oil_reserves_per_capita_m3": {"fuel": "oil", "metric": "reserves", "per_capita": "per_capita"},
             "gas_reserves_per_capita_m3": {"fuel": "gas", "metric": "reserves", "per_capita": "per_capita"},
-            # Total fossil fuel production (the aggregate that the "by fuel" breakdown decomposes)
-            # and consumption.
+            # Total fossil fuel production and consumption (the aggregates that the "by fuel"
+            # breakdowns decompose).
             "total_production_twh": {"fuel": "total", "metric": "production", "per_capita": "total"},
             "total_production_per_capita_kwh": {"fuel": "total", "metric": "production", "per_capita": "per_capita"},
             "total_consumption_twh": {"fuel": "total", "metric": "consumption", "per_capita": "total"},
@@ -156,7 +156,8 @@ def run() -> None:
     # indicator display name.
     set_view_titles(c, dims_stats)
 
-    # Add "by fuel" stacked views that decompose total fossil fuel production into coal, oil, and gas.
+    # Add "by fuel" stacked views that decompose total fossil fuel production and consumption into
+    # coal, oil, and gas.
     add_decomposition_views(c)
 
     #
@@ -272,12 +273,14 @@ def _view_subtitle(fuel: str, metric: str, count: str) -> str:
     return sentence
 
 
-def _decomposition_title(count: str) -> str:
-    return "Fossil fuel production per person, by fuel" if count == "per_capita" else "Fossil fuel production by fuel"
+def _decomposition_title(metric: str, count: str) -> str:
+    stem = {"production": "Fossil fuel production", "consumption": "Fossil fuel consumption"}[metric]
+    return f"{stem} per person, by fuel" if count == "per_capita" else f"{stem} by fuel"
 
 
 def add_decomposition_views(c) -> None:
-    """Add stacked "by fuel" views that break total fossil fuel production into coal, oil, and gas.
+    """Add stacked "by fuel" views that break total fossil fuel production and consumption into coal,
+    oil, and gas.
 
     Constituents are listed top-to-bottom for the stacked chart (grapher renders the first series at
     the top), so coal sits at the bottom.
@@ -292,26 +295,27 @@ def add_decomposition_views(c) -> None:
     single_views = {
         (v.dimensions.get("fuel"), v.dimensions.get("metric"), v.dimensions.get("per_capita")): v for v in c.views
     }
-    for count in ["total", "per_capita"]:
-        indicators = []
-        for constituent in ["gas", "oil", "coal"]:
-            view = single_views.get((constituent, "production", count))
-            if view is not None and view.indicators.y:
-                indicators.extend(deepcopy(view.indicators.y))
-        if not indicators:
-            continue
-        config = {
-            **base_config,
-            "title": _decomposition_title(count),
-            "subtitle": ENERGY_UNIT_PHRASE[count],
-        }
-        new_view = View(
-            dimensions={"fuel": "total", "metric": "by_fuel", "per_capita": count},
-            indicators=ViewIndicators(y=indicators),
-            config=config,
-        )
-        new_view.mark_as_grouped()
-        c.views.append(new_view)
+    for metric in ["production", "consumption"]:
+        for count in ["total", "per_capita"]:
+            indicators = []
+            for constituent in ["gas", "oil", "coal"]:
+                view = single_views.get((constituent, metric, count))
+                if view is not None and view.indicators.y:
+                    indicators.extend(deepcopy(view.indicators.y))
+            if not indicators:
+                continue
+            config = {
+                **base_config,
+                "title": _decomposition_title(metric, count),
+                "subtitle": ENERGY_UNIT_PHRASE[count],
+            }
+            new_view = View(
+                dimensions={"fuel": "total", "metric": f"{metric}_by_fuel", "per_capita": count},
+                indicators=ViewIndicators(y=indicators),
+                config=config,
+            )
+            new_view.mark_as_grouped()
+            c.views.append(new_view)
 
 
 # Map color scheme per (fuel, metric, per_capita), copied from the original production charts each
