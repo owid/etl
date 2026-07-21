@@ -167,6 +167,10 @@ def _page_embed(url: str, height: int = 850) -> None:
     MDim page rewrites its own query params client-side — so swapping the `src`
     prop doesn't always navigate. Rendering the iframe as raw HTML makes the
     component content change with the URL, forcing a remount.
+
+    NOTE: streamlit deprecates `components.html` in favor of `st.iframe`, but
+    `st.iframe` has no `key` to force a remount — don't swap this back without
+    verifying the embedded MDim page follows the view selectors across reruns.
     """
     components.html(
         f'<iframe src="{html_lib.escape(url, quote=True)}" loading="lazy" '
