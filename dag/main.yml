@@ -8,12 +8,12 @@ steps:
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   # Create steps with latest population and GDP per capita for Grapher (entity sorting, peer countries).
   data://external/owid_grapher/latest/population:
     - data://grapher/demography/2024-07-15/population
   data://external/owid_grapher/latest/gdp:
-    - data://grapher/worldbank_wdi/2025-09-08/wdi
+    - data://grapher/worldbank_wdi/2026-07-14/wdi
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -31,7 +31,7 @@ steps:
   # Malnutrition
   data://grapher/malnutrition/2024-12-16/malnutrition:
     - data://garden/malnutrition/2024-12-16/malnutrition:
-      - data://garden/worldbank_wdi/2026-02-27/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
       - data://garden/un/2024-07-12/un_wpp
 
   #
@@ -48,15 +48,15 @@ steps:
   # Internet
   data://grapher/technology/2024-12-23/internet:
     - data://garden/technology/2024-12-23/internet:
-      - data://garden/worldbank_wdi/2026-02-27/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
 
   # UNDP
   data://garden/un/2025-05-07/undp_hdr:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://meadow/un/2025-05-07/undp_hdr:
       - snapshot://un/2025-05-07/undp_hdr.csv
   data://grapher/un/2025-05-07/undp_hdr:
@@ -164,10 +164,11 @@ steps:
       - data://garden/demography/2023-03-31/population
 
   # World Bank - Worldwide Bureaucracy Indicators
-  data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
-    - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
-      - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
-        - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+  data://grapher/wb/2026-07-14/worldwide_bureaucracy_indicators:
+    - data://garden/wb/2026-07-14/worldwide_bureaucracy_indicators:
+      - data://meadow/wb/2026-07-14/worldwide_bureaucracy_indicators:
+        - snapshot://wb/2026-07-14/worldwide_bureaucracy_indicators.zip
+      - data://garden/regions/2023-01-01/regions
 
   # Information Capacity Dataset
   data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
@@ -211,7 +212,7 @@ steps:
   data://grapher/missing_data/2024-03-26/who_md_suicides:
     - data://garden/missing_data/2024-03-26/who_md_suicides:
       - data://garden/who/2024-03-24/self_inflicted_injuries
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2023-03-31/population
 
@@ -222,7 +223,7 @@ steps:
         - snapshot://news/2025-10-29/guardian_mentions.csv
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
 
   # News coverage by GDELT 2
   data://grapher/news/2024-05-23/gdelt_v2:
@@ -238,7 +239,7 @@ steps:
         - snapshot://worldbank_wdi/2025-01-24/wdi.zip
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
 
   #
   # Aviation Safety Network - Aviation Statistics.
@@ -249,7 +250,7 @@ steps:
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_period.csv
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics.csv
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_nature.csv
-      - data://garden/worldbank_wdi/2026-02-27/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
 
   # Homicide - OMM
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
@@ -263,7 +264,7 @@ steps:
   data://garden/un/2026-06-09/igme:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/un/2018/igme
     - data://meadow/un/2026-06-09/igme
   data://grapher/un/2026-06-09/igme:
@@ -271,14 +272,14 @@ steps:
 
   # Long-run child mortality, Gapminder + UN IGME
   data://garden/un/2026-06-09/long_run_child_mortality:
-  - data://garden/gapminder/2023-09-18/under_five_mortality:
-    - data://meadow/gapminder/2023-09-18/under_five_mortality:
+    - data://garden/gapminder/2023-09-18/under_five_mortality:
+      - data://meadow/gapminder/2023-09-18/under_five_mortality:
         - snapshot://gapminder/2023-09-18/under_five_mortality.xlsx
     #  Gapminder  - Under five mortality v11
-  - data://garden/gapminder/2023-09-21/under_five_mortality:
-    - data://meadow/gapminder/2023-09-21/under_five_mortality:
+    - data://garden/gapminder/2023-09-21/under_five_mortality:
+      - data://meadow/gapminder/2023-09-21/under_five_mortality:
         - snapshot://gapminder/2023-09-21/under_five_mortality.xlsx
-  - data://garden/un/2026-06-09/igme
+    - data://garden/un/2026-06-09/igme
   data://grapher/un/2026-06-09/long_run_child_mortality:
     - data://garden/un/2026-06-09/long_run_child_mortality
 
@@ -384,18 +385,19 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
 
-  # WB income groups 2025-07-01
+  # WB income groups 2026-07-01
 
-  data://garden/wb/2025-07-01/income_groups:
-    - data://meadow/wb/2025-07-01/income_groups:
-      - snapshot://wb/2025-07-01/income_groups.xlsx
+  data://garden/wb/2026-07-01/income_groups:
+    - data://meadow/wb/2026-07-01/income_groups:
+      - snapshot://wb/2026-07-01/income_groups.xlsx
 
-  data://grapher/wb/2025-07-01/income_groups:
-    - data://garden/wb/2025-07-01/income_groups
-    - data://garden/wb/2025-07-01/income_groups_aggregations:
-      - data://garden/wb/2025-07-01/income_groups
+  data://grapher/wb/2026-07-01/income_groups:
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups_aggregations:
+      - data://garden/wb/2026-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
+
 
   # Integrated Values Survey (also builds the World Values Survey table from its own snapshot/meadow)
 
@@ -463,7 +465,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/worldbank_wdi/2025-09-08/wdi:
       - snapshot://worldbank_wdi/2025-09-08/wdi.zip
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/demography/2024-07-15/population
     - data://garden/un/2024-07-12/un_wpp
     - snapshot://worldbank_wdi/2025-09-08/wdi.zip
@@ -479,7 +481,7 @@ steps:
       - data://meadow/imf/2025-07-08/trade:
         - snapshot://imf/2025-07-08/trade.csv
       - data://garden/regions/2023-01-01/regions
-      - data://garden/worldbank_wdi/2025-09-08/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
 
   #
   # Trade Volume Index - WTO Trade Growth
@@ -529,7 +531,7 @@ steps:
         - snapshot://oecd/2025-12-23/official_development_assistance_dac1.zip
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
 
   #
   # CORE Econ - Growth rate of GDP per capita and productivity
@@ -562,12 +564,21 @@ steps:
     - data://garden/worldbank_wdi/2026-01-29/wdi:
       - data://garden/un/2024-07-12/un_wpp
       - snapshot://worldbank_wdi/2026-01-29/wdi.zip
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
       - data://meadow/worldbank_wdi/2026-01-29/wdi:
         - snapshot://worldbank_wdi/2026-01-29/wdi.zip
 
+  data://grapher/worldbank_wdi/2026-07-14/wdi:
+    - data://garden/worldbank_wdi/2026-07-14/wdi:
+      - data://meadow/worldbank_wdi/2026-07-14/wdi:
+        - snapshot://worldbank_wdi/2026-07-14/wdi.zip
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/regions/2023-01-01/regions
+      - snapshot://worldbank_wdi/2026-07-14/wdi.zip
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
 
   #
   # Trust in US government - Pew Research Center
@@ -594,7 +605,7 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/regions/2023-01-01/regions
     - snapshot://worldbank_wdi/2026-02-27/wdi.zip
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/demography/2024-07-15/population
 
   data://grapher/worldbank_wdi/2026-02-27/wdi:
@@ -613,7 +624,7 @@ steps:
   data://garden/happiness/2026-03-16/happiness:
     - snapshot://happiness/2026-03-16/happiness.xlsx
     - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/happiness/2026-03-16/happiness:
     - data://garden/happiness/2026-03-16/happiness
@@ -631,8 +642,8 @@ steps:
 
 
   # USA PPI New Office Construction (US Bureau of Labor Statistics)
-  data://garden/bls/2026-03-24/us_ppi_construction:
-    - snapshot://bls/2026-03-24/us_ppi_construction.csv
+  data://garden/bls/2026-07-20/us_ppi_construction:
+    - snapshot://bls/2026-07-20/us_ppi_construction.csv
 
   #
   # World Airlines Traffic and Capacity

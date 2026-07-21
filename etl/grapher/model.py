@@ -1148,7 +1148,7 @@ class Variable(Base):
     attribution: Mapped[str | None] = mapped_column(TEXT, default=None)
     descriptionShort: Mapped[str | None] = mapped_column(TEXT, default=None)
     descriptionFromProducer: Mapped[str | None] = mapped_column(TEXT, default=None)
-    descriptionKey: Mapped[list[str] | None] = mapped_column(JSON, default=None)
+    descriptionKey: Mapped[str | None] = mapped_column(JSON, default=None)
     descriptionProcessing: Mapped[str | None] = mapped_column(TEXT, default=None)
     # NOTE: Use of `licenses` is discouraged, they should be captured in origins.
     licenses: Mapped[list[dict] | None] = mapped_column(JSON, default=None)
@@ -1242,7 +1242,7 @@ class Variable(Base):
         presentation_dict.pop("faqs", None)
 
         if metadata.description_key:
-            assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
+            assert isinstance(metadata.description_key, str), "descriptionKey should be a markdown string"
 
         return cls(
             shortName=short_name,

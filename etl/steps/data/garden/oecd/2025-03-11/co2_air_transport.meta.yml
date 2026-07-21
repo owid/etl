@@ -87,7 +87,7 @@ tables:
         short_unit: t
         display:
           zeroDay: '2019-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       ter_int_m:
         title: Monthly CO₂ emissions from international aviation
@@ -96,7 +96,7 @@ tables:
         short_unit: t
         display:
           zeroDay: '2019-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       per_capita_ter_dom_m:
         title: Monthly CO₂ emissions from domestic aviation per capita
@@ -106,7 +106,7 @@ tables:
         short_unit: kg
         display:
           zeroDay: '2019-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       per_capita_ter_int_m:
         title: Monthly CO₂ emissions from international aviation per capita
@@ -116,7 +116,7 @@ tables:
         short_unit: kg
         display:
           zeroDay: '2019-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       total_monthly_emissions:
         title: Monthly CO₂ total emissions from aviation
@@ -125,7 +125,7 @@ tables:
         short_unit: t
         display:
           zeroDay: '2019-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       total_annual_emissions:
         title: Total annual CO₂ emissions from aviation

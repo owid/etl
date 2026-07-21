@@ -8,6 +8,7 @@ from __future__ import annotations
 import copy
 import json
 import os
+import re
 from collections import defaultdict
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
@@ -28,6 +29,7 @@ from owid.catalog.core.meta import (
     Origin,
     VariableMeta,
     VariablePresentationMeta,
+    description_key_to_string,
 )
 from owid.catalog.core.properties import metadata_property
 
@@ -656,30 +658,35 @@ def get_unique_licenses_from_indicators(indicators: list[Indicator]) -> list[Lic
     return licenses
 
 
-def get_unique_description_key_points_from_indicators(indicators: list[Indicator]) -> list[str]:
-    """Get unique description key points from a list of indicators.
+def get_unique_description_key_points_from_indicators(indicators: list[Indicator]) -> str | list[str] | None:
+    """Combine the description_key of a list of indicators.
 
-    Collects all unique key points from the description_key field of multiple indicators,
-    preserving order of first occurrence.
+    Indicators sharing an identical description_key (the common case, e.g. any
+    operation on a single indicator) contribute it only once, and the value is
+    returned unchanged. When several distinct description_keys are combined,
+    each is converted to markdown text and they are concatenated in order of
+    first occurrence.
 
     Args:
-        indicators: List of Indicator objects to extract description key points from.
+        indicators: List of Indicator objects to combine description_key from.
 
     Returns:
-        List of unique description key points in order of first appearance.
-
-    Example:
-        ```python
-        key_points = get_unique_description_key_points_from_indicators([ind1, ind2])
-        for point in key_points:
-            print(f"- {point}")
-        ```
+        The combined description_key, or None if no indicator has one.
     """
-    # Make a list of all description key points of all indicators.
-    description_key_points = []
+    uniques: list[str | list[str]] = []
     for indicator in indicators:
-        description_key_points += [k for k in indicator.metadata.description_key if k not in description_key_points]
-    return description_key_points
+        description_key = indicator.metadata.description_key
+        if description_key and description_key not in uniques:
+            uniques.append(description_key)
+    if not uniques:
+        return None
+    if len(uniques) == 1:
+        return uniques[0]
+    texts = [
+        description_key_to_string(description_key) if isinstance(description_key, list) else description_key
+        for description_key in uniques
+    ]
+    return "\n\n".join(text for text in texts if text) or None
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:
@@ -733,12 +740,42 @@ def combine_indicators_processing_level(indicators: list[Indicator]) -> PROCESSI
         # If there are no processing levels, return None.
         return None
 
-    # Ensure that all processing levels are known.
-    unknown_processing_levels = {level for level in processing_levels} - set(PROCESSING_LEVELS_ORDER)
+    # Unrendered Jinja templates are valid processing levels at authoring time (the dataset
+    # schema allows "<%"-patterned strings, rendered per dimension at grapher time), but they
+    # can't participate in the level comparison below.
+    templates = [level for level in processing_levels if "<%" in level]
+    literal_levels = [level for level in processing_levels if "<%" not in level]
+
+    # Ensure that all literal processing levels are known.
+    unknown_processing_levels = set(literal_levels) - set(PROCESSING_LEVELS_ORDER)
     assert len(unknown_processing_levels) == 0, f"Unknown processing levels: {unknown_processing_levels}"
 
-    # If any of the indicators has a processing level, take the highest level.
-    maximum_level = max([PROCESSING_LEVELS_ORDER[level] for level in processing_levels])
+    if not literal_levels and len(set(templates)) == 1:
+        # Only templates and all identical (e.g. comparing two versions of the same column):
+        # keep the template so it still renders per dimension downstream.
+        return cast(PROCESSING_LEVELS, templates[0])
+
+    # A template's rendered value is unknown here. Its possible outputs are the literal text
+    # outside its `<% ... %>` statement tags (conditions never render, so a level name inside
+    # e.g. `sector == "major donors"` doesn't count) — take the highest level named there, so
+    # combining with a literal never understates the result (a maybe-major template + "minor"
+    # must combine to "major", since processing_level feeds licensing downstream). When the
+    # output is routed through a variable (e.g. `<% set level = "major" if ... %><< level >>`)
+    # the output text names no level — fall back to scanning the whole source, deliberately
+    # overstating rather than understating.
+    template_levels: list[str] = []
+    for template in templates:
+        rendered_text = re.sub(r"<%.*?%>", " ", template, flags=re.DOTALL)
+        levels = [level for level in PROCESSING_LEVELS_ORDER if level in rendered_text]
+        template_levels += levels or [level for level in PROCESSING_LEVELS_ORDER if level in template]
+
+    candidate_levels = literal_levels + template_levels
+    if not candidate_levels:
+        # Distinct templates that spell out no known level — there is no sensible combination.
+        return None
+
+    # Take the highest level any of the indicators has (or could render).
+    maximum_level = max([PROCESSING_LEVELS_ORDER[level] for level in candidate_levels])
 
     # Return the maximum level as a string.
     combined_processing_level = {value: key for key, value in PROCESSING_LEVELS_ORDER.items()}[maximum_level]

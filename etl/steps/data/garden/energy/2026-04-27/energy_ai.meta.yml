@@ -21,6 +21,7 @@ dataset:
 
   owners:
     - Pablo Rosado
+    - Edouard Mathieu
 tables:
   energy_ai:
     variables:

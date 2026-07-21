@@ -13,7 +13,7 @@ from typing import Any, Literal, TypedDict, cast
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog.core.meta import GrapherConfig
+from owid.catalog.core.meta import GrapherConfig, description_key_to_string
 from owid.catalog.core.utils import underscore
 from structlog import get_logger
 from typing_extensions import Self
@@ -263,6 +263,10 @@ class Collection(MDIMBase):
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
+
+        # description_key is a markdown string; a YAML list is authoring sugar
+        # and gets converted before the config is stored.
+        _convert_description_key_lists(config)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
@@ -1298,6 +1302,18 @@ _pattern = re.compile(r"_([a-z])")
 def snake_to_camel(s: str) -> str:
     # Use the compiled pattern to substitute underscores with the uppercase letter.
     return _pattern.sub(lambda match: match.group(1).upper(), s)
+
+
+def _convert_description_key_lists(config: dict[str, Any]) -> None:
+    """Convert description_key lists to markdown strings in the collection-level
+    and per-view metadata of a collection config (in place)."""
+    metadatas = [config.get("metadata"), *(view.get("metadata") for view in config.get("views", []))]
+    for metadata in metadatas:
+        if metadata and isinstance(metadata.get("description_key"), list):
+            # `- *anchor` authoring produces nested lists; flatten them like
+            # dataset YAML metadata does before converting.
+            flat = [item for sub in metadata["description_key"] for item in ([sub] if isinstance(sub, str) else sub)]
+            metadata["description_key"] = description_key_to_string(flat)
 
 
 # model.core

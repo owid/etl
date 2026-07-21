@@ -38,6 +38,70 @@ def get_affected_charts_cli(indicator_mapping: dict[int, int]) -> list[gm.Chart]
     return charts
 
 
+def _fetch_single_indicator_config(chart_config: dict, indicator_mapping: dict[int, int]) -> dict | None:
+    """Fetch the ETL grapher config of a chart's own (primary) indicator.
+
+    This is the baseline an inheritance-enabled chart inherits from, used by
+    `compute_inheritance_patch` to strip only the fields that would resolve to the same
+    value anyway (see #5911 and its follow-up fix).
+
+    For a chart with more than one dimension (e.g. a `color` or `size` variable besides
+    `y`), title/subtitle/map/etc. inheritance is driven by the `y` dimension's own
+    indicator, not the secondary ones -- so we use that one specifically rather than
+    giving up. Falls back to the first dimension with a variable ID if there's no `y`
+    dimension (e.g. scatter plots with only x/y numeric axes and no property named "y").
+
+    Returns `{}` -- not None -- when the (single) indicator has no `grapherConfigETL` at
+    all: that means inheritance provides nothing, so the effective baseline *is* just the
+    generic schema defaults, which `compute_inheritance_patch` handles safely (as opposed
+    to None, which triggers the separate, more conservative "no baseline known at all"
+    keep-everything fallback in `ChartIndicatorUpdater.run`).
+    Returns None only when the chart has no dimension with a variable ID to look up at all.
+    """
+    dimensions = chart_config.get("dimensions", [])
+    y_dims = [dim for dim in dimensions if dim.get("property") == "y" and dim.get("variableId")]
+    candidates = y_dims or [dim for dim in dimensions if dim.get("variableId")]
+    if not candidates:
+        return None
+    variable_id = indicator_mapping.get(candidates[0]["variableId"], candidates[0]["variableId"])
+
+    df = read_sql(
+        "SELECT cc.full FROM variables v JOIN chart_configs cc ON cc.id = v.grapherConfigIdETL WHERE v.id = %(vid)s",
+        engine=get_engine(),
+        params={"vid": int(variable_id)},
+    )
+    if df.empty:
+        return {}
+    full = df.iloc[0]["full"]
+    return json.loads(full) if isinstance(full, (str, bytes)) else full
+
+
+def _fetch_dimension_display_baselines(chart_config: dict, indicator_mapping: dict[int, int]) -> dict[int, dict] | None:
+    """Fetch each dimension's (new, remapped) variable's own `display` metadata.
+
+    Used by `prune_dimension_displays` to strip `dimensions[*].display` fields that are
+    redundant with the variable's own display settings -- a separate inheritance path
+    from `_fetch_single_indicator_config`'s grapherConfigETL-based one (dimension display
+    inherits from `variables.display`, not from the chart's own indicator config).
+    """
+    variable_ids = {dim.get("variableId") for dim in chart_config.get("dimensions", []) if dim.get("variableId")}
+    if not variable_ids:
+        return None
+    new_variable_ids = {int(indicator_mapping.get(vid, vid)) for vid in variable_ids}
+
+    df = read_sql(
+        f"SELECT id, display FROM variables WHERE id IN ({','.join(str(v) for v in sorted(new_variable_ids))})",
+        engine=get_engine(),
+    )
+    if df.empty:
+        return None
+    return {
+        int(row["id"]): (json.loads(row["display"]) if isinstance(row["display"], (str, bytes)) else row["display"])
+        for _, row in df.iterrows()
+        if row["display"] is not None
+    }
+
+
 def _update_single_chart(
     chart: gm.Chart, indicator_mapping: dict[int, int], api: AdminAPI, user_id: int | None = None
 ) -> int:
@@ -47,6 +111,13 @@ def _update_single_chart(
         chart.config,
         indicator_mapping,
         get_schema_from_url(chart.config["$schema"]),
+        indicator_config=_fetch_single_indicator_config(chart.config, indicator_mapping),
+        dimension_display_baselines=_fetch_dimension_display_baselines(chart.config, indicator_mapping),
+        # chart.config is chart_configs.full (the fully resolved config, inherited values
+        # included) -- pass the real stored patch too so inheritance pruning can tell
+        # "genuinely explicit" apart from "just showing through via inheritance from the
+        # old indicator" (see ChartIndicatorUpdater.run's original_patch docstring).
+        original_patch=chart.chart_config.patch,
     )
 
     # Get chart ID

@@ -21,7 +21,6 @@ tables:
           conversionFactor: 1000
           numDecimalPlaces: 1
           tolerance: 5
-          yearIsDay: false
           zeroDay: '1900-01-01'
           entityAnnotationsMap: 'Germany: dummy annotation'
           includeInTable: true

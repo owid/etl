@@ -10,9 +10,9 @@ meta:
     url_download: https://static.cambridge.org/content/id/urn:cambridge.org:id:article:S0962728623000040/resource/name/S0962728623000040sup001.zip
     date_published: 2023-02-06
     date_accessed: 2024-12-12
-  license:
-    url: https://s100.copyright.com/AppDispatchServlet?publisherName=CUP&publication=AWF&title=Estimating%20global%20numbers%20of%20farmed%20fishes%20killed%20for%20food%20annually%20from%201990%20to%202019&publicationDate=06%20February%202023&author=Alison%20Mood%2C%20Elena%20Lara%2C%20Natasha%20K%20Boyland%2C%20Phil%20Brooke&copyright=%C2%A9%20The%20Author(s)%2C%202023.%20Published%20by%20Cambridge%20University%20Press%20on%20behalf%20of%20The%20Universities%20Federation%20for%20Animal%20Welfare&contentID=10.1017%2Fawf.2023.4&startPage=&endPage=&orderBeanReset=True&volumeNum=32&issueNum=&oa=CC-BY
-    name: CC BY
+    license:
+      url: https://s100.copyright.com/AppDispatchServlet?publisherName=CUP&publication=AWF&title=Estimating%20global%20numbers%20of%20farmed%20fishes%20killed%20for%20food%20annually%20from%201990%20to%202019&publicationDate=06%20February%202023&author=Alison%20Mood%2C%20Elena%20Lara%2C%20Natasha%20K%20Boyland%2C%20Phil%20Brooke&copyright=%C2%A9%20The%20Author(s)%2C%202023.%20Published%20by%20Cambridge%20University%20Press%20on%20behalf%20of%20The%20Universities%20Federation%20for%20Animal%20Welfare&contentID=10.1017%2Fawf.2023.4&startPage=&endPage=&orderBeanReset=True&volumeNum=32&issueNum=&oa=CC-BY
+      name: CC BY
 outs:
   - md5: d0d46c11581778d18c9dfe2a0b580d97
     size: 2033309

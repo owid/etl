@@ -154,6 +154,23 @@ def _commit_parent(sha: str, cache: dict[str, tuple[str, int]]) -> tuple[str, in
     return cache[sha]
 
 
+def _default_branch_sha() -> str | None:
+    """SHA of ``origin/master``, or None when the remote-tracking ref is unavailable."""
+    try:
+        return _run_git("rev-parse", "--verify", "origin/master").strip()
+    except subprocess.CalledProcessError:
+        return None
+
+
+def _is_ancestor(sha: str, of: str) -> bool:
+    result = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", sha, of],
+        cwd=paths.BASE_DIR,
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
 class _BlobReader:
     """Read git blobs by content hash via a persistent ``git cat-file --batch`` process.
 
@@ -318,6 +335,18 @@ def _build_last_seen(since: str | None, limit: int | None) -> dict[str, LastSeen
     reader = _BlobReader()
     parent_cache: dict[str, tuple[str, int]] = {}
     removed: dict[str, LastSeen] = {}
+    # Recovery points must survive a squash-merge: branch-local commits disappear from
+    # history once the PR is squashed, leaving `git checkout <sha>` with nothing to check
+    # out. When a removal's parent is not reachable from origin/master, record the tip of
+    # origin/master instead (the newest shipped state of the step — it may have received
+    # updates on master after this branch was cut). If master no longer declares the step,
+    # fall back to the merge-base — the last shared commit that still contains it. Steps
+    # that only ever existed on the branch have no recoverable state on the default branch
+    # and are skipped entirely.
+    master_sha = _default_branch_sha()
+    reachable: dict[str, bool] = {}
+    master_state: tuple[int, dict[str, tuple[set[str], str]]] | None = None
+    merge_base: tuple[str, int, dict[str, tuple[set[str], str]]] | None = None
     try:
         # Seed the previous state from the baseline (the ``since`` commit) so a removal
         # in the very first walked commit is detected. Without this, ``since..HEAD``
@@ -340,6 +369,37 @@ def _build_last_seen(since: str | None, limit: int | None) -> dict[str, LastSeen
                 # ``grapher://`` steps) must not enter the archive graph.
                 deps = {d for d in deps if d.startswith("walden") or _is_parseable_step(d)}
                 rec_sha, rec_ts = _commit_parent(sha, parent_cache)
+                if master_sha is not None:
+                    if rec_sha not in reachable:
+                        reachable[rec_sha] = _is_ancestor(rec_sha, master_sha)
+                    if not reachable[rec_sha]:
+                        if master_state is None:
+                            master_ts = int(_run_git("show", "-s", "--format=%ct", master_sha).strip())
+                            master_state = (master_ts, _active_dag_at(master_sha, _tree_blob_map(master_sha), reader))
+                        master_ts, master_dag = master_state
+                        if step in master_dag:
+                            # The step is still active on master's tip — record that: it
+                            # carries any updates the step received on master after this
+                            # branch was cut, and it survives the squash-merge.
+                            deps, dag_file = master_dag[step]
+                            rec_sha, rec_ts = master_sha, master_ts
+                        else:
+                            if merge_base is None:
+                                mb_sha = _run_git("merge-base", "HEAD", master_sha).strip()
+                                mb_ts = int(_run_git("show", "-s", "--format=%ct", mb_sha).strip())
+                                mb_dag = _active_dag_at(mb_sha, _tree_blob_map(mb_sha), reader)
+                                merge_base = (mb_sha, mb_ts, mb_dag)
+                            mb_sha, mb_ts, mb_dag = merge_base
+                            if step not in mb_dag:
+                                # Branch-only transient step (created and removed within this
+                                # branch): it never shipped, so there is nothing to archive.
+                                log.info("archive_dag.skip_branch_only_step", step=step)
+                                continue
+                            # Master already dropped the step independently; the merge-base
+                            # is the last shared commit that still contains it.
+                            deps, dag_file = mb_dag[step]
+                            rec_sha, rec_ts = mb_sha, mb_ts
+                        deps = {d for d in deps if d.startswith("walden") or _is_parseable_step(d)}
                 removed[step] = LastSeen(sha=rec_sha, timestamp=rec_ts, deps=deps, dag_file=dag_file)
             for step in cur_keys:
                 removed.pop(step, None)  # re-added → no longer archived
@@ -385,10 +445,27 @@ def _backfill_markers(dag_file: Path, hashes: dict[str, LastSeen], dry_run: bool
 
     Line-based and surgical: existing steps, dependencies, comments and ordering are
     preserved. If a step already has an archived-marker in the contiguous comment block
-    directly above it, the marker is replaced when the recovery hash changed; otherwise
-    a new marker is inserted. This makes the command idempotent and self-correcting.
-    Returns the number of markers inserted or updated.
+    directly above it, the marker is replaced only when its recovery hash is broken
+    (not reachable from ``origin/master`` — e.g. a branch commit dropped by a
+    squash-merge); a differing-but-reachable hash is left alone, since both are valid
+    recovery points and replacing would churn every previously archived entry. Steps
+    with no marker get one inserted. This makes the command idempotent and
+    self-correcting. Returns the number of markers inserted or updated.
     """
+    master_sha = _default_branch_sha()
+    reachable: dict[str, bool] = {}
+
+    def _marker_is_valid(marker_line: str) -> bool:
+        m = MARKER_RE.search(marker_line)
+        if not m:
+            return False
+        if master_sha is None:
+            return True  # no origin/master to validate against — keep what's there
+        sha = m.group(1)
+        if sha not in reachable:
+            reachable[sha] = _is_ancestor(sha, master_sha)
+        return reachable[sha]
+
     lines = dag_file.read_text().splitlines(keepends=True)
     out: list[str] = []
     changed = 0
@@ -406,7 +483,7 @@ def _backfill_markers(dag_file: Path, hashes: dict[str, LastSeen], dry_run: bool
         if is_step and stripped[:-1] in hashes:
             marker_line = f"  {hashes[stripped[:-1]].marker}\n"
             # Look back over the contiguous comment block directly above for an
-            # existing marker to replace (stop at the first non-comment line).
+            # existing marker (stop at the first non-comment line).
             k = len(out) - 1
             existing_idx = None
             while k >= 0 and out[k].lstrip().startswith("#"):
@@ -415,7 +492,7 @@ def _backfill_markers(dag_file: Path, hashes: dict[str, LastSeen], dry_run: bool
                     break
                 k -= 1
             if existing_idx is not None:
-                if out[existing_idx] != marker_line:
+                if out[existing_idx] != marker_line and not _marker_is_valid(out[existing_idx]):
                     out[existing_idx] = marker_line
                     changed += 1
             else:

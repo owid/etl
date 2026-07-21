@@ -402,13 +402,54 @@ class VariablePresentationMeta(MetaBase):
     faqs: list[FaqLink] = field(default_factory=list)
 
 
+_MARKDOWN_LIST_MARKER = re.compile(r"([-*+]|\d+[.)])\s")
+
+
+def _collapse_description_key_item(item: str) -> str:
+    """Collapse a multi-line bullet item into a single line, the way the old
+    renderer effectively did (it unwrapped paragraphs inside list items, so
+    line and paragraph breaks displayed as plain spaces). Lines starting a
+    markdown list are kept and indented, as those rendered as nested lists.
+    """
+    parts: list[str] = []
+    for raw_line in item.split("\n"):
+        line = raw_line.strip()
+        if not line:
+            continue
+        if not parts:
+            parts.append(line)
+        elif _MARKDOWN_LIST_MARKER.match(line):
+            parts.append("\n  " + line)
+        else:
+            parts.append(" " + line)
+    return "".join(parts)
+
+
+def description_key_to_string(items: list[str]) -> str | None:
+    """Convert a legacy description_key list of bullet points into a single
+    markdown string.
+
+    The conversion preserves how the grapher rendered lists before
+    description_key became free-form markdown: a single item was rendered as
+    prose (full markdown, paragraphs included), several items as a bulleted
+    list with line breaks inside items flattened.
+    """
+    cleaned = [item.strip() for item in items if item and item.strip()]
+    if not cleaned:
+        return None
+    if len(cleaned) == 1:
+        return cleaned[0]
+    return "\n".join("- " + _collapse_description_key_item(item) for item in cleaned)
+
+
 @pruned_json
 @dataclass(eq=False)
 class VariableMeta(MetaBase):
     """Allowed fields for `display` attribute used for grapher:
         name
         zeroDay
-        yearIsDay
+        yearIsDay  # deprecated, use timeInterval instead
+        timeInterval  # one of: day, week, month, quarter, year, decade
         includeInTable
         numDecimalPlaces
         conversionFactor
@@ -427,8 +468,13 @@ class VariableMeta(MetaBase):
     description_short: str | None = None
     # How did the origin describe this variable?
     description_from_producer: str | None = None
-    # List of bullet points for the description key (can use markdown formatting)
-    description_key: list[str] = field(default_factory=list)
+    # Free-form markdown with the key information about the indicator, shown as
+    # "What you should know about this data" on data pages. It can also be
+    # authored as a list of bullet points (items may contain Jinja that must
+    # render per-item), which is converted to a markdown list after Jinja
+    # rendering in `update_variable_metadata` — the grapher only ever sees a
+    # string.
+    description_key: str | list[str] | None = None
     origins: list[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
     # Use of `licenses` is discouraged, they should be captured in origins.
     licenses: list[License] = field(default_factory=list)
@@ -707,9 +753,14 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
         if isinstance(meta.display.get("roundingMode"), str) and not meta.display["roundingMode"].strip():
             del meta.display["roundingMode"]
 
-    # Prune empty fields from description_key
+    # description_key authored as a list of bullet points (Jinja in items has
+    # been rendered by now) is converted to a markdown string, and pruned when
+    # empty.
     if meta.description_key:
-        meta.description_key = [x for x in meta.description_key if x.strip()]
+        if isinstance(meta.description_key, list):
+            meta.description_key = description_key_to_string(meta.description_key)
+        elif not meta.description_key.strip():
+            meta.description_key = None
 
     # Convert from string to proper type when it comes from YAML
     grapher_config = getattr(getattr(meta, "presentation", None), "grapher_config", {}) or {}

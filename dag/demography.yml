@@ -27,7 +27,7 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
     # Auxiliary
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
     - data://garden/faostat/2024-03-14/faostat_rl_auxiliary
   data://grapher/demography/2024-07-15/population:
     - data://garden/demography/2024-07-15/population
@@ -319,7 +319,7 @@ steps:
             - data://meadow/demography/2026-02-11/wittgenstein_human_capital_proj:
                 - snapshot://demography/2026-02-11/wittgenstein_human_capital.zip
         - data://garden/regions/2023-01-01/regions
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
 
   #
   # US State Population
@@ -351,7 +351,7 @@ steps:
         - data://meadow/demography/2026-02-04/census_us_idb:
             - snapshot://demography/2026-02-04/census_us_idb.zip
         - data://garden/regions/2023-01-01/regions
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
 
   #
   # TODO: add step name (just something recognizable)
@@ -368,7 +368,7 @@ steps:
             - snapshot://demography/2026-02-05/ihme_2020_live_births.zip
             - snapshot://demography/2026-02-05/ihme_2020_population_ref.zip
         - data://garden/regions/2023-01-01/regions
-        - data://garden/wb/2025-07-01/income_groups
+        - data://garden/wb/2026-07-01/income_groups
 
   ########################################################################
   # OTHERS (legacy, used downstream -- regularly check)
@@ -384,6 +384,6 @@ steps:
         - data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj:
             - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   data://grapher/demography/2024-12-06/wittgenstein_human_capital:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital

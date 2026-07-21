@@ -41,34 +41,6 @@ class ChartDiffConflictResolver:
         # Resolved values. key -> value, where key is conflicted field and value is the resolution.
         self.value_resolved = {}
 
-    def run(self) -> None:
-        """Run conflict resolver."""
-        st.warning("This is under development! Find below a form with the different fields that present conflicts.")
-
-        # If things to compare...
-        if self.config_compare:
-            st.markdown(
-                "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
-            )
-
-            # Show conflict resolver per field
-            ## Provide tools to merge the content of each field
-            for field in self.config_compare:
-                self._show_field_conflict_resolver(field)
-
-            # Button to resolve all conflicts
-            if st.button(
-                "Resolve conflicts",
-                help="Click to resolve the conflicts and update the chart config.",
-                key="resolve-conflicts-btn",
-                type="primary",
-            ):
-                self.resolve_conflicts(rerun=True)
-        else:
-            st.success(
-                "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
-            )
-
     def _show_field_conflict_resolver(self, field):
         with st.container(border=True):
             # Title & layout
@@ -211,8 +183,3 @@ def compare_chart_configs(c1, c2):
             )
 
     return diff_list
-
-
-def st_show_conflict_resolver(diff: ChartDiff, session: Session) -> None:
-    """Conflict resolver."""
-    ChartDiffConflictResolver(diff, session).run()
