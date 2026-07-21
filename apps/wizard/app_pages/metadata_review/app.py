@@ -71,11 +71,18 @@ def main() -> None:
 
 def mdim_page(user) -> None:
     mdims = state.cached_list_mdims()
+    open_counts = state.open_counts_by_page()
+    # Pages with open proposals first, then by recency.
+    mdims.sort(key=lambda m: m["updated_at"], reverse=True)
+    mdims.sort(key=lambda m: open_counts.get(m["catalog_path"], 0), reverse=True)
     options = [m["catalog_path"] for m in mdims]
-    labels = {
-        m["catalog_path"]: f"{m['slug'] or m['catalog_path']}" + ("" if m["published"] else " (unpublished)")
-        for m in mdims
-    }
+    labels = {}
+    for m in mdims:
+        label = f"{m['slug'] or m['catalog_path']}" + ("" if m["published"] else " (unpublished)")
+        n_open = open_counts.get(m["catalog_path"], 0)
+        if n_open:
+            label += f" — 💬 {n_open} open"
+        labels[m["catalog_path"]] = label
     catalog_path = url_persist(st.selectbox)(
         "MDim",
         options=options,
@@ -85,6 +92,7 @@ def mdim_page(user) -> None:
         placeholder="Pick an MDim to review...",
     )
     if not catalog_path:
+        _open_overview()
         st.stop()
 
     review = state.cached_resolve_mdim(catalog_path)
@@ -156,6 +164,30 @@ def mdim_page(user) -> None:
 
     with tab_all:
         _all_suggestions_tab(suggestions, comments_by_suggestion, users, user, fields_by_key, catalog_path)
+
+
+def _open_overview() -> None:
+    """Landing overview: every page with open proposals, so returning reviewers
+    see at a glance where the discussion is (instead of an empty picker)."""
+    summary = state.load_open_summary()
+    if not summary:
+        st.info("No open proposals anywhere right now. Pick a page above to start reviewing.")
+        return
+    st.subheader("Pages with open proposals")
+    for group in summary:
+        page = group["page"]
+        if group["kind"] == "mdim":
+            link = f"?mr_mode=MDims&mr_mdim={quote(page, safe='')}"
+            label = page
+        else:
+            # Indicator catalogPath 'grapher/ns/ver/ds/table#col' -> its dataset page.
+            dataset_path = "/".join(page.split("#")[0].split("/")[1:4])
+            link = f"?mr_mode=Datasets&mr_dataset={quote(dataset_path, safe='')}"
+            label = dataset_path
+        n = group["n_open"]
+        st.markdown(
+            f"- [{label}]({link}) — :orange-badge[💬 {n} open] · last activity {group['last_activity']:%Y-%m-%d %H:%M}"
+        )
 
 
 def _page_embed(url: str, height: int = 850, hide_page_selectors: bool = False) -> None:
@@ -241,6 +273,7 @@ def dataset_page(user) -> None:
         placeholder="Pick a grapher dataset to review...",
     )
     if not catalog_path:
+        _open_overview()
         st.stop()
 
     review = state.cached_resolve_dataset(catalog_path)

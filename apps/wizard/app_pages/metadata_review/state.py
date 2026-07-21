@@ -73,6 +73,39 @@ def load_suggestions(target_paths: list[str]) -> tuple[list, dict[int, list], di
     return suggestions, comments_by_suggestion, users
 
 
+def load_open_summary() -> list[dict]:
+    """Open proposals grouped by the page they were filed from (for the landing overview).
+
+    Returns [{page, kind ('mdim'|'indicator'), n_open, last_activity}] sorted by recency.
+    Uncached so a freshly filed proposal shows up when the reviewer returns to the landing.
+    """
+    with Session(get_engine()) as session:
+        from sqlalchemy import select
+
+        rows = session.execute(
+            select(
+                gm.MetadataReviewSuggestion.filedFromPath,
+                gm.MetadataReviewSuggestion.targetPath,
+                gm.MetadataReviewSuggestion.targetType,
+                gm.MetadataReviewSuggestion.updatedAt,
+            ).where(gm.MetadataReviewSuggestion.status == "open")
+        ).all()
+    groups: dict[str, dict] = {}
+    for filed_from, target_path, target_type, updated_at in rows:
+        page = filed_from or target_path
+        # A page path with '#' but no channel prefix is an MDim catalogPath.
+        kind = "mdim" if ("#" in page and not page.startswith("grapher/")) else "indicator"
+        group = groups.setdefault(page, {"page": page, "kind": kind, "n_open": 0, "last_activity": updated_at})
+        group["n_open"] += 1
+        group["last_activity"] = max(group["last_activity"], updated_at)
+    return sorted(groups.values(), key=lambda g: g["last_activity"], reverse=True)
+
+
+def open_counts_by_page() -> dict[str, int]:
+    """Open-proposal counts keyed by the page the suggestion was filed from."""
+    return {g["page"]: g["n_open"] for g in load_open_summary()}
+
+
 def current_user() -> gm.User | None:
     """The grapher user (Tailscale IP on staging, GRAPHER_USER_ID locally); None when unknown."""
     try:
