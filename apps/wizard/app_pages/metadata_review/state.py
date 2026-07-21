@@ -87,26 +87,25 @@ def create_suggestion(
     suggested_value: str | None,
     comment_text: str | None,
 ) -> None:
+    """File onto the field's consolidated thread (one open proposal per field)."""
     target_type, target_path, view_id, field_path = field.source_key()
     with Session(get_engine()) as session:
-        suggestion = gm.MetadataReviewSuggestion(
-            targetType=target_type,
-            targetPath=target_path,
-            viewId=view_id,
-            fieldPath=field_path,
+        gm.MetadataReviewSuggestion.file_or_update(
+            session,
+            target_type=target_type,
+            target_path=target_path,
+            view_id=view_id,
+            field_path=field_path,
+            user_id=user_id,
             provenance=field.provenance,
-            createdBy=user_id,
-            inheritedFromPath=field.inherited_from,
-            filedFromPath=field.target_path,
-            filedFromViewId=field.view_id,
-            currentValue=str(field.current_value) if field.current_value is not None else None,
-            suggestedValue=suggested_value or None,
-            pageChecksum=field.page_checksum,
+            current_value=str(field.current_value) if field.current_value is not None else None,
+            suggested_value=suggested_value or None,
+            comment_text=comment_text,
+            inherited_from_path=field.inherited_from,
+            filed_from_path=field.target_path,
+            filed_from_view_id=field.view_id,
+            page_checksum=field.page_checksum,
         )
-        session.add(suggestion)
-        session.commit()
-        if comment_text:
-            suggestion.add_comment(session, user_id=user_id, text=comment_text)
 
 
 def add_comment(suggestion_id: int, user_id: int, text: str) -> None:

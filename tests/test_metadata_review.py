@@ -126,6 +126,49 @@ def test_suggestions_by_source_key_groups():
 
 
 # ---------------------------------------------------------------------------
+# Bullet diffs (description_key consolidation)
+# ---------------------------------------------------------------------------
+
+
+def test_split_bullets_prose_and_list():
+    from apps.metadata_review.diffs import split_bullets
+
+    assert split_bullets(None) == []
+    assert split_bullets("Single prose item.") == ["Single prose item."]
+    assert split_bullets("- One\n- Two\n  continued\n- Three") == ["One", "Two continued", "Three"]
+
+
+def test_bullet_diff_only_changed_bullets():
+    from apps.metadata_review.diffs import bullet_diff, diff_markdown_lines, diff_summary
+
+    current = "- Keep me\n- Old wording\n- Also keep"
+    proposed = "- Keep me\n- New wording\n- Also keep\n- Brand new bullet"
+    ops = bullet_diff(current, proposed)
+    assert [(o.op, o.text) for o in ops] == [
+        ("keep", "Keep me"),
+        ("remove", "Old wording"),
+        ("add", "New wording"),
+        ("keep", "Also keep"),
+        ("add", "Brand new bullet"),
+    ]
+    assert diff_summary(ops) == "2 added, 1 removed; 2 unchanged"
+    lines = diff_markdown_lines(ops)
+    # Unchanged bullets are summarized, not repeated.
+    assert "- _… 1 unchanged bullet_" in lines
+    assert any("~~Old wording~~" in line for line in lines)
+    assert any(":green[+] New wording" in line for line in lines)
+    assert not any("Keep me" in line for line in lines)
+
+
+def test_bullet_diff_no_changes():
+    from apps.metadata_review.diffs import bullet_diff, diff_summary
+
+    ops = bullet_diff("- A\n- B", "- A\n- B")
+    assert all(o.op == "keep" for o in ops)
+    assert diff_summary(ops) == "no bullet changes; 2 unchanged"
+
+
+# ---------------------------------------------------------------------------
 # Staleness
 # ---------------------------------------------------------------------------
 

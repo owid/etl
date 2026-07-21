@@ -6,7 +6,7 @@ file field-level suggestions with threaded comments. The data scientist exports
 them with `etl metadata-review export <target>` and implements the changes in ETL.
 """
 
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 import streamlit as st
 
@@ -16,7 +16,7 @@ from apps.metadata_review.resolution import shared_view_ids, suggestions_by_sour
 from apps.metadata_review.targets import MdimReview, ReviewableField  # noqa: E402
 from apps.wizard.app_pages.metadata_review import state  # noqa: E402
 from apps.wizard.app_pages.metadata_review.field_panel import render_field  # noqa: E402
-from apps.wizard.utils.components import Pagination, mdim_chart, url_persist  # noqa: E402
+from apps.wizard.utils.components import Pagination, url_persist  # noqa: E402
 from etl.config import OWID_ENV  # noqa: E402
 
 st.title(":material/rate_review: Metadata Review")
@@ -123,10 +123,16 @@ def mdim_page(user) -> None:
         if view is None:
             st.info("No view matches this dimension combination — pick another.")
         else:
-            col_chart, col_fields = st.columns([1, 1])
-            with col_chart:
-                mdim_chart(f"{OWID_ENV.admin_site}/grapher/{quote(catalog_path, safe='')}", view=view.dimensions)
-                st.caption(f"View: `{view.view_id}`")
+            col_page, col_fields = st.columns([3, 2])
+            with col_page:
+                # The real MDim page (admin preview renders the full page, controls included),
+                # so the reviewer sees exactly what readers see.
+                page_url = f"{OWID_ENV.admin_site}/grapher/{quote(catalog_path, safe='')}?{urlencode(view.dimensions)}"
+                st.iframe(page_url, height=850)
+                st.caption(
+                    "This is the live page. Note: changing the dropdowns *inside* the page won't move the "
+                    "field panel — use the selectors above to switch views."
+                )
             with col_fields:
                 for field in view.fields:
                     shared = shared_view_ids(review, field)
@@ -220,15 +226,22 @@ def dataset_page(user) -> None:
         label = indicator.name or indicator.catalog_path.split("#")[-1]
         with st.expander(f"{label}" + (f" — :orange[{n_open} open]" if n_open else ""), expanded=False):
             st.caption(f"`{indicator.catalog_path}`")
-            for field in indicator.fields:
-                render_field(
-                    field,
-                    suggestions_by_key.get(field.source_key(), []),
-                    comments_by_suggestion,
-                    users,
-                    user,
-                    fields_by_key,
-                )
+            col_page, col_fields = st.columns([3, 2])
+            with col_page:
+                if indicator.variable_id is not None:
+                    # The real data page (admin preview), so the reviewer sees exactly
+                    # what readers see — key information, sources, and all.
+                    st.iframe(OWID_ENV.data_page_preview(indicator.variable_id), height=850)
+            with col_fields:
+                for field in indicator.fields:
+                    render_field(
+                        field,
+                        suggestions_by_key.get(field.source_key(), []),
+                        comments_by_suggestion,
+                        users,
+                        user,
+                        fields_by_key,
+                    )
 
     _all_suggestions_tab(suggestions, comments_by_suggestion, users, user, fields_by_key, catalog_path, header=True)
 

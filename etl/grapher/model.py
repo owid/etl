@@ -1892,6 +1892,77 @@ class MetadataReviewSuggestion(Base):
     )
 
     @classmethod
+    def file_or_update(
+        cls,
+        session: Session,
+        target_type: str,
+        target_path: str,
+        view_id: str | None,
+        field_path: str,
+        user_id: int,
+        provenance: str,
+        current_value: str | None,
+        suggested_value: str | None,
+        comment_text: str | None = None,
+        inherited_from_path: str | None = None,
+        filed_from_path: str | None = None,
+        filed_from_view_id: str | None = None,
+        page_checksum: str | None = None,
+    ) -> "MetadataReviewSuggestion":
+        """File a suggestion, consolidating onto the field's existing OPEN thread.
+
+        A field has at most one open proposal: when an open suggestion already
+        exists for the same source key, the new proposed text replaces it (the
+        edit is recorded as a `revision` comment) and any comment joins the same
+        thread — instead of piling up parallel threads that each repeat the text.
+        """
+        existing = session.scalars(
+            select(cls)
+            .where(
+                cls.targetType == target_type,
+                cls.targetPath == target_path,
+                cls.viewId.is_(None) if view_id is None else cls.viewId == view_id,
+                cls.fieldPath == field_path,
+                cls.status == "open",
+            )
+            .order_by(cls.createdAt.desc())
+        ).first()
+
+        if existing is None:
+            suggestion = cls(
+                targetType=target_type,
+                targetPath=target_path,
+                viewId=view_id,
+                fieldPath=field_path,
+                provenance=provenance,
+                createdBy=user_id,
+                inheritedFromPath=inherited_from_path,
+                filedFromPath=filed_from_path,
+                filedFromViewId=filed_from_view_id,
+                currentValue=current_value,
+                suggestedValue=suggested_value,
+                pageChecksum=page_checksum,
+            )
+            session.add(suggestion)
+            session.commit()
+        else:
+            suggestion = existing
+            if suggested_value is not None and suggested_value != suggestion.suggestedValue:
+                had_proposal = suggestion.suggestedValue is not None
+                suggestion.suggestedValue = suggested_value
+                session.add(suggestion)
+                session.commit()
+                suggestion.add_comment(
+                    session,
+                    user_id=user_id,
+                    text="Updated the proposed text." if had_proposal else "Added a proposed text.",
+                    kind="revision",
+                )
+        if comment_text:
+            suggestion.add_comment(session, user_id=user_id, text=comment_text)
+        return suggestion
+
+    @classmethod
     def load_for_paths(
         cls,
         session: Session,
