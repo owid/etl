@@ -676,6 +676,9 @@ def run() -> None:
     # rows, which the declarative format can't express.)
     tb = _fix_misfiled_incitement_status(tb)
 
+    # Validate the value columns (after corrections, so local fixes are covered too).
+    sanity_check_proportions(tb)
+
     # Drop structural-placeholder (law, status) combinations — combos that are all-zero per the codebook.
     placeholders = _detect_structural_placeholders(tb)
     mask = tb.set_index(["law", "status"]).index.isin(placeholders)
@@ -770,6 +773,23 @@ def _fix_misfiled_incitement_status(tb):
     return tb
 
 
+def sanity_check_proportions(tb):
+    """Validate the value columns of the long policy table (codebook §4.3, §4.6, §4.5).
+
+    `proportion` is a population share in [0, 1]; `evidence_of_enforcement` is a five-anchor
+    scale {0, 0.25, 0.5, 0.75, 1} (or blank); `gender_change_requirement` uses the codebook's
+    controlled vocabulary (REQ_LABELS in `_build_gmc_combined` guards its coverage separately).
+    """
+    assert tb["proportion"].notna().all(), "NaN proportions — the balanced panel should carry explicit zeros."
+    assert tb["proportion"].between(0, 1).all(), (
+        f"Proportion outside [0, 1]: max={tb['proportion'].max()}, min={tb['proportion'].min()} — "
+        "a share of the population can't exceed 1."
+    )
+    eoe = tb["evidence_of_enforcement"].dropna()
+    bad_eoe = sorted(set(eoe[~eoe.isin([0, 0.25, 0.5, 0.75, 1])]))
+    assert not bad_eoe, f"Evidence_of_Enforcement off the five-anchor scale: {bad_eoe[:5]}."
+
+
 def _add_regional_composite_index(tb):
     """Append population-weighted regional means of `composite_index` for the standard REGIONS.
 
@@ -791,6 +811,16 @@ def _add_regional_composite_index(tb):
     )
     tb_w = tb_w.drop(columns=["composite_index_weighted", "population"])
     assert tb_w.loc[region_mask, "composite_index"].notna().all(), "NaN regional composite index."
+    # A weighted mean must lie within the range of the values it averages: every regional value
+    # must sit between that year's country minimum and maximum.
+    country_rng = (
+        tb_w.loc[~region_mask].groupby("year")["composite_index"].agg(["min", "max"]).rename(columns=lambda c: f"c_{c}")
+    )
+    regions_yr = tb_w.loc[region_mask, ["year", "composite_index"]].join(country_rng, on="year")
+    out_of_range = regions_yr[
+        (regions_yr["composite_index"] < regions_yr["c_min"]) | (regions_yr["composite_index"] > regions_yr["c_max"])
+    ]
+    assert out_of_range.empty, f"Regional composite index outside country range in years {sorted(set(out_of_range['year']))}."
     return tb_w
 
 
@@ -805,8 +835,20 @@ def sanity_check_index(tb):
     assert consistency.max() < 0.001, "Composite index no longer equals progressive minus regressive score."
     assert tb["progressive_score"].between(0, 23).all(), "Progressive score outside [0, 23]."
     assert tb["regressive_score"].between(0, 10).all(), "Regressive score outside [0, 10]."
+    assert tb["composite_index"].between(-10, 23).all(), "Composite index outside its theoretical bounds [-10, 23]."
     assert tb["unweighted_index"].between(-10, 23).all(), "Unweighted index outside its theoretical bounds."
+    assert (tb["unweighted_index"] % 1 == 0).all(), "Unweighted index has non-integer values (it's a ±1 count)."
+    # The two indices measure the same construct — the codebook (§7.2) reports yearly Pearson
+    # correlations of 0.96-0.99; a collapse below 0.9 means one of them broke.
+    worst_corr = min(
+        float(g["composite_index"].corr(g["unweighted_index"])) for _, g in tb.groupby("year")
+    )
+    assert worst_corr > 0.9, f"Composite and unweighted index diverged (min yearly correlation {worst_corr:.3f} < 0.9)."
     assert tb["country"].nunique() >= 195, f"Index coverage shrank: {tb['country'].nunique()} countries (had 195)."
+    per_year = tb.groupby("year")["country"].nunique()
+    assert per_year.min() >= 180, (
+        f"Per-year coverage dropped to {per_year.min()} countries (was 183-195 across 1991-2025)."
+    )
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in index table."
 
 
