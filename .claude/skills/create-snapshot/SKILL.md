@@ -182,12 +182,14 @@ After writing the files, run:
 
 - **Links**: run the HEAD-check loop from `/update-dataset` §6c ("Link verification") on every URL in the new `.dvc` (`url_main`, `url_download`, `license.url`, and any URL inside `description`). A curl non-2xx is a *signal*, not proof — Cloudflare-fronted hosts return false 404s to curl. Escalate with WebFetch, then the Wayback Machine, before treating a link as broken; never swap a link for an alternative on a curl-only failure. URLs carrying a `#fragment` also need §6c's anchor pass — HTTP status alone can't validate a fragment.
 - **Citation year vs `date_published` year**: the year inside `citation_full` should normally match `date_published`'s year. A deliberate mismatch is fine when the producer labels the release by *edition* rather than publish date (e.g. a "2025 report" published 2026-03-17) — leave a one-line `#` comment in the `.dvc` so the next reviewer doesn't re-flag it (`/review-data-pr` §5 checks exactly this pair).
+- **Optional deeper pass — adversarial source verification**: [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) goes beyond "the links resolve" and *reads* the producer's documentation behind them, checking every `.dvc` claim (description verbatim-ness, counts, `date_published`, license, citation) against what the docs actually say — its Phase 0 is the slice that applies at snapshot stage (the data cross-checks need a built garden dataset, e.g. via `/create-dataset`). Don't run it by default — it fetches docs and runs web searches, so it can consume many tokens; offer it when the source looks unreliable (no version labels, self-published, or the page and file seem to disagree).
 
 ### 6. Report to the user
 
 Show:
 - The paths of the files created (`.dvc`, plus the `.py` if one was needed)
 - Whether the snapshot ran successfully
+- **The source's other data files, if any** — when the landing page / repository ships several data files (companion indices, summary panels, codebooks with data), list the ones NOT snapshotted so the user can opt in now or skip deliberately. **Persist the inventory in the `.dvc`**, not just in chat — a `# NOTE:` comment above `url_download` listing the release's other data files as of `date_accessed` (e.g. `# NOTE: the release also ships Foo_Index.csv and codebook.pdf — not snapshotted (2026-07-20)`). That comment is the baseline the next `/update-dataset` cycle diffs against when the host has no file-history API; a new companion file is invisible to every within-file check (see `/update-dataset`, "Surface new indicators").
 - Next steps: "You can now create a meadow step for `<namespace>/<version>/<short_name>`"
 
 ## Notes

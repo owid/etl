@@ -59,6 +59,12 @@ definitions:
     url_main: https://ilostat.ilo.org/
     date_accessed: "2026-02-03"
     attribution_short: ILO
+  origins_fao: &origins_fao
+    producer: Food and Agriculture Organization of the United Nations
+    title: FAOSTAT country groups
+    url_main: https://www.fao.org/faostat/en/#definitions
+    date_accessed: "2026-02-25"
+    attribution_short: FAOSTAT
 
 tables:
   regions:
@@ -503,5 +509,130 @@ tables:
                   "Northern, Southern and Western Europe (ILO)": "Northern, Southern and Western Europe"
                   "Eastern Europe (ILO)": "Eastern Europe"
                   "Central and Western Asia (ILO)": "Central and Western Asia"
+                customHiddenCategories:
+                  "No data": true
+
+      # FAO
+      fao_1_region:
+        title: World regions according to FAO (1)
+        description_short: |-
+          Level-1 broad regions (continents) defined by the Food and Agriculture Organization of the United Nations (FAO).
+        type: ordinal
+        sort:
+          - "Africa (FAO)"
+          - "Americas (FAO)"
+          - "Asia (FAO)"
+          - "Europe (FAO)"
+          - "Oceania (FAO)"
+        origins:
+          - *origins_fao
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Africa (FAO)": "Africa"
+                  "Americas (FAO)": "Americas"
+                  "Asia (FAO)": "Asia"
+                  "Europe (FAO)": "Europe"
+                  "Oceania (FAO)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
+
+      fao_2_region:
+        title: World regions according to FAO (2)
+        description_short: |-
+          Level-2 regions (subregions) defined by the Food and Agriculture Organization of the United Nations (FAO).
+        type: ordinal
+        sort:
+          - "Northern Africa (FAO)"
+          - "Eastern Africa (FAO)"
+          - "Middle Africa (FAO)"
+          - "Southern Africa (FAO)"
+          - "Western Africa (FAO)"
+          - "Northern America (FAO)"
+          - "Caribbean (FAO)"
+          - "Central America (FAO)"
+          - "South America (FAO)"
+          - "Western Asia (FAO)"
+          - "Central Asia (FAO)"
+          - "Southern Asia (FAO)"
+          - "Eastern Asia (FAO)"
+          - "South-eastern Asia (FAO)"
+          - "Southern Europe (FAO)"
+          - "Western Europe (FAO)"
+          - "Northern Europe (FAO)"
+          - "Eastern Europe (FAO)"
+          - "Australia and New Zealand (FAO)"
+          - "Melanesia (FAO)"
+          - "Micronesia (FAO)"
+          - "Polynesia (FAO)"
+        origins:
+          - *origins_fao
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Northern Africa (FAO)": "Northern Africa"
+                  "Eastern Africa (FAO)": "Eastern Africa"
+                  "Middle Africa (FAO)": "Middle Africa"
+                  "Southern Africa (FAO)": "Southern Africa"
+                  "Western Africa (FAO)": "Western Africa"
+                  "Northern America (FAO)": "Northern America"
+                  "Caribbean (FAO)": "Caribbean"
+                  "Central America (FAO)": "Central America"
+                  "South America (FAO)": "South America"
+                  "Western Asia (FAO)": "Western Asia"
+                  "Central Asia (FAO)": "Central Asia"
+                  "Southern Asia (FAO)": "Southern Asia"
+                  "Eastern Asia (FAO)": "Eastern Asia"
+                  "South-eastern Asia (FAO)": "South-eastern Asia"
+                  "Southern Europe (FAO)": "Southern Europe"
+                  "Western Europe (FAO)": "Western Europe"
+                  "Northern Europe (FAO)": "Northern Europe"
+                  "Eastern Europe (FAO)": "Eastern Europe"
+                  "Australia and New Zealand (FAO)": "Australia and New Zealand"
+                  "Melanesia (FAO)": "Melanesia"
+                  "Micronesia (FAO)": "Micronesia"
+                  "Polynesia (FAO)": "Polynesia"
+                customHiddenCategories:
+                  "No data": true
+
+      fao_sdg_region:
+        title: World regions according to FAO (SDG)
+        description_short: |-
+          Regions defined by the Food and Agriculture Organization of the United Nations (FAO) for its SDG (Sustainable Development Goals) reporting, following the UN SDG regional groupings.
+        type: ordinal
+        sort:
+          - "Sub-Saharan Africa (FAO)"
+          - "Northern America and Europe (FAO)"
+          - "Latin America and the Caribbean (FAO)"
+          - "Western Asia and Northern Africa (FAO)"
+          - "Central Asia and Southern Asia (FAO)"
+          - "Eastern Asia and South-eastern Asia (FAO)"
+          - "Australia and New Zealand (FAO)"
+          - "Oceania excluding Australia and New Zealand (FAO)"
+        origins:
+          - *origins_fao
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Sub-Saharan Africa (FAO)": "Sub-Saharan Africa"
+                  "Northern America and Europe (FAO)": "Northern America and Europe"
+                  "Latin America and the Caribbean (FAO)": "Latin America and the Caribbean"
+                  "Western Asia and Northern Africa (FAO)": "Western Asia and Northern Africa"
+                  "Central Asia and Southern Asia (FAO)": "Central Asia and Southern Asia"
+                  "Eastern Asia and South-eastern Asia (FAO)": "Eastern Asia and South-eastern Asia"
+                  "Australia and New Zealand (FAO)": "Australia and New Zealand"
+                  "Oceania excluding Australia and New Zealand (FAO)": "Oceania excluding Australia and New Zealand"
                 customHiddenCategories:
                   "No data": true

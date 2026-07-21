@@ -1,5 +1,5 @@
 title:
-  title: Incomes of the richest
+  title: Income shares of the richest
   title_variant: World Inequality Database
 topic_tags:
   - Economic Inequality
@@ -27,14 +27,21 @@ dimensions:
     choices:
       - slug: Richest 0.1%
         name: Richest 0.1%
+        group: Top income groups
       - slug: Richest 1%
         name: Richest 1%
+        group: Top income groups
       - slug: "10"
         name: Richest 10%
+        group: Top income groups
       - slug: all
         name: All deciles
+        description: The share of income received by each tenth of the population, from poorest to richest
+        group: Whole distribution
       - slug: "10_40_50"
         name: Poorest 50%, middle 40%, next 9% and richest 1%
+        description: The share of income received by each of these groups
+        group: Whole distribution
 
   - name: Income measure
     slug: welfare_type

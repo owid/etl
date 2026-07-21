@@ -80,6 +80,7 @@ Now ask the user **once**, with all your best guesses pre-filled, using `AskUser
 - **Namespace + short_name + dataset title** (show your proposal; let them override).
 - **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). If they give one, fetch it now for citation, license, and column definitions.
 - **License** — show your best guess (default `CC BY 4.0` for academic/IGO sources if unknown) and let them correct.
+- **Other data files the source ships** — when the landing page or repository carries several data files (a companion index, summary tables), list them with a default of "not ingesting these" so the user can opt in with one word. Persist the skips as the companion-files `# NOTE:` in the snapshot `.dvc` (Step 4 follows `/create-snapshot`'s convention) — that NOTE, not the PR body, is the baseline the update and review workflows diff against; mention them in the PR body as well for the reviewer.
 - **Any column meanings you couldn't infer** — only ask about the genuinely ambiguous ones (e.g. "is `ev_sales_share` a percentage 0–100 or a fraction 0–1?"). Don't ask about columns you're confident on.
 
 Everything else (units you inferred, descriptions, topic tags) you'll fill in and surface for review later — don't ask now.
@@ -183,6 +184,12 @@ STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --gra
 ```
 
 Confirm the upsert actually succeeded before moving on: it should print the dataset's admin URL / id (`…/admin/datasets/<id>`). **Capture that `<id>`** — you'll hand it to the user in Step 7. If the upsert errored or printed no dataset, fix it now rather than handing over a link that won't resolve.
+
+### Step 6b — Adversarial fact-check of data and metadata (optional — offer it in the handoff)
+
+Optionally run [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) on `garden/<namespace>/<version>/<short_name>`. It's not part of the default build because it can consume many tokens (~12–20 web calls even for a small dataset) — mention it as an offer in the Step 7 handoff ("I can also fact-check the data and metadata against the source's documentation and independent sources — say the word") and run it when the user opts in, or proactively when the build surfaced red flags (values that look implausible, a source page contradicting the file).
+
+When it runs: since the dataset is brand-new (no charts yet, few indicators), review **all** indicators. This catches the two things the Step 7 review table can't: metadata you inferred that the source's own documentation contradicts (units, definitions, scope), and values the *source itself* got wrong (unit slips, wrong-year rows) — verified against independent sources online. Fold the findings into the handoff in plain language ("I double-checked the numbers against <independent source> — X and Y match; Z looks off, here's why"), and route confirmed source errors to `<short_name>.corrections.yml` per that skill's routing table rather than editing the data inline.
 
 ### Step 7 — Commit, push, and hand off for review
 
