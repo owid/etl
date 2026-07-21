@@ -7,6 +7,7 @@ them with `etl metadata-review export <target>` and implements the changes in ET
 """
 
 import html as html_lib
+import json
 from urllib.parse import quote, urlencode
 
 import streamlit as st
@@ -130,11 +131,8 @@ def mdim_page(user) -> None:
                 # The real MDim page (admin preview renders the full page, controls included),
                 # so the reviewer sees exactly what readers see.
                 page_url = f"{OWID_ENV.admin_site}/grapher/{quote(catalog_path, safe='')}?{urlencode(view.dimensions)}"
-                _page_embed(page_url, height=850)
-                st.caption(
-                    "This is the live page. Note: changing the dropdowns *inside* the page won't move the "
-                    "field panel — use the selectors above to switch views."
-                )
+                _page_embed(page_url, height=850, hide_page_selectors=True)
+                st.caption("This is the live page — navigate views with the selectors above.")
             with col_fields:
                 for field in view.fields:
                     shared = shared_view_ids(review, field)
@@ -160,7 +158,7 @@ def mdim_page(user) -> None:
         _all_suggestions_tab(suggestions, comments_by_suggestion, users, user, fields_by_key, catalog_path)
 
 
-def _page_embed(url: str, height: int = 850) -> None:
+def _page_embed(url: str, height: int = 850, hide_page_selectors: bool = False) -> None:
     """Embed a live page in an iframe that reliably reloads when the URL changes.
 
     `st.iframe` keeps the same component instance across reruns, and the embedded
@@ -171,11 +169,37 @@ def _page_embed(url: str, height: int = 850) -> None:
     NOTE: streamlit deprecates `components.html` in favor of `st.iframe`, but
     `st.iframe` has no `key` to force a remount — don't swap this back without
     verifying the embedded MDim page follows the view selectors across reruns.
+
+    With `hide_page_selectors=True`, the MDim page's own dropdown panel is hidden
+    (the wizard's selectors are the single source of truth — two competing sets of
+    dropdowns that can't stay in sync would be confusing). The full page has no
+    `hideControls` support, so this injects CSS into the loaded document — which
+    works on staging because the wizard and the admin preview share an origin;
+    cross-origin contexts (local dev) silently keep the page's dropdowns visible.
     """
+    hide_css = ".settings-row__wrapper, .multi-dim-settings { display: none !important; }"
     components.html(
-        f'<iframe src="{html_lib.escape(url, quote=True)}" loading="lazy" '
+        f'<iframe id="mr_page_embed" src="{html_lib.escape(url, quote=True)}" loading="lazy" '
         f'style="width:100%;height:{height - 20}px;border:1px solid #e6e6e6;border-radius:4px;background:#fff;">'
-        "</iframe>",
+        "</iframe>"
+        + (
+            f"""
+<script>
+const frame = document.getElementById("mr_page_embed");
+frame.addEventListener("load", () => {{
+    try {{
+        const doc = frame.contentDocument;
+        const style = doc.createElement("style");
+        style.textContent = {json.dumps(hide_css)};
+        doc.head.appendChild(style);
+    }} catch (e) {{
+        // Cross-origin (e.g. local dev wizard vs. admin) — leave the page's controls visible.
+    }}
+}});
+</script>"""
+            if hide_page_selectors
+            else ""
+        ),
         height=height,
     )
 
