@@ -1980,7 +1980,11 @@ class MetadataReviewSuggestion(Base):
         if target_paths:
             conditions.append(cls.targetPath.in_(target_paths))
         for prefix in path_prefixes or []:
-            conditions.append(cls.targetPath.like(prefix.replace("%", r"\%") + "%"))
+            # Anchor at a path boundary so 'grapher/ns/ver/population' doesn't also
+            # match 'grapher/ns/ver/population_historical'; escape LIKE wildcards
+            # ('_' is common in dataset names).
+            escaped = prefix.rstrip("/").replace("%", r"\%").replace("_", r"\_")
+            conditions.append(cls.targetPath.like(escaped + "/%"))
         q = select(cls).where(or_(*conditions))
         if statuses:
             q = q.where(cls.status.in_(statuses))
