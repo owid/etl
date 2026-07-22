@@ -296,29 +296,20 @@ def run() -> None:
     c.save()
 
     #
-    # PROTOTYPE (mdim-downloads project) -- hybrid handoff: ETL builds the
-    # wide table (no per-view HTTP fetch needed, data's already local) and
-    # stages it + an indicator index for grapher to pick up. Real
-    # metadata.json/readme.md assembly happens grapher-side, reusing its
-    # existing (tested, correct) citation/title code instead of a Python
-    # reimplementation -- see mdim-downloads/solution-space/etl-feasibility.md.
-    # Needs c.save() to have already run once so indicator catalog paths are
-    # fully expanded.
+    # PROTOTYPE (mdim-downloads project) -- ETL builds the wide table (no
+    # per-view HTTP fetch needed, data's already local) and stages it + an
+    # indicator index to R2. A Cloudflare Function on the grapher side builds
+    # the real metadata.json/readme.md/zip live, on every download request --
+    # same as a regular chart's own download, not a pre-baked artifact. See
+    # mdim-downloads/solution-space/etl-feasibility.md. Needs c.save() to have
+    # already run once so indicator catalog paths are fully expanded.
     #
     staged = stage_download_package_for_collection(
         c,
         dest_dir=paths.dest_dir / "download_package",
-        s3_prefix=f"owid-public/data/mdim-downloads-staging/{paths.short_name}",
+        s3_prefix=f"owid-public/data/mdim-downloads/{paths.short_name}",
     )
-    # Final URL the grapher-side build step will publish the real zip to --
-    # set here so the config is ready once that step runs; may 404 until it
-    # does, for this prototype.
-    final_url = f"https://owid-public.owid.io/data/mdim-downloads/{paths.short_name}/{paths.short_name}.zip"
-    c.download_package = {
-        "url": final_url,
-        "fileCount": staged.indicator_count,
-        "rowCount": staged.row_count,
-    }
+    c.download_package = staged.to_config()
     c.upsert_to_db(OWID_ENV)
 
 

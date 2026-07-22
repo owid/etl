@@ -1,30 +1,24 @@
-"""Build a "complete dataset" download package for a Collection (MDIM/Explorer).
+"""Build the "complete dataset" download package for a Collection (MDIM/Explorer).
 
 Prototype for the mdim-downloads project (see owid-projects/mdim-downloads).
-Two ways to build the wide table this package is based on:
 
-- `build_download_package(tables=[...], ...)` — pass the tables a script
-  already has in memory, keyed on each column's own `dimensions` metadata
-  (the pattern `adjust_dimensions_schooling`-style steps use). Fast, but only
-  as good as whatever the script itself decorated its in-memory copies with.
-- `build_download_package_for_collection(collection, ...)` — generic: derives
-  the indicator list and their dimension values from the Collection's own
-  *views* (skipping grouped/comparison views via `View.is_grouped`, and
-  deduplicating by catalog path so an indicator reused across several views
-  is only included once), then loads each underlying table fresh from the
-  on-disk catalog. Doesn't require the calling script to hand-build anything,
-  and reads the pristine on-disk column metadata rather than whatever a
-  script may have overwritten in memory (avoiding at least one class of bugs
-  in the process -- see mdim-downloads/solution-space/etl-feasibility.md).
+Mirrors how a regular chart's own download works: the zip is built fresh per
+request by a Cloudflare Function on the grapher side
+(functions/_common/mdimDownloadFunctions.ts), not baked once and stored at a
+fixed URL. ETL's job is only the part that genuinely benefits from running at
+publish time rather than per-request: joining every view's indicator into one
+wide table (no per-view HTTP fetch) and resolving each indicator's real
+grapher variable ID. `stage_download_package_for_collection()` uploads that
+join (wide.csv) plus an indicator index to R2; the grapher-side function
+fetches those two small files on every download request and does the rest
+(real per-indicator metadata, citations, readme) live.
 """
 
 from __future__ import annotations
 
 import json
-import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -101,25 +95,6 @@ def _resolve_time_column(tb: Table) -> tuple[Table, str]:
     return tb, "date"
 
 
-@dataclass
-class DownloadPackageResult:
-    zip_path: Path
-    file_count: int
-    row_count: int
-    size_bytes: int
-    last_updated: str
-
-    def to_config(self, url: str) -> dict:
-        """Shape matching MultiDimDataPageConfig.downloadPackage on the grapher side."""
-        return {
-            "url": url,
-            "fileCount": self.file_count,
-            "rowCount": self.row_count,
-            "sizeBytes": self.size_bytes,
-            "lastUpdated": self.last_updated,
-        }
-
-
 def _dimension_suffix(col_dimensions: dict) -> str:
     parts = [f"{key}_{col_dimensions[key]}" for key in sorted(col_dimensions) if col_dimensions[key]]
     return "__".join(parts)
@@ -143,34 +118,6 @@ def _outer_join_on_key(tables: list[Table]) -> Table:
         wide = tb if wide is None else pr.merge(wide, tb, on=key, how="outer")
     assert wide is not None, "no tables to join"
     return wide.sort_values(key).reset_index(drop=True)
-
-
-def build_wide_table(tables: list[Table]) -> Table:
-    """Outer-join tables on country + year/date, renaming each value column from its
-    own `dimensions` metadata (e.g. {"metric_type": "average_years_schooling", "sex":
-    "both"} -> "average_years_schooling__level_all__sex_both")."""
-    renamed = []
-    for tb in tables:
-        tb, time_col = _resolve_time_column(tb)
-        key_cols = ("country", time_col)
-        rename = {}
-        for col in tb.columns:
-            if col in key_cols:
-                continue
-            dims = getattr(tb[col].metadata, "dimensions", None) or {}
-            short = tb[col].metadata.original_short_name or col
-            rename[col] = _wide_column_name(short, dims)
-        renamed.append(tb.rename(columns=rename))
-    return _outer_join_on_key(renamed)
-
-
-def _dimension_keys(tables: list[Table]) -> set[str]:
-    keys: set[str] = set()
-    for tb in tables:
-        for col in tb.columns:
-            dims = getattr(tb[col].metadata, "dimensions", None) or {}
-            keys.update(k for k, v in dims.items() if v)
-    return keys
 
 
 def _iter_used_indicators(collection: Collection):
@@ -197,12 +144,12 @@ def _split_catalog_path(catalog_path: str) -> tuple[str, str, str]:
 
 
 def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict[str, str]]:
-    """Generic version of build_wide_table: resolves the indicator list and their
-    dimension values from the collection's own views, and loads each underlying
-    table fresh from the on-disk catalog (no dependency on any script's in-memory
-    tables). Returns (wide_table, {wide_column_name: catalog_path}) -- the second
-    is needed to hand off metadata assembly to grapher, which looks up indicators
-    by catalog path / variable ID, not by our wide-CSV column name."""
+    """Resolves the indicator list and their dimension values from the
+    collection's own views, and loads each underlying table fresh from the
+    on-disk catalog (no dependency on any script's in-memory tables). Returns
+    (wide_table, {wide_column_name: catalog_path}) -- the second is needed to
+    hand off metadata assembly to grapher, which looks up indicators by
+    catalog path / variable ID, not by our wide-CSV column name."""
     by_table: dict[tuple[str, str], list[tuple[str, dict]]] = defaultdict(list)
     for catalog_path, dims in _iter_used_indicators(collection):
         dataset_dir, table_name, column = _split_catalog_path(catalog_path)
@@ -237,120 +184,6 @@ def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict
     return _outer_join_on_key(renamed_tables), column_to_catalog_path
 
 
-def _render_readme(title: str, slug: str, value_columns: list[str], time_column: str) -> str:
-    columns_list = "\n".join(f"- `{c}`" for c in value_columns)
-    return f"""# {title} — complete dataset
-
-Prototype package for the mdim-downloads project. Bundles every dimension
-combination of this dataset into one wide-format CSV, instead of the
-per-view download you get from the chart itself.
-
-## Files
-
-- `{slug}.csv` — one row per country/{time_column}, one column per indicator
-  × dimension combination.
-- `manifest.json` — file list, indicator/row counts, generation date.
-- This README.
-
-## Columns
-
-`country`, `{time_column}`, then:
-
-{columns_list}
-
-Column names encode their dimension values as `<dimension>_<value>` pairs —
-see manifest.json for the full dimension list.
-"""
-
-
-def _write_package_files(
-    wide: Table,
-    dest_dir: Path,
-    title: str,
-    slug: str,
-    dimension_keys: set[str],
-) -> DownloadPackageResult:
-    dest_dir.mkdir(parents=True, exist_ok=True)
-
-    time_column = _time_column(wide)
-    value_columns = [c for c in wide.columns if c not in ("country", time_column)]
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-
-    csv_name = f"{slug}.csv"
-    csv_path = dest_dir / csv_name
-    wide.to_csv(csv_path, index=False)
-
-    manifest = {
-        "slug": slug,
-        "title": title,
-        "generatedAt": now,
-        "files": [csv_name, "manifest.json", "readme.md"],
-        "fileCount": len(value_columns),
-        "rowCount": len(wide),
-        "dimensions": sorted(dimension_keys),
-    }
-    manifest_path = dest_dir / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest, indent=2))
-
-    readme_path = dest_dir / "readme.md"
-    readme_path.write_text(_render_readme(title, slug, value_columns, time_column))
-
-    zip_path = dest_dir / f"{slug}.zip"
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for p in (csv_path, manifest_path, readme_path):
-            zf.write(p, p.name)
-
-    log.info(
-        "download_package.built",
-        zip_path=str(zip_path),
-        rows=len(wide),
-        indicators=len(value_columns),
-        size_bytes=zip_path.stat().st_size,
-    )
-
-    return DownloadPackageResult(
-        zip_path=zip_path,
-        file_count=len(value_columns),
-        row_count=len(wide),
-        size_bytes=zip_path.stat().st_size,
-        last_updated=now,
-    )
-
-
-def build_download_package(
-    tables: list[Table],
-    dest_dir: Path,
-    title: str,
-    slug: str,
-) -> DownloadPackageResult:
-    """Build the package from tables the caller already has in memory."""
-    wide = build_wide_table(tables)
-    return _write_package_files(wide, dest_dir, title, slug, _dimension_keys(tables))
-
-
-def build_download_package_for_collection(
-    collection: Collection,
-    dest_dir: Path,
-    title: str | None = None,
-    slug: str | None = None,
-) -> DownloadPackageResult:
-    """Build the package generically from the collection's own views -- no
-    script-specific wiring needed beyond calling this once before c.save().
-
-    Superseded by `stage_download_package_for_collection()` for real use --
-    this builds its own thin manifest.json/readme.md rather than handing off
-    to grapher's real metadata-assembly code. Kept for comparison/fallback."""
-    wide, _column_to_catalog_path = build_wide_table_for_collection(collection)
-    dimension_keys = {d.slug for d in collection.dimensions}
-    return _write_package_files(
-        wide,
-        dest_dir,
-        title or collection.title["title"],
-        slug or collection.short_name,
-        dimension_keys,
-    )
-
-
 def resolve_variable_ids(catalog_paths: list[str]) -> dict[str, int]:
     """Look up real grapher variable IDs for a list of catalog paths, via the
     same DB the ETL step already upserted these indicators into."""
@@ -363,6 +196,15 @@ def resolve_variable_ids(catalog_paths: list[str]) -> dict[str, int]:
         return Variable.catalog_paths_to_variable_ids(session, catalog_paths)
 
 
+# Buckets with a known public HTTPS domain -- mirrors the pattern already used
+# for owid_co2.py / owid_energy.py / income_distribution.py etc. (S3_BUCKET_NAME
+# = "owid-public", served at owid-public.owid.io). Add more here if this ever
+# moves to a different bucket.
+PUBLIC_BUCKET_DOMAINS = {
+    "owid-public": "https://owid-public.owid.io",
+}
+
+
 @dataclass
 class StagedPackageResult:
     csv_url: str
@@ -370,22 +212,36 @@ class StagedPackageResult:
     row_count: int
     indicator_count: int
 
+    def to_config(self) -> dict:
+        """Shape matching MultiDimDataPageConfig.downloadPackage on the grapher
+        side. No `url` here -- the browser-facing download link is the dynamic
+        build route, computed from the page's own slug on the grapher side,
+        not stored (same convention as a chart's own `.zip` link)."""
+        return {
+            "csvUrl": self.csv_url,
+            "indicatorsUrl": self.indicators_url,
+            "fileCount": self.indicator_count,
+            "rowCount": self.row_count,
+        }
+
 
 def stage_download_package_for_collection(
     collection: Collection,
     dest_dir: Path,
     s3_prefix: str,
 ) -> StagedPackageResult:
-    """PROTOTYPE hybrid handoff: ETL builds the wide table (the part that
-    benefits from local data access -- no per-view HTTP fetches, validated
-    across 12 real MDIMs) and uploads it plus an indicator/column-name index.
-    Real metadata.json + readme.md assembly happens on the grapher side,
-    reusing its existing (tested, correct) citation/title-formatting code
-    instead of a Python reimplementation -- see
-    mdim-downloads/solution-space/etl-feasibility.md for why.
+    """Builds the wide table (the part that benefits from local data access --
+    no per-view HTTP fetches, validated across 12 real MDIMs) and uploads it
+    plus an indicator/column-name index to R2. A Cloudflare Function on the
+    grapher side (fetchCompleteDatasetZipForGrapher in
+    mdimDownloadFunctions.ts) fetches these on every download request and
+    builds the real metadata.json + readme.md + zip live, reusing its
+    existing (tested, correct) citation/title-formatting code instead of a
+    Python reimplementation -- see mdim-downloads/solution-space/etl-feasibility.md.
 
-    `s3_prefix` is bucket/path, e.g.
-    "owid-public/data/mdim-downloads-staging/years_of_schooling".
+    `s3_prefix` is bucket/path, e.g. "owid-public/data/mdim-downloads/years_of_schooling".
+    This is the permanent, canonical location grapher reads from on every
+    request -- not a staging area for a later build step.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
     wide, column_to_catalog_path = build_wide_table_for_collection(collection)
@@ -441,28 +297,3 @@ def stage_download_package_for_collection(
         row_count=len(wide),
         indicator_count=len(indicators),
     )
-
-
-# Buckets with a known public HTTPS domain -- mirrors the pattern already used
-# for owid_co2.py / owid_energy.py / income_distribution.py etc. (S3_BUCKET_NAME
-# = "owid-public", served at owid-public.owid.io). Add more here if this ever
-# moves to a different bucket.
-PUBLIC_BUCKET_DOMAINS = {
-    "owid-public": "https://owid-public.owid.io",
-}
-
-
-def upload_to_r2(zip_path: Path, s3_key: str, public: bool = True) -> str:
-    """Upload the built zip to R2. `s3_key` is bucket/path, e.g.
-    "owid-public/data/mdim-downloads/years_of_schooling/years_of_schooling.zip".
-
-    Returns a public https URL if the bucket is in PUBLIC_BUCKET_DOMAINS,
-    otherwise the s3:// URI (which needs credentials to fetch -- not usable
-    as a browser download link). `public=True` only sets the object's ACL to
-    public-read; the https URL is only reachable if the bucket also has a
-    known public domain, which is what PUBLIC_BUCKET_DOMAINS records."""
-    bucket, key = s3_key.split("/", 1)
-    s3_utils.upload(f"s3://{s3_key}", zip_path, public=public, downloadable=True)
-    if bucket in PUBLIC_BUCKET_DOMAINS:
-        return f"{PUBLIC_BUCKET_DOMAINS[bucket]}/{key}"
-    return f"s3://{s3_key}"
