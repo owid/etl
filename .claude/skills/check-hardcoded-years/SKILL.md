@@ -35,11 +35,12 @@ A **number** is a pin; `"earliest"` / `"latest"` / absent are fine. In ETL YAML,
 
 ## Availability lookup and grading
 
-The per-variable latest time comes from the indicators API `metadata.json` → `dimensions.years.values[].id` (same endpoint, prefix rules, caching, and failed-fetch semantics as [`check-empty-entities`](../check-empty-entities/SKILL.md): staging via `OWIDEnv.from_staging(branch).indicators_url` — never hand-build `staging-site-<branch>`; production via `https://api.ourworldindata.org/v1/indicators/<id>.metadata.json`; a failed fetch is *unknown*, never graded). For a chart, grade against the max over its y-variables' latest times. During a dataset update you can read the same numbers for free from the locally built grapher dataset instead.
+The per-variable latest time comes from the indicators API `metadata.json` → `dimensions.years.values[].id` (same endpoint, prefix rules, caching, and failed-fetch semantics as [`check-empty-entities`](../check-empty-entities/SKILL.md): staging via `OWIDEnv.from_staging(branch).indicators_url` — never hand-build `staging-site-<branch>`; production via `https://api.ourworldindata.org/v1/indicators/<id>.metadata.json`; a failed fetch is *unknown*, never graded). For a chart, grade against the max over its y-variables' latest times — **except `map.time`/`map.startTime`, which grade against the map's own indicator**: `map.columnSlug` when set (stored as a stringified variable id — cast before the lookup), else the first y variable, which is grapher's fallback (see `etl/indicator_upgrade/indicator_update.py`). A map isn't stale because a *different* y-series runs longer, and a stale map-only indicator would otherwise be missed. During a dataset update you can read the same numbers for free from the locally built grapher dataset instead.
 
 - 🔴 **Hides data now** — `maxTime` / `map.time` / `timelineMaxTime` pinned **below** the variables' latest time. Readers open the chart and don't see the newest data; `timelineMaxTime` is the worst case (the new years can't even be reached). In dataset mode this means the update is invisible on that chart.
 - 🟡 **Goes stale next cycle** — the same fields pinned **equal to** the latest time. Renders identically to `"latest"` today, but silently becomes a 🔴 at the next update — this is the manual-bump treadmill the chart history shows. Propose switching to `"latest"` now.
 - ℹ️ **Probably deliberate** — report, don't push: numeric `minTime` / `timelineMinTime` / `map.startTime` (editorial start-year framing, pre-X data-quality cutoffs); `minTime == maxTime` single-year charts; pins **above** the latest time (projection headroom); narrative charts (a pinned period is often their entire point — audit the **merged parent+patch** config via `AdminAPI(...).get_narrative_chart(id)["configFull"]`, same gotcha as everywhere else).
+- ℹ️ **Projection-series exception** — when the reference indicator's latest time lies in the **future**, a hiding-field pin below it is usually the last-estimates cutoff, not staleness: UN WPP MDim views deliberately pin `map.time` to the last estimate year so the map doesn't open deep in the projection tail (see `etl/steps/export/multidim/un/latest/view_edits.py`). Grade ℹ️ and never propose `"latest"` there — that change is actively harmful. Apply the is-it-future test only to year axes; a day-offset axis needs the `zeroDay` conversion first.
 
 **Deliberate-pin signal:** the pinned value appears in the chart's `title`, `subtitle`, `note`, or slug (comparison charts like `...-2020-vs-1980`). Those pins are *coupled* to FAUST text — if anyone ever bumps the pin, the text must change with it — so never auto-fix them, and say so in the report. The heuristic only makes sense for year-valued time axes, not day offsets.
 
@@ -70,19 +71,26 @@ Same loop shape as `check-empty-entities` — one config pass, grading inline:
 
 ```python
 import json
+from datetime import date
 from etl.config import OWIDEnv
 from etl.http import session as http_session
 
 env = OWIDEnv.from_staging("<branch>")
 PREFIX = env.indicators_url  # normalized container name — never hand-build staging-site-<branch>
+CURRENT_YEAR = date.today().year
 cache = {}
 
 def latest_time(var_id, prefix=PREFIX):
+    """(latest time id, zeroDay) — a set zeroDay means the axis is day offsets, not years."""
     key = (prefix, var_id)
     if key not in cache:
         r = http_session.get(f"{prefix}/{var_id}.metadata.json", timeout=60)
-        vals = r.json()["dimensions"]["years"]["values"] if r.ok else None
-        cache[key] = max(v["id"] for v in vals) if vals else None  # None = unknown, never grade on it
+        if r.ok:
+            m = r.json()
+            vals = m["dimensions"]["years"]["values"]
+            cache[key] = (max(v["id"] for v in vals) if vals else None, (m.get("display") or {}).get("zeroDay"))
+        else:
+            cache[key] = (None, None)  # unknown, never grade on it
     return cache[key]
 
 HIDING = {"maxTime", "timelineMaxTime", "map.time"}
@@ -114,20 +122,27 @@ cfgs = env.read_sql("""
 for _, row in cfgs.iterrows():
     cfg = json.loads(row["config"])
     y_ids = [d["variableId"] for d in cfg.get("dimensions", []) if d.get("property") == "y"]
-    times = [latest_time(v) for v in y_ids]
-    t_max = max((t for t in times if t is not None), default=None)
+    fetched = [latest_time(v) for v in y_ids]
+    t_max = max((t for t, _ in fetched if t is not None), default=None)
+    day_axis = any(zd for _, zd in fetched)
+    # the map renders its own indicator: map.columnSlug (stringified variable id) when set, else the first y variable
+    map_slug = (cfg.get("map") or {}).get("columnSlug")
+    t_map = latest_time(int(map_slug))[0] if str(map_slug or "").isdigit() else (fetched[0][0] if fetched else None)
     faust = " ".join(str(cfg.get(k, "")) for k in ("title", "subtitle", "note")) + " " + (row["slug"] or "")
     for field, val in pins(cfg):
-        if t_max is None:
-            ...  # unknown availability — coverage caveat, not a finding
-        elif field in HIDING and val < t_max:
+        ref = t_map if field.startswith("map.") else t_max
+        if ref is None:
+            continue  # unknown availability — coverage caveat, not a finding
+        if field in HIDING and not day_axis and ref > CURRENT_YEAR:
+            sev = "ℹ️"  # projection series — the pin is usually the estimates cutoff, not staleness
+        elif field in HIDING and val < ref:
             sev = "🔴"
-        elif field in HIDING and val == t_max:
+        elif field in HIDING and val == ref:
             sev = "🟡"
         else:
             sev = "ℹ️"
         deliberate = str(int(val)) in faust  # year-axis heuristic only — skip for day-offset variables
-        ...  # collect (sev, surface, chart_id, slug, field, val, t_max, deliberate)
+        ...  # collect (sev, surface, chart_id, slug, field, val, ref, deliberate)
 ```
 
 Repeat over `multi_dim_x_chart_configs`, `explorer_views`, narrative-chart merged configs, and parsed `posts_gdocs_links` query strings (`time=` components), then fold in the repo grep. Query gotchas: pymysql `%`-formats break on quoted literals — parameterize everything. **The public Datasette mirror is DuckDB**, not SQLite/MySQL — `json_type()` returns DuckDB type names (`UBIGINT`, `VARCHAR`, …), so don't filter numerics by type name in SQL; use `TRY_CAST(json_extract_string(cc.full, '$.maxTime') AS DOUBLE) IS NOT NULL` or pull `json_extract_string(...)` values and classify client-side.
