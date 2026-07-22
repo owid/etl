@@ -30,6 +30,10 @@ FIELD_LABELS = {
     "description_key": "Key information",
 }
 
+# Bullet-list fields: tracked/diffed bullet-by-bullet, shared by bullet transfer
+# (never by dimension-word pattern — word substitution is meaningless for lists).
+DESCRIPTION_KEY_FIELDS = {"metadata.description_key", "description_key"}
+
 # View-level fieldPath -> the indicator-level fieldPath it inherits from.
 VIEW_TO_INDICATOR_FIELD = {
     "config.title": "grapher_config.title",

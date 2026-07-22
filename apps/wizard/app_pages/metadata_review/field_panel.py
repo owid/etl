@@ -14,13 +14,11 @@ import streamlit as st
 import etl.grapher.model as gm
 from apps.metadata_review.diffs import apply_bullet_edits, bullet_diff, diff_summary, tracked_changes_html
 from apps.metadata_review.resolution import Staleness, check_staleness, transfer_proposal
-from apps.metadata_review.targets import MdimReview, ReviewableField
+from apps.metadata_review.targets import DESCRIPTION_KEY_FIELDS, MdimReview, ReviewableField
 from apps.wizard.app_pages.metadata_review import state
 from apps.wizard.app_pages.metadata_review.tracked_editor import tracked_editor
 
 STATUS_ICONS = {"open": "💬", "implemented": "✅", "rejected": "🚫"}
-
-DESCRIPTION_KEY_FIELDS = {"metadata.description_key", "description_key"}
 
 
 def _key(field: ReviewableField, suffix: str, ns: str = "main") -> str:
@@ -128,6 +126,7 @@ def render_field(
             st.markdown(f"> {field.current_value}")
 
         if proposal is not None:
+            borrowed = str(proposal.currentValue or "").strip() != str(field.current_value or "").strip()
             _render_thread(
                 field,
                 proposal,
@@ -137,6 +136,8 @@ def render_field(
                 user=user,
                 fields_by_key=fields_by_key,
                 key_ns=key_ns,
+                borrowed=borrowed,
+                initial_override=display_value if borrowed else None,
             )
         elif user is not None:
             _render_edit_controls(field, user, existing=None, key_ns=key_ns)
@@ -154,6 +155,8 @@ def _render_thread(
     user: gm.User | None,
     fields_by_key: dict[tuple, ReviewableField],
     key_ns: str = "main",
+    borrowed: bool = False,
+    initial_override: str | None = None,
 ) -> None:
     """The compact discussion strip under the field's (tracked) text.
 
@@ -262,6 +265,8 @@ def _render_edit_controls(
     user: gm.User,
     existing: gm.MetadataReviewSuggestion | None,
     key_ns: str = "main",
+    borrowed: bool = False,
+    initial_override: str | None = None,
 ) -> None:
     """In-place tracked-changes editing: the displayed text becomes editable, with a
     live diff preview; saving files onto the field's consolidated proposal."""
@@ -270,8 +275,14 @@ def _render_edit_controls(
 
     if st.session_state.get(editing_key):
         # `is not None`, not truthiness: an empty string is a real proposal (clear the
-        # field) and must survive a refine round-trip.
-        initial = existing.suggestedValue if existing is not None and existing.suggestedValue is not None else current
+        # field) and must survive a refine round-trip. For a borrowed thread (filed on
+        # a page with different text), seed with the version transferred to THIS view.
+        if initial_override is not None:
+            initial = initial_override
+        elif existing is not None and existing.suggestedValue is not None and not borrowed:
+            initial = existing.suggestedValue
+        else:
+            initial = current
         result = tracked_editor(
             original=current,
             initial=initial,
@@ -284,14 +295,23 @@ def _render_edit_controls(
             if result.get("action") == "save":
                 text = (result.get("text") or "").strip()
                 comment = (result.get("comment") or "").strip() or None
-                if existing is not None:
-                    # Refine the existing thread in place — it may be keyed to another
-                    # view's source (borrowed by identical text).
+                if existing is not None and not borrowed:
+                    # Refine the existing thread in place (same-text source key).
                     proposal_unchanged = text == (existing.suggestedValue or "").strip()
                     state.update_proposal(
                         existing.id,
                         user_id=user.id,
                         suggested_value=None if proposal_unchanged else text,
+                        comment_text=comment,
+                    )
+                elif existing is not None:
+                    # A borrowed thread belongs to another page's text — refining it
+                    # from here files onto THIS field's own source instead, so the
+                    # foreign row keeps its alignment.
+                    state.create_suggestion(
+                        field,
+                        user_id=user.id,
+                        suggested_value=None if text == current.strip() else text,
                         comment_text=comment,
                     )
                 elif text != current.strip() or comment:

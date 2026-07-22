@@ -422,6 +422,79 @@ def test_apply_bullet_edits_partial_transfer():
     assert out == ("- DIFFERENT intro\n- Shared source note, reworded\n- Extra bullet", 1, 2)
 
 
+def test_apply_bullet_edits_additions_need_full_rewrite_match():
+    from apps.metadata_review.diffs import apply_bullet_edits
+
+    # A pure addition rides along when ALL rewrites apply...
+    out = apply_bullet_edits(
+        "- Shared note",
+        "- Shared note, reworded\n- Brand new bullet",
+        "- Shared note\n- Other page tail",
+    )
+    assert out == ("- Shared note, reworded\n- Brand new bullet\n- Other page tail", 2, 2)
+    # ...but NOT when a page-specific rewrite was skipped (different list variant —
+    # the addition may carry that variant's context, e.g. after-tax-only content).
+    out = apply_bullet_edits(
+        "- Dimension-specific bullet\n- Shared note",
+        "- Dimension-specific bullet, reworded\n- Shared note, reworded\n- Dimension-specific addition",
+        "- OTHER dimension bullet\n- Shared note",
+    )
+    assert out == ("- OTHER dimension bullet\n- Shared note, reworded", 1, 3)
+
+
+def test_threads_do_not_bullet_borrow_across_sibling_views():
+    """Views of the SAME MDim (e.g. before vs after tax) must not borrow bullet-list
+    threads from each other — only exact-text/pattern sharing applies there."""
+    from apps.metadata_review.resolution import suggestions_by_source_key, threads_for_field
+    from apps.metadata_review.targets import MdimReview, ViewReview
+
+    review = MdimReview(
+        target_path="wid/latest/incomes#incomes", slug="incomes", title="T", title_variant=None, page_checksum="x"
+    )
+    lists = {
+        "before_tax": "- Shared generic bullet\n- Income is measured before taxes.",
+        "after_tax": "- Shared generic bullet\n- Income is measured after taxes.",
+    }
+    for welfare, bullets in lists.items():
+        view_id = f"welfare_type={welfare}"
+        indicator = f"grapher/wid/latest/inc/t#share__{welfare}"
+        review.views.append(
+            ViewReview(
+                view_id=view_id,
+                dimensions={"welfare_type": welfare},
+                indicator_path=indicator,
+                fields=[
+                    _field(
+                        view_id=view_id,
+                        field_path="metadata.description_key",
+                        provenance="inherited",
+                        current_value=bullets,
+                        inherited_from=indicator,
+                    )
+                ],
+            )
+        )
+    # A thread on the after-tax indicator edits the shared bullet (so bullet-transfer
+    # WOULD match) — it must still not surface on the before-tax view.
+    suggestion = gm.MetadataReviewSuggestion(
+        targetType="indicator",
+        targetPath="grapher/wid/latest/inc/t#share__after_tax",
+        fieldPath="description_key",
+        provenance="inherited",
+        createdBy=1,
+        currentValue=lists["after_tax"],
+        suggestedValue="- Shared generic bullet, reworded\n- Income is measured after taxes.",
+        filedFromViewId="welfare_type=after_tax",
+    )
+    suggestion.id = 7
+    grouped = suggestions_by_source_key([suggestion])
+    before_field = review.views[0].fields[0]
+    assert threads_for_field(review, before_field, grouped) == []
+    # Its own view still shows it.
+    after_field = review.views[1].fields[0]
+    assert [s.id for s in threads_for_field(review, after_field, grouped)] == [7]
+
+
 def test_bullet_diff_no_changes():
     from apps.metadata_review.diffs import bullet_diff, diff_summary
 

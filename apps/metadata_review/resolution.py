@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 import etl.grapher.model as gm
 from apps.metadata_review.diffs import apply_bullet_edits
 from apps.metadata_review.targets import (
+    DESCRIPTION_KEY_FIELDS,
     FIELD_LABELS,
     VIEW_TO_INDICATOR_FIELD,
     DatasetReview,
@@ -561,7 +562,8 @@ def shared_view_ids(review: MdimReview, field: ReviewableField) -> list[str]:
         return []
     value = _norm(field.current_value)
     own_view = next((v for v in review.views if v.view_id == field.view_id), None)
-    pattern = _field_pattern(review, own_view, field) if own_view is not None else None
+    use_pattern = own_view is not None and field.field_path not in DESCRIPTION_KEY_FIELDS
+    pattern = _field_pattern(review, own_view, field) if use_pattern else None
     shared = []
     for view in review.views:
         if view.view_id == field.view_id:
@@ -594,7 +596,8 @@ def threads_for_field(
     if review is not None and field.view_id is not None and field.current_value is not None:
         value = _norm(field.current_value)
         own_view = next((v for v in review.views if v.view_id == field.view_id), None)
-        pattern = _field_pattern(review, own_view, field) if own_view is not None else None
+        use_pattern = own_view is not None and field.field_path not in DESCRIPTION_KEY_FIELDS
+        pattern = _field_pattern(review, own_view, field) if use_pattern else None
         for view in review.views:
             for other in view.fields:
                 if other.field_path != field.field_path:
@@ -613,12 +616,18 @@ def threads_for_field(
     # when they target the equivalent field and either their text snapshot matches
     # ours, or — for bullet lists — the bullets they edit exist in our list too
     # (lists share individual bullets via YAML anchors while differing as a whole).
+    # NOTE: indicators backing OTHER VIEWS of this same page are excluded — sibling
+    # views (e.g. before vs after tax) are governed by the exact-text/pattern rules
+    # above; bullet-matching across them would mix dimension-specific content.
     if field.current_value is not None:
         value = _norm(field.current_value)
+        own_page_indicators = set(review.indicator_paths) if review is not None else set()
         indicator_field = VIEW_TO_INDICATOR_FIELD.get(field.field_path, field.field_path)
         is_bullets = indicator_field == "description_key"
         for key, threads in suggestions_by_key.items():
             if key in keys or key[0] != "indicator" or key[3] != indicator_field:
+                continue
+            if key[1] in own_page_indicators:
                 continue
             for suggestion in threads:
                 if _norm(suggestion.currentValue) == value or (

@@ -188,10 +188,18 @@ def apply_bullet_edits(
         except ValueError:
             return -1
 
+    units = paired_ops(ops)
+    # Pure additions may carry page-specific content (e.g. a bullet about one
+    # dimension's data availability). They only ride along when EVERY rewrite in
+    # the proposal applied here — a partial match means this page's list is a
+    # different variant, and injected additions would mix contexts.
+    rewrites = [(kind, removed) for kind, removed, _ in units if kind in ("pair", "remove")]
+    all_rewrites_apply = all(find(removed or "") >= 0 for _, removed in rewrites)
+
     anchor = -1  # last position in `target` we matched or touched.
     anchored = False
     applied, total = 0, 0
-    for kind, removed, added in paired_ops(ops):
+    for kind, removed, added in units:
         if kind == "keep":
             pos = find(removed or "")
             if pos >= 0:
@@ -212,8 +220,8 @@ def apply_bullet_edits(
             anchored = True
             applied += 1
         elif added is not None:  # pure addition
-            if not anchored:
-                continue  # no shared context to anchor the new bullet to.
+            if not anchored or not all_rewrites_apply:
+                continue
             target.insert(anchor + 1, added)
             anchor += 1
             applied += 1
