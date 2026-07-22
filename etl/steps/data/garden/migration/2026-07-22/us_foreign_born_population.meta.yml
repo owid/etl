@@ -93,7 +93,7 @@ tables:
           - "{definitions.undercount}"
           - '"Not specified" covers people whose country of birth was not recorded, and people born at sea.'
         description_processing: |-
-          We calculated these regional totals from the source's data, grouping countries into regions as defined by Our World in Data. They can differ from the source's own regional totals: for example, we count the Caribbean and Central America (including Mexico) as part of North America. Two exceptions follow the source's groupings: people born in the European part of Turkey are counted in Europe, and everyone born in the former Soviet Union is counted in Europe.
+          We calculated these regional totals from the source's data, grouping countries into regions as defined by Our World in Data. They can differ from the source's own regional totals: for example, we count the Caribbean and Central America (including Mexico) as part of North America. Everyone born in the former Soviet Union is counted in Europe, because the source does not separate its Asian part.
         processing_level: major
         display:
           numDecimalPlaces: 0

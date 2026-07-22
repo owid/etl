@@ -128,6 +128,15 @@ def make_by_region(tb_origin: Table) -> Table:
     to_region = {row: region for region, rows in REGION_ROWS.items() for row in rows}
     tb["country"] = tb["country"].map(to_region)
     tb = tb.groupby(["country", "year"], as_index=False, observed=True)["foreign_born_population"].sum(min_count=1)
+
+    # OWID counts all of Turkey in Asia, but the source files its "Turkey in Europe" row
+    # (reported 1850-1930) inside Europe — move it over.
+    turkey_in_europe = (
+        tb_origin[tb_origin["country"] == "Turkey in Europe"].set_index("year")["foreign_born_population"].dropna()
+    )
+    for region, sign in [("Europe", -1), ("Asia", 1)]:
+        mask = (tb["country"] == region) & tb["year"].isin(turkey_in_europe.index)
+        tb.loc[mask, "foreign_born_population"] += sign * tb.loc[mask, "year"].map(turkey_in_europe)
     tb = tb.dropna(subset=["foreign_born_population"])
 
     # The regions and "Not specified" must add up exactly to the source's total.
