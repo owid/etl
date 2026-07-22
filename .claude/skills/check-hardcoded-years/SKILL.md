@@ -29,7 +29,7 @@ Production scale (2026-07): 180 published charts carried a numeric `maxTime`, ~3
 | `map.time` | `"latest"` | Map tab renders that time — a pinned map keeps showing the old year |
 | `map.startTime` | — | With `map.time`, defines a map time range — same staleness risk |
 
-A **number** is a pin; `"earliest"` / `"latest"` / absent are fine. In ETL YAML, quoted numeric strings count too (`minTime: "1433"` in the monkeypox explorer config is a pin).
+A **number** is a pin; `"earliest"` / `"latest"` / absent are fine. In ETL YAML, quoted numeric strings count too (`minTime: "1433"` in the monkeypox explorer config is a pin). `map.time` / `map.startTime` only matter when the chart actually exposes the map (`hasMapTab: true` or `tab: "map"`) — on a chart without a map tab they're dormant config with no reader-facing effect (the chart-approval check gates on the same conditions), so skip them there rather than raising false findings.
 
 **Time values are not always years.** Daily-frequency indicators use day offsets from the variable's zero day (`timelineMinTime: 600` in the covid explorer, `minTime: "1433"` in monkeypox). Always compare a pin against the variable's own time axis (below) — never eyeball "that doesn't look like a year". Negative values are BC years (`minTime: -13` exists in production), and values beyond the current year are projection charts (2100) — both legitimate.
 
@@ -54,7 +54,7 @@ The per-variable latest time comes from the indicators API `metadata.json` → `
 | Indicator-level configs | `presentation.grapher_config` in garden/grapher `.meta.yml` (repo grep below) | The `.meta.yml` + step re-run with `--grapher`. These propagate into every thin MDim/explorer view that inherits the indicator's config, so one pinned field here fans out to many views. |
 | Article references | `posts_gdocs_links` (join `posts_gdocs pg ON pg.id = pgl.sourceId` — the FK is `sourceId`, not a gdoc-named column — and filter `pg.published = 1`) whose `queryString` carries `time=` — embeds and hyperlinks to charts, MDims, and explorers alike | Gdoc edit (content follow-up). Same plumbing as `check-empty-entities` §4: resolve `target` through `chart_slug_redirects`, link each citation with a scroll-to-highlight URL via `find_chart_citations_in_content`, and verify fixes on the live article page, not the lagging Datasette mirror. |
 
-**Parsing `time=` in URLs:** the grapher time param is a single value (`time=2019`) or a range (`time=1990..2020`, `time=earliest..2023`). Each **numeric** component is a pin — grade the end bound like `maxTime` (an embed with `time=..2019` keeps showing the old window after the data reaches 2025), the start bound like `minTime`. `earliest`/`latest` components are fine, and daily charts use ISO dates (`time=2020-01-01..latest`) — compare those on the date axis. Skip `$time`-style template placeholders in country-page dynamic embeds. Article time pins are often deliberate framing of the surrounding prose, so default them to 🟡-at-worst and always hand them to content follow-up rather than editing configs.
+**Parsing `time=` in URLs:** the grapher time param is a single value (`time=2019`) or a range (`time=1990..2020`, `time=earliest..2023`). Each **numeric** component is a pin — grade the end bound like `maxTime` (an embed with `time=..2019` keeps showing the old window after the data reaches 2025), the start bound like `minTime`. `earliest`/`latest` components are fine, and daily charts use ISO dates (`time=2020-01-01..latest`) — convert those to day offsets before grading: a day-axis variable advertises `display.zeroDay` in the same `metadata.json` (its `dimensions.years.values[].id` are day offsets from that date), so the component's comparable value is `(date.fromisoformat(part) - date.fromisoformat(zero_day)).days`. Skip `$time`-style template placeholders in country-page dynamic embeds. Article time pins are often deliberate framing of the surrounding prose, so default them to 🟡-at-worst and always hand them to content follow-up rather than editing configs.
 
 Repo grep for the ETL-side sources (also catches pins that haven't reached any DB yet):
 
@@ -88,7 +88,10 @@ def latest_time(var_id, prefix=PREFIX):
 HIDING = {"maxTime", "timelineMaxTime", "map.time"}
 
 def pins(cfg):
-    for path in ["minTime", "maxTime", "timelineMinTime", "timelineMaxTime", "map.time", "map.startTime"]:
+    fields = ["minTime", "maxTime", "timelineMinTime", "timelineMaxTime"]
+    if cfg.get("hasMapTab") or cfg.get("tab") == "map":
+        fields += ["map.time", "map.startTime"]  # dormant when no map is exposed — skip to avoid false findings
+    for path in fields:
         v = cfg
         for k in path.split("."):
             v = (v or {}).get(k) if isinstance(v, dict) else None
@@ -139,5 +142,3 @@ One table per severity — chart/view id, surface, admin or grapher link (stagin
 - **Coverage caveats** — variables whose metadata fetch failed; non-ETL explorers whose TSV wasn't parsed.
 
 Pins are almost always **pre-existing** (updates don't create them), so there's no production-grading pass here — the question is only whether the new data now extends past the pin.
-
-Reference run (GMSD + NMC v9/v7 update, PR #6499): 7 charts, no MDim/explorer/narrative surfaces, 1 article `time=1900..latest` link (fine — end bound dynamic). One 🔴 — a chart pinned `maxTime: 2016` against data through 2022, whose `chart_revisions` history showed the pin being saved back when 2016 *was* the data's last year — and two 🟡 pins equal to their series' max: the full 🟡→🔴 lifecycle in one dataset.
