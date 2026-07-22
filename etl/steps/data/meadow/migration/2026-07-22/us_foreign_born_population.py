@@ -4,8 +4,9 @@ Two snapshots are used:
 - The Census Bureau's working paper "Historical Census Statistics on the Foreign-Born Population
   of the United States: 1850 to 2000" (a PDF), whose Table 1 gives the total and foreign-born
   population at each census.
-- American Community Survey 1-year estimates (table B05012), with the same two series annually
-  from 2005.
+- American Community Survey 1-year estimates (table B05002), with the same two series annually
+  from 2005. The snapshot stores the Census API's own variable codes, which are renamed to
+  readable column names here.
 """
 
 import re
@@ -17,6 +18,12 @@ from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 paths = PathFinder(__file__)
+
+# Census API variable codes of ACS table B05002, as stored in the snapshot.
+ACS_COLUMNS = {
+    "B05002_001E": "total_population",
+    "B05002_013E": "foreign_born_population",
+}
 
 
 def parse_census_table(snap: Snapshot) -> Table:
@@ -69,6 +76,7 @@ def run() -> None:
     #
     tb_census = parse_census_table(snap_census)
     tb_acs = snap_acs.read_csv()
+    tb_acs = tb_acs.rename(columns=ACS_COLUMNS)[["year", *ACS_COLUMNS.values()]].astype(int)
 
     tables = [
         tb_census.format(["year"], short_name="census"),

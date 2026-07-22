@@ -25,6 +25,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: 1f1c3ddffcb875df35f4b51c3b8390f6
-    size: 502
+  - md5: 4fa9e555f62fe340b1006ec64011ff83
+    size: 526
     path: us_foreign_born_population_american_community_survey.csv
