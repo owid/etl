@@ -3,6 +3,7 @@
 definitions:
   common:
     presentation:
+      attribution: US Census Bureau (2006, 2025)
       topic_tags:
         - Migration
   who_counts: |-
