@@ -108,8 +108,8 @@ REGIONS = {
     ],
     "Africa": ["Egypt", "Ethiopia", "Liberia", "Morocco", "South Africa", "Other Africa"],
     "Oceania": ["Australia", "New Zealand", "Other Oceania"],
-    "Other America": ["Other America"],
-    "Not specified": ["Not Specified"],
+    # "Other America" cannot be split between North and South America, so it goes to "Not specified".
+    "Not specified": ["Not Specified", "Other America"],
 }
 COUNTRY_TO_REGION = {country: region for region, countries in REGIONS.items() for country in countries}
 
@@ -171,19 +171,20 @@ def make_by_region(tb_origin: Table) -> Table:
     tb = tb.groupby(["country", "decade"], as_index=False, observed=True)["immigrants"].sum(min_count=1)
     tb = tb.dropna(subset=["immigrants"])
 
-    # Our region sums must reconcile exactly with DHS's own aggregate rows.
+    # Our region sums must reconcile exactly with DHS's own aggregate rows. "Other America"
+    # goes into our "Not specified" series, so it is subtracted from DHS's America total.
     dhs = tb_origin.set_index(["country", "decade"])["immigrants"]
     ours = tb.set_index(["country", "decade"])["immigrants"]
-    for region, dhs_regions in [
-        (["Europe"], ["Europe"]),
-        (["Asia"], ["Asia"]),
-        (["Africa"], ["Africa"]),
-        (["Oceania"], ["Oceania"]),
-        (["North America", "South America", "Other America"], ["America"]),
-    ]:
-        ours_sum = sum(ours.get(r, 0) for r in [(r, d) for r in region for d in range(1820, 2020, 10)])
-        dhs_sum = sum(dhs.get((r, d), 0) or 0 for r in dhs_regions for d in range(1820, 2020, 10))
-        assert abs(ours_sum - dhs_sum) < 1, f"Region {region} does not match DHS's {dhs_regions}."
+    checks = {
+        ("Europe",): dhs.loc["Europe"].sum(),
+        ("Asia",): dhs.loc["Asia"].sum(),
+        ("Africa",): dhs.loc["Africa"].sum(),
+        ("Oceania",): dhs.loc["Oceania"].sum(),
+        ("North America", "South America"): dhs.loc["America"].sum() - dhs.loc["Other America"].sum(),
+    }
+    for regions, dhs_sum in checks.items():
+        ours_sum = sum(ours.loc[r].sum() for r in regions)
+        assert abs(ours_sum - dhs_sum) < 1, f"Regions {regions} do not match the source's aggregates."
 
     total = dhs.loc["Total"].sum()
     assert abs(tb["immigrants"].sum() - total) < 1, "Region sums (incl. placeholders) do not add up to the total."
