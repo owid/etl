@@ -63,7 +63,7 @@ tables:
           timeInterval: decade
         presentation:
           grapher_config:
-            note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in. This data does not include unauthorized immigration as it happens, but people who later gain legal status appear in the year they are granted residence.
+            note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in. This data does not include unauthorized immigration as it happens, but people who later gain legal status appear in the decade they are granted residence.
 
   by_region_of_origin:
     variables:
@@ -80,4 +80,4 @@ tables:
           timeInterval: decade
         presentation:
           grapher_config:
-            note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in. This data does not include unauthorized immigration as it happens, but people who later gain legal status appear in the year they are granted residence.
+            note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in. This data does not include unauthorized immigration as it happens, but people who later gain legal status appear in the decade they are granted residence.
