@@ -234,7 +234,8 @@ def _render_edit_controls(
 ) -> None:
     """In-place tracked-changes editing: the displayed text becomes editable, with a
     live diff preview; saving files onto the field's consolidated proposal."""
-    editing_key = _key(field, "editing", key_ns)
+    sid = str(existing.id) if existing is not None else "new"
+    editing_key = _key(field, f"editing_{sid}", key_ns)
     current = str(field.current_value) if field.current_value is not None else ""
 
     if st.session_state.get(editing_key):
@@ -250,10 +251,10 @@ def _render_edit_controls(
         result = tracked_editor(
             original=current,
             initial=initial,
-            key=_key(field, "editor", key_ns),
+            key=_key(field, f"editor_{sid}", key_ns),
             bullet_list=field.field_path in DESCRIPTION_KEY_FIELDS,
         )
-        handled_key = _key(field, "nonce", key_ns)
+        handled_key = _key(field, f"nonce_{sid}", key_ns)
         if result and result.get("nonce") != st.session_state.get(handled_key):
             st.session_state[handled_key] = result.get("nonce")
             if result.get("action") == "save":
@@ -292,15 +293,15 @@ def _render_edit_controls(
     label = "✏️ Refine proposed text" if existing is not None else "✏️ Suggest an edit"
     col_edit, col_comment = st.columns([1, 1])
     with col_edit:
-        if st.button(label, key=_key(field, "editbtn", key_ns)):
+        if st.button(label, key=_key(field, f"editbtn_{sid}", key_ns)):
             st.session_state[editing_key] = True
             st.rerun()
     if existing is None:
         with col_comment, st.popover("💬 Comment only"):
-            with st.form(key=_key(field, "cform", key_ns), clear_on_submit=True, border=False):
+            with st.form(key=_key(field, f"cform_{sid}", key_ns), clear_on_submit=True, border=False):
                 comment = st.text_area(
                     "Comment",
-                    key=_key(field, "comment", key_ns),
+                    key=_key(field, f"comment_{sid}", key_ns),
                     height=80,
                     label_visibility="collapsed",
                     placeholder="A remark without proposing text...",
