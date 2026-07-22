@@ -1,0 +1,43 @@
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+  who_counts: |-
+    The foreign-born population covers everyone living in the United States who was born in another country, whatever their legal status. It is a snapshot of the people present at a given time, not a count of arrivals.
+  sources: |-
+    The data comes from the decennial census up to 2000, and from the annual American Community Survey from 2005 onward. There is no value for 2020, because the Census Bureau did not release standard survey estimates for that year due to data-collection problems during the COVID-19 pandemic.
+  first_census: |-
+    The series starts in 1850, the first census that asked where people were born.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  us_foreign_born_population:
+    variables:
+      foreign_born_population:
+        title: Foreign-born population of the United States
+        unit: people
+        short_unit: ""
+        description_key:
+          - "{definitions.who_counts}"
+          - "{definitions.sources}"
+          - "{definitions.first_census}"
+        display:
+          numDecimalPlaces: 0
+      share_foreign_born:
+        title: Share of the United States population born in another country
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - "{definitions.who_counts}"
+          - "{definitions.sources}"
+          - "{definitions.first_census}"
+        description_processing: |-
+          We calculated this indicator by dividing the foreign-born population by the total population reported by the same census or survey.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
