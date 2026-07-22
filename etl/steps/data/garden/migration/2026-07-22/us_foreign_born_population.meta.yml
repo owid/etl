@@ -21,6 +21,8 @@ definitions:
 
 dataset:
   update_period_days: 365
+  owners:
+    - Edouard Mathieu
 
 tables:
   us_foreign_born_population:
