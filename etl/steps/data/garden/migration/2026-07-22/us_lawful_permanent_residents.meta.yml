@@ -14,7 +14,7 @@ definitions:
     - **1820–1867:** The figures count every foreign national who arrived by ship at a US seaport, including temporary visitors and people passing through, because no distinction was yet made between immigrants and other travelers.
     - **1868–1891:** The figures count only foreign nationals who arrived intending to settle, because the government now separated genuine immigrants from temporary visitors and stopped counting the visitors.
     - **1892 onward:** The figures count only foreign nationals formally inspected and admitted for permanent residence, so people who arrived but were turned away at inspection are no longer included, and the count reflects a legal admission rather than a simple arrival.
-    - Immigrants entering overland from Canada and Mexico were not fully counted **before 1908**.
+    - Immigrants entering overland from Canada and Mexico were not fully counted **until 1908**.
 
 dataset:
   update_period_days: 365
