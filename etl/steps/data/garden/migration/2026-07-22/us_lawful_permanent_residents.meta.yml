@@ -65,7 +65,6 @@ tables:
         description_key:
           - "{definitions.what_this_counts}"
           - "{definitions.counting_changes}"
-          - We only show data for Canada and Mexico from the 1910s onward, because of the incomplete counting of overland arrivals before 1908.
           - Country borders have changed over this period, so a country's figures may not always refer to the same area. The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden. Russia refers to the Russian Empire until 1920, the Soviet Union until 1990, and a group of post-Soviet countries in the 1990s. Czechoslovakia includes Czechia and Slovakia, Yugoslavia includes its successor countries, Korea includes both North and South Korea, and Canada includes Newfoundland, which was a separate territory until it joined Canada in 1949.
           - "{definitions.fiscal_years}"
         display:
