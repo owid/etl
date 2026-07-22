@@ -442,9 +442,10 @@ def test_apply_bullet_edits_additions_need_full_rewrite_match():
     assert out == ("- OTHER dimension bullet\n- Shared note, reworded", 1, 3)
 
 
-def test_threads_do_not_bullet_borrow_across_sibling_views():
-    """Views of the SAME MDim (e.g. before vs after tax) must not borrow bullet-list
-    threads from each other — only exact-text/pattern sharing applies there."""
+def test_threads_bullet_borrow_across_sibling_views_only_for_shared_bullets():
+    """Across views of one MDim (e.g. before vs after tax), a bullet-list thread
+    carries only when it edits bullets shared VERBATIM by both lists; edits to
+    dimension-specific bullets stay on their own views."""
     from apps.metadata_review.resolution import suggestions_by_source_key, threads_for_field
     from apps.metadata_review.targets import MdimReview, ViewReview
 
@@ -474,9 +475,9 @@ def test_threads_do_not_bullet_borrow_across_sibling_views():
                 ],
             )
         )
-    # A thread on the after-tax indicator edits the shared bullet (so bullet-transfer
-    # WOULD match) — it must still not surface on the before-tax view.
-    suggestion = gm.MetadataReviewSuggestion(
+    # A thread on the after-tax indicator editing the SHARED bullet carries to the
+    # before-tax view (the edit genuinely applies there).
+    shared_edit = gm.MetadataReviewSuggestion(
         targetType="indicator",
         targetPath="grapher/wid/latest/inc/t#share__after_tax",
         fieldPath="description_key",
@@ -486,13 +487,25 @@ def test_threads_do_not_bullet_borrow_across_sibling_views():
         suggestedValue="- Shared generic bullet, reworded\n- Income is measured after taxes.",
         filedFromViewId="welfare_type=after_tax",
     )
-    suggestion.id = 7
-    grouped = suggestions_by_source_key([suggestion])
+    shared_edit.id = 7
+    # A thread editing only the DIMENSION-SPECIFIC bullet stays on its own views.
+    variant_edit = gm.MetadataReviewSuggestion(
+        targetType="indicator",
+        targetPath="grapher/wid/latest/inc/t#share__after_tax",
+        fieldPath="description_key",
+        provenance="inherited",
+        createdBy=1,
+        currentValue=lists["after_tax"],
+        suggestedValue="- Shared generic bullet\n- Income is measured after taxes, reworded.",
+        filedFromViewId="welfare_type=after_tax",
+    )
+    variant_edit.id = 8
+    grouped = suggestions_by_source_key([shared_edit, variant_edit])
     before_field = review.views[0].fields[0]
-    assert threads_for_field(review, before_field, grouped) == []
-    # Its own view still shows it.
+    assert [s.id for s in threads_for_field(review, before_field, grouped)] == [7]
+    # Its own view shows both.
     after_field = review.views[1].fields[0]
-    assert [s.id for s in threads_for_field(review, after_field, grouped)] == [7]
+    assert [s.id for s in threads_for_field(review, after_field, grouped)] == [7, 8]
 
 
 def test_bullet_diff_no_changes():

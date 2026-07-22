@@ -18,6 +18,7 @@ Inheritance rules ported from the faust-metadata-audit skill
 
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 from urllib.parse import quote, urlencode
 
@@ -611,23 +612,18 @@ def threads_for_field(
         for suggestion in suggestions_by_key.get(key, []):
             seen[suggestion.id] = suggestion
 
-    # Cross-page sharing: threads keyed to indicators NOT used by this page (e.g.
-    # filed on another MDim built from the same garden metadata) still belong here
-    # when they target the equivalent field and either their text snapshot matches
-    # ours, or — for bullet lists — the bullets they edit exist in our list too
-    # (lists share individual bullets via YAML anchors while differing as a whole).
-    # NOTE: indicators backing OTHER VIEWS of this same page are excluded — sibling
-    # views (e.g. before vs after tax) are governed by the exact-text/pattern rules
-    # above; bullet-matching across them would mix dimension-specific content.
+    # Cross-source sharing: threads keyed to OTHER indicators (sibling views of this
+    # MDim, or pages built from the same garden metadata) still belong here when they
+    # target the equivalent field and either their text snapshot matches ours, or —
+    # for bullet lists — the bullets they edit exist verbatim in our list too (lists
+    # share individual bullets via YAML anchors while differing as a whole; edits to
+    # variant-specific bullets don't match and stay on their own views).
     if field.current_value is not None:
         value = _norm(field.current_value)
-        own_page_indicators = set(review.indicator_paths) if review is not None else set()
         indicator_field = VIEW_TO_INDICATOR_FIELD.get(field.field_path, field.field_path)
         is_bullets = indicator_field == "description_key"
         for key, threads in suggestions_by_key.items():
             if key in keys or key[0] != "indicator" or key[3] != indicator_field:
-                continue
-            if key[1] in own_page_indicators:
                 continue
             for suggestion in threads:
                 if _norm(suggestion.currentValue) == value or (
@@ -637,7 +633,7 @@ def threads_for_field(
                     is not None
                 ):
                     seen.setdefault(suggestion.id, suggestion)
-    return sorted(seen.values(), key=lambda s: s.createdAt)
+    return sorted(seen.values(), key=lambda s: s.createdAt or datetime.min)
 
 
 @dataclass
