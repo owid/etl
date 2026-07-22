@@ -92,6 +92,11 @@ def pins(cfg):
         v = cfg
         for k in path.split("."):
             v = (v or {}).get(k) if isinstance(v, dict) else None
+        if isinstance(v, str) and v not in ("earliest", "latest"):
+            try:
+                v = float(v)  # quoted numeric pins ('maxTime: "2023"') count too
+            except ValueError:
+                continue
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             yield path, v
 
