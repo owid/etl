@@ -303,8 +303,8 @@ def run() -> None:
     # run once so indicator catalog paths are fully expanded.
     #
     pkg = build_download_package_for_collection(c, dest_dir=paths.dest_dir / "download_package")
-    upload_to_r2(pkg.zip_path, f"owid-private/mdim-downloads/{paths.short_name}/{paths.short_name}.zip")
-    c.download_package = pkg.to_config(url=f"/mdim-download-prototype/{paths.short_name}.zip")
+    url = upload_to_r2(pkg.zip_path, f"owid-public/data/mdim-downloads/{paths.short_name}/{paths.short_name}.zip")
+    c.download_package = pkg.to_config(url=url)
     c.upsert_to_db(OWID_ENV)
 
 

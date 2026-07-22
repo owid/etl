@@ -299,15 +299,26 @@ def build_download_package_for_collection(
     )
 
 
+# Buckets with a known public HTTPS domain -- mirrors the pattern already used
+# for owid_co2.py / owid_energy.py / income_distribution.py etc. (S3_BUCKET_NAME
+# = "owid-public", served at owid-public.owid.io). Add more here if this ever
+# moves to a different bucket.
+PUBLIC_BUCKET_DOMAINS = {
+    "owid-public": "https://owid-public.owid.io",
+}
+
+
 def upload_to_r2(zip_path: Path, s3_key: str, public: bool = True) -> str:
     """Upload the built zip to R2. `s3_key` is bucket/path, e.g.
-    "owid-private/mdim-downloads/years_of_schooling/years_of_schooling.zip".
+    "owid-public/data/mdim-downloads/years_of_schooling/years_of_schooling.zip".
 
-    Returns the s3:// URI, not a public https URL -- whether `owid-private`
-    (or whatever bucket this ends up living in) exposes a public download
-    domain is a separate, undecided question (see mdim-downloads status.md).
-    `public=True` only sets the object's ACL to public-read; it doesn't by
-    itself make the bucket reachable over plain HTTPS."""
-    s3_url = f"s3://{s3_key}"
-    s3_utils.upload(s3_url, zip_path, public=public, downloadable=True)
-    return s3_url
+    Returns a public https URL if the bucket is in PUBLIC_BUCKET_DOMAINS,
+    otherwise the s3:// URI (which needs credentials to fetch -- not usable
+    as a browser download link). `public=True` only sets the object's ACL to
+    public-read; the https URL is only reachable if the bucket also has a
+    known public domain, which is what PUBLIC_BUCKET_DOMAINS records."""
+    bucket, key = s3_key.split("/", 1)
+    s3_utils.upload(f"s3://{s3_key}", zip_path, public=public, downloadable=True)
+    if bucket in PUBLIC_BUCKET_DOMAINS:
+        return f"{PUBLIC_BUCKET_DOMAINS[bucket]}/{key}"
+    return f"s3://{s3_key}"
