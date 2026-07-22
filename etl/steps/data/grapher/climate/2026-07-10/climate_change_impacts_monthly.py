@@ -22,7 +22,7 @@ def run() -> None:
     tb = tb.rename(columns={"location": "country"}, errors="raise")
 
     # Adapt table with dates to grapher requirements.
-    tb = adapt_table_with_dates_to_grapher(tb)
+    tb = adapt_table_with_dates_to_grapher(tb, time_interval="month")
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format(["country", "year"])
