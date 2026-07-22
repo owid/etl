@@ -14,7 +14,7 @@ definitions:
     - **2005 onward:** the American Community Survey, an annual survey of about 3.5 million households. Survey estimates are less exact than a census count.
   caveats: |-
     Two things changed over the course of the series:
-    - The country's borders: Alaska and Hawaii are included from 1960 onward. The 1890 figures exclude about 325,000 people living in the Indian Territory and on Indian reservations, who were not asked about their place of birth.
+    - The population included: Alaska and Hawaii are included from 1960 onward. The 1890 figures exclude about 325,000 people living in the Indian Territory and on Indian reservations, who were not asked about their place of birth.
     - The list of US territories: people born in a territory count as native-born, so when a territory's status changed, so did their classification. For example, people born in the Philippines counted as native-born until it became independent in 1946, and as foreign-born after.
   undercount: |-
     People living in the country without authorization are included in the definition, but censuses and surveys are known to miss part of this group, so the true foreign-born population is likely somewhat higher.
