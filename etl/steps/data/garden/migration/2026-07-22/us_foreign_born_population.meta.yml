@@ -11,7 +11,7 @@ definitions:
   sources: |-
     The data comes from two sources with the same definition of foreign-born:
     - **1850–2000:** the decennial census. Figures up to 1940 come from a full count of the population; figures from 1950 to 2000 are based on large census samples (between 1 in 4 and 1 in 6 people).
-    - **2005 onward:** the American Community Survey, an annual survey of about 3.5 million households. Unlike the census, these are estimates for the whole year rather than a count on a single day, and they carry some sampling error. There is no value for 2020, because the Census Bureau did not release estimates for that year due to data-collection problems during the COVID-19 pandemic.
+    - **2005 onward:** the American Community Survey, an annual survey of about 3.5 million households. Survey estimates are less exact than a census count.
   caveats: |-
     Two things changed over the course of the series:
     - The country's borders: Alaska and Hawaii are included from 1960 onward. The 1890 figures exclude about 325,000 people living in the Indian Territory and on Indian reservations, who were not asked about their place of birth.
