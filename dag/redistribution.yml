@@ -105,3 +105,11 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/cow/2024-07-26/national_material_capabilities:
     - data://garden/cow/2024-07-26/national_material_capabilities
+  data://grapher/harvard/2026-07-22/global_military_spending_dataset:
+    - data://garden/harvard/2026-07-22/global_military_spending_dataset:
+      - data://garden/demography/2024-07-15/population
+      - data://garden/cow/2024-07-26/national_material_capabilities
+      - data://garden/countries/2024-08-27/gleditsch
+      - data://meadow/harvard/2026-07-22/global_military_spending_dataset:
+        - snapshot://harvard/2026-07-22/global_military_spending_dataset.rds
+        - snapshot://harvard/2026-07-22/global_military_spending_dataset_burden.rds
