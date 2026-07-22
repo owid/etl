@@ -18,8 +18,6 @@ definitions:
     - The list of US territories: people born in a territory count as native-born, so when a territory's status changed, so did their classification. For example, people born in the Philippines counted as native-born until it became independent in 1946, and as foreign-born after.
   undercount: |-
     People living in the country without authorization are included in the definition, but censuses and surveys are known to miss part of this group, so the true foreign-born population is likely somewhat higher.
-  first_census: |-
-    The series starts in 1850, the first census that asked where people were born.
 
 dataset:
   update_period_days: 365
@@ -36,7 +34,6 @@ tables:
           - "{definitions.sources}"
           - "{definitions.caveats}"
           - "{definitions.undercount}"
-          - "{definitions.first_census}"
         display:
           numDecimalPlaces: 0
       share_foreign_born:
@@ -48,7 +45,6 @@ tables:
           - "{definitions.sources}"
           - "{definitions.caveats}"
           - "{definitions.undercount}"
-          - "{definitions.first_census}"
         description_processing: |-
           We calculated this indicator by dividing the foreign-born population by the total resident population reported by the same census or survey. Using the same source for both numbers means the share is internally consistent: any undercount affects both the numerator and the denominator.
         processing_level: major
