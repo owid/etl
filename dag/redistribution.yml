@@ -99,12 +99,6 @@ steps:
         - snapshot://harvard/2026-07-22/global_military_spending_dataset_burden.rds
 
   # Correlates of War - National Material Capabilities
-  data://garden/cow/2024-07-26/national_material_capabilities:
-    - data://meadow/cow/2024-07-26/national_material_capabilities:
-      - snapshot://cow/2024-07-26/national_material_capabilities.csv
-    - data://garden/countries/2023-09-29/cow_ssm
-  data://grapher/cow/2024-07-26/national_material_capabilities:
-    - data://garden/cow/2024-07-26/national_material_capabilities
   data://grapher/cow/2026-07-22/national_material_capabilities:
     - data://garden/cow/2026-07-22/national_material_capabilities:
       - data://garden/countries/2023-09-29/cow_ssm
