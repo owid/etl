@@ -47,6 +47,7 @@ tables:
         title: People obtaining legal permanent resident status in the United States, by country of origin
         description_key:
           - "{definitions.counting_changes}"
+          - "{definitions.status_grants}"
           - |-
             Country borders have changed over this period, so a country's figures may not always refer to the same area.
             - The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden.
@@ -64,6 +65,7 @@ tables:
         title: People obtaining legal permanent resident status in the United States, by region of origin
         description_key:
           - "{definitions.counting_changes}"
+          - "{definitions.status_grants}"
           - '"Not specified" covers people whose origin was not recorded, and a small number of people from the Americas whom the source does not assign to a specific country.'
         description_processing: |-
           We calculated these regional totals from the source's country-level data, grouping countries into regions as defined by Our World in Data. They can differ from the source's own regional totals: for example, we count Caribbean and Central American countries as part of North America.
