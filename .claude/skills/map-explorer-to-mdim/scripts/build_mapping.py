@@ -33,7 +33,24 @@ import csv
 import importlib.util
 import json
 from collections import defaultdict
+from dataclasses import dataclass
 from pathlib import Path
+
+
+@dataclass
+class ViewMapping:
+    """One explorer view and where it maps to."""
+
+    eid: str  # explorer view id, "1".."N"
+    dims: dict  # {explorer dimension name: display value}
+    mdim: str  # target MDIM short name
+    view_id: str  # target MDIM view id ("A2", ...); "" when unresolved
+    target: dict  # {mdim dim slug: choice slug}; partial when unresolved
+    csv_row: dict  # the wide mapping_proposal.csv row
+
+    @property
+    def resolved(self) -> bool:
+        return bool(self.view_id)
 
 
 def load_rules(out: Path):
@@ -55,9 +72,7 @@ def read_csv(path: Path):
         return header, list(r)
 
 
-def write_mapping_json(
-    out: Path, explorer_slug, explorer_dims, mdims_meta, catalog_path_of, ids_by_target, out_rows
-) -> Path:
+def write_mapping_json(out: Path, explorer_slug, explorer_dims, mdims_meta, ids_by_target, mappings) -> Path:
     """Write mapping.json — a redirect payload for an owid-grapher API to consume.
 
     Structure::
@@ -85,37 +100,35 @@ def write_mapping_json(
     dimension name→value), the target view is (MDIM catalogPath + dimension
     slug→choice-slug, plus our internal ``viewId`` for cross-referencing the CSVs).
     """
+    catalog_path_of = {m["short"]: m["catalogPath"] for m in mdims_meta}
     redirects = []
-    resolved = 0
-    for row, mdim, view_id, dims, target in out_rows:
+    for m in mappings:
         record = {
-            "sourceViewId": int(row["id"]),
-            "source": {"explorerSlug": explorer_slug, "dimensions": dims},
+            "sourceViewId": int(m.eid),
+            "source": {"explorerSlug": explorer_slug, "dimensions": m.dims},
         }
-        if view_id:
-            resolved += 1
+        if m.resolved:
             record["target"] = {
-                "mdim": mdim,
-                "catalogPath": catalog_path_of.get(mdim),
-                "viewId": view_id,
-                "dimensions": target,
+                "mdim": m.mdim,
+                "catalogPath": catalog_path_of.get(m.mdim),
+                "viewId": m.view_id,
+                "dimensions": m.target,
             }
-            sharers = ids_by_target[(mdim, view_id)]
+            sharers = ids_by_target[(m.mdim, m.view_id)]
             if len(sharers) > 1:
                 record["sharedTargetSourceIds"] = [int(s) for s in sharers]
         else:
             record["target"] = None
-            record["unresolvedReason"] = (
-                f"No view in MDIM '{mdim}' matches the translated dimensions {target}"
-            )
+            record["unresolvedReason"] = f"No view in MDIM '{m.mdim}' matches the translated dimensions {m.target}"
         redirects.append(record)
 
+    resolved = sum(1 for m in mappings if m.resolved)
     payload = {
         "explorer": {"slug": explorer_slug, "dimensions": explorer_dims},
         "targets": [
             {"mdim": m["short"], "catalogPath": m["catalogPath"], "dimensions": m["dimensions"]} for m in mdims_meta
         ],
-        "stats": {"total": len(out_rows), "resolved": resolved, "unresolved": len(out_rows) - resolved},
+        "stats": {"total": len(mappings), "resolved": resolved, "unresolved": len(mappings) - resolved},
         "redirects": redirects,
     }
     path = out / "mapping.json"
@@ -142,7 +155,6 @@ def main():
         )
     sources = json.loads(sources_path.read_text())
     explorer_slug = sources["explorer"]["slug"]
-    catalog_path_of = {m["short"]: m["catalogPath"] for m in sources["mdims"]}
 
     # Explorer views
     exp_header, exp_rows = read_csv(out / "explorer_views.csv")
@@ -179,7 +191,7 @@ def main():
         + ["shared_target_explorer_ids"]
     )
 
-    out_rows = []
+    mappings: list[ViewMapping] = []
     flags = []
     ids_by_target = defaultdict(list)  # (mdim, view_id) -> [explorer ids]
 
@@ -209,45 +221,38 @@ def main():
             ids_by_target[(mdim, view_id)].append(eid)
         else:
             flags.append(f"id={eid}: no {mdim} view for {target} (from {dims})")
-        out_rows.append((row, mdim, view_id, dims, target))
+        mappings.append(ViewMapping(eid=eid, dims=dims, mdim=mdim, view_id=view_id, target=target, csv_row=row))
 
     # shared_target_explorer_ids: fill when >1 explorer view shares a target MDIM view.
-    for row, mdim, view_id, _dims, _target in out_rows:
-        if view_id:
-            sharers = ids_by_target[(mdim, view_id)]
-            if len(sharers) > 1:
-                row["shared_target_explorer_ids"] = ",".join(sharers)
+    for m in mappings:
+        if m.resolved and len(ids_by_target[(m.mdim, m.view_id)]) > 1:
+            m.csv_row["shared_target_explorer_ids"] = ",".join(ids_by_target[(m.mdim, m.view_id)])
 
     path = out / "mapping_proposal.csv"
     with open(path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=header)
         w.writeheader()
-        w.writerows(r for r, _, _, _, _ in out_rows)
+        w.writerows(m.csv_row for m in mappings)
 
     # Redirect payload for the owid-grapher API — full source + target identifiers.
     json_path = write_mapping_json(
-        out,
-        explorer_slug,
-        sources["explorer"]["dimensions"],
-        sources["mdims"],
-        catalog_path_of,
-        ids_by_target,
-        out_rows,
+        out, explorer_slug, rules.EXPLORER_DIMENSIONS, sources["mdims"], ids_by_target, mappings
     )
 
     # Report
-    resolved = sum(1 for _, _, v, _, _ in out_rows if v)
+    resolved = sum(1 for m in mappings if m.resolved)
     print(f"-> {path}")
     print(f"-> {json_path}")
-    print(f"explorer views: {len(out_rows)}  |  resolved: {resolved}  |  unresolved: {len(out_rows) - resolved}")
-    per_mdim = defaultdict(lambda: [0, set()])
-    for _, mdim, v, _, _ in out_rows:
-        per_mdim[mdim][0] += 1
-        if v:
-            per_mdim[mdim][1].add(v)
-    for mdim, (n, vids) in per_mdim.items():
-        print(f"  {mdim}: {n} explorer views -> {len(vids)} distinct MDIM views")
-    shared = sum(1 for r, _, _, _, _ in out_rows if r["shared_target_explorer_ids"])
+    print(f"explorer views: {len(mappings)}  |  resolved: {resolved}  |  unresolved: {len(mappings) - resolved}")
+    n_views = defaultdict(int)
+    view_ids = defaultdict(set)
+    for m in mappings:
+        n_views[m.mdim] += 1
+        if m.resolved:
+            view_ids[m.mdim].add(m.view_id)
+    for mdim in n_views:
+        print(f"  {mdim}: {n_views[mdim]} explorer views -> {len(view_ids[mdim])} distinct MDIM views")
+    shared = sum(1 for m in mappings if m.csv_row["shared_target_explorer_ids"])
     print(f"rows pointing at a shared MDIM view: {shared}")
     if flags:
         print("\nFLAGS (unresolved):")
