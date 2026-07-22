@@ -1,3 +1,4 @@
 dataset:
+  update_period_days: 90
   owners:
     - Pablo Arriagada

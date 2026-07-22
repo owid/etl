@@ -1308,3 +1308,9 @@ steps:
     - data://garden/artificial_intelligence/2026-03-30/robotaxis:
       - data://meadow/artificial_intelligence/2026-03-30/robotaxis:
         - snapshot://artificial_intelligence/2026-03-30/robotaxis.csv
+  # archived; last active in 8ae3ab94ffa3 on 2026-07-20
+  data://grapher/us_census_bureau/2026-03-24/datacenter_construction:
+    - data://garden/us_census_bureau/2026-03-24/datacenter_construction:
+      - data://garden/bls/2026-03-24/us_ppi_construction
+      - data://meadow/us_census_bureau/2026-03-24/datacenter_construction:
+        - snapshot://us_census_bureau/2026-03-24/datacenter_construction.xlsx

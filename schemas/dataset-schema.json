@@ -612,30 +612,37 @@
                 },
                 "description_key": {
                   "title": "Indicator's key information",
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        ]
                       }
-                    ]
-                  },
-                  "description": "List of key pieces of information about the indicator.",
+                    }
+                  ],
+                  "description": "Key information about the indicator as free-form markdown text. A YAML list of bullet points is also accepted and converted to a markdown list on load.",
                   "requirement_level": "recommended (for curated indicators)",
                   "guidelines": [
                     [
-                      "Must be a list of one or more short paragraphs.",
+                      "Must be free-form markdown text with the key information about the indicator, or a list of bullet points.",
                       {
                         "type": "list",
                         "value": [
-                          "Each paragraph must start with a capital letter.",
-                          "Each paragraph must end with a period."
+                          "The text is rendered as markdown (paragraphs, links and lists are supported).",
+                          "A YAML list is authoring sugar for a markdown list; each bullet must start with a capital letter and end with a period."
                         ]
                       }
                     ],

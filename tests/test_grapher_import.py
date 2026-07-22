@@ -53,7 +53,6 @@ def test_calculate_checksum_metadata_invariant_to_empty_field_shapes():
 
     meta_with_empties = VariableMeta(
         origins=[Origin(title="T", producer="P")],
-        description_key=[],
         licenses=[],
         sort=[],
     )

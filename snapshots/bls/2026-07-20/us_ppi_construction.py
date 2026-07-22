@@ -24,8 +24,14 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # Load environment variables from .env file
 load_dotenv()
 KEY = os.getenv("US_BLS_API_KEY")
+# NOTE: BEA does not publish the series IDs it uses for its data-center composite deflator
+# ("BLS PPIs for industrial buildings and warehouses", SCB 2025 annual update). The IDs below follow
+# the standard BLS mapping for nonresidential building construction PPIs (WPU8011xx), and WPU801103
+# was verified against the previously ingested office-construction series.
 SERIES_IDS = [
-    "WPU801103",  # PPI Commodity data for new office construction
+    "WPU801101",  # PPI Commodity data for new warehouse building construction (NAICS 236221)
+    "WPU801103",  # PPI Commodity data for new office building construction (NAICS 236223)
+    "WPU801104",  # PPI Commodity data for new industrial building construction (NAICS 236211)
 ]
 
 
@@ -105,7 +111,3 @@ def main(upload: bool) -> None:
     df_to_file(df, file_path=snap.path)
 
     snap.dvc_add(upload=upload)
-
-
-if __name__ == "__main__":
-    main()
