@@ -10,6 +10,8 @@ definitions:
 
   description_key_methodology: This data is calculated by using nine different military expenditure data sources and combining them using a model. The model links the country-year data together and estimates a mean with a prediction interval for each observation. For more information about the methodology, see [the original article](https://journals.sagepub.com/doi/10.1177/00220027241232964).
 
+  description_key_estimates: These are model-based estimates — the mean across many underlying data sources — so they can differ from figures reported directly by any single source, such as SIPRI. Estimates of total military spending in particular tend to be somewhat higher than the headline figures those sources report.
+
   description_key_percentage_gdp: The military expenditure data is divided by gross domestic product (GDP) estimates obtained from a similar latent variable model, explained by the same authors in [a different article](https://journals.sagepub.com/doi/10.1177/00220027211054432).
 
   description_key_percentage_sdp_1: The military expenditure data is divided by surplus domestic product (SDP), defined as the difference between gross domestic product (GDP) and the economic resources that the population consumes to survive, such that for each state i in year t, SDP(it) = GDP(it) − ((365 ∗ τ) ∗ Population(it)). τ is the subsistence threshold
@@ -58,6 +60,7 @@ tables:
         description_short: "This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries."
         description_key:
           - "{definitions.description_key_methodology}"
+          - "{definitions.description_key_estimates}"
         description_from_producer: |-
           {definitions.description_from_producer_methodology}
         display:
@@ -72,6 +75,7 @@ tables:
         description_short: "This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries."
         description_key:
           - "{definitions.description_key_methodology}"
+          - "{definitions.description_key_estimates}"
         description_from_producer: |-
           {definitions.description_from_producer_methodology}
         processing_level: major
@@ -160,6 +164,7 @@ tables:
         description_short: "This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries."
         description_key:
           - "{definitions.description_key_methodology}"
+          - "{definitions.description_key_estimates}"
           - Military personnel are troops under the command of the national government, intended for use against foreign adversaries, and held ready for combat as of January 1 of the given year.
         processing_level: major
         description_processing: |-
