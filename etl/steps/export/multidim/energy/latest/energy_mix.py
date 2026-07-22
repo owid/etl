@@ -226,7 +226,10 @@ _DECOMPOSITION_STEM = {
     "solar_and_wind": "Solar and wind supply",
 }
 # Footnotes for specific "by source" decomposition views.
-_DECOMPOSITION_NOTES = {"renewables": "Traditional biomass is not included."}
+# Footnote for the total primary-energy views: the Statistical Review covers commercially-traded
+# energy, so traditional biomass is not part of the total. It gets its own biomass-inclusive chart.
+TRADITIONAL_BIOMASS_NOTE = "Traditional biomass is not included."
+_DECOMPOSITION_NOTES = {"renewables": TRADITIONAL_BIOMASS_NOTE, "total": TRADITIONAL_BIOMASS_NOTE}
 
 
 def _decomposition_title(source: str, base_metric: str) -> str:
@@ -753,4 +756,7 @@ def set_view_titles(c, dims_max: dict) -> None:
         config["title"] = _view_title(source, metric)
         config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric, dims_max.get((source, metric)))
+        # The total (all-source) views are the primary-energy total; flag that it excludes traditional biomass.
+        if source == "total":
+            config["note"] = TRADITIONAL_BIOMASS_NOTE
         v.config = config
