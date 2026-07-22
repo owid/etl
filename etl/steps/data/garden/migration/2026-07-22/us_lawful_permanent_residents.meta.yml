@@ -9,12 +9,8 @@ definitions:
     presentation:
       topic_tags:
         - Migration
-  what_this_counts: |-
-    This is a count of lawful permanent residents: people who have been granted the right to live in the United States permanently. It doesn't include unauthorized entries.
-  fiscal_years: |-
-    Values refer to US fiscal years rather than calendar years. Fiscal year 1976 covered 15 months, because the end date of fiscal years was moved from June to September that year.
   counting_changes: |-
-    The way immigrants were counted has changed over time.
+    The way immigrants were counted by the US government has changed over time.
     - **1820–1867:** The figures count every foreign national who arrived by ship at a US seaport, including temporary visitors and people passing through, because no distinction was yet made between immigrants and other travelers.
     - **1868–1891:** The figures count only foreign nationals who arrived intending to settle, because the government now separated genuine immigrants from temporary visitors and stopped counting the visitors.
     - **1892 onward:** The figures count only foreign nationals formally inspected and admitted for permanent residence, so people who arrived but were turned away at inspection are no longer included, and the count reflects a legal admission rather than a simple arrival.
@@ -27,26 +23,20 @@ tables:
   us_lawful_permanent_residents:
     variables:
       immigrants:
-        title: Number of people granted lawful permanent residence in the United States
-        description_short: |-
-          The number of people who were granted lawful permanent residence in the United States in each fiscal year.
+        title: Number of people immigrating legally to the United States
+        description_short: Excludes unauthorized immigration.
         description_key:
-          - "{definitions.what_this_counts}"
           - "{definitions.counting_changes}"
-          - "{definitions.fiscal_years}"
         display:
           name: New lawful permanent residents
         presentation:
-          title_public: Number of people granted lawful permanent residence in the United States
+          title_public: Number of people immigrating legally to the United States
       immigrants_per_1000:
-        title: Number of people granted lawful permanent residence in the United States, per 1,000 people
+        title: Number of people immigrating legally to the United States, per 1,000 people
         unit: per 1,000 people
-        description_short: |-
-          The number of people who were granted lawful permanent residence in the United States in each fiscal year, per 1,000 people living in the country.
+        description_short: Excludes unauthorized immigration.
         description_key:
-          - "{definitions.what_this_counts}"
           - "{definitions.counting_changes}"
-          - "{definitions.fiscal_years}"
         description_processing: |-
           We calculated this indicator by dividing the number of new lawful permanent residents by the population of the United States, using the [long-run population data](https://ourworldindata.org/population-sources) published by Our World in Data.
         processing_level: major
@@ -54,41 +44,37 @@ tables:
           name: New lawful permanent residents per 1,000 people
           numDecimalPlaces: 1
         presentation:
-          title_public: Number of people granted lawful permanent residence in the United States, per 1,000 people
+          title_public: Number of people immigrating legally to the United States, per 1,000 people
 
   by_country_of_origin:
     variables:
       immigrants:
-        title: Number of people granted lawful permanent residence in the United States, by country of origin
-        description_short: |-
-          The number of people who were granted lawful permanent residence in the United States in each decade, by the country they came from.
+        title: Number of people immigrating legally to the United States, by country of origin
+        description_short: Excludes unauthorized immigration.
         description_key:
-          - "{definitions.what_this_counts}"
           - "{definitions.counting_changes}"
           - |-
             Country borders have changed over this period, so a country's figures may not always refer to the same area.
             - The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden.
             - Russia refers to the Russian Empire until 1920, the Soviet Union until 1990, and a group of post-Soviet countries in the 1990s.
             - Czechoslovakia includes Czechia and Slovakia; Yugoslavia includes its successor countries; Korea includes both North and South Korea; Canada includes Newfoundland, which was a separate territory until it joined Canada in 1949.
-          - "{definitions.fiscal_years}"
         display:
           name: New lawful permanent residents
           timeInterval: decade
         presentation:
-          title_public: Number of people granted lawful permanent residence in the United States, by country of origin
+          title_public: Number of people immigrating legally to the United States, by country of origin
           title_variant: By country of origin, by decade
+          grapher_config:
+            note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
 
   by_region_of_origin:
     variables:
       immigrants:
-        title: Number of people granted lawful permanent residence in the United States, by region of origin
-        description_short: |-
-          The number of people who were granted lawful permanent residence in the United States in each decade, by the world region they came from.
+        title: Number of people immigrating legally to the United States, by region of origin
+        description_short: Excludes unauthorized immigration.
         description_key:
-          - "{definitions.what_this_counts}"
           - "{definitions.counting_changes}"
           - '"Not specified" covers people whose origin was not recorded, and a small number of people from the Americas whom the source does not assign to a specific country.'
-          - "{definitions.fiscal_years}"
         description_processing: |-
           We calculated these regional totals from the source's country-level data, grouping countries into regions as defined by Our World in Data. They can differ from the source's own regional totals: for example, we count Caribbean and Central American countries as part of North America.
         processing_level: major
@@ -96,5 +82,7 @@ tables:
           name: New lawful permanent residents
           timeInterval: decade
         presentation:
-          title_public: Number of people granted lawful permanent residence in the United States, by region of origin
+          title_public: Number of people immigrating legally to the United States, by region of origin
           title_variant: By region of origin, by decade
+          grapher_config:
+            note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
