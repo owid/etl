@@ -405,10 +405,20 @@ def stage_download_package_for_collection(
         if catalog_path in variable_ids
     ]
 
+    # Chart-level context the grapher-side build needs for metadata.json's
+    # `chart` block (mirroring the single-chart download's shape) -- only
+    # available here, so it rides along with the indicator index.
+    index = {
+        "title": collection.title.get("title"),
+        "titleVariant": collection.title.get("title_variant"),
+        "defaultSelection": collection.default_selection,
+        "indicators": indicators,
+    }
+
     csv_path = dest_dir / "wide.csv"
     wide.to_csv(csv_path, index=False)
     indicators_path = dest_dir / "indicators.json"
-    indicators_path.write_text(json.dumps(indicators, indent=2))
+    indicators_path.write_text(json.dumps(index, indent=2))
 
     csv_key = f"{s3_prefix}/wide.csv"
     indicators_key = f"{s3_prefix}/indicators.json"
