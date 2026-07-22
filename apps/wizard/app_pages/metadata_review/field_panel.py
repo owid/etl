@@ -162,9 +162,11 @@ def _render_thread(
         st.caption("Sign-in not detected — reply/status controls disabled.")
         return
 
-    if st.session_state.get(_key(field, "editing", key_ns)):
+    if st.session_state.get(_key(field, f"editing_{proposal.id}", key_ns)):
         # The editor must span the whole section, not sit inside a button column.
-        _render_edit_controls(field, user, existing=proposal, key_ns=key_ns)
+        _render_edit_controls(
+            field, user, existing=proposal, key_ns=key_ns, borrowed=borrowed, initial_override=initial_override
+        )
     else:
         # One slim controls row: reply (popover), status, refine.
         reply_col, status_col, edit_col = st.columns([1.1, 2.2, 1.7], vertical_alignment="center")
@@ -189,7 +191,9 @@ def _render_thread(
                 state.set_status(proposal.id, user.id, status)
                 st.rerun()
         with edit_col:
-            _render_edit_controls(field, user, existing=proposal, key_ns=key_ns)
+            _render_edit_controls(
+                field, user, existing=proposal, key_ns=key_ns, borrowed=borrowed, initial_override=initial_override
+            )
 
 
 def _render_resolved(
