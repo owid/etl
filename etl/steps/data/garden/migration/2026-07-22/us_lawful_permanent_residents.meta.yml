@@ -61,7 +61,6 @@ tables:
           The number of people who were granted lawful permanent residence in the United States in each decade, by the country they came from.
         description_key:
           - "{definitions.what_this_counts}"
-          - Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
           - "{definitions.counting_changes}"
           - Country borders have changed over this period, so a country's figures may not always refer to the same area. The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden. Russia refers to the Russian Empire until 1920, the Soviet Union until 1990, and a group of post-Soviet countries in the 1990s. Czechoslovakia includes Czechia and Slovakia, Yugoslavia includes its successor countries, Korea includes both North and South Korea, and Canada includes Newfoundland, which was a separate territory until it joined Canada in 1949.
           - Immigrants entering overland from Canada and Mexico were not fully counted before 1908. We therefore only show data for Canada and Mexico from the 1910s onward.
@@ -81,7 +80,6 @@ tables:
           The number of people who were granted lawful permanent residence in the United States in each decade, by the world region they came from.
         description_key:
           - "{definitions.what_this_counts}"
-          - Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
           - "{definitions.counting_changes}"
           - '"Not specified" covers people whose origin was not recorded, and a small number of people from the Americas whom the source does not assign to a specific country.'
           - "{definitions.fiscal_years}"
