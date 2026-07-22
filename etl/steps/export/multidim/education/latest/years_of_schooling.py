@@ -1,7 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.collection import combine_collections
-from etl.collection.download_package import build_download_package
+from etl.collection.download_package import build_download_package_for_collection, upload_to_r2
+from etl.config import OWID_ENV
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -290,24 +291,21 @@ def run() -> None:
         edit_indicator_displays(view)
 
     #
-    # PROTOTYPE (mdim-downloads project): build the "download complete
-    # dataset" package -- a wide CSV + manifest + README covering every
-    # dimension combination, zipped. Real deployment would upload the zip
-    # to R2 and use that URL; this prototype writes it to the step's own
-    # export dir and points at a local dev URL for demoing end-to-end.
-    #
-    pkg = build_download_package(
-        tables=[tb_undp, tb_opri, tb_gender_stats],
-        dest_dir=paths.dest_dir / "download_package",
-        title=config["title"]["title"],
-        slug=paths.short_name,
-    )
-    c.download_package = pkg.to_config(url=f"/mdim-download-prototype/{paths.short_name}.zip")
-
-    #
     # Save garden dataset.
     #
     c.save()
+
+    #
+    # PROTOTYPE (mdim-downloads project): build the "download complete
+    # dataset" package -- a wide CSV + manifest + README covering every
+    # dimension combination, zipped, uploaded to R2 -- then push the
+    # resulting config with a second upsert. Needs c.save() to have already
+    # run once so indicator catalog paths are fully expanded.
+    #
+    pkg = build_download_package_for_collection(c, dest_dir=paths.dest_dir / "download_package")
+    upload_to_r2(pkg.zip_path, f"owid-private/mdim-downloads/{paths.short_name}/{paths.short_name}.zip")
+    c.download_package = pkg.to_config(url=f"/mdim-download-prototype/{paths.short_name}.zip")
+    c.upsert_to_db(OWID_ENV)
 
 
 def adjust_dimensions_schooling(tb):

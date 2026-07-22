@@ -1,31 +1,62 @@
 """Build a "complete dataset" download package for a Collection (MDIM/Explorer).
 
 Prototype for the mdim-downloads project (see owid-projects/mdim-downloads).
-Given the source tables that feed a collection's views (each with country +
-year keys, and per-column `dimensions` metadata), this joins them into one
-wide table and writes a CSV + manifest.json + README, zipped together.
+Two ways to build the wide table this package is based on:
 
-Scope note: this assembles the wide table from the tables the calling script
-already has in memory, keyed on the per-column `dimensions` metadata those
-tables carry (the pattern `adjust_dimensions_schooling`-style steps already
-use). It does not yet re-resolve an arbitrary collection's indicators from
-catalog paths alone — see the "net-new" pieces in
-mdim-downloads/solution-space/etl-feasibility.md.
+- `build_download_package(tables=[...], ...)` — pass the tables a script
+  already has in memory, keyed on each column's own `dimensions` metadata
+  (the pattern `adjust_dimensions_schooling`-style steps use). Fast, but only
+  as good as whatever the script itself decorated its in-memory copies with.
+- `build_download_package_for_collection(collection, ...)` — generic: derives
+  the indicator list and their dimension values from the Collection's own
+  *views* (skipping grouped/comparison views via `View.is_grouped`, and
+  deduplicating by catalog path so an indicator reused across several views
+  is only included once), then loads each underlying table fresh from the
+  on-disk catalog. Doesn't require the calling script to hand-build anything,
+  and reads the pristine on-disk column metadata rather than whatever a
+  script may have overwritten in memory (avoiding at least one class of bugs
+  in the process -- see mdim-downloads/solution-space/etl-feasibility.md).
 """
 
 from __future__ import annotations
 
 import json
 import zipfile
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from owid.catalog import Table
+from owid.catalog import Dataset as CatalogDataset
+from owid.catalog import Table, s3_utils
 from owid.catalog import processing as pr
 from structlog import get_logger
 
+from etl.paths import DATA_DIR
+
+if TYPE_CHECKING:
+    from etl.collection.model.core import Collection
+
 log = get_logger()
+
+# Grapher tables are always keyed on country + one of these time columns --
+# annual data uses "year", daily data (e.g. covid) uses "date". Never both,
+# and (so far, empirically) never anything else.
+TIME_COLUMN_CANDIDATES = ("year", "date")
+
+
+class MixedTimeGranularityError(ValueError):
+    """Raised when a collection's indicators mix annual ("year") and daily
+    ("date") tables -- joining those needs a resampling decision this
+    prototype doesn't make for you. See mdim-downloads status.md."""
+
+
+def _time_column(tb: Table) -> str:
+    candidates = [c for c in TIME_COLUMN_CANDIDATES if c in tb.columns]
+    if len(candidates) != 1:
+        raise ValueError(f"Expected exactly one of {TIME_COLUMN_CANDIDATES} in columns, found {candidates}")
+    return candidates[0]
 
 
 @dataclass
@@ -57,23 +88,37 @@ def _wide_column_name(short_name: str, col_dimensions: dict) -> str:
     return f"{short_name}__{suffix}" if suffix else short_name
 
 
-def build_wide_table(tables: list[Table]) -> Table:
-    """Outer-join tables on country+year, renaming each value column from its own
-    `dimensions` metadata (e.g. {"metric_type": "average_years_schooling", "sex": "both"}
-    -> "average_years_schooling__level_all__sex_both")."""
+def _outer_join_on_key(tables: list[Table]) -> Table:
+    time_cols = {_time_column(tb) for tb in tables}
+    if len(time_cols) > 1:
+        raise MixedTimeGranularityError(
+            f"Tables use different time columns ({sorted(time_cols)}) -- can't outer-join "
+            "annual and daily data without a resampling decision."
+        )
+    key = ["country", time_cols.pop()]
     wide = None
     for tb in tables:
+        wide = tb if wide is None else pr.merge(wide, tb, on=key, how="outer")
+    assert wide is not None, "no tables to join"
+    return wide.sort_values(key).reset_index(drop=True)
+
+
+def build_wide_table(tables: list[Table]) -> Table:
+    """Outer-join tables on country + year/date, renaming each value column from its
+    own `dimensions` metadata (e.g. {"metric_type": "average_years_schooling", "sex":
+    "both"} -> "average_years_schooling__level_all__sex_both")."""
+    renamed = []
+    for tb in tables:
+        key_cols = ("country", _time_column(tb))
         rename = {}
         for col in tb.columns:
-            if col in ("country", "year"):
+            if col in key_cols:
                 continue
             dims = getattr(tb[col].metadata, "dimensions", None) or {}
             short = tb[col].metadata.original_short_name or col
             rename[col] = _wide_column_name(short, dims)
-        tb = tb.rename(columns=rename)
-        wide = tb if wide is None else pr.merge(wide, tb, on=["country", "year"], how="outer")
-    assert wide is not None, "build_wide_table requires at least one table"
-    return wide.sort_values(["country", "year"]).reset_index(drop=True)
+        renamed.append(tb.rename(columns=rename))
+    return _outer_join_on_key(renamed)
 
 
 def _dimension_keys(tables: list[Table]) -> set[str]:
@@ -85,7 +130,66 @@ def _dimension_keys(tables: list[Table]) -> set[str]:
     return keys
 
 
-def _render_readme(title: str, slug: str, value_columns: list[str]) -> str:
+def _iter_used_indicators(collection: Collection):
+    """Yield (catalog_path, view_dimensions) once per distinct indicator, in
+    first-seen order, skipping views created by group_views() -- those just
+    re-display already-included indicators under a synthetic comparison
+    dimension, they don't add new data."""
+    seen: set[str] = set()
+    for view in collection.views:
+        if view.is_grouped:
+            continue
+        for ind in view.indicators.y or []:
+            if ind.catalogPath in seen:
+                continue
+            seen.add(ind.catalogPath)
+            yield ind.catalogPath, view.dimensions
+
+
+def _split_catalog_path(catalog_path: str) -> tuple[str, str, str]:
+    """ "grapher/un/2025-05-07/undp_hdr/undp_hdr_sex#mys" -> (dataset_dir, table_name, column)."""
+    dataset_part, column = catalog_path.split("#")
+    *dataset_segments, table_name = dataset_part.split("/")
+    return "/".join(dataset_segments), table_name, column
+
+
+def build_wide_table_for_collection(collection: Collection) -> Table:
+    """Generic version of build_wide_table: resolves the indicator list and their
+    dimension values from the collection's own views, and loads each underlying
+    table fresh from the on-disk catalog (no dependency on any script's in-memory
+    tables)."""
+    by_table: dict[tuple[str, str], list[tuple[str, dict]]] = defaultdict(list)
+    for catalog_path, dims in _iter_used_indicators(collection):
+        dataset_dir, table_name, column = _split_catalog_path(catalog_path)
+        by_table[(dataset_dir, table_name)].append((column, dims))
+
+    dataset_cache: dict[str, CatalogDataset] = {}
+    renamed_tables = []
+    for (dataset_dir, table_name), cols in by_table.items():
+        if dataset_dir not in dataset_cache:
+            dataset_cache[dataset_dir] = CatalogDataset(DATA_DIR / dataset_dir)
+        tb = dataset_cache[dataset_dir][table_name].reset_index()
+
+        rename = {}
+        keep = ["country", _time_column(tb)]
+        for column, dims in cols:
+            if column not in tb.columns:
+                log.warning(
+                    "download_package.column_missing",
+                    dataset_dir=dataset_dir,
+                    table_name=table_name,
+                    column=column,
+                )
+                continue
+            short = tb[column].metadata.original_short_name or column
+            rename[column] = _wide_column_name(short, dims)
+            keep.append(column)
+        renamed_tables.append(tb[keep].rename(columns=rename))
+
+    return _outer_join_on_key(renamed_tables)
+
+
+def _render_readme(title: str, slug: str, value_columns: list[str], time_column: str) -> str:
     columns_list = "\n".join(f"- `{c}`" for c in value_columns)
     return f"""# {title} — complete dataset
 
@@ -95,14 +199,14 @@ per-view download you get from the chart itself.
 
 ## Files
 
-- `{slug}.csv` — one row per country/year, one column per indicator ×
-  dimension combination.
+- `{slug}.csv` — one row per country/{time_column}, one column per indicator
+  × dimension combination.
 - `manifest.json` — file list, indicator/row counts, generation date.
 - This README.
 
 ## Columns
 
-`country`, `year`, then:
+`country`, `{time_column}`, then:
 
 {columns_list}
 
@@ -111,16 +215,17 @@ see manifest.json for the full dimension list.
 """
 
 
-def build_download_package(
-    tables: list[Table],
+def _write_package_files(
+    wide: Table,
     dest_dir: Path,
     title: str,
     slug: str,
+    dimension_keys: set[str],
 ) -> DownloadPackageResult:
     dest_dir.mkdir(parents=True, exist_ok=True)
 
-    wide = build_wide_table(tables)
-    value_columns = [c for c in wide.columns if c not in ("country", "year")]
+    time_column = _time_column(wide)
+    value_columns = [c for c in wide.columns if c not in ("country", time_column)]
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     csv_name = f"{slug}.csv"
@@ -134,13 +239,13 @@ def build_download_package(
         "files": [csv_name, "manifest.json", "readme.md"],
         "fileCount": len(value_columns),
         "rowCount": len(wide),
-        "dimensions": sorted(_dimension_keys(tables)),
+        "dimensions": sorted(dimension_keys),
     }
     manifest_path = dest_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2))
 
     readme_path = dest_dir / "readme.md"
-    readme_path.write_text(_render_readme(title, slug, value_columns))
+    readme_path.write_text(_render_readme(title, slug, value_columns, time_column))
 
     zip_path = dest_dir / f"{slug}.zip"
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -162,3 +267,47 @@ def build_download_package(
         size_bytes=zip_path.stat().st_size,
         last_updated=now,
     )
+
+
+def build_download_package(
+    tables: list[Table],
+    dest_dir: Path,
+    title: str,
+    slug: str,
+) -> DownloadPackageResult:
+    """Build the package from tables the caller already has in memory."""
+    wide = build_wide_table(tables)
+    return _write_package_files(wide, dest_dir, title, slug, _dimension_keys(tables))
+
+
+def build_download_package_for_collection(
+    collection: Collection,
+    dest_dir: Path,
+    title: str | None = None,
+    slug: str | None = None,
+) -> DownloadPackageResult:
+    """Build the package generically from the collection's own views -- no
+    script-specific wiring needed beyond calling this once before c.save()."""
+    wide = build_wide_table_for_collection(collection)
+    dimension_keys = {d.slug for d in collection.dimensions}
+    return _write_package_files(
+        wide,
+        dest_dir,
+        title or collection.title["title"],
+        slug or collection.short_name,
+        dimension_keys,
+    )
+
+
+def upload_to_r2(zip_path: Path, s3_key: str, public: bool = True) -> str:
+    """Upload the built zip to R2. `s3_key` is bucket/path, e.g.
+    "owid-private/mdim-downloads/years_of_schooling/years_of_schooling.zip".
+
+    Returns the s3:// URI, not a public https URL -- whether `owid-private`
+    (or whatever bucket this ends up living in) exposes a public download
+    domain is a separate, undecided question (see mdim-downloads status.md).
+    `public=True` only sets the object's ACL to public-read; it doesn't by
+    itself make the bucket reachable over plain HTTPS."""
+    s3_url = f"s3://{s3_key}"
+    s3_utils.upload(s3_url, zip_path, public=public, downloadable=True)
+    return s3_url
