@@ -8,6 +8,7 @@ bullet-level diff, so only the changed bullets show.
 """
 
 import hashlib
+from datetime import datetime
 
 import streamlit as st
 
@@ -19,6 +20,8 @@ from apps.wizard.app_pages.metadata_review import state
 from apps.wizard.app_pages.metadata_review.tracked_editor import tracked_editor
 
 STATUS_ICONS = {"open": "💬", "implemented": "✅", "rejected": "🚫"}
+
+_EPOCH = datetime.min
 
 
 def _key(field: ReviewableField, suffix: str, ns: str = "main") -> str:
@@ -91,20 +94,17 @@ def render_field(
             st.markdown(f"> {field.current_value}")
 
         if open_suggestions:
-            for thread in open_suggestions:
-                borrowed = str(thread.currentValue or "").strip() != str(field.current_value or "").strip()
-                _render_thread(
-                    field,
-                    thread,
-                    comments_by_suggestion=comments_by_suggestion,
-                    users=users,
-                    user=user,
-                    fields_by_key=fields_by_key,
-                    key_ns=key_ns,
-                    borrowed=borrowed,
-                    applied_here=applied_by_thread.get(thread.id, False),
-                    initial_override=display_value if borrowed else None,
-                )
+            _render_discussion(
+                field,
+                open_suggestions,
+                comments_by_suggestion=comments_by_suggestion,
+                users=users,
+                user=user,
+                fields_by_key=fields_by_key,
+                key_ns=key_ns,
+                applied_by_thread=applied_by_thread,
+                display_value=display_value,
+            )
         elif user is not None:
             _render_edit_controls(field, user, existing=None, key_ns=key_ns)
 
@@ -112,44 +112,47 @@ def render_field(
             _render_resolved(suggestion, comments_by_suggestion.get(suggestion.id, []), users, user, key_ns=key_ns)
 
 
-def _render_thread(
+def _render_discussion(
     field: ReviewableField,
-    proposal: gm.MetadataReviewSuggestion,
+    threads: list[gm.MetadataReviewSuggestion],
     comments_by_suggestion: dict[int, list],
     users: dict[int, str],
     user: gm.User | None,
     fields_by_key: dict[tuple, ReviewableField],
     key_ns: str = "main",
-    borrowed: bool = False,
-    applied_here: bool = True,
-    initial_override: str | None = None,
+    applied_by_thread: dict[int, bool] | None = None,
+    display_value: str | None = None,
 ) -> None:
-    """The compact discussion strip under the field's (tracked) text.
+    """ONE discussion strip per field, covering all threads contributing to the
+    tracked text above: merged comments, one Reply, one status control (applies
+    to all contributing threads) and one Refine.
 
     The proposed text itself is NOT repeated here — the field's main text block
-    above already shows it as tracked changes.
+    already shows the combined tracked changes.
     """
-    staleness: Staleness = check_staleness(proposal, fields_by_key, display_field=field)
-    author = users.get(proposal.createdBy, f"user {proposal.createdBy}")
+    applied_by_thread = applied_by_thread or {}
+    # The field's own thread anchors refinement; the newest thread anchors replies
+    # when the field has no own thread.
+    own = [t for t in threads if str(t.currentValue or "").strip() == str(field.current_value or "").strip()]
+    anchor = max(own, key=lambda t: t.createdAt or _EPOCH) if own else max(threads, key=lambda t: t.createdAt or _EPOCH)
+    borrowed_anchor = not own
 
-    meta = f"✏️ Proposed by **{author}**, {proposal.createdAt:%Y-%m-%d}"
-    if proposal.filedFromPath and proposal.filedFromPath != field.target_path:
-        # Cross-page thread (e.g. filed on a sibling MDim sharing this metadata).
-        meta += f" — filed on `{proposal.filedFromPath}`"
-    if not applied_here and proposal.suggestedValue is not None:
-        meta += " — ⚠️ its edits don't apply to this view's text (shown where filed)"
+    authors = list(dict.fromkeys(users.get(t.createdBy, f"user {t.createdBy}") for t in threads))
+    started = min((t.createdAt for t in threads if t.createdAt), default=None)
+    meta = "✏️ Proposed by **" + "**, **".join(authors) + "**"
+    if started:
+        meta += f", {started:%Y-%m-%d}"
     st.caption(meta)
 
-    if staleness.target_gone:
-        st.warning("The view/indicator this proposal was filed on no longer exists on this page.")
-    elif staleness.field_changed:
-        with st.expander("Text when the proposal was filed", expanded=False):
-            st.markdown(f"> {proposal.currentValue or '_(not set)_'}")
-
-    if proposal.suggestedValue is None:
+    staleness: Staleness = check_staleness(anchor, fields_by_key, display_field=field)
+    if staleness.field_changed:
+        st.warning("The field's text changed since this proposal was filed — re-check the tracked changes.")
+    if any(not applied_by_thread.get(t.id, False) and t.suggestedValue is not None for t in threads):
+        st.caption("⚠️ Some proposed edits don't apply to this view's text — they show on the views they were made for.")
+    if all(t.suggestedValue is None for t in threads):
         st.caption("_Discussion only — no replacement text proposed yet._")
 
-    comments = sorted(comments_by_suggestion.get(proposal.id, []), key=lambda c: c.createdAt)
+    comments = sorted((c for t in threads for c in comments_by_suggestion.get(t.id, [])), key=lambda c: c.createdAt)
     for comment in comments:
         comment_author = users.get(comment.userId, f"user {comment.userId}")
         when = comment.createdAt.strftime("%Y-%m-%d %H:%M")
@@ -162,37 +165,56 @@ def _render_thread(
         st.caption("Sign-in not detected — reply/status controls disabled.")
         return
 
-    if st.session_state.get(_key(field, f"editing_{proposal.id}", key_ns)):
+    if st.session_state.get(_key(field, f"editing_{anchor.id}", key_ns)):
         # The editor must span the whole section, not sit inside a button column.
         _render_edit_controls(
-            field, user, existing=proposal, key_ns=key_ns, borrowed=borrowed, initial_override=initial_override
+            field,
+            user,
+            existing=anchor,
+            key_ns=key_ns,
+            borrowed=borrowed_anchor,
+            initial_override=display_value if borrowed_anchor else None,
         )
     else:
         # One slim controls row: reply (popover), status, refine.
         reply_col, status_col, edit_col = st.columns([1.1, 2.2, 1.7], vertical_alignment="center")
         with reply_col, st.popover("💬 Reply"):
-            reply_key = f"mrs_reply_{key_ns}_{proposal.id}"
+            reply_key = f"mrs_reply_{key_ns}_{anchor.id}"
             with st.form(key=f"{reply_key}_form", clear_on_submit=True, border=False):
                 reply = st.text_area(
                     "Reply", key=reply_key, height=80, label_visibility="collapsed", placeholder="Reply..."
                 )
                 if st.form_submit_button("Send") and reply.strip():
-                    state.add_comment(proposal.id, user.id, reply.strip())
+                    state.add_comment(anchor.id, user.id, reply.strip())
                     st.rerun()
         with status_col:
             status = st.segmented_control(
                 "Status",
                 options=["open", "implemented", "rejected"],
-                default=proposal.status,
-                key=f"mrs_status_{key_ns}_{proposal.id}",
+                default="open",
+                key=f"mrs_status_{key_ns}_{anchor.id}",
                 label_visibility="collapsed",
             )
-            if status and status != proposal.status:
-                state.set_status(proposal.id, user.id, status)
-                st.rerun()
+            if status and status != "open":
+                # Resolving applies to every thread whose edits are shown here.
+                errors = []
+                for thread in threads:
+                    try:
+                        state.set_status(thread.id, user.id, status)
+                    except ValueError as e:
+                        errors.append(str(e))
+                if errors:
+                    st.warning(errors[0])
+                else:
+                    st.rerun()
         with edit_col:
             _render_edit_controls(
-                field, user, existing=proposal, key_ns=key_ns, borrowed=borrowed, initial_override=initial_override
+                field,
+                user,
+                existing=anchor,
+                key_ns=key_ns,
+                borrowed=borrowed_anchor,
+                initial_override=display_value if borrowed_anchor else None,
             )
 
 
