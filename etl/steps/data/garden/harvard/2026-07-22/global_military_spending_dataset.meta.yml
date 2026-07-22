@@ -8,7 +8,7 @@ definitions:
     display: &common-display
       tolerance: 5
 
-  description_key_methodology: This data is calculated by using nine different military expenditure data sources and combining them using a model. The model links the country-year data together and estimates a mean with a prediction interval for each observation. For more information about the methodology, see [the original article](https://journals.sagepub.com/doi/10.1177/00220027241232964).
+  description_key_methodology: This data is calculated by using different military expenditure data sources and combining them using a model. The model links the country-year data together and estimates a mean with a prediction interval for each observation. For more information about the methodology, see [the original article](https://journals.sagepub.com/doi/10.1177/00220027241232964).
 
   description_key_estimates: These are model-based estimates — the mean across many underlying data sources — so they can differ from figures reported directly by any single source, such as SIPRI. Estimates of total military spending in particular tend to be somewhat higher than the headline figures those sources report.
 
