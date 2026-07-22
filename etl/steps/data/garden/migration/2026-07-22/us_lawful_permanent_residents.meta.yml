@@ -27,12 +27,10 @@ tables:
       immigrants:
         title: People obtaining legal permanent resident status in the United States
         description_key:
-          - "{definitions.counting_changes}"
           - "{definitions.status_grants}"
-        presentation:
-          title_public: People obtaining legal permanent resident status in the United States
+          - "{definitions.counting_changes}"
       immigrants_per_1000:
-        title: People obtaining legal permanent resident status in the United States, per 1,000 people
+        title: People obtaining legal permanent resident status in the United States, per 1,000 people in the population
         unit: per 1,000 people
         description_key:
           - "{definitions.counting_changes}"
@@ -42,8 +40,6 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 1
-        presentation:
-          title_public: People obtaining legal permanent resident status in the United States, per 1,000 people
 
   by_country_of_origin:
     variables:
@@ -59,8 +55,6 @@ tables:
         display:
           timeInterval: decade
         presentation:
-          title_public: People obtaining legal permanent resident status in the United States, by country of origin
-          title_variant: By country of origin, by decade
           grapher_config:
             note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
 
@@ -77,7 +71,5 @@ tables:
         display:
           timeInterval: decade
         presentation:
-          title_public: People obtaining legal permanent resident status in the United States, by region of origin
-          title_variant: By region of origin, by decade
           grapher_config:
             note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
