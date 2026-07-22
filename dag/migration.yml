@@ -102,8 +102,10 @@ steps:
   data://grapher/migration/2026-07-22/us_lawful_permanent_residents:
     - data://garden/migration/2026-07-22/us_lawful_permanent_residents
   data://meadow/migration/2026-07-22/us_foreign_born_population:
-    - snapshot://migration/2026-07-22/us_foreign_born_population_census.pdf
+    - snapshot://migration/2026-07-22/us_foreign_born_population_census.xls
+    - snapshot://migration/2026-07-22/us_foreign_born_population_census_by_country.xls
     - snapshot://migration/2026-07-22/us_foreign_born_population_american_community_survey.csv
+    - snapshot://migration/2026-07-22/us_foreign_born_population_by_country_american_community_survey.csv
   data://garden/migration/2026-07-22/us_foreign_born_population:
     - data://meadow/migration/2026-07-22/us_foreign_born_population
   data://grapher/migration/2026-07-22/us_foreign_born_population:
