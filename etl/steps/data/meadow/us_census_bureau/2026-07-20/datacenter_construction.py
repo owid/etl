@@ -16,7 +16,7 @@ def run() -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("datacenter_construction.xlsx")
 
-    # Load data from snapshot - read the "Private SA" sheet with header on row 4 (0-indexed as 3)
+    # Load data from snapshot - read the "Private NSA" sheet with header on row 4 (0-indexed as 3)
     tb = snap.read(sheet_name="Private NSA", header=3)
     #
     # Process data.

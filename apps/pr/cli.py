@@ -57,15 +57,15 @@ etl pr "some title for the PR" -t --worktree-path /tmp/etl-mybranch
 
 The new working directory is printed at the end (default: `../etl-BRANCH`); `cd` into it to start working there.
 
-**Custom use case (5)**: Share the original repo's `data/` directory with the new worktree, so ETL steps don't have to recompute population, regions, etc.
+**Custom use case (5)**: Share the original repo's `data/`, `workbench/`, and `ai/` directories with the new worktree, so ETL steps don't have to recompute population, regions, etc., and Claude Code skills (e.g. `update-dataset`) write their scratch artifacts straight into the main repo.
 
 ```shell
 etl pr "some title for the PR" -t --share-data
 ```
 
-This makes the new worktree's `data/` a shortcut (symlink) to the original repo's `data/`, so both worktrees share the same ETL outputs and you don't have to recompute them. Note that data/ is a symlink to the original repo's data/, so:
+This makes the new worktree's `data/`, `workbench/`, and `ai/` shortcuts (symlinks) to the original repo's, so both worktrees share the same outputs and you don't have to recompute or salvage them. Since the real content lives in the main repo, removing the worktree — by any method, including a plain `git worktree remove` — never touches it; only the symlink itself is deleted. Note:
 - If you run the same steps in both worktrees, they may overwrite each other's output.
-- DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree.
+- DO NOT use `rm -rf data/` / `rm -rf workbench/` / `rm -rf ai/` (with the trailing slash) — that follows the symlink and wipes the original folder along with the worktree's copy. Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree; both remove only the symlinks.
 
 After the command finishes, `uv sync` has already run inside the worktree, so its `.venv/` is ready to use. With a `chpwd` hook in your `~/.zshrc` that sources `.venv/bin/activate` whenever present, `cd ../etl-BRANCH` is all that's needed — activation is automatic. Without the hook, also run `source .venv/bin/activate` after the cd. Skipping activation silently routes `etl`/`etlr` to the original repo's source code.
 
@@ -190,7 +190,7 @@ MODEL_DEFAULT = "gpt-5-mini"
     "--share-data",
     "share_data",
     is_flag=True,
-    help="Symlink the new worktree's data/ to the original repo's data/ (only with --worktree). Avoids recomputing upstream ETL steps. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` in the worktree.",
+    help="Symlink the new worktree's data/, workbench/, and ai/ to the original repo's (only with --worktree). Avoids recomputing upstream ETL steps and losing workbench/ai scratch artifacts on worktree removal. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` (or workbench/ or ai/) in the worktree.",
 )
 @click.option(
     "--auto-assign",
@@ -268,7 +268,7 @@ def cli(
             resolved_worktree_path = resolve_worktree_path(work_branch, worktree_path)
             branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path)
             if share_data:
-                symlink_data_dir(resolved_worktree_path)
+                symlink_shared_dirs(resolved_worktree_path)
             # Subsequent git operations (commit, push) must run inside the worktree.
             repo = Repo(resolved_worktree_path)
         else:
@@ -437,19 +437,38 @@ def branch_out_worktree(repo, base_branch: str, work_branch: str, worktree_path:
         log.debug(f"No .env found at '{src_env}', skipping copy.")
 
 
-def symlink_data_dir(worktree_path: Path) -> None:
-    """Symlink the original repo's data dir into the worktree, so ETL steps reuse cached outputs."""
+# Gitignored dirs symlinked into the worktree by --share-data.
+SHARED_SCRATCH_DIRS = ("workbench", "ai")
+
+
+def symlink_shared_dirs(worktree_path: Path) -> None:
+    """Symlink data/, workbench/, and ai/ from the original repo into the new worktree.
+
+    data/ lets ETL steps reuse cached outputs instead of recomputing them. workbench/ and ai/ are
+    gitignored scratch dirs that Claude Code skills (e.g. update-dataset) write progress logs and
+    notes into — sharing them means that content lives in the main repo from the start, so removing
+    the worktree by any method never risks losing it (unlike relying on `pr-clean`'s post-hoc copy).
+    """
     src = BASE_DIR / "data"
     dst = worktree_path / "data"
     if not src.exists():
         log.warning(f"Cannot share data: '{src}' does not exist in the original repo.")
-        return
-    if dst.exists() or dst.is_symlink():
+    elif dst.exists() or dst.is_symlink():
         # `git worktree add` shouldn't have created a `data/` (it's gitignored), but be defensive.
         log.warning(f"'{dst}' already exists, skipping data symlink.")
-        return
-    os.symlink(src, dst)
-    log.info(f"Symlinked '{dst}' -> '{src}'.")
+    else:
+        os.symlink(src, dst)
+        log.info(f"Symlinked '{dst}' -> '{src}'.")
+
+    for name in SHARED_SCRATCH_DIRS:
+        src = BASE_DIR / name
+        dst = worktree_path / name
+        if dst.exists() or dst.is_symlink():
+            log.warning(f"'{dst}' already exists, skipping {name} symlink.")
+            continue
+        src.mkdir(parents=True, exist_ok=True)  # gitignored scratch dir; fine to create if missing
+        os.symlink(src, dst)
+        log.info(f"Symlinked '{dst}' -> '{src}'.")
 
 
 def install_worktree_venv(worktree_path: Path) -> bool:
@@ -512,12 +531,14 @@ def print_worktree_hint(
     print("sessions back into the main repo so they're still resumable from there.")
     if shared_data:
         print()
-        print("WARNING: data/ is a symlink to the original repo's data/, so:")
+        print("WARNING: data/, workbench/, and ai/ are symlinks to the original repo's, so:")
         print("  - If you run the same steps in both worktrees, they may overwrite each other's output.")
-        print("  - DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. ")
+        print("  - DO NOT use `rm -rf data/` (or workbench/ or ai/); this follows the symlink and wipes")
+        print("    the original folder along with the worktree's copy.")
         print(
-            "    Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree."
+            "    Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree —"
         )
+        print("    both remove only the symlinks, leaving the shared content untouched.")
 
 
 def create_pr(repo, work_branch, base_branch, pr_title, auto_assign: bool = False):
@@ -690,7 +711,10 @@ are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool wil
 2. (Worktree branches only) Copy the worktree's gitignored `workbench/` and `ai/` scratch dirs into
    `workbench/<branch>/` and `ai/<branch>/` in the main repo (suffixed `-1`, `-2`... on the rare name
    clash), so the working notes/outputs survive the worktree removal without overwriting anything.
-3. Remove the git worktree (skipped with a warning if it has uncommitted changes).
+   Skipped for a dir created by `--share-data` (it's a symlink to the main repo already — nothing to
+   salvage).
+3. Remove the git worktree (skipped with a warning if it has uncommitted changes). `--share-data`'s
+   symlinks are unlinked first so they don't themselves block the removal.
 4. Delete the local branch.
 
 Each branch is tagged `[merged]` or `[closed]` so you can see its PR outcome before selecting.
@@ -929,8 +953,23 @@ def clean_branch(
         # destroy it for good): the Claude sessions, plus the workbench/ and ai/ scratch dirs.
         # The session dir lives outside the worktree, but copy everything before removal on principle.
         copy_sessions(worktree_path, main_project_dir)
-        for name in ("workbench", "ai"):
-            copy_dir_namespaced(worktree_path / name, main_worktree_path / name, branch)
+        for name in SHARED_SCRATCH_DIRS:
+            src = worktree_path / name
+            if src.is_symlink():
+                # Created by --share-data: the real content already lives in the main repo, so
+                # there's nothing to salvage — copying would just duplicate it wholesale.
+                continue
+            copy_dir_namespaced(src, main_worktree_path / name, branch)
+
+        # `git worktree remove` refuses a worktree with untracked files, and --share-data's
+        # symlinks (data/, workbench/, ai/) count as untracked. Unlink them ourselves first — safe,
+        # since their real content lives in the main repo, untouched — so only genuine leftover
+        # uncommitted/untracked work still blocks the plain removal below.
+        for name in ("data", *SHARED_SCRATCH_DIRS):
+            link = worktree_path / name
+            if link.is_symlink():
+                link.unlink()
+
         try:
             repo.git.worktree("remove", str(worktree_path))
             log.info(f"Removed worktree '{worktree_path}'.")

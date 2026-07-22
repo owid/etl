@@ -82,6 +82,10 @@ def run() -> None:
 
     tb_garden = tb
 
+    # Correct known upstream errors (see wdi.corrections.yml) -- currently, World Bank-aggregate
+    # spikes/drops in a handful of trade-ratio indicators caused by severe 2025 coverage gaps.
+    tb_garden = paths.apply_corrections(tb_garden)
+
     log.info("wdi.add_variable_metadata")
     tb_garden = add_variable_metadata(tb_garden, tb_metadata)
 

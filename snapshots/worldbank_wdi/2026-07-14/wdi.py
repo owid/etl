@@ -50,6 +50,11 @@ It's easier to do it in two steps:
   (World, Sub-Saharan Africa (WB), etc. all have real values through 2024) - removed the garden step's
   dormant custom-aggregation workaround and the now-stale note about chart 755.
 - Check old WDI version and try to switch their charts to new indicators and archive them.
+- Revisit `wdi.corrections.yml`: 13 (indicator, entity) pairs had their 2025 World Bank-aggregate
+  value nulled out (ne_trd_gnfs_zs, bg_gsr_nfsv_gd_zs, bx_gsr_tran_zs, bx_gsr_ccis_zs, tx_val_tran_zs_wt)
+  because country coverage for 2025 collapsed 35-45% vs. the normal year-to-year lag (notably the US
+  and Japan missing), biasing these GDP/trade-weighted ratios. Once 2025 reporting has caught up (check
+  coverage counts in the raw WDICSV.csv), remove the corrections that no longer apply.
 
 """
 

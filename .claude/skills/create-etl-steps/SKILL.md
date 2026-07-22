@@ -148,6 +148,8 @@ definitions:
 
 dataset:
   update_period_days: 365
+  owners:
+    - <canonical OWID name of the user, from `git config user.name` via `etl.owners.resolve_owner`>
 
 
 tables:
@@ -187,7 +189,7 @@ tables:
       #     tableDisplay:
       #       hideAbsoluteChange:
       #       hideRelativeChange:
-      #     yearIsDay: false
+      #     timeInterval: day  # day | week | month | quarter | year | decade; omit for yearly data. Sub-yearly data is encoded as days-since-zeroDay integers.
       #     zeroDay:
       #     roundingMode:
       #     numSignificantFigures:

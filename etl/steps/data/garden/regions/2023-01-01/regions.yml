@@ -4539,3 +4539,280 @@
     - TKM
     - TUR
     - UZB
+
+##########
+# Food and Agriculture Organization (FAOSTAT)
+# https://www.fao.org/faostat/en/#definitions
+# FAO follows the UN M49 geographic classification with two nested levels: 5 continents (fao_1) and
+# 22 subregions (fao_2). Each region is defined by reference to the corresponding UN M49 region, plus
+# the entities FAOSTAT's areagroup metadata additionally lists: historical entities (USSR, Yugoslavia,
+# Czechoslovakia, Serbia and Montenegro, Sudan (former), Ethiopia (former), Netherlands Antilles, the
+# former Yemens), Taiwan and Palestine. Membership cross-checked against FAOSTAT's areagroup tables
+# (accessed 2026-02-25). FAO also reports the UN SDG regional grouping in its food-security domains;
+# those SDG regions are defined below as a third tier (defined_by fao_sdg).
+##########
+
+
+### Africa
+- code: FAO_AFR
+  name: "Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_1
+  members:
+    - FAO_NAF
+    - FAO_EAF
+    - FAO_MAF
+    - FAO_SAF
+    - FAO_WAF
+- code: FAO_NAF
+  name: "Northern Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_NAF
+    - OWID_SDN # Sudan (former)
+- code: FAO_EAF
+  name: "Eastern Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_EAF
+    - OWID_ERE # Ethiopia (former)
+- code: FAO_MAF
+  name: "Middle Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_MAF
+- code: FAO_SAF
+  name: "Southern Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_SAF
+- code: FAO_WAF
+  name: "Western Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_WAF
+
+### Americas
+- code: FAO_AME
+  name: "Americas (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_1
+  members:
+    - FAO_NAM
+    - FAO_CAM
+    - FAO_CAR
+    - FAO_SAM
+- code: FAO_NAM
+  name: "Northern America (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_NAM
+- code: FAO_CAM
+  name: "Central America (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_CAM
+- code: FAO_CAR
+  name: "Caribbean (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_CAR
+    - ANT # Netherlands Antilles
+- code: FAO_SAM
+  name: "South America (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_SAM
+
+### Asia
+- code: FAO_ASI
+  name: "Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_1
+  members:
+    - FAO_CAS
+    - FAO_EAS
+    - FAO_SEA
+    - FAO_SAS
+    - FAO_WAS
+- code: FAO_CAS
+  name: "Central Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_CAS
+- code: FAO_EAS
+  name: "Eastern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_EAS
+    - TWN # Taiwan
+- code: FAO_SEA
+  name: "South-eastern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_SEA
+- code: FAO_SAS
+  name: "Southern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_SAS
+- code: FAO_WAS
+  name: "Western Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_WAS
+    - PSE # Palestine
+    - OWID_YAR # Yemen Arab Republic (listed by FAOSTAT under this region)
+    - OWID_YPR # Yemen People's Republic (listed by FAOSTAT under this region)
+
+### Europe
+- code: FAO_EUR
+  name: "Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_1
+  members:
+    - FAO_EEU
+    - FAO_NEU
+    - FAO_SEU
+    - FAO_WEU
+- code: FAO_EEU
+  name: "Eastern Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_EEU
+    - OWID_CZS # Czechoslovakia
+    - OWID_USS # USSR
+- code: FAO_NEU
+  name: "Northern Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_NEU
+- code: FAO_SEU
+  name: "Southern Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_SEU
+    - OWID_SRM # Serbia and Montenegro
+    - OWID_YGS # Yugoslavia
+- code: FAO_WEU
+  name: "Western Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_WEU
+
+### Oceania
+- code: FAO_OCE
+  name: "Oceania (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_1
+  members:
+    - FAO_ANZ
+    - FAO_MEL
+    - FAO_MIC
+    - FAO_POL
+- code: FAO_ANZ
+  name: "Australia and New Zealand (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_ANZ
+- code: FAO_MEL
+  name: "Melanesia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_MEL
+- code: FAO_MIC
+  name: "Micronesia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_MIC
+- code: FAO_POL
+  name: "Polynesia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_2
+  members:
+    - UNM49_POL
+
+##########
+# FAO SDG regional grouping (used in FAO's food-security domains, e.g. faostat_fs and faostat_sdgb).
+# These are the UN SDG regions FAO adopts for SDG reporting: an orthogonal coarsening of the fao_2
+# subregions (they cross continents, e.g. Northern America and Europe). Australia and New Zealand is the
+# 8th SDG region but is a fao_2 subregion, so it is tagged fao_2 and back-filled into the fao_sdg map.
+##########
+
+- code: FAO_SSA
+  name: "Sub-Saharan Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_EAF
+    - FAO_MAF
+    - FAO_SAF
+    - FAO_WAF
+- code: FAO_LAC
+  name: "Latin America and the Caribbean (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_CAM
+    - FAO_CAR
+    - FAO_SAM
+- code: FAO_NAE
+  name: "Northern America and Europe (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_NAM
+    - FAO_EEU
+    - FAO_NEU
+    - FAO_SEU
+    - FAO_WEU
+- code: FAO_WANA
+  name: "Western Asia and Northern Africa (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_WAS
+    - FAO_NAF
+- code: FAO_CSA
+  name: "Central Asia and Southern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_CAS
+    - FAO_SAS
+- code: FAO_ESEA
+  name: "Eastern Asia and South-eastern Asia (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_EAS
+    - FAO_SEA
+- code: FAO_OCX
+  name: "Oceania excluding Australia and New Zealand (FAO)"
+  region_type: "aggregate"
+  defined_by: fao_sdg
+  members:
+    - FAO_MEL
+    - FAO_MIC
+    - FAO_POL

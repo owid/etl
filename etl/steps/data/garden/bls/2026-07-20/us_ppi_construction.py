@@ -8,7 +8,9 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 VARIABLE_NAMES = {
+    "WPU801101": "ppi_new_warehouse_construction",
     "WPU801103": "ppi_new_office_construction",
+    "WPU801104": "ppi_new_industrial_construction",
 }
 
 
