@@ -23,7 +23,9 @@ DHS_REGIONS = ["Europe", "Asia", "America", "Africa", "Oceania"]
 DHS_SUBREGIONS = ["Caribbean", "Central America", "South America"]
 
 # Rows that combine two countries. DHS reports them combined in early decades; where the
-# countries are reported separately, we keep the separate rows and drop the combined one.
+# separate rows fully account for the combined row, we keep the separate rows and drop the
+# combined one. In some decades the separate rows are partial (footnotes 2 and 8: "not
+# reported separately for all years"), so we keep the combined row there instead.
 COMPOSITES = {
     "Austria-Hungary": ["Austria", "Hungary"],
     "Norway-Sweden": ["Norway", "Sweden"],
@@ -144,10 +146,19 @@ def make_by_country(tb_origin: Table) -> Table:
     """Keep country rows only, using separate countries where reported and combined rows otherwise."""
     tb = tb_origin[~tb_origin["country"].isin(DHS_REGIONS + DHS_SUBREGIONS + RESIDUALS + ["Total"])].copy()
 
-    # Where a combined row overlaps with its separately-reported countries, keep the countries.
+    # Switch from the combined row to the separate rows at the first decade from which the
+    # separate rows always add up to the combined row. In earlier decades the separate rows,
+    # where present, cover only part of the decade — e.g. Austria and Hungary in the 1860s,
+    # 1890s, and 1900s (footnote 2) — so we keep the combined row and drop them.
     for parent, children in COMPOSITES.items():
-        child_decades = set(tb.loc[tb["country"].isin(children) & tb["immigrants"].notna(), "decade"])
-        tb = tb[~((tb["country"] == parent) & tb["decade"].isin(child_decades))]
+        both = tb[tb["country"].isin([parent] + children)].pivot(index="decade", columns="country", values="immigrants")
+        reconciled = set(both.index[(both[parent] - both[children].sum(axis=1, min_count=len(children))).abs() < 1])
+        parent_decades = both.index[both[parent].notna()]
+        candidates = [d for d in parent_decades if all(d2 in reconciled for d2 in parent_decades if d2 >= d)]
+        assert candidates, f"No decade from which {children} fully account for {parent}."
+        cut = min(candidates)
+        tb = tb[~((tb["country"] == parent) & (tb["decade"] >= cut))]
+        tb = tb[~(tb["country"].isin(children) & (tb["decade"] < cut))]
 
     # Drop Canada and Mexico before the 1910s: people arriving by land were not fully counted
     # until 1908, so earlier figures are large undercounts. They are kept in the region table,
