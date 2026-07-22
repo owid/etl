@@ -57,13 +57,41 @@ The per-variable latest time comes from the indicators API `metadata.json` → `
 
 **Parsing `time=` in URLs:** the grapher time param is a single value (`time=2019`) or a range (`time=1990..2020`, `time=earliest..2023`). Each **numeric** component is a pin — grade the end bound like `maxTime` (an embed with `time=..2019` keeps showing the old window after the data reaches 2025), the start bound like `minTime`. `earliest`/`latest` components are fine, and daily charts use ISO dates (`time=2020-01-01..latest`) — convert those to day offsets before grading: a day-axis variable advertises `display.zeroDay` in the same `metadata.json` (its `dimensions.years.values[].id` are day offsets from that date), so the component's comparable value is `(date.fromisoformat(part) - date.fromisoformat(zero_day)).days`. Skip `$time`-style template placeholders in country-page dynamic embeds. Article time pins are often deliberate framing of the surrounding prose, so default them to 🟡-at-worst and always hand them to content follow-up rather than editing configs.
 
-Repo grep for the ETL-side sources (also catches pins that haven't reached any DB yet):
+Repo scan for the ETL-side sources (also catches pins that haven't reached any DB yet). The flat keys grep directly; the **nested map bounds (`map:` → `time`/`startTime`) never match a flat pattern** — walk the YAML for those:
 
 ```bash
 rg -n '"?(minTime|maxTime|timelineMinTime|timelineMaxTime)"?:' \
     etl/steps/export/multidim etl/steps/export/explorers \
     etl/steps/data/garden etl/steps/data/grapher -g "*.yml"
 ```
+
+```python
+import yaml
+from pathlib import Path
+
+def map_pins(node, trail=()):
+    if isinstance(node, dict):
+        m = node.get("map")
+        if isinstance(m, dict):
+            for f in ("time", "startTime"):
+                if f in m and str(m[f]) not in ("earliest", "latest"):
+                    yield "/".join(trail), f, m[f]
+        for k, v in node.items():
+            yield from map_pins(v, trail + (str(k),))
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from map_pins(v, trail + (str(i),))
+
+for p in Path("etl/steps").rglob("*.yml"):
+    try:
+        for trail, f, v in map_pins(yaml.safe_load(p.read_text()) or {}):
+            print(f"{p}: map.{f} = {v}  (at {trail})")
+    except yaml.YAMLError:
+        if "map:" in p.read_text():
+            print(f"UNPARSED (likely Jinja-templated): {p} — inspect its map: block manually")
+```
+
+Don't drop the unparsed files silently — Jinja-templated garden metas fail `safe_load`, and one of them can be exactly the file carrying the pin (e.g. `pisa.meta.yml` nests `map: time: 2022` under `presentation.grapher_config`).
 
 ## Script skeleton
 
