@@ -9,14 +9,14 @@ definitions:
     presentation:
       topic_tags:
         - Migration
-  status_grants: |-
-    Unauthorized immigration is not counted as it happens, but people who later gain legal status — such as those legalized under the [1986 amnesty](https://en.wikipedia.org/wiki/Immigration_Reform_and_Control_Act_of_1986) — appear in the year they are granted residence.
   counting_changes: |-
     The way immigrants were counted by the US government has changed over time.
     - **1820–1867:** the figures count every foreign national who arrived by ship at a US seaport, including temporary visitors and people passing through, because no distinction was yet made between immigrants and other travelers.
     - **1868–1891:** the figures count only foreign nationals who arrived intending to settle, because the government now separated genuine immigrants from temporary visitors and stopped counting the visitors.
     - **1892 onward:** the figures count only foreign nationals formally inspected and admitted for permanent residence, so people who arrived but were turned away at inspection are no longer included, and the count reflects a legal admission rather than a simple arrival.
     - Immigrants entering overland from Canada and Mexico were not fully counted **until 1908**.
+  status_grants: |-
+    Unauthorized immigration is not counted as it happens, but people who later gain legal status — such as those legalized under the [1986 amnesty](https://en.wikipedia.org/wiki/Immigration_Reform_and_Control_Act_of_1986) — appear in the year they are granted residence.
 
 dataset:
   update_period_days: 365
@@ -27,8 +27,8 @@ tables:
       immigrants:
         title: People obtaining legal permanent resident status in the United States
         description_key:
-          - "{definitions.status_grants}"
           - "{definitions.counting_changes}"
+          - "{definitions.status_grants}"
       immigrants_per_1000:
         title: People obtaining legal permanent resident status in the United States, per 1,000 people in the population
         unit: per 1,000 people
