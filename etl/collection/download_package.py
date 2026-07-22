@@ -196,11 +196,13 @@ def _split_catalog_path(catalog_path: str) -> tuple[str, str, str]:
     return "/".join(dataset_segments), table_name, column
 
 
-def build_wide_table_for_collection(collection: Collection) -> Table:
+def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict[str, str]]:
     """Generic version of build_wide_table: resolves the indicator list and their
     dimension values from the collection's own views, and loads each underlying
     table fresh from the on-disk catalog (no dependency on any script's in-memory
-    tables)."""
+    tables). Returns (wide_table, {wide_column_name: catalog_path}) -- the second
+    is needed to hand off metadata assembly to grapher, which looks up indicators
+    by catalog path / variable ID, not by our wide-CSV column name."""
     by_table: dict[tuple[str, str], list[tuple[str, dict]]] = defaultdict(list)
     for catalog_path, dims in _iter_used_indicators(collection):
         dataset_dir, table_name, column = _split_catalog_path(catalog_path)
@@ -208,6 +210,7 @@ def build_wide_table_for_collection(collection: Collection) -> Table:
 
     dataset_cache: dict[str, CatalogDataset] = {}
     renamed_tables = []
+    column_to_catalog_path: dict[str, str] = {}
     for (dataset_dir, table_name), cols in by_table.items():
         if dataset_dir not in dataset_cache:
             dataset_cache[dataset_dir] = CatalogDataset(DATA_DIR / dataset_dir)
@@ -225,12 +228,13 @@ def build_wide_table_for_collection(collection: Collection) -> Table:
                     column=column,
                 )
                 continue
-            short = tb[column].metadata.original_short_name or column
-            rename[column] = _wide_column_name(short, dims)
+            wide_name = _wide_column_name(tb[column].metadata.original_short_name or column, dims)
+            rename[column] = wide_name
+            column_to_catalog_path[wide_name] = f"{dataset_dir}/{table_name}#{column}"
             keep.append(column)
         renamed_tables.append(tb[keep].rename(columns=rename))
 
-    return _outer_join_on_key(renamed_tables)
+    return _outer_join_on_key(renamed_tables), column_to_catalog_path
 
 
 def _render_readme(title: str, slug: str, value_columns: list[str], time_column: str) -> str:
@@ -331,8 +335,12 @@ def build_download_package_for_collection(
     slug: str | None = None,
 ) -> DownloadPackageResult:
     """Build the package generically from the collection's own views -- no
-    script-specific wiring needed beyond calling this once before c.save()."""
-    wide = build_wide_table_for_collection(collection)
+    script-specific wiring needed beyond calling this once before c.save().
+
+    Superseded by `stage_download_package_for_collection()` for real use --
+    this builds its own thin manifest.json/readme.md rather than handing off
+    to grapher's real metadata-assembly code. Kept for comparison/fallback."""
+    wide, _column_to_catalog_path = build_wide_table_for_collection(collection)
     dimension_keys = {d.slug for d in collection.dimensions}
     return _write_package_files(
         wide,
@@ -340,6 +348,88 @@ def build_download_package_for_collection(
         title or collection.title["title"],
         slug or collection.short_name,
         dimension_keys,
+    )
+
+
+def resolve_variable_ids(catalog_paths: list[str]) -> dict[str, int]:
+    """Look up real grapher variable IDs for a list of catalog paths, via the
+    same DB the ETL step already upserted these indicators into."""
+    from sqlalchemy.orm import Session
+
+    from etl.config import OWID_ENV
+    from etl.grapher.model import Variable
+
+    with Session(OWID_ENV.engine) as session:
+        return Variable.catalog_paths_to_variable_ids(session, catalog_paths)
+
+
+@dataclass
+class StagedPackageResult:
+    csv_url: str
+    indicators_url: str
+    row_count: int
+    indicator_count: int
+
+
+def stage_download_package_for_collection(
+    collection: Collection,
+    dest_dir: Path,
+    s3_prefix: str,
+) -> StagedPackageResult:
+    """PROTOTYPE hybrid handoff: ETL builds the wide table (the part that
+    benefits from local data access -- no per-view HTTP fetches, validated
+    across 12 real MDIMs) and uploads it plus an indicator/column-name index.
+    Real metadata.json + readme.md assembly happens on the grapher side,
+    reusing its existing (tested, correct) citation/title-formatting code
+    instead of a Python reimplementation -- see
+    mdim-downloads/solution-space/etl-feasibility.md for why.
+
+    `s3_prefix` is bucket/path, e.g.
+    "owid-public/data/mdim-downloads-staging/years_of_schooling".
+    """
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    wide, column_to_catalog_path = build_wide_table_for_collection(collection)
+
+    variable_ids = resolve_variable_ids(list(column_to_catalog_path.values()))
+    missing = [p for p in column_to_catalog_path.values() if p not in variable_ids]
+    if missing:
+        log.warning("download_package.variable_id_missing", catalog_paths=missing)
+
+    indicators = [
+        {
+            "wideColumnName": wide_name,
+            "catalogPath": catalog_path,
+            "owidVariableId": variable_ids.get(catalog_path),
+        }
+        for wide_name, catalog_path in column_to_catalog_path.items()
+        if catalog_path in variable_ids
+    ]
+
+    csv_path = dest_dir / "wide.csv"
+    wide.to_csv(csv_path, index=False)
+    indicators_path = dest_dir / "indicators.json"
+    indicators_path.write_text(json.dumps(indicators, indent=2))
+
+    csv_key = f"{s3_prefix}/wide.csv"
+    indicators_key = f"{s3_prefix}/indicators.json"
+    s3_utils.upload(f"s3://{csv_key}", csv_path, public=True)
+    s3_utils.upload(f"s3://{indicators_key}", indicators_path, public=True)
+
+    bucket = s3_prefix.split("/", 1)[0]
+    base_url = PUBLIC_BUCKET_DOMAINS.get(bucket, f"s3://{bucket}") + "/" + s3_prefix.split("/", 1)[1]
+
+    log.info(
+        "download_package.staged",
+        rows=len(wide),
+        indicators=len(indicators),
+        csv_url=f"{base_url}/wide.csv",
+    )
+
+    return StagedPackageResult(
+        csv_url=f"{base_url}/wide.csv",
+        indicators_url=f"{base_url}/indicators.json",
+        row_count=len(wide),
+        indicator_count=len(indicators),
     )
 
 

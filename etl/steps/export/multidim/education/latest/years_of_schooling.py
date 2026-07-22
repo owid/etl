@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.collection import combine_collections
-from etl.collection.download_package import build_download_package_for_collection, upload_to_r2
+from etl.collection.download_package import stage_download_package_for_collection
 from etl.config import OWID_ENV
 from etl.helpers import PathFinder
 
@@ -296,15 +296,29 @@ def run() -> None:
     c.save()
 
     #
-    # PROTOTYPE (mdim-downloads project): build the "download complete
-    # dataset" package -- a wide CSV + manifest + README covering every
-    # dimension combination, zipped, uploaded to R2 -- then push the
-    # resulting config with a second upsert. Needs c.save() to have already
-    # run once so indicator catalog paths are fully expanded.
+    # PROTOTYPE (mdim-downloads project) -- hybrid handoff: ETL builds the
+    # wide table (no per-view HTTP fetch needed, data's already local) and
+    # stages it + an indicator index for grapher to pick up. Real
+    # metadata.json/readme.md assembly happens grapher-side, reusing its
+    # existing (tested, correct) citation/title code instead of a Python
+    # reimplementation -- see mdim-downloads/solution-space/etl-feasibility.md.
+    # Needs c.save() to have already run once so indicator catalog paths are
+    # fully expanded.
     #
-    pkg = build_download_package_for_collection(c, dest_dir=paths.dest_dir / "download_package")
-    url = upload_to_r2(pkg.zip_path, f"owid-public/data/mdim-downloads/{paths.short_name}/{paths.short_name}.zip")
-    c.download_package = pkg.to_config(url=url)
+    staged = stage_download_package_for_collection(
+        c,
+        dest_dir=paths.dest_dir / "download_package",
+        s3_prefix=f"owid-public/data/mdim-downloads-staging/{paths.short_name}",
+    )
+    # Final URL the grapher-side build step will publish the real zip to --
+    # set here so the config is ready once that step runs; may 404 until it
+    # does, for this prototype.
+    final_url = f"https://owid-public.owid.io/data/mdim-downloads/{paths.short_name}/{paths.short_name}.zip"
+    c.download_package = {
+        "url": final_url,
+        "fileCount": staged.indicator_count,
+        "rowCount": staged.row_count,
+    }
     c.upsert_to_db(OWID_ENV)
 
 
