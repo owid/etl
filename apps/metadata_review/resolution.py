@@ -636,6 +636,47 @@ def threads_for_field(
     return sorted(seen.values(), key=lambda s: s.createdAt or datetime.min)
 
 
+def combined_display_value(
+    field: ReviewableField,
+    open_threads: list[gm.MetadataReviewSuggestion],
+    review: MdimReview | None = None,
+) -> tuple[str | None, dict[int, bool]]:
+    """The field's text with ALL applicable open proposals applied (Google-Docs style).
+
+    Own threads (base text matches this field) apply directly — newest wins when
+    legacy duplicates exist; borrowed threads then layer on top: bullet lists via
+    verbatim-bullet transfer, other fields via dimension-word transfer (only when
+    no own proposal supplied the text). Returns (combined text or None when no
+    proposal applies, {thread id: applied on this field?}).
+    """
+    is_bullets = field.field_path in DESCRIPTION_KEY_FIELDS
+    current = str(field.current_value) if field.current_value is not None else ""
+    own = [
+        s for s in open_threads if s.suggestedValue is not None and str(s.currentValue or "").strip() == current.strip()
+    ]
+    borrowed = [s for s in open_threads if s.suggestedValue is not None and s not in own]
+    applied: dict[int, bool] = {s.id: False for s in open_threads}
+
+    display: str | None = None
+    if own:
+        canonical = max(own, key=lambda s: s.createdAt or datetime.min)
+        display = canonical.suggestedValue
+        applied[canonical.id] = True
+
+    for thread in sorted(borrowed, key=lambda s: s.createdAt or datetime.min):
+        if is_bullets:
+            transfer = apply_bullet_edits(thread.currentValue, thread.suggestedValue, display or current)
+            if transfer is not None:
+                display = transfer[0]
+                applied[thread.id] = True
+        elif display is None and review is not None:
+            transferred = transfer_proposal(review, thread, field)
+            if transferred is not None:
+                display = transferred
+                applied[thread.id] = True
+    return display, applied
+
+
 @dataclass
 class Staleness:
     """Result of comparing a persisted suggestion against the currently resolved field."""

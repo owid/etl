@@ -813,3 +813,55 @@ def _load_mdim(path):
     from owid.catalog.core.utils import dynamic_yaml_load, dynamic_yaml_to_dict
 
     return dynamic_yaml_to_dict(dynamic_yaml_load(path))
+
+
+# ---------------------------------------------------------------------------
+# Combined display: all applicable proposals in one tracked text
+# ---------------------------------------------------------------------------
+
+
+def test_combined_display_value_layers_own_and_borrowed():
+    from apps.metadata_review.resolution import combined_display_value
+
+    field = _field(
+        field_path="metadata.description_key",
+        provenance="inherited",
+        current_value="- Shared A\n- Own specific\n- Shared B",
+    )
+    own = gm.MetadataReviewSuggestion(
+        targetType="indicator", targetPath=field.inherited_from, fieldPath="description_key",
+        provenance="inherited", createdBy=1,
+        currentValue="- Shared A\n- Own specific\n- Shared B",
+        suggestedValue="- Shared A\n- Own specific, reworded\n- Shared B",
+    )  # fmt: skip
+    own.id = 1
+    borrowed = gm.MetadataReviewSuggestion(
+        targetType="indicator", targetPath="grapher/x/l/d/t#other", fieldPath="description_key",
+        provenance="inherited", createdBy=2,
+        currentValue="- Shared A\n- Other specific\n- Shared B",
+        suggestedValue="- Shared A, reworded\n- Other specific\n- Shared B",
+    )  # fmt: skip
+    borrowed.id = 2
+    display, applied = combined_display_value(field, [own, borrowed])
+    # Both proposals visible in ONE combined text: own edit + borrowed shared-bullet edit.
+    assert display == "- Shared A, reworded\n- Own specific, reworded\n- Shared B"
+    assert applied == {1: True, 2: True}
+
+
+def test_combined_display_value_skips_inapplicable_borrowed():
+    from apps.metadata_review.resolution import combined_display_value
+
+    field = _field(
+        field_path="metadata.description_key",
+        provenance="inherited",
+        current_value="- Shared A\n- Own specific",
+    )
+    foreign_only = gm.MetadataReviewSuggestion(
+        targetType="indicator", targetPath="grapher/x/l/d/t#other", fieldPath="description_key",
+        provenance="inherited", createdBy=2,
+        currentValue="- Shared A\n- Other specific",
+        suggestedValue="- Shared A\n- Other specific, reworded",
+    )  # fmt: skip
+    foreign_only.id = 3
+    display, applied = combined_display_value(field, [foreign_only])
+    assert display is None and applied == {3: False}

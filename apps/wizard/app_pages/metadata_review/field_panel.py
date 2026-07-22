@@ -12,8 +12,8 @@ import hashlib
 import streamlit as st
 
 import etl.grapher.model as gm
-from apps.metadata_review.diffs import apply_bullet_edits, bullet_diff, diff_summary, tracked_changes_html
-from apps.metadata_review.resolution import Staleness, check_staleness, transfer_proposal
+from apps.metadata_review.diffs import bullet_diff, diff_summary, tracked_changes_html
+from apps.metadata_review.resolution import Staleness, check_staleness, combined_display_value
 from apps.metadata_review.targets import DESCRIPTION_KEY_FIELDS, MdimReview, ReviewableField
 from apps.wizard.app_pages.metadata_review import state
 from apps.wizard.app_pages.metadata_review.tracked_editor import tracked_editor
@@ -71,53 +71,18 @@ def render_field(
             if badges:
                 st.markdown(" ".join(badges), help=shared_tooltip)
 
-        # The field's text, shown ONCE: tracked changes when a proposal exists
-        # (deletions struck through, insertions tinted), plain text otherwise.
-        display_value = None
-        transfer_note = None
-        if proposal is not None and proposal.suggestedValue is not None:
-            base_matches = str(proposal.currentValue or "").strip() == str(field.current_value or "").strip()
-            if base_matches:
-                display_value = proposal.suggestedValue
-            elif field.field_path in DESCRIPTION_KEY_FIELDS:
-                # Bullet lists share individual bullets across pages — re-apply the
-                # proposal's bullet edits to THIS field's list (partially if needed).
-                transfer = apply_bullet_edits(
-                    proposal.currentValue, proposal.suggestedValue, str(field.current_value or "")
-                )
-                if transfer is not None:
-                    display_value, n_applied, n_total = transfer
-                    transfer_note = "↳ Shared bullets — the proposal's edits are applied to this page's list."
-                    if n_applied < n_total:
-                        transfer_note = (
-                            f"↳ {n_applied} of {n_total} bullet edits apply here — "
-                            "the rest touch bullets this page doesn't have."
-                        )
-            elif mdim_review is not None:
-                # Pattern-shared thread filed on a view whose rendered text differs
-                # only by dimension words — re-render the proposal for THIS view.
-                display_value = transfer_proposal(mdim_review, proposal, field)
-                if display_value is not None:
-                    transfer_note = "↳ Shared pattern — the proposed wording is shown with this view's dimension words."
-        if proposal is not None and display_value is not None:
-            staleness = check_staleness(proposal, fields_by_key, display_field=field)
-            if staleness.field_changed:
-                st.warning("The field's text changed since this proposal was filed — re-check the tracked changes.")
+        # The field's text, shown ONCE, with ALL applicable open proposals applied
+        # (own proposal first, borrowed ones layered on top) — Google-Docs style.
+        display_value, applied_by_thread = combined_display_value(field, open_suggestions, review=mdim_review)
+        if display_value is not None:
+            if proposal is not None:
+                staleness = check_staleness(proposal, fields_by_key, display_field=field)
+                if staleness.field_changed:
+                    st.warning("The field's text changed since a proposal was filed — re-check the tracked changes.")
             is_bullets = field.field_path in DESCRIPTION_KEY_FIELDS
             if is_bullets:
                 st.caption(f"Bullet changes ({diff_summary(bullet_diff(field.current_value, display_value))}):")
             st.html(tracked_changes_html(field.current_value, display_value, is_bullet_list=is_bullets))
-            if transfer_note:
-                st.caption(transfer_note)
-        elif proposal is not None and proposal.suggestedValue is not None:
-            # Connected thread, but the proposal can't be re-rendered for this view
-            # (it changed the dimension words themselves). Show the current text.
-            if field.current_value is not None:
-                st.markdown(f"> {field.current_value}")
-            st.caption(
-                "✏️ A change to this text's shared pattern is proposed on another view — "
-                "open that view to see the tracked wording."
-            )
         elif field.current_value is None:
             st.caption("_(not set — the chart renders without it)_")
         elif str(field.current_value) == "":
@@ -125,20 +90,21 @@ def render_field(
         else:
             st.markdown(f"> {field.current_value}")
 
-        if proposal is not None:
-            borrowed = str(proposal.currentValue or "").strip() != str(field.current_value or "").strip()
-            _render_thread(
-                field,
-                proposal,
-                extra_threads=open_suggestions[1:],
-                comments_by_suggestion=comments_by_suggestion,
-                users=users,
-                user=user,
-                fields_by_key=fields_by_key,
-                key_ns=key_ns,
-                borrowed=borrowed,
-                initial_override=display_value if borrowed else None,
-            )
+        if open_suggestions:
+            for thread in open_suggestions:
+                borrowed = str(thread.currentValue or "").strip() != str(field.current_value or "").strip()
+                _render_thread(
+                    field,
+                    thread,
+                    comments_by_suggestion=comments_by_suggestion,
+                    users=users,
+                    user=user,
+                    fields_by_key=fields_by_key,
+                    key_ns=key_ns,
+                    borrowed=borrowed,
+                    applied_here=applied_by_thread.get(thread.id, False),
+                    initial_override=display_value if borrowed else None,
+                )
         elif user is not None:
             _render_edit_controls(field, user, existing=None, key_ns=key_ns)
 
@@ -149,13 +115,13 @@ def render_field(
 def _render_thread(
     field: ReviewableField,
     proposal: gm.MetadataReviewSuggestion,
-    extra_threads: list[gm.MetadataReviewSuggestion],
     comments_by_suggestion: dict[int, list],
     users: dict[int, str],
     user: gm.User | None,
     fields_by_key: dict[tuple, ReviewableField],
     key_ns: str = "main",
     borrowed: bool = False,
+    applied_here: bool = True,
     initial_override: str | None = None,
 ) -> None:
     """The compact discussion strip under the field's (tracked) text.
@@ -170,6 +136,8 @@ def _render_thread(
     if proposal.filedFromPath and proposal.filedFromPath != field.target_path:
         # Cross-page thread (e.g. filed on a sibling MDim sharing this metadata).
         meta += f" — filed on `{proposal.filedFromPath}`"
+    if not applied_here and proposal.suggestedValue is not None:
+        meta += " — ⚠️ its edits don't apply to this view's text (shown where filed)"
     st.caption(meta)
 
     if staleness.target_gone:
@@ -181,11 +149,7 @@ def _render_thread(
     if proposal.suggestedValue is None:
         st.caption("_Discussion only — no replacement text proposed yet._")
 
-    # Thread: comments from the canonical proposal plus any legacy parallel threads.
-    comments = list(comments_by_suggestion.get(proposal.id, []))
-    for legacy in extra_threads:
-        comments += comments_by_suggestion.get(legacy.id, [])
-    comments.sort(key=lambda c: c.createdAt)
+    comments = sorted(comments_by_suggestion.get(proposal.id, []), key=lambda c: c.createdAt)
     for comment in comments:
         comment_author = users.get(comment.userId, f"user {comment.userId}")
         when = comment.createdAt.strftime("%Y-%m-%d %H:%M")
