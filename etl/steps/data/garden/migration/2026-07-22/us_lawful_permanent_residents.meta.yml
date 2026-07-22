@@ -60,13 +60,12 @@ tables:
         description_short: |-
           The number of people who were granted lawful permanent residence in the United States in each decade, by the country they came from.
         description_key:
-          - Each value is the total for one decade, from the 1820s to the 2010s.
-          - "{definitions.fiscal_years}"
           - "{definitions.what_this_counts}"
           - Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
           - "{definitions.counting_changes}"
           - Country borders have changed over this period, so a country's figures may not always refer to the same area. The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden. Russia refers to the Russian Empire until 1920, the Soviet Union until 1990, and a group of post-Soviet countries in the 1990s. Czechoslovakia includes Czechia and Slovakia, Yugoslavia includes its successor countries, Korea includes both North and South Korea, and Canada includes Newfoundland, which was a separate territory until it joined Canada in 1949.
-          - Immigrants entering overland from Canada and Mexico were not fully counted before 1908. We therefore only show data for Canada and Mexico from the 1910s onward. Earlier arrivals from these countries are still included in the regional totals.
+          - Immigrants entering overland from Canada and Mexico were not fully counted before 1908. We therefore only show data for Canada and Mexico from the 1910s onward.
+          - "{definitions.fiscal_years}"
         display:
           name: New lawful permanent residents
           timeInterval: decade
@@ -81,12 +80,11 @@ tables:
         description_short: |-
           The number of people who were granted lawful permanent residence in the United States in each decade, by the world region they came from.
         description_key:
-          - Each value is the total for one decade, from the 1820s to the 2010s.
-          - "{definitions.fiscal_years}"
           - "{definitions.what_this_counts}"
           - Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
           - "{definitions.counting_changes}"
           - '"Not specified" covers people whose origin was not recorded, and a small number of people from the Americas whom the source does not assign to a specific country.'
+          - "{definitions.fiscal_years}"
         description_processing: |-
           We calculated these regional totals from the source's country-level data, grouping countries into regions as defined by Our World in Data. They can differ from the source's own regional totals: for example, we count Caribbean and Central American countries as part of North America.
         processing_level: major
