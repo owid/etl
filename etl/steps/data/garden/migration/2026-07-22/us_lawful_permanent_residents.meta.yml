@@ -18,7 +18,7 @@ definitions:
     - **1820–1867:** The figures count every foreign national who arrived by ship at a US seaport, including temporary visitors and people passing through, because no distinction was yet made between immigrants and other travelers.
     - **1868–1891:** The figures count only foreign nationals who arrived intending to settle, because the government now separated genuine immigrants from temporary visitors and stopped counting the visitors.
     - **1892 onward:** The figures count only foreign nationals formally inspected and admitted for permanent residence, so people who arrived but were turned away at inspection are no longer included, and the count reflects a legal admission rather than a simple arrival.
-    - Immigrants entering overland from Canada and Mexico were not fully counted before 1908.
+    - Immigrants entering overland from Canada and Mexico were not fully counted **before 1908**.
 
 dataset:
   update_period_days: 365
@@ -65,7 +65,11 @@ tables:
         description_key:
           - "{definitions.what_this_counts}"
           - "{definitions.counting_changes}"
-          - Country borders have changed over this period, so a country's figures may not always refer to the same area. The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden. Russia refers to the Russian Empire until 1920, the Soviet Union until 1990, and a group of post-Soviet countries in the 1990s. Czechoslovakia includes Czechia and Slovakia, Yugoslavia includes its successor countries, Korea includes both North and South Korea, and Canada includes Newfoundland, which was a separate territory until it joined Canada in 1949.
+          - |-
+            Country borders have changed over this period, so a country's figures may not always refer to the same area.
+            - The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden.
+            - Russia refers to the Russian Empire until 1920, the Soviet Union until 1990, and a group of post-Soviet countries in the 1990s.
+            - Czechoslovakia includes Czechia and Slovakia; Yugoslavia includes its successor countries; Korea includes both North and South Korea; Canada includes Newfoundland, which was a separate territory until it joined Canada in 1949.
           - "{definitions.fiscal_years}"
         display:
           name: New lawful permanent residents
