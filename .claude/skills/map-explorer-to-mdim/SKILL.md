@@ -87,6 +87,9 @@ Writes into the out folder:
   the distinct values per dimension, each MDIM's dims/choices, auto-suggested value
   matches (where a slugified explorer value equals a real MDIM choice slug), and a
   ready-to-edit `mapping_rules.py` template.
+- `_sources.json` — machine-readable record of the explorer slug + dimension names and
+  each MDIM's short/prefix/catalogPath/dim-slugs. Consumed by `build_mapping.py` to emit
+  `mapping.json` (below); don't hand-edit it.
 
 ### 2. Write `mapping_rules.py`
 
@@ -121,6 +124,36 @@ Writes `mapping_proposal.csv`, one row per explorer view:
 | `<mdim>_<dimslug>` … | wide block; only the **target** MDIM's columns are filled with the translated slugs |
 | `shared_target_explorer_ids` | when >1 explorer view lands on the same MDIM view, the comma-joined list of all those explorer ids (e.g. `1,12`); empty when the target is unique |
 
+It also writes **`mapping.json`** — the same mapping as a redirect payload for an
+owid-grapher API (yet to be built) to consume. Unlike the CSV (positional `dimension_N`
+columns, meant for a spreadsheet), the JSON carries every identifier a redirect needs:
+
+```jsonc
+{
+  "explorer": { "slug": "...", "dimensions": ["<name>", ...] },
+  "targets":  [ { "mdim": "...", "catalogPath": "ns/v/short#short", "dimensions": ["<slug>", ...] } ],
+  "stats":    { "total": N, "resolved": N, "unresolved": N },
+  "redirects": [
+    {
+      "sourceViewId": 1,
+      "source": { "explorerSlug": "...", "dimensions": { "<name>": "<value>", ... } },
+      "target": {                       // null when unresolved
+        "mdim": "...", "catalogPath": "ns/v/short#short",
+        "viewId": "A2",                 // internal id, cross-references the CSVs
+        "dimensions": { "<slug>": "<choiceSlug>", ... }
+      },
+      "sharedTargetSourceIds": [1, 29, 57],   // present only when >1 source shares this target
+      "unresolvedReason": "..."               // present only when target is null
+    }
+  ]
+}
+```
+
+The **source** view is identified by the explorer slug + dimension **name→display-value**
+(the explorer URL query params); the **target** view by the MDIM catalogPath + dimension
+**slug→choice-slug** (the MDIM URL query params). Unresolved views are kept with
+`target: null` so the API can see the full picture; a consumer typically skips them.
+
 The script prints a validation report: how many explorer views resolved, distinct MDIM
 views hit per MDIM, how many rows share a target, and **FLAGS** for any explorer view that
 didn't resolve to a real MDIM view (fix the rules and re-run until there are no flags).
@@ -144,4 +177,6 @@ spreadsheet for a human reviewer / topic owner to confirm before redirects are c
   aggregate). Nothing redirects to those — fine, just confirm.
 - Explorer dimension columns stay `dimension_1..N` (compact, and joinable to the explorer CSV);
   the name legend lives in `_scaffold.md` and in `EXPLORER_DIMENSIONS`.
-- Re-running `extract_views.py` overwrites the CSVs but **not** your `mapping_rules.py`.
+- Re-running `extract_views.py` overwrites the CSVs and `_sources.json` but **not** your `mapping_rules.py`.
+- `mapping.json` needs `_sources.json`; if you extracted before this output existed, just
+  re-run `extract_views.py` once (it preserves `mapping_rules.py`), then `build_mapping.py`.

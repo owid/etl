@@ -18,6 +18,12 @@ Writes ``mapping_proposal.csv`` (one row per explorer view):
     shared_target_explorer_ids  (when >1 explorer view hits the same MDIM view,
                                  the comma-joined list of all those explorer ids)
 
+Also writes ``mapping.json`` — a redirect payload for an owid-grapher API to consume.
+It carries the full source + target identifiers (explorer slug + dimension name→value
+for the source; MDIM catalogPath + dimension slug→choice-slug + our internal view id for
+the target), so a redirect from an explorer view URL to an MDIM view URL can be built
+without re-reading the DB. Requires ``_sources.json`` (written by extract_views.py).
+
 Usage:
     .venv/bin/python .claude/skills/map-explorer-to-mdim/scripts/build_mapping.py --out ai/<folder>
 """
@@ -25,6 +31,7 @@ Usage:
 import argparse
 import csv
 import importlib.util
+import json
 from collections import defaultdict
 from pathlib import Path
 
@@ -48,6 +55,74 @@ def read_csv(path: Path):
         return header, list(r)
 
 
+def write_mapping_json(
+    out: Path, explorer_slug, explorer_dims, mdims_meta, catalog_path_of, ids_by_target, out_rows
+) -> Path:
+    """Write mapping.json — a redirect payload for an owid-grapher API to consume.
+
+    Structure::
+
+        {
+          "explorer": {"slug": ..., "dimensions": [<names>]},
+          "targets":  [{"mdim": ..., "catalogPath": ..., "dimensions": [<slugs>]}],
+          "stats":    {"total": N, "resolved": N, "unresolved": N},
+          "redirects": [
+            {
+              "sourceViewId": 1,
+              "source": {"explorerSlug": ..., "dimensions": {<name>: <value>}},
+              "target": {  # null when unresolved
+                "mdim": ..., "catalogPath": ..., "viewId": "A2",
+                "dimensions": {<slug>: <choiceSlug>}
+              },
+              "sharedTargetSourceIds": [1, 12],   # present only when >1 source shares this view
+              "unresolvedReason": "..."           # present only when target is null
+            },
+            ...
+          ]
+        }
+
+    All identifiers a redirect needs are here: the source view is (explorer slug +
+    dimension name→value), the target view is (MDIM catalogPath + dimension
+    slug→choice-slug, plus our internal ``viewId`` for cross-referencing the CSVs).
+    """
+    redirects = []
+    resolved = 0
+    for row, mdim, view_id, dims, target in out_rows:
+        record = {
+            "sourceViewId": int(row["id"]),
+            "source": {"explorerSlug": explorer_slug, "dimensions": dims},
+        }
+        if view_id:
+            resolved += 1
+            record["target"] = {
+                "mdim": mdim,
+                "catalogPath": catalog_path_of.get(mdim),
+                "viewId": view_id,
+                "dimensions": target,
+            }
+            sharers = ids_by_target[(mdim, view_id)]
+            if len(sharers) > 1:
+                record["sharedTargetSourceIds"] = [int(s) for s in sharers]
+        else:
+            record["target"] = None
+            record["unresolvedReason"] = (
+                f"No view in MDIM '{mdim}' matches the translated dimensions {target}"
+            )
+        redirects.append(record)
+
+    payload = {
+        "explorer": {"slug": explorer_slug, "dimensions": explorer_dims},
+        "targets": [
+            {"mdim": m["short"], "catalogPath": m["catalogPath"], "dimensions": m["dimensions"]} for m in mdims_meta
+        ],
+        "stats": {"total": len(out_rows), "resolved": resolved, "unresolved": len(out_rows) - resolved},
+        "redirects": redirects,
+    }
+    path = out / "mapping.json"
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
+    return path
+
+
 def main():
     ap = argparse.ArgumentParser(description="Build the explorer->MDIM mapping proposal.")
     ap.add_argument(
@@ -57,6 +132,17 @@ def main():
     out = Path(args.out)
 
     rules = load_rules(out)
+
+    # Source/target identifiers (explorer slug, MDIM catalogPaths) for the redirect JSON.
+    sources_path = out / "_sources.json"
+    if not sources_path.exists():
+        raise SystemExit(
+            f"Missing {sources_path}. Re-run extract_views.py (it now writes _sources.json), "
+            "then re-run this script. Your mapping_rules.py is preserved."
+        )
+    sources = json.loads(sources_path.read_text())
+    explorer_slug = sources["explorer"]["slug"]
+    catalog_path_of = {m["short"]: m["catalogPath"] for m in sources["mdims"]}
 
     # Explorer views
     exp_header, exp_rows = read_csv(out / "explorer_views.csv")
@@ -123,10 +209,10 @@ def main():
             ids_by_target[(mdim, view_id)].append(eid)
         else:
             flags.append(f"id={eid}: no {mdim} view for {target} (from {dims})")
-        out_rows.append((row, mdim, view_id))
+        out_rows.append((row, mdim, view_id, dims, target))
 
     # shared_target_explorer_ids: fill when >1 explorer view shares a target MDIM view.
-    for row, mdim, view_id in out_rows:
+    for row, mdim, view_id, _dims, _target in out_rows:
         if view_id:
             sharers = ids_by_target[(mdim, view_id)]
             if len(sharers) > 1:
@@ -136,20 +222,32 @@ def main():
     with open(path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=header)
         w.writeheader()
-        w.writerows(r for r, _, _ in out_rows)
+        w.writerows(r for r, _, _, _, _ in out_rows)
+
+    # Redirect payload for the owid-grapher API — full source + target identifiers.
+    json_path = write_mapping_json(
+        out,
+        explorer_slug,
+        sources["explorer"]["dimensions"],
+        sources["mdims"],
+        catalog_path_of,
+        ids_by_target,
+        out_rows,
+    )
 
     # Report
-    resolved = sum(1 for _, _, v in out_rows if v)
+    resolved = sum(1 for _, _, v, _, _ in out_rows if v)
     print(f"-> {path}")
+    print(f"-> {json_path}")
     print(f"explorer views: {len(out_rows)}  |  resolved: {resolved}  |  unresolved: {len(out_rows) - resolved}")
     per_mdim = defaultdict(lambda: [0, set()])
-    for _, mdim, v in out_rows:
+    for _, mdim, v, _, _ in out_rows:
         per_mdim[mdim][0] += 1
         if v:
             per_mdim[mdim][1].add(v)
     for mdim, (n, vids) in per_mdim.items():
         print(f"  {mdim}: {n} explorer views -> {len(vids)} distinct MDIM views")
-    shared = sum(1 for r, _, _ in out_rows if r["shared_target_explorer_ids"])
+    shared = sum(1 for r, _, _, _, _ in out_rows if r["shared_target_explorer_ids"])
     print(f"rows pointing at a shared MDIM view: {shared}")
     if flags:
         print("\nFLAGS (unresolved):")
