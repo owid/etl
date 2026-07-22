@@ -60,7 +60,7 @@ tables:
           title_variant: <Disambiguating label>
 ```
 
-**Key rule from CLAUDE.md:** Omit the `dataset:` block entirely (inherited from origin) -- only set `update_period_days` when needed.
+**Key rule from CLAUDE.md:** The `dataset:` block carries only `update_period_days` and `owners` -- everything else is inherited from origin. Always set `owners` when it's missing (canonical name from the `schemas/dataset-schema.json` enum, resolved via `etl.owners.resolve_owner`; first entry = accountable owner).
 
 **Full field reference:** For a complete list of all supported metadata fields (beyond what's covered here), read `schemas/dataset-schema.json`.
 
