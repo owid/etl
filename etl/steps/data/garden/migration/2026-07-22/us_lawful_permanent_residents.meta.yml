@@ -10,7 +10,7 @@ definitions:
       topic_tags:
         - Migration
   what_this_counts: |-
-    This is a count of lawful permanent residents: people who have been granted the right to live in the United States permanently. It doesn't include temporary visitors and unauthorized entries.
+    This is a count of lawful permanent residents: people who have been granted the right to live in the United States permanently. It doesn't include unauthorized entries.
   fiscal_years: |-
     Values refer to US fiscal years rather than calendar years. Fiscal year 1976 covered 15 months, because the end date of fiscal years was moved from June to September that year.
   counting_changes: |-
