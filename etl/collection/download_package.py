@@ -28,6 +28,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import pandas as pd
 from owid.catalog import Dataset as CatalogDataset
 from owid.catalog import Table, s3_utils
 from owid.catalog import processing as pr
@@ -57,6 +58,47 @@ def _time_column(tb: Table) -> str:
     if len(candidates) != 1:
         raise ValueError(f"Expected exactly one of {TIME_COLUMN_CANDIDATES} in columns, found {candidates}")
     return candidates[0]
+
+
+def _resolve_time_column(tb: Table) -> tuple[Table, str]:
+    """Return (possibly-converted table, time column name).
+
+    Grapher has a second daily-data convention this module didn't originally
+    account for: some indicators store a day-offset integer in a column
+    literally named "year" (`display.yearIsDay=True`, `display.zeroDay` gives
+    the reference date) rather than in an actual "date" column. Confirmed on
+    covid/latest/cases_deaths: display == {"zeroDay": "2020-01-21",
+    "yearIsDay": True, ...}. Left unconverted, that integer gets silently
+    treated as a calendar year (e.g. -17, 2350) -- wrong, not just mislabeled.
+    Convert it to a real "date" column before it reaches any join/output.
+    """
+    if "date" in tb.columns:
+        # Normalize dtype regardless of source -- real "date" columns show up
+        # as category, datetime64, or object depending on the table, and a
+        # collection can combine several of those. Merging mismatched dtypes
+        # on the join key raises ("merge on object and datetime64[ns] columns
+        # for key 'date'"), so every table's "date" is cast to the same
+        # plain ISO-string form before it reaches any join.
+        tb = tb.copy()
+        tb["date"] = pd.to_datetime(tb["date"]).dt.date.astype(str)
+        return tb, "date"
+    if "year" not in tb.columns:
+        raise ValueError(f"Expected one of {TIME_COLUMN_CANDIDATES} in columns, found {list(tb.columns)}")
+
+    value_cols = [c for c in tb.columns if c not in ("country", "year")]
+    displays = [getattr(tb[c].metadata, "display", None) or {} for c in value_cols]
+    if not any(d.get("yearIsDay") for d in displays):
+        return tb, "year"
+
+    zero_days = {d["zeroDay"] for d in displays if d.get("yearIsDay") and d.get("zeroDay")}
+    if len(zero_days) != 1:
+        raise ValueError(f"Expected exactly one zeroDay for yearIsDay columns, found {zero_days}")
+    zero_day = pd.Timestamp(zero_days.pop())
+
+    tb = tb.copy()
+    tb["date"] = (zero_day + pd.to_timedelta(tb["year"], unit="D")).dt.date.astype(str)
+    tb = tb.drop(columns=["year"])
+    return tb, "date"
 
 
 @dataclass
@@ -109,7 +151,8 @@ def build_wide_table(tables: list[Table]) -> Table:
     "both"} -> "average_years_schooling__level_all__sex_both")."""
     renamed = []
     for tb in tables:
-        key_cols = ("country", _time_column(tb))
+        tb, time_col = _resolve_time_column(tb)
+        key_cols = ("country", time_col)
         rename = {}
         for col in tb.columns:
             if col in key_cols:
@@ -169,9 +212,10 @@ def build_wide_table_for_collection(collection: Collection) -> Table:
         if dataset_dir not in dataset_cache:
             dataset_cache[dataset_dir] = CatalogDataset(DATA_DIR / dataset_dir)
         tb = dataset_cache[dataset_dir][table_name].reset_index()
+        tb, time_col = _resolve_time_column(tb)
 
         rename = {}
-        keep = ["country", _time_column(tb)]
+        keep = ["country", time_col]
         for column, dims in cols:
             if column not in tb.columns:
                 log.warning(
@@ -210,7 +254,7 @@ per-view download you get from the chart itself.
 
 {columns_list}
 
-Column names encode their dimension values (e.g. `sex_both`, `level_all`) —
+Column names encode their dimension values as `<dimension>_<value>` pairs —
 see manifest.json for the full dimension list.
 """
 
