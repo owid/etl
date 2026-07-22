@@ -374,12 +374,20 @@ ORIGINAL_MAP_SCHEMES = {
     ("nuclear", "generation"): {
         "baseColorScheme": "GnBu",
         "binningStrategy": "manual",
-        "customNumericValues": [0, 10, 20, 50, 100, 200, 500, 1],
+        # Leading [0, 0] "No nuclear" grey bin, as on the nuclear share map (see ("nuclear", "share_of_generation")).
+        "customNumericValues": [0, 0, 10, 20, 50, 100, 200, 500, 1],
+        "customNumericColors": ["#dedede", None, None, None, None, None, None, None],
+        "customNumericLabels": ["No nuclear", "", None, None, None, None, None, None],
+        "customNumericColorsActive": True,
     },
     ("nuclear", "per_capita"): {
         "baseColorScheme": "PuBuGn",
         "binningStrategy": "manual",
-        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 1],
+        # Leading [0, 0] "No nuclear" grey bin, as on the nuclear share map (see ("nuclear", "share_of_generation")).
+        "customNumericValues": [0, 0, 100, 200, 500, 1000, 2000, 5000, 1],
+        "customNumericColors": ["#dedede", None, None, None, None, None, None, None],
+        "customNumericLabels": ["No nuclear", "", None, None, None, None, None, None],
+        "customNumericColorsActive": True,
     },
     ("nuclear", "share_of_generation"): {
         "baseColorScheme": "YlGnBu",

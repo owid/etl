@@ -421,7 +421,11 @@ ORIGINAL_MAP_SCHEMES = {
     ("nuclear", "per_capita"): {
         "baseColorScheme": "PuBuGn",
         "binningStrategy": "manual",
-        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 10000, 1],
+        # Leading [0, 0] "No nuclear" grey bin, as on the nuclear share map (see ("nuclear", "share")).
+        "customNumericValues": [0, 0, 100, 200, 500, 1000, 2000, 5000, 10000, 1],
+        "customNumericColors": ["#dedede", None, None, None, None, None, None, None, None],
+        "customNumericLabels": ["No nuclear", "", None, None, None, None, None, None, None],
+        "customNumericColorsActive": True,
     },
     ("nuclear", "share"): {
         "baseColorScheme": "BuPu",
@@ -436,8 +440,11 @@ ORIGINAL_MAP_SCHEMES = {
     ("nuclear", "total"): {
         "baseColorScheme": "BuPu",
         "binningStrategy": "manual",
-        "customNumericValues": [0, 10, 30, 100, 300, 1000, 1],
-        "customNumericColors": [None, None, None],
+        # Leading [0, 0] "No nuclear" grey bin, as on the nuclear share map (see ("nuclear", "share")).
+        "customNumericValues": [0, 0, 10, 30, 100, 300, 1000, 1],
+        "customNumericColors": ["#dedede", None, None, None],
+        "customNumericLabels": ["No nuclear", "", None, None, None, None, None],
+        "customNumericColorsActive": True,
     },
     ("oil", "annual_change"): {
         "baseColorScheme": "PRGn",
