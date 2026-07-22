@@ -14,7 +14,10 @@ definitions:
   fiscal_years: |-
     Values refer to US fiscal years rather than calendar years. Fiscal year 1976 covered 15 months, because the end date of fiscal years was moved from June to September that year.
   counting_changes: |-
-    The way immigrants were counted has changed over time. From 1820 to 1867, the figures count passengers arriving at seaports; from 1868 to 1891, arriving immigrants; and from 1892 onward, immigrants admitted for permanent residence. Immigrants entering overland from Canada and Mexico were not fully counted before 1908.
+    The way immigrants were counted has changed over time.
+    - **1820–1867:** The figures count every foreign national who arrived by ship at a US seaport, including temporary visitors and people passing through, because no distinction was yet made between immigrants and other travelers.
+    - **1868–1891:** The figures count only foreign nationals who arrived intending to settle, because the government now separated genuine immigrants from temporary visitors and stopped counting the visitors.
+    - **1892 onward:** The figures count only foreign nationals formally inspected and admitted for permanent residence, so people who arrived but were turned away at inspection are no longer included, and the count reflects a legal admission rather than a simple arrival.
 
 dataset:
   update_period_days: 365
@@ -29,7 +32,6 @@ tables:
         description_key:
           - "{definitions.what_this_counts}"
           - "{definitions.counting_changes}"
-          - To protect privacy, the source rounds all values to the nearest 10.
           - "{definitions.fiscal_years}"
         display:
           name: New lawful permanent residents
@@ -62,8 +64,8 @@ tables:
         description_key:
           - "{definitions.what_this_counts}"
           - "{definitions.counting_changes}"
-          - Country borders have changed over this period, so a country's figures may not always refer to the same area. The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden. Russia refers to the Russian Empire until 1920, the Soviet Union until 1990, and a group of post-Soviet countries in the 1990s. Czechoslovakia includes Czechia and Slovakia, Yugoslavia includes its successor countries, Korea includes both North and South Korea, and Canada includes Newfoundland, which was a separate territory until it joined Canada in 1949.
           - Immigrants entering overland from Canada and Mexico were not fully counted before 1908. We therefore only show data for Canada and Mexico from the 1910s onward.
+          - Country borders have changed over this period, so a country's figures may not always refer to the same area. The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden. Russia refers to the Russian Empire until 1920, the Soviet Union until 1990, and a group of post-Soviet countries in the 1990s. Czechoslovakia includes Czechia and Slovakia, Yugoslavia includes its successor countries, Korea includes both North and South Korea, and Canada includes Newfoundland, which was a separate territory until it joined Canada in 1949.
           - "{definitions.fiscal_years}"
         display:
           name: New lawful permanent residents
@@ -81,6 +83,7 @@ tables:
         description_key:
           - "{definitions.what_this_counts}"
           - "{definitions.counting_changes}"
+          - Immigrants entering overland from Canada and Mexico were not fully counted before 1908.
           - '"Not specified" covers people whose origin was not recorded, and a small number of people from the Americas whom the source does not assign to a specific country.'
           - "{definitions.fiscal_years}"
         description_processing: |-
