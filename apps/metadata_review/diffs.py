@@ -1,8 +1,9 @@
-"""Compact diff helpers for suggestion rendering.
+"""Diff helpers for suggestion rendering.
 
-`description_key` is a markdown bullet list that can run to a dozen bullets;
-repeating the whole list in every thread drowns the actual change. These helpers
-reduce a proposal to only what changed, bullet by bullet.
+Proposals render as tracked changes over the FULL text — the reader always sees
+the entire field as it would read, with deletions struck through and insertions
+tinted. `description_key` (a markdown bullet list) diffs bullet-by-bullet so a
+rewritten bullet tracks inline instead of appearing as a remove+add pair.
 """
 
 import difflib
@@ -105,36 +106,24 @@ def tracked_changes_html(current: str | None, proposed: str | None, is_bullet_li
     """Full tracked-changes rendering of a proposal, ready for st.html.
 
     Bullet-list fields diff bullet-by-bullet: changed bullets get inline word
-    tracking, added/removed bullets are marked whole, unchanged runs collapse.
+    tracking, added/removed bullets are marked whole, and unchanged bullets are
+    shown in full — the reader always sees the entire text as it would read.
     """
     if not is_bullet_list:
         body = word_diff_html(current, proposed)
         return f'<div style="line-height:1.55;font-size:0.95rem;">{body}</div>'
 
     lines: list[str] = []
-    keep_run = 0
-
-    def flush_keeps() -> None:
-        nonlocal keep_run
-        if keep_run:
-            noun = "bullet" if keep_run == 1 else "bullets"
-            lines.append(f'<li style="color:#888;list-style:none;">… {keep_run} unchanged {noun}</li>')
-            keep_run = 0
-
     for kind, removed, added in paired_ops(bullet_diff(current, proposed)):
         if kind == "keep":
-            keep_run += 1
+            lines.append(f"<li>{html.escape(removed or '')}</li>")
         elif kind == "pair":
             # A changed bullet: render as one bullet with inline word tracking.
-            flush_keeps()
             lines.append(f"<li>{word_diff_html(removed, added)}</li>")
         elif kind == "remove":
-            flush_keeps()
             lines.append(f'<li><del style="{_DEL_STYLE}">{html.escape(removed or "")}</del></li>')
         else:
-            flush_keeps()
             lines.append(f'<li><ins style="{_INS_STYLE}">{html.escape(added or "")}</ins></li>')
-    flush_keeps()
     return '<ul style="line-height:1.55;font-size:0.95rem;margin:0;padding-left:1.2rem;">' + "".join(lines) + "</ul>"
 
 
@@ -233,31 +222,3 @@ def apply_bullet_edits(
         return None
     text = target[0] if len(target) == 1 else "\n".join(f"- {b}" for b in target)
     return text, applied, total
-
-
-def diff_markdown_lines(ops: list[BulletDiff], collapse_keeps: bool = True) -> list[str]:
-    """Markdown lines showing only the changed bullets; unchanged runs are summarized."""
-    lines: list[str] = []
-    keep_run = 0
-
-    def flush_keeps() -> None:
-        nonlocal keep_run
-        if keep_run:
-            noun = "bullet" if keep_run == 1 else "bullets"
-            lines.append(f"- _… {keep_run} unchanged {noun}_")
-            keep_run = 0
-
-    for op in ops:
-        if op.op == "keep":
-            if collapse_keeps:
-                keep_run += 1
-            else:
-                lines.append(f"- {op.text}")
-        elif op.op == "remove":
-            flush_keeps()
-            lines.append(f"- :red[−] ~~{op.text}~~")
-        else:
-            flush_keeps()
-            lines.append(f"- :green[+] {op.text}")
-    flush_keeps()
-    return lines

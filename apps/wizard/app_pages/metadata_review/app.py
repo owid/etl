@@ -29,7 +29,7 @@ from etl.config import OWID_ENV  # noqa: E402
 st.title(":material/rate_review: Metadata Review")
 st.markdown(
     "Review the user-facing text of MDims and data pages, and leave field-level suggestions. "
-    "Each field shows **where its text comes from**, so the implementer knows what to edit."
+    "Where the text comes from (and what to edit) is resolved automatically for the implementer."
 )
 
 
@@ -132,7 +132,7 @@ def mdim_page(user) -> None:
     )
 
     with tab_page:
-        st.caption("The MDim title and every dropdown label. All of these live in the MDim config.")
+        st.caption("The MDim title and every dropdown label.")
         for field in review.page_fields:
             render_field(
                 field,
@@ -350,8 +350,7 @@ def dataset_page(user) -> None:
 
     st.header(review.name or catalog_path)
     st.caption(
-        f"{len(review.indicators)} indicators. Fields here are all **inherited** from the ETL metadata "
-        "(or missing) — suggestions filed here also surface on MDim views using these indicators."
+        f"{len(review.indicators)} indicators — suggestions filed here also surface on MDim views showing the same text."
     )
 
     query = st.text_input("Filter indicators", key="mr_ds_filter", placeholder="Type to filter by name or path...")
@@ -443,7 +442,7 @@ def _all_suggestions_tab(
                 dims = mdim_review.human_dimensions(view.dimensions)
                 st.caption("View: " + " · ".join(f"**{k}:** {v}" for k, v in dims.items()))
         elif field.target_type == "indicator":
-            st.caption(f"Indicator: `{field.target_path}`")
+            st.caption(f"Indicator: {field.target_path.split('#')[-1].replace('_', ' ')}")
         shared = shared_view_ids(mdim_review, field) if mdim_review is not None else None
         render_field(
             field,

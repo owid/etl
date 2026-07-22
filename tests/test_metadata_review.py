@@ -346,7 +346,7 @@ def test_split_bullets_prose_and_list():
 
 
 def test_bullet_diff_only_changed_bullets():
-    from apps.metadata_review.diffs import bullet_diff, diff_markdown_lines, diff_summary
+    from apps.metadata_review.diffs import bullet_diff, diff_summary, tracked_changes_html
 
     current = "- Keep me\n- Old wording\n- Also keep"
     proposed = "- Keep me\n- New wording\n- Also keep\n- Brand new bullet"
@@ -359,12 +359,14 @@ def test_bullet_diff_only_changed_bullets():
         ("add", "Brand new bullet"),
     ]
     assert diff_summary(ops) == "2 added, 1 removed; 2 unchanged"
-    lines = diff_markdown_lines(ops)
-    # Unchanged bullets are summarized, not repeated.
-    assert "- _… 1 unchanged bullet_" in lines
-    assert any("~~Old wording~~" in line for line in lines)
-    assert any(":green[+] New wording" in line for line in lines)
-    assert not any("Keep me" in line for line in lines)
+    # The tracked rendering shows the ENTIRE list: unchanged bullets in full,
+    # the changed one with inline word tracking, additions tinted.
+    out = tracked_changes_html(current, proposed, is_bullet_list=True)
+    assert "Keep me" in out and "Also keep" in out
+    assert "unchanged" not in out  # no collapsed placeholders
+    assert "<del" in out and "Old" in out
+    # The changed bullet tracks word-by-word, so markup splits the phrase.
+    assert "<ins" in out and "New" in out and "wording" in out and "Brand new bullet" in out
 
 
 def test_word_diff_html_tracks_changes_inline():
@@ -384,10 +386,12 @@ def test_tracked_changes_html_bullets():
     out = tracked_changes_html(
         "- Keep\n- Old wording here\n- Tail", "- Keep\n- New wording here\n- Tail", is_bullet_list=True
     )
-    # The changed bullet is ONE bullet with inline word tracking, not a remove+add pair.
-    assert out.count("<li>") == 1
+    # Every bullet shows (full text always); the changed one is a single bullet
+    # with inline word tracking, not a remove+add pair.
+    assert out.count("<li>") == 3
+    assert "Keep" in out and "Tail" in out
     assert "<del" in out and "Old" in out and "<ins" in out and "New" in out
-    assert "unchanged" in out  # kept bullets collapsed
+    assert "unchanged" not in out
 
 
 def test_apply_bullet_edits_transfers_shared_bullet():
