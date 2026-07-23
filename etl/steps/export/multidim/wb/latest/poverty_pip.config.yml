@@ -64,13 +64,10 @@ definitions:
 
   description_key_not_market_income: In lower-income countries, many people produce food for their own use or exchange goods without money. This data accounts for that by estimating what these goods would have cost if bought in the market and adding that value to their consumption or income.
 
-  # These views group several poverty lines, so the "show breaks in the data" option only becomes
-  # available after selecting a single poverty line — hence the no-toggle wording.
-  description_key_show_breaks_no_toggle: |-
-    The exact surveys that countries run can change over time, creating breaks across which data points are less comparable. The World Bank provides an indicator of where these breaks occur, and you can see them by selecting a single poverty line in the chart and using the option to show breaks in the data.
-
-  description_key_income_consumption_no_toggle: |-
-    For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations. You can see all the original data points, however, by selecting a single poverty line in the chart and using the option to show breaks in the data.
+  # These views group several poverty lines and expose no "show breaks in the data" toggle, so the
+  # show-breaks bullet is omitted entirely and the income/consumption bullet drops its breaks reference.
+  description_key_income_consumption_no_breaks: |-
+    For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations.
 
   description_key_regional_global_estimates: |-
     Regional and global estimates are extrapolated to the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
@@ -196,8 +193,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -250,8 +246,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -300,8 +295,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -355,8 +349,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -425,8 +418,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -487,8 +479,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -530,8 +521,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -584,8 +574,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -633,8 +622,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -686,8 +674,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -756,8 +743,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
@@ -817,8 +803,7 @@ views:
         - "{definitions.description_key_umic_poverty_line}"
         - "{definitions.description_key_source_world_bank}"
         - "{definitions.description_key_not_market_income}"
-        - "{definitions.description_key_show_breaks_no_toggle}"
-        - "{definitions.description_key_income_consumption_no_toggle}"
+        - "{definitions.description_key_income_consumption_no_breaks}"
         - "{definitions.description_key_regional_global_estimates}"
         - "{definitions.description_key_ppp}"
       description_short: "{definitions.ppp_adjustment_subtitle}"
