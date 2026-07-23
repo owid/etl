@@ -17,6 +17,29 @@ time doesn't. The Cloudflare Function fetches the finished CSV + a small
 indicator index from R2 on every download request and does the rest (real
 per-indicator metadata, citations, readme) live, so metadata still stays
 fresh from the Data API.
+
+KNOWN LIMITATION -- there is still a size ceiling, just a much higher one.
+The Cloudflare Function fetches the whole CSV into memory and hands it to
+littlezipper, which buffers the zip's output too (see the doc comment in
+mdimDownloadFunctions.ts) -- roughly 2x the CSV's own size on top of it, all
+within the Worker's 128MB isolate limit. Measured 2026-07-23 against the
+largest real table in the codebase (covid/latest/cases_deaths, 589,632 rows):
+the resulting wide CSV was 34.8MB and the live route on staging returned 200
+in ~2s. That's the actual biggest case in the current MDIM set and it's
+comfortably fine, but a future MDIM with a much wider table (many more
+indicators than covid_deaths' 6, or more rows) could eventually cross the
+line -- there was no complaint against a real ceiling, only headroom that
+looked large before it was measured.
+
+If that happens, the fallback (considered and deliberately not built,
+because nothing needs it yet) is to split into two downloads instead of one
+zip: link directly to this module's already-final-format CSV in R2 (zero
+Cloudflare Function cost, since the file needs no further processing) plus a
+separate, small, dynamically-built zip containing just metadata.json +
+readme.md (cheap regardless of row count, since it's O(indicators) not
+O(rows)). The cost is UX, not implementation: two links/files instead of one
+zip shaped like a chart's own download. All the ETL-side work above (entity
+codes, long names) stays exactly as useful for that path as for this one.
 """
 
 from __future__ import annotations
