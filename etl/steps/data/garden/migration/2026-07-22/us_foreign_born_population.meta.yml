@@ -101,7 +101,7 @@ tables:
   share_by_origin_group:
     variables:
       share_of_population:
-        title: Share of the United States population born in another country, by region of birth
+        title: Share of the United States population born in another country, by place of birth
         unit: "%"
         short_unit: "%"
         description_key: |-
