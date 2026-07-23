@@ -18,4 +18,14 @@ dataset:
     - Pablo Rosado
 tables:
   energy_mix:
-    variables: {}
+    variables:
+      traditional_biomass_twh:
+        title: Traditional biomass
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Energy from traditional biomass (fuelwood, charcoal, crop residues, and dung), measured in [terawatt-hours](#dod:watt-hours). This is not part of total energy supply and is shown separately.
+        description_processing: |-
+          - Traditional biomass (fuelwood, charcoal, crop residues, and dung) is estimated by Vaclav Smil (2017) from per-capita consumption and population, and is available for the World only. The level is highly uncertain, with estimates across the literature spanning roughly a factor of two.
+          - Smil's series ends in 2015; for later years we hold the last available value constant, because there is no reliable recent measurement of traditional biomass use. It is kept separate from total energy supply, which follows the Statistical Review's commercially-traded scope.
+        display:
+          name: Traditional biomass

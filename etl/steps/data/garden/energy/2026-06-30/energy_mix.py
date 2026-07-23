@@ -106,6 +106,31 @@ def add_smil_world_long_run(tb: Table, tb_smil: Table) -> Table:
     return tb
 
 
+def add_traditional_biomass(tb: Table, tb_smil: Table) -> Table:
+    """Add World traditional biomass (Smil 2017) as a separate series.
+
+    Traditional biomass is deliberately NOT part of Total Energy Supply: it is excluded from the total
+    and from every aggregate, and is not exposed as an MDIM source. It is provided here as a standalone
+    World-only series so the biomass-inclusive charts (e.g. global primary energy by source, including
+    traditional biomass) can stack it alongside the commercially-traded sources.
+
+    Smil's estimates run until ~2015; for later years we hold the last value constant (as the previous
+    global_primary_energy step did), because there is no reliable recent measurement of traditional
+    biomass use.
+    """
+    smil = tb_smil.reset_index()
+    smil = smil[smil["country"] == "World"][["country", "year", "traditional_biomass__twh_direct_energy"]].rename(
+        columns={"traditional_biomass__twh_direct_energy": "traditional_biomass_twh"}, errors="raise"
+    )
+    tb = combine_two_overlapping_dataframes(df1=tb, df2=smil, index_columns=["country", "year"])
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+    # Hold Smil's last value constant from its final year up to the latest year in the data.
+    smil_last_year = int(smil["year"].max())
+    mask = (tb["country"] == "World") & (tb["year"] >= smil_last_year)
+    tb.loc[mask, "traditional_biomass_twh"] = tb.loc[mask, "traditional_biomass_twh"].ffill()
+    return tb
+
+
 def add_aggregate_sources(tb: Table) -> Table:
     """Create aggregate sources (fossil fuels, renewables, low-carbon energy, solar and wind)."""
     tb = tb.copy()
@@ -273,6 +298,9 @@ def run() -> None:
 
     # Extend the total energy supply with EIA data (for countries not covered by the Statistical Review).
     tb = extend_total_with_eia(tb=tb, tb_eia=tb_eia)
+
+    # Add World traditional biomass (Smil), kept separate from the TES total, for biomass-inclusive charts.
+    tb = add_traditional_biomass(tb=tb, tb_smil=tb_smil)
 
     # Add shares, annual change, per-capita and per-GDP variables.
     tb = add_shares(tb=tb)
