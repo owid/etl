@@ -11,18 +11,18 @@ tables:
   norway_emigration:
     variables:
       overseas_emigration_share:
-        title: Share of Norway's population emigrating to overseas countries
+        title: Annual share of Norway's population emigrating outside Europe
         unit: "%"
         short_unit: "%"
+        description_short: Only emigration to overseas destinations outside Europe is counted — mostly to North America. People moving to other European countries are not included.
         description_key: |-
-          The figures count people leaving Norway each year for countries outside Europe — mostly North America. They were recorded through passenger lists of emigrant ships. People moving to other European countries were not recorded, so total emigration was higher than these figures show.
+          This data counts people who left Norway for overseas countries outside Europe — [overwhelmingly North America](https://www.ssb.no/a/histstat/nos/nos_vii_025.pdf).
+
+          From 1867, they were registered by the police when departing on emigrant ships from Norwegian ports; earlier figures were compiled from local administrative reports. People moving to other European countries were not recorded, and some overseas emigrants were also missed, for example those who traveled via ports in other countries.
 
           The series ends in 1950, because from 1951 onward Statistics Norway counted all emigration rather than only emigration to overseas countries.
         description_processing: |-
           We calculated this indicator by dividing the number of emigrations by the population of Norway at the start of the same year, reported in the same source table.
-        processing_level: major
+        processing_level: minor
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            note: Only emigration to destinations outside Europe is counted — mostly to North America. People moving to other European countries are not included.
