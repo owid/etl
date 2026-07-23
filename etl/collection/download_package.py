@@ -5,13 +5,18 @@ Prototype for the mdim-downloads project (see owid-projects/mdim-downloads).
 Mirrors how a regular chart's own download works: the zip is built fresh per
 request by a Cloudflare Function on the grapher side
 (functions/_common/mdimDownloadFunctions.ts), not baked once and stored at a
-fixed URL. ETL's job is only the part that genuinely benefits from running at
+fixed URL. ETL's job is the part that genuinely benefits from running once at
 publish time rather than per-request: joining every view's indicator into one
-wide table (no per-view HTTP fetch) and resolving each indicator's real
-grapher variable ID. `stage_download_package_for_collection()` uploads that
-join (wide.csv) plus an indicator index to R2; the grapher-side function
-fetches those two small files on every download request and does the rest
-(real per-indicator metadata, citations, readme) live.
+wide table (no per-view HTTP fetch), resolving each indicator's real grapher
+variable ID, AND writing the CSV in its final downloadable shape (Entity/Code/
+Year columns, long display-name headers, numbers formatted) -- so the
+Cloudflare Function never has to parse or rebuild the CSV. On a real
+covid-scale MDIM (~590k rows), doing that row-by-row rebuild inside a Worker
+would risk the 128MB isolate memory limit; doing it once in pandas at build
+time doesn't. The Cloudflare Function fetches the finished CSV + a small
+indicator index from R2 on every download request and does the rest (real
+per-indicator metadata, citations, readme) live, so metadata still stays
+fresh from the Data API.
 """
 
 from __future__ import annotations
@@ -196,6 +201,70 @@ def resolve_variable_ids(catalog_paths: list[str]) -> dict[str, int]:
         return Variable.catalog_paths_to_variable_ids(session, catalog_paths)
 
 
+def _resolve_entity_codes(names: list[str]) -> dict[str, str]:
+    """Look up OWID entity codes for a list of country/region names, via the
+    same DB -- no need to go through the Data API for this."""
+    from sqlalchemy import select
+    from sqlalchemy.orm import Session
+
+    from etl.config import OWID_ENV
+    from etl.grapher.model import Entity
+
+    with Session(OWID_ENV.engine) as session:
+        query = select(Entity.name, Entity.code).where(Entity.name.in_(names))
+        return {name: code for name, code in session.execute(query) if code}
+
+
+def _fetch_variables(variable_ids: list[int]):
+    """Fetch full Variable rows (title/display/presentation fields) for a list
+    of variable IDs -- the same fields the Data API serves, straight from the
+    DB ETL already upserted them into."""
+    from sqlalchemy import select
+    from sqlalchemy.orm import Session
+
+    from etl.config import OWID_ENV
+    from etl.grapher.model import Variable
+
+    with Session(OWID_ENV.engine) as session:
+        query = select(Variable).where(Variable.id.in_(variable_ids))
+        return {var.id: var for var in session.scalars(query).all()}
+
+
+def _compute_long_column_name(var) -> str:
+    """Mirrors computeLongColumnName in mdimDownloadFunctions.ts (owid-grapher)
+    field-for-field. Computed once here, in ETL, rather than from live Data API
+    data in the Cloudflare Function -- it becomes both the CSV header and
+    metadata.json's column key, so the two can't drift from each other."""
+    display_name = (var.display or {}).get("name")
+    title_public = var.titlePublic or display_name or var.name
+    title = title_public
+    if var.attributionShort and var.titleVariant:
+        title = f"{title} – {var.titleVariant} – {var.attributionShort}"
+    elif var.titleVariant:
+        title = f"{title} – {var.titleVariant}"
+    elif var.attributionShort:
+        title = f"{title} – {var.attributionShort}"
+    if display_name and display_name != title_public:
+        title = f"{title} ({display_name})"
+    return title
+
+
+def _format_numeric_series(s: pd.Series) -> pd.Series:
+    """Print whole numbers without a trailing ".0" ("11", not "11.0") and NaN
+    as an empty cell -- matches how grapher's own CSV writer serializes
+    values. One-time cost at ETL build time, not per download request."""
+    if not pd.api.types.is_numeric_dtype(s):
+        return s
+
+    def fmt(v):
+        if pd.isna(v):
+            return ""
+        f = float(v)
+        return str(int(f)) if f.is_integer() else str(v)
+
+    return s.map(fmt)
+
+
 # Buckets with a known public HTTPS domain -- mirrors the pattern already used
 # for owid_co2.py / owid_energy.py / income_distribution.py etc. (S3_BUCKET_NAME
 # = "owid-public", served at owid-public.owid.io). Add more here if this ever
@@ -251,11 +320,34 @@ def stage_download_package_for_collection(
     if missing:
         log.warning("download_package.variable_id_missing", catalog_paths=missing)
 
+    variables = _fetch_variables(list(variable_ids.values()))
+
+    # Long display name per wide-table column, computed once here so it can't
+    # drift from what the Cloudflare Function later uses as metadata.json's
+    # column key -- becomes both the CSV header and that key.
+    long_names: dict[str, str] = {}
+    seen_long_names: dict[str, str] = {}
+    for wide_name, catalog_path in column_to_catalog_path.items():
+        var = variables.get(variable_ids.get(catalog_path))
+        if var is None:
+            continue
+        long_name = _compute_long_column_name(var)
+        existing = seen_long_names.get(long_name)
+        if existing and existing != wide_name:
+            log.warning(
+                "download_package.column_name_collision",
+                long_name=long_name,
+                columns=[existing, wide_name],
+            )
+        seen_long_names[long_name] = wide_name
+        long_names[wide_name] = long_name
+
     indicators = [
         {
             "wideColumnName": wide_name,
             "catalogPath": catalog_path,
             "owidVariableId": variable_ids.get(catalog_path),
+            "longName": long_names.get(wide_name, wide_name),
         }
         for wide_name, catalog_path in column_to_catalog_path.items()
         if catalog_path in variable_ids
@@ -271,8 +363,26 @@ def stage_download_package_for_collection(
         "indicators": indicators,
     }
 
+    # Write the CSV in its FINAL downloadable shape -- Entity/Code/Year, long
+    # display-name headers, numbers formatted -- so the Cloudflare Function
+    # can pass the bytes straight into the zip without parsing a single row.
+    time_col = _time_column(wide)
+    time_header = "Day" if time_col == "date" else "Year"
+    data_cols = [c for c in wide.columns if c not in ("country", time_col)]
+    entity_codes = _resolve_entity_codes(wide["country"].unique().tolist())
+
+    final = pd.DataFrame(
+        {
+            "Entity": wide["country"],
+            "Code": wide["country"].map(entity_codes).fillna(""),
+            time_header: wide[time_col],
+        }
+    )
+    for c in data_cols:
+        final[long_names.get(c, c)] = _format_numeric_series(wide[c])
+
     csv_path = dest_dir / "wide.csv"
-    wide.to_csv(csv_path, index=False)
+    final.to_csv(csv_path, index=False)
     indicators_path = dest_dir / "indicators.json"
     indicators_path.write_text(json.dumps(index, indent=2))
 
