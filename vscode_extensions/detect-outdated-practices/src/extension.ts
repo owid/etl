@@ -138,9 +138,11 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
 // Message for the Dataset table-read rule (implemented as a stateful pass in updateDiagnostics,
 // not a per-line regex, because it needs to know which variables are live Dataset objects).
 const DATASET_READ_MESSAGE =
-    'Reading a table via `ds["table"]` subscript is outdated. Use `ds.read("table")` instead — it '
-    + 'resets the index by default; pass `reset_index=False` to keep the index '
-    + '(e.g. `ds.read("table", reset_index=False)`).';
+    'Reading a table via `ds["table"]` subscript is outdated; use `ds.read("table")`. '
+    + 'If the read is chained with `.reset_index()`, replace the whole `ds["table"].reset_index()` '
+    + 'expression with `ds.read("table")` — it already resets the index, so keeping the trailing '
+    + '`.reset_index()` would add a spurious `index` column. Where you need to preserve the index '
+    + '(e.g. feeding a grapher step), use `ds.read("table", reset_index=False)`.';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Detect Outdated Practices extension activated.');
