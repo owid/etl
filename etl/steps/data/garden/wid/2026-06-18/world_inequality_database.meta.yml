@@ -633,7 +633,6 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_national_income}"
           - "{definitions.description_key_missing_data}"
-          - "{definitions.description_key_posttax}"
         display:
           name: Share (bottom 50%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -666,7 +665,6 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_national_income}"
           - "{definitions.description_key_missing_data}"
-          - "{definitions.description_key_posttax}"
         display:
           name: Share (middle 40%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -683,7 +681,6 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_national_income}"
           - "{definitions.description_key_missing_data}"
-          - "{definitions.description_key_posttax}"
         display:
           name: Share (90-99th percentiles, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -700,7 +697,6 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_national_income}"
           - "{definitions.description_key_missing_data}"
-          - "{definitions.description_key_posttax}"
         display:
           name: Share (top 10%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -732,7 +728,6 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_national_income}"
           - "{definitions.description_key_missing_data}"
-          - "{definitions.description_key_posttax}"
         display:
           name: Share (top 1%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -764,7 +759,6 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_national_income}"
           - "{definitions.description_key_missing_data}"
-          - "{definitions.description_key_posttax}"
         display:
           name: Share (top 0.1%, <<welfare_type>>)
           numDecimalPlaces: 1
@@ -951,7 +945,6 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_national_income}"
           - "{definitions.description_key_missing_data}"
-          - "{definitions.description_key_posttax}"
         display:
           name: |-
             {macros}

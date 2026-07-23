@@ -27,10 +27,6 @@ OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX = "Before tax income is measured bef
 OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX = "After tax income is measured after taxes have been paid and government benefits have been received. This includes not only cash benefits like social assistance, but also the value of public services like hospitals and schools, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by survey-based data sources."
 NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown as separate series. Comparing the two gives a sense of the role of redistribution through a country's tax and benefits system."
 
-# Sourced from the after_tax indicator's description_key. The before_vs_after view inherits from the
-# before_tax indicator, so this bullet is otherwise lost; we re-attach it as the last bullet.
-DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY = "Data on income after tax and benefits is less widely available than that before tax. Where it is missing, WID constructs distributions from the more widely available pre-tax data, combined with data on tax revenue and government expenditure. These estimates are more uncertain than where direct data is available. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/)."
-
 
 def run() -> None:
     #
@@ -235,7 +231,6 @@ def _get_before_vs_after_metadata(tb, view):
 
         description_key = _description_key_bullets(meta)
         description_key = _replace_welfare_type_bullet(description_key, col_name)
-        description_key = _append_after_tax_availability_bullet(description_key, tb, view)
 
         return {
             "title": title,
@@ -254,23 +249,6 @@ def _replace_welfare_type_bullet(description_key, col_name):
         f"Neither OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX nor _AFTER_TAX found in {col_name}.description_key — garden text changed, update the constants."
     )
     return [NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER if b in old_welfare_keys else b for b in description_key]
-
-
-def _append_after_tax_availability_bullet(description_key, tb, view):
-    """Append the after_tax-only availability caveat (sourced from the after_tax indicator) as the last bullet."""
-    if DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY in description_key:
-        return description_key
-    after_tax_ind = next((i for i in view.indicators.y if "after_tax" in i.catalogPath), None)
-    if after_tax_ind:
-        after_tax_col = after_tax_ind.catalogPath.split("#")[-1]
-        after_tax_description_key = (
-            _description_key_bullets(tb[after_tax_col].metadata) if after_tax_col in tb.columns else []
-        )
-        assert DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY in after_tax_description_key, (
-            f"DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY not found in {after_tax_col}.description_key — garden text changed, update the constant."
-        )
-        description_key.append(DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY)
-    return description_key
 
 
 def _assert_and_replace(text, old, new, field, col_name):
