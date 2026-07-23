@@ -27,7 +27,7 @@ tables:
   us_lawful_permanent_residents:
     variables:
       immigrants:
-        title: People obtaining legal permanent resident status in the United States
+        title: People granted permanent residency in the United States
         description_key: |-
           {definitions.counting_changes}
 
@@ -36,14 +36,14 @@ tables:
           grapher_config:
             note: Counts the year residency was granted, not the year someone arrived. Many recipients lived in the US for years beforehand — on temporary visas, as refugees, or without legal status. People who never obtain legal status are not included.
       immigrants_per_1000:
-        title: People obtaining legal permanent resident status in the United States, per 1,000 people in the population
+        title: People granted permanent residency in the United States, per 1,000 people in the population
         unit: per 1,000 people
         description_key: |-
           {definitions.counting_changes}
 
           {definitions.status_grants}
         description_processing: |-
-          We calculated this indicator by dividing the number of people obtaining legal permanent resident status by the population of the United States, using the [long-run population data](https://ourworldindata.org/population-sources) published by Our World in Data.
+          We calculated this indicator by dividing the number of people granted permanent residency by the population of the United States, using the [long-run population data](https://ourworldindata.org/population-sources) published by Our World in Data.
         processing_level: major
         display:
           numDecimalPlaces: 1
@@ -54,7 +54,7 @@ tables:
   by_country_of_origin:
     variables:
       immigrants:
-        title: People obtaining legal permanent resident status in the United States, by country of origin
+        title: People granted permanent residency in the United States, by country of origin
         description_key: |-
           {definitions.counting_changes}
 
@@ -79,7 +79,7 @@ tables:
   by_region_of_origin:
     variables:
       immigrants:
-        title: People obtaining legal permanent resident status in the United States, by region of origin
+        title: People granted permanent residency in the United States, by region of origin
         description_key: |-
           {definitions.counting_changes}
 
