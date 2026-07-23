@@ -34,7 +34,7 @@ tables:
           {definitions.status_grants}
         presentation:
           grapher_config:
-            note: This data does not include unauthorized immigration as it happens, but people who later gain legal status appear in the year they are granted residence.
+            note: Counts the year residency was granted, not the year someone arrived. Many recipients lived in the US for years beforehand — on temporary visas, as refugees, or without legal status. People who never obtain legal status are not included.
       immigrants_per_1000:
         title: People obtaining legal permanent resident status in the United States, per 1,000 people in the population
         unit: per 1,000 people
@@ -49,7 +49,7 @@ tables:
           numDecimalPlaces: 1
         presentation:
           grapher_config:
-            note: This data does not include unauthorized immigration as it happens, but people who later gain legal status appear in the year they are granted residence.
+            note: Counts the year residency was granted, not the year someone arrived. Many recipients lived in the US for years beforehand — on temporary visas, as refugees, or without legal status. People who never obtain legal status are not included.
 
   by_country_of_origin:
     variables:
@@ -74,7 +74,7 @@ tables:
             Yugoslavia: includes successor countries
         presentation:
           grapher_config:
-            note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in. This data does not include unauthorized immigration as it happens, but people who later gain legal status appear in the decade they are granted residence.
+            note: Counts the year residency was granted, not the year someone arrived. Many recipients lived in the US for years beforehand — on temporary visas, as refugees, or without legal status. People who never obtain legal status are not included. Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
 
   by_region_of_origin:
     variables:
@@ -93,4 +93,4 @@ tables:
           timeInterval: decade
         presentation:
           grapher_config:
-            note: Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in. This data does not include unauthorized immigration as it happens, but people who later gain legal status appear in the decade they are granted residence.
+            note: Counts the year residency was granted, not the year someone arrived. Many recipients lived in the US for years beforehand — on temporary visas, as refugees, or without legal status. People who never obtain legal status are not included. Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
