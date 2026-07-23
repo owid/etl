@@ -138,3 +138,19 @@ def test_validate_skips_when_schema_not_vendored_locally():
     }
     # Should not raise (skipped because the local schema file is absent).
     _validate_chart_config(config, "my-chart")
+
+
+def test_uuid_v7_is_valid_and_time_ordered():
+    import time
+    import uuid as uuid_module
+
+    from etl.collection.chart_upsert import _uuid_v7
+
+    before_ms = time.time_ns() // 1_000_000
+    generated = uuid_module.UUID(_uuid_v7())
+    after_ms = time.time_ns() // 1_000_000
+
+    assert generated.version == 7
+    assert generated.variant == uuid_module.RFC_4122
+    # The top 48 bits are the unix-ms timestamp.
+    assert before_ms <= generated.int >> 80 <= after_ms

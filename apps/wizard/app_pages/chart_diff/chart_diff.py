@@ -169,33 +169,41 @@ def _target_has_etl_columns(target_chart: gm.Chart | None) -> bool:
 
 def _same_chart_across_envs(source_chart: gm.Chart, target_chart: gm.Chart) -> bool:
     """Return true when source and target refer to the same logical chart."""
+    # The config UUID (charts.configId) is the chart's stable identity: rows
+    # copied from production keep it, and chart-sync carries it along when
+    # creating a chart on production. It's the strongest signal we have.
+    if source_chart.configId == target_chart.configId:
+        return True
     if (
         _target_has_etl_columns(target_chart)
         and source_chart.catalogPath
         and source_chart.catalogPath == target_chart.catalogPath
     ):
         return True
+    # Legacy fallback for charts synced before config UUIDs were carried
+    # across environments: same numeric id and same creation time.
     return source_chart.id == target_chart.id and source_chart.createdAt == target_chart.createdAt
 
 
-def _is_catalog_path_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) -> bool:
-    """True when production minted its own row for an ETL-authored staging chart."""
-    if target_chart is None or not _target_has_etl_columns(target_chart):
+def _is_cross_env_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) -> bool:
+    """True when production minted its own row (with a different numeric id) for
+    a staging chart — matched by config UUID or catalogPath instead."""
+    if target_chart is None or source_chart.id == target_chart.id:
         return False
-    return bool(
-        source_chart.catalogPath
-        and source_chart.catalogPath == target_chart.catalogPath
-        and source_chart.id != target_chart.id
-    )
+    if source_chart.configId == target_chart.configId:
+        return True
+    if not _target_has_etl_columns(target_chart):
+        return False
+    return bool(source_chart.catalogPath and source_chart.catalogPath == target_chart.catalogPath)
 
 
 def _target_updated_at_for_review(source_chart: gm.Chart, target_chart: gm.Chart | None) -> dt.datetime | None:
     """Timestamp key used for approvals/conflicts.
 
-    Catalog-path twins did not exist in production when the staging chart was
-    reviewed, so their approvals were recorded with targetUpdatedAt=NULL.
+    Cross-environment twins did not exist in production when the staging chart
+    was reviewed, so their approvals were recorded with targetUpdatedAt=NULL.
     """
-    if target_chart is None or _is_catalog_path_twin(source_chart, target_chart):
+    if target_chart is None or _is_cross_env_twin(source_chart, target_chart):
         return None
     return target_chart.updatedAt
 
@@ -366,7 +374,7 @@ class ChartDiff:
                 with Session(OWID_ENV.engine) as session:
                     staging_created_at = get_staging_creation_time(session)
             chart_edited_in_prod = self.target_chart.updatedAt > staging_created_at
-            if _is_catalog_path_twin(self.source_chart, self.target_chart):
+            if _is_cross_env_twin(self.source_chart, self.target_chart):
                 chart_edited_in_prod = False
 
             # If edited, check if conflict was resolved
@@ -708,14 +716,25 @@ class ChartDiff:
                     chart.id: chart if _charts_are_equivalent_envs(source_charts[chart.id], chart) else None
                     for chart in target_charts_list
                 }
-            # New ETL-authored charts are created independently on staging and
-            # production. Their numeric IDs/createdAt differ, but catalogPath is
-            # the stable identity we should use for review and sync. Only possible
-            # once prod has the column.
-            if target_has_cols:
-                for source_chart_id, source_chart in source_charts.items():
-                    if target_charts.get(source_chart_id) is not None or not source_chart.catalogPath:
-                        continue
+            # Charts created on staging and synced to production keep their
+            # config UUID (charts.configId) but get a fresh numeric id there.
+            # Match still-unmatched charts by config UUID first (the column
+            # exists everywhere), then by catalogPath for ETL-authored charts
+            # synced before config UUIDs were carried across environments
+            # (only possible once prod has the column).
+            for source_chart_id, source_chart in source_charts.items():
+                if target_charts.get(source_chart_id) is not None:
+                    continue
+
+                stmt = select(gm.Chart).where(gm.Chart.configId == source_chart.configId)
+                if not target_has_cols:
+                    stmt = stmt.options(defer(gm.Chart.catalogPath), defer(gm.Chart.configIdETL))
+                twin = target_session.scalars(stmt).one_or_none()
+                if twin is not None:
+                    target_charts[source_chart_id] = twin
+                    continue
+
+                if target_has_cols and source_chart.catalogPath:
                     try:
                         target_charts[source_chart_id] = gm.Chart.load_chart(
                             target_session, catalog_path=source_chart.catalogPath

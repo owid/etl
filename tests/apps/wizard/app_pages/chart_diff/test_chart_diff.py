@@ -10,19 +10,42 @@ from types import SimpleNamespace
 # import inside the test bodies means collection never triggers it.
 
 
-def _chart(chart_id: int, created_at: datetime, catalog_path: str | None = None):
+def _chart(chart_id: int, created_at: datetime, catalog_path: str | None = None, config_id: str | None = None):
     return SimpleNamespace(
         id=chart_id,
         createdAt=created_at,
         updatedAt=created_at + timedelta(hours=1),
         catalogPath=catalog_path,
+        configId=config_id or f"config-uuid-{chart_id}",
     )
+
+
+def test_config_uuid_identifies_chart_twins():
+    from apps.wizard.app_pages.chart_diff.chart_diff import (
+        ChartDiff,
+        _is_cross_env_twin,
+        _same_chart_across_envs,
+        _target_updated_at_for_review,
+    )
+
+    # Same config UUID, different numeric ids: a chart synced from staging to
+    # production. No ETL columns needed — configId exists everywhere.
+    config_id = "0198c0e8-0000-7000-8000-000000000000"
+    source = _chart(100, datetime(2026, 1, 1), config_id=config_id)
+    target = _chart(200, datetime(2026, 1, 2), config_id=config_id)
+
+    assert _same_chart_across_envs(source, target)
+    assert _is_cross_env_twin(source, target)
+    assert _target_updated_at_for_review(source, target) is None
+
+    diff = ChartDiff(source_chart=source, target_chart=target, approval=None, conflict=None)
+    assert diff.chart_id == source.id
 
 
 def test_catalog_path_identifies_etl_chart_twins(monkeypatch):
     from apps.wizard.app_pages.chart_diff.chart_diff import (
         ChartDiff,
-        _is_catalog_path_twin,
+        _is_cross_env_twin,
         _same_chart_across_envs,
         _target_updated_at_for_review,
     )
@@ -38,7 +61,7 @@ def test_catalog_path_identifies_etl_chart_twins(monkeypatch):
     target = _chart(200, datetime(2026, 1, 2), "animal_welfare/latest/chart#chart")
 
     assert _same_chart_across_envs(source, target)
-    assert _is_catalog_path_twin(source, target)
+    assert _is_cross_env_twin(source, target)
     assert _target_updated_at_for_review(source, target) is None
 
     diff = ChartDiff(source_chart=source, target_chart=target, approval=None, conflict=None)
@@ -47,15 +70,18 @@ def test_catalog_path_identifies_etl_chart_twins(monkeypatch):
 
 def test_regular_charts_still_match_by_id_and_created_at():
     from apps.wizard.app_pages.chart_diff.chart_diff import (
-        _is_catalog_path_twin,
+        _is_cross_env_twin,
         _same_chart_across_envs,
         _target_updated_at_for_review,
     )
 
     created_at = datetime(2026, 1, 1)
-    source = _chart(100, created_at)
-    target = _chart(100, created_at)
+    # Different config UUIDs (e.g. rows written before configIds were carried
+    # across environments would still differ) — the id+createdAt fallback
+    # must keep matching these.
+    source = _chart(100, created_at, config_id="config-uuid-source")
+    target = _chart(100, created_at, config_id="config-uuid-target")
 
     assert _same_chart_across_envs(source, target)
-    assert not _is_catalog_path_twin(source, target)
+    assert not _is_cross_env_twin(source, target)
     assert _target_updated_at_for_review(source, target) == target.updatedAt
