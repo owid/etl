@@ -239,7 +239,7 @@ def _decomposition_title(source: str, base_metric: str) -> str:
 
 # Carbon intensity of energy (CO2 per unit of total energy supply) lives in the Global Carbon Budget,
 # which already divides emissions by this same TES. Referenced by short path, expanded via the dep.
-CARBON_INTENSITY_INDICATOR = "global_carbon_budget#emissions_total_per_unit_energy"
+CARBON_INTENSITY_INDICATOR = "carbon_intensity_of_energy#emissions_total_per_unit_energy"
 
 
 def add_carbon_intensity_view(c) -> None:

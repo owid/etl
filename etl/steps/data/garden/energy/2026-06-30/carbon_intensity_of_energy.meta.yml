@@ -1,0 +1,31 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+        - CO2 & Greenhouse Gas Emissions
+    unit: grams of CO₂ per kilowatt-hour
+    short_unit: gCO₂/kWh
+    description_processing: |-
+      - Carbon intensity of energy is calculated by dividing fossil CO₂ emissions (from the Global Carbon Budget) by total energy supply (from our energy mix dataset), expressed in grams of CO₂ per kilowatt-hour.
+      - Total energy supply follows the physical energy content method used by the Energy Institute's Statistical Review of World Energy since its 2025 release. This replaces the older substitution method, under which renewables and nuclear were scaled up to a fossil-fuel-equivalent; because that scaling raised the denominator, the substitution-method intensity was lower than the value shown here.
+
+dataset:
+  title: Carbon intensity of energy
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+tables:
+  carbon_intensity_of_energy:
+    variables:
+      emissions_total_per_unit_energy:
+        title: Carbon intensity of energy
+        description_short: Fossil [carbon dioxide (CO₂)](#dod:co2) emissions per unit of [total energy supply](#dod:total-energy-supply), measured in grams of CO₂ per kilowatt-hour.
+        display:
+          name: Carbon intensity of energy
+      emissions_total_including_land_use_change_per_unit_energy:
+        title: Carbon intensity of energy (including land-use change)
+        description_short: Fossil and land-use-change [carbon dioxide (CO₂)](#dod:co2) emissions per unit of [total energy supply](#dod:total-energy-supply), measured in grams of CO₂ per kilowatt-hour.
+        display:
+          name: Carbon intensity of energy (including land-use change)

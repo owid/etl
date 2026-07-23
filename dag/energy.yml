@@ -132,12 +132,19 @@ steps:
     - data://garden/papers/2023-12-12/smil_2017
   data://grapher/energy/2026-06-30/energy_mix:
     - data://garden/energy/2026-06-30/energy_mix
+  # Carbon intensity of energy: fossil CO2 emissions (Global Carbon Budget) divided by total energy
+  # supply (energy_mix, TES). This is the TES-based successor to the Global Carbon Budget's own
+  # substitution-method emissions-per-energy indicator.
+  data://garden/energy/2026-06-30/carbon_intensity_of_energy:
+    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/energy/2026-06-30/energy_mix
+  data://grapher/energy/2026-06-30/carbon_intensity_of_energy:
+    - data://garden/energy/2026-06-30/carbon_intensity_of_energy
   export://multidim/energy/latest/energy_mix:
     - data://grapher/energy/2026-06-30/energy_mix
-    # Carbon intensity of energy (CO2 per unit of total energy supply) comes from the Global Carbon
-    # Budget, which itself divides emissions by the energy_mix TES. Referencing it here (downstream of
-    # both) is a diamond, not a cycle.
-    - data://grapher/gcp/2025-11-13/global_carbon_budget
+    # Carbon intensity view: sourced from the dedicated carbon_intensity_of_energy step (TES basis),
+    # so the energy_mix subtree stays on a single Statistical Review version.
+    - data://grapher/energy/2026-06-30/carbon_intensity_of_energy
   #
   # Energy - Fossil fuels (production, trade, consumption and reserves; 2026 Statistical Review + EIA).
   #

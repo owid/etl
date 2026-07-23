@@ -129,15 +129,12 @@ JONES_COLUMNS = {
 #     "total_n2o_emissions_including_lucf": "nitrous_oxide",
 #     "total_n2o_emissions_including_lucf_per_capita": "nitrous_oxide_per_capita",
 # }
-# NOTE: Since the 2026 update we use Total Energy Supply (TES) from the energy_mix dataset instead of
-# the old substitution-method primary energy consumption. The energy_per_capita and energy_per_gdp
-# columns shift slightly under TES (renewables and nuclear are counted lower).
 PRIMARY_ENERGY_COLUMNS = {
     "country": "country",
     "year": "year",
-    "total_energy_supply_twh": "primary_energy_consumption",
-    "total_energy_supply_per_capita_kwh": "energy_per_capita",
-    "total_energy_supply_per_gdp_kwh_per_dollar": "energy_per_gdp",
+    "primary_energy_consumption__twh": "primary_energy_consumption",
+    "primary_energy_consumption_per_capita__kwh": "energy_per_capita",
+    "primary_energy_consumption_per_gdp__kwh_per_dollar": "energy_per_gdp",
 }
 REGIONS_COLUMNS = {
     "name": "country",
@@ -352,8 +349,8 @@ def run() -> None:
     # Load the GDP dataset by GGDC Maddison.
     ds_gdp = paths.load_dataset("maddison_project_database")
 
-    # Load the energy mix dataset (Total Energy Supply, in our 'energy' namespace).
-    ds_energy = paths.load_dataset("energy_mix")
+    # Load primary energy consumption dataset (by different sources in our 'energy' namespace).
+    ds_energy = paths.load_dataset("primary_energy_consumption")
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
@@ -367,7 +364,7 @@ def run() -> None:
     # tb_climate_watch_ghg = ds_climate_watch["greenhouse_gas_emissions_by_sector"]
     # tb_climate_watch_ch4 = ds_climate_watch["methane_emissions_by_sector"]
     # tb_climate_watch_n2o = ds_climate_watch["nitrous_oxide_emissions_by_sector"]
-    tb_energy = ds_energy["energy_mix"]
+    tb_energy = ds_energy["primary_energy_consumption"]
     tb_gdp = ds_gdp["maddison_project_database"]
     tb_population = ds_population["population"]
     tb_regions = ds_regions["regions"]

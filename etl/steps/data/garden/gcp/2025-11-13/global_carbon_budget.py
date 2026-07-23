@@ -80,14 +80,11 @@ CO2_COLUMNS = {
 # List all sources of emissions considered.
 EMISSION_SOURCES = [column for column in CO2_COLUMNS.values() if column not in ["country", "year"]]
 
-# Columns to use from the energy mix data and how to rename them.
-# NOTE: Since the 2026 update we use Total Energy Supply (TES) from the energy_mix dataset instead of
-# the old substitution-method primary energy consumption. This slightly changes emissions-per-energy
-# (TES counts renewables and nuclear lower, so the total energy is lower and the intensity is higher).
+# Columns to use from primary energy consumption data and how to rename them.
 PRIMARY_ENERGY_COLUMNS = {
     "country": "country",
     "year": "year",
-    "total_energy_supply_twh": "primary_energy_consumption",
+    "primary_energy_consumption__twh": "primary_energy_consumption",
 }
 
 # Columns to use from historical emissions data and how to rename them.
@@ -849,6 +846,11 @@ def combine_data_and_add_variables(
         )
 
     # Add total emissions per unit energy (in grams of emissions per kWh).
+    # NOTE: This still divides by the old substitution-method primary energy. A Total Energy Supply
+    # version now lives in energy/latest/carbon_intensity_of_energy. On the next update, repoint this
+    # step's energy input to Total Energy Supply (energy_mix) and remove that separate step — but note
+    # that carbon_intensity_of_energy currently depends on this step, so drop that dependency first to
+    # avoid a cycle.
     tb_co2_with_regions["emissions_total_per_unit_energy"] = (
         TONNES_OF_CO2_TO_G_OF_CO2
         * tb_co2_with_regions["emissions_total"]
@@ -957,9 +959,9 @@ def run() -> None:
     tb_production = ds_meadow.read("global_carbon_budget_production_emissions", safe_types=False)
     tb_land_use = ds_meadow.read("global_carbon_budget_land_use_change", safe_types=False)
 
-    # Load the energy mix dataset and read its main table (Total Energy Supply).
-    ds_energy = paths.load_dataset("energy_mix")
-    tb_energy = ds_energy["energy_mix"].reset_index()
+    # Load primary energy consumption dataset and read its main table.
+    ds_energy = paths.load_dataset("primary_energy_consumption")
+    tb_energy = ds_energy["primary_energy_consumption"].reset_index()
 
     # Load GDP dataset.
     ds_gdp = paths.load_dataset("maddison_project_database")
