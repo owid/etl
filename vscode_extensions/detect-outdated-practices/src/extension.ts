@@ -137,13 +137,15 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         // Matches reading a table from a Dataset via subscript access in assignment position, e.g.:
         // - tb = ds_meadow["table_name"]
         // - tb = ds_garden["table_name"].reset_index()
+        // - tb = ds_pip[f"income_consumption_{ppp_year}"]   (the optional `f?` covers f-strings)
         // The `(?<==\s*)` lookbehind requires the subscript to be the right-hand side of an
         // assignment — genuine Dataset reads are always `var = ds[...]`. This avoids flagging
         // Table/DataFrame column access that appears inside expressions (e.g. `ds["col"] == x`),
         // including cases where a `ds_*` name has been rebound to a Table. `Dataset.read()` is the
-        // modern accessor. Trade-off: a Dataset read not assigned to a variable (return/func-arg) is
-        // not flagged, but that form is vanishingly rare in ETL steps.
-        pattern: /(?<==\s*)ds\w*\[\s*["'][^"']+["']\s*\]/g,
+        // modern accessor. Trade-offs: a Dataset read not assigned to a variable (return/func-arg) is
+        // not flagged; and a bare-variable table name (`ds[table]`) is intentionally skipped, since it
+        // is indistinguishable from column-by-variable or boolean-mask indexing. Both forms are rare.
+        pattern: /(?<==\s*)ds\w*\[\s*f?["'][^"']+["']\s*\]/g,
         message: 'Reading a table via `ds["table"]` subscript is outdated. Use `ds.read("table")` instead — it resets the index by default; pass `reset_index=False` to keep the index (e.g. `ds.read("table", reset_index=False)`).',
         severity: vscode.DiagnosticSeverity.Warning,
         scope: 'etl/steps/data/**'
