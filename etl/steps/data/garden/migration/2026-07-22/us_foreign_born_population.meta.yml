@@ -18,8 +18,8 @@ definitions:
     Two things changed over the course of the series:
     - The population included: Alaska and Hawaii are included from 1960 onward. The 1890 figures exclude about 325,000 people living in the Indian Territory and on Indian reservations, who were not asked about their place of birth.
     - The list of US territories: people born in a territory count as native-born, so when a territory's status changed, so did their classification. For example, people born in the Philippines counted as native-born until it became independent in 1946, and as foreign-born after.
-  census_only_sources: |-
-    The data comes from the decennial census up to 2000, and from the annual American Community Survey from 2005 onward. There is no data for 1940 and 1950, because the census publications of those years only gave the country of birth of the White population, and no data for 2020, because no survey estimates were released for that year.
+  missing_years: |-
+    There is no data for 1940 and 1950, because the census publications of those years only gave the country of birth of the White population, and no data for 2020, because no survey estimates were released for that year.
   old_countries: |-
     Country borders have changed over this period, so a country's figures may not always refer to the same area.
     - The Soviet Union includes its Asian part for the whole period; before 1920 it corresponds to the Russian Empire.
@@ -72,7 +72,8 @@ tables:
         short_unit: ""
         description_key:
           - "{definitions.who_counts}"
-          - "{definitions.census_only_sources}"
+          - "{definitions.sources}"
+          - "{definitions.missing_years}"
           - "{definitions.old_countries}"
           - "{definitions.caveats}"
           - "{definitions.undercount}"
@@ -90,7 +91,8 @@ tables:
         short_unit: ""
         description_key:
           - "{definitions.who_counts}"
-          - "{definitions.census_only_sources}"
+          - "{definitions.sources}"
+          - "{definitions.missing_years}"
           - "{definitions.caveats}"
           - "{definitions.undercount}"
           - '"Not specified" covers people whose country of birth was not recorded, and people born at sea.'
