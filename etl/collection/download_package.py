@@ -339,7 +339,7 @@ class StagedPackageResult:
         return {
             "csvUrl": self.csv_url,
             "indicatorsUrl": self.indicators_url,
-            "fileCount": self.indicator_count,
+            "indicatorCount": self.indicator_count,
             "rowCount": self.row_count,
         }
 
