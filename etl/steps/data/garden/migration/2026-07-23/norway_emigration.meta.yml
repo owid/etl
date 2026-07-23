@@ -18,7 +18,9 @@ tables:
         description_key: |-
           This data counts people who left Norway for overseas countries outside Europe — [overwhelmingly North America](https://www.ssb.no/a/histstat/nos/nos_vii_025.pdf).
 
-          From 1867, they were registered by the police when departing on emigrant ships from Norwegian ports; earlier figures were compiled from local administrative reports. People moving to other European countries were not recorded, and some overseas emigrants were also missed, for example those who traveled via ports in other countries.
+          From 1867, they were registered by the police when departing on emigrant ships from Norwegian ports; earlier figures were compiled from reports by parish priests. People moving to other European countries were not recorded, and some overseas emigrants were also missed, for example those who traveled via ports in other countries.
+
+          There is no data for most years before 1836, when records were sparse, and none for 1941–1945, during the German occupation of Norway.
 
           The series ends in 1950, because from 1951 onward Statistics Norway counted all emigration rather than only emigration to overseas countries.
         description_processing: |-
