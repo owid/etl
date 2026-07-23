@@ -69,6 +69,7 @@ def parse_by_country_of_birth(snap: Snapshot) -> Table:
         label = str(tb.iloc[i, 2])
         if label == "nan" or label.startswith("Footnotes"):
             continue
+        line_number = int(tb.iloc[i, 0])
         depth = len(re.match(r"^\s*(\.*)", label.replace(" ", "")).group(1))
         # Strip leading dots, trailing dot/ellipsis leaders, and footnote markers.
         country = re.sub(r"[.…\s]+$", "", label).lstrip(" .")
@@ -81,7 +82,15 @@ def parse_by_country_of_birth(snap: Snapshot) -> Table:
                 value = 0  # the report uses "-" for zero
             else:
                 value = int(float(value))
-            rows.append({"country": country, "depth": depth, "year": year, "foreign_born_population": value})
+            rows.append(
+                {
+                    "country": country,
+                    "line": line_number,
+                    "depth": depth,
+                    "year": year,
+                    "foreign_born_population": value,
+                }
+            )
 
     tb = snap.read_from_records(rows)
 

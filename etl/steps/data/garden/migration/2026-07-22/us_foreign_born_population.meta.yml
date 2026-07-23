@@ -23,9 +23,8 @@ definitions:
   old_countries: |-
     Country borders have changed over this period, so a country's figures may not always refer to the same area.
     - The Soviet Union includes its Asian part for the whole period; before 1920 it corresponds to the Russian Empire.
-    - Before 1980, people born in Taiwan are counted with China.
     - Before 1930, the United Kingdom figures cover Great Britain only; Northern Ireland is included in the Ireland figures.
-    - Since 1980, China excludes Hong Kong and Taiwan, which are shown separately.
+    - China includes Taiwan until 1980 and excludes it afterward. The source does not say how Hong Kong is counted before 1980. Between 1980 and 2005, people born in Taiwan and Hong Kong are grouped in the "Not specified" category. They are only shown separately from 2005 onward.
     - Czechoslovakia covers Czechia and Slovakia combined, including in the years after the country split. Korea includes both North and South Korea.
   undercount: |-
     People living in the country without authorization are included in the definition, but censuses and surveys are known to miss part of this group. Other sources that try to adjust for this can find a slightly higher foreign-born population.
@@ -77,11 +76,15 @@ tables:
           - "{definitions.old_countries}"
           - "{definitions.caveats}"
           - "{definitions.undercount}"
+          - 'Entities like "Asia (not specified)" cover people known to be born in a region but in a country the source does not list separately. Their size depends on how many countries the source lists: the census data lists only about 40, so by 2000 they cover about 40% of the foreign-born population, while the survey data from 2005 onward lists about 120, leaving only a few percent unattributed. "Not specified" covers the small number of people with no recorded country of birth, including people born at sea.'
         description_processing: |-
-          We combined the source's "Turkey in Europe" and "Turkey in Asia" series into a single series for Turkey, and used the source's Great Britain series to extend the United Kingdom series before 1930.
+          We combined the source's "Turkey in Europe" and "Turkey in Asia" series into a single series for Turkey, and used the source's Great Britain series to extend the United Kingdom series before 1930. People not attributed to a listed country are assigned to a "(not specified)" entity of their region, so all entities together add up to the source's total.
         processing_level: major
         display:
           numDecimalPlaces: 0
+          entityAnnotationsMap: |-
+            Korea: includes North & South
+            Czechoslovakia: includes Czechia & Slovakia
 
   by_region_of_birth:
     variables:

@@ -10,71 +10,243 @@ Outputs three tables:
   (rebuilt from the sources' rows, regrouping Latin America into North and South America).
 """
 
+import re
+
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# Source rows of Table 4 that we publish as countries, as named in the source. Region rows,
-# intermediate groupings (British Isles, Scandinavia, Low countries), residual rows
-# ("Other ...", "... n.e.c.") and partial sub-rows (Azores, Canada-French, the Soviet Union's
-# "In Europe" part) are used only for the region aggregates or skipped.
-COUNTRIES = [
-    "Ireland",
-    "Denmark",
-    "Finland",
-    "Iceland",
-    "Norway",
-    "Sweden",
-    "Belgium",
-    "Luxembourg",
-    "Netherlands",
-    "Austria",
-    "France",
-    "Germany",
-    "Switzerland",
-    "Greece",
-    "Italy",
-    "Portugal (total)",
-    "Spain",
-    "Albania",
-    "Bulgaria",
-    "Czechoslovakia",
-    "Estonia",
-    "Hungary",
-    "Latvia",
-    "Lithuania",
-    "Poland",
-    "Romania",
-    "Soviet Union (former)",
-    "Yugoslavia",
-    "Armenia",
-    "China",
-    "India",
-    "Japan",
-    "Palestine",
-    "Syria",
-    "Cuba",
-    "Mexico",
-    "Canada",
-    "Australia",
-    "Sandwich Islands (Hawaii)",
-]
-
-# Continents following OWID region definitions, built from the source's own aggregate rows.
-# The source groups the Americas as "Latin America" + "Northern America"; OWID counts the
-# Caribbean and Central America (incl. Mexico) as part of North America.
-REGION_ROWS = {
-    "Europe": ["Europe"],
-    "Asia": ["Asia"],
-    "Africa": ["Africa"],
-    "Oceania": ["Oceania"],
-    "North America": ["Caribbean", "Central America", "Northern America"],
-    "South America": ["South America"],
-    "Not specified": ["Region or country not reported"],
+# Source rows of Table 4 that we publish as countries, mapped to the entity we show. Their
+# sub-rows are skipped: "Great Britain" extends the United Kingdom before 1930 (when the UK
+# row is not reported and Northern Ireland is included in Ireland); "Turkey in Europe" and
+# "Turkey in Asia" are summed into Turkey; "Portugal (total)" includes the Azores and Madeira.
+CENSUS_ENTITIES = {
+    c: c
+    for c in [
+        "Ireland",
+        "Denmark",
+        "Finland",
+        "Iceland",
+        "Norway",
+        "Sweden",
+        "Belgium",
+        "Luxembourg",
+        "Netherlands",
+        "Austria",
+        "France",
+        "Germany",
+        "Switzerland",
+        "Greece",
+        "Italy",
+        "Spain",
+        "Albania",
+        "Bulgaria",
+        "Czechoslovakia",
+        "Estonia",
+        "Hungary",
+        "Latvia",
+        "Lithuania",
+        "Poland",
+        "Romania",
+        "Soviet Union (former)",
+        "Yugoslavia",
+        "Armenia",
+        "China",
+        "India",
+        "Japan",
+        "Palestine",
+        "Syria",
+        "Cuba",
+        "Mexico",
+        "Canada",
+        "Australia",
+        "Sandwich Islands (Hawaii)",
+    ]
 }
+CENSUS_ENTITIES.update(
+    {
+        "United Kingdom": "United Kingdom",
+        "Great Britain": "United Kingdom",
+        "Turkey in Europe": "Turkey",
+        "Turkey in Asia": "Turkey",
+        "Portugal (total)": "Portugal",
+    }
+)
+
+# Continent of each branch of the source's hierarchy, for naming "(not specified)" entities.
+CENSUS_BRANCH_REGIONS = {
+    "Europe": "Europe",
+    "Asia": "Asia",
+    "Africa": "Africa",
+    "Oceania": "Oceania",
+    "Caribbean": "North America",
+    "Central America": "North America",
+    "South America": "South America",
+    "Northern America": "North America",
+}
+
+# ACS rows we take whole, skipping their sub-rows.
+ACS_PARENT_COUNTRIES = ["United Kingdom", "United Kingdom (inc. Crown Dependencies)", "Portugal"]
+
+# ACS leaf rows that are not countries.
+ACS_NON_COUNTRY = (
+    r"Other |n\.e\.c|excluding England and Scotland|^West Indies$|^Middle Africa$|^England$|^Scotland$|^Azores Islands$"
+)
+
+
+def adjust_soviet_asian_part(tb: Table) -> Table:
+    """Align the census table with our convention that the Soviet Union counts in Europe.
+
+    The source's "Soviet Union (former)" row includes its Asian part (footnote 3), but where
+    the source reports the European part separately (the "In Europe" sub-row, in 2000), its
+    own aggregates count the Asian part under Asia. We keep the full Soviet Union in Europe,
+    so we move that amount from Asia's rows to Europe's."""
+    piv = tb.pivot(index="country", columns="year", values="foreign_born_population")
+    tb = tb.copy()
+    for year in piv.columns:
+        in_europe = piv.at["In Europe", year]
+        if pd.isna(in_europe):
+            continue
+        delta = piv.at["Soviet Union (former)", year] - in_europe
+        for country, sign in [
+            ("Other Asia", -1),
+            ("Asia", -1),
+            ("Eastern Europe", 1),
+            ("Southern and Eastern Europe", 1),
+            ("Europe", 1),
+        ]:
+            mask = (tb["country"] == country) & (tb["year"] == year)
+            tb.loc[mask, "foreign_born_population"] += sign * delta
+    return tb
+
+
+def cover_census_tree(tb_origin: Table) -> Table:
+    """Walk the census table's hierarchy so that every person is counted exactly once.
+
+    Rows in CENSUS_ENTITIES are taken whole (their sub-rows are skipped). Everyone else goes
+    to a "<region> (not specified)" entity — including the remainders of rows whose sub-rows
+    do not add up to them — or to "Not specified" when the source gives no region.
+    """
+    nodes = tb_origin[["country", "line", "depth"]].drop_duplicates().sort_values("line").to_dict("records")
+    # The source's indentation is inconsistent for two rows: "Southern and Eastern Europe" and
+    # "Europe n.e.c" are siblings of "Northern and Western Europe" (their values sum to the
+    # Europe row), but carry one more leading dot.
+    for node in nodes:
+        if node["country"] in ("Southern and Eastern Europe", "Europe n.e.c"):
+            node["depth"] = 2
+    values = tb_origin.pivot(index="country", columns="year", values="foreign_born_population")
+
+    # Parent of each node: the closest previous node with a smaller depth.
+    for i, node in enumerate(nodes):
+        node["children"] = []
+        node["parent"] = None
+        for prev in reversed(nodes[:i]):
+            if prev["depth"] < node["depth"]:
+                node["parent"] = prev
+                prev["children"].append(node)
+                break
+
+    def residual_entity(node) -> str:
+        while node is not None:
+            if node["country"] in CENSUS_BRANCH_REGIONS:
+                return f"{CENSUS_BRANCH_REGIONS[node['country']]} (not specified)"
+            node = node["parent"]
+        return "Not specified"
+
+    rows = []
+
+    def cover(node, year) -> float:
+        value = values.at[node["country"], year]
+        value = None if pd.isna(value) else float(value)
+        if node["country"] in CENSUS_ENTITIES and value is not None:
+            rows.append({"country": CENSUS_ENTITIES[node["country"]], "year": year, "foreign_born_population": value})
+            return value
+        if node["children"]:
+            covered = sum(cover(child, year) for child in node["children"])
+            if value is None:
+                return covered
+            remainder = value - covered
+            assert remainder > -1, f"{node['country']} {year}: sub-rows add up to more than the row."
+            if remainder > 0:
+                rows.append({"country": residual_entity(node), "year": year, "foreign_born_population": remainder})
+            return value
+        if value is not None:
+            rows.append({"country": residual_entity(node), "year": year, "foreign_born_population": value})
+            return value
+        return 0.0
+
+    roots = [n for n in nodes if n["parent"] is None and n["country"] != "Total"]
+    for year in values.columns:
+        covered = sum(cover(root, year) for root in roots)
+        assert abs(covered - values.at["Total", year]) < 1, f"{year}: entities do not add up to the total."
+
+    tb = Table(pd.DataFrame(rows)).groupby(["country", "year"], as_index=False)["foreign_born_population"].sum()
+    tb = Table(tb)
+    tb["foreign_born_population"] = tb["foreign_born_population"].copy_metadata(tb_origin["foreign_born_population"])
+    return tb
+
+
+def cover_acs_tree(tb_origin: Table) -> Table:
+    """Same exact-cover walk for the ACS table, whose hierarchy lives in the "path" column."""
+    rows = []
+    for year, sub in tb_origin.groupby("year"):
+        values = {p: (None if pd.isna(v) else float(v)) for p, v in zip(sub["path"], sub["foreign_born_population"])}
+        children = {p: [] for p in values}
+        for p in values:
+            parent = " / ".join(p.split(" / ")[:-1])
+            if parent in children:
+                children[parent].append(p)
+
+        def region_of(path: str) -> str:
+            parts = path.split(" / ")
+            if parts[1] in ("Europe", "Asia", "Africa", "Oceania"):
+                return parts[1]
+            if "South America" in parts:
+                return "South America"
+            return "North America"
+
+        def cover(path: str) -> float:
+            value = values[path]
+            name = path.split(" / ")[-1]
+            if name in ACS_PARENT_COUNTRIES and value is not None:
+                rows.append({"country": name, "year": year, "foreign_born_population": value})
+                return value
+            if children[path]:
+                covered = sum(cover(child) for child in children[path])
+                if value is None:
+                    return covered
+                remainder = value - covered
+                assert remainder > -1, f"{path} {year}: sub-rows add up to more than the row."
+                if remainder > 0:
+                    rows.append(
+                        {
+                            "country": f"{region_of(path)} (not specified)",
+                            "year": year,
+                            "foreign_born_population": remainder,
+                        }
+                    )
+                return value
+            if value is None:
+                return 0.0
+            if re.search(ACS_NON_COUNTRY, name):
+                rows.append(
+                    {"country": f"{region_of(path)} (not specified)", "year": year, "foreign_born_population": value}
+                )
+            else:
+                rows.append({"country": name, "year": year, "foreign_born_population": value})
+            return value
+
+        covered = sum(cover(p) for p in children["Total"])
+        assert abs(covered - values["Total"]) < 1, f"{year}: entities do not add up to the total."
+
+    tb = Table(pd.DataFrame(rows)).groupby(["country", "year"], as_index=False)["foreign_born_population"].sum()
+    tb = Table(tb)
+    tb["foreign_born_population"] = tb["foreign_born_population"].copy_metadata(tb_origin["foreign_born_population"])
+    return tb
 
 
 def sanity_check(tb: Table) -> None:
@@ -99,27 +271,18 @@ def make_annual(tb_census: Table, tb_acs: Table) -> Table:
     return tb
 
 
-def make_by_country(tb_origin: Table) -> Table:
-    """Keep country rows, joining the source's split series for the United Kingdom and Turkey."""
-    piv = tb_origin.pivot(index="country", columns="year", values="foreign_born_population")
-
-    tb = tb_origin[tb_origin["country"].isin(COUNTRIES)].drop(columns=["depth"])
-
-    # The United Kingdom is only reported as such from 1930. Before that, Northern Ireland is
-    # included in the Ireland row, so Great Britain covers the same area as today's United
-    # Kingdom minus Northern Ireland — we use it for the earlier years.
-    uk = piv.loc["United Kingdom"].fillna(piv.loc["Great Britain"]).rename("foreign_born_population")
-    uk = uk.reset_index().assign(country="United Kingdom")
-
-    # Turkey is reported as "Turkey in Europe" (1850-1930) and "Turkey in Asia" (1910-2000);
-    # we sum the two into one series.
-    turkey = piv.loc[["Turkey in Europe", "Turkey in Asia"]].sum(min_count=1).rename("foreign_born_population")
-    turkey = turkey.reset_index().assign(country="Turkey")
-
-    tb = pr.concat([tb, Table(uk), Table(turkey)], ignore_index=True)
-    tb = tb.dropna(subset=["foreign_born_population"])
-    tb["foreign_born_population"] = tb["foreign_born_population"].copy_metadata(tb_origin["foreign_born_population"])
-    return tb
+# Continents following OWID region definitions, built from the source's own aggregate rows.
+# The source groups the Americas as "Latin America" + "Northern America"; OWID counts the
+# Caribbean and Central America (incl. Mexico) as part of North America.
+REGION_ROWS = {
+    "Europe": ["Europe"],
+    "Asia": ["Asia"],
+    "Africa": ["Africa"],
+    "Oceania": ["Oceania"],
+    "North America": ["Caribbean", "Central America", "Northern America"],
+    "South America": ["South America"],
+    "Not specified": ["Region or country not reported"],
+}
 
 
 def make_by_region(tb_origin: Table) -> Table:
@@ -170,21 +333,88 @@ ACS_REGION_PATHS = {
 }
 
 
-def make_acs_by_country(tb: Table) -> Table:
+def make_acs_by_country(tb: Table) -> tuple:
     """Select country rows from the ACS table: leaf rows of the hierarchy, except residual
-    buckets, plus the United Kingdom and Portugal aggregate rows (whose sub-rows are dropped)."""
+    buckets, plus the United Kingdom and Portugal aggregate rows (whose sub-rows are dropped).
+    Also returns the residual leaf paths, which feed the "(not specified)" entities."""
     frames = []
+    residual_paths = []
     for _, sub in tb.groupby("year"):
         paths = set(sub["path"])
         parent_paths = [p for p in paths if p.split(" / ")[-1] in ACS_PARENT_COUNTRIES]
         is_leaf = sub["path"].apply(lambda p: not any(q.startswith(p + " / ") for q in paths))
         under_parent = sub["path"].apply(lambda p: any(p.startswith(q + " / ") for q in parent_paths))
-        keep = (is_leaf & ~under_parent & ~sub["country"].astype(str).str.contains(ACS_NON_COUNTRY, regex=True)) | sub[
-            "path"
-        ].isin(parent_paths)
+        residual = sub["country"].astype(str).str.contains(ACS_NON_COUNTRY, regex=True)
+        keep = (is_leaf & ~under_parent & ~residual) | sub["path"].isin(parent_paths)
         frames.append(sub[keep])
+        residual_paths.extend(sub.loc[is_leaf & ~under_parent & residual, "path"])
     tb = pr.concat(frames)[["country", "year", "foreign_born_population"]]
     tb = tb.dropna(subset=["foreign_born_population"])
+    return tb, residual_paths
+
+
+# Census rows for people whose specific country is not listed, assigned to their region.
+# "Not specified" is kept only for the truly unattributed.
+CENSUS_RESIDUALS = {
+    "Other Scandinavia": "Europe (not specified)",
+    "Other Western Europe": "Europe (not specified)",
+    "Other Southern Europe": "Europe (not specified)",
+    "Other Eastern Europe": "Europe (not specified)",
+    "Europe n.e.c": "Europe (not specified)",
+    "Other Asia": "Asia (not specified)",
+    "Africa excl. Atlantic Islands": "Africa (not specified)",
+    "Atlantic Islands": "Africa (not specified)",
+    "Other Oceania": "Oceania (not specified)",
+    "Other Caribbean": "North America (not specified)",
+    "Other Central America": "North America (not specified)",
+    "Other Northern America": "North America (not specified)",
+    "South America": "South America (not specified)",
+    "Born at sea": "Not specified",
+    "Not reported": "Not specified",
+}
+
+
+def acs_residual_entity(path: str) -> str:
+    """Region-level entity for an ACS residual row, from its position in the hierarchy."""
+    parts = path.split(" / ")
+    if parts[1] in ("Europe", "Asia", "Africa", "Oceania"):
+        return f"{parts[1]} (not specified)"
+    if "South America" in parts:
+        return "South America (not specified)"
+    return "North America (not specified)"
+
+
+def add_not_specified(tb_countries: Table, tb_census: Table, tb_acs: Table, acs_residual_paths: list) -> Table:
+    """Add entities for people not attributed to a listed country. Where the source gives
+    their region, they become e.g. "Asia (not specified)"; only people with no recorded
+    origin become "Not specified"."""
+    census = tb_census[tb_census["country"].isin(CENSUS_RESIDUALS)].copy()
+    census["country"] = census["country"].map(CENSUS_RESIDUALS)
+    census = census[["country", "year", "foreign_born_population"]]
+
+    acs = tb_acs[tb_acs["path"].isin(acs_residual_paths)].copy()
+    acs["country"] = acs["path"].apply(acs_residual_entity)
+    acs = acs[["country", "year", "foreign_born_population"]]
+
+    residuals = pr.concat([census, acs], ignore_index=True)
+    residuals = residuals.groupby(["country", "year"], as_index=False, observed=True)["foreign_born_population"].sum(
+        min_count=1
+    )
+    residuals = residuals.dropna(subset=["foreign_born_population"])
+
+    tb = pr.concat([tb_countries, residuals], ignore_index=True)
+    tb["foreign_born_population"] = tb["foreign_born_population"].copy_metadata(tb_countries["foreign_born_population"])
+
+    # Everything must now add up to the source's totals.
+    totals = pr.concat(
+        [
+            tb_census[tb_census["country"] == "Total"][["year", "foreign_born_population"]],
+            tb_acs[tb_acs["path"] == "Total"][["year", "foreign_born_population"]],
+        ],
+        ignore_index=True,
+    ).set_index("year")["foreign_born_population"]
+    ours = tb.groupby("year")["foreign_born_population"].sum()
+    assert (ours - totals).abs().max() < 1, "Countries and residuals do not add up to the source's total."
     return tb
 
 
@@ -216,9 +446,8 @@ def run() -> None:
     #
     # By-country and by-region tables combine the census years (1850-2000) with the ACS years
     # (2005 onward); the two sources never overlap in years.
-    tb_countries = pr.concat(
-        [make_by_country(tb_by_country), make_acs_by_country(tb_acs_by_country)], ignore_index=True
-    )
+    tb_by_country = adjust_soviet_asian_part(tb_by_country)
+    tb_countries = pr.concat([cover_census_tree(tb_by_country), cover_acs_tree(tb_acs_by_country)], ignore_index=True)
     tb_countries = paths.regions.harmonize_names(tb_countries, countries_file=paths.country_mapping_path)
     tb_regions = pr.concat([make_by_region(tb_by_country), make_acs_by_region(tb_acs_by_country)], ignore_index=True)
 

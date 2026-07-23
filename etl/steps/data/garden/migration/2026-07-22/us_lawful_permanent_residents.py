@@ -8,6 +8,7 @@ Outputs three tables:
   (rebuilt from the country rows, not DHS's own region rows).
 """
 
+import owid.catalog.processing as pr
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -115,9 +116,20 @@ REGIONS = {
 }
 COUNTRY_TO_REGION = {country: region for region, countries in REGIONS.items() for country in countries}
 
-# Residual rows that feed the region aggregates but are not countries, so they are
-# excluded from the by-country table.
+# Residual rows that feed the region aggregates but are not countries. In the by-country
+# table they appear as "(not specified)" entities of their region.
 RESIDUALS = [c for c in COUNTRY_TO_REGION if c.startswith("Other") or c == "Not Specified"]
+RESIDUAL_ENTITIES = {
+    "Other Europe": "Europe (not specified)",
+    "Other Asia": "Asia (not specified)",
+    "Other Africa": "Africa (not specified)",
+    "Other Oceania": "Oceania (not specified)",
+    "Other Caribbean": "North America (not specified)",
+    "Other Central America": "North America (not specified)",
+    "Other South America": "South America (not specified)",
+    "Other America": "America (not specified)",
+    "Not Specified": "Not specified",
+}
 
 
 def sanity_check_inputs(tb_annual: Table, tb_origin: Table) -> None:
@@ -167,6 +179,18 @@ def make_by_country(tb_origin: Table) -> Table:
 
     tb = tb.dropna(subset=["immigrants"])
     tb = paths.regions.harmonize_names(tb, countries_file=paths.country_mapping_path)
+
+    # Keep the residual rows ("Other Europe", ...) as "(not specified)" entities of their
+    # region, so people from countries the source does not list separately are not dropped.
+    # "Other America" cannot be split between North and South America; "Not specified" is
+    # kept for people whose origin was not recorded.
+    residuals = tb_origin[tb_origin["country"].isin(RESIDUALS)].copy()
+    residuals["country"] = residuals["country"].map(RESIDUAL_ENTITIES)
+    residuals = residuals.groupby(["country", "decade"], as_index=False, observed=True)["immigrants"].sum(min_count=1)
+    residuals = residuals.dropna(subset=["immigrants"])
+    tb = pr.concat([tb, residuals], ignore_index=True)
+    tb["immigrants"] = tb["immigrants"].copy_metadata(tb_origin["immigrants"])
+
     tb = tb.rename(columns={"decade": "year"})
     return tb
 
