@@ -25,7 +25,7 @@ EXTRAPOLATED = "no"
 # in _replace_welfare_type_bullet catches drift in the source.
 OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX = "Before tax income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance benefits, such as unemployment insurance — contributions to these are deducted, and the corresponding benefits are added back as income. [Read more](#dod:wid-income-definition)."
 OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX = "After tax income is measured after taxes have been paid and government benefits have been received. This includes not only cash benefits like social assistance, but also the value of public services like hospitals and schools, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by survey-based data sources."
-NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown as separate series. Comparing the two gives a sense of the role of redistribution through a country's tax and benefits system."
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes have been paid and government benefits received, which are shown as separate series. Comparing the two gives a sense of the role of redistribution through a country's tax and benefits system."
 
 
 def run() -> None:

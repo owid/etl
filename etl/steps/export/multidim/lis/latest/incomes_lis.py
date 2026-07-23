@@ -24,7 +24,7 @@ PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences i
 # in _get_before_vs_after_metadata catches drift in the source.
 OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = "Income is measured after taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received."
 OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = "Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. Private pension income is also included, meaning a retired person’s before-tax income varies depending on whether their country’s pensions system is primarily public, private or a mix."
-NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown as separate series. Comparing the two gives a sense of the role of redistribution through a country's tax and benefits system."
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes have been paid and government benefits received, which are shown as separate series. Comparing the two gives a sense of the role of redistribution through a country's tax and benefits system."
 
 
 def run() -> None:
