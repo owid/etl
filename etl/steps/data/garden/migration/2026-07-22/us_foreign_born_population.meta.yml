@@ -41,22 +41,28 @@ tables:
         title: Foreign-born population of the United States
         unit: people
         short_unit: ""
-        description_key:
-          - "{definitions.who_counts}"
-          - "{definitions.sources}"
-          - "{definitions.caveats}"
-          - "{definitions.undercount}"
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.caveats}
+
+          {definitions.undercount}
         display:
           numDecimalPlaces: 0
       share_foreign_born:
         title: Share of the United States population born in another country
         unit: "%"
         short_unit: "%"
-        description_key:
-          - "{definitions.who_counts}"
-          - "{definitions.sources}"
-          - "{definitions.caveats}"
-          - "{definitions.undercount}"
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.caveats}
+
+          {definitions.undercount}
         description_processing: |-
           We calculated this indicator by dividing the foreign-born population by the total resident population reported by the same census or survey. Using the same source for both numbers means the share is internally consistent: any undercount affects both the numerator and the denominator.
         processing_level: major
@@ -69,14 +75,20 @@ tables:
         title: Foreign-born population of the United States, by country of birth
         unit: people
         short_unit: ""
-        description_key:
-          - "{definitions.who_counts}"
-          - "{definitions.sources}"
-          - "{definitions.missing_years}"
-          - "{definitions.old_countries}"
-          - "{definitions.caveats}"
-          - "{definitions.undercount}"
-          - 'Entities like "Asia (not specified)" cover people known to be born in a region but in a country the source does not list separately. Their size depends on how many countries the source lists: the census data lists only about 40, so by 2000 they cover about 40% of the foreign-born population, while the survey data from 2005 onward lists about 120, leaving only a few percent unattributed. "Not specified" covers the small number of people with no recorded country of birth, including people born at sea.'
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.missing_years}
+
+          {definitions.old_countries}
+
+          {definitions.caveats}
+
+          {definitions.undercount}
+
+          Entities like "Asia (not specified)" cover people known to be born in a region but in a country the source does not list separately. Their size depends on how many countries the source lists: the census data lists only about 40, so by 2000 they cover about 40% of the foreign-born population, while the survey data from 2005 onward lists about 120, leaving only a few percent unattributed. "Not specified" covers the small number of people with no recorded country of birth, including people born at sea.
         description_processing: |-
           We combined the source's "Turkey in Europe" and "Turkey in Asia" series into a single series for Turkey, and used the source's Great Britain series to extend the United Kingdom series before 1930. People not attributed to a listed country are assigned to a "(not specified)" entity of their region, so all entities together add up to the source's total.
         processing_level: major
@@ -92,13 +104,18 @@ tables:
         title: Foreign-born population of the United States, by region of birth
         unit: people
         short_unit: ""
-        description_key:
-          - "{definitions.who_counts}"
-          - "{definitions.sources}"
-          - "{definitions.missing_years}"
-          - "{definitions.caveats}"
-          - "{definitions.undercount}"
-          - '"Not specified" covers people whose country of birth was not recorded, and people born at sea.'
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.missing_years}
+
+          {definitions.caveats}
+
+          {definitions.undercount}
+
+          "Not specified" covers people whose country of birth was not recorded, and people born at sea.
         description_processing: |-
           We calculated these regional totals from the source's data, grouping countries into regions as defined by Our World in Data. They can differ from the source's own regional totals: for example, we count the Caribbean and Central America (including Mexico) as part of North America. Everyone born in the former Soviet Union is counted in Europe, because the source does not separate its Asian part.
         processing_level: major
