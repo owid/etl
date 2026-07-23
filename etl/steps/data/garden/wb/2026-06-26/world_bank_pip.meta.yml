@@ -194,59 +194,69 @@ definitions:
     This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
     <%- endif %>
 
-  description_key_welfare_type_base: |-
-    Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). These are not perfectly comparable: income equals consumption plus savings, and consumption tends to be more evenly distributed than income. For most countries, we have only one option available. But when both are available, we keep one observation per country and year. You can see these different series by selecting the option to show breaks in the data.
-
-  description_key_welfare_type_spells: |-
-    The data comes from the World Bank's Poverty and Inequality Platform (PIP), which draws on national household surveys. Depending on the country and year, the data refers either to income (after taxes and benefits) or to consumption, [per capita](#dod:per-capita). These are not perfectly comparable: income equals consumption plus savings, and consumption tends to be more evenly distributed than income. Comparability can also break _within_ either measure when survey methods or measurement change over time. This chart shows each comparable series separately.
-
-  description_key_welfare_type: |-
-    <% if welfare_type is defined and survey_comparability is defined and survey_comparability == "No spells" %>
-    <% if welfare_type == "income" %>
-    The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
-    <%- elif welfare_type == "consumption" %>
-    The data relates to consumption [per capita](#dod:per-capita).
+  description_key_source_world_bank: |-
+    <% if welfare_type is defined and welfare_type == "income" and (survey_comparability is not defined or survey_comparability == "No spells") %>
+    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. Here we only include surveys measuring people's incomes after taxes and benefits. [Read more](#dod:read-more-income-consumption-pip).
+    <%- elif welfare_type is defined and welfare_type == "consumption" and (survey_comparability is not defined or survey_comparability == "No spells") %>
+    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. Here we only include surveys measuring people's consumption — a different but closely related measure to income. [Read more](#dod:read-more-income-consumption-pip).
     <%- else %>
-    {definitions.description_key_welfare_type_base}
+    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. To achieve wide coverage, it pools data from two kinds of surveys. For high-income countries, the data measures people's incomes after taxes and benefits. For most low- and middle-income countries, it instead measures their consumption — a different but closely related measure. [Read more](#dod:read-more-income-consumption-pip).
+    <%- endif %>
+
+  description_key_not_market_income: In lower-income countries, many people produce food for their own use or exchange goods without money. This data accounts for that by estimating what these goods would have cost if bought in the market and adding that value to their consumption or income.
+
+  description_key_show_breaks: |-
+    <% if survey_comparability is defined and (table is not defined or table != "Income or consumption intra/extrapolated") and (welfare_type == "income or consumption" or survey_comparability != "No spells") %>
+    The exact surveys that countries run can change over time, creating breaks across which data points are less comparable. The World Bank provides an indicator of where these breaks occur, and this chart gives the option to show the breaks.
+    <%- endif %>
+
+  description_key_income_consumption: |-
+    <% if survey_comparability is defined and survey_comparability != "No spells" %>
+    This chart shows income and consumption surveys as separate series. Where a country switches between the two over time, or has both available for some years, these appear as distinct lines.
+    <%- elif welfare_type is defined and welfare_type == "income or consumption" %>
+    <% if table is defined and table == "Income or consumption intra/extrapolated" %>
+    For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations.
+    <%- else %>
+    For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations. You can see all the original data points, however, using the option to show breaks in the data.
     <%- endif %>
     <%- endif %>
 
-  description_key_not_market_income: Many people, today and in the past, have no monetary income. This data accounts for that by adding the estimated value of non-market income, like food grown by subsistence farmers for their own use.
-
-  description_key_nowcasts: |-
+  description_key_regional_global_estimates: |-
     <% if survey_comparability is not defined or survey_comparability == "No spells" %>
-    <% if table is not defined or table != "Income or consumption intra/extrapolated" %>
-    The data comes from the World Bank's Poverty and Inequality Platform (PIP), which draws on national household surveys. This gives it wide global coverage, but because it pools surveys with different methodologies and mixes income and consumption data, there are limitations to the comparability of the data points between countries and over time. Regional and global estimates are extrapolated to the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+    <% if table is defined and table == "Income or consumption intra/extrapolated" %>
+    Country estimates are interpolated and extrapolated to the year of the data release using GDP growth estimates and forecasts. This data is then used to produce regional and global aggregates available for each year. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html).
     <%- else %>
-    The data comes from the World Bank's Poverty and Inequality Platform (PIP), which draws on national household surveys. This gives it wide global coverage, but because it pools surveys with different methodologies and mixes income and consumption data, there are limitations to the comparability of the data points between countries and over time. Country estimates are interpolated and extrapolated to the year of the data release using GDP growth estimates and forecasts. This data is then used to produce regional and global aggregates available for each year. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html).
+    Regional and global estimates are extrapolated to the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
     <%- endif %>
-    <%- else %>
-    {definitions.description_key_welfare_type_spells}
     <%- endif %>
-
-  description_key_inequality: |-
-    Incomes are distributed very unequally, both between countries and within them. This data lets you compare how income is distributed across the population and how that has changed over time. We discuss this in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_gini: |-
-    Incomes are distributed very unequally, both between countries and within them. The Gini coefficient is a common measure of inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality. We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss income inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    The Gini coefficient is a common measure of income inequality, which summarizes the distribution and expresses it in terms of a number from 0 to 1. Higher values indicate higher inequality. We explain how it works in our article [Measuring inequality: what is the Gini coefficient?](https://ourworldindata.org/what-is-the-gini-coefficient), and discuss inequality measures and data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
-  description_key_palma_ratio : |-
-    Incomes are distributed very unequally, both between countries and within them. The Palma ratio captures this by comparing the income share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% receive twice as much as the poorest 40%. We discuss income inequality more broadly on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+  description_key_palma_ratio: |-
+    The Palma ratio is a measure of inequality that compares the income share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% receive twice as much as the poorest 40%. We discuss the data and other measures in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_mean: |-
-    This data shows the mean (average) income or consumption per person. Because incomes are unevenly distributed, with a small number of people on very high incomes, the mean is typically higher than what most people have. To see the income of a typical person, you can look at the median income instead. We discuss how incomes are distributed in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    This data shows the mean (average) income or consumption per person. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_median: |-
-    This data shows the median income or consumption per person — the level below which half the population falls. Unlike the mean, the median is not pulled up by the incomes of the richest, so it better reflects what a typical person has. We discuss how incomes are distributed in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    This data shows the median income or consumption per person — the level below which half the population falls. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_avg: |-
-    This data shows the mean (average) income or consumption per person within decile groups — each representing a tenth of the population, ranked by income. For example, the poorest decile is the poorest 10% of people in a country.
+    This data shows the mean (average) income or consumption per person within decile groups — each representing a tenth of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_thr: |-
-    This data shows the income or consumption threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.
+    <% if decile is defined and decile == "5" %>
+    {definitions.description_key_median}
+    <%- else %>
+    This data lets you compare incomes across deciles, or tenths of the population. The data shows the income threshold dividing each decile. The poorest decile threshold, for example, is the income level below which the poorest 10% of people in a country or region fall. We discuss these measures and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    <%- endif %>
 
   description_key_share: |-
-    This data shows the share of total income or consumption that goes to specific groups of the population. For example, if the poorest decile receives 3% of total income, it means the poorest 10% of people share just 3% of all income between them.
+    This data shows the share of total income or consumption received by each decile — a tenth of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+
+  description_key_share_groups: |-
+    This data shows the share of total income or consumption received by different groups of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   prosperity_gap_threshold: |-
     <% if ppp_version == 2017 %>
@@ -746,10 +756,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -794,10 +806,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -816,10 +830,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -841,10 +857,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -889,10 +907,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -911,10 +931,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
@@ -938,10 +960,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -991,10 +1015,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -1038,10 +1064,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -1084,10 +1112,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -1132,10 +1162,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -1166,10 +1198,12 @@ tables:
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_extreme_poverty_additional}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
@@ -1199,9 +1233,11 @@ tables:
         description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
         description_key:
           - "{definitions.description_key_gini}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
@@ -1244,9 +1280,11 @@ tables:
         description_short: The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.
         description_key:
           - "{definitions.description_key_palma_ratio}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
 
@@ -1289,9 +1327,11 @@ tables:
         short_unit: ""
         description_short: The S80/S20 ratio is a measure of inequality that divides the share received by the richest 20% by the share of the poorest 20%. Higher values indicate higher inequality.
         description_key:
-          - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1322,9 +1362,11 @@ tables:
           P90 and P10 are the levels of income or consumption below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
           <%- endif %>
         description_key:
-          - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1353,9 +1395,11 @@ tables:
           The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income or consumption.
           <%- endif %>
         description_key:
-          - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1386,9 +1430,11 @@ tables:
           The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income or consumption is two times higher than that of someone just falling in the poorest tenth of the population.
           <%- endif %>
         description_key:
-          - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1414,9 +1460,11 @@ tables:
         short_unit: ""
         description_short: The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.
         description_key:
-          - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
@@ -1459,9 +1507,11 @@ tables:
         short_unit: ""
         description_short: The polarization index, also known as the Wolfson polarization index, measures the extent to which the distribution of income or consumption is “spread out” and bi-modal. Like the Gini coefficient, the polarization index ranges from 0 (no polarization) to 1 (complete polarization).
         description_key:
-          - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1492,11 +1542,12 @@ tables:
           The share of income or consumption {definitions.welfare_type_verb} by the poorest 50% of the population.
           <% endif %>
         description_key:
-          - "{definitions.description_key_inequality}"
-          - "{definitions.description_key_share}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_share_groups}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1525,11 +1576,12 @@ tables:
           The share of income or consumption {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.
           <% endif %>
         description_key:
-          - "{definitions.description_key_inequality}"
-          - "{definitions.description_key_share}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_share_groups}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1558,11 +1610,12 @@ tables:
           The share of income or consumption {definitions.welfare_type_verb} by the richest 1% of the population.
           <% endif %>
         description_key:
-          - "{definitions.description_key_inequality}"
-          - "{definitions.description_key_share}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_share_groups}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -1591,11 +1644,12 @@ tables:
           The share of income or consumption {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
           <% endif %>
         description_key:
-          - "{definitions.description_key_inequality}"
-          - "{definitions.description_key_share}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_share_groups}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_share_90_99}
           {definitions.description_processing_main}
@@ -1628,10 +1682,12 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_mean}"
-          - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_main_poverty}
         description_from_producer: |-
@@ -1684,10 +1740,12 @@ tables:
           <%- endif %>
         description_key:
           - "{definitions.description_key_median}"
-          - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_main_poverty}
         description_from_producer: |-
@@ -1737,17 +1795,18 @@ tables:
         description_short: |-
           {macros}
           <% if survey_comparability == "No spells" %>
-          The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+          The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% else %>
-          The mean income or consumption per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+          The mean income or consumption {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
-          - "{definitions.description_key_inequality}"
           - "{definitions.description_key_avg}"
-          - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_avg}
           {definitions.description_processing_main}
@@ -1810,11 +1869,12 @@ tables:
           The share of income or consumption {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
-          - "{definitions.description_key_inequality}"
           - "{definitions.description_key_share}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
@@ -1875,12 +1935,13 @@ tables:
           The level of income or consumption {definitions.per_period} below which <<decile>>0% of the population falls.
           <% endif %>
         description_key:
-          - "{definitions.description_key_inequality}"
           - "{definitions.description_key_thr}"
-          - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_thr}
           {definitions.description_processing_main}
@@ -1933,10 +1994,12 @@ tables:
           The level of income or consumption {definitions.per_period} below which 99% of the population falls.
           <% endif %>
         description_key:
-          - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_thr}
           {definitions.description_processing_main}
@@ -1966,10 +2029,12 @@ tables:
           The mean income or consumption {definitions.per_period} within the richest 1% of the population.
           <% endif %>
         description_key:
-          - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_nowcasts}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_avg}
           {definitions.description_processing_main}
@@ -2018,10 +2083,12 @@ tables:
         short_unit: $
         description_short: The Societal Poverty Line (SPL) is defined to account for national definitions of poverty around the world. The SPL is the [International Poverty Line](#dod:international-poverty-line) when the national median is sufficiently low and it grows as the median income or consumption grows.
         description_key:
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_main}
         display:
@@ -2039,10 +2106,12 @@ tables:
         description_short: |-
           Percentage of population living in households with an income or consumption below the Societal Poverty Line.
         description_key:
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
@@ -2059,10 +2128,12 @@ tables:
         description_short: Average factor by which incomes need to be multiplied to bring everyone to the prosperity standard of {definitions.prosperity_gap_threshold} per person per day.
         description_key:
           - "{definitions.description_key_prosperity_gap}"
-          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_show_breaks}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_regional_global_estimates}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
@@ -2095,7 +2166,7 @@ tables:
         short_unit: ""
         description_short: The number of income or consumption surveys available in the past decade. Each decade comprises the current year and the nine years before.
         description_key:
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_surveys_past_decade}
@@ -2112,9 +2183,9 @@ tables:
         short_unit: $
         description_short: The mean <<welfare_type>> per day within the percentile <<percentile>> of the population.
         description_key:
-          - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_ppp}"
         display:
           name: Average (percentile <<percentile>>)
           numDecimalPlaces: 2
@@ -2126,7 +2197,7 @@ tables:
         short_unit: "%"
         description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the percentile <<percentile>> of the population.
         description_key:
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
         display:
           name: Share (percentile <<percentile>>)
@@ -2139,9 +2210,9 @@ tables:
         short_unit: $
         description_short: The level of <<welfare_type>> per day below which the <<percentile>>% of the population falls.
         description_key:
-          - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_thr_percentiles}
         display:

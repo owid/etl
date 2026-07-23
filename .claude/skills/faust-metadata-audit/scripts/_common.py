@@ -128,6 +128,27 @@ def resolve_field(view_value: Any, inherited_value: Any) -> tuple[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+def description_key_as_list(value: Any) -> Any:
+    """Normalize a description_key value to a list of bullet strings.
+
+    The grapher channel stores description_key as a single markdown string
+    (multiple bullets joined as "- item1\\n- item2\\n..."; a lone item as plain
+    prose). Older builds stored a Python list. Return a list either way so the
+    report can render per-bullet slugs; pass through None and non-strings.
+    """
+    if value is None or isinstance(value, list):
+        return value
+    if not isinstance(value, str):
+        return value
+    stripped = value.strip()
+    if not stripped:
+        return None
+    lines = [ln.strip() for ln in stripped.split("\n") if ln.strip()]
+    if lines and all(ln.startswith("- ") for ln in lines):
+        return [ln[2:].strip() for ln in lines]
+    return [stripped]
+
+
 def md_escape(s: str) -> str:
     return s.replace("\n", " ").strip()
 

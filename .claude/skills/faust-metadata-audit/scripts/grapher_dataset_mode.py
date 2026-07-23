@@ -41,6 +41,7 @@ from _common import (  # noqa: E402
     ADMIN_BASE,
     BulletLibrary,
     collect_used_tags,
+    description_key_as_list,
     get_indicator_meta,
     how_to_read_block,
     inherited_note,
@@ -64,7 +65,9 @@ def resolve_indicator_fields(catalog_path: str) -> dict[str, tuple[str, Any]]:
         "Subtitle": resolve_field(None, inherited_subtitle(meta)),
         "Footnote": resolve_field(None, inherited_note(meta)),
         "description_short": resolve_field(None, getattr(meta, "description_short", None) if meta else None),
-        "description_key": resolve_field(None, getattr(meta, "description_key", None) if meta else None),
+        "description_key": resolve_field(
+            None, description_key_as_list(getattr(meta, "description_key", None) if meta else None)
+        ),
     }
 
 

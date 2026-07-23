@@ -44,6 +44,7 @@ from _common import (  # noqa: E402
     ADMIN_BASE,
     BulletLibrary,
     collect_used_tags,
+    description_key_as_list,
     get_indicator_meta,
     how_to_read_block,
     inherited_note,
@@ -165,8 +166,8 @@ def resolve_view_fields(view: dict[str, Any]) -> dict[str, tuple[str, Any]]:
             getattr(meta, "description_short", None) if meta else None,
         ),
         "description_key": resolve_field(
-            vm.get("description_key"),
-            getattr(meta, "description_key", None) if meta else None,
+            description_key_as_list(vm.get("description_key")),
+            description_key_as_list(getattr(meta, "description_key", None) if meta else None),
         ),
         "__primary_y": ("override" if cp else "missing", cp),
     }

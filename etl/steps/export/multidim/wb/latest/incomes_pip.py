@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog.core.meta import description_key_to_string
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -25,10 +27,18 @@ PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences i
 POPULATION_PATH = "grapher/demography/2024-07-15/population/historical#population_historical"
 REGION_PATH = "grapher/regions/2023-01-01/regions/regions#owid_region"
 
-# Override of description_key_thr (line 245 of world_bank_pip.meta.yml) for the grouped thr+decile=all view.
-# OLD_DESCRIPTION_KEY_THR mirrors the garden text verbatim — the assertion below catches drift in the source.
-OLD_DESCRIPTION_KEY_THR = 'This data shows the income or consumption threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
-NEW_DESCRIPTION_KEY_THR_ALL = 'This data shows the income or consumption threshold for each decile of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
+# The garden bullets (world_bank_pip.meta.yml) describe the "show breaks in the data" option as
+# directly available, but in grouped views (all deciles, P10/P50/P90, richer/poorer groups) breaks
+# only become visible after selecting a single group — so those two bullets are swapped for
+# no-toggle variants. The share bullet is also swapped in the richer/poorer-groups view, whose
+# groups are not deciles. The OLD_* constants mirror the garden texts verbatim; the assertion
+# below catches drift in the source.
+OLD_SHOW_BREAKS = "The exact surveys that countries run can change over time, creating breaks across which data points are less comparable. The World Bank provides an indicator of where these breaks occur, and this chart gives the option to show the breaks."
+NEW_SHOW_BREAKS_NO_TOGGLE = "The exact surveys that countries run can change over time, creating breaks across which data points are less comparable. The World Bank provides an indicator of where these breaks occur, and you can see them by selecting a single group in the chart and using the option to show breaks in the data."
+OLD_INCOME_CONSUMPTION = "For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations. You can see all the original data points, however, using the option to show breaks in the data."
+NEW_INCOME_CONSUMPTION_NO_TOGGLE = "For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations. You can see all the original data points, however, by selecting a single group in the chart and using the option to show breaks in the data."
+OLD_SHARE_DECILE = "This data shows the share of total income or consumption received by each decile — a tenth of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality)."
+NEW_SHARE_GROUPS = "This data shows the share of total income or consumption received by different groups of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality)."
 
 
 def run() -> None:
@@ -239,23 +249,48 @@ def run() -> None:
             )
             view.config["matchingEntitiesOnly"] = True
 
-    # description_key_thr's "given decile" wording fits single-decile views; rewrite it for the grouped all-decile view while preserving the indicator's other bullets.
+    # Swap toggle-dependent bullets for their no-toggle variants in grouped views, preserving the indicator's other bullets.
+    # In the grapher channel, description_key is a single markdown string (bullets joined with "\n- "), so we match and
+    # replace on substrings rather than list membership.
     for view in c.views:
-        if view.matches(indicator="thr", decile="all") and view.indicators.y:
+        if view.matches(decile=["all", "p10_p50_p90", "10_40_50"]) and view.indicators.y:
             col_name = view.indicators.y[0].catalogPath.split("#")[-1]
-            source_description_key = list(tb[col_name].metadata.description_key) if col_name in tb.columns else []
-            assert OLD_DESCRIPTION_KEY_THR in source_description_key, (
-                f"OLD_DESCRIPTION_KEY_THR not found in {col_name}.description_key — garden text changed, update OLD_DESCRIPTION_KEY_THR/NEW_DESCRIPTION_KEY_THR_ALL."
+            source_description_key = _description_key_string(tb, col_name)
+            assert OLD_SHOW_BREAKS in source_description_key and OLD_INCOME_CONSUMPTION in source_description_key, (
+                f"Toggle bullets not found in {col_name}.description_key — garden text changed, update OLD_SHOW_BREAKS/OLD_INCOME_CONSUMPTION."
             )
+            new_description_key = source_description_key.replace(OLD_SHOW_BREAKS, NEW_SHOW_BREAKS_NO_TOGGLE).replace(
+                OLD_INCOME_CONSUMPTION, NEW_INCOME_CONSUMPTION_NO_TOGGLE
+            )
+            # The richer/poorer-groups view mixes richest 10% / middle 40% / poorest 50% — not deciles.
+            if view.matches(decile="10_40_50"):
+                assert OLD_SHARE_DECILE in source_description_key, (
+                    f"Share bullet not found in {col_name}.description_key — garden text changed, update OLD_SHARE_DECILE."
+                )
+                new_description_key = new_description_key.replace(OLD_SHARE_DECILE, NEW_SHARE_GROUPS)
             view.metadata = view.metadata or {}
-            view.metadata["description_key"] = [
-                NEW_DESCRIPTION_KEY_THR_ALL if b == OLD_DESCRIPTION_KEY_THR else b for b in source_description_key
-            ]
+            view.metadata["description_key"] = new_description_key
 
     #
     # Save garden dataset.
     #
     c.save()
+
+
+def _description_key_string(tb, col_name):
+    """Return an indicator's description_key as a single markdown string.
+
+    The grapher channel stores description_key as markdown (bullets joined with "\\n- "),
+    but older builds stored a list; normalize both to the string form.
+    """
+    if col_name not in tb.columns:
+        return ""
+    dk = tb[col_name].metadata.description_key
+    if dk is None:
+        return ""
+    if isinstance(dk, str):
+        return dk
+    return description_key_to_string(list(dk)) or ""
 
 
 def _get_grouped_decile_title(view):
