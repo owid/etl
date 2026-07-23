@@ -388,7 +388,8 @@ class Chart(Base):
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
-    configId: Mapped[bytes] = mapped_column(CHAR(36))
+    # The chart's config UUID — its stable identity across environments.
+    configId: Mapped[str] = mapped_column(CHAR(36))
     # The authored layer, as its own chart_configs row. `configId` is what renders.
     patchConfigId: Mapped[bytes] = mapped_column(CHAR(36))
     configIdETL: Mapped[bytes | None] = mapped_column(CHAR(36), init=False)
@@ -451,16 +452,23 @@ class Chart(Base):
         chart_id: int | None = None,
         slug: str | None = None,
         catalog_path: str | None = None,
+        config_id: str | None = None,
     ) -> "Chart":
-        """Load a chart by `chart_id`, `slug`, or `catalog_path`."""
+        """Load a chart by `chart_id`, `slug`, `catalog_path`, or `config_id`.
+
+        `config_id` is the chart's config UUID (`charts.configId`) — the chart's
+        stable identity across environments, unlike the numeric id.
+        """
         if chart_id:
             cond = cls.id == chart_id
         elif slug:
             cond = cls.slug == slug
         elif catalog_path:
             cond = cls.catalogPath == catalog_path
+        elif config_id:
+            cond = cls.configId == config_id
         else:
-            raise ValueError("One of chart_id, slug, or catalog_path must be provided")
+            raise ValueError("One of chart_id, slug, catalog_path, or config_id must be provided")
         charts = session.scalars(select(cls).where(cond)).all()
 
         # there can be multiple charts with the same slug, pick the published one
@@ -2139,6 +2147,15 @@ class NarrativeChart(Base):
         if not parent_chart_ids:
             return []
         return list(session.scalars(select(cls).where(cls.parentChartId.in_(parent_chart_ids))).all())
+
+    @classmethod
+    def load_by_chart_config_id(cls, session: Session, chart_config_id: str) -> "NarrativeChart | None":
+        """Load the narrative chart owning the given config UUID (`narrative_charts.chartConfigId`).
+
+        The config UUID is the narrative chart's stable identity across
+        environments; numeric ids are minted independently per environment.
+        """
+        return session.scalars(select(cls).where(cls.chartConfigId == chart_config_id)).one_or_none()
 
     def load_config(self, session: Session) -> dict[str, Any]:
         """Load the authored (patch) config from chart_configs table.

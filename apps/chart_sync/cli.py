@@ -252,10 +252,14 @@ def cli(
                     # Chart in target exists, update it
                     if diff.target_chart:
                         target_chart_id = diff.target_chart.id
-                        catalog_path_twin = (
-                            diff.source_chart.catalogPath
-                            and diff.source_chart.catalogPath == diff.target_chart.catalogPath
-                            and diff.source_chart.id != diff.target_chart.id
+                        # Target row was matched by config UUID or catalogPath
+                        # rather than numeric id (production minted its own row).
+                        cross_env_twin = diff.source_chart.id != diff.target_chart.id and (
+                            diff.source_chart.configId == diff.target_chart.configId
+                            or (
+                                diff.source_chart.catalogPath
+                                and diff.source_chart.catalogPath == diff.target_chart.catalogPath
+                            )
                         )
 
                         # Check if configs and tags are equal
@@ -273,7 +277,7 @@ def cli(
                             configs_equal
                             and tags_equal
                             and etl_configs_equal
-                            and (not catalog_path_twin or publication_equal)
+                            and (not cross_env_twin or publication_equal)
                         ):
                             log.info(
                                 "chart_sync.skip",
@@ -332,23 +336,23 @@ def cli(
                             synced_chart_ids.add(chart_id)
                             # Note: New charts don't have old datasets to archive, so no dataset IDs collected
                             if not dry_run:
+                                # Carry the source chart's config UUID (its stable
+                                # identity) to the target, so future diffs/syncs
+                                # match the two rows directly instead of relying
+                                # on the id+createdAt heuristic.
+                                source_config_id = diff.source_chart.configId
                                 if migrated_etl_config is not None:
-                                    bootstrap = {
-                                        "$schema": migrated_config.get("$schema", config.DEFAULT_GRAPHER_SCHEMA),
-                                        "slug": migrated_config.get("slug"),
-                                        "dimensions": migrated_config["dimensions"],
-                                        "isPublished": False,
-                                    }
-                                    resp = target_api.create_chart(bootstrap, user_id=user_id)
-                                    target_api.put_chart_etl_config(
-                                        resp["chartId"],
-                                        migrated_etl_config,
+                                    resp = target_api.upsert_chart_etl_config(
+                                        chart_config_id=source_config_id,
+                                        grapher_config=migrated_etl_config,
                                         catalog_path=diff.source_chart.catalogPath,
                                         user_id=user_id,
                                     )
                                     target_api.update_chart(resp["chartId"], migrated_config, user_id=user_id)
                                 else:
-                                    resp = target_api.create_chart(migrated_config, user_id=user_id)
+                                    resp = target_api.create_chart(
+                                        migrated_config, user_id=user_id, config_id=source_config_id
+                                    )
                                 target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
                             else:
                                 resp = {"chartId": None}
@@ -581,7 +585,9 @@ def _sync_narrative_charts(
     """Sync narrative charts for the given synced parent chart IDs.
 
     When a chart is synced, we also sync all its child narrative charts.
-    Narrative charts are matched by ID between environments.
+    Narrative charts are matched by their config UUID
+    (`narrative_charts.chartConfigId`) between environments — numeric ids are
+    minted independently per environment and may collide.
 
     The sync process:
     1. Fetch the merged config from source via Admin API
@@ -608,8 +614,11 @@ def _sync_narrative_charts(
     )
 
     for source_nc in source_narrative_charts:
-        # Check if narrative chart exists in target by ID
-        target_nc = target_session.get(gm.NarrativeChart, source_nc.id)
+        # Check if the narrative chart exists in target, matched by its config
+        # UUID — the stable cross-environment identity (rows copied from
+        # production keep it; a numeric-id match could be a different chart
+        # that happens to share the id).
+        target_nc = gm.NarrativeChart.load_by_chart_config_id(target_session, source_nc.chartConfigId)
 
         if not target_nc:
             # Narrative chart doesn't exist in target - this is expected if it's new

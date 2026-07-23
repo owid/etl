@@ -79,7 +79,13 @@ class AdminAPI:
         js = self._json_from_response(resp)
         return js
 
-    def create_chart(self, chart_config: dict, user_id: int | None = None) -> dict:
+    def create_chart(self, chart_config: dict, user_id: int | None = None, config_id: str | None = None) -> dict:
+        """Create a new chart.
+
+        When `config_id` is given, the new chart is created with that config UUID
+        (`charts.configId`) as its identity — used by chart-sync to carry a
+        chart's identity from staging to production.
+        """
         # Extract chart-table fields; keep them out of the chart config payload.
         config = chart_config.copy()
         is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
@@ -90,6 +96,8 @@ class AdminAPI:
         if is_inheritance_enabled is not None:
             inheritance_param = "enable" if is_inheritance_enabled else "disable"
             params["inheritance"] = inheritance_param
+        if config_id is not None:
+            params["configId"] = config_id
 
         resp = http_session.post(
             self.owid_env.admin_api + "/charts",
@@ -315,6 +323,38 @@ class AdminAPI:
         js = self._json_from_response(resp)
         if not js["success"]:
             raise AdminAPIError({"error": js["error"], "chart_id": chart_id, "grapher_config": grapher_config})
+        return js
+
+    def upsert_chart_etl_config(
+        self,
+        chart_config_id: str,
+        grapher_config: dict[str, Any],
+        catalog_path: str | None = None,
+        user_id: int | None = None,
+    ) -> dict:
+        """Insert or update a chart's ETL-authored grapher config, addressed by
+        the chart's config UUID (`charts.configId`).
+
+        Unlike `put_chart_etl_config`, this has upsert semantics: if no chart
+        with the given config UUID exists, the admin creates a minimal draft
+        chart carrying that UUID as its identity and attaches the ETL config to
+        it. The response contains the numeric `chartId` and a `created` flag.
+        """
+        # Mirror put_grapher_config: default the schema if missing.
+        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
+
+        # Retry in case we're restarting Admin on staging server
+        resp = requests_with_retry().put(
+            self.owid_env.admin_api + f"/charts/by-config/{chart_config_id}/etlConfig",
+            headers=self._headers(user_id),
+            params={"catalogPath": catalog_path} if catalog_path else None,
+            json=grapher_config,
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError(
+                {"error": js["error"], "chart_config_id": chart_config_id, "grapher_config": grapher_config}
+            )
         return js
 
     def delete_chart_etl_config(self, chart_id: int, user_id: int | None = None) -> dict:

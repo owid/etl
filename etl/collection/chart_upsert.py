@@ -1,11 +1,18 @@
 """Upsert a Collection with zero dimensions as a regular Grapher chart.
 
 The collection's YAML is treated as the chart's ETL-authored grapher config and
-written to `chart_configs.etlConfig` via `PUT /admin/api/charts/:id/etlConfig`.
-Admin-authored edits live in `chart_configs.patch` and are preserved across
-ETL re-pushes by construction (ETL and admin write to different columns).
+written to the chart's ETL config row via
+`PUT /admin/api/charts/by-config/:chartConfigId/etlConfig`, addressed by the
+chart's config UUID (`charts.configId`) — the chart's stable identity. The
+endpoint has upsert semantics: if no chart with that UUID exists yet, the admin
+creates a minimal draft chart carrying it. Admin-authored edits live in
+`chart_configs.patch` and are preserved across ETL re-pushes by construction
+(ETL and admin write to different rows).
 """
 
+import secrets
+import time
+import uuid
 from typing import TYPE_CHECKING, Any
 
 import structlog
@@ -54,10 +61,9 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
     # Look up the chart by its ETL catalog path (the stable ETL identity, like
     # multi_dim_data_pages.catalogPath). Charts that pre-date ETL authorship have
     # no catalogPath yet, so fall back to the slug: a match there is adopted (the
-    # put_chart_etl_config call below stamps the catalog path onto the chart, so
-    # subsequent runs find it by catalog path directly). If neither matches, we
-    # create a new chart with a minimal bootstrap config and then write the full
-    # config into the chart's ETL config row.
+    # upsert call below stamps the catalog path onto the chart, so subsequent
+    # runs find it by catalog path directly). If neither matches, the upsert
+    # call creates a new chart.
     with Session(owid_env.engine) as session:
         try:
             existing = Chart.load_chart(session, catalog_path=collection.catalog_path)
@@ -76,37 +82,34 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
                     "or remove the conflicting step."
                 )
 
+    # The chart's stable identity is its config UUID (charts.configId). Existing
+    # charts keep theirs; new charts get a client-generated UUIDv7 and are
+    # created by the upsert call below in the same request that stores the ETL
+    # config. Compared to a separate bootstrap create, this leaves the new
+    # chart's admin patch (almost) empty, so the ETL layer owns all fields —
+    # notably `dimensions` — from birth. New charts are unpublished drafts with
+    # indicator inheritance enabled (the admin's default for new charts).
     if existing is None:
-        # Minimal bootstrap so the chart row exists. We deliberately keep the
-        # patch tiny: just what the grapher save path needs (schema, slug,
-        # dimensions, isPublished). Everything else lands in etlConfig below.
-        bootstrap = {
-            "$schema": chart_config.get("$schema", DEFAULT_GRAPHER_SCHEMA),
-            "slug": slug,
-            "dimensions": chart_config["dimensions"],
-            "isPublished": False,
-            # Enable indicator-to-chart config inheritance for ETL-authored charts,
-            # so grapher_config set on an indicator flows into every chart built on
-            # it. Set only at creation, so existing charts are never touched.
-            "isInheritanceEnabled": True,
-        }
+        chart_config_id = _uuid_v7()
         log.info("collection.chart.create", slug=slug)
-        result = admin_api.create_chart(chart_config=bootstrap)
-        chart_id = result["chartId"]
-        is_new = True
     else:
-        chart_id = existing.id
+        chart_config_id = existing.configId
         if existing.catalogPath is None:
             # First ETL push for a chart that already existed in the admin.
-            log.info("collection.chart.adopt", slug=slug, chart_id=chart_id)
+            log.info("collection.chart.adopt", slug=slug, chart_id=existing.id)
         else:
-            log.info("collection.chart.update", slug=slug, chart_id=chart_id)
-        is_new = False
+            log.info("collection.chart.update", slug=slug, chart_id=existing.id)
 
     # Write the chart's ETL-authored config. This recomputes `full` server-side
     # as merge(variableETL, etlConfig, existing patch); any admin patches
     # already in chart_configs.patch are preserved.
-    admin_api.put_chart_etl_config(chart_id=chart_id, grapher_config=chart_config, catalog_path=collection.catalog_path)
+    result = admin_api.upsert_chart_etl_config(
+        chart_config_id=chart_config_id,
+        grapher_config=chart_config,
+        catalog_path=collection.catalog_path,
+    )
+    chart_id = result["chartId"]
+    is_new = result["created"]
 
     # Set topic tags on freshly created charts only — once a chart exists,
     # tags are admin-managed and ETL must not stomp on them.
@@ -169,6 +172,18 @@ def _validate_chart_config(config: dict[str, Any], slug: str) -> None:
     except ValidationError as e:
         location = "/".join(str(p) for p in e.absolute_path) or "(root)"
         raise ValueError(f"Invalid chart config for slug '{slug}' at `{location}`: {e.message}") from e
+
+
+def _uuid_v7() -> str:
+    """Generate a UUIDv7 (time-ordered), matching the UUIDs the grapher admin
+    generates for `chart_configs.id`. Python's `uuid` module only ships this
+    from 3.14, so build it by hand: 48-bit unix-ms timestamp, 4-bit version,
+    74 random bits (12-bit rand_a + 2-bit variant + 62-bit rand_b).
+    """
+    timestamp_ms = time.time_ns() // 1_000_000
+    rand = secrets.randbits(74)
+    value = (timestamp_ms << 80) | (0x7 << 76) | ((rand >> 62) << 64) | (0b10 << 62) | (rand & ((1 << 62) - 1))
+    return str(uuid.UUID(int=value))
 
 
 def _axis_entries(view: "View", axis: str) -> list:
