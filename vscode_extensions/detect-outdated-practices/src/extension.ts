@@ -273,11 +273,14 @@ export function activate(context: vscode.ExtensionContext) {
                     diagnostics.push(diagnostic);
                 }
 
-                // 2. Track Dataset variables: add on `X = ...load_dataset(...)`; drop X when it is
-                //    reassigned to anything else (i.e. rebound to a Table/DataFrame).
+                // 2. Track Dataset variables: add X on a *bare* `X = ...load_dataset(...)` assignment;
+                //    drop X when it is reassigned to anything else. The right-hand side must be only the
+                //    load_dataset call (optionally with a trailing comment): `X = load_dataset(...)[...]`
+                //    or `...load_dataset(...).reset_index()` already extract a Table, so X is not a Dataset.
                 const assignMatch = line.match(assignRe);
                 if (assignMatch) {
-                    if (/\bload_dataset\s*\(/.test(assignMatch[2])) {
+                    const rhs = assignMatch[2];
+                    if (/^[\w.]*load_dataset\s*\([^)]*\)\s*(#.*)?$/.test(rhs)) {
                         datasetVars.add(assignMatch[1]);
                     } else if (datasetVars.has(assignMatch[1])) {
                         datasetVars.delete(assignMatch[1]);
