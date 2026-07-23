@@ -26,7 +26,7 @@ definitions:
     - Before 1980, people born in Taiwan are counted with China.
     - Before 1930, the United Kingdom figures cover Great Britain only; Northern Ireland is included in the Ireland figures.
     - Since 1980, China excludes Hong Kong and Taiwan, which are shown separately.
-    - Czechoslovakia covers Czechia and Slovakia combined, including in the years after the country split. The source reports one combined figure for Korea; we show it as South Korea, since it includes only a small number of people born in North Korea.
+    - Czechoslovakia covers Czechia and Slovakia combined, including in the years after the country split. Korea includes both North and South Korea.
   undercount: |-
     People living in the country without authorization are included in the definition, but censuses and surveys are known to miss part of this group. Other sources that try to adjust for this can find a slightly higher foreign-born population.
 
