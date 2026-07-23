@@ -251,7 +251,7 @@ tables:
         short_unit: "%"
         description_short: The ratio of military personnel to total population, expressed as a percentage.
         description_key:
-          - "Because this indicator divides military personnel by total population, the change in the total-population data vintage from 2017 onward (see the total population indicator) can create small discontinuities at the 2016-2017 boundary even when military personnel itself is unchanged."
+          - "Because this indicator divides military personnel by total population, the change in the total-population data vintage from 2017 onward can create small discontinuities at the 2016-2017 boundary even when military personnel itself is unchanged."
         description_processing: |-
           We have divided the number of military personnel by the total population and multiplied by 100 to express the result as a percentage. Both indicators are provided by the source.
         processing_level: major
