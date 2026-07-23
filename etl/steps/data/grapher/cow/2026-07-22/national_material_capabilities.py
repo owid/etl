@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("national_material_capabilities")
 
     # Read table from garden dataset.
-    tb = ds_garden["national_material_capabilities"]
+    tb = ds_garden.read("national_material_capabilities", reset_index=False)
 
     #
     # Save outputs.

@@ -25,14 +25,14 @@ def run() -> None:
     ds_nmc = paths.load_dataset("national_material_capabilities")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["global_military_spending_dataset"].reset_index()
-    tb_burden = ds_meadow["global_military_spending_dataset_burden"].reset_index()
+    tb = ds_meadow.read("global_military_spending_dataset")
+    tb_burden = ds_meadow.read("global_military_spending_dataset_burden")
 
     # Read Gleditsch country codes
-    tb_gleditsch = ds_gleditsch["gleditsch_countries"].reset_index()
+    tb_gleditsch = ds_gleditsch.read("gleditsch_countries")
 
     # Read National Material Capabilities
-    tb_nmc = ds_nmc["national_material_capabilities"].reset_index()
+    tb_nmc = ds_nmc.read("national_material_capabilities")
 
     sanity_check_inputs(tb=tb, tb_burden=tb_burden)
 

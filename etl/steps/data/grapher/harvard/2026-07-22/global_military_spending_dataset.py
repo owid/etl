@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("global_military_spending_dataset")
 
     # Read table from garden dataset.
-    tb = ds_garden["global_military_spending_dataset"]
+    tb = ds_garden.read("global_military_spending_dataset", reset_index=False)
 
     #
     # Save outputs.

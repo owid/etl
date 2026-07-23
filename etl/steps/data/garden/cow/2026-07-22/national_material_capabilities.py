@@ -37,8 +37,8 @@ def run() -> None:
     ds_cow_countries = paths.load_dataset("cow_ssm")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["national_material_capabilities"].reset_index()
-    tb_cow_countries = ds_cow_countries["cow_ssm_countries"].reset_index()
+    tb = ds_meadow.read("national_material_capabilities")
+    tb_cow_countries = ds_cow_countries.read("cow_ssm_countries")
 
     sanity_check_inputs(tb=tb)
 
