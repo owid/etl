@@ -104,6 +104,10 @@ Open `_scaffold.md`, then write `ai/<slug>-mdim-mapping/mapping_rules.py` defini
 - `translate(dims, mdim) -> dict` — return `{mdim_dim_slug: choice_slug}` for the target
   MDIM view, built from the `*_MAP` dicts. Only include slugs the MDIM actually has
   (e.g. economic_damages has no `metric` — single-choice dims are pruned from MDIM views).
+- *(optional)* `DEFAULT_MDIM = "<short>"` — the catch-all target for the bare explorer URL
+  (see `mapping.json` → `catchAll`). Omit it and the best-fitting MDIM is chosen automatically
+  (the one receiving the most resolved views; tie-break = earliest in `MDIMS`). Set it only
+  when the automatic pick isn't the MDIM you'd want a param-less explorer link to land on.
 
 The scaffold seeds the `*_MAP` dicts with `slugify(value)` guesses. **Verify every entry** —
 slugify won't catch label↔slug differences like `Decadal average`→`decadal`, `Injuries`→`injured`,
@@ -133,6 +137,11 @@ columns, meant for a spreadsheet), the JSON carries every identifier a redirect 
   "explorer": { "slug": "...", "dimensions": ["<name>", ...] },
   "targets":  [ { "mdim": "...", "catalogPath": "ns/v/short#short", "dimensions": ["<slug>", ...] } ],
   "stats":    { "total": N, "resolved": N, "unresolved": N },
+  "catchAll": {                        // bare explorer URL (no query params) fallback
+    "source": { "explorerSlug": "..." },
+    "target": { "mdim": "...", "catalogPath": "ns/v/short#short",
+                "viewId": null, "dimensions": {} }   // no params → the MDIM's default view
+  },
   "redirects": [
     {
       "sourceViewId": 1,
@@ -153,6 +162,12 @@ The **source** view is identified by the explorer slug + dimension **name→disp
 (the explorer URL query params); the **target** view by the MDIM catalogPath + dimension
 **slug→choice-slug** (the MDIM URL query params). Unresolved views are kept with
 `target: null` so the API can see the full picture; a consumer typically skips them.
+
+**`catchAll` is always present**: it redirects the bare explorer URL (no query params) — and
+serves as the sensible fallback for any view a consumer doesn't route individually — to the
+best-fitting MDIM with **no query params**, which grapher renders as that MDIM's default view
+(hence `viewId: null`, `dimensions: {}`). The best-fitting MDIM is the one most views resolve
+to, or whatever `DEFAULT_MDIM` in `mapping_rules.py` overrides it to.
 
 The script prints a validation report: how many explorer views resolved, distinct MDIM
 views hit per MDIM, how many rows share a target, and **FLAGS** for any explorer view that

@@ -72,7 +72,28 @@ def read_csv(path: Path):
         return header, list(r)
 
 
-def write_mapping_json(out: Path, explorer_slug, explorer_dims, mdims_meta, ids_by_target, mappings) -> Path:
+def pick_default_mdim(rules, mappings) -> str:
+    """The catch-all target: the best-fitting MDIM for the bare explorer URL.
+
+    ``mapping_rules.py`` may set ``DEFAULT_MDIM = "<short>"`` to force it; otherwise it's
+    the MDIM that receives the most resolved explorer views (tie-break: earliest in MDIMS).
+    """
+    override = getattr(rules, "DEFAULT_MDIM", None)
+    if override is not None:
+        if override not in rules.MDIMS:
+            raise SystemExit(f"DEFAULT_MDIM {override!r} is not in MDIMS {rules.MDIMS}")
+        return override
+    counts = {short: 0 for short in rules.MDIMS}
+    for m in mappings:
+        if m.resolved:
+            counts[m.mdim] += 1
+    # Higher count wins; on a tie, the earlier MDIM (smaller index) wins.
+    return max(rules.MDIMS, key=lambda s: (counts[s], -rules.MDIMS.index(s)))
+
+
+def write_mapping_json(
+    out: Path, explorer_slug, explorer_dims, mdims_meta, ids_by_target, mappings, default_mdim
+) -> Path:
     """Write mapping.json — a redirect payload for an owid-grapher API to consume.
 
     Structure::
@@ -81,6 +102,11 @@ def write_mapping_json(out: Path, explorer_slug, explorer_dims, mdims_meta, ids_
           "explorer": {"slug": ..., "dimensions": [<names>]},
           "targets":  [{"mdim": ..., "catalogPath": ..., "dimensions": [<slugs>]}],
           "stats":    {"total": N, "resolved": N, "unresolved": N},
+          "catchAll": {                     # bare explorer URL -> best-fitting MDIM default view
+            "source": {"explorerSlug": ...},                 # no query params
+            "target": {"mdim": ..., "catalogPath": ...,
+                       "viewId": null, "dimensions": {}}     # no query params = MDIM default view
+          },
           "redirects": [
             {
               "sourceViewId": 1,
@@ -99,8 +125,20 @@ def write_mapping_json(out: Path, explorer_slug, explorer_dims, mdims_meta, ids_
     All identifiers a redirect needs are here: the source view is (explorer slug +
     dimension name→value), the target view is (MDIM catalogPath + dimension
     slug→choice-slug, plus our internal ``viewId`` for cross-referencing the CSVs).
+    ``catchAll`` is the fallback for the bare explorer URL (and any view a consumer
+    chooses not to route individually): it points at the best-fitting MDIM with no query
+    params, which grapher renders as that MDIM's default view.
     """
     catalog_path_of = {m["short"]: m["catalogPath"] for m in mdims_meta}
+    catch_all = {
+        "source": {"explorerSlug": explorer_slug},
+        "target": {
+            "mdim": default_mdim,
+            "catalogPath": catalog_path_of.get(default_mdim),
+            "viewId": None,
+            "dimensions": {},
+        },
+    }
     redirects = []
     for m in mappings:
         record = {
@@ -129,6 +167,7 @@ def write_mapping_json(out: Path, explorer_slug, explorer_dims, mdims_meta, ids_
             {"mdim": m["short"], "catalogPath": m["catalogPath"], "dimensions": m["dimensions"]} for m in mdims_meta
         ],
         "stats": {"total": len(mappings), "resolved": resolved, "unresolved": len(mappings) - resolved},
+        "catchAll": catch_all,
         "redirects": redirects,
     }
     path = out / "mapping.json"
@@ -235,8 +274,9 @@ def main():
         w.writerows(m.csv_row for m in mappings)
 
     # Redirect payload for the owid-grapher API — full source + target identifiers.
+    default_mdim = pick_default_mdim(rules, mappings)
     json_path = write_mapping_json(
-        out, explorer_slug, rules.EXPLORER_DIMENSIONS, sources["mdims"], ids_by_target, mappings
+        out, explorer_slug, rules.EXPLORER_DIMENSIONS, sources["mdims"], ids_by_target, mappings, default_mdim
     )
 
     # Report
@@ -254,6 +294,7 @@ def main():
         print(f"  {mdim}: {n_views[mdim]} explorer views -> {len(view_ids[mdim])} distinct MDIM views")
     shared = sum(1 for m in mappings if m.csv_row["shared_target_explorer_ids"])
     print(f"rows pointing at a shared MDIM view: {shared}")
+    print(f"catch-all: bare explorer '{explorer_slug}' -> MDIM '{default_mdim}' default view")
     if flags:
         print("\nFLAGS (unresolved):")
         for fl in flags:
