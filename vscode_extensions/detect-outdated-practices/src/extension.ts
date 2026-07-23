@@ -132,6 +132,18 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         message: '`set_index` is outdated for finalizing a table. Use `tb.format()` instead, which sets the index and also sorts rows, checks the key is unique, and normalizes column names/types. `format()` expects `country` and `year` by default; pass custom keys with `tb.format(["disease", "year"])`. For year-less tables use `set_index("country")` plus `tb.metadata.short_name`.',
         severity: vscode.DiagnosticSeverity.Warning,
         scope: 'etl/steps/data/**'
+    },
+    {
+        // Matches reading a table from a Dataset via subscript access, e.g.:
+        // - ds_meadow["table_name"]
+        // - ds_garden["table_name"].reset_index()
+        // Dataset variables in ETL steps are conventionally named `ds` / `ds_*`, which lets the
+        // pattern target Dataset table access without catching Table/DataFrame column access
+        // (tb[...], df[...]). `Dataset.read()` is the modern accessor.
+        pattern: /\bds\w*\[\s*["'][^"']+["']\s*\]/g,
+        message: 'Reading a table via `ds["table"]` subscript is outdated. Use `ds.read("table")` instead — it resets the index by default; pass `reset_index=False` to keep the index (e.g. `ds.read("table", reset_index=False)`).',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'etl/steps/data/**'
     }
 ];
 
