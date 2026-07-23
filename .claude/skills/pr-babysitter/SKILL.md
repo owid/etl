@@ -19,7 +19,7 @@ Only ONE babysitter per PR. If one is already running, message it (SendMessage) 
 
 1. Post the trigger as a bare PR comment: `gh pr comment <n> --body "@codex review"`. Record the exact `created_at` timestamp of that comment (`gh api repos/owid/etl/issues/<n>/comments`).
 2. Spawn a `general-purpose` background agent with the prompt template below, filled in. The agent works in the SAME checkout on the SAME branch — warn it that the main session may also push commits mid-loop.
-3. When the completion notification arrives, relay the report. If the agent stops early (its notification says it is "waiting"), resume it with a message telling it to poll inside a bash `until` loop rather than ending its turn.
+3. When the completion notification arrives, relay the report. If the agent stops early (its notification says it is "waiting"), resume it with a message telling it to keep polling in short bash calls rather than ending its turn.
 
 ## Agent prompt template
 
@@ -32,7 +32,7 @@ You are babysitting PR #<n> on <repo> (branch <branch>) until CI is green and th
 Loop (max <3> iterations, then stop and report):
 
 1. **CI**: `gh pr checks <n> --watch --interval 60` (up to 30 min). On failure: read logs (`gh run view <id> --log-failed`), diagnose, fix.
-2. **Wait for the review**: poll every 2-3 minutes for a review by a user matching "codex" with `submitted_at` LATER than the trigger timestamp above. Poll inside a single bash `until ...; do sleep 120; done` loop — do NOT end your turn to wait. Give up after 30 minutes and say so in your report.
+2. **Wait for the review**: poll every 2-3 minutes for a Codex response LATER than the trigger timestamp above, checking BOTH endpoints — Codex submits a formal review (`pulls/<n>/reviews`) when it has findings, but posts a plain issue comment (`issues/<n>/comments`, e.g. "Didn't find any major issues") when it has none; watching only the reviews endpoint strands the loop forever on a clean review. Poll in SHORT bash calls (one `sleep 120` + both checks per call, repeated as separate tool calls) — never one long multi-minute loop, so that queued messages from the main session can reach you between calls. Do NOT end your turn to wait. Give up after 30 minutes and say so in your report.
 3. **Judge each finding.** Valid: real bugs, wrong data handling, broken asserts, metadata errors. Invalid: style nitpicks contradicting CLAUDE.md conventions, or suggestions to undo deliberate decisions listed in the PR description. When a finding touches a decision you know the main session made deliberately, rebut rather than fix.
 4. **Fix valid findings**: `git pull --rebase` FIRST (the branch may have moved). Use `.venv/bin/` for everything. Verify with the relevant `etlr` steps and `make check`. Commit `🐛🤖`/`🔨🤖` + "Co-Authored-By: Claude <model name> <noreply@anthropic.com>", push.
 5. **Reply to every finding's inline comment** (fixed → what you did + commit hash; rebutted → why). Every reply MUST start with this exact first line:
@@ -51,7 +51,8 @@ Final report: status of every CI check; each finding with verdict (fixed+commit 
 
 ## Lessons already folded in (do not relearn)
 
-- The agent must poll inside `until` loops; ending its turn "to wait" strands the loop until someone resumes it.
+- The agent must keep polling within its turn (ending the turn "to wait" strands the loop until someone resumes it) — but in short bash calls, never one long multi-minute loop: messages from the main session can only be delivered between tool calls, so a long sleep makes the agent unreachable.
+- Codex answers on two different surfaces: findings arrive as a formal review, a clean pass arrives as a plain issue comment ("Didn't find any major issues"). Poll both, or a clean review strands the loop until the deadline.
 - Replying to a review comment does NOT resolve the thread; resolution is a separate GraphQL mutation.
 - Every re-trigger resets the polling threshold; deleted trigger comments make timestamps lie — always pin the threshold to a comment that still exists.
 - Main session and agent share the checkout: both must `git pull --rebase` before committing, and the main session must not run a parallel review/CI loop.

@@ -31,7 +31,7 @@ tables:
       #   unit: arbitrary units
       #   short_unit: au
       #   description_short: Short description of testing variable.
-      #   description_key: List of key points about the indicator.
+      #   description_key: Key information about the indicator, as free-form markdown text (a YAML list of bullets is also accepted).
       #   processing_level: minor
       #   description_processing: Description of processing of testing variable.
       #   description_from_producer: Description of testing variable from producer.
