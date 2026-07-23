@@ -86,9 +86,9 @@ tables:
 
           {definitions.caveats}
 
-          {definitions.undercount}
-
           Entities like "Asia (not specified)" cover people known to be born in a region but in a country the source does not list separately. Their size depends on how many countries the source lists: the census data lists only about 40, so by 2000 they cover about 40% of the foreign-born population, while the survey data from 2005 onward lists about 120, leaving only a few percent unattributed. "Not specified" covers the small number of people with no recorded country of birth, including people born at sea.
+
+          {definitions.undercount}
         description_processing: |-
           We combined the source's "Turkey in Europe" and "Turkey in Asia" series into a single series for Turkey, and used the source's Great Britain series to extend the United Kingdom series before 1930. People not attributed to a listed country are assigned to a "(not specified)" entity of their region, so all entities together add up to the source's total.
         processing_level: major
@@ -113,9 +113,9 @@ tables:
 
           {definitions.caveats}
 
-          {definitions.undercount}
-
           "Rest of America" covers everyone born in the Americas outside Mexico and Canada. "Not specified" covers people whose country of birth was not recorded, and people born at sea.
+
+          {definitions.undercount}
         description_processing: |-
           We calculated these shares by dividing the foreign-born population of each group of origin by the total resident population reported by the same census or survey. "Rest of America" is the Americas minus Mexico and Canada. People born in the European part of Turkey are counted in Asia, and everyone born in the former Soviet Union is counted in Europe.
         processing_level: major
@@ -137,9 +137,9 @@ tables:
 
           {definitions.caveats}
 
-          {definitions.undercount}
-
           "Not specified" covers people whose country of birth was not recorded, and people born at sea.
+
+          {definitions.undercount}
         description_processing: |-
           We calculated these regional totals from the source's data, grouping countries into regions as defined by Our World in Data. They can differ from the source's own regional totals: for example, we count the Caribbean and Central America (including Mexico) as part of North America. Everyone born in the former Soviet Union is counted in Europe, because the source does not separate its Asian part.
         processing_level: major
