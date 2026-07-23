@@ -63,6 +63,137 @@ BIOMASS_SHARE_SOURCES = {
     "traditional_biomass": "Traditional biomass",
 }
 
+# Countries that enter only through the EIA total-energy extension (no Statistical Review by-source
+# breakdown) and that are confirmed to have no nuclear power. The Statistical Review garden step already
+# zero-fills nuclear for the no-nuclear countries it *does* cover; this list extends that to the
+# EIA-only countries, so the nuclear map shows "No nuclear" for them instead of "No data".
+COUNTRIES_WITHOUT_NUCLEAR = [
+    "Afghanistan",
+    "Albania",
+    "American Samoa",
+    "Antarctica",
+    "Antigua and Barbuda",
+    "Aruba",
+    "Bahamas",
+    "Barbados",
+    "Belize",
+    "Benin",
+    "Bermuda",
+    "Bhutan",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "British Virgin Islands",
+    "Burkina Faso",
+    "Burundi",
+    "Cambodia",
+    "Cameroon",
+    "Cape Verde",
+    "Cayman Islands",
+    "Central African Republic",
+    "Comoros",
+    "Cook Islands",
+    "Costa Rica",
+    "Cote d'Ivoire",
+    "Djibouti",
+    "Dominica",
+    "Dominican Republic",
+    "East Timor",
+    "El Salvador",
+    "Eritrea",
+    "Eswatini",
+    "Ethiopia",
+    "Falkland Islands",
+    "Faroe Islands",
+    "Fiji",
+    "French Guiana",
+    "French Polynesia",
+    "Gambia",
+    "Georgia",
+    "Ghana",
+    "Gibraltar",
+    "Greenland",
+    "Grenada",
+    "Guadeloupe",
+    "Guam",
+    "Guatemala",
+    "Guinea",
+    "Guinea-Bissau",
+    "Haiti",
+    "Honduras",
+    "Jamaica",
+    "Jordan",
+    "Kenya",
+    "Kiribati",
+    "Kosovo",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Lesotho",
+    "Liberia",
+    "Macao",
+    "Malawi",
+    "Maldives",
+    "Mali",
+    "Malta",
+    "Martinique",
+    "Mauritania",
+    "Mauritius",
+    "Micronesia (country)",
+    "Moldova",
+    "Montenegro",
+    "Montserrat",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Netherlands Antilles",
+    "Nicaragua",
+    "Niger",
+    "Niue",
+    "Northern Mariana Islands",
+    "Palestine",
+    "Panama",
+    "Paraguay",
+    "Puerto Rico",
+    "Reunion",
+    "Rwanda",
+    "Saint Helena",
+    "Saint Kitts and Nevis",
+    "Saint Lucia",
+    "Saint Pierre and Miquelon",
+    "Saint Vincent and the Grenadines",
+    "Samoa",
+    "Sao Tome and Principe",
+    "Senegal",
+    "Seychelles",
+    "Sierra Leone",
+    "Solomon Islands",
+    "Somalia",
+    "Suriname",
+    "Tajikistan",
+    "Tanzania",
+    "Togo",
+    "Tonga",
+    "Turks and Caicos Islands",
+    "Tuvalu",
+    "Uganda",
+    "United States Virgin Islands",
+    "Uruguay",
+    "Vanuatu",
+    "Western Sahara",
+]
+
+# EIA-only entities that DID operate nuclear power (Armenia's plant is still active; the others are
+# historical states that ran reactors). These keep "No data" for nuclear rather than a misleading zero.
+COUNTRIES_WITH_NUCLEAR_NO_BREAKDOWN = [
+    "Armenia",
+    "Czechoslovakia",
+    "East Germany",
+    "West Germany",
+    "Yugoslavia",
+    "Serbia and Montenegro",
+    "North Korea",
+]
+
 # Mapping of Smil (2017) World columns (direct energy, in TWh) onto our source columns, used to extend
 # the World series before the Statistical Review begins (1965).
 # NOTE: We use Smil's commercially-traded sources only. Smil also reports traditional biomass, but the
@@ -189,6 +320,31 @@ def add_shares(tb: Table) -> Table:
         # Clip to 100: float32 noise otherwise leaves values like 100.000008, which makes grapher
         # render an open-ended ">100%" bracket on the map legend.
         tb[f"{source}_share_pct"] = (100 * tb[f"{source}_twh"] / tb["total_energy_supply_twh"]).clip(upper=100)
+    return tb
+
+
+def fill_nuclear_zero_for_countries_without_nuclear(tb: Table) -> Table:
+    """Set nuclear to zero for EIA-only countries confirmed to have no nuclear power.
+
+    Countries that enter only through the EIA total-energy extension have no by-source breakdown, so
+    their nuclear is missing (NaN) and the map renders them as "No data". For countries we know have no
+    nuclear power, that missing value is really a zero; filling it makes the map show "No nuclear".
+    Entities that did operate nuclear power are deliberately left as NaN.
+    """
+    tb = tb.copy()
+    # Countries with no by-source breakdown at all (nuclear is NaN in every year they appear).
+    nuclear_all_nan = tb.groupby("country", observed=True)["nuclear_twh"].transform(lambda s: s.isna().all())
+    eia_only = set(tb.loc[nuclear_all_nan, "country"])
+    # Energy Institute regional aggregates (e.g. "OPEC (EI)") are not countries and can contain nuclear
+    # members, so they are never zero-filled and are excluded from the classification.
+    eia_only = {country for country in eia_only if not country.endswith("(EI)")}
+    # Guard: every such country must be explicitly classified, so a newly-added country fails the build
+    # loudly instead of silently showing "No data".
+    unclassified = eia_only - set(COUNTRIES_WITHOUT_NUCLEAR) - set(COUNTRIES_WITH_NUCLEAR_NO_BREAKDOWN)
+    assert not unclassified, (
+        f"Countries with no nuclear data are not classified as with/without nuclear: {sorted(unclassified)}"
+    )
+    tb.loc[tb["country"].isin(COUNTRIES_WITHOUT_NUCLEAR) & tb["nuclear_twh"].isna(), "nuclear_twh"] = 0
     return tb
 
 
@@ -330,6 +486,10 @@ def run() -> None:
 
     # Add World traditional biomass (Smil), kept separate from the TES total, for biomass-inclusive charts.
     tb = add_traditional_biomass(tb=tb, tb_smil=tb_smil)
+
+    # For EIA-only countries confirmed to have no nuclear power, fill their missing nuclear with zero
+    # (so the nuclear map shows "No nuclear" instead of "No data").
+    tb = fill_nuclear_zero_for_countries_without_nuclear(tb=tb)
 
     # Add shares, annual change, per-capita and per-GDP variables.
     tb = add_shares(tb=tb)
