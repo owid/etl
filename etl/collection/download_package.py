@@ -275,7 +275,16 @@ def _compute_long_column_name(var) -> str:
 def _format_numeric_series(s: pd.Series) -> pd.Series:
     """Print whole numbers without a trailing ".0" ("11", not "11.0") and NaN
     as an empty cell -- matches how grapher's own CSV writer serializes
-    values. One-time cost at ETL build time, not per download request."""
+    values. One-time cost at ETL build time, not per download request.
+
+    Also rounds to ~6 significant figures before printing. Most OWID
+    indicator columns are stored as float32; naively widening to float64 and
+    calling str() surfaces float32's inherent rounding error as a long,
+    meaningless decimal tail (e.g. float32(183.3) prints as
+    "183.3000030517578"). Found spot-checking real covid/natural-disasters
+    packages 2026-07-23. Rounds via %g (so scientific notation never survives
+    into the final string -- %g would use it for small values, this reformats
+    the already-rounded value with plain fixed-point notation instead)."""
     if not pd.api.types.is_numeric_dtype(s):
         return s
 
@@ -283,7 +292,13 @@ def _format_numeric_series(s: pd.Series) -> pd.Series:
         if pd.isna(v):
             return ""
         f = float(v)
-        return str(int(f)) if f.is_integer() else str(v)
+        if f.is_integer():
+            return str(int(f))
+        rounded = float(f"{f:.6g}")
+        if rounded.is_integer():
+            return str(int(rounded))
+        text = f"{rounded:.10f}".rstrip("0")
+        return text if not text.endswith(".") else text + "0"
 
     return s.map(fmt)
 
