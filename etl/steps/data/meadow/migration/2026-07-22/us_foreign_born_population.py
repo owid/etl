@@ -6,7 +6,7 @@ Three snapshots are used, all with the same definition of foreign-born:
   census.
 - Table 4 of the same report: foreign-born population by world region and country of birth,
   at each census from 1850 to 1930 and from 1960 to 2000 (the 1940 and 1950 censuses only
-  published this for the White population).
+  published this for the white population).
 - American Community Survey 1-year estimates (table B05002), with the total and foreign-born
   population annually from 2005. The snapshot stores the Census API's own variable codes,
   which are renamed to readable column names here.

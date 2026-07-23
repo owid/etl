@@ -8,7 +8,7 @@ meta:
     description: |-
       A report by the US Census Bureau that brings together statistics on the foreign-born population of the United States from every census between 1850 and 2000. Its tables cover nativity, citizenship, place of birth, language, age and sex, race and Hispanic origin, length of residence, and place of residence.
     description_snapshot: |-
-      Table 4 of the report, which gives the foreign-born population of the United States by world region and country of birth, at each census from 1850 to 1930 and from 1960 to 2000. There is no data for 1940 and 1950, because the census publications of those years only gave the country of birth of the White population.
+      Table 4 of the report, which gives the foreign-born population of the United States by world region and country of birth, at each census from 1850 to 1930 and from 1960 to 2000. There is no data for 1940 and 1950, because the census publications of those years only gave the country of birth of the white population.
 
       Notes from the source: prior to 1980, people born in Taiwan are counted with China. Data for the former Soviet Union include its Asian part. In 2000, data for Portugal include the Madeira Islands, and the country of birth was imputed when it was not reported.
     date_published: "2006-02-02"

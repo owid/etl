@@ -19,7 +19,7 @@ definitions:
     - The population included: Alaska and Hawaii are included from 1960 onward. The 1890 figures exclude about 325,000 people living in the Indian Territory and on Indian reservations, who were not asked about their place of birth.
     - The list of US territories: people born in a territory count as native-born, so when a territory's status changed, so did their classification. For example, people born in the Philippines counted as native-born until it became independent in 1946, and as foreign-born after.
   missing_years: |-
-    There is no data for 1940 and 1950, because the census publications of those years only gave the country of birth of the White population, and no data for 2020, because no survey estimates were released for that year.
+    There is no data for 1940 and 1950, because the census publications of those years only gave the country of birth of the white population, and no data for 2020, because no survey estimates were released for that year.
   old_countries: |-
     Country borders have changed over this period, so a country's figures may not always refer to the same area.
     - The Soviet Union includes its Asian part for the whole period; before 1920 it corresponds to the Russian Empire.
