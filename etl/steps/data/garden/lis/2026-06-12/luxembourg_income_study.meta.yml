@@ -110,7 +110,7 @@ definitions:
     <% if welfare_type == "dhi" %>
     Income is measured after taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received.
     <%- elif welfare_type == "mi" %>
-    Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. LIS includes private pensions, meaning a retired person’s before-tax income depends on how their country organizes pensions.
+    Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. Private pension income is also included, meaning a retired person’s before-tax income varies depending on whether their country’s pensions system is primarily public, private or a mix.
     <%- endif %>
 
   description_key_equivalence_scale: |-
@@ -564,9 +564,6 @@ definitions:
     - Mexico
     - Russia
     - Israel
-
-  # This is the ID of the Google Doc that contains the FAQs
-  gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
 
 
 # Learn more about the available fields:

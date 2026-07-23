@@ -95,27 +95,6 @@ definitions:
     owned
     <%- endif %>
 
-  verb_welfare_type_present: |-
-    <% if welfare_type != "wealth" %>
-    receives
-    <%- else %>
-    owns
-    <%- endif %>
-
-  verb_welfare_type_present_plural: |-
-    <% if welfare_type != "wealth" %>
-    receive
-    <%- else %>
-    own
-    <%- endif %>
-
-  verb_welfare_type_goes_to: |-
-    <% if welfare_type != "wealth" %>
-    that goes to
-    <%- else %>
-    owned by
-    <%- endif %>
-
   concept_welfare_type: |-
     <% if welfare_type != "wealth" %>
     income
@@ -496,7 +475,6 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_national_income}"
           - "{definitions.description_key_missing_data}"
-          - "{definitions.description_key_posttax}"
         display:
           name: Gini coefficient (<<welfare_type>>)
           numDecimalPlaces: 2
@@ -528,7 +506,6 @@ tables:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_national_income}"
           - "{definitions.description_key_missing_data}"
-          - "{definitions.description_key_posttax}"
         display:
           name: Palma ratio (<<welfare_type>>)
           numDecimalPlaces: 1

@@ -240,13 +240,13 @@ definitions:
     The Palma ratio is a measure of inequality that compares the income share of the richest 10% to that of the poorest 40%. For example, a value of 2 means the richest 10% receive twice as much as the poorest 40%. We discuss the data and other measures in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
 
   description_key_mean: |-
-    This data shows the mean (average) income or consumption per person. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    This data shows the mean (average) income or consumption per person.
 
   description_key_median: |-
-    This data shows the median income or consumption per person — the level below which half the population falls. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    This data shows the median income or consumption per person — the level below which half the population falls.
 
   description_key_avg: |-
-    This data shows the mean (average) income or consumption per person within decile groups — each representing a tenth of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    This data shows the mean (average) income or consumption per person within decile groups — each representing a tenth of the population, ranked from poorest to richest.
 
   description_key_thr: |-
     <% if decile is defined and decile == "5" %>
@@ -728,11 +728,6 @@ definitions:
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
 
-  # For indicators created exclusively for the consolidated dataset, to avoid long dataset names
-  short_title: |-
-    <% if poverty_line != "No poverty line" %>
-     {definitions.poverty_line_a_day}, <<welfare_type>>, <<table>>, <<survey_comparability>>
-    <%- endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
