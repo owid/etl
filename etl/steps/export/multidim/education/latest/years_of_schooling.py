@@ -307,7 +307,7 @@ def run() -> None:
     staged = stage_download_package_for_collection(
         c,
         dest_dir=paths.dest_dir / "download_package",
-        s3_prefix=f"owid-public/data/mdim-downloads/{paths.short_name}",
+        slug=paths.short_name,
     )
     c.download_package = staged.to_config()
     c.upsert_to_db(OWID_ENV)

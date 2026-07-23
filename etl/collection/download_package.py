@@ -56,6 +56,7 @@ from owid.catalog import Table, s3_utils
 from owid.catalog import processing as pr
 from structlog import get_logger
 
+from etl import config
 from etl.paths import DATA_DIR
 
 if TYPE_CHECKING:
@@ -315,13 +316,21 @@ def _format_numeric_series(s: pd.Series) -> pd.Series:
     return s.map(fmt)
 
 
-# Buckets with a known public HTTPS domain -- mirrors the pattern already used
-# for owid_co2.py / owid_energy.py / income_distribution.py etc. (S3_BUCKET_NAME
-# = "owid-public", served at owid-public.owid.io). Add more here if this ever
-# moves to a different bucket.
-PUBLIC_BUCKET_DOMAINS = {
-    "owid-public": "https://owid-public.owid.io",
-}
+# Where to stage the wide CSV + indicator index, split by environment exactly
+# like BAKED_VARIABLES_PATH/DATA_API_URL (etl/config.py) already split the
+# baked indicator JSONs -- same bucket pair, so every staging branch gets its
+# own isolated path under api-staging.owid.io instead of every automated
+# staging build overwriting the one production file at a fixed path (the
+# owid-public/owid_co2.py-style scripts this originally copied don't need
+# that isolation because they're only ever run manually against production).
+def _mdim_downloads_locations(slug: str) -> tuple[str, str]:
+    """Returns (s3_prefix, base_url) for a given MDIM's download package."""
+    if config.DATA_API_ENV == "production":
+        return f"owid-api/v1/mdim-downloads/{slug}", f"https://api.ourworldindata.org/v1/mdim-downloads/{slug}"
+    return (
+        f"owid-api-staging/{config.DATA_API_ENV}/v1/mdim-downloads/{slug}",
+        f"https://api-staging.owid.io/{config.DATA_API_ENV}/v1/mdim-downloads/{slug}",
+    )
 
 
 @dataclass
@@ -347,7 +356,7 @@ class StagedPackageResult:
 def stage_download_package_for_collection(
     collection: Collection,
     dest_dir: Path,
-    s3_prefix: str,
+    slug: str,
 ) -> StagedPackageResult:
     """Builds the wide table (the part that benefits from local data access --
     no per-view HTTP fetches, validated across 12 real MDIMs) and uploads it
@@ -358,9 +367,10 @@ def stage_download_package_for_collection(
     existing (tested, correct) citation/title-formatting code instead of a
     Python reimplementation -- see mdim-downloads/solution-space/etl-feasibility.md.
 
-    `s3_prefix` is bucket/path, e.g. "owid-public/data/mdim-downloads/years_of_schooling".
-    This is the permanent, canonical location grapher reads from on every
-    request -- not a staging area for a later build step.
+    `slug` picks the R2 location via `_mdim_downloads_locations()` -- the
+    permanent, canonical location grapher reads from on every request (not a
+    staging area for a later build step), isolated per environment so a
+    staging branch's build never overwrites the real production file.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
     wide, column_to_catalog_path = build_wide_table_for_collection(collection)
@@ -440,13 +450,9 @@ def stage_download_package_for_collection(
     indicators_path = dest_dir / "indicators.json"
     indicators_path.write_text(json.dumps(index, indent=2))
 
-    csv_key = f"{s3_prefix}/wide.csv"
-    indicators_key = f"{s3_prefix}/indicators.json"
-    s3_utils.upload(f"s3://{csv_key}", csv_path, public=True)
-    s3_utils.upload(f"s3://{indicators_key}", indicators_path, public=True)
-
-    bucket = s3_prefix.split("/", 1)[0]
-    base_url = PUBLIC_BUCKET_DOMAINS.get(bucket, f"s3://{bucket}") + "/" + s3_prefix.split("/", 1)[1]
+    s3_prefix, base_url = _mdim_downloads_locations(slug)
+    s3_utils.upload(f"s3://{s3_prefix}/wide.csv", csv_path, public=True)
+    s3_utils.upload(f"s3://{s3_prefix}/indicators.json", indicators_path, public=True)
 
     log.info(
         "download_package.staged",
