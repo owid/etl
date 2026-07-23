@@ -152,7 +152,19 @@ def _iter_used_indicators(collection: Collection):
     """Yield (catalog_path, view_dimensions) once per distinct indicator, in
     first-seen order, skipping views created by group_views() -- those just
     re-display already-included indicators under a synthetic comparison
-    dimension, they don't add new data."""
+    dimension, they don't add new data.
+
+    KNOWN GAP -- that assumption isn't always true. A subagent spot-check
+    (2026-07-23) of natural-disasters-deaths found its "all disasters
+    combined" view is missing from the "complete" package. That MDIM calls
+    add_total_indicator_for_map() to add a genuinely NEW total indicator
+    that exists only on a grouped view's map tab, not on any regular view --
+    skipping all grouped views here means this function never sees it, so
+    the wide table silently ends up incomplete for any MDIM using that
+    pattern. Not fixed yet: doing so means telling apart "grouped view that
+    only re-displays existing indicators" from "grouped view that also
+    introduces a new one," which isn't something `view.is_grouped` alone
+    can answer."""
     seen: set[str] = set()
     for view in collection.views:
         if view.is_grouped:
