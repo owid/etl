@@ -198,9 +198,9 @@ definitions:
     <% if welfare_type is defined and welfare_type == "income" and (survey_comparability is not defined or survey_comparability == "No spells") %>
     This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. Here we only include surveys measuring people's incomes after taxes and benefits. [Read more](#dod:read-more-income-consumption-pip).
     <%- elif welfare_type is defined and welfare_type == "consumption" and (survey_comparability is not defined or survey_comparability == "No spells") %>
-    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. Here we only include surveys measuring people's consumption — a different but closely related measure to income. [Read more](#dod:read-more-income-consumption-pip).
+    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. Here we only include surveys measuring people's consumption — a different but [closely related](#dod:read-more-income-consumption-pip) measure to income.
     <%- else %>
-    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. To achieve wide coverage, it pools data from two kinds of surveys. For high-income countries, the data measures people's incomes after taxes and benefits. For most low- and middle-income countries, it instead measures their consumption — a different but closely related measure. [Read more](#dod:read-more-income-consumption-pip).
+    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. To achieve wide coverage, it pools data from two kinds of surveys. For high-income countries, the data measures people's incomes after taxes and benefits. For most low- and middle-income countries, it instead measures their consumption — a different but [closely related](#dod:read-more-income-consumption-pip) measure.
     <%- endif %>
 
   description_key_not_market_income: In lower-income countries, many people produce food for their own use or exchange goods without money. This data accounts for that by estimating what these goods would have cost if bought in the market and adding that value to their consumption or income.
@@ -217,7 +217,7 @@ definitions:
     <% if table is defined and table == "Income or consumption intra/extrapolated" %>
     For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations.
     <%- else %>
-    For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations. You can see all the original data points, however, using the option to show breaks in the data.
+    For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations. You can see which measure each data point corresponds to by selecting the option to show breaks in the data.
     <%- endif %>
     <%- endif %>
 
