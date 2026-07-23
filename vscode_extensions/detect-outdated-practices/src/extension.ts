@@ -132,25 +132,15 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         message: '`set_index` is outdated for finalizing a table. Use `tb.format()` instead, which sets the index and also sorts rows, checks the key is unique, and normalizes column names/types. `format()` expects `country` and `year` by default; pass custom keys with `tb.format(["disease", "year"])`. For year-less tables use `set_index("country")` plus `tb.metadata.short_name`.',
         severity: vscode.DiagnosticSeverity.Warning,
         scope: 'etl/steps/data/**'
-    },
-    {
-        // Matches reading a table from a Dataset via subscript access in assignment position, e.g.:
-        // - tb = ds_meadow["table_name"]
-        // - tb = ds_garden["table_name"].reset_index()
-        // - tb = ds_pip[f"income_consumption_{ppp_year}"]   (the optional `f?` covers f-strings)
-        // The `(?<==\s*)` lookbehind requires the subscript to be the right-hand side of an
-        // assignment — genuine Dataset reads are always `var = ds[...]`. This avoids flagging
-        // Table/DataFrame column access that appears inside expressions (e.g. `ds["col"] == x`),
-        // including cases where a `ds_*` name has been rebound to a Table. `Dataset.read()` is the
-        // modern accessor. Trade-offs: a Dataset read not assigned to a variable (return/func-arg) is
-        // not flagged; and a bare-variable table name (`ds[table]`) is intentionally skipped, since it
-        // is indistinguishable from column-by-variable or boolean-mask indexing. Both forms are rare.
-        pattern: /(?<==\s*)ds\w*\[\s*f?["'][^"']+["']\s*\]/g,
-        message: 'Reading a table via `ds["table"]` subscript is outdated. Use `ds.read("table")` instead — it resets the index by default; pass `reset_index=False` to keep the index (e.g. `ds.read("table", reset_index=False)`).',
-        severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
     }
 ];
+
+// Message for the Dataset table-read rule (implemented as a stateful pass in updateDiagnostics,
+// not a per-line regex, because it needs to know which variables are live Dataset objects).
+const DATASET_READ_MESSAGE =
+    'Reading a table via `ds["table"]` subscript is outdated. Use `ds.read("table")` instead — it '
+    + 'resets the index by default; pass `reset_index=False` to keep the index '
+    + '(e.g. `ds.read("table", reset_index=False)`).';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Detect Outdated Practices extension activated.');
@@ -246,6 +236,50 @@ export function activate(context: vscode.ExtensionContext) {
 
                     diagnostic.source = 'outdated-practices';
                     diagnostics.push(diagnostic);
+                }
+            }
+        }
+
+        // Dataset table reads via subscript, e.g. `tb = ds_meadow["table"]`. Flagged only when the
+        // variable is a *live* Dataset — assigned from `load_dataset(...)` and not since rebound to a
+        // Table. This `load_dataset` signal is more reliable than a name heuristic: it flags genuine
+        // reads (including in non-assignment positions) while never flagging Table/DataFrame column
+        // access (e.g. after `ds_x = ds_x["t"].reset_index()`, a later `ds_x["col"]` is not flagged).
+        if (matchesScope(document.uri.fsPath, 'etl/steps/data/**')) {
+            const datasetVars = new Set<string>();
+            const assignRe = /^\s*(\w+)\s*=\s*(.*)$/;
+            for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+                const line = lines[lineIndex];
+
+                // 1. Flag string-literal / f-string subscript reads on variables currently known to be
+                //    Datasets. Runs before this line's assignment is applied, so `ds = ds["t"]...` is
+                //    correctly flagged (the read happens while `ds` is still a Dataset).
+                const readRe = /(\w+)\[\s*f?["'][^"']+["']\s*\]/g;
+                let readMatch: RegExpExecArray | null;
+                while ((readMatch = readRe.exec(line)) !== null) {
+                    if (!datasetVars.has(readMatch[1])) {
+                        continue;
+                    }
+                    const startPos = new vscode.Position(lineIndex, readMatch.index);
+                    const endPos = new vscode.Position(lineIndex, readMatch.index + readMatch[0].length);
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(startPos, endPos),
+                        DATASET_READ_MESSAGE,
+                        vscode.DiagnosticSeverity.Warning
+                    );
+                    diagnostic.source = 'outdated-practices';
+                    diagnostics.push(diagnostic);
+                }
+
+                // 2. Track Dataset variables: add on `X = ...load_dataset(...)`; drop X when it is
+                //    reassigned to anything else (i.e. rebound to a Table/DataFrame).
+                const assignMatch = line.match(assignRe);
+                if (assignMatch) {
+                    if (/\bload_dataset\s*\(/.test(assignMatch[2])) {
+                        datasetVars.add(assignMatch[1]);
+                    } else if (datasetVars.has(assignMatch[1])) {
+                        datasetVars.delete(assignMatch[1]);
+                    }
                 }
             }
         }
