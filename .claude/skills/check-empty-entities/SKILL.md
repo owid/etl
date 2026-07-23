@@ -127,5 +127,3 @@ Repeat the loop shape over `multi_dim_x_chart_configs`, `explorer_views`, and `n
 - **Regressions** (block): view, surface, entities lost, prod evidence.
 - **Pre-existing gaps** (🟡 — still need fixing, just not necessarily in this PR): table of citation (scroll-to-highlight link), chart (staging grapher link via `OWIDEnv.from_staging(branch).chart_site(slug)` — same normalized-host rule as the API prefix; never hand-build `staging-site-<branch>`), and dead entities — the common pattern is old URLs using unsuffixed WB region / income-group names while data lives under `(WB)`-suffixed entities.
 - **Coverage caveats**: charts with no production baseline; variables whose metadata fetch failed (don't count fetch failures as empty).
-
-Reference run (WDI 2026-07, PR #6439): 480 charts, 37 MDim views, 18 narrative charts, 585 gdoc references — zero regressions, 10 pre-existing gaps handed to content follow-up.
