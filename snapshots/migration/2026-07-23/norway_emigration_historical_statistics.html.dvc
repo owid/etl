@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical statistics of Norway
+    title_snapshot: Historical statistics of Norway - Population, births, deaths, marriages, migration and population increase
+    description: |-
+      A collection of long-run statistical tables for Norway, published online by Statistics Norway as a continuation of its book Historical Statistics 1994. The tables cover population, industry, and society, with some series reaching back to the 17th century.
+    description_snapshot: |-
+      Table 3.13 of the collection, which gives the population and the yearly numbers of births, deaths, marriages, immigrations, and emigrations in Norway from 1735 to 2015. Emigration figures start in 1821 and only count emigration to overseas countries before 1951; immigration figures start in 1951.
+    # The page states no publication date; the table ends with 2015 data, so it was published in 2016 or later.
+    date_published: "2016"
+
+    # Citation
+    producer: Statistics Norway
+    citation_full: |-
+      Statistics Norway. Historical statistics, table 3.13: Population, births, deaths, marriages, migration and population increase, 1735-2015.
+    attribution_short: SSB
+
+    # Files
+    url_main: https://www.ssb.no/a/en/histstat/
+    url_download: https://www.ssb.no/a/histstat/tabeller/3-13-en.html
+    date_accessed: "2026-07-23"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.ssb.no/en/diverse/lisens
+outs:
+  - md5: 20a3cedc4969e936efe859293414ff99
+    size: 111431
+    path: norway_emigration_historical_statistics.html
