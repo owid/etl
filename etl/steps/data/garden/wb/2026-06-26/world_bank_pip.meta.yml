@@ -2155,7 +2155,6 @@ tables:
         description_short: The number of income or consumption surveys available in the past decade. Each decade comprises the current year and the nine years before.
         description_key:
           - "{definitions.description_key_source_world_bank}"
-          - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_income_consumption}"
         description_processing: |-
           {definitions.description_processing_surveys_past_decade}
