@@ -98,6 +98,30 @@ tables:
             Korea: includes North & South
             Czechoslovakia: includes Czechia & Slovakia
 
+  share_by_origin_group:
+    variables:
+      share_of_population:
+        title: Share of the United States population born in another country, by region of birth
+        unit: "%"
+        short_unit: "%"
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.missing_years}
+
+          {definitions.caveats}
+
+          {definitions.undercount}
+
+          "Rest of America" covers everyone born in the Americas outside Mexico and Canada. "Not specified" covers people whose country of birth was not recorded, and people born at sea.
+        description_processing: |-
+          We calculated these shares by dividing the foreign-born population of each group of origin by the total resident population reported by the same census or survey. "Rest of America" is the Americas minus Mexico and Canada. People born in the European part of Turkey are counted in Asia, and everyone born in the former Soviet Union is counted in Europe.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
   by_region_of_birth:
     variables:
       foreign_born_population:

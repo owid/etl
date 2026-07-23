@@ -14,6 +14,7 @@ def run() -> None:
         ds_garden.read("us_foreign_born_population", reset_index=False),
         ds_garden.read("by_country_of_birth", reset_index=False),
         ds_garden.read("by_region_of_birth", reset_index=False),
+        ds_garden.read("share_by_origin_group", reset_index=False),
     ]
 
     #
