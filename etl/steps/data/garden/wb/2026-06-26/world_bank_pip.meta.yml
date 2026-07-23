@@ -213,8 +213,8 @@ definitions:
   description_key_income_consumption: |-
     <% if survey_comparability is defined and survey_comparability != "No spells" %>
     This chart shows income and consumption surveys as separate series. Where a country switches between the two over time, or has both available for some years, these appear as distinct lines.
-    <%- elif welfare_type is defined and welfare_type == "income or consumption" %>
-    <% if table is defined and table == "Income or consumption intra/extrapolated" %>
+    <%- elif welfare_type is not defined or welfare_type == "income or consumption" %>
+    <% if welfare_type is not defined or (table is defined and table == "Income or consumption intra/extrapolated") %>
     For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations.
     <%- else %>
     For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations. You can see which measure each data point corresponds to by selecting the option to show breaks in the data.
@@ -2156,6 +2156,7 @@ tables:
         description_key:
           - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_income_consumption}"
         description_processing: |-
           {definitions.description_processing_surveys_past_decade}
         display:
