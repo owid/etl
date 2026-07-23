@@ -397,7 +397,11 @@ def stage_download_package_for_collection(
     final = pd.DataFrame(
         {
             "Entity": wide["country"],
-            "Code": wide["country"].map(entity_codes).fillna(""),
+            # .astype(str) first -- "country" is often a categorical column,
+            # and .map() on a Categorical can return a Categorical whose
+            # .fillna("") then fails ("new category") if "" isn't already
+            # one of its categories.
+            "Code": wide["country"].astype(str).map(entity_codes).fillna(""),
             time_header: wide[time_col],
         }
     )
