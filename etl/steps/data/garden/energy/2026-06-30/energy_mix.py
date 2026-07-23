@@ -57,6 +57,12 @@ SOURCE_NAMES = {
 }
 ALL_SOURCES = list(SOURCE_NAMES)
 
+# Sources shown in the biomass-inclusive share chart: the individual TES sources plus traditional biomass.
+BIOMASS_SHARE_SOURCES = {
+    **{source: SOURCE_NAMES[source] for source in SR_SOURCES.values()},
+    "traditional_biomass": "Traditional biomass",
+}
+
 # Mapping of Smil (2017) World columns (direct energy, in TWh) onto our source columns, used to extend
 # the World series before the Statistical Review begins (1965).
 # NOTE: We use Smil's commercially-traded sources only. Smil also reports traditional biomass, but the
@@ -186,6 +192,29 @@ def add_shares(tb: Table) -> Table:
     return tb
 
 
+def add_biomass_inclusive_shares(tb: Table) -> Table:
+    """Add World-only shares of each source in primary energy *including* traditional biomass.
+
+    Total energy supply excludes traditional biomass by design, so these shares use an alternative
+    denominator (total energy supply plus traditional biomass) and cover the World only, reproducing the
+    biomass-inclusive share chart from the old global_primary_energy step. Each source's share, including
+    biomass itself, sums to 100%.
+    """
+    tb = tb.copy()
+    # Traditional biomass is World-only, so this denominator (and thus these shares) are non-null for World only.
+    total_with_biomass = tb["total_energy_supply_twh"] + tb["traditional_biomass_twh"]
+    for source, name in BIOMASS_SHARE_SOURCES.items():
+        col = f"{source}_share_including_biomass_pct"
+        tb[col] = (100 * tb[f"{source}_twh"] / total_with_biomass).clip(upper=100)
+        tb[col].metadata.title = f"{name} as a share of primary energy (including traditional biomass)"
+        tb[col].metadata.unit = "%"
+        tb[col].metadata.short_unit = "%"
+        display = dict(tb[col].metadata.display or {})
+        display["name"] = name
+        tb[col].metadata.display = display
+    return tb
+
+
 def add_annual_change(tb: Table) -> Table:
     """Add annual change (absolute and percentage) for each source and the total.
 
@@ -304,6 +333,8 @@ def run() -> None:
 
     # Add shares, annual change, per-capita and per-GDP variables.
     tb = add_shares(tb=tb)
+    # Add World-only shares against a denominator that includes traditional biomass.
+    tb = add_biomass_inclusive_shares(tb=tb)
     tb = add_annual_change(tb=tb)
     tb = add_per_capita(tb=tb)
     tb = add_per_gdp(tb=tb, ds_gdp=ds_gdp)
