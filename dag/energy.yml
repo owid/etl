@@ -69,17 +69,6 @@ steps:
         - snapshot://irena/2025-06-20/renewable_energy_patents.csv
       - data://garden/regions/2023-01-01/regions
   #
-  # Energy Institute - Statistical Review of World Energy.
-  #
-  data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy:
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2026-07-01/income_groups
-    - data://meadow/energy_institute/2025-06-27/statistical_review_of_world_energy:
-      - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.csv
-      - snapshot://energy_institute/2025-06-27/statistical_review_of_world_energy.xlsx
-  data://grapher/energy_institute/2025-06-27/statistical_review_of_world_energy:
-    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #
   # Energy Institute - Statistical Review of World Energy (2026, Total Energy Supply).
   #
   data://garden/energy_institute/2026-06-30/statistical_review_of_world_energy:
@@ -112,15 +101,6 @@ steps:
         - data://garden/demography/2024-07-15/population
         - data://garden/wb/2026-07-01/income_groups
         - data://garden/regions/2023-01-01/regions
-  #
-  # Energy - Energy mix.
-  #
-  data://garden/energy/2025-06-27/energy_mix:
-    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-    - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2026-07-01/income_groups
-  data://grapher/energy/2025-06-27/energy_mix:
-    - data://garden/energy/2025-06-27/energy_mix
   #
   # Energy - Energy mix (Total Energy Supply, 2026 Statistical Review).
   #
@@ -165,43 +145,11 @@ steps:
   export://multidim/energy/latest/fossil_fuels:
     - data://grapher/energy/2026-06-30/fossil_fuels
   #
-  # Energy - Fossil fuel reserves/production ratio.
-  #
-  data://grapher/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
-    - data://garden/energy/2025-06-27/fossil_fuel_reserves_production_ratio:
-      - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #
-  # Energy - Fossil Fuel Production.
-  #
-  data://garden/energy/2025-06-27/fossil_fuel_production:
-    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-    # Shift - Energy production from fossil fuels.
-    - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels:
-      - data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels:
-        - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
-      - data://garden/wb/2026-07-01/income_groups
-      - data://garden/regions/2023-01-01/regions
-    # Smil - Global primary energy (2017), used to extend World coal production before 1900.
-    - data://garden/papers/2023-12-12/smil_2017
-    # NIC / Fouquet - UK historical energy data, used to extend UK coal production before 1900.
-    - data://garden/energy/2026-07-02/uk_historical_energy:
-      - data://meadow/energy/2026-07-02/uk_historical_energy:
-        - snapshot://energy/2026-07-02/uk_historical_energy.xlsx
-    - data://garden/demography/2024-07-15/population
-  data://grapher/energy/2025-06-27/fossil_fuel_production:
-    - data://garden/energy/2025-06-27/fossil_fuel_production
-  #
-  # Energy - Global primary energy.
-  #
-  data://grapher/energy/2025-06-27/global_primary_energy:
-    - data://garden/energy/2025-06-27/global_primary_energy:
-      # Smil - Global primary energy (2017).
-      - data://garden/papers/2023-12-12/smil_2017:
-        - data://meadow/papers/2023-12-12/smil_2017:
-          - snapshot://papers/2023-12-12/smil_2017.csv
-      - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-  #
   # Energy - Primary energy consumption.
+  # NOTE: This is a substitution-method (pre-TES) step, kept in the active DAG (not moved to
+  # energy_legacy.yml) because the emissions pipeline still depends on it: owid_co2 embeds its
+  # energy-per-capita / energy-per-gdp columns, and the Global Carbon Budget uses it for carbon
+  # intensity. Once those are adapted to Total Energy Supply (separate PR), this can move to legacy.
   #
   data://garden/energy/2026-05-05/primary_energy_consumption:
     - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
@@ -293,13 +241,6 @@ steps:
       - data://garden/bank_of_england/2026-01-21/millennium_macroeconomic_data
       - data://meadow/light/2025-12-29/energy_innovation_long_run
   #
-  # Energy - OWID Energy dataset.
-  #
-  export://github/energy_data/latest/owid_energy:
-    - data://garden/energy_data/2026-04-24/owid_energy
-  export://s3/energy_data/latest/owid_energy:
-    - data://garden/energy_data/2026-04-24/owid_energy
-  #
   # UN: Energy Statistics Database
   #
   data://garden/un/2026-02-11/energy_statistics_database:
@@ -327,13 +268,6 @@ steps:
       - snapshot://ember/2026-04-24/yearly_electricity__global.csv
     - data://garden/wb/2026-07-01/income_groups
   #
-  # Energy - Electricity mix (EI & Ember).
-  #
-  data://garden/energy/2026-04-24/electricity_mix:
-    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-    - data://garden/ember/2026-04-24/yearly_electricity
-    - data://garden/demography/2024-07-15/population
-  #
   # Energy - Electricity mix (EI & Ember, 2026 Statistical Review).
   #
   data://garden/energy/2026-06-30/electricity_mix:
@@ -353,33 +287,11 @@ steps:
   export://multidim/energy/latest/electricity_mix:
     - data://grapher/energy/2026-06-30/electricity_mix
   #
-  # Energy - OWID Energy dataset.
-  #
-  data://garden/energy_data/2026-04-24/owid_energy:
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/energy/2026-05-05/primary_energy_consumption
-    - data://garden/energy/2025-06-27/fossil_fuel_production
-    - data://garden/energy/2026-04-24/electricity_mix
-    - data://garden/demography/2024-07-15/population
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/energy/2025-06-27/energy_mix
-  data://grapher/energy/2026-04-24/electricity_mix:
-    - data://garden/energy/2026-04-24/electricity_mix
-  #
   # Energy: global historical electricity scaling.
   #
   data://grapher/energy/2026-06-30/global_historical_electricity_scaling:
     - data://garden/energy/2026-06-30/global_historical_electricity_scaling:
       - data://garden/energy/2026-06-30/electricity_mix
-  #
-  # IEA - Energy and AI.
-  #
-  data://grapher/energy/2026-04-27/energy_ai:
-    - data://garden/energy/2026-04-27/energy_ai:
-      - data://garden/regions/2023-01-01/regions
-      - data://meadow/energy/2025-11-07/energy_ai
-      - data://meadow/energy/2026-04-27/energy_ai
-      - data://garden/energy/2026-04-24/electricity_mix
   # IEA - Energy and AI (repointed to the 2026 Statistical Review electricity mix). Electricity generation
   # is unaffected by the Total Energy Supply switch, so this is a like-for-like update of the same chart.
   data://grapher/energy/2026-06-30/energy_ai:
@@ -398,3 +310,4 @@ steps:
     - data://garden/energy/2025-11-10/ireland_metered_consumption:
       - data://meadow/energy/2025-11-10/ireland_metered_consumption:
         - snapshot://energy/2025-11-10/ireland_metered_consumption.csv
+
