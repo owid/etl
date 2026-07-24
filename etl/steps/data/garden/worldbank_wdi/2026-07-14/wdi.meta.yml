@@ -1074,6 +1074,8 @@ tables:
         title: Inflation, consumer prices (annual %)
         short_unit: '%'
         unit: annual %
+        description_key: |-
+          Inflation as measured by the consumer price index reflects the annual percentage change in the cost to the average consumer of acquiring a basket of goods and services that may be fixed or changed at specified intervals, such as yearly.
       fp_wpi_totl:
         title: Wholesale price index (2010 = 100)
         unit: 2010 = 100
