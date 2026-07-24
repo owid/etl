@@ -4820,9 +4820,8 @@
 ##########
 # Energy Institute
 ##########
-# Regions used by the Energy Institute in its Statistical Review of World Energy. These seven regions partition the
-# world's countries and territories, each assigned to exactly one region (the only exception is the Gaza Strip
-# sub-entity, which is subsumed by Palestine). Membership follows the EI definitions and the country groupings in the review's
+# Regions used by the Energy Institute in its Statistical Review of World Energy. These seven regions form a
+# complete partition of the world. Membership follows the EI definitions and the country groupings in the review's
 # data sheets; where the EI definitions sheet and its data disagree, the data placement is used (e.g. Ukraine is
 # listed under CIS in the definitions but reported under Europe in every data sheet, so it is placed in Europe).
 - code: EI_NAM
