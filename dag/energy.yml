@@ -91,17 +91,6 @@ steps:
     - data://garden/wb/2026-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
   #
-  # Energy - Fossil fuels explorer.
-  #
-  export://explorers/energy/latest/fossil_fuels:
-    # Energy - Fossil fuels.
-    - data://grapher/energy/2026-05-05/fossil_fuels:
-      - data://garden/energy/2026-05-05/fossil_fuels:
-        - data://garden/eia/2026-05-05/international_energy
-        - data://garden/demography/2024-07-15/population
-        - data://garden/wb/2026-07-01/income_groups
-        - data://garden/regions/2023-01-01/regions
-  #
   # Energy - Energy mix (Total Energy Supply, 2026 Statistical Review).
   #
   data://garden/energy/2026-06-30/energy_mix:
@@ -144,20 +133,6 @@ steps:
     - data://garden/energy/2026-06-30/fossil_fuels
   export://multidim/energy/latest/fossil_fuels:
     - data://grapher/energy/2026-06-30/fossil_fuels
-  #
-  # Energy - Primary energy consumption.
-  # NOTE: This is a substitution-method (pre-TES) step, kept in the active DAG (not moved to
-  # energy_legacy.yml) because the emissions pipeline still depends on it: owid_co2 embeds its
-  # energy-per-capita / energy-per-gdp columns, and the Global Carbon Budget uses it for carbon
-  # intensity. Once those are adapted to Total Energy Supply (separate PR), this can move to legacy.
-  #
-  data://garden/energy/2026-05-05/primary_energy_consumption:
-    - data://garden/energy_institute/2025-06-27/statistical_review_of_world_energy
-    - data://garden/demography/2024-07-15/population
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/eia/2026-05-05/international_energy
-  data://grapher/energy/2026-05-05/primary_energy_consumption:
-    - data://garden/energy/2026-05-05/primary_energy_consumption
   #
   # IRENA - Renewable energy statistics.
   #
@@ -310,4 +285,5 @@ steps:
     - data://garden/energy/2025-11-10/ireland_metered_consumption:
       - data://meadow/energy/2025-11-10/ireland_metered_consumption:
         - snapshot://energy/2025-11-10/ireland_metered_consumption.csv
+
 
