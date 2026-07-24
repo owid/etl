@@ -34,7 +34,7 @@ Any rewrites you propose use American spelling.
 
 Scope by calling context:
 
-In the workflow skills this review is an **optional, offered** step (it can consume many tokens — see the estimates in Step 1); when invoked from one of them, scope accordingly:
+In most workflow skills this review is an **optional, offered** step (it can consume many tokens — see the estimates in Step 1), except where the table marks it mandatory; when invoked from one of them, scope accordingly:
 
 | Context | Scope |
 |---|---|
@@ -42,6 +42,7 @@ In the workflow skills this review is an **optional, offered** step (it can cons
 | `/create-dataset` Step 6b (optional) | Everything — all indicators (new datasets are small and have no charts yet) |
 | `/create-snapshot` § 5 (optional) | Phase 0 only — verify the `.dvc` claims against the fetched producer docs (no built dataset yet, so no data cross-checks) |
 | `/review-data-pr` § 10b | Only if the author ran it: verify outcomes and independently spot-check 2–3 findings and 2–3 anchor values |
+| `/edit-faust-metadata` (**mandatory**) | Claims-only, on the added/edited metadata text exclusively — verify each new/changed sentence against the producer docs behind the links in the text and the snapshot `.dvc`. NO data-value cross-checks, anomaly scans, or indicator prioritization (no data changed), and unedited metadata is out of scope — a handful of web calls, not the full review |
 | Standalone | Top-N + anomalies (or `--full`) |
 
 ## Step 1 — Prioritize indicators by chart views (heaviness control)
@@ -97,7 +98,7 @@ Establish what you're looking at before criticizing anything. Investigative, not
    ```bash
    rg --no-filename -No "https?://[^\"' )>]+" snapshots/<ns>/<version>/ etl/steps/data/{meadow,garden,grapher}/<ns>/<version>/
    ```
-2. **Compare the source's file-modification dates/hashes against our snapshot's `date_accessed`/md5** (e.g. the OSF API lists `date_modified` and hashes per file). Producers replace files in place without bumping version labels — an unchanged version string proves nothing, and an in-place revision is the single highest-yield thing this phase can find.
+2. **Compare the source's file-modification dates/hashes against our snapshot's `date_accessed`/md5** (e.g. the OSF API lists `date_modified` and hashes per file). Producers replace files in place without bumping version labels — an unchanged version string proves nothing, and an in-place revision is the single highest-yield thing this phase can find. While at it, diff the source's **file inventory** against what we snapshot: a new companion file (pre-built index, summary table, construction script) is a new-indicator candidate that no within-file diff can surface — route it to the update workflow's "Surface new indicators" step rather than just cataloguing it.
 3. **Fetch and READ the producer's own documentation** — methodology pages, indicator definitions, codebooks/data dictionaries, release notes. Not secondary commentary, not a blog post about the source: the source itself. Follow the links from `url_main` to the actual methodology document when the landing page is thin. Access escalation per repo convention: curl → WebFetch → Wayback Machine before treating a 4xx as real.
 4. **Check for an existing `<short_name>.corrections.yml`** next to the garden step. Its entries are *known, already-handled* source errors — acknowledge them in Part 0 of the report; never re-flag them as new findings.
 5. **Establish the pipeline.** For each metric under review: what does the source publish (exact indicator name, unit, definition, granularity, upstream data — official statistics, modeled, survey)? What does OWID add on top (read `description_processing`, the garden step code, and the corrections file)? Every later critique must state whose layer it targets.
@@ -175,7 +176,7 @@ This is the half that catches the *source's* mistakes — the ones invisible to 
 
 **Independence rules (anti-circularity — read before searching).** An independent source is a *different producer measuring the same quantity* (WHO vs. IHME, IEA vs. Energy Institute, IMF vs. World Bank, UN WPP vs. a national statistics office), or the primary source the producer aggregates. **Never** count as independent: ourworldindata.org itself; sites that republish OWID (Wikipedia charts and infoboxes frequently cite us — check the citation); mirrors of the same producer (tradingeconomics and friends scrape WB/IMF); or the producer's own secondary pages.
 
-**Procedure per value:** WebSearch the quantity + entity + year → open 1–2 authoritative hits with WebFetch → record source, value, and link in the Part 2 table.
+**Procedure per value:** WebSearch the quantity + entity + year → open 1–2 authoritative hits with WebFetch → record source, value, and link in the Part 2 table. **Never cite a number straight from the search-results summary** — summaries blend several sources and lag living pages; every figure that reaches a finding, a PR body, or a producer question must be quoted from a page you actually opened (a stale search-summary count once shipped into a producer email as "21 of 32" when the opened page said 22, later 26).
 
 **Measurement-artifact scrutiny (per source, not per value):** search `"<producer> completeness bias"`, `"<producer> coverage <region>"`, `"<indicator> revision history"` and read what comes back. When you flag a comparability problem, name the **specific mechanism** by which the data misleads (e.g. "death registration completeness below 60% in region X inflates apparent improvement"); a bare "comparisons should be made with care" is banned.
 

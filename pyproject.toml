@@ -88,6 +88,7 @@ dependencies = [
 
 [tool.uv]
 exclude-newer = "3 days"
+link-mode = "hardlink"
 
 [tool.uv.sources]
 owid-owl = { path = "lib/owl", editable = true }

@@ -170,3 +170,18 @@ steps:
     - data://garden/oecd/2025-12-11/health_expenditure:
       - data://meadow/oecd/2025-12-11/health_expenditure:
         - snapshot://oecd/2025-12-11/health_expenditure.csv
+  # archived; last active in bc5d7deacf7e on 2026-07-22
+  data://grapher/harvard/2025-04-28/global_military_spending_dataset:
+    - data://garden/harvard/2025-04-28/global_military_spending_dataset:
+      - data://garden/demography/2024-07-15/population
+      - data://garden/cow/2024-07-26/national_material_capabilities
+      - data://meadow/harvard/2025-04-28/global_military_spending_dataset:
+        - snapshot://harvard/2025-04-28/global_military_spending_dataset.rds
+        - snapshot://harvard/2025-04-28/global_military_spending_dataset_burden.rds
+      - data://garden/countries/2024-08-27/gleditsch
+  # archived; last active in bc5d7deacf7e on 2026-07-22
+  data://grapher/cow/2024-07-26/national_material_capabilities:
+    - data://garden/cow/2024-07-26/national_material_capabilities:
+      - data://meadow/cow/2024-07-26/national_material_capabilities:
+        - snapshot://cow/2024-07-26/national_material_capabilities.csv
+      - data://garden/countries/2023-09-29/cow_ssm

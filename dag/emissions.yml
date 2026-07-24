@@ -13,10 +13,10 @@ steps:
   #
   # Net zero tracker.
   #
-  data://grapher/emissions/2023-10-10/net_zero_tracker:
-    - data://garden/emissions/2023-10-10/net_zero_tracker:
-      - data://meadow/emissions/2023-10-10/net_zero_tracker:
-        - snapshot://emissions/2023-10-10/net_zero_tracker.xlsx
+  data://grapher/emissions/2026-07-13/net_zero_tracker:
+    - data://garden/emissions/2026-07-13/net_zero_tracker:
+      - data://meadow/emissions/2026-07-13/net_zero_tracker:
+        - snapshot://emissions/2026-07-13/net_zero_tracker.xlsx
   #
   # Global Warming Potential factors (IPCC, 2021).
   #

@@ -135,6 +135,37 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
     }
 ];
 
+// Message for the Dataset table-read rule (implemented as a stateful pass in updateDiagnostics,
+// not a per-line regex, because it needs to know which variables are live Dataset objects).
+const DATASET_READ_MESSAGE =
+    'Reading a table via `ds["table"]` subscript is outdated; use `ds.read("table")`. '
+    + 'If the read is chained with `.reset_index()`, replace the whole `ds["table"].reset_index()` '
+    + 'expression with `ds.read("table")` — it already resets the index, so keeping the trailing '
+    + '`.reset_index()` would add a spurious `index` column. Where you need to preserve the index '
+    + '(e.g. feeding a grapher step), use `ds.read("table", reset_index=False)`.';
+
+// Strip a trailing `#` comment from a line, respecting quoted strings, so the Dataset-read detector
+// never flags commented-out code (e.g. `# ds_garden["population"]`). Returns a prefix of the line,
+// so match offsets computed on the result still line up with the original line.
+function stripInlineComment(line: string): string {
+    let inString = false;
+    let quote = '';
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inString) {
+            if (ch === quote && line[i - 1] !== '\\') {
+                inString = false;
+            }
+        } else if (ch === '"' || ch === "'") {
+            inString = true;
+            quote = ch;
+        } else if (ch === '#') {
+            return line.slice(0, i);
+        }
+    }
+    return line;
+}
+
 export function activate(context: vscode.ExtensionContext) {
     console.log('Detect Outdated Practices extension activated.');
 
@@ -229,6 +260,78 @@ export function activate(context: vscode.ExtensionContext) {
 
                     diagnostic.source = 'outdated-practices';
                     diagnostics.push(diagnostic);
+                }
+            }
+        }
+
+        // Dataset table reads via subscript, e.g. `tb = ds_meadow["table"]`. Flagged only when the
+        // variable is a *live* Dataset — assigned from `load_dataset(...)` and not since rebound to a
+        // Table. This `load_dataset` signal is more reliable than a name heuristic: it flags genuine
+        // reads (including in non-assignment positions) while never flagging Table/DataFrame column
+        // access (e.g. after `ds_x = ds_x["t"].reset_index()`, a later `ds_x["col"]` is not flagged).
+        if (matchesScope(document.uri.fsPath, 'etl/steps/data/**')) {
+            const datasetVars = new Set<string>();
+            const assignRe = /^\s*(\w+)\s*=\s*(.*)$/;
+            for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+                // Strip trailing comments so commented-out code (e.g. `# ds_garden["x"]`) is not flagged.
+                const code = stripInlineComment(lines[lineIndex]);
+
+                // 1a. Flag subscript reads on variables currently known to be live Datasets. Runs before
+                //     this line's assignment, so `ds = ds["t"]...` is flagged (the read is on a Dataset).
+                const readRe = /(\w+)\[\s*f?["'][^"']+["']\s*\]/g;
+                let readMatch: RegExpExecArray | null;
+                while ((readMatch = readRe.exec(code)) !== null) {
+                    if (!datasetVars.has(readMatch[1])) {
+                        continue;
+                    }
+                    const startPos = new vscode.Position(lineIndex, readMatch.index);
+                    const endPos = new vscode.Position(lineIndex, readMatch.index + readMatch[0].length);
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(startPos, endPos),
+                        DATASET_READ_MESSAGE,
+                        vscode.DiagnosticSeverity.Warning
+                    );
+                    diagnostic.source = 'outdated-practices';
+                    diagnostics.push(diagnostic);
+                }
+
+                // 1b. Flag inline reads directly on a load_dataset(...) result, e.g.
+                //     `codes = paths.load_dataset("x")["country_codes"]` (subscript on the loader itself).
+                const inlineReadRe = /load_dataset\s*\([^)]*\)\s*\[\s*f?["'][^"']+["']\s*\]/g;
+                let inlineMatch: RegExpExecArray | null;
+                while ((inlineMatch = inlineReadRe.exec(code)) !== null) {
+                    const startPos = new vscode.Position(lineIndex, inlineMatch.index);
+                    const endPos = new vscode.Position(lineIndex, inlineMatch.index + inlineMatch[0].length);
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(startPos, endPos),
+                        DATASET_READ_MESSAGE,
+                        vscode.DiagnosticSeverity.Warning
+                    );
+                    diagnostic.source = 'outdated-practices';
+                    diagnostics.push(diagnostic);
+                }
+
+                // 2a. Names annotated as a Dataset are live Datasets too — most importantly
+                //     Dataset-typed function parameters, e.g. `def _sanity_checks(ds: Dataset)`, whose
+                //     `ds["table"]` reads would otherwise be missed (the name is never assigned locally).
+                //     Matches `name: Dataset`, `name: catalog.Dataset`, `name: "Dataset"` (not DatasetMeta).
+                const annotationRe = /(\w+)\s*:\s*"?(?:\w+\.)?Dataset\b/g;
+                let annotationMatch: RegExpExecArray | null;
+                while ((annotationMatch = annotationRe.exec(code)) !== null) {
+                    datasetVars.add(annotationMatch[1]);
+                }
+
+                // 2b. Track Dataset variables: add X on a *bare* `X = ...load_dataset(...)` assignment; drop
+                //    X when reassigned to anything else. `X = load_dataset(...)[...]` / `.reset_index()`
+                //    extract a Table, so X is not a Dataset (its subscripts are column access).
+                const assignMatch = code.match(assignRe);
+                if (assignMatch) {
+                    const rhs = assignMatch[2];
+                    if (/^[\w.]*load_dataset\s*\([^)]*\)\s*$/.test(rhs)) {
+                        datasetVars.add(assignMatch[1]);
+                    } else if (datasetVars.has(assignMatch[1])) {
+                        datasetVars.delete(assignMatch[1]);
+                    }
                 }
             }
         }

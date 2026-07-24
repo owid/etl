@@ -9,7 +9,14 @@ from typing import Any
 import jinja2
 
 from owid.catalog.core.jinja import _expand_jinja_text, _uses_jinja
-from owid.catalog.core.meta import DatasetMeta, License, Origin, TableMeta, VariableMeta
+from owid.catalog.core.meta import (
+    DatasetMeta,
+    License,
+    Origin,
+    TableMeta,
+    VariableMeta,
+    description_key_to_string,
+)
 from owid.catalog.core.utils import remove_details_on_demand
 
 DEFAULT_CATALOG_BASE_URL = "https://catalog.ourworldindata.org"
@@ -486,9 +493,12 @@ def _variable_title(name: str, meta: VariableMeta) -> str:
 
 
 def _variable_description(meta: VariableMeta) -> str | None:
+    description_key = meta.description_key
+    if isinstance(description_key, list):
+        description_key = description_key_to_string(description_key)
     candidates = (
         meta.description_short,
-        " ".join(meta.description_key) if meta.description_key else None,
+        description_key,
         meta.description_from_producer,
         meta.description,
     )

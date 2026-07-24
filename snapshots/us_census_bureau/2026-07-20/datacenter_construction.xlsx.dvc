@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: United States Census Bureau
+    title: Value of Private Construction Put in Place
+    description: |-
+      Monthly construction spending data for private construction in the United States, broken down by construction type.
+      The dataset includes datacenter construction spending measured as not seasonally adjusted monthly values in millions of dollars.
+
+      Estimates for private nonresidential categories such as data centers and offices come from the Construction Progress
+      Reporting Survey (CPRS), in which owners of sampled construction projects (drawn from Dodge Data & Analytics project
+      lists) report the value of work done each month until completion. Estimates include materials, labor, architectural
+      and engineering costs, overhead, interest and taxes paid during construction, and contractor's profits.
+    citation_full: U.S. Census Bureau, Value of Construction Put in Place Survey (VIP), Private Construction Spending Time Series
+    url_main: https://www.census.gov/construction/c30/historical_data.html
+    url_download: https://www.census.gov/construction/c30/xlsx/privtime.xlsx
+    date_accessed: '2026-07-20'
+    date_published: '2026-07-01'
+    license:
+      name: Public Domain
+outs:
+  - md5: b3fa97d41f53616c20f17e24e71ad4df
+    size: 173413
+    path: datacenter_construction.xlsx
