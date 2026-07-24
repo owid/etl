@@ -337,10 +337,11 @@ def render_markdown(result: dict[str, Any], branch: str) -> str:
     affected_charts = [c for c in charts if not c.get("shielded") and not c.get("no_inherit_reason")]
     shielded = [c for c in charts if c.get("shielded")]
     no_inherit = [c for c in charts if c.get("no_inherit_reason") and not c.get("shielded")]
+    affected_narrative = [n for n in result["narrative_charts"] if not n.get("shielded")]
     lines.append(
         f"**Blast radius:** {len(affected_charts)} charts, {len(result['mdim_views'])} MDim views, "
         f"{sum(e['n_views'] for e in result['explorers'])} explorer views "
-        f"(in {len(result['explorers'])} explorers), {len(result['narrative_charts'])} narrative charts, "
+        f"(in {len(result['explorers'])} explorers), {len(affected_narrative)} narrative charts, "
         f"{len(result['gdoc_refs'])} article references."
     )
     lines.append("")
@@ -461,7 +462,7 @@ def main() -> None:
         "beyond_target_count": len([c for c in charts if not c.get("shielded") and not c.get("no_inherit_reason")])
         + len(mdim_views)
         + sum(e["n_views"] for e in explorers)
-        + len(narrative),
+        + len([n for n in narrative if not n.get("shielded")]),
     }
     if args.json:
         print(json.dumps(result, indent=2, default=str))
