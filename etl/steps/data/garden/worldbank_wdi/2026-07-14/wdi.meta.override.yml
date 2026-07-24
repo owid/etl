@@ -523,6 +523,13 @@ tables:
 
       ####################################################################################################
 
+      fp_cpi_totl_zg:
+        title: Inflation, consumer prices (annual %)
+        description_key:
+          - Inflation as measured by the consumer price index reflects the annual percentage change in the cost to the average consumer of acquiring a basket of goods and services that may be fixed or changed at specified intervals, such as yearly.
+
+      ####################################################################################################
+
       it_net_user_zs:
         title: Individuals using the Internet (% of population)
         description_short: Share of the population who used the Internet in the last three months.
