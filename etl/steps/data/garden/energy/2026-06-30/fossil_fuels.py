@@ -15,7 +15,7 @@ Review without the step that EIA's (slightly higher) values would introduce at t
 The dataset also includes:
 - Consumption in energy units, combined from the same sources as production (Statistical Review,
   extended with EIA).
-- Production in physical units, from the Statistical Review.
+- Production in physical units, from EIA (broad country coverage).
 - Proved reserves, trade (imports, exports, net imports), and consumption in physical units, from EIA.
 - The World reserves-to-production ratio for each fossil fuel.
 """
@@ -129,22 +129,30 @@ def add_annual_change(tb: Table) -> Table:
     return tb
 
 
-def add_physical_production(tb: Table, tb_review: Table) -> Table:
-    """Add fossil fuel production in physical units, from the Statistical Review only.
+def add_physical_production(tb: Table, tb_eia: Table) -> Table:
+    """Add fossil fuel production in physical units, from EIA.
 
-    Coal and oil in tonnes, gas in cubic meters. The Statistical Review reports coal and oil in
-    million tonnes and gas in billion cubic meters; they are converted to base units here so grapher
-    can apply magnitude prefixes itself. These units differ by fuel and cannot be summed across fuels
-    (unlike the energy-content series in terawatt-hours), so there is no cross-fuel total. Only the
-    Statistical Review reports them, so coverage begins in 1965.
+    Coal in tonnes, oil and gas in cubic meters. EIA reports coal in million tonnes, gas in billion
+    cubic meters, and crude oil in thousand barrels per day; all are converted to base units here so
+    grapher can apply magnitude prefixes itself. These units differ by fuel and cannot be summed across
+    fuels (unlike the energy-content series in terawatt-hours), so there is no cross-fuel total. EIA is
+    preferred over the Statistical Review here (as it already is for reserves and trade): it covers
+    roughly three times as many producing countries and matches the physical production previously
+    published in the fossil fuels explorer.
     """
-    tb_review = tb_review.reset_index()
-    columns = ["coal_production_mt", "oil_production_mt", "gas_production_bcm"]
-    tb = tb.merge(tb_review[["country", "year"] + columns], on=["country", "year"], how="left")
-    tb["coal_production_tonnes"] = tb["coal_production_mt"] * MILLION_TONNES_TO_TONNES
-    tb["oil_production_tonnes"] = tb["oil_production_mt"] * MILLION_TONNES_TO_TONNES
-    tb["gas_production_m3"] = tb["gas_production_bcm"] * BILLION_CUBIC_METERS_TO_CUBIC_METERS
-    tb = tb.drop(columns=["coal_production_mt", "oil_production_mt", "gas_production_bcm"], errors="raise")
+    tb_eia = tb_eia.reset_index()[
+        ["country", "year", "coal_production_mt", "natural_gas_production", "crude_oil_production"]
+    ]
+    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix).
+    tb_eia = tb_eia[~tb_eia["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
+    tb_eia["coal_production_tonnes"] = tb_eia["coal_production_mt"] * MILLION_TONNES_TO_TONNES
+    tb_eia["gas_production_m3"] = tb_eia["natural_gas_production"] * BILLION_CUBIC_METERS_TO_CUBIC_METERS
+    tb_eia["oil_production_m3"] = tb_eia["crude_oil_production"] * KBPD_TO_CUBIC_METERS_PER_YEAR
+    tb_eia = tb_eia.drop(
+        columns=["coal_production_mt", "natural_gas_production", "crude_oil_production"], errors="raise"
+    )
+    tb_eia = tb_eia.dropna(subset=["coal_production_tonnes", "gas_production_m3", "oil_production_m3"], how="all")
+    tb = tb.merge(tb_eia, on=["country", "year"], how="outer")
     return tb
 
 
@@ -237,10 +245,10 @@ def add_per_capita(tb: Table) -> Table:
     for fuel in FUELS:
         tb[f"{fuel}_production_per_capita_kwh"] = tb[f"{fuel}_production_twh"] / tb["population"] * TWH_TO_KWH
         tb[f"{fuel}_consumption_per_capita_kwh"] = tb[f"{fuel}_consumption_twh"] / tb["population"] * TWH_TO_KWH
-    # Per-capita production in physical units (Statistical Review only): coal and oil in tonnes, gas in
-    # cubic meters. Totals are already in base units, so per capita is just total over population.
+    # Per-capita production in physical units (EIA): coal in tonnes, oil and gas in cubic meters.
+    # Totals are already in base units, so per capita is just total over population.
     tb["coal_production_per_capita_tonnes"] = tb["coal_production_tonnes"] / tb["population"]
-    tb["oil_production_per_capita_tonnes"] = tb["oil_production_tonnes"] / tb["population"]
+    tb["oil_production_per_capita_m3"] = tb["oil_production_m3"] / tb["population"]
     tb["gas_production_per_capita_m3"] = tb["gas_production_m3"] / tb["population"]
     # Per-capita trade and consumption: coal in tonnes, oil and gas in cubic meters per person.
     for metric in ["consumption", "imports", "exports", "net_imports"]:
@@ -332,10 +340,15 @@ def add_variable_metadata(tb: Table) -> Table:
     # variable titles per dataset). The multidim overrides the view titles, so this only shows in the admin.
     physical_specs = {
         "coal_production_tonnes": ("Coal production (tonnes)", "tonnes", "t", "Coal"),
-        "oil_production_tonnes": ("Oil production (tonnes)", "tonnes", "t", "Oil"),
+        "oil_production_m3": ("Oil production (cubic meters)", "cubic meters", "m³", "Oil"),
         "gas_production_m3": ("Gas production (cubic meters)", "cubic meters", "m³", "Gas"),
         "coal_production_per_capita_tonnes": ("Coal production per capita (tonnes)", "tonnes per person", "t", "Coal"),
-        "oil_production_per_capita_tonnes": ("Oil production per capita (tonnes)", "tonnes per person", "t", "Oil"),
+        "oil_production_per_capita_m3": (
+            "Oil production per capita (cubic meters)",
+            "cubic meters per person",
+            "m³",
+            "Oil",
+        ),
         "gas_production_per_capita_m3": (
             "Gas production per capita (cubic meters)",
             "cubic meters per person",
@@ -421,7 +434,7 @@ def sanity_check_outputs(tb: Table) -> None:
     # are legitimately negative for net exporters, so they are not checked).
     for column in [
         "coal_production_tonnes",
-        "oil_production_tonnes",
+        "oil_production_m3",
         "gas_production_m3",
         "coal_reserves_tonnes",
         "oil_reserves_m3",
@@ -489,7 +502,7 @@ def run() -> None:
     # Add annual change, physical-unit production and reserves (Statistical Review only), trade and
     # consumption (EIA), and per-capita.
     tb = add_annual_change(tb=tb)
-    tb = add_physical_production(tb=tb, tb_review=tb_review)
+    tb = add_physical_production(tb=tb, tb_eia=tb_eia)
     tb = add_reserves(tb=tb, tb_eia=tb_eia)
     tb = add_trade_and_consumption(tb=tb, tb_eia=tb_eia)
     tb = add_per_capita(tb=tb)

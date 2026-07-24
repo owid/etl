@@ -67,14 +67,14 @@ def _column_dimensions() -> dict:
     dims.update(
         {
             "coal_production_tonnes": {"fuel": "coal", "metric": "production_physical", "per_capita": "total"},
-            "oil_production_tonnes": {"fuel": "oil", "metric": "production_physical", "per_capita": "total"},
+            "oil_production_m3": {"fuel": "oil", "metric": "production_physical", "per_capita": "total"},
             "gas_production_m3": {"fuel": "gas", "metric": "production_physical", "per_capita": "total"},
             "coal_production_per_capita_tonnes": {
                 "fuel": "coal",
                 "metric": "production_physical",
                 "per_capita": "per_capita",
             },
-            "oil_production_per_capita_tonnes": {
+            "oil_production_per_capita_m3": {
                 "fuel": "oil",
                 "metric": "production_physical",
                 "per_capita": "per_capita",
@@ -207,8 +207,8 @@ ENERGY_UNIT_PHRASE = {
 PHYSICAL_UNITS = {
     ("coal", "production_physical", "total"): "tonnes",
     ("coal", "production_physical", "per_capita"): "tonnes per person",
-    ("oil", "production_physical", "total"): "tonnes",
-    ("oil", "production_physical", "per_capita"): "tonnes per person",
+    ("oil", "production_physical", "total"): "cubic meters",
+    ("oil", "production_physical", "per_capita"): "cubic meters per person",
     ("gas", "production_physical", "total"): "cubic meters",
     ("gas", "production_physical", "per_capita"): "cubic meters per person",
     ("coal", "reserves", "total"): "tonnes",
@@ -238,7 +238,7 @@ NET_IMPORTS_NOTE = (
 _OIL_TRADE_NOTE = "Includes crude oil and lease condensate; refined petroleum products are not included."
 OIL_NOTES = {
     "production": "Includes crude oil, condensates, natural gas liquids, and other liquid fuels.",
-    "production_physical": "Includes crude oil, shale oil, oil sands, condensates, and natural gas liquids.",
+    "production_physical": "Includes crude oil and lease condensate.",
     "consumption": "Includes refined petroleum products and other liquid fuels.",
     "consumption_physical": "Includes all petroleum products and other liquid fuels, such as biofuels.",
     "imports": _OIL_TRADE_NOTE,

@@ -9,7 +9,7 @@ definitions:
     description_processing: |-
       - Fossil fuel production is taken from the Energy Institute's Statistical Review of World Energy (from 1965), extended before then with Etemad & Luciani's historical estimates (1900-1979) and, for coal, with Vaclav Smil (2017) for the World and the NIC / Fouquet historical dataset for the United Kingdom (before 1900). It is extended to countries not covered by the Statistical Review, and to recent years, with the U.S. Energy Information Administration's data.
       - Fossil fuel consumption in energy units comes from the Energy Institute's Statistical Review of World Energy, extended to countries it does not cover, and to recent years, with the U.S. Energy Information Administration's data.
-      - Fossil fuel proved reserves, trade (imports, exports, and net imports), and consumption in physical units come from the U.S. Energy Information Administration.
+      - Fossil fuel production, proved reserves, trade (imports, exports, and net imports), and consumption — all in physical units — come from the U.S. Energy Information Administration.
 
 dataset:
   title: Fossil fuels
