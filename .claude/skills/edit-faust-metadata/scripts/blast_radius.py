@@ -289,9 +289,24 @@ def sweep_narrative_charts(env: OWIDEnv, chart_ids: list[int], mx_ids: list[int]
         rows.extend(df.to_dict(orient="records"))
     for row in rows:
         patch = json.loads(row["patch"]) if isinstance(row["patch"], str) else (row["patch"] or {})
-        row["shielded"] = bool(field and field.split(".")[0] in patch)
+        row["shielded"] = bool(field and _patch_has_path(patch, field))
         row.pop("patch", None)
     return rows
+
+
+def _patch_has_path(patch: dict, field: str) -> bool:
+    """True when the full dot-path exists in the patch — same semantics as the chart sweep's
+    JSON_CONTAINS_PATH; checking only the top-level key would treat e.g. `map: {colorScale: ...}`
+    as overriding `map.time` and wrongly shield the narrative chart."""
+    node: Any = patch
+    for part in field.split("."):
+        if isinstance(node, list) and part.isdigit() and int(part) < len(node):
+            node = node[int(part)]
+        elif isinstance(node, dict) and part in node:
+            node = node[part]
+        else:
+            return False
+    return True
 
 
 def sweep_gdoc_refs(env: OWIDEnv, slugs: list[str]) -> list[dict]:
