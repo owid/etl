@@ -104,7 +104,7 @@ Three routes:
 
 **Target = indicator:** → **route (a)**; blast radius on its variable ids.
 
-**Narrative charts** (rare): their config is a patch over the parent chart. Edit via `AdminAPI(OWIDEnv.from_staging(branch)).get_narrative_chart(id)` / `update_narrative_chart(id, cfg)` — and audit the **merged** config (`configFull` from the API), since the stored `full` can be stale.
+**Narrative charts** (rare): their config is a patch over the parent chart. Edit via `AdminAPI(OWIDEnv.from_staging(branch)).get_narrative_chart(id)` / `update_narrative_chart(id, cfg)` — and audit the **merged** config (`configFull` from the API), since the stored `full` can be stale. When a narrative chart is affected *indirectly* — because you edited its parent's FAUST — follow [Narrative-chart children of an edited FAUST field](#narrative-chart-children-of-an-edited-faust-field).
 
 ## Blast radius — notify and ask first
 
@@ -130,7 +130,19 @@ Decision rule: if surfaces **beyond the one the user pointed at** are affected (
 2. **Scope down** — name the concrete alternative: a view-level override in the MDim (route b) or an explicit chart-level value (route c), leaving other surfaces untouched.
 3. **Abort.**
 
-If the beyond-target count is zero, skip the ask and proceed.
+If the beyond-target count is zero, skip the ask and proceed. When the report lists narrative-chart children (affected or shielded), also run the section below before the checkpoint.
+
+## Narrative-chart children of an edited FAUST field
+
+Changing a chart's title/subtitle/note — whether via the indicator's ETL metadata (route a) or the chart's patch (route c) — also reaches its narrative-chart children. Check them with the same logic as `/update-dataset` step 7's stale-FAUST pass. For every child the blast radius lists (`narrative_charts.parentChartId`, plus `parentMultiDimXChartConfigId` when the parent is an MDim view):
+
+1. **Child inherits the field** (key absent from its patch — blast radius lists it as affected): it picks up the parent's new text automatically. Verify the **merged** config — `AdminAPI(OWIDEnv.from_staging(branch)).get_narrative_chart(id)["configFull"]`, never the stored `chart_configs.full` (it can be stale) — and list the child at the checkpoint so the user can eyeball the new text in the narrative framing.
+2. **Child overrides the field** (blast radius marks it shielded): compare its override against the parent's **pre-edit** text using `_find_stale_faust_overrides(child_patch, pre_edit_parent_config)` from `apps/indicator_upgrade/upgrade.py` (near-identical after markdown-link stripping = stale; substantially different = intentional):
+   - **Stale copy** — the child froze the parent's old text at creation time and no longer tracks it. Propose setting the child's field to the parent's **new exact text**, which drops the key out of the patch and restores inheritance. **Always ask the user before changing it** — narrative-chart text is reader-facing editorial content; never fold the child fix silently into the parent edit. Apply via `AdminAPI.update_narrative_chart` on staging.
+   - **Intentional rewrite** — leave it, but flag it at the checkpoint if the parent's new text now contradicts the child's framing (e.g. the parent's subtitle changed a definition the child's rewrite still states the old way).
+   - Leave numeric display overrides (`tolerance`, `numDecimalPlaces`, …) alone unless asked — they may be intentional.
+
+Like the parent edit itself, child fixes land on **staging only** and ride chart-diff to production after approval + merge.
 
 ## Workflow (edit mode)
 
