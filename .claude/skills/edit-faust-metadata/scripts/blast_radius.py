@@ -4,7 +4,10 @@ Given variable ids, indicator catalogPaths, a garden meta.yml anchor, or a chart
 branch's STAGING database (a production clone at branch-creation time) for:
 
 - charts using the variables (with `--field`, charts shielded by their own patch override of
-  that field are listed separately — an inherited-text change does NOT reach them);
+  that field are listed separately — an inherited-text change does NOT reach them; for the
+  chart-text fields title/subtitle/note, charts with no inheritance path — variable not a y
+  series, several y series, or inheritance disabled — are also listed separately, since
+  grapher only inherits chart config from a single-y parent);
 - MDim views carrying the variables (via multi_dim_x_chart_configs, unioned with a client-side
   scan of the MDim configs' y catalogPaths);
 - explorer views rendering the variables (legacy CSV-backed explorers are invisible to these
@@ -40,6 +43,12 @@ from etl.config import OWIDEnv, get_container_name  # noqa: E402
 from etl.files import ruamel_load  # noqa: E402
 
 FIELD_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_.]*$")
+
+# Chart-text fields that reach a chart only via grapher config inheritance. Grapher's
+# inheritance parent exists only for charts with exactly one y dimension and inheritance
+# enabled (owid-grapher getParentVariableIdFromChartConfig) — other usages of the variable
+# (x/color/size, one of several y series) have no inheritance path for these fields.
+TEXT_FIELDS = ("title", "subtitle", "note")
 
 
 def current_branch() -> str:
@@ -156,20 +165,34 @@ def sweep_charts(env: OWIDEnv, variable_ids: list[int], field: str | None) -> li
         if not FIELD_RE.match(field):
             raise SystemExit(f"Invalid --field '{field}'")
         json_path = "$." + ".".join(f'"{p}"' for p in field.split("."))
-        shielded_col = f", JSON_CONTAINS_PATH(cc.patch, 'one', '{json_path}') AS shielded"
+        shielded_col = f", MAX(JSON_CONTAINS_PATH(cc.patch, 'one', '{json_path}')) AS shielded"
     df = env.read_sql(
         f"""
-        SELECT DISTINCT c.id AS chart_id, cc.slug, c.publishedAt IS NOT NULL AS published
+        SELECT c.id AS chart_id, cc.slug, c.publishedAt IS NOT NULL AS published,
+               c.isInheritanceEnabled AS inheritance_enabled,
+               MAX(cd.property = 'y') AS affected_var_in_y,
+               (SELECT COUNT(*) FROM chart_dimensions cd2
+                WHERE cd2.chartId = c.id AND cd2.property = 'y') AS n_y_dims
                {shielded_col}
         FROM chart_dimensions cd
         JOIN charts c ON c.id = cd.chartId
         JOIN chart_configs cc ON cc.id = c.configId
         WHERE cd.variableId IN ({clause})
+        GROUP BY c.id, cc.slug, c.publishedAt, c.isInheritanceEnabled
         ORDER BY published DESC, cc.slug
         """,
         params=params,
     )
-    return df.to_dict(orient="records")
+    charts = df.to_dict(orient="records")
+    if field and field.split(".")[0] in TEXT_FIELDS:
+        for c in charts:
+            if not c["affected_var_in_y"]:
+                c["no_inherit_reason"] = "variable is not a y series (x/color/size only)"
+            elif int(c["n_y_dims"]) != 1:
+                c["no_inherit_reason"] = "several y series — grapher has no inheritance parent"
+            elif not c["inheritance_enabled"]:
+                c["no_inherit_reason"] = "inheritance disabled on the chart"
+    return charts
 
 
 def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[str]) -> list[dict]:
@@ -311,8 +334,9 @@ def render_markdown(result: dict[str, Any], branch: str) -> str:
     site = f"http://{get_container_name(branch)}"
     lines: list[str] = []
     charts = result["charts"]
-    affected_charts = [c for c in charts if not c.get("shielded")]
+    affected_charts = [c for c in charts if not c.get("shielded") and not c.get("no_inherit_reason")]
     shielded = [c for c in charts if c.get("shielded")]
+    no_inherit = [c for c in charts if c.get("no_inherit_reason") and not c.get("shielded")]
     lines.append(
         f"**Blast radius:** {len(affected_charts)} charts, {len(result['mdim_views'])} MDim views, "
         f"{sum(e['n_views'] for e in result['explorers'])} explorer views "
@@ -333,6 +357,14 @@ def render_markdown(result: dict[str, Any], branch: str) -> str:
         for c in shielded:
             lines.append(
                 f"- [{c['slug']}]({site}/grapher/{c['slug']}) — [edit]({site}/admin/charts/{c['chart_id']}/edit)"
+            )
+        lines.append("")
+    if no_inherit:
+        lines.append("### Charts with no inheritance path for this field (NOT affected)")
+        for c in no_inherit:
+            lines.append(
+                f"- [{c['slug']}]({site}/grapher/{c['slug']}) — {c['no_inherit_reason']} — "
+                f"[edit]({site}/admin/charts/{c['chart_id']}/edit)"
             )
         lines.append("")
     if result["mdim_views"]:
@@ -426,7 +458,7 @@ def main() -> None:
         "explorers": explorers,
         "narrative_charts": narrative,
         "gdoc_refs": gdocs,
-        "beyond_target_count": len([c for c in charts if not c.get("shielded")])
+        "beyond_target_count": len([c for c in charts if not c.get("shielded") and not c.get("no_inherit_reason")])
         + len(mdim_views)
         + sum(e["n_views"] for e in explorers)
         + len(narrative),
