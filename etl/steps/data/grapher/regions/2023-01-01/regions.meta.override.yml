@@ -65,6 +65,13 @@ definitions:
     url_main: https://www.fao.org/faostat/en/#definitions
     date_accessed: "2026-02-25"
     attribution_short: FAOSTAT
+  origins_ei: &origins_ei
+    producer: Energy Institute
+    title: Energy Institute world regions
+    url_main: https://www.energyinst.org/statistical-review/
+    date_accessed: "2025-06-27"
+    citation_full: Energy Institute - Statistical Review of World Energy (2025).
+    attribution_short: Energy Institute
 
 tables:
   regions:
@@ -340,6 +347,39 @@ tables:
           - Eurasia (IEA)
         origins:
           - *origins_iea_regions
+
+      # Energy Institute
+      ei_region:
+        title: World regions according to the Energy Institute
+        description_short: |-
+          Regions as defined by the Energy Institute in its Statistical Review of World Energy.
+        type: ordinal
+        sort:
+          - North America (EI)
+          - South and Central America (EI)
+          - Europe (EI)
+          - CIS (EI)
+          - Middle East (EI)
+          - Africa (EI)
+          - Asia Pacific (EI)
+        origins:
+          - *origins_ei
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "North America (EI)": "North America"
+                  "South and Central America (EI)": "South and Central America"
+                  "Europe (EI)": "Europe"
+                  "CIS (EI)": "CIS"
+                  "Middle East (EI)": "Middle East"
+                  "Africa (EI)": "Africa"
+                  "Asia Pacific (EI)": "Asia Pacific"
+                customHiddenCategories:
+                  "No data": true
 
       # Pew
       pew_region:
