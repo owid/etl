@@ -85,12 +85,14 @@ Three routes:
 - **(b) MDim step files** — edit the MDim `.config.yml` / `.py` → `STAGING=1 .venv/bin/etlr export://multidim/<ns>/<ver>/<name> --export --private`.
 - **(c) Chart config on staging** — `scripts/update_chart_config.py` (guarded, staging-only; see below). Reaches production only via chart-diff approval + chart-sync after merge.
 
+**Default rule: inherited fields get fixed in the ETL files, never patched via the admin API.** If the rendered text comes from the indicator's metadata or an MDim's step files, the edit belongs in those files — routes (a)/(b). File edits are the durable source of truth: they survive rebuilds and dataset updates, reach every surface, and go through code review. A route-(c) patch on an inherited field creates a chart-level override that shadows the source from then on — the chart silently stops tracking future metadata improvements. Reserve route (c) for fields that are genuinely chart-level (already in the patch, or with no inheritance path) or for a deliberate, user-confirmed decision to scope a change to one chart.
+
 **Target = chart, field F:**
 
 1. F is indicator-only (description_short/key, unit/short_unit, title_public, attribution_short, indicator-level display.name) → **route (a)**. Blast radius is mandatory first. Exception: the user wants a legend/series name changed on *this chart only* → `dimensions[i].display.name` via **route (c)** — offer both, default to fixing the source.
 2. F ∈ {title, subtitle, note}:
    - Key present in the chart's `patch` → **route (c)** (the patch wins regardless of inheritance).
-   - Key absent + inheritance enabled + single y indicator + inheritable → the rendered text IS the indicator's → **route (a)** if the fix should apply everywhere; **route (c)** (set an explicit patch value) if scoped to this chart. Run the blast radius and let its counts frame the question.
+   - Key absent + inheritance enabled + single y indicator + inheritable → the rendered text IS the indicator's → **route (a)** by default (fix at the source, per the default rule above). Route (c) is only the scope-down option in the blast-radius ask, when the user confirms the change should apply to this one chart and not the other surfaces — and make the trade-off explicit: the patch permanently detaches the field from the indicator's metadata.
    - Key absent + inheritance disabled, or multi-y-indicator chart (inheritance baseline ambiguous — same conservatism as `indicator_update.py`), or no ETL grapher config → **route (c)**.
 3. Entity selection / colors / axis / map settings → chart-config-only → **route (c)**. For selection edits, check the entities actually have data in the indicator (see the `check-empty-entities` skill's availability lookup).
 
