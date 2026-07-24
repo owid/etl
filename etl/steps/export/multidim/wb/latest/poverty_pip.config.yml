@@ -62,7 +62,7 @@ definitions:
   description_key_source_world_bank: |-
     This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. To achieve wide coverage, it pools data from two kinds of surveys. For high-income countries, the data measures people's incomes after taxes and benefits. For most low- and middle-income countries, it instead measures their consumption — a different but [closely related](#dod:read-more-income-consumption-pip) measure.
 
-  description_key_not_market_income: In lower-income countries, many people produce food for their own use or exchange goods without money. This data accounts for that by estimating what these goods would have cost if bought in the market and adding that value to their consumption or income.
+  description_key_not_market_income: In lower-income countries, many people produce food for their own use or exchange goods without money. This data accounts for that by estimating what these goods would have cost if bought in the market and adding that value to their consumption.
 
   # These views group several poverty lines and expose no "show breaks in the data" toggle, so the
   # show-breaks bullet is omitted entirely and the income/consumption bullet drops its breaks reference.
@@ -70,7 +70,7 @@ definitions:
     For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations.
 
   description_key_regional_global_estimates: |-
-    Regional and global estimates are extrapolated to the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+    Regional and global estimates are extrapolated to the year of the data release using growth estimates and forecasts from [national accounts](#dod:national-accounts). For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
 
 
 dimensions:

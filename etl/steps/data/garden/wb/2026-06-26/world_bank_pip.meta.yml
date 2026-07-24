@@ -203,7 +203,7 @@ definitions:
     This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. To achieve wide coverage, it pools data from two kinds of surveys. For high-income countries, the data measures people's incomes after taxes and benefits. For most low- and middle-income countries, it instead measures their consumption — a different but [closely related](#dod:read-more-income-consumption-pip) measure.
     <%- endif %>
 
-  description_key_not_market_income: In lower-income countries, many people produce food for their own use or exchange goods without money. This data accounts for that by estimating what these goods would have cost if bought in the market and adding that value to their consumption or income.
+  description_key_not_market_income: In lower-income countries, many people produce food for their own use or exchange goods without money. This data accounts for that by estimating what these goods would have cost if bought in the market and adding that value to their consumption.
 
   description_key_show_breaks: |-
     <% if survey_comparability is defined and (table is not defined or table != "Income or consumption intra/extrapolated") and (welfare_type == "income or consumption" or survey_comparability != "No spells") %>
@@ -229,7 +229,7 @@ definitions:
     <% if table is defined and table == "Income or consumption intra/extrapolated" %>
     Country estimates are interpolated and extrapolated to the year of the data release using GDP growth estimates and forecasts. This data is then used to produce regional and global aggregates available for each year. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html).
     <%- else %>
-    Regional and global estimates are extrapolated to the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+    Regional and global estimates are extrapolated to the year of the data release using growth estimates and forecasts from [national accounts](#dod:national-accounts). For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
     <%- endif %>
     <%- endif %>
 
