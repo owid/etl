@@ -30,6 +30,7 @@ Field mapping — user vocabulary → where the field can live:
 | subtitle | `subtitle` | yes (patch) | `presentation.grapher_config.subtitle` |
 | footnote / note | `note` | yes (patch) | `presentation.grapher_config.note` |
 | description / "About this data" | `description_short`, `description_key` | no | yes (top-level VariableMeta) |
+| WYSK / "What you should know about this indicator" | `description_key` | no | yes (top-level VariableMeta) |
 | unit / short unit | `unit`, `short_unit`, `display.unit` | display-only via dimensions | yes |
 | legend / series label | `dimensions[i].display.name` | yes (patch) | `display.name` |
 | public title (data page) | `presentation.title_public` | no | yes |
