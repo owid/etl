@@ -6,6 +6,10 @@ default_selection:
 topic_tags:
   - "Energy"
   - "Fossil Fuels"
+definitions:
+  common_views:
+    - config:
+        originUrl: "https://ourworldindata.org/fossil-fuels"
 dimensions:
   - slug: "fuel"
     name: "Fuel"

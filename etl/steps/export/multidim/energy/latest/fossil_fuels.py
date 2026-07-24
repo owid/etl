@@ -291,6 +291,9 @@ def add_decomposition_views(c) -> None:
         "hasMapTab": False,
         "hideRelativeToggle": False,
         "yAxis": {"min": 0},
+        # These decomposition views are appended after create_collection, so the config.yml
+        # common_views originUrl does not reach them; set it here too.
+        "originUrl": "https://ourworldindata.org/fossil-fuels",
     }
     single_views = {
         (v.dimensions.get("fuel"), v.dimensions.get("metric"), v.dimensions.get("per_capita")): v for v in c.views
