@@ -162,9 +162,11 @@ If the beyond-target count is zero, skip the ask and proceed.
 
 **Style rules for writing text** live in `.claude/skills/owid-metadata-generation/SKILL.md` — follow its field-by-field guidelines whenever composing new text (description_short must not repeat the title; plain language, expand acronyms; description_key ordered data-specific → methodology → caveats; curly apostrophes; American English; per-field guidance in `schemas/definitions.json`).
 
-**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing (`/check-metadata-spacing`), style guide (`/check-metadata-style`), the manual clarity checklist, and link + `#dod:` verification.
+**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing (`/check-metadata-spacing`), style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, and adversarial claims verification (`/adversarial-data-review`).
 
 Scoping rules specific to this skill:
+
+- **Adversarial claims verification is MANDATORY here, but only on the metadata being added or edited — never on the data.** Run `/adversarial-data-review` scoped to the new/changed text: treat every added or edited sentence as a claim and verify it against the producer's documentation (fetch what's behind the links in the edited text and the dataset's snapshot `.dvc` — the link check only proves URLs resolve; this reads what they say). Skip the skill's data-value cross-checks, anomaly scans, and indicator prioritization entirely — no data changed. Unedited metadata is out of scope too. This keeps the pass cheap (a handful of web calls) while catching the failure mode nothing else covers: text that is well-formed, well-styled, and factually wrong (stale methodology attributions, scope overclaims, misread units in prose).
 
 - For a one-field conversational edit, run the checks against **the edited text/step only** — don't re-audit the whole dataset. For target-report or mass edits, run the full skills as `/update-dataset` does.
 - Route (c) chart-config text has no `.meta.yml` — apply the style guide, the clarity checklist, and a typo pass directly to the new text.
