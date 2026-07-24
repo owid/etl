@@ -72,6 +72,13 @@ definitions:
     date_accessed: "2025-06-27"
     citation_full: Energy Institute - Statistical Review of World Energy (2025).
     attribution_short: Energy Institute
+  origins_ember: &origins_ember
+    producer: Ember
+    title: Ember world regions
+    url_main: https://ember-energy.org/data/yearly-electricity-data/
+    date_accessed: "2026-04-24"
+    citation_full: Ember - Yearly Electricity Data (2026).
+    attribution_short: Ember
 
 tables:
   regions:
@@ -378,6 +385,39 @@ tables:
                   "Middle East (EI)": "Middle East"
                   "Africa (EI)": "Africa"
                   "Asia Pacific (EI)": "Asia Pacific"
+                customHiddenCategories:
+                  "No data": true
+
+      # Ember
+      ember_region:
+        title: World regions according to Ember
+        description_short: |-
+          Regions as defined by Ember in its Yearly Electricity Data.
+        type: ordinal
+        sort:
+          - Africa (Ember)
+          - Asia (Ember)
+          - Europe (Ember)
+          - Latin America and Caribbean (Ember)
+          - Middle East (Ember)
+          - North America (Ember)
+          - Oceania (Ember)
+        origins:
+          - *origins_ember
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Africa (Ember)": "Africa"
+                  "Asia (Ember)": "Asia"
+                  "Europe (Ember)": "Europe"
+                  "Latin America and Caribbean (Ember)": "Latin America and Caribbean"
+                  "Middle East (Ember)": "Middle East"
+                  "North America (Ember)": "North America"
+                  "Oceania (Ember)": "Oceania"
                 customHiddenCategories:
                   "No data": true
 
