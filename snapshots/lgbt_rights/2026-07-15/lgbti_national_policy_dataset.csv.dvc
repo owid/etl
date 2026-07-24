@@ -3,27 +3,30 @@ meta:
     producer: Velasco
     title: LGBTI National Policy Dataset
     description: |-
-      The LGBTI National Policy Dataset (Version 2.0) is a country-year-policy panel tracking the adoption, scope, and enforcement of LGBTI-related policies across 196 countries from 1991 to 2025. The dataset is distributed in long format: each row records one country in one year for one specific policy-status combination. It is designed for use in comparative political research, policy diffusion analysis, and quantitative cross-national studies of LGBTI rights.
+      The LGBTI National Policy Dataset (Version 2.1) is a country-year-policy panel tracking the adoption, scope, and enforcement of LGBTI-related policies across 195 countries from 1991 to 2025. The dataset is distributed in long format: each row records one country in one year for one specific policy-status combination. It is designed for use in comparative political research, policy diffusion analysis, and quantitative cross-national studies of LGBTI rights.
 
       The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy paired with two mutually exclusive status directions). Of these 54 combinations, 37 contain substantive data; the remaining 17 are structural placeholders with all-zero values, included to maintain a fully balanced panel suitable for econometric methods.
     citation_full: |-
-      Velasco, Kristopher. 2026. "LGBTI National Policy Dataset, Version 2.0." Distributed via Open Science Framework: osf.io/wta9p.
+      Velasco, Kristopher. 2026. "LGBTI National Policy Dataset, Version 2.1." https://doi.org/10.17605/OSF.IO/WTA9P.
     attribution_short: Velasco
-    version_producer: '2.0'
+    version_producer: '2.1'
     url_main: https://osf.io/wta9p/overview
-    # Stable OSF GUID link for LGBTI_Policy_Data_Long.csv — resolves to the file's latest version.
-    url_download: https://osf.io/download/zpd78/
-    date_accessed: '2026-07-15'
-    # NOTE: The producer replaced the data file and codebook on OSF on 2026-06-12 (6,813 changed
-    # Proportion cells vs the 2026-03-23 release) while keeping the "Version 2.0" label — the
-    # version_producer field can't distinguish revisions; compare file dates on OSF when updating.
-    date_published: '2026-06-12'
-    # NOTE: The OSF project declares no license (verified 2026-07-15, and in the April 2026 Wayback
-    # capture) and the producer's site states none, so the earlier "CC BY 4.0" claim was unsupported.
-    # Producer copyright is the conservative default until Velasco confirms terms — update on reply.
+    # Stable OSF link for LGBTI_Policy_Data_Long.csv. NOTE: the file's short GUID (formerly zpd78) was
+    # lost when the producer deleted and re-uploaded the file in the 2026-07-24 (v2.1) revision, so this
+    # points at the current file resource id — re-derive it from the OSF API if it 404s on a future update.
+    url_download: https://osf.io/download/6a636ff7f73288faf9a326b3/
+    date_accessed: '2026-07-24'
+    # NOTE: The producer revises Version 2.x in place on OSF without a changelog. The 2026-07-24 revision
+    # (labeled "Version 2.1" in the LICENSE file the producer added) replaced both data files and the
+    # codebook, following coding questions we raised on the June release — compare OSF file dates/hashes
+    # when updating, since the version_producer field alone can't distinguish in-place revisions.
+    date_published: '2026-07-24'
+    # The producer added a LICENSE file (CC BY 4.0) in the 2026-07-24 revision, replacing the earlier
+    # no-declared-license state.
     license:
-      name: © Kristopher Velasco
+      name: CC BY 4.0
+      url: https://osf.io/wta9p/
 outs:
-  - md5: c39c9aac33547de3320e0be62b40c091
-    size: 83399301
+  - md5: 19123f1aa1f2526d5bef21ce11a7e930
+    size: 83642275
     path: lgbti_national_policy_dataset.csv

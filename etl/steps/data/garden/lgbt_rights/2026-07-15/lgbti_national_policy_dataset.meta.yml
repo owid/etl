@@ -928,7 +928,7 @@ tables:
           Whether a legal process exists to change the gender marker on official identity documents, and what the process requires — self-declaration, medical or psychological diagnosis, surgery, or surgery plus sterilization.
         description_key:
           - '{definitions.description_key_dataset}'
-          - 'The indicator is coded as follows: **_Self-declaration is enough_** (legal change of the gender marker is possible based on self-declaration), **_Diagnosis required_** (legal change requires a medical or psychological diagnosis), **_Surgery required_** (legal change requires gender-affirming surgery), **_Surgery and sterilization required_** (legal change requires both gender-affirming surgery and sterilization), **_Legally possible, requirement unknown_** (legal change is in effect but the procedural requirement is not recorded in the source), **_Varies by region_** (rules differ between subnational jurisdictions, or legal change is only partially in effect) and **_Not legally possible_** (no legal procedure exists to change the gender marker on official identity documents).'
+          - 'The indicator is coded as follows: **_Self-declaration is enough_** (legal change of the gender marker is possible based on self-declaration), **_Court order required_** (legal change requires a judicial procedure, with no medical or surgical condition), **_Diagnosis required_** (legal change requires a medical or psychological diagnosis), **_Surgery required_** (legal change requires gender-affirming surgery), **_Surgery and sterilization required_** (legal change requires both gender-affirming surgery and sterilization), **_Legally possible, requirement unknown_** (legal change is in effect but the procedural requirement is not recorded in the source), **_Varies by region_** (rules differ between subnational jurisdictions, or legal change is only partially in effect) and **_Not legally possible_** (no legal procedure exists to change the gender marker on official identity documents).'
           - "{definitions.description_key_binding_instrument}"
         unit: ""
         short_unit: ""
@@ -938,6 +938,7 @@ tables:
         type: ordinal
         sort:
           - Self-declaration is enough
+          - Court order required
           - Diagnosis required
           - Surgery required
           - Surgery and sterilization required
@@ -3238,26 +3239,32 @@ tables:
 
 
       # ── Gender marker change regional aggregates ─────────────────────────────────
-      gender_marker_change_legally_possible__requirement_unknown_count:
-        title: Legal change of gender marker — Legally possible, requirement unknown (number of countries)
-        description_short: The number of countries classified as "Legally possible, requirement unknown" on the indicator on legal change of gender marker.
+      # NOTE: the producer's 2026-07-24 (v2.1) revision added the "Court Order" requirement (only
+      # Lithuania) and left no legal country with an unrecorded requirement, so the regional columns
+      # for "Legally possible, requirement unknown" are no longer generated and its blocks were
+      # removed here. The country-level `gender_marker_change` sort keeps that label because the
+      # classification can still produce it if a future release ships a legal country with a blank
+      # requirement — re-add the regional blocks below if that category reappears.
+      gender_marker_change_court_order_required_count:
+        title: Legal change of gender marker — Court order required (number of countries)
+        description_short: The number of countries classified as "Court order required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Legally possible, requirement unknown" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then counted the countries classified as "Court order required" within each region. {definitions.description_regions_processing}'
         unit: countries
         short_unit: ""
         display:
-          name: Legally possible, requirement unknown
+          name: Court order required
           numDecimalPlaces: 0
 
-      gender_marker_change_legally_possible__requirement_unknown_pop:
-        title: Legal change of gender marker — Legally possible, requirement unknown (population)
-        description_short: The total population of countries classified as "Legally possible, requirement unknown" on the indicator on legal change of gender marker.
+      gender_marker_change_court_order_required_pop:
+        title: Legal change of gender marker — Court order required (population)
+        description_short: The total population of countries classified as "Court order required" on the indicator on legal change of gender marker.
         processing_level: major
-        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Legally possible, requirement unknown" within each region. {definitions.description_regions_processing}'
+        description_processing: '{definitions.derivation_gmc} We then summed the populations of countries classified as "Court order required" within each region. {definitions.description_regions_processing}'
         unit: people
         short_unit: ""
         display:
-          name: Legally possible, requirement unknown
+          name: Court order required
           numDecimalPlaces: 0
 
       gender_marker_change_diagnosis_required_count:

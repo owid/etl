@@ -668,13 +668,21 @@ def run() -> None:
     # Harmonize country names
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # Apply declared corrections for known upstream errors (see lgbti_national_policy_dataset.corrections.yml).
+    # Apply any declared corrections for known upstream errors (lgbti_national_policy_dataset.corrections.yml,
+    # if present). The v2.0 gender-marker corrections were retired once the producer re-coded those rows in
+    # the 2026-07-24 (v2.1) revision, so no corrections file currently ships.
     tb = paths.apply_corrections(tb)
 
     # Repair a status misfile the producer introduced in the 2026-06-12 revision (see function docstring).
     # (Kept in code rather than corrections.yml: it's a rule-based proportion swap across two status
     # rows, which the declarative format can't express.)
     tb = _fix_misfiled_incitement_status(tb)
+
+    # Correct gender-marker requirements the producer left frozen at the pre-reform value, and reflect
+    # Nepal's court-ordered marriage recognition. Both are year-scoped rule-based fixes (a value/status
+    # override from a reform year onward) that the declarative corrections format can't express.
+    tb = _fix_lagging_gender_marker_requirements(tb)
+    tb = _fix_nepal_marriage_recognition(tb)
 
     # Validate the value columns (after corrections, so local fixes are covered too).
     sanity_check_proportions(tb)
@@ -770,6 +778,78 @@ def _fix_misfiled_incitement_status(tb):
         active_years = tb.loc[illegal & (tb["proportion"] > 0), "year"].unique()
         tb.loc[legal & tb["year"].isin(active_years), "proportion"] = 1.0
         tb.loc[illegal, "proportion"] = 0.0
+    return tb
+
+
+# Gender-marker-change requirements the producer's v2.1 field left frozen at the strictest pre-reform
+# value across the whole panel (codebook §4.5/§6.7 make the field time-varying, but these reforms are
+# not reflected). Each is corrected FROM its reform year onward; pre-reform years keep the old,
+# correct-for-then value. Countries that adopted purely administrative self-declaration map to "Self-ID";
+# France and Greece removed the medical requirement but kept a judicial procedure, so they map to the
+# producer's own "Court Order" value. All reforms verified against ≥2 independent sources during the
+# adversarial review (ai/adversarial-review-lgbti_national_policy_dataset-2026-07-24.md); reported to the
+# producer. Format: country -> (reform_year, expected_current_value, corrected_value).
+_GMC_REQUIREMENT_FIXES = {
+    "Malta": (2015, "Surgery", "Self-ID"),  # GIGESC Act 2015 — self-ID, no medical/surgical requirement
+    "Denmark": (2014, "Surgery+Sterilization", "Self-ID"),  # 2014 self-determination law; no medical certification
+    "Portugal": (2018, "Surgery", "Self-ID"),  # Law 38/2018 — administrative self-determination, no diagnosis
+    "Brazil": (2018, "Surgery", "Self-ID"),  # STF ADI 4275 (2018) — registry self-declaration, no surgery/judicial
+    "Colombia": (2015, "Surgery", "Self-ID"),  # Decreto 1227/2015 — notarial declaration, no medical
+    "Iceland": (2019, "Medical Diagnosis", "Self-ID"),  # Gender Autonomy Act 80/2019 — self-determination
+    "New Zealand": (
+        2023,
+        "Medical Diagnosis",
+        "Self-ID",
+    ),  # BDMRR Act 2021 (in force 15 Jun 2023) — statutory declaration
+    "France": (
+        2017,
+        "Surgery+Sterilization",
+        "Court Order",
+    ),  # Law 2016-1547 (Civ. Code 61-5/61-6) — judicial, no medical
+    "Greece": (2017, "Surgery", "Court Order"),  # Law 4491/2017 — court decision, no medical
+}
+
+
+def _fix_lagging_gender_marker_requirements(tb):
+    """Correct gender_marker_change requirements the producer left frozen at the pre-reform value.
+
+    For each country in `_GMC_REQUIREMENT_FIXES`, overwrite `gender_change_requirement` on the
+    gender_marker_change/legal rows FROM the reform year onward. The assert fails loudly if the
+    producer fixes the field upstream (the pre-fix value is no longer the expected one) — then delete
+    that country's entry. Pre-reform years are untouched, so their correct-for-then requirement stays.
+    """
+    is_gmc = (tb["law"] == "gender_marker_change") & (tb["status"] == "legal")
+    for country, (reform_year, old, new) in _GMC_REQUIREMENT_FIXES.items():
+        post = is_gmc & (tb["country"] == country) & (tb["year"] >= reform_year)
+        current = sorted(tb.loc[post, "gender_change_requirement"].dropna().unique().tolist())
+        assert current == [old], (
+            f"{country} gender_marker_change requirement from {reform_year} is {current}, expected ['{old}'] — "
+            "the producer may have fixed it upstream; remove its entry from _GMC_REQUIREMENT_FIXES."
+        )
+        tb.loc[post, "gender_change_requirement"] = new
+    return tb
+
+
+def _fix_nepal_marriage_recognition(tb):
+    """Reflect Nepal's court-ordered same-sex marriage recognition (2023 onward).
+
+    v2.1 codes Nepal marriage as "Banned" (marriage_equality/illegal = 1, legal = 0) on the strength of
+    the Muluki Civil Code's man-woman definition. But Nepal's Supreme Court ordered an interim same-sex
+    marriage register in 2023 and the first marriages were registered from November 2023, making Nepal
+    the first South Asian country to recognize same-sex marriage. The codebook's own convention counts
+    operative court practice as a binding pathway, so from 2023 we set the Legal direction in force and
+    clear the codified-ban direction (otherwise the combined key legal=1/ban=1 is unmapped). Pre-2023
+    years are untouched. Self-canceling assert. Verified: Wikipedia, Equaldex (PR #6454); reported to
+    the producer.
+    """
+    m = (tb["law"] == "marriage_equality") & (tb["country"] == "Nepal") & (tb["year"] >= 2023)
+    legal, illegal = m & (tb["status"] == "legal"), m & (tb["status"] == "illegal")
+    assert (tb.loc[legal, "proportion"] == 0).all() and (tb.loc[illegal, "proportion"] == 1).all(), (
+        "Nepal marriage_equality from 2023 no longer looks like legal=0 / ban=1 — the producer may have "
+        "recoded it; re-check and remove _fix_nepal_marriage_recognition."
+    )
+    tb.loc[legal, "proportion"] = 1.0
+    tb.loc[illegal, "proportion"] = 0.0
     return tb
 
 
@@ -985,6 +1065,7 @@ def _build_gmc_combined(wide):
       - Not legally possible            : proportion = 0
       - Varies by region             : 0 < proportion < 1
       - Self-declaration                : proportion = 1, requirement in {Self-ID, Self-Declaration}
+      - Court order required            : proportion = 1, requirement = Court Order (judicial, non-medical)
       - Medical/psychological diagnosis : proportion = 1, requirement in {Medical/Psychological, Medical Diagnosis}
       - Surgery required                : proportion = 1, requirement in {Surgery, Mixed (Surgery + Medical/Psychological)}
       - Surgery and sterilization       : proportion = 1, requirement = Surgery+Sterilization
@@ -1000,6 +1081,10 @@ def _build_gmc_combined(wide):
     REQ_LABELS = {
         "Self-ID": "Self-declaration is enough",
         "Self-Declaration": "Self-declaration is enough",
+        # "Court Order" is a procedural (judicial) requirement with no medical/surgical condition — added by
+        # the producer in the 2026-07-24 (v2.1) revision (only Lithuania carries it). We give it its own
+        # category rather than folding it into a medical tier.
+        "Court Order": "Court order required",
         "Medical/Psychological": "Diagnosis required",
         "Medical Diagnosis": "Diagnosis required",
         "Surgery": "Surgery required",
