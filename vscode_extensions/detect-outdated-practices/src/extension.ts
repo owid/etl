@@ -311,7 +311,17 @@ export function activate(context: vscode.ExtensionContext) {
                     diagnostics.push(diagnostic);
                 }
 
-                // 2. Track Dataset variables: add X on a *bare* `X = ...load_dataset(...)` assignment; drop
+                // 2a. Names annotated as a Dataset are live Datasets too — most importantly
+                //     Dataset-typed function parameters, e.g. `def _sanity_checks(ds: Dataset)`, whose
+                //     `ds["table"]` reads would otherwise be missed (the name is never assigned locally).
+                //     Matches `name: Dataset`, `name: catalog.Dataset`, `name: "Dataset"` (not DatasetMeta).
+                const annotationRe = /(\w+)\s*:\s*"?(?:\w+\.)?Dataset\b/g;
+                let annotationMatch: RegExpExecArray | null;
+                while ((annotationMatch = annotationRe.exec(code)) !== null) {
+                    datasetVars.add(annotationMatch[1]);
+                }
+
+                // 2b. Track Dataset variables: add X on a *bare* `X = ...load_dataset(...)` assignment; drop
                 //    X when reassigned to anything else. `X = load_dataset(...)[...]` / `.reset_index()`
                 //    extract a Table, so X is not a Dataset (its subscripts are column access).
                 const assignMatch = code.match(assignRe);
