@@ -120,7 +120,7 @@ Run it whenever:
 - the route is **(b)** and the edit touches a shared block (`common_view_config`, config-level `definitions`, a garden definition consumed by several views);
 - the route is **(c)** and the chart has narrative-chart children or gdoc embeds (the reporter checks).
 
-It sweeps: **charts** (with `--field`, charts shielded by their own patch override of that field are listed separately — they will NOT change), **MDim views**, **explorer views** (legacy CSV explorers are invisible to these tables — caveat is printed), **narrative charts**, and **article references** (informational: embeds don't break, but the displayed text changes).
+It sweeps: **charts** (with `--field`, charts shielded by their own patch override of that field are listed separately — they will NOT change; for the chart-text fields title/subtitle/note, charts with no inheritance path — variable not a y series, several y series, or inheritance disabled — are also listed separately and excluded from the beyond-target count, since grapher only inherits chart config from a single-y, inheritance-enabled parent), **MDim views**, **explorer views** (legacy CSV explorers are invisible to these tables — caveat is printed), **narrative charts**, and **article references** (informational: embeds don't break, but the displayed text changes).
 
 Decision rule: if surfaces **beyond the one the user pointed at** are affected (count > 0), STOP and ask the user before applying:
 
