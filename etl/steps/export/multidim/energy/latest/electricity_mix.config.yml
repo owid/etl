@@ -8,6 +8,10 @@ default_dimensions:
   metric: "generation"
 topic_tags:
   - "Energy"
+definitions:
+  common_views:
+    - config:
+        originUrl: "https://ourworldindata.org/electricity-mix"
 dimensions:
   - slug: "source"
     name: "Source"

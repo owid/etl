@@ -252,7 +252,13 @@ def add_decomposition_views(c) -> None:
     These live on the metric dimension (by_source / by_source_per_capita) and only exist for
     aggregates, so grapher hides the metric when an individual source is selected.
     """
-    base_config = {"chartTypes": ["StackedArea"], "tab": "chart", "hasMapTab": False, "hideRelativeToggle": False}
+    base_config = {
+        "chartTypes": ["StackedArea"],
+        "tab": "chart",
+        "hasMapTab": False,
+        "hideRelativeToggle": False,
+        "originUrl": "https://ourworldindata.org/electricity-mix",
+    }
     single_views = {(v.dimensions.get("source"), v.dimensions.get("metric")): v for v in c.views}
     for source, constituents in AGGREGATE_DECOMPOSITION.items():
         for base_metric, new_metric in _DECOMPOSITION_METRICS.items():

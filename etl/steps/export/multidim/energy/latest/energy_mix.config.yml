@@ -8,6 +8,10 @@ default_dimensions:
   metric: "total"
 topic_tags:
   - "Energy"
+definitions:
+  common_views:
+    - config:
+        originUrl: "https://ourworldindata.org/energy"
 dimensions:
   - slug: "source"
     name: "Source"

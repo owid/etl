@@ -254,6 +254,7 @@ def add_carbon_intensity_view(c) -> None:
             "[total energy supply](#dod:total-energy-supply)."
         ),
         "map": {"colorScale": {"baseColorScheme": "YlOrBr"}, "timeTolerance": 3},
+        "originUrl": "https://ourworldindata.org/energy",
     }
     view = View(
         dimensions={"source": "total", "metric": "carbon_intensity"},
@@ -269,7 +270,13 @@ def add_decomposition_views(c) -> None:
     These live on the metric dimension (by_source / by_source_per_capita) and only exist for
     aggregates, so grapher hides the metric when an individual source is selected.
     """
-    base_config = {"chartTypes": ["StackedArea"], "tab": "chart", "hasMapTab": False, "hideRelativeToggle": False}
+    base_config = {
+        "chartTypes": ["StackedArea"],
+        "tab": "chart",
+        "hasMapTab": False,
+        "hideRelativeToggle": False,
+        "originUrl": "https://ourworldindata.org/energy",
+    }
     single_views = {(v.dimensions.get("source"), v.dimensions.get("metric")): v for v in c.views}
     for source, constituents in AGGREGATE_DECOMPOSITION.items():
         for base_metric, new_metric in _DECOMPOSITION_METRICS.items():
