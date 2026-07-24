@@ -242,6 +242,11 @@ def candidate_files_for_indicator(catalog_path: str) -> list[str]:
     can point at a version no longer on disk), so when the exact version is absent the latest
     on-disk version of the dataset is returned instead — the caller must confirm it's the step
     that actually feeds the indicator before editing.
+
+    When a `<ds>.meta.override.yml` sits next to the meta.yml, it is listed FIRST: the ETL
+    merges it on top of the built metadata (etl/steps/__init__.py), and datasets that carry one
+    (e.g. WDI) auto-generate their main meta.yml — manual curation must go into the override
+    file or it is lost on the next regeneration.
     """
     path_part = catalog_path.split("#", 1)[0]
     parts = path_part.split("/")
@@ -254,10 +259,20 @@ def candidate_files_for_indicator(catalog_path: str) -> list[str]:
     for channel in ("garden", "grapher"):
         exact = REPO_ROOT / "etl/steps/data" / channel / ns / ver / f"{ds}.meta.yml"
         if exact.exists():
+            override = exact.with_name(f"{ds}.meta.override.yml")
+            if override.exists():
+                files.append(
+                    f"{override.relative_to(REPO_ROOT)} (manual-curation override — edit THIS file; the main meta.yml is likely auto-generated)"
+                )
             files.append(str(exact.relative_to(REPO_ROOT)))
             continue
         versions = sorted((REPO_ROOT / "etl/steps/data" / channel / ns).glob(f"*/{ds}.meta.yml"))
         if versions:
+            override = versions[-1].with_name(f"{ds}.meta.override.yml")
+            if override.exists():
+                files.append(
+                    f"{override.relative_to(REPO_ROOT)} (manual-curation override — edit THIS file; the main meta.yml is likely auto-generated)"
+                )
             files.append(f"{versions[-1].relative_to(REPO_ROOT)} (latest on disk — catalogPath says {ver})")
     return files
 

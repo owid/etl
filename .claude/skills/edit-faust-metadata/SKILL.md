@@ -70,6 +70,7 @@ Notes baked into the resolver — don't re-derive them by hand:
 - Duplicate slugs prefer the published chart; editing an unpublished chart gets a warning.
 - MDim choice values can carry deliberate trailing spaces — dims are matched stripped but written back raw (memory: `reference_mdim_choice_name_trailing_space`).
 - Never hand-build `staging-site-<branch>` hostnames — branch names get normalized and truncated to 28 chars (`etl.config.get_container_name`); a wrong name silently serves a different environment.
+- When a `<short_name>.meta.override.yml` exists next to the meta.yml, the resolver lists it first — that's the manual-curation surface (the main meta.yml is likely auto-generated; see the route (a) note below).
 
 ## Edit routing — which layer gets the edit
 
@@ -80,7 +81,7 @@ Primitives:
 
 Three routes:
 
-- **(a) Indicator ETL metadata** — edit the garden `.meta.yml` → rebuild garden+grapher → `STAGING=1 etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` to upsert to staging.
+- **(a) Indicator ETL metadata** — edit the garden `.meta.yml` → rebuild garden+grapher → `STAGING=1 etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` to upsert to staging. **Check for a `<short_name>.meta.override.yml` next to the meta.yml first** — the ETL merges it on top of the built metadata automatically (`etl/steps/__init__.py`), and datasets that carry one (WDI is the flagship: `wdi.meta.override.yml`) auto-generate their main `.meta.yml`, so manual curation MUST go into the override file — an edit to the auto-generated file builds fine but is silently lost on the next regeneration. The resolver lists the override file first when it exists.
 - **(b) MDim step files** — edit the MDim `.config.yml` / `.py` → `STAGING=1 .venv/bin/etlr export://multidim/<ns>/<ver>/<name> --export --private`.
 - **(c) Chart config on staging** — `scripts/update_chart_config.py` (guarded, staging-only; see below). Reaches production only via chart-diff approval + chart-sync after merge.
 
