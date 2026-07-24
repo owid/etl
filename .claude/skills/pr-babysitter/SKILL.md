@@ -19,7 +19,7 @@ Only ONE babysitter per PR. If one is already running, message it (SendMessage) 
 
 1. Post the trigger as a bare PR comment: `gh pr comment <n> --body "@codex review"`. Record the exact `created_at` timestamp of that comment (`gh api repos/owid/etl/issues/<n>/comments`).
 2. Spawn a `general-purpose` background agent with the prompt template below, filled in. The agent works in the SAME checkout on the SAME branch — warn it that the main session may also push commits mid-loop.
-3. When the completion notification arrives, relay the report. If the agent stops early (its notification says it is "waiting"), resume it with a message telling it to keep polling in short bash calls rather than ending its turn.
+3. When the completion notification arrives, relay the report. If the agent stops early (its notification says it is "waiting", "the monitor will notify me", "the waiter is still looping", or anything short of a final report), resume it with a message telling it to keep polling in short bash calls rather than ending its turn. **Expect to do this 1–2 times per run** — agents routinely stop early despite the prompt's warnings, so treat every non-final-report notification as a stall and send the corrective immediately (state the current trigger timestamp and any commits the main session pushed meanwhile).
 
 ## Agent prompt template
 
@@ -31,7 +31,7 @@ You are babysitting PR #<n> on <repo> (branch <branch>) until CI is green and th
 
 Loop (max <3> iterations, then stop and report):
 
-1. **CI**: `gh pr checks <n> --watch --interval 60` (up to 30 min). On failure: read logs (`gh run view <id> --log-failed`), diagnose, fix.
+1. **CI**: `gh pr checks <n> --watch --interval 60` run in the FOREGROUND of your own turn (up to 30 min) — never as a background task you then "wait on"; a backgrounded watcher does not resume you. On failure: read logs (`gh run view <id> --log-failed`), diagnose, fix.
 2. **Wait for the review**: poll every 2-3 minutes for a Codex response LATER than the trigger timestamp above, checking BOTH endpoints — Codex submits a formal review (`pulls/<n>/reviews`) when it has findings, but posts a plain issue comment (`issues/<n>/comments`, e.g. "Didn't find any major issues") when it has none; watching only the reviews endpoint strands the loop forever on a clean review. Poll in SHORT bash calls (one `sleep 120` + both checks per call, repeated as separate tool calls) — never one long multi-minute loop, so that queued messages from the main session can reach you between calls. Give up after 30 minutes and say so in your report.
 
    **The polling happens by YOU making the next tool call, in this same turn.** There is no such thing as "arming a monitor", "watching for events", or waiting to be notified — nothing you set up keeps running once you stop, and phrases like "I'll act on events as they arrive" mean you have stopped. After every poll call that comes back empty, immediately make the next poll call. You end your turn exactly once: when the final report is written. Never before — not after CI passes, not after "setting up" anything, not while "waiting".
@@ -55,6 +55,7 @@ Final report: status of every CI check; each finding with verdict (fixed+commit 
 
 - The agent must keep polling within its turn (ending the turn "to wait" strands the loop until someone resumes it) — but in short bash calls, never one long multi-minute loop: messages from the main session can only be delivered between tool calls, so a long sleep makes the agent unreachable.
 - Agents talk themselves into stopping with "monitors are armed, I'll act on events as they arrive" — there are no monitors; nothing runs after the turn ends. The prompt must say explicitly that polling means making the next tool call yourself, and that the turn ends exactly once, at the final report.
+- The same stall wears other disguises: backgrounding `gh pr checks --watch` (or any "waiter") and ending the turn "until its notification arrives". A backgrounded watcher notifies no one who can act. Even with all warnings in the prompt, agents stall this way 1–2 times per run — the main session's SendMessage corrective ("poll yourself in short calls; end the turn only at the final report") reliably restarts them, so budget for it rather than treating it as exceptional.
 - Codex answers on two different surfaces: findings arrive as a formal review, a clean pass arrives as a plain issue comment ("Didn't find any major issues"). Poll both, or a clean review strands the loop until the deadline.
 - Replying to a review comment does NOT resolve the thread; resolution is a separate GraphQL mutation.
 - Every re-trigger resets the polling threshold; deleted trigger comments make timestamps lie — always pin the threshold to a comment that still exists.
