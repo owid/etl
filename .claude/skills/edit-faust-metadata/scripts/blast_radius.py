@@ -406,13 +406,17 @@ def main() -> None:
     if resolved_paths and not args.catalog_path:
         print(f"Expanded to {len(variable_ids)} variables from anchor '{args.anchor}'.")
 
-    charts = [c for c in sweep_charts(env, variable_ids, args.field) if c["chart_id"] not in args.exclude_chart_id]
+    all_charts = sweep_charts(env, variable_ids, args.field)
+    charts = [c for c in all_charts if c["chart_id"] not in args.exclude_chart_id]
     mdim_views = sweep_mdim_views(env, variable_ids, resolved_paths or catalog_paths)
     explorers = sweep_explorer_views(env, variable_ids)
     chart_ids = [c["chart_id"] for c in charts] + args.exclude_chart_id
     mx_ids = [v["mx_id"] for v in mdim_views if v.get("mx_id")]
     narrative = sweep_narrative_charts(env, chart_ids, mx_ids, args.field)
-    gdocs = sweep_gdoc_refs(env, [c["slug"] for c in charts if c["slug"]])
+    # The gdoc sweep includes the target chart's slug: articles embedding the chart being
+    # edited display the changed text too (same rationale as passing exclude ids to the
+    # narrative sweep above). Only the beyond-target *chart list* filters out the target.
+    gdocs = sweep_gdoc_refs(env, [c["slug"] for c in all_charts if c["slug"]])
 
     result = {
         "branch": branch,
