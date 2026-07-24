@@ -1,6 +1,6 @@
 """Generate a Markdown FAUST audit for a grapher dataset or a hand-picked list of indicators.
 
-For each indicator (column), resolves the five fields that the faust-metadata-audit
+For each indicator (column), resolves the five fields that the edit-faust-metadata
 skill cares about and tags each one as [inherited] (from the column's VariableMeta)
 or [missing]. There is no [override] tag in this mode because there are no views —
 each indicator is reported standalone.
@@ -8,13 +8,13 @@ each indicator is reported standalone.
 Two input modes:
 
 1. Whole dataset:
-       .venv/bin/python .claude/skills/faust-metadata-audit/scripts/grapher_dataset_mode.py \\
+       .venv/bin/python .claude/skills/edit-faust-metadata/scripts/grapher_dataset_mode.py \\
            --dataset data/grapher/wb/2026-03-24/world_bank_pip
 
    Iterates every column of every table in the dataset.
 
 2. Hand-picked indicators (by catalogPath, one per line in a file or passed directly):
-       .venv/bin/python .claude/skills/faust-metadata-audit/scripts/grapher_dataset_mode.py \\
+       .venv/bin/python .claude/skills/edit-faust-metadata/scripts/grapher_dataset_mode.py \\
            --indicators grapher/wb/2026-03-24/world_bank_pip/incomes#thr__... \\
                         grapher/wb/2026-03-24/world_bank_pip/incomes#share__...
 
