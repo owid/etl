@@ -433,7 +433,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    |---|---|
    | `title` / `presentation.title_public` | A non-specialist should know what the indicator measures from the title alone. Expand acronyms unless universally known (skip GDP; expand GWIS, MFI, SDG, IHME). Don't cram units into the title. |
    | `description_short` | One or two short sentences: what the metric is and what it covers. No jargon without a gloss. Active voice. The chart subtitle is short by design — no run-on or stacked clauses. |
-   | `description_key` | Each bullet should land a distinct, useful fact. Skip filler ("this dataset is widely used"); prefer substantive caveats (coverage gaps, methodology limits, what counts/doesn't count). |
+   | `description_key` | Free-form markdown prose (paragraphs; sub-lists only where they help — see grapher's descriptionKey-to-string change). Each paragraph or bullet should land a distinct, useful fact. Skip filler ("this dataset is widely used"); prefer substantive caveats (coverage gaps, methodology limits, what counts/doesn't count). |
    | `display.name` | Short legend label. Reads naturally on a chart axis/legend; doesn't restate the title. |
    | `presentation.grapher_config.note` | Concise footnote, ≤1 sentence ideally. |
 
@@ -475,7 +475,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    | `unit` | Common is fine |
    | `short_unit` | Common is fine |
    | `description_short` | Per-indicator |
-   | `description_key` | At least one bullet; usually common |
+   | `description_key` | Non-empty (markdown prose, or legacy bullet list); usually common |
    | `processing_level` | `minor` or `major` |
    | `presentation.topic_tags` | At least one tag |
    | `display.numDecimalPlaces` | Common is fine |

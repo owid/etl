@@ -47,8 +47,8 @@ tables:
         short_unit: <Symbol>
         description_short: |-
           <1-2 sentences>
-        description_key:
-          - <Bullet point>
+        description_key: |-
+          <Key information as free-form markdown: paragraphs, with sub-lists where helpful>
         description_from_producer: |-
           <Original text from source>
         description_processing: |-
@@ -128,20 +128,22 @@ description_short: |-
   The number of people living in extreme poverty, based on data and estimates from different sources.
 ```
 
-**`description_key`** -- Array of self-contained bullet points for "About this data" panel.
+**`description_key`** -- Free-form markdown text for the "About this data" panel: prose paragraphs, with markdown sub-lists only where a list genuinely helps. (A YAML list of bullet points is still accepted and renders as a markdown list, but prefer prose — see grapher's descriptionKey-to-string migration.)
 - Plain language, no jargon (e.g. "livestock digestive processes" not "enteric fermentation"). Expand acronyms on first use.
 - **Add concrete examples** for abstract scope descriptions (what countries are included, what events qualify)
 - **Order**: data-specific points first, methodology second, caveats last
 - Only describe data that actually exists in the indicator. State implications of limitations explicitly.
+- Separate distinct facts with blank lines (paragraphs), so line breaks render meaningfully.
 
 ```yaml
-# GOOD
-description_key:
-  - Extreme poverty is measured using the International Poverty Line of $2.15 per day in 2017 international dollars.
-  - This metric uses household survey data adjusted for purchasing power parity (PPP).
+# GOOD - prose paragraphs, sub-list only where it helps
+description_key: |-
+  Extreme poverty is measured using the International Poverty Line of $2.15 per day in 2017 international dollars.
+
+  This metric uses household survey data adjusted for purchasing power parity (PPP).
 # BAD - unexpanded acronyms, jargon
-description_key:
-  - Uses IPL of $2.15/day (2017 PPP).
+description_key: |-
+  Uses IPL of $2.15/day (2017 PPP).
 ```
 
 **`description_from_producer`** -- Exact producer text, verbatim or minimally edited. Only if producer provides clear definitions. Can be set in `definitions.common` when the same producer description applies to all variables, with per-variable overrides as needed.

@@ -88,6 +88,8 @@ for table_name in ds.table_names:
         put('description_short', getattr(m, 'description_short', None))
 
         dk = getattr(m, 'description_key', None) or []
+        if isinstance(dk, str):  # modern format: one free-form markdown string
+            dk = [dk]
         for i, v in enumerate(dk):
             put(f'description_key[{i}]', v)
 
@@ -117,7 +119,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 |---|---|
 | `title` | Variable short title; shows in the catalog and some chart views |
 | `description_short` | One-liner rendered under chart titles |
-| `description_key[i]` | Bullet list on chart data pages |
+| `description_key[i]` | Key information on chart data pages (markdown string, or legacy bullet list) |
 | `display.name` | Series label in chart legends |
 | `presentation.title_public` | Public-facing chart title |
 | `presentation.title_variant` | Disambiguator ("Historical", "WHO estimate", …) |
