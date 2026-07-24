@@ -535,14 +535,21 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
 
 def _get_timespan(table: pd.DataFrame, variable_meta: VariableMeta) -> str:
     display = variable_meta.display or {}
-    # Timespan does not work for sub-yearly data
+
+    # Timespan does not work for sub-yearly data.
     if display.get("yearIsDay") or display.get("timeInterval") in {"day", "week", "month", "quarter"}:
         return ""
-    else:
-        years = table.year.unique()
-        if len(years) == 0:
-            return ""
-        else:
-            min_year = min(years)
-            max_year = max(years)
-            return f"{min_year}-{max_year}"
+
+    years = table.year.unique()
+    if len(years) == 0:
+        return ""
+
+    min_year = min(years)
+    max_year = max(years)
+    if display.get("timeInterval") == "decade":
+        # Each value codes a calendar decade (e.g. 1820s = 1820–1829) by a representative year
+        # within it; snap the start down and the end up to the decade boundaries so the timespan
+        # reflects the full coverage (e.g. 1820–2019, not 1820–2010).
+        min_year = (min_year // 10) * 10
+        max_year = (max_year // 10) * 10 + 9
+    return f"{min_year}-{max_year}"

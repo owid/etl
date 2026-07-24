@@ -60,3 +60,22 @@ def test_calculate_checksum_metadata_invariant_to_empty_field_shapes():
     assert db.calculate_checksum_metadata(meta_with_empties, df) == db.calculate_checksum_metadata(
         meta_without_empties, df
     )
+
+
+def test_get_timespan_yearly():
+    df = pd.DataFrame({"year": [1961, 1980, 2009]})
+    assert db._get_timespan(df, VariableMeta()) == "1961-2009"
+
+
+def test_get_timespan_decade():
+    meta = VariableMeta(display={"timeInterval": "decade"})
+    # Decades coded by their first year: end snaps up to the decade's last year.
+    assert db._get_timespan(pd.DataFrame({"year": [1820, 1830, 2010]}), meta) == "1820-2019"
+    # Off-boundary representative years (e.g. mid-decade) snap to decade boundaries too.
+    assert db._get_timespan(pd.DataFrame({"year": [1825, 1835, 2015]}), meta) == "1820-2019"
+
+
+def test_get_timespan_subyearly_is_empty():
+    df = pd.DataFrame({"year": [0, 28, 59]})
+    for interval in ("day", "week", "month", "quarter"):
+        assert db._get_timespan(df, VariableMeta(display={"timeInterval": interval})) == ""
