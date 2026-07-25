@@ -25,10 +25,17 @@ PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences i
 POPULATION_PATH = "grapher/demography/2024-07-15/population/historical#population_historical"
 REGION_PATH = "grapher/regions/2023-01-01/regions/regions#owid_region"
 
-# Override of description_key_thr (line 245 of world_bank_pip.meta.yml) for the grouped thr+decile=all view.
-# OLD_DESCRIPTION_KEY_THR mirrors the garden text verbatim — the assertion below catches drift in the source.
-OLD_DESCRIPTION_KEY_THR = 'This data shows the income or consumption threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
-NEW_DESCRIPTION_KEY_THR_ALL = 'This data shows the income or consumption threshold for each decile of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
+# Grouped views (all deciles, P10/P50/P90, richer/poorer groups) exist only in the "No spells"
+# variant — they expose no "show breaks in the data" toggle. So the two breaks-dependent garden
+# bullets are edited: the show-breaks bullet is dropped entirely, and the income/consumption
+# bullet loses its "you can see the original points via breaks" tail. The share bullet is also
+# swapped in the richer/poorer-groups view, whose groups are not deciles. The OLD_* constants
+# mirror the garden texts verbatim; the assertions below catch drift in the source.
+OLD_SHOW_BREAKS = "The exact surveys that countries run can change over time, creating breaks across which data points are less comparable. The World Bank provides an indicator of where these breaks occur, and this chart gives the option to show the breaks."
+OLD_INCOME_CONSUMPTION = "For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations. You can see which measure each data point corresponds to by selecting the option to show breaks in the data."
+NEW_INCOME_CONSUMPTION_NO_BREAKS = "For a small number of countries and years, the data source provides two estimates: one measuring households' income and one measuring consumption. To show a single series over time, we keep only one of these observations."
+OLD_SHARE_DECILE = "This data shows the share of total income or consumption received by each decile — a tenth of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality)."
+NEW_SHARE_GROUPS = "This data shows the share of total income or consumption received by different groups of the population, ranked from poorest to richest. We discuss this measure and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality)."
 
 
 def run() -> None:
@@ -239,23 +246,58 @@ def run() -> None:
             )
             view.config["matchingEntitiesOnly"] = True
 
-    # description_key_thr's "given decile" wording fits single-decile views; rewrite it for the grouped all-decile view while preserving the indicator's other bullets.
+    # Grouped views have no breaks toggle: drop the show-breaks bullet and remove the breaks
+    # reference from the income/consumption bullet, preserving the indicator's other bullets.
     for view in c.views:
-        if view.matches(indicator="thr", decile="all") and view.indicators.y:
+        if view.matches(decile=["all", "p10_p50_p90", "10_40_50"]) and view.indicators.y:
             col_name = view.indicators.y[0].catalogPath.split("#")[-1]
-            source_description_key = list(tb[col_name].metadata.description_key) if col_name in tb.columns else []
-            assert OLD_DESCRIPTION_KEY_THR in source_description_key, (
-                f"OLD_DESCRIPTION_KEY_THR not found in {col_name}.description_key — garden text changed, update OLD_DESCRIPTION_KEY_THR/NEW_DESCRIPTION_KEY_THR_ALL."
+            source_bullets = _description_key_bullets(tb, col_name)
+            assert OLD_SHOW_BREAKS in source_bullets and OLD_INCOME_CONSUMPTION in source_bullets, (
+                f"Breaks bullets not found in {col_name}.description_key — garden text changed, update OLD_SHOW_BREAKS/OLD_INCOME_CONSUMPTION."
             )
+            # The richer/poorer-groups view mixes richest 10% / middle 40% / poorest 50% — not deciles.
+            swap_share = view.matches(decile="10_40_50")
+            if swap_share:
+                assert OLD_SHARE_DECILE in source_bullets, (
+                    f"Share bullet not found in {col_name}.description_key — garden text changed, update OLD_SHARE_DECILE."
+                )
+            new_bullets = []
+            for bullet in source_bullets:
+                if bullet == OLD_SHOW_BREAKS:
+                    continue
+                if bullet == OLD_INCOME_CONSUMPTION:
+                    new_bullets.append(NEW_INCOME_CONSUMPTION_NO_BREAKS)
+                elif swap_share and bullet == OLD_SHARE_DECILE:
+                    new_bullets.append(NEW_SHARE_GROUPS)
+                else:
+                    new_bullets.append(bullet)
             view.metadata = view.metadata or {}
-            view.metadata["description_key"] = [
-                NEW_DESCRIPTION_KEY_THR_ALL if b == OLD_DESCRIPTION_KEY_THR else b for b in source_description_key
-            ]
+            view.metadata["description_key"] = new_bullets
 
     #
     # Save garden dataset.
     #
     c.save()
+
+
+def _description_key_bullets(tb, col_name):
+    """Return an indicator's description_key as a list of bullet strings.
+
+    The grapher channel stores description_key as a single markdown string (bullets joined with
+    "\\n- "); older builds stored a list. Normalize both to a list so bullets can be dropped or
+    swapped individually.
+    """
+    if col_name not in tb.columns:
+        return []
+    dk = tb[col_name].metadata.description_key
+    if dk is None:
+        return []
+    if not isinstance(dk, str):
+        return list(dk)
+    lines = [line.strip() for line in dk.split("\n") if line.strip()]
+    if lines and all(line.startswith("- ") for line in lines):
+        return [line[2:].strip() for line in lines]
+    return [dk.strip()]
 
 
 def _get_grouped_decile_title(view):

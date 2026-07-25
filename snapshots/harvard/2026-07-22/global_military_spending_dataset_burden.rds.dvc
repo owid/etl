@@ -7,17 +7,17 @@ meta:
     title_snapshot: Global Military Spending Dataset - Military Burden
     citation_full: |-
       - Miriam Barnum; Christopher Fariss; Jonathan Markowitz; Gaea Morales (2024). Measuring Arms: Introducing the Global Military Spending Dataset. Journal of Conflict Resolution, 0(0). https://doi.org/10.1177/00220027241232964
-      - Miriam Barnum; Christopher Fariss; Jonathan Markowitz; Gaea Morales, 2022, "Global Military Spending Dataset", https://doi.org/10.7910/DVN/DHMZOW, Harvard Dataverse, V8; estimates_milburden_20250304.rds [fileName]
+      - Miriam Barnum; Christopher Fariss; Jonathan Markowitz; Gaea Morales, 2022, "Global Military Spending Dataset", https://doi.org/10.7910/DVN/DHMZOW, Harvard Dataverse, V9; estimates_milburden_20250429.rds [fileName]
     attribution: Barnum et al. - Global Military Spending Dataset (2025)
-    version_producer: Version 8
+    version_producer: Version 9
     url_main: https://journals.sagepub.com/doi/10.1177/00220027241232964
-    url_download: https://dataverse.harvard.edu/api/access/datafile/10980707
-    date_accessed: '2025-04-28'
-    date_published: '2025-03-11'
+    url_download: https://dataverse.harvard.edu/api/access/datafile/11122137
+    date_accessed: '2026-07-22'
+    date_published: '2025-04-29'
     license:
       name: CC0
       url: https://doi.org/10.7910/DVN/DHMZOW
 outs:
-  - md5: bd340a8b7c310c84b248a2555883711a
+  - md5: 7c793f82aa1aece369faab19bdfd0247
     size: 3582544
     path: global_military_spending_dataset_burden.rds
