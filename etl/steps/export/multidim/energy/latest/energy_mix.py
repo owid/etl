@@ -175,7 +175,7 @@ METRIC_UNIT_PHRASE = {
 }
 SOURCE_COMPOSITION = {
     "fossil_fuels": "Fossil fuels are the sum of coal, oil, and gas.",
-    "renewables": "Renewables include hydropower, solar, wind, biofuels, and other renewables (geothermal, biomass, and waste).",
+    "renewables": "Renewables include hydropower, solar, wind, geothermal, bioenergy, wave, and tidal, but not traditional biomass, which can be a key energy source, especially in lower-income settings.",
     "low_carbon_energy": "Low-carbon energy is the sum of nuclear and renewables.",
     "other_renewables": "Other renewables include geothermal, biomass, and waste.",
     "solar_and_wind": "Combined energy supply from solar and wind.",
@@ -230,6 +230,13 @@ _DECOMPOSITION_STEM = {
 # energy, so traditional biomass is not part of the total. It gets its own biomass-inclusive chart.
 TRADITIONAL_BIOMASS_NOTE = "Traditional biomass is not included."
 _DECOMPOSITION_NOTES = {"renewables": TRADITIONAL_BIOMASS_NOTE, "total": TRADITIONAL_BIOMASS_NOTE}
+# Footnotes for single-source views, keyed by source. The total views flag that traditional biomass is
+# excluded; the low-carbon views spell out what "renewables" contains (its subtitle only says low-carbon
+# energy is nuclear plus renewables).
+SOURCE_NOTES = {
+    "total": TRADITIONAL_BIOMASS_NOTE,
+    "low_carbon_energy": "Renewables include hydropower, solar, wind, geothermal, wave, tidal, and bioenergy, but not traditional biomass.",
+}
 
 
 def _decomposition_title(source: str, base_metric: str) -> str:
@@ -770,7 +777,7 @@ def set_view_titles(c, dims_max: dict) -> None:
         config["title"] = _view_title(source, metric)
         config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric, dims_max.get((source, metric)))
-        # The total (all-source) views are the primary-energy total; flag that it excludes traditional biomass.
-        if source == "total":
-            config["note"] = TRADITIONAL_BIOMASS_NOTE
+        note = SOURCE_NOTES.get(source)
+        if note:
+            config["note"] = note
         v.config = config
