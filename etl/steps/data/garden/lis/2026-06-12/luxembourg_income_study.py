@@ -122,6 +122,7 @@ def run() -> None:
     tb_incomes = ds_meadow.read("incomes")
     tb_inequality = ds_meadow.read("inequality")
     tb_relative_poverty = ds_meadow.read("relative_poverty")
+    tb_percentiles = ds_meadow.read("percentiles")
 
     #
     # Process data.
@@ -131,11 +132,13 @@ def run() -> None:
     tb_incomes = paths.regions.harmonize_names(tb=tb_incomes, warn_on_unused_countries=False)
     tb_inequality = paths.regions.harmonize_names(tb=tb_inequality)
     tb_relative_poverty = paths.regions.harmonize_names(tb=tb_relative_poverty)
+    tb_percentiles = paths.regions.harmonize_names(tb=tb_percentiles, warn_on_unused_countries=False)
 
     tb_absolute_poverty = process_poverty(tb=tb_absolute_poverty, absolute=True)
     tb_relative_poverty = process_poverty(tb=tb_relative_poverty, absolute=False)
     tb_inequality = process_inequality(tb=tb_inequality)
     tb_incomes = process_incomes(tb=tb_incomes)
+    tb_percentiles = process_percentiles(tb=tb_percentiles)
 
     tb_incomes = add_period_dimension(tb=tb_incomes)
 
@@ -152,6 +155,7 @@ def run() -> None:
         tb_incomes=tb_incomes,
         tb_poverty=tb_poverty,
     )
+    sanity_check_percentiles(tb_percentiles)
 
     # Improve table format.
     tb_poverty = tb_poverty.format(
@@ -161,16 +165,22 @@ def run() -> None:
         ["country", "year", "welfare_type", "equivalence_scale", "decile", "period"], short_name="incomes"
     )
     tb_inequality = tb_inequality.format(["country", "year", "welfare_type", "equivalence_scale"])
+    tb_percentiles = tb_percentiles.format(
+        ["country", "year", "welfare_type", "equivalence_scale", "percentile"], short_name="percentiles"
+    )
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
+    # NOTE: tb_percentiles is intentionally NOT propagated to grapher (see the grapher step, which reads
+    # poverty/incomes/inequality by name). It is a garden-only table.
     ds_garden = paths.create_dataset(
         tables=[
             tb_poverty,
             tb_incomes,
             tb_inequality,
+            tb_percentiles,
         ],
         default_metadata=ds_meadow.metadata,
     )
@@ -348,6 +358,29 @@ def add_period_dimension(tb: Table) -> Table:
     return tb
 
 
+def process_percentiles(tb: Table) -> Table:
+    """
+    Process percentiles table.
+    Extract the percentile number from the indicator and rename the value to `thr` (the income
+    threshold below which that percentile of the population falls). Kept in long form, one row per
+    percentile — this table is garden-only and is not pushed to grapher.
+    """
+    # Assert that all indicators follow the expected `p_<n>` pattern.
+    is_percentile = tb["indicator"].str.fullmatch(r"p_\d+")
+    assert is_percentile.all(), f"Unexpected percentile indicators: {sorted(set(tb['indicator'][~is_percentile]))}"
+
+    # Extract percentile number from the indicator name (e.g. "p_50" -> 50).
+    tb["percentile"] = tb["indicator"].str.split("_").str[-1].astype(int)
+
+    # Rename value to threshold (renaming preserves the Variable's origins).
+    tb = tb.rename(columns={"value": "thr"})
+
+    # Drop the original indicator column.
+    tb = tb.drop(columns=["indicator"])
+
+    return tb
+
+
 def sanity_checks(tb_inequality: Table, tb_incomes: Table, tb_poverty: Table) -> None:
     """
     Perform sanity checks on the data
@@ -363,6 +396,34 @@ def sanity_checks(tb_inequality: Table, tb_incomes: Table, tb_poverty: Table) ->
     check_avg_between_thr(tb_incomes)
     check_poverty_range(tb_poverty)
     check_poverty_monotonicity(tb_poverty)
+
+
+def sanity_check_percentiles(tb: Table) -> None:
+    """
+    Warn-only checks on the percentiles table. Runs unconditionally (not gated behind DEBUG) so
+    anomalies surface on normal builds, but only logs warnings — it never fails the build.
+
+    - Completeness: expect 99 percentiles per (country, year, welfare_type, equivalence_scale) group.
+    - Monotonicity: thresholds must be non-decreasing across percentiles within each such group.
+      equivalence_scale is part of the grouping (not just welfare-country-year): the two scales are
+      separate distributions, so grouping without it would interleave them into false violations.
+    """
+    tb = tb.copy()
+    group_cols = ["country", "year", "welfare_type", "equivalence_scale"]
+
+    # Completeness: expect 99 percentiles per distribution.
+    sizes = tb.groupby(group_cols, observed=True)["percentile"].transform("count")
+    if (sizes != 99).any():
+        paths.log.warning(f"{int((sizes != 99).sum())} percentile rows belong to groups without 99 percentiles.")
+
+    # Monotonicity: thresholds must be non-decreasing across percentiles within each group.
+    tb = tb.sort_values(group_cols + ["percentile"])
+    decreases = tb.groupby(group_cols, observed=True)["thr"].diff() < 0
+    if decreases.any():
+        paths.log.warning(
+            f"""{int(decreases.sum())} non-monotonic percentile thresholds (by welfare_type-country-year-equivalence_scale):
+            {_tabulate(tb.loc[decreases, group_cols + ["percentile", "thr"]])}"""
+        )
 
 
 def check_between_0_and_1(tb_inequality: Table) -> None:

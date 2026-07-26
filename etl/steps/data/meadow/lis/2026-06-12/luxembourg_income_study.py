@@ -20,7 +20,13 @@ def run() -> None:
     #
     # Load inputs.
     #
-    snapshot_names = ["lis_incomes.csv", "lis_absolute_poverty.csv", "lis_inequality.csv", "lis_relative_poverty.csv"]
+    snapshot_names = [
+        "lis_incomes.csv",
+        "lis_absolute_poverty.csv",
+        "lis_inequality.csv",
+        "lis_relative_poverty.csv",
+        "lis_percentiles.csv",
+    ]
     tables = []
     for snapshot_name in snapshot_names:
         # Retrieve snapshot.
@@ -34,6 +40,16 @@ def run() -> None:
         #
         # Process data.
         #
+
+        # The percentiles file ships an extra `year_ppp` column (the PPP base year) the other files
+        # lack. Selecting the columns below drops it, but first surface it so a future change (a PPP
+        # rebase, or the column disappearing) is noticed — the garden metadata hardcodes 2021 prices.
+        if "year_ppp" in tb.columns:
+            ppp_years = sorted(tb["year_ppp"].dropna().unique())
+            if ppp_years != [2021]:
+                paths.log.warning(
+                    f"{snapshot_name}: unexpected year_ppp {ppp_years} (expected [2021]); check garden ppp_version."
+                )
 
         # Keep only relevant columns and rename them.
         tb = tb[list(COLUMNS_TO_KEEP.keys())].rename(columns=COLUMNS_TO_KEEP, errors="raise")
