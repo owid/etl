@@ -175,7 +175,7 @@ METRIC_UNIT_PHRASE = {
 }
 SOURCE_COMPOSITION = {
     "fossil_fuels": "Fossil fuels are the sum of coal, oil, and gas.",
-    "renewables": "Renewables include hydropower, solar, wind, geothermal, bioenergy, wave, and tidal, but not traditional biomass, which can be a key energy source, especially in lower-income settings.",
+    "renewables": "Renewables include hydropower, solar, wind, geothermal, wave, tidal, and bioenergy, but not traditional biomass.",
     "low_carbon_energy": "Low-carbon energy is the sum of nuclear and renewables.",
     "other_renewables": "Other renewables include geothermal, biomass, and waste.",
     "solar_and_wind": "Combined energy supply from solar and wind.",
