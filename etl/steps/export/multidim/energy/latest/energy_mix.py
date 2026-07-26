@@ -171,14 +171,15 @@ METRIC_UNIT_PHRASE = {
     "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.",
     "share": "Measured as a percentage of [total energy supply](#dod:total-energy-supply).",
     "annual_change": "Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).",
-    "annual_change_pct": "Percentage change in [total energy supply](#dod:total-energy-supply) in one year, relative to the previous year.",
+    "annual_change_pct": "Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.",
 }
 SOURCE_COMPOSITION = {
     "fossil_fuels": "Fossil fuels are the sum of coal, oil, and gas.",
     "renewables": "Renewables include hydropower, solar, wind, geothermal, wave, tidal, and bioenergy, but not traditional biomass.",
     "low_carbon_energy": "Low-carbon energy is the sum of nuclear and renewables.",
     "other_renewables": "Other renewables include geothermal, biomass, and waste.",
-    "solar_and_wind": "Combined energy supply from solar and wind.",
+    # No entry for "solar_and_wind": the title already says "solar and wind", so a composition note
+    # ("Combined energy supply from solar and wind") would just restate it.
 }
 
 
@@ -186,16 +187,27 @@ SOURCE_COMPOSITION = {
 # (the per-person renewables view, whose subtitle is already carrying the "per person" phrasing).
 COMPOSITION_AS_NOTE = {("renewables", "per_capita")}
 
+# Fully custom subtitles for specific (source, metric) views, where the generic phrasing reads wrong
+# (e.g. the generic annual-change unit says "change in total energy supply", which is misleading on a
+# single-source view — here it should name the source instead).
+VIEW_SUBTITLE_OVERRIDES = {
+    ("solar_and_wind", "annual_change"): (
+        "Change in solar and wind energy generation relative to the previous year, measured in "
+        "[terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply)."
+    ),
+}
+
 
 def _view_subtitle(source: str, metric: str) -> str:
+    if (source, metric) in VIEW_SUBTITLE_OVERRIDES:
+        return VIEW_SUBTITLE_OVERRIDES[(source, metric)]
     unit = METRIC_UNIT_PHRASE[metric]
     note = SOURCE_COMPOSITION.get(source)
     if (source, metric) in COMPOSITION_AS_NOTE:
         note = None
-    # Lead with what the series is (the composition note), then the unit, so the subtitle reads as
-    # "Combined energy supply from solar and wind. Measured as a percentage of..." rather than the
-    # reverse. A period keeps it robust across all metrics (the annual-change unit is not a "Measured…").
-    return f"{note} {unit}" if note else unit
+    # Lead with the unit ("Measured in terawatt-hours of total energy supply."), then the composition
+    # note. A period keeps it robust across all metrics (the annual-change unit is not a "Measured…").
+    return f"{unit} {note}" if note else unit
 
 
 # Aggregates that can be decomposed "by source", mapped to their constituent individual sources.
