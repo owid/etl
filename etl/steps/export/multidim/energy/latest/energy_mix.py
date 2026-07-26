@@ -187,20 +187,8 @@ SOURCE_COMPOSITION = {
 # (the per-person renewables view, whose subtitle is already carrying the "per person" phrasing).
 COMPOSITION_AS_NOTE = {("renewables", "per_capita")}
 
-# Fully custom subtitles for specific (source, metric) views, where the generic phrasing reads wrong
-# (e.g. the generic annual-change unit says "change in total energy supply", which is misleading on a
-# single-source view — here it should name the source instead).
-VIEW_SUBTITLE_OVERRIDES = {
-    ("solar_and_wind", "annual_change"): (
-        "Change in solar and wind energy generation relative to the previous year, measured in "
-        "[terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply)."
-    ),
-}
-
 
 def _view_subtitle(source: str, metric: str) -> str:
-    if (source, metric) in VIEW_SUBTITLE_OVERRIDES:
-        return VIEW_SUBTITLE_OVERRIDES[(source, metric)]
     unit = METRIC_UNIT_PHRASE[metric]
     note = SOURCE_COMPOSITION.get(source)
     if (source, metric) in COMPOSITION_AS_NOTE:
