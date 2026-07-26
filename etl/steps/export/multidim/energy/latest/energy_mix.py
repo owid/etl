@@ -519,7 +519,9 @@ ORIGINAL_MAP_SCHEMES = {
     ("renewables", "total"): {
         "baseColorScheme": "YlGn",
         "binningStrategy": "manual",
-        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 1],
+        # TES counts renewables at face value (lower than the substitution method), so the top of the
+        # range is now China at ~4100 TWh; a 1-3-10 scale with an open ">3000" top avoids empty bins.
+        "customNumericValues": [0, 10, 30, 100, 300, 1000, 3000, 1],
     },
     ("solar", "annual_change"): {
         "baseColorScheme": "RdBu",
