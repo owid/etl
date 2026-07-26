@@ -182,7 +182,8 @@ SOURCE_COMPOSITION = {
     "renewables": "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.",
     "low_carbon": "Low-carbon sources are the sum of nuclear and renewables.",
     "other_renewables": "Other renewables include bioenergy, geothermal, wave, and tidal.",
-    "solar_and_wind": "Combined electricity generation from solar and wind.",
+    # No entry for "solar_and_wind": the title already says "solar and wind", so a composition note
+    # ("Combined electricity generation from solar and wind") would just restate it.
     "wind": "Includes both onshore and offshore wind.",
 }
 # Total-only metrics have a single fixed subtitle (they only exist for source "total").
@@ -201,8 +202,7 @@ def _view_subtitle(source: str, metric: str) -> str:
     unit = METRIC_UNIT_PHRASE[metric]
     note = SOURCE_COMPOSITION.get(source)
     # Lead with what the series is (the composition note), then the unit, so the subtitle reads as
-    # "Combined electricity generation from solar and wind. Measured as a percentage of..." rather than
-    # the reverse.
+    # "Fossil fuels include coal, oil, and gas. Measured as a percentage of..." rather than the reverse.
     return f"{note} {unit}" if note else unit
 
 
