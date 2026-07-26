@@ -410,7 +410,9 @@ ORIGINAL_MAP_SCHEMES = {
     ("hydro", "total"): {
         "baseColorScheme": "GnBu",
         "binningStrategy": "manual",
-        "customNumericValues": [0, 100, 200, 500, 1000, 2000, 1],
+        # TES counts hydro at face value (~2.5x lower than the substitution method), so the top of the
+        # range is now China at ~1400 TWh; a 1-3-10 scale with an open ">1000" top avoids empty bins.
+        "customNumericValues": [0, 10, 30, 100, 300, 1000, 1],
     },
     ("low_carbon_energy", "annual_change"): {
         "baseColorScheme": "PuOr",
