@@ -192,7 +192,7 @@ SOURCE_COMPOSITION = {
 TOTAL_ONLY_SUBTITLES = {
     "demand": "Total electricity generation, adjusted for imports and exports. Measured in [terawatt-hours](#dod:watt-hours).",
     "demand_per_capita": "Electricity generation adjusted for imports and exports. Measured in [kilowatt-hours](#dod:watt-hours) per person.",
-    "net_imports": "Electricity imports minus exports, measured in [terawatt-hours](#dod:watt-hours). Positive values are net importers; negative values are net exporters.",
+    "net_imports": "Net electricity imports are calculated as electricity imports minus exports. Countries with positive values are net importers of electricity; negative values are net exporters. Measured in [terawatt-hours](#dod:watt-hours).",
     "imports_share": "Net electricity imports are calculated as electricity imports minus exports. This is given as a share of a country's electricity demand. Countries with positive values are net importers of electricity; negative values are net exporters.",
     "carbon_intensity": "Measured in grams of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) emitted per [kilowatt-hour](#dod:watt-hours) of electricity generated. Emissions are estimated on a lifecycle basis, including upstream, supply chain and manufacturing stages, and cover all greenhouse gases.",
 }
