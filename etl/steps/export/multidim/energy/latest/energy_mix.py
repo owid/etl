@@ -170,7 +170,7 @@ METRIC_UNIT_PHRASE = {
     "total": "Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).",
     "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.",
     "share": "Measured as a percentage of [total energy supply](#dod:total-energy-supply).",
-    "annual_change": "Annual change in [total energy supply](#dod:total-energy-supply) in one year, relative to the previous year.",
+    "annual_change": "Change in [total energy supply](#dod:total-energy-supply) from one year to the next, measured in [terawatt-hours](#dod:watt-hours).",
     "annual_change_pct": "Percentage change in [total energy supply](#dod:total-energy-supply) in one year, relative to the previous year.",
 }
 SOURCE_COMPOSITION = {
