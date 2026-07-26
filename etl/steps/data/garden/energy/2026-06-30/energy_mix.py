@@ -149,6 +149,7 @@ COUNTRIES_WITHOUT_NUCLEAR = [
     "Nicaragua",
     "Niger",
     "Niue",
+    "North Korea",
     "Northern Mariana Islands",
     "Palestine",
     "Panama",
@@ -164,6 +165,7 @@ COUNTRIES_WITHOUT_NUCLEAR = [
     "Samoa",
     "Sao Tome and Principe",
     "Senegal",
+    "Serbia and Montenegro",
     "Seychelles",
     "Sierra Leone",
     "Solomon Islands",
@@ -190,8 +192,6 @@ COUNTRIES_WITH_NUCLEAR_NO_BREAKDOWN = [
     "East Germany",
     "West Germany",
     "Yugoslavia",
-    "Serbia and Montenegro",
-    "North Korea",
 ]
 
 # Mapping of Smil (2017) World columns (direct energy, in TWh) onto our source columns, used to extend
