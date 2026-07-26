@@ -40,9 +40,11 @@ SOURCE_COLUMN_PREFIX = {
     "wind": "wind",
     "solar_and_wind": "solar_and_wind",
     "renewables": "renewable",
-    # Excluding bioenergy: bioenergy is its own source view and its own series in the "by source"
-    # decomposition, so "other renewables" here is geothermal, wave, and tidal only (no double count).
-    "other_renewables": "other_renewables_excluding_bioenergy",
+    # Must stay on the "including bioenergy" column. The excluding-bioenergy and standalone bioenergy
+    # series are missing entirely for ~70 countries (China, India, Brazil, Japan...) and start late
+    # elsewhere, so using the split in the stacked "by source" view collapses each country's chart to
+    # that sparse intersection (e.g. UK 1920-2025 -> 1990-2019). Combined keeps full historical coverage.
+    "other_renewables": "other_renewables_including_bioenergy",
     "bioenergy": "bioenergy",
     "low_carbon": "low_carbon",
 }
@@ -183,7 +185,7 @@ SOURCE_COMPOSITION = {
     "fossil": "Fossil fuels include coal, oil, and gas.",
     "renewables": "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.",
     "low_carbon": "Low-carbon sources are the sum of nuclear and renewables.",
-    "other_renewables": "Other renewables include geothermal, wave, and tidal.",
+    "other_renewables": "Other renewables include bioenergy, geothermal, wave, and tidal.",
     # No entry for "solar_and_wind": the title already says "solar and wind", so a composition note
     # ("Combined electricity generation from solar and wind") would just restate it.
     "wind": "Includes both onshore and offshore wind.",
@@ -210,13 +212,13 @@ def _view_subtitle(source: str, metric: str) -> str:
 
 # Aggregates that can be decomposed "by source", mapped to their constituent individual sources.
 # Constituents are listed top-to-bottom for the stacked chart (grapher renders the first series at the
-# top). "other_renewables" is geothermal/wave/tidal only, so "bioenergy" is a separate series (matching
-# the original "Electricity production by source" chart and the primary-energy mix).
+# top). "other_renewables" already includes bioenergy (the split columns have too little coverage to
+# stack; see SOURCE_COLUMN_PREFIX), so "bioenergy" is left out to avoid double count.
 AGGREGATE_DECOMPOSITION = {
-    "total": ["other_renewables", "bioenergy", "solar", "wind", "hydro", "nuclear", "gas", "oil", "coal"],
+    "total": ["other_renewables", "solar", "wind", "hydro", "nuclear", "gas", "oil", "coal"],
     "fossil": ["gas", "oil", "coal"],
-    "renewables": ["other_renewables", "bioenergy", "solar", "wind", "hydro"],
-    "low_carbon": ["other_renewables", "bioenergy", "solar", "wind", "hydro", "nuclear"],
+    "renewables": ["other_renewables", "solar", "wind", "hydro"],
+    "low_carbon": ["other_renewables", "solar", "wind", "hydro", "nuclear"],
     "solar_and_wind": ["solar", "wind"],
 }
 # Canonical OWID per-source colors, copied from the original "Electricity production by source" chart so
