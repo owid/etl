@@ -170,7 +170,7 @@ METRIC_UNIT_PHRASE = {
     "total": "Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).",
     "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.",
     "share": "Measured as a percentage of [total energy supply](#dod:total-energy-supply).",
-    "annual_change": "Change in [total energy supply](#dod:total-energy-supply) from one year to the next, measured in [terawatt-hours](#dod:watt-hours).",
+    "annual_change": "Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).",
     "annual_change_pct": "Percentage change in [total energy supply](#dod:total-energy-supply) in one year, relative to the previous year.",
 }
 SOURCE_COMPOSITION = {
@@ -182,9 +182,16 @@ SOURCE_COMPOSITION = {
 }
 
 
+# (source, metric) views where the composition reads better as a footnote than inline in the subtitle
+# (the per-person renewables view, whose subtitle is already carrying the "per person" phrasing).
+COMPOSITION_AS_NOTE = {("renewables", "per_capita")}
+
+
 def _view_subtitle(source: str, metric: str) -> str:
     unit = METRIC_UNIT_PHRASE[metric]
     note = SOURCE_COMPOSITION.get(source)
+    if (source, metric) in COMPOSITION_AS_NOTE:
+        note = None
     # Lead with what the series is (the composition note), then the unit, so the subtitle reads as
     # "Combined energy supply from solar and wind. Measured as a percentage of..." rather than the
     # reverse. A period keeps it robust across all metrics (the annual-change unit is not a "Measured…").
@@ -778,6 +785,8 @@ def set_view_titles(c, dims_max: dict) -> None:
         config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric, dims_max.get((source, metric)))
         note = SOURCE_NOTES.get(source)
+        if (source, metric) in COMPOSITION_AS_NOTE:
+            note = SOURCE_COMPOSITION[source]
         if note:
             config["note"] = note
         v.config = config
