@@ -372,6 +372,13 @@ def process_percentiles(tb: Table) -> Table:
     # Extract percentile number from the indicator name (e.g. "p_50" -> 50).
     tb["percentile"] = tb["indicator"].str.split("_").str[-1].astype(int)
 
+    # Hard-fail on percentile numbers outside the valid 1–99 range: an indicator like `p_0` or
+    # `p_100` matches the pattern above but is not a valid percentile threshold, and it would slip
+    # past the warn-only completeness check (a group could still total 99 rows). This is a schema
+    # surprise, so it fails the build (unlike the warn-only distribution checks downstream).
+    out_of_range = ~tb["percentile"].between(1, 99)
+    assert not out_of_range.any(), f"Percentile numbers outside 1–99: {sorted(set(tb['percentile'][out_of_range]))}"
+
     # Rename value to threshold (renaming preserves the Variable's origins).
     tb = tb.rename(columns={"value": "thr"})
 
