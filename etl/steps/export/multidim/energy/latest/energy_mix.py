@@ -576,7 +576,7 @@ ORIGINAL_MAP_SCHEMES = {
     ("wind", "share"): {
         "baseColorScheme": "PuBuGn",
         "binningStrategy": "manual",
-        "customNumericValues": [0, 5, 10, 15, 20, 1],
+        "customNumericValues": [0, 2, 4, 6, 8, 10, 12, 1],
         "customNumericColors": [None],
     },
     ("wind", "total"): {
