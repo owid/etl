@@ -64,22 +64,40 @@ script, environment variables), see
   rather than working around it.
 
 - **Admin links can't be opened; resolve the id instead.** When the user shares
-  `https://admin.owid.io/admin/variables/<id>` (or `/admin/charts/<id>`), don't
-  fetch it. Pull the id out and query the public Datasette mirror, which needs
-  no auth and covers `variables` including unpublished ones:
+  an `admin.owid.io` link, don't fetch it — pull the id out of the URL and query
+  the public Datasette mirror, which needs no auth.
+
+  `/admin/variables/<id>` — indicator metadata, including unpublished
+  indicators:
 
   ```bash
   curl -s "https://datasette-public.owid.io/owid/variables.json?id__in=<id>&_shape=array"
   ```
 
+  `/admin/charts/<id>/edit` — the chart's full config. It comes back as a JSON
+  string inside the row, so unwrap it:
+
+  ```bash
+  curl -s "https://datasette-public.owid.io/owid/charts.json?id__exact=<id>&_shape=array&_col=config" \
+    | .venv/bin/python -c "import json,sys; print(json.dumps(json.loads(json.load(sys.stdin)[0]['config']), indent=2))"
+  ```
+
+  `chart_dimensions` maps that chart to its indicators
+  (`?chartId__exact=<id>&_shape=array`), so the two together answer "what is
+  this chart built from". If you already have the slug rather than the id,
+  `https://ourworldindata.org/grapher/<slug>.config.json` returns the same thing
+  in one call.
+
   Filter with `?<col>__in=` / `?<col>__exact=` and select columns with repeated
   `&_col=`. The `?sql=` form documented in the root CLAUDE.md works too, but a
   long encoded query has 403'd intermittently, so prefer the filter form for
-  simple lookups. Charts and gdocs in Datasette are filtered to published only —
-  for a *draft* chart, ask the user to paste
-  `admin.owid.io/admin/api/charts/<id>.config.json`, which renders as JSON in
-  their already-authenticated browser. Never guess what an id refers to: say you
-  couldn't resolve it and ask.
+  simple lookups.
+
+  Charts and gdocs in Datasette are **filtered to published only**, so an empty
+  result for a plausible chart id usually means it's a draft, not that the id is
+  wrong. Drafts are only reachable from an authenticated browser: ask the user
+  to open `admin.owid.io/admin/api/charts/<id>.config.json` and paste it. Never
+  guess what an id refers to — say you couldn't resolve it and ask.
 
 - **After pushing, hand the user a staging link**, deep-linked to the affected
   chart or page. Don't derive the name by hand:
