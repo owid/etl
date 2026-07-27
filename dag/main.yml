@@ -13,7 +13,7 @@ steps:
   data://external/owid_grapher/latest/population:
     - data://grapher/demography/2024-07-15/population
   data://external/owid_grapher/latest/gdp:
-    - data://grapher/worldbank_wdi/2026-07-14/wdi
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions

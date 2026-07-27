@@ -14,7 +14,7 @@ steps:
       - data://garden/ggdc/2022-12-23/maddison_database:
         - data://meadow/ggdc/2022-12-23/maddison_database:
           - snapshot://ggdc/2022-12-23/maddison_database.xlsx
-      - data://grapher/worldbank_wdi/2026-07-14/wdi
+      - data://grapher/worldbank_wdi/2026-07-27/wdi
 
   # Penn World Table
   data://garden/ggdc/2025-10-09/penn_world_table:
