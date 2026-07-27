@@ -377,6 +377,14 @@ tables:
               time: true
             map:
               colorScale:
+                customCategoryColors:
+                  "North America (EI)": "#CC7641"
+                  "South and Central America (EI)": "#B04E74"
+                  "Europe (EI)": "#526F9B"
+                  "CIS (EI)": "#92D3DE"
+                  "Middle East (EI)": "#C3A27C"
+                  "Africa (EI)": "#A07AB8"
+                  "Asia Pacific (EI)": "#6FA54F"
                 customCategoryLabels:
                   "North America (EI)": "North America"
                   "South and Central America (EI)": "South and Central America"
@@ -410,6 +418,14 @@ tables:
               time: true
             map:
               colorScale:
+                customCategoryColors:
+                  "North America (Ember)": "#CC7641"
+                  "Latin America and Caribbean (Ember)": "#B04E74"
+                  "Europe (Ember)": "#526F9B"
+                  "Africa (Ember)": "#A07AB8"
+                  "Middle East (Ember)": "#C3A27C"
+                  "Asia (Ember)": "#238A84"
+                  "Oceania (Ember)": "#5FB8C8"
                 customCategoryLabels:
                   "Africa (Ember)": "Africa"
                   "Asia (Ember)": "Asia"
