@@ -250,6 +250,30 @@ def combine_ei_and_ember_data(tb_review, tb_ember):
     return combined
 
 
+def derive_other_renewables_excluding_bioenergy(combined: Table) -> Table:
+    """Fill 'other renewables excluding bioenergy' where it is missing but derivable.
+
+    Ember reports the combined 'other renewables including bioenergy' and, separately, bioenergy, but
+    not always the geothermal/wave/tidal remainder ('excluding'). Wherever the combined figure and
+    bioenergy are both present but the remainder is missing, derive it as excluding = including -
+    bioenergy (the three are defined so that including = excluding + bioenergy, so this is exact).
+    Country-years that have only the combined figure (no bioenergy) are left missing on purpose.
+    """
+    inc = "other_renewables_including_bioenergy_generation__twh"
+    exc = "other_renewables_excluding_bioenergy_generation__twh"
+    bio = "bioenergy_generation__twh"
+    residual = combined[inc] - combined[bio]
+    n_negative = int((residual < -1e-6).sum())
+    if n_negative:
+        # Tiny mismatches between EI's combined figure and Ember's bioenergy; clip to zero.
+        log.warning("electricity_mix.other_renewables_excluding.negative_residual_clipped", n=n_negative)
+    derived = residual.clip(lower=0)
+    n_filled = int((combined[exc].isna() & derived.notna()).sum())
+    log.info("electricity_mix.derive_other_renewables_excluding", n_filled=n_filled)
+    combined[exc] = combined[exc].fillna(derived)
+    return combined
+
+
 def add_per_capita_variables(combined: Table) -> Table:
     """Add per capita variables (in kWh per person) to the combined EI and Ember table.
 
@@ -778,6 +802,10 @@ def run() -> None:
 
     # Check if carbon intensity needs to be recalculated.
     check_carbon_intensity(combined=combined)
+
+    # Derive 'other renewables excluding bioenergy' where it is missing but recoverable from the
+    # combined figure and bioenergy (case B). Done before per-capita and share so they inherit it.
+    combined = derive_other_renewables_excluding_bioenergy(combined=combined)
 
     # Add per capita variables.
     combined = add_per_capita_variables(combined=combined)
