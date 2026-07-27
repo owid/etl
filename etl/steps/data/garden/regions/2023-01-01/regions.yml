@@ -4830,9 +4830,7 @@
   defined_by: ei
   members:
     - CAN
-    - GRL
     - MEX
-    - SPM
     - USA
 - code: EI_SCA
   name: "South and Central America (EI)"
