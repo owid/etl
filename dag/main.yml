@@ -660,6 +660,18 @@ steps:
     - data://garden/itopf/2026-05-06/oil_spills:
       - data://meadow/itopf/2026-05-06/oil_spills:
         - snapshot://itopf/2026-05-06/oil_spills.pdf
+  # OECD Official Development Assistance (ODA)
+
+  data://grapher/oecd/2026-07-27/official_development_assistance:
+    - data://garden/oecd/2026-07-27/official_development_assistance:
+      - data://meadow/oecd/2026-07-27/official_development_assistance:
+        - snapshot://oecd/2026-07-27/official_development_assistance_dac5.zip
+        - snapshot://oecd/2026-07-27/official_development_assistance_dac2a.zip
+        - snapshot://oecd/2026-07-27/official_development_assistance_dac1.zip
+      - data://garden/demography/2024-07-15/population
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
