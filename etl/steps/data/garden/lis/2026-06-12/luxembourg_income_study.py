@@ -438,7 +438,7 @@ def sanity_check_percentiles(tb: Table) -> None:
     Warn-only checks on the percentiles table. Runs unconditionally (not gated behind DEBUG) so
     anomalies surface on normal builds, but only logs warnings — it never fails the build.
 
-    - Completeness: expect 99 percentiles per (country, year, welfare_type, equivalence_scale) group.
+    - Completeness: expect 99 populated thresholds per (country, year, welfare_type, equivalence_scale) group.
     - Monotonicity: thresholds must be non-decreasing across percentiles within each such group.
       equivalence_scale is part of the grouping (not just welfare-country-year): the two scales are
       separate distributions, so grouping without it would interleave them into false violations.
@@ -446,10 +446,15 @@ def sanity_check_percentiles(tb: Table) -> None:
     tb = tb.copy()
     group_cols = ["country", "year", "welfare_type", "equivalence_scale"]
 
-    # Completeness: expect 99 percentiles per distribution.
-    sizes = tb.groupby(group_cols, observed=True)["percentile"].transform("count")
-    if (sizes != 99).any():
-        paths.log.warning(f"{int((sizes != 99).sum())} percentile rows belong to groups without 99 percentiles.")
+    # Completeness: expect 99 populated thresholds per distribution. Count non-null `thr` (not the
+    # always-populated `percentile` key), so a group with all 99 rows but blank threshold values is
+    # flagged too — not just groups that are missing rows entirely.
+    populated = tb.groupby(group_cols, observed=True)["thr"].transform("count")
+    if (populated != 99).any():
+        n = int((populated != 99).sum())
+        paths.log.warning(
+            f"{n} percentile rows belong to groups without 99 populated thresholds (missing rows or null values)."
+        )
 
     # Monotonicity: thresholds must be non-decreasing across percentiles within each group.
     tb = tb.sort_values(group_cols + ["percentile"])
