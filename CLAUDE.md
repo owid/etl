@@ -421,7 +421,8 @@ See `.claude/docs/` for:
 
 If you are running in a Claude Code cloud sandbox (`CLAUDE_CODE_REMOTE=true`), read
 `.claude/docs/cloud-sandbox.md` **before starting work** — it covers the pre-created
-branch name, spurious `uv.lock` diffs, and the absence of a database.
+branch name, spurious `uv.lock` diffs, the absence of a database, which OWID hosts
+the egress proxy blocks, and how to resolve an `admin.owid.io` link you can't open.
 
 ## Individual Preferences
 
