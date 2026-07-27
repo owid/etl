@@ -177,7 +177,8 @@ SOURCE_COMPOSITION = {
     "fossil_fuels": "Fossil fuels are the sum of coal, oil, and gas.",
     "renewables": "Renewables include hydropower, solar, wind, geothermal, wave, tidal, and bioenergy, but not traditional biomass.",
     "low_carbon_energy": "Low-carbon energy is the sum of nuclear and renewables.",
-    "other_renewables": "Other renewables include geothermal, biomass, and waste.",
+    # No entry for "other_renewables": its composition is carried as a footnote (OTHER_RENEWABLES_NOTE),
+    # not inline in the subtitle, wherever "Other renewables" appears (standalone views and by-source stacks).
     # No entry for "solar_and_wind": the title already says "solar and wind", so a composition note
     # ("Combined energy supply from solar and wind") would just restate it.
 }
@@ -237,12 +238,19 @@ _DECOMPOSITION_STEM = {
 # energy, so traditional biomass is not part of the total. It gets its own biomass-inclusive chart.
 TRADITIONAL_BIOMASS_NOTE = "Traditional biomass is not included."
 _DECOMPOSITION_NOTES = {"renewables": TRADITIONAL_BIOMASS_NOTE, "total": TRADITIONAL_BIOMASS_NOTE}
+# "Other renewables" needs a footnote spelling out its contents wherever it appears: the standalone
+# other-renewables views (via SOURCE_NOTES below) and as a band in the by-source stacks (appended in
+# add_decomposition_views). It is deliberately kept out of the subtitle. In the primary-energy (EI) data,
+# biomass burned for power/heat sits inside "other renewables"; liquid biofuels are a separate source.
+OTHER_RENEWABLES_NOTE = "Other renewables include geothermal, biomass, and waste."
+
 # Footnotes for single-source views, keyed by source. The total views flag that traditional biomass is
 # excluded; the low-carbon views spell out what "renewables" contains (its subtitle only says low-carbon
-# energy is nuclear plus renewables).
+# energy is nuclear plus renewables); the other-renewables views spell out their contents.
 SOURCE_NOTES = {
     "total": TRADITIONAL_BIOMASS_NOTE,
     "low_carbon_energy": "Renewables include hydropower, solar, wind, geothermal, wave, tidal, and bioenergy, but not traditional biomass.",
+    "other_renewables": OTHER_RENEWABLES_NOTE,
 }
 
 
@@ -310,9 +318,15 @@ def add_decomposition_views(c) -> None:
                 "title": _decomposition_title(source, base_metric),
                 "subtitle": METRIC_UNIT_PHRASE[base_metric],
             }
-            note = _DECOMPOSITION_NOTES.get(source)
-            if note:
-                config["note"] = note
+            # Footnote: spell out "Other renewables" wherever it is a band, plus any aggregate-level note
+            # (e.g. traditional biomass is excluded from the total and renewables stacks).
+            notes = []
+            if "other_renewables" in constituents:
+                notes.append(OTHER_RENEWABLES_NOTE)
+            if source in _DECOMPOSITION_NOTES:
+                notes.append(_DECOMPOSITION_NOTES[source])
+            if notes:
+                config["note"] = " ".join(notes)
             new_view = View(
                 dimensions={"source": source, "metric": new_metric},
                 indicators=ViewIndicators(y=indicators),

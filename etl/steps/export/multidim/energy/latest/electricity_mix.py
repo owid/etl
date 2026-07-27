@@ -180,10 +180,13 @@ METRIC_UNIT_PHRASE = {
     "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
     "share_of_generation": "Measured as a percentage of total electricity generation.",
 }
-# Footnote for the stacked "by source" views only, where the coalesced other-renewables column lumps
-# pre-2000 bioenergy into "other renewables" for the countries that can't be split that far back. The
-# standalone views use the clean excluding column, so their subtitle is the plain composition below.
-OTHER_RENEWABLES_NOTE = (
+# Footnote spelling out what "Other renewables" contains, required wherever it appears (kept out of the
+# subtitle). The standalone other-renewables views use the clean excluding-bioenergy column
+# (geothermal/wave/tidal only), so they get the plain note. The stacked "by source" views use the coalesced
+# column, which lumps pre-2000 bioenergy into "other renewables" for countries that can't be split that far
+# back, so they get the extended note with the caveat.
+OTHER_RENEWABLES_NOTE = "Other renewables include geothermal, wave, and tidal."
+OTHER_RENEWABLES_STACKED_NOTE = (
     "Other renewables include geothermal, wave, and tidal; bioenergy may be included prior to 2000 due to "
     "limited data availability."
 )
@@ -191,10 +194,16 @@ SOURCE_COMPOSITION = {
     "fossil": "Fossil fuels include coal, oil, and gas.",
     "renewables": "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.",
     "low_carbon": "Low-carbon sources are the sum of nuclear and renewables.",
-    "other_renewables": "Other renewables include geothermal, wave, and tidal.",
+    # No entry for "other_renewables": its composition is carried as a footnote (OTHER_RENEWABLES_NOTE),
+    # not inline in the subtitle.
     # No entry for "solar_and_wind": the title already says "solar and wind", so a composition note
     # ("Combined electricity generation from solar and wind") would just restate it.
     "wind": "Includes both onshore and offshore wind.",
+}
+
+# Footnotes for standalone single-source views, keyed by source.
+SOURCE_NOTES = {
+    "other_renewables": OTHER_RENEWABLES_NOTE,
 }
 # Total-only metrics have a single fixed subtitle (they only exist for source "total").
 TOTAL_ONLY_SUBTITLES = {
@@ -299,9 +308,10 @@ def add_decomposition_views(c) -> None:
                 "title": _decomposition_title(source, base_metric),
                 "subtitle": METRIC_UNIT_PHRASE[base_metric],
             }
-            # Views that split bioenergy out get the footnote explaining the pre-2000 caveat.
-            if "bioenergy" in constituents:
-                config["note"] = OTHER_RENEWABLES_NOTE
+            # The stacked "other renewables" band uses the coalesced column, so it needs the extended
+            # footnote flagging that pre-2000 bioenergy may be lumped in.
+            if "other_renewables" in constituents:
+                config["note"] = OTHER_RENEWABLES_STACKED_NOTE
             new_view = View(
                 dimensions={"source": source, "metric": new_metric},
                 indicators=ViewIndicators(y=indicators),
@@ -656,4 +666,7 @@ def set_view_titles(c, dims_max: dict) -> None:
         config["title"] = _view_title(source, metric)
         config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric, dims_max.get((source, metric)))
+        note = SOURCE_NOTES.get(source)
+        if note:
+            config["note"] = note
         v.config = config
