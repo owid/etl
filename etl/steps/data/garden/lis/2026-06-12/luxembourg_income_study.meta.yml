@@ -1201,11 +1201,11 @@ tables:
   percentiles:
     variables:
       thr:
-        title: Threshold income (percentile <<percentile>>, {definitions.welfare_type}, {definitions.equivalence_scale})
+        title: Threshold income (percentile <<percentile>>, {definitions.per_period}, {definitions.welfare_type}, {definitions.equivalence_scale})
         unit: international-$ in {definitions.ppp_version} prices
         short_unit: "$"
         description_short: |-
-          The level of income per year below which <<percentile>>% of the population falls.
+          The level of income {definitions.per_period} below which <<percentile>>% of the population falls.
         description_key:
           - "{definitions.description_key_lis}"
           - "{definitions.description_key_welfare_type}"
@@ -1213,6 +1213,6 @@ tables:
           - "{definitions.description_key_ppp}"
         display:
           name: Threshold income (percentile <<percentile>>) ({definitions.welfare_type})
-          numDecimalPlaces: 0
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
           <<: *common_display
 

@@ -157,6 +157,9 @@ def run() -> None:
     )
     sanity_check_percentiles(tb_percentiles)
 
+    # Add the period dimension (day, month, year) to the annual thresholds, after the sanity check.
+    tb_percentiles = add_period_dimension_percentiles(tb=tb_percentiles)
+
     # Improve table format.
     tb_poverty = tb_poverty.format(
         ["country", "year", "poverty_line", "welfare_type", "equivalence_scale"], short_name="poverty"
@@ -166,7 +169,7 @@ def run() -> None:
     )
     tb_inequality = tb_inequality.format(["country", "year", "welfare_type", "equivalence_scale"])
     tb_percentiles = tb_percentiles.format(
-        ["country", "year", "welfare_type", "equivalence_scale", "percentile"], short_name="percentiles"
+        ["country", "year", "welfare_type", "equivalence_scale", "percentile", "period"], short_name="percentiles"
     )
 
     #
@@ -384,6 +387,31 @@ def process_percentiles(tb: Table) -> Table:
 
     # Drop the original indicator column.
     tb = tb.drop(columns=["indicator"])
+
+    return tb
+
+
+def add_period_dimension_percentiles(tb: Table) -> Table:
+    """
+    Add period dimension to the percentiles table (day, month, year).
+
+    The source thresholds are annual, so — the same way as the incomes table (see
+    `add_period_dimension`) — the daily value is the annual one divided by 365 and the monthly value
+    by 12. Dividing the Variable by a scalar preserves its origins.
+    """
+    tb_year = tb.copy()
+    tb_day = tb.copy()
+    tb_month = tb.copy()
+
+    tb_day["thr"] = tb_day["thr"] / 365
+    tb_month["thr"] = tb_month["thr"] / 12
+
+    tb_year["period"] = "year"
+    tb_day["period"] = "day"
+    tb_month["period"] = "month"
+
+    # Concatenate all the tables
+    tb = pr.concat([tb_year, tb_day, tb_month], ignore_index=True, sort=False)
 
     return tb
 
