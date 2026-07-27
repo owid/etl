@@ -13,12 +13,12 @@ meta:
     attribution_short: WHO
     url_main: https://www.cdc.gov/bird-flu/php/surveillance/chart-epi-curve-ah5n1.html
     url_download: https://www.cdc.gov/bird-flu/modules/charts/past-reported-global-cases_2.json
-    date_accessed: 2026-07-27
+    date_accessed: '2026-07-27'
     date_published: "2026-07-13"
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
 outs:
-  - md5: 237584eade5af31ae5ad928ee24730e0
-    size: 26879
+  - md5: b50aa564ef5882f20c4f9883dcb8f5d7
+    size: 26726
     path: avian_influenza_ah5n1.csv
