@@ -205,8 +205,8 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
         description_short: |-
           Regions as defined by <Provider full name>.
         type: ordinal
-        sort:
-          - <Region> (<Provider>)              # legend order
+        sort:                                    # legend/map order — see ordering rule below
+          - <Region> (<Provider>)
           - ...
         origins:
           - *origins_<provider>
@@ -221,6 +221,8 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
                 customHiddenCategories:
                   "No data": true
 ```
+
+> **Ordering rule for `sort`:** order the regions so they read **roughly left-to-right across a world map** — i.e. by approximate west-to-east longitude, starting with North America. A good default sweep is: North America → (Central/South America or Latin America) → Europe → Africa → Middle East → (CIS / Central Asia) → Asia (Pacific) → Oceania. Drop the regions the provider doesn't have and keep the rest in this relative order. This `sort` drives the map legend order **and** the categorical color assignment (colors are handed out in sort order), so keep the same order in the owid-grapher `customRegionDisplayOrder[<provider>]` (Step 9) and in the region-definition chart (Step 7) so the legend, the chart, and the hover all agree.
 
 **6c. Cross-tier back-fill** — if Step 3 found a region shared across tiers, add the masked back-fill to `grapher/regions/2023-01-01/regions.py` after the inversion loop (see the existing `process_un_definitions` example for the shape).
 
