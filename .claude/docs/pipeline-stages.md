@@ -12,7 +12,7 @@ Basic cleaning and format standardization. Minimal transformations - mostly load
 
 ### Garden (`etl/steps/data/garden/`)
 Business logic layer:
-- Country harmonization via `geo.harmonize_countries()`
+- Country harmonization via `paths.regions.harmonize_names()`
 - Indicator calculations and derivations
 - Metadata enrichment
 - Data validation
@@ -20,8 +20,8 @@ Business logic layer:
 ### Grapher (`etl/steps/data/grapher/`)
 MySQL database ingestion for OWID visualization platform.
 
-### Export (`etl/steps/data/export/`)
-Final outputs - explorers, collections, APIs.
+### Export (`etl/steps/export/`)
+Final outputs - explorers, collections, APIs. Addressed as `export://...`, not `data://export/...`.
 
 ## Step URI Pattern
 
