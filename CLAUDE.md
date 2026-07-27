@@ -116,20 +116,14 @@ Internal terms that recur across this guide, the skills, and the codebase:
 
 Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
-**"The step completed" is not "the data is right".** A step exiting 0 says
-nothing about its output — a unit regression, a silent row drop, or a no-op
-rebuild all finish cleanly. Whenever you run a step on someone's behalf, report
-what came out of it, not just that it ran:
+**"The step completed" is not "the data is right".** After running a step for
+someone, report what came out of it: row count, year range, entities, and a few
+values from the latest year, plus whether anything changed against the published
+catalog. `✅ No differences found` is itself a result worth reporting.
 
 ```bash
-.venv/bin/etl diff REMOTE data/ --include <dataset> --verbose   # did values change vs the published catalog?
+.venv/bin/etl diff REMOTE data/ --include <dataset> --verbose
 ```
-
-Alongside that, state the shape of the output — row count, year range, entities,
-and a couple of actual values from the latest year — so the numbers are
-checkable by a human. `✅ No differences found` is a real result worth
-reporting: it means the rebuild reproduced published data and there was nothing
-to fix.
 
 ### Running Snapshot Steps
 

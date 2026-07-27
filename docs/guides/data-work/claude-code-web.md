@@ -48,44 +48,35 @@ power users).
 
 ### Setup script
 
-The sandbox image ships an old `uv` and an empty package cache, which makes
-every session slow to start and can silently rewrite `uv.lock` (see below).
-This script fixes both. It runs once, and the resulting filesystem is
-snapshotted, so later sessions skip it entirely; the snapshot rebuilds when you
-edit the environment settings and automatically after ~7 days.
+The sandbox ships a `uv` too old to read our `pyproject.toml` (it silently
+rewrites `uv.lock`) and an empty package cache, so every session starts slowly.
+This script fixes both. It runs once and the filesystem is snapshotted, so later
+sessions skip it; the snapshot rebuilds when you edit the environment settings
+and automatically after ~7 days.
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# The sandbox has shipped uv 0.8.17, which cannot parse the relative
-# `exclude-newer = "3 days"` in pyproject.toml: it discards the whole [tool.uv]
-# table, concludes the lockfile's cutoff was removed, and re-resolves every
-# dependency — a ~2000-line uv.lock diff that silently bumps hundreds of
-# packages. uv 0.10 is the first release that handles it. The install script is
-# used rather than `uv self update`, which hits GitHub API rate limits here.
+# uv >= 0.10 is required. `uv self update` hits GitHub API rate limits here.
 curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"
 
-# The setup script runs before the session's repo is cloned, so clone it here
-# to warm the uv cache. The .venv itself cannot be reused (it hard-codes
-# absolute paths), but ~/.cache/uv goes into the snapshot, which turns the
-# session's own `uv sync` from a multi-minute download into a few seconds.
+# This runs before the session's repo is cloned, so clone it here to warm
+# ~/.cache/uv, which the snapshot keeps. (The .venv itself can't be reused — it
+# hard-codes absolute paths — but sessions rebuild it in seconds from cache.)
 git clone --depth 1 https://github.com/owid/etl /opt/etl-setup
 cd /opt/etl-setup
 UV_HTTP_TIMEOUT=300 uv sync --all-extras --group dev
 ```
 
 Also add `UV_HTTP_TIMEOUT=300` to the environment variables. `--all-extras`
-pulls `sentence-transformers`, and with it torch and the CUDA stack — 4.1 GB of
-linux-only wheels that don't exist on macOS. Downloading those in parallel
-saturates the sandbox's egress proxy, and uv's 30-second default is a *read*
-timeout, so any other download that goes half a minute without receiving a byte
-is killed. Which package dies varies from run to run.
+pulls 4.1 GB of linux-only torch/CUDA wheels; downloading them saturates the
+sandbox's egress proxy until some other download stalls past uv's 30-second read
+timeout.
 
-Sessions still build their own `.venv` — that part runs from
-`scripts/remote_setup.sh`, wired as a `SessionStart` hook — but from a warm
-cache and with a current uv.
+Sessions still build their own `.venv` via `scripts/remote_setup.sh`, wired as a
+`SessionStart` hook.
 
 ## Create a dataset
 
@@ -119,22 +110,15 @@ claude --cloud "Run the cherry blossom step and report what breaks"
 ```
 
 This starts a cloud session on the same environment while you keep working
-locally. The VM clones from GitHub rather than from your machine, so **push
-your branch first**. Then:
+locally. The VM clones from GitHub rather than from your machine, so **push your
+branch first**. Then `/tasks` lists running sessions (each `claude --cloud` is
+its own, so they can run in parallel), and `/teleport` (or `/tp`) pulls one into
+your terminal with the branch checked out and the full conversation history
+loaded. Neither flag appears in `claude --help`, but both work.
 
-- `/tasks` — check on running sessions (each `claude --cloud` is its own
-  session, so you can start several in parallel).
-- `/teleport` (or `/tp`) — pull a session into your terminal: it checks out the
-  branch and loads the full conversation history, so the local session
-  continues where the cloud one left off.
-
-Neither flag appears in `claude --help`, but both work.
-
-This is the practical way to debug the cloud environment itself: run
-`check-tools` in a session to get the exact versions of everything installed
-(the command only exists there), then reproduce locally against that specific
-version rather than trying to recreate the whole VM — there is no published
-image for it.
+To debug the environment itself, run `check-tools` in a session for exact tool
+versions — the command only exists there — then reproduce against that version
+locally. There is no published image to run.
 
 !!! note
 

@@ -10,11 +10,10 @@
 #     so we cd there if set and otherwise derive the root from this script.
 #   * We do NOT use `set -e`, and we always `exit 0`: a SessionStart hook hiccup
 #     must never block the session from starting.
-#   * The `.venv` must be created in the session's own checkout, so building it
-#     belongs here rather than in the cloud environment "setup script" (which
-#     runs before the repo is cloned). The setup script still matters: it
-#     installs a current uv and warms the uv cache, both of which land in the
-#     environment snapshot. See docs/guides/data-work/claude-code-web.md.
+#   * The `.venv` must live in the session's own checkout, so it's built here
+#     rather than in the environment setup script, which runs before the repo is
+#     cloned and instead installs uv and warms its cache. See
+#     docs/guides/data-work/claude-code-web.md.
 #   * The hook also runs on `resume`, so a rare transient `uv sync` failure at
 #     first boot self-heals on the next resume — no in-script retry needed.
 
@@ -46,17 +45,10 @@ if [ ! -f pyproject.toml ]; then
 fi
 
 # --- Make sure uv is new enough ---------------------------------------------
-# The sandbox image has shipped uv 0.8.17, which cannot parse the relative
-# `exclude-newer = "3 days"` in pyproject.toml. On that failure uv discards the
-# WHOLE [tool.uv] table, concludes the lockfile's cutoff was removed, and
-# re-resolves every dependency — a ~2000-line uv.lock diff that silently bumps
-# hundreds of packages and can leak into an unrelated PR. uv 0.10 is the first
-# release that handles it; anything older re-resolves.
-#
-# The environment setup script installs a current uv (and the snapshot keeps
-# it), so this is a fallback for environments created before that script
-# existed. `uv self update` is not used: it needs the GitHub API and hits
-# anonymous rate limits in the sandbox.
+# Below 0.10, uv can't parse `exclude-newer = "3 days"` in pyproject.toml and
+# silently re-resolves the whole lockfile. The environment setup script installs
+# a current uv, so this only fires in environments created before it existed.
+# (`uv self update` hits GitHub API rate limits here.)
 UV_MIN_MINOR=10
 echo ""
 if uv --version | awk '{split($2, v, "."); exit !(v[1] > 0 || v[2] >= '"$UV_MIN_MINOR"')}'; then
@@ -74,16 +66,13 @@ else
 fi
 
 # --- Install dependencies (the critical step) -------------------------------
-# `uv sync` is exactly what `make .venv` runs underneath, without the extra
-# install-hooks / sanity-check layers that aren't needed in a cloud sandbox.
-# uv is idempotent, so it's safe to run on every session/resume. Capture output
-# so a failure shows WHY (uv's own error) instead of a bare "failed".
+# `uv sync` is what `make .venv` runs underneath, minus the install-hooks layer
+# a sandbox doesn't need, and it's idempotent across resumes. Output is captured
+# so a failure shows uv's own error rather than a bare "failed".
 #
-# UV_HTTP_TIMEOUT is raised from uv's 30s default, which is a *read* timeout
-# (30s without receiving a byte), not a transfer timeout. On a cold cache
-# --all-extras pulls torch and the CUDA stack — 4.1 GB of linux-only wheels —
-# and downloading those in parallel saturates the sandbox's egress proxy until
-# some unrelated download stalls out. Which one dies varies from run to run.
+# uv's 30s default is a *read* timeout, and on a cold cache --all-extras pulls
+# 4.1 GB of linux-only torch/CUDA wheels that saturate the egress proxy until
+# some other download stalls out — hence the longer timeout.
 echo ""
 echo "📦 Installing dependencies (uv sync)..."
 INSTALL_START=$(date +%s)
