@@ -161,7 +161,7 @@ wizard = [
     "sentence-transformers>=5.1.0",
     # Transitive via sentence-transformers, but declared here because
     # [tool.uv.sources] only binds direct dependencies.
-    "torch>=2.0",
+    "torch>=2.13.0",
     "pandas-gbq>=0.25.0",
     "wfork-streamlit-profiler>=0.2.7",
     "google-api-python-client>=2.127.0",
