@@ -69,8 +69,8 @@ definitions:
     producer: Energy Institute
     title: Energy Institute world regions
     url_main: https://www.energyinst.org/statistical-review/
-    date_accessed: "2025-06-27"
-    citation_full: Energy Institute - Statistical Review of World Energy (2025).
+    date_accessed: "2026-07-02"
+    citation_full: Energy Institute - Statistical Review of World Energy (2026).
     attribution_short: Energy Institute
   origins_ember: &origins_ember
     producer: Ember
