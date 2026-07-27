@@ -382,7 +382,6 @@ def add_share_variables(combined: Table) -> Table:
         "oil_generation__twh",
         "other_renewables_excluding_bioenergy_generation__twh",
         "other_renewables_including_bioenergy_generation__twh",
-        "other_renewables_generation__twh",
         "renewable_generation__twh",
         "solar_generation__twh",
         "total_generation__twh",

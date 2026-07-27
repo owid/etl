@@ -60,7 +60,7 @@ dimensions:
         group: "Individual sources"
       - slug: "other_renewables"
         name: "Other renewables"
-        description: "Geothermal, wave, and tidal; bioenergy may be included before 2000"
+        description: "Geothermal, wave, and tidal"
         group: "Individual sources"
   - slug: "metric"
     name: "Metric"
