@@ -146,12 +146,15 @@ SOURCE_TITLE_NAMES = {
 
 def _view_title(source: str, metric: str) -> str:
     if source == "total":
+        # "Primary energy use" (not bare "Primary energy"), so the quantity reads as a complete noun
+        # phrase. The precise term "total energy supply" stays DoD'd in the subtitle. Source-specific
+        # titles below keep "primary energy from {source}", where "from ..." already completes the phrase.
         return {
-            "total": "Primary energy",
-            "per_capita": "Primary energy per person",
-            "share": "Primary energy",
-            "annual_change": "Annual change in primary energy",
-            "annual_change_pct": "Annual percentage change in primary energy",
+            "total": "Primary energy use",
+            "per_capita": "Primary energy use per person",
+            "share": "Primary energy use",
+            "annual_change": "Annual change in primary energy use",
+            "annual_change_pct": "Annual percentage change in primary energy use",
         }[metric]
     name = SOURCE_TITLE_NAMES[source]
     return {
@@ -227,7 +230,7 @@ SOURCE_COLORS = {
 _DECOMPOSITION_METRICS = {"total": "by_source", "per_capita": "by_source_per_capita"}
 # Title stem per aggregate.
 _DECOMPOSITION_STEM = {
-    "total": "Primary energy",
+    "total": "Primary energy use",
     "fossil_fuels": "Fossil fuel supply",
     "renewables": "Renewable energy supply",
     "low_carbon_energy": "Low-carbon energy supply",
