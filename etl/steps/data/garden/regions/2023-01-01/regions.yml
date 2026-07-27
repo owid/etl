@@ -4849,7 +4849,6 @@
     - BOL
     - BRA
     - BRB
-    - BVT
     - CHL
     - COL
     - CRI
@@ -4878,7 +4877,6 @@
     - PER
     - PRI
     - PRY
-    - SGS
     - SLV
     - SUR
     - SXM
@@ -4985,7 +4983,6 @@
   defined_by: ei
   members:
     - AGO
-    - ATF
     - BDI
     - BEN
     - BFA
@@ -5062,10 +5059,8 @@
     - FSM
     - GUM
     - HKG
-    - HMD
     - IDN
     - IND
-    - IOT
     - JPN
     - KHM
     - KIR
