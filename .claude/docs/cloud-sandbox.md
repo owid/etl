@@ -22,8 +22,19 @@ script, environment variables), see
 - **There is no MySQL in the sandbox and staging servers are on Tailscale.** So
   `--grapher` (the MySQL upsert), `make query`, and `OWID_ENV.read_sql` are not
   available. Run steps without `--grapher`: that still builds meadow, garden,
-  and the grapher dataset feather. Anything DB-side — variable upserts,
-  chart-diff, the admin — happens on the PR's staging server after you push.
+  and the grapher dataset feather. **This overrides the root CLAUDE.md's "for
+  `grapher://` steps, always add `--grapher`" rule** — following it here only
+  buys you `No grapher user id has been set in the environment` and a wasted
+  run. Anything DB-side — variable upserts, chart-diff, the admin — happens on
+  the PR's staging server after you push.
+
+- **Fetch upstream dependencies instead of rebuilding them:** `PREFER_DOWNLOAD=1
+  .venv/bin/etlr <step> --private` pulls already-published upstream datasets
+  from the catalog rather than recomputing the whole chain inside the VM. It
+  makes no difference for a small step, but without it a step sitting on a heavy
+  dependency (population, WDI, FAOSTAT) rebuilds all of it. Needs `Full` network
+  access, and it only works for versions already in the catalog — never for the
+  step you are currently building.
 
 - **To check a build without a database, diff it against the remote catalog:**
   `.venv/bin/etl diff REMOTE data/ --include <dataset>` (add `--verbose`, or
