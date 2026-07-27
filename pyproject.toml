@@ -90,7 +90,16 @@ dependencies = [
 exclude-newer = "3 days"
 link-mode = "hardlink"
 
+# PyPI ships torch bundled with the CUDA runtime on Linux (~4 GB of nvidia-*
+# wheels). We run embeddings on CPU everywhere, so take the CPU build instead.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [tool.uv.sources]
+# macOS wheels on PyPI are already CPU-only, so this only applies to Linux.
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
 owid-owl = { path = "lib/owl", editable = true }
 owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
@@ -150,6 +159,9 @@ wizard = [
     "plotly>=5.23.0",
     "statsmodels>=0.14.4",
     "sentence-transformers>=5.1.0",
+    # Transitive via sentence-transformers, but declared here because
+    # [tool.uv.sources] only binds direct dependencies.
+    "torch>=2.0",
     "pandas-gbq>=0.25.0",
     "wfork-streamlit-profiler>=0.2.7",
     "google-api-python-client>=2.127.0",
