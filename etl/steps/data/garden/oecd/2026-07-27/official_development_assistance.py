@@ -439,7 +439,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
 
     # Assert if the official donors aggregation is in the recipient dataset
     assert set(OFFICIAL_DONORS.keys()).issubset(set(tb_recipient["donor"].unique())), (
-        f"The official donot aggregate set is not in the recipient dataset: {OFFICIAL_DONORS.keys()}"
+        f"The official donors aggregate set is not in the recipient dataset: {OFFICIAL_DONORS.keys()}"
     )
 
     # Rename donor categories set in DONORS_TOTALS and OFFICIAL_DONORS
@@ -453,7 +453,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     # Define columns to sum
     cols = [col for col in tb_donor_categories.columns if col not in ["country", "year", "donor", "oda_share_gni"]]
 
-    # Create a new table with the sum of all the columns not in country year donor and oda_share_gni in tb_donor_categories and name the colum donor as 'Total aid'
+    # Create a new table with the sum of all the columns not in country year donor and oda_share_gni in tb_donor_categories and name the column donor as 'Total aid'
     # I set min_count to ensure that the sum is only calculated if all donors have data
     tb_donor_categories_grouped = tb_donor_categories.groupby(["country", "year"], as_index=False, observed=True)[
         cols
