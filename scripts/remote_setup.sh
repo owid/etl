@@ -69,16 +69,12 @@ fi
 # `uv sync` is what `make .venv` runs underneath, minus the install-hooks layer
 # a sandbox doesn't need, and it's idempotent across resumes. Output is captured
 # so a failure shows uv's own error rather than a bare "failed".
-#
-# uv's 30s default is a *read* timeout, and on a cold cache --all-extras pulls
-# 4.1 GB of linux-only torch/CUDA wheels that saturate the egress proxy until
-# some other download stalls out — hence the longer timeout.
 echo ""
 echo "📦 Installing dependencies (uv sync)..."
 INSTALL_START=$(date +%s)
 
 SYNC_LOG=$(mktemp)
-if UV_HTTP_TIMEOUT="${UV_HTTP_TIMEOUT:-300}" uv sync --all-extras --group dev >"$SYNC_LOG" 2>&1; then
+if uv sync --all-extras --group dev >"$SYNC_LOG" 2>&1; then
   echo "✅ Dependencies installed ($(($(date +%s) - INSTALL_START))s)"
 else
   echo "❌ uv sync failed — the session may not have a working .venv:"

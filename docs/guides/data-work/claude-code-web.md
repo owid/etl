@@ -67,13 +67,8 @@ export PATH="$HOME/.local/bin:$PATH"
 # hard-codes absolute paths — but sessions rebuild it in seconds from cache.)
 git clone --depth 1 https://github.com/owid/etl /opt/etl-setup
 cd /opt/etl-setup
-UV_HTTP_TIMEOUT=300 uv sync --all-extras --group dev
+uv sync --all-extras --group dev
 ```
-
-Also add `UV_HTTP_TIMEOUT=300` to the environment variables. `--all-extras`
-pulls 4.1 GB of linux-only torch/CUDA wheels; downloading them saturates the
-sandbox's egress proxy until some other download stalls past uv's 30-second read
-timeout.
 
 Sessions still build their own `.venv` via `scripts/remote_setup.sh`, wired as a
 `SessionStart` hook.
