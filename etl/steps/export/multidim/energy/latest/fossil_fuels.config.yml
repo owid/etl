@@ -3,6 +3,12 @@ title:
   title_variant: ""
 default_selection:
   - "World"
+# Default to an individual fuel (coal) rather than the "Total" aggregate: several metrics (imports,
+# exports, net imports, reserves) only exist per fuel, and defaulting to the aggregate hides them.
+default_dimensions:
+  fuel: "coal"
+  metric: "production"
+  per_capita: "total"
 topic_tags:
   - "Energy"
   - "Fossil Fuels"
