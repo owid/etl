@@ -79,9 +79,11 @@ fi
 # uv is idempotent, so it's safe to run on every session/resume. Capture output
 # so a failure shows WHY (uv's own error) instead of a bare "failed".
 #
-# UV_HTTP_TIMEOUT is raised from uv's 30s default: some wheels here are large
-# (grpcio, torch) and the sandbox's egress proxy is slow enough that the
-# default times out on a cold cache.
+# UV_HTTP_TIMEOUT is raised from uv's 30s default, which is a *read* timeout
+# (30s without receiving a byte), not a transfer timeout. On a cold cache
+# --all-extras pulls torch and the CUDA stack — 4.1 GB of linux-only wheels —
+# and downloading those in parallel saturates the sandbox's egress proxy until
+# some unrelated download stalls out. Which one dies varies from run to run.
 echo ""
 echo "📦 Installing dependencies (uv sync)..."
 INSTALL_START=$(date +%s)

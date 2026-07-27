@@ -76,9 +76,12 @@ cd /opt/etl-setup
 UV_HTTP_TIMEOUT=300 uv sync --all-extras --group dev
 ```
 
-Also add `UV_HTTP_TIMEOUT=300` to the environment variables: uv's 30-second
-default times out on large wheels (grpcio, torch) through the sandbox's egress
-proxy.
+Also add `UV_HTTP_TIMEOUT=300` to the environment variables. `--all-extras`
+pulls `sentence-transformers`, and with it torch and the CUDA stack — 4.1 GB of
+linux-only wheels that don't exist on macOS. Downloading those in parallel
+saturates the sandbox's egress proxy, and uv's 30-second default is a *read*
+timeout, so any other download that goes half a minute without receiving a byte
+is killed. Which package dies varies from run to run.
 
 Sessions still build their own `.venv` — that part runs from
 `scripts/remote_setup.sh`, wired as a `SessionStart` hook — but from a warm
