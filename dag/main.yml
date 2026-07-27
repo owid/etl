@@ -580,6 +580,16 @@ steps:
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/demography/2024-07-15/population
 
+  data://grapher/worldbank_wdi/2026-07-27/wdi:
+    - data://garden/worldbank_wdi/2026-07-27/wdi:
+      - data://meadow/worldbank_wdi/2026-07-27/wdi:
+        - snapshot://worldbank_wdi/2026-07-27/wdi.zip
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/regions/2023-01-01/regions
+      - snapshot://worldbank_wdi/2026-07-27/wdi.zip
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+
   #
   # Trust in US government - Pew Research Center
   #

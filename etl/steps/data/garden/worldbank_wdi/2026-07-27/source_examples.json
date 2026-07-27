@@ -1,0 +1,152 @@
+[
+  {
+    "rawName": "ASPIRE: The Atlas of Social Protection - Indicators of Resilience and Equity, The World Bank. Data are based on national representative household surveys. (datatopics.worldbank.org/aspire/)",
+    "dataPublisherSource": "The Atlas of Social Protection Indicators of Resilience and Equity - World Bank",
+    "name": "ASPIRE: The Atlas of Social Protection, World Bank"
+  },
+  {
+    "rawName": "Brauer, M. et al. 2017, for the Global Burden of Disease Study 2017.",
+    "dataPublisherSource": "Brauer et al. (2017)",
+    "name": "Brauer et al. (2017), via World Bank"
+  },
+  {
+    "rawName": "Data collected by the Lancet Commission on Global Surgery (www.lancetglobalsurgery.org); Data collected by WHO Collaborating Centre for Surgery and Public Health at Lund University from various sources including Ministries of Health or equivalent national regulatory bodies, national official entities such as medical councils, Eurostat, OECD, WHO Euro Health For All Database, WHO EURO Technical resources for health Database; BMJ Glob Health.",
+    "dataPublisherSource": "Lancet Commission on Global Surgery, World Health Organization Collaborating Centre for Surgery and Public Health at Lund University",
+    "name": "Lancet Commission on Global Surgery, WHO, and BMJ Global Health, via World Bank"
+  },
+  {
+    "rawName": "Debt service is the sum of principle repayments and interest actually paid in currency, goods, or services. This series differs from the standard debt to exports series. It covers only long-term public and publicly guaranteed debt and repayments (repurchases and charges) to the IMF. Exports of goods and services include primary income, but do not include workers' remittances.",
+    "dataPublisherSource": "International Debt Statistics - World Bank",
+    "name": "International Debt Statistics - World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS)",
+    "dataPublisherSource": "Demographic and Health Surveys",
+    "name": "Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS), Multiple Indicator Cluster Surveys (MICS), and other surveys",
+    "dataPublisherSource": "Demographic and Health Surveys, Multiple Indicator Cluster Surveys, other surveys",
+    "name": "Demographic and Health Surveys (DHS), Multiple Indicator Cluster Surveys (MICS), and other surveys, via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys (DHS).",
+    "dataPublisherSource": "Demographic and Health Surveys (DHS)",
+    "name": "Demographic and Health Surveys (DHS), via World Bank"
+  },
+  {
+    "rawName": "Demographic and Health Surveys, and UNAIDS.",
+    "dataPublisherSource": "Demographic and Health Surveys, UNAIDS",
+    "name": "Demographic and Health Surveys (DHS), and UNAIDS, via World Bank"
+  },
+  {
+    "rawName": "Derived using World Bank national accounts data and OECD National Accounts data files, and employment data from International Labour Organization, ILOSTAT database.",
+    "dataPublisherSource": "ILOSTAT database - International Labour Organization, National accounts data - World Bank / OECD",
+    "name": "World Bank and OECD national accounts, and ILOSTAT"
+  },
+  {
+    "rawName": "World Bank staff estimates based on age distributions of United Nations Population Division's World Population Prospects: 2024 Revision.",
+    "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2024)",
+    "name": "World Bank based on data from the UN Population Division"
+  },
+  {
+    "rawName": "Food and Agriculture Organization of the United Nations (FAO)",
+    "dataPublisherSource": "Food and Agriculture Organization of the United Nations",
+    "name": "Food and Agriculture Organization of the United Nations, via World Bank"
+  },
+  {
+    "rawName": "Inter-Parliamentary Union (IPU) (www.ipu.org).  For the year of 1998, the data is as of August 10, 1998.",
+    "dataPublisherSource": "Inter-Parliamentary Union",
+    "name": "Inter-Parliamentary Union (IPU), via World Bank"
+  },
+  {
+    "rawName": "United Nations Population Division, Trends in Total Migrant Stock: 2008 Revision.",
+    "dataPublisherSource": "Trends in Total Migrant Stock - UN Population Division (2008)",
+    "name": "United Nations Population Division, via World Bank"
+  },
+  {
+    "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, Geographical Distribution of Financial Flows to Developing Countries, Development Co-operation Report, and International Development Statistics database. Data are available online at: www.oecd.org/dac/stats/idsonline. World Bank gross capital formation estimates are used for the denominator.",
+    "dataPublisherSource": "Geographical Distribution of Financial Flows to Developing Countries - OECD Development Assistance Committee, Development Co-operation Report - OECD Development Assistance Committee, International Development Statistics Database - OECD, Gross capital formation estimates - World Bank",
+    "name": "Development Assistance Committee - OECD, via World Bank"
+  },
+  {
+    "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, Geographical Distribution of Financial Flows to Developing Countries, Development Co-operation Report, and International Development Statistics database. Data are available online at: www.oecd.org/dac/stats/idsonline. World Bank imports of good and services estimates are used for the denominator.",
+    "dataPublisherSource": "Geographical Distribution of Financial Flows to Developing Countries - OECD Development Assistance Committee, Development Co-operation Report - OECD Development Assistance Committee, International Development Statistics Database - OECD, Imports estimates - World Bank",
+    "name": "Development Assistance Committee - OECD, via World Bank"
+  },
+  {
+    "rawName": "Food and Agriculture Organization and World Bank population estimates.",
+    "dataPublisherSource": "Food and Agriculture Organization of the United Nations, Population estimates - World Bank",
+    "name": "Food and Agriculture Organization of the United Nations and World Bank"
+  },
+  {
+    "rawName": "Food and Agriculture Organization, AQUASTAT data, and World Bank and OECD GDP estimates.",
+    "dataPublisherSource": "AQUASTAT Database - Food and Agriculture Organization of the United Nations, GDP estimates - World Bank / OECD",
+    "name": "Food and Agriculture Organization of the United Nations, OECD, and World Bank"
+  },
+  {
+    "rawName": "Food and Agriculture Organization, AQUASTAT data.",
+    "dataPublisherSource": "AQUASTAT Database - Food and Agriculture Organization of the United Nations",
+    "name": "Food and Agriculture Organization of the United Nations, OECD, and World Bank"
+  },
+  {
+    "rawName": "Food and Agriculture Organization, electronic files and web site.",
+    "dataPublisherSource": "Food and Agriculture Organization of the United Nations",
+    "name": "Food and Agriculture Organization of the United Nations, via World Bank"
+  },
+  {
+    "rawName": "Household surveys, including Demographic and Health Surveys and Multiple Indicator Cluster Surveys. Largely compiled by United Nations Population Division.",
+    "dataPublisherSource": "Demographic and Health Surveys, Multiple Indicator Cluster Surveys, Household surveys, UN Population Division",
+    "name": "Demographic and Health Surveys (DHS), Multiple Indicator Cluster Surveys (MICS), and United Nations Population Division, via World Bank"
+  },
+  {
+    "rawName": "International Comparison Program, World Bank | World Development Indicators database, World Bank | Eurostat-OECD PPP Programme.",
+    "dataPublisherSource": "International Comparison Program - World Bank, World Development Indicators - World Bank, Eurostat-OECD PPP Programme",
+    "name": "Eurostat, OECD, and World Bank"
+  },
+  {
+    "rawName": "The Program in Global Surgery and Social Change (PGSSC) at Harvard Medical School (https://www.pgssc.org/)",
+    "dataPublisherSource": "Harvard Medical School Program in Global Surgery and Social Change",
+    "name": "Harvard Medical School Program in Global Surgery and Social Change (PGSSC), via World Bank"
+  },
+  {
+    "rawName": "The country data compiled, adjusted and used in the estimation model by the Maternal Mortality Estimation Inter-Agency Group (MMEIG). The country data were compiled from the following sources:  civil registration and vital statistics; specialized studies on maternal mortality; population based surveys and censuses; other available data sources including data from surveillance sites.",
+    "dataPublisherSource": "UN Maternal Mortality Estimation Inter-Agency Group",
+    "name": "UN Maternal Mortality Estimation Inter-Agency Group, via World Bank"
+  },
+  {
+    "rawName": "UNICEF, State of the World's Children, Childinfo, and Demographic and Health Surveys.",
+    "dataPublisherSource": "State of the World's Children - UNICEF, Demographic and Health Surveys",
+    "name": "Demographic and Health Surveys (DHS) and UNICEF, via World Bank"
+  },
+  {
+    "rawName": "UNICEF-WHO Low birthweight estimates [data.unicef.org]",
+    "dataPublisherSource": "Low Birthweight Estimates - UNICEF / World Health Organization",
+    "name": "UNICEF and World Health Organization, via World Bank"
+  },
+  {
+    "rawName": "Understanding Children's Work project based on data from ILO, UNICEF and the World Bank.",
+    "dataPublisherSource": "Understanding Children's Work Project - International Labour Organization / UNICEF / World Bank",
+    "name": "International Labour Organization, UNICEF, and World Bank"
+  },
+  {
+    "rawName": "United Nations Children's Fund, Division of Data, Analysis, Planning and Monitoring (2019). UNICEF Global Databases on Iodized salt, New York, June 2019",
+    "dataPublisherSource": "Global Database on Household Consumption of Iodized Salt - UNICEF",
+    "name": "UNICEF, via World Bank"
+  },
+  {
+    "rawName": "United Nations High Commissioner for Refugees (UNHCR) and UNRWA through UNHCR's Refugee Data Finder at https://www.unhcr.org/refugee-statistics/.",
+    "dataPublisherSource": "Refugee Data Finder - UN High Commissioner for Refugees",
+    "name": "UNHCR and UNRWA, via World Bank"
+  },
+  {
+    "rawName": "World Bank staff estimates based on IMF balance of payments data, and World Bank and OECD GDP estimates.",
+    "dataPublisherSource": "World Bank based on Balance of Payments Statistics - International Monetary Fund, GDP estimates - World Bank / OECD",
+    "name": "World Bank based on IMF and OECD"
+  },
+  {
+    "rawName": "International Labour Organization. \"ILO Modelled Estimates and Projections database (ILOEST)\" ILOSTAT. Accessed June 18, 2024. https://ilostat.ilo.org/data/.",
+    "dataPublisherSource": "ILO Modelled Estimates and Projections Database (ILOEST) - International Labour Organization",
+    "name": "International Labour Organization, ILOSTAT, via World Bank"
+  }
+]
