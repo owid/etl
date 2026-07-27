@@ -58,8 +58,9 @@ It's easier to do it in two steps:
   (`NY.GDP.PCAP.CD`, `NY.GDP.PCAP.KD`, `NY.GDP.PCAP.KN`) already carried 2025 -- so the PPP charts
   sat a full year behind the market-rate ones on production. 2025 only landed for the PPP series
   around 2026-07-27 (232 economies), which is what this version exists to pick up.
-  So: after running the snapshot, check the latest-year coverage of `NY.GDP.PCAP.PP.KD` in the raw
-  WDICSV.csv. If it is empty, re-snapshot a couple of weeks later rather than shipping the gap.
+  `sanity_check_ppp_coverage` now enforces this at build time: the snapshot aborts before it is
+  written if the PPP series lag the market-rate ones in the latest released year. If it fires,
+  re-run the snapshot a couple of weeks later rather than shipping the gap.
   `version_producer` and `last_updated_date` will NOT tell you the file changed -- compare the
   downloaded file's md5 and its per-year non-null counts instead.
 - Revisit `wdi.corrections.yml`: 13 (indicator, entity) pairs had their 2025 World Bank-aggregate
@@ -97,6 +98,24 @@ URL_METADATA = "https://ddh-openapi.worldbank.org/dataset/download?dataset_uniqu
 
 # Legacy API for individual indicator metadata (used by garden step)
 LEGACY_API_BASE_URL = "https://api.worldbank.org/v2/indicator"
+
+# Market-exchange-rate GDP per capita, used as the reference for how far the World Bank has
+# backfilled the release. This series is populated first (see the "Next update" note above).
+PPP_REFERENCE_INDICATOR = "NY.GDP.PCAP.CD"
+
+# PPP-denominated GDP per capita. The World Bank fills these in weeks after the rest of the
+# release, without bumping `version_producer` or `last_updated_date`.
+PPP_INDICATORS = ["NY.GDP.PCAP.PP.KD", "NY.GDP.PCAP.PP.CD"]
+
+# A year only counts as released once the reference series covers at least this many entities,
+# so a handful of early reporters in a not-yet-published year can't become the comparison year.
+# For reference, in the 2026-07-27 file `NY.GDP.PCAP.CD` covers 233 entities in 2025.
+PPP_MIN_REFERENCE_ENTITIES = 100
+
+# In that year, the PPP series must reach at least this share of the reference series' coverage.
+# In the 2026-07-27 file the ratio is 232/233 = 1.00; in the 2026-07-14 and 2026-07-16 files it
+# was 0/233 = 0.00, so anything in between comfortably separates a good release from a lagging one.
+PPP_MIN_COVERAGE_RATIO = 0.5
 
 # Number of parallel workers for fetching legacy metadata.
 # api.worldbank.org's legacy indicator endpoint 502s persistently under ~20-way parallel load
@@ -143,12 +162,66 @@ def main(upload: bool) -> None:
     # Download the ~270MB zip data file.
     snap.download_from_source()
 
+    # Abort before the (slow) legacy-metadata fetch if the World Bank has not finished
+    # backfilling the PPP-denominated series for this release.
+    sanity_check_ppp_coverage(snap.path)
+
     # Add legacy metadata from individual indicator API calls
     # This provides the exact format needed by the garden step (indicator_name, source, unit, topic)
     add_legacy_metadata_to_zip(snap.path)
 
     # Create the snapshot and upload the data.
     snap.dvc_add(upload=upload)
+
+
+def sanity_check_ppp_coverage(zip_path: Path) -> None:
+    """Fail the snapshot if the PPP-denominated GDP per capita series lag the market-rate ones.
+
+    The World Bank refreshes a WDI release *in place* over several weeks and the PPP-denominated
+    series are populated last, so a snapshot taken too early silently ships the PPP charts a full
+    year behind the US$ ones. Neither `version_producer` nor `last_updated_date` changes while this
+    happens, so the only reliable signal is the actual per-year coverage in the raw data.
+
+    The check is relative rather than absolute: it finds the latest year the reference series has
+    genuinely been released for, and requires the PPP series to have comparable coverage in that
+    same year. If the whole release simply hasn't reached year N yet, there is no lag to flag.
+    """
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        df = pd.read_csv(zf.open("WDICSV.csv"), usecols=lambda c: c == "Indicator Code" or re.fullmatch(r"\d{4}", c))
+
+    years = sorted(c for c in df.columns if re.fullmatch(r"\d{4}", c))
+    assert years, "No year columns found in WDICSV.csv."
+
+    codes = [PPP_REFERENCE_INDICATOR] + PPP_INDICATORS
+    missing = sorted(set(codes) - set(df["Indicator Code"]))
+    assert not missing, (
+        f"Indicators missing from WDICSV.csv: {missing}. The GDP per capita series were renamed or dropped upstream."
+    )
+
+    counts = df[df["Indicator Code"].isin(codes)].groupby("Indicator Code")[years].count()
+
+    released_years = [year for year in years if counts.loc[PPP_REFERENCE_INDICATOR, year] >= PPP_MIN_REFERENCE_ENTITIES]
+    assert released_years, (
+        f"{PPP_REFERENCE_INDICATOR} covers fewer than {PPP_MIN_REFERENCE_ENTITIES} entities in every year. "
+        "The download is truncated or the file layout changed."
+    )
+    latest_year = released_years[-1]
+    reference_count = counts.loc[PPP_REFERENCE_INDICATOR, latest_year]
+
+    for code in PPP_INDICATORS:
+        ppp_count = counts.loc[code, latest_year]
+        assert ppp_count >= PPP_MIN_COVERAGE_RATIO * reference_count, (
+            f"{code} covers only {ppp_count} entities in {latest_year}, against {reference_count} for "
+            f"{PPP_REFERENCE_INDICATOR}. The World Bank has not finished backfilling the PPP-denominated "
+            f"series for this release, so shipping it would leave the PPP charts a year behind the "
+            f"market-rate ones. Re-run the snapshot in a couple of weeks -- see the module docstring."
+        )
+
+    print(
+        f"PPP coverage check passed: in {latest_year}, "
+        + ", ".join(f"{code} covers {counts.loc[code, latest_year]} entities" for code in PPP_INDICATORS)
+        + f" against {reference_count} for {PPP_REFERENCE_INDICATOR}."
+    )
 
 
 @memory.cache
