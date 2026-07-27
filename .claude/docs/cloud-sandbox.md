@@ -29,27 +29,28 @@ script, environment variables), see
   `.venv/bin/etl diff REMOTE data/ --include <dataset>` (add `--verbose`, or
   `--output-html` for a report). This answers "did my rebuild change any
   values?", which is most of why you'd run a step by hand, and needs no MySQL —
-  but it does fetch from `catalog.ourworldindata.org`, so confirm that host is
-  reachable first (see below). "The step completed" is not the same as "the data
-  is right"; say which one you verified.
+  only `catalog.ourworldindata.org`, which is reachable under `Full` network
+  access (see below). "The step completed" is not the same as "the data is
+  right"; say which one you verified.
 
-- **Don't assume any OWID host is reachable — check the one you need.** Egress
-  goes through a gateway proxy that allows hosts by policy, and the policy is
-  not the same in every environment. `snapshots.owid.io` has worked (so `etlr`
-  resolves dependencies normally), while `datasette-public.owid.io`,
-  `api.ourworldindata.org` and `catalog.ourworldindata.org` have all been denied
-  in at least one session. One `curl -s -o /dev/null -w "%{http_code}\n" <url>`
-  settles it in a second — do that before building a plan on top of a host.
-  `admin.owid.io` is the exception that never works: Cloudflare Access rejects
-  every non-browser client at the edge, whatever the proxy allows.
+- **OWID hosts are reachable, but only with `Full` network access.** Snapshots,
+  the catalog, the public API and Datasette all work in an environment set to
+  `Full`. Under `Trusted` the gateway refuses them, and `etlr` snapshot
+  downloads, `etl diff` and every Datasette lookup fail together. If that
+  happens, the fix is a setting, not a workaround: tell the user to switch the
+  environment's network access to `Full` (see
+  [claude-code-web.md](../../docs/guides/data-work/claude-code-web.md)).
+
+  `admin.owid.io` is the one host that never works regardless: Cloudflare Access
+  rejects every non-browser client at the edge.
 
   Creating a *new* snapshot with `etls` needs the `R2_*` environment variables;
   if they're missing, the environment was set up without them and the user needs
   to add them (they're in 1Password — never scrape credentials from anywhere
   else).
 
-- **A blocked host looks like an auth problem — it isn't.** WebFetch reports a
-  gateway denial as `HTTP 403 Forbidden` with the hint *"If this URL requires
+- **A refused host looks like an auth problem — it isn't.** WebFetch reports a
+  gateway refusal as `HTTP 403 Forbidden` with the hint *"If this URL requires
   authentication, use an authenticated tool"*, and `curl` just returns `000`.
   Chasing that hint means hunting for credentials that would not have helped.
   Confirm the real cause before concluding anything:
@@ -60,7 +61,7 @@ script, environment variables), see
 
   `"kind": "connect_rejected"` names the host the gateway refused — the request
   died before TLS, so no key, token, or login would have changed the outcome.
-  Report it as a sandbox network limit and ask the user to allowlist the host,
+  That's the `Trusted`-network signature above; report it and ask for `Full`
   rather than working around it.
 
 - **Admin links can't be opened; resolve the id instead.** When the user shares

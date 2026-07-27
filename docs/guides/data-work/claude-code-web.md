@@ -23,8 +23,11 @@ power users).
 
 1. Open <https://claude.ai/code>.
     - **First-time users** are redirected to an onboarding flow: use the name
-      `etl` and `Trusted` or `Full` network access (you can switch to `Full`
-      later if `Trusted` turns out to be limiting).
+      `etl` and **`Full`** network access. `Trusted` blocks our own hosts —
+      `datasette-public.owid.io`, `api.ourworldindata.org` and
+      `catalog.ourworldindata.org` are all refused — which quietly breaks
+      indicator lookups and `etl diff`, and the failure looks like an
+      authentication error rather than a network one.
     - **Existing users** won't see onboarding: click the environment selector
       (":cloud: Default") above the chat input and create a new `etl`
       environment with the same settings.
