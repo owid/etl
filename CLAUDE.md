@@ -116,6 +116,15 @@ Internal terms that recur across this guide, the skills, and the codebase:
 
 Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
+**"The step completed" is not "the data is right".** After running a step for
+someone, report what came out of it: row count, year range, entities, and a few
+values from the latest year, plus whether anything changed against the published
+catalog. `✅ No differences found` is itself a result worth reporting.
+
+```bash
+.venv/bin/etl diff REMOTE data/ --include <dataset> --verbose
+```
+
 ### Running Snapshot Steps
 
 ```bash
@@ -417,6 +426,12 @@ When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinn
 See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
 - `pipeline-stages.md` - Pipeline architecture details
+- `cloud-sandbox.md` - Claude Code on the web: what a cloud session can and can't do
+
+If you are running in a Claude Code cloud sandbox (`CLAUDE_CODE_REMOTE=true`), read
+`.claude/docs/cloud-sandbox.md` **before starting work** — it covers the pre-created
+branch name, spurious `uv.lock` diffs, the absence of a database, which OWID hosts
+the egress proxy blocks, and how to resolve an `admin.owid.io` link you can't open.
 
 ## Individual Preferences
 
