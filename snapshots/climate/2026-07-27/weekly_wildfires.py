@@ -249,21 +249,26 @@ def fetch_emissions(country: str, year: int) -> pd.DataFrame | None:
 
 
 def read_previous_snapshot() -> pd.DataFrame | None:
-    """Read the most recent earlier version of this snapshot, to compare the new fetch against.
+    """Read the latest snapshot data that predates this fetch, to compare the new fetch against.
 
-    Each update creates a new version folder, so the previous data lives under a different version.
-    Returns None only when no earlier version exists (i.e. the very first run).
+    Each update creates a new version folder, so on an update the previous data lives under the most
+    recent earlier version. Once that predecessor is archived, this version is the only one left, and
+    a rerun compares against the data already stored for this version instead.
+    Returns None only when neither exists, i.e. the very first run of a brand new snapshot.
     """
     previous_versions = sorted(
         path.parent.name
         for path in (SNAPSHOTS_DIR / "climate").glob(f"*/{SHORT_NAME}.csv.dvc")
         if path.parent.name < SNAPSHOT_VERSION
     )
-    if not previous_versions:
-        log.warning(f"No previous version of {SHORT_NAME} found; skipping comparison with previous snapshot.")
-        return None
+    if previous_versions:
+        previous_snapshot = Snapshot(f"climate/{previous_versions[-1]}/{SHORT_NAME}.csv")
+    else:
+        previous_snapshot = Snapshot(f"climate/{SNAPSHOT_VERSION}/{SHORT_NAME}.csv")
+        if previous_snapshot.metadata.outs is None:
+            log.warning(f"No earlier data found for {SHORT_NAME}; skipping comparison with previous snapshot.")
+            return None
 
-    previous_snapshot = Snapshot(f"climate/{previous_versions[-1]}/{SHORT_NAME}.csv")
     # Download the previous data file if it is not already available locally.
     previous_snapshot.pull(force=False)
 
