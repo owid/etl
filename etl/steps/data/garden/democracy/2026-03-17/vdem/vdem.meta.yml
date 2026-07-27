@@ -498,7 +498,7 @@ tables:
       v2exfemhos: # wom_hos_vdem_owid
         title: Woman head of state
         description_short: |-
-          Denotes whether the head of state in office is a woman at anytime during the year.
+          Denotes whether the head of state in office is a woman at any time during the year.
         description_from_producer: |-
           If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
 
@@ -548,7 +548,7 @@ tables:
       v2exfemhog:
         title: Woman head of government
         description_short: |-
-          Denotes whether the head of government in office is a woman at anytime during the year.
+          Denotes whether the head of government in office is a woman at any time during the year.
         description_from_producer: |-
           Question: What is the gender of the head of government?
 
@@ -593,7 +593,7 @@ tables:
       v2exfemhoe:
         title: Woman chief executive
         description_short: |-
-          The variable denotes whether the chief executive of government in office is a woman at anytime during the year.
+          The variable denotes whether the chief executive of government in office is a woman at any time during the year.
         description_processing: |-
           Assigns the value based on the gender of the most powerful chief: either Head of state or Head of government.
 
@@ -653,7 +653,7 @@ tables:
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
-          This indicator is only estimated for countries listed in V-Dem in 2024.
+          This indicator is only estimated for countries that V-Dem lists in the most recent year of the data.
 
           {definitions.aux.description_imputes}
         unit: ""
@@ -681,7 +681,7 @@ tables:
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
-          In addition, we used the V-Dem indicator `electmulpar_hoe_row_owid`, which is based on V-Dem indicator `v2elmulpar_osp_hoe`, to assess if the country goes through electoral processes to elect the chief executive.
+          In addition, we used our political regime classification (`regime_row_owid`), which is based on V-Dem's "Regimes of the World" measure, to identify the years in which the country was an electoral or a liberal democracy.
 
           {definitions.aux.description_imputes}
         unit: ""
@@ -3030,7 +3030,7 @@ tables:
     common:
       unit: "%"
       description_processing: |-
-        We estimate the share based on the countries that V-Dem lists in 2024.
+        We estimate the share based on the countries that V-Dem lists in the most recent year of the data.
     variables:
       share_countries_wom_hoe_ever:
         title: |-
