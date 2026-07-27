@@ -365,9 +365,9 @@ tables:
           - North America (EI)
           - South and Central America (EI)
           - Europe (EI)
-          - CIS (EI)
-          - Middle East (EI)
           - Africa (EI)
+          - Middle East (EI)
+          - CIS (EI)
           - Asia Pacific (EI)
         origins:
           - *origins_ei
@@ -395,12 +395,12 @@ tables:
           Regions as defined by Ember in its Yearly Electricity Data.
         type: ordinal
         sort:
-          - Africa (Ember)
-          - Asia (Ember)
-          - Europe (Ember)
-          - Latin America and Caribbean (Ember)
-          - Middle East (Ember)
           - North America (Ember)
+          - Latin America and Caribbean (Ember)
+          - Europe (Ember)
+          - Africa (Ember)
+          - Middle East (Ember)
+          - Asia (Ember)
           - Oceania (Ember)
         origins:
           - *origins_ember
