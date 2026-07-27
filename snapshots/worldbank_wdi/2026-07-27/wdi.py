@@ -63,6 +63,20 @@ It's easier to do it in two steps:
   re-run the snapshot a couple of weeks later rather than shipping the gap.
   `version_producer` and `last_updated_date` will NOT tell you the file changed -- compare the
   downloaded file's md5 and its per-year non-null counts instead.
+- The "Availability of unemployment estimates by source" comparison
+  (`unemployment_rate_ilo_modeling_comparison_absolute`) stops short of the latest year on purpose --
+  nothing to do here routinely. ILO's modeled estimates run a few years past the last real observation,
+  and in those projected years `sl_uem_totl_zs` differs from the national estimate by construction, so
+  including them would report ILO's projection horizon as a disagreement between the two sources. The
+  garden step finds the boundary from the data (`MINIMUM_ILOEST_AGREEMENT_RATIO`) and logs which years
+  it drops. If a future release moves the boundary somewhere that ratio no longer separates cleanly,
+  the ground truth is ILOSTAT's own flag -- the last year with `obs_status == "R"` ("Real value"),
+  the same for every country:
+    curl -s "https://rplumber.ilo.org/data/indicator/?id=UNE_2EAP_SEX_AGE_RT_A&ref_area=AUS&format=.csv"
+  Check ILOSTAT's ILOEST round matches the one frozen in the WDI snapshot before trusting it: WDI
+  records the access date in WDISeries.csv (January 17, 2026 here) while ILOSTAT is live, so confirm
+  WDI's `sl_uem_totl_zs` still equals the ILOSTAT value for a probe country-year. As of this release
+  ILOEST runs to 2027, real through 2024.
 - Revisit `wdi.corrections.yml`: 13 (indicator, entity) pairs had their 2025 World Bank-aggregate
   value nulled out (ne_trd_gnfs_zs, bg_gsr_nfsv_gd_zs, bx_gsr_tran_zs, bx_gsr_ccis_zs, tx_val_tran_zs_wt)
   because country coverage for 2025 collapsed 35-45% vs. the normal year-to-year lag (notably the US

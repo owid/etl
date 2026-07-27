@@ -2320,9 +2320,13 @@ tables:
         description_key:
           - "{definitions.description_key_modelling_status}"
           - "{definitions.description_key_no_published_estimates}"
+          - The comparison stops before the most recent year for which both sources publish data. The ILO's modeled estimates run ahead of reported data, and in those projected years they differ from national estimates simply because no survey result has been incorporated into the model yet — not because the two sources disagree about what happened.
+          - Even in years built on real observations, the two sources can differ. The ILO adjusts national figures to a common definition before they enter its modeled series, so a country's published headline rate and the ILO's harmonized version of it are not always identical.
         processing_level: "major"
         description_processing: |-
           We derive this indicator by calculating the absolute difference between the ILO modeled estimates and the national estimates for unemployment rate in each country and year. If the absolute difference is less than 0.1 percentage points, we consider the estimates to be the same value. If the absolute difference is 0.1 percentage points or more, we classify it as a different value. If data is only available in one of the datasets, we indicate that as well.
+
+          We restrict the comparison to years in which the ILO's modeled estimates are built on real observations. The modeled series extends a few years beyond the latest reported data, and in those projected years it differs from national estimates by construction. We identify them from the data: in years based on real observations, most countries' modeled and national values match exactly, and that share collapses once the modeled series becomes a projection. We drop the most recent years where it falls below 40% of the level seen in earlier years, and stop at the first year that clears it.
         presentation:
           grapher_config:
             note: When both national survey estimates and ILO modeled estimates are available, they are classified as "agreeing" if they differ by less than 0.1 percentage points, and as "disagreeing" otherwise.

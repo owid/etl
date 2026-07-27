@@ -31,6 +31,36 @@ MAXIMUM_ALLOWED_RATIO_DIFFERENCE = 0.01  # 1%
 # Set maximum absolute difference between ILO modeled and national values
 MAXIMUM_ALLOWED_ABSOLUTE_DIFFERENCE = 0.1  # 0.1 percentage points
 
+# Trailing years of the ILO modeled-vs-national comparison are dropped when ILO's modeled series is
+# still a projection there. ILO's modeled estimates (ILOEST) extend two years past the last real
+# observation, so for the newest year(s) sl_uem_totl_zs is a nowcast and comparing it against the
+# national estimate reports how far ahead ILO has projected rather than whether the two sources
+# disagree -- which is what the "Availability of unemployment estimates by source" chart claims to show.
+#
+# A projection year is unmistakable in the data: the share of countries whose modeled and national
+# values match exactly collapses. A year is dropped when that share falls below this fraction of the
+# median share across all *earlier* years (comparing only against earlier years keeps the baseline free
+# of the tail it is meant to detect).
+#
+# Why 0.4 and not something stricter: real years can legitimately disagree, because ILO harmonizes
+# national figures before they enter ILOEST (Austria 2024: 5.327 as published nationally, 5.2 in
+# ILOEST; Ireland 4.475 -> 4.3). Trimming those away would delete exactly what the chart exists to
+# show. Observed shares in this release -- 76-87% for 2018-2023, 47% in 2024, 12% in 2025 -- and
+# ILOSTAT's own obs_status flag marks 2018-2024 as "Real value" with 2025+ unflagged. So the real
+# boundary sits between 47% and 12%, and 0.4 of a ~78% baseline (~31%) splits them with room on both
+# sides while a stricter 0.75 would wrongly discard 2024.
+#
+# NOTE: if a future release moves the boundary somewhere this ratio no longer separates cleanly, the
+# ground truth is ILOSTAT's flag -- the last year with obs_status == "R" is the last real year, and the
+# boundary is the same for every country:
+#   curl -s "https://rplumber.ilo.org/data/indicator/?id=UNE_2EAP_SEX_AGE_RT_A&ref_area=AUS&format=.csv"
+# Check that ILOSTAT's ILOEST round matches the one frozen in the WDI snapshot before trusting it
+# (WDISeries.csv records "date accessed: January 17, 2026" here, while ILOSTAT is live).
+MINIMUM_ILOEST_AGREEMENT_RATIO = 0.4
+
+# Don't judge a year's agreement share on a handful of countries.
+MINIMUM_COUNTRIES_FOR_ILOEST_CHECK = 20
+
 # Define base year to calculate constant 2021 US$ GDPs to compare with constant 2021 int-$ GDPs
 BASE_YEAR_FOR_CONSTANT_USD_GDP = 2021
 
@@ -866,6 +896,43 @@ def add_patents_articles_per_million_people(tb: Table) -> Table:
     return tb
 
 
+def _last_reconciled_year(tb: Table, comparison_column: str, max_year: int) -> int:
+    """Return the last year before ILO's modeled series turns into a projection.
+
+    Complements `_last_year_with_substantial_coverage`, which only sees sparsity: a recent year can have
+    plenty of countries reporting on both series and still be misleading, because ILO's modeled figure
+    is a nowcast there. See MINIMUM_ILOEST_AGREEMENT_RATIO for the threshold and why it is set loosely
+    enough to preserve years that genuinely disagree.
+
+    Walks back from `max_year` while the year's exact-agreement share is below
+    MINIMUM_ILOEST_AGREEMENT_RATIO x the median share of all earlier years, stopping at the first year
+    that passes. Years with fewer than MINIMUM_COUNTRIES_FOR_ILOEST_CHECK countries are left to the
+    coverage guard rather than judged on a noisy share.
+    """
+    both = tb[tb[comparison_column].isin(["Both available (agreeing)", "Both available (disagreeing)"])]
+    if both.empty:
+        return max_year
+
+    shares = both.groupby("year")[comparison_column].apply(lambda s: (s == "Both available (agreeing)").mean())
+    counts = both.groupby("year").size()
+
+    year = max_year
+    while year in shares.index and counts[year] >= MINIMUM_COUNTRIES_FOR_ILOEST_CHECK:
+        earlier = shares[shares.index < year]
+        if earlier.empty or shares[year] >= earlier.median() * MINIMUM_ILOEST_AGREEMENT_RATIO:
+            break
+        log.info(
+            "wdi.ilo_comparison.projection_year_dropped",
+            year=year,
+            agreeing_share=round(float(shares[year]), 3),
+            baseline_share=round(float(earlier.median()), 3),
+            countries=int(counts[year]),
+        )
+        year -= 1
+
+    return year
+
+
 def _last_year_with_substantial_coverage(tb: Table, indicator: str, threshold: float = 0.5) -> int:
     """Return the last year where `indicator` has at least `threshold` × median annual country count."""
     counts = tb.loc[tb[indicator].notna()].groupby("year")["country"].nunique()
@@ -927,6 +994,18 @@ def add_ilo_modeling_comparison_indicators(tb: Table) -> Table:
         max_year_modeled = _last_year_with_substantial_coverage(tb, ind_modeled)
         max_year_national = _last_year_with_substantial_coverage(tb, ind_national)
         max_year_for_comparison = min(max_year_modeled, max_year_national)
+
+        # Then trim any trailing years where ILO's modeled series is still a projection, so the
+        # comparison doesn't report ILO's projection horizon as a disagreement between the two sources.
+        max_year_for_comparison = _last_reconciled_year(
+            tb, f"{indicator}_ilo_modeling_comparison_absolute", max_year_for_comparison
+        )
+        log.info(
+            "wdi.ilo_comparison.max_year",
+            indicator=indicator,
+            coverage_limit=min(max_year_modeled, max_year_national),
+            applied=max_year_for_comparison,
+        )
 
         # Make ilo_modeling_comparison NaN for years greater than the maximum year with substantial data
         tb.loc[tb["year"] > max_year_for_comparison, f"{indicator}_ilo_modeling_comparison_absolute"] = pd.NA
