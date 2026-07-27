@@ -40,11 +40,11 @@ SOURCE_COLUMN_PREFIX = {
     "wind": "wind",
     "solar_and_wind": "solar_and_wind",
     "renewables": "renewable",
-    # Must stay on the "including bioenergy" column. The excluding-bioenergy and standalone bioenergy
-    # series are missing entirely for ~70 countries (China, India, Brazil, Japan...) and start late
-    # elsewhere, so using the split in the stacked "by source" view collapses each country's chart to
-    # that sparse intersection (e.g. UK 1920-2025 -> 1990-2019). Combined keeps full historical coverage.
-    "other_renewables": "other_renewables_including_bioenergy",
+    # Coalesced series (garden add_bioenergy_split_helper_columns): excludes bioenergy where the split is
+    # known (post-2000 and wherever available), falling back to the combined figure for the earlier years
+    # where bioenergy cannot be separated. Keeps full historical coverage while letting bioenergy be its
+    # own stacked band (from bioenergy_stacked, see add_decomposition_views).
+    "other_renewables": "other_renewables",
     "bioenergy": "bioenergy",
     "low_carbon": "low_carbon",
 }
@@ -181,11 +181,17 @@ METRIC_UNIT_PHRASE = {
     "per_capita": "Measured in [kilowatt-hours](#dod:watt-hours) per person.",
     "share_of_generation": "Measured as a percentage of total electricity generation.",
 }
+# "Other renewables" is geo/wave/tidal, but before 2000 some countries can't be separated from bioenergy;
+# used both as the standalone view's subtitle and as the stacked "by source" footnote.
+OTHER_RENEWABLES_NOTE = (
+    "Other renewables include geothermal, wave, and tidal; bioenergy may be included prior to 2000 due to "
+    "limited data availability."
+)
 SOURCE_COMPOSITION = {
     "fossil": "Fossil fuels include coal, oil, and gas.",
     "renewables": "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.",
     "low_carbon": "Low-carbon sources are the sum of nuclear and renewables.",
-    "other_renewables": "Other renewables include bioenergy, geothermal, wave, and tidal.",
+    "other_renewables": OTHER_RENEWABLES_NOTE,
     # No entry for "solar_and_wind": the title already says "solar and wind", so a composition note
     # ("Combined electricity generation from solar and wind") would just restate it.
     "wind": "Includes both onshore and offshore wind.",
@@ -212,13 +218,13 @@ def _view_subtitle(source: str, metric: str) -> str:
 
 # Aggregates that can be decomposed "by source", mapped to their constituent individual sources.
 # Constituents are listed top-to-bottom for the stacked chart (grapher renders the first series at the
-# top). "other_renewables" already includes bioenergy (the split columns have too little coverage to
-# stack; see SOURCE_COLUMN_PREFIX), so "bioenergy" is left out to avoid double count.
+# top). "other_renewables" (geo/wave/tidal) and "bioenergy" are separate bands; both use gap-filled helper
+# columns so the stack keeps full history (see add_decomposition_views and the garden helper columns).
 AGGREGATE_DECOMPOSITION = {
-    "total": ["other_renewables", "solar", "wind", "hydro", "nuclear", "gas", "oil", "coal"],
+    "total": ["other_renewables", "bioenergy", "solar", "wind", "hydro", "nuclear", "gas", "oil", "coal"],
     "fossil": ["gas", "oil", "coal"],
-    "renewables": ["other_renewables", "solar", "wind", "hydro"],
-    "low_carbon": ["other_renewables", "solar", "wind", "hydro", "nuclear"],
+    "renewables": ["other_renewables", "bioenergy", "solar", "wind", "hydro"],
+    "low_carbon": ["other_renewables", "bioenergy", "solar", "wind", "hydro", "nuclear"],
     "solar_and_wind": ["solar", "wind"],
 }
 # Canonical OWID per-source colors, copied from the original "Electricity production by source" chart so
@@ -272,6 +278,12 @@ def add_decomposition_views(c) -> None:
                 view = single_views.get((constituent, base_metric))
                 if view is not None and view.indicators.y:
                     for indicator in deepcopy(view.indicators.y):
+                        if constituent == "bioenergy":
+                            # Stack the zero-filled bioenergy so the chart keeps full history; the clean
+                            # bioenergy column stays on the standalone "Bioenergy" view.
+                            indicator.catalogPath = indicator.catalogPath.replace(
+                                "bioenergy_generation", "bioenergy_stacked_generation"
+                            )
                         color = SOURCE_COLORS.get(constituent)
                         if color:
                             indicator.update_display({"color": color})
@@ -283,6 +295,9 @@ def add_decomposition_views(c) -> None:
                 "title": _decomposition_title(source, base_metric),
                 "subtitle": METRIC_UNIT_PHRASE[base_metric],
             }
+            # Views that split bioenergy out get the footnote explaining the pre-2000 caveat.
+            if "bioenergy" in constituents:
+                config["note"] = OTHER_RENEWABLES_NOTE
             new_view = View(
                 dimensions={"source": source, "metric": new_metric},
                 indicators=ViewIndicators(y=indicators),

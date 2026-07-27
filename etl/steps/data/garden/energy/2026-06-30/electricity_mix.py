@@ -274,6 +274,28 @@ def derive_other_renewables_excluding_bioenergy(combined: Table) -> Table:
     return combined
 
 
+def add_bioenergy_split_helper_columns(combined: Table) -> Table:
+    """Add gap-filled helper columns so the stacked 'by source' views can show bioenergy separately
+    while keeping full historical coverage.
+
+    A stacked chart only renders years where every series has a value, so a sparse bioenergy series would
+    otherwise collapse each country's history to the years the split exists. These two helpers always sum
+    to the true 'other renewables including bioenergy' total, so the stack keeps full coverage:
+      - other_renewables_generation__twh: other renewables excluding bioenergy where known (post-2000 and
+        anywhere the split is available), falling back to the combined figure for the earlier years where
+        bioenergy cannot be separated. There, its biomass is carried in this 'other renewables' band.
+      - bioenergy_stacked_generation__twh: bioenergy with missing values set to zero, so it stacks across
+        the full period (zero in the early years whose biomass is instead carried by other renewables).
+    The clean, unfilled bioenergy_generation__twh and other_renewables_excluding/including columns are kept
+    for the standalone (non-stacked) source views.
+    """
+    inc = "other_renewables_including_bioenergy_generation__twh"
+    exc = "other_renewables_excluding_bioenergy_generation__twh"
+    combined["other_renewables_generation__twh"] = combined[exc].fillna(combined[inc])
+    combined["bioenergy_stacked_generation__twh"] = combined["bioenergy_generation__twh"].fillna(0)
+    return combined
+
+
 def add_per_capita_variables(combined: Table) -> Table:
     """Add per capita variables (in kWh per person) to the combined EI and Ember table.
 
@@ -307,6 +329,8 @@ def add_per_capita_variables(combined: Table) -> Table:
         "oil_generation__twh",
         "other_renewables_excluding_bioenergy_generation__twh",
         "other_renewables_including_bioenergy_generation__twh",
+        "other_renewables_generation__twh",
+        "bioenergy_stacked_generation__twh",
         "renewable_generation__twh",
         "solar_generation__twh",
         "total_generation__twh",
@@ -358,6 +382,7 @@ def add_share_variables(combined: Table) -> Table:
         "oil_generation__twh",
         "other_renewables_excluding_bioenergy_generation__twh",
         "other_renewables_including_bioenergy_generation__twh",
+        "other_renewables_generation__twh",
         "renewable_generation__twh",
         "solar_generation__twh",
         "total_generation__twh",
@@ -806,6 +831,9 @@ def run() -> None:
     # Derive 'other renewables excluding bioenergy' where it is missing but recoverable from the
     # combined figure and bioenergy (case B). Done before per-capita and share so they inherit it.
     combined = derive_other_renewables_excluding_bioenergy(combined=combined)
+
+    # Gap-filled helper columns so the stacked 'by source' views can separate bioenergy with full history.
+    combined = add_bioenergy_split_helper_columns(combined=combined)
 
     # Add per capita variables.
     combined = add_per_capita_variables(combined=combined)
