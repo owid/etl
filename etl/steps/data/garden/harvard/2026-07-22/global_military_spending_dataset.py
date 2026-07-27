@@ -25,14 +25,16 @@ def run() -> None:
     ds_nmc = paths.load_dataset("national_material_capabilities")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["global_military_spending_dataset"].reset_index()
-    tb_burden = ds_meadow["global_military_spending_dataset_burden"].reset_index()
+    tb = ds_meadow.read("global_military_spending_dataset")
+    tb_burden = ds_meadow.read("global_military_spending_dataset_burden")
 
     # Read Gleditsch country codes
-    tb_gleditsch = ds_gleditsch["gleditsch_countries"].reset_index()
+    tb_gleditsch = ds_gleditsch.read("gleditsch_countries")
 
     # Read National Material Capabilities
-    tb_nmc = ds_nmc["national_material_capabilities"].reset_index()
+    tb_nmc = ds_nmc.read("national_material_capabilities")
+
+    sanity_check_inputs(tb=tb, tb_burden=tb_burden)
 
     #
     # Process data.
@@ -54,6 +56,8 @@ def run() -> None:
 
     tb = calculate_milex_per_military_personnel(tb=tb, tb_nmc=tb_nmc)
 
+    sanity_check_outputs(tb=tb)
+
     tb = tb.format(["country", "year"])
 
     #
@@ -64,6 +68,39 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def sanity_check_inputs(tb: Table, tb_burden: Table) -> None:
+    """Validate the source tables before any processing."""
+    # The specific latent-estimate series we select must exist in the source constant-US$ table.
+    assert MILEX_INDICATOR in set(tb["indicator"]), (
+        f"Expected series '{MILEX_INDICATOR}' missing from source constant-US$ table."
+    )
+    # Every burden column we consume must be present.
+    missing_burden = set(BURDEN_INDICATORS) - set(tb_burden.columns)
+    assert not missing_burden, f"Burden columns missing from source: {sorted(missing_burden)}"
+    # Burden series are published as fractions in [0, 1] (the source caps military burden at 1.0 = 100%).
+    # NOTE: if a future release un-caps this, revisit the [0, 100] output bound in sanity_check_outputs.
+    b_min = tb_burden[BURDEN_INDICATORS].min().min()
+    b_max = tb_burden[BURDEN_INDICATORS].max().max()
+    assert b_min >= 0 and b_max <= 1, f"Burden fractions outside [0, 1]: min={b_min}, max={b_max}"
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    """Validate the assembled garden table before formatting."""
+    # Key uniqueness.
+    assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in output."
+    # No indicator column should be entirely missing.
+    all_nan = tb.columns[tb.isna().all()].tolist()
+    assert not all_nan, f"Fully-NaN column(s): {all_nan}"
+    # Military expenditure levels and per-denominator ratios are strictly positive.
+    for col in ["milex_estimate", "milex_estimate_per_capita", "milex_per_military_personnel"]:
+        s = tb[col].dropna()
+        assert (s > 0).all(), f"Non-positive value in '{col}' (min={s.min()})."
+    # Burden shares are percentages in [0, 100] (source caps burden at 100%).
+    for col in BURDEN_INDICATORS:
+        s = tb[col].dropna()
+        assert (s >= 0).all() and (s <= 100).all(), f"'{col}' outside [0, 100]: min={s.min()}, max={s.max()}"
 
 
 def get_code_to_country(tb_gw):

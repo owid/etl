@@ -217,7 +217,7 @@ tables:
         short_unit: "$"
         description_short: This data is expressed in British pounds prior to 1914 and US dollars thereafter. It is not adjusted for inflation or differences in the cost of living between countries.
         description_from_producer: |-
-          Military expenditure is each state’s total military budget in each year for the period 1816-2016.
+          Military expenditure is each state’s total military budget in each year for the period 1816-2022.
 
           {definitions.description_from_producer_milex}
         processing_level: minor
@@ -234,7 +234,7 @@ tables:
         short_unit: ""
         description_short: Troops under the command of the national government, intended for use against foreign adversaries, and held ready for combat as of January 1 of the given year.
         description_from_producer: |-
-          Military Personnel is the size of a state’s military personnel in each year for the period 1816-2016.
+          Military Personnel is the size of a state’s military personnel in each year for the period 1816-2022.
 
           {definitions.description_from_producer_milper}
         processing_level: minor
@@ -250,6 +250,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The ratio of military personnel to total population, expressed as a percentage.
+        description_key:
+          - "Because this indicator divides military personnel by total population, the change in the total-population data vintage from 2017 onward can create small discontinuities at the 2016-2017 boundary even when military personnel itself is unchanged."
         description_processing: |-
           We have divided the number of military personnel by the total population and multiplied by 100 to express the result as a percentage. Both indicators are provided by the source.
         processing_level: major
@@ -266,7 +268,7 @@ tables:
         short_unit: "t"
         description_short: Involve transitions concerning the categories of iron produced and the types of fuels used in making iron and steel.
         description_from_producer: |-
-          Iron and Steel production reflects a state’s production of pig iron (1816-1899) and steel (1900-2016) in each year for the period 1816-2016.
+          Iron and Steel production reflects a state’s production of pig iron (1816-1899) and steel (1900-2022) in each year for the period 1816-2022.
 
           {definitions.description_from_producer_irst}
         processing_level: minor
@@ -283,7 +285,7 @@ tables:
         short_unit: ""
         description_short: Measures one element of the industrial capacity of states in the international system. Simply put, the greater the energy consumption, the larger the potential manufacturing base of an economy, the larger the potential economy of the state in question, and the more wealth and potential influence that state could or should have.
         description_from_producer: |-
-          Primary Energy Consumption is a state’s consumption of energy (metric ton coal equivalent) in each year for the period 1816-2016.
+          Primary Energy Consumption is a state’s consumption of energy (metric ton coal equivalent) in each year for the period 1816-2022.
 
           {definitions.description_from_producer_pec}
         processing_level: minor
@@ -298,9 +300,11 @@ tables:
         title: Total population
         unit: "people"
         short_unit: ""
-        description_short: ""
+        description_short: The size of a state's total civilian population.
+        description_key:
+          - "For data from 2017 onward, total population is drawn from a newer vintage of the UN World Population Prospects than the values through 2016. For many countries this produces one-off jumps at the 2016-2017 boundary (for example, large single-year steps for Micronesia, Eritrea, and Yemen) that reflect the change in data vintage rather than an actual change in population. This discontinuity also carries into indicators derived from population, such as military personnel as a share of total population and the Composite Index of National Capability."
         description_from_producer: |-
-          Total population is the size of a state’s civilian population in each year for the period 1816-2016.
+          Total population is the size of a state’s civilian population in each year for the period 1816-2022.
 
           {definitions.description_from_producer_tpop}
         processing_level: minor
@@ -315,9 +319,11 @@ tables:
         title: Urban population
         unit: "people"
         short_unit: ""
-        description_short: ""
+        description_short: The size of a state's population living in cities and urban areas.
+        description_key:
+          - "The definition of urban population changes over the series: through 2001 it counts cities of at least 100,000 people; for 2002-2016 it counts urban agglomerations of at least 300,000 people; and from 2017 onward (following the 2025 data revision) it counts cities of at least 50,000 people with a density of at least 1,500 per square kilometer, drawn from the UN World Urbanization Prospects. These changes can create discontinuities in the series (most notably a decline for the United States), so urban population is best compared across countries within a given year rather than over time within a single country."
         description_from_producer: |-
-          Urban population is the size of a state’s urban population in each year for the period 1816-2016.
+          Urban population is the size of a state’s urban population in each year for the period 1816-2022.
 
           {definitions.description_from_producer_upop}
         processing_level: minor

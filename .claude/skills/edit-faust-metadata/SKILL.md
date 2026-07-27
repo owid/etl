@@ -85,12 +85,14 @@ Three routes:
 - **(b) MDim step files** — edit the MDim `.config.yml` / `.py` → `STAGING=1 .venv/bin/etlr export://multidim/<ns>/<ver>/<name> --export --private`.
 - **(c) Chart config on staging** — `scripts/update_chart_config.py` (guarded, staging-only; see below). Reaches production only via chart-diff approval + chart-sync after merge.
 
+**Default rule: inherited fields get fixed in the ETL files, never patched via the admin API.** If the rendered text comes from the indicator's metadata or an MDim's step files, the edit belongs in those files — routes (a)/(b). File edits are the durable source of truth: they survive rebuilds and dataset updates, reach every surface, and go through code review. A route-(c) patch on an inherited field creates a chart-level override that shadows the source from then on — the chart silently stops tracking future metadata improvements. Reserve route (c) for fields that are genuinely chart-level (already in the patch, or with no inheritance path) or for a deliberate, user-confirmed decision to scope a change to one chart.
+
 **Target = chart, field F:**
 
 1. F is indicator-only (description_short/key, unit/short_unit, title_public, attribution_short, indicator-level display.name) → **route (a)**. Blast radius is mandatory first. Exception: the user wants a legend/series name changed on *this chart only* → `dimensions[i].display.name` via **route (c)** — offer both, default to fixing the source.
 2. F ∈ {title, subtitle, note}:
    - Key present in the chart's `patch` → **route (c)** (the patch wins regardless of inheritance).
-   - Key absent + inheritance enabled + single y indicator + inheritable → the rendered text IS the indicator's → **route (a)** if the fix should apply everywhere; **route (c)** (set an explicit patch value) if scoped to this chart. Run the blast radius and let its counts frame the question.
+   - Key absent + inheritance enabled + single y indicator + inheritable → the rendered text IS the indicator's → **route (a)** by default (fix at the source, per the default rule above). Route (c) is only the scope-down option in the blast-radius ask, when the user confirms the change should apply to this one chart and not the other surfaces — and make the trade-off explicit: the patch permanently detaches the field from the indicator's metadata.
    - Key absent + inheritance disabled, or multi-y-indicator chart (inheritance baseline ambiguous — same conservatism as `indicator_update.py`), or no ETL grapher config → **route (c)**.
 3. Entity selection / colors / axis / map settings → chart-config-only → **route (c)**. For selection edits, check the entities actually have data in the indicator (see the `check-empty-entities` skill's availability lookup).
 
@@ -104,7 +106,7 @@ Three routes:
 
 **Target = indicator:** → **route (a)**; blast radius on its variable ids.
 
-**Narrative charts** (rare): their config is a patch over the parent chart. Edit via `AdminAPI(OWIDEnv.from_staging(branch)).get_narrative_chart(id)` / `update_narrative_chart(id, cfg)` — and audit the **merged** config (`configFull` from the API), since the stored `full` can be stale.
+**Narrative charts** (rare): their config is a patch over the parent chart. Edit via `AdminAPI(OWIDEnv.from_staging(branch)).get_narrative_chart(id)` / `update_narrative_chart(id, cfg)` — and audit the **merged** config (`configFull` from the API), since the stored `full` can be stale. When a narrative chart is affected *indirectly* — because you edited its parent's FAUST — follow [Narrative-chart children of an edited FAUST field](#narrative-chart-children-of-an-edited-faust-field).
 
 ## Blast radius — notify and ask first
 
@@ -130,7 +132,19 @@ Decision rule: if surfaces **beyond the one the user pointed at** are affected (
 2. **Scope down** — name the concrete alternative: a view-level override in the MDim (route b) or an explicit chart-level value (route c), leaving other surfaces untouched.
 3. **Abort.**
 
-If the beyond-target count is zero, skip the ask and proceed.
+If the beyond-target count is zero, skip the ask and proceed. When the report lists narrative-chart children (affected or shielded), also run the section below before the checkpoint.
+
+## Narrative-chart children of an edited FAUST field
+
+Changing a chart's title/subtitle/note — whether via the indicator's ETL metadata (route a) or the chart's patch (route c) — also reaches its narrative-chart children. Check them with the same logic as `/update-dataset` step 7's stale-FAUST pass. For every child the blast radius lists (`narrative_charts.parentChartId`, plus `parentMultiDimXChartConfigId` when the parent is an MDim view):
+
+1. **Child inherits the field** (key absent from its patch — blast radius lists it as affected): it picks up the parent's new text automatically. Verify the **merged** config — `AdminAPI(OWIDEnv.from_staging(branch)).get_narrative_chart(id)["configFull"]`, never the stored `chart_configs.full` (it can be stale) — and list the child at the checkpoint so the user can eyeball the new text in the narrative framing.
+2. **Child overrides the field** (blast radius marks it shielded): compare its override against the parent's **pre-edit** text using `_find_stale_faust_overrides(child_patch, pre_edit_parent_config)` from `apps/indicator_upgrade/upgrade.py` (near-identical after markdown-link stripping = stale; substantially different = intentional). The pre-edit parent config MUST be the snapshot taken in workflow step 6, **before** the edit was applied — comparing against the already-updated parent makes a child that froze the old wording look "substantially different" and misclassifies the stale copy as an intentional rewrite:
+   - **Stale copy** — the child froze the parent's old text at creation time and no longer tracks it. Propose setting the child's field to the parent's **new exact text**, which drops the key out of the patch and restores inheritance. **Always ask the user before changing it** — narrative-chart text is reader-facing editorial content; never fold the child fix silently into the parent edit. Apply via `AdminAPI.update_narrative_chart` on staging.
+   - **Intentional rewrite** — leave it, but flag it at the checkpoint if the parent's new text now contradicts the child's framing (e.g. the parent's subtitle changed a definition the child's rewrite still states the old way).
+   - Leave numeric display overrides (`tolerance`, `numDecimalPlaces`, …) alone unless asked — they may be intentional.
+
+Like the parent edit itself, child fixes land on **staging only** and ride chart-diff to production after approval + merge.
 
 ## Workflow (edit mode)
 
@@ -141,7 +155,7 @@ If the beyond-target count is zero, skip the ask and proceed.
 3. Wait for staging readiness: retry `OWIDEnv.from_staging(branch).read_sql("SELECT 1")` (builds take a few minutes).
 4. Run `resolve_target.py` with the DB; pick the route via the decision tree.
 5. Run `blast_radius.py` per the rules above; ask the user if other surfaces are affected.
-6. Apply the edit:
+6. Apply the edit. **If the blast radius listed narrative-chart children, snapshot each parent's pre-edit rendered config FIRST** — the narrative-children pass compares against this, and after the edit the pre-edit text is gone. Save `chart_configs.full` from the staging DB to a scratch file, using the query that matches the parent type: for a chart parent (child listed via `parentChartId`), `SELECT cc.full FROM charts c JOIN chart_configs cc ON cc.id = c.configId WHERE c.id = <id>`; for an MDim-view parent (child listed via `parentMultiDimXChartConfigId`), `SELECT cc.full FROM multi_dim_x_chart_configs mx JOIN chart_configs cc ON cc.id = mx.chartConfigId WHERE mx.id = <mx_id>` (the child's `parent_view` / the view's `mx_id` in the blast-radius `--json` output). MDim view configs can be thin — if the edited field is absent from the view's `full` because it inherits from the indicator, also record the field's pre-edit rendered text from the staging indicator metadata API before editing. Then:
    - route (a): edit the garden `.meta.yml`, following the style rules below;
    - route (b): edit the MDim yaml/py (mind mirror constants);
    - route (c): `update_chart_config.py --branch <b> --chart-id <id> --set ... [--dry-run first]`.

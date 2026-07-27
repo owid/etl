@@ -289,9 +289,24 @@ def sweep_narrative_charts(env: OWIDEnv, chart_ids: list[int], mx_ids: list[int]
         rows.extend(df.to_dict(orient="records"))
     for row in rows:
         patch = json.loads(row["patch"]) if isinstance(row["patch"], str) else (row["patch"] or {})
-        row["shielded"] = bool(field and field.split(".")[0] in patch)
+        row["shielded"] = bool(field and _patch_has_path(patch, field))
         row.pop("patch", None)
     return rows
+
+
+def _patch_has_path(patch: dict, field: str) -> bool:
+    """True when the full dot-path exists in the patch — same semantics as the chart sweep's
+    JSON_CONTAINS_PATH; checking only the top-level key would treat e.g. `map: {colorScale: ...}`
+    as overriding `map.time` and wrongly shield the narrative chart."""
+    node: Any = patch
+    for part in field.split("."):
+        if isinstance(node, list) and part.isdigit() and int(part) < len(node):
+            node = node[int(part)]
+        elif isinstance(node, dict) and part in node:
+            node = node[part]
+        else:
+            return False
+    return True
 
 
 def sweep_gdoc_refs(env: OWIDEnv, slugs: list[str]) -> list[dict]:
@@ -337,10 +352,11 @@ def render_markdown(result: dict[str, Any], branch: str) -> str:
     affected_charts = [c for c in charts if not c.get("shielded") and not c.get("no_inherit_reason")]
     shielded = [c for c in charts if c.get("shielded")]
     no_inherit = [c for c in charts if c.get("no_inherit_reason") and not c.get("shielded")]
+    affected_narrative = [n for n in result["narrative_charts"] if not n.get("shielded")]
     lines.append(
         f"**Blast radius:** {len(affected_charts)} charts, {len(result['mdim_views'])} MDim views, "
         f"{sum(e['n_views'] for e in result['explorers'])} explorer views "
-        f"(in {len(result['explorers'])} explorers), {len(result['narrative_charts'])} narrative charts, "
+        f"(in {len(result['explorers'])} explorers), {len(affected_narrative)} narrative charts, "
         f"{len(result['gdoc_refs'])} article references."
     )
     lines.append("")
@@ -461,7 +477,7 @@ def main() -> None:
         "beyond_target_count": len([c for c in charts if not c.get("shielded") and not c.get("no_inherit_reason")])
         + len(mdim_views)
         + sum(e["n_views"] for e in explorers)
-        + len(narrative),
+        + len([n for n in narrative if not n.get("shielded")]),
     }
     if args.json:
         print(json.dumps(result, indent=2, default=str))
