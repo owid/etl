@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.collection import combine_collections
-from etl.collection.download_package import stage_download_package_for_collection
+from etl.collection.download_package import build_download_package_for_collection
 from etl.config import OWID_ENV
 from etl.helpers import PathFinder
 
@@ -296,20 +296,15 @@ def run() -> None:
     c.save()
 
     #
-    # PROTOTYPE (mdim-downloads project) -- ETL builds the wide table (no
-    # per-view HTTP fetch needed, data's already local) and stages it + an
-    # indicator index to R2. A Cloudflare Function on the grapher side builds
-    # the real metadata.json/readme.md/zip live, on every download request --
-    # same as a regular chart's own download, not a pre-baked artifact. See
-    # mdim-downloads/solution-space/etl-feasibility.md. Needs c.save() to have
-    # already run once so indicator catalog paths are fully expanded.
+    # PROTOTYPE (mdim-downloads project) -- build the "complete dataset" zip
+    # (wide CSV + metadata.json + readme.md, covering every dimension
+    # combination) and publish it to R2. The data page just links to it. Needs
+    # c.save() to have already run once, so indicator catalog paths are fully
+    # expanded and the MDIM has a page slug. See
+    # mdim-downloads/solution-space/etl-feasibility.md.
     #
-    staged = stage_download_package_for_collection(
-        c,
-        dest_dir=paths.dest_dir / "download_package",
-        slug=paths.short_name,
-    )
-    c.download_package = staged.to_config()
+    package = build_download_package_for_collection(c, dest_dir=paths.dest_dir / "download_package")
+    c.download_package = package.to_config()
     c.upsert_to_db(OWID_ENV)
 
 
