@@ -39,8 +39,47 @@ power users).
         environment — only put values there that are okay to share within the
         org (like the 1Password ones above).
 
-3. Next to the environment selector is the repository picker — choose
+3. In the same settings, paste the [setup script](#setup-script) below.
+4. Next to the environment selector is the repository picker — choose
    `owid/etl`.
+
+### Setup script
+
+The sandbox image ships an old `uv` and an empty package cache, which makes
+every session slow to start and can silently rewrite `uv.lock` (see below).
+This script fixes both. It runs once, and the resulting filesystem is
+snapshotted, so later sessions skip it entirely; the snapshot rebuilds when you
+edit the environment settings and automatically after ~7 days.
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+# The sandbox has shipped uv 0.8.17, which cannot parse the relative
+# `exclude-newer = "3 days"` in pyproject.toml: it discards the whole [tool.uv]
+# table, concludes the lockfile's cutoff was removed, and re-resolves every
+# dependency — a ~2000-line uv.lock diff that silently bumps hundreds of
+# packages. uv 0.10 is the first release that handles it. The install script is
+# used rather than `uv self update`, which hits GitHub API rate limits here.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+
+# The setup script runs before the session's repo is cloned, so clone it here
+# to warm the uv cache. The .venv itself cannot be reused (it hard-codes
+# absolute paths), but ~/.cache/uv goes into the snapshot, which turns the
+# session's own `uv sync` from a multi-minute download into a few seconds.
+git clone --depth 1 https://github.com/owid/etl /opt/etl-setup
+cd /opt/etl-setup
+UV_HTTP_TIMEOUT=300 uv sync --all-extras --group dev
+```
+
+Also add `UV_HTTP_TIMEOUT=300` to the environment variables: uv's 30-second
+default times out on large wheels (grpcio, torch) through the sandbox's egress
+proxy.
+
+Sessions still build their own `.venv` — that part runs from
+`scripts/remote_setup.sh`, wired as a `SessionStart` hook — but from a warm
+cache and with a current uv.
 
 ## Create a dataset
 

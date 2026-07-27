@@ -417,6 +417,11 @@ When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinn
 See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
 - `pipeline-stages.md` - Pipeline architecture details
+- `cloud-sandbox.md` - Claude Code on the web: what a cloud session can and can't do
+
+If you are running in a Claude Code cloud sandbox (`CLAUDE_CODE_REMOTE=true`), read
+`.claude/docs/cloud-sandbox.md` **before starting work** — it covers the pre-created
+branch name, spurious `uv.lock` diffs, and the absence of a database.
 
 ## Individual Preferences
 
