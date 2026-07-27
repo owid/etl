@@ -102,6 +102,41 @@ From there:
    the PR).
 3. Merge the PR — this syncs your charts to production.
 
+## Drive cloud sessions from the terminal
+
+If you already work in the terminal, you don't have to switch to the browser to
+use the cloud environment — and you don't have to copy results back by hand.
+From the ETL repository:
+
+```bash
+claude --cloud "Run the cherry blossom step and report what breaks"
+```
+
+This starts a cloud session on the same environment while you keep working
+locally. The VM clones from GitHub rather than from your machine, so **push
+your branch first**. Then:
+
+- `/tasks` — check on running sessions (each `claude --cloud` is its own
+  session, so you can start several in parallel).
+- `/teleport` (or `/tp`) — pull a session into your terminal: it checks out the
+  branch and loads the full conversation history, so the local session
+  continues where the cloud one left off.
+
+Neither flag appears in `claude --help`, but both work.
+
+This is the practical way to debug the cloud environment itself: run
+`check-tools` in a session to get the exact versions of everything installed
+(the command only exists there), then reproduce locally against that specific
+version rather than trying to recreate the whole VM — there is no published
+image for it.
+
+!!! note
+
+    Cloud sessions get the repository's `CLAUDE.md`, `.claude/` skills and
+    agents, and the `SessionStart` hook, but **not** your personal
+    `~/.claude/CLAUDE.md`. Anything a cloud session needs to know has to live
+    in the repo — see [`.claude/docs/cloud-sandbox.md`](https://github.com/owid/etl/blob/master/.claude/docs/cloud-sandbox.md).
+
 ## Feedback
 
 This workflow is actively evolving. If you try it, share your session or
