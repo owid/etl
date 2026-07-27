@@ -668,23 +668,14 @@ def run() -> None:
     # Harmonize country names
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # Apply any declared corrections for known upstream errors (lgbti_national_policy_dataset.corrections.yml,
-    # if present). The v2.0 gender-marker corrections were retired once the producer re-coded those rows in
-    # the 2026-07-24 (v2.1) revision, so no corrections file currently ships.
-    tb = paths.apply_corrections(tb)
+    # NOTE: We ship Velasco v2.1 exactly as published — no local data corrections are applied. The known
+    # source issues found in review (the Mexico/Venezuela incitement-to-hatred status misfile; the
+    # gender-marker requirement frozen at the pre-reform value for ~9 self-ID/de-medicalized countries;
+    # and the Nepal marriage coding) are documented in PR #6454 and reported to the producer, to be
+    # applied only once agreed with the topic owner or fixed upstream. Keeping staging equal to the source
+    # makes it unambiguous which values come from Velasco vs. any later OWID edit.
 
-    # Repair a status misfile the producer introduced in the 2026-06-12 revision (see function docstring).
-    # (Kept in code rather than corrections.yml: it's a rule-based proportion swap across two status
-    # rows, which the declarative format can't express.)
-    tb = _fix_misfiled_incitement_status(tb)
-
-    # Correct gender-marker requirements the producer left frozen at the pre-reform value, and reflect
-    # Nepal's court-ordered marriage recognition. Both are year-scoped rule-based fixes (a value/status
-    # override from a reform year onward) that the declarative corrections format can't express.
-    tb = _fix_lagging_gender_marker_requirements(tb)
-    tb = _fix_nepal_marriage_recognition(tb)
-
-    # Validate the value columns (after corrections, so local fixes are covered too).
+    # Validate the value columns.
     sanity_check_proportions(tb)
 
     # Drop structural-placeholder (law, status) combinations — combos that are all-zero per the codebook.
@@ -754,103 +745,6 @@ def run() -> None:
         default_metadata=ds_meadow.metadata,
     )
     ds_garden.save()
-
-
-def _fix_misfiled_incitement_status(tb):
-    """Repair a source misfile introduced in the producer's 2026-06-12 revision of v2.0.
-
-    Mexico's and Venezuela's incitement-to-hatred protections (their own Source_1 citations are
-    protection statutes: Mexico's LFPED 2014 Art. 9; Venezuela's Ley contra el Odio 2017 Art. 20)
-    are coded under status="illegal" with the "legal" rows zeroed — while the codebook (§6.5:
-    for Incitement to Hatred, "Legal" means the protection is in force) and the other 48 countries
-    with the same protection type carry it under "legal". The March 2026 release also had both
-    countries under "legal". We swap the proportions back so the two countries don't silently flip
-    to "Not prohibited" on published charts. NOTE: reported to the producer; the assert below fails
-    loudly when the misfile is fixed upstream — then delete this function and its call.
-    """
-    for country in ["Mexico", "Venezuela"]:
-        m = (tb["country"] == country) & (tb["law"] == "incitement_to_hatred")
-        legal, illegal = m & (tb["status"] == "legal"), m & (tb["status"] == "illegal")
-        assert tb.loc[illegal, "proportion"].max() == 1 and tb.loc[legal, "proportion"].max() == 0, (
-            f"{country}'s incitement-to-hatred rows no longer look misfiled (protection not under "
-            "'illegal' anymore) — the upstream error may be fixed; remove _fix_misfiled_incitement_status."
-        )
-        active_years = tb.loc[illegal & (tb["proportion"] > 0), "year"].unique()
-        tb.loc[legal & tb["year"].isin(active_years), "proportion"] = 1.0
-        tb.loc[illegal, "proportion"] = 0.0
-    return tb
-
-
-# Gender-marker-change requirements the producer's v2.1 field left frozen at the strictest pre-reform
-# value across the whole panel (codebook §4.5/§6.7 make the field time-varying, but these reforms are
-# not reflected). Each is corrected FROM its reform year onward; pre-reform years keep the old,
-# correct-for-then value. Countries that adopted purely administrative self-declaration map to "Self-ID";
-# France and Greece removed the medical requirement but kept a judicial procedure, so they map to the
-# producer's own "Court Order" value. All reforms verified against ≥2 independent sources during the
-# adversarial review (ai/adversarial-review-lgbti_national_policy_dataset-2026-07-24.md); reported to the
-# producer. Format: country -> (reform_year, expected_current_value, corrected_value).
-_GMC_REQUIREMENT_FIXES = {
-    "Malta": (2015, "Surgery", "Self-ID"),  # GIGESC Act 2015 — self-ID, no medical/surgical requirement
-    "Denmark": (2014, "Surgery+Sterilization", "Self-ID"),  # 2014 self-determination law; no medical certification
-    "Portugal": (2018, "Surgery", "Self-ID"),  # Law 38/2018 — administrative self-determination, no diagnosis
-    "Brazil": (2018, "Surgery", "Self-ID"),  # STF ADI 4275 (2018) — registry self-declaration, no surgery/judicial
-    "Colombia": (2015, "Surgery", "Self-ID"),  # Decreto 1227/2015 — notarial declaration, no medical
-    "Iceland": (2019, "Medical Diagnosis", "Self-ID"),  # Gender Autonomy Act 80/2019 — self-determination
-    "New Zealand": (
-        2023,
-        "Medical Diagnosis",
-        "Self-ID",
-    ),  # BDMRR Act 2021 (in force 15 Jun 2023) — statutory declaration
-    "France": (
-        2017,
-        "Surgery+Sterilization",
-        "Court Order",
-    ),  # Law 2016-1547 (Civ. Code 61-5/61-6) — judicial, no medical
-    "Greece": (2017, "Surgery", "Court Order"),  # Law 4491/2017 — court decision, no medical
-}
-
-
-def _fix_lagging_gender_marker_requirements(tb):
-    """Correct gender_marker_change requirements the producer left frozen at the pre-reform value.
-
-    For each country in `_GMC_REQUIREMENT_FIXES`, overwrite `gender_change_requirement` on the
-    gender_marker_change/legal rows FROM the reform year onward. The assert fails loudly if the
-    producer fixes the field upstream (the pre-fix value is no longer the expected one) — then delete
-    that country's entry. Pre-reform years are untouched, so their correct-for-then requirement stays.
-    """
-    is_gmc = (tb["law"] == "gender_marker_change") & (tb["status"] == "legal")
-    for country, (reform_year, old, new) in _GMC_REQUIREMENT_FIXES.items():
-        post = is_gmc & (tb["country"] == country) & (tb["year"] >= reform_year)
-        current = sorted(tb.loc[post, "gender_change_requirement"].dropna().unique().tolist())
-        assert current == [old], (
-            f"{country} gender_marker_change requirement from {reform_year} is {current}, expected ['{old}'] — "
-            "the producer may have fixed it upstream; remove its entry from _GMC_REQUIREMENT_FIXES."
-        )
-        tb.loc[post, "gender_change_requirement"] = new
-    return tb
-
-
-def _fix_nepal_marriage_recognition(tb):
-    """Reflect Nepal's court-ordered same-sex marriage recognition (2023 onward).
-
-    v2.1 codes Nepal marriage as "Banned" (marriage_equality/illegal = 1, legal = 0) on the strength of
-    the Muluki Civil Code's man-woman definition. But Nepal's Supreme Court ordered an interim same-sex
-    marriage register in 2023 and the first marriages were registered from November 2023, making Nepal
-    the first South Asian country to recognize same-sex marriage. The codebook's own convention counts
-    operative court practice as a binding pathway, so from 2023 we set the Legal direction in force and
-    clear the codified-ban direction (otherwise the combined key legal=1/ban=1 is unmapped). Pre-2023
-    years are untouched. Self-canceling assert. Verified: Wikipedia, Equaldex (PR #6454); reported to
-    the producer.
-    """
-    m = (tb["law"] == "marriage_equality") & (tb["country"] == "Nepal") & (tb["year"] >= 2023)
-    legal, illegal = m & (tb["status"] == "legal"), m & (tb["status"] == "illegal")
-    assert (tb.loc[legal, "proportion"] == 0).all() and (tb.loc[illegal, "proportion"] == 1).all(), (
-        "Nepal marriage_equality from 2023 no longer looks like legal=0 / ban=1 — the producer may have "
-        "recoded it; re-check and remove _fix_nepal_marriage_recognition."
-    )
-    tb.loc[legal, "proportion"] = 1.0
-    tb.loc[illegal, "proportion"] = 0.0
-    return tb
 
 
 def sanity_check_proportions(tb):
@@ -935,17 +829,14 @@ def sanity_check_index(tb):
 def _detect_structural_placeholders(tb):
     """Return the set of (law, status) combos that are zero for every country and year.
 
-    Codebook v2.0 (June 2026 revision) §3.3 reports 17 placeholders and 37 active combinations.
-    We detect them dynamically and assert the count to surface any source-side coding changes.
-    NOTE: we assert 18, not 17 — the incitement_to_hatred/illegal combo becomes all-zero after
-    _fix_misfiled_incitement_status moves its only two countries back to the legal direction.
-    When that correction is removed, restore the assert to the codebook's own count.
+    Codebook (2026 revision) §3.3 reports 17 placeholders and 37 active combinations. We detect them
+    dynamically and assert the count to surface any source-side coding changes. We ship the source
+    as-is (no local corrections), so this matches the codebook's own count of 17.
     """
     placeholder_series = tb.groupby(["law", "status"], observed=True)["proportion"].max()
     placeholders = set(placeholder_series[placeholder_series == 0].index)
-    assert len(placeholders) == 18, (
-        f"Expected 18 placeholder (law, status) combos (17 per codebook v2.0 §3.3 + "
-        f"incitement_to_hatred/illegal zeroed by our misfile correction); found {len(placeholders)}."
+    assert len(placeholders) == 17, (
+        f"Expected 17 placeholder (law, status) combos per codebook §3.3; found {len(placeholders)}."
     )
     return placeholders
 
