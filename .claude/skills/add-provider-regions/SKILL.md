@@ -205,8 +205,8 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
         description_short: |-
           Regions as defined by <Provider full name>.
         type: ordinal
-        sort:
-          - <Region> (<Provider>)              # legend order
+        sort:                                    # legend/map order — see ordering rule below
+          - <Region> (<Provider>)
           - ...
         origins:
           - *origins_<provider>
@@ -221,6 +221,8 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
                 customHiddenCategories:
                   "No data": true
 ```
+
+> **Ordering rule for `sort`:** order the regions so they read **roughly left-to-right across a world map** — i.e. by approximate west-to-east longitude, starting with North America. A good default sweep is: North America → (Central/South America or Latin America) → Europe → Africa → Middle East → (CIS / Central Asia) → Asia (Pacific) → Oceania. Drop the regions the provider doesn't have and keep the rest in this relative order. This `sort` drives the map legend order **and** the categorical color assignment (colors are handed out in sort order), so keep the same order in the owid-grapher `customRegionDisplayOrder[<provider>]` (Step 9) and in the region-definition chart (Step 7) so the legend, the chart, and the hover all agree.
 
 **6c. Cross-tier back-fill** — if Step 3 found a region shared across tiers, add the masked back-fill to `grapher/regions/2023-01-01/regions.py` after the inversion loop (see the existing `process_un_definitions` example for the shape).
 
@@ -294,7 +296,7 @@ git add etl/steps/data/garden/regions/2023-01-01/regions.yml \
 git commit -m "📊🤖 Add <Provider> regions to regions dataset"
 ```
 
-If not already on a feature branch, create one and a PR with `etl pr "Add <Provider> regions" data`, then push. In the PR body, open with the disclosure blockquote (`> _Written by Claude Code — @<handle> at the wheel._`) and keep any reviewer attribution out of committed code/YAML.
+If not already on a feature branch, create one and a PR with `etl pr "Add <Provider> regions" data`, then push. In the PR body, open with the disclosure blockquote (`> _Written by Claude <model name> — @<handle> at the wheel._`, model name = the model actually generating the content) and keep any reviewer attribution out of committed code/YAML.
 
 > **Heads-up:** once this merges, the post-merge deploy is **slow** — editing the regions dataset invalidates much of the DAG, so it can take hours for the new regions to reach the production catalog. The owid-grapher follow-up (Step 9) can't start until they do, so don't expect to chain straight into it.
 
@@ -368,6 +370,13 @@ yarn typecheck          # surfaces any missing label-record entries (the Record<
 yarn fixLintChanged     # lint the changed files; yarn fixFormatChanged to format
 ```
 Confirm the provider appears in `regionGroupLabels` and the relevant label record(s), and that typecheck is clean (a missing entry in a `Record<RegionDataProvider, …>` / `Record<TooltipKey, …>` registry is a compile error — that's your safety net). Open a PR in `owid-grapher` (title like `🔨 update regions file`), with the disclosure blockquote in the body.
+
+### Renaming existing regions (not a fresh add)
+
+Occasionally you're not adding a provider but **renaming** its already-published regions (e.g. WID's `MENA (WID)` → `Middle East and North Africa (WID)`, or `&` → `and`). The Step 9 flow is the same, with two wrinkles:
+
+- **Finish with `runRegionsUpdater` from prod — never merge on a hand-edit.** Renaming a region's `name` shifts the derived name / `RegionDataProvider` union types, so it's tempting to hand-edit the `name`s directly in `regions.data.ts` to keep `yarn typecheck` green before the prod catalog has rebuilt. That stopgap is **always incomplete**: the updater also regenerates each region's `shortName` and `slug` *from* the name, which a hand-edit silently misses (on the WID rename the stopgap kept the stale `mena-wid` slug and dropped MENA's `shortName`). Once the rename is live on prod, run `runRegionsUpdater` and let it overwrite the file — the diff exposes any derived field the stopgap got wrong. Treat the regenerated file as the source of truth, not the hand-edit.
+- **Ignore the "set up redirects" message for provider regions.** The updater unconditionally prints *"Be sure to set up redirects for any slugs that have changed"* on **any** change to `regions.data.ts`. But a `slug` only drives a URL for a **country** profile page (`/country/<slug>`, baked only for `regionType: "country"` — see `countries` in `regionsUtils.ts`). Provider regions are `regionType: "aggregate"` and have no country page, so their slug changes need **no** redirect. Only act on that warning if a real *country's* slug changed.
 
 ---
 

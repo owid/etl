@@ -55,18 +55,19 @@ steps:
   ############################################################
 
   # OECD Health Expenditure and Financing Database
-  data://garden/oecd/2025-12-11/health_expenditure:
-    - data://meadow/oecd/2025-12-11/health_expenditure:
-      - snapshot://oecd/2025-12-11/health_expenditure.csv
-  data://grapher/oecd/2025-12-11/health_expenditure:
-    - data://garden/oecd/2025-12-11/health_expenditure
+  data://garden/oecd/2026-07-07/health_expenditure:
+    - data://meadow/oecd/2026-07-07/health_expenditure:
+      - snapshot://oecd/2026-07-07/health_expenditure.csv
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/oecd/2026-07-07/health_expenditure:
+    - data://garden/oecd/2026-07-07/health_expenditure
 
   #
   # Health expenditure as a share of GDP (OMM)
   #
   data://grapher/health_expenditure/2025-07-10/health_expenditure_omm:
     - data://garden/health_expenditure/2025-07-10/health_expenditure_omm:
-      - data://garden/oecd/2025-12-11/health_expenditure
+      - data://garden/oecd/2026-07-07/health_expenditure
       # OECD health expenditure (1960-1991) (1993)
       - data://garden/oecd/2025-03-04/health_expenditure_1993:
         - data://meadow/oecd/2025-03-04/health_expenditure_1993:
@@ -85,22 +86,21 @@ steps:
     - data://garden/sipri/2026-04-27/military_expenditure:
       - data://meadow/sipri/2026-04-27/military_expenditure:
         - snapshot://sipri/2026-04-27/military_expenditure.xlsx
-      - data://garden/worldbank_wdi/2026-02-27/wdi
+      - data://garden/worldbank_wdi/2026-07-14/wdi
 
   # Global Military Spending Dataset
-  data://grapher/harvard/2025-04-28/global_military_spending_dataset:
-    - data://garden/harvard/2025-04-28/global_military_spending_dataset:
+  data://grapher/harvard/2026-07-22/global_military_spending_dataset:
+    - data://garden/harvard/2026-07-22/global_military_spending_dataset:
       - data://garden/demography/2024-07-15/population
-      - data://garden/cow/2024-07-26/national_material_capabilities
+      - data://garden/cow/2026-07-22/national_material_capabilities
       - data://garden/countries/2024-08-27/gleditsch
-      - data://meadow/harvard/2025-04-28/global_military_spending_dataset:
-        - snapshot://harvard/2025-04-28/global_military_spending_dataset.rds
-        - snapshot://harvard/2025-04-28/global_military_spending_dataset_burden.rds
+      - data://meadow/harvard/2026-07-22/global_military_spending_dataset:
+        - snapshot://harvard/2026-07-22/global_military_spending_dataset.rds
+        - snapshot://harvard/2026-07-22/global_military_spending_dataset_burden.rds
 
   # Correlates of War - National Material Capabilities
-  data://garden/cow/2024-07-26/national_material_capabilities:
-    - data://meadow/cow/2024-07-26/national_material_capabilities:
-      - snapshot://cow/2024-07-26/national_material_capabilities.csv
-    - data://garden/countries/2023-09-29/cow_ssm
-  data://grapher/cow/2024-07-26/national_material_capabilities:
-    - data://garden/cow/2024-07-26/national_material_capabilities
+  data://grapher/cow/2026-07-22/national_material_capabilities:
+    - data://garden/cow/2026-07-22/national_material_capabilities:
+      - data://garden/countries/2023-09-29/cow_ssm
+      - data://meadow/cow/2026-07-22/national_material_capabilities:
+        - snapshot://cow/2026-07-22/national_material_capabilities.zip

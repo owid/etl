@@ -44,9 +44,7 @@ def run() -> None:
     ## Yearly data
     tb_year = tb_year.rename(columns={"month": "date"})
     ## Monthly data
-    ## FIXES
-    ## Fix "225" should be "2025"
-    tb_month["month"] = tb_month["month"].str.replace("12/1/225", "12/1/2025")
+    tb_month = paths.apply_corrections(tb_month)
     # date_1 = pd.to_datetime(tb_month["month"], format="%b-%y", errors="coerce")
     # date_2 = pd.to_datetime(tb_month["month"], format="%y-%b", errors="coerce")
     # date_3 = pd.to_datetime("200" + tb_month["month"].astype(str), format="%Y-%b", errors="coerce")
@@ -55,6 +53,9 @@ def run() -> None:
     tb_month["date"] = pr.to_datetime(tb_month["month"], format="%m/%d/%Y")
     assert tb_month["date"].notna().all(), "Some dates could not be parsed."
     tb_month = tb_month.drop(columns=["month"])
+
+    # Check that the two tables published by the source are consistent with each other.
+    sanity_check_totals(tb_month, tb_year)
 
     # Harmonize country names
     tb_month = paths.regions.harmonize_names(tb=tb_month)
@@ -106,6 +107,23 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def sanity_check_totals(tb_month: Table, tb_year: Table) -> None:
+    """Check that the monthly cases add up to the yearly totals, both of them reported by the source.
+
+    The source publishes the same cases twice, as a monthly series and as yearly totals. A mismatch means
+    that one of the two was updated without the other, and would give us two contradicting indicators.
+    """
+    monthly = (
+        tb_month.assign(year=tb_month["date"].dt.year).groupby(["country", "year"], observed=True)["avian_cases"].sum()
+    )
+    yearly = tb_year.assign(year=tb_year["date"].astype(int)).set_index(["country", "year"])["avian_cases"]
+
+    assert set(monthly.index) == set(yearly.index), "Monthly and yearly data cover different country-years."
+
+    mismatch = monthly[monthly != yearly.loc[monthly.index]]
+    assert mismatch.empty, f"Monthly cases don't add up to the yearly totals reported by the source:\n{mismatch}"
 
 
 def add_regions(tb, ds_regions: Dataset) -> Table:

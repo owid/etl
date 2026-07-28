@@ -506,3 +506,47 @@ steps:
   # archived; last active in 84c142b71404 on 2026-02-11
   export://multidim/wb/latest/world_bank_pip:
     - data://grapher/wb/2026-01-22/world_bank_pip
+  # archived; last active in 26734197a82b on 2026-06-26
+  data://garden/poverty_inequality/2025-01-22/poverty_inequality_file:
+    - data://garden/wb/2026-03-24/world_bank_pip
+    - data://garden/wid/2026-02-10/world_inequality_database
+  # archived; last active in 8065c2e1d6da on 2026-06-29
+  data://grapher/wb/2026-03-24/world_bank_pip:
+    - data://garden/wb/2026-03-24/world_bank_pip
+  # archived; last active in 8065c2e1d6da on 2026-06-29
+  data://meadow/wb/2026-03-24/world_bank_pip:
+    - snapshot://wb/2026-03-24/world_bank_pip_percentiles.csv
+    - snapshot://wb/2026-03-24/world_bank_pip.csv
+  # archived; last active in 8065c2e1d6da on 2026-06-29
+  data://garden/wb/2026-03-24/world_bank_pip:
+    - data://meadow/wb/2026-03-24/world_bank_pip
+  # archived; last active in 8065c2e1d6da on 2026-06-29
+  data://garden/wb/2026-03-24/world_bank_pip_legacy:
+    - data://meadow/wb/2026-03-24/world_bank_pip
+  # archived; last active in a6a7fbaabae4 on 2026-07-07
+  data://grapher/wid/2026-02-10/world_inequality_database:
+    - data://garden/wid/2026-02-10/world_inequality_database
+  # archived; last active in a6a7fbaabae4 on 2026-07-07
+  data://garden/wid/2026-02-10/world_inequality_database:
+    - data://meadow/wid/2026-02-10/world_inequality_database
+  # archived; last active in a6a7fbaabae4 on 2026-07-07
+  data://garden/wid/2026-02-10/world_inequality_database_legacy:
+    - data://meadow/wid/2026-02-10/world_inequality_database
+  # archived; last active in a6a7fbaabae4 on 2026-07-07
+  data://meadow/wid/2026-02-10/world_inequality_database:
+    - snapshot://wid/2026-02-10/world_inequality_database_with_extrapolations.csv
+    - snapshot://wid/2026-02-10/world_inequality_database.csv
+    - snapshot://wid/2026-02-10/world_inequality_database_distribution_with_extrapolations.csv
+    - snapshot://wid/2026-02-10/world_inequality_database_distribution.csv
+    - snapshot://wid/2026-02-10/world_inequality_database_fiscal.csv
+    - data://garden/regions/2023-01-01/regions
+  # archived; last active in 9d251260ad8b on 2026-07-28
+  data://explorers/poverty_inequality/latest/poverty_inequality:
+    - data://explorers/wb/latest/world_bank_pip
+    - data://explorers/wid/latest/world_inequality_database
+  # archived; last active in 9d251260ad8b on 2026-07-28
+  data://explorers/wid/latest/world_inequality_database:
+    - data://garden/wid/2026-06-18/world_inequality_database_legacy
+  # archived; last active in 1c3d0dac654a on 2026-07-28
+  data://garden/wid/2026-06-18/world_inequality_database_legacy:
+    - data://meadow/wid/2026-06-18/world_inequality_database

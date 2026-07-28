@@ -25,7 +25,7 @@ dataset:
   title: Deaths from famines by year and decade
 
   owners:
-    - Veronika Samborska
+    - Pablo Arriagada
 tables:
   total_famines_by_year_decade:
     variables:

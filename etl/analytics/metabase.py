@@ -25,7 +25,10 @@ log = get_logger()
 
 # Config
 COLLECTION_EXPERT_ID = 61  # Expert collection
-DATABASE_ID = 2  # Semantic Layer database
+# Default DB for created questions = the semantic layer (now the prod_semantic dataset on the
+# BigQuery "Data warehouse" connection; the old DuckDB connection (id 2) was retired). Single
+# source of truth with the read path.
+DATABASE_ID = METABASE_SEMANTIC_LAYER_DATABASE_ID
 
 # HTTP status codes that indicate Metabase is temporarily unavailable rather than a permanent error.
 # Metabase is restarted by the analytics pipeline whenever the DuckDB mirrors are rebuilt (daily, plus
@@ -101,7 +104,7 @@ def read_metabase(
     }
     body = {
         "query": {
-            # Database corresponding to the Semantic Layer (DuckDB).
+            # Database corresponding to the Semantic Layer (BigQuery).
             "database": database_id,
             "type": "native",
             "native": {"query": re.sub(r"\s+", " ", sql.strip())},
@@ -113,7 +116,7 @@ def read_metabase(
     # I cannot get the /api/dataset/csv endpoint to work when sending a dict (or json.dumps(dict)) to the POST body,
     # so I instead urlencode the body. The url encoding is a little awkward – we cannot simply use urllib.parse.urlencode(body)
     # b/c python dict single quotes need to be changed to double quotes. But we can't naively change all single quotes to
-    # double quotes b/c the sql query might include single quotes (and DuckDB doesn't allow double quotes). So the line below
+    # double quotes b/c the sql query might include single quotes (and double quotes mean identifiers, not strings). So the line below
     # executes the url encoding without replacing any quotes within the sql query.
     urlencoded = "&".join([f"{k}={urllib.parse.quote_plus(json.dumps(v))}" for k, v in body.items()])
 
@@ -203,10 +206,10 @@ def create_question(
 ):
     """Create a question in Metabase with the given SQL query and title.
 
-    This tool should be used once we are sure that the query is valid in Datasette.
+    This tool should be used once we are sure that the query is valid (i.e. it ran successfully against the semantic layer).
 
     Args:
-        query: Query user for Datasette/Metabase.
+        query: SQL query (BigQuery / GoogleSQL) for the Metabase question.
         title: Title that describes what the query does. Should be short, but concise.
     Returns:
         Question object from Metabase API.

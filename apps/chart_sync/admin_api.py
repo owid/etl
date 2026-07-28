@@ -289,7 +289,9 @@ class AdminAPI:
 def requests_with_retry() -> requests.Session:
     s = requests.Session()
     s.headers["User-Agent"] = USER_AGENT
-    retries = Retry(total=5, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+    # 401 is included because staging's admin API can transiently reject a valid key while
+    # grapher-build's DB migrations run concurrently with this build (see owid/ops#540).
+    retries = Retry(total=5, backoff_factor=1, status_forcelist=[401, 500, 502, 503, 504])
     s.mount("http://", HTTPAdapter(max_retries=retries))
     s.mount("https://", HTTPAdapter(max_retries=retries))
     return s

@@ -1,4 +1,16 @@
 steps:
+  # Top wealth shares in the UK over more than a century (Alvaredo, Atkinson and Morelli, 2018)
+  data://grapher/economics/2026-07-28/wealth_uk:
+    - data://garden/economics/2026-07-28/wealth_uk:
+      - data://meadow/economics/2026-07-28/wealth_uk:
+        - snapshot://economics/2026-07-28/wealth_uk.csv
+
+  # US top wealth shares (Saez and Zucman, 2020 - Journal of Economic Perspectives)
+  data://grapher/economics/2026-07-28/saez_zucman_wealth_shares:
+    - data://garden/economics/2026-07-28/saez_zucman_wealth_shares:
+      - data://meadow/economics/2026-07-28/saez_zucman_wealth_shares:
+        - snapshot://economics/2026-07-28/saez_zucman_wealth_shares.xlsx
+
   # OWID - OWID Deflator.
   data://garden/economics/2025-08-29/owid_deflator:
     # World Bank - WDI (specifically indicators used for inflation adjustments).

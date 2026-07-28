@@ -2211,3 +2211,17 @@ def test_rename_choice_slug_invalid_dedup_value_raises():
     )
     with pytest.raises(ValueError, match="must be 'inherit' or 'overwrite'"):
         c.rename_choice_slug("d", "old", "new", dedup_slug="bogus")  # type: ignore[arg-type]
+
+
+def test_convert_description_key_lists_flattens_anchored_lists():
+    """`- *anchor` authoring in collection configs produces nested lists, which
+    must be flattened before the list is converted to a markdown string."""
+    from etl.collection.model.core import _convert_description_key_lists
+
+    config = {
+        "metadata": {"description_key": [["shared one", "shared two"], "extra"]},
+        "views": [{"metadata": {"description_key": ["only"]}}],
+    }
+    _convert_description_key_lists(config)
+    assert config["metadata"]["description_key"] == "- shared one\n- shared two\n- extra"
+    assert config["views"][0]["metadata"]["description_key"] == "only"

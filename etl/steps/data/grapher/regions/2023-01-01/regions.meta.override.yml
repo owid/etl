@@ -59,6 +59,26 @@ definitions:
     url_main: https://ilostat.ilo.org/
     date_accessed: "2026-02-03"
     attribution_short: ILO
+  origins_fao: &origins_fao
+    producer: Food and Agriculture Organization of the United Nations
+    title: FAOSTAT country groups
+    url_main: https://www.fao.org/faostat/en/#definitions
+    date_accessed: "2026-02-25"
+    attribution_short: FAOSTAT
+  origins_ei: &origins_ei
+    producer: Energy Institute
+    title: Energy Institute world regions
+    url_main: https://www.energyinst.org/statistical-review/
+    date_accessed: "2026-07-02"
+    citation_full: Energy Institute - Statistical Review of World Energy (2026).
+    attribution_short: Energy Institute
+  origins_ember: &origins_ember
+    producer: Ember
+    title: Ember world regions
+    url_main: https://ember-energy.org/data/yearly-electricity-data/
+    date_accessed: "2026-04-24"
+    citation_full: Ember - Yearly Electricity Data (2026).
+    attribution_short: Ember
 
 tables:
   regions:
@@ -335,6 +355,88 @@ tables:
         origins:
           - *origins_iea_regions
 
+      # Energy Institute
+      ei_region:
+        title: World regions according to the Energy Institute
+        description_short: |-
+          Regions as defined by the Energy Institute in its Statistical Review of World Energy.
+        type: ordinal
+        sort:
+          - North America (EI)
+          - South and Central America (EI)
+          - Europe (EI)
+          - Africa (EI)
+          - Middle East (EI)
+          - CIS (EI)
+          - Asia Pacific (EI)
+        origins:
+          - *origins_ei
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryColors:
+                  "North America (EI)": "#CC7641"
+                  "South and Central America (EI)": "#B04E74"
+                  "Europe (EI)": "#526F9B"
+                  "CIS (EI)": "#92D3DE"
+                  "Middle East (EI)": "#C3A27C"
+                  "Africa (EI)": "#A07AB8"
+                  "Asia Pacific (EI)": "#6FA54F"
+                customCategoryLabels:
+                  "North America (EI)": "North America"
+                  "South and Central America (EI)": "South and Central America"
+                  "Europe (EI)": "Europe"
+                  "CIS (EI)": "CIS"
+                  "Middle East (EI)": "Middle East"
+                  "Africa (EI)": "Africa"
+                  "Asia Pacific (EI)": "Asia Pacific"
+                customHiddenCategories:
+                  "No data": true
+
+      # Ember
+      ember_region:
+        title: World regions according to Ember
+        description_short: |-
+          Regions as defined by Ember in its Yearly Electricity Data.
+        type: ordinal
+        sort:
+          - North America (Ember)
+          - Latin America and Caribbean (Ember)
+          - Europe (Ember)
+          - Africa (Ember)
+          - Middle East (Ember)
+          - Asia (Ember)
+          - Oceania (Ember)
+        origins:
+          - *origins_ember
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryColors:
+                  "North America (Ember)": "#CC7641"
+                  "Latin America and Caribbean (Ember)": "#B04E74"
+                  "Europe (Ember)": "#526F9B"
+                  "Africa (Ember)": "#A07AB8"
+                  "Middle East (Ember)": "#C3A27C"
+                  "Asia (Ember)": "#238A84"
+                  "Oceania (Ember)": "#5FB8C8"
+                customCategoryLabels:
+                  "Africa (Ember)": "Africa"
+                  "Asia (Ember)": "Asia"
+                  "Europe (Ember)": "Europe"
+                  "Latin America and Caribbean (Ember)": "Latin America and Caribbean"
+                  "Middle East (Ember)": "Middle East"
+                  "North America (Ember)": "North America"
+                  "Oceania (Ember)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
+
       # Pew
       pew_region:
         title: World regions according to Pew
@@ -410,10 +512,10 @@ tables:
           - Latin America (WID)
           - Europe (WID)
           - Russia and Central Asia (WID)
-          - MENA (WID)
+          - Middle East and North Africa (WID)
           - Sub-Saharan Africa (WID)
           - East Asia (WID)
-          - South & South-East Asia (WID)
+          - South and South-East Asia (WID)
           - Oceania (WID)
         origins:
           - *origins_wid
@@ -428,10 +530,10 @@ tables:
                   "Latin America (WID)": "Latin America"
                   "Europe (WID)": "Europe"
                   "Russia and Central Asia (WID)": "Russia and Central Asia"
-                  "MENA (WID)": "MENA"
+                  "Middle East and North Africa (WID)": "Middle East and North Africa"
                   "Sub-Saharan Africa (WID)": "Sub-Saharan Africa"
                   "East Asia (WID)": "East Asia"
-                  "South & South-East Asia (WID)": "South & South-East Asia"
+                  "South and South-East Asia (WID)": "South and South-East Asia"
                   "Oceania (WID)": "Oceania"
                 customHiddenCategories:
                   "No data": true
@@ -503,5 +605,130 @@ tables:
                   "Northern, Southern and Western Europe (ILO)": "Northern, Southern and Western Europe"
                   "Eastern Europe (ILO)": "Eastern Europe"
                   "Central and Western Asia (ILO)": "Central and Western Asia"
+                customHiddenCategories:
+                  "No data": true
+
+      # FAO
+      fao_1_region:
+        title: World regions according to FAO (1)
+        description_short: |-
+          Level-1 broad regions (continents) defined by the Food and Agriculture Organization of the United Nations (FAO).
+        type: ordinal
+        sort:
+          - "Americas (FAO)"
+          - "Africa (FAO)"
+          - "Europe (FAO)"
+          - "Asia (FAO)"
+          - "Oceania (FAO)"
+        origins:
+          - *origins_fao
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Africa (FAO)": "Africa"
+                  "Americas (FAO)": "Americas"
+                  "Asia (FAO)": "Asia"
+                  "Europe (FAO)": "Europe"
+                  "Oceania (FAO)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
+
+      fao_2_region:
+        title: World regions according to FAO (2)
+        description_short: |-
+          Level-2 regions (subregions) defined by the Food and Agriculture Organization of the United Nations (FAO).
+        type: ordinal
+        sort:
+          - "Northern America (FAO)"
+          - "Caribbean (FAO)"
+          - "Central America (FAO)"
+          - "South America (FAO)"
+          - "Northern Africa (FAO)"
+          - "Eastern Africa (FAO)"
+          - "Middle Africa (FAO)"
+          - "Southern Africa (FAO)"
+          - "Western Africa (FAO)"
+          - "Southern Europe (FAO)"
+          - "Western Europe (FAO)"
+          - "Northern Europe (FAO)"
+          - "Eastern Europe (FAO)"
+          - "Western Asia (FAO)"
+          - "Central Asia (FAO)"
+          - "Southern Asia (FAO)"
+          - "Eastern Asia (FAO)"
+          - "South-eastern Asia (FAO)"
+          - "Australia and New Zealand (FAO)"
+          - "Melanesia (FAO)"
+          - "Micronesia (FAO)"
+          - "Polynesia (FAO)"
+        origins:
+          - *origins_fao
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Northern Africa (FAO)": "Northern Africa"
+                  "Eastern Africa (FAO)": "Eastern Africa"
+                  "Middle Africa (FAO)": "Middle Africa"
+                  "Southern Africa (FAO)": "Southern Africa"
+                  "Western Africa (FAO)": "Western Africa"
+                  "Northern America (FAO)": "Northern America"
+                  "Caribbean (FAO)": "Caribbean"
+                  "Central America (FAO)": "Central America"
+                  "South America (FAO)": "South America"
+                  "Western Asia (FAO)": "Western Asia"
+                  "Central Asia (FAO)": "Central Asia"
+                  "Southern Asia (FAO)": "Southern Asia"
+                  "Eastern Asia (FAO)": "Eastern Asia"
+                  "South-eastern Asia (FAO)": "South-eastern Asia"
+                  "Southern Europe (FAO)": "Southern Europe"
+                  "Western Europe (FAO)": "Western Europe"
+                  "Northern Europe (FAO)": "Northern Europe"
+                  "Eastern Europe (FAO)": "Eastern Europe"
+                  "Australia and New Zealand (FAO)": "Australia and New Zealand"
+                  "Melanesia (FAO)": "Melanesia"
+                  "Micronesia (FAO)": "Micronesia"
+                  "Polynesia (FAO)": "Polynesia"
+                customHiddenCategories:
+                  "No data": true
+
+      fao_sdg_region:
+        title: World regions according to FAO (SDG)
+        description_short: |-
+          Regions defined by the Food and Agriculture Organization of the United Nations (FAO) for its SDG (Sustainable Development Goals) reporting, following the UN SDG regional groupings.
+        type: ordinal
+        sort:
+          - "Northern America and Europe (FAO)"
+          - "Latin America and the Caribbean (FAO)"
+          - "Sub-Saharan Africa (FAO)"
+          - "Western Asia and Northern Africa (FAO)"
+          - "Central Asia and Southern Asia (FAO)"
+          - "Eastern Asia and South-eastern Asia (FAO)"
+          - "Australia and New Zealand (FAO)"
+          - "Oceania excluding Australia and New Zealand (FAO)"
+        origins:
+          - *origins_fao
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "Sub-Saharan Africa (FAO)": "Sub-Saharan Africa"
+                  "Northern America and Europe (FAO)": "Northern America and Europe"
+                  "Latin America and the Caribbean (FAO)": "Latin America and the Caribbean"
+                  "Western Asia and Northern Africa (FAO)": "Western Asia and Northern Africa"
+                  "Central Asia and Southern Asia (FAO)": "Central Asia and Southern Asia"
+                  "Eastern Asia and South-eastern Asia (FAO)": "Eastern Asia and South-eastern Asia"
+                  "Australia and New Zealand (FAO)": "Australia and New Zealand"
+                  "Oceania excluding Australia and New Zealand (FAO)": "Oceania excluding Australia and New Zealand"
                 customHiddenCategories:
                   "No data": true

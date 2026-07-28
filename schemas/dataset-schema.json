@@ -403,6 +403,11 @@
           "title": "Non-redistribution of dataset ",
           "description": "Whether the dataset is non-redistributable, and therefore data should not be downloadable from the chart."
         },
+        "jsonld": {
+          "type": "boolean",
+          "title": "Publish catalog landing page / JSON-LD",
+          "description": "Opt this dataset into the public catalog landing page with Schema.org Dataset JSON-LD (`etl d publish --jsonld`). Canary rollout of the catalog-discovery project; the dataset must also pass the JSON-LD quality gates."
+        },
         "licenses": {
           "type": "array",
           "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset.",
@@ -607,30 +612,37 @@
                 },
                 "description_key": {
                   "title": "Indicator's key information",
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        ]
                       }
-                    ]
-                  },
-                  "description": "List of key pieces of information about the indicator.",
+                    }
+                  ],
+                  "description": "Key information about the indicator as free-form markdown text. A YAML list of bullet points is also accepted and converted to a markdown list on load.",
                   "requirement_level": "recommended (for curated indicators)",
                   "guidelines": [
                     [
-                      "Must be a list of one or more short paragraphs.",
+                      "Must be free-form markdown text with the key information about the indicator, or a list of bullet points.",
                       {
                         "type": "list",
                         "value": [
-                          "Each paragraph must start with a capital letter.",
-                          "Each paragraph must end with a period."
+                          "The text is rendered as markdown (paragraphs, links and lists are supported).",
+                          "A YAML list is authoring sugar for a markdown list; each bullet must start with a capital letter and end with a period."
                         ]
                       }
                     ],
@@ -1408,6 +1420,19 @@
                         "originUrl": {
                           "type": "string",
                           "description": "The page containing this chart where more context can be found"
+                        },
+                        "license": {
+                          "type": "string",
+                          "description": "The license the chart is published under, linked in the chart footer",
+                          "default": "cc-by",
+                          "enum": [
+                            "cc-by",
+                            "cc-by-sa",
+                            "cc-by-nc",
+                            "cc-by-nc-sa",
+                            "cc-by-nd",
+                            "cc-by-nc-nd"
+                          ]
                         },
                         "colorScale": {
                           "$ref": "#/$defs/colorScale"

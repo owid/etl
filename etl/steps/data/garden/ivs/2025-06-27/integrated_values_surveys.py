@@ -202,6 +202,13 @@ MOST_IMPORTANT_QUESTIONS = ["most_important_first_choice", "most_important_secon
 # Feel concerned about humankind (5-point), single custom block
 HUMANKIND_CONCERN_QUESTIONS = ["humankind"]
 
+# --- World Values Survey (WVS) table ---
+# WVS-only questions (asked in WVS but absent from IVS), built into a separate `world_values_survey`
+# table inside this same dataset. Each entry is the column suffix produced by wvs_create_file.do.
+WVS_WOMEN_INCOME_QUESTIONS = ["women_income"]  # D066_01, 5-point agree
+WVS_CONFIDENCE_ELECTIONS_QUESTIONS = ["elections"]  # E069_64, 4-point confidence
+WVS_TERRORISM_QUESTIONS = ["terrorism"]  # F114E, 10-point justifiable
+
 
 def run() -> None:
     #
@@ -219,7 +226,9 @@ def run() -> None:
     # Drop columns
     tb = drop_indicators_and_replace_nans(tb)
 
-    tb = paths.regions.harmonize_names(tb)
+    # The IVS and WVS tables share one countries mapping file, so each leaves some entries unused;
+    # silence the (expected) "unused values in mapping" warning.
+    tb = paths.regions.harmonize_names(tb, warn_on_unused_countries=False)
 
     # Sanity checks
     tb = sanity_checks(tb)
@@ -227,10 +236,28 @@ def run() -> None:
     tb = tb.format(["country", "year"])
 
     #
+    # Build the World Values Survey (WVS) table from its own meadow dataset (WVS-only questions).
+    #
+    ds_meadow_wvs = paths.load_dataset("world_values_survey")
+    tb_wvs = ds_meadow_wvs.read("world_values_survey")
+
+    tb_wvs = process_wvs(tb_wvs)
+
+    tb_wvs = paths.regions.harmonize_names(tb_wvs, warn_on_unused_countries=False)
+
+    # Sanity checks (recodes must sum to 100%)
+    tb_wvs = sanity_checks_wvs(tb_wvs)
+
+    tb_wvs = tb_wvs.format(["country", "year"])
+
+    #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    # Create a new garden dataset with the same metadata as the meadow dataset. The dataset holds two
+    # tables: the Integrated Values Surveys table and the World Values Survey table.
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_wvs], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -1031,5 +1058,63 @@ def check_sum_100(tb: Table, questions: list[str], answers: list[str], margin: f
 
     # Remove sum_check
     tb = tb.drop(columns=["sum_check"])
+
+    return tb
+
+
+def process_wvs(tb: Table) -> Table:
+    """
+    Process the World Values Survey table (WVS-only questions).
+
+    Unlike IVS, WVS shares contain no spurious zeros: country-years where a question was not asked are
+    missing after the Stata merge (not zero), so no 0 -> null replacement is applied here. We only null out
+    "don't know" where the rest of the answers are null (parity with IVS), then drop all-null rows.
+    """
+    # Replace 0 by null for "don't know" columns if the rest of the columns are null.
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=WVS_WOMEN_INCOME_QUESTIONS,
+        answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree"],
+    )
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=WVS_CONFIDENCE_ELECTIONS_QUESTIONS,
+        answers=["great_deal", "quite_a_lot", "not_very_much", "none_at_all"],
+    )
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=WVS_TERRORISM_QUESTIONS,
+        answers=["never_just_agg", "always_just_agg", "neutral"],
+    )
+
+    # Drop rows with all null values in columns other than country and year.
+    tb = tb.dropna(how="all", subset=tb.columns.difference(["country", "year"]))
+
+    return tb
+
+
+def sanity_checks_wvs(tb: Table) -> Table:
+    """
+    Perform sanity checks on the World Values Survey table (the mutually-exclusive categories plus
+    "don't know" and "no answer" must add up to 100%).
+    """
+    tb = check_sum_100(
+        tb=tb,
+        questions=WVS_WOMEN_INCOME_QUESTIONS,
+        answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+    tb = check_sum_100(
+        tb=tb,
+        questions=WVS_CONFIDENCE_ELECTIONS_QUESTIONS,
+        answers=["great_deal", "quite_a_lot", "not_very_much", "none_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+    tb = check_sum_100(
+        tb=tb,
+        questions=WVS_TERRORISM_QUESTIONS,
+        answers=["never_just_agg", "always_just_agg", "neutral", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
 
     return tb

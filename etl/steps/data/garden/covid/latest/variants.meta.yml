@@ -1,6 +1,6 @@
 definitions:
   default_display: &default_display
-    yearIsDay: true
+    timeInterval: day
     zeroDay: '2020-01-21'
 
 dataset:

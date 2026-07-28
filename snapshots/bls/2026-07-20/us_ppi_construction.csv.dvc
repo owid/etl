@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: U.S. Bureau of Labor Statistics
+    title: US PPI New Nonresidential Building Construction
+    description: |-
+      Producer price indexes (PPIs) for new nonresidential building construction in the United States, covering new office, new warehouse, and new industrial building construction.
+
+      BLS uses a method in which building models are developed and specified to represent the buildings being constructed in the marketplace. Multiple models were developed for each building type to accommodate variations in building design. The building models are described as a series of unique production elements or "assemblies" in BLS terminology. Each building assembly represents a building construction activity that can be fully defined as a unique portion of the total project. Each assembly is made up of unit-price components that define the specific type and quantity of materials, labor, and equipment necessary for the assembly's installation.
+
+      A professional cost-estimating firm developed the building models under BLS direction. To achieve an output price, BLS combines the detailed material and installation (labor and related equipment) cost data, which are updated quarterly by the cost-estimating firm, with margin (overhead and profit) data collected monthly by BLS directly from building construction contractors. BLS aggregates output price changes captured at the assembly level each month to represent the changes in output prices for the total structure. Therefore, the BLS output indexes attempt to measure changes in the input costs for these structures, along with changes in contractor markups.
+    citation_full: U.S. Bureau of Labor Statistics
+    url_main: |-
+      https://www.bls.gov/ppi/factsheets/producer-price-index-data-for-nonresidential-building-construction-sector-new-office-building-construction-naics-236223.htm
+    date_accessed: '2026-07-20'
+    date_published: '2026'
+    license:
+      name: Public domain
+      url: https://www.bls.gov/opub/copyright-information.htm
+outs:
+  - md5: 3c6569cd8eb096745c367336be2323af
+    size: 25042
+    path: us_ppi_construction.csv

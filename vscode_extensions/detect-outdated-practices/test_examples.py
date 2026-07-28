@@ -80,3 +80,21 @@ tb = paths.load_dependency("un/2023/population")["table_name"]
 # Example 3: Multiple dependencies
 ds1 = paths.load_dependency("source1/version/name1")
 ds2 = paths.load_dependency("source2/version/name2")
+
+# ========================================
+# PATTERN 4: .set_index() to finalize a table
+# ========================================
+
+# Example 1: Standard country/year index
+tb = tb.set_index(["country", "year"])
+
+# Example 2: Custom keys with verify_integrity (as seen in the funding meadow step)
+tb = tb.set_index(["disease", "Year"], verify_integrity=False)
+
+# Example 3: Single-key index
+tb = tb.set_index("country")
+
+# These should NOT be detected — set_index is chained/subscripted here, so it is an
+# intermediate lookup or reshape, not a table finalize (format() is not a replacement):
+series = tb.set_index("country")["pa_nus_prvt_pp"]
+metadata_dict = tb_meta.set_index("indicator_code").to_dict("index")

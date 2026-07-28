@@ -7,8 +7,9 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Exclude the last three as we want to treat them differently and remove the january rows from them
-TABLES_EXCLUDE = ["fertility_single", "population_january"]
+# Exclude tables that don't fit the estimates-into-each-variant reshape: fertility_single and
+# population_january are treated differently, and population_peak has no variant dimension.
+TABLES_EXCLUDE = ["fertility_single", "population_january", "population_peak"]
 
 
 def run() -> None:

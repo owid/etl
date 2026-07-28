@@ -20,7 +20,8 @@ dataset:
   update_period_days: 365
 
   owners:
-    - Veronika Samborska
+    - Pablo Rosado
+    - Edouard Mathieu
 tables:
   energy_ai:
     variables:

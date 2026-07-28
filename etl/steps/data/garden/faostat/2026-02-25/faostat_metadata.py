@@ -1071,3 +1071,10 @@ def run() -> None:
 
     # Save the new garden dataset.
     ds_grapher.save()
+
+
+# NOTE: This step's checksum only covers files named "faostat_metadata*" or "shared*" in this folder.
+# The country harmonization files (faostat.countries.json, faostat.excluded_countries.json) are loaded
+# at runtime but do not match those patterns, so editing them alone does NOT trigger a rebuild here (or
+# in any downstream FAOSTAT step). After changing that harmonization, make a small edit anywhere in this
+# file (e.g. tweak this comment) to force this step's checksum to change and propagate the rebuild.

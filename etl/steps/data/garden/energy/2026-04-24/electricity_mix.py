@@ -7,13 +7,9 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
-
-# Initialize logger.
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -452,7 +448,7 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
                 "other_renewables_including_bioenergy_generation__twh",
                 "renewable_generation__twh",
             ],
-            "Upper-middle-income countries": ["gas_generation__twh", "oil_generation__twh"],
+            "Upper-middle-income countries": ["oil_generation__twh"],
             "High-income countries": ["oil_generation__twh"],
             "Europe": ["oil_generation__twh"],
             "North America": [],
@@ -463,6 +459,11 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
             "South America": [],
         }
     )
+    # Collect any region whose actual EI-vs-Ember discrepancies no longer match the expected list.
+    # These drift when the income-group membership changes (a World Bank reclassification) or when an
+    # energy-data update shifts the aggregates — e.g. FY2027 moved the Philippines and Vietnam into
+    # the upper-middle-income group, which brought gas generation there back within tolerance.
+    drifted_regions = {}
     for region in segments_not_combined:
         _remove_combination = []
         for col in combined.drop(columns=["country", "year"]).columns:
@@ -485,14 +486,22 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
                         assert compared["year"].min() == 1990 if region == "European Union (27)" else 2000, (
                             "Minimum year changed."
                         )
-        error = f"Expected discrepancies between Statistical Review and Ember data for aggregate regions may have changed for region: {region}. Current discrepant indicators: {_remove_combination}. Use this list in 'segments_not_combined'."
         if set(segments_not_combined[region]) != set(_remove_combination):
-            log.error(error)
+            drifted_regions[region] = sorted(_remove_combination)
 
         for col in _remove_combination:
             # Remove data for years prior to 2000 (which correspond to the Statistical Review).
             # NOTE: This may need to be generalized if Ember adds data prior to 2000 (which is the case already for European countries, but they are so far not affected by the discrepancies).
             combined.loc[(combined["country"] == region) & (combined["year"] < 2000), col] = np.nan
+
+    # Fail loudly if the discrepancy structure drifted, so a stale `segments_not_combined` can't ship
+    # unnoticed. The actual removal above already uses the freshly-computed discrepancies, so the data
+    # stays correct — but the mismatch is a signal worth reviewing (usually an income-group
+    # reclassification), and the expected list should be kept in sync with the values printed here.
+    assert not drifted_regions, (
+        "EI-vs-Ember discrepancies for aggregate regions changed. Update `segments_not_combined` to "
+        f"match the current discrepant indicators per region: {drifted_regions}"
+    )
 
     return combined
 

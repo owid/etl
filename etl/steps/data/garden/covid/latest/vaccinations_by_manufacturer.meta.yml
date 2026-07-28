@@ -15,93 +15,93 @@ tables:
         title: CanSino
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       covaxin:
         title: Covaxin
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       johnson_and_johnson:
         title: Johnson&Johnson
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       medicago:
         title: Medicago
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       moderna:
         title: Moderna
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       novavax:
         title: Novavax
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       oxford_astrazeneca:
         title: Oxford/AstraZeneca
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       pfizer_biontech:
         title: Pfizer/BioNTech
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       skycovione:
         title: SKYCovione
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       sanofi_gsk:
         title: Sanofi/GSK
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       sinopharm_beijing:
         title: Sinopharm/Beijing
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       sinovac:
         title: Sinovac
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       sputnik_light:
         title: Sputnik Light
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       sputnik_v:
         title: Sputnik V
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
       valneva:
         title: Valneva
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2021-01-01'
