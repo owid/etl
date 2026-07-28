@@ -60,13 +60,13 @@ Key fields:
 
 ## The chart's identity (`chart_config_id`)
 
-ETL addresses a chart by its config UUID (`charts.configId`), never by slug or numeric id, and it never looks the chart up per environment. The YAML must therefore declare the UUID, and the same YAML then targets the same chart on local, staging, and production.
+At push time ETL addresses a chart only by its config UUID (`charts.configId`) — never by slug or numeric id — and it never looks the chart up per environment. The YAML must therefore declare the UUID, and the same YAML then targets the same chart on local, staging, and production. (Slug and numeric id are still how *you* find the UUID once, while authoring; see `lookup` below.)
 
 Use `etl chart-config-id` to write the field — it validates that the target really is a single-chart config and refuses to clobber an existing UUID:
 
 ```bash
 # New chart: mint a UUIDv7.
-.venv/bin/etl chart-config-id new etl/steps/export/multidim/<ns>/latest/<short_name>.config.yml
+.venv/bin/etl chart-config-id new <config.yml>
 
 # Existing chart moving into ETL: take the UUID from the chart already in grapher, so the
 # config lands on it instead of creating a duplicate. Name the chart by slug or by the
@@ -178,7 +178,7 @@ Admin overrides always win on a per-field basis. To "unlink" a field back to the
 
 - **Chart with dropdowns / dimension selectors** → use `create-multidim`. Single-chart `.config.yml` files have `dimensions: []`; multi-dim ones don't.
 - **Brand-new chart from scratch and you want the structure auto-generated** → use `create-multidim` even for single charts; it writes the YAML skeleton, and you set `dimensions: []` after.
-- **Editing a chart that exists only in the admin (no `.config.yml`)** → adopt it into ETL first by writing a `.config.yml` whose `chart_config_id` is that chart's existing `charts.configId` (see "The chart's identity"), then edit here. Tooling to generate the YAML from the live config (`chart_pull` CLI) is a Phase 1 follow-up.
+- **Editing a chart that exists only in the admin (no `.config.yml`)** → adopt it into ETL first: write the `.config.yml`, then point it at the existing chart with `etl chart-config-id lookup <config.yml> --chart-id <id>` (see "The chart's identity"), and edit here. Tooling to generate the rest of the YAML from the live config (`chart_pull` CLI) is a Phase 1 follow-up.
 
 ## Related skills
 
