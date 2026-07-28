@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is **owid-catalog** - a Python library (version 0.4.3) that provides core data types for Our World in Data's data catalog system. It's published as a PyPI package and serves as the foundation for OWID's ETL system.
+This is **owid-catalog** - a Python library that provides core data types for Our World in Data's data catalog system. It's published as a PyPI package and serves as the foundation for OWID's ETL system.
 
 The library provides pandas-enhanced data structures with rich metadata support:
 - **Dataset**: Container for multiple tables with shared metadata
@@ -37,8 +37,9 @@ pytest tests/          # ❌
 ```bash
 uv add package_name     # Add a new package
 uv remove package_name  # Remove a package
-uv sync                 # Sync dependencies
 ```
+
+**Never run bare `uv sync`** — it prunes optional deps the repo needs and breaks the `etl` CLI. To install or repair the environment, use `uv sync --all-extras --group dev` (what `make .venv` runs).
 
 ### Common Development Tasks
 
@@ -289,7 +290,7 @@ uv build
 
 ## Important Notes
 
-- Python 3.10+ required (supports 3.10, 3.11, 3.12, 3.13)
+- Python 3.10+ required — see `requires-python` in `pyproject.toml` for the supported range
 - This library is experimental - APIs may change
 - Extends ruff configuration from parent `../../pyproject.toml`
 - Always run `make check` before committing changes

@@ -98,7 +98,7 @@ def get_chart_views_from_bq(
     query = f"""
         SELECT
             {select_clause}
-        FROM prod_google_analytics4.grapher_views_by_day_page_grapher_device_country_iframe
+        FROM prod_ga4.grapher_views_by_day_page_grapher_device_country_iframe
         WHERE
             day >= '{date_start}'
             AND day <= '{date_end}'

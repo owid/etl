@@ -45,7 +45,7 @@ header_dict = {
     "explorerTitle": "Incomes Across the Distribution - World Bank",
     "selection": ["Mozambique", "Nigeria", "Kenya", "Bangladesh", "Bolivia", "World"],
     "explorerSubtitle": "Explore World Bank data on the distribution of incomes.",
-    "isPublished": "true",
+    "isPublished": "false",
     "googleSheet": f"https://docs.google.com/spreadsheets/d/{sheet_id}",
     "wpBlockId": "57756",
     "entityType": "country or region",
