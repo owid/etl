@@ -2924,6 +2924,12 @@ tables:
   vdem_num_countries:
     common:
       unit: "countries"
+      # NOTE: This overrides the dataset-wide `description_imputes` default on purpose. `make_table_countries`
+      # drops imputed observations before counting, so the imputation note does not apply to these indicators.
+      # `vdem_population` deliberately keeps the default instead: population figures only exist for today's
+      # borders, so imputed observations must be counted there to avoid leaving people out of the totals.
+      description_processing: |-
+        We only count the countries that V-Dem covers in the given year. Where we impute a country's data from a historical entity it was part of, those imputed values are excluded from the count, because the country did not yet exist separately at the time.
     variables:
       num_countries_regime:
         title: |-
@@ -3012,6 +3018,14 @@ tables:
           <%- elif category == "no" %>
           Number of countries that never had a woman chief executive
           <%- endif -%>
+        description_short: |-
+          <%- if category == '-1' -%>
+          Countries for which we do not know whether they had ever had a woman chief executive by the end of the given year.
+          <%- elif category == "yes" %>
+          Countries that had ever had a woman chief executive by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          <%- elif category == "no" %>
+          Countries that had never had a woman chief executive by the end of the given year.
+          <%- endif -%>
 
       num_countries_wom_hoe_ever_demelect:
         title: |-
@@ -3021,6 +3035,14 @@ tables:
           Number of countries that had a woman chief executive elected democratically
           <%- elif category == "no" %>
           Number of countries that never had a woman chief executive elected democratically
+          <%- endif -%>
+        description_short: |-
+          <%- if category == '-1' -%>
+          Countries for which we do not know whether they had ever had a woman chief executive while being a democracy, by the end of the given year.
+          <%- elif category == "yes" %>
+          Countries that had ever had a woman chief executive while being an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          <%- elif category == "no" %>
+          Countries that had never had a woman chief executive while being an electoral or a liberal democracy, by the end of the given year.
           <%- endif -%>
 
   ##################################################################################################
@@ -3035,10 +3057,14 @@ tables:
       share_countries_wom_hoe_ever:
         title: |-
           Share of countries that had a woman chief executive
+        description_short: |-
+          Share of today's countries that had ever had a woman chief executive by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
 
       share_countries_wom_hoe_ever_demelect:
         title: |-
           Share of countries that had a woman chief executive elected democratically
+        description_short: |-
+          Share of today's countries that had ever had a woman chief executive while being an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
 
   ##################################################################################################
   ##################################################################################################
@@ -3134,6 +3160,14 @@ tables:
           <%- elif category == "no" %>
           People living in countries that never had a woman chief executive
           <%- endif -%>
+        description_short: |-
+          <%- if category == '-1' -%>
+          People living in countries for which we do not know whether they had ever had a woman chief executive by the end of the given year.
+          <%- elif category == "yes" %>
+          People living in countries that had ever had a woman chief executive by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          <%- elif category == "no" %>
+          People living in countries that had never had a woman chief executive by the end of the given year.
+          <%- endif -%>
 
       population_wom_hoe_ever_demelect:
         title: |-
@@ -3143,4 +3177,12 @@ tables:
           People living in countries that had a woman chief executive elected democratically
           <%- elif category == "no" %>
           People living in countries that never had a woman chief executive elected democratically
+          <%- endif -%>
+        description_short: |-
+          <%- if category == '-1' -%>
+          People living in countries for which we do not know whether they had ever had a woman chief executive while being a democracy, by the end of the given year.
+          <%- elif category == "yes" %>
+          People living in countries that had ever had a woman chief executive while being an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          <%- elif category == "no" %>
+          People living in countries that had never had a woman chief executive while being an electoral or a liberal democracy, by the end of the given year.
           <%- endif -%>
