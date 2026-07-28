@@ -18,6 +18,10 @@ definitions:
         hasMapTab: true
         tab: map
         chartTypes: ["LineChart"]
+  definition_remittances: Remittances include personal transfers sent by migrants to their home countries as well as compensation of workers who are employed in an economy where they are not resident.
+  definition_remittances_share_of_gdp: This chart shows the share of GDP that is made up of the sum of all remittances sent to this country. If this share is high, it means that remittances are an important source of income in this country.
+  definition_remittances_cost_of_sending: This chart shows the average transaction cost as a percentage of total remittances sent from this country to abroad, for a single transaction of USD 200. It is calculated by averaging over the cost of all remittance flows from this country.
+  definition_remittances_cost_of_receiving: This chart shows the average transaction cost as a percentage of total remittances sent from abroad to this country, for a single transaction of USD 200. It is calculated by averaging over the cost of all remittance flows into this country.
 
 dimensions:
   - slug: metric
@@ -49,6 +53,10 @@ views:
           baseColorScheme: BuPu
           binningStrategy: manual
           customNumericValues: [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
+    metadata:
+      description_key:
+        - "{definitions.definition_remittances}"
+        - "{definitions.definition_remittances_share_of_gdp}"
 
   - dimensions:
       metric: cost_of_sending
@@ -63,7 +71,10 @@ views:
           baseColorScheme: Oranges
           binningStrategy: manual
           customNumericValues: [0, 2, 4, 6, 8, 10, 12, 14, 16]
-          minValue: 1.943111
+    metadata:
+      description_key:
+        - "{definitions.definition_remittances}"
+        - "{definitions.definition_remittances_cost_of_sending}"
 
   - dimensions:
       metric: cost_of_receiving
@@ -71,11 +82,14 @@ views:
       y:
         - catalogPath: wdi#si_rmt_cost_ib_zs
     config:
-      title: Average cost of sending remittances to country
+      title: Average cost of receiving remittances in country
       subtitle: The average transaction cost as a percentage of total remittances sent from abroad to this country, for a single transaction of USD 200.
       map:
         colorScale:
           baseColorScheme: Oranges
           binningStrategy: manual
           customNumericValues: [0, 2, 4, 6, 8, 10, 12, 14, 16]
-          minValue: 0.996667
+    metadata:
+      description_key:
+        - "{definitions.definition_remittances}"
+        - "{definitions.definition_remittances_cost_of_receiving}"
