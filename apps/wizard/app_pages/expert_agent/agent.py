@@ -18,7 +18,13 @@ from pydantic_ai.tools import RunContext
 # from RestrictedPython import compile_restricted, safe_globals
 from apps.wizard.app_pages.expert_agent.media import save_code_file, save_plot_file
 from apps.wizard.app_pages.expert_agent.utils import CURRENT_DIR, MODEL_DEFAULT, QueryResult, log, serialize_df
-from etl.analytics.metabase import _generate_question_url, create_question, get_question_info, read_semantic_layer
+from etl.analytics.metabase import (
+    _generate_question_url,
+    assert_question_is_read_only,
+    create_question,
+    get_question_info,
+    read_semantic_layer,
+)
 from etl.analytics.metabase import get_question_data as _get_question_data
 from etl.config import GOOGLE_API_KEY, OWID_MCP_SERVER_URL
 from etl.docs import (
@@ -31,6 +37,7 @@ from etl.docs import (
 )
 from etl.files import ruamel_dump
 from etl.paths import BASE_DIR, DOCS_DIR
+from etl.sql_guard import SqlNotReadOnlyError
 
 #######################################################
 # LOAD KNOWLEDGE BASE
@@ -445,6 +452,13 @@ async def execute_query(query: str, title: str, description: str, num_rows: int 
             url_metabase=url_metabase,
             card_id_metabase=card_id,
         )
+    except SqlNotReadOnlyError as e:
+        # Rejected before it ever reached BigQuery: tell the model what the actual rule is,
+        # rather than sending it off to debug GoogleSQL syntax that is not the problem.
+        return QueryResult(
+            message=f"ERROR. This tool only runs a single read-only SELECT statement. {e}",
+            valid=False,
+        )
     except Exception as e:
         return QueryResult(
             message=f"ERROR. Query is invalid! Check for correctness, it must be BigQuery (GoogleSQL) compatible!\nError: {e}",
@@ -542,6 +556,18 @@ async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
             data (list[list]): Small slice of the data (first `num_rows` rows).
             total_rows (int): Total number of rows in the dataframe.
     """
+    # Running a saved question executes whatever SQL it stores, under our Metabase API key, so
+    # the card's own query gets the same read-only check as `execute_query`. The card ids the
+    # agent sees come from questions outside the Expert collection, i.e. ones it did not write.
+    question = get_question_info(card_id)
+    try:
+        assert_question_is_read_only(question)
+    except SqlNotReadOnlyError as e:
+        return QueryResult(
+            message=f"ERROR. Metabase question {card_id} is not read-only, so it was not run. {e}",
+            valid=False,
+        )
+
     # Getting data
     data = _get_question_data(card_id)
 
@@ -557,8 +583,8 @@ async def get_question_data(card_id: int, num_rows: int = 20) -> QueryResult:
     #     text=f"**:material/construction: Tool use**: Getting data from a Metabase question, via `get_question_data`, using id `{card_id}` for question named '{q_name}'",
     # )
 
-    # Generate URL
-    url = await get_question_url(card_id)
+    # Generate URL (reusing the question we already fetched above)
+    url = _generate_question_url(question)
 
     # Serialize
     data = serialize_df(data, num_rows=num_rows)
@@ -601,7 +627,9 @@ async def generate_plot(
     model_name = ctx.model.model_name
     question_id = ctx.deps.get("question_id", f"plot_{card_id}")
 
-    # Get data from Metabase
+    # Get data from Metabase. Same sink as `get_question_data`: running a card executes its
+    # stored SQL, so check it is read-only first.
+    assert_question_is_read_only(get_question_info(card_id))
     df = _get_question_data(card_id)
     if df.empty:
         raise ValueError(f"DataFrame is empty for question with ID {card_id}")

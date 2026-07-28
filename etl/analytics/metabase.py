@@ -20,6 +20,7 @@ from etl.config import (
     METABASE_URL_LOCAL,
     OWID_ENV,
 )
+from etl.sql_guard import SqlNotReadOnlyError, validate_read_only_sql
 
 log = get_logger()
 
@@ -55,6 +56,11 @@ def read_semantic_layer(sql: str) -> pd.DataFrame:
 
     To query another database via Metabase, use `read_metabase` instead.
 
+    The query must be a single read-only SELECT: this is the entry point the Expert agent uses
+    for model-written SQL, and the connection behind it is a BigQuery service account with
+    write access to more than the semantic layer. See `etl.sql_guard` for what the check is and
+    is not worth.
+
     Parameters
     ----------
     sql : str
@@ -65,7 +71,13 @@ def read_semantic_layer(sql: str) -> pd.DataFrame:
     pd.DataFrame
         DataFrame containing the results of the query.
 
+    Raises
+    ------
+    SqlNotReadOnlyError
+        If `sql` is not a single read-only SELECT statement.
+
     """
+    validate_read_only_sql(sql)
     return read_metabase(
         sql,
         METABASE_SEMANTIC_LAYER_DATABASE_ID,
@@ -283,6 +295,57 @@ def get_question_info(question_id: int, prod: bool = False) -> dict:
     assert question.get("type") == "question", f"Card with id {question_id} is not a question"
 
     return question
+
+
+def _native_sql_of_question(dataset_query: dict) -> list[str]:
+    """Return every raw-SQL fragment a saved question would run.
+
+    Metabase exposes two shapes for `dataset_query`: the legacy
+    `{"type": "native", "native": {"query": ...}}`, and the MBQL-lib one currently returned by
+    our instance, `{"lib/type": "mbql/query", "stages": [{"lib/type": "mbql.stage/native",
+    "native": "..."}]}`. Query-builder stages carry no SQL and can only read, so they
+    contribute nothing. An unrecognised shape raises rather than being waved through — if this
+    starts firing, Metabase changed its API and the guard needs updating.
+    """
+    if "stages" in dataset_query:
+        sql_fragments = []
+        for stage in dataset_query["stages"]:
+            stage_type = stage.get("lib/type")
+            if stage_type == "mbql.stage/native":
+                native = stage.get("native") or ""
+                # `native` is a plain string in this format, but tolerate the nested form.
+                sql_fragments.append(native.get("query", "") if isinstance(native, dict) else native)
+            elif stage_type != "mbql.stage/mbql":
+                raise SqlNotReadOnlyError(f"Unrecognised Metabase query stage {stage_type!r}; refusing to run it.")
+        return sql_fragments
+
+    query_type = dataset_query.get("type")
+    if query_type == "native":
+        return [(dataset_query.get("native") or {}).get("query") or ""]
+    if query_type == "query":
+        return []
+    raise SqlNotReadOnlyError(f"Unrecognised Metabase query type {query_type!r}; refusing to run it.")
+
+
+def assert_question_is_read_only(question: dict) -> None:
+    """Raise unless running this saved question would only read.
+
+    A card id is worth exactly as much as the SQL stored in it: Metabase runs the card
+    server-side under our own API key, so "execute card N" is a way to execute arbitrary
+    native SQL without ever passing a query string. Callers that take a card id from a
+    language model should run this first.
+
+    Raises
+    ------
+    SqlNotReadOnlyError
+        If the question stores anything other than read-only SELECTs.
+
+    """
+    dataset_query = question.get("dataset_query")
+    if not isinstance(dataset_query, dict) or not dataset_query:
+        raise SqlNotReadOnlyError(f"Metabase question {question.get('id')} has no query definition to check.")
+    for sql in _native_sql_of_question(dataset_query):
+        validate_read_only_sql(sql)
 
 
 def get_question_data(card_id: int, data_format: str = "csv", prod: bool = False) -> pd.DataFrame:

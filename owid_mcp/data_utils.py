@@ -18,6 +18,7 @@ import yaml
 from owid.catalog.core import CatalogPath
 
 from etl.http import HEADERS
+from etl.sql_guard import validate_read_only_sql
 from owid_mcp.config import (
     ALGOLIA_API_KEY,
     ALGOLIA_APP_ID,
@@ -33,9 +34,6 @@ log = structlog.get_logger()
 
 # Global mapping cache
 _NAME_TO_CODE_MAPPING: dict[str, str] | None = None
-
-# SQL validation pattern
-SQL_SELECT_RE = re.compile(r"^\s*select\b", re.IGNORECASE | re.DOTALL)
 
 # DuckDB (Datasette's current query backend) reports a missing column as a
 # "Binder Error", e.g.:
@@ -218,7 +216,8 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> dict[str, Any
     Parameters
     ----------
     query : str
-        A SQL statement starting with `SELECT`. Anything else is rejected.
+        A single `SELECT` statement (a leading `WITH` clause is fine). Anything else is
+        rejected — see `etl.sql_guard`.
     max_rows : int
         Safety cap (1‑5000). The query is rewritten with `LIMIT` if absent.
 
@@ -227,8 +226,7 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> dict[str, Any
     dict
         {"csv": "actual csv content", "source": datasette_csv_url}
     """
-    if not SQL_SELECT_RE.match(query):
-        raise ValueError("Only SELECT statements are allowed.")
+    validate_read_only_sql(query)
     if max_rows < 1 or max_rows > MAX_ROWS_HARD:
         raise ValueError(f"max_rows must be 1‑{MAX_ROWS_HARD}.")
 

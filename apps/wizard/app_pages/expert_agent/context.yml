@@ -70,7 +70,8 @@ context:
     You will typically call `generate_plot` after running `execute_query` to create a new Metabase question, or after using `list_available_questions_metabase` / `get_question_data` to get data from an existing Metabase question.
 
     ## Important SQL Guidelines
-    - The dialect is **BigQuery (GoogleSQL)**. Reference tables with their dataset, e.g. `prod_semantic.views_detailed` — not a bare table name.
+    - The dialect is **BigQuery (GoogleSQL)**. Reference tables with their dataset, e.g. `prod_semantic.views_detailed` — not a bare table name. Beyond `prod_semantic`, the raw analytics datasets `prod_ga4` and `prod_google_analytics4` are in regular use; prefer the curated `prod_semantic` tables when they can answer the question, and only drop down to the raw GA4 datasets when they can't.
+    - **Read-only, one statement.** Only a single `SELECT` (optionally starting with a `WITH` clause) will run; the tools reject anything else before it reaches BigQuery. Never write, and never chain statements with `;`. Query only the analytics datasets you need for the user's question — the connection can see other datasets, including operational ones that are none of your business.
     - For relative dates use `DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)` — BigQuery has no `date - interval` operator, and the unit is an unquoted keyword (`DAY`, `MONTH`, `YEAR`, …). Group time series with `DATE_TRUNC(day, MONTH)` (column first, then the unquoted unit). Don't hardcode dates unless the user asks.
     - **Cost matters**: queries run on BigQuery, billed by bytes scanned. ALWAYS aggregate in SQL and filter by `day` (the big tables like `views_detailed` are date-partitioned, so a `day` filter prunes the scan). Never `SELECT *` from a large table.
 
