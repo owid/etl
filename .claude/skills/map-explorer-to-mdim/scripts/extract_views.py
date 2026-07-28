@@ -14,6 +14,9 @@ Outputs into ``--out``:
 - ``multidim_<short>_views.csv`` — id (A1.., B1.., ...) + one column per MDIM dim slug
 - ``_scaffold.md``              — dimension legend, distinct values, auto-suggested
                                   value matches, and a ``mapping_rules.py`` template
+- ``_sources.json``             — explorer slug + dim names and each MDIM's
+                                  short/prefix/catalogPath/dim-slugs, so ``build_mapping.py``
+                                  can emit a redirect ``mapping.json`` with full identifiers
 
 Usage:
     .venv/bin/python .claude/skills/map-explorer-to-mdim/scripts/extract_views.py \
@@ -201,6 +204,28 @@ def build_scaffold(out: Path, explorer_slug, dim_names, exp_rows, mdims) -> Path
     return path
 
 
+def write_sources_json(out: Path, explorer_slug, dim_names, mdims) -> Path:
+    """Persist the identifiers build_mapping.py needs to emit the redirect mapping.json.
+
+    mdims: list of dicts {short, prefix, catalog_path, dim_slugs, rows}.
+    """
+    data = {
+        "explorer": {"slug": explorer_slug, "dimensions": dim_names},
+        "mdims": [
+            {
+                "short": m["short"],
+                "prefix": m["prefix"],
+                "catalogPath": m["catalog_path"],
+                "dimensions": m["dim_slugs"],
+            }
+            for m in mdims
+        ],
+    }
+    path = out / "_sources.json"
+    path.write_text(json.dumps(data, indent=2) + "\n")
+    return path
+
+
 def check_db_connection():
     """Fail fast with actionable guidance if the grapher DB isn't reachable."""
     try:
@@ -249,6 +274,9 @@ def main():
         p = write_mdim_csv(out, short, prefix, dim_slugs, rows)
         print(f"{prefix} {short}: {len(rows)} views, dims={dim_slugs} -> {p.name}")
         mdims.append({"short": short, "prefix": prefix, "catalog_path": cp, "dim_slugs": dim_slugs, "rows": rows})
+
+    p = write_sources_json(out, args.explorer, dim_names, mdims)
+    print(f"sources -> {p.name}")
 
     p = build_scaffold(out, args.explorer, dim_names, exp_rows, mdims)
     print(f"scaffold -> {p.name}  (write mapping_rules.py, then run build_mapping.py)")

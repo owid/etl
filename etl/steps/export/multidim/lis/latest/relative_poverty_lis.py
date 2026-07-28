@@ -19,8 +19,8 @@ DIMENSIONS_CONFIG = {
 # welfare_type=before_vs_after view. The OLD_* constants mirror the garden text verbatim — the assertion
 # in _get_before_vs_after_metadata catches drift in the source.
 OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = "Income is measured after taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received."
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = "Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. LIS includes private pensions, meaning a retired person’s before-tax income depends on how their country organizes pensions."
-NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown as separate series. Comparing the two gives a sense of the redistribution achieved through a country's tax and benefits system. In most countries, relative poverty is lower after taxes and benefits than before, but the size of this gap varies widely across countries."
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = "Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. Private pension income is also included, meaning a retired person’s before-tax income varies depending on whether their country’s pensions system is primarily public, private or a mix."
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes have been paid and government benefits received, which are shown as separate series. Comparing the two gives a sense of the role of redistribution through a country's tax and benefits system."
 
 
 def run() -> None:
@@ -112,7 +112,7 @@ def _get_before_vs_after_metadata(tb, view):
             col_name,
         )
 
-        description_key = list(meta.description_key) if meta.description_key else []
+        description_key = _description_key_bullets(meta)
         old_welfare_keys = {OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI, OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI}
         assert any(b in old_welfare_keys for b in description_key), (
             f"Neither OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI nor _MI found in {col_name}.description_key — garden text changed, update the constants."
@@ -128,3 +128,20 @@ def _assert_and_replace(text, old, new, field, col_name):
     """Replace `old` with `new` in `text`; assert `old` was present so silent drift in the garden meta surfaces as a clear error."""
     assert old in text, f"'{old}' not found in {col_name}.{field} — garden text changed, update the replacement."
     return text.replace(old, new)
+
+
+def _description_key_bullets(meta):
+    """Return an indicator's description_key as a list of bullet strings.
+
+    The grapher channel stores description_key as a single markdown string (bullets joined with
+    "\\n- "); older builds stored a list. Normalize both to a list so bullets can be swapped.
+    """
+    dk = meta.description_key if meta else None
+    if dk is None:
+        return []
+    if not isinstance(dk, str):
+        return list(dk)
+    lines = [line.strip() for line in dk.split("\n") if line.strip()]
+    if lines and all(line.startswith("- ") for line in lines):
+        return [line[2:].strip() for line in lines]
+    return [dk.strip()]

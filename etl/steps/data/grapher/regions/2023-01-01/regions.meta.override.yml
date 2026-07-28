@@ -65,6 +65,20 @@ definitions:
     url_main: https://www.fao.org/faostat/en/#definitions
     date_accessed: "2026-02-25"
     attribution_short: FAOSTAT
+  origins_ei: &origins_ei
+    producer: Energy Institute
+    title: Energy Institute world regions
+    url_main: https://www.energyinst.org/statistical-review/
+    date_accessed: "2026-07-02"
+    citation_full: Energy Institute - Statistical Review of World Energy (2026).
+    attribution_short: Energy Institute
+  origins_ember: &origins_ember
+    producer: Ember
+    title: Ember world regions
+    url_main: https://ember-energy.org/data/yearly-electricity-data/
+    date_accessed: "2026-04-24"
+    citation_full: Ember - Yearly Electricity Data (2026).
+    attribution_short: Ember
 
 tables:
   regions:
@@ -340,6 +354,88 @@ tables:
           - Eurasia (IEA)
         origins:
           - *origins_iea_regions
+
+      # Energy Institute
+      ei_region:
+        title: World regions according to the Energy Institute
+        description_short: |-
+          Regions as defined by the Energy Institute in its Statistical Review of World Energy.
+        type: ordinal
+        sort:
+          - North America (EI)
+          - South and Central America (EI)
+          - Europe (EI)
+          - Africa (EI)
+          - Middle East (EI)
+          - CIS (EI)
+          - Asia Pacific (EI)
+        origins:
+          - *origins_ei
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryColors:
+                  "North America (EI)": "#CC7641"
+                  "South and Central America (EI)": "#B04E74"
+                  "Europe (EI)": "#526F9B"
+                  "CIS (EI)": "#92D3DE"
+                  "Middle East (EI)": "#C3A27C"
+                  "Africa (EI)": "#A07AB8"
+                  "Asia Pacific (EI)": "#6FA54F"
+                customCategoryLabels:
+                  "North America (EI)": "North America"
+                  "South and Central America (EI)": "South and Central America"
+                  "Europe (EI)": "Europe"
+                  "CIS (EI)": "CIS"
+                  "Middle East (EI)": "Middle East"
+                  "Africa (EI)": "Africa"
+                  "Asia Pacific (EI)": "Asia Pacific"
+                customHiddenCategories:
+                  "No data": true
+
+      # Ember
+      ember_region:
+        title: World regions according to Ember
+        description_short: |-
+          Regions as defined by Ember in its Yearly Electricity Data.
+        type: ordinal
+        sort:
+          - North America (Ember)
+          - Latin America and Caribbean (Ember)
+          - Europe (Ember)
+          - Africa (Ember)
+          - Middle East (Ember)
+          - Asia (Ember)
+          - Oceania (Ember)
+        origins:
+          - *origins_ember
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryColors:
+                  "North America (Ember)": "#CC7641"
+                  "Latin America and Caribbean (Ember)": "#B04E74"
+                  "Europe (Ember)": "#526F9B"
+                  "Africa (Ember)": "#A07AB8"
+                  "Middle East (Ember)": "#C3A27C"
+                  "Asia (Ember)": "#238A84"
+                  "Oceania (Ember)": "#5FB8C8"
+                customCategoryLabels:
+                  "Africa (Ember)": "Africa"
+                  "Asia (Ember)": "Asia"
+                  "Europe (Ember)": "Europe"
+                  "Latin America and Caribbean (Ember)": "Latin America and Caribbean"
+                  "Middle East (Ember)": "Middle East"
+                  "North America (Ember)": "North America"
+                  "Oceania (Ember)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
 
       # Pew
       pew_region:
