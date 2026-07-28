@@ -1,8 +1,9 @@
-# NOTE: After December 2024 update, check the steps in `remove_jumps_in_the_data_and_unneeded_cols`
+# NOTE: On each update, re-check `remove_jumps_in_the_data_and_unneeded_cols` — it patches around a
+# source-side GNI coverage gap that the OECD may eventually fill in.
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder
 
@@ -107,6 +108,15 @@ CATEGORIES = {
     },
 }
 
+# Define the in-donor ODA components that are summed into the `oda_indonor_*` aggregates (and, by
+# subtraction from total ODA, into the `oda_overseas_*` ones).
+INDONOR_SUBCOMPONENTS = [
+    "i_a_5_scholarships_student_costs_donor_countries",
+    "i_a_7_administrative_costs_not_included_elsewhere",
+    "i_a_8_1_development_awareness",
+    "i_a_8_2_refugees_in_donor_countries",
+]
+
 # Define indices for pivot tables.
 INDICES = {
     "dac1": ["country", "year"],
@@ -171,16 +181,19 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("official_development_assistance")
-    ds_population = paths.load_dataset("population")
 
-    # Read table from meadow dataset.
-    tb_dac1 = ds_meadow["dac1"].reset_index()
-    tb_dac2a = ds_meadow["dac2a"].reset_index()
-    tb_dac5 = ds_meadow["dac5"].reset_index()
+    # Read tables from meadow dataset.
+    # NOTE: safe_types=False keeps the label columns categorical. DAC2A alone has ~10M rows, so
+    # converting them to strings is expensive, and the code below relies on the `.cat` accessor.
+    tb_dac1 = ds_meadow.read("dac1", safe_types=False)
+    tb_dac2a = ds_meadow.read("dac2a", safe_types=False)
+    tb_dac5 = ds_meadow.read("dac5", safe_types=False)
 
     #
     # Process data.
     #
+    sanity_check_inputs(tb_dac1=tb_dac1, tb_dac2a=tb_dac2a, tb_dac5=tb_dac5)
+
     tb_dac1 = paths.regions.harmonize_names(
         tb=tb_dac1,
         country_col="donor",
@@ -241,15 +254,7 @@ def run() -> None:
 
     tb_dac1 = combine_net_and_grant_equivalents(tb=tb_dac1)
 
-    tb_dac1 = add_oda_components_as_share_of_oda(
-        tb=tb_dac1,
-        subcomponent_list=[
-            "i_a_5_scholarships_student_costs_donor_countries",
-            "i_a_7_administrative_costs_not_included_elsewhere",
-            "i_a_8_1_development_awareness",
-            "i_a_8_2_refugees_in_donor_countries",
-        ],
-    )
+    tb_dac1 = add_oda_components_as_share_of_oda(tb=tb_dac1, subcomponent_list=INDONOR_SUBCOMPONENTS)
 
     tb = add_donor_data_from_recipient_dataset(tb_donor=tb_dac1, tb_recipient=tb_dac2a)
 
@@ -268,11 +273,12 @@ def run() -> None:
             "humanitarian_aid_recipient",
             "oda_by_sector",
         ],
-        ds_population=ds_population,
     )
 
     # Replace inf values with None (can occur when dividing by zero or very small populations)
     tb = tb.replace([float("inf"), float("-inf")], None)
+
+    sanity_check_outputs(tb=tb, subcomponent_list=INDONOR_SUBCOMPONENTS)
 
     tb = tb.format(["country", "year", "donor", "sector"], short_name=paths.short_name)
     tb_dac2a = tb_dac2a.format(["country", "year", "donor"])
@@ -433,7 +439,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
 
     # Assert if the official donors aggregation is in the recipient dataset
     assert set(OFFICIAL_DONORS.keys()).issubset(set(tb_recipient["donor"].unique())), (
-        f"The official donot aggregate set is not in the recipient dataset: {OFFICIAL_DONORS.keys()}"
+        f"The official donors aggregate set is not in the recipient dataset: {OFFICIAL_DONORS.keys()}"
     )
 
     # Rename donor categories set in DONORS_TOTALS and OFFICIAL_DONORS
@@ -447,7 +453,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     # Define columns to sum
     cols = [col for col in tb_donor_categories.columns if col not in ["country", "year", "donor", "oda_share_gni"]]
 
-    # Create a new table with the sum of all the columns not in country year donor and oda_share_gni in tb_donor_categories and name the colum donor as 'Total aid'
+    # Create a new table with the sum of all the columns not in country year donor and oda_share_gni in tb_donor_categories and name the column donor as 'Total aid'
     # I set min_count to ensure that the sum is only calculated if all donors have data
     tb_donor_categories_grouped = tb_donor_categories.groupby(["country", "year"], as_index=False, observed=True)[
         cols
@@ -489,7 +495,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     return tb
 
 
-def create_indicators_per_capita_owid_population(tb: Table, indicator_list: list[str], ds_population: Dataset) -> Table:
+def create_indicators_per_capita_owid_population(tb: Table, indicator_list: list[str]) -> Table:
     """
     Create indicators per capita for the recipient indicators.
     The per capita values available in the OECD Data Explorer are in current prices, so we want to use the constant values.
@@ -589,15 +595,15 @@ def remove_jumps_in_the_data_and_unneeded_cols(tb: Table) -> Table:
     Also, remove redundant columns.
     """
 
-    # For i_oda_net_disbursements_share_gni
+    # For i_oda_net_disbursements_share_gni.
+    # NOTE: In 1990 and 1991 Kuwait, Saudi Arabia, the United Arab Emirates and Qatar report their
+    # (Gulf War-era, and therefore very large) ODA but report no GNI, so they enter the numerator of
+    # this aggregate while being absent from the denominator. The result is an implausible 5.6% and
+    # 2.7% of GNI, against a UN target of 0.7%. The mismatch persists in later years too, but only
+    # distorts these two visibly. Re-check whether the source has filled in the missing GNI figures.
     tb.loc[
-        (tb["country"] == "Non-DAC countries (OECD)") & (tb["year"] <= 1991),
+        (tb["country"] == "Non-DAC countries") & (tb["year"] <= 1991),
         "i_oda_net_disbursements_share_gni",
-    ] = None
-
-    # For i_oda_net_disbursements_per_capita
-    tb.loc[
-        (tb["country"] == "Non-DAC countries (OECD)") & (tb["year"] == 2007), "i_oda_net_disbursements_per_capita"
     ] = None
 
     # Remove columns
@@ -655,18 +661,34 @@ def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: list[str]) 
             tb[f"{subcomponent}_grant_equivalents"] / tb["oda_grant_equivalents"] * 100
         )
 
-    # Also calculate the sum of these components
-    tb["oda_indonor_net_disbursements"] = tb[
-        [f"{subcomponent}_net_disbursements" for subcomponent in subcomponent_list]
-    ].sum(axis=1)
+    # Also calculate the sum of these components.
+    # NOTE: min_count=1 keeps the total undefined where the source reports none of the components,
+    # instead of returning a spurious zero (which would also make the "overseas" remainder below
+    # absorb the entire ODA total). Donors have only ever reported a subset of these categories -
+    # scholarships appear from 2010 and refugees in donor countries from 1992 - so requiring all of
+    # them would discard most of the series.
+    for suffix in ["net_disbursements", "grant_equivalents"]:
+        components = [f"{subcomponent}_{suffix}" for subcomponent in subcomponent_list]
+        total = tb[components].sum(axis=1, min_count=1)
+
+        # Suppress the total for years the source has not fully published yet. The OECD's preliminary
+        # April release reports only some aid types, so summing it would understate in-donor aid (the
+        # missing components are ~25% of it on average). Coverage of these categories otherwise only
+        # ever widens over time, so a component that was reported last year and by nobody this year
+        # means "not published yet" rather than "nil".
+        incomplete_years = _find_incomplete_years(tb=tb, components=components)
+        if incomplete_years:
+            paths.log.info(
+                f"In-donor {suffix} aggregates are left undefined for {sorted(incomplete_years)}: the "
+                f"source stopped reporting a component it reported the year before."
+            )
+            total = total.where(~tb["year"].isin(incomplete_years))
+
+        tb[f"oda_indonor_{suffix}"] = total
 
     tb["oda_indonor_net_disbursements_share_oda"] = (
         tb["oda_indonor_net_disbursements"] / tb["i_oda_net_disbursements"] * 100
     )
-
-    tb["oda_indonor_grant_equivalents"] = tb[
-        [f"{subcomponent}_grant_equivalents" for subcomponent in subcomponent_list]
-    ].sum(axis=1)
 
     tb["oda_indonor_grant_equivalents_share_oda"] = (
         tb["oda_indonor_grant_equivalents"] / tb["oda_grant_equivalents"] * 100
@@ -685,3 +707,84 @@ def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: list[str]) 
     )
 
     return tb
+
+
+def _find_incomplete_years(tb: Table, components: list[str]) -> set[int]:
+    """
+    Find years in which the source withdrew a component it reported the year before.
+
+    Reporting of the in-donor categories widens over time (a donor starts reporting a category and
+    keeps doing so), so a category going from "reported by someone" to "reported by nobody" marks a
+    year the source has not finished publishing rather than a year of genuine zeros.
+    """
+    reporters_per_year = tb.groupby("year", observed=True)[components].apply(lambda group: group.notna().sum())
+    reporters_per_year = reporters_per_year.sort_index()
+    withdrawn = (reporters_per_year == 0) & (reporters_per_year.shift(1) > 0)
+
+    return set(reporters_per_year.index[withdrawn.any(axis=1)])
+
+
+def sanity_check_inputs(tb_dac1: Table, tb_dac2a: Table, tb_dac5: Table) -> None:
+    """
+    Check that every source label this step filters on is still present in the meadow tables.
+
+    The CATEGORIES maps match OECD labels by exact string. When the OECD renames one, the filter in
+    `reformat_table_and_make_it_wide` silently drops those rows and the corresponding indicator
+    disappears from the output without any error, so assert the labels up front instead.
+    """
+    tables = {"dac1": tb_dac1, "dac2a": tb_dac2a, "dac5": tb_dac5}
+
+    for short_name, categories in CATEGORIES.items():
+        tb = tables[short_name]
+        for column, mapping in categories.items():
+            observed = set(tb[column].dropna().unique())
+            missing = set(mapping) - observed
+            assert not missing, (
+                f"Labels expected by CATEGORIES['{short_name}']['{column}'] are missing from the "
+                f"source data: {sorted(missing)}. The OECD has most likely renamed them; update the "
+                f"mapping (and the matching indicator names in the .meta.yml) to the new labels."
+            )
+
+
+def sanity_check_outputs(tb: Table, subcomponent_list: list[str]) -> None:
+    """
+    Check the combined output table before it is saved.
+    """
+    # No indicator should be entirely empty.
+    empty_columns = sorted(tb.columns[tb.isna().all()])
+    assert not empty_columns, f"These output columns are entirely empty: {empty_columns}"
+
+    # In-donor and overseas ODA partition total ODA, so their shares must sit within 0-100%.
+    for suffix in ["net_disbursements", "grant_equivalents"]:
+        for prefix in ["oda_indonor", "oda_overseas"]:
+            column = f"{prefix}_{suffix}_share_oda"
+            values = tb[column].dropna()
+            assert values.between(0, 100).all(), (
+                f"{column} falls outside 0-100%: min={values.min()}, max={values.max()}."
+            )
+
+    # The in-donor totals are sums over `subcomponent_list`, so a row where the source reports none
+    # of the components must stay undefined. Summing to zero there would also hand the whole ODA
+    # total to the "overseas" remainder, which is derived by subtraction.
+    for suffix in ["net_disbursements", "grant_equivalents"]:
+        components = [f"{subcomponent}_{suffix}" for subcomponent in subcomponent_list]
+        nothing_reported = tb[components].isna().all(axis=1)
+
+        for prefix, total_column in [
+            ("oda_indonor", f"oda_indonor_{suffix}"),
+            ("oda_overseas", f"oda_overseas_{suffix}"),
+        ]:
+            offending = tb.loc[nothing_reported & tb[total_column].notna()]
+            assert offending.empty, (
+                f"{total_column} has a value on {len(offending)} row(s) where none of its components "
+                f"is reported (e.g. {sorted(set(offending['year']))[:5]}). It must be null there, "
+                f"otherwise unreported components are silently counted as zero."
+            )
+
+        # Years the source has not finished publishing must not carry an aggregate either.
+        incomplete_years = _find_incomplete_years(tb=tb, components=components)
+        offending = tb.loc[tb["year"].isin(incomplete_years) & tb[f"oda_indonor_{suffix}"].notna()]
+        assert offending.empty, (
+            f"oda_indonor_{suffix} has a value in {sorted(incomplete_years)}, where the source "
+            f"withdrew a component it reported the previous year."
+        )
