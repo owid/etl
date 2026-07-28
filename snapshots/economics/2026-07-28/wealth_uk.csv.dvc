@@ -24,7 +24,6 @@ meta:
     # License
     license:
       name: © Alvaredo, Atkinson and Morelli (2018)
-      url: https://doi.org/10.1016/j.jpubeco.2018.02.008
 outs:
   - md5: 1c6f42a205f08a900f34ef4bf89bf1fc
     size: 5756
