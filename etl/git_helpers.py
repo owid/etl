@@ -86,9 +86,11 @@ class GithubRepo:
 
     def _git(self, *args: str, **kwargs: Any) -> str:
         "Execute a git command in the context of this repo."
+        # NOTE: since sh 2.0, commands return the decoded stdout as a str (pass
+        # _return_cmd=True to get the old RunningCommand object back).
         return cast(
             str,
-            sh.git("--no-pager", *args, _cwd=self.cache_dir.as_posix(), **kwargs).stdout.decode("utf8").strip(),  # ty: ignore[call-non-callable]
+            sh.git("--no-pager", *args, _cwd=self.cache_dir.as_posix(), **kwargs).strip(),  # ty: ignore[call-non-callable]
         )
 
     def is_up_to_date(self) -> bool:

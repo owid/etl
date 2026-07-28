@@ -28,6 +28,7 @@ from etl.steps import (
     DataStepPrivate,
     SnapshotStep,
     Step,
+    StepFailedError,
     filter_to_subgraph,
     get_etag,
     isolated_env,
@@ -76,6 +77,32 @@ def test_data_step_recovers_from_partial_output():
         assert (dest_dir / "index.json").exists()
         assert not (dest_dir / "leftover.parquet").exists()
         Dataset(dest_dir.as_posix())
+
+
+def test_data_step_failure_raises_step_failed_error():
+    # A step whose run() raises must surface as a regular Exception carrying the step name and the
+    # traceback from the child that ran it. It used to exit via sys.exit(1), and that SystemExit
+    # sailed past the `except Exception` handlers in the runners, ending the whole run without
+    # logging the step or printing anything.
+    with temporary_step() as step_name:
+        py_file = paths.STEP_DIR / "data" / f"{step_name}.py"
+        py_file.write_text("def run() -> None:\n    raise ValueError('boom in step code')\n")
+
+        leftovers_before = set(Path(tempfile.gettempdir()).glob("etl-step-traceback-*"))
+
+        # DEBUG runs steps in-process; the runners use a forked child in a real run.
+        with patch("etl.config.DEBUG", False), pytest.raises(StepFailedError) as exc_info:
+            DataStep(step_name, []).run()
+
+    assert step_name in str(exc_info.value)
+    # The traceback rides along on the exception (not in its message, which gets re-raised at the
+    # end of a run), so whoever handles the failure can print it.
+    child_traceback = exc_info.value.child_traceback
+    assert f"--- Traceback for data://{step_name}" in child_traceback
+    assert "ValueError: boom in step code" in child_traceback
+    assert "Traceback (most recent call last)" in child_traceback
+    # The file the child passes its traceback through is the parent's to clean up.
+    assert set(Path(tempfile.gettempdir()).glob("etl-step-traceback-*")) == leftovers_before
 
 
 def test_data_step_becomes_dirty_when_pandas_version_changes():

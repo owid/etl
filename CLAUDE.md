@@ -116,6 +116,15 @@ Internal terms that recur across this guide, the skills, and the codebase:
 
 Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
+**"The step completed" is not "the data is right".** After running a step for
+someone, report what came out of it: row count, year range, entities, and a few
+values from the latest year, plus whether anything changed against the published
+catalog. `✅ No differences found` is itself a result worth reporting.
+
+```bash
+.venv/bin/etl diff REMOTE data/ --include <dataset> --verbose
+```
+
 ### Running Snapshot Steps
 
 ```bash
@@ -230,23 +239,6 @@ def run() -> None:
 
 For a known *source* error we patch locally until the provider fixes it, don't inline `.loc[...]`/`.drop(...)` — declare it in a `<short_name>.corrections.yml` next to the step and apply with `tb = paths.apply_corrections(tb)`. See `etl/data_corrections.py` for the format; `etl corrections -o /tmp/c.html --charts` inventories and visualises them all. For enumerated provider point-errors only — systematic recoding *rules* and aggregation stay in step code.
 
-### Ad-hoc Data Exploration
-```python
-from etl.snapshot import Snapshot
-snap = Snapshot("namespace/version/file.csv")
-tb = snap.read_csv()
-```
-
-### Catalog System
-
-Built on **owid.catalog** library:
-- **Dataset**: Container for multiple tables with shared metadata
-- **Table**: pandas.DataFrame subclass with rich metadata per column
-- **Variable**: pandas.Series subclass with variable-specific metadata
-- Content-based checksums for change detection
-- Multiple formats (feather, parquet, csv) with automatic schema validation
-
-
 ### HTTP calls to OWID infra
 
 When internal code hits an OWID host (catalog, grapher, `files.ourworldindata.org`, `search.owid.io`, Datasette, admin API, etc.), use the shared session from `etl.http` instead of bare `requests` / `httpx` / `pd.read_*(url)`. It pre-sets a `User-Agent: owid-etl/...` header so our traffic is distinguishable in CDN logs.
@@ -292,119 +284,15 @@ If the same sentence could fit in both, it belongs in garden — not in `.dvc`. 
 
 ## Sanity checks
 
-Silent data corruption is one of the easier bugs to miss. A step can run cleanly, pass type checks, and ship to staging while producing wrong numbers — and by the time someone notices on a chart, the bad data may already be live. Sanity checks are how we catch that at build time instead.
+Silent data corruption is one of the easier bugs to miss: a step can run cleanly, pass type checks, and ship wrong numbers to staging. Every garden step that does more than a straight load-and-format asserts its assumptions about its inputs and its output — and so does any snapshot that parses non-trivially (PDF tables, custom binary formats, scraping). Where they go, what they look like, and which categories are worth checking are in `.claude/rules/sanity-checks.md`, which loads on its own when you open a step or snapshot script.
 
-**Write them. Make them strict.** Every garden step that does anything more than a straight load-and-format should assert its assumptions about both the input it received and the output it produced. The bar isn't "would I notice this on a chart" — it's "could this go wrong, and if it did, would the step still finish without complaining?". If yes, that's a check.
+## Querying MySQL, and verifying charts on staging
 
-### Where they go
-
-- **Garden** is the main home. The input tables, the transformations, and the output table are all in one place, and that's where business logic lives. Put one `sanity_check_inputs(...)` right after loading meadow tables (before any transform), and one `sanity_check_outputs(...)` right before `paths.create_dataset(...)`. Call both from `run()`. See [`rff/2026-06-10/emissions_weighted_carbon_price.py`](etl/steps/data/garden/rff/2026-06-10/emissions_weighted_carbon_price.py) for a clean, recent example.
-- **Snapshot** usually doesn't need checks — most snapshots just download and write. But when the snapshot itself does non-trivial parsing (PDF tables, custom binary formats, scraping), add integrity checks right before `snap.create_snapshot(...)`. If the parser can produce silently-wrong rows, the snapshot is the only place to catch it before the bad rows leak into meadow.
-- **Meadow** should stay light. If you find yourself wanting checks there, it usually means the logic belongs in garden instead.
-
-### How they look
-
-Use plain `assert` with a clear error message. Hard-fail is the default — let the step crash loudly. Save `log.warning(...)` for checks that flag suspicious patterns the maintainer should *review* but that aren't always wrong (e.g., a country dropping to zero in the latest year — could be a real signal, could be incomplete reporting).
-
-```python
-def sanity_check_inputs(tb_economy: Table, tb_coverage: Table) -> None:
-    assert set(tb_economy["jurisdiction"]) == set(tb_coverage["jurisdiction"]), "Jurisdictions don't match between the two input tables."
-    assert not tb_economy.duplicated(subset=["jurisdiction", "year"]).any(), "Duplicate (jurisdiction, year) rows in economy table."
-    price_cols = [c for c in tb_economy.columns if c not in ["jurisdiction", "year"]]
-    assert tb_economy[price_cols].min().min() >= 0, "Negative price found — source error or unit mistake."
-
-
-def sanity_check_outputs(tb: Table) -> None:
-    assert tb.columns[tb.isna().all()].empty, "Output has a fully-NaN column."
-    # Soft signal — surface for review, don't fail.
-    dropped = sorted(set(tb[tb["year"] == tb["year"].max()].query("value == 0")["country"]))
-    if dropped:
-        log.warning(f"Countries that dropped to zero in the latest year: {dropped}")
-```
-
-### Categories worth checking
-
-Pick whichever apply to your step. Don't write all of these by default — write the ones that would catch a real failure mode for this dataset.
-
-- **Shape / schema invariants.** Set-equality on the columns, categories, subcategories, variables, or any other identifier list you expect to be stable across versions. (`set(tb["category"]) == set(EXPECTED_CATEGORIES)`.) Catches schema changes at the source.
-- **Key uniqueness.** `assert not tb.duplicated(subset=[...]).any()` on whatever key columns the table is supposed to be unique on. Catches accidental row duplication from joins.
-- **Value ranges.** Non-negative where it should be, within plausible bounds where you know them, no NaN where you don't expect any. Catches unit mistakes and parser drift.
-- **Cross-table / cross-source agreement.** If two source tables both report the same key, their overlap should agree to the dollar (or within a documented tolerance). Catches misaligned extractions.
-- **Sum reconciles with published total.** If the source publishes both the components and the total, assert that summing the components equals the total within tolerance. See [`emissions/2026-02-11/emissions_by_custom_sector.py`](etl/steps/data/garden/emissions/2026-02-11/emissions_by_custom_sector.py:172) for an example. Catches row-shift extraction bugs and unit-mismatches.
-- **No silent drops.** If you filter, dedupe, or aggregate, assert that the row count or aggregate matches what you'd expect. (`assert len(tb) == n_expected`.) Catches transforms that quietly lose data.
-- **Coverage didn't shrink.** When updating a dataset version, check that you still have at least as many countries / quarters / categories as the previous version — a sudden drop is usually a parsing regression, not a real change.
-- **Magnitude matches the previous version.** When rewriting or updating a step, compare output values against the previous live version — a silent unit regression (e.g. a dropped ×1e6 conversion) passes every schema check and ships wrong-by-a-million values. Source columns whose headers carry unit markers (`(mils)`, `(000)`, `%`) demand an explicit conversion in garden **plus** a magnitude assert (`assert 1e12 < tb[col].max() < 1e14`), so the conversion can't be lost in a future rewrite.
-
-### When checks fail
-
-Don't suppress the assertion to get the step to pass. Treat the failure as the signal it is: investigate, then either fix the upstream logic or — if the source genuinely changed — update the assertion (and document why in a `# NOTE:` comment near the check).
-
-## Querying MySQL
-
-### Quick queries (staging)
-```bash
-make query SQL="SELECT COUNT(*) FROM variables WHERE catalogPath IS NULL"
-```
-Automatically connects to `staging-site-{branch}` based on current git branch.
-
-### Python (for more control)
-```python
-from etl.config import OWID_ENV
-df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
-```
-
-**Prefer Python when the SQL contains `%` (LIKE patterns, JSON_EXTRACT paths) or single-quoted strings — `make query` re-interprets those via shell + make and breaks unpredictably.** Use `params={...}` for `%`/quoted values to dodge pymysql's own `%`-format-string parsing.
-
-**`OWID_ENV` targets your local dev DB even when you're on a branch.** To query the branch's staging DB from Python, use `OWIDEnv.from_staging('<branch>')` (`from etl.config import OWIDEnv`) — e.g. `OWIDEnv.from_staging('my-branch').read_sql(...)`. Also note `make query` shells out to the `mysql` CLI, which may not be installed; if it errors with `mysql: command not found`, use the Python `from_staging(...).read_sql(...)` path instead.
-
-### Production queries via public Datasette
-
-When you need production data (which charts use an indicator, chart configs, gdoc links) and local/prod MySQL isn't reachable, query the public Datasette over HTTP:
-
-```bash
-curl -s "https://datasette-public.owid.io/owid.json?sql=<url-encoded SQL>"
-```
-
-`chart_dimensions` + `charts` + `chart_configs` answer "which charts use variable X"; `narrative_charts` and `posts_gdocs_links` cover derived charts and article references — together they answer the full "what does this dataset affect?" question when assessing the blast radius of a data fix.
-
-## Verifying charts on staging
-
-- **Indicator data/metadata API**: `https://api-staging.owid.io/staging-site-<branch>/v1/indicators/<id>.data.json` (and `.metadata.json`). The path prefix is `staging-site-<branch>`, **not** the bare branch name — a wrong prefix silently serves data from a different environment instead of 404ing, which looks exactly like "my fix didn't take". When in doubt, grep the staging chart page (`http://staging-site-<branch>/grapher/<slug>`) for `data.json` to get the exact URLs it loads.
-- **Rendered chart without a browser**: `http://staging-site-<branch>/grapher/<slug>.svg` returns a server-side render — grep it for axis labels / entity names to verify a fix end-to-end (e.g. `grep -oE '>[0-9]+ [a-z]+[^<]*<'` to read the y-axis ticks).
-
-## Additional Tools
-
-Get `--help` for details on any command.
-
-### Fast File Searching
-
-Use `rg` (ripgrep) instead of `find -exec grep` - it's ~100x faster:
-```bash
-rg -l "pattern" -g "*.py" -g "!.venv"
-```
+Use the `query-grapher-db` skill — it covers the local dev DB, a branch's staging DB, production via the public Datasette, and the staging indicator/SVG endpoints.
 
 ## Package Management
 
-Use `uv` (not pip):
-```bash
-uv add package_name
-uv remove package_name
-```
-
 **Never run bare `uv sync`** — it prunes optional deps the repo needs (streamlit, etc.) and breaks `etl`/`etl pr`. The full environment is `uv sync --all-extras --group dev` (what `make .venv` runs); use that to install or repair the venv.
-
-## VSCode Extensions
-
-Extensions live in `vscode_extensions/<name>/`. After **every** code change, you must compile, package, and install — just compiling is NOT enough:
-
-```bash
-cd vscode_extensions/<name>
-npm run compile
-npx @vscode/vsce package --out install/<name>-<version>.vsix
-code --install-extension install/<name>-<version>.vsix --force
-```
-
-Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
 
 ## GitHub Actions
 
@@ -417,6 +305,12 @@ When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinn
 See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
 - `pipeline-stages.md` - Pipeline architecture details
+- `cloud-sandbox.md` - Claude Code on the web: what a cloud session can and can't do
+
+If you are running in a Claude Code cloud sandbox (`CLAUDE_CODE_REMOTE=true`), read
+`.claude/docs/cloud-sandbox.md` **before starting work** — it covers the pre-created
+branch name, spurious `uv.lock` diffs, the absence of a database, which OWID hosts
+the egress proxy blocks, and how to resolve an `admin.owid.io` link you can't open.
 
 ## Individual Preferences
 
