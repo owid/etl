@@ -547,3 +547,6 @@ steps:
   # archived; last active in 9d251260ad8b on 2026-07-28
   data://explorers/wid/latest/world_inequality_database:
     - data://garden/wid/2026-06-18/world_inequality_database_legacy
+  # archived; last active in 1c3d0dac654a on 2026-07-28
+  data://garden/wid/2026-06-18/world_inequality_database_legacy:
+    - data://meadow/wid/2026-06-18/world_inequality_database
