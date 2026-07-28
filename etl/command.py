@@ -623,8 +623,9 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
         _write_execution_times(execution_times)
 
     if continue_on_failure and exceptions:
-        for step, exception in zip(failing_steps, exceptions):
-            log.error("step_exception", step=str(step), exception=str(exception))
+        # Tracebacks were printed as each step failed; recap the step names, since by now they are
+        # thousands of lines up in the log.
+        log.error("steps_failed", steps=sorted(str(step) for step in failing_steps))
         # Raise the first exception
         raise exceptions[0]
 
