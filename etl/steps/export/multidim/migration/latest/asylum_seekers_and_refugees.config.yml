@@ -20,6 +20,19 @@ definitions:
         hasMapTab: true
         tab: map
         chartTypes: ["LineChart"]
+  # Description bullets for refugees/ asylum-seekers
+  description_key_refugee: A refugee is a person in need of international protection. They had to flee their home country because of serious threats against which the authorities of their home country cannot or will not protect them.
+  description_key_asylum: An asylum-seeker is a person who has fled their home country because of serious threats against which the authorities of their home country cannot or will not protect them. A person is considered an asylum-seeker if they have applied for asylum in another country and are waiting for a decision on their application.
+  description_diff_refugee_asylum: The UNHCR only considers a person a refugee if they have been granted protection in a foreign country. If a person has fled their home country and applied for asylum in another country, but is still waiting for a decision on their application, they are considered an asylum-seeker.
+  description_returned_refugees: Returned refugees are former refugees who have returned to their countries of origin, but are yet to be fully integrated.
+  description_returned_statistics: The UNHCR only includes refugees who returned during this calendar year in their statistics, although in practice, operations may assist returnees for longer periods.
+  description_stateless: Stateless persons are people who are not considered a citizen of any country. A person can be stateless for many reasons, including (among others) unknown parentage, discrimination or complex nationality laws. You can read more about this on the [UNHCR's website](https://www.unhcr.org/about-unhcr/who-we-protect/stateless-people).
+  description_stateless_problems: Stateless persons often struggle to obtain documentation and proof of their legal identities. Because of this, they face difficulties accessing basic rights and services, such as education, healthcare, employment, and freedom of movement. They may also be at risk of detention or deportation.
+  # Footnotes
+  footnote_refugees: This data includes all refugees, not just those who fled that year.
+  footnote_asylum: This data includes all asylum-seekers, not just those who fled or applied for asylum that year.
+  footnote_refugees_asylum: This data includes all refugees who live in this country, not just those who arrived that year.
+  footnote_asylum_asylum: This data includes all asylum-seekers who live in this country, not just those who arrived or applied for asylum that year.
 
 dimensions:
   - slug: metric
@@ -38,7 +51,7 @@ dimensions:
         name: Stateless persons
         description: People who are not considered a citizen of any country.
   - slug: direction
-    name: Origin or country of asylum
+    name: By origin or destination
     choices:
       - slug: origin
         name: By country of origin
@@ -73,6 +86,10 @@ views:
           baseColorScheme: YlOrRd
           binningStrategy: manual
           customNumericValues: [0, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
+    metadata:
+      description_key:
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_diff_refugee_asylum}"
 
   - dimensions:
       metric: refugees
@@ -82,11 +99,16 @@ views:
       y:
         - catalogPath: refugee_data_origin#refugees_per_1000
     config:
+      note: "{definitions.footnote_refugees}"
       map:
         colorScale:
           baseColorScheme: YlOrRd
           binningStrategy: manual
           customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100, 300]
+    metadata:
+      description_key:
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_diff_refugee_asylum}"
 
   - dimensions:
       metric: refugees
@@ -101,6 +123,10 @@ views:
           baseColorScheme: YlGnBu
           binningStrategy: manual
           customNumericValues: [0, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
+    metadata:
+      description_key:
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_diff_refugee_asylum}"
 
   - dimensions:
       metric: refugees
@@ -110,11 +136,16 @@ views:
       y:
         - catalogPath: refugee_data_asylum#refugees_per_1000
     config:
+      note: "{definitions.footnote_refugees_asylum}"
       map:
         colorScale:
           baseColorScheme: YlGnBu
           binningStrategy: manual
           customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100]
+    metadata:
+      description_key:
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_diff_refugee_asylum}"
 
   # Asylum seekers
   - dimensions:
@@ -125,11 +156,16 @@ views:
       y:
         - catalogPath: refugee_data_origin#asylum_seekers
     config:
+      note: "{definitions.footnote_asylum}"
       map:
         colorScale:
           baseColorScheme: YlOrRd
           binningStrategy: manual
           customNumericValues: [0, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+    metadata:
+      description_key:
+        - "{definitions.description_key_asylum}"
+        - "{definitions.description_diff_refugee_asylum}"
 
   - dimensions:
       metric: asylum_seekers
@@ -139,11 +175,16 @@ views:
       y:
         - catalogPath: refugee_data_origin#asylum_seekers_per_100k
     config:
+      note: "{definitions.footnote_asylum}"
       map:
         colorScale:
           baseColorScheme: YlOrRd
           binningStrategy: manual
           customNumericValues: [0, 10, 20, 50, 100, 200, 500, 1000]
+    metadata:
+      description_key:
+        - "{definitions.description_key_asylum}"
+        - "{definitions.description_diff_refugee_asylum}"
 
   - dimensions:
       metric: asylum_seekers
@@ -158,6 +199,10 @@ views:
           baseColorScheme: YlGnBu
           binningStrategy: manual
           customNumericValues: [0, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+    metadata:
+      description_key:
+        - "{definitions.description_key_asylum}"
+        - "{definitions.description_diff_refugee_asylum}"
 
   - dimensions:
       metric: asylum_seekers
@@ -167,11 +212,16 @@ views:
       y:
         - catalogPath: refugee_data_asylum#asylum_seekers_per_100k
     config:
+      note: "{definitions.footnote_asylum_asylum}"
       map:
         colorScale:
           baseColorScheme: YlGnBu
           binningStrategy: manual
           customNumericValues: [0, 1, 3, 10, 30, 100, 300, 1000, 3000]
+    metadata:
+      description_key:
+        - "{definitions.description_key_asylum}"
+        - "{definitions.description_diff_refugee_asylum}"
 
   # Returned refugees (per-capita not published for this metric)
   - dimensions:
@@ -187,6 +237,11 @@ views:
           baseColorScheme: BuGn
           binningStrategy: manual
           customNumericValues: [0, 10, 100, 1000, 10000, 100000, 1000000]
+    metadata:
+      description_key:
+        - "{definitions.description_returned_refugees}"
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_returned_statistics}"
 
   - dimensions:
       metric: returned_refugees
@@ -201,6 +256,11 @@ views:
           baseColorScheme: GnBu
           binningStrategy: manual
           customNumericValues: [0, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000]
+    metadata:
+      description_key:
+        - "{definitions.description_returned_refugees}"
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_returned_statistics}"
 
   # Stateless persons (only reported by country of residence, i.e. "asylum" perspective)
   - dimensions:
@@ -216,6 +276,10 @@ views:
           baseColorScheme: YlGnBu
           binningStrategy: manual
           customNumericValues: [0, 10, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+    metadata:
+      description_key:
+        - "{definitions.description_stateless}"
+        - "{definitions.description_stateless_problems}"
 
   - dimensions:
       metric: stateless
@@ -230,3 +294,8 @@ views:
           baseColorScheme: YlGnBu
           binningStrategy: manual
           customNumericValues: [0, 0.3, 1, 3, 10, 30, 100, 300, 1000, 3000]
+    metadata:
+      description_key:
+        - "{definitions.description_stateless}"
+        - "{definitions.description_stateless_problems}"
+
