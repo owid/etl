@@ -57,10 +57,6 @@ steps:
   export://multidim/wid/latest/wealth_wid:
     - data://grapher/wid/2026-06-18/world_inequality_database
 
-    # Legacy WID pipeline
-  data://garden/wid/2026-06-18/world_inequality_database_legacy:
-    - data://meadow/wid/2026-06-18/world_inequality_database
-
   #
   # Luxembourg Income Study
   #
