@@ -8,8 +8,10 @@ meta:
       This dataset accompanies the paper "The Rise of Income and Wealth Inequality in America: Evidence from Distributional Macroeconomic Accounts", which uses distributional national accounts to study the long-run concentration of income and wealth in the United States.
 
       The authors combine tax, survey and national accounts data to estimate the shares of income and wealth held by top groups (such as the top 10%, top 1% and top 0.1%) and by the bottom 50%, along with related series on economic growth by income group, effective tax rates and government transfers.
-
-      OWID uses the top wealth-share series from this workbook (the revised Saez and Zucman September 2020 estimates); the workbook also contains the income-share, growth, tax and transfer series behind the paper's other figures, which are not ingested here.
+    # NOTE: The workbook has ~10 data sheets (Figures 1-6 + appendix). We ingest only the wealth-shares
+    # sheet "DataF1-F2(Wealth)", and within it only the revised Saez-Zucman September 2020 series. The
+    # income-share, growth, tax and transfer sheets, and the alternative wealth-estimate methods, are
+    # available in the same file for a future extension.
     date_published: "2020-11-01"
 
     # Citation
