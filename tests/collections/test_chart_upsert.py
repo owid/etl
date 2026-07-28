@@ -12,6 +12,8 @@ from unittest.mock import patch
 import pytest
 
 from etl.collection.chart_upsert import _build_chart_config, _validate_chart_config
+from etl.collection.model.core import Collection, Definitions
+from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.model.view import View, ViewIndicators
 from etl.config import DEFAULT_GRAPHER_SCHEMA
 
@@ -140,14 +142,91 @@ def test_validate_skips_when_schema_not_vendored_locally():
     _validate_chart_config(config, "my-chart")
 
 
-def test_uuid_v7_is_valid_and_time_ordered():
+def test_chart_config_id_required_for_single_charts():
+    collection = Collection(
+        catalog_path="animal_welfare/latest/my_chart#my_chart",
+        dimensions=[],
+        views=[_make_view({"y": "table#ind1"})],
+        _definitions=Definitions(),
+    )
+    with pytest.raises(ValueError, match="missing a top-level `chart_config_id`"):
+        collection.validate_chart_config_id()
+
+
+def _chart_collection(chart_config_id) -> Collection:
+    return Collection(
+        catalog_path="animal_welfare/latest/my_chart#my_chart",
+        dimensions=[],
+        views=[_make_view({"y": "table#ind1"})],
+        chart_config_id=chart_config_id,
+        _definitions=Definitions(),
+    )
+
+
+def test_chart_config_id_must_be_a_uuid():
+    with pytest.raises(ValueError, match="invalid `chart_config_id`"):
+        _chart_collection("7118").validate_chart_config_id()
+
+
+def test_chart_config_id_must_be_a_string():
+    # An unquoted numeric-looking value in the YAML would arrive as an int.
+    with pytest.raises(ValueError, match="expected a UUID string, got int"):
+        _chart_collection(7118).validate_chart_config_id()  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        # All of these parse as UUIDs but wouldn't match the CHAR(36) lookup key in grapher.
+        "0191b6c7559570b28d30fa03fccd7add",
+        "{0191b6c7-5595-70b2-8d30-fa03fccd7add}",
+        "urn:uuid:0191b6c7-5595-70b2-8d30-fa03fccd7add",
+        "0191B6C7-5595-70B2-8D30-FA03FCCD7ADD",
+    ],
+)
+def test_chart_config_id_must_be_canonical(value):
+    with pytest.raises(ValueError, match="non-canonical `chart_config_id`"):
+        _chart_collection(value).validate_chart_config_id()
+
+
+def test_chart_config_id_warns_when_not_uuid7(capsys):
+    # A canonical UUIDv4 is accepted but flagged — grapher only ever mints v7.
+    _chart_collection("6e8bc430-9c3a-41d9-a52e-b0a9b8b64f3d").validate_chart_config_id()
+    assert "collection.chart_config_id.not_uuid7" in capsys.readouterr().out
+
+
+def test_chart_config_id_accepted_for_single_charts():
+    collection = Collection(
+        catalog_path="animal_welfare/latest/my_chart#my_chart",
+        dimensions=[],
+        views=[_make_view({"y": "table#ind1"})],
+        chart_config_id="0191b6c7-5595-70b2-8d30-fa03fccd7add",
+        _definitions=Definitions(),
+    )
+    # Should not raise.
+    collection.validate_chart_config_id()
+
+
+def test_chart_config_id_rejected_on_mdims():
+    collection = Collection(
+        catalog_path="animal_welfare/latest/my_mdim#my_mdim",
+        dimensions=[Dimension(slug="sex", name="Sex", choices=[DimensionChoice(slug="female", name="Female")])],
+        views=[View(dimensions={"sex": "female"}, indicators=ViewIndicators.from_dict({"y": "table#ind1"}))],
+        chart_config_id="0191b6c7-5595-70b2-8d30-fa03fccd7add",
+        _definitions=Definitions(),
+    )
+    with pytest.raises(ValueError, match="declares `chart_config_id` but has dimensions"):
+        collection.validate_chart_config_id()
+
+
+def test_new_chart_config_id_is_valid_uuid7_and_time_ordered():
     import time
     import uuid as uuid_module
 
-    from etl.collection.chart_upsert import _uuid_v7
+    from etl.collection.chart_upsert import new_chart_config_id
 
     before_ms = time.time_ns() // 1_000_000
-    generated = uuid_module.UUID(_uuid_v7())
+    generated = uuid_module.UUID(new_chart_config_id())
     after_ms = time.time_ns() // 1_000_000
 
     assert generated.version == 7

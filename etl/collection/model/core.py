@@ -3,6 +3,7 @@
 import inspect
 import json
 import re
+import uuid
 from collections import defaultdict
 from collections.abc import Callable
 from copy import deepcopy
@@ -94,6 +95,11 @@ class Collection(MDIMBase):
     # See `validate_required_fields()` for the per-collection-type rules.
     title: dict[str, str] | None = None
     default_selection: list[str] | None = None
+
+    # The chart's stable identity (`charts.configId` in grapher). Required for — and only
+    # valid on — single-chart collections (`dimensions: []`); mdims are identified by
+    # their catalog path instead. See `validate_chart_config_id()`.
+    chart_config_id: str | None = None
 
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
@@ -244,6 +250,9 @@ class Collection(MDIMBase):
         # for default_selection). Single-chart collections (`dimensions: []`) ignore both.
         self.validate_title()
         self.validate_default_selection()
+
+        # Single charts must declare their grapher identity (`chart_config_id`); mdims must not.
+        self.validate_chart_config_id()
 
         # Run sanity checks on grouped views
         self.validate_grouped_views()
@@ -613,6 +622,81 @@ class Collection(MDIMBase):
             raise ValueError(
                 f"Collection '{self.catalog_path}' is a multidim (has dimensions) but is missing "
                 "a top-level `title.title`. Add it to your config YAML."
+            )
+
+    def validate_chart_config_id(self):
+        """`chart_config_id` is required for — and only valid on — single-chart collections.
+
+        A single chart's identity in grapher is its config UUID (`charts.configId`), and the
+        ETL config YAML has to declare it: for a chart that already exists, look up its UUID;
+        for a new chart, mint one. Without it we couldn't tell "push this config to that chart"
+        apart from "create yet another chart".
+        """
+        # Only multidims can be single charts (`dimensions: []`); explorers are always multi-view.
+        if self._collection_type != "multidim":
+            return
+
+        if self.dimensions:
+            # An mdim is identified by its catalog path (`multi_dim_data_pages.catalogPath`).
+            if self.chart_config_id:
+                raise ValueError(
+                    f"Collection '{self.catalog_path}' declares `chart_config_id` but has dimensions. "
+                    "That field identifies a single chart; mdims are identified by their catalog path. "
+                    "Remove it."
+                )
+            return
+
+        if not self.chart_config_id:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' is a single chart (`dimensions: []`) but is missing "
+                "a top-level `chart_config_id`. It is the chart's identity in grapher (`charts.configId`) "
+                "and must be declared in the config YAML:\n"
+                "  - for a chart that already exists, use its config UUID (see `charts.configId`, e.g. "
+                "`SELECT c.configId FROM charts c JOIN chart_configs cf ON cf.id = c.configId "
+                "WHERE cf.slug = '<slug>'`);\n"
+                "  - for a brand-new chart, mint one with "
+                "`python -c 'from etl.collection.chart_upsert import new_chart_config_id; "
+                "print(new_chart_config_id())'`."
+            )
+
+        # The UUID is used verbatim as the lookup key in
+        # `PUT /charts/by-config/:uuid/etlConfig` and stored as a CHAR(36), so it has to be
+        # in canonical lower-case dashed form. `uuid.UUID()` alone is too lenient — it happily
+        # parses '{...}', 'urn:uuid:...', undashed hex and upper case, none of which would
+        # match the chart we mean to target: the endpoint would create a *new* chart instead.
+        if not isinstance(self.chart_config_id, str):
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has an invalid `chart_config_id` "
+                f"({self.chart_config_id!r}): expected a UUID string, got {type(self.chart_config_id).__name__}. "
+                "Quote it in the config YAML."
+            )
+        try:
+            parsed = uuid.UUID(self.chart_config_id)
+        except ValueError:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has an invalid `chart_config_id` "
+                f"('{self.chart_config_id}'): expected a UUID."
+            ) from None
+        if str(parsed) != self.chart_config_id:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has a non-canonical `chart_config_id` "
+                f"('{self.chart_config_id}'). Grapher stores and matches it as a lower-case dashed "
+                f"UUID, so write it exactly as '{parsed}'."
+            )
+        if parsed.version != 7:
+            # Every chart config UUID grapher has ever generated is a UUIDv7, so a different
+            # version means the value probably didn't come from grapher (or from
+            # `new_chart_config_id`). Not fatal — the upsert would just create a new chart —
+            # but almost always a sign the wrong UUID was pasted in.
+            log.warning(
+                "collection.chart_config_id.not_uuid7",
+                catalog_path=self.catalog_path,
+                chart_config_id=self.chart_config_id,
+                version=parsed.version,
+                message=(
+                    "`chart_config_id` is not a UUIDv7. Grapher generates v7 UUIDs for chart "
+                    "configs — double-check this is the intended chart's `charts.configId`."
+                ),
             )
 
     def validate_default_selection(self):

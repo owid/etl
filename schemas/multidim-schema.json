@@ -291,6 +291,41 @@
                 ]
             ]
         },
+        "chart_config_id": {
+            "type": "string",
+            "title": "Chart config UUID",
+            "description": "Identity of the single chart this config authors, as stored in grapher's `charts.configId`.",
+            "requirement_level": "required for single charts (`dimensions: []`), otherwise must be omitted",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "guidelines": [
+                [
+                    "Only valid on single-chart collections (`dimensions: []`); multi-dimensional collections are identified by their catalog path."
+                ],
+                [
+                    "When bringing an existing chart into ETL, use that chart's `charts.configId` so the config lands on the existing chart instead of creating a new one."
+                ],
+                [
+                    "For a brand-new chart, mint a UUIDv7 with `python -c 'from etl.collection.chart_upsert import new_chart_config_id; print(new_chart_config_id())'`."
+                ],
+                [
+                    "Never change it once set — it is the chart's identity in every environment (local, staging, production)."
+                ],
+                [
+                    "Must be in canonical lower-case dashed form; it is used verbatim as grapher's lookup key."
+                ]
+            ],
+            "examples": [
+                "0191b6c7-5595-70b2-8d30-fa03fccd7add"
+            ],
+            "examples_bad": [
+                [
+                    "7118",
+                    "banning-of-chick-culling",
+                    "0191B6C7-5595-70B2-8D30-FA03FCCD7ADD",
+                    "0191b6c7559570b28d30fa03fccd7add"
+                ]
+            ]
+        },
         "topic_tags": {
             "type": "array",
             "title": "Topic tags",

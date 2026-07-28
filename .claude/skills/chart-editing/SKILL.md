@@ -26,6 +26,7 @@ The chart's public slug is auto-derived from the short name with underscores rep
 ## Minimum viable config
 
 ```yaml
+chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
 topic_tags:
   - "Animal Welfare"
 dimensions: []
@@ -51,10 +52,32 @@ views:
 
 Key fields:
 
+- `chart_config_id` — **required**, the chart's identity in grapher (`charts.configId`). See "The chart's identity" below.
 - `dimensions: []` and exactly one view → this YAML pushes as a single chart, not an mdim page.
 - `views[0].indicators.y` — list of indicator catalog paths. For multi-series, list more than one.
 - `views[0].config` — the grapher config that becomes the chart's `etlConfig` in `chart_configs`. Same shape as a chart-admin export.
 - No top-level `title:` or `default_selection:` block — those exist only for multidim data pages and are ignored for single charts.
+
+## The chart's identity (`chart_config_id`)
+
+ETL addresses a chart by its config UUID (`charts.configId`), never by slug or numeric id, and it never looks the chart up per environment. The YAML must therefore declare the UUID, and the same YAML then targets the same chart on local, staging, and production.
+
+**New chart** — mint a UUIDv7:
+
+```bash
+.venv/bin/python -c "from etl.collection.chart_upsert import new_chart_config_id; print(new_chart_config_id())"
+```
+
+**Existing chart moving into ETL** — use the chart's current UUID, so the ETL config lands on it instead of creating a duplicate:
+
+```bash
+curl -s --get "https://datasette-public.owid.io/owid.json" \
+  --data-urlencode "sql=SELECT c.id, c.configId FROM charts c JOIN chart_configs cf ON cf.id = c.configId WHERE cf.slug = '<slug>'"
+```
+
+(Or `make query SQL="SELECT c.configId FROM charts c JOIN chart_configs cf ON cf.id = c.configId WHERE cf.slug = '<slug>'"` against staging.)
+
+Never change `chart_config_id` once it's committed — a changed UUID means "a different chart", so the push creates a new draft chart and abandons the old one.
 
 ## DAG entry
 
@@ -155,7 +178,7 @@ Admin overrides always win on a per-field basis. To "unlink" a field back to the
 
 - **Chart with dropdowns / dimension selectors** → use `create-multidim`. Single-chart `.config.yml` files have `dimensions: []`; multi-dim ones don't.
 - **Brand-new chart from scratch and you want the structure auto-generated** → use `create-multidim` even for single charts; it writes the YAML skeleton, and you set `dimensions: []` after.
-- **Editing a chart that exists only in the admin (no `.config.yml`)** → adopt it into ETL first, then edit here. Adoption tooling (`chart_pull` CLI) is a Phase 1 follow-up.
+- **Editing a chart that exists only in the admin (no `.config.yml`)** → adopt it into ETL first by writing a `.config.yml` whose `chart_config_id` is that chart's existing `charts.configId` (see "The chart's identity"), then edit here. Tooling to generate the YAML from the live config (`chart_pull` CLI) is a Phase 1 follow-up.
 
 ## Related skills
 
