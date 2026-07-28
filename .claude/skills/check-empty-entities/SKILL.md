@@ -27,6 +27,10 @@ Cache per variable id and fetch in parallel (a large dataset means hundreds of v
 
 ## Checks
 
+### Where dead selections come from (read before scanning)
+
+Overwhelmingly from **entity-rename cycles of a dataset's own aggregate entities** — a past update changed the suffix convention (`Multilaterals (OECD)` → `Multilateral organizations`, `Low-income countries (WB)` → hyphenated unsuffixed forms) and every surface that pinned the old names kept them. Real-country selections almost never die; dataset-defined aggregates (donor groups, income groups, provider regions) are the population to watch. Two consequences for the audit: the moment one finding surfaces a renamed-suffix pattern, **grep every surface for that pattern directly** (chart `selectedEntityNames` *and* `focusedSeriesNames`, narrative-chart patches, article `country=` URLs) instead of relying only on per-view availability checks — the same rename hits them all; and note that dead names sit in both directions (an old suffixed form can die while its unsuffixed twin lives, or vice versa — check availability, don't pattern-guess the fix). (ODA 2026-07: one rename cycle left dead names on 5 charts, 6 narrative charts, and 4 published articles simultaneously.)
+
 ### 1. Charts
 
 For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`), parse `chart_configs.full`:
@@ -126,5 +130,5 @@ Repeat the loop shape over `multi_dim_x_chart_configs`, `explorer_views`, and `n
 ## Report format
 
 - **Regressions** (block): view, surface, entities lost, prod evidence.
-- **Pre-existing gaps** (🟡 — still need fixing, just not necessarily in this PR): table of citation (scroll-to-highlight link), chart (staging grapher link via `OWIDEnv.from_staging(branch).chart_site(slug)` — same normalized-host rule as the API prefix; never hand-build `staging-site-<branch>`), and dead entities — the common pattern is old URLs using unsuffixed WB region / income-group names while data lives under `(WB)`-suffixed entities.
+- **Pre-existing gaps** (🟡 — still need fixing, just not necessarily in this PR): table of citation (scroll-to-highlight link), chart (staging grapher link via `OWIDEnv.from_staging(branch).chart_site(slug)` — same normalized-host rule as the API prefix; never hand-build `staging-site-<branch>`), and dead entities — the common pattern is a rename-cycle mismatch between the URL and the live entities (unsuffixed names in old URLs while data lives under suffixed entities, or stale `(OECD)`/`(WB)`-suffixed names after the data moved to unsuffixed forms).
 - **Coverage caveats**: charts with no production baseline; variables whose metadata fetch failed (don't count fetch failures as empty).
