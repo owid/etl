@@ -1,10 +1,11 @@
 """Metadata Diff: review how a branch changes the user-visible metadata texts of MDIMs.
 
-Two connected views:
+Two connected views, against a selectable baseline (production, or staging-site-master to
+isolate this branch's changes from production deploy lag):
 - "Blast radius": a horizontal tree of all views of an MDIM (following its control
   order), colored by whether the view's texts differ between this staging server and
-  production. Leaves link to the View diff.
-- "View diff": side-by-side production/staging comparison of the changed texts of one
+  the baseline. Leaves link to the View diff.
+- "View diff": side-by-side baseline/staging comparison of the changed texts of one
   view, with the MDIM controls as navigation.
 
 Unlike the config diff in chart-diff, this compares the *rendered* texts end users see:
@@ -59,18 +60,31 @@ DIFF_CSS = """
 </style>
 """
 
-# Environments: source = this staging server, target = production (same logic as chart-diff).
+# Source environment: this staging server. The baseline ("target") is selectable in the
+# UI: production answers "what will readers see change?", while staging-site-master
+# answers "what does this branch change?" — the latter stays clean even when production
+# lags behind master (e.g. a failed production sync).
 SOURCE = OWID_ENV
-if config.ENV_FILE_PROD:
-    TARGET = OWIDEnv.from_env_file(config.ENV_FILE_PROD)
-else:
-    TARGET = OWIDEnv.from_staging("master")
+
+BASELINES = {
+    "production": "production",
+    "master": "staging-site-master",
+}
+
+
+def _baseline_env(baseline: str) -> OWIDEnv:
+    if baseline == "production":
+        if config.ENV_FILE_PROD:
+            return OWIDEnv.from_env_file(config.ENV_FILE_PROD)
+        # No production credentials on this server — master is the closest baseline.
+        return OWIDEnv.from_staging("master")
+    return OWIDEnv.from_staging("master")
 
 
 @st.cache_resource
-def get_engines() -> tuple[Engine, Engine]:
+def get_engines(baseline: str) -> tuple[Engine, Engine]:
     assert OWID_ENV.env_remote != "production", "Metadata Diff must run on a staging server, not production."
-    return SOURCE.engine, TARGET.engine
+    return SOURCE.engine, _baseline_env(baseline).engine
 
 
 @st.cache_data(ttl=300, show_spinner="Computing metadata diff for all views…")
@@ -80,10 +94,10 @@ def compute_diff(
     _target_engine: Engine,
     cache_key: str,
 ) -> tuple[list[dict[str, Any]], list[ViewDiff]]:
-    """Diff every view of an MDIM between staging and production.
+    """Diff every view of an MDIM between staging and the selected baseline.
 
-    `cache_key` only busts the cache when configs change; indicator metadata changes
-    are picked up by the TTL.
+    `cache_key` busts the cache when configs or the baseline change; indicator metadata
+    changes are picked up by the TTL.
     """
     source_config = load_mdim_config(_source_engine, catalog_path)
     assert source_config is not None, f"MDIM {catalog_path} not found in staging."
@@ -150,6 +164,7 @@ def render_view_diff_page(
     dimensions: list[dict[str, Any]],
     view_diffs: list[ViewDiff],
     mdim_row: Any,
+    baseline: str,
 ) -> None:
     """The View diff page: MDIM controls as navigation + side-by-side text diffs."""
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
@@ -186,17 +201,18 @@ def render_view_diff_page(
         return
 
     # --- Header: status + links --------------------------------------------------
-    # NOTE: `published_target` is NaN when the MDIM doesn't exist in production (left join).
-    prod_slug = mdim_row.get("slug_target") if mdim_row.get("published_target") == 1 else None
-    prod_url = _view_url(TARGET, catalog_path, prod_slug, view.dimensions)
+    baseline_name = BASELINES[baseline]
+    # NOTE: `published_target` is NaN when the MDIM doesn't exist in the baseline (left join).
+    baseline_slug = mdim_row.get("slug_target") if mdim_row.get("published_target") == 1 else None
+    baseline_url = _view_url(_baseline_env(baseline), catalog_path, baseline_slug, view.dimensions)
     staging_url = _view_url(SOURCE, catalog_path, None, view.dimensions)
 
-    links = [f"[Current view (production)]({prod_url})"]
+    links = [f"[Current view ({baseline_name})]({baseline_url})"]
     if view.changed:
         links.append(f"[Changed view (this staging server)]({staging_url})")
 
     if view.is_new:
-        st.info("This view is **new** — it does not exist in production. " + " · ".join(links))
+        st.info(f"This view is **new** — it does not exist in {baseline_name}. " + " · ".join(links))
     elif view.changed:
         n = len(view.fields)
         st.warning(f"**{n} field{'s' if n > 1 else ''} changed** in this view. " + " · ".join(links))
@@ -210,10 +226,10 @@ def render_view_diff_page(
         st.markdown(f"##### {field_label(field_name)}")
         col_old, col_new = st.columns(2)
         with col_old:
-            st.markdown(":gray[**Production**]")
+            st.markdown(f":gray[**{baseline_name.capitalize()}**]")
             st.markdown(_render_text_html(change["old"], change["new"], side="old"), unsafe_allow_html=True)
         with col_new:
-            st.markdown(":green[**Staging**]")
+            st.markdown(":green[**This staging server**]")
             st.markdown(_render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
 
 
@@ -221,14 +237,29 @@ def main() -> None:
     st.title(":material/difference: Metadata Diff")
     st.caption(
         "Review how this staging server changes the metadata texts end users see on MDIMs "
-        "(e.g. *What you should know about this data*), view by view, compared to production. "
+        "(e.g. *What you should know about this data*), view by view, against a baseline. "
         "This includes changes coming from garden step templates, which don't show up in config diffs."
     )
 
-    if not config.ENV_FILE_PROD:
+    baseline = url_persist(st.radio)(
+        "Compare against",
+        key="baseline",
+        options=list(BASELINES),
+        format_func=lambda b: (
+            "🌍 Production (what readers will see change)"
+            if b == "production"
+            else "🌿 master (what this branch changes)"
+        ),
+        horizontal=True,
+        help="Production can lag behind master (e.g. while a deploy is pending), which shows up "
+        "here as changes this branch didn't make. Compare against `staging-site-master` to "
+        "isolate exactly what this branch changes.",
+    )
+
+    if baseline == "production" and not config.ENV_FILE_PROD:
         st.warning("No production env file found — comparing against `staging-site-master` instead.")
 
-    source_engine, target_engine = get_engines()
+    source_engine, target_engine = get_engines(baseline)
 
     df_mdims = get_mdim_changes(source_engine, target_engine)
     if df_mdims.empty:
@@ -251,7 +282,7 @@ def main() -> None:
             options=df_mdims.index.tolist(),
             format_func=_format_mdim,
             on_change=_clear_view_params,
-            help="✏️ = the MDIM config differs from production. Texts can also change "
+            help="✏️ = the MDIM config differs from the baseline. Texts can also change "
             "through indicator metadata without a config change — the diff below catches both.",
         )
     with col_mode:
@@ -272,7 +303,7 @@ def main() -> None:
         catalog_path,
         source_engine,
         target_engine,
-        cache_key=f"{df_mdims.loc[catalog_path, 'configMd5_source']}-{df_mdims.loc[catalog_path, 'configMd5_target']}",
+        cache_key=f"{baseline}-{df_mdims.loc[catalog_path, 'configMd5_source']}-{df_mdims.loc[catalog_path, 'configMd5_target']}",
     )
 
     if not view_diffs:
@@ -280,7 +311,7 @@ def main() -> None:
         return
 
     if mode == "view":
-        render_view_diff_page(catalog_path, dimensions, view_diffs, df_mdims.loc[catalog_path])
+        render_view_diff_page(catalog_path, dimensions, view_diffs, df_mdims.loc[catalog_path], baseline)
     else:
         n_changed = sum(1 for v in view_diffs if v.changed)
         if n_changed == 0:
