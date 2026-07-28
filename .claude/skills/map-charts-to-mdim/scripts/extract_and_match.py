@@ -755,7 +755,8 @@ def main():
 
     report(charts, mdims, views, stats, selection)
     print(f"\n-> {out}/mapping_proposal.csv  (review this; then build_review.py for the side-by-side HTML)")
-    print(f"-> {out}/mapping.json  (redirect payload for apply_redirects.py — gated, ask the user first)")
+    print(f"-> {out}/mapping.json  (combined machine record for apply_redirects.py — gated, ask the user first)")
+    print(f"-> {out}/payloads/*.json  ({n_payloads} files, ONE source chart per JSON — the copy-paste handoff unit)")
 
 
 if __name__ == "__main__":

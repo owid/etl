@@ -80,9 +80,17 @@ Writes into `--out`:
 | `charts.csv` | selected charts + their indicator slots |
 | `multidim_views.csv` | every candidate MDIM view (row ids `A1…`, `B1…`) |
 | `mapping_proposal.csv` | one row per chart: quality, target view, clickable URLs |
-| `mapping.json` | redirect payload — confident, conflict-free matches only |
+| `mapping.json` | combined redirect payload — confident, conflict-free matches only |
+| `payloads/<chart_slug>.json` | **one JSON per source chart** — the copy-paste handoff unit |
 | `unmatched.md` | everything not proposed, with candidates/near-miss detail |
 | `_sources.json` | machine record of run inputs (don't hand-edit) |
+
+**Handoff convention: one source per JSON.** Like the explorer→MDIM redirect
+deliverables (`ai/explorer-mdim-redirects/`, one `admin_bulk_payload.json` per
+explorer), each JSON handed over must describe exactly ONE source page. For
+charts that means one file per chart, in `payloads/`. The combined
+`mapping.json` is the machine record consumed by `apply_redirects.py` — don't
+hand that one over as a copy-paste payload.
 
 **Matching**: a chart matches a view when the y-variable-ID sets are equal AND
 x/size/color agree (absent == absent). Several matching views → tiebreak on chart
