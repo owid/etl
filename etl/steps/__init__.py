@@ -55,6 +55,16 @@ DAG = dict[str, set[str]]
 INSTANT_METADATA_DIFF = {}
 
 
+class StepFailedError(Exception):
+    """A step's code raised, and the child process (fork or subprocess) that ran it already printed
+    the traceback.
+
+    This must be a regular Exception rather than a `sys.exit(exit_code)`: the runners catch
+    `Exception` to log which step failed and to honour `--continue-on-failure`, and a `SystemExit`
+    would sail past those handlers and end the run without naming the step or printing anything.
+    """
+
+
 def compile_steps(
     dag: DAG,
     subdag: DAG,
@@ -730,7 +740,10 @@ class DataStep(Step):
                 run_module_run(step_module, self._dest_dir.as_posix())
                 os._exit(0)
             except BaseException:
-                traceback.print_exc()
+                # Write the traceback in one call, prefixed with the step it belongs to. Sibling
+                # children of a parallel build share this stderr, and line-by-line writes from
+                # several of them interleave into an unreadable mix.
+                os.write(2, f"--- Traceback for {self}\n{traceback.format_exc()}".encode())
                 os._exit(1)
         else:
             # ---------- parent process ----------
@@ -738,7 +751,7 @@ class DataStep(Step):
             if os.WIFEXITED(status):
                 exit_code = os.WEXITSTATUS(status)
                 if exit_code != 0:
-                    sys.exit(exit_code)
+                    raise StepFailedError(f"Step {self} failed with exit code {exit_code} (traceback above)")
             elif os.WIFSIGNALED(status):
                 sig = os.WTERMSIG(status)
                 raise Exception(f"Step {self} was killed by signal {sig}")
@@ -769,7 +782,7 @@ class DataStep(Step):
         try:
             subprocess.check_call(args, env=env)
         except subprocess.CalledProcessError as e:
-            sys.exit(e.returncode)
+            raise StepFailedError(f"Step {self} failed with exit code {e.returncode} (traceback above)") from e
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
