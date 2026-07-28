@@ -46,15 +46,24 @@ repeatable `--mdim <catalogPath>` (as in `multi_dim_data_pages.catalogPath`).
 Charts and MDIMs are read from the grapher DB via `OWID_ENV` — read-only is
 enough for the proposal phase. Point `OWID_ENV` at a DB that has both:
 
-1. **Staging branch**: on a `staging-site-<branch>` branch, run as-is.
+1. **Staging DB**: prefix with `STAGING=1` (the current branch's
+   `staging-site-<branch>` DB; `STAGING=<name>` for another branch's). Being
+   checked out on the branch is NOT enough by itself — without the prefix,
+   `OWID_ENV` silently points at your local dev DB, which also passes the
+   connection preflight.
 2. **Production, read-only, via an env file**: prefix with
    `ENV_FILE=<prod creds file> DATA_API_ENV=production`. Don't assume the file
    name — check what exists (`ls .env*`); on some machines it's `.env.prod`, on
    others `.env.live`.
 3. **Some other credentials file**: `ENV_FILE=<their file>`.
 
-If no suitable env file exists and you're not on a staging branch, **stop and ask
-the user** — never hardcode credentials.
+If no suitable env file exists and there's no staging server to point at, **stop
+and ask the user** — never hardcode credentials.
+
+The extractor prints the environment it resolved (`grapher DB: ...`) — check
+that line matches what you intended before trusting the output. All links in
+the artifacts (and the review HTML panes) default to that environment's site,
+so a staging extraction is reviewed against staging; `--host` overrides.
 
 ```bash
 ls .env* 2>/dev/null

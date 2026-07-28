@@ -13,6 +13,11 @@ own left-hand URL (each chart is its own /grapher/<slug> page), and no
 a proposed target (ambiguous / near-miss / none / conflict) show their candidate
 info instead of a right-hand iframe, so they can be triaged into ``overrides.csv``.
 
+Both panes are rendered against one base URL: by default the host recorded by
+``extract_and_match.py`` in ``_sources.json`` (i.e. the environment the mapping
+was extracted from — a staging-extracted mapping is reviewed against staging,
+not production). ``--host`` overrides it.
+
 Usage::
 
     .venv/bin/python .claude/skills/map-charts-to-mdim/scripts/build_review.py \\
@@ -27,6 +32,16 @@ import json
 from collections import Counter
 from pathlib import Path
 from urllib.parse import urlparse
+
+
+def recorded_host(mapping_dir: Path) -> tuple[str, str] | None:
+    """Host the mapping was extracted against, as recorded in _sources.json."""
+    src = mapping_dir / "_sources.json"
+    if src.exists():
+        host = (json.loads(src.read_text()).get("host") or "").rstrip("/")
+        if host:
+            return host, f"recorded at extraction in {src.name}"
+    return None
 
 
 def parse_proposal(mapping_dir: Path) -> list[dict]:
@@ -603,8 +618,9 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Build the self-contained HTML to review a chart → MDIM mapping.")
     ap.add_argument("--mapping-dir", required=True, type=Path,
                     help="Folder produced by map-charts-to-mdim (contains mapping_proposal.csv).")  # fmt: skip
-    ap.add_argument("--host", default="https://ourworldindata.org",
-                    help="Base URL for both panes (default: production).")  # fmt: skip
+    ap.add_argument("--host", default=None,
+                    help="Base URL for both panes (default: the host the mapping was extracted "
+                         "against, from _sources.json; production if that record is missing).")  # fmt: skip
     ap.add_argument("--output", type=Path, default=None,
                     help="Output HTML path (default: ai/<mapping-dir name>_chart_mdim_review.html).")  # fmt: skip
     ap.add_argument("--no-coverage", action="store_true", help="Skip the coverage report.")
@@ -617,8 +633,16 @@ def main() -> None:
     if not args.no_coverage:
         coverage_report(records)
 
+    # Review against the environment the mapping came from — defaulting to production
+    # would silently show different charts/MDIMs for a staging-extracted mapping.
+    if args.host:
+        host, provenance = args.host.rstrip("/"), "--host"
+    else:
+        host, provenance = recorded_host(args.mapping_dir) or ("https://ourworldindata.org", "production fallback — no host recorded in _sources.json")  # fmt: skip
+    print(f"pane host: {host}  ({provenance})")
+
     name = args.mapping_dir.name.replace("-", "_")
-    endpoints = {"host": args.host.rstrip("/")}
+    endpoints = {"host": host}
     output_path = args.output or Path(f"ai/{name}_chart_mdim_review.html")
     render_html(records, endpoints, output_path, name)
     size_kb = output_path.stat().st_size // 1024

@@ -1,10 +1,14 @@
 """Extract published charts + MDIM views from the grapher DB, match charts to
 MDIM views by indicator IDs, and write a redirect proposal.
 
-Everything here is READ-ONLY: it queries the grapher DB via ``OWID_ENV`` (run on
-a staging branch, or against production with ``ENV_FILE=<prod creds file>
-DATA_API_ENV=production``) and writes artifacts into ``--out``. No redirect is
-created — that's ``apply_redirects.py``, gated on explicit user confirmation.
+Everything here is READ-ONLY: it queries the grapher DB via ``OWID_ENV``
+(``STAGING=1`` for the current branch's staging DB, or against production with
+``ENV_FILE=<prod creds file> DATA_API_ENV=production``) and writes artifacts
+into ``--out``. The resolved environment is printed at startup — check it: a
+reachable local dev DB also passes the preflight, and extracting from the wrong
+environment produces a mapping that silently points at the wrong charts. No
+redirect is created — that's ``apply_redirects.py``, gated on explicit user
+confirmation.
 
 Charts are selected by exactly one of ``--tag`` / ``--slugs`` / ``--dataset-id``
 and matched against the views of every published MDIM (or only those passed via
@@ -55,7 +59,7 @@ PROPOSAL_COLUMNS = [
 
 
 def check_db_connection():
-    """Fail fast with actionable guidance if the grapher DB isn't reachable."""
+    """Fail fast with actionable guidance if the grapher DB isn't reachable; say which env resolved."""
     try:
         OWID_ENV.read_sql("SELECT 1")
     except Exception as e:  # noqa: BLE001 - connectivity preflight, surface a friendly hint
@@ -64,11 +68,15 @@ def check_db_connection():
             f"  {type(e).__name__}: {str(e).splitlines()[0]}\n\n"
             "This skill reads charts + MDIMs from the grapher DB. Point OWID_ENV at a DB\n"
             "that has both, by one of:\n"
-            "  - running on a `staging-site-<branch>` branch (no prefix needed), or\n"
+            "  - `STAGING=1` (the current branch's staging DB; `STAGING=<name>` for another branch —\n"
+            "    just being on the branch is NOT enough, the default is your local dev DB), or\n"
             "  - `ENV_FILE=<prod creds file> DATA_API_ENV=production` (e.g. .env.prod / .env.live), or\n"
             "  - `ENV_FILE=<your creds file>`.\n"
             "If you don't have a credentials file, ask which one to use — don't hardcode secrets."
         )
+    # A reachable DB is not necessarily the intended one (a local dev DB also passes) —
+    # print what resolved so a wrong-environment run is visible, not silent.
+    print(f"grapher DB: {OWID_ENV.name}")
 
 
 def excel_prefix(i: int) -> str:
@@ -719,14 +727,20 @@ def main():
     ap.add_argument("--mdim", action="append", default=[],
                     help="Restrict targets to these MDIM catalogPaths (repeatable; default: all published MDIMs)")  # fmt: skip
     ap.add_argument("--out", required=True, help="Output folder, e.g. ai/<name>-charts-mdim-mapping")
-    ap.add_argument("--host", default=PUBLIC_HOST, help="Base URL for chart/view links (default: production)")
+    ap.add_argument("--host", default=None,
+                    help="Base URL for chart/view links (default: the site of the DB environment "
+                         "OWID_ENV resolves to, e.g. staging DB -> staging links)")  # fmt: skip
     args = ap.parse_args()
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    host = args.host.rstrip("/")
 
     check_db_connection()
+
+    # Links must point at the environment the data came from — a mapping extracted from
+    # staging with production URLs would be reviewed against the wrong charts.
+    host = (args.host or OWID_ENV.site or PUBLIC_HOST).rstrip("/")
+    print(f"link host: {host}" + ("" if args.host else "  (from the DB environment; override with --host)"))
 
     charts, selection = resolve_charts(args)
     attach_chart_slots(charts)
