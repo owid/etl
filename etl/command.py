@@ -808,8 +808,11 @@ def _print_step_failure(e: BaseException) -> None:
     from etl.steps import StepFailedError
 
     if isinstance(e, StepFailedError):
-        # The step ran in a child process that already printed the real traceback. Everything this
-        # exception would add is executor plumbing (_RemoteTraceback, future.result frames).
+        # The step ran in a child process, which handed its traceback back through the exception.
+        # Printing the exception itself would only add executor plumbing (_RemoteTraceback,
+        # future.result frames).
+        if e.child_traceback:
+            print(e.child_traceback, file=sys.stderr)
         print(e, file=sys.stderr)
     else:
         traceback.print_exception(type(e), e, e.__traceback__)
