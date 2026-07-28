@@ -11,7 +11,7 @@ definitions:
       Please note: Regions in this table include economies at all income levels. The term country, used interchangeably with economy, does not imply political independence but refers to any territory for which authorities report separate social or economic statistics. Click [here](https://datahelpdesk.worldbank.org/knowledgebase/articles/378834-how-does-the-world-bank-classify-countries) for information about how the World Bank classifies countries.
 
     description_key:
-      - The World Bank creates a yearly classification of countries by income, for all countries with population over 30,000.
+      - The World Bank creates a yearly classification of countries by income for all countries with a population over 30,000.
       - This classification stays the same throughout the World Bank's fiscal year (from July 1 to June 30) even if the income data for a country changes.
       - Low-income countries are those with a gross national income (GNI) per capita of $1,175 or less in 2025.
       - Lower-middle-income countries are those with a GNI per capita between $1,176 and $4,635 in 2025.

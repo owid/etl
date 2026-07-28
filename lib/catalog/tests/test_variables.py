@@ -17,6 +17,12 @@ from owid.catalog.core.indicators import (
 )
 from owid.catalog.core.meta import VariableMeta, VariablePresentationMeta
 
+# description_key of the indicators defined in conftest.py.
+DESCRIPTION_KEY_A = "- Key description point 1 of Indicator 1\n- Common key description point"
+DESCRIPTION_KEY_B = (
+    "- Key description point 1 of Indicator 2\n- Common key description point\n- Key description point 2 of Indicator 2"
+)
+
 
 def test_create_empty_variable() -> None:
     v = Variable(name="dog")
@@ -84,12 +90,7 @@ def test_create_new_variable_as_sum_of_other_two(table_1, origins, licenses) -> 
     # Since "a" and "b" have different title and description, "c" should have no title or description.
     assert tb1["c"].metadata.title is None
     assert tb1["c"].metadata.description is None
-    assert tb1["c"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["c"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -163,12 +164,7 @@ def test_create_new_variable_as_product_of_other_two(table_1, origins, licenses)
     assert (tb1["e"] == pd.Series([4, 10, 18])).all()
     assert tb1["e"].metadata.title is None
     assert tb1["e"].metadata.description is None
-    assert tb1["e"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["e"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["e"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["e"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -188,12 +184,7 @@ def test_create_new_variable_as_product_of_other_three(table_1, origins, license
     assert (tb1["f"] == pd.Series([20, 70, 162])).all()
     assert tb1["f"].metadata.title is None
     assert tb1["f"].metadata.description is None
-    assert tb1["f"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["f"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["f"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["f"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of all variables.
@@ -211,12 +202,7 @@ def test_create_new_variable_as_division_of_other_two(table_1, origins, licenses
     assert (tb1["g"] == pd.Series([0.25, 0.40, 0.50])).all()
     assert tb1["g"].metadata.title is None
     assert tb1["g"].metadata.description is None
-    assert tb1["g"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["g"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["g"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["g"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -234,13 +220,8 @@ def test_create_new_variable_as_floor_division_of_other_two(table_1, origins, li
     assert (tb1["h"] == pd.Series([4, 2, 2])).all()
     assert tb1["h"].metadata.title is None
     assert tb1["h"].metadata.description is None
-    # Note that the order of key description points should be first b and then a.
-    assert tb1["h"].metadata.description_key == [
-        "Key description point 1 of Indicator 2",
-        "Common key description point",
-        "Key description point 2 of Indicator 2",
-        "Key description point 1 of Indicator 1",
-    ]
+    # Note that the order of key descriptions should be first b and then a.
+    assert tb1["h"].metadata.description_key == f"{DESCRIPTION_KEY_B}\n\n{DESCRIPTION_KEY_A}"
     assert tb1["h"].metadata.origins == [origins[2], origins[3], origins[1]]
     assert tb1["h"].metadata.licenses == [licenses[2], licenses[3], licenses[1]]
     # Processing level should be the highest of the two variables.
@@ -258,12 +239,7 @@ def test_create_new_variable_as_module_division_of_other_two(table_1, origins, l
     assert (tb1["i"] == pd.Series([1, 2, 3])).all()
     assert tb1["i"].metadata.title is None
     assert tb1["i"].metadata.description is None
-    assert tb1["i"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["i"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["i"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["i"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -299,12 +275,7 @@ def test_create_new_variables_as_another_variable_to_the_power_of_another_variab
     assert (tb1["k"] == pd.Series([1, 32, 729])).all()
     assert tb1["k"].metadata.title is None
     assert tb1["k"].metadata.description is None
-    assert tb1["k"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["k"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["k"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["k"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.

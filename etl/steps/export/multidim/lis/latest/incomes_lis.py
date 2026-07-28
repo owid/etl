@@ -23,13 +23,8 @@ PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences i
 # welfare_type=before_vs_after view. The OLD_* constants mirror the garden text verbatim — the assertion
 # in _get_before_vs_after_metadata catches drift in the source.
 OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI = "Income is measured after taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received."
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = "Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. LIS includes private pensions, meaning a retired person’s before-tax income depends on how their country organizes pensions."
-NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_SHARE = "This data is based on income measured both before and after taxes and benefits, which are shown separately. Taxes and benefits typically increase the share going to poorer groups and reduce the share going to richer groups."
-NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_REST = "This data is based on income measured both before and after taxes and benefits, which are shown separately. Taxes and benefits typically raise incomes at the bottom of the distribution and reduce incomes at the top."
-
-# Override of description_key_thr (luxembourg_income_study.meta.yml line 147) for the grouped thr+decile=all view.
-OLD_DESCRIPTION_KEY_THR = 'This data shows the income threshold for a given decile — a tenth of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
-NEW_DESCRIPTION_KEY_THR_ALL = 'This data shows the income threshold for each decile of the population. The "poorest decile" threshold, for example, is the income level below which the poorest 10% of people in a country fall.'
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI = "Income is measured before taxes have been paid and government benefits — such as public pensions, unemployment benefits, and social assistance — have been received. Private pension income is also included, meaning a retired person’s before-tax income varies depending on whether their country’s pensions system is primarily public, private or a mix."
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes have been paid and government benefits received, which are shown as separate series. Comparing the two gives a sense of the role of redistribution through a country's tax and benefits system."
 
 
 def run() -> None:
@@ -163,19 +158,6 @@ def run() -> None:
                 if name:
                     ind.display = {"name": name}
 
-    # description_key_thr's "given decile" wording fits single-decile views; rewrite it for the grouped all-decile view while preserving the indicator's other bullets.
-    for view in c.views:
-        if view.matches(indicator="thr", decile="all") and view.indicators.y:
-            col_name = view.indicators.y[0].catalogPath.split("#")[-1]
-            source_description_key = list(tb[col_name].metadata.description_key) if col_name in tb.columns else []
-            assert OLD_DESCRIPTION_KEY_THR in source_description_key, (
-                f"OLD_DESCRIPTION_KEY_THR not found in {col_name}.description_key — garden text changed, update OLD_DESCRIPTION_KEY_THR/NEW_DESCRIPTION_KEY_THR_ALL."
-            )
-            view.metadata = view.metadata or {}
-            view.metadata["description_key"] = [
-                NEW_DESCRIPTION_KEY_THR_ALL if b == OLD_DESCRIPTION_KEY_THR else b for b in source_description_key
-            ]
-
     # Group welfare_type (before vs after tax)
     c.group_views(
         groups=[
@@ -306,21 +288,33 @@ def _get_before_vs_after_metadata(tb, view):
             col_name,
         )
 
-        description_key = list(meta.description_key) if meta.description_key else []
+        description_key = _description_key_bullets(meta)
         old_welfare_keys = {OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI, OLD_DESCRIPTION_KEY_WELFARE_TYPE_MI}
         assert any(b in old_welfare_keys for b in description_key), (
             f"Neither OLD_DESCRIPTION_KEY_WELFARE_TYPE_DHI nor _MI found in {col_name}.description_key — garden text changed, update the constants."
         )
-        new_text = (
-            NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_SHARE
-            if view.dimensions.get("indicator") == "share"
-            else NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER_REST
-        )
-        description_key = [new_text if b in old_welfare_keys else b for b in description_key]
+        description_key = [NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER if b in old_welfare_keys else b for b in description_key]
 
         return {"title": title, "subtitle": subtitle, "description_key": description_key}
 
     return {"title": "", "subtitle": "", "description_key": []}
+
+
+def _description_key_bullets(meta):
+    """Return an indicator's description_key as a list of bullet strings.
+
+    The grapher channel stores description_key as a single markdown string (bullets joined with
+    "\\n- "); older builds stored a list. Normalize both to a list so bullets can be swapped.
+    """
+    dk = meta.description_key if meta else None
+    if dk is None:
+        return []
+    if not isinstance(dk, str):
+        return list(dk)
+    lines = [line.strip() for line in dk.split("\n") if line.strip()]
+    if lines and all(line.startswith("- ") for line in lines):
+        return [line[2:].strip() for line in lines]
+    return [dk.strip()]
 
 
 def _build_indicator_display_names(tb):

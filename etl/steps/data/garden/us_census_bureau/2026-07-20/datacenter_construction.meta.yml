@@ -1,0 +1,88 @@
+definitions:
+  common:
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      attribution_short: US Census Bureau
+      topic_tags:
+        - Artificial Intelligence
+  desc_key: &desc_key
+    - This indicator shows monthly spending on the physical construction of data center buildings in the United States. It represents the actual value of work done at construction sites each month, including materials, labor, and contractor costs.
+    - This data doesn't include maintenance work, land purchases, or the computer equipment that goes inside data centers (like servers and storage systems). This means it captures only a small part of total data center investment, since IT hardware represents a significant additional cost.
+    - Only privately-owned construction projects are counted. Projects owned by federal, state, or local governments are not included.
+    - Data centers power a wide range of online services beyond AI, such as streaming services and cloud storage.
+    - The values shown are not seasonally adjusted, meaning they reflect actual monthly spending and typical seasonal patterns, including slower winter construction and busier summer periods.
+    - Recent months are preliminary and are revised as more complete reports arrive. Once a year, the Census Bureau also revises the previous two years of data, and these annual revisions can be substantial.
+  desc_key_office: &desc_key_office
+    - This indicator shows monthly spending on the physical construction of general office buildings in the United States. It represents the actual value of work done at construction sites each month, including materials, labor, and contractor costs.
+    - This data doesn't include maintenance work, land purchases, or the fit-out costs inside buildings.
+    - Only privately-owned construction projects are counted. Projects owned by federal, state, or local governments are not included.
+    - The values shown are not seasonally adjusted, meaning they reflect actual monthly spending and typical seasonal patterns, including slower winter construction and busier summer periods.
+    - Recent months are preliminary and are revised as more complete reports arrive. Once a year, the Census Bureau also revises the previous two years of data, and these annual revisions can be substantial.
+dataset:
+  update_period_days: 90
+
+  owners:
+    - Pablo Arriagada
+    - Edouard Mathieu
+tables:
+  datacenter_construction:
+    variables:
+      datacenter_construction_spending:
+        title: Monthly spending on data center construction in the United States
+        unit: US dollars
+        short_unit: $
+        description_short: This only includes work done on-site to construct data center buildings each month, including materials and construction labor. It excludes the cost of IT hardware inside the buildings, like servers and storage, which can account for a large share of total investment. This data is expressed in US dollars. It is not adjusted for inflation. Only private construction is included.
+        description_key:
+          - *desc_key
+        processing_level: minor
+        presentation:
+          title_public: Monthly spending on data center construction in the United States
+        display:
+          name: Data center construction
+      general_office_construction_spending:
+        title: Monthly spending on general office construction in the United States
+        unit: US dollars
+        short_unit: $
+        description_short: Monthly spending on the physical construction of general office buildings in the United States. Measured as the value of work done on-site each month, including materials and construction labor. Not adjusted for inflation. Only private construction is included.
+        description_key:
+          - *desc_key_office
+        processing_level: minor
+        presentation:
+          title_public: Monthly spending on general office construction in the United States
+        display:
+          name: Office construction
+      general_office_construction_spending_real:
+        title: Monthly spending on general office construction in the United States (inflation-adjusted)
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: Monthly spending on the physical construction of general office buildings in the United States, adjusted for inflation using the Producer Price Index (PPI) for new office building construction. Expressed in constant 2021 US dollars. Only private construction is included.
+        description_key:
+          - *desc_key_office
+          - This indicator is adjusted for inflation using the Producer Price Index (PPI) for new office building construction.
+        description_processing: We adjusted for inflation using the US Bureau of Labor Statistics' producer price index (PPI) for new office building construction, rebased so that its 2021 annual average = 100.
+        presentation:
+          title_public: Monthly spending on general office construction in the United States
+          grapher_config:
+            note: This data is expressed in constant 2021 US$. Inflation adjustment is based on the Producer Price Index (PPI) for new office construction, rebased to its 2021 annual average.
+        processing_level: major
+
+        display:
+          name: Office construction
+      datacenter_construction_spending_real:
+        title: Monthly spending on data center construction in the United States (inflation-adjusted)
+        unit: constant 2021 US$
+        short_unit: $
+        description_short: This only includes work done on-site to construct data center buildings each month, including materials and construction labor. It excludes the cost of IT hardware inside the buildings, like servers and storage, which can account for a large share of total investment. This data is expressed in US dollars, adjusted for inflation. Only private construction is included.
+        description_key:
+          - *desc_key
+          - This indicator is adjusted for inflation using a composite price index that equally weights the producer price indexes (PPIs) for new industrial building and new warehouse building construction — the approach the US Bureau of Economic Analysis adopted for data center construction in its [2025 annual update](https://apps.bea.gov/scb/issues/2025/11-november/1125-nea-annual-update.htm).
+        description_processing: We adjusted for inflation using a composite price index that equally weights the US Bureau of Labor Statistics' producer price indexes (PPIs) for new industrial building and new warehouse building construction, each rebased so that its 2021 annual average = 100. This follows the approach the US Bureau of Economic Analysis adopted for data center construction in its [2025 annual update](https://apps.bea.gov/scb/issues/2025/11-november/1125-nea-annual-update.htm).
+        presentation:
+          title_public: Monthly spending on data center construction in the United States
+          grapher_config:
+            note: This data is expressed in constant 2021 US$. Inflation adjustment is based on a composite of the Producer Price Indexes (PPIs) for new industrial and new warehouse construction.
+        processing_level: major
+
+        display:
+          name: Data center construction

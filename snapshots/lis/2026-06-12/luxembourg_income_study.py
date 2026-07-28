@@ -31,6 +31,7 @@ FILES = {
     "lis_incomes.csv": "incomes",
     "lis_inequality.csv": "inequality",
     "lis_relative_poverty.csv": "relative_poverty",
+    "lis_percentiles.csv": "percentiles",
 }
 
 

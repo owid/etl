@@ -11,7 +11,7 @@ definitions:
   others:
     zero_day: &zero_day
       zeroDay: 2020-01-21
-      yearIsDay: true
+      timeInterval: day
     per_capita: &per_capita |-
       Per-capita values have been estimated by using the population in 2022 as a reference.
   common:

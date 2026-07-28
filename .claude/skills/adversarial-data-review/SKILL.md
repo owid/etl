@@ -34,7 +34,7 @@ Any rewrites you propose use American spelling.
 
 Scope by calling context:
 
-In the workflow skills this review is an **optional, offered** step (it can consume many tokens — see the estimates in Step 1); when invoked from one of them, scope accordingly:
+In most workflow skills this review is an **optional, offered** step (it can consume many tokens — see the estimates in Step 1), except where the table marks it mandatory; when invoked from one of them, scope accordingly:
 
 | Context | Scope |
 |---|---|
@@ -42,6 +42,7 @@ In the workflow skills this review is an **optional, offered** step (it can cons
 | `/create-dataset` Step 6b (optional) | Everything — all indicators (new datasets are small and have no charts yet) |
 | `/create-snapshot` § 5 (optional) | Phase 0 only — verify the `.dvc` claims against the fetched producer docs (no built dataset yet, so no data cross-checks) |
 | `/review-data-pr` § 10b | Only if the author ran it: verify outcomes and independently spot-check 2–3 findings and 2–3 anchor values |
+| `/edit-faust-metadata` (**mandatory**) | Claims-only, on the added/edited metadata text exclusively — verify each new/changed sentence against the producer docs behind the links in the text and the snapshot `.dvc`. NO data-value cross-checks, anomaly scans, or indicator prioritization (no data changed), and unedited metadata is out of scope — a handful of web calls, not the full review |
 | Standalone | Top-N + anomalies (or `--full`) |
 
 ## Step 1 — Prioritize indicators by chart views (heaviness control)
@@ -175,7 +176,7 @@ This is the half that catches the *source's* mistakes — the ones invisible to 
 
 **Independence rules (anti-circularity — read before searching).** An independent source is a *different producer measuring the same quantity* (WHO vs. IHME, IEA vs. Energy Institute, IMF vs. World Bank, UN WPP vs. a national statistics office), or the primary source the producer aggregates. **Never** count as independent: ourworldindata.org itself; sites that republish OWID (Wikipedia charts and infoboxes frequently cite us — check the citation); mirrors of the same producer (tradingeconomics and friends scrape WB/IMF); or the producer's own secondary pages.
 
-**Procedure per value:** WebSearch the quantity + entity + year → open 1–2 authoritative hits with WebFetch → record source, value, and link in the Part 2 table.
+**Procedure per value:** WebSearch the quantity + entity + year → open 1–2 authoritative hits with WebFetch → record source, value, and link in the Part 2 table. **Never cite a number straight from the search-results summary** — summaries blend several sources and lag living pages; every figure that reaches a finding, a PR body, or a producer question must be quoted from a page you actually opened (a stale search-summary count once shipped into a producer email as "21 of 32" when the opened page said 22, later 26).
 
 **Measurement-artifact scrutiny (per source, not per value):** search `"<producer> completeness bias"`, `"<producer> coverage <region>"`, `"<indicator> revision history"` and read what comes back. When you flag a comparability problem, name the **specific mechanism** by which the data misleads (e.g. "death registration completeness below 60% in region X inflates apparent improvement"); a bare "comparisons should be made with care" is banned.
 
