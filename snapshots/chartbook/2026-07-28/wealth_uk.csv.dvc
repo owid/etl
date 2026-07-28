@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Top wealth shares in the UK over more than a century
+    description: |-
+      This dataset presents long-run estimates of the concentration of personal wealth in the United Kingdom, measured as the share of total net personal wealth held by top wealth groups from 1895 onwards.
+
+      The estimates are constructed mainly from estate data (wealth left at death) using the estate multiplier method, by which estates are re-weighted to represent the living population, and are linked with earlier investment-income and other administrative sources to extend the series back over more than a century.
+
+      The series cover cumulative top shares — the shares of the top 10%, top 5%, top 1%, top 0.5% and top 0.1% of adults, together with the complementary share of the bottom 90% — as well as the intermediate brackets that lie between these thresholds.
+    date_published: "2018-06-01"
+
+    # Citation
+    producer: Alvaredo, Atkinson and Morelli
+    citation_full: |-
+      Alvaredo, F., Atkinson, A. B., & Morelli, S. (2018). Top wealth shares in the UK over more than a century. Journal of Public Economics, 162, 26-47. https://doi.org/10.1016/j.jpubeco.2018.02.008
+
+    # Files
+    url_main: https://doi.org/10.1016/j.jpubeco.2018.02.008
+    date_accessed: '2026-07-28'
+
+    # License
+    license:
+      name: © Alvaredo, Atkinson and Morelli (2018)
+      url: https://doi.org/10.1016/j.jpubeco.2018.02.008
+outs:
+  - md5: 1c6f42a205f08a900f34ef4bf89bf1fc
+    size: 5756
+    path: wealth_uk.csv
