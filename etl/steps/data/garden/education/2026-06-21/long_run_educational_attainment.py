@@ -1,16 +1,23 @@
-"""Load OECD educational attainment data and splice with Lee & Lee historical estimates.
+"""
+This garden step creates multiple long run indicators of educational attainment, combining historical estimates from Lee & Lee (2018) with observed data from the OECD, UNDP and projections from the Wittgenstein Centre.
 
-The OECD data now includes multiple education levels (less than primary, below upper secondary,
-upper secondary + post-secondary non-tertiary, tertiary) and sex breakdowns (total, female, male).
+The indicators in question are:
+- Tertiary education (25-64): Lee & Lee + OECD tertiary
+- No formal education (25-64): Lee & Lee + Wittgenstein projections
+- Some formal education (25-64): 100 - no formal education
+- Average years of schooling (25-64): Lee & Lee + UNDP
 
 Combined indicators splice Lee & Lee historical estimates with OECD observed data:
 - Tertiary education (25-64): Lee & Lee + OECD tertiary
 - No formal education (25-64): Lee & Lee + OECD less-than-primary
 
 Also produces:
-- OECD-only indicators (all education levels, by sex).
 - Wittgenstein Centre indicators for comparison.
 - Lee & Lee + Wittgenstein Centre splice for no/some formal education (15-64).
+
+OECD-only indicators (all education levels, by sex, no splicing) are produced separately in
+oecd/2026-06-21/oecd_educational_attainment, which this step depends on for the OECD totals used
+in the splices above.
 """
 
 import owid.catalog.processing as pr
@@ -39,8 +46,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    ds_meadow = paths.load_dataset("education_attainment_distribution")
-    tb_oecd_all = ds_meadow.read("education_attainment_distribution")
+    ds_oecd = paths.load_dataset("oecd_educational_attainment")
+    tb_oecd_total = ds_oecd.read("oecd_educational_attainment")
 
     ds_lee_lee = paths.load_dataset("education_lee_lee")
     tb_lee_lee = ds_lee_lee.read("education_lee_lee")
@@ -50,13 +57,6 @@ def run() -> None:
     #
     # Process data.
     #
-
-    # Harmonize OECD country names.
-    tb_oecd_all = paths.regions.harmonize_names(tb_oecd_all)
-
-    # Split OECD into total and by-sex.
-    tb_oecd_total = tb_oecd_all[tb_oecd_all["sex"] == "total"].drop(columns=["sex"]).reset_index(drop=True)
-    tb_oecd_by_sex = tb_oecd_all[tb_oecd_all["sex"] != "total"].reset_index(drop=True)
 
     # --- Combined tertiary: Lee & Lee + OECD (25-64, total) ---
     tb_tertiary_combined = make_ll_oecd_splice(
@@ -82,16 +82,6 @@ def run() -> None:
     tb_no_formal_combined = tb_no_formal_combined.reset_index()
     tb_no_formal_combined["share_some_formal_education"] = 100 - tb_no_formal_combined["share_no_formal_education"]
     tb_no_formal_combined = tb_no_formal_combined.format(["country", "year"], short_name="education_no_formal_combined")
-
-    # --- OECD-only: all education levels, total (no splice) ---
-    tb_oecd_only = tb_oecd_total.copy()
-    tb_oecd_only = tb_oecd_only.format(["country", "year"], short_name="education_attainment_distribution_oecd")
-
-    # --- OECD by sex ---
-    tb_oecd_by_sex["sex"] = tb_oecd_by_sex["sex"].map({"female": "Women", "male": "Men"}).astype("category")
-    tb_oecd_sex = tb_oecd_by_sex.format(
-        ["country", "year", "sex"], short_name="education_attainment_distribution_oecd_sex"
-    )
 
     # --- Wittgenstein Centre tables (SSP2) ---
     tb_wc_tertiary = make_wc_share(
@@ -119,8 +109,6 @@ def run() -> None:
     all_tables = [
         tb_tertiary_combined,
         tb_no_formal_combined,
-        tb_oecd_only,
-        tb_oecd_sex,
         tb_wc_tertiary,
         tb_wc_no_edu,
         tb_wc_some_edu,

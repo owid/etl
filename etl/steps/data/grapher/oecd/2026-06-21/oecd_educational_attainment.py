@@ -7,19 +7,13 @@ paths = PathFinder(__file__)
 AGGREGATES_TO_EXCLUDE = ["European Union (25 countries)", "G20", "OECD"]
 
 TABLE_NAMES = [
-    "long_run_educational_attainment",
-    "education_no_formal_combined",
-    "education_attainment_distribution_wc",
-    "education_no_formal_wc",
-    "education_some_formal_wc",
-    "education_no_formal_by_sex_wc",
-    "education_formal_combined",
-    "education_no_formal_three_sources",
+    "oecd_educational_attainment",
+    "oecd_educational_attainment_by_sex",
 ]
 
 
 def run() -> None:
-    ds_garden = paths.load_dataset("long_run_educational_attainment")
+    ds_garden = paths.load_dataset("oecd_educational_attainment")
 
     tables = []
     for name in TABLE_NAMES:
