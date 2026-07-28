@@ -5,6 +5,8 @@ definitions:
     presentation:
       topic_tags:
         - Foreign Aid
+      # NOTE: attribution_short does not inherit from the origin, so it has to be set here.
+      attribution_short: OECD
     display: &common_display
       tolerance: 5
       # NOTE: I also define another entity annotations map for the cases where Multilateral organizations is just EU institutions.
@@ -16,8 +18,10 @@ definitions:
         Official donors: DAC countries, non-DAC countries and multilateral organizations
         Private donors: Civil society organizations reporting aid data
 
-  # NOTE: Modify this year in future updates.
-  inflation_year: 2023
+  # NOTE: Base year of the OECD's constant-price series. The OECD rebases it at each release, so
+  # this must be bumped on every update, together with CONSTANT_PRICE_BASE_YEAR in the meadow step
+  # (whose assertion fails loudly if the two drift apart from the source).
+  inflation_year: 2024
 
   # NOTE: These annotations only differ from the default one on the definition of multilateral organizations.
   entity_annotations_alternative: &entity_annotations_alternative |-
@@ -249,7 +253,9 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   title: OECD Official Development Assistance (ODA)
-  update_period_days: 365
+  # The OECD publishes twice a year: preliminary aggregate figures in April and the full detailed
+  # release in December.
+  update_period_days: 182
 
   owners:
     - Pablo Arriagada
@@ -1674,10 +1680,9 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         processing_level: major
+        description_processing: "{definitions.processing_income_aggregations}"
         description_from_producer: |-
           {definitions.producer_food_aid}
-
-          {definitions.processing_income_aggregations}
         presentation:
           title_variant: <<donor>>
         display:

@@ -5,15 +5,18 @@ meta:
     description: |-
       This dataset provides aggregate statistics on the geographical distribution of bilateral and multilateral disbursements of official development assistance (ODA) to developing countries and territories on the DAC List of ODA Recipients and multilateral agencies that are ODA-eligible. These data are presented by provider and partner country. Data disaggregated by some types of aid (e.g., grants, loans, and technical co-operation) or flows from philanthropic foundations are also available.
     citation_full: |-
-      OECD (2025). OECD Official Development Assistance (ODA) - DAC2A: Aid (ODA) disbursements to countries and regions. OECD Data Explorer.
+      OECD (2026). OECD Official Development Assistance (ODA) - DAC2A: Aid (ODA) disbursements to countries and regions. OECD Data Explorer.
     url_main: https://www.oecd.org/en/topics/policy-issues/official-development-assistance-oda.html
+    # NOTE: These stats.oecd.org `IDFile` links are stable permalinks — the OECD refreshes the file in
+    # place at each release, so the same URL serves the latest data. Do not re-hunt them each cycle
+    # (verified unchanged across the 2024-08-21, 2025-02-19, 2025-12-23 and 2026-07-27 snapshots).
     url_download: https://stats.oecd.org/wbos/fileview2.aspx?IDFile=87917fc3-d015-4c13-8605-dfcf5211802f
-    date_accessed: '2025-12-23'
-    date_published: '2025-12-18'
+    date_accessed: '2026-07-27'
+    date_published: '2026-04-09'
     license:
       name: OECD Terms & conditions
       url: https://www.oecd.org/en/about/terms-conditions.html
 outs:
-  - md5: 264ac0a479c393e1ef0aafe13d983b38
-    size: 79922430
+  - md5: 6a7b07702b8bcc865cbe940644341858
+    size: 80121158
     path: official_development_assistance_dac2a.zip
