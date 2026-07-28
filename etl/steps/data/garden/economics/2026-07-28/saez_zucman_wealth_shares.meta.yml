@@ -6,15 +6,28 @@ definitions:
       topic_tags:
         - Economic Inequality
       attribution_short: Saez and Zucman
-    description_key:
-      - Wealth is measured as marketable (net) wealth: the value of all assets a household owns, minus its debts. It is estimated from capitalized income flows, combining tax, survey and national accounts data.
-      - These are the revised Saez and Zucman estimates from their September 2020 update, which incorporate information from the Federal Reserve's Distributional Financial Accounts.
-      - "\"Tax units\" treat a married couple filing jointly as a single unit, while \"equal-split adults\" divide each household's wealth equally between its adults. Equal-split shares are typically slightly lower, because splitting wealth within couples spreads it across more units."
-      - The authors also publish several alternative estimates of US wealth concentration (from the Survey of Consumer Finances, estate multiplier methods, and other researchers); those are not included here.
     description_processing: |-
       The source workbook contains many series behind the paper's figures (income shares, growth by income group, effective tax rates and transfers), as well as several alternative estimates of wealth concentration. We use only the top wealth-share series, and within those only the revised Saez and Zucman September 2020 estimates, for both the "tax units" and "equal-split adults" population concepts.
 
       The wealth shares are reported by the source as fractions of total wealth and have been converted to percentages.
+
+  # =============================================================================
+  # REUSABLE "WHAT YOU SHOULD KNOW" BULLETS
+  # =============================================================================
+  wysk_marketable_wealth: &wysk_marketable_wealth |-
+    Wealth is measured as marketable (net) wealth.
+  wysk_revised_series: &wysk_revised_series |-
+    These are the revised Saez and Zucman estimates from their 2020 update, which build on the estimates by Saez and Zucman (2016) and incorporate information from the Federal Reserve's Distributional Financial Accounts.
+
+  desc_key_equal_split: &desc_key_equal_split
+    - *wysk_marketable_wealth
+    - These shares are based on the "equal-split adults" series, which divides each household's wealth equally among its adults.
+    - *wysk_revised_series
+
+  desc_key_tax_units: &desc_key_tax_units
+    - *wysk_marketable_wealth
+    - These shares are based on the "tax units" series, which treats a married couple filing jointly as a single unit.
+    - *wysk_revised_series
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -33,6 +46,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The share of total wealth held by the richest 10% of tax units (a married couple counts as one unit).
+        description_key: *desc_key_tax_units
         display:
           name: Top 10% (tax units)
           numDecimalPlaces: 1
@@ -45,6 +59,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The share of total wealth held by the richest 1% of tax units (a married couple counts as one unit).
+        description_key: *desc_key_tax_units
         display:
           name: Top 1% (tax units)
           numDecimalPlaces: 1
@@ -57,6 +72,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The share of total wealth held by the richest 0.1% of tax units (a married couple counts as one unit).
+        description_key: *desc_key_tax_units
         display:
           name: Top 0.1% (tax units)
           numDecimalPlaces: 1
@@ -69,6 +85,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The share of total wealth held by the richest 10% of adults, with each household's wealth split equally between its adults.
+        description_key: *desc_key_equal_split
         display:
           name: Top 10% (equal-split adults)
           numDecimalPlaces: 1
@@ -81,6 +98,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The share of total wealth held by the richest 1% of adults, with each household's wealth split equally between its adults.
+        description_key: *desc_key_equal_split
         display:
           name: Top 1% (equal-split adults)
           numDecimalPlaces: 1
@@ -93,6 +111,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: The share of total wealth held by the richest 0.1% of adults, with each household's wealth split equally between its adults.
+        description_key: *desc_key_equal_split
         display:
           name: Top 0.1% (equal-split adults)
           numDecimalPlaces: 1
