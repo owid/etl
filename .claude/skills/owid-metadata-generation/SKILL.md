@@ -47,8 +47,8 @@ tables:
         short_unit: <Symbol>
         description_short: |-
           <1-2 sentences>
-        description_key:
-          - <Bullet point>
+        description_key: |-
+          <Key information as free-form markdown: paragraphs, with sub-lists where helpful>
         description_from_producer: |-
           <Original text from source>
         description_processing: |-
@@ -128,20 +128,22 @@ description_short: |-
   The number of people living in extreme poverty, based on data and estimates from different sources.
 ```
 
-**`description_key`** -- Array of self-contained bullet points for "About this data" panel.
+**`description_key`** -- Free-form markdown text for the "About this data" panel: prose paragraphs, with markdown sub-lists only where a list genuinely helps. (A YAML list of bullet points is still accepted and renders as a markdown list, but prefer prose — see grapher's descriptionKey-to-string migration.)
 - Plain language, no jargon (e.g. "livestock digestive processes" not "enteric fermentation"). Expand acronyms on first use.
 - **Add concrete examples** for abstract scope descriptions (what countries are included, what events qualify)
 - **Order**: data-specific points first, methodology second, caveats last
 - Only describe data that actually exists in the indicator. State implications of limitations explicitly.
+- Separate distinct facts with blank lines (paragraphs), so line breaks render meaningfully.
 
 ```yaml
-# GOOD
-description_key:
-  - Extreme poverty is measured using the International Poverty Line of $2.15 per day in 2017 international dollars.
-  - This metric uses household survey data adjusted for purchasing power parity (PPP).
+# GOOD - prose paragraphs, sub-list only where it helps
+description_key: |-
+  Extreme poverty is measured using the International Poverty Line of $2.15 per day in 2017 international dollars.
+
+  This metric uses household survey data adjusted for purchasing power parity (PPP).
 # BAD - unexpanded acronyms, jargon
-description_key:
-  - Uses IPL of $2.15/day (2017 PPP).
+description_key: |-
+  Uses IPL of $2.15/day (2017 PPP).
 ```
 
 **`description_from_producer`** -- Exact producer text, verbatim or minimally edited. Only if producer provides clear definitions. Can be set in `definitions.common` when the same producer description applies to all variables, with per-variable overrides as needed.
@@ -229,7 +231,29 @@ For full syntax details, see `docs/architecture/metadata/structuring-yaml.md`.
 4. **Write top-down**: Start with `definitions:` and `common:` to identify shared patterns before individual variables
 5. **Fill systematically**: For each variable: title -> units -> description_short -> description_key -> processing_level -> display
 6. **Preview with INSTANT mode**: `INSTANT=1 .venv/bin/etlr data://grapher/<ns>/<ver>/<ds> --grapher --only`
-7. **Check typos**: Run the `check-metadata-typos` skill on the step path
+7. **Run the metadata quality checks** (next section)
+
+## Metadata quality checks
+
+The canonical check suite for metadata text, shared by `/update-dataset` (§6b/§6c), `/edit-faust-metadata`, and this skill. Keep the three in sync: if a check is added or changed here, check whether those skills need a matching edit in the same commit.
+
+Run all of these after the metadata is written and the steps are built, so every issue surfaces together:
+
+1. **Typos** — `/check-metadata-typos` on each edited `.meta.yml` (garden first, then grapher). Accept or skip each suggested fix.
+2. **Jinja spacing** — `/check-metadata-spacing` on the built garden and grapher datasets. Catches template artifacts (doubled spaces, stray newlines) that only appear after Jinja rendering.
+3. **Style guide** — `/check-metadata-style` on the grapher step. Audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide (`.claude/skills/check-metadata-style/STYLE_GUIDE.md`).
+4. **Clarity for a general audience** — read every user-facing field with non-specialist eyes; the other checks enforce structure and style, this one judges whether the text is *understandable*. Flag and rewrite (propose concrete rewrites, don't just flag):
+   - Acronyms or technical terms not expanded on first use (skip GDP; expand GWIS, MFI, SDG, IHME)
+   - Sentences that only make sense if you already know the data source
+   - Quantitative claims with no unit context surfacing anywhere in the user-facing text
+   - Inconsistent terminology between indicators in the same dataset
+   - Domain phrases with a plain-English equivalent ("anthropogenic emissions" → "human-caused emissions")
+   - Methodology-attribution claims ("following guidance from <agency>…") — open the cited link and confirm it actually says that; agencies revise methodology
+   - Scope qualifiers present in the origin title but absent from user-facing text (private-only, adults-only, market-exchange-rate-only)
+5. **Link verification** — every URL and `[term](#dod:term)` in the text: URLs must resolve (curl as the batch primary; on a 4xx from an OWID link, double-check with WebFetch + Wayback before acting); dod slugs checked against the `dods` table via public Datasette (`SELECT name FROM dods WHERE name LIKE ...`); a missing dod → keep the link and list it as a "create in admin" follow-up in the PR body.
+6. **Adversarial claims verification** — `/adversarial-data-review` scoped to the newly written or edited metadata text only: treat each added/changed sentence as a claim and verify it against the producer's documentation (read what's behind the links — check 5 only proves they resolve). Catches text that is well-formed but factually wrong: stale methodology attributions, scope overclaims, misread units in prose. Scope by context: **mandatory in `/edit-faust-metadata`** (claims-only, no data cross-checks — cheap); the full-dataset review including data-value cross-checks stays the opt-in step described in `/update-dataset` §6c-bis (token-heavy).
+
+If any check rewrites a `.meta.yml`, re-run the affected step so the built catalog reflects the edits (**add `--grapher` when the step is on the grapher channel**, otherwise staging keeps serving the old text), then re-run the check to confirm zero remaining violations.
 
 ## Quality Checklist
 
