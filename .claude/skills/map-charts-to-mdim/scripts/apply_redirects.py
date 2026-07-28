@@ -15,12 +15,18 @@ Targets whichever env OWID_ENV resolves to. Redirect tables are per-environment
 (staging does NOT sync to production), so production redirects require running
 this against production admin creds.
 
+`--decisions` takes the review export from build_review.py (⬇ JSON / ⬇ CSV) and
+excludes every chart the reviewer flagged — pass it whenever a review happened.
+
 Usage:
     .venv/bin/python .claude/skills/map-charts-to-mdim/scripts/apply_redirects.py \
-        --mapping ai/<name>-charts-mdim-mapping [--execute] [--unpublish]
+        --mapping ai/<name>-charts-mdim-mapping \
+        [--decisions ai/<name>-charts-mdim-mapping/<name>_chart_mdim_review.json] \
+        [--execute] [--unpublish]
 """
 
 import argparse
+import csv
 import json
 import re
 from collections import defaultdict
@@ -44,6 +50,34 @@ def load_mapping(path_arg: str) -> dict:
     if not path.exists():
         raise SystemExit(f"Not found: {path}. Run extract_and_match.py first.")
     return json.loads(path.read_text())
+
+
+def load_decisions(path_arg: str) -> dict[int, dict]:
+    """Load the review export from build_review.py (the ⬇ JSON / ⬇ CSV buttons), keyed by chart id."""
+    path = Path(path_arg)
+    if not path.exists():
+        raise SystemExit(f"Decisions file not found: {path}")
+    if path.suffix.lower() == ".csv":
+        with open(path, newline="") as f:
+            rows = list(csv.DictReader(f))
+    else:
+        rows = json.loads(path.read_text())
+    return {int(r["id"]): {"status": (r.get("status") or "").strip(), "note": (r.get("note") or "").strip()} for r in rows}  # fmt: skip
+
+
+def apply_decisions(entries: list[dict], decisions: dict[int, dict]) -> tuple[list[dict], list[tuple[dict, str]], int]:
+    """Drop entries whose chart the reviewer flagged; count kept entries that carry no decision."""
+    kept, flagged, undecided = [], [], 0
+    for e in entries:
+        d = decisions.get(e["chart"]["id"], {})
+        status = d.get("status", "")
+        if status == "flagged":
+            flagged.append((e, d.get("note", "")))
+        else:
+            kept.append(e)
+            if status != "approved":
+                undecided += 1
+    return kept, flagged, undecided
 
 
 def existing_mdim_redirects(sources: tuple[str, ...]) -> dict[str, dict]:
@@ -138,6 +172,8 @@ def main() -> int:
     ap.add_argument("--execute", action="store_true", help="actually create the redirects (otherwise audit only)")
     ap.add_argument("--unpublish", action="store_true",
                     help="after creating redirects, unpublish the source charts (requires --execute + typed confirmation)")  # fmt: skip
+    ap.add_argument("--decisions",
+                    help="review export from build_review.py (⬇ JSON / ⬇ CSV) — charts the reviewer flagged are excluded")  # fmt: skip
     args = ap.parse_args()
 
     if args.unpublish and not args.execute:
@@ -149,6 +185,20 @@ def main() -> int:
     # charts are still published (the extractor only selects published charts), so they still
     # shadow their redirect and must be included in the unpublish step.
     already_done = mapping.get("already_done", [])
+
+    if args.decisions:
+        decisions = load_decisions(args.decisions)
+        redirects, flagged_r, undecided = apply_decisions(redirects, decisions)
+        already_done, flagged_d, _ = apply_decisions(already_done, decisions)
+        flagged = flagged_r + flagged_d
+        print(f"Review decisions ({args.decisions}): {len(flagged)} flagged (excluded), "
+              f"{undecided} proposed redirect(s) without a decision (kept).")  # fmt: skip
+        for e, note in flagged:
+            print(f"  FLAGGED  {e['source']}{'  — ' + note if note else ''}")
+    elif args.execute:
+        print("note: no --decisions file — flags made in the review HTML are NOT consumed. Export them "
+              "(⬇ JSON) and pass --decisions, or fold them into overrides.csv and re-run extract_and_match.py.")  # fmt: skip
+
     if not redirects and not already_done:
         print("mapping.json has no proposed redirects — nothing to do.")
         return 0

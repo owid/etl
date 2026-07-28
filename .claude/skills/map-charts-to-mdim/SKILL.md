@@ -132,6 +132,9 @@ Rows without a target show their candidates / near-miss diff instead of an
 iframe, so ambiguous cases can be triaged into `overrides.csv` from the same UI.
 The proposal CSV also works standalone in a spreadsheet (URLs are clickable).
 
+When the review is done, export the decisions (⬇ JSON or ⬇ CSV) — the apply
+step consumes that file so flagged charts are excluded.
+
 ### 3. Overrides + re-run (only if needed)
 
 For ambiguous rows (or to force/suppress a match), write
@@ -154,8 +157,14 @@ conversation.** Dry-run first, always:
 
 ```bash
 .venv/bin/python .claude/skills/map-charts-to-mdim/scripts/apply_redirects.py \
-  --mapping ai/economic-inequality-charts-mdim-mapping
+  --mapping ai/economic-inequality-charts-mdim-mapping \
+  --decisions ai/economic-inequality-charts-mdim-mapping/economic-inequality_chart_mdim_review.json
 ```
+
+Whenever a review happened, pass the exported decisions file (step 2) via
+`--decisions` — charts the reviewer flagged are excluded from both the redirect
+creation and the unpublish step. Without it, review-HTML flags are silently
+ignored (the script warns on `--execute`).
 
 The dry-run re-checks existing redirects + chains fresh and prints the action
 table (`CREATE` / `EXISTS` / `DIFFERS` / `CONFLICT`); non-zero exit means
@@ -188,7 +197,9 @@ Facts to surface to the user before `--execute`:
   defaults to `LineChart` when the config omits `chartTypes` entirely, so
   NULL == NULL is a meaningful tiebreak, not a wildcard.
 - Views without `fullConfigId` can't be redirect targets and are excluded from
-  the pool (warned).
+  the pool (warned). Same for views with an indicator entry that can't be
+  resolved to a variable id — matching on a truncated indicator set could hit
+  the wrong chart.
 - Re-runs regenerate everything except `overrides.csv`; `mapping.json` is
   derived — never hand-edit it.
 - Don't `ORDER BY` in SQL that selects `multi_dim_data_pages.config` — the

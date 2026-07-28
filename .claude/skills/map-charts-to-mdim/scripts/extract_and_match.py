@@ -273,6 +273,15 @@ def get_mdims_and_views(restrict: list[str], host: str) -> tuple[list[dict], lis
 
     usable = []
     for v in views:
+        # A view with an unresolvable indicator would get a truncated signature and could
+        # spuriously exact-match a chart that only carries the remaining indicators.
+        unresolved = [cp for slot in ("y", *EXTRA_SLOTS) for vid, cp in v[f"_raw_{slot}"] if vid is None]
+        if unresolved:
+            print(
+                f"warning: view {v['row_id']} ({v['mdim_slug']}?{v['query_str']}) has unresolvable "
+                f"indicator(s) {unresolved} — excluded from matching"
+            )
+            continue
         v["y"] = frozenset(vid for vid, _ in v["_raw_y"] if vid is not None)
         for slot in EXTRA_SLOTS:
             entries = [vid for vid, _ in v[f"_raw_{slot}"] if vid is not None]
