@@ -63,7 +63,7 @@ header_dict = {
         "China",
     ],
     "explorerSubtitle": "Explore key inequality indicators from the World Inequality Database and the World Bank.",
-    "isPublished": "true",
+    "isPublished": "false",
     "googleSheet": "",
     "wpBlockId": "57760",
     "entityType": "country or region",

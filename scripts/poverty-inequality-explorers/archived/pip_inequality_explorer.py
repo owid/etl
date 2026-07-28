@@ -42,7 +42,7 @@ header_dict = {
         "China",
     ],
     "explorerSubtitle": "Explore World Bank data on inequality.",
-    "isPublished": "true",
+    "isPublished": "false",
     "googleSheet": f"https://docs.google.com/spreadsheets/d/{sheet_id}",
     "wpBlockId": "57756",
     "entityType": "country or region",
