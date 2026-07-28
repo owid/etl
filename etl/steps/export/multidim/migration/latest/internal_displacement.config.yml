@@ -332,9 +332,9 @@ views:
         - "{definitions.description_key_idmc_criteria}"
         - "{definitions.description_key_idmc_rounded}"
 
-  # Returned IDPs (UNHCR; only reported as an annual flow)
+  # Returned IDPs (UNHCR; only conflict IDPs and only reported as an annual flow)
   - dimensions:
-      cause: total
+      cause: conflict
       metric: returned
       unit: total
     indicators:
@@ -349,7 +349,7 @@ views:
           customNumericValues: [0, 1000, 10000, 100000, 1000000, 0]
 
   - dimensions:
-      cause: total
+      cause: conflict
       metric: returned
       unit: per_capita
     indicators:
