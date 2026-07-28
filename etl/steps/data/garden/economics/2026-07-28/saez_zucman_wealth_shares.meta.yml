@@ -1,0 +1,97 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Economic Inequality
+      attribution_short: Saez and Zucman
+    description_key:
+      - Wealth is measured as marketable (net) wealth: the value of all assets a household owns, minus its debts. It is estimated from capitalized income flows, combining tax, survey and national accounts data.
+      - These are the revised Saez and Zucman estimates from their September 2020 update, which incorporate information from the Federal Reserve's Distributional Financial Accounts.
+      - "\"Tax units\" treat a married couple filing jointly as a single unit, while \"equal-split adults\" divide each household's wealth equally between its adults. Equal-split shares are typically slightly lower, because splitting wealth within couples spreads it across more units."
+      - The authors also publish several alternative estimates of US wealth concentration (from the Survey of Consumer Finances, estate multiplier methods, and other researchers); those are not included here.
+    description_processing: |-
+      The wealth shares are reported by the source as fractions of total wealth and have been converted to percentages. Of the many series in the source workbook, only the revised Saez and Zucman September 2020 estimates are used here, for both the "tax units" and "equal-split adults" population concepts.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  owners:
+    - Bertha Rohenkohl
+
+tables:
+  saez_zucman_wealth_shares:
+    variables:
+      share_top_10_tax_units:
+        title: Wealth share of the richest 10% (tax units)
+        presentation:
+          title_public: Wealth share of the richest 10%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of total wealth held by the richest 10% of tax units (a married couple counts as one unit).
+        display:
+          name: Top 10% (tax units)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      share_top_1_tax_units:
+        title: Wealth share of the richest 1% (tax units)
+        presentation:
+          title_public: Wealth share of the richest 1%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of total wealth held by the richest 1% of tax units (a married couple counts as one unit).
+        display:
+          name: Top 1% (tax units)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      share_top_0p1_tax_units:
+        title: Wealth share of the richest 0.1% (tax units)
+        presentation:
+          title_public: Wealth share of the richest 0.1%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of total wealth held by the richest 0.1% of tax units (a married couple counts as one unit).
+        display:
+          name: Top 0.1% (tax units)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      share_top_10_equal_split:
+        title: Wealth share of the richest 10% (equal-split adults)
+        presentation:
+          title_public: Wealth share of the richest 10%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of total wealth held by the richest 10% of adults, with each household's wealth split equally between its adults.
+        display:
+          name: Top 10% (equal-split adults)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      share_top_1_equal_split:
+        title: Wealth share of the richest 1% (equal-split adults)
+        presentation:
+          title_public: Wealth share of the richest 1%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of total wealth held by the richest 1% of adults, with each household's wealth split equally between its adults.
+        display:
+          name: Top 1% (equal-split adults)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      share_top_0p1_equal_split:
+        title: Wealth share of the richest 0.1% (equal-split adults)
+        presentation:
+          title_public: Wealth share of the richest 0.1%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of total wealth held by the richest 0.1% of adults, with each household's wealth split equally between its adults.
+        display:
+          name: Top 0.1% (equal-split adults)
+          numDecimalPlaces: 1
+          tolerance: 5
