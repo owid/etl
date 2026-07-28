@@ -28,7 +28,7 @@ dataset:
 tables:
   # --- Combined indicators: Lee & Lee + OECD tertiary splice ---
 
-  education_attainment_distribution:
+  long_run_educational_attainment:
     common:
       processing_level: major
     variables:
