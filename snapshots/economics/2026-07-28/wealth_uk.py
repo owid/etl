@@ -5,7 +5,7 @@ The data file is extracted manually from the supplementary information of the pa
 2018), available at https://doi.org/10.1016/j.jpubeco.2018.02.008.
 
 Run with:
-  etls chartbook/2026-07-28/wealth_uk --path-to-file <path>
+  etls economics/2026-07-28/wealth_uk --path-to-file <path>
 """
 
 from etl.helpers import PathFinder

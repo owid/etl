@@ -220,12 +220,6 @@ steps:
     - data://meadow/ons/2024-03-20/hours_and_earnings_uk:
       - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
 
-  # Top wealth shares in the UK over more than a century (Alvaredo, Atkinson and Morelli, 2018)
-  data://grapher/chartbook/2026-07-28/wealth_uk:
-    - data://garden/chartbook/2026-07-28/wealth_uk:
-      - data://meadow/chartbook/2026-07-28/wealth_uk:
-        - snapshot://chartbook/2026-07-28/wealth_uk.csv
-
   ################################################################################################
   # MULTIPLE-COUNTRY DATASETS
   ################################################################################################
