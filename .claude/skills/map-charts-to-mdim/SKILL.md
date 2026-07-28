@@ -214,8 +214,9 @@ Facts to surface to the user before `--execute`:
   NULL == NULL is a meaningful tiebreak, not a wildcard.
 - Views without `fullConfigId` can't be redirect targets and are excluded from
   the pool (warned). Same for views with an indicator entry that can't be
-  resolved to a variable id — matching on a truncated indicator set could hit
-  the wrong chart.
+  resolved to a variable id, and for views with several indicators in one
+  x/size/color slot (a chart holds one per slot) — matching on a truncated
+  indicator set could hit the wrong chart.
 - Re-runs regenerate everything except `overrides.csv`; `mapping.json` is
   derived — never hand-edit it.
 - Don't `ORDER BY` in SQL that selects `multi_dim_data_pages.config` — the

@@ -290,13 +290,19 @@ def get_mdims_and_views(restrict: list[str], host: str) -> tuple[list[dict], lis
                 f"indicator(s) {unresolved} — excluded from matching"
             )
             continue
+        # A chart holds a single indicator per x/size/color slot, so a view carrying several
+        # in one slot has no chart-shaped signature — truncating to the first could spuriously
+        # exact-match a chart that lacks the rest. Exclude the view, like unresolved ones.
+        multi = [slot for slot in EXTRA_SLOTS if sum(1 for vid, _ in v[f"_raw_{slot}"] if vid is not None) > 1]
+        if multi:
+            print(
+                f"warning: view {v['row_id']} ({v['mdim_slug']}?{v['query_str']}) has multiple indicators "
+                f"in {', '.join(repr(s) for s in multi)} — excluded from matching (a chart slot holds one)"
+            )
+            continue
         v["y"] = frozenset(vid for vid, _ in v["_raw_y"] if vid is not None)
         for slot in EXTRA_SLOTS:
             entries = [vid for vid, _ in v[f"_raw_{slot}"] if vid is not None]
-            if len(entries) > 1:
-                print(
-                    f"warning: view {v['row_id']} ({v['mdim_slug']}) has multiple '{slot}' indicators — keeping the first"
-                )
             v[slot] = entries[0] if entries else None
         if not v["view_config_id"]:
             print(
