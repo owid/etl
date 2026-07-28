@@ -132,62 +132,6 @@ class Base(MappedAsDataclass, DeclarativeBase):
             raise ValueError(f"Unrecognized value for if_exists: {if_exists}")
 
 
-class HousekeeperReview(Base):
-    __tablename__ = "housekeeper_reviews"
-
-    id: Mapped[int] = mapped_column(
-        Integer,
-        primary_key=True,
-        init=False,
-        # autoincrement=True,
-        comment="Identifier of the review",
-    )
-    suggestedAt: Mapped[datetime] = mapped_column(
-        DateTime,
-        nullable=True,
-        server_default=text("CURRENT_TIMESTAMP"),
-        comment="Date when the review was suggested",
-    )
-    objectType: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False,
-        comment="Type of the object to review (e.g., 'chart', 'dataset', etc.)",
-    )
-
-    objectId: Mapped[int] = mapped_column(Integer, nullable=False)
-
-    @classmethod
-    def load_reviews(cls, session: Session, object_type: str | None = None) -> list["HousekeeperReview"]:
-        if object_type is None:
-            vars = session.scalars(select(cls)).all()
-            return list(vars)
-        else:
-            vars = session.scalars(select(cls).where(cls.objectType == object_type)).all()
-            return list(vars)
-
-    @classmethod
-    def load_reviews_object_id(cls, session: Session, object_type: str, since: datetime | None = None) -> list[int]:
-        """Load object IDs that have been reviewed.
-
-        Args:
-            session: Database session
-            object_type: Type of object (e.g., 'chart')
-            since: If provided, only return reviews after this date
-        """
-        query = select(cls.objectId).where(cls.objectType == object_type)
-        if since is not None:
-            query = query.where(cls.suggestedAt >= since)
-        vars = session.scalars(query).all()
-        return list(vars)
-
-    @classmethod
-    def add_review(cls, session: Session, object_type: str, object_id: int):
-        new_review = cls(objectType=object_type, objectId=object_id, suggestedAt=datetime.now(timezone.utc))
-        session.add(new_review)
-        session.commit()
-        # return new_review
-
-
 class Entity(Base):
     __tablename__ = "entities"
     __table_args__ = (Index("code", "code", unique=True), Index("name", "name", unique=True))
