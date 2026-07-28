@@ -1,6 +1,10 @@
-# Writing ETL steps
+---
+paths:
+  - "etl/steps/**/*.py"
+  - "snapshots/**/*.py"
+---
 
-## Sanity checks
+# Sanity checks in ETL steps and snapshots
 
 Silent data corruption is one of the easier bugs to miss. A step can run cleanly, pass type checks, and ship to staging while producing wrong numbers — and by the time someone notices on a chart, the bad data may already be live. Sanity checks are how we catch that at build time instead.
 
@@ -9,7 +13,7 @@ Silent data corruption is one of the easier bugs to miss. A step can run cleanly
 ### Where they go
 
 - **Garden** is the main home. The input tables, the transformations, and the output table are all in one place, and that's where business logic lives. Put one `sanity_check_inputs(...)` right after loading meadow tables (before any transform), and one `sanity_check_outputs(...)` right before `paths.create_dataset(...)`. Call both from `run()`. See `etl/steps/data/garden/rff/2026-06-10/emissions_weighted_carbon_price.py` for a clean, recent example.
-- **Snapshot** usually doesn't need checks — most snapshots just download and write. But when the snapshot itself does non-trivial parsing (PDF tables, custom binary formats, scraping), add integrity checks right before `snap.create_snapshot(...)`. If the parser can produce silently-wrong rows, the snapshot is the only place to catch it before the bad rows leak into meadow. (Snapshot scripts live in `snapshots/`, outside this directory.)
+- **Snapshot** usually doesn't need checks — most snapshots just download and write. But when the snapshot itself does non-trivial parsing (PDF tables, custom binary formats, scraping), add integrity checks right before `snap.create_snapshot(...)`. If the parser can produce silently-wrong rows, the snapshot is the only place to catch it before the bad rows leak into meadow.
 - **Meadow** should stay light. If you find yourself wanting checks there, it usually means the logic belongs in garden instead.
 
 ### How they look

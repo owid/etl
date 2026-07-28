@@ -284,7 +284,7 @@ If the same sentence could fit in both, it belongs in garden — not in `.dvc`. 
 
 ## Sanity checks
 
-Silent data corruption is one of the easier bugs to miss: a step can run cleanly, pass type checks, and ship wrong numbers to staging. Every garden step that does more than a straight load-and-format asserts its assumptions about its inputs and its output — and so does any snapshot that parses non-trivially (PDF tables, custom binary formats, scraping). Where they go, what they look like, and which categories are worth checking are in `etl/steps/CLAUDE.md`, which loads whenever you work under `etl/steps/`.
+Silent data corruption is one of the easier bugs to miss: a step can run cleanly, pass type checks, and ship wrong numbers to staging. Every garden step that does more than a straight load-and-format asserts its assumptions about its inputs and its output — and so does any snapshot that parses non-trivially (PDF tables, custom binary formats, scraping). Where they go, what they look like, and which categories are worth checking are in `.claude/rules/sanity-checks.md`, which loads on its own when you open a step or snapshot script.
 
 ## Querying MySQL, and verifying charts on staging
 
