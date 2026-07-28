@@ -62,22 +62,22 @@ Key fields:
 
 ETL addresses a chart by its config UUID (`charts.configId`), never by slug or numeric id, and it never looks the chart up per environment. The YAML must therefore declare the UUID, and the same YAML then targets the same chart on local, staging, and production.
 
-**New chart** — mint a UUIDv7:
+Use `etl chart-config-id` to write the field — it validates that the target really is a single-chart config and refuses to clobber an existing UUID:
 
 ```bash
-.venv/bin/python -c "from etl.collection.chart_upsert import new_chart_config_id; print(new_chart_config_id())"
+# New chart: mint a UUIDv7.
+.venv/bin/etl chart-config-id new etl/steps/export/multidim/<ns>/latest/<short_name>.config.yml
+
+# Existing chart moving into ETL: take the UUID from the chart already in grapher, so the
+# config lands on it instead of creating a duplicate. Name the chart by slug or by the
+# numeric id from its admin URL — exactly one of the two.
+.venv/bin/etl chart-config-id lookup <config.yml> --slug banning-of-chick-culling
+.venv/bin/etl chart-config-id lookup <config.yml> --chart-id 7118
 ```
 
-**Existing chart moving into ETL** — use the chart's current UUID, so the ETL config lands on it instead of creating a duplicate:
+`lookup` queries the configured grapher DB (`OWID_ENV`); pass `--env <staging-branch>` (or `--env <path/to/.env>`) to look elsewhere. The chart is never inferred from the file name — picking the wrong chart is the failure this field exists to prevent, so you name it explicitly.
 
-```bash
-curl -s --get "https://datasette-public.owid.io/owid.json" \
-  --data-urlencode "sql=SELECT c.id, c.configId FROM charts c JOIN chart_configs cf ON cf.id = c.configId WHERE cf.slug = '<slug>'"
-```
-
-(Or `make query SQL="SELECT c.configId FROM charts c JOIN chart_configs cf ON cf.id = c.configId WHERE cf.slug = '<slug>'"` against staging.)
-
-Never change `chart_config_id` once it's committed — a changed UUID means "a different chart", so the push creates a new draft chart and abandons the old one.
+Never change `chart_config_id` once it's committed — a changed UUID means "a different chart", so the push creates a new draft chart and abandons the old one. That's why both subcommands require `--force` to overwrite.
 
 ## DAG entry
 
