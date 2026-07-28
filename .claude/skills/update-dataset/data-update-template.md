@@ -104,6 +104,8 @@ The OWID GDocs Add-on colors and indents these docs. You can reproduce that styl
 
 Per-line HTML shape: `<p style="margin-left:10pt"><span style="color:#666666">…</span></p>`; links `<a href="…" style="color:#1155cc;text-decoration:underline">…</a>`; encode all non-ASCII as HTML entities. Verify afterward with `download_file_content(exportMimeType="text/html")` and check the `color:` / `margin-left:` survived. (If OWID changes the scheme, re-extract it from a recent correctly-formatted doc rather than trusting these hex values.)
 
+**Dod links do not survive the HTML import.** A fragment href like `#dod:oda` gets rewritten by Google's importer into an internal bookmark id (`#id.xxxxxxxx`), silently breaking the dod. External `https://` links come through fine (wrapped in Google's redirector, which is normal). After creating the doc, list every dod the body uses in the handoff and ask the user to re-add each one by hand (select the anchor text → edit link → paste the literal `#dod:…`).
+
 ---
 
 ## Field-by-field guidance
