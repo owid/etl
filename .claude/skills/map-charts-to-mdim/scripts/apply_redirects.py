@@ -38,6 +38,10 @@ from etl.http import session as http_session
 
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
+# References a redirect does NOT fix: these surfaces embed the chart directly (by id/slug)
+# and break if it is unpublished. Same set as add-gdp-scatter's redirect_to_scatter.py.
+MANUAL_REF_KEYS = ("explorers", "narrativeCharts", "dataInsights", "staticViz")
+
 
 def short_admin_host() -> str:
     return TAILSCALE_SUFFIX_RE.sub("", OWID_ENV.admin_api).rstrip("/").removesuffix("/api")
@@ -62,22 +66,66 @@ def load_decisions(path_arg: str) -> dict[int, dict]:
             rows = list(csv.DictReader(f))
     else:
         rows = json.loads(path.read_text())
-    return {int(r["id"]): {"status": (r.get("status") or "").strip(), "note": (r.get("note") or "").strip()} for r in rows}  # fmt: skip
+    return {
+        int(r["id"]): {
+            "status": (r.get("status") or "").strip(),
+            "note": (r.get("note") or "").strip(),
+            # the target the decision was made on, used to detect stale decisions
+            "target_mdim": (r.get("target_mdim") or "").strip(),
+            "view_id": (r.get("view_id") or "").strip(),
+        }
+        for r in rows
+    }
 
 
-def apply_decisions(entries: list[dict], decisions: dict[int, dict]) -> tuple[list[dict], list[tuple[dict, str]], int]:
-    """Drop entries whose chart the reviewer flagged; count kept entries that carry no decision."""
-    kept, flagged, undecided = [], [], 0
+def apply_decisions(
+    entries: list[dict], decisions: dict[int, dict]
+) -> tuple[list[dict], list[tuple[dict, str]], list[dict], int]:
+    """Drop entries whose chart the reviewer flagged; count kept entries that carry no decision.
+
+    A decision is bound to the proposal it was made on: if the export carries the reviewed
+    target (target_mdim/view_id) and it differs from the entry's current target, the decision
+    is stale and treated as no decision at all.
+    """
+    kept, flagged, stale, undecided = [], [], [], 0
     for e in entries:
         d = decisions.get(e["chart"]["id"], {})
         status = d.get("status", "")
+        reviewed_target = (d.get("target_mdim", ""), d.get("view_id", ""))
+        if status and any(reviewed_target) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"]):
+            stale.append(e)
+            status = ""
         if status == "flagged":
             flagged.append((e, d.get("note", "")))
         else:
             kept.append(e)
             if status != "approved":
                 undecided += 1
-    return kept, flagged, undecided
+    return kept, flagged, stale, undecided
+
+
+def stale_charts(entries: list[dict]) -> dict[str, str]:
+    """Source charts whose slug or config changed since the proposal was written."""
+    ids = tuple(e["chart"]["id"] for e in entries)
+    if not ids:
+        return {}
+    df = OWID_ENV.read_sql(
+        "SELECT c.id, cc.slug, cc.fullMd5 AS config_md5 FROM charts c "
+        "JOIN chart_configs cc ON cc.id = c.configId WHERE c.id IN %(ids)s",
+        params={"ids": ids},
+    )
+    current = {int(r["id"]): r for r in df.to_dict("records")}
+    stale = {}
+    for e in entries:
+        ch = e["chart"]
+        cur = current.get(ch["id"])
+        if cur is None:
+            stale[e["source"]] = "chart no longer exists — re-run extract_and_match.py"
+        elif cur["slug"] != ch["slug"]:
+            stale[e["source"]] = f"chart slug changed since the proposal (now '{cur['slug']}') — re-run extract_and_match.py"  # fmt: skip
+        elif ch.get("configMd5") and cur["config_md5"] != ch["configMd5"]:
+            stale[e["source"]] = "chart config changed since the proposal — re-run extract_and_match.py"
+    return stale
 
 
 def existing_mdim_redirects(sources: tuple[str, ...]) -> dict[str, dict]:
@@ -188,13 +236,15 @@ def main() -> int:
 
     if args.decisions:
         decisions = load_decisions(args.decisions)
-        redirects, flagged_r, undecided = apply_decisions(redirects, decisions)
-        already_done, flagged_d, _ = apply_decisions(already_done, decisions)
+        redirects, flagged_r, stale_r, undecided = apply_decisions(redirects, decisions)
+        already_done, flagged_d, stale_d, _ = apply_decisions(already_done, decisions)
         flagged = flagged_r + flagged_d
         print(f"Review decisions ({args.decisions}): {len(flagged)} flagged (excluded), "
               f"{undecided} proposed redirect(s) without a decision (kept).")  # fmt: skip
         for e, note in flagged:
             print(f"  FLAGGED  {e['source']}{'  — ' + note if note else ''}")
+        for e in stale_r + stale_d:
+            print(f"  STALE DECISION (made on a different target — treated as undecided)  {e['source']}")
     elif args.execute:
         print("note: no --decisions file — flags made in the review HTML are NOT consumed. Export them "
               "(⬇ JSON) and pass --decisions, or fold them into overrides.csv and re-run extract_and_match.py.")  # fmt: skip
@@ -213,11 +263,15 @@ def main() -> int:
     sources = tuple(r["source"] for r in redirects + already_done)
     existing = existing_mdim_redirects(sources)
     chains = chain_conflicts(redirects)
+    stale = stale_charts(redirects + already_done)
 
     rows = []
     to_create = []
     for r in redirects:
         source, t = r["source"], r["target"]
+        if source in stale:
+            rows.append((source, t["url"], "STALE", stale[source]))
+            continue
         prior = existing.get(source)
         if prior is not None:
             if int(prior["multiDimId"]) == t["multiDimId"] and prior["viewConfigId"] == t["viewConfigId"]:
@@ -235,6 +289,9 @@ def main() -> int:
     still_done = []
     for r in already_done:
         source, t = r["source"], r["target"]
+        if source in stale:
+            rows.append((source, t["url"], "STALE", stale[source]))
+            continue
         prior = existing.get(source)
         if prior is not None and int(prior["multiDimId"]) == t["multiDimId"] and prior["viewConfigId"] == t["viewConfigId"]:  # fmt: skip
             rows.append((source, t["url"], "EXISTS", "already redirected at proposal time — chart still needs unpublishing"))  # fmt: skip
@@ -271,7 +328,7 @@ def main() -> int:
     for source, url, status, note in sorted(rows, key=lambda x: (x[2], x[0])):
         print(f"{source:<{width}} {status:<9} {note or '-> ' + url}")
 
-    bad = [r for r in rows if r[2] in ("DIFFERS", "CONFLICT", "ERROR", "CHAIN", "BAD_VIEW", "GONE")]
+    bad = [r for r in rows if r[2] in ("DIFFERS", "CONFLICT", "ERROR", "CHAIN", "BAD_VIEW", "GONE", "STALE")]
     unpublish_failures = 0
 
     if args.execute:
@@ -290,25 +347,46 @@ def main() -> int:
                     f"  {r['chart']['id']:>6}  {r['chart']['slug']}  ({short_admin_host()}/charts/{r['chart']['id']}/edit)"
                 )
             if args.unpublish:
-                expected = f"unpublish {len(created_or_existing)} charts"
-                answer = input(f"\nType '{expected}' to unpublish them now: ").strip()
-                if answer != expected:
-                    print("Confirmation did not match — NOT unpublishing.")
-                    return 1
                 api = AdminAPI(OWID_ENV)
+                # A redirect only covers the /grapher/<slug> URL. Explorers, narrative charts,
+                # data insights, and static viz reference the chart directly and break if it is
+                # unpublished — audit and block those; they need manual migration first.
+                to_unpublish, blocked = [], []
                 for r in created_or_existing:
-                    chart_id = r["chart"]["id"]
                     try:
-                        cfg = api.get_chart_config(chart_id)
-                        if cfg.get("isPublished"):
-                            cfg["isPublished"] = False
-                            api.update_chart(chart_id, cfg)
-                            print(f"  unpublished {chart_id} ({r['chart']['slug']})")
-                        else:
-                            print(f"  {chart_id} ({r['chart']['slug']}) already unpublished")
-                    except Exception as e:  # noqa: BLE001 - keep going, report per-row
-                        unpublish_failures += 1
-                        print(f"  ERROR unpublishing {chart_id} ({r['chart']['slug']}): {str(e)[:100]}")
+                        refs = api.get_chart_references(r["chart"]["id"]).get("references", {})
+                        manual = {k: len(refs[k]) for k in MANUAL_REF_KEYS if refs.get(k)}
+                    except Exception as e:  # noqa: BLE001 - fail closed: can't verify -> don't unpublish
+                        blocked.append((r, f"could not fetch chart references: {str(e)[:80]}"))
+                        continue
+                    if manual:
+                        blocked.append((r, "directly referenced by " + ", ".join(f"{k} ({n})" for k, n in manual.items())))  # fmt: skip
+                    else:
+                        to_unpublish.append(r)
+                if blocked:
+                    unpublish_failures += len(blocked)
+                    print("\nBLOCKED from unpublishing (a redirect does not update these references — migrate them manually first):")  # fmt: skip
+                    for r, why in blocked:
+                        print(f"  {r['chart']['id']:>6}  {r['chart']['slug']}  {why}")
+                if to_unpublish:
+                    expected = f"unpublish {len(to_unpublish)} charts"
+                    answer = input(f"\nType '{expected}' to unpublish them now: ").strip()
+                    if answer != expected:
+                        print("Confirmation did not match — NOT unpublishing.")
+                        return 1
+                    for r in to_unpublish:
+                        chart_id = r["chart"]["id"]
+                        try:
+                            cfg = api.get_chart_config(chart_id)
+                            if cfg.get("isPublished"):
+                                cfg["isPublished"] = False
+                                api.update_chart(chart_id, cfg)
+                                print(f"  unpublished {chart_id} ({r['chart']['slug']})")
+                            else:
+                                print(f"  {chart_id} ({r['chart']['slug']}) already unpublished")
+                        except Exception as e:  # noqa: BLE001 - keep going, report per-row
+                            unpublish_failures += 1
+                            print(f"  ERROR unpublishing {chart_id} ({r['chart']['slug']}): {str(e)[:100]}")
                 if unpublish_failures:
                     print(f"\n{unpublish_failures} chart(s) could NOT be unpublished — their live pages still shadow the redirects.")  # fmt: skip
             else:

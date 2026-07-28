@@ -249,6 +249,22 @@ let filter = "all";
 let order = RECORDS.map((_, i) => i);
 let pos = 0;
 
+// A decision is bound to the proposal it was made on: when a re-run of the extractor
+// changes a chart's proposed target, the saved approval/flag must not carry over to
+// the new, unreviewed target.
+function fp(rec) { return (rec.target_mdim || "") + "::" + (rec.view_id || ""); }
+(function pruneStaleDecisions() {
+  let n = 0;
+  for (const rec of RECORDS) {
+    const d = decisions[String(rec.id)];
+    if (d && d.target !== fp(rec)) { delete decisions[String(rec.id)]; n++; }
+  }
+  if (n) {
+    localStorage.setItem(LS_DEC, JSON.stringify(decisions));
+    setTimeout(() => toast(n + " saved decision(s) cleared — their proposed target changed since they were made."), 400);
+  }
+})();
+
 // --- persistence -----------------------------------------------------------
 // localStorage is the always-on store: every decision is saved immediately and
 // restored on reopen, so a refresh never loses work. Optionally, "Auto-save to
@@ -334,15 +350,20 @@ function importJSON(file) {
     try {
       const data = JSON.parse(r.result);
       const rows = Array.isArray(data) ? data : [];
-      let n = 0;
+      const byId = {};
+      for (const rec of RECORDS) byId[String(rec.id)] = rec;
+      let n = 0, skipped = 0;
       for (const row of rows) {
-        if (row && row.id != null && (row.status || row.note)) {
-          decisions[String(row.id)] = { status: row.status || null, note: row.note || "" };
-          n++;
-        }
+        if (!(row && row.id != null && (row.status || row.note))) continue;
+        const rec = byId[String(row.id)];
+        const rowFp = (row.target_mdim || "") + "::" + (row.view_id || "");
+        if (!rec || rowFp !== fp(rec)) { skipped++; continue; }  // chart gone or target changed
+        decisions[String(row.id)] = { status: row.status || null, note: row.note || "", target: rowFp };
+        n++;
       }
       persist(); render();
-      toast("Imported " + n + " decisions from " + file.name + ".");
+      toast("Imported " + n + " decisions from " + file.name + "." +
+            (skipped ? " Skipped " + skipped + " (chart missing or its proposed target changed)." : ""));
     } catch (e) {
       toast("Couldn't read that file: " + e.message);
     }
@@ -498,6 +519,7 @@ function decide(status) {
   const nextId = (status && pos < order.length - 1) ? RECORDS[order[pos + 1]].id : null;
   const cur = decisions[rec.id] || {};
   cur.status = status;
+  cur.target = fp(rec);
   decisions[rec.id] = cur;
   persist();
   if (nextId !== null) {
@@ -511,6 +533,7 @@ function saveNote(v) {
   const rec = RECORDS[order[pos]];
   const cur = decisions[rec.id] || {};
   cur.note = v;
+  cur.target = fp(rec);
   decisions[rec.id] = cur;
   persist();
 }

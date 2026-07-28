@@ -166,9 +166,11 @@ Whenever a review happened, pass the exported decisions file (step 2) via
 creation and the unpublish step. Without it, review-HTML flags are silently
 ignored (the script warns on `--execute`).
 
-The dry-run re-checks existing redirects + chains fresh and prints the action
-table (`CREATE` / `EXISTS` / `DIFFERS` / `CONFLICT`); non-zero exit means
-something needs attention before executing.
+The dry-run re-checks existing redirects + chains fresh, re-verifies each
+source chart against the DB (slug + config MD5 captured at extraction — an
+edited or deleted chart comes back `STALE` and is skipped), and prints the
+action table (`CREATE` / `EXISTS` / `DIFFERS` / `CONFLICT` / `STALE`);
+non-zero exit means something needs attention before executing.
 
 Facts to surface to the user before `--execute`:
 
@@ -182,6 +184,11 @@ Facts to surface to the user before `--execute`:
   disappear), which is what makes the redirect actually take effect — grapher's
   own reference script does both. That's why `--unpublish` is a separate flag,
   requires `--execute`, and asks for a typed confirmation.
+- Before unpublishing, each chart's references are audited via the admin API:
+  charts directly referenced by **explorers / narrative charts / data insights /
+  static viz** are blocked and reported (a redirect does not update those —
+  they need manual migration first). Gdoc/article links are fine: they go
+  through the `/grapher/<slug>` URL, which the redirect covers.
 
 ## Gotchas
 

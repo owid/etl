@@ -90,7 +90,7 @@ def path_tail(catalog_path: str | None) -> str:
 
 CHART_SELECT = """
 SELECT DISTINCT c.id AS chart_id, cc.slug AS chart_slug, cc.chartType AS chart_type,
-       cc.full->>'$.title' AS title, c.publishedAt AS published_at
+       cc.full->>'$.title' AS title, c.publishedAt AS published_at, cc.fullMd5 AS config_md5
 FROM charts c
 JOIN chart_configs cc ON cc.id = c.configId
 """
@@ -566,7 +566,8 @@ def write_proposal_csv(out: Path, charts: list[dict], id_to_path: dict[int, str]
 
 
 def chart_json(c: dict) -> dict:
-    return {"id": c["chart_id"], "slug": c["chart_slug"], "title": c["title"]}
+    # configMd5 lets apply_redirects.py detect charts edited after the proposal was written.
+    return {"id": c["chart_id"], "slug": c["chart_slug"], "title": c["title"], "configMd5": c["config_md5"]}
 
 
 def redirect_json(c: dict) -> dict:
