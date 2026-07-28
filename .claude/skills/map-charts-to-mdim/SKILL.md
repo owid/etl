@@ -103,7 +103,9 @@ site `redirects`, and `chart_slug_redirects` chains. A common one: an old chart
 with **incoming chart_slug_redirects** — the API hard-rejects that as a chain,
 so it's surfaced now, not at apply time. Conflicted matches land in
 `mapping.json → conflicts[]`, not in the POST-able `redirects[]`. Charts already
-redirected to the same target are counted as `already_done` (no action).
+redirected to the same target are counted as `already_done` — no redirect to
+create, but they are still published (the extractor only selects published
+charts), so `apply_redirects.py` still includes them in the unpublish step.
 
 Many charts → one view is legitimate (e.g. a line chart and its map twin) —
 surfaced via `shared_target_chart_ids`, never collapsed.

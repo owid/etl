@@ -56,11 +56,14 @@ def existing_mdim_redirects(sources: tuple[str, ...]) -> dict[str, dict]:
     return {r["source"]: r for r in df.to_dict("records")}
 
 
-def chain_conflicts(sources: tuple[str, ...], slugs: tuple[str, ...]) -> dict[str, list[str]]:
-    """Fresh chain checks (the DB may have changed since the proposal was written)."""
+def chain_conflicts(redirects: list[dict]) -> dict[str, list[str]]:
+    """Fresh chain checks, mirroring extract_and_match.check_conflicts (the DB may have changed since the proposal)."""
     reasons: dict[str, list[str]] = defaultdict(list)
-    if not sources:
+    if not redirects:
         return reasons
+    sources = tuple(r["source"] for r in redirects)
+    slugs = tuple(r["chart"]["slug"] for r in redirects)
+
     site = OWID_ENV.read_sql(
         "SELECT source, target FROM redirects WHERE source IN %(s)s OR target IN %(s)s", params={"s": sources}
     )
@@ -69,6 +72,7 @@ def chain_conflicts(sources: tuple[str, ...], slugs: tuple[str, ...]) -> dict[st
             reasons[r["source"]].append(f"already a site redirect source -> {r['target']}")
         if r["target"] in sources:
             reasons[r["target"]].append(f"chain: site redirect {r['source']} points at this chart")
+
     incoming = OWID_ENV.read_sql(
         "SELECT csr.slug AS old_slug, cc.slug AS chart_slug FROM chart_slug_redirects csr "
         "JOIN charts c ON c.id = csr.chart_id JOIN chart_configs cc ON cc.id = c.configId "
@@ -77,6 +81,42 @@ def chain_conflicts(sources: tuple[str, ...], slugs: tuple[str, ...]) -> dict[st
     )
     for r in incoming.to_dict("records"):
         reasons[f"/grapher/{r['chart_slug']}"].append(f"chain: incoming chart_slug_redirect from '{r['old_slug']}'")
+
+    own_old = OWID_ENV.read_sql("SELECT slug FROM chart_slug_redirects WHERE slug IN %(s)s", params={"s": slugs})
+    for slug in own_old["slug"]:
+        reasons[f"/grapher/{slug}"].append("chart slug is itself an old slug in chart_slug_redirects")
+
+    redirected_mdim_slugs = set(
+        OWID_ENV.read_sql(
+            "SELECT DISTINCT mdp.slug FROM multi_dim_redirects mdr "
+            "JOIN multi_dim_data_pages mdp ON mdp.id = mdr.multiDimId WHERE mdp.slug IS NOT NULL"
+        )["slug"]
+    )
+
+    # Target side, once per targeted MDIM: its own /grapher/<slug> must not be a redirect source.
+    targeted_slugs = tuple({r["target"]["mdimSlug"] for r in redirects})
+    targeted_sources = tuple(f"/grapher/{s}" for s in targeted_slugs)
+    bad_targets = set(
+        OWID_ENV.read_sql(
+            "SELECT source FROM redirects WHERE source IN %(s)s "
+            "UNION SELECT source FROM multi_dim_redirects WHERE source IN %(s)s",
+            params={"s": targeted_sources},
+        )["source"]
+    ) | {
+        f"/grapher/{s}"
+        for s in OWID_ENV.read_sql(
+            "SELECT slug FROM chart_slug_redirects WHERE slug IN %(s)s", params={"s": targeted_slugs}
+        )["slug"]
+    }
+
+    for r in redirects:
+        source, slug, t = r["source"], r["chart"]["slug"], r["target"]
+        if slug in redirected_mdim_slugs:
+            reasons[source].append("chart slug equals an MDIM slug that is already a redirect target")
+        if slug == t["mdimSlug"]:
+            reasons[source].append("self-redirect: chart slug equals the target MDIM slug")
+        if f"/grapher/{t['mdimSlug']}" in bad_targets:
+            reasons[source].append(f"target /grapher/{t['mdimSlug']} is itself a redirect source")
     return reasons
 
 
@@ -105,21 +145,24 @@ def main() -> int:
 
     mapping = load_mapping(args.mapping)
     redirects = mapping.get("redirects", [])
-    if not redirects:
+    # Redirects that already existed at proposal time: no redirect to create, but the source
+    # charts are still published (the extractor only selects published charts), so they still
+    # shadow their redirect and must be included in the unpublish step.
+    already_done = mapping.get("already_done", [])
+    if not redirects and not already_done:
         print("mapping.json has no proposed redirects — nothing to do.")
         return 0
 
     print(f"Target admin: {short_admin_host()}   mode: {'EXECUTE' if args.execute else 'AUDIT (dry-run)'}")
-    print(f"Proposed redirects: {len(redirects)}")
+    print(f"Proposed redirects: {len(redirects)}   already redirected at proposal time: {len(already_done)}")
     if args.execute:
         print(
             f"note: each created redirect triggers a static build ({len(redirects)} builds; the deploy queue coalesces)."
         )
 
-    sources = tuple(r["source"] for r in redirects)
-    slugs = tuple(r["chart"]["slug"] for r in redirects)
+    sources = tuple(r["source"] for r in redirects + already_done)
     existing = existing_mdim_redirects(sources)
-    chains = chain_conflicts(sources, slugs)
+    chains = chain_conflicts(redirects)
 
     rows = []
     to_create = []
@@ -137,6 +180,20 @@ def main() -> int:
         else:
             rows.append((source, t["url"], "CREATE", ""))
             to_create.append(r)
+
+    # Re-verify the proposal-time redirects still exist and still point at the proposed target.
+    still_done = []
+    for r in already_done:
+        source, t = r["source"], r["target"]
+        prior = existing.get(source)
+        if prior is not None and int(prior["multiDimId"]) == t["multiDimId"] and prior["viewConfigId"] == t["viewConfigId"]:  # fmt: skip
+            rows.append((source, t["url"], "EXISTS", "already redirected at proposal time — chart still needs unpublishing"))  # fmt: skip
+            still_done.append(r)
+        elif prior is not None:
+            rows.append((source, t["url"], "DIFFERS", f"already redirected to multiDimId={prior['multiDimId']} "
+                                                      f"viewConfigId={prior['viewConfigId']}"))  # fmt: skip
+        else:
+            rows.append((source, t["url"], "GONE", "redirect existed at proposal time but is now missing — re-run extract_and_match.py"))  # fmt: skip
 
     if args.execute and to_create:
         api = AdminAPI(OWID_ENV)
@@ -164,21 +221,23 @@ def main() -> int:
     for source, url, status, note in sorted(rows, key=lambda x: (x[2], x[0])):
         print(f"{source:<{width}} {status:<9} {note or '-> ' + url}")
 
-    bad = [r for r in rows if r[2] in ("DIFFERS", "CONFLICT", "ERROR", "CHAIN", "BAD_VIEW")]
+    bad = [r for r in rows if r[2] in ("DIFFERS", "CONFLICT", "ERROR", "CHAIN", "BAD_VIEW", "GONE")]
+    unpublish_failures = 0
 
     if args.execute:
         created_or_existing = [r for r in redirects if r.get("_created")] + [
             r for r in redirects if existing.get(r["source"]) is not None
             and int(existing[r["source"]]["multiDimId"]) == r["target"]["multiDimId"]
             and existing[r["source"]]["viewConfigId"] == r["target"]["viewConfigId"]
-        ]  # fmt: skip
+        ] + still_done  # fmt: skip
         if created_or_existing:
             print(
                 "\nSource charts now redirected — they should be UNPUBLISHED so the live page doesn't shadow the redirect:"
             )
             for r in created_or_existing:
                 print(
-                    f"  {r['chart']['id']:>6}  {r['chart']['slug']}  ({short_admin_host()}/admin/charts/{r['chart']['id']}/edit)"
+                    # short_admin_host() already ends in /admin (it only strips the /api suffix).
+                    f"  {r['chart']['id']:>6}  {r['chart']['slug']}  ({short_admin_host()}/charts/{r['chart']['id']}/edit)"
                 )
             if args.unpublish:
                 expected = f"unpublish {len(created_or_existing)} charts"
@@ -198,14 +257,17 @@ def main() -> int:
                         else:
                             print(f"  {chart_id} ({r['chart']['slug']}) already unpublished")
                     except Exception as e:  # noqa: BLE001 - keep going, report per-row
+                        unpublish_failures += 1
                         print(f"  ERROR unpublishing {chart_id} ({r['chart']['slug']}): {str(e)[:100]}")
+                if unpublish_failures:
+                    print(f"\n{unpublish_failures} chart(s) could NOT be unpublished — their live pages still shadow the redirects.")  # fmt: skip
             else:
                 print("(re-run with --unpublish to unpublish them, or do it in the admin)")
     elif not bad:
         print(f"\nDry-run clean: {sum(1 for r in rows if r[2] == 'CREATE')} redirect(s) would be created. "
               "Re-run with --execute once the user has approved.")  # fmt: skip
 
-    return 1 if bad else 0
+    return 1 if bad or unpublish_failures else 0
 
 
 if __name__ == "__main__":

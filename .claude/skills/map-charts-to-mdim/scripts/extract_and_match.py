@@ -571,6 +571,7 @@ def redirect_json(c: dict) -> dict:
             "mdimSlug": t["mdim_slug"],
             "viewId": t["view_id"],
             "viewConfigId": t["view_config_id"],
+            "dimensions": t["dims"],
             "queryStr": t["query_str"],
             "url": t["url"],
         },
@@ -579,6 +580,23 @@ def redirect_json(c: dict) -> dict:
     if c["shared_with"]:
         entry["sharedTargetChartIds"] = [int(i) for i in c["shared_with"].split(",")]
     return entry
+
+
+def write_payloads(out: Path, charts: list[dict]) -> int:
+    """One JSON per source chart under <out>/payloads/ — the copy-paste handoff unit.
+
+    Mirrors the explorer→MDIM redirect deliverable convention: each payload file
+    describes exactly ONE source page and its redirect. The combined mapping.json
+    stays the machine record for apply_redirects.py.
+    """
+    payload_dir = out / "payloads"
+    payload_dir.mkdir(exist_ok=True)
+    for stale in payload_dir.glob("*.json"):
+        stale.unlink()
+    proposed = [c for c in charts if c["target"] is not None and not c["conflict"] and not c["already_done"]]
+    for c in proposed:
+        (payload_dir / f"{c['chart_slug']}.json").write_text(json.dumps(redirect_json(c), indent=2) + "\n")
+    return len(proposed)
 
 
 def write_mapping_json(out: Path, charts: list[dict], mdims: list[dict], selection: dict) -> dict:
@@ -726,6 +744,7 @@ def main():
     write_views_csv(out, views)
     write_proposal_csv(out, charts, id_to_path, host)
     stats = write_mapping_json(out, charts, mdims, selection)
+    n_payloads = write_payloads(out, charts)
     write_unmatched_md(out, charts, id_to_path, host)
     (out / "_sources.json").write_text(json.dumps({
         "selection": selection,
