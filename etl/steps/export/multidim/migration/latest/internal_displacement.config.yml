@@ -21,6 +21,19 @@ definitions:
         tab: map
         chartTypes: ["LineChart"]
 
+  description_key_stock: This chart shows the total number of internally displaced people living in a region at the end of the year.
+  description_key_flow: This chart shows the total number of internal displacements that occurred during the year. A displacement occurs every time a person is forced to leave their home but remains within their country's borders.
+  description_key_flow_addendum: One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+  description_key_conflict: Internal displacements triggered by conflict and violence include international armed conflict, non-international armed conflict, communal violence, crime-related violence, civilian-state violence and other forms of violence.
+  description_key_disaster: |-
+    Natural disasters in this context include, for example, hazards such as floods, droughts, landslides, storms – including cyclones and other storms –, wildfires and extreme temperatures as well as earthquakes, volcanic eruptions and landslides.
+  description_key_idmc_criteria: A displaced person is included in this statistic if their displacement was forced/ involuntary, they have left their habitual residence and they have not crossed an international border.
+  description_key_idmc_rounded: IDMC provides rounded numbers to reflect the inherent uncertainty in displacement data. Figures equal or lower than 100,000 are rounded to two significant digits while figures above 100,000 are rounded to the nearest thousand.
+
+  footnote_zero_idps: A value of 0 means that IDMC is not aware of any internally displaced people (IDPs) in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no IDPs.
+  footnote_zero_displacements: A value of 0 means that IDMC is not aware of any internal displacements in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no displacements.
+  footnote_return_calendar_year: The UNHCR only includes IDPs who returned during this calendar year in their statistics.
+
 dimensions:
   - slug: cause
     name: Cause
@@ -52,7 +65,7 @@ dimensions:
       - slug: total
         name: Total number
       - slug: per_capita
-        name: Per 1,000 people
+        name: Per capita
     presentation:
       type: radio
 
@@ -66,12 +79,18 @@ views:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded
     config:
+      note: "{definitions.footnote_zero_idps}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
           minValue: 1640
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   - dimensions:
       cause: total
@@ -81,11 +100,17 @@ views:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded_per_thousand
     config:
+      note: "{definitions.footnote_zero_idps}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100, 200]
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100, 200, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   - dimensions:
       cause: total
@@ -95,11 +120,18 @@ views:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded
     config:
+      note: "{definitions.footnote_zero_displacements}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 30000, 100000, 300000, 1000000, 3000000]
+          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   - dimensions:
       cause: total
@@ -109,11 +141,18 @@ views:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded_per_thousand
     config:
+      note: "{definitions.footnote_zero_displacements}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
           customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   # Conflict and violence
   - dimensions:
@@ -124,12 +163,19 @@ views:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded
     config:
+      note: "{definitions.footnote_zero_idps}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000, 0]
           minValue: 1640
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_conflict}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   - dimensions:
       cause: conflict
@@ -139,11 +185,18 @@ views:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded_per_thousand
     config:
+      note: "{definitions.footnote_zero_idps}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100, 200]
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100, 200, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_conflict}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   - dimensions:
       cause: conflict
@@ -153,12 +206,20 @@ views:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded
     config:
+      note: "{definitions.footnote_zero_displacements}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
           customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
           minValue: 230
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_conflict}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   - dimensions:
       cause: conflict
@@ -168,11 +229,19 @@ views:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded_per_thousand
     config:
+      note: "{definitions.footnote_zero_displacements}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
           customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_conflict}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   # Disasters
   - dimensions:
@@ -183,12 +252,19 @@ views:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded
     config:
+      note: "{definitions.footnote_zero_idps}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 0]
           minValue: 1640
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_disaster}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   - dimensions:
       cause: disaster
@@ -198,11 +274,18 @@ views:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded_per_thousand
     config:
+      note: "{definitions.footnote_zero_idps}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
           customNumericValues: [0, 1, 2, 5, 10, 20, 50]
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_disaster}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   - dimensions:
       cause: disaster
@@ -212,12 +295,20 @@ views:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded
     config:
+      note: "{definitions.footnote_zero_displacements}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
+          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 0]
           minValue: 230
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_disaster}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   - dimensions:
       cause: disaster
@@ -227,11 +318,19 @@ views:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded_per_thousand
     config:
+      note: "{definitions.footnote_zero_displacements}"
       map:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
           customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_disaster}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_key_idmc_rounded}"
 
   # Returned IDPs (UNHCR; only reported as an annual flow)
   - dimensions:
@@ -242,11 +341,12 @@ views:
       y:
         - catalogPath: refugee_data_origin#returned_idps
     config:
+      note: "{definitions.footnote_return_calendar_year}"
       map:
         colorScale:
           baseColorScheme: BuGn
           binningStrategy: manual
-          customNumericValues: [0, 1000, 10000, 100000, 1000000, 10000000]
+          customNumericValues: [0, 1000, 10000, 100000, 1000000, 0]
 
   - dimensions:
       cause: total
@@ -256,8 +356,9 @@ views:
       y:
         - catalogPath: refugee_data_origin#returned_idps_per_100k
     config:
+      note: "{definitions.footnote_return_calendar_year}"
       map:
         colorScale:
           baseColorScheme: BuGn
           binningStrategy: manual
-          customNumericValues: [0, 0.5, 1, 2, 5, 10, 20, 50, 100]
+          customNumericValues: [0, 30, 100, 300, 1000, 3000, 0]
