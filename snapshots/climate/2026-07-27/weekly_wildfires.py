@@ -20,7 +20,7 @@ from owid.datautils.io import df_to_file
 from structlog import get_logger
 from tqdm import tqdm
 
-from etl.paths import LATEST_REGIONS_DATASET_PATH
+from etl.paths import LATEST_REGIONS_DATASET_PATH, SNAPSHOTS_DIR
 from etl.snapshot import Snapshot
 
 # Initialize logger.
@@ -29,6 +29,9 @@ log = get_logger()
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
+
+# Short name of this snapshot, used to locate its previous version.
+SHORT_NAME = Path(__file__).stem
 
 # Get the current year
 CURRENT_YEAR = datetime.now().year
@@ -245,17 +248,41 @@ def fetch_emissions(country: str, year: int) -> pd.DataFrame | None:
     return pd.concat([df, df_cum])
 
 
+def read_previous_snapshot() -> pd.DataFrame | None:
+    """Read the latest snapshot data that predates this fetch, to compare the new fetch against.
+
+    Each update creates a new version folder, so on an update the previous data lives under the most
+    recent earlier version. Once that predecessor is archived, this version is the only one left, and
+    a rerun compares against the data already stored for this version instead.
+    Returns None only when neither exists, i.e. the very first run of a brand new snapshot.
+    """
+    previous_versions = sorted(
+        path.parent.name
+        for path in (SNAPSHOTS_DIR / "climate").glob(f"*/{SHORT_NAME}.csv.dvc")
+        if path.parent.name < SNAPSHOT_VERSION
+    )
+    if previous_versions:
+        previous_snapshot = Snapshot(f"climate/{previous_versions[-1]}/{SHORT_NAME}.csv")
+    else:
+        previous_snapshot = Snapshot(f"climate/{SNAPSHOT_VERSION}/{SHORT_NAME}.csv")
+        if previous_snapshot.metadata.outs is None:
+            log.warning(f"No earlier data found for {SHORT_NAME}; skipping comparison with previous snapshot.")
+            return None
+
+    # Download the previous data file if it is not already available locally.
+    previous_snapshot.pull(force=False)
+
+    return previous_snapshot.read()
+
+
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Initialize a new snapshot object for storing data, using a predefined file path structure.
     snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/weekly_wildfires.csv")
 
-    # Load existing snapshot for comparison at the end of the script.
-    try:
-        orig_snapshot_df = snap.read()
-    except FileNotFoundError:
-        orig_snapshot_df = None
+    # Load the previous snapshot for comparison at the end of the script.
+    orig_snapshot_df = read_previous_snapshot()
 
     # All (country, year) pairs to fetch, in a deterministic order.
     pairs = [(country, year) for year in YEARS for country in COUNTRIES]
@@ -300,7 +327,7 @@ def main(upload: bool) -> None:
 
     if orig_snapshot_df is not None and len(df_final) < len(orig_snapshot_df):
         raise ValueError(
-            f"New snapshot has fewer rows ({len(df_final)}) than the original snapshot {len(orig_snapshot_df)}. API could be down or data is missing."
+            f"New snapshot has fewer rows ({len(df_final)}) than the previous snapshot ({len(orig_snapshot_df)}). API could be down or data is missing."
         )
 
     # Save the final DataFrame to the specified file path in the snapshot.
@@ -318,7 +345,3 @@ def modify_metadata(snap: Snapshot) -> Snapshot:
     snap.metadata.origin.date_accessed = dt.date.today()  # ty: ignore
     snap.metadata.save()
     return snap
-
-
-if __name__ == "__main__":
-    main()

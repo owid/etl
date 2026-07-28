@@ -74,6 +74,7 @@ steps:
         - snapshot://lis/2026-06-12/lis_inequality.csv
         - snapshot://lis/2026-06-12/lis_incomes.csv
         - snapshot://lis/2026-06-12/lis_relative_poverty.csv
+        - snapshot://lis/2026-06-12/lis_percentiles.csv
   export://explorers/lis/latest/poverty_lis:
     - data://grapher/lis/2026-06-12/luxembourg_income_study
   export://explorers/lis/latest/inequality_lis:
