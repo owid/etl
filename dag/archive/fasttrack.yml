@@ -248,3 +248,6 @@ steps:
   # archived; last active in 0719d58958ef on 2025-04-11
   data://grapher/fasttrack/2025-04-10/guinea_worm:
     - snapshot://fasttrack/2025-04-10/guinea_worm.csv
+  # archived; last active in c9329f6c921f on 2026-07-28
+  data-private://grapher/fasttrack/latest/uk_wealth_share_top1:
+    - snapshot-private://fasttrack/latest/uk_wealth_share_top1.csv
