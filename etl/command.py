@@ -9,6 +9,7 @@ import re
 import resource
 import sys
 import time
+import traceback
 from collections.abc import Callable, Iterator, MutableMapping
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from contextlib import contextmanager
@@ -607,6 +608,9 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
                     exceptions.append(e)
                     skipped_steps.append(step)
                     click.echo(click.style(f"--- FAILED {step}", fg="red"))
+                    # Only the first exception gets raised at the end of the run, so report this
+                    # one now or it is lost.
+                    _print_step_failure(e)
                     continue
                 else:
                     raise e
@@ -619,8 +623,9 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
         _write_execution_times(execution_times)
 
     if continue_on_failure and exceptions:
-        for step, exception in zip(failing_steps, exceptions):
-            log.error("step_exception", step=str(step), exception=str(exception))
+        # Tracebacks were printed as each step failed; recap the step names, since by now they are
+        # thousands of lines up in the log.
+        log.error("steps_failed", steps=sorted(str(step) for step in failing_steps))
         # Raise the first exception
         raise exceptions[0]
 
@@ -753,7 +758,18 @@ def exec_graph_parallel(
                     try:
                         future.result()
                         topological_sorter.done(task)
-                    except Exception as e:
+                    except KeyboardInterrupt:
+                        raise
+                    # Catch BaseException, not Exception: a step that somehow raises SystemExit would
+                    # otherwise end the run without ever naming the step or printing its traceback.
+                    except BaseException as e:
+                        # Report the failure right away. Re-raising is not enough: the pool only
+                        # exits once every already-submitted step has finished, which on a full
+                        # build is hours after the failure, and in CONTINUE_ON_FAILURE mode all but
+                        # the first exception are never raised at all.
+                        print(f"--- Failed {task} - {click.style('FAILED', fg='red')}")
+                        _print_step_failure(e)
+
                         if continue_on_failure:
                             failed_tasks.add(task)
                             skipped_tasks.add(
@@ -761,14 +777,14 @@ def exec_graph_parallel(
                             )  # Failed tasks should also be considered skipped for dependency checking
                             exceptions.append(e)
                             topological_sorter.done(task)  # Mark as done so execution can continue
-                            print(f"--- Failed {task} - {click.style('FAILED', fg='red')}")
                         else:
                             raise e
 
         # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
         if continue_on_failure and exceptions:
-            for exception in exceptions:
-                log.error("step_exception", exception=str(exception))
+            # Tracebacks were printed as each step failed; recap the step names, since by now they
+            # are thousands of lines up in the log.
+            log.error("steps_failed", steps=sorted(failed_tasks))
             raise exceptions[0]
 
 
@@ -785,6 +801,22 @@ def _create_expected_time_message(
         return ""
     else:
         return prepend_message + partial_message + append_message
+
+
+def _print_step_failure(e: BaseException) -> None:
+    """Print what a failed step's exception says, on stderr, right when the failure happens."""
+    from etl.steps import StepFailedError
+
+    if isinstance(e, StepFailedError):
+        # The step ran in a child process, which handed its traceback back through the exception.
+        # Printing the exception itself would only add executor plumbing (_RemoteTraceback,
+        # future.result frames).
+        if e.child_traceback:
+            print(e.child_traceback, file=sys.stderr)
+        print(e, file=sys.stderr)
+    else:
+        traceback.print_exception(type(e), e, e.__traceback__)
+    sys.stderr.flush()
 
 
 def _exec_step_job(
