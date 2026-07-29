@@ -49,11 +49,25 @@ def run() -> None:
     ds_md = paths.load_dataset("maddison_database")
     tb_md = ds_md.read("maddison_database")
 
+    sanity_check_inputs(tb_wdi, tb_mpd, tb_md)
+
+    # The set of years the splice must preserve, computed from the inputs the same way the
+    # processing selects them: Maddison Database up to 1820, Maddison Project Database up to 1990,
+    # WDI (non-null World rows) after 1990.
+    wdi_world = tb_wdi[tb_wdi["country"] == "World"].dropna(subset=["ny_gdp_mktp_pp_kd", "ny_gdp_pcap_pp_kd"])
+    expected_years = (
+        set(tb_md.loc[tb_md["year"] <= YEAR_MPD_MD, "year"])
+        | set(tb_mpd.loc[(tb_mpd["country"] == "World") & (tb_mpd["year"] <= YEAR_WDI_MPD), "year"])
+        | set(wdi_world.loc[wdi_world["year"] > YEAR_WDI_MPD, "year"])
+    )
+
     #
     # Process data.
     tb = process_and_combine_datasets(tb_wdi, tb_mpd, tb_md)
 
     tb = tb.format(short_name=paths.short_name)
+
+    sanity_check_outputs(tb, expected_years)
 
     #
     # Save outputs.
@@ -184,3 +198,75 @@ def create_estimations_from_growth(
     tb = tb[["country", "year"] + var_list]
 
     return tb
+
+
+def sanity_check_inputs(tb_wdi: Table, tb_mpd: Table, tb_md: Table) -> None:
+    """
+    Assert the assumptions the splice makes about its inputs: the required series exist, the World
+    entity is present, and each pair of sources overlaps (with positive values) at its reference year.
+    """
+    # WDI: required series and a usable World row at the WDI/MPD reference year.
+    for col in ["ny_gdp_mktp_pp_kd", "ny_gdp_pcap_pp_kd"]:
+        assert col in tb_wdi.columns, f"WDI is missing the required series {col}."
+    wdi_ref = tb_wdi[(tb_wdi["country"] == "World") & (tb_wdi["year"] == YEAR_WDI_MPD)]
+    assert len(wdi_ref) == 1, f"WDI must have exactly one World row for {YEAR_WDI_MPD}."
+    assert (wdi_ref[["ny_gdp_mktp_pp_kd", "ny_gdp_pcap_pp_kd"]] > 0).all().all(), (
+        f"WDI World GDP and GDP per capita must be present and positive in {YEAR_WDI_MPD} — "
+        "without them the MPD growth cannot be spliced onto WDI."
+    )
+
+    # MPD: World rows at both reference years, with positive values.
+    for year in [YEAR_WDI_MPD, YEAR_MPD_MD]:
+        mpd_ref = tb_mpd[(tb_mpd["country"] == "World") & (tb_mpd["year"] == year)]
+        assert len(mpd_ref) == 1, f"Maddison Project Database must have exactly one World row for {year}."
+        assert (mpd_ref[["gdp", "gdp_per_capita"]] > 0).all().all(), (
+            f"Maddison Project Database World GDP and GDP per capita must be present and positive in {year}."
+        )
+
+    # MD: a row at the MPD/MD reference year, with positive values (the table is World-only).
+    md_ref = tb_md[tb_md["year"] == YEAR_MPD_MD]
+    assert len(md_ref) == 1, f"Maddison Database must have exactly one row for {YEAR_MPD_MD}."
+    assert (md_ref[["gdp", "gdp_per_capita"]] > 0).all().all(), (
+        f"Maddison Database GDP and GDP per capita must be present and positive in {YEAR_MPD_MD}."
+    )
+
+
+def sanity_check_outputs(tb: Table, expected_years: set) -> None:
+    """
+    Assert the spliced output is complete and plausible: no year from any source window was silently
+    dropped, no nulls, magnitudes in the right ballpark (a scale change upstream would land far
+    outside these windows), and the pre-1990 rounding rule actually applied.
+    """
+    tb = tb.reset_index()
+
+    # No silent drops: every year each source contributes must be in the output.
+    missing_years = expected_years - set(tb["year"])
+    assert not missing_years, (
+        f"Years present in the inputs are missing from the spliced output: {sorted(missing_years)}"
+    )
+
+    # No nulls and only the World entity.
+    assert set(tb["country"]) == {"World"}, "Output must contain only the World entity."
+    assert tb[["gdp", "gdp_per_capita"]].notna().all().all(), "Output has null GDP or GDP per capita values."
+
+    # Plausible magnitudes in 2021 international-$ — an upstream scale change (e.g. WDI switching
+    # units) would land orders of magnitude outside these windows.
+    assert tb["gdp"].between(1e11, 1e15).all(), "World GDP outside the plausible window (1e11–1e15 int-$)."
+    assert tb["gdp_per_capita"].between(400, 40_000).all(), (
+        "World GDP per capita outside the plausible window (400–40,000 int-$)."
+    )
+    # Implied world population must be plausible for every year (also catches the two series
+    # getting out of step with each other at a splice point).
+    implied_population = tb["gdp"] / tb["gdp_per_capita"]
+    assert implied_population.between(1e8, 1.2e10).all(), (
+        "GDP / GDP per capita implies an implausible world population — the two series are out of step."
+    )
+
+    # The pre-1990 rounding rule (uncertainty of old estimations) must have applied.
+    pre_reference = tb[tb["year"] < YEAR_WDI_MPD]
+    assert (pre_reference["gdp"] % 10**ACCURACY_GDP == 0).all(), (
+        f"Pre-{YEAR_WDI_MPD} GDP values are not rounded to 10^{ACCURACY_GDP}."
+    )
+    assert (pre_reference["gdp_per_capita"] % 10**ACCURACY_GDP_PER_CAPITA == 0).all(), (
+        f"Pre-{YEAR_WDI_MPD} GDP per capita values are not rounded to 10^{ACCURACY_GDP_PER_CAPITA}."
+    )
