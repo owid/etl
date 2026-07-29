@@ -6,7 +6,6 @@ branch (https://github.com/owid/etl/issues/6552).
 
 from pathlib import Path
 
-import click
 import pytest
 from git import Repo
 
@@ -82,10 +81,25 @@ def test_branch_out_no_update_base_keeps_stale_start_point(stale_local):
     assert stale_local.head.commit == stale_tip
 
 
-def test_branch_out_fails_on_diverged_base(stale_local):
-    _commit_file(stale_local, "local.txt", "3", "local-only commit")
-    with pytest.raises(click.ClickException, match="diverged"):
-        branch_out(stale_local, "master", "work-branch")
+def test_branch_out_diverged_base_starts_from_remote_and_keeps_local_untouched(stale_local):
+    local_tip = _commit_file(stale_local, "local.txt", "3", "local-only commit")
+    remote_tip = stale_local.commit("origin/master")
+    branch_out(stale_local, "master", "work-branch")
+    # The work branch starts at the remote tip; the diverged local base branch is left untouched.
+    assert stale_local.head.commit == remote_tip
+    assert stale_local.commit("master") == local_tip
+
+
+def test_branch_out_carries_uncommitted_changes(stale_local):
+    # Typical workflow: start editing while on a stale 'master', then wrap the work in a PR branch.
+    dirty_file = Path(stale_local.working_tree_dir) / "a.txt"  # ty: ignore
+    dirty_file.write_text("uncommitted edit")
+    remote_tip = stale_local.commit("origin/master")
+    branch_out(stale_local, "master", "work-branch")
+    assert stale_local.head.commit == remote_tip
+    assert dirty_file.read_text() == "uncommitted edit"
+    # The local base branch was still fast-forwarded (only its ref moves, never the working tree).
+    assert stale_local.commit("master") == remote_tip
 
 
 def test_branch_out_worktree_starts_from_remote(stale_local, tmp_path):

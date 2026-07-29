@@ -12,7 +12,7 @@ Arguments:
 
 **Main use case**: Branch out from `master` to a temporary `work_branch`, and create a PR to merge `work_branch` -> `master`. You will be asked to choose a category. The value of `work_branch` will be auto-generated based on the title and the category.
 
-The work branch is always created from the latest `origin/<base_branch>`, never from your (possibly stale) local base branch, so unpushed commits sitting on the local base branch are not included. When branching in place, the local base branch is also fast-forwarded to its remote counterpart along the way (the command fails if the two have diverged). Pass `--no-update-base` to branch off your local base branch as-is instead.
+The work branch is always created from the latest `origin/<base_branch>`, never from your (possibly stale) local base branch, so unpushed commits sitting on the local base branch are not included. When branching in place, the local base branch is also fast-forwarded to its remote counterpart when possible (when it carries unpushed or diverged commits, it is left untouched and a warning is logged). Pass `--no-update-base` to branch off your local base branch as-is instead.
 
 ```shell
 # Without specifying a category (you will be prompted for a category)
@@ -203,7 +203,7 @@ MODEL_DEFAULT = "gpt-5-mini"
     "--no-update-base",
     "no_update_base",
     is_flag=True,
-    help="Branch off your local base branch as-is, even if it is behind its remote counterpart. By default, the work branch is created from the latest 'origin/<base-branch>'.",
+    help="Branch off your local base branch as-is, even if it is behind its remote counterpart. By default, the work branch is created from the latest 'origin/<base_branch>'.",
 )
 def cli(
     title: str,
@@ -408,39 +408,52 @@ def check_branches_valid(base_branch, work_branch, remote_branches):
 
 def branch_out(repo, base_branch, work_branch, update_base: bool = True):
     """Branch out from base_branch and create branch 'work_branch'."""
-    try:
-        log.info(
-            f"Switching to base branch '{base_branch}', creating new branch '{work_branch}' from there, and switching to it."
-        )
-        repo.git.checkout(base_branch)
-        if update_base:
-            # Fast-forward the local base branch to its remote counterpart (already fetched by
-            # init_repo), so the work branch doesn't start from a stale base. A stale start point
-            # pollutes `etl diff` with every dataset that changed on the base branch since.
-            log.info(f"Fast-forwarding '{base_branch}' to 'origin/{base_branch}'.")
-            try:
-                repo.git.merge("--ff-only", f"origin/{base_branch}")
-            except GitCommandError as e:
-                raise click.ClickException(
-                    f"Local branch '{base_branch}' has diverged from 'origin/{base_branch}', so it cannot be fast-forwarded. "
-                    f"Reconcile them first (e.g. 'git rebase origin/{base_branch}'), or re-run with --no-update-base "
-                    f"to branch off your local '{base_branch}' as-is.\n{e}"
-                )
-            # The local base branch may still be ahead of the remote (unpushed commits); the
-            # fast-forward above is a no-op then. The work branch must start exactly at the
-            # remote tip, so those commits don't silently end up in the PR.
-            if repo.commit(base_branch) != repo.commit(f"origin/{base_branch}"):
-                log.warning(
-                    f"Local '{base_branch}' has commits not pushed to 'origin/{base_branch}'; they will NOT be "
-                    f"included in '{work_branch}'. Re-run with --no-update-base to include them."
-                )
-            # --no-track: without it, git would set 'origin/<base_branch>' as the new branch's
-            # upstream, which breaks a plain `git push` on the work branch later.
-            repo.git.checkout("--no-track", "-b", work_branch, f"origin/{base_branch}")
-        else:
+    if not update_base:
+        try:
+            log.info(
+                f"Switching to base branch '{base_branch}', creating new branch '{work_branch}' from there, and switching to it."
+            )
+            repo.git.checkout(base_branch)
             repo.git.checkout("-b", work_branch)
+        except GitCommandError as e:
+            raise click.ClickException(f"Failed to create a new branch from '{base_branch}':\n{e}")
+        return
+
+    # Create the work branch directly from the remote's latest base branch (already fetched by
+    # init_repo), never from the possibly stale local one: a stale start point pollutes `etl diff`
+    # with every dataset that changed on the base branch since, and raises "not in the DAG" errors
+    # for steps that already exist. Uncommitted changes carry over, as with any plain checkout.
+    # --no-track: without it, git would set 'origin/<base_branch>' as the new branch's upstream,
+    # which breaks a plain `git push` on the work branch later.
+    try:
+        log.info(f"Creating new branch '{work_branch}' from 'origin/{base_branch}', and switching to it.")
+        repo.git.checkout("--no-track", "-b", work_branch, f"origin/{base_branch}")
     except GitCommandError as e:
-        raise click.ClickException(f"Failed to create a new branch from '{base_branch}':\n{e}")
+        raise click.ClickException(f"Failed to create a new branch from 'origin/{base_branch}':\n{e}")
+
+    # Keep the local base branch from going stale: fast-forward it to the remote when possible.
+    # The work branch is already checked out, so this moves only the ref; it can never touch the
+    # working tree, and never blocks the PR.
+    if base_branch not in {head.name for head in repo.heads}:
+        return
+    local_commit = repo.commit(base_branch)
+    remote_commit = repo.commit(f"origin/{base_branch}")
+    if local_commit == remote_commit:
+        return
+    if repo.is_ancestor(local_commit, remote_commit):
+        try:
+            repo.git.branch("-f", base_branch, f"origin/{base_branch}")
+            log.info(f"Fast-forwarded local '{base_branch}' to 'origin/{base_branch}'.")
+        except GitCommandError as e:
+            # E.g. the base branch is checked out in another worktree.
+            log.warning(f"Could not fast-forward local '{base_branch}' to 'origin/{base_branch}':\n{e}")
+    else:
+        # The local base branch is ahead of the remote or has diverged from it.
+        log.warning(
+            f"Local '{base_branch}' has commits not pushed to 'origin/{base_branch}'; they are NOT included in "
+            f"'{work_branch}', and local '{base_branch}' is left untouched. Re-run with --no-update-base to "
+            f"branch off your local '{base_branch}' as-is."
+        )
 
 
 def resolve_worktree_path(work_branch: str, override: str | None) -> Path:
