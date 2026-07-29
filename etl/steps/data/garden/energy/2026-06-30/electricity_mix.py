@@ -296,6 +296,47 @@ def add_bioenergy_split_helper_columns(combined: Table) -> Table:
     return combined
 
 
+# Generation variables (TWh) that become per-capita (kWh/person) and share-of-electricity (%) columns.
+# Defined at module level so the monthly table builder reuses the exact same lists as the annual data.
+PER_CAPITA_VARIABLES = [
+    "bioenergy_generation__twh",
+    "coal_generation__twh",
+    "fossil_generation__twh",
+    "gas_generation__twh",
+    "hydro_generation__twh",
+    "low_carbon_generation__twh",
+    "nuclear_generation__twh",
+    "oil_generation__twh",
+    "other_renewables_excluding_bioenergy_generation__twh",
+    "other_renewables_including_bioenergy_generation__twh",
+    "other_renewables_generation__twh",
+    "bioenergy_stacked_generation__twh",
+    "renewable_generation__twh",
+    "solar_generation__twh",
+    "total_generation__twh",
+    "total_demand__twh",
+    "wind_generation__twh",
+    "solar_and_wind_generation__twh",
+]
+SHARE_VARIABLES = [
+    "bioenergy_generation__twh",
+    "coal_generation__twh",
+    "fossil_generation__twh",
+    "gas_generation__twh",
+    "hydro_generation__twh",
+    "low_carbon_generation__twh",
+    "nuclear_generation__twh",
+    "oil_generation__twh",
+    "other_renewables_excluding_bioenergy_generation__twh",
+    "other_renewables_including_bioenergy_generation__twh",
+    "renewable_generation__twh",
+    "solar_generation__twh",
+    "total_generation__twh",
+    "wind_generation__twh",
+    "solar_and_wind_generation__twh",
+]
+
+
 def add_per_capita_variables(combined: Table) -> Table:
     """Add per capita variables (in kWh per person) to the combined EI and Ember table.
 
@@ -317,27 +358,8 @@ def add_per_capita_variables(combined: Table) -> Table:
     """
     combined = combined.copy()
 
-    # Variables to make per capita.
-    per_capita_variables = [
-        "bioenergy_generation__twh",
-        "coal_generation__twh",
-        "fossil_generation__twh",
-        "gas_generation__twh",
-        "hydro_generation__twh",
-        "low_carbon_generation__twh",
-        "nuclear_generation__twh",
-        "oil_generation__twh",
-        "other_renewables_excluding_bioenergy_generation__twh",
-        "other_renewables_including_bioenergy_generation__twh",
-        "other_renewables_generation__twh",
-        "bioenergy_stacked_generation__twh",
-        "renewable_generation__twh",
-        "solar_generation__twh",
-        "total_generation__twh",
-        "total_demand__twh",
-        "wind_generation__twh",
-        "solar_and_wind_generation__twh",
-    ]
+    # Variables to make per capita (shared with the monthly builder; see PER_CAPITA_VARIABLES above).
+    per_capita_variables = PER_CAPITA_VARIABLES
     # Add a column for population (only for harmonized countries).
     combined = paths.regions.add_population(tb=combined, warn_on_missing_countries=False)
 
@@ -370,24 +392,8 @@ def add_share_variables(combined: Table) -> Table:
 
     """
     # Variables to make as share of electricity (new variable names will be the name of the original variable followed
-    # by '_share_of_electricity__pct').
-    share_variables = [
-        "bioenergy_generation__twh",
-        "coal_generation__twh",
-        "fossil_generation__twh",
-        "gas_generation__twh",
-        "hydro_generation__twh",
-        "low_carbon_generation__twh",
-        "nuclear_generation__twh",
-        "oil_generation__twh",
-        "other_renewables_excluding_bioenergy_generation__twh",
-        "other_renewables_including_bioenergy_generation__twh",
-        "renewable_generation__twh",
-        "solar_generation__twh",
-        "total_generation__twh",
-        "wind_generation__twh",
-        "solar_and_wind_generation__twh",
-    ]
+    # by '_share_of_electricity__pct'). Shared with the monthly builder; see SHARE_VARIABLES above.
+    share_variables = SHARE_VARIABLES
     for variable in share_variables:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
         combined[new_column] = 100 * combined[variable] / combined["total_generation__twh"]
@@ -734,6 +740,54 @@ def add_uk_historical_electricity(combined: Table, tb_beis: Table) -> Table:
     return combined
 
 
+def add_per_capita_variables_monthly(tb: Table) -> Table:
+    """Per-capita (kWh per person) variables for the monthly table.
+
+    Population is annual, so each month uses its calendar-year population.
+    """
+    tb = tb.copy()
+    tb["year"] = tb["date"].dt.year
+    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
+    for variable in PER_CAPITA_VARIABLES:
+        new_column = "per_capita_" + variable.replace("__twh", "__kwh")
+        tb[new_column] = tb[variable] * TWH_TO_KWH / tb["population"]
+    tb = tb.drop(columns=["year", "population"], errors="raise")
+    return tb
+
+
+def add_share_variables_monthly(tb: Table) -> Table:
+    """Share-of-electricity (%) and net-imports-share variables for the monthly table.
+
+    Skips the share of electricity in primary energy, which is an annual, Statistical-Review-only metric.
+    """
+    for variable in SHARE_VARIABLES:
+        new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
+        tb[new_column] = 100 * tb[variable] / tb["total_generation__twh"]
+    tb["net_imports_share_of_demand__pct"] = 100 * tb["total_net_imports__twh"] / tb["total_demand__twh"]
+    error = "Total electricity share does not add up to 100%."
+    assert all(abs(tb["total_share_of_electricity__pct"].dropna() - 100) < 0.01), error
+    tb = tb.drop(columns=["total_share_of_electricity__pct"], errors="raise")
+    return tb
+
+
+def build_monthly_electricity_mix() -> Table:
+    """Build the Ember-only monthly electricity mix table, parallel to the annual combined table.
+
+    Reuses the same Ember processing as the annual data (rename, aggregates, the bioenergy /
+    other-renewables split and gap-filled helpers), but without combining other sources (the monthly
+    data is Ember-only) and indexed by date instead of year.
+    """
+    ds_ember_monthly = paths.load_dataset("monthly_electricity")
+    tb = ds_ember_monthly.read("monthly_electricity", reset_index=False)
+    tb = process_ember_data(tb_ember=tb)
+    tb = derive_other_renewables_excluding_bioenergy(combined=tb)
+    tb = add_bioenergy_split_helper_columns(combined=tb)
+    tb = add_per_capita_variables_monthly(tb=tb)
+    tb = add_share_variables_monthly(tb=tb)
+    tb = tb.format(keys=["country", "date"], sort_columns=True, short_name="electricity_mix_monthly")
+    return tb
+
+
 def run() -> None:
     #
     # Load data.
@@ -843,9 +897,12 @@ def run() -> None:
     # Format table conveniently.
     combined = combined.format(sort_columns=True, short_name=paths.short_name)
 
+    # Build the Ember-only monthly table (a parallel frequency; the annual data above is untouched).
+    tb_monthly = build_monthly_electricity_mix()
+
     #
     # Save outputs.
     #
-    # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[combined])
+    # Create a new garden dataset with both the annual and the monthly tables.
+    ds_garden = paths.create_dataset(tables=[combined, tb_monthly])
     ds_garden.save()

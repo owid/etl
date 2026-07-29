@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: Ember
+    title: Monthly Electricity Data
+    description: |-
+      This dataset contains monthly electricity generation, emissions and demand data for 88 geographies representing more than 90% of global power demand.
+
+      You can find more about Ember's methodology in [this document](https://files.ember-energy.org/public-downloads/ember_electricity_data_methodology.pdf).
+    citation_full: |-
+      Ember - Monthly Electricity Data (2026).
+
+      The data is collected from multi-country datasets (EIA, Eurostat, Energy Institute) as well as national sources (e.g China data from the National Bureau of Statistics).
+    attribution_short: Ember
+    url_main: https://ember-energy.org/data/monthly-electricity-data/
+    url_download: https://files.ember-energy.org/public-downloads/generation/outputs/release_generation_monthly_global.csv
+    date_accessed: '2026-07-28'
+    date_published: '2026-07-28'
+    license:
+      name: CC BY 4.0
+      url: https://ember-energy.org/creative-commons/
+outs:
+  - md5: 1aabb14f48b0134575c5783ac45002a9
+    size: 26897508
+    path: monthly_electricity.csv

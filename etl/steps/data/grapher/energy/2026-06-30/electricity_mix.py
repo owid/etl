@@ -1,5 +1,7 @@
 """Grapher step for the Electricity Mix (Energy Institute & Ember) dataset."""
 
+from copy import deepcopy
+
 from etl.grapher.helpers import add_columns_for_multiindicator_chart
 from etl.helpers import PathFinder
 
@@ -105,8 +107,19 @@ def run() -> None:
         columns_to_fill_with_zeros=[],
     )
 
+    # Also expose the Ember-only monthly table (date-indexed) as a second table in this dataset.
+    # Its indicators are the same as the annual table's, so reuse their metadata (titles, units, display),
+    # but keep the monthly table's own Ember-only origins and drop the annual combined-sources processing note.
+    tb_monthly = ds_garden.read("electricity_mix_monthly", reset_index=False)
+    for column in tb_monthly.columns:
+        if column in tb_garden.columns:
+            monthly_origins = tb_monthly[column].metadata.origins
+            tb_monthly[column].metadata = deepcopy(tb_garden[column].metadata)
+            tb_monthly[column].metadata.origins = monthly_origins
+            tb_monthly[column].metadata.description_processing = None
+
     #
     # Save outputs.
     #
-    ds_grapher = paths.create_dataset(tables=[tb])
+    ds_grapher = paths.create_dataset(tables=[tb, tb_monthly], default_metadata=ds_garden.metadata)
     ds_grapher.save()
