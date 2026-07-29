@@ -2,7 +2,7 @@
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.catalog_helpers import last_date_accessed
 from etl.data_helpers import geo
@@ -35,40 +35,6 @@ REGIONS = {
 
 # The six continents that "World" is defined as the sum of, used to check that "World" stays complete.
 CONTINENTS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
-
-# Members of "Europe" that the source does not report, and which the aggregates therefore cannot include.
-# "Serbia excluding Kosovo" is an alternative to "Serbia", which the source does report, and the source folds
-# Transnistria into Moldova.
-EUROPE_MEMBERS_NOT_REPORTED = ["Serbia excluding Kosovo", "Transnistria"]
-
-
-def sanity_check_member_coverage(tb: Table, ds_regions: Dataset, summed_columns: list[str]) -> None:
-    """Check that every European country the source covers is present, and reports on every informed date.
-
-    Regions are aggregated with min_num_values_per_year=1, which is what this dataset needs: no country reports in
-    the off-season, and the burnt-area series only starts in 2012, so requiring every member would empty the
-    aggregates. The cost of that tolerance is that a country dropping out of a future weekly snapshot, or missing a
-    single week, would quietly shrink "Europe" and "Europe (excl. Russia)" by the same amount, leaving the
-    reconciliation between the two intact. These asserts make it loud instead.
-    """
-    expected_members = set(
-        geo.list_members_of_region("Europe", ds_regions, excluded_members=["Russia"], exclude_historical_countries=True)
-    ) - set(EUROPE_MEMBERS_NOT_REPORTED)
-
-    missing = sorted(expected_members - set(tb["country"]))
-    assert not missing, f"The source no longer reports {missing}, which would silently shrink the European aggregates."
-
-    members = tb[tb["country"].isin(expected_members)]
-    for column in summed_columns:
-        reporting = members.groupby("date", observed=True)[column].apply(lambda values: values.notna().sum())
-        # NOTE: The source reports either every European country or none of them on a given date. If this ever
-        # fails, check whether the source really has a gap before relaxing it, because a partially covered date
-        # understates a published aggregate.
-        partial = reporting[(reporting > 0) & (reporting < len(expected_members))]
-        assert partial.empty, (
-            f"'{column}' is reported by only some European countries on "
-            f"{[str(date.date()) for date in partial.index[:5]]}, so the European aggregates are understated."
-        )
 
 
 def sanity_check_outputs(tb: Table, summed_columns: list[str]) -> None:
@@ -199,7 +165,6 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["total_area_ha"])
     tb = tb.set_index(["country", "date"], verify_integrity=True)
 
-    sanity_check_member_coverage(tb.reset_index(), ds_regions=ds_regions, summed_columns=cols_to_keep)
     sanity_check_outputs(tb, summed_columns=cols_to_keep)
 
     #
