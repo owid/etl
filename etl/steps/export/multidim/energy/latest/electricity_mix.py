@@ -316,7 +316,7 @@ def add_decomposition_views(c) -> None:
                     continue
                 config = {
                     **base_config,
-                    "title": _decomposition_title(source, base_metric),
+                    "title": _with_frequency(_decomposition_title(source, base_metric), frequency),
                     "subtitle": METRIC_UNIT_PHRASE[base_metric],
                 }
                 # The stacked "other renewables" band uses the coalesced column, so it needs the extended
@@ -668,6 +668,16 @@ def _map_config(source: str, metric: str, vmax: float | None = None, frequency: 
     return {"colorScale": color_scale, "timeTolerance": 3}
 
 
+def _with_frequency(title: str, frequency: str) -> str:
+    """Prefix monthly view titles with "Monthly " (lowercasing the original's first letter so it reads
+    naturally). This keeps a downloaded monthly chart image from being mistaken for annual data, which
+    would understate the magnitudes roughly twelvefold.
+    """
+    if frequency == "monthly":
+        return "Monthly " + title[0].lower() + title[1:]
+    return title
+
+
 def set_view_titles(c, dims_max: dict) -> None:
     for v in c.views:
         source = v.dimensions["source"]
@@ -677,7 +687,7 @@ def set_view_titles(c, dims_max: dict) -> None:
         metric = v.dimensions["metric"]
         frequency = v.dimensions.get("frequency", "annual")
         config = dict(v.config or {})
-        config["title"] = _view_title(source, metric)
+        config["title"] = _with_frequency(_view_title(source, metric), frequency)
         config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric, dims_max.get((source, metric, frequency)), frequency)
         note = SOURCE_NOTES.get(source)
