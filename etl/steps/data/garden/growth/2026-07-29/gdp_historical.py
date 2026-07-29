@@ -15,7 +15,7 @@ The Maddison Database is a different project from Maddison Project Database: the
 import owid.catalog.core.processing as pr
 from owid.catalog.core import Table, warnings
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -31,7 +31,7 @@ ACCURACY_GDP = 6
 ACCURACY_GDP_PER_CAPITA = 2
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -39,31 +39,27 @@ def run(dest_dir: str) -> None:
 
     # World Bank WDI
     ds_wdi = paths.load_dataset("wdi")
-    tb_wdi = ds_wdi["wdi"].reset_index()
+    tb_wdi = ds_wdi.read("wdi")
 
     # Maddison Project Database
     ds_mpd = paths.load_dataset("maddison_project_database")
-    tb_mpd = ds_mpd["maddison_project_database"].reset_index()
+    tb_mpd = ds_mpd.read("maddison_project_database")
 
     # Maddison Database
     ds_md = paths.load_dataset("maddison_database")
-    tb_md = ds_md["maddison_database"].reset_index()
+    tb_md = ds_md.read("maddison_database")
 
     #
     # Process data.
     tb = process_and_combine_datasets(tb_wdi, tb_mpd, tb_md)
 
-    tb = tb.format()
+    tb = tb.format(short_name=paths.short_name)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=[tb],
-        check_variables_metadata=True,
-    )
+    ds_garden = paths.create_dataset(tables=[tb])
 
     # Save changes in the new garden dataset.
     ds_garden.save()
