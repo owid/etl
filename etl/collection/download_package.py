@@ -6,6 +6,16 @@ The whole package -- wide CSV + metadata.json + readme.md, zipped -- is built
 here, once, at ETL publish time, and uploaded to R2. The grapher side does
 nothing but link to it.
 
+Three objects go up per collection, for two different audiences:
+
+  * `<slug>.complete-dataset.zip` -- the download button. One click, a CSV that
+    opens in a spreadsheet, and a readme explaining every column.
+  * `<slug>.parquet` and `<slug>.metadata.json` -- the Data API section, for
+    people and agents reading the data with code. Parquet because it can be
+    queried in place: DuckDB over HTTP prunes to the columns asked for, so one
+    indicator out of years-of-schooling costs 37kB rather than the whole file.
+    See `_write_parquet`.
+
 An earlier iteration split the work: ETL staged a wide CSV + an indicator index
 to R2, and a Cloudflare Function assembled the zip fresh on every request, so
 it could reuse grapher's own citation/readme formatting code instead of a
@@ -51,9 +61,12 @@ from typing import TYPE_CHECKING
 from urllib.parse import urlencode
 
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 from owid.catalog import Dataset as CatalogDataset
 from owid.catalog import Table, s3_utils
 from owid.catalog import processing as pr
+from owid.repack import repack_frame
 from structlog import get_logger
 
 from etl import config
@@ -478,6 +491,45 @@ def _long_column_name(col: IndicatorColumn) -> str:
     return col.meta.get("name") or get_title(col)
 
 
+def _write_parquet(
+    keys: pd.DataFrame,
+    wide: Table,
+    columns: list[tuple[str, str, int, IndicatorColumn]],
+    path: Path,
+) -> None:
+    """Write the wide table as Parquet, dtypes chosen by `repack_frame`.
+
+    Why this exists alongside the CSV: Parquet is the artifact that can be
+    *queried* rather than downloaded. DuckDB reads it over HTTP with column
+    pruning, so pulling one indicator out of years-of-schooling transfers 37kB
+    of a 671kB file instead of the whole 530kB zip. (That benefit is
+    DuckDB-specific -- pandas' `read_parquet` goes through fsspec, which fetches
+    the entire object and prunes locally, so a pandas user gains nothing but
+    loses nothing either.)
+
+    `repack_frame` is doing real work here, not just saving bytes. Written
+    naively the file is 1.03MB; repacked it is 671kB, because it picks Float32
+    for the indicator columns, category for Entity/Code and UInt16 for Year.
+    Using it also means these files carry the same dtype conventions as
+    everything else we publish to the catalog, rather than a rule invented here.
+
+    One caveat worth knowing: `repack_series` accepts a Float32 downcast on
+    `np.allclose(rtol=1e-5)` rather than exact equality. It tries `to_int`
+    first, so whole-number indicators (populations, counts) stay exact as
+    integers; a large-magnitude *non-integer* column is the case that loses
+    absolute precision. That is the same trade every other repacked catalog
+    table already makes.
+    """
+    df = keys.copy()
+    for wide_name, long_name, _variable_id, _col in columns:
+        df[long_name] = wide[wide_name].values
+    pq.write_table(
+        pa.Table.from_pandas(repack_frame(df), preserve_index=False),
+        path,
+        compression="zstd",
+    )
+
+
 def _format_numeric_series(s: pd.Series) -> pd.Series:
     """Print whole numbers without a trailing ".0" ("11", not "11.0") and NaN
     as an empty cell -- matches how grapher's own CSV writer serializes
@@ -582,16 +634,26 @@ All data and visualizations on Our World in Data rely on data sourced from one o
 @dataclass
 class DownloadPackageResult:
     url: str
+    parquet_url: str
+    metadata_url: str
     row_count: int
     indicator_count: int
     size_bytes: int
 
     def to_config(self) -> dict:
         """Shape matching MultiDimDataPageConfig.downloadPackage on the grapher
-        side. `url` points straight at the R2 object -- there is no grapher
-        route in front of it, so nothing has to be computed at render time."""
+        side. Every URL points straight at an R2 object -- there is no grapher
+        route in front of them, so nothing has to be computed at render time.
+
+        `url` is the zip behind the download button; `parquet_url` and
+        `metadata_url` are the same data as separate objects, for the Data API
+        section. They're separate keys rather than one derived from another
+        because the grapher side should never be constructing R2 paths.
+        """
         return {
             "url": self.url,
+            "parquetUrl": self.parquet_url,
+            "metadataUrl": self.metadata_url,
             "indicatorCount": self.indicator_count,
             "rowCount": self.row_count,
             "sizeBytes": self.size_bytes,
@@ -697,7 +759,7 @@ def build_download_package_for_collection(
     time_header = "Day" if time_col == "date" else "Year"
     entity_codes = _resolve_entity_codes(wide["country"].unique().tolist())
 
-    final = pd.DataFrame(
+    keys = pd.DataFrame(
         {
             "Entity": wide["country"],
             # .astype(str) first -- "country" is often a categorical column,
@@ -708,11 +770,21 @@ def build_download_package_for_collection(
             time_header: wide[time_col],
         }
     )
+    final = keys.copy()
     for wide_name, long_name, _variable_id, _col in columns:
         final[long_name] = _format_numeric_series(wide[wide_name])
 
     csv_path = dest_dir / f"{page_slug}.csv"
     final.to_csv(csv_path, index=False)
+
+    #
+    # The same table as Parquet, for programmatic consumers. Built from the
+    # unformatted values on purpose: `_format_numeric_series` exists to make
+    # numbers print like grapher's CSV writer does, and stringly-formatted
+    # numbers are the one thing a typed columnar format should not carry.
+    #
+    parquet_path = dest_dir / f"{page_slug}.parquet"
+    _write_parquet(keys, wide, columns, parquet_path)
 
     #
     # Zip it. Entry order and names mirror a single-chart download.
@@ -749,17 +821,31 @@ def build_download_package_for_collection(
     # Content-Type at all.
     s3_utils.upload(s3_url, zip_path, public=True, downloadable=True, content_type="application/zip")
 
+    # The Parquet and metadata JSON go up as their own objects, for the Data API
+    # section rather than the download button. No downloadable=True on these:
+    # Content-Disposition would tell the browser to save a file, and the point
+    # of the Parquet is to be read in place by a query.
+    metadata_path = dest_dir / f"{page_slug}.metadata.json"
+    metadata_path.write_text(metadata_json)
+    parquet_s3, parquet_url = _download_package_location(parquet_path.name)
+    metadata_s3, metadata_url = _download_package_location(metadata_path.name)
+    s3_utils.upload(parquet_s3, parquet_path, public=True, content_type="application/vnd.apache.parquet")
+    s3_utils.upload(metadata_s3, metadata_path, public=True, content_type="application/json")
+
     log.info(
         "download_package.published",
         rows=len(wide),
         indicators=len(columns),
         csv_bytes=csv_path.stat().st_size,
         zip_bytes=size_bytes,
+        parquet_bytes=parquet_path.stat().st_size,
         url=public_url,
     )
 
     return DownloadPackageResult(
         url=public_url,
+        parquet_url=parquet_url,
+        metadata_url=metadata_url,
         row_count=len(wide),
         indicator_count=len(columns),
         size_bytes=size_bytes,
