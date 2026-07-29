@@ -143,10 +143,8 @@ definitions:
 
   # Trained teachers map configuration
   trained_teachers_grapher_config: &trained_teachers_grapher_config
-    maxTime: 2024
     hasMapTab: true
     map:
-      time: 2024
       timeTolerance: 10
       colorScale:
         binningStrategy: manual
@@ -155,10 +153,8 @@ definitions:
 
   # Gross enrolment ratio configuration
   grapher_config_enrolment_pubugn: &grapher_config_enrolment_pubugn
-    maxTime: 2024
     hasMapTab: true
     map:
-      time: 2024
       timeTolerance: 10
       colorScale:
         binningStrategy: manual
