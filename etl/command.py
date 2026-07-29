@@ -623,9 +623,7 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
         _write_execution_times(execution_times)
 
     if continue_on_failure and exceptions:
-        # Tracebacks were printed as each step failed; recap the step names, since by now they are
-        # thousands of lines up in the log.
-        log.error("steps_failed", steps=sorted(str(step) for step in failing_steps))
+        _print_failure_recap([(str(step), e) for step, e in zip(failing_steps, exceptions)])
         # Raise the first exception
         raise exceptions[0]
 
@@ -707,85 +705,89 @@ def exec_graph_parallel(
     :param use_threads: Flag indicating whether to use threads instead of processes for parallel execution.
     :param kwargs: Additional keyword arguments to be passed to the function.
     """
-    import structlog
-
-    log = structlog.get_logger()
     topological_sorter = TopologicalSorter(exec_graph)
     topological_sorter.prepare()
 
     pool_factory = ThreadPoolExecutor if use_threads else ProcessPoolExecutor
-    with pool_factory(max_workers=workers) as executor:
-        # Dictionary to keep track of future tasks
-        future_to_task: dict[Future, str] = {}
-        failed_tasks = set()
-        skipped_tasks = set()
-        exceptions = []
 
-        ready_tasks = []
+    # Every failure and the step it came from, so the run can end with a recap of all of them. The
+    # recap runs in a finally: without CONTINUE_ON_FAILURE the failure is re-raised straight away,
+    # but the pool still drains every submitted step before that reaches the top level, so the
+    # traceback would end up just as far up the log as in continue-on-failure mode.
+    failures: list[tuple[str, BaseException]] = []
+    try:
+        with pool_factory(max_workers=workers) as executor:
+            # Dictionary to keep track of future tasks
+            future_to_task: dict[Future, str] = {}
+            failed_tasks = set()
+            skipped_tasks = set()
 
-        while topological_sorter.is_active():
-            # add new tasks
-            ready_tasks += topological_sorter.get_ready()
+            ready_tasks = []
 
-            # Submit tasks that are ready to the executor, but skip those dependent on failed or skipped tasks
-            tasks_to_submit = []
-            for task in ready_tasks[:workers]:
-                if continue_on_failure:
-                    # Check if any dependency of this task has failed or been skipped
-                    task_deps = exec_graph.get(task, set())
-                    if task_deps & (failed_tasks | skipped_tasks):
-                        print(f"--- Skipping {task} (depends on failed task)")
-                        skipped_tasks.add(task)
-                        topological_sorter.done(task)  # Mark as done so execution can continue
-                        continue
+            while topological_sorter.is_active():
+                # add new tasks
+                ready_tasks += topological_sorter.get_ready()
 
-                tasks_to_submit.append(task)
-
-            for task in tasks_to_submit:
-                future = executor.submit(func, task, **kwargs)
-                future_to_task[future] = task
-
-            # remove ready tasks
-            ready_tasks = ready_tasks[workers:]
-
-            # Wait for at least one future to complete
-            if future_to_task:
-                done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
-
-                # Mark completed tasks as done
-                for future in done:
-                    task = future_to_task.pop(future)
-                    try:
-                        future.result()
-                        topological_sorter.done(task)
-                    except KeyboardInterrupt:
-                        raise
-                    # Catch BaseException, not Exception: a step that somehow raises SystemExit would
-                    # otherwise end the run without ever naming the step or printing its traceback.
-                    except BaseException as e:
-                        # Report the failure right away. Re-raising is not enough: the pool only
-                        # exits once every already-submitted step has finished, which on a full
-                        # build is hours after the failure, and in CONTINUE_ON_FAILURE mode all but
-                        # the first exception are never raised at all.
-                        print(f"--- Failed {task} - {click.style('FAILED', fg='red')}")
-                        _print_step_failure(e)
-
-                        if continue_on_failure:
-                            failed_tasks.add(task)
-                            skipped_tasks.add(
-                                task
-                            )  # Failed tasks should also be considered skipped for dependency checking
-                            exceptions.append(e)
+                # Submit tasks that are ready to the executor, but skip those dependent on failed or skipped tasks
+                tasks_to_submit = []
+                for task in ready_tasks[:workers]:
+                    if continue_on_failure:
+                        # Check if any dependency of this task has failed or been skipped
+                        task_deps = exec_graph.get(task, set())
+                        if task_deps & (failed_tasks | skipped_tasks):
+                            print(f"--- Skipping {task} (depends on failed task)")
+                            skipped_tasks.add(task)
                             topological_sorter.done(task)  # Mark as done so execution can continue
-                        else:
-                            raise e
+                            continue
 
-        # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
-        if continue_on_failure and exceptions:
-            # Tracebacks were printed as each step failed; recap the step names, since by now they
-            # are thousands of lines up in the log.
-            log.error("steps_failed", steps=sorted(failed_tasks))
-            raise exceptions[0]
+                    tasks_to_submit.append(task)
+
+                for task in tasks_to_submit:
+                    future = executor.submit(func, task, **kwargs)
+                    future_to_task[future] = task
+
+                # remove ready tasks
+                ready_tasks = ready_tasks[workers:]
+
+                # Wait for at least one future to complete
+                if future_to_task:
+                    done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
+
+                    # Mark completed tasks as done
+                    for future in done:
+                        task = future_to_task.pop(future)
+                        try:
+                            future.result()
+                            topological_sorter.done(task)
+                        except KeyboardInterrupt:
+                            raise
+                        # Catch BaseException, not Exception: a step that somehow raises SystemExit would
+                        # otherwise end the run without ever naming the step or printing its traceback.
+                        except BaseException as e:
+                            # Report the failure right away, as well as in the end-of-run recap: on a
+                            # long build you want to see it while the run is still going.
+                            # "+++" rather than "---": both open a log group in Buildkite, but a
+                            # "---" one is collapsed by default, which would fold the traceback
+                            # printed right below out of sight.
+                            print(f"+++ Failed {task}")
+                            _print_step_failure(e)
+                            failures.append((task, e))
+
+                            if continue_on_failure:
+                                failed_tasks.add(task)
+                                skipped_tasks.add(
+                                    task
+                                )  # Failed tasks should also be considered skipped for dependency checking
+                                topological_sorter.done(task)  # Mark as done so execution can continue
+                            else:
+                                raise e
+
+            # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
+            if continue_on_failure and failures:
+                raise failures[0][1]
+    finally:
+        if failures:
+            _print_failure_recap(failures)
 
 
 def _create_expected_time_message(
@@ -803,9 +805,36 @@ def _create_expected_time_message(
         return prepend_message + partial_message + append_message
 
 
+def _print_failure_recap(failures: "list[tuple[str, BaseException]]") -> None:
+    """Reprint every failed step's traceback at the end of the run.
+
+    The individual failures are printed as they happen, but by the end of a build they are
+    thousands of lines up the log — and the tail is what gets read: Buildkite's error box shows
+    only the last lines, where the re-raised exception contributes nothing but executor plumbing
+    (its child traceback rides on an attribute, so Python's own handler never prints it).
+    """
+    import structlog
+
+    log = structlog.get_logger()
+
+    print(f"+++ {len(failures)} step(s) failed", flush=True)
+    for step_name, e in failures:
+        # Not a "---"/"+++" prefix: that would open a new Buildkite log group per failure and only
+        # the last one stays visible. These stay inside the recap's own group.
+        print(f">>> Failed {step_name}", flush=True)
+        _print_step_failure(e)
+    # The step list at the very end is what you feed back into `etl run`.
+    log.error("steps_failed", steps=sorted(step_name for step_name, _ in failures))
+
+
 def _print_step_failure(e: BaseException) -> None:
     """Print what a failed step's exception says, on stderr, right when the failure happens."""
     from etl.steps import StepFailedError
+
+    # Anything printed to stdout just before this (the "--- Failed <step>" header) is still sitting
+    # in a block buffer when stdout is a pipe, as it is in CI, while stderr is unbuffered — without
+    # this the header and its traceback end up hundreds of lines apart.
+    sys.stdout.flush()
 
     if isinstance(e, StepFailedError):
         # The step ran in a child process, which handed its traceback back through the exception.

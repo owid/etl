@@ -73,7 +73,7 @@ def test_exec_graph_parallel_prints_traceback(capsys):
         cmd.exec_graph_parallel({"task1": set()}, failing_func, continue_on_failure=False, workers=1, use_threads=True)
 
     captured = capsys.readouterr()
-    assert "--- Failed task1" in captured.out
+    assert "+++ Failed task1" in captured.out
     assert "ValueError: boom in task1" in captured.err
 
 
@@ -93,6 +93,25 @@ def test_exec_graph_parallel_reports_every_failure(capsys):
     assert "ValueError: boom in task2" in captured.err
 
 
+def test_exec_graph_parallel_recaps_failures_at_the_end(capsys):
+    from etl.steps import StepFailedError
+
+    def failing_func(task: str, **kwargs):
+        raise StepFailedError(f"Step {task} failed with exit code 1", child_traceback=f"TypeError: bad dtype in {task}")
+
+    with pytest.raises(StepFailedError):
+        cmd.exec_graph_parallel(
+            {"task1": set(), "task2": set()}, failing_func, continue_on_failure=True, workers=2, use_threads=True
+        )
+
+    captured = capsys.readouterr()
+    # CI shows the tail of the log, where the re-raised exception contributes only executor
+    # plumbing, so every failure's traceback is repeated in a recap at the end of the run.
+    assert "+++ 2 step(s) failed" in captured.out
+    for task in ("task1", "task2"):
+        assert captured.err.count(f"TypeError: bad dtype in {task}") == 2
+
+
 def test_exec_graph_parallel_does_not_exit_silently_on_system_exit(capsys):
     # A step that raises SystemExit (as the forked step runner used to on failure) must not end the
     # run in silence: `except Exception` would not catch it and nothing would be printed.
@@ -103,7 +122,7 @@ def test_exec_graph_parallel_does_not_exit_silently_on_system_exit(capsys):
         cmd.exec_graph_parallel({"task1": set()}, exiting_func, continue_on_failure=False, workers=1, use_threads=True)
 
     captured = capsys.readouterr()
-    assert "--- Failed task1" in captured.out
+    assert "+++ Failed task1" in captured.out
     assert "SystemExit" in captured.err
 
 

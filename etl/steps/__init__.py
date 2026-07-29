@@ -765,7 +765,7 @@ class DataStep(Step):
                 # concurrent children would interleave into an unreadable mix. The parent attaches
                 # it to StepFailedError, which the runners print one failure at a time.
                 try:
-                    traceback_path.write_text(f"--- Traceback for {self}\n{traceback.format_exc()}")
+                    traceback_path.write_text(f">>> Traceback for {self}\n{traceback.format_exc()}")
                 except OSError:
                     # Last resort, interleaved or not: never lose the traceback.
                     traceback.print_exc()
