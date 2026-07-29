@@ -36,6 +36,40 @@ REGIONS = {
 # The six continents that "World" is defined as the sum of, used to check that "World" stays complete.
 CONTINENTS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
 
+# Number of countries the source reports.
+# NOTE: The comparison below is ">=", so the source covering more countries does not fail the build. Raise this
+# number when that happens, so that a later drop is still caught.
+EXPECTED_NUM_COUNTRIES = 251
+
+
+def sanity_check_inputs(tb: Table, indicators: list[str]) -> None:
+    """Check that the source still reports a complete country-by-date grid.
+
+    Regions are aggregated with min_num_values_per_year=1, which is what this dataset needs: no country reports in
+    the off-season, and the burnt-area series only starts in 2012, so requiring every member would empty the
+    aggregates. The cost of that tolerance is that a country dropping out of the source, or missing a single week,
+    would quietly shrink every aggregate containing it, and no downstream check would notice. These asserts make it
+    loud instead.
+    """
+    num_countries = tb["country"].nunique()
+    assert num_countries >= EXPECTED_NUM_COUNTRIES, (
+        f"The source reports {num_countries} countries, down from {EXPECTED_NUM_COUNTRIES}, so every aggregate "
+        "containing a dropped country is understated."
+    )
+    assert len(tb) == num_countries * tb["date"].nunique(), "The source no longer reports a complete country-date grid."
+
+    for column in indicators:
+        # For a given indicator, every country is informed on exactly the same dates, so a date is reported either
+        # by all countries or by none, and no aggregate is ever built from a subset of its members.
+        # NOTE: If this ever fails, check whether the source really has a gap before relaxing it, because a
+        # partially reported date understates every aggregate on that date.
+        num_countries_per_date = tb.groupby("date", observed=True)[column].apply(lambda values: values.notna().sum())
+        partial = num_countries_per_date[(num_countries_per_date > 0) & (num_countries_per_date < num_countries)]
+        assert partial.empty, (
+            f"'{column}' is reported for only some countries on "
+            f"{[str(date.date()) for date in partial.index[:5]]}, so the aggregates on those dates are understated."
+        )
+
 
 def sanity_check_outputs(tb: Table, summed_columns: list[str]) -> None:
     """Check the new "Europe (excl. Russia)" aggregate, and that adding it left the other regions untouched."""
@@ -136,6 +170,9 @@ def run(dest_dir: str) -> None:
     # Create a date column
     tb_pivot["date"] = pd.to_datetime(tb_pivot["year"].astype(str) + "-" + tb_pivot["month_day"].astype(str))
     tb_pivot = tb_pivot.drop(columns=["year", "month_day"])
+    # Check the source's coverage while the table still holds only countries.
+    sanity_check_inputs(tb_pivot, indicators=cols_to_keep)
+
     aggregations = {agg: "sum" for agg in cols_to_keep}
     # Add region aggregates.
     tb_pivot = geo.add_regions_to_table(
