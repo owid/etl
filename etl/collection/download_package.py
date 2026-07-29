@@ -437,8 +437,8 @@ def _dimension_definitions(collection: Collection) -> list[dict]:
     choices, each as a stable slug plus the display name.
 
     This exists so a consumer can label a column's dimension combination
-    without fetching the MDIM config separately: the per-column "views" entries
-    use slugs only, and these are the names they map to.
+    without fetching the MDIM config separately: the per-column `dimensions`
+    fields use slugs only, and these are the names they map to.
     """
     return [
         {
@@ -450,21 +450,40 @@ def _dimension_definitions(collection: Collection) -> list[dict]:
     ]
 
 
-def _view_entries(combinations: list[dict], page_url: str) -> list[dict]:
-    """metadata.json's per-column "views" -- the dimension combination(s) whose
-    view shows this column, and the page URL that opens each one.
+def _view_fields(combinations: list[dict], page_url: str) -> dict:
+    """metadata.json's per-column `dimensions` / `url` / `otherViews` -- which
+    dimension combination this column belongs to, and the page URL that opens it.
 
     Choice *slugs* rather than names, because they're stable across copy edits
     and they're the same tokens the page's query params use -- which is what
     makes the URL derivable, and gives a consumer the round trip from a CSV
     column back to the view it came from. Empty values are dropped for the same
     reason `_dimension_suffix` drops them: they identify nothing.
+
+    Almost every column belongs to exactly one combination, so that one is
+    inlined as flat `dimensions` + `url` fields and there's nothing else. A
+    column *can* belong to several -- when a dimension is redundant for that
+    indicator, e.g. un_wpp's age-0 deaths column, which is reachable as both
+    `indicator=deaths` and `indicator=infant_deaths` because an infant death is
+    a death at age 0. The extras then go in `otherViews`, so the rare case stays
+    complete without every column paying for it with a nested list.
+
+    The inlined one is simply the first view that referenced the indicator --
+    the same one `_wide_column_name` takes its suffix from, so the two agree.
+    It is not semantically privileged, and a consumer that wants every
+    combination has to read `otherViews` too.
     """
+    assert combinations, "a column exists because some view referenced it"
     entries = []
     for combination in combinations:
         dimensions = {slug: choice for slug, choice in combination.items() if choice}
         entries.append({"dimensions": dimensions, "url": f"{page_url}?{urlencode(dimensions)}"})
-    return entries
+
+    primary, *rest = entries
+    fields = {"dimensions": primary["dimensions"], "url": primary["url"]}
+    if rest:
+        fields["otherViews"] = rest
+    return fields
 
 
 def _long_column_name(col: IndicatorColumn) -> str:
@@ -593,7 +612,7 @@ def _readme(title: str, page_url: str, column_sections: list[str]) -> str:
     no tolerance columns) and three MDIM-only additions that have no counterpart
     there: that the package covers every dimension combination, that column
     headers shouldn't be parsed, and how to read metadata.json's "dimensions"
-    and per-column "views" keys instead.
+    and per-column "dimensions"/"url" keys instead.
 
     !!! KEEP IN SYNC WITH owid-grapher's readmeTools.ts !!!
     """
@@ -615,7 +634,9 @@ The remaining columns are the data columns, each of which is a time series corre
 
 The .metadata.json file contains metadata about the data package. The "chart" key contains information to recreate the chart, like the title, subtitle etc.. The "columns" key contains information about each of the columns in the csv, like the unit, timespan covered, citation for the data etc..
 
-The "dimensions" key lists this dataset's dimensions and the choices available for each, as a stable slug plus a display name. Every column entry then carries a "views" key naming the dimension combination(s) that column belongs to, by slug, along with the URL that opens each combination on our website. Together those let you go from a CSV column to its dimension choices, and back, without parsing column headers.
+The "dimensions" key lists this dataset's dimensions and the choices available for each, as a stable slug plus a display name. Every column entry then carries its own "dimensions" key naming the combination of choices that column belongs to, by slug, plus a "url" that opens that combination on our website. Together those let you go from a CSV column to its dimension choices, and back, without parsing column headers.
+
+A few columns belong to more than one combination, which happens when a dimension makes no difference to that particular indicator. Those carry an extra "otherViews" key listing the remaining combinations in the same shape; if you need every combination a column appears under, read both keys.
 
 ## About the data
 
@@ -719,11 +740,11 @@ def build_download_package_for_collection(
         attributions.add(get_attribution(col))
         metadata_columns[long_name] = {
             # MDIM-only. A single-chart download has no dimension structure, so
-            # this key has no counterpart in owid-grapher's assembleMetadata --
-            # an intended divergence from that format, not drift. Emitted first
-            # so it's the first thing visible under a column key, above the long
-            # description fields.
-            "views": _view_entries(column_to_dimensions[wide_name], page_url),
+            # these keys have no counterpart in owid-grapher's assembleMetadata
+            # -- an intended divergence from that format, not drift. Emitted
+            # first so they're the first thing visible under a column key, above
+            # the long description fields.
+            **_view_fields(column_to_dimensions[wide_name], page_url),
             **metadata_column_entry(
                 col,
                 variable_id,
