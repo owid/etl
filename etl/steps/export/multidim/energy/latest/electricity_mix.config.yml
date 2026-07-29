@@ -103,7 +103,6 @@ dimensions:
         name: "Annual"
       - slug: "monthly"
         name: "Monthly"
-        description: "Monthly data from Ember, from 1999 onwards"
 views:
   # Views are generated programmatically in the step.
   []
