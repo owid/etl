@@ -20,7 +20,7 @@ dataset:
    - Veronika Samborska
 
 tables:
-  oecd_educational_attainment:
+  education_attainment_distribution:
     common:
       unit: "%"
       short_unit: "%"
@@ -62,7 +62,7 @@ tables:
           title_public: Tertiary education
         description_short: Share of adults aged 25–64 who have completed [tertiary education](#dod:tertiary-education) (ISCED 5–8).
 
-  oecd_educational_attainment_by_sex:
+  education_attainment_distribution_by_sex:
     common:
       unit: "%"
       short_unit: "%"

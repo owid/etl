@@ -2,16 +2,16 @@ steps:
   # OECD Adults' educational attainment distribution (OECD-only indicators, no splicing with other sources)
   data://meadow/oecd/2026-06-21/education_attainment_distribution:
     - snapshot://oecd/2026-06-21/education_attainment_distribution.csv
-  data://garden/oecd/2026-06-21/oecd_educational_attainment:
+  data://garden/oecd/2026-06-21/education_attainment_distribution:
     - data://meadow/oecd/2026-06-21/education_attainment_distribution
-  data://grapher/oecd/2026-06-21/oecd_educational_attainment:
-    - data://garden/oecd/2026-06-21/oecd_educational_attainment
+  data://grapher/oecd/2026-06-21/education_attainment_distribution:
+    - data://garden/oecd/2026-06-21/education_attainment_distribution
 
   # Long-run educational attainment
   # Splices Lee & Lee historical estimates (pre-OECD) with OECD observed data
   data://grapher/education/2026-06-21/long_run_educational_attainment:
     - data://garden/education/2026-06-21/long_run_educational_attainment:
-      - data://garden/oecd/2026-06-21/oecd_educational_attainment
+      - data://garden/oecd/2026-06-21/education_attainment_distribution
       - data://garden/education/2023-07-17/education_lee_lee
       - data://garden/demography/2026-02-11/wittgenstein_human_capital
 

@@ -16,8 +16,8 @@ Also produces:
 - Lee & Lee + Wittgenstein Centre splice for no/some formal education (15-64).
 
 OECD-only indicators (all education levels, by sex, no splicing) are produced separately in
-oecd/2026-06-21/oecd_educational_attainment, which this step depends on for the OECD totals used
-in the splices above.
+oecd/2026-06-21/education_attainment_distribution, which this step depends on for the OECD totals
+used in the splices above.
 """
 
 import owid.catalog.processing as pr
@@ -46,8 +46,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    ds_oecd = paths.load_dataset("oecd_educational_attainment")
-    tb_oecd_total = ds_oecd.read("oecd_educational_attainment")
+    ds_oecd = paths.load_dataset("education_attainment_distribution")
+    tb_oecd_total = ds_oecd.read("education_attainment_distribution")
 
     ds_lee_lee = paths.load_dataset("education_lee_lee")
     tb_lee_lee = ds_lee_lee.read("education_lee_lee")
