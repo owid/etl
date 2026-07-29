@@ -60,7 +60,11 @@ It's easier to do it in two steps:
   around 2026-07-27 (232 economies), which is what this version exists to pick up.
   `sanity_check_ppp_coverage` now enforces this at build time: the snapshot aborts before it is
   written if the PPP series lag the market-rate ones in the latest released year. If it fires,
-  re-run the snapshot a couple of weeks later rather than shipping the gap.
+  re-run the snapshot a couple of weeks later rather than shipping the gap. It is a **July-cycle**
+  guard -- the new year of national accounts arrives mid-year, so that is the only release where the
+  PPP series can trail. In the winter release both series end on the same year and the check passes
+  with nothing to compare, which is not evidence the lag is gone; there check instead that the
+  release added a new year at all.
   `version_producer` and `last_updated_date` will NOT tell you the file changed -- compare the
   downloaded file's md5 and its per-year non-null counts instead.
 - The "Availability of unemployment estimates by source" comparison
@@ -129,6 +133,14 @@ PPP_MIN_REFERENCE_ENTITIES = 100
 # In that year, the PPP series must reach at least this share of the reference series' coverage.
 # In the 2026-07-27 file the ratio is 232/233 = 1.00; in the 2026-07-14 and 2026-07-16 files it
 # was 0/233 = 0.00, so anything in between comfortably separates a good release from a lagging one.
+#
+# NOTE: this check only does any work in the mid-year release. The World Bank adds the new year of
+# national accounts in July, and that is when the PPP series can trail the market-rate one. The
+# winter release adds no new year at all -- both series sit at the same maximum (2026-02-27:
+# NY.GDP.PCAP.CD and NY.GDP.PCAP.PP.KD both end 2024, at 205 and 201 entities, ratio 0.98) -- so the
+# check compares a year both series already cover and passes trivially. That pass is **not** evidence
+# the lag is fixed; it means there was nothing to lag behind. Judge a winter release on whether it
+# added a year at all, not on this assertion going quiet.
 PPP_MIN_COVERAGE_RATIO = 0.5
 
 # Number of parallel workers for fetching legacy metadata.
