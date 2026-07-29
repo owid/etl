@@ -15,6 +15,9 @@ paths = PathFinder(__file__)
 PARTITION_COLUMNS = ["share_bottom_50", "share_middle_40", "share_top_10"]
 SHARE_COLUMNS = PARTITION_COLUMNS + ["share_top_1"]
 
+# The middle 40% is used to verify the partition identity but is not surfaced as an indicator.
+COLUMNS_NOT_SURFACED = ["share_middle_40"]
+
 
 def sanity_check_inputs(tb: Table) -> None:
     assert set(tb["country"].unique()) == {"France"}, "Expected France as the only entity."
@@ -60,6 +63,9 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
 
     sanity_check_outputs(tb)
+
+    # Drop the middle 40% (kept above only to check the partition identity).
+    tb = tb.drop(columns=COLUMNS_NOT_SURFACED)
 
     tb = tb.format(["country", "year"], short_name=paths.short_name)
 

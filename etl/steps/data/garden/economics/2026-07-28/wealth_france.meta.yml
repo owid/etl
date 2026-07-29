@@ -7,10 +7,9 @@ definitions:
         - Economic Inequality
       attribution_short: Garbinti, Goupille-Lebret and Piketty
     description_key:
-      - Wealth refers to net personal wealth: the market value of all the financial and non-financial assets adults own, minus their debts.
-      - The estimates cover all adults, with each adult counted individually, and wealth is expressed among the adult population.
-      - The series combine income-tax, inheritance and wealth-survey data with national accounts to build homogeneous estimates stretching back to 1800.
-      - Definitions of wealth and the underlying data sources change over such a long period; the source paper documents these breaks in detail.
+      - Wealth refers to net personal wealth.
+      - The estimates cover all adults, with each adult counted individually.
+      - The series combines income-tax, inheritance, and wealth-survey data with national accounts to build estimates stretching back to 1800. Definitions of wealth and the underlying data sources change over such a long period; the source paper documents these changes in detail.
     description_processing: |-
       The source workbook reports the summary statistics behind the paper's wealth series — wealth shares, wealth thresholds and inverted Pareto coefficients by year, plus a separate sheet on wealth growth by group. We use only the wealth-share series.
 
@@ -47,18 +46,6 @@ tables:
         description_short: The share of total personal wealth held by the wealthiest 1% of adults.
         display:
           name: Top 1%
-          numDecimalPlaces: 1
-          tolerance: 5
-
-      share_middle_40:
-        title: Wealth share of the middle 40%
-        presentation:
-          title_public: Wealth share of the middle 40%
-        unit: "%"
-        short_unit: "%"
-        description_short: The share of total personal wealth held by the middle 40% of adults — those wealthier than the poorest 50% but less wealthy than the richest 10%.
-        display:
-          name: Middle 40%
           numDecimalPlaces: 1
           tolerance: 5
 
