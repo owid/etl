@@ -173,20 +173,29 @@ def _check_package_size(
     A package that trips this is nearly always telling us the format is wrong
     for that collection, not that the data is unusually large.
 
+    Note that this is a statement about the *zip* only. The Parquet published
+    beside it does not have the problem: nulls are run-length-encoded definition
+    levels, so the empty cells cost almost nothing (measured on
+    years-of-schooling, wide 671kB vs long 680kB -- the shape barely matters),
+    and a consumer reading it with DuckDB pulls only the columns they ask for.
+    So an MDIM that trips this has a working programmatic path already; what it
+    lacks is a sane one-click download.
+
     So when it trips, the fix is a judgement call about that collection, and
     the options are roughly:
 
-      * Long format for this collection. Better for the sparse case and for
-        programmatic consumers, worse in a spreadsheet, and the per-column
-        metadata no longer lines up. Note that a format heuristic was tried
-        before and abandoned -- the switching rule was hard to get right and
-        cost us two code paths to maintain -- so prefer an explicit per-
-        collection choice over reintroducing one.
-      * No package for this collection, pointing power users at the Python
-        catalog library instead, which lets them select the columns they
+      * Raise `max_size_bytes` for this one collection, if a multi-MB download
+        is genuinely acceptable for its audience. Cheapest, and more often right
+        than it looks, given the Parquet covers the people who would suffer most.
+      * No zip for this collection, pointing people at the Parquet and the
+        Python catalog library instead, which let them select the columns they
         actually want and skip the padding entirely.
-      * Raise `max_size_bytes` for this one collection, if the size is genuinely
-        justified and a multi-MB download is acceptable for its audience.
+      * Long format for this collection. Better in a text editor, worse in a
+        spreadsheet, and the per-column metadata no longer lines up. Note that a
+        format heuristic was tried before and abandoned -- the switching rule was
+        hard to get right and cost us two code paths to maintain -- so prefer an
+        explicit per-collection choice over reintroducing one. Least attractive
+        of the three now that Parquet exists.
 
     Whichever it is, it wants a human decision, which is why this raises rather
     than warns.
