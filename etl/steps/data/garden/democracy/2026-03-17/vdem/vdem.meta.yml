@@ -544,6 +544,28 @@ tables:
           {definitions.aux.description_imputes}
         unit: ""
 
+      # Had female HOS ever
+      wom_hos_ever:
+        title: Country had a woman head of state at least once
+        description_short: |-
+          Denotes whether a country ever had a woman head of state.
+        description_from_producer: |-
+          If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
+
+          Indicator name: `v2exfemhos`
+        description_processing: |-
+          We derive this indicator as follows:
+
+          1) Take the gender of the head of state in a given year from V-Dem's `v2exfemhos` indicator, which refers to any point during the year rather than to December 31. A woman who held the office for only part of a year therefore counts.
+          2) Once 1) evaluates to "female", we assign the value 1 to the indicator for the given year and all following years.
+
+          Years in which the gender of the head of state is unknown are left unknown, and so are all later years until a woman held the office: without knowing who was in office, we cannot tell whether a country had had a woman head of state by then.
+
+          This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
+
+          {definitions.aux.description_imputes}
+        unit: ""
+
       ## 3.4.3.16 HOG female
       v2exfemhog:
         title: Woman head of government
@@ -585,6 +607,35 @@ tables:
           Joseph Jacques Jean Chrétien: 1993-2002 Canada
           KåreIsaachsen Willoch: 1981-1985 Norway
           YuriiIvanovych Yekhanurov: 2005 Ukraine
+
+          {definitions.aux.description_imputes}
+        unit: ""
+
+      # Had female HOG ever
+      wom_hog_ever:
+        title: Country had a woman head of government at least once
+        description_short: |-
+          Denotes whether a country ever had a woman head of government.
+        description_from_producer: |-
+          Question: What is the gender of the head of government?
+
+          Clarification: If the head of government is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
+
+          Responses:
+          0: Male
+          1: Female
+
+          Indicator name: `v2exfemhog`
+        description_processing: |-
+          We derive this indicator as follows:
+
+          1) Take the gender of the head of government in a given year from V-Dem's `v2exfemhog` indicator, which refers to any point during the year rather than to December 31. A woman who held the office for only part of a year therefore counts.
+          2) Where the head of state was also the head of government, given by V-Dem's `v2exhoshog` indicator, we use the gender of the head of state instead. V-Dem only fills its head-of-government columns when the two offices are held by different people, so without this step the gender of the head of government would be unknown for more than half of all observations. Where V-Dem fills both, the two never disagree.
+          3) Once 1) or 2) evaluates to "female", we assign the value 1 to the indicator for the given year and all following years.
+
+          Years in which the gender of the head of government is unknown are left unknown, and so are all later years until a woman held the office: without knowing who was in office, we cannot tell whether a country had had a woman head of government by then.
+
+          This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
 
           {definitions.aux.description_imputes}
         unit: ""
@@ -653,7 +704,7 @@ tables:
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
-          This indicator is only estimated for countries listed in V-Dem in 2024.
+          This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
 
           {definitions.aux.description_imputes}
         unit: ""
