@@ -94,7 +94,7 @@ Three routes:
    - Key present in the chart's `patch` → **route (c)** (the patch wins regardless of inheritance).
    - Key absent + inheritance enabled + single y indicator + inheritable → the rendered text IS the indicator's → **route (a)** by default (fix at the source, per the default rule above). Route (c) is only the scope-down option in the blast-radius ask, when the user confirms the change should apply to this one chart and not the other surfaces — and make the trade-off explicit: the patch permanently detaches the field from the indicator's metadata.
    - Key absent + inheritance disabled, or multi-y-indicator chart (inheritance baseline ambiguous — same conservatism as `indicator_update.py`), or no ETL grapher config → **route (c)**.
-3. Entity selection / colors / axis / map settings → chart-config-only → **route (c)**. For selection edits, check the entities actually have data in the indicator (see the `check-empty-entities` skill's availability lookup).
+3. Entity selection / colors / axis / map settings → chart-config-only → **route (c)**. For selection edits, check the entities actually have data in the indicator (see the `check-empty-entities` skill's availability lookup), and keep `selectedEntityColors` in step with the selection: on a rename, move the color entry from the old name to the new one (deleting it discards a deliberately assigned color — a visual regression); on a drop, delete it. Same rule as `check-empty-entities`' fix guidance — keep the two in sync.
 
 **Target = MDim view, field F:**
 
@@ -206,7 +206,7 @@ Scoping rules specific to this skill:
 
 ### Always close with what's still open
 
-Same rule as [`check-hardcoded-years`](../check-hardcoded-years/SKILL.md#always-close-with-whats-still-open) — end the checkpoint and the final hand-off with an explicit open-items block, in the PR body as well as in chat, split into **handed off** (waiting on someone else — `#dod:` terms to create in admin, an editorial call on pin-coupled text), **proposed** (waiting on sign-off — the checkpoint diff itself, and route-(c) chart-diff approval in the Wizard, which is easy to leave dangling because the merge doesn't force it), and **unverified** (checks skipped or scoped out, staging surfaces not previewed). Re-state the whole block on every revisit rather than reporting only the delta, and say explicitly when an item clears.
+End the checkpoint and the final hand-off with the open-items block defined in CLAUDE.md ("Close every report with what's still open") — in the PR body as well as chat. This skill's usual danglers: `#dod:` terms to create in admin and editorial calls on pin-coupled text (handed off), the checkpoint diff itself and route-(c) chart-diff approval in the Wizard (proposed — easy to leave dangling because the merge doesn't force it), and checks scoped out or staging surfaces not previewed (unverified).
 
 ## The guarded chart editor (route c)
 

@@ -15,6 +15,16 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
 - **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
+## Close every report with what's still open
+
+Multi-step work — updates, audits, reviews, migrations — rarely ends with everything closed. End the report (and the PR body, when there is one) with an explicit open-items block; never make the user ask "what's left?". Keep three buckets separate:
+
+- **Handed off** — waiting on someone else. Name who acts and what the ask is, and include a locator (link, file, id) — an item the next person must re-derive is not handed off.
+- **Proposed** — waiting on sign-off. State the exact change so "yes" is a complete answer.
+- **Unverified** — nobody checked it: skipped or failed checks, surfaces left uncovered, capped or truncated sweeps. Silence here reads as "clean", which is the one wrong signal a report can send.
+
+Re-state the whole block every time the work is revisited — carry open items forward rather than reporting only the delta, and say explicitly when an item clears instead of dropping it silently.
+
 ## Team
 
 Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it."
