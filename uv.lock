@@ -13,7 +13,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-07-25T12:25:05.10952Z"
+exclude-newer = "2026-07-26T09:09:33.726262Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -1358,7 +1358,7 @@ requires-dist = [
     { name = "owid-datautils", editable = "lib/datautils" },
     { name = "owid-owl", editable = "lib/owl" },
     { name = "owid-repack", editable = "lib/repack" },
-    { name = "pandas", specifier = ">=2.3.3,<3" },
+    { name = "pandas", specifier = "==2.3.3" },
     { name = "pandas-gbq", specifier = ">=0.29.2" },
     { name = "pandas-gbq", marker = "extra == 'wizard'", specifier = ">=0.25.0" },
     { name = "pdfplumber", specifier = ">=0.9.0" },
