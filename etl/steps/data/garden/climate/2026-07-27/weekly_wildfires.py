@@ -56,6 +56,21 @@ def sanity_check_europe_aggregates(tb: Table) -> None:
         relative_error = (incl[column] - excl[column] - russia[column]).abs() / incl[column].abs().clip(lower=1)
         assert (relative_error[informed] < 1e-5).all(), f"'{column}' incl. minus excl. Russia does not equal Russia."
 
+    # The shares of land area burnt need a land area for each aggregate. FAOSTAT only reports one for "Europe",
+    # so both aggregates would silently come out all null if their denominators were not filled in.
+    for column in ["share_area_ha", "share_area_ha_cumulative"]:
+        for name, aggregate in [("incl.", incl), ("excl.", excl)]:
+            assert aggregate[column].notna().sum() == russia[column].notna().sum(), (
+                f"'{column}' is informed on fewer dates for 'Europe ({name} Russia)' than for Russia, which "
+                "points to a missing land area."
+            )
+            assert aggregate[column].dropna().between(0, 100).all(), f"'{column}' is outside 0-100% for Europe."
+
+    # Europe without Russia is a much smaller area, so the same burnt area weighs more heavily.
+    assert (excl["total_area_ha"] < incl["total_area_ha"]).all(), (
+        "The land area of Europe excluding Russia should be smaller than including it."
+    )
+
 
 def run(dest_dir: str) -> None:
     #
@@ -124,13 +139,25 @@ def run(dest_dir: str) -> None:
         min_num_values_per_year=1,
         year_col="date",
     )
-    sanity_check_europe_aggregates(tb_pivot)
-
     # Merge land area data with the wildfire data
     tb = pr.merge(tb_pivot, area_most_recent_year, on=["country"], how="left")
 
+    # FAOSTAT reports a land area for "Europe", but not for the two aggregates built from it, so their
+    # denominators have to be set explicitly. "Europe (incl. Russia)" reuses Europe's area as published, and
+    # "Europe (excl. Russia)" subtracts Russia's.
+    faostat_area_ha = area_most_recent_year.set_index("country")["total_area_ha"]
+    assert {"Europe", "Russia"} <= set(faostat_area_ha.index), (
+        "FAOSTAT is missing a land area for 'Europe' or 'Russia'."
+    )
+    europe_area_ha = faostat_area_ha.loc["Europe"]
+    russia_area_ha = faostat_area_ha.loc["Russia"]
+    tb.loc[tb["country"] == "Europe (incl. Russia)", "total_area_ha"] = europe_area_ha
+    tb.loc[tb["country"] == "Europe (excl. Russia)", "total_area_ha"] = europe_area_ha - russia_area_ha
+
     tb["share_area_ha"] = (tb["area_ha"] / tb["total_area_ha"]) * 100
     tb["share_area_ha_cumulative"] = (tb["area_ha_cumulative"] / tb["total_area_ha"]) * 100
+
+    sanity_check_europe_aggregates(tb)
 
     tb = tb.drop(columns=["total_area_ha"])
     tb = tb.set_index(["country", "date"], verify_integrity=True)
