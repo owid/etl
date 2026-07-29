@@ -13,7 +13,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-07-26T09:09:33.726262Z"
+exclude-newer = "2026-07-26T10:51:54.004645Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -4556,7 +4556,7 @@ dev = [
 
 [[package]]
 name = "owid-datautils"
-version = "0.6.7"
+version = "0.6.8"
 source = { editable = "lib/datautils" }
 dependencies = [
     { name = "boto3" },
