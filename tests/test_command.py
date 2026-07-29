@@ -63,6 +63,50 @@ def test_exec_graph_parallel():
     assert all(task in done for task in exec_graph.keys())
 
 
+def test_exec_graph_parallel_prints_traceback(capsys):
+    def failing_func(task: str, **kwargs):
+        raise ValueError(f"boom in {task}")
+
+    # Without continue_on_failure the exception propagates, but only once the pool has drained
+    # every already-submitted step, so the traceback has to be printed as soon as the step fails.
+    with pytest.raises(ValueError):
+        cmd.exec_graph_parallel({"task1": set()}, failing_func, continue_on_failure=False, workers=1, use_threads=True)
+
+    captured = capsys.readouterr()
+    assert "--- Failed task1" in captured.out
+    assert "ValueError: boom in task1" in captured.err
+
+
+def test_exec_graph_parallel_reports_every_failure(capsys):
+    def failing_func(task: str, **kwargs):
+        raise ValueError(f"boom in {task}")
+
+    # In continue_on_failure mode only the first exception is ever raised, so each failure needs
+    # its own traceback in the log.
+    with pytest.raises(ValueError):
+        cmd.exec_graph_parallel(
+            {"task1": set(), "task2": set()}, failing_func, continue_on_failure=True, workers=2, use_threads=True
+        )
+
+    captured = capsys.readouterr()
+    assert "ValueError: boom in task1" in captured.err
+    assert "ValueError: boom in task2" in captured.err
+
+
+def test_exec_graph_parallel_does_not_exit_silently_on_system_exit(capsys):
+    # A step that raises SystemExit (as the forked step runner used to on failure) must not end the
+    # run in silence: `except Exception` would not catch it and nothing would be printed.
+    def exiting_func(task: str, **kwargs):
+        raise SystemExit(1)
+
+    with pytest.raises(SystemExit):
+        cmd.exec_graph_parallel({"task1": set()}, exiting_func, continue_on_failure=False, workers=1, use_threads=True)
+
+    captured = capsys.readouterr()
+    assert "--- Failed task1" in captured.out
+    assert "SystemExit" in captured.err
+
+
 def test_construct_full_dag():
     """Test construct_full_dag function covers grapher step generation and export step handling."""
     # Test DAG with data://grapher step and export step
