@@ -42,13 +42,19 @@ def sanity_check_europe_aggregates(tb: Table) -> None:
     assert incl.index.equals(excl.index), "The two European aggregates cover different dates."
     assert incl.index.equals(russia.index), "Russia and the European aggregates cover different dates."
 
-    for column in ["area_ha", "area_ha_cumulative", "events", "events_cumulative"]:
+    for column in ["area_ha", "area_ha_cumulative", "events", "events_cumulative", "CO2", "CO2_cumulative"]:
         # Excluding Russia can only lower the aggregate.
         assert (excl[column] <= incl[column]).all(), f"'{column}' is larger excluding Russia than including it."
-        # The difference between the two aggregates must be exactly Russia.
-        assert ((incl[column] - excl[column] - russia[column]).abs() < 1e-6).all(), (
-            f"'{column}' incl. minus excl. Russia does not equal Russia."
-        )
+
+        # The difference between the two aggregates must be Russia. Compare only the dates where all three are
+        # informed, and check that those are the majority, so that the comparison is not vacuous.
+        informed = incl[column].notna() & excl[column].notna() & russia[column].notna()
+        assert informed.sum() > 0.5 * len(incl), f"'{column}' is informed on too few dates to be checked."
+        # NOTE: Values are stored as float32, so compare relative to the magnitude of the aggregate. An exact
+        # comparison fails on rounding alone (the largest aggregates are of the order of 1e7, where one float32
+        # step is about 2).
+        relative_error = (incl[column] - excl[column] - russia[column]).abs() / incl[column].abs().clip(lower=1)
+        assert (relative_error[informed] < 1e-5).all(), f"'{column}' incl. minus excl. Russia does not equal Russia."
 
 
 def run(dest_dir: str) -> None:
