@@ -303,8 +303,19 @@ def main_cli(
             with launch_ipdb_on_exception():
                 main(**kwargs)  # ty: ignore
         else:
+            from etl.steps import StepFailedError
+
             try:
                 main(**kwargs)  # ty: ignore
+            except StepFailedError:
+                if not watch:
+                    # Every failed step has just been reported, with its traceback, by the recap at
+                    # the end of the run. Re-raising would add nothing but executor plumbing
+                    # (_RemoteTraceback and future.result frames) and push that recap out of the
+                    # tail of the log, which is the part CI shows you.
+                    raise SystemExit(1) from None
+                print("--- step_failed", flush=True)
+                continue
             except Exception:
                 if not watch:
                     raise
