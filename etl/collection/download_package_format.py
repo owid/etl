@@ -626,12 +626,20 @@ def _data_processing_lines(col: IndicatorColumn) -> list[str]:
     return ["", "#### Notes on our processing step for this indicator", description_processing]
 
 
-def column_readme_text(col: IndicatorColumn, today: date) -> list[str]:
-    """`columnReadmeText` -- one indicator's full readme section, as lines."""
+def column_readme_text(col: IndicatorColumn, today: date, heading: str | None = None) -> list[str]:
+    """`columnReadmeText` -- one indicator's full readme section, as lines.
+
+    `heading` overrides the section title, which the port otherwise takes from
+    `get_title()` like the TypeScript does. The complete-dataset package passes
+    its column name: with 21+ columns in one file, a reader has to be able to
+    match a readme section to a column, and since that name comes from the
+    indicator's `name` rather than its display title the two would otherwise
+    read as different indicators.
+    """
     attribution = get_attribution(col)
     return [
         "",
-        f"## {get_title(col)}",
+        f"## {heading or get_title(col)}",
         *_description_lines(col),
         *_key_data_lines(col, today),
         "",
