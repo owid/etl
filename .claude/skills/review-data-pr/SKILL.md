@@ -149,6 +149,12 @@ Run after the §4 pipeline build. Three checks:
 
 If the garden step doesn't use the harmonizer at all (no `.countries.json`; `country` assigned inline), checks #2 and #3 still apply — #2 is the only thing that catches non-canonical inline values.
 
+### 8c-bis. Did another dataset update merge while this PR was open?
+
+Cheap and worth doing on any PR more than a few days old. A branch serves *its own* snapshot of every other dataset, so if another update merged to `master` meanwhile, the branch's staging is behind on that dataset — and any chart combining both differs from production on two axes. Approving it syncs the stale config back and **reverts the other update** on a published chart. Nothing flags this: CI is green and the chart renders.
+
+Check `git log HEAD..origin/master --oneline` for `📊` dataset commits; for each, look for charts carrying indicators from both datasets and compare **every** dimension's dataset version, staging vs production — not just the dimension this PR touches. The fix is merging `master` in and remapping the affected charts' foreign dimensions; charts using *only* the other dataset are out of chart-diff scope and never sync, so they're correctly left alone. 🔴 if a shared chart would regress.
+
 ### 8d. Empty-entity audit (optional to run — always offer it)
 
 The author-side audit is optional to *run* in `/update-dataset` (the `check-empty-entities` skill sweeps every chart/MDim/explorer/narrative/gdoc surface, which can consume many tokens) — so a missing audit is not a finding. If the author ran it, verify the **outcome**: a selection that had data on production but none on staging is a 🔴 regression from the update; a gap identical on production is 🟡 pre-existing — it still needs fixing (chart-config edit or content follow-up on the gdoc), just not necessarily in this PR, so confirm the PR body documents it and a fix is planned.
@@ -297,6 +303,9 @@ Structure the review with:
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
 8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
+9. **What's still open** — carried forward from the PR body, using the open-items buckets defined in CLAUDE.md ("Close every report with what's still open") plus the update workflow's fourth bucket (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+
+**Check the PR body actually carries that block** (CLAUDE.md requires it). A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Findings that were deliberately handed off need a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 
 ## Severity rubric
 
