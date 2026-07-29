@@ -760,12 +760,13 @@ class DataStep(Step):
                 os._exit(0)
             except BaseException:
                 # Hand the traceback to the parent through a file rather than writing it to the
-                # stderr this child shares with its siblings. A traceback easily exceeds PIPE_BUF,
+                # stdout this child shares with its siblings. A traceback easily exceeds PIPE_BUF,
                 # above which a write is neither atomic nor guaranteed to complete in one call, so
                 # concurrent children would interleave into an unreadable mix. The parent attaches
-                # it to StepFailedError, which the runners print one failure at a time.
+                # it to StepFailedError, which the runners print one failure at a time, labelled
+                # with the step it belongs to.
                 try:
-                    traceback_path.write_text(f">>> Traceback for {self}\n{traceback.format_exc()}")
+                    traceback_path.write_text(traceback.format_exc())
                 except OSError:
                     # Last resort, interleaved or not: never lose the traceback.
                     traceback.print_exc()

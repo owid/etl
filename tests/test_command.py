@@ -74,7 +74,7 @@ def test_exec_graph_parallel_prints_traceback(capsys):
 
     captured = capsys.readouterr()
     assert "+++ Failed task1" in captured.out
-    assert "ValueError: boom in task1" in captured.err
+    assert "ValueError: boom in task1" in captured.out
 
 
 def test_exec_graph_parallel_reports_every_failure(capsys):
@@ -89,8 +89,8 @@ def test_exec_graph_parallel_reports_every_failure(capsys):
         )
 
     captured = capsys.readouterr()
-    assert "ValueError: boom in task1" in captured.err
-    assert "ValueError: boom in task2" in captured.err
+    assert "ValueError: boom in task1" in captured.out
+    assert "ValueError: boom in task2" in captured.out
 
 
 def test_exec_graph_parallel_recaps_failures_at_the_end(capsys):
@@ -109,7 +109,9 @@ def test_exec_graph_parallel_recaps_failures_at_the_end(capsys):
     # plumbing, so every failure's traceback is repeated in a recap at the end of the run.
     assert "+++ 2 step(s) failed" in captured.out
     for task in ("task1", "task2"):
-        assert captured.err.count(f"TypeError: bad dtype in {task}") == 2
+        # Header and traceback have to be one write to one stream, or Buildkite interleaves them.
+        assert captured.out.count(f"+++ Failed {task}\nTypeError: bad dtype in {task}") == 1
+        assert captured.out.count(f">>> Failed {task}\nTypeError: bad dtype in {task}") == 1
 
 
 def test_exec_graph_parallel_does_not_exit_silently_on_system_exit(capsys):
@@ -123,7 +125,7 @@ def test_exec_graph_parallel_does_not_exit_silently_on_system_exit(capsys):
 
     captured = capsys.readouterr()
     assert "+++ Failed task1" in captured.out
-    assert "SystemExit" in captured.err
+    assert "SystemExit" in captured.out
 
 
 def test_construct_full_dag():

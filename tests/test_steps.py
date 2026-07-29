@@ -98,7 +98,6 @@ def test_data_step_failure_raises_step_failed_error():
     # The traceback rides along on the exception (not in its message, which gets re-raised at the
     # end of a run), so whoever handles the failure can print it.
     child_traceback = exc_info.value.child_traceback
-    assert f">>> Traceback for data://{step_name}" in child_traceback
     assert "ValueError: boom in step code" in child_traceback
     assert "Traceback (most recent call last)" in child_traceback
     # The file the child passes its traceback through is the parent's to clean up.

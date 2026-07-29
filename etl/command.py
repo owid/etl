@@ -618,10 +618,9 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
                     failing_steps.append(step)
                     exceptions.append(e)
                     skipped_steps.append(step)
-                    click.echo(click.style(f"--- FAILED {step}", fg="red"))
                     # Only the first exception gets raised at the end of the run, so report this
                     # one now or it is lost.
-                    _print_step_failure(e)
+                    _print_step_failure(str(step), e)
                     continue
                 else:
                     raise e
@@ -777,11 +776,7 @@ def exec_graph_parallel(
                         except BaseException as e:
                             # Report the failure right away, as well as in the end-of-run recap: on a
                             # long build you want to see it while the run is still going.
-                            # "+++" rather than "---": both open a log group in Buildkite, but a
-                            # "---" one is collapsed by default, which would fold the traceback
-                            # printed right below out of sight.
-                            print(f"+++ Failed {task}")
-                            _print_step_failure(e)
+                            _print_step_failure(task, e)
                             failures.append((task, e))
 
                             if continue_on_failure:
@@ -828,35 +823,45 @@ def _print_failure_recap(failures: "list[tuple[str, BaseException]]") -> None:
 
     log = structlog.get_logger()
 
-    print(f"+++ {len(failures)} step(s) failed", flush=True)
+    # ">>>" rather than "---"/"+++" for the individual steps: those would each open a Buildkite log
+    # group of their own, splitting the recap up. This way they stay inside the recap's own group.
+    blocks = [f"+++ {len(failures)} step(s) failed"]
     for step_name, e in failures:
-        # Not a "---"/"+++" prefix: that would open a new Buildkite log group per failure and only
-        # the last one stays visible. These stay inside the recap's own group.
-        print(f">>> Failed {step_name}", flush=True)
-        _print_step_failure(e)
+        blocks.append(f">>> Failed {step_name}\n{_format_step_failure(e)}")
+    print("\n".join(blocks), flush=True)
+
     # The step list at the very end is what you feed back into `etl run`.
     log.error("steps_failed", steps=sorted(step_name for step_name, _ in failures))
 
 
-def _print_step_failure(e: BaseException) -> None:
-    """Print what a failed step's exception says, on stderr, right when the failure happens."""
-    from etl.steps import StepFailedError
+def _print_step_failure(step_name: str, e: BaseException) -> None:
+    """Report a failed step and its traceback, right when the failure happens.
 
-    # Anything printed to stdout just before this (the "--- Failed <step>" header) is still sitting
-    # in a block buffer when stdout is a pipe, as it is in CI, while stderr is unbuffered — without
-    # this the header and its traceback end up hundreds of lines apart.
-    sys.stdout.flush()
+    "+++" rather than the "---" the other headers use: both open a log group in Buildkite, but a
+    "---" one is collapsed by default, which would fold the traceback out of sight.
+    """
+    print(f"+++ Failed {step_name}\n{_format_step_failure(e)}", flush=True)
+
+
+def _format_step_failure(e: BaseException) -> str:
+    """Render what a failed step's exception says.
+
+    One string, printed in one call to stdout by the callers, rather than a header on stdout and a
+    traceback on stderr: Buildkite reads the two streams through separate pipes and merges them in
+    the order its readers happen to see them, so output split across both comes out interleaved no
+    matter how carefully each stream is flushed.
+    """
+    from etl.steps import StepFailedError
 
     if isinstance(e, StepFailedError):
         # The step ran in a child process, which handed its traceback back through the exception.
-        # Printing the exception itself would only add executor plumbing (_RemoteTraceback,
+        # Rendering the exception itself would only add executor plumbing (_RemoteTraceback,
         # future.result frames).
-        if e.child_traceback:
-            print(e.child_traceback, file=sys.stderr)
-        print(e, file=sys.stderr)
+        parts = [e.child_traceback] if e.child_traceback else []
+        parts.append(str(e))
+        return "\n".join(parts)
     else:
-        traceback.print_exception(type(e), e, e.__traceback__)
-    sys.stderr.flush()
+        return "".join(traceback.format_exception(type(e), e, e.__traceback__)).rstrip()
 
 
 def _exec_step_job(
