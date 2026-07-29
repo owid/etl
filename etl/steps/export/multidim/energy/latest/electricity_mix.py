@@ -284,7 +284,9 @@ def add_decomposition_views(c) -> None:
     aggregates, so grapher hides the metric when an individual source is selected.
     """
     base_config = {
-        "chartTypes": ["StackedArea"],
+        # StackedArea (mix over time) + StackedDiscreteBar (cross-country mix at a point in time); both
+        # Group-2 (stacked) chart types, so they can coexist.
+        "chartTypes": ["StackedArea", "StackedDiscreteBar"],
         "tab": "chart",
         "hasMapTab": False,
         "hideRelativeToggle": False,
