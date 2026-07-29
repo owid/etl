@@ -31,12 +31,23 @@ Cache per variable id and fetch in parallel (a large dataset means hundreds of v
 
 Overwhelmingly from **entity-rename cycles of a dataset's own aggregate entities** — a past update changed the suffix convention (`Multilaterals (OECD)` → `Multilateral organizations`, `Low-income countries (WB)` → hyphenated unsuffixed forms) and every surface that pinned the old names kept them. Real-country selections almost never die; dataset-defined aggregates (donor groups, income groups, provider regions) are the population to watch. Two consequences for the audit: the moment one finding surfaces a renamed-suffix pattern, **grep every surface for that pattern directly** (chart `selectedEntityNames` *and* `focusedSeriesNames`, narrative-chart patches, article `country=` URLs) instead of relying only on per-view availability checks — the same rename hits them all; and note that dead names sit in both directions (an old suffixed form can die while its unsuffixed twin lives, or vice versa — check availability, don't pattern-guess the fix). (ODA 2026-07: one rename cycle left dead names on 5 charts, 6 narrative charts, and 4 published articles simultaneously.)
 
+### Fixing a dead selection: rename, drop, or neither
+
+String similarity picks the *fix*, never validates it — it proposed `Nigeria → Niger` (different countries) in a real sweep. Before applying any rename, **read the chart's whole selection**, and gate every edit on three checks: the replacement must have data in *that chart's own* y-variables, must not already be selected, and the result must contain no duplicates. Drops need the mirror guard — refuse to remove any entity that *does* have data.
+
+Reading the whole selection is what catches the two failure modes similarity can't:
+
+- **Scheme mismatch.** A chart pinning a coherent non-provider scheme (Oceania, Central Asia, Eastern Europe, South America, Western & Central Europe…) against an indicator that only carries provider regions will offer tempting one-to-one matches for the handful whose names overlap (`South Asia`, `North America`). Applying them silently mixes two incompatible region definitions in one chart. The fix is a decision about which scheme the chart should use, not a rename — put it to the dataset owner.
+- **The target is already pinned.** Then the dead name is a leftover, and the fix is a **drop, not a rename** — renaming duplicates the entity. Common after a partial past migration: the same chart carries both `Sub-Saharan Africa` and `Sub-Saharan Africa (WB)`, or both the old and new MENA names. (Watch for genuinely renamed aggregates too: the World Bank's `Middle East and North Africa` became `Middle East, North Africa, Afghanistan and Pakistan (WB)` — a definitional change, not cosmetic.) Same for aggregates we never carry: `Middle-income countries` isn't one of the four WB income groups, and charts pinning it usually already have `Upper-middle-income countries` and `Lower-middle-income countries`.
+
+Prune `selectedEntityColors` for every entity you drop or rename, or the config keeps a dangling colour key. And check the excluded-countries file before proposing anything: an entity in `<short_name>.excluded_countries.json` (`IDA only`, `Arab World`, `Heavily-indebted poor countries`) can never have data, so a drop is the only option.
+
 ### 1. Charts
 
 For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`), parse `chart_configs.full`:
 
 - `selectedEntityNames` must intersect the union of the chart's y-variables' entities-with-data. Zero overlap on a non-empty selection = the chart renders empty.
-- **Skip ScatterPlot and Marimekko** — they legitimately have no `selectedEntityNames` (they plot all entities).
+- **Skip ScatterPlot and Marimekko** — they legitimately have no `selectedEntityNames` (they plot all entities). Detect them by shape, not by the `type` field: a chart with an `x` dimension renders as a scatter even when `type` is absent (reporting as the `LineChart` default). An **empty selection means every entity renders, not none** — so a bad value in such a chart is maximally visible, not hidden. (`share-of-rural-population-with-electricity-access-vs-…`, 0 selected + `minTime: latest`, is where a reader spotted Chad plotted at 100% rural electricity access.) Phrasing a report line as "corrected entity not in selection" for these charts is actively misleading.
 - A **missing/empty selection** on other chart types is only a finding if production's config differs — the upgrader never touches entity selections, so an empty selection is almost always pre-existing. Verify via public Datasette before flagging.
 - Also flag any y-variable whose entity list is entirely empty (a broken indicator, not just a broken view).
 
