@@ -303,6 +303,9 @@ Structure the review with:
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
 8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
+9. **What's still open** — carried forward from the PR body, split into **handed off** (waiting on someone else — content edits, an upstream error reported to the producer, a topic owner's decision), **proposed** (waiting on sign-off), **unverified** (audits offered but not run, failed fetches, surfaces skipped for cost), and **deferred to a follow-up PR** (downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+
+**Check the PR body actually carries that block** (`/update-dataset` requires it). A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Findings that were deliberately handed off need a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 
 ## Severity rubric
 

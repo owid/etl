@@ -1000,6 +1000,18 @@ Tell the user something like: "Final QA: please review **[Anomalist](http://<con
 
 These pages need a fresh staging build, so they're only meaningful after the PR's grapher upload to staging has completed and the staging server has rebuilt.
 
+**Close every hand-off with a standing "what's still open" block.** An update generates far more loose ends than it closes: findings routed to someone else, fixes awaiting sign-off, checks nobody ran, work deferred to a follow-up PR. Those are invisible unless named, and a hand-off that lists only what you *did* reads as if the update is finished. Put the block in the **PR body** as well as in chat — chat scrolls away, and the PR is what the reviewer and future-you actually read.
+
+Keep three buckets separate, because each needs something different from the reader:
+
+- **Handed off — waiting on someone else.** Gdoc/content edits, editorial calls, an upstream data error to report to the producer, a topic owner's decision. Name **who** acts and **what the ask is**, and include the locator so they don't have to re-derive your work.
+- **Proposed — waiting on sign-off.** Ready-to-apply changes you're holding because they're reader-facing. State the exact change so "yes" is a complete answer.
+- **Unverified — nobody checked this.** Audits offered but not run, metadata fetches that failed, surfaces skipped for cost, top-N truncation, anything the staging build didn't cover. Silence here reads as "clean", which is the one wrong signal a hand-off can send.
+
+Plus **deferred to a follow-up PR** where the two-PR pattern is in play (downstream consumers to repoint, old-version archiving, charts on retired indicators) — that list is the follow-up PR's scope, so losing it means redoing the analysis.
+
+Re-state the whole block on **every** revisit, including after a round of fixes — carry forward what's still open rather than reporting only the delta, and say explicitly when an item clears instead of dropping it silently. The user should never have to ask "what's left?" or "tell me everything I haven't tackled".
+
 **Before closing out, confirm both optional heavier audits were suggested.** Two checks are opt-in to *run* but **mandatory to offer** — the adversarial data & metadata review (`/adversarial-data-review`, step 6c-bis) and the empty-entity audit (`check-empty-entities`, step 7). It's easy to skip past them in a long session, which is exactly the failure this guard exists to catch. If you reach this hand-off and haven't yet surfaced either one to the user, do it now: name the skill, say briefly what it would catch and why you did or didn't recommend running it, and let the user decide. Never let the update finish having silently omitted the offer.
 
 ## Guardrails and tips

@@ -215,3 +215,17 @@ One table per severity — chart/view id, surface, admin or grapher link (stagin
 - **Coverage caveats** — variables whose metadata fetch failed; non-ETL explorers whose TSV wasn't parsed.
 
 Pins are almost always **pre-existing** (updates don't create them), so there's no production-grading pass here — the question is only whether the new data now extends past the pin.
+
+### Always close with what's still open
+
+An audit's findings mostly can't be closed by the audit: gdoc pins need a content edit, reader-facing defaults need sign-off, some surfaces couldn't be graded at all. Those items are invisible unless you name them, and a report that only lists what you *found* reads as if the work is done. So end every run with an explicit open-items block, and repeat it in the PR body — not just in chat, which scrolls away.
+
+Three separate buckets; don't merge them, because they need different things from the reader:
+
+- **Handed off — waiting on someone else.** Findings you deliberately did not fix (gdoc edits, editorial calls on FAUST-coupled pins, decisions the topic owner owns). Say **who** acts and **what the ask is**, and give them the locator, not just the finding — an item nobody can act on without re-deriving your work is not really handed off.
+- **Proposed — waiting on sign-off.** Fixes you're ready to apply but haven't, because they change a reader-facing default. State the exact change so "yes" is a complete answer.
+- **Unverified — nobody checked this.** Metadata fetches that failed, non-ETL explorer TSVs left unparsed, surfaces skipped for cost, any top-N truncation. Silence here reads as "clean", which is the one wrong signal an audit can send. If you bounded the sweep, say what fell outside the bound.
+
+Re-state the block **every time** the audit is revisited, including after a round of fixes — carry forward what's still open rather than reporting only the delta, so the remaining work never has to be reconstructed from scrollback. When an item clears, say so explicitly instead of dropping it silently.
+
+Where the same run also touched things outside this audit's scope (a follow-up PR, an upstream data error to report to the producer), list those too. The point is that the user should never have to ask "what's left?".
