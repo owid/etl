@@ -12,7 +12,7 @@ Arguments:
 
 **Main use case**: Branch out from `master` to a temporary `work_branch`, and create a PR to merge `work_branch` -> `master`. You will be asked to choose a category. The value of `work_branch` will be auto-generated based on the title and the category.
 
-The work branch is always created from the latest `origin/<base_branch>`, not from your (possibly stale) local base branch: when branching in place, the local base branch is first fast-forwarded to its remote counterpart (the command fails if the two have diverged); with `--worktree`, the new branch starts directly from `origin/<base_branch>`. Pass `--no-update-base` to branch off your local base branch as-is.
+The work branch is always created from the latest `origin/<base_branch>`, never from your (possibly stale) local base branch, so unpushed commits sitting on the local base branch are not included. When branching in place, the local base branch is also fast-forwarded to its remote counterpart along the way (the command fails if the two have diverged). Pass `--no-update-base` to branch off your local base branch as-is instead.
 
 ```shell
 # Without specifying a category (you will be prompted for a category)
@@ -426,7 +426,19 @@ def branch_out(repo, base_branch, work_branch, update_base: bool = True):
                     f"Reconcile them first (e.g. 'git rebase origin/{base_branch}'), or re-run with --no-update-base "
                     f"to branch off your local '{base_branch}' as-is.\n{e}"
                 )
-        repo.git.checkout("-b", work_branch)
+            # The local base branch may still be ahead of the remote (unpushed commits); the
+            # fast-forward above is a no-op then. The work branch must start exactly at the
+            # remote tip, so those commits don't silently end up in the PR.
+            if repo.commit(base_branch) != repo.commit(f"origin/{base_branch}"):
+                log.warning(
+                    f"Local '{base_branch}' has commits not pushed to 'origin/{base_branch}'; they will NOT be "
+                    f"included in '{work_branch}'. Re-run with --no-update-base to include them."
+                )
+            # --no-track: without it, git would set 'origin/<base_branch>' as the new branch's
+            # upstream, which breaks a plain `git push` on the work branch later.
+            repo.git.checkout("--no-track", "-b", work_branch, f"origin/{base_branch}")
+        else:
+            repo.git.checkout("-b", work_branch)
     except GitCommandError as e:
         raise click.ClickException(f"Failed to create a new branch from '{base_branch}':\n{e}")
 

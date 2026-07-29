@@ -59,6 +59,20 @@ def test_branch_out_starts_from_remote_and_fast_forwards_base(stale_local):
     assert stale_local.head.commit == remote_tip
     # The local base branch was fast-forwarded along the way.
     assert stale_local.commit("master") == remote_tip
+    # No upstream tracking: a plain `git push` on the work branch must not target origin/master.
+    assert stale_local.active_branch.tracking_branch() is None
+
+
+def test_branch_out_excludes_unpushed_local_commits(stale_local):
+    # Make the local base branch strictly ahead of the remote (unpushed commit on top of its tip).
+    stale_local.git.merge("--ff-only", "origin/master")
+    local_tip = _commit_file(stale_local, "local.txt", "3", "unpushed local commit")
+    remote_tip = stale_local.commit("origin/master")
+    branch_out(stale_local, "master", "work-branch")
+    # The work branch starts exactly at the remote tip, without the unpushed commit.
+    assert stale_local.head.commit == remote_tip
+    # The unpushed commit stays on the local base branch, untouched.
+    assert stale_local.commit("master") == local_tip
 
 
 def test_branch_out_no_update_base_keeps_stale_start_point(stale_local):
