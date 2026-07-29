@@ -73,10 +73,19 @@ Three exclusions keep that check from crying wolf; without them a WDI-scale swee
 
 - **Strip URLs from the context window before scanning it for years.** The context contains the link's own `time=1990..2016`, so a naive year regex "finds" 1990 and 2016 in every single case and marks the whole list deliberate. Sub out `https?://\S+` first. (This produced a wrong 9-of-15 "deliberate" verdict on the WDI 2026-07-27 sweep.)
 - **`endpointsOnly=1` justifies the start bound, not the end one.** It means the chart is a first-vs-last-point comparison — so the start year is structural, but the comparison is generally *better* with more years. These are usually "extend the end to `latest`, keep the start", not "leave alone".
-- **The real blocker is a numeric claim in the sentence that depends on the end year** — "increased 12-fold", "more than 95%", a ratio in the article title. Changing the pin there invalidates prose, so it's an editorial call, not a link fix.
+- **The real blocker is a numeric claim in the sentence that depends on the end year** — "increased 12-fold", "more than 95%", a ratio in the article title. Changing the pin there invalidates prose, so it's an editorial call, not a link fix. Scan for **numbers, not just years**: "the UK economy has grown 300% and the world economy more than 600%" names no year but is entirely determined by the pinned endpoint.
 - **Check the link's visible text and the article title too**, not just the surrounding sentence: link text of literally `2024`, or a title like "…over the past three decades" matching a `1994..2024` range, couples the pin to something a reader sees.
 - **Sibling links to the same chart are strong evidence.** If one link in a passage uses `time=latest` and another uses a pinned year, the pinned one is almost certainly an oversight; if the prose links use `latest` and only a `<Chart>` embed is pinned, likewise.
 - Also flag the inverse of staleness: a pin whose range **stops short of the years the sentence discusses** (prose about "2010 to 2019" under a chart pinned `1990..2017`).
+
+**Make each finding locatable in the Google Doc**, or the handoff is unusable — whoever fixes it has to find the link before they can edit it, and Google Docs search **does not index hyperlink targets**. So never hand over "search for the chart slug" for an in-text link:
+
+- **Report `posts_gdocs_links.text` — the visible anchor text** — as the search string for `span-link` components ("clicking here", "this other", "Several countries"). That is the only part of the link a reader, or Docs search, can see.
+- The slug is searchable **only** for components that write the URL out as literal text — `chart` (`<Chart url="…">`) and `front-matter`. Branch on `componentType` when composing the instruction; front-matter lives in the doc header, not the body.
+- **Report the raw `target`, not the redirect-resolved slug.** `posts_gdocs_links.target` stores the slug as the author typed it, which may predate a rename (`gross-domestic-product` → `gdp-worldbank-constant-usd`). Resolve through `chart_slug_redirects` for *grading*; keep the raw target for *locating*.
+- **Count sibling links to the same chart in the same doc** and say which one to fix. A doc can link one chart four times with different `time=` values; "search for X" is ambiguous otherwise. Flag when the anchor text is a very common word ("Here", "2024") so the editor knows to verify by hovering.
+
+**Parse `time=` components; don't prefix-match.** A `time=\d`-style regex silently drops `time=earliest..2017` and `time=earliest..latest` — split on `..` and test each component.
 
 Repo scan for the ETL-side sources (also catches pins that haven't reached any DB yet). The flat keys grep directly; the **nested map bounds (`map:` → `time`/`startTime`) never match a flat pattern** — walk the YAML for those:
 
