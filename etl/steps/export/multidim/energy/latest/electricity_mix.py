@@ -111,9 +111,10 @@ def run() -> None:
             {
                 "hasMapTab": True,
                 "tab": "map" if frequency == "annual" else "chart",
-                # Slope charts let users compare a metric across countries between two time points
-                # (e.g. coal's share in 2000 vs 2025). Not added to the by-source stacks (can't slope a stack).
-                "chartTypes": ["LineChart", "DiscreteBar", "SlopeChart"],
+                # Slope and dumbbell charts let users compare a metric across countries between two time
+                # points (e.g. coal's share in 2000 vs 2025). All Group-1 (non-stacked) chart types, so
+                # they can coexist; not added to the by-source stacks, which are Group-2 (stacked) only.
+                "chartTypes": ["LineChart", "DiscreteBar", "Dumbbell", "SlopeChart"],
             }
         )
 
