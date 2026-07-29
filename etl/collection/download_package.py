@@ -91,6 +91,108 @@ class DownloadPackageTooLargeError(Exception):
     """Raised when the built package exceeds `MAX_PACKAGE_SIZE_BYTES`."""
 
 
+class DuplicateColumnNameError(Exception):
+    """Raised when two wide-table columns resolve to the same display name."""
+
+
+def _choice_names(dimension_definitions: list[dict]) -> dict[str, dict[str, str]]:
+    """{dimension slug: {choice slug: choice display name}}, for labelling."""
+    return {
+        dimension["slug"]: {choice["slug"]: choice["name"] for choice in dimension["choices"]}
+        for dimension in dimension_definitions
+    }
+
+
+def _disambiguate_long_names(
+    columns: list[tuple[str, str, int, IndicatorColumn]],
+    column_to_dimensions: dict[str, list[dict]],
+    choice_names: dict[str, dict[str, str]],
+    dimension_order: list[str],
+) -> list[tuple[str, str, int, IndicatorColumn]]:
+    """Make colliding display names distinct by appending the dimension values
+    that actually differ between them.
+
+    Two indicators in one collection routinely share a display name, and it is
+    not sloppiness: the name deliberately omits the dimension a drop-down
+    selects. `incomes-across-distribution-lis` has three indicators named
+    "Mean income (per day / per month / per year, after tax, equivalized)"
+    whose `display.name` is "Mean income (after tax)" for all three, because on
+    the chart the period comes from the period selector. `get_title()` prefers
+    the display name, so all three arrive here as one string.
+
+    That makes an automatic fix both possible and the right thing: we know each
+    column's dimension combination, so the three become "Mean income (after
+    tax) - Per day / - Per month / - Per year". Only the dimensions that vary
+    within a colliding group are appended -- appending all of them would bloat
+    every name in a collection with many dimensions to no purpose.
+
+    Names that still collide afterwards are left alone for
+    `_check_column_names_unique` to reject: it means the columns differ by
+    something other than dimensions, and there is nothing meaningful left to
+    append.
+    """
+    groups: dict[str, list[int]] = defaultdict(list)
+    for index, (_wide_name, long_name, _variable_id, _col) in enumerate(columns):
+        groups[long_name].append(index)
+
+    out = list(columns)
+    for indices in groups.values():
+        if len(indices) < 2:
+            continue
+        # first combination only -- the same one _wide_column_name uses, so the
+        # suffix stays stable if a later view starts showing the indicator too
+        combos = {i: (column_to_dimensions.get(columns[i][0]) or [{}])[0] for i in indices}
+        varying = [slug for slug in dimension_order if len({combo.get(slug) for combo in combos.values()}) > 1]
+        if not varying:
+            continue
+        for i in indices:
+            wide_name, long_name, variable_id, col = columns[i]
+            labels = [
+                choice_names.get(slug, {}).get(value) or value for slug in varying if (value := combos[i].get(slug))
+            ]
+            if labels:
+                out[i] = (wide_name, f"{long_name} - {' - '.join(labels)}", variable_id, col)
+    return out
+
+
+def _check_column_names_unique(page_slug: str, columns: list[tuple[str, str, int, IndicatorColumn]]) -> None:
+    """Refuse to publish a package whose columns don't have distinct names.
+
+    The display name is used three times over -- as the CSV header, as the
+    Parquet field name, and as the key of that column's entry in
+    `metadata.json` -- so two columns sharing one is not a cosmetic problem:
+
+      * `metadata.json` is a dict keyed by that name, so one of the two
+        indicators loses its entry entirely, silently.
+      * Parquet permits duplicate field names, but readers don't cope. pandas
+        refuses the file outright (`ArrowInvalid: Multiple matches for
+        FieldRef.Name(...)`), so a single collision makes the whole package
+        unreadable there. DuckDB is worse in a way: it renames the second
+        column to `<name>_1` without complaint, so selecting the name by hand
+        quietly returns only the first of the two.
+      * CSV is the mild case -- pandas mangles the second header to
+        `<name>.1` -- which is why this was originally only a warning.
+
+    Parquet is what promotes it to an error. By the time this runs,
+    `_disambiguate_long_names` has already resolved every collision that the
+    dimensions can explain -- which, measured across all 32 published MDIMs, is
+    all of them. Anything left differs by something we can't name, so it wants
+    a human.
+    """
+    seen: dict[str, list[str]] = defaultdict(list)
+    for wide_name, long_name, _variable_id, _col in columns:
+        seen[long_name].append(wide_name)
+    collisions = {name: cols for name, cols in seen.items() if len(cols) > 1}
+    if not collisions:
+        return
+    detail = "; ".join(f"{name!r} <- {sorted(cols)}" for name, cols in sorted(collisions.items()))
+    raise DuplicateColumnNameError(
+        f"Download package for {page_slug} has {len(collisions)} duplicate column "
+        f"name(s) that the dimensions don't explain: {detail}. See "
+        "_check_column_names_unique in etl/collection/download_package.py."
+    )
+
+
 def _check_package_size(
     page_slug: str,
     zip_bytes: int,
@@ -582,22 +684,22 @@ def build_download_package_for_collection(
     ]
     metadata_by_id = _fetch_indicator_metadata([variable_id for _, variable_id in resolved])
 
-    # Long display name per wide-table column -- becomes both the CSV header
-    # and metadata.json's column key, so the two can't drift from each other.
+    # Long display name per wide-table column -- becomes the CSV header, the
+    # Parquet field name and metadata.json's column key, so none of the three
+    # can drift from the others, and all three need it to be unique.
     columns: list[tuple[str, str, int, IndicatorColumn]] = []
-    seen_long_names: dict[str, str] = {}
     for wide_name, variable_id in resolved:
         col = IndicatorColumn(metadata_by_id[variable_id])
-        long_name = _long_column_name(col)
-        existing = seen_long_names.get(long_name)
-        if existing and existing != wide_name:
-            log.warning(
-                "download_package.column_name_collision",
-                long_name=long_name,
-                columns=[existing, wide_name],
-            )
-        seen_long_names[long_name] = wide_name
-        columns.append((wide_name, long_name, variable_id, col))
+        columns.append((wide_name, _long_column_name(col), variable_id, col))
+
+    dimension_definitions = _dimension_definitions(collection)
+    columns = _disambiguate_long_names(
+        columns,
+        column_to_dimensions,
+        _choice_names(dimension_definitions),
+        [dimension["slug"] for dimension in dimension_definitions],
+    )
+    _check_column_names_unique(page_slug, columns)
 
     #
     # metadata.json + readme.md
@@ -632,7 +734,7 @@ def build_download_package_for_collection(
                 "originalChartUrl": page_url,
                 "selection": collection.default_selection or [],
             },
-            "dimensions": _dimension_definitions(collection),
+            "dimensions": dimension_definitions,
             "columns": metadata_columns,
             # Same key as a single-chart download for format parity, but here
             # it's necessarily the date the package was built, not downloaded.
