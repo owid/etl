@@ -2,6 +2,7 @@
 
 import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Table
 
 from etl.catalog_helpers import last_date_accessed
 from etl.data_helpers import geo
@@ -10,7 +11,72 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "European Union (27)", "World"]
+# Name of the aggregate added alongside "Europe".
+EUROPE_EXCL_RUSSIA = "Europe (excl. Russia)"
+
+# Regions to aggregate.
+# "Europe" includes all of Russia, which accounts for around 90% of the region's burnt area in every year, so the
+# continental total mostly follows the Russian fire season and can move in the opposite direction to the rest of
+# the continent. EUROPE_EXCL_RUSSIA is aggregated alongside it, so readers can choose between "European Union
+# (27)", "Europe" and "Europe (excl. Russia)".
+# NOTE: The order matters. "World" is defined in the regions dataset as the sum of the six continents, so "Europe"
+# has to be aggregated before it. "Europe (excl. Russia)" is not one of those six, so it is not double counted.
+REGIONS = {
+    "North America": {},
+    "South America": {},
+    "Europe": {},
+    EUROPE_EXCL_RUSSIA: {"additional_regions": ["Europe"], "excluded_members": ["Russia"]},
+    "Africa": {},
+    "Asia": {},
+    "Oceania": {},
+    "European Union (27)": {},
+    "World": {},
+}
+
+# The six continents that "World" is defined as the sum of, used to check that "World" stays complete.
+CONTINENTS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
+
+
+def sanity_check_outputs(tb: Table, summed_columns: list[str]) -> None:
+    """Check the new "Europe (excl. Russia)" aggregate, and that adding it left the other regions untouched."""
+    tb = tb.reset_index()
+    countries = set(tb["country"])
+    assert {"Europe", EUROPE_EXCL_RUSSIA, "Russia", "World"} <= countries, "A required region is missing."
+    assert set(CONTINENTS) <= countries, "A continent is missing, which would make 'World' incomplete."
+
+    europe = tb[tb["country"] == "Europe"].set_index("date").sort_index()
+    excl = tb[tb["country"] == EUROPE_EXCL_RUSSIA].set_index("date").sort_index()
+    russia = tb[tb["country"] == "Russia"].set_index("date").sort_index()
+    assert europe.index.equals(excl.index), "'Europe' and 'Europe (excl. Russia)' cover different dates."
+    assert europe.index.equals(russia.index), "Russia and the European aggregates cover different dates."
+
+    # No indicator should be entirely empty for the new aggregate. FAOSTAT publishes no land area for it, so the
+    # share indicators come out null unless their denominator is derived explicitly.
+    for column in [c for c in tb.columns if c not in ("country", "date")]:
+        if russia[column].notna().any():
+            assert excl[column].notna().any(), f"'{column}' is entirely empty for '{EUROPE_EXCL_RUSSIA}'."
+
+    for column in summed_columns:
+        # Excluding Russia can only lower the total.
+        assert (excl[column] <= europe[column]).all(), f"'{column}' is larger excluding Russia than including it."
+        # Europe minus Europe excluding Russia must be Russia.
+        # NOTE: Values are stored as float32, so compare relative to the magnitude of the total. An exact
+        # comparison fails on rounding alone (the largest totals are of the order of 1e7, where one float32 step
+        # is about 2).
+        informed = europe[column].notna() & excl[column].notna() & russia[column].notna()
+        assert informed.sum() > 0.5 * len(europe), f"'{column}' is informed on too few dates to be checked."
+        error = (europe[column] - excl[column] - russia[column]).abs() / europe[column].abs().clip(lower=1)
+        assert (error[informed] < 1e-5).all(), f"'{column}' for Europe minus Europe excluding Russia is not Russia."
+
+        # "World" is the sum of the six continents. Adding a region must not change it.
+        world = tb[tb["country"] == "World"].set_index("date").sort_index()[column]
+        continents = sum(tb[tb["country"] == c].set_index("date").sort_index()[column].fillna(0) for c in CONTINENTS)
+        informed = world.notna()
+        error = (world - continents).abs() / world.abs().clip(lower=1)
+        assert (error[informed] < 1e-5).all(), f"'World' is not the sum of the six continents for '{column}'."
+
+    for column in [c for c in tb.columns if c.startswith("share_")]:
+        assert excl[column].dropna().between(0, 100).all(), f"'{column}' is outside 0-100% for {EUROPE_EXCL_RUSSIA}."
 
 
 def run(dest_dir: str) -> None:
@@ -83,11 +149,23 @@ def run(dest_dir: str) -> None:
     # Merge land area data with the wildfire data
     tb = pr.merge(tb_pivot, area_most_recent_year, on=["country"], how="left")
 
+    # FAOSTAT publishes a land area for "Europe", but not for aggregates derived from it, so the merge above leaves
+    # the new aggregate without a denominator and its shares would silently come out null. Derive it here.
+    faostat_area_ha = area_most_recent_year.set_index("country")["total_area_ha"]
+    assert {"Europe", "Russia"} <= set(faostat_area_ha.index), (
+        "FAOSTAT is missing a land area for 'Europe' or 'Russia'."
+    )
+    tb.loc[tb["country"] == EUROPE_EXCL_RUSSIA, "total_area_ha"] = (
+        faostat_area_ha.loc["Europe"] - faostat_area_ha.loc["Russia"]
+    )
+
     tb["share_area_ha"] = (tb["area_ha"] / tb["total_area_ha"]) * 100
     tb["share_area_ha_cumulative"] = (tb["area_ha_cumulative"] / tb["total_area_ha"]) * 100
 
     tb = tb.drop(columns=["total_area_ha"])
     tb = tb.set_index(["country", "date"], verify_integrity=True)
+
+    sanity_check_outputs(tb, summed_columns=cols_to_keep)
 
     #
     # Save outputs.
