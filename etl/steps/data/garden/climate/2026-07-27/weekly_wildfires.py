@@ -12,13 +12,16 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Regions to aggregate.
-# NOTE: "Europe" is deliberately absent. Russia accounts for around 90% of the burnt area of the European
-# aggregate in every year, so a plain "Europe" line tracks the Russian fire season and can move in the opposite
-# direction to the rest of the continent. It is split into two explicit aggregates instead, so that readers pick
-# the one they mean.
+# NOTE: Russia accounts for around 90% of the burnt area of the European aggregate in every year, so a plain
+# "Europe" line tracks the Russian fire season and can move in the opposite direction to the rest of the
+# continent. It is therefore split into the two explicit aggregates below, so that readers pick the one they mean.
+# "Europe" itself is still aggregated, because "World" is defined as the sum of the six continents and would
+# otherwise be missing Europe entirely. It is dropped right after the aggregation, before anything is published.
+# The order matters: "Europe" has to come before "World".
 REGIONS = {
     "North America": {},
     "South America": {},
+    "Europe": {},
     "Europe (incl. Russia)": {"additional_regions": ["Europe"]},
     "Europe (excl. Russia)": {"additional_regions": ["Europe"], "excluded_members": ["Russia"]},
     "Africa": {},
@@ -27,6 +30,40 @@ REGIONS = {
     "European Union (27)": {},
     "World": {},
 }
+
+# The six continents that "World" is the sum of. Used to check that "World" stays complete.
+CONTINENTS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
+
+# Aggregates that are only built so that "World" can be computed, and that are not published.
+REGIONS_NOT_PUBLISHED = ["Europe"]
+
+
+def sanity_check_world_is_complete(tb: Table) -> None:
+    """Check that "World" is still the sum of the six continents.
+
+    "World" is an aggregate of the six continents, not of individual countries, so it is only complete while
+    the plain "Europe" aggregate is in the table. Dropping "Europe" before "World" is computed would quietly
+    remove Europe from the world total instead of raising.
+    """
+    missing = sorted(set(CONTINENTS) - set(tb["country"]))
+    assert not missing, (
+        f"{missing} missing from the table, so the 'World' aggregate is incomplete. Every continent has to stay "
+        "in REGIONS, even the ones that are not published."
+    )
+
+    world = tb[tb["country"] == "World"].set_index("date").sort_index()
+    continents = {continent: tb[tb["country"] == continent].set_index("date").sort_index() for continent in CONTINENTS}
+    for continent, tb_continent in continents.items():
+        assert world.index.equals(tb_continent.index), f"'{continent}' and 'World' cover different dates."
+
+    for column in ["area_ha", "area_ha_cumulative", "events", "events_cumulative", "CO2", "CO2_cumulative"]:
+        total = sum(tb_continent[column].fillna(0) for tb_continent in continents.values())
+        # NOTE: Values are stored as float32, so compare relative to the magnitude of the total.
+        relative_error = (world[column].fillna(0) - total).abs() / world[column].abs().clip(lower=1)
+        assert (relative_error < 1e-5).all(), (
+            f"'World' does not equal the sum of the six continents for '{column}'. If the plain 'Europe' "
+            "aggregate was removed from REGIONS, Europe is missing from the world total."
+        )
 
 
 def sanity_check_europe_aggregates(tb: Table) -> None:
@@ -139,6 +176,12 @@ def run(dest_dir: str) -> None:
         min_num_values_per_year=1,
         year_col="date",
     )
+    sanity_check_world_is_complete(tb_pivot)
+
+    # "Europe" was only needed to build the "World" aggregate. Drop it now, so that readers are left with the
+    # two explicit European aggregates and cannot pick a line that is really the Russian fire season.
+    tb_pivot = tb_pivot[~tb_pivot["country"].isin(REGIONS_NOT_PUBLISHED)].reset_index(drop=True)
+
     # Merge land area data with the wildfire data
     tb = pr.merge(tb_pivot, area_most_recent_year, on=["country"], how="left")
 
@@ -160,6 +203,16 @@ def run(dest_dir: str) -> None:
     sanity_check_europe_aggregates(tb)
 
     tb = tb.drop(columns=["total_area_ha"])
+
+    # The land area table brings "Europe" back as an unused category, and a categorical index materialises
+    # unused categories as all-null rows in the downstream groupbys. Drop them, so that no empty "Europe"
+    # entity reappears in the grapher datasets.
+    if isinstance(tb["country"].dtype, pd.CategoricalDtype):
+        # NOTE: The ".cat" accessor returns a plain series, so the column metadata has to be restored.
+        country_metadata = tb["country"].metadata
+        tb["country"] = tb["country"].cat.remove_unused_categories()
+        tb["country"].metadata = country_metadata
+
     tb = tb.set_index(["country", "date"], verify_integrity=True)
 
     #
