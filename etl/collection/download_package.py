@@ -24,7 +24,10 @@ What that buys, beyond avoiding the Worker limits:
     (covid_explorer: 101 indicators, 602k rows, 34.8MB CSV) fitted with less
     headroom than was comfortable, and there was a documented two-package
     fallback waiting for the first MDIM that didn't fit. R2 just serves bytes,
-    so both the ceiling and the fallback design are gone.
+    so both the technical ceiling and the fallback design are gone. What
+    remains is a policy one: `_check_package_size` refuses to publish a
+    package big enough to suggest the wide CSV is the wrong format for that
+    collection.
   * Real compression. littlezipper wrote stored (uncompressed) entries, so a
     34.8MB CSV was a ~34.8MB download. DEFLATE on a wide, sparse table does a
     lot better.
@@ -73,11 +76,70 @@ log = get_logger()
 # and (so far, empirically) never anything else.
 TIME_COLUMN_CANDIDATES = ("year", "date")
 
+# Tripwire, not a technical limit -- see _check_package_size.
+MAX_PACKAGE_SIZE_BYTES = 10_000_000
+
 
 class MixedTimeGranularityError(ValueError):
     """Raised when a collection's indicators mix annual ("year") and daily
     ("date") tables -- joining those needs a resampling decision this
     prototype doesn't make for you. See mdim-downloads status.md."""
+
+
+class DownloadPackageTooLargeError(Exception):
+    """Raised when the built package exceeds `MAX_PACKAGE_SIZE_BYTES`."""
+
+
+def _check_package_size(
+    page_slug: str,
+    zip_bytes: int,
+    csv_bytes: int,
+    max_size_bytes: int,
+) -> None:
+    """Refuse to publish a package that has outgrown a one-click browser download.
+
+    Nothing technical breaks above the threshold: R2 serves an object of any
+    size, and the zip is built once here rather than per request. The threshold
+    is a tripwire, deliberately set an order of magnitude below where it would
+    actually hurt, because the number it guards is a proxy for a design problem
+    rather than the problem itself.
+
+    That problem is the wide format. One CSV with one column per indicator per
+    dimension combination is the right shape for the median MDIM -- today's are
+    all a few MB zipped -- and it is what makes the package readable in a
+    spreadsheet and keyed one-to-one to `metadata.json`'s per-column entries.
+    But its width grows with the product of the dimension cardinalities while
+    each new column is mostly empty, so a collection with a few more dimensions
+    than usual produces a file that is enormous and almost entirely padding.
+    A package that trips this is nearly always telling us the format is wrong
+    for that collection, not that the data is unusually large.
+
+    So when it trips, the fix is a judgement call about that collection, and
+    the options are roughly:
+
+      * Long format for this collection. Better for the sparse case and for
+        programmatic consumers, worse in a spreadsheet, and the per-column
+        metadata no longer lines up. Note that a format heuristic was tried
+        before and abandoned -- the switching rule was hard to get right and
+        cost us two code paths to maintain -- so prefer an explicit per-
+        collection choice over reintroducing one.
+      * No package for this collection, pointing power users at the Python
+        catalog library instead, which lets them select the columns they
+        actually want and skip the padding entirely.
+      * Raise `max_size_bytes` for this one collection, if the size is genuinely
+        justified and a multi-MB download is acceptable for its audience.
+
+    Whichever it is, it wants a human decision, which is why this raises rather
+    than warns.
+    """
+    if zip_bytes <= max_size_bytes:
+        return
+    raise DownloadPackageTooLargeError(
+        f"Download package for {page_slug} is {zip_bytes / 1e6:.1f}MB zipped "
+        f"({csv_bytes / 1e6:.1f}MB as CSV), over the {max_size_bytes / 1e6:.0f}MB "
+        "threshold. This usually means the wide CSV is mostly empty cells; see "
+        "_check_package_size in etl/collection/download_package.py for the options."
+    )
 
 
 def _time_column(tb: Table) -> str:
@@ -437,6 +499,7 @@ def build_download_package_for_collection(
     collection: Collection,
     dest_dir: Path,
     build_date: date | None = None,
+    max_size_bytes: int = MAX_PACKAGE_SIZE_BYTES,
 ) -> DownloadPackageResult:
     """Build the complete-dataset zip and publish it to R2.
 
@@ -444,6 +507,10 @@ def build_download_package_for_collection(
     need to be fully expanded, the indicators need to exist in the DB so their
     variable IDs and published metadata can be resolved, and the MDIM needs a
     page slug.
+
+    Raises `DownloadPackageTooLargeError` if the result exceeds
+    `max_size_bytes`; raise it per collection only for the reasons in
+    `_check_package_size`.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
     build_date = build_date or pd.Timestamp.now(tz=timezone.utc).date()
@@ -561,6 +628,13 @@ def build_download_package_for_collection(
             zf.writestr(info, data)
 
     size_bytes = zip_path.stat().st_size
+    # Checked before the upload, so an oversized package never reaches R2.
+    _check_package_size(
+        page_slug=page_slug,
+        zip_bytes=size_bytes,
+        csv_bytes=csv_path.stat().st_size,
+        max_size_bytes=max_size_bytes,
+    )
 
     s3_url, public_url = _download_package_location(zip_name)
     # downloadable=True sets Content-Disposition, so clicking the R2 link saves
