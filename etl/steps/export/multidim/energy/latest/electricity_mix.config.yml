@@ -6,6 +6,7 @@ default_selection:
 default_dimensions:
   source: "total"
   metric: "generation"
+  frequency: "annual"
 topic_tags:
   - "Energy"
 definitions:
@@ -95,6 +96,14 @@ dimensions:
       - slug: "by_source_per_capita"
         name: "By source, per capita"
         description: "Electricity generation per person, broken down by source, stacked"
+  - slug: "frequency"
+    name: "Frequency"
+    choices:
+      - slug: "annual"
+        name: "Annual"
+      - slug: "monthly"
+        name: "Monthly"
+        description: "Monthly data from Ember, from 1999 onwards"
 views:
   # Views are generated programmatically in the step.
   []

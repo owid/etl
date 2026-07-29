@@ -63,56 +63,64 @@ def run() -> None:
     # Load inputs.
     #
     ds = paths.load_dataset("electricity_mix")
-    tb = ds.read("electricity_mix", reset_index=False)
 
     #
     # Process data.
     #
-    column_dimensions = {}
-    # Source x metric grid (generation, per capita, share of generation).
-    for source_slug, prefix in SOURCE_COLUMN_PREFIX.items():
-        candidates = {
-            "generation": f"{prefix}_generation__twh",
-            "per_capita": f"per_capita_{prefix}_generation__kwh",
-            "share_of_generation": f"{prefix}_share_of_electricity__pct",
-        }
-        for metric_slug, column in candidates.items():
+    # Build the source x metric grid for both frequencies: annual (from the combined electricity_mix
+    # table) and monthly (from the Ember-only, date-indexed electricity_mix_monthly table).
+    dims_max = {}
+    tables = []
+    common_view_configs = []
+    for frequency, table_name in [("annual", "electricity_mix"), ("monthly", "electricity_mix_monthly")]:
+        tb = ds.read(table_name, reset_index=False)
+        column_dimensions = {}
+        # Source x metric grid (generation, per capita, share of generation).
+        for source_slug, prefix in SOURCE_COLUMN_PREFIX.items():
+            candidates = {
+                "generation": f"{prefix}_generation__twh",
+                "per_capita": f"per_capita_{prefix}_generation__kwh",
+                "share_of_generation": f"{prefix}_share_of_electricity__pct",
+            }
+            for metric_slug, column in candidates.items():
+                if column in tb.columns:
+                    column_dimensions[column] = {"source": source_slug, "metric": metric_slug, "frequency": frequency}
+        # Total-only metrics (demand, imports, carbon intensity).
+        for metric_slug, column in TOTAL_ONLY_METRICS.items():
             if column in tb.columns:
-                column_dimensions[column] = {"source": source_slug, "metric": metric_slug}
+                column_dimensions[column] = {"source": "total", "metric": metric_slug, "frequency": frequency}
 
-    # Total-only metrics (demand, imports, carbon intensity).
-    for metric_slug, column in TOTAL_ONLY_METRICS.items():
-        if column in tb.columns:
-            column_dimensions[column] = {"source": "total", "metric": metric_slug}
+        tb = tb[list(column_dimensions)]
+        # Reference magnitude per (source, metric, frequency) for sizing the map's bins: the 99th
+        # percentile across countries only (aggregates excluded, single outliers ignored). Monthly values
+        # are ~1/12 of the annual ones, so they get their own scale. See set_view_titles / _map_config.
+        country_level = tb.index.get_level_values("country")
+        is_country = ~(country_level.isin(AGGREGATE_ENTITIES) | country_level.str.contains("(EI)", regex=False))
+        tb_countries = tb[is_country]
+        for column, dims in column_dimensions.items():
+            dims_max[(dims["source"], dims["metric"], frequency)] = float(
+                tb_countries[column].astype("float64").quantile(0.99)
+            )
+            tb[column].m.dimensions = dims
+            tb[column].m.original_short_name = "electricity"
 
-    tb = tb[list(column_dimensions)]
-    # Reference magnitude per (source, metric) for sizing the map's log bins: the 99th percentile
-    # across countries only (aggregates excluded, single outliers ignored). See set_view_titles.
-    country_level = tb.index.get_level_values("country")
-    is_country = ~(country_level.isin(AGGREGATE_ENTITIES) | country_level.str.contains("(EI)", regex=False))
-    tb_countries = tb[is_country]
-    dims_max = {
-        (dims["source"], dims["metric"]): float(tb_countries[column].astype("float64").quantile(0.99))
-        for column, dims in column_dimensions.items()
-    }
-    for column, dims in column_dimensions.items():
-        tb[column].m.dimensions = dims
-        tb[column].m.original_short_name = "electricity"
-
-    common_view_config = {
-        "hasMapTab": True,
-        "tab": "map",
-        # Line + bar tabs (grapher's default), so single-source views keep the bar tab the
-        # original charts had.
-        "chartTypes": ["LineChart", "DiscreteBar"],
-    }
+        tables.append(tb)
+        # Annual defaults to the map tab; monthly defaults to the line chart (a single-month map is less
+        # useful), but both keep the map tab available so the time slider can scrub through the map.
+        common_view_configs.append(
+            {
+                "hasMapTab": True,
+                "tab": "map" if frequency == "annual" else "chart",
+                "chartTypes": ["LineChart", "DiscreteBar"],
+            }
+        )
 
     c = paths.create_collection(
         config=paths.load_collection_config(),
-        tb=tb,
+        tb=tables,
         indicator_names=["electricity"],
-        dimensions=["source", "metric"],
-        common_view_config=common_view_config,
+        dimensions=["source", "metric", "frequency"],
+        common_view_config=common_view_configs,
     )
 
     # Set an explicit title on every single-source view, so grapher does not fall back to the
@@ -279,46 +287,49 @@ def add_decomposition_views(c) -> None:
         "hideRelativeToggle": False,
         "originUrl": "https://ourworldindata.org/electricity-mix",
     }
-    single_views = {(v.dimensions.get("source"), v.dimensions.get("metric")): v for v in c.views}
-    for source, constituents in AGGREGATE_DECOMPOSITION.items():
-        for base_metric, new_metric in _DECOMPOSITION_METRICS.items():
-            indicators = []
-            for constituent in constituents:
-                view = single_views.get((constituent, base_metric))
-                if view is not None and view.indicators.y:
-                    for indicator in deepcopy(view.indicators.y):
-                        # Swap the standalone (clean) columns for the gap-filled ones so the stack keeps
-                        # full history; the clean columns stay on the standalone source views.
-                        if constituent == "bioenergy":
-                            indicator.catalogPath = indicator.catalogPath.replace(
-                                "bioenergy_generation", "bioenergy_stacked_generation"
-                            )
-                        elif constituent == "other_renewables":
-                            indicator.catalogPath = indicator.catalogPath.replace(
-                                "other_renewables_excluding_bioenergy_generation", "other_renewables_generation"
-                            )
-                        color = SOURCE_COLORS.get(constituent)
-                        if color:
-                            indicator.update_display({"color": color})
-                        indicators.append(indicator)
-            if not indicators:
-                continue
-            config = {
-                **base_config,
-                "title": _decomposition_title(source, base_metric),
-                "subtitle": METRIC_UNIT_PHRASE[base_metric],
-            }
-            # The stacked "other renewables" band uses the coalesced column, so it needs the extended
-            # footnote flagging that pre-2000 bioenergy may be lumped in.
-            if "other_renewables" in constituents:
-                config["note"] = OTHER_RENEWABLES_STACKED_NOTE
-            new_view = View(
-                dimensions={"source": source, "metric": new_metric},
-                indicators=ViewIndicators(y=indicators),
-                config=config,
-            )
-            new_view.mark_as_grouped()
-            c.views.append(new_view)
+    single_views = {
+        (v.dimensions.get("source"), v.dimensions.get("metric"), v.dimensions.get("frequency")): v for v in c.views
+    }
+    for frequency in ["annual", "monthly"]:
+        for source, constituents in AGGREGATE_DECOMPOSITION.items():
+            for base_metric, new_metric in _DECOMPOSITION_METRICS.items():
+                indicators = []
+                for constituent in constituents:
+                    view = single_views.get((constituent, base_metric, frequency))
+                    if view is not None and view.indicators.y:
+                        for indicator in deepcopy(view.indicators.y):
+                            # Swap the standalone (clean) columns for the gap-filled ones so the stack keeps
+                            # full history; the clean columns stay on the standalone source views.
+                            if constituent == "bioenergy":
+                                indicator.catalogPath = indicator.catalogPath.replace(
+                                    "bioenergy_generation", "bioenergy_stacked_generation"
+                                )
+                            elif constituent == "other_renewables":
+                                indicator.catalogPath = indicator.catalogPath.replace(
+                                    "other_renewables_excluding_bioenergy_generation", "other_renewables_generation"
+                                )
+                            color = SOURCE_COLORS.get(constituent)
+                            if color:
+                                indicator.update_display({"color": color})
+                            indicators.append(indicator)
+                if not indicators:
+                    continue
+                config = {
+                    **base_config,
+                    "title": _decomposition_title(source, base_metric),
+                    "subtitle": METRIC_UNIT_PHRASE[base_metric],
+                }
+                # The stacked "other renewables" band uses the coalesced column, so it needs the extended
+                # footnote flagging that pre-2000 bioenergy may be lumped in.
+                if "other_renewables" in constituents:
+                    config["note"] = OTHER_RENEWABLES_STACKED_NOTE
+                new_view = View(
+                    dimensions={"source": source, "metric": new_metric, "frequency": frequency},
+                    indicators=ViewIndicators(y=indicators),
+                    config=config,
+                )
+                new_view.mark_as_grouped()
+                c.views.append(new_view)
 
 
 # Map colorScale per (source, metric), copied verbatim from the original production charts each view
@@ -619,8 +630,10 @@ def _share_thresholds(vmax: float | None) -> tuple[list[float], bool] | None:
     return edges, top < 100
 
 
-def _map_config(source: str, metric: str, vmax: float | None = None) -> dict:
-    scheme = ORIGINAL_MAP_SCHEMES.get((source, metric))
+def _map_config(source: str, metric: str, vmax: float | None = None, frequency: str = "annual") -> dict:
+    # Annual reuses the hand-tuned brackets from the original charts; monthly values are ~1/12 the size,
+    # so the monthly map is auto-binned from the monthly 99th percentile instead of the annual brackets.
+    scheme = ORIGINAL_MAP_SCHEMES.get((source, metric)) if frequency == "annual" else None
     if scheme is not None and len(scheme.get("customNumericValues", [])) >= 3:
         # The original chart had explicit manual brackets: reproduce them verbatim, so the brackets,
         # color scheme, open-ended bins, and special bins (e.g. the nuclear "No nuclear" =0 bucket) all
@@ -662,10 +675,11 @@ def set_view_titles(c, dims_max: dict) -> None:
             # Grouped/stacked views already have a title from group_views.
             continue
         metric = v.dimensions["metric"]
+        frequency = v.dimensions.get("frequency", "annual")
         config = dict(v.config or {})
         config["title"] = _view_title(source, metric)
         config["subtitle"] = _view_subtitle(source, metric)
-        config["map"] = _map_config(source, metric, dims_max.get((source, metric)))
+        config["map"] = _map_config(source, metric, dims_max.get((source, metric, frequency)), frequency)
         note = SOURCE_NOTES.get(source)
         if note:
             config["note"] = note
