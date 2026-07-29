@@ -2,6 +2,7 @@
 
 import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Table
 
 from etl.catalog_helpers import last_date_accessed
 from etl.data_helpers import geo
@@ -10,7 +11,44 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "European Union (27)", "World"]
+# Regions to aggregate.
+# NOTE: "Europe" is deliberately absent. Russia accounts for around 90% of the burnt area of the European
+# aggregate in every year, so a plain "Europe" line tracks the Russian fire season and can move in the opposite
+# direction to the rest of the continent. It is split into two explicit aggregates instead, so that readers pick
+# the one they mean.
+REGIONS = {
+    "North America": {},
+    "South America": {},
+    "Europe (incl. Russia)": {"additional_regions": ["Europe"]},
+    "Europe (excl. Russia)": {"additional_regions": ["Europe"], "excluded_members": ["Russia"]},
+    "Africa": {},
+    "Asia": {},
+    "Oceania": {},
+    "European Union (27)": {},
+    "World": {},
+}
+
+
+def sanity_check_europe_aggregates(tb: Table) -> None:
+    """Check that the two European aggregates replaced the old "Europe" one, and that they reconcile with Russia."""
+    countries = set(tb["country"])
+    assert "Europe" not in countries, "The 'Europe' aggregate should have been replaced by the incl./excl. Russia ones."
+    assert {"Europe (incl. Russia)", "Europe (excl. Russia)"} <= countries, "A European aggregate is missing."
+
+    # Both aggregates cover the same dates, so they can be compared row by row.
+    incl = tb[tb["country"] == "Europe (incl. Russia)"].set_index("date").sort_index()
+    excl = tb[tb["country"] == "Europe (excl. Russia)"].set_index("date").sort_index()
+    russia = tb[tb["country"] == "Russia"].set_index("date").sort_index()
+    assert incl.index.equals(excl.index), "The two European aggregates cover different dates."
+    assert incl.index.equals(russia.index), "Russia and the European aggregates cover different dates."
+
+    for column in ["area_ha", "area_ha_cumulative", "events", "events_cumulative"]:
+        # Excluding Russia can only lower the aggregate.
+        assert (excl[column] <= incl[column]).all(), f"'{column}' is larger excluding Russia than including it."
+        # The difference between the two aggregates must be exactly Russia.
+        assert ((incl[column] - excl[column] - russia[column]).abs() < 1e-6).all(), (
+            f"'{column}' incl. minus excl. Russia does not equal Russia."
+        )
 
 
 def run(dest_dir: str) -> None:
@@ -80,6 +118,8 @@ def run(dest_dir: str) -> None:
         min_num_values_per_year=1,
         year_col="date",
     )
+    sanity_check_europe_aggregates(tb_pivot)
+
     # Merge land area data with the wildfire data
     tb = pr.merge(tb_pivot, area_most_recent_year, on=["country"], how="left")
 
