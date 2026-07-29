@@ -11,6 +11,12 @@ steps:
       - data://meadow/economics/2026-07-28/saez_zucman_wealth_shares:
         - snapshot://economics/2026-07-28/saez_zucman_wealth_shares.xlsx
 
+  # Wealth inequality in France, 1800-2014 (Garbinti, Goupille-Lebret and Piketty, 2021)
+  data://grapher/economics/2026-07-28/wealth_france:
+    - data://garden/economics/2026-07-28/wealth_france:
+      - data://meadow/economics/2026-07-28/wealth_france:
+        - snapshot://economics/2026-07-28/wealth_france.xlsx
+
   # OWID - OWID Deflator.
   data://garden/economics/2025-08-29/owid_deflator:
     # World Bank - WDI (specifically indicators used for inflation adjustments).
