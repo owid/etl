@@ -48,6 +48,7 @@ from dataclasses import dataclass
 from datetime import date, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
+from urllib.parse import urlencode
 
 import pandas as pd
 from owid.catalog import Dataset as CatalogDataset
@@ -215,13 +216,19 @@ def _outer_join_on_key(tables: list[Table]) -> Table:
     return wide.sort_values(key).reset_index(drop=True)
 
 
-def _iter_used_indicators(collection: Collection):
-    """Yield (catalog_path, view_dimensions) once per distinct indicator, in
-    first-seen order, skipping views created by group_views() -- those just
+def _used_indicators(collection: Collection) -> dict[str, list[dict]]:
+    """Map each distinct indicator's catalog path to every dimension
+    combination it is shown under -- keys and combinations both in first-seen
+    order -- skipping views created by group_views(), since those just
     re-display already-included indicators under a synthetic comparison
-    dimension, they don't add new data.
+    dimension and don't add new data.
 
-    KNOWN GAP -- that assumption isn't always true. A subagent spot-check
+    Usually a one-element list, but an indicator reachable from several views
+    (a choice that doesn't affect that particular indicator) genuinely has
+    more than one, and metadata.json reports all of them. Only the first is
+    used to name the wide column, so column names stay stable regardless.
+
+    KNOWN GAP -- the group_views() assumption above isn't always true. A spot-check
     (2026-07-23) of natural-disasters-deaths found its "all disasters
     combined" view is missing from the "complete" package. That MDIM calls
     add_total_indicator_for_map() to add a genuinely NEW total indicator
@@ -232,15 +239,15 @@ def _iter_used_indicators(collection: Collection):
     only re-displays existing indicators" from "grouped view that also
     introduces a new one," which isn't something `view.is_grouped` alone
     can answer."""
-    seen: set[str] = set()
+    used: dict[str, list[dict]] = {}
     for view in collection.views:
         if view.is_grouped:
             continue
         for ind in view.indicators.y or []:
-            if ind.catalogPath in seen:
-                continue
-            seen.add(ind.catalogPath)
-            yield ind.catalogPath, view.dimensions
+            combinations = used.setdefault(ind.catalogPath, [])
+            if view.dimensions not in combinations:
+                combinations.append(view.dimensions)
+    return used
 
 
 def _split_catalog_path(catalog_path: str) -> tuple[str, str, str]:
@@ -250,20 +257,23 @@ def _split_catalog_path(catalog_path: str) -> tuple[str, str, str]:
     return "/".join(dataset_segments), table_name, column
 
 
-def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict[str, str]]:
+def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict[str, str], dict[str, list[dict]]]:
     """Resolves the indicator list and their dimension values from the
     collection's own views, and loads each underlying table fresh from the
     on-disk catalog (no dependency on any script's in-memory tables). Returns
-    (wide_table, {wide_column_name: catalog_path}) -- the second is needed to
-    look each indicator's metadata up by variable ID."""
-    by_table: dict[tuple[str, str], list[tuple[str, dict]]] = defaultdict(list)
-    for catalog_path, dims in _iter_used_indicators(collection):
+    (wide_table, {wide_column_name: catalog_path}, {wide_column_name:
+    dimension_combinations}) -- the second is needed to look each indicator's
+    metadata up by variable ID, the third to report the dimension structure in
+    metadata.json."""
+    by_table: dict[tuple[str, str], list[tuple[str, list[dict]]]] = defaultdict(list)
+    for catalog_path, combinations in _used_indicators(collection).items():
         dataset_dir, table_name, column = _split_catalog_path(catalog_path)
-        by_table[(dataset_dir, table_name)].append((column, dims))
+        by_table[(dataset_dir, table_name)].append((column, combinations))
 
     dataset_cache: dict[str, CatalogDataset] = {}
     renamed_tables = []
     column_to_catalog_path: dict[str, str] = {}
+    column_to_dimensions: dict[str, list[dict]] = {}
     for (dataset_dir, table_name), cols in by_table.items():
         if dataset_dir not in dataset_cache:
             dataset_cache[dataset_dir] = CatalogDataset(DATA_DIR / dataset_dir)
@@ -272,7 +282,7 @@ def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict
 
         rename = {}
         keep = ["country", time_col]
-        for column, dims in cols:
+        for column, combinations in cols:
             if column not in tb.columns:
                 log.warning(
                     "download_package.column_missing",
@@ -281,13 +291,14 @@ def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict
                     column=column,
                 )
                 continue
-            wide_name = _wide_column_name(tb[column].metadata.original_short_name or column, dims)
+            wide_name = _wide_column_name(tb[column].metadata.original_short_name or column, combinations[0])
             rename[column] = wide_name
             column_to_catalog_path[wide_name] = f"{dataset_dir}/{table_name}#{column}"
+            column_to_dimensions[wide_name] = combinations
             keep.append(column)
         renamed_tables.append(tb[keep].rename(columns=rename))
 
-    return _outer_join_on_key(renamed_tables), column_to_catalog_path
+    return _outer_join_on_key(renamed_tables), column_to_catalog_path, column_to_dimensions
 
 
 def resolve_variable_ids(catalog_paths: list[str]) -> dict[str, int]:
@@ -361,6 +372,41 @@ def _fetch_indicator_metadata(variable_ids: list[int]) -> dict[int, dict]:
         raise ValueError(f"No published metadata JSON for indicator(s) {missing} -- has the grapher step run?")
 
     return dict(zip(variable_ids, metadata))
+
+
+def _dimension_definitions(collection: Collection) -> list[dict]:
+    """metadata.json's top-level "dimensions" -- the collection's dimensions and
+    choices, each as a stable slug plus the display name.
+
+    This exists so a consumer can label a column's dimension combination
+    without fetching the MDIM config separately: the per-column "views" entries
+    use slugs only, and these are the names they map to.
+    """
+    return [
+        {
+            "slug": dimension.slug,
+            "name": dimension.name,
+            "choices": [{"slug": choice.slug, "name": choice.name} for choice in dimension.choices],
+        }
+        for dimension in collection.dimensions
+    ]
+
+
+def _view_entries(combinations: list[dict], page_url: str) -> list[dict]:
+    """metadata.json's per-column "views" -- the dimension combination(s) whose
+    view shows this column, and the page URL that opens each one.
+
+    Choice *slugs* rather than names, because they're stable across copy edits
+    and they're the same tokens the page's query params use -- which is what
+    makes the URL derivable, and gives a consumer the round trip from a CSV
+    column back to the view it came from. Empty values are dropped for the same
+    reason `_dimension_suffix` drops them: they identify nothing.
+    """
+    entries = []
+    for combination in combinations:
+        dimensions = {slug: choice for slug, choice in combination.items() if choice}
+        entries.append({"dimensions": dimensions, "url": f"{page_url}?{urlencode(dimensions)}"})
+    return entries
 
 
 def _long_column_name(col: IndicatorColumn) -> str:
@@ -438,9 +484,11 @@ _ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)
 
 def _readme(title: str, page_url: str, column_sections: list[str]) -> str:
     """Ported from `constructReadme`'s multi-column branch (readmeTools.ts),
-    with one sentence added to say the package covers every dimension
-    combination, and the tolerance-column paragraph dropped (a complete-dataset
-    package has no tolerance columns).
+    with the tolerance-column paragraph dropped (a complete-dataset package has
+    no tolerance columns) and three MDIM-only additions that have no counterpart
+    there: that the package covers every dimension combination, that column
+    headers shouldn't be parsed, and how to read metadata.json's "dimensions"
+    and per-column "views" keys instead.
 
     !!! KEEP IN SYNC WITH owid-grapher's readmeTools.ts !!!
     """
@@ -456,11 +504,13 @@ The first two columns in the CSV file are "Entity" and "Code". "Entity" is the n
 
 The third column is either "Year" or "Day". If the data is annual, this is "Year" and contains only the year as an integer. If the column is "Day", the column contains a date string in the form "YYYY-MM-DD".
 
-The remaining columns are the data columns, each of which is a time series corresponding to one dimension combination of this dataset.
+The remaining columns are the data columns, each of which is a time series corresponding to one dimension combination of this dataset. Their headers are human-readable names; don't parse them to work out which dimension combination a column belongs to, use the .metadata.json file described below instead.
 
 ## Metadata.json structure
 
 The .metadata.json file contains metadata about the data package. The "chart" key contains information to recreate the chart, like the title, subtitle etc.. The "columns" key contains information about each of the columns in the csv, like the unit, timespan covered, citation for the data etc..
+
+The "dimensions" key lists this dataset's dimensions and the choices available for each, as a stable slug plus a display name. Every column entry then carries a "views" key naming the dimension combination(s) that column belongs to, by slug, along with the URL that opens each combination on our website. Together those let you go from a CSV column to its dimension choices, and back, without parsing column headers.
 
 ## About the data
 
@@ -518,7 +568,7 @@ def build_download_package_for_collection(
     page_slug = _resolve_page_slug(collection)
     page_url = f"https://ourworldindata.org/grapher/{page_slug}"
 
-    wide, column_to_catalog_path = build_wide_table_for_collection(collection)
+    wide, column_to_catalog_path, column_to_dimensions = build_wide_table_for_collection(collection)
 
     variable_ids = resolve_variable_ids(list(column_to_catalog_path.values()))
     missing = [p for p in column_to_catalog_path.values() if p not in variable_ids]
@@ -556,14 +606,22 @@ def build_download_package_for_collection(
     metadata_columns = {}
     readme_sections = []
     attributions = set()
-    for _wide_name, long_name, variable_id, col in columns:
+    for wide_name, long_name, variable_id, col in columns:
         attributions.add(get_attribution(col))
-        metadata_columns[long_name] = metadata_column_entry(
-            col,
-            variable_id,
-            f"{config.DATA_API_URL}/{variable_id}.metadata.json",
-            build_date,
-        )
+        metadata_columns[long_name] = {
+            # MDIM-only. A single-chart download has no dimension structure, so
+            # this key has no counterpart in owid-grapher's assembleMetadata --
+            # an intended divergence from that format, not drift. Emitted first
+            # so it's the first thing visible under a column key, above the long
+            # description fields.
+            "views": _view_entries(column_to_dimensions[wide_name], page_url),
+            **metadata_column_entry(
+                col,
+                variable_id,
+                f"{config.DATA_API_URL}/{variable_id}.metadata.json",
+                build_date,
+            ),
+        }
         readme_sections.append("\n".join(column_readme_text(col, build_date)))
 
     metadata_json = dumps_like_json_stringify(
@@ -574,6 +632,7 @@ def build_download_package_for_collection(
                 "originalChartUrl": page_url,
                 "selection": collection.default_selection or [],
             },
+            "dimensions": _dimension_definitions(collection),
             "columns": metadata_columns,
             # Same key as a single-chart download for format parity, but here
             # it's necessarily the date the package was built, not downloaded.
