@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Accounting for Wealth Inequality Dynamics - Methods, Estimates and Simulations for France (1800-2014)
+    description: |-
+      This dataset presents long-run homogeneous series on the distribution of personal wealth in France over the 1800-2014 period. Combining income tax, inheritance and wealth-survey data with national accounts, the authors estimate the share of total net personal wealth held by different groups of the adult population, together with average wealth levels and the wealth thresholds that define each group.
+
+      Wealth is measured as net individual wealth among adults: the market value of all the financial and non-financial assets individuals own, minus their debts, distributed across the adult population.
+    # NOTE: The workbook has two sheets: "sum_stat_w" (summary statistics for the wealth
+    # distribution — wealth shares, thresholds and inverted Pareto coefficients by year) and
+    # "growth" (wealth growth by group across historical sub-periods). We ingest only the
+    # "sum_stat_w" sheet, and within it only the wealth-share columns. The thresholds, Pareto
+    # coefficients and the growth sheet are available in the same file for a future extension.
+    date_published: "2021-02-01"
+
+    # Citation
+    producer: Garbinti, Goupille-Lebret and Piketty
+    citation_full: |-
+      Garbinti, B., Goupille-Lebret, J., & Piketty, T. (2021). Accounting for Wealth-Inequality Dynamics: Methods, Estimates, and Simulations for France. Journal of the European Economic Association, 19(1), 620-663. https://doi.org/10.1093/jeea/jvaa025
+
+    # Files
+    url_main: https://doi.org/10.1093/jeea/jvaa025
+    date_accessed: '2026-07-28'
+
+    # License
+    license:
+      name: © Garbinti, Goupille-Lebret and Piketty (2021)
+outs:
+  - md5: bf3c2bb6b93c727accef4fbddaabc779
+    size: 48235
+    path: wealth_france.xlsx
