@@ -69,6 +69,15 @@ Three exclusions keep that check from crying wolf; without them a WDI-scale swee
 
 **Parsing `time=` in URLs:** the grapher time param is a single value (`time=2019`) or a range (`time=1990..2020`, `time=earliest..2023`). Each **numeric** component is a pin — grade the end bound like `maxTime` (an embed with `time=..2019` keeps showing the old window after the data reaches 2025), the start bound like `minTime`. `earliest`/`latest` components are fine, and daily charts use ISO dates (`time=2020-01-01..latest`) — convert those to day offsets before grading: a day-axis variable advertises `display.zeroDay` in the same `metadata.json` (its `dimensions.years.values[].id` are day offsets from that date), so the component's comparable value is `(date.fromisoformat(part) - date.fromisoformat(zero_day)).days`. Skip `$time`-style template placeholders in country-page dynamic embeds. Article time pins are often deliberate framing of the surrounding prose, so default them to 🟡-at-worst and always hand them to content follow-up rather than editing configs.
 
+**Judging an article pin deliberate vs. stale.** Pull ±400 chars of `posts_gdocs.markdown` around the link and read it — but grade on the right signals, because the obvious test is a trap:
+
+- **Strip URLs from the context window before scanning it for years.** The context contains the link's own `time=1990..2016`, so a naive year regex "finds" 1990 and 2016 in every single case and marks the whole list deliberate. Sub out `https?://\S+` first. (This produced a wrong 9-of-15 "deliberate" verdict on the WDI 2026-07-27 sweep.)
+- **`endpointsOnly=1` justifies the start bound, not the end one.** It means the chart is a first-vs-last-point comparison — so the start year is structural, but the comparison is generally *better* with more years. These are usually "extend the end to `latest`, keep the start", not "leave alone".
+- **The real blocker is a numeric claim in the sentence that depends on the end year** — "increased 12-fold", "more than 95%", a ratio in the article title. Changing the pin there invalidates prose, so it's an editorial call, not a link fix.
+- **Check the link's visible text and the article title too**, not just the surrounding sentence: link text of literally `2024`, or a title like "…over the past three decades" matching a `1994..2024` range, couples the pin to something a reader sees.
+- **Sibling links to the same chart are strong evidence.** If one link in a passage uses `time=latest` and another uses a pinned year, the pinned one is almost certainly an oversight; if the prose links use `latest` and only a `<Chart>` embed is pinned, likewise.
+- Also flag the inverse of staleness: a pin whose range **stops short of the years the sentence discusses** (prose about "2010 to 2019" under a chart pinned `1990..2017`).
+
 Repo scan for the ETL-side sources (also catches pins that haven't reached any DB yet). The flat keys grep directly; the **nested map bounds (`map:` → `time`/`startTime`) never match a flat pattern** — walk the YAML for those:
 
 ```bash
