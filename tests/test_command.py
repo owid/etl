@@ -19,6 +19,14 @@ def test_timed_run():
     assert abs(time_taken - 0.05) < 0.2
 
 
+@pytest.fixture(autouse=True)
+def _clear_step_failures():
+    # The failure list is module state, emptied by print_failure_recap() at the end of a run.
+    cmd.STEP_FAILURES.clear()
+    yield
+    cmd.STEP_FAILURES.clear()
+
+
 @pytest.fixture()
 def dag():
     return {"data-private://a": {"data://b"}, "data://e": {"data://f"}}
@@ -93,16 +101,18 @@ def test_exec_graph_parallel_reports_every_failure(capsys):
     assert "ValueError: boom in task2" in captured.out
 
 
-def test_exec_graph_parallel_recaps_failures_at_the_end(capsys):
+def test_failure_recap_repeats_every_traceback(capsys):
     from etl.steps import StepFailedError
 
     def failing_func(task: str, **kwargs):
-        raise StepFailedError(f"Step {task} failed with exit code 1", child_traceback=f"TypeError: bad dtype in {task}")
+        raise StepFailedError(f"TypeError: bad dtype in {task}\nStep {task} failed with exit code 1")
 
     with pytest.raises(StepFailedError):
         cmd.exec_graph_parallel(
             {"task1": set(), "task2": set()}, failing_func, continue_on_failure=True, workers=2, use_threads=True
         )
+    # What the CLI does once the run is over, however it ended.
+    cmd.print_failure_recap()
 
     captured = capsys.readouterr()
     # CI shows the tail of the log, where the re-raised exception contributes only executor
@@ -112,6 +122,8 @@ def test_exec_graph_parallel_recaps_failures_at_the_end(capsys):
         # Header and traceback have to be one write to one stream, or Buildkite interleaves them.
         assert captured.out.count(f"+++ Failed {task}\nTypeError: bad dtype in {task}") == 1
         assert captured.out.count(f">>> Failed {task}\nTypeError: bad dtype in {task}") == 1
+    # Emptied, so a later run in the same process doesn't repeat these.
+    assert cmd.STEP_FAILURES == []
 
 
 def test_exec_graph_parallel_does_not_exit_silently_on_system_exit(capsys):

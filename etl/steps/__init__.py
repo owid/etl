@@ -58,16 +58,14 @@ INSTANT_METADATA_DIFF = {}
 class StepFailedError(Exception):
     """A step's code raised in the child process (fork or subprocess) that ran it.
 
+    The message carries the child's traceback, since the exception itself has none worth printing:
+    its own frames are the runner's, and across a process pool they arrive wrapped in
+    `_RemoteTraceback` plumbing.
+
     This must be a regular Exception rather than a `sys.exit(exit_code)`: the runners catch
     `Exception` to log which step failed and to honour `--continue-on-failure`, and a `SystemExit`
     would sail past those handlers and end the run without naming the step or printing anything.
     """
-
-    def __init__(self, message: str, child_traceback: str = "") -> None:
-        super().__init__(message)
-        # Traceback from the child, if it managed to hand one back. Kept out of the message so that
-        # re-raising this at the end of a run repeats the summary line, not the whole traceback.
-        self.child_traceback = child_traceback
 
 
 def compile_steps(
@@ -697,12 +695,13 @@ class DataStep(Step):
         else:
             self._run_py_subprocess()
 
-    def _read_child_traceback(self, traceback_path: Path) -> str:
-        """Read back the traceback a failed child left behind, if it got that far."""
+    def _child_failure_message(self, traceback_path: Path, exit_code: int) -> str:
+        """Describe a failed child: the traceback it left behind, if it got that far, and the step."""
         try:
-            return traceback_path.read_text().rstrip()
+            child_traceback = traceback_path.read_text().rstrip() + "\n"
         except OSError:
-            return ""
+            child_traceback = ""
+        return f"{child_traceback}Step {self} failed with exit code {exit_code}"
 
     def _run_py_fork(self) -> None:
         """Run the step in a forked child process (Linux only)."""
@@ -762,8 +761,8 @@ class DataStep(Step):
                 # Hand the traceback to the parent through a file rather than writing it to the
                 # stdout this child shares with its siblings. A traceback easily exceeds PIPE_BUF,
                 # above which a write is neither atomic nor guaranteed to complete in one call, so
-                # concurrent children would interleave into an unreadable mix. The parent attaches
-                # it to StepFailedError, which the runners print one failure at a time, labelled
+                # concurrent children would interleave into an unreadable mix. The parent puts it in
+                # StepFailedError's message, and the runners print one failure at a time, labelled
                 # with the step it belongs to.
                 try:
                     traceback_path.write_text(traceback.format_exc())
@@ -778,10 +777,7 @@ class DataStep(Step):
                 if os.WIFEXITED(status):
                     exit_code = os.WEXITSTATUS(status)
                     if exit_code != 0:
-                        raise StepFailedError(
-                            f"Step {self} failed with exit code {exit_code}",
-                            child_traceback=self._read_child_traceback(traceback_path),
-                        )
+                        raise StepFailedError(self._child_failure_message(traceback_path, exit_code))
                 elif os.WIFSIGNALED(status):
                     sig = os.WTERMSIG(status)
                     raise Exception(f"Step {self} was killed by signal {sig}")

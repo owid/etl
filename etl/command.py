@@ -41,6 +41,10 @@ DAG = dict[str, set[str]]
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
 
+# Failures of the run in progress, as (step name, traceback), so it can end with a recap of them
+# all. Both runners report into it from the main process; `print_failure_recap` empties it.
+STEP_FAILURES: list[tuple[str, str]] = []
+
 
 @click.command(name="run")
 @click.option(
@@ -309,10 +313,10 @@ def main_cli(
                 main(**kwargs)  # ty: ignore
             except StepFailedError:
                 if not watch:
-                    # Every failed step has just been reported, with its traceback, by the recap at
-                    # the end of the run. Re-raising would add nothing but executor plumbing
-                    # (_RemoteTraceback and future.result frames) and push that recap out of the
-                    # tail of the log, which is the part CI shows you.
+                    # Exit rather than re-raise: the recap in the finally below reports every failed
+                    # step with its traceback, and a re-raise would add nothing but executor
+                    # plumbing (_RemoteTraceback and future.result frames) on top of it — which is
+                    # what CI would then show you instead of the recap.
                     raise SystemExit(1) from None
                 print("--- step_failed", flush=True)
                 continue
@@ -324,6 +328,9 @@ def main_cli(
                 traceback.print_exc()
                 print("--- step_failed", flush=True)
                 continue
+            finally:
+                # In a finally, so every way a run can end goes through it. No-op when nothing failed.
+                print_failure_recap()
             if watch:
                 print("--- Dataset rebuild complete", flush=True)
 
@@ -614,13 +621,13 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
                 # log which step failed and re-raise the exception, otherwise it gets lost
                 # in logs and we don't know which step failed
                 log.error("step_failed", step=str(step))
+                # Report before deciding what to do with it: only the first exception is ever
+                # re-raised, and it carries no traceback of its own worth printing.
+                _report_step_failure(str(step), e)
                 if continue_on_failure:
                     failing_steps.append(step)
                     exceptions.append(e)
                     skipped_steps.append(step)
-                    # Only the first exception gets raised at the end of the run, so report this
-                    # one now or it is lost.
-                    _print_step_failure(str(step), e)
                     continue
                 else:
                     raise e
@@ -633,7 +640,6 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
         _write_execution_times(execution_times)
 
     if continue_on_failure and exceptions:
-        _print_failure_recap([(str(step), e) for step, e in zip(failing_steps, exceptions)])
         # Raise the first exception
         raise exceptions[0]
 
@@ -719,81 +725,72 @@ def exec_graph_parallel(
     topological_sorter.prepare()
 
     pool_factory = ThreadPoolExecutor if use_threads else ProcessPoolExecutor
+    with pool_factory(max_workers=workers) as executor:
+        # Dictionary to keep track of future tasks
+        future_to_task: dict[Future, str] = {}
+        failed_tasks = set()
+        skipped_tasks = set()
+        exceptions = []
 
-    # Every failure and the step it came from, so the run can end with a recap of all of them. The
-    # recap runs in a finally: without CONTINUE_ON_FAILURE the failure is re-raised straight away,
-    # but the pool still drains every submitted step before that reaches the top level, so the
-    # traceback would end up just as far up the log as in continue-on-failure mode.
-    failures: list[tuple[str, BaseException]] = []
-    try:
-        with pool_factory(max_workers=workers) as executor:
-            # Dictionary to keep track of future tasks
-            future_to_task: dict[Future, str] = {}
-            failed_tasks = set()
-            skipped_tasks = set()
+        ready_tasks = []
 
-            ready_tasks = []
+        while topological_sorter.is_active():
+            # add new tasks
+            ready_tasks += topological_sorter.get_ready()
 
-            while topological_sorter.is_active():
-                # add new tasks
-                ready_tasks += topological_sorter.get_ready()
+            # Submit tasks that are ready to the executor, but skip those dependent on failed or skipped tasks
+            tasks_to_submit = []
+            for task in ready_tasks[:workers]:
+                if continue_on_failure:
+                    # Check if any dependency of this task has failed or been skipped
+                    task_deps = exec_graph.get(task, set())
+                    if task_deps & (failed_tasks | skipped_tasks):
+                        print(f"--- Skipping {task} (depends on failed task)")
+                        skipped_tasks.add(task)
+                        topological_sorter.done(task)  # Mark as done so execution can continue
+                        continue
 
-                # Submit tasks that are ready to the executor, but skip those dependent on failed or skipped tasks
-                tasks_to_submit = []
-                for task in ready_tasks[:workers]:
-                    if continue_on_failure:
-                        # Check if any dependency of this task has failed or been skipped
-                        task_deps = exec_graph.get(task, set())
-                        if task_deps & (failed_tasks | skipped_tasks):
-                            print(f"--- Skipping {task} (depends on failed task)")
-                            skipped_tasks.add(task)
+                tasks_to_submit.append(task)
+
+            for task in tasks_to_submit:
+                future = executor.submit(func, task, **kwargs)
+                future_to_task[future] = task
+
+            # remove ready tasks
+            ready_tasks = ready_tasks[workers:]
+
+            # Wait for at least one future to complete
+            if future_to_task:
+                done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
+
+                # Mark completed tasks as done
+                for future in done:
+                    task = future_to_task.pop(future)
+                    try:
+                        future.result()
+                        topological_sorter.done(task)
+                    except KeyboardInterrupt:
+                        raise
+                    # Catch BaseException, not Exception: a step that somehow raises SystemExit would
+                    # otherwise end the run without ever naming the step or printing its traceback.
+                    except BaseException as e:
+                        # Report the failure right away, on top of the recap at the end of the run:
+                        # on a long build you want to see it while the run is still going.
+                        _report_step_failure(task, e)
+
+                        if continue_on_failure:
+                            failed_tasks.add(task)
+                            skipped_tasks.add(
+                                task
+                            )  # Failed tasks should also be considered skipped for dependency checking
+                            exceptions.append(e)
                             topological_sorter.done(task)  # Mark as done so execution can continue
-                            continue
+                        else:
+                            raise e
 
-                    tasks_to_submit.append(task)
-
-                for task in tasks_to_submit:
-                    future = executor.submit(func, task, **kwargs)
-                    future_to_task[future] = task
-
-                # remove ready tasks
-                ready_tasks = ready_tasks[workers:]
-
-                # Wait for at least one future to complete
-                if future_to_task:
-                    done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
-
-                    # Mark completed tasks as done
-                    for future in done:
-                        task = future_to_task.pop(future)
-                        try:
-                            future.result()
-                            topological_sorter.done(task)
-                        except KeyboardInterrupt:
-                            raise
-                        # Catch BaseException, not Exception: a step that somehow raises SystemExit would
-                        # otherwise end the run without ever naming the step or printing its traceback.
-                        except BaseException as e:
-                            # Report the failure right away, as well as in the end-of-run recap: on a
-                            # long build you want to see it while the run is still going.
-                            _print_step_failure(task, e)
-                            failures.append((task, e))
-
-                            if continue_on_failure:
-                                failed_tasks.add(task)
-                                skipped_tasks.add(
-                                    task
-                                )  # Failed tasks should also be considered skipped for dependency checking
-                                topological_sorter.done(task)  # Mark as done so execution can continue
-                            else:
-                                raise e
-
-            # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
-            if continue_on_failure and failures:
-                raise failures[0][1]
-    finally:
-        if failures:
-            _print_failure_recap(failures)
+        # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
+        if continue_on_failure and exceptions:
+            raise exceptions[0]
 
 
 def _create_expected_time_message(
@@ -811,57 +808,47 @@ def _create_expected_time_message(
         return prepend_message + partial_message + append_message
 
 
-def _print_failure_recap(failures: "list[tuple[str, BaseException]]") -> None:
-    """Reprint every failed step's traceback at the end of the run.
+def _report_step_failure(step_name: str, e: BaseException) -> None:
+    """Print a failed step's traceback, and keep it for the recap at the end of the run.
 
-    The individual failures are printed as they happen, but by the end of a build they are
-    thousands of lines up the log — and the tail is what gets read: Buildkite's error box shows
-    only the last lines, where the re-raised exception contributes nothing but executor plumbing
-    (its child traceback rides on an attribute, so Python's own handler never prints it).
-    """
-    import structlog
-
-    log = structlog.get_logger()
-
-    # ">>>" rather than "---"/"+++" for the individual steps: those would each open a Buildkite log
-    # group of their own, splitting the recap up. This way they stay inside the recap's own group.
-    blocks = [f"+++ {len(failures)} step(s) failed"]
-    for step_name, e in failures:
-        blocks.append(f">>> Failed {step_name}\n{_format_step_failure(e)}")
-    print("\n".join(blocks), flush=True)
-
-    # The step list at the very end is what you feed back into `etl run`.
-    log.error("steps_failed", steps=sorted(step_name for step_name, _ in failures))
-
-
-def _print_step_failure(step_name: str, e: BaseException) -> None:
-    """Report a failed step and its traceback, right when the failure happens.
-
-    "+++" rather than the "---" the other headers use: both open a log group in Buildkite, but a
-    "---" one is collapsed by default, which would fold the traceback out of sight.
-    """
-    print(f"+++ Failed {step_name}\n{_format_step_failure(e)}", flush=True)
-
-
-def _format_step_failure(e: BaseException) -> str:
-    """Render what a failed step's exception says.
-
-    One string, printed in one call to stdout by the callers, rather than a header on stdout and a
-    traceback on stderr: Buildkite reads the two streams through separate pipes and merges them in
-    the order its readers happen to see them, so output split across both comes out interleaved no
-    matter how carefully each stream is flushed.
+    Header and traceback go out as one write to one stream: Buildkite reads stdout and stderr
+    through separate pipes and merges them in whatever order its readers get there, so output split
+    across the two comes out interleaved however carefully each is flushed. "+++" opens a log group
+    that is expanded by default, unlike the "---" the other headers use.
     """
     from etl.steps import StepFailedError
 
+    # A StepFailedError's message carries the traceback from the child process that ran the step.
+    # Rendering the exception itself would only add executor plumbing (_RemoteTraceback frames).
     if isinstance(e, StepFailedError):
-        # The step ran in a child process, which handed its traceback back through the exception.
-        # Rendering the exception itself would only add executor plumbing (_RemoteTraceback,
-        # future.result frames).
-        parts = [e.child_traceback] if e.child_traceback else []
-        parts.append(str(e))
-        return "\n".join(parts)
+        failure = str(e)
     else:
-        return "".join(traceback.format_exception(type(e), e, e.__traceback__)).rstrip()
+        failure = "".join(traceback.format_exception(type(e), e, e.__traceback__)).rstrip()
+
+    STEP_FAILURES.append((step_name, failure))
+    print(f"+++ Failed {step_name}\n{failure}", flush=True)
+
+
+def print_failure_recap() -> None:
+    """Reprint every failure of this run, and forget them.
+
+    Each was printed as it happened, but by the end of a build they are thousands of lines up the
+    log — and the tail is what gets read, being what Buildkite puts in its error box.
+    """
+    if not STEP_FAILURES:
+        return
+
+    import structlog
+
+    # ">>>" for the individual steps: "---"/"+++" would each open a log group of their own and
+    # split the recap up, whereas these stay inside the recap's own group.
+    blocks = [f"+++ {len(STEP_FAILURES)} step(s) failed"]
+    blocks += [f">>> Failed {step_name}\n{failure}" for step_name, failure in STEP_FAILURES]
+    print("\n".join(blocks), flush=True)
+
+    # The step list at the very end is what you feed back into `etl run`.
+    structlog.get_logger().error("steps_failed", steps=sorted(step_name for step_name, _ in STEP_FAILURES))
+    STEP_FAILURES.clear()
 
 
 def _exec_step_job(
