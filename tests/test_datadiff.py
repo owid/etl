@@ -16,6 +16,7 @@ from etl.datadiff import (
     _changed_records,
     _dataset_files_match,
     _diff_lines,
+    _is_code_column,
     _is_superseded_remote_predecessor,
     _table_metadata_dict,
 )
@@ -26,6 +27,7 @@ from etl.datadiff_report import (
     DiffReport,
     TableDiffResult,
     ValueDiff,
+    _tier,
     _tier_chip,
     render_html,
 )
@@ -945,6 +947,42 @@ def test_zero_padded_codes_stay_unscored():
     )
     _, sorted_by_score, median_bard, _, _ = _changed_records(decimals, "a")
     assert sorted_by_score and median_bard is not None
+
+
+def test_code_column_classified_on_full_column_not_changed_rows():
+    """The padded codes proving a column is coded may all sit on rows that didn't change.
+
+    `both` holds only changed rows, so if "004" stays "004" and only "100" -> "112" moves, the
+    frame carries no evidence of coding at all. `_is_code_column` therefore reads the full column
+    and the verdict is passed in.
+    """
+    full_column = pd.Series(pd.Categorical(["004", "100"]))
+    assert _is_code_column(full_column)
+    assert not _is_code_column(pd.Series(pd.Categorical(["0.75", "China"])))
+    assert not _is_code_column(pd.Series([0.75, 1.25]))
+
+    both = pd.DataFrame({"year": [2001], "a -": pd.Categorical(["100"]), "a +": pd.Categorical(["112"])})
+    # Without the full-column verdict the changed rows look like a plain quantity.
+    assert _changed_records(both, "a")[1:] == (True, pytest.approx(0.0566, abs=1e-3), 0, 0)
+    assert _changed_records(both, "a", is_code_column=True)[1:] == (False, None, 0, 0)
+
+
+def test_infinities_are_treated_as_sentinels_not_scored():
+    """An infinity must not poison the column's median and drop it out of the report.
+
+    `pd.to_numeric` parses "Inf", and a float column can hold one outright. BARD returns NaN for
+    it, `median_bard` becomes NaN, and `_tier` reads NaN as no tier — so the column silently loses
+    its chip and its place in the watch list. Infinities are blanked to NaN and handled like any
+    other unmeasurable value instead.
+    """
+    for side in (pd.Categorical(["Inf", "2.0"]), [float("inf"), 2.0]):
+        both = pd.DataFrame({"year": [2000, 2001], "a -": side, "a +": [1.0, 2.5]})
+        records, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+        assert sorted_by_score
+        assert median_bard == pytest.approx(0.1111, abs=1e-3), "the median must come from the finite revision only"
+        assert (appeared, disappeared) == (1, 0)
+        assert not any("nan" in r["anomaly score"] for r in records)
+        assert _tier(median_bard) != "none"
 
 
 def test_non_numeric_dtypes_stay_unscored():

@@ -869,6 +869,26 @@ def _df_to_records(df: pd.DataFrame, limit: int = SAMPLE_LIMIT) -> list[dict[str
 ZERO_PADDED_RE = re.compile(r"^-?0\d")
 
 
+def _is_code_column(s: pd.Series) -> bool:
+    """Whether ``s`` holds identifiers that merely look numeric, rather than quantities.
+
+    Zero-padding is the tell — ISO numeric country codes, area codes — and one padded value is
+    enough, since a code column stays a code column at the values that need no padding. Judge it
+    on the *whole* column: the padded codes may all sit on rows that didn't change, in which case
+    the changed-rows frame alone carries no evidence that the column is coded at all.
+    """
+    if pd.api.types.is_numeric_dtype(s):
+        return False
+    if isinstance(s.dtype, pd.CategoricalDtype):
+        # Categories are already deduplicated, so this costs nothing on a long column.
+        values = s.dtype.categories
+    elif pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
+        values = pd.unique(s.astype("object"))
+    else:
+        return False
+    return any(isinstance(v, str) and ZERO_PADDED_RE.match(v) for v in values)
+
+
 def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
     """``s`` as float64 for BARD scoring, or None if its dtype can't carry a number at all.
 
@@ -885,28 +905,35 @@ def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
     which weighs both sides of the diff together — see `_changed_records`. Dtypes that can't hold
     a number at all (datetimes, for one) return None and keep the unscoreable path.
 
-    Codes that merely *look* numeric are the risk in parsing strings, and zero-padding is the one
-    unambiguous tell: a column holding "004" is a set of identifiers (ISO numeric country codes,
-    area codes) whose flips have no measurable size, so it stays unscored rather than reporting
-    "004" -> "008" as a BARD anomaly. Unpadded codes are indistinguishable from small quantities
-    and are still scored — see `_changed_records` on why that beats the unscoreable path.
+    Codes that merely *look* numeric are the risk in parsing strings, so a column `_is_code_column`
+    recognizes is rejected here too. Infinities are rejected differently — as missing rather than as
+    a whole unscoreable column: `pd.to_numeric` happily parses "Inf" (and a float column can hold
+    one outright), but BARD returns NaN for it, which would poison the column's median and, since
+    `_tier` reads NaN as no tier at all, drop the column out of the report's chips and watch list
+    without a word. An unmeasurable value is exactly what a sentinel is, so it's treated as one.
     """
     if pd.api.types.is_numeric_dtype(s):
-        return s.astype("float64")
+        return _finite(s.astype("float64"))
     if isinstance(s.dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
-        values = s.astype("object")
-        # Checked over distinct values only — cheap even on a wide diff. One padded value is
-        # enough: a code column is a code column even where individual codes need no padding.
-        if any(isinstance(v, str) and ZERO_PADDED_RE.match(v) for v in pd.unique(values)):
+        if _is_code_column(s):
             return None
-        return pd.to_numeric(values, errors="coerce").astype("float64")
+        return _finite(pd.to_numeric(s.astype("object"), errors="coerce").astype("float64"))
     return None
 
 
+def _finite(s: pd.Series) -> pd.Series:
+    """``s`` with infinities blanked to NaN, so they're handled as sentinels rather than scored."""
+    return s.where(np.isfinite(s))
+
+
 def _changed_records(
-    both: pd.DataFrame, col: str, limit: int = SAMPLE_LIMIT
+    both: pd.DataFrame, col: str, limit: int = SAMPLE_LIMIT, is_code_column: bool = False
 ) -> tuple[list[dict[str, str]], bool, float | None, int, int]:
     """Sample records for a changed-values diff.
+
+    `both` holds only the rows that changed, which is all the scoring needs but not always enough
+    to classify the column: pass `is_code_column` when the *full* column shows it holds identifiers
+    (see `_is_code_column`), since its padded values may all sit on rows that didn't change.
 
     A value appearing or disappearing (NaN on one side) is a *coverage* event, not a value
     *revision* — e.g. the newest year in a new dataset version, or a slow-cadence indicator whose
@@ -942,7 +969,7 @@ def _changed_records(
     # changes exactly those rows, and old is then entirely non-numeric. Judging that side alone
     # would call the indicator categorical and hand it maximal severity, the very failure this
     # coercion exists to remove; judged jointly, it reads as the coverage event it is.
-    if old is None or new is None or not (old.notna().any() or new.notna().any()):
+    if is_code_column or old is None or new is None or not (old.notna().any() or new.notna().any()):
         return _df_to_records(both, limit=limit), False, None, 0, 0
     old_isna = old.isna().to_numpy()
     new_isna = new.isna().to_numpy()
@@ -1036,7 +1063,12 @@ def _data_diff(
             both = samp_a.join(samp_b, lsuffix=" -", rsuffix=" +")
         lines += _df_to_str(both)
 
-        records, sorted_by_score, median_bard, appeared_count, disappeared_count = _changed_records(both, col)
+        # Classified on the full columns, not on `both`: a code column's padded values may all sit
+        # on rows that didn't change, leaving the changed-rows frame with no sign that it is coded.
+        is_code_column = _is_code_column(table_a[col]) or _is_code_column(table_b[col])
+        records, sorted_by_score, median_bard, appeared_count, disappeared_count = _changed_records(
+            both, col, is_code_column=is_code_column
+        )
         value_diffs.append(
             ValueDiff(
                 kind="changed",
