@@ -1287,7 +1287,7 @@ steps:
       - data://meadow/wvs/2023-06-25/longitudinal_wvs:
         - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
         - data://garden/regions/2023-01-01/regions
-  # archived; last active in 7f465a71b4a2 on 2026-07-01
+  # archived; last active in f08d01d5bf75 on 2026-07-10
   data://grapher/wb/2025-07-01/income_groups:
     - data://garden/wb/2025-07-01/income_groups_aggregations:
       - data://garden/wb/2025-07-01/income_groups:
@@ -1296,6 +1296,24 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
     - data://garden/wb/2025-07-01/income_groups
+  # archived; last active in 3f9e92d13c77 on 2026-07-14
+  data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
+      - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
+        - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+  # archived; last active in 8ae3ab94ffa3 on 2026-07-20
+  data://garden/bls/2026-03-24/us_ppi_construction:
+    - snapshot://bls/2026-03-24/us_ppi_construction.csv
+  # archived; last active in 64b19ea0388e on 2026-07-27
+  data://grapher/oecd/2025-12-23/official_development_assistance:
+    - data://garden/oecd/2025-12-23/official_development_assistance:
+      - data://meadow/oecd/2025-12-23/official_development_assistance:
+        - snapshot://oecd/2025-12-23/official_development_assistance_dac5.zip
+        - snapshot://oecd/2025-12-23/official_development_assistance_dac2a.zip
+        - snapshot://oecd/2025-12-23/official_development_assistance_dac1.zip
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

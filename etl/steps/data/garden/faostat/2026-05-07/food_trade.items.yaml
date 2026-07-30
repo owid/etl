@@ -8,14 +8,16 @@
 # Each entry:
 #   display:     name shown in the visualization dropdown.
 #   item_codes:  FAO commodity item code(s) -> the code's name in FAOSTAT TM (asserted against
-#                the snapshot in the garden step). Most items have a single code. A few combine a
-#                primary commodity with a mechanically-derived form that trade is split across
-#                (beef bone-in + boneless, almonds in-shell + shelled, milled + broken rice, raw +
-#                refined sugar). For those, the trade of all codes is summed and the item carries
-#                no production or supply context, because summing those would double-count (the
-#                derived form is processed from the primary). The first code is the item's id;
-#                combined items use 100000 + that code, so the id is never mistaken for a single
-#                FAO commodity.
+#                the snapshot in the garden step). Most items have a single code. Some combine a
+#                primary commodity with a mechanically-derived form or preservation state that
+#                trade is split across (beef bone-in + boneless, almonds in-shell + shelled,
+#                milled + broken rice, raw + refined sugar, fresh + dried figs, fresh + preserved
+#                olives). Extracted or milled derivatives (flour, starch, oil, juice) stay
+#                separate items and are never folded into the crop. For combined items, the trade
+#                of all codes is summed and the item carries no production or supply context,
+#                because summing those would double-count (the derived form is processed from the
+#                primary). The first code is the item's id; combined items use 100000 + that code,
+#                so the id is never mistaken for a single FAO commodity.
 items:
   - display: Almonds
     item_codes:
@@ -109,6 +111,7 @@ items:
   - display: Chillies and peppers
     item_codes:
       401: Chillies and peppers, green (Capsicum spp. and Pimenta spp.)
+      689: Chillies and peppers, dry (Capsicum spp., Pimenta spp.), raw
   - display: Chocolate
     item_codes:
       666: Chocolate products nes
@@ -133,6 +136,7 @@ items:
   - display: Coconuts
     item_codes:
       249: Coconuts, in shell
+      250: Coconuts, desiccated
   - display: Confectionery
     item_codes:
       168: Sugar confectionery
@@ -169,9 +173,12 @@ items:
   - display: Eggs
     item_codes:
       1062: Hen eggs in shell, fresh
+      1063: Eggs, liquid
+      1064: Eggs, dried
   - display: Figs
     item_codes:
       569: Figs
+      570: Figs, dried
   - display: Garlic
     item_codes:
       406: Green garlic
@@ -196,6 +203,8 @@ items:
   - display: Green maize
     item_codes:
       446: Green corn (maize)
+      447: Sweet corn, frozen
+      448: Sweet corn, prepared or preserved
   - display: Green peas
     item_codes:
       417: Peas, green
@@ -273,6 +282,8 @@ items:
   - display: Mushrooms
     item_codes:
       449: Mushrooms and truffles
+      450: Dried mushrooms
+      451: Canned mushrooms
   - display: Mustard seed
     item_codes:
       292: Mustard seed
@@ -288,12 +299,14 @@ items:
   - display: Olives
     item_codes:
       260: Olives
+      262: Olives preserved
   - display: Onions
     item_codes:
       403: Onions and shallots, dry (excluding dehydrated)
   - display: Orange juice
     item_codes:
       491: Orange juice
+      492: Orange juice, concentrated
   - display: Oranges
     item_codes:
       490: Oranges
@@ -324,6 +337,7 @@ items:
   - display: Pineapples
     item_codes:
       574: Pineapples
+      575: Pineapples, otherwise prepared or preserved
   - display: Pistachios
     item_codes:
       223: Pistachios, in shell
@@ -369,6 +383,8 @@ items:
       31: Rice, milled
       32: Rice, broken
       28: Husked rice
+      27: Rice
+      29: Rice, milled (husked)
   - display: Roasted coffee
     item_codes:
       657: Coffee, decaffeinated or roasted
@@ -476,3 +492,4 @@ items:
   - display: Yoghurt
     item_codes:
       891: Yoghurt
+      892: Yoghurt, with additives

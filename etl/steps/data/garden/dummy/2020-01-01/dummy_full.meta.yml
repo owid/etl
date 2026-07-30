@@ -29,7 +29,6 @@ tables:
           conversionFactor: 9999
           numDecimalPlaces: 9
           tolerance: 9
-          yearIsDay: false
           zeroDay: '1900-01-01'
           entityAnnotationsMap: 'France: [display.entityAnnotationsMap example France]'
           includeInTable: true

@@ -90,9 +90,12 @@ def run() -> None:
     # POPULATION #
     tb_population_jan, tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
     tb_population = add_owid_regions(tb_population, indicators=["population"])
+    ## Population peak status (before/at/after the 1950-2100 population peak)
+    tb_population_peak = process_population_peak(tb_population)
     ## Format
     tb_population = tb_population.format(COLUMNS_INDEX)
     tb_population_jan = tb_population_jan.format(COLUMNS_INDEX, short_name="population_january")  # January data
+    tb_population_peak = tb_population_peak.format(["country", "year"], short_name="population_peak")
 
     # SEX RATIO #
     tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
@@ -167,6 +170,7 @@ def run() -> None:
     tables = [
         tb_population_jan,
         tb_population,
+        tb_population_peak,
         tb_growth_rate,
         tb_nat_change,
         tb_fertility,
@@ -287,6 +291,55 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> tuple[Table, T
     tb_sex = tb_sex.drop(columns=["month"])
 
     return tb_jan, tb, tb_sex
+
+
+def process_population_peak(tb: Table) -> Table:
+    """Derive each population's peak status over 1950-2100.
+
+    Uses total population (sex='all', age='all'), combining estimates (pre-2024) with
+    medium-variant projections. Each country-year is labeled relative to the year in which
+    the population reaches its maximum over the full period: "Before peak", "Peak year", or
+    "After peak". Populations still growing in 2100 are labeled "Before peak" throughout,
+    since their peak lies beyond the projection horizon.
+    """
+    paths.log.info("Processing population peak status...")
+
+    # Total population series: estimates (1950-2023) + medium projections (2024-2100).
+    mask = (tb["sex"] == "all") & (tb["age"] == "all") & (tb["variant"].isin(["estimates", "medium"]))
+    tb_peak = tb.loc[mask, ["country", "year", "population"]].copy()
+
+    # Sanity checks: one row per country-year, continuous 1950-2100 coverage, no NaNs.
+    assert not tb_peak.duplicated(subset=["country", "year"]).any(), "Duplicate country-year in population data."
+    assert tb_peak["population"].notna().all(), "NaN population values."
+    year_min, year_max = tb_peak["year"].min(), tb_peak["year"].max()
+    assert (year_min, year_max) == (1950, 2100), f"Unexpected year range: {year_min}-{year_max}."
+    counts = tb_peak.groupby("country", observed=True)["year"].count()
+    assert (counts == year_max - year_min + 1).all(), "Gaps in yearly population series."
+
+    # Find each country's peak year (first year of maximum population, in case of ties).
+    tb_peak = tb_peak.sort_values(["country", "year"])
+    idx_peak = tb_peak.groupby("country", observed=True)["population"].idxmax()
+    tb_year_peak = tb_peak.loc[idx_peak, ["country", "year"]].rename(columns={"year": "year_peak"})
+    tb_peak = tb_peak.merge(tb_year_peak, on="country", how="left")
+
+    # Label each year relative to the peak year.
+    column = "population_peak_status"
+    tb_peak[column] = "Before peak"
+    tb_peak.loc[tb_peak["year"] == tb_peak["year_peak"], column] = "Peak year"
+    tb_peak.loc[tb_peak["year"] > tb_peak["year_peak"], column] = "After peak"
+    # Populations still growing at the end of the projection period have not peaked.
+    tb_peak.loc[tb_peak["year_peak"] == year_max, column] = "Before peak"
+    tb_peak[column] = tb_peak[column].copy_metadata(tb_peak["population"])
+
+    # Numeric companion (-1=Before peak, 0=Peak year, 1=After peak): grapher's line-chart color
+    # dimension only accepts numeric indicators, so the ordinal alone can't color a timeseries.
+    column_code = "population_peak_status_code"
+    tb_peak[column_code] = -1
+    tb_peak.loc[tb_peak[column] == "Peak year", column_code] = 0
+    tb_peak.loc[tb_peak[column] == "After peak", column_code] = 1
+    tb_peak[column_code] = tb_peak[column_code].copy_metadata(tb_peak["population"])
+
+    return tb_peak[["country", "year", column, column_code]]
 
 
 def process_dependency(tb: Table) -> Table:

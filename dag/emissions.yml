@@ -13,10 +13,10 @@ steps:
   #
   # Net zero tracker.
   #
-  data://grapher/emissions/2023-10-10/net_zero_tracker:
-    - data://garden/emissions/2023-10-10/net_zero_tracker:
-      - data://meadow/emissions/2023-10-10/net_zero_tracker:
-        - snapshot://emissions/2023-10-10/net_zero_tracker.xlsx
+  data://grapher/emissions/2026-07-13/net_zero_tracker:
+    - data://garden/emissions/2026-07-13/net_zero_tracker:
+      - data://meadow/emissions/2026-07-13/net_zero_tracker:
+        - snapshot://emissions/2026-07-13/net_zero_tracker.xlsx
   #
   # Global Warming Potential factors (IPCC, 2021).
   #
@@ -117,7 +117,7 @@ steps:
   # Decoupling of GDP and CO2.
   #
   data://garden/emissions/2026-03-05/gdp_and_co2_decoupling:
-    - data://garden/worldbank_wdi/2026-02-27/wdi
+    - data://garden/worldbank_wdi/2026-07-14/wdi
     - data://garden/gcp/2025-11-13/global_carbon_budget
     - data://garden/regions/2023-01-01/regions
   #

@@ -71,3 +71,60 @@ def test_get_all_changed_catalog_paths_downstream_and_direct_export_deduped(mock
     # Without include_export, only the data catalog path is returned.
     result_no_export = get_all_changed_catalog_paths(files_changed)
     assert result_no_export == ["garden/un/latest/un_wpp"]
+
+
+@patch("etl.io.load_dag")
+def test_get_all_changed_catalog_paths_version_bump_includes_old_version(mock_load_dag):
+    """A version bump must also surface the *previous* version's catalog path.
+
+    Only the new version's files changed, so naively `dataset_catalog_paths` would contain just
+    the new path. Callers (e.g. datadiff's `--changed`) turn this list into an --include filter, so
+    if the old version's path isn't included, it gets filtered out of the REMOTE-catalog fetch and
+    the diff tool reports the bump as a brand-new dataset instead of comparing against the old one.
+    """
+    mock_load_dag.return_value = {
+        "data://garden/worldbank_wdi/2026-07-14/wdi": {"data://meadow/worldbank_wdi/2026-07-14/wdi"},
+        "data://meadow/worldbank_wdi/2026-07-14/wdi": set(),
+        "data://garden/worldbank_wdi/2026-02-27/wdi": {"data://meadow/worldbank_wdi/2026-02-27/wdi"},
+        "data://meadow/worldbank_wdi/2026-02-27/wdi": set(),
+        # An unrelated dataset that happens to share the short_name in a different namespace —
+        # must NOT be pulled in as a sibling version.
+        "data://garden/other_namespace/2026-01-01/wdi": set(),
+    }
+    files_changed = {"etl/steps/data/garden/worldbank_wdi/2026-07-14/wdi.py": "M"}
+
+    result = get_all_changed_catalog_paths(files_changed)
+
+    assert "garden/worldbank_wdi/2026-07-14/wdi" in result
+    assert "garden/worldbank_wdi/2026-02-27/wdi" in result
+    assert "garden/other_namespace/2026-01-01/wdi" not in result
+
+
+@patch("etl.io.load_dag")
+def test_get_all_changed_catalog_paths_only_pulls_in_closest_preceding_sibling(mock_load_dag):
+    """A dataset with several *independently* active vintages (e.g. WDI, which keeps older
+    versions in production for other downstream consumers instead of superseding them in place)
+    must only pull in its closest predecessor as a comparison sibling — not every other active
+    version.
+
+    Sweeping in all of them would put datasets that aren't part of this change, and usually
+    aren't built locally either, in scope for `etl diff`'s --changed comparison, which then
+    reports each one as falsely "removed".
+    """
+    mock_load_dag.return_value = {
+        "data://garden/worldbank_wdi/2025-01-24/wdi": set(),
+        "data://garden/worldbank_wdi/2025-09-08/wdi": set(),
+        "data://garden/worldbank_wdi/2026-01-29/wdi": set(),
+        "data://garden/worldbank_wdi/2026-02-27/wdi": set(),
+        "data://garden/worldbank_wdi/2026-07-14/wdi": {"data://meadow/worldbank_wdi/2026-07-14/wdi"},
+        "data://meadow/worldbank_wdi/2026-07-14/wdi": set(),
+    }
+    files_changed = {"etl/steps/data/garden/worldbank_wdi/2026-07-14/wdi.py": "M"}
+
+    result = get_all_changed_catalog_paths(files_changed)
+
+    assert "garden/worldbank_wdi/2026-07-14/wdi" in result
+    assert "garden/worldbank_wdi/2026-02-27/wdi" in result
+    assert "garden/worldbank_wdi/2025-01-24/wdi" not in result
+    assert "garden/worldbank_wdi/2025-09-08/wdi" not in result
+    assert "garden/worldbank_wdi/2026-01-29/wdi" not in result

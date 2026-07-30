@@ -40,7 +40,7 @@ tables:
         display:
           includeInTable: true
           name: Retail & Recreation
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       grocery_and_pharmacy:
         title: grocery_and_pharmacy
@@ -53,7 +53,7 @@ tables:
         display:
           includeInTable: true
           name: Grocery & Pharmacy Stores
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       parks:
         title: parks
@@ -66,7 +66,7 @@ tables:
         display:
           includeInTable: true
           name: Parks
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       transit_stations:
         title: transit_stations
@@ -79,7 +79,7 @@ tables:
         display:
           includeInTable: true
           name: Transit Stations
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       workplaces:
         title: workplaces
@@ -92,7 +92,7 @@ tables:
         display:
           includeInTable: true
           name: Workplaces
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
       residential:
         title: residential
@@ -106,5 +106,5 @@ tables:
         display:
           includeInTable: true
           name: Residential
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'

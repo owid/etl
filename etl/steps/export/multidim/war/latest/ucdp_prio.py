@@ -256,23 +256,41 @@ def edit_faust(c, tb_ucdp, tb_up, region_names):
     )
 
 
+def _description_key_as_list(description_key) -> list[str]:
+    # `description_key` may be the new free-form markdown string or a legacy list of bullets
+    # (see owid.catalog.core.meta.description_key_to_string). Normalize to a list of bullets so
+    # the list-based logic below keeps working.
+    if description_key is None:
+        return []
+    if isinstance(description_key, list):
+        return description_key
+    text = description_key.strip()
+    if text.startswith("- "):
+        return [item.strip() for item in text[2:].split("\n- ")]
+    return [text]
+
+
 def _set_description_key(view, tb_ucdp, tb_up):
     UCDP_ONLY = "[Uppsala Conflict Data Program (UCDP)](https://ucdp.uu.se/)"
     UCDP_AND_PRIO = f"{UCDP_ONLY} and the [Peace Research Institute Oslo (PRIO)](https://www.prio.org/data/1)"
     keys = None
     if (view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"):
         if view.d.indicator == "deaths":
-            keys = tb_up["number_deaths_ongoing_conflicts__conflict_type_state_based"].metadata.description_key
+            keys = _description_key_as_list(
+                tb_up["number_deaths_ongoing_conflicts__conflict_type_state_based"].metadata.description_key
+            )
         elif view.d.indicator == "death_rate":
-            keys = tb_up[
-                "number_deaths_ongoing_conflicts_per_capita__conflict_type_state_based"
-            ].metadata.description_key
+            keys = _description_key_as_list(
+                tb_up["number_deaths_ongoing_conflicts_per_capita__conflict_type_state_based"].metadata.description_key
+            )
         elif view.d.indicator == "wars_ongoing":
-            keys = tb_ucdp["number_ongoing_conflicts__conflict_type_all"].metadata.description_key + [TEXT_KEY_EXTRA]
+            keys = _description_key_as_list(
+                tb_ucdp["number_ongoing_conflicts__conflict_type_all"].metadata.description_key
+            ) + [TEXT_KEY_EXTRA]
         elif view.d.indicator == "wars_ongoing_country_rate":
-            keys = tb_ucdp["number_ongoing_conflicts_per_country__conflict_type_all"].metadata.description_key + [
-                TEXT_KEY_EXTRA
-            ]
+            keys = _description_key_as_list(
+                tb_ucdp["number_ongoing_conflicts_per_country__conflict_type_all"].metadata.description_key
+            ) + [TEXT_KEY_EXTRA]
         else:
             raise ValueError(f"Unknown indicator: {view.d.indicator}")
 
@@ -282,12 +300,14 @@ def _set_description_key(view, tb_ucdp, tb_up):
 
     elif view.d.indicator == "wars_ongoing":
         ctype = view.d.conflict_type.replace(" ", "_").replace("-", "_").replace("(", "_").lower().strip(")")
-        keys = tb_ucdp[f"number_ongoing_conflicts__conflict_type_{ctype}"].metadata.description_key + [TEXT_KEY_EXTRA]
+        keys = _description_key_as_list(
+            tb_ucdp[f"number_ongoing_conflicts__conflict_type_{ctype}"].metadata.description_key
+        ) + [TEXT_KEY_EXTRA]
     elif view.d.indicator == "wars_ongoing_country_rate":
         ctype = view.d.conflict_type.replace(" ", "_").replace("-", "_").replace("(", "_").lower().strip(")")
-        keys = tb_ucdp[f"number_ongoing_conflicts_per_country__conflict_type_{ctype}"].metadata.description_key + [
-            TEXT_KEY_EXTRA
-        ]
+        keys = _description_key_as_list(
+            tb_ucdp[f"number_ongoing_conflicts_per_country__conflict_type_{ctype}"].metadata.description_key
+        ) + [TEXT_KEY_EXTRA]
 
     if keys is not None:
         for i, key in enumerate(keys):

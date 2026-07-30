@@ -775,9 +775,9 @@ steps:
   data://grapher/clio_infra/2017-09-09/clio_infra__biological_standards_of_living__baten_and_blum__2015:
     - data://garden/clio_infra/2017-09-09/clio_infra__biological_standards_of_living__baten_and_blum__2015:
         - snapshot://clio_infra/2017-09-09/clio_infra__biological_standards_of_living__baten_and_blum__2015.feather
-  data://grapher/clio_infra/2017-09-09/clio_infra__human_capital:
-    - data://garden/clio_infra/2017-09-09/clio_infra__human_capital:
-        - snapshot://clio_infra/2017-09-09/clio_infra__human_capital.feather
+  data://grapher/clio_infra/2026-07-16/clio_infra__human_capital:
+    - data://garden/clio_infra/2026-07-16/clio_infra__human_capital:
+        - snapshot://clio_infra/2026-07-16/clio_infra__human_capital.xlsx
   data://grapher/technology/2017-11-30/usa_patents_granted__us_patent__and__trademark_office:
     - data://garden/technology/2017-11-30/usa_patents_granted__us_patent__and__trademark_office:
         - snapshot://technology/2017-11-30/usa_patents_granted__us_patent__and__trademark_office.feather
