@@ -70,6 +70,12 @@ Two fields carry the weight for callers:
 - **`query_string`** — the reference's own URL params (`country=`, `time=`, `tab=`),
   where article-level pins live and what makes a replacement URL reconstructable.
 
+**`admin_url`** is the chart's editor in **whichever environment was audited** — a
+staging sweep yields staging admin links, a production sweep yields `admin.owid.io`
+(tailscale suffixes are stripped, since the short host resolves and the long one is
+noise). MDim views deliberately have none: they are not editable in the admin, and
+their fix belongs in the ETL YAML.
+
 `surface_id` identifies the surface object itself (chart id,
 `multi_dim_x_chart_configs.id`, narrative chart id, explorer slug, tag id), for when
 you need to edit it rather than read it. **For any gdoc-backed surface (articles,

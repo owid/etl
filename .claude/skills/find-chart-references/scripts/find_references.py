@@ -34,6 +34,7 @@ Usage:
 
 import argparse
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 from urllib.parse import quote, urlencode
@@ -41,11 +42,12 @@ from urllib.parse import quote, urlencode
 from etl.config import OWID_ENV
 
 RENDER, EMBED, LINK = "render", "embed", "link"
+TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
 COLUMNS = [
     "subject_type", "subject", "subject_label", "subject_id", "surface", "kind",
     "where", "where_path", "surface_id", "config_id", "context",
-    "query_string", "text", "published", "preview_url",
+    "query_string", "text", "published", "preview_url", "admin_url",
 ]  # fmt: skip
 
 
@@ -76,6 +78,7 @@ def rec(subject_type, subject, subject_id, surface, kind, where, where_path="", 
         "text": text or "",
         "published": bool(published),
         "preview_url": "",
+        "admin_url": "",
     }
 
 
@@ -691,6 +694,33 @@ def deep_link(f: dict, host: str) -> str:
     return f"{base}#:~:text={encoded}"
 
 
+def admin_base() -> str:
+    """Admin root for whichever environment OWID_ENV resolves to.
+
+    Staging hosts carry a tailscale suffix that is noise in a link handed to a human
+    (and the short form resolves fine), so strip it.
+    """
+    admin = (OWID_ENV.admin_site or "https://admin.owid.io/admin").rstrip("/")
+    return TAILSCALE_SUFFIX_RE.sub("", admin)
+
+
+def add_admin_urls(findings: list[dict]) -> None:
+    """Every chart gets an edit link, in the environment being audited.
+
+    A reference is only actionable if you can open the thing to change it — for a chart
+    that is the admin editor, not the public page.
+    """
+    admin = admin_base()
+    for f in findings:
+        if f["surface"] == "narrative chart" and f["surface_id"]:
+            f["admin_url"] = f"{admin}/narrative-charts/{f['surface_id']}/edit"
+        elif f["surface"] == "chart" and f["surface_id"]:
+            f["admin_url"] = f"{admin}/charts/{f['surface_id']}/edit"
+        elif f["subject_type"] == "chart" and f["subject_id"]:
+            # The row is a reference *to* a chart (article, explorer, static viz…).
+            f["admin_url"] = f"{admin}/charts/{f['subject_id']}/edit"
+
+
 def add_preview_urls(findings: list[dict], host: str) -> None:
     """The referenced view itself, as the reader sees it.
 
@@ -799,6 +829,8 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str) -> No
                     page_type = f" _{ptype}_" if ptype else ""
                     preview = f" · [👁 preview]({gdoc_preview_url(f, admin)})" if f["surface_id"] else ""
                     links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host)})"
+                    if f["admin_url"]:
+                        links += f" · [✎ chart admin]({f['admin_url']})"
                     subject = (
                         f"[`{cell(f['subject_label'], 44)}`]({f['preview_url']})"
                         if f["preview_url"]
@@ -816,7 +848,8 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str) -> No
                     lines.append(
                         f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 72)}{draft} | "
                         f"{cell(f['context'], 44)} | "
-                        f"{'[👁 view](' + f['preview_url'] + ')' if f['preview_url'] else link} |"
+                        f"{'[👁 view](' + f['preview_url'] + ')' if f['preview_url'] else link}"
+                        f"{' · [✎ admin](' + f['admin_url'] + ')' if f['admin_url'] else ''} |"
                     )
             lines.append("")
     lines += [
@@ -908,6 +941,7 @@ def main() -> int:
               "(auto-generated from the page's tags — nothing to edit; --include-all-charts to keep)")  # fmt: skip
 
     label_indicator_subjects(findings)
+    add_admin_urls(findings)
     add_preview_urls(findings, (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/"))
 
     order = {EMBED: 0, RENDER: 1, LINK: 2}
