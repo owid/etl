@@ -916,6 +916,37 @@ def test_column_scored_when_only_one_side_is_numeric():
     assert (appeared, disappeared) == (0, 2)
 
 
+def test_zero_padded_codes_stay_unscored():
+    """Identifiers that only look numeric must not be parsed into quantities.
+
+    Meadow tables carry ISO numeric country codes and the like as strings. Coercing them would
+    report "004" -> "008" as a BARD anomaly, so a column holding any zero-padded value is treated
+    as a code column — including the values in it that happen to need no padding.
+    """
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["004", "100"]),
+            "a +": pd.Categorical(["008", "112"]),
+        }
+    )
+    _, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+
+    # Decimals below one are not zero-padding: a real quantity keeps its score.
+    decimals = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["0.7500", "0"]),
+            "a +": pd.Categorical(["0.8000", "0.1"]),
+        }
+    )
+    _, sorted_by_score, median_bard, _, _ = _changed_records(decimals, "a")
+    assert sorted_by_score and median_bard is not None
+
+
 def test_non_numeric_dtypes_stay_unscored():
     """A dtype that can't hold a number at all keeps the unscoreable path."""
     both = pd.DataFrame(

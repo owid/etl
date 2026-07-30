@@ -864,6 +864,11 @@ def _df_to_records(df: pd.DataFrame, limit: int = SAMPLE_LIMIT) -> list[dict[str
     return [{str(k): _fmt(v) for k, v in row.items()} for row in df_samp.to_dict("records")]
 
 
+# A zero-padded string ("004", "007") is an identifier, not a quantity — nothing measured is
+# written that way. Matches a leading zero followed by a digit, so "0.5" and "0" stay numeric.
+ZERO_PADDED_RE = re.compile(r"^-?0\d")
+
+
 def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
     """``s`` as float64 for BARD scoring, or None if its dtype can't carry a number at all.
 
@@ -879,11 +884,22 @@ def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
     scored normally. Whether anything numeric actually survived the coercion is up to the caller,
     which weighs both sides of the diff together — see `_changed_records`. Dtypes that can't hold
     a number at all (datetimes, for one) return None and keep the unscoreable path.
+
+    Codes that merely *look* numeric are the risk in parsing strings, and zero-padding is the one
+    unambiguous tell: a column holding "004" is a set of identifiers (ISO numeric country codes,
+    area codes) whose flips have no measurable size, so it stays unscored rather than reporting
+    "004" -> "008" as a BARD anomaly. Unpadded codes are indistinguishable from small quantities
+    and are still scored — see `_changed_records` on why that beats the unscoreable path.
     """
     if pd.api.types.is_numeric_dtype(s):
         return s.astype("float64")
     if isinstance(s.dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
-        return pd.to_numeric(s.astype("object"), errors="coerce").astype("float64")
+        values = s.astype("object")
+        # Checked over distinct values only — cheap even on a wide diff. One padded value is
+        # enough: a code column is a code column even where individual codes need no padding.
+        if any(isinstance(v, str) and ZERO_PADDED_RE.match(v) for v in pd.unique(values)):
+            return None
+        return pd.to_numeric(values, errors="coerce").astype("float64")
     return None
 
 
