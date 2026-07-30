@@ -41,6 +41,10 @@ DAG = dict[str, set[str]]
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
 
+# Failures of the run in progress, as (step name, traceback), so it can end with a recap of them
+# all. Both runners report into it from the main process; `print_failure_recap` empties it.
+STEP_FAILURES: list[tuple[str, str]] = []
+
 
 @click.command(name="run")
 @click.option(
@@ -250,21 +254,38 @@ def main_cli(
             # This lets staging-site-master do a full build with the same command as feature branches.
             click.echo("On master branch: --modified runs all selected steps (no diff filter).")
         else:
-            steps = _modified_steps(includes=steps, exact_match=exact_match)
-            if not steps:
-                click.echo("No steps modified relative to origin/master.")
-                return
-            # `--modified` surfaces modified export steps (multidim/explorer recipes) by design, but
-            # they're only buildable in export mode. When a branch edits only such a recipe (e.g. a
-            # single `<explorer>.<key>.config.yml`), the modified set is export-only; without this we
-            # would exclude it downstream and crash with "No steps matched". Enable export (which also
-            # un-excludes the grapher deps the export step needs) so the explorer actually rebuilds.
-            if not export and any(s.startswith("export://") for s in steps):
-                export = True
-                click.echo("Detected modified export step(s); enabling --export for this run.")
-            click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
-            # We matched modified catalog paths as substrings, so disable exact matching downstream.
-            exact_match = False
+            from etl.git_helpers import get_changed_files
+
+            # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
+            files_changed = get_changed_files(include_diff=False)
+            global_changes = _global_checksum_inputs_changed(files_changed)
+            if global_changes:
+                # These files aren't under etl/steps/ or snapshots/, so _modified_steps would see
+                # nothing changed - but DataStep.checksum_input() bakes pd.__version__ and
+                # config.ETL_EPOCH into every step's checksum, so a change here makes every step
+                # dirty regardless of which step files were touched. Don't filter in that case.
+                click.echo(
+                    f"Detected changes to {', '.join(global_changes)}, which affect every step's "
+                    "checksum (pandas version / ETL_EPOCH); --modified runs all selected steps "
+                    "(no diff filter)."
+                )
+            else:
+                steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
+                if not steps:
+                    click.echo("No steps modified relative to origin/master.")
+                    return
+                # `--modified` surfaces modified export steps (multidim/explorer recipes) by design,
+                # but they're only buildable in export mode. When a branch edits only such a recipe
+                # (e.g. a single `<explorer>.<key>.config.yml`), the modified set is export-only;
+                # without this we would exclude it downstream and crash with "No steps matched".
+                # Enable export (which also un-excludes the grapher deps the export step needs) so
+                # the explorer actually rebuilds.
+                if not export and any(s.startswith("export://") for s in steps):
+                    export = True
+                    click.echo("Detected modified export step(s); enabling --export for this run.")
+                click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
+                # We matched modified catalog paths as substrings, so disable exact matching downstream.
+                exact_match = False
 
     kwargs = dict(
         includes=steps,
@@ -303,8 +324,19 @@ def main_cli(
             with launch_ipdb_on_exception():
                 main(**kwargs)  # ty: ignore
         else:
+            from etl.steps import StepFailedError
+
             try:
                 main(**kwargs)  # ty: ignore
+            except StepFailedError:
+                if not watch:
+                    # Exit rather than re-raise: the recap in the finally below reports every failed
+                    # step with its traceback, and a re-raise would add nothing but executor
+                    # plumbing (_RemoteTraceback and future.result frames) on top of it — which is
+                    # what CI would then show you instead of the recap.
+                    raise SystemExit(1) from None
+                print("--- step_failed", flush=True)
+                continue
             except Exception:
                 if not watch:
                     raise
@@ -313,6 +345,9 @@ def main_cli(
                 traceback.print_exc()
                 print("--- step_failed", flush=True)
                 continue
+            finally:
+                # In a finally, so every way a run can end goes through it. No-op when nothing failed.
+                print_failure_recap()
             if watch:
                 print("--- Dataset rebuild complete", flush=True)
 
@@ -332,7 +367,23 @@ def _current_branch_name() -> str | None:
         return None
 
 
-def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]:
+# Repo-wide files that, per `DataStep.checksum_input()` (etl/steps/__init__.py), get baked into
+# *every* step's checksum on top of the step's own files: the pandas version (root pyproject.toml /
+# uv.lock pin it) and config.ETL_EPOCH (etl/config.py). A change to any of these makes every step
+# dirty regardless of which step files a branch touched, so a plain git-diff of step files misses it.
+_GLOBAL_CHECKSUM_FILES = {"pyproject.toml", "uv.lock", "etl/config.py"}
+
+
+def _global_checksum_inputs_changed(files_changed: dict[str, dict[str, str]]) -> list[str]:
+    """Return which repo-wide, all-steps-checksum-affecting files changed vs origin/master."""
+    return sorted(f for f in _GLOBAL_CHECKSUM_FILES if f in files_changed)
+
+
+def _modified_steps(
+    includes: list[str],
+    exact_match: bool = False,
+    files_changed: dict[str, dict[str, str]] | None = None,
+) -> list[str]:
     """Return catalog paths of steps that changed vs origin/master, plus their downstream steps.
 
     Reuses the same machinery as chart-diff (`get_changed_files` + `get_all_changed_catalog_paths`),
@@ -343,12 +394,17 @@ def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]
     multidims/explorers a branch affects via their upstream data steps. Data steps are returned
     URI-less (e.g. "garden/foo/bar"); export steps keep their full URI so `export://...` patterns
     match them.
+
+    :param files_changed: Pass in an already-fetched `get_changed_files()` result to avoid
+        recomputing it (callers that also need to check `_global_checksum_inputs_changed` first).
     """
     from etl.git_helpers import get_changed_files
     from etl.io import get_all_changed_catalog_paths
 
-    # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
-    changed_paths = get_all_changed_catalog_paths(get_changed_files(include_diff=False), include_export=True)
+    if files_changed is None:
+        # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
+        files_changed = get_changed_files(include_diff=False)
+    changed_paths = get_all_changed_catalog_paths(files_changed, include_export=True)
 
     # Narrow to those also matching the explicit STEPS arguments.
     if includes:
@@ -603,14 +659,13 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
                 # log which step failed and re-raise the exception, otherwise it gets lost
                 # in logs and we don't know which step failed
                 log.error("step_failed", step=str(step))
+                # Report before deciding what to do with it: only the first exception is ever
+                # re-raised, and it carries no traceback of its own worth printing.
+                _report_step_failure(str(step), e)
                 if continue_on_failure:
                     failing_steps.append(step)
                     exceptions.append(e)
                     skipped_steps.append(step)
-                    click.echo(click.style(f"--- FAILED {step}", fg="red"))
-                    # Only the first exception gets raised at the end of the run, so report this
-                    # one now or it is lost.
-                    _print_step_failure(e)
                     continue
                 else:
                     raise e
@@ -623,9 +678,6 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
         _write_execution_times(execution_times)
 
     if continue_on_failure and exceptions:
-        # Tracebacks were printed as each step failed; recap the step names, since by now they are
-        # thousands of lines up in the log.
-        log.error("steps_failed", steps=sorted(str(step) for step in failing_steps))
         # Raise the first exception
         raise exceptions[0]
 
@@ -707,9 +759,6 @@ def exec_graph_parallel(
     :param use_threads: Flag indicating whether to use threads instead of processes for parallel execution.
     :param kwargs: Additional keyword arguments to be passed to the function.
     """
-    import structlog
-
-    log = structlog.get_logger()
     topological_sorter = TopologicalSorter(exec_graph)
     topological_sorter.prepare()
 
@@ -763,12 +812,9 @@ def exec_graph_parallel(
                     # Catch BaseException, not Exception: a step that somehow raises SystemExit would
                     # otherwise end the run without ever naming the step or printing its traceback.
                     except BaseException as e:
-                        # Report the failure right away. Re-raising is not enough: the pool only
-                        # exits once every already-submitted step has finished, which on a full
-                        # build is hours after the failure, and in CONTINUE_ON_FAILURE mode all but
-                        # the first exception are never raised at all.
-                        print(f"--- Failed {task} - {click.style('FAILED', fg='red')}")
-                        _print_step_failure(e)
+                        # Report the failure right away, on top of the recap at the end of the run:
+                        # on a long build you want to see it while the run is still going.
+                        _report_step_failure(task, e)
 
                         if continue_on_failure:
                             failed_tasks.add(task)
@@ -782,9 +828,6 @@ def exec_graph_parallel(
 
         # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
         if continue_on_failure and exceptions:
-            # Tracebacks were printed as each step failed; recap the step names, since by now they
-            # are thousands of lines up in the log.
-            log.error("steps_failed", steps=sorted(failed_tasks))
             raise exceptions[0]
 
 
@@ -803,20 +846,47 @@ def _create_expected_time_message(
         return prepend_message + partial_message + append_message
 
 
-def _print_step_failure(e: BaseException) -> None:
-    """Print what a failed step's exception says, on stderr, right when the failure happens."""
+def _report_step_failure(step_name: str, e: BaseException) -> None:
+    """Print a failed step's traceback, and keep it for the recap at the end of the run.
+
+    Header and traceback go out as one write to one stream: Buildkite reads stdout and stderr
+    through separate pipes and merges them in whatever order its readers get there, so output split
+    across the two comes out interleaved however carefully each is flushed. "+++" opens a log group
+    that is expanded by default, unlike the "---" the other headers use.
+    """
     from etl.steps import StepFailedError
 
+    # A StepFailedError's message carries the traceback from the child process that ran the step.
+    # Rendering the exception itself would only add executor plumbing (_RemoteTraceback frames).
     if isinstance(e, StepFailedError):
-        # The step ran in a child process, which handed its traceback back through the exception.
-        # Printing the exception itself would only add executor plumbing (_RemoteTraceback,
-        # future.result frames).
-        if e.child_traceback:
-            print(e.child_traceback, file=sys.stderr)
-        print(e, file=sys.stderr)
+        failure = str(e)
     else:
-        traceback.print_exception(type(e), e, e.__traceback__)
-    sys.stderr.flush()
+        failure = "".join(traceback.format_exception(type(e), e, e.__traceback__)).rstrip()
+
+    STEP_FAILURES.append((step_name, failure))
+    print(f"+++ Failed {step_name}\n{failure}", flush=True)
+
+
+def print_failure_recap() -> None:
+    """Reprint every failure of this run, and forget them.
+
+    Each was printed as it happened, but by the end of a build they are thousands of lines up the
+    log — and the tail is what gets read, being what Buildkite puts in its error box.
+    """
+    if not STEP_FAILURES:
+        return
+
+    import structlog
+
+    # ">>>" for the individual steps: "---"/"+++" would each open a log group of their own and
+    # split the recap up, whereas these stay inside the recap's own group.
+    blocks = [f"+++ {len(STEP_FAILURES)} step(s) failed"]
+    blocks += [f">>> Failed {step_name}\n{failure}" for step_name, failure in STEP_FAILURES]
+    print("\n".join(blocks), flush=True)
+
+    # The step list at the very end is what you feed back into `etl run`.
+    structlog.get_logger().error("steps_failed", steps=sorted(step_name for step_name, _ in STEP_FAILURES))
+    STEP_FAILURES.clear()
 
 
 def _exec_step_job(

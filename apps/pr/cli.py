@@ -12,6 +12,8 @@ Arguments:
 
 **Main use case**: Branch out from `master` to a temporary `work_branch`, and create a PR to merge `work_branch` -> `master`. You will be asked to choose a category. The value of `work_branch` will be auto-generated based on the title and the category.
 
+The work branch is always created from the latest `origin/<base_branch>`, never from your (possibly stale) local base branch, so unpushed commits sitting on the local base branch are not included. When branching in place, the local base branch is also fast-forwarded to its remote counterpart when possible (when it carries unpushed or diverged commits, it is left untouched and a warning is logged). Pass `--no-update-base` to branch off your local base branch as-is instead.
+
 ```shell
 # Without specifying a category (you will be prompted for a category)
 etl pr "some title for the PR"
@@ -197,6 +199,12 @@ MODEL_DEFAULT = "gpt-5-mini"
     is_flag=True,
     help="Automatically assign the PR to the GitHub user the token belongs to.",
 )
+@click.option(
+    "--no-update-base",
+    "no_update_base",
+    is_flag=True,
+    help="Branch off your local base branch as-is, even if it is behind its remote counterpart. By default, the work branch is created from the latest 'origin/<base_branch>'.",
+)
 def cli(
     title: str,
     category: str | None,
@@ -210,6 +218,7 @@ def cli(
     worktree_path: str | None,
     share_data: bool,
     auto_assign: bool,
+    no_update_base: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
     # Check that the user has set up a GitHub token.
@@ -230,6 +239,8 @@ def cli(
         raise click.ClickException("--worktree-path requires --worktree.")
     if share_data and not worktree:
         raise click.ClickException("--share-data requires --worktree.")
+    if no_update_base and direct:
+        raise click.ClickException("--no-update-base has no effect with --direct (no new branch is created).")
 
     # Get category
     category = ensure_category(category)
@@ -266,13 +277,13 @@ def cli(
                 work_branch = f"{work_branch}-private"
         if worktree:
             resolved_worktree_path = resolve_worktree_path(work_branch, worktree_path)
-            branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path)
+            branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path, update_base=not no_update_base)
             if share_data:
                 symlink_shared_dirs(resolved_worktree_path)
             # Subsequent git operations (commit, push) must run inside the worktree.
             repo = Repo(resolved_worktree_path)
         else:
-            branch_out(repo, base_branch, work_branch)
+            branch_out(repo, base_branch, work_branch, update_base=not no_update_base)
 
     # Create PR
     create_pr(repo, work_branch, base_branch, pr_title, auto_assign=auto_assign)
@@ -395,16 +406,54 @@ def check_branches_valid(base_branch, work_branch, remote_branches):
         )
 
 
-def branch_out(repo, base_branch, work_branch):
+def branch_out(repo, base_branch, work_branch, update_base: bool = True):
     """Branch out from base_branch and create branch 'work_branch'."""
+    if not update_base:
+        try:
+            log.info(
+                f"Switching to base branch '{base_branch}', creating new branch '{work_branch}' from there, and switching to it."
+            )
+            repo.git.checkout(base_branch)
+            repo.git.checkout("-b", work_branch)
+        except GitCommandError as e:
+            raise click.ClickException(f"Failed to create a new branch from '{base_branch}':\n{e}")
+        return
+
+    # Create the work branch directly from the remote's latest base branch (already fetched by
+    # init_repo), never from the possibly stale local one: a stale start point pollutes `etl diff`
+    # with every dataset that changed on the base branch since, and raises "not in the DAG" errors
+    # for steps that already exist. Uncommitted changes carry over, as with any plain checkout.
+    # --no-track: without it, git would set 'origin/<base_branch>' as the new branch's upstream,
+    # which breaks a plain `git push` on the work branch later.
     try:
-        log.info(
-            f"Switching to base branch '{base_branch}', creating new branch '{work_branch}' from there, and switching to it."
-        )
-        repo.git.checkout(base_branch)
-        repo.git.checkout("-b", work_branch)
+        log.info(f"Creating new branch '{work_branch}' from 'origin/{base_branch}', and switching to it.")
+        repo.git.checkout("--no-track", "-b", work_branch, f"origin/{base_branch}")
     except GitCommandError as e:
-        raise click.ClickException(f"Failed to create a new branch from '{base_branch}':\n{e}")
+        raise click.ClickException(f"Failed to create a new branch from 'origin/{base_branch}':\n{e}")
+
+    # Keep the local base branch from going stale: fast-forward it to the remote when possible.
+    # The work branch is already checked out, so this moves only the ref; it can never touch the
+    # working tree, and never blocks the PR.
+    if base_branch not in {head.name for head in repo.heads}:
+        return
+    local_commit = repo.commit(base_branch)
+    remote_commit = repo.commit(f"origin/{base_branch}")
+    if local_commit == remote_commit:
+        return
+    if repo.is_ancestor(local_commit, remote_commit):
+        try:
+            repo.git.branch("-f", base_branch, f"origin/{base_branch}")
+            log.info(f"Fast-forwarded local '{base_branch}' to 'origin/{base_branch}'.")
+        except GitCommandError as e:
+            # E.g. the base branch is checked out in another worktree.
+            log.warning(f"Could not fast-forward local '{base_branch}' to 'origin/{base_branch}':\n{e}")
+    else:
+        # The local base branch is ahead of the remote or has diverged from it.
+        log.warning(
+            f"Local '{base_branch}' has commits not pushed to 'origin/{base_branch}'; they are NOT included in "
+            f"'{work_branch}', and local '{base_branch}' is left untouched. Re-run with --no-update-base to "
+            f"branch off your local '{base_branch}' as-is."
+        )
 
 
 def resolve_worktree_path(work_branch: str, override: str | None) -> Path:
@@ -414,16 +463,24 @@ def resolve_worktree_path(work_branch: str, override: str | None) -> Path:
     return (BASE_DIR.parent / f"etl-{work_branch}").resolve()
 
 
-def branch_out_worktree(repo, base_branch: str, work_branch: str, worktree_path: Path) -> None:
+def branch_out_worktree(
+    repo, base_branch: str, work_branch: str, worktree_path: Path, update_base: bool = True
+) -> None:
     """Create branch 'work_branch' from 'base_branch' inside a new git worktree at 'worktree_path'."""
     if worktree_path.exists():
         raise click.ClickException(
             f"Worktree path '{worktree_path}' already exists. "
             "Choose a different --worktree-path or remove the existing directory."
         )
+    # Branch from the remote's latest base branch (already fetched by init_repo), not from the
+    # possibly stale local one. The local base branch may be checked out in another worktree, so
+    # unlike branch_out it cannot be fast-forwarded here; it is simply left untouched.
+    # --no-track: without it, git would set 'origin/<base_branch>' as the new branch's upstream,
+    # which breaks a plain `git push` on the work branch later.
+    start_point = f"origin/{base_branch}" if update_base else base_branch
     try:
-        log.info(f"Creating worktree at '{worktree_path}' with new branch '{work_branch}' from '{base_branch}'.")
-        repo.git.worktree("add", "-b", work_branch, str(worktree_path), base_branch)
+        log.info(f"Creating worktree at '{worktree_path}' with new branch '{work_branch}' from '{start_point}'.")
+        repo.git.worktree("add", "--no-track", "-b", work_branch, str(worktree_path), start_point)
     except GitCommandError as e:
         raise click.ClickException(f"Failed to create worktree at '{worktree_path}':\n{e}")
 

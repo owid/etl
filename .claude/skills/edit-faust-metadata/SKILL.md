@@ -94,7 +94,7 @@ Three routes:
    - Key present in the chart's `patch` → **route (c)** (the patch wins regardless of inheritance).
    - Key absent + inheritance enabled + single y indicator + inheritable → the rendered text IS the indicator's → **route (a)** by default (fix at the source, per the default rule above). Route (c) is only the scope-down option in the blast-radius ask, when the user confirms the change should apply to this one chart and not the other surfaces — and make the trade-off explicit: the patch permanently detaches the field from the indicator's metadata.
    - Key absent + inheritance disabled, or multi-y-indicator chart (inheritance baseline ambiguous — same conservatism as `indicator_update.py`), or no ETL grapher config → **route (c)**.
-3. Entity selection / colors / axis / map settings → chart-config-only → **route (c)**. For selection edits, check the entities actually have data in the indicator (see the `check-empty-entities` skill's availability lookup).
+3. Entity selection / colors / axis / map settings → chart-config-only → **route (c)**. For selection edits, check the entities actually have data in the indicator (see the `check-empty-entities` skill's availability lookup), and keep `selectedEntityColors` in step with the selection: on a rename, move the color entry from the old name to the new one (deleting it discards a deliberately assigned color — a visual regression); on a drop, delete it. Same rule as `check-empty-entities`' fix guidance — keep the two in sync.
 
 **Target = MDim view, field F:**
 
@@ -184,7 +184,7 @@ Scoping rules specific to this skill:
 
 - **Adversarial claims verification is MANDATORY here, but only on the metadata being added or edited — never on the data.** Run `/adversarial-data-review` scoped to the new/changed text: treat every added or edited sentence as a claim and verify it against the producer's documentation (fetch what's behind the links in the edited text and the dataset's snapshot `.dvc` — the link check only proves URLs resolve; this reads what they say). Skip the skill's data-value cross-checks, anomaly scans, and indicator prioritization entirely — no data changed. Unedited metadata is out of scope too. This keeps the pass cheap (a handful of web calls) while catching the failure mode nothing else covers: text that is well-formed, well-styled, and factually wrong (stale methodology attributions, scope overclaims, misread units in prose).
 
-- For a one-field conversational edit, run the checks against **the edited text/step only** — don't re-audit the whole dataset. For target-report or mass edits, run the full skills as `/update-dataset` does.
+- **Pin-coupling check — the mirror of [`check-hardcoded-years`](../check-hardcoded-years/SKILL.md)' deliberate-pin signal.** That audit refuses to bump a time pin when the pin's value lives in the FAUST text; this skill edits the text side of the same coupling, so check it from here too, in both directions. (i) When the edited text names a year or a figure the chart's current window produces ("increased 12-fold", "more than 95%", a ratio in the title, "the past three decades"), read the config's `minTime`/`maxTime`/`map.time` before shipping: changing the words without the pin — or leaving words that a pin bump has already invalidated — breaks the pairing that audit deliberately preserves. Scan for **numbers, not just years**: "grown 300%" names no year but is entirely determined by the pinned endpoint. (ii) When *adding* text, an endpoint-dependent figure creates a new coupling that silently goes stale at the next data update — prefer phrasing that survives updates ("has increased more than tenfold" only if it stays true with more years), and where the figure is the point, say so in the PR body so the next update cycle's audit knows the pin↔text pair is deliberate.
 - Route (c) chart-config text has no `.meta.yml` — apply the style guide, the clarity checklist, and a typo pass directly to the new text.
 - If a check rewrites a `.meta.yml`, re-run the affected step (grapher steps with `--grapher`) and re-run the check to confirm zero remaining violations.
 - New `[term](#dod:term)` links: check the `dods` table via public Datasette (`SELECT name FROM dods WHERE name LIKE ...`) before shipping; if missing, keep the link and list it in the PR body as a "create in admin" follow-up.
@@ -203,6 +203,10 @@ Scoping rules specific to this skill:
 - Route (a)/(b) file edits deploy when the PR merges (normal ETL deploy).
 - Route (c) staging chart edits appear in **chart-diff**; they are synced to production by chart-sync only after approval in the Wizard + merge. Remind the user of the pending approval.
 - Never point a write at `admin.owid.io` or the production DB. The guard in `update_chart_config.py` enforces this; don't work around it.
+
+### Always close with what's still open
+
+End the checkpoint and the final hand-off with the open-items block defined in CLAUDE.md ("Close every report with what's still open") — in the PR body as well as chat. This skill's usual danglers: `#dod:` terms to create in admin and editorial calls on pin-coupled text (handed off), the checkpoint diff itself and route-(c) chart-diff approval in the Wizard (proposed — easy to leave dangling because the merge doesn't force it), and checks scoped out or staging surfaces not previewed (unverified).
 
 ## The guarded chart editor (route c)
 

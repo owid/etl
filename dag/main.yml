@@ -13,7 +13,7 @@ steps:
   data://external/owid_grapher/latest/population:
     - data://grapher/demography/2024-07-15/population
   data://external/owid_grapher/latest/gdp:
-    - data://grapher/worldbank_wdi/2026-07-14/wdi
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -577,6 +577,16 @@ steps:
       - data://garden/un/2024-07-12/un_wpp
       - data://garden/regions/2023-01-01/regions
       - snapshot://worldbank_wdi/2026-07-14/wdi.zip
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+
+  data://grapher/worldbank_wdi/2026-07-27/wdi:
+    - data://garden/worldbank_wdi/2026-07-27/wdi:
+      - data://meadow/worldbank_wdi/2026-07-27/wdi:
+        - snapshot://worldbank_wdi/2026-07-27/wdi.zip
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/regions/2023-01-01/regions
+      - snapshot://worldbank_wdi/2026-07-27/wdi.zip
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/demography/2024-07-15/population
 

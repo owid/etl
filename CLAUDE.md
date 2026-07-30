@@ -15,6 +15,16 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
 - **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
+## Close every report with what's still open
+
+Multi-step work — updates, audits, reviews, migrations — rarely ends with everything closed. End the report (and the PR body, when there is one) with an explicit open-items block; never make the user ask "what's left?". Keep three buckets separate:
+
+- **Handed off** — waiting on someone else. Name who acts and what the ask is, and include a locator (link, file, id) — an item the next person must re-derive is not handed off.
+- **Proposed** — waiting on sign-off. State the exact change so "yes" is a complete answer.
+- **Unverified** — nobody checked it: skipped or failed checks, surfaces left uncovered, capped or truncated sweeps. Silence here reads as "clean", which is the one wrong signal a report can send.
+
+Re-state the whole block every time the work is revisited — carry open items forward rather than reporting only the delta, and say explicitly when an item clears instead of dropping it silently.
+
 ## Team
 
 Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it."
@@ -165,8 +175,6 @@ gh pr edit <number> --body "..."
 ```
 
 **Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
-
-**After `etl pr --worktree`, verify the branch is current AND actually pushed.** Worktree creation can branch off a stale local `master` (missing recent merges → `_check_dag_completeness` "not in the DAG" errors on steps that should already exist) — fix with `git fetch origin master && git rebase origin/master`. That rebase then needs its own push: check `gh pr view --json additions,deletions` isn't `0`/`0` before assuming the PR reflects your commits.
 
 **Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
 
