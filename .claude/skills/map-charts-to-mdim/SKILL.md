@@ -141,8 +141,13 @@ matters:
 
 Charts already redirected to the same target are counted as `already_done` — no
 redirect to create, but they are still published (the extractor only selects
-published charts), so they still shadow their redirect and still need the CLI to
-unpublish them.
+published charts), so they shadow their redirect and it never fires. **The CLI
+cannot finish these**: their source is already a `multi_dim_redirects` source,
+which its own validation rejects, so including them would abort the whole run.
+Preflight reports them as `MANUAL`; unpublish each one in the grapher admin. The
+exception is a chart carrying old slugs — hand-unpublishing deletes its
+`chart_slug_redirects` rows and those slugs become hard 404s, so take those to
+the Grapher team instead.
 
 Many charts → one view is legitimate (e.g. a line chart and its map twin) —
 surfaced via `shared_target_chart_ids`, never collapsed.
@@ -210,7 +215,8 @@ MDIM dimension of the same name and lands the reader on the wrong view. The
 audit flags those explicitly.
 
 Mention this step every time (like `/update-dataset` step 7); running it is the
-user's call, since a wide sweep costs tokens.
+user's call, since a wide sweep costs tokens — but preflight gates on the same
+embedded references, so it becomes mandatory before applying.
 
 **Narrative charts are a known dead end.** They keep rendering (the config is
 fetched by UUID), but "Explore the data" points at the parent chart's slug and
@@ -235,12 +241,21 @@ ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
 ```
 
 It re-runs every validation the CLI performs, against the live DB, and re-checks
-each source chart's slug + config MD5 (an edited or deleted chart comes back
-`STALE`). Statuses: `OK` / `BLOCKER` / `EXISTS` / `DIFFERS` / `GONE` / `STALE`.
-Non-zero exit means **do not run the CLI yet** — it runs a single transaction, so
-one bad row aborts the entire migration. Pass `--decisions` whenever a review
-happened; flagged charts are excluded (remove them from the CSV, or mark them
-`SKIP` in `overrides.csv` and re-run step 1).
+both sides of each row against the proposal: the source chart's slug + config MD5,
+and the target MDIM's slug + reviewed view (an edited, deleted, renamed or rebuilt
+one comes back `STALE`). Statuses: `OK` / `BLOCKER` / `EXISTS` / `DIFFERS` /
+`GONE` / `STALE` / `MANUAL`.
+
+It also **gates on embedded references**. Explorers, narrative charts, data
+insights, static viz and article chart blocks render the chart's own config, so
+the CLI's unpublish step breaks them with no error anywhere — the one failure mode
+the CLI itself cannot detect. Preflight counts them (current *and* old slugs) and
+exits non-zero while any remain. Migrate them (step 4 gives you each replacement
+URL), then re-run; `--no-references` skips the gate once they are handled.
+
+Non-zero exit means **do not run the CLI yet**. Pass `--decisions` whenever a
+review happened; flagged charts are excluded (remove them from the CSV, or mark
+them `SKIP` in `overrides.csv` and re-run step 1).
 
 Then, from the **owid-grapher** repo:
 

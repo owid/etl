@@ -9,10 +9,14 @@ Why a preflight exists: that CLI runs **one transaction**, and any row it reject
 aborts the entire migration. So every check here mirrors a check the CLI performs,
 against the live DB, so the bad rows surface before the run instead of during it.
 
-It also catches two things the CLI cannot know about:
+It also catches things the CLI cannot know about:
 - charts edited (or deleted) since the proposal was written — `configMd5` drift,
   which usually means the target view no longer matches what a human reviewed;
-- charts the reviewer flagged in the review HTML (`--decisions`).
+- MDIMs deleted, renamed, or rebuilt since the proposal, so the reviewed view no
+  longer exists or no longer sits at the recorded URL;
+- charts the reviewer flagged in the review HTML (`--decisions`);
+- charts still embedded elsewhere. Those never abort the CLI — they break
+  *silently* when it unpublishes the source chart — so they gate readiness here.
 
 Usage:
     ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
@@ -109,6 +113,49 @@ def stale_charts(entries: list[dict]) -> dict[str, str]:
             stale[e["source"]] = f"chart slug changed since the proposal (now '{cur['slug']}') — re-run extract_and_match.py"  # fmt: skip
         elif ch.get("configMd5") and cur["config_md5"] != ch["configMd5"]:
             stale[e["source"]] = "chart config changed since the proposal — re-run extract_and_match.py"
+    return stale
+
+
+def stale_targets(entries: list[dict]) -> dict[str, str]:
+    """Targets whose MDIM or reviewed view changed since the proposal was written.
+
+    The mirror of `stale_charts` on the target side. A deleted or renamed MDIM, or a
+    view whose config was regenerated, leaves the CSV pointing at a URL nobody
+    reviewed — and `cli_blockers` would not notice, because it only looks up MDIMs
+    that still exist under the recorded slug.
+    """
+    ids = tuple({e["target"]["multiDimId"] for e in entries})
+    if not ids:
+        return {}
+    # No ORDER BY: these configs are multi-MB JSON and sorting them server-side blows
+    # the MySQL sort buffer (error 1038).
+    df = OWID_ENV.read_sql("SELECT id, slug, config FROM multi_dim_data_pages WHERE id IN %(ids)s", params={"ids": ids})
+    current: dict[int, dict] = {}
+    for row in df.to_dict("records"):
+        cfg = row["config"]
+        cfg = json.loads(cfg) if isinstance(cfg, str) else (cfg or {})
+        views = {
+            v.get("fullConfigId"): "__".join(f"{k}={val}" for k, val in sorted((v.get("dimensions") or {}).items()))
+            for v in cfg.get("views", [])
+        }
+        current[int(row["id"])] = {"slug": row["slug"], "views": views}
+
+    rerun = " — re-run extract_and_match.py and re-review"
+    stale: dict[str, str] = {}
+    for e in entries:
+        t = e["target"]
+        cur = current.get(t["multiDimId"])
+        if cur is None:
+            stale[e["source"]] = f"target MDIM (multiDimId={t['multiDimId']}) no longer exists{rerun}"
+        elif cur["slug"] != t["mdimSlug"]:
+            stale[e["source"]] = f"target MDIM slug changed since the proposal (now '{cur['slug']}'){rerun}"
+        elif t["viewConfigId"] not in cur["views"]:
+            stale[e["source"]] = f"the reviewed target view is gone from the MDIM{rerun}"
+        elif cur["views"][t["viewConfigId"]] != t["viewId"]:
+            stale[e["source"]] = (
+                f"the reviewed view config now belongs to a different view "
+                f"(now '{cur['views'][t['viewConfigId']]}'){rerun}"
+            )
     return stale
 
 
@@ -232,24 +279,38 @@ def validate_cli_csv(path: Path, redirects: list[dict]) -> list[str]:
     return problems
 
 
-def reference_summary(redirects: list[dict]) -> dict[int, str]:
-    """One line per chart: which surfaces a redirect will NOT fix.
+def embed_references(redirects: list[dict]) -> dict[int, str]:
+    """One line per chart: the surfaces that embed it and so break when it is unpublished.
+
+    A redirect only rescues hyperlinks. Everything counted here holds the chart by id or
+    slug and renders its own config, so the CLI's unpublish step breaks it with no error
+    anywhere — which is why these gate readiness instead of merely being reported. Old
+    slugs are included: references written before a rename point at those.
 
     Pure SQL, so this works with read-only credentials (the admin references API needs
     ADMIN_API_KEY). Counts only — audit_references.py does the full sweep with
     replacement URLs.
     """
     ids = tuple(r["chart"]["id"] for r in redirects)
-    slugs = tuple(r["chart"]["slug"] for r in redirects)
     if not ids:
         return {}
+    by_slug = {r["chart"]["slug"]: r["chart"]["id"] for r in redirects}
+    for r in redirects:
+        for old in r.get("oldSlugs", []):
+            by_slug[old] = r["chart"]["id"]
+    slugs = tuple(by_slug)
     counts: dict[int, dict[str, int]] = defaultdict(dict)
 
-    def add(surface: str, df, id_col: str = "chart_id") -> None:
+    def add_by_id(surface: str, df) -> None:
         for row in df.to_dict("records"):
-            counts[int(row[id_col])][surface] = int(row["n"])
+            counts[int(row["chart_id"])][surface] = counts[int(row["chart_id"])].get(surface, 0) + int(row["n"])
 
-    add(
+    def add_by_slug(surface: str, df) -> None:
+        for row in df.to_dict("records"):
+            cid = by_slug[row["slug"]]
+            counts[cid][surface] = counts[cid].get(surface, 0) + int(row["n"])
+
+    add_by_id(
         "explorers",
         OWID_ENV.read_sql(
             "SELECT ec.chartId AS chart_id, COUNT(DISTINCT ec.explorerSlug) AS n FROM explorer_charts ec "
@@ -258,7 +319,7 @@ def reference_summary(redirects: list[dict]) -> dict[int, str]:
             params={"ids": ids},
         ),
     )
-    add(
+    add_by_id(
         "narrativeCharts",
         OWID_ENV.read_sql(
             "SELECT parentChartId AS chart_id, COUNT(*) AS n FROM narrative_charts "
@@ -266,28 +327,41 @@ def reference_summary(redirects: list[dict]) -> dict[int, str]:
             params={"ids": ids},
         ),
     )
-    add(
+    add_by_slug(
         "staticViz",
         OWID_ENV.read_sql(
-            "SELECT c.id AS chart_id, COUNT(*) AS n FROM static_viz sv "
-            "JOIN chart_configs cc ON cc.slug = sv.grapherSlug JOIN charts c ON c.configId = cc.id "
-            "WHERE c.id IN %(ids)s GROUP BY c.id",
-            params={"ids": ids},
+            "SELECT grapherSlug AS slug, COUNT(*) AS n FROM static_viz "
+            "WHERE grapherSlug IN %(slugs)s GROUP BY grapherSlug",
+            params={"slugs": slugs},
+        ),
+    )
+    # Block-level components render the chart; `span-*` is a hyperlink in prose, which the
+    # 301 covers. LEFT() rather than LIKE: a literal '%' in the SQL string would collide
+    # with pymysql's own parameter formatting.
+    add_by_slug(
+        "articleEmbeds",
+        OWID_ENV.read_sql(
+            "SELECT pgl.target AS slug, COUNT(*) AS n FROM posts_gdocs_links pgl "
+            "JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
+            "WHERE pgl.target IN %(slugs)s AND pgl.linkType IN ('grapher', 'guided-chart') "
+            "AND pg.published = 1 AND (pgl.componentType IS NULL OR LEFT(pgl.componentType, 5) <> 'span-') "
+            "GROUP BY pgl.target",
+            params={"slugs": slugs},
         ),
     )
     # Data insights carry the chart in content->>'$."grapher-url"', not in posts_gdocs_links.
     # The derived slug can't be grouped in the same SELECT under only_full_group_by.
-    di = OWID_ENV.read_sql(
-        "SELECT slug, COUNT(*) AS n FROM ("
-        "  SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(pg.content->>'$.\"grapher-url\"', '/grapher/', -1), '?', 1) AS slug"
-        "  FROM posts_gdocs pg WHERE pg.type = 'data-insight' AND pg.published = 1"
-        "    AND pg.content->>'$.\"grapher-url\"' IS NOT NULL"
-        ") t WHERE slug IN %(slugs)s GROUP BY slug",
-        params={"slugs": slugs},
+    add_by_slug(
+        "dataInsights",
+        OWID_ENV.read_sql(
+            "SELECT slug, COUNT(*) AS n FROM ("
+            "  SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(pg.content->>'$.\"grapher-url\"', '/grapher/', -1), '?', 1) AS slug"
+            "  FROM posts_gdocs pg WHERE pg.type = 'data-insight' AND pg.published = 1"
+            "    AND pg.content->>'$.\"grapher-url\"' IS NOT NULL"
+            ") t WHERE slug IN %(slugs)s GROUP BY slug",
+            params={"slugs": slugs},
+        ),
     )
-    by_slug = {r["chart"]["slug"]: r["chart"]["id"] for r in redirects}
-    for row in di.to_dict("records"):
-        counts[by_slug[row["slug"]]]["dataInsights"] = int(row["n"])
 
     return {cid: ", ".join(f"{k} ({n})" for k, n in sorted(v.items())) for cid, v in counts.items() if v}
 
@@ -297,7 +371,8 @@ def main() -> int:
     ap.add_argument("--mapping", required=True, help="mapping.json path, or the folder containing it")
     ap.add_argument("--decisions",
                     help="review export from build_review.py (⬇ JSON / ⬇ CSV) — charts the reviewer flagged are excluded")  # fmt: skip
-    ap.add_argument("--no-references", action="store_true", help="skip the per-chart reference summary (one API call per chart)")  # fmt: skip
+    ap.add_argument("--no-references", action="store_true",
+                    help="skip the embedded-reference gate (only once those references have been migrated)")  # fmt: skip
     args = ap.parse_args()
 
     mapping, mapping_dir = load_mapping(args.mapping)
@@ -336,6 +411,8 @@ def main() -> int:
     existing = existing_mdim_redirects(sources)
     blockers = cli_blockers(redirects)
     stale = stale_charts(redirects + already_done)
+    for source, reason in stale_targets(redirects + already_done).items():
+        stale.setdefault(source, reason)
 
     rows = []
     for r in redirects:
@@ -364,7 +441,16 @@ def main() -> int:
             continue
         prior = existing.get(source)
         if prior is not None and int(prior["multiDimId"]) == t["multiDimId"] and prior["viewConfigId"] == t["viewConfigId"]:  # fmt: skip
-            rows.append((source, t["url"], "EXISTS", "redirect in place; chart still published — unpublish it"))
+            # The CLI cannot finish these: their source is already a multi_dim_redirects
+            # source, which its own validation rejects, so the row would abort the run.
+            if r.get("oldSlugs"):
+                rows.append((source, t["url"], "MANUAL", f"redirect in place, chart still published — but it carries "
+                                                         f"old slug(s) {r['oldSlugs']} that a hand-unpublish would turn "
+                                                         f"into hard 404s; ask the Grapher team to migrate them"))  # fmt: skip
+            else:
+                rows.append((source, t["url"], "MANUAL", "redirect in place but the chart is still published, so it "
+                                                         "never fires — unpublish the chart in the grapher admin "
+                                                         "(the CLI rejects this row: its source is already a redirect source)"))  # fmt: skip
         elif prior is not None:
             rows.append((source, t["url"], "DIFFERS", f"already redirected to multiDimId={prior['multiDimId']} "
                                                       f"viewConfigId={prior['viewConfigId']}"))  # fmt: skip
@@ -384,20 +470,27 @@ def main() -> int:
         for p in csv_problems:
             print(f"  {p}")
 
-    if not args.no_references:
-        refs = reference_summary(redirects)
-        if refs:
-            print("\nSurfaces a redirect will NOT fix (these embed the chart and break on unpublish):")
-            for r in redirects:
-                note = refs.get(r["chart"]["id"])
-                if note:
-                    print(f"  {r['chart']['slug']}: {note}")
-            print("  Run audit_references.py for the full list with replacement URLs.")
+    embeds = {} if args.no_references else embed_references(redirects)
+    if embeds:
+        print("\nSurfaces a redirect will NOT fix (these embed the chart and break when the CLI unpublishes it):")
+        for r in redirects:
+            note = embeds.get(r["chart"]["id"])
+            if note:
+                print(f"  {r['chart']['slug']}: {note}")
+        print("  Run audit_references.py for the full list with replacement URLs.")
 
-    bad = [r for r in rows if r[2] != "OK"]
+    bad = [r for r in rows if r[2] not in ("OK", "MANUAL")]
+    manual = [r for r in rows if r[2] == "MANUAL"]
     if bad or csv_problems:
-        print(f"\nNOT ready: {len(bad)} row(s) and {len(csv_problems)} CSV problem(s) need attention.")
-        print("The CLI runs a single transaction — any one of these aborts the entire migration.")
+        print(f"\nNOT ready: {len(bad)} row(s) and {len(csv_problems)} CSV problem(s) would abort the CLI.")
+        print("It runs a single transaction — any one of these aborts the entire migration.")
+    if embeds:
+        print(f"\nNOT ready: {len(embeds)} source chart(s) are still embedded elsewhere. These do NOT abort the CLI —"
+              "\nthey break silently when it unpublishes the chart. Migrate them first (audit_references.py lists"
+              "\neach reference with its replacement URL); --no-references skips this gate once they are handled.")  # fmt: skip
+    if manual:
+        print(f"\n{len(manual)} row(s) need a step outside the CLI — see MANUAL above.")
+    if bad or csv_problems or embeds or manual:
         return 1
 
     print(f"\nReady: {len(rows)} row(s) validate against the live DB. Rehearse, then apply, from owid-grapher:")
