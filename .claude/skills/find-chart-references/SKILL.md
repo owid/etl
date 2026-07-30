@@ -93,6 +93,23 @@ catalog path is not silently skipped.
 
 **Explorer subjects**: article links/embeds (`linkType='explorer'`).
 
+## Who uses this, and what stays theirs
+
+This skill answers *which surfaces reference the object*. It deliberately does not
+interpret them — each caller keeps the analysis only it can do:
+
+| Skill | Uses the sweep for | Keeps |
+|---|---|---|
+| `check-hardcoded-years` | the surface list for a dataset/indicator, plus each reference's `query_string` (article `time=` pins) | reading configs for `minTime`/`maxTime`/`map.time`, grading pins against the data's latest time, the where-the-fix-goes table |
+| `check-empty-entities` | the same list, plus `query_string` (`country=` pins) and old-slug expansion | entity-selection vs entities-with-data checks, grading findings against production |
+| `update-dataset` (step 7) | one sweep shared by both audits above | the update workflow around them |
+| `review-data-pr` (§8d) | a cheap "which surfaces carry this dataset" check | judging whether the author's audit was complete |
+| `map-charts-to-mdim` | the sweep for the charts being redirected | replacement URLs, redirect severity, param-collision detection |
+| `edit-faust-metadata` | — (keeps `blast_radius.py`) | per-field inheritance analysis: which surfaces are *shielded* by their own patch override, which have no inheritance path. A generic sweep can't answer that |
+
+When a caller needs a surface this doesn't cover, add it here rather than locally —
+that's the point of the split.
+
 ## Known gaps
 
 State these when reporting; silence reads as full coverage.

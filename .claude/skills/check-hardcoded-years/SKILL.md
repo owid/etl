@@ -60,6 +60,15 @@ Three exclusions keep that check from crying wolf; without them a WDI-scale swee
 
 ## Surfaces and where the fix lives
 
+**Getting the surface list.** `find-chart-references` sweeps every surface below
+from a dataset, indicator, chart, MDim or explorer subject, and returns each
+reference with its `query_string` and an `embed`/`render`/`link` classification —
+use it (`--dataset-id` or `--variable-ids`, plus `--transitive` for the article
+hop) rather than re-deriving the joins here. What stays in this skill is everything
+downstream of that list: reading each surface's config, finding the pins, and
+grading them against the data's latest time. The table remains authoritative for
+**where the fix goes**, which the sweep doesn't know.
+
 | Surface | Where the pins are | Where the fix goes |
 |---|---|---|
 | Charts | `chart_dimensions` → `charts` → `chart_configs.full` | Chart config edit — `AdminAPI` (`apps/chart_sync/admin_api.py`): `get_chart_config(id)`, set the field to `"latest"`, `update_chart(id, cfg)`. In an update, apply on **staging** with user sign-off — the edit rides Chart Diff to production at merge. General mode: hand the list to the user or get explicit sign-off per batch before touching production. |
