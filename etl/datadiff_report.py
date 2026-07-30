@@ -181,10 +181,15 @@ class ColumnDiffResult:
         False only for a genuinely categorical changed column, whose `severity` is the 1.0
         "a category flip has no meaningful size" default. The report labels those "not scored"
         instead of quoting a 100% median it never computed.
+
+        A column with no in-place revisions at all — only rows added or removed — is still scored:
+        its severity comes from the share of rows lost, which is measured, not a fallback. Only a
+        `changed` diff can be unscoreable, so the absence of one is never evidence of one.
         """
-        if self.kind != "changed" or not self.value_diffs:
+        changed = [v for v in self.value_diffs if v.kind == "changed"]
+        if self.kind != "changed" or not changed:
             return True
-        return any(v.median_bard is not None for v in self.value_diffs if v.kind == "changed")
+        return any(v.median_bard is not None for v in changed)
 
 
 @dataclass

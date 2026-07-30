@@ -26,6 +26,7 @@ from etl.datadiff_report import (
     DiffReport,
     TableDiffResult,
     ValueDiff,
+    _tier_chip,
     render_html,
 )
 
@@ -835,8 +836,6 @@ def test_genuinely_categorical_column_stays_unscored():
 
 def test_unscored_column_reports_not_scored_instead_of_100_percent():
     """The 1.0 severity fallback must not be rendered as a measured "median anomaly score 100%"."""
-    from etl.datadiff_report import ColumnDiffResult, ValueDiff, _tier_chip
-
     categorical = ColumnDiffResult(
         name="status",
         kind="changed",
@@ -857,3 +856,45 @@ def test_unscored_column_reports_not_scored_instead_of_100_percent():
     assert "not scored" in chip and "100%" not in chip
     # A genuine, measured 100% still says so.
     assert "median anomaly score 100%" in _tier_chip(numeric.severity, numeric.kind, scored=numeric.is_scored)
+
+
+def test_sentinel_to_sentinel_row_is_not_counted_as_coverage():
+    """A row that is non-numeric on both sides is neither a revision nor a coverage event.
+
+    A sentinel whose text changes ("China" -> "n/a"), or a gap filled with a sentinel, coerces to
+    NaN on both sides. Nothing numeric appeared, disappeared or moved, so the row must not be
+    labeled "disappeared" in the sample while `disappeared_count` stays zero.
+    """
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001, 2002, 2003],
+            "a -": pd.Categorical(["0.7529", "China", "1.5000", None]),
+            "a +": pd.Categorical(["0.7627", "n/a", "China", "China"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+
+    assert sorted_by_score
+    assert median_bard is not None and median_bard < 0.01
+    # Only the numeric-to-sentinel row (1.5 -> "China") is a genuine coverage loss.
+    assert (appeared, disappeared) == (0, 1)
+    labels = sorted(r["anomaly score"] for r in records)
+    assert labels == ["0.65%", "disappeared", "not scored", "not scored"], labels
+
+
+def test_coverage_only_numeric_column_is_still_scored():
+    """A numeric column with only removed rows has a measured severity, so it is not "not scored".
+
+    Its `value_diffs` hold no `changed` entry at all; the absence of one is not evidence that the
+    column is categorical, and its severity (the share of rows lost) was measured, not defaulted.
+    """
+    coverage_only = ColumnDiffResult(
+        name="gdp",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="removed", count=1, total=4)],
+    )
+
+    assert coverage_only.is_scored
+    chip = _tier_chip(coverage_only.severity, coverage_only.kind, scored=coverage_only.is_scored)
+    assert "not scored" not in chip

@@ -907,6 +907,12 @@ def _changed_records(
     resistant to blow-ups on tiny values), with appeared/disappeared rows sorted after them and
     labeled as such instead of given a score. Other dtypes keep the plain random sample.
 
+    A sentinel-carrying column (see `_as_comparable_floats`) can also change from one non-numeric
+    value to another — a sentinel whose text was edited, or a gap filled with a sentinel. Both
+    sides coerce to NaN, so nothing numeric appeared, disappeared or moved: those rows are labeled
+    "not scored" rather than given a number or miscounted as a coverage event. They still show up
+    in the diff's changed-row count and in the sample, so the change stays visible.
+
     Returns (records, sorted_by_score, median_bard, appeared_count, disappeared_count).
     median_bard is the median BARD across all *revised* rows (not just the sample) — the report
     uses it to sort columns, tables and datasets by how big their genuine revisions typically are.
@@ -933,9 +939,18 @@ def _changed_records(
     rank_key = np.where(revised, -score, np.inf)
     order = np.argsort(rank_key, kind="stable")[:limit]
     top = both.iloc[order].copy()
-    top["anomaly score"] = [
-        format_score(score[i]) if revised[i] else ("appeared" if appeared[i] else "disappeared") for i in order
-    ]
+
+    def _label(i: int) -> str:
+        if revised[i]:
+            return format_score(score[i])
+        if appeared[i]:
+            return "appeared"
+        if disappeared[i]:
+            return "disappeared"
+        # Non-numeric on both sides (sentinel to sentinel): not a coverage event either.
+        return "not scored"
+
+    top["anomaly score"] = [_label(i) for i in order]
     return _df_to_records(top, limit=limit), True, median_bard, int(appeared.sum()), int(disappeared.sum())
 
 
