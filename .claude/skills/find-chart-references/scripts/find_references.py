@@ -36,7 +36,7 @@ import argparse
 import json
 from collections import defaultdict
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 from etl.config import OWID_ENV
 
@@ -45,7 +45,7 @@ RENDER, EMBED, LINK = "render", "embed", "link"
 COLUMNS = [
     "subject_type", "subject", "subject_label", "subject_id", "surface", "kind",
     "where", "where_path", "surface_id", "config_id", "context",
-    "query_string", "text", "published",
+    "query_string", "text", "published", "preview_url",
 ]  # fmt: skip
 
 
@@ -75,6 +75,7 @@ def rec(subject_type, subject, subject_id, surface, kind, where, where_path="", 
         "query_string": query_string or "",
         "text": text or "",
         "published": bool(published),
+        "preview_url": "",
     }
 
 
@@ -432,6 +433,20 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     """
     ids = set(variable_ids)
     out = []
+    # Load the configs first and index each view's dimensions by its fullConfigId. The
+    # dimensions are what a preview URL needs, and taking them from the config avoids
+    # splitting viewId on "__" — a choice slug may itself contain underscores.
+    configs = OWID_ENV.read_sql("SELECT slug, catalogPath, published, config FROM multi_dim_data_pages")
+    dims_by_config_id: dict[str, dict] = {}
+    parsed = []
+    for row in configs.to_dict("records"):
+        cfg = row["config"]
+        cfg = json.loads(cfg) if isinstance(cfg, str) else (cfg or {})
+        parsed.append((row, cfg))
+        for view in cfg.get("views", []):
+            if view.get("fullConfigId"):
+                dims_by_config_id[view["fullConfigId"]] = view.get("dimensions") or {}
+
     df = OWID_ENV.read_sql(
         "SELECT mx.variableId, mx.id AS mx_id, mx.chartConfigId, md.slug, md.catalogPath, md.published, mx.viewId "
         "FROM multi_dim_x_chart_configs mx JOIN multi_dim_data_pages md ON md.id = mx.multiDimId "
@@ -442,6 +457,7 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     for r in df.to_dict("records"):
         key = (r["slug"], r["viewId"])
         seen.add(key)
+        dims = dims_by_config_id.get(r["chartConfigId"], {})
         out.append(
             rec(
                 "indicator",
@@ -454,13 +470,11 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
                 surface_id=int(r["mx_id"]),
                 config_id=r["chartConfigId"],
                 context=r["catalogPath"],
+                query_string=urlencode(sorted(dims.items())) if dims else "",
                 published=r["published"],
             )  # fmt: skip
         )
-    configs = OWID_ENV.read_sql("SELECT slug, catalogPath, published, config FROM multi_dim_data_pages")
-    for row in configs.to_dict("records"):
-        cfg = row["config"]
-        cfg = json.loads(cfg) if isinstance(cfg, str) else (cfg or {})
+    for row, cfg in parsed:
         for view in cfg.get("views", []):
             view_id = "__".join(f"{k}={v}" for k, v in sorted((view.get("dimensions") or {}).items()))
             if (row["slug"], view_id) in seen:
@@ -492,6 +506,7 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
                         # fullConfigId is the view's chart_configs row (config_id elsewhere too)
                         config_id=view.get("fullConfigId"),
                         context=f"{row['catalogPath']} (found by config scan, not mx.variableId)",
+                        query_string=urlencode(sorted((view.get("dimensions") or {}).items())),
                         published=row["published"],
                     )  # fmt: skip
                 )
@@ -671,6 +686,26 @@ def deep_link(f: dict, host: str) -> str:
     return f"{base}#:~:text={encoded}"
 
 
+def add_preview_urls(findings: list[dict], host: str) -> None:
+    """The referenced view itself, as the reader sees it.
+
+    For an article reference that is the chart plus the reference's own params; for an
+    MDIM view it is the MDIM at that view's dimensions. This is what makes a row
+    judgeable — the slug alone doesn't tell you which view is in play.
+    """
+    for f in findings:
+        qs = f"?{f['query_string'].lstrip('?')}" if f["query_string"] else ""
+        if f["surface"] == "mdim view":
+            mdim_slug = f["where"].split(":", 1)[0]
+            f["preview_url"] = f"{host}/grapher/{mdim_slug}{qs}"
+        elif f["surface"] == "explorer":
+            f["preview_url"] = f"{host}/explorers/{f['where']}"
+        elif f["subject_type"] == "chart":
+            f["preview_url"] = f"{host}/grapher/{f['subject']}{qs}"
+        elif f["surface"] == "chart" and f["where_path"]:
+            f["preview_url"] = f"{host}{f['where_path']}{qs}"
+
+
 def label_indicator_subjects(findings: list[dict]) -> None:
     """Replace bare variable ids with the indicator's name, so a reader can tell them apart."""
     ids = {f["subject_id"] for f in findings if f["subject_type"] == "indicator" and f["subject_id"]}
@@ -719,7 +754,7 @@ def write_markdown(findings: list[dict], path: str, host: str) -> None:
             lines += [f"### {surface} ({len(rows)})", ""]
             if surface in GDOC_SURFACES:
                 lines += [
-                    "| Subject | Article | Component | Open | Find in the doc | Params |",
+                    "| Subject | Article | Component | Open | Find in the doc | Preview |",
                     "|---|---|---|---|---|---|",
                 ]
                 for f in rows:
@@ -729,17 +764,17 @@ def write_markdown(findings: list[dict], path: str, host: str) -> None:
                     lines.append(
                         f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 44)}{draft} | "
                         f"{cell(f['context'], 30)} | {links} | {find} | "
-                        f"{'`' + cell(f['query_string'], 40) + '`' if f['query_string'] else '—'} |"
+                        f"{'[👁 view](' + f['preview_url'] + ')' if f['preview_url'] else '—'} |"
                     )
             else:
-                lines += ["| Subject | Where | Open | Context | Params |", "|---|---|---|---|---|"]
+                lines += ["| Subject | Where | Context | Preview |", "|---|---|---|---|"]
                 for f in rows:
                     draft = "" if f["published"] else " ⚠️draft"
                     link = f"[🔗 open]({host}{f['where_path']})" if f["where_path"] else "—"
                     lines.append(
-                        f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 72)}{draft} | {link} | "
+                        f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 72)}{draft} | "
                         f"{cell(f['context'], 44)} | "
-                        f"{'`' + cell(f['query_string'], 40) + '`' if f['query_string'] else '—'} |"
+                        f"{'[👁 view](' + f['preview_url'] + ')' if f['preview_url'] else link} |"
                     )
             lines.append("")
     lines += [
@@ -816,6 +851,7 @@ def main() -> int:
         findings += sweep_explorer_subject(explorer)
 
     label_indicator_subjects(findings)
+    add_preview_urls(findings, (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/"))
 
     order = {EMBED: 0, RENDER: 1, LINK: 2}
     # Coerce every sort key to str: any surface field can be NULL in the DB, and a

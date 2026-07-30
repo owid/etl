@@ -88,6 +88,11 @@ reach it:
   built the same way as `chart_diff/citations.py:create_text_fragment_url`), which
   opens the page scrolled to and highlighting the exact sentence.
 
+Every row also gets a **👁 preview** — the referenced view itself, as the reader sees
+it: the chart plus that reference's own params, or the MDIM at that view's exact
+dimensions. A slug alone doesn't tell you which of an MDIM's hundred views is in
+play, so this is what makes a row judgeable without opening the article.
+
 Block embeds have no anchor text, so those fall back to the plain article URL.
 
 Indicator subjects are labelled with the indicator's name (not a bare variable id),
