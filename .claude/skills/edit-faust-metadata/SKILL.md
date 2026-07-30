@@ -126,6 +126,8 @@ Run it whenever:
 
 It sweeps: **charts** (with `--field`, charts shielded by their own patch override of that field are listed separately — they will NOT change; for the chart-text fields title/subtitle/note, charts with no inheritance path — variable not a y series, several y series, or inheritance disabled — are also listed separately and excluded from the beyond-target count, since grapher only inherits chart config from a single-y, inheritance-enabled parent), **MDim views**, **explorer views** (legacy CSV explorers are invisible to these tables — caveat is printed), **narrative charts**, and **article references** (informational: embeds don't break, but the displayed text changes).
 
+`blast_radius.py` stays the tool for *this* skill: its value is the per-field inheritance analysis (which surfaces are shielded by their own patch, which have no inheritance path), which decides whether an edit actually reaches a surface — a question no generic sweep answers. For the plainer question "what references this object at all", including surfaces this script doesn't cover (data insights, static viz, key-chart slots, WordPress), use `find-chart-references`.
+
 Decision rule: if surfaces **beyond the one the user pointed at** are affected (count > 0), STOP and ask the user before applying:
 
 1. **Proceed broadly** — the text is wrong everywhere; fix at the source.

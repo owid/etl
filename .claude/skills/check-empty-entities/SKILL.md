@@ -42,6 +42,15 @@ Reading the whole selection is what catches the two failure modes similarity can
 
 Keep `selectedEntityColors` in step with every edit: on a **rename**, move the entry from the old name to the replacement (deleting it discards a deliberately assigned color — a visual regression); on a **drop**, delete the entry. Either way, don't leave a dangling color key. And check the excluded-countries file before proposing anything: an entity in `<short_name>.excluded_countries.json` (`IDA only`, `Arab World`, `Heavily-indebted poor countries`) can never have data, so a drop is the only option.
 
+**Getting the surface list.** `find-chart-references` sweeps every surface in §1–§4
+from a dataset or indicator subject and returns each reference with its
+`query_string` (where `country=` pins live) and an `embed`/`render`/`link`
+classification — use it (`--dataset-id`, plus `--transitive` for the article hop)
+rather than re-deriving the joins. It also expands chart subjects through
+`chart_slug_redirects`, which §4 requires. What stays here is the part it can't do:
+reading each surface's entity selection, checking it against entities-with-data, and
+grading the result against production.
+
 ### 1. Charts
 
 For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`), parse `chart_configs.full`:
