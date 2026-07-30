@@ -353,7 +353,8 @@ def sweep_wordpress(by_slug: dict[str, dict]) -> list[dict]:
     params = {f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)}
     try:
         df = OWID_ENV.read_sql(
-            "SELECT p.slug AS post_slug, pl.target FROM posts_links pl JOIN posts p ON p.id = pl.sourceId "
+            "SELECT p.id AS post_id, p.slug AS post_slug, pl.target "
+            "FROM posts_links pl JOIN posts p ON p.id = pl.sourceId "
             f"WHERE p.status = 'publish' AND ({clauses})",
             params=params,
         )
@@ -375,7 +376,8 @@ def sweep_wordpress(by_slug: dict[str, dict]) -> list[dict]:
                 LINK,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                surface_id=r["gdoc_id"],
+                # A WordPress post, not a gdoc — `posts.id`, with no Google Doc behind it.
+                surface_id=int(r["post_id"]),
                 context="legacy post link",
                 query_string=target.split("?", 1)[1] if "?" in target else "",
             )  # fmt: skip
@@ -396,6 +398,18 @@ def parse_json_obj(value) -> dict:
     except (json.JSONDecodeError, TypeError):
         return {}
     return parsed if isinstance(parsed, dict) else {}
+
+
+def parse_json_list(value) -> list:
+    if not value:
+        return []
+    if isinstance(value, list):
+        return value
+    try:
+        parsed = json.loads(value)
+    except (json.JSONDecodeError, TypeError):
+        return []
+    return parsed if isinstance(parsed, list) else []
 
 
 def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
@@ -517,10 +531,19 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
 
 
 def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
-    """Explorers built on these indicators, aggregated per explorer (not per view)."""
+    """Explorer views rendering these indicators — one row per view, with its config id.
+
+    `explorer_variables` records which explorers use an indicator, not which of their
+    views do, and an explorer-level aggregate gives a caller nothing to inspect: the
+    pinned entities and time bounds live in each view's own grapher config. That link
+    is `explorer_views.chartConfigId` -> `chart_configs`, so narrow to the explorers
+    that use the indicators, then match inside their view configs. Every row then
+    carries a `config_id`, like a chart or an MDIM view.
+    """
+    ids = set(variable_ids)
     try:
-        df = OWID_ENV.read_sql(
-            "SELECT ev.variableId, ev.explorerSlug, e.isPublished, COUNT(*) AS n "
+        used = OWID_ENV.read_sql(
+            "SELECT ev.variableId, ev.explorerSlug, e.isPublished "
             "FROM explorer_variables ev JOIN explorers e ON e.slug = ev.explorerSlug "
             "WHERE ev.variableId IN %(ids)s GROUP BY ev.variableId, ev.explorerSlug, e.isPublished",
             params={"ids": tuple(variable_ids)},
@@ -528,23 +551,70 @@ def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     except Exception as e:  # noqa: BLE001 - table shape varies across environments
         print(f"  (explorer_variables sweep skipped: {type(e).__name__})")
         return []
-    return [
-        rec(
-            "indicator",
-            str(r["variableId"]),
-            int(r["variableId"]),
-            "explorer",
-            RENDER,
-            r["explorerSlug"],
-            f"/explorers/{r['explorerSlug']}",
-            surface_id=r["explorerSlug"],
-            # Aggregated per explorer: use explorer_views -> chart_configs for the
-            # individual view configs when you need to inspect them.
-            context=f"{r['n']} view(s)",
-            published=r["isPublished"],
-        )  # fmt: skip
-        for r in df.to_dict("records")
-    ]
+    if used.empty:
+        return []
+    published = {r["explorerSlug"]: r["isPublished"] for r in used.to_dict("records")}
+
+    views = OWID_ENV.read_sql(
+        "SELECT ev.explorerSlug, ev.viewId, ev.dimensions, ev.chartConfigId, "
+        "       cc.full->'$.dimensions' AS config_dimensions "
+        "FROM explorer_views ev JOIN chart_configs cc ON cc.id = ev.chartConfigId "
+        "WHERE ev.explorerSlug IN %(s)s ORDER BY ev.explorerSlug, ev.viewId",
+        params={"s": tuple(published)},
+    )
+    out, covered = [], set()
+    for r in views.to_dict("records"):
+        hits = sorted(
+            {
+                int(d["variableId"])
+                for d in parse_json_list(r["config_dimensions"])
+                if isinstance(d, dict) and d.get("variableId") in ids
+            }
+        )
+        if not hits:
+            continue
+        covered.update((vid, r["explorerSlug"]) for vid in hits)
+        # `explorer_views.dimensions` holds the choice labels an explorer URL uses
+        # verbatim, so they double as the query string that opens this exact view.
+        choices = parse_json_obj(r["dimensions"])
+        out.append(
+            rec(
+                "indicator",
+                str(hits[0]),
+                hits[0],
+                "explorer view",
+                RENDER,
+                f"{r['explorerSlug']}:{r['viewId']}",
+                f"/explorers/{r['explorerSlug']}",
+                surface_id=r["explorerSlug"],
+                config_id=r["chartConfigId"],
+                context=f"renders {len(hits)} of these indicators",
+                query_string=urlencode(sorted(choices.items())) if choices else "",
+                published=published[r["explorerSlug"]],
+            )  # fmt: skip
+        )
+    # An indicator can be registered against an explorer whose view configs never name
+    # it (a stale row, or views built outside `explorer_views`). Keep the explorer-level
+    # reference for those instead of dropping it — the empty `config_id` is the signal
+    # that there is no view config to inspect.
+    for r in used.to_dict("records"):
+        if (int(r["variableId"]), r["explorerSlug"]) in covered:
+            continue
+        out.append(
+            rec(
+                "indicator",
+                str(r["variableId"]),
+                int(r["variableId"]),
+                "explorer",
+                RENDER,
+                r["explorerSlug"],
+                f"/explorers/{r['explorerSlug']}",
+                surface_id=r["explorerSlug"],
+                context="used by the explorer, but no view config records it — nothing to inspect",
+                published=r["isPublished"],
+            )  # fmt: skip
+        )
+    return out
 
 
 # ----- MDIM / explorer subjects ---------------------------------------------------
@@ -563,7 +633,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
     out = []
 
     links = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.queryString, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
         "WHERE pgl.target = %(s)s AND pgl.linkType IN ('grapher', 'guided-chart')",
@@ -733,6 +803,8 @@ def add_preview_urls(findings: list[dict], host: str) -> None:
         if f["surface"] == "mdim view":
             mdim_slug = f["where"].split(":", 1)[0]
             f["preview_url"] = f"{host}/grapher/{mdim_slug}{qs}"
+        elif f["surface"] == "explorer view":
+            f["preview_url"] = f"{host}/explorers/{f['where'].split(':', 1)[0]}{qs}"
         elif f["surface"] == "explorer":
             f["preview_url"] = f"{host}/explorers/{f['where']}"
         elif f["subject_type"] == "chart":
@@ -837,9 +909,7 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str) -> No
                         else f"`{cell(f['subject_label'], 44)}`"
                     )
                     find = search_hint(f)
-                    lines.append(
-                        f"| {subject} | {cell(f['where'], 44)}{page_type}{draft} | {links} | {find} | {preview} |"
-                    )
+                    lines.append(f"| {subject} | {cell(f['where'], 44)}{page_type}{draft} | {links} | {find} |")
             else:
                 lines += ["| Subject | Where | Context | Open |", "|---|---|---|---|"]
                 for f in rows:
@@ -966,7 +1036,7 @@ def main() -> int:
             findings,
             args.md_out,
             (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/"),
-            (OWID_ENV.admin_site or "https://admin.owid.io/admin").rstrip("/"),
+            admin_base(),
         )
         print(f"-> {args.md_out}")
     if not any([args.json_out, args.csv_out, args.md_out]):

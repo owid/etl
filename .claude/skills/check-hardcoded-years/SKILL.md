@@ -69,10 +69,12 @@ ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
 ```
 
 Each row carries a `config_id` (`chart_configs.id`) for every config-bearing
-surface — charts, MDim views, narrative charts — so fetching the configs to
-inspect is one `WHERE id IN (...)` against `chart_configs`, with no surface joins
-of your own. Article rows carry the `query_string`, which is where `time=` pins
-live. This skill's job starts after that: find the pins, grade them against the
+surface — charts, MDim views, explorer views, narrative charts — so fetching the
+configs to inspect is one `WHERE id IN (...)` against `chart_configs`, with no
+surface joins of your own. Article rows carry the `query_string`, which is where
+`time=` pins live. A `surface = "explorer"` row (as opposed to `explorer view`)
+carries no `config_id`: the indicator is registered on that explorer but no view
+config names it, so report it as unchecked rather than passing it. This skill's job starts after that: find the pins, grade them against the
 data's latest time, and route the fix.
 
 | Surface | Where the fix goes |

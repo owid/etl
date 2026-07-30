@@ -61,12 +61,15 @@ surface_id, config_id, context, query_string, text, published`.
 Two fields carry the weight for callers:
 
 - **`config_id`** — the surface's `chart_configs.id`, present for every
-  config-bearing surface (charts, MDim views, narrative charts). This is what lets a
-  caller inspect configs without re-deriving any joins: a single
+  config-bearing surface (charts, MDim views, explorer views, narrative charts). This
+  is what lets a caller inspect configs without re-deriving any joins: a single
   `SELECT ... FROM chart_configs WHERE id IN (...)` covers charts, MDim views and
   explorer views alike. **One exception:** for a narrative chart read
   `AdminAPI.get_narrative_chart(id)["configFull"]` instead — the stored row lags a
-  parent edit until the child is re-saved.
+  parent edit until the child is re-saved. A row with an empty `config_id` has no
+  config to read: the `explorer` surface (as opposed to `explorer view`) is the
+  fallback for an indicator registered on an explorer whose view configs never name
+  it, and article, static-viz and key-chart rows never had one.
 - **`query_string`** — the reference's own URL params (`country=`, `time=`, `tab=`),
   where article-level pins live and what makes a replacement URL reconstructable.
 
@@ -126,7 +129,11 @@ references written before a rename point at the old one):
 **Indicator subjects**: charts (`chart_dimensions`), MDIM views
 (`multi_dim_x_chart_configs` **plus** a config scan — that column records only the
 first y indicator, so multi-indicator views are invisible to the join alone),
-explorers (`explorer_variables`, aggregated per explorer).
+explorer views (`explorer_variables` narrows to the explorers involved, then each
+one's `explorer_views` → `chart_configs` says which of its views actually render the
+indicator). Explorer views are emitted **one row per view**, so a dataset powering a
+large explorer yields hundreds of rows — that is the price of every row carrying a
+`config_id`.
 
 **MDIM subjects**: article links/embeds, narrative charts pinned to a view
 (`parentMultiDimXChartConfigId`), and inbound `multi_dim_redirects`.
