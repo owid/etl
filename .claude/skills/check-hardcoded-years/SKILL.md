@@ -195,9 +195,12 @@ def pins(cfg):
 # Surfaces come from find-chart-references (--dataset-id ... --json refs.json);
 # every config-bearing row carries a config_id, so one query fetches them all.
 refs = [r for r in json.load(open("refs.json")) if r["config_id"]]
+ids = tuple({r["config_id"] for r in refs})
+if not ids:  # `WHERE id IN ()` is a MySQL syntax error, not an empty result
+    raise SystemExit("No config-bearing references — report the unchecked surfaces instead.")
 cfgs = env.read_sql(
     "SELECT id, slug, full AS config FROM chart_configs WHERE id IN %(i)s",
-    params={"i": tuple({r["config_id"] for r in refs})},
+    params={"i": ids},
 )
 
 for _, row in cfgs.iterrows():

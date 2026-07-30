@@ -620,22 +620,26 @@ def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
         # `explorer_views.dimensions` holds the choice labels an explorer URL uses
         # verbatim, so they double as the query string that opens this exact view.
         choices = parse_json_obj(r["dimensions"])
-        out.append(
-            rec(
-                "indicator",
-                str(hits[0]),
-                hits[0],
-                "explorer view",
-                RENDER,
-                f"{r['explorerSlug']}:{r['viewId']}",
-                f"/explorers/{r['explorerSlug']}",
-                surface_id=r["explorerSlug"],
-                config_id=r["chartConfigId"],
-                context=f"renders {len(hits)} of these indicators",
-                query_string=urlencode(sorted(choices.items())) if choices else "",
-                published=published[r["explorerSlug"]],
-            )  # fmt: skip
-        )
+        # One row per matching indicator, as `sweep_charts_of_indicators` does: a view
+        # plotting two of them is a reference for both, and attributing it to only one
+        # would report the other as unreferenced.
+        for vid in hits:
+            out.append(
+                rec(
+                    "indicator",
+                    str(vid),
+                    vid,
+                    "explorer view",
+                    RENDER,
+                    f"{r['explorerSlug']}:{r['viewId']}",
+                    f"/explorers/{r['explorerSlug']}",
+                    surface_id=r["explorerSlug"],
+                    config_id=r["chartConfigId"],
+                    context=" · ".join(f"{k}: {v}" for k, v in sorted(choices.items())),
+                    query_string=urlencode(sorted(choices.items())) if choices else "",
+                    published=published[r["explorerSlug"]],
+                )  # fmt: skip
+            )
     # An indicator can be registered against an explorer whose view configs never name
     # it (a stale row, or views built outside `explorer_views`). Keep the explorer-level
     # reference for those instead of dropping it — the empty `config_id` is the signal
@@ -1046,6 +1050,10 @@ def main() -> int:
             if hop:
                 print(f"  transitive: sweeping articles for {len(hop)} chart slug(s)")
                 findings += sweep_gdoc_links(hop)
+                # Raw-URL links are a separate table scan from the typed ones, and an
+                # article pinning `country=`/`time=` in a bare URL is exactly what the
+                # downstream audits look for — sweep both hops, not just the typed one.
+                findings += sweep_gdoc_url_links(hop)
                 findings += sweep_data_insights(hop)
                 findings += sweep_narrative_charts_of_charts(hop)
             # A narrative chart can hang off an MDIM view instead of a chart, so the
