@@ -68,13 +68,13 @@ For every chart with `hasMapTab`, validate `map.columnSlug` **only when it is se
 
 Same selection-vs-availability check on their configs:
 
-- MDim views: `multi_dim_x_chart_configs` → `chart_configs` (all MDims, not just the dataset's own — other MDims can carry this dataset's variables in y-dimensions). Discover views and seed y ids through `mx.variableId` (the repo's own MDim queries join via it), unioned with the config's `dimensions` — don't rely on the config alone.
-- Explorer views: `explorer_views` → `chart_configs` (join `explorers` for `isPublished`) — explorer panels render grapher configs and can pin `selectedEntityNames` too, so an upgraded explorer view can be empty while everything else passes. `explorer_variables` tells you which explorers carry the dataset's variables at all. **Legacy CSV-backed explorers** (`data://explorers/...` wide tables — e.g. the poverty explorer) appear in neither table: their data and selections live in the explorer TSV, outside grapher configs, so report them as a coverage caveat instead of silently passing.
+- MDim views: the sweep returns them with a `config_id`, covering **all** MDims (not just the dataset's own — another MDim can carry these variables in its y-dimensions) and finding multi-indicator views that `mx.variableId` alone misses, since that column records only the first y indicator.
+- Explorer views: explorer panels render grapher configs and can pin `selectedEntityNames` too, so an upgraded explorer view can be empty while everything else passes. The sweep aggregates per explorer; expand to individual view configs via `explorer_views` → `chart_configs` when you need to inspect them. **Legacy CSV-backed explorers** (`data://explorers/...` wide tables — e.g. the poverty explorer) appear in no DB table at all: their data and selections live in the explorer TSV, outside grapher configs, so report them as a coverage caveat instead of silently passing.
 - Narrative charts: audit the **full config, never the bare patch**. The patch in `narrative_charts.chartConfigId` → `chart_configs.patch` lacks every inherited field, so a narrative chart inheriting `selectedEntityNames` or dimensions from its parent can falsely pass — use `AdminAPI(OWIDEnv.from_staging("<branch>")).get_narrative_chart(id)["configFull"]` (this is the stored materialized `chart_configs.full`; it lags a parent edit until the child is re-saved — see `/update-dataset` step 7's narrative-chart notes). Pass the **staging** env explicitly — the global `OWID_ENV` points at your local/default environment unless the process was launched with `STAGING=<branch>`, and reading narrative configs from the wrong DB silently hides staging-only regressions.
 
 ### 4. Article references (gdoc embeds and hyperlinks)
 
-`posts_gdocs_links` rows (`linkType IN ('grapher', 'guided-chart')`, **published** gdocs only) whose `queryString` carries `country=` pin entities in the URL — the upgrader never rewrites these. (Also scan `linkType='url'` rows for **live** `ourworldindata.org/grapher/` URLs — as of 2026-07 every url-typed grapher row is an `archive.ourworldindata.org` snapshot, which is frozen and out of scope, but don't bet the audit on that classification holding.) Parsing rules learned the hard way:
+Article rows come back from the sweep with their `query_string`; the ones carrying `country=` pin entities in the URL, and the upgrader never rewrites these. (The sweep covers `linkType='url'` rows pointing at live grapher pages too, and drops `archive.ourworldindata.org` snapshots — frozen by design.) Filter to `published` rows for reader-facing findings. Parsing rules learned the hard way:
 
 - Entities are `~`-separated; **legacy URLs use `+`**, which `parse_qs` decodes to spaces — a chunk with spaces may itself be one entity name ("South Asia"), so try a full-chunk match first, then greedy multi-word matching against the `entities` table.
 - Skip `$entityCode` / `$entityName` template placeholders (country-page dynamic embeds).
@@ -114,13 +114,13 @@ def entities(var_id, prefix=PREFIX):
         cache[key] = {e["name"] for e in r.json()["dimensions"]["entities"]["values"]} if r.ok else None
     return cache[key]
 
-cfgs = env.read_sql("""
-    SELECT DISTINCT c.id AS chart_id, cc.slug, cc.full AS config
-    FROM chart_dimensions cd
-    JOIN variables v ON cd.variableId = v.id
-    JOIN charts c ON c.id = cd.chartId
-    JOIN chart_configs cc ON cc.id = c.configId
-    WHERE v.datasetId = %(d)s""", params={"d": DATASET_ID})
+# Surfaces come from find-chart-references (--dataset-id ... --json refs.json);
+# every config-bearing row carries a config_id, so one query fetches them all.
+refs = [r for r in json.load(open("refs.json")) if r["config_id"]]
+cfgs = env.read_sql(
+    "SELECT id, slug, full AS config FROM chart_configs WHERE id IN %(i)s",
+    params={"i": tuple({r["config_id"] for r in refs})},
+)
 
 for _, row in cfgs.iterrows():
     cfg = json.loads(row["config"])
@@ -145,7 +145,7 @@ for _, row in cfgs.iterrows():
         ...  # finding -> grade against production
 ```
 
-Repeat the loop shape over `multi_dim_x_chart_configs`, `explorer_views`, and `narrative_charts` configs (merged parent+patch for the latter) and over parsed `posts_gdocs_links` query strings. Query gotcha: pymysql `%`-formats break on quoted literals and `LIKE` patterns — parameterize everything (`params={...}`), and use `CHAR_LENGTH(x) = 0` instead of `x = ''`.
+The same loop covers MDim and explorer views — they are `chart_configs` rows the sweep already returned a `config_id` for. Two surfaces need their own handling: **narrative charts** (merged parent+patch via `AdminAPI.get_narrative_chart(id)["configFull"]`, never the bare `config_id` row) and **article references** (parse `country=` out of each row's `query_string`). Query gotcha: pymysql `%`-formats break on quoted literals and `LIKE` patterns — parameterize everything (`params={...}`), and use `CHAR_LENGTH(x) = 0` instead of `x = ''`.
 
 ## Report format
 

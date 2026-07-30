@@ -43,12 +43,22 @@ RENDER, EMBED, LINK = "render", "embed", "link"
 
 COLUMNS = [
     "subject_type", "subject", "subject_id", "surface", "kind",
-    "where", "where_path", "context", "query_string", "text", "published",
+    "where", "where_path", "surface_id", "config_id", "context",
+    "query_string", "text", "published",
 ]  # fmt: skip
 
 
 def rec(subject_type, subject, subject_id, surface, kind, where, where_path="",
-        context="", query_string="", text="", published=True) -> dict:  # fmt: skip
+        surface_id=None, config_id=None, context="", query_string="", text="",
+        published=True) -> dict:  # fmt: skip
+    """One reference.
+
+    `surface_id` and `config_id` are the handles a caller needs to go further without
+    re-deriving the joins: `surface_id` identifies the surface object (chart id,
+    multi_dim_x_chart_configs.id, narrative chart id, explorer slug), and `config_id`
+    is its `chart_configs.id` where one exists — enough to fetch the rendered config
+    and inspect it (time pins, entity selections, FAUST text).
+    """
     return {
         "subject_type": subject_type,
         "subject": subject,
@@ -57,6 +67,8 @@ def rec(subject_type, subject, subject_id, surface, kind, where, where_path="",
         "kind": kind,
         "where": where,
         "where_path": where_path,
+        "surface_id": surface_id,
+        "config_id": config_id,
         "context": context,
         "query_string": query_string or "",
         "text": text or "",
@@ -202,7 +214,8 @@ def sweep_explorer_charts(by_slug: dict[str, dict]) -> list[dict]:
             EMBED,
             r["explorerSlug"],
             f"/explorers/{r['explorerSlug']}",
-            "references the chart by id",
+            surface_id=r["explorerSlug"],
+            context="references the chart by id",
             published=r["isPublished"],
         )  # fmt: skip
         for r in df.to_dict("records")
@@ -217,7 +230,8 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
     """
     ids = tuple({v["id"] for v in by_slug.values()})
     df = OWID_ENV.read_sql(
-        "SELECT nc.id, nc.name, nc.parentChartId AS chart_id, nc.queryParamsForParentChart AS qp, cc.slug "
+        "SELECT nc.id, nc.name, nc.chartConfigId, nc.parentChartId AS chart_id, "
+        "       nc.queryParamsForParentChart AS qp, cc.slug "
         "FROM narrative_charts nc JOIN charts c ON c.id = nc.parentChartId "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE nc.parentChartId IN %(ids)s ORDER BY nc.name",
         params={"ids": ids},
@@ -234,8 +248,13 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
                 EMBED,
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
-                '"Explore the data" link is built from the parent chart slug',
-                "&".join(f"{k}={v}" for k, v in sorted(params.items())),
+                surface_id=int(r["id"]),
+                # NOTE: chart_configs.full for a narrative chart is materialized and lags a
+                # parent edit. To inspect one, use AdminAPI.get_narrative_chart(id)["configFull"]
+                # rather than reading this row directly.
+                config_id=r["chartConfigId"],
+                context='"Explore the data" link is built from the parent chart slug',
+                query_string="&".join(f"{k}={v}" for k, v in sorted(params.items())),
             )  # fmt: skip
         )
     return out
@@ -296,7 +315,7 @@ def sweep_key_charts(by_slug: dict[str, dict]) -> list[dict]:
     """Topic-page key-chart slots. MDIM tags don't participate in that rotation."""
     ids = tuple({v["id"] for v in by_slug.values()})
     df = OWID_ENV.read_sql(
-        "SELECT ct.chartId AS chart_id, t.name AS tag, ct.keyChartLevel, cc.slug "
+        "SELECT ct.chartId AS chart_id, ct.tagId, t.name AS tag, ct.keyChartLevel, cc.slug "
         "FROM chart_tags ct JOIN tags t ON t.id = ct.tagId "
         "JOIN charts c ON c.id = ct.chartId JOIN chart_configs cc ON cc.id = c.configId "
         "WHERE ct.chartId IN %(ids)s AND ct.keyChartLevel > 0 ORDER BY t.name",
@@ -310,6 +329,7 @@ def sweep_key_charts(by_slug: dict[str, dict]) -> list[dict]:
             "key chart",
             RENDER,
             r["tag"],
+            surface_id=int(r["tagId"]),
             context=f"keyChartLevel={r['keyChartLevel']}",
         )  # fmt: skip
         for r in df.to_dict("records")
@@ -369,7 +389,8 @@ def parse_json_obj(value) -> dict:
 
 def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
     df = OWID_ENV.read_sql(
-        "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.slug, c.publishedAt IS NOT NULL AS published "
+        "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.id AS config_id, cc.slug, "
+        "       c.publishedAt IS NOT NULL AS published, c.isInheritanceEnabled AS inheritance "
         "FROM chart_dimensions cd JOIN charts c ON c.id = cd.chartId "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE cd.variableId IN %(ids)s ORDER BY cc.slug",
         params={"ids": tuple(variable_ids)},
@@ -383,7 +404,9 @@ def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
             RENDER,
             r["slug"],
             f"/grapher/{r['slug']}",
-            f"chart id {r['chart_id']}",
+            surface_id=int(r["chart_id"]),
+            config_id=r["config_id"],
+            context=f"inheritance {'on' if r['inheritance'] else 'off'}",
             published=r["published"],
         )  # fmt: skip
         for r in df.to_dict("records")
@@ -400,7 +423,7 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     ids = set(variable_ids)
     out = []
     df = OWID_ENV.read_sql(
-        "SELECT mx.variableId, md.slug, md.catalogPath, md.published, mx.viewId "
+        "SELECT mx.variableId, mx.id AS mx_id, mx.chartConfigId, md.slug, md.catalogPath, md.published, mx.viewId "
         "FROM multi_dim_x_chart_configs mx JOIN multi_dim_data_pages md ON md.id = mx.multiDimId "
         "WHERE mx.variableId IN %(ids)s",
         params={"ids": tuple(variable_ids)},
@@ -418,7 +441,9 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
                 RENDER,
                 f"{r['slug']}:{r['viewId']}",
                 f"/grapher/{r['slug']}",
-                r["catalogPath"],
+                surface_id=int(r["mx_id"]),
+                config_id=r["chartConfigId"],
+                context=r["catalogPath"],
                 published=r["published"],
             )  # fmt: skip
         )
@@ -454,7 +479,9 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
                         RENDER,
                         f"{row['slug']}:{view_id}",
                         f"/grapher/{row['slug']}",
-                        row["catalogPath"],
+                        # fullConfigId is the view's chart_configs row (config_id elsewhere too)
+                        config_id=view.get("fullConfigId"),
+                        context=f"{row['catalogPath']} (found by config scan, not mx.variableId)",
                         published=row["published"],
                     )  # fmt: skip
                 )
@@ -482,7 +509,10 @@ def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
             RENDER,
             r["explorerSlug"],
             f"/explorers/{r['explorerSlug']}",
-            f"{r['n']} view(s)",
+            surface_id=r["explorerSlug"],
+            # Aggregated per explorer: use explorer_views -> chart_configs for the
+            # individual view configs when you need to inspect them.
+            context=f"{r['n']} view(s)",
             published=r["isPublished"],
         )  # fmt: skip
         for r in df.to_dict("records")

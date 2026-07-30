@@ -56,8 +56,23 @@ that render an indicator, sweep the articles referencing those charts. Off by
 default — it multiplies the work on a widely-charted dataset.
 
 Output rows: `subject_type, subject, subject_id, surface, kind, where, where_path,
-context, query_string, text, published`. `query_string` is what makes a
-replacement URL reconstructable (`country=`, `time=`, `tab=`), so don't drop it.
+surface_id, config_id, context, query_string, text, published`.
+
+Two fields carry the weight for callers:
+
+- **`config_id`** — the surface's `chart_configs.id`, present for every
+  config-bearing surface (charts, MDim views, narrative charts). This is what lets a
+  caller inspect configs without re-deriving any joins: a single
+  `SELECT ... FROM chart_configs WHERE id IN (...)` covers charts, MDim views and
+  explorer views alike. **One exception:** for a narrative chart read
+  `AdminAPI.get_narrative_chart(id)["configFull"]` instead — the stored row lags a
+  parent edit until the child is re-saved.
+- **`query_string`** — the reference's own URL params (`country=`, `time=`, `tab=`),
+  where article-level pins live and what makes a replacement URL reconstructable.
+
+`surface_id` identifies the surface object itself (chart id,
+`multi_dim_x_chart_configs.id`, narrative chart id, explorer slug, tag id), for when
+you need to edit it rather than read it.
 
 ## Surface catalog
 
@@ -109,6 +124,16 @@ that's the point of the split.
 State these when reporting; silence reads as full coverage.
 
 - Non-ETL explorers whose config lives in the `explorers` TSV are not parsed.
+- **Legacy CSV-backed explorers** (`data://explorers/...` wide tables — e.g. the
+  poverty explorer) appear in no DB table: their data and selections live in the
+  explorer TSV, outside grapher configs. Report them as a coverage caveat rather
+  than letting them pass silently.
+- `linkType='url'` rows pointing at `archive.ourworldindata.org` are dropped as
+  frozen by design. As of 2026-07 every url-typed grapher row was an archive
+  snapshot — don't bet an audit on that classification continuing to hold.
+- Indicator-level `presentation.grapher_config` lives in garden/grapher
+  `.meta.yml`, not the DB. It is invisible here and needs a repo grep, and it fans
+  out to every thin MDim/explorer view that inherits it.
 - Data insights are matched on `grapher-url`; one storing the reference elsewhere
   is missed.
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside
