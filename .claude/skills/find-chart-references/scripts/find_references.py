@@ -718,6 +718,27 @@ def label_indicator_subjects(findings: list[dict]) -> None:
             f["subject_label"] = f"{names[f['subject_id']]} ({f['subject_id']})"
 
 
+def search_hint(f: dict) -> str:
+    """What to search for inside the Google Doc to land on this reference.
+
+    A prose hyperlink has visible anchor text, so that phrase is the search term. A
+    block embed has none — the doc holds a bare grapher URL — so the slug is. Use the
+    slug exactly as recorded: `posts_gdocs_links.target` keeps what the author typed,
+    which may be an old slug, and that is what is actually in the document.
+    """
+    component = (f.get("context") or "").split(" (")[0]
+    # Some blocks aren't hand-placed, so "find it in the doc" is the wrong instruction.
+    if component == "all-charts":
+        return "n/a — auto-generated from the page's tags, not written in the doc"
+    anchor = (f.get("text") or "").strip()
+    if anchor:
+        return f'"{cell(anchor, 55)}"'
+    if f["subject_type"] == "chart":
+        where = "the insight's grapher-url" if component == "front-matter" else "the URL in the block"
+        return f"`{cell(f['subject'], 50)}` — {where}"
+    return "—"
+
+
 def cell(value: str, limit: int = 70) -> str:
     """Table-safe cell: escape pipes and newlines, truncate runaway text."""
     text = " ".join(str(value or "").split()).replace("|", "\\|")
@@ -754,16 +775,20 @@ def write_markdown(findings: list[dict], path: str, host: str) -> None:
             lines += [f"### {surface} ({len(rows)})", ""]
             if surface in GDOC_SURFACES:
                 lines += [
-                    "| Subject | Article | Component | Open | Find in the doc | Preview |",
-                    "|---|---|---|---|---|---|",
+                    "| Subject | Article | Open | Find in the doc | Preview |",
+                    "|---|---|---|---|---|",
                 ]
                 for f in rows:
                     draft = "" if f["published"] else " ⚠️draft"
+                    # The page type (article / topic-page / data-insight) changes who owns
+                    # the fix; the block type does not, and `kind` already implies it.
+                    ptype = f["context"].split("(")[-1].rstrip(")") if "(" in f["context"] else ""
+                    page_type = f" _{ptype}_" if ptype else ""
                     links = f"[📄 doc]({doc_url(f)}) · [🔗 page]({deep_link(f, host)})"
-                    find = f'"{cell(f["text"], 60)}"' if f["text"] else "—"
+                    find = search_hint(f)
                     lines.append(
-                        f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 44)}{draft} | "
-                        f"{cell(f['context'], 30)} | {links} | {find} | "
+                        f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 44)}{page_type}{draft} | "
+                        f"{links} | {find} | "
                         f"{'[👁 view](' + f['preview_url'] + ')' if f['preview_url'] else '—'} |"
                     )
             else:
