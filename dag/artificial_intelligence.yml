@@ -73,11 +73,11 @@ steps:
 
 
   # Datacenter construction spending (U.S. Census Bureau)
-  data://grapher/us_census_bureau/2026-03-24/datacenter_construction:
-    - data://garden/us_census_bureau/2026-03-24/datacenter_construction:
-      - data://garden/bls/2026-03-24/us_ppi_construction
-      - data://meadow/us_census_bureau/2026-03-24/datacenter_construction:
-        - snapshot://us_census_bureau/2026-03-24/datacenter_construction.xlsx
+  data://grapher/us_census_bureau/2026-07-20/datacenter_construction:
+    - data://garden/us_census_bureau/2026-07-20/datacenter_construction:
+      - data://garden/bls/2026-07-20/us_ppi_construction
+      - data://meadow/us_census_bureau/2026-07-20/datacenter_construction:
+        - snapshot://us_census_bureau/2026-07-20/datacenter_construction.xlsx
 
   # TSMC operating data
   data://grapher/tsmc/2025-11-10/operating_data:
@@ -106,10 +106,10 @@ steps:
           - snapshot://ifr/2026-01-14/robot_density.xlsx
 
   # Robotaxis dataset
-  data://grapher/artificial_intelligence/2026-03-30/robotaxis:
-    - data://garden/artificial_intelligence/2026-03-30/robotaxis:
-      - data://meadow/artificial_intelligence/2026-03-30/robotaxis:
-        - snapshot://artificial_intelligence/2026-03-30/robotaxis.csv
+  data://grapher/artificial_intelligence/2026-07-15/robotaxis:
+    - data://garden/artificial_intelligence/2026-07-15/robotaxis:
+      - data://meadow/artificial_intelligence/2026-07-15/robotaxis:
+        - snapshot://artificial_intelligence/2026-07-15/robotaxis.csv
 
   # NVIDIA quarterly revenue dataset
   data://grapher/artificial_intelligence/2026-06-08/nvidia_revenue:
@@ -130,10 +130,10 @@ steps:
         - snapshot://eurostat/2026-04-07/generative_ai_use.gz
 
   # Gallup - Artificial Intelligence indicator
-  data://grapher/gallup/2026-04-03/ai_indicator:
-    - data://garden/gallup/2026-04-03/ai_indicator:
-      - data://meadow/gallup/2026-04-03/ai_indicator:
-        - snapshot://gallup/2026-04-03/ai_indicator.csv
+  data://grapher/gallup/2026-07-15/ai_indicator:
+    - data://garden/gallup/2026-07-15/ai_indicator:
+      - data://meadow/gallup/2026-07-15/ai_indicator:
+        - snapshot://gallup/2026-07-15/ai_indicator.csv
   ########################
   # AI Index Report 2026
   ############################

@@ -149,6 +149,31 @@ def test_render():
     assert rendered_meta.title == "Title X"
 
 
+def test_description_key_to_string_flattens_multiline_items():
+    # Line and paragraph breaks inside items are flattened to spaces, matching
+    # how the old renderer displayed them (paragraphs unwrapped inside <li>).
+    assert meta.description_key_to_string(["**Rationale:**\nMortality does not.", "Other."]) == (
+        "- **Rationale:** Mortality does not.\n- Other."
+    )
+    assert meta.description_key_to_string(["Para one.\n\nPara two.", "Other."]) == ("- Para one. Para two.\n- Other.")
+    # Markdown lists inside an item rendered as nested lists — keep them nested.
+    assert meta.description_key_to_string(["Includes:\n- a\n- b", "Other."]) == ("- Includes:\n  - a\n  - b\n- Other.")
+    # A single item passes through unchanged (it was rendered as full markdown).
+    assert meta.description_key_to_string(["Para one.\n\nPara two."]) == "Para one.\n\nPara two."
+
+
+def test_update_variable_metadata_converts_description_key_list():
+    # A list of bullet points is converted to a markdown string after Jinja rendering.
+    m = meta.VariableMeta(description_key=["Point 1", "Point 2"])
+    assert meta.update_variable_metadata(m).description_key == "- Point 1\n- Point 2"
+
+    m = meta.VariableMeta(description_key=["Only point"])
+    assert meta.update_variable_metadata(m).description_key == "Only point"
+
+    m = meta.VariableMeta(description_key="Already a string")
+    assert meta.update_variable_metadata(m).description_key == "Already a string"
+
+
 def test_render_description_key():
     jinja_description_key = [
         "<% if dim_a == 'x' %> Desc x <% endif %>  ",
@@ -159,7 +184,8 @@ def test_render_description_key():
     var_meta = meta.VariableMeta(description_key=jinja_description_key)  # ty: ignore
     rendered_meta = var_meta.render(dim_dict={"dim_a": "x"})
     assert isinstance(rendered_meta, meta.VariableMeta)
-    assert rendered_meta.description_key == ["Desc x", "Desc z"]
+    # A list set programmatically is normalized to a markdown string.
+    assert rendered_meta.description_key == "- Desc x\n- Desc z"
 
 
 def test_render_with_error():
@@ -215,8 +241,8 @@ def test_update_variable_metadata():
     assert updated.display["numDecimalPlaces"] == 2
     assert isinstance(updated.display["numDecimalPlaces"], int)
 
-    # Check empty description_key entries were pruned
-    assert updated.description_key == ["Important point", "Another important point"]
+    # Check empty description_key entries were pruned and the list normalized to a string
+    assert updated.description_key == "- Important point\n- Another important point"
 
     # Check numeric conversions in grapher_config
     color_scale = updated.presentation.grapher_config["map"]["colorScale"]

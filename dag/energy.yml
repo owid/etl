@@ -21,6 +21,13 @@ steps:
       - data://meadow/iea/2026-06-18/ev_charging_points:
         - snapshot://iea/2026-06-18/ev_charging_points.csv
   #
+  # IEA - Share of households with air conditioning
+  #
+  data://grapher/iea/2026-07-20/share_of_households_with_air_conditioning:
+    - data://garden/iea/2026-07-20/share_of_households_with_air_conditioning:
+      - data://meadow/iea/2026-07-20/share_of_households_with_air_conditioning:
+        - snapshot://iea/2026-07-20/share_of_households_with_air_conditioning.csv
+  #
   # Energy prices explorer
   #
   export://multidim/energy/latest/energy_prices:

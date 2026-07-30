@@ -81,6 +81,13 @@ def make_table_phi(tb: Table) -> Table:
         index=["country", "year", "age"], columns="sex", values=["number_survivors", "number_deaths"]
     ).reset_index()
 
+    # Pivoting several `values` columns at once returns them as object, which makes every
+    # arithmetic step below object too — and `Series.round` rejects object dtype (pandas 2.2
+    # accepted it and returned the values unrounded, so `phi` was never actually rounded).
+    for column in tb.columns:
+        if column[0] in ("number_survivors", "number_deaths"):
+            tb[column] = tb[column].astype("Float64")
+
     # Order
     tb = tb.sort_values(["country", "year", "age"])
 

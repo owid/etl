@@ -12,6 +12,8 @@ Arguments:
 
 **Main use case**: Branch out from `master` to a temporary `work_branch`, and create a PR to merge `work_branch` -> `master`. You will be asked to choose a category. The value of `work_branch` will be auto-generated based on the title and the category.
 
+The work branch is always created from the latest `origin/<base_branch>`, never from your (possibly stale) local base branch, so unpushed commits sitting on the local base branch are not included. When branching in place, the local base branch is also fast-forwarded to its remote counterpart when possible (when it carries unpushed or diverged commits, it is left untouched and a warning is logged). Pass `--no-update-base` to branch off your local base branch as-is instead.
+
 ```shell
 # Without specifying a category (you will be prompted for a category)
 etl pr "some title for the PR"
@@ -57,15 +59,15 @@ etl pr "some title for the PR" -t --worktree-path /tmp/etl-mybranch
 
 The new working directory is printed at the end (default: `../etl-BRANCH`); `cd` into it to start working there.
 
-**Custom use case (5)**: Share the original repo's `data/` directory with the new worktree, so ETL steps don't have to recompute population, regions, etc.
+**Custom use case (5)**: Share the original repo's `data/`, `workbench/`, and `ai/` directories with the new worktree, so ETL steps don't have to recompute population, regions, etc., and Claude Code skills (e.g. `update-dataset`) write their scratch artifacts straight into the main repo.
 
 ```shell
 etl pr "some title for the PR" -t --share-data
 ```
 
-This makes the new worktree's `data/` a shortcut (symlink) to the original repo's `data/`, so both worktrees share the same ETL outputs and you don't have to recompute them. Note that data/ is a symlink to the original repo's data/, so:
+This makes the new worktree's `data/`, `workbench/`, and `ai/` shortcuts (symlinks) to the original repo's, so both worktrees share the same outputs and you don't have to recompute or salvage them. Since the real content lives in the main repo, removing the worktree — by any method, including a plain `git worktree remove` — never touches it; only the symlink itself is deleted. Note:
 - If you run the same steps in both worktrees, they may overwrite each other's output.
-- DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree.
+- DO NOT use `rm -rf data/` / `rm -rf workbench/` / `rm -rf ai/` (with the trailing slash) — that follows the symlink and wipes the original folder along with the worktree's copy. Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree; both remove only the symlinks.
 
 After the command finishes, `uv sync` has already run inside the worktree, so its `.venv/` is ready to use. With a `chpwd` hook in your `~/.zshrc` that sources `.venv/bin/activate` whenever present, `cd ../etl-BRANCH` is all that's needed — activation is automatic. Without the hook, also run `source .venv/bin/activate` after the cd. Skipping activation silently routes `etl`/`etlr` to the original repo's source code.
 
@@ -190,12 +192,18 @@ MODEL_DEFAULT = "gpt-5-mini"
     "--share-data",
     "share_data",
     is_flag=True,
-    help="Symlink the new worktree's data/ to the original repo's data/ (only with --worktree). Avoids recomputing upstream ETL steps. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` in the worktree.",
+    help="Symlink the new worktree's data/, workbench/, and ai/ to the original repo's (only with --worktree). Avoids recomputing upstream ETL steps and losing workbench/ai scratch artifacts on worktree removal. Don't run heavy ETL ops in both worktrees concurrently, and never `rm -rf data/` (or workbench/ or ai/) in the worktree.",
 )
 @click.option(
     "--auto-assign",
     is_flag=True,
     help="Automatically assign the PR to the GitHub user the token belongs to.",
+)
+@click.option(
+    "--no-update-base",
+    "no_update_base",
+    is_flag=True,
+    help="Branch off your local base branch as-is, even if it is behind its remote counterpart. By default, the work branch is created from the latest 'origin/<base_branch>'.",
 )
 def cli(
     title: str,
@@ -210,6 +218,7 @@ def cli(
     worktree_path: str | None,
     share_data: bool,
     auto_assign: bool,
+    no_update_base: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
     # Check that the user has set up a GitHub token.
@@ -230,6 +239,8 @@ def cli(
         raise click.ClickException("--worktree-path requires --worktree.")
     if share_data and not worktree:
         raise click.ClickException("--share-data requires --worktree.")
+    if no_update_base and direct:
+        raise click.ClickException("--no-update-base has no effect with --direct (no new branch is created).")
 
     # Get category
     category = ensure_category(category)
@@ -266,13 +277,13 @@ def cli(
                 work_branch = f"{work_branch}-private"
         if worktree:
             resolved_worktree_path = resolve_worktree_path(work_branch, worktree_path)
-            branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path)
+            branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path, update_base=not no_update_base)
             if share_data:
-                symlink_data_dir(resolved_worktree_path)
+                symlink_shared_dirs(resolved_worktree_path)
             # Subsequent git operations (commit, push) must run inside the worktree.
             repo = Repo(resolved_worktree_path)
         else:
-            branch_out(repo, base_branch, work_branch)
+            branch_out(repo, base_branch, work_branch, update_base=not no_update_base)
 
     # Create PR
     create_pr(repo, work_branch, base_branch, pr_title, auto_assign=auto_assign)
@@ -395,16 +406,54 @@ def check_branches_valid(base_branch, work_branch, remote_branches):
         )
 
 
-def branch_out(repo, base_branch, work_branch):
+def branch_out(repo, base_branch, work_branch, update_base: bool = True):
     """Branch out from base_branch and create branch 'work_branch'."""
+    if not update_base:
+        try:
+            log.info(
+                f"Switching to base branch '{base_branch}', creating new branch '{work_branch}' from there, and switching to it."
+            )
+            repo.git.checkout(base_branch)
+            repo.git.checkout("-b", work_branch)
+        except GitCommandError as e:
+            raise click.ClickException(f"Failed to create a new branch from '{base_branch}':\n{e}")
+        return
+
+    # Create the work branch directly from the remote's latest base branch (already fetched by
+    # init_repo), never from the possibly stale local one: a stale start point pollutes `etl diff`
+    # with every dataset that changed on the base branch since, and raises "not in the DAG" errors
+    # for steps that already exist. Uncommitted changes carry over, as with any plain checkout.
+    # --no-track: without it, git would set 'origin/<base_branch>' as the new branch's upstream,
+    # which breaks a plain `git push` on the work branch later.
     try:
-        log.info(
-            f"Switching to base branch '{base_branch}', creating new branch '{work_branch}' from there, and switching to it."
-        )
-        repo.git.checkout(base_branch)
-        repo.git.checkout("-b", work_branch)
+        log.info(f"Creating new branch '{work_branch}' from 'origin/{base_branch}', and switching to it.")
+        repo.git.checkout("--no-track", "-b", work_branch, f"origin/{base_branch}")
     except GitCommandError as e:
-        raise click.ClickException(f"Failed to create a new branch from '{base_branch}':\n{e}")
+        raise click.ClickException(f"Failed to create a new branch from 'origin/{base_branch}':\n{e}")
+
+    # Keep the local base branch from going stale: fast-forward it to the remote when possible.
+    # The work branch is already checked out, so this moves only the ref; it can never touch the
+    # working tree, and never blocks the PR.
+    if base_branch not in {head.name for head in repo.heads}:
+        return
+    local_commit = repo.commit(base_branch)
+    remote_commit = repo.commit(f"origin/{base_branch}")
+    if local_commit == remote_commit:
+        return
+    if repo.is_ancestor(local_commit, remote_commit):
+        try:
+            repo.git.branch("-f", base_branch, f"origin/{base_branch}")
+            log.info(f"Fast-forwarded local '{base_branch}' to 'origin/{base_branch}'.")
+        except GitCommandError as e:
+            # E.g. the base branch is checked out in another worktree.
+            log.warning(f"Could not fast-forward local '{base_branch}' to 'origin/{base_branch}':\n{e}")
+    else:
+        # The local base branch is ahead of the remote or has diverged from it.
+        log.warning(
+            f"Local '{base_branch}' has commits not pushed to 'origin/{base_branch}'; they are NOT included in "
+            f"'{work_branch}', and local '{base_branch}' is left untouched. Re-run with --no-update-base to "
+            f"branch off your local '{base_branch}' as-is."
+        )
 
 
 def resolve_worktree_path(work_branch: str, override: str | None) -> Path:
@@ -414,16 +463,24 @@ def resolve_worktree_path(work_branch: str, override: str | None) -> Path:
     return (BASE_DIR.parent / f"etl-{work_branch}").resolve()
 
 
-def branch_out_worktree(repo, base_branch: str, work_branch: str, worktree_path: Path) -> None:
+def branch_out_worktree(
+    repo, base_branch: str, work_branch: str, worktree_path: Path, update_base: bool = True
+) -> None:
     """Create branch 'work_branch' from 'base_branch' inside a new git worktree at 'worktree_path'."""
     if worktree_path.exists():
         raise click.ClickException(
             f"Worktree path '{worktree_path}' already exists. "
             "Choose a different --worktree-path or remove the existing directory."
         )
+    # Branch from the remote's latest base branch (already fetched by init_repo), not from the
+    # possibly stale local one. The local base branch may be checked out in another worktree, so
+    # unlike branch_out it cannot be fast-forwarded here; it is simply left untouched.
+    # --no-track: without it, git would set 'origin/<base_branch>' as the new branch's upstream,
+    # which breaks a plain `git push` on the work branch later.
+    start_point = f"origin/{base_branch}" if update_base else base_branch
     try:
-        log.info(f"Creating worktree at '{worktree_path}' with new branch '{work_branch}' from '{base_branch}'.")
-        repo.git.worktree("add", "-b", work_branch, str(worktree_path), base_branch)
+        log.info(f"Creating worktree at '{worktree_path}' with new branch '{work_branch}' from '{start_point}'.")
+        repo.git.worktree("add", "--no-track", "-b", work_branch, str(worktree_path), start_point)
     except GitCommandError as e:
         raise click.ClickException(f"Failed to create worktree at '{worktree_path}':\n{e}")
 
@@ -437,19 +494,38 @@ def branch_out_worktree(repo, base_branch: str, work_branch: str, worktree_path:
         log.debug(f"No .env found at '{src_env}', skipping copy.")
 
 
-def symlink_data_dir(worktree_path: Path) -> None:
-    """Symlink the original repo's data dir into the worktree, so ETL steps reuse cached outputs."""
+# Gitignored dirs symlinked into the worktree by --share-data.
+SHARED_SCRATCH_DIRS = ("workbench", "ai")
+
+
+def symlink_shared_dirs(worktree_path: Path) -> None:
+    """Symlink data/, workbench/, and ai/ from the original repo into the new worktree.
+
+    data/ lets ETL steps reuse cached outputs instead of recomputing them. workbench/ and ai/ are
+    gitignored scratch dirs that Claude Code skills (e.g. update-dataset) write progress logs and
+    notes into — sharing them means that content lives in the main repo from the start, so removing
+    the worktree by any method never risks losing it (unlike relying on `pr-clean`'s post-hoc copy).
+    """
     src = BASE_DIR / "data"
     dst = worktree_path / "data"
     if not src.exists():
         log.warning(f"Cannot share data: '{src}' does not exist in the original repo.")
-        return
-    if dst.exists() or dst.is_symlink():
+    elif dst.exists() or dst.is_symlink():
         # `git worktree add` shouldn't have created a `data/` (it's gitignored), but be defensive.
         log.warning(f"'{dst}' already exists, skipping data symlink.")
-        return
-    os.symlink(src, dst)
-    log.info(f"Symlinked '{dst}' -> '{src}'.")
+    else:
+        os.symlink(src, dst)
+        log.info(f"Symlinked '{dst}' -> '{src}'.")
+
+    for name in SHARED_SCRATCH_DIRS:
+        src = BASE_DIR / name
+        dst = worktree_path / name
+        if dst.exists() or dst.is_symlink():
+            log.warning(f"'{dst}' already exists, skipping {name} symlink.")
+            continue
+        src.mkdir(parents=True, exist_ok=True)  # gitignored scratch dir; fine to create if missing
+        os.symlink(src, dst)
+        log.info(f"Symlinked '{dst}' -> '{src}'.")
 
 
 def install_worktree_venv(worktree_path: Path) -> bool:
@@ -512,12 +588,14 @@ def print_worktree_hint(
     print("sessions back into the main repo so they're still resumable from there.")
     if shared_data:
         print()
-        print("WARNING: data/ is a symlink to the original repo's data/, so:")
+        print("WARNING: data/, workbench/, and ai/ are symlinks to the original repo's, so:")
         print("  - If you run the same steps in both worktrees, they may overwrite each other's output.")
-        print("  - DO NOT use `rm -rf data/`; this would wipe both the symlink and the original data folder. ")
+        print("  - DO NOT use `rm -rf data/` (or workbench/ or ai/); this follows the symlink and wipes")
+        print("    the original folder along with the worktree's copy.")
         print(
-            "    Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree."
+            "    Instead, use `etl pr-clean` (or `git worktree remove ../etl-[whatever-branch]`) to remove a worktree —"
         )
+        print("    both remove only the symlinks, leaving the shared content untouched.")
 
 
 def create_pr(repo, work_branch, base_branch, pr_title, auto_assign: bool = False):
@@ -690,7 +768,10 @@ are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool wil
 2. (Worktree branches only) Copy the worktree's gitignored `workbench/` and `ai/` scratch dirs into
    `workbench/<branch>/` and `ai/<branch>/` in the main repo (suffixed `-1`, `-2`... on the rare name
    clash), so the working notes/outputs survive the worktree removal without overwriting anything.
-3. Remove the git worktree (skipped with a warning if it has uncommitted changes).
+   Skipped for a dir created by `--share-data` (it's a symlink to the main repo already — nothing to
+   salvage).
+3. Remove the git worktree (skipped with a warning if it has uncommitted changes). `--share-data`'s
+   symlinks are unlinked first so they don't themselves block the removal.
 4. Delete the local branch.
 
 Each branch is tagged `[merged]` or `[closed]` so you can see its PR outcome before selecting.
@@ -929,8 +1010,23 @@ def clean_branch(
         # destroy it for good): the Claude sessions, plus the workbench/ and ai/ scratch dirs.
         # The session dir lives outside the worktree, but copy everything before removal on principle.
         copy_sessions(worktree_path, main_project_dir)
-        for name in ("workbench", "ai"):
-            copy_dir_namespaced(worktree_path / name, main_worktree_path / name, branch)
+        for name in SHARED_SCRATCH_DIRS:
+            src = worktree_path / name
+            if src.is_symlink():
+                # Created by --share-data: the real content already lives in the main repo, so
+                # there's nothing to salvage — copying would just duplicate it wholesale.
+                continue
+            copy_dir_namespaced(src, main_worktree_path / name, branch)
+
+        # `git worktree remove` refuses a worktree with untracked files, and --share-data's
+        # symlinks (data/, workbench/, ai/) count as untracked. Unlink them ourselves first — safe,
+        # since their real content lives in the main repo, untouched — so only genuine leftover
+        # uncommitted/untracked work still blocks the plain removal below.
+        for name in ("data", *SHARED_SCRATCH_DIRS):
+            link = worktree_path / name
+            if link.is_symlink():
+                link.unlink()
+
         try:
             repo.git.worktree("remove", str(worktree_path))
             log.info(f"Removed worktree '{worktree_path}'.")

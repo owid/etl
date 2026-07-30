@@ -1,12 +1,13 @@
 import difflib
 import os
 import re
+import textwrap
 import traceback
 import urllib.error
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, NamedTuple, cast
 
 import numpy as np
 import pandas as pd
@@ -83,6 +84,19 @@ class DatasetDiff:
         # Structured mirror of the printed summary, filled in by summary().
         self.result = DatasetDiffResult(path=dataset_uri(ds_b or ds_a), kind="identical")  # type: ignore[arg-type]
 
+    def _p_multiline(self, text: str) -> None:
+        """Print a (possibly huge) multi-line diff body one line at a time.
+
+        Rich's console rendering of a single giant `Text` blob scales badly with the number of
+        embedded style spans: for WDI-sized metadata diffs (tens of thousands of lines, each
+        wrapped in a color tag), a single `self.p(text)` call can take hours due to quadratic
+        behavior in `Text.divide`/`Text.join` during soft-wrap layout. Printing line-by-line keeps
+        each `Text` object small, which is linear instead (verified: 58k lines dropped from an
+        unbounded hang to ~7s).
+        """
+        for line in text.split("\n"):
+            self.p(line)
+
     def _filter_table_by_country(self, table: Table) -> Table:
         """Filter table by country if country is in the index."""
         if "country" in table.index.names:
@@ -103,13 +117,14 @@ class DatasetDiff:
 
             # compare dataset metadata
             meta_a, meta_b = _dataset_metadata_dict(ds_a), _dataset_metadata_dict(ds_b)
-            diff = _dict_diff(meta_a, meta_b, tabs=2)
+            diff_lines = _diff_lines(meta_a, meta_b)
+            diff = _format_diff(diff_lines, tabs=2)
             if diff:
                 self.result.kind = "changed"
-                self.result.meta_diff = _dict_diff(meta_a, meta_b, tabs=0, color=False)
+                self.result.meta_diff = _format_diff(diff_lines, tabs=0, color=False)
                 self.p(f"[yellow]~ Dataset [b]{dataset_uri(ds_b)}[/b]{new_version}")
                 if self.verbose:
-                    self.p(diff)
+                    self._p_multiline(diff)
             else:
                 self.p(f"[white]= Dataset [b]{dataset_uri(ds_b)}{new_version}[/b]")
         elif ds_a:
@@ -224,15 +239,16 @@ tb = {_snippet_dataset(ds_b, table_name)}
 
             # compare table metadata
             tab_meta_a, tab_meta_b = _table_metadata_dict(table_a), _table_metadata_dict(table_b)
-            diff = _dict_diff(tab_meta_a, tab_meta_b, tabs=3)
+            tab_diff_lines = _diff_lines(tab_meta_a, tab_meta_b)
+            diff = _format_diff(tab_diff_lines, tabs=3)
             tab_res = TableDiffResult(name=table_name, kind="changed" if diff else "identical")
             self.result.tables.append(tab_res)
             if diff:
-                tab_res.meta_diff = _dict_diff(tab_meta_a, tab_meta_b, tabs=0, color=False)
+                tab_res.meta_diff = _format_diff(tab_diff_lines, tabs=0, color=False)
                 self.p(f"\t[yellow]~ Table [b]{table_name}[/b] (changed [u]metadata[/u])")
 
                 if self.verbose:
-                    self.p(diff)
+                    self._p_multiline(diff)
             else:
                 self.p(f"\t[white]= Table [b]{table_name}[/b]")
 
@@ -263,7 +279,7 @@ tb = {_snippet_dataset(ds_b, table_name)}
                                 tabs=4,
                             )
                             if self.verbose and out:
-                                self.p(out)
+                                self._p_multiline(out)
 
             # compare columns
             all_cols = sorted((set(table_a.columns) | set(table_b.columns)) - set(dims))
@@ -291,7 +307,8 @@ tb = {_snippet_dataset(ds_b, table_name)}
                     # metadata diff
                     col_meta_a = _column_metadata_dict(col_a.metadata)
                     col_meta_b = _column_metadata_dict(col_b.metadata)
-                    meta_diff = _dict_diff(col_meta_a, col_meta_b, tabs=4)
+                    col_diff_lines = _diff_lines(col_meta_a, col_meta_b)
+                    meta_diff = _format_diff(col_diff_lines, tabs=4)
 
                     # equality on index and series
                     eq_data = series_equals(table_a[col], table_b[col])
@@ -311,7 +328,7 @@ tb = {_snippet_dataset(ds_b, table_name)}
                             changes=[c.replace("[u]", "").replace("[/u]", "") for c in changed],
                         )
                         if meta_diff:
-                            col_res.meta_diff = _dict_diff(col_meta_a, col_meta_b, tabs=0, color=False)
+                            col_res.meta_diff = _format_diff(col_diff_lines, tabs=0, color=False)
                         tab_res.columns.append(col_res)
                         self.p(f"\t\t[yellow]~ Column [b]{col}[/b] ({', '.join(changed)})")
                         if self.verbose or self.details:
@@ -322,12 +339,12 @@ tb = {_snippet_dataset(ds_b, table_name)}
                                 )
                         if self.verbose:
                             if meta_diff:
-                                self.p(meta_diff)
+                                self._p_multiline(meta_diff)
                             if new_index.any() or removed_index.any() or (~eq_data).any():
                                 if meta_diff:
                                     self.p("")
                                 if out:
-                                    self.p(out)
+                                    self._p_multiline(out)
                     else:
                         # do not print identical columns
                         pass
@@ -397,6 +414,24 @@ def _dataset_files_match(ds_local: Dataset, ds_remote: "RemoteDataset") -> bool:
         remote_md5 = dict(zip(local_md5.keys(), executor.map(_remote_md5, local_md5.keys())))
 
     return all(local_md5[f] == remote_md5.get(f) for f in local_md5)
+
+
+def _changed_include_regex(include: str | None, catalog_paths: list[str]) -> str:
+    """Build the --include regex for `--changed`, combining it with the user-supplied --include.
+
+    Each catalog path is anchored at the end (but not the start — the local catalog matches
+    against the full absolute directory path, e.g. ".../data/garden/.../wdi", not the bare
+    "garden/.../wdi" the remote catalog uses). A bare substring join would let one changed
+    dataset's short_name match as a *prefix* of another, unrelated dataset's short_name (e.g.
+    "wb/2026-07-01/income_groups" matching inside ".../income_groups_aggregations"), sweeping it
+    falsely into the comparison scope and reporting it as "removed" once it turns out not to be
+    built locally either. Anchoring at the end rules that out while still matching both catalogs.
+    """
+    catalog_paths_pattern = "|".join(rf"{re.escape(p)}$" for p in catalog_paths)
+    if include:
+        # Positive look-aheads to match on both the user's --include and the changed paths.
+        return rf"(?=.*{include})(?={catalog_paths_pattern})"
+    return catalog_paths_pattern
 
 
 @click.command(name="diff", help=__doc__)
@@ -547,11 +582,7 @@ def cli(
             console.print("[green]✅ No differences found[/green]")
             exit(0)
 
-        # Add those files to `include` regex (use positive look-aheads to match on both)
-        if include:
-            include = rf"(?=.*{include})(?=.*{'|'.join(catalog_paths)})"
-        else:
-            include = "|".join(catalog_paths)
+        include = _changed_include_regex(include, catalog_paths)
 
     path_to_ds_a = _load_catalog_datasets(path_a, channel, include, exclude)
     path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)
@@ -577,7 +608,9 @@ def cli(
 
     matched_datasets = []
     skipped_identical_data = 0
-    for path in sorted(set(path_to_ds_a.keys()) | set(path_to_ds_b.keys())):
+    all_paths = sorted(set(path_to_ds_a.keys()) | set(path_to_ds_b.keys()))
+    all_paths = [p for p in all_paths if not _is_superseded_remote_predecessor(p, path_to_ds_b)]
+    for path in all_paths:
         ds_a = _match_dataset(path_to_ds_a, path)
         ds_b = _match_dataset(path_to_ds_b, path)
 
@@ -731,19 +764,61 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
     return index_a.equals(index_b)
 
 
-def _dict_diff(dict_a: dict[str, Any], dict_b: dict[str, Any], tabs: int = 0, color: bool = True, **kwargs) -> str:
-    """Convert dictionaries into YAML and compare them using difflib. Return colored diff as a string."""
+_DIFF_LINE_WRAP_WIDTH = 100
+
+
+def _wrap_long_lines(text: str, width: int = _DIFF_LINE_WRAP_WIDTH) -> list[str]:
+    """Split a YAML dump into diff-friendly lines, word-wrapping long ones.
+
+    `yaml_dump`'s own `width` only wraps folded/plain scalars — literal block scalars (`|-`,
+    used for any string containing no newlines of its own, e.g. `citation_full`) are emitted
+    verbatim on one line however long. A single-word change at the end of an otherwise-identical
+    few-hundred-character producer citation (a common shape: boilerplate text ending in
+    "Accessed on <date>") then makes the *entire* line register as changed by the line-level diff
+    below, duplicating the whole paragraph in both the removed and added sides. Wrapping first
+    lets the line-level diff match all the unchanged wrapped chunks and only report the one that
+    actually differs.
+    """
+    lines = []
+    for line in text.splitlines(keepends=True):
+        stripped = line.rstrip("\n")
+        newline = line[len(stripped) :]
+        indent = len(stripped) - len(stripped.lstrip(" "))
+        if len(stripped) <= width:
+            lines.append(line)
+            continue
+        wrapped = textwrap.wrap(
+            stripped, width=width, subsequent_indent=" " * indent, break_long_words=False, break_on_hyphens=False
+        )
+        lines.extend(w + (newline if i == len(wrapped) - 1 else "\n") for i, w in enumerate(wrapped))
+    return lines
+
+
+def _diff_lines(dict_a: dict[str, Any], dict_b: dict[str, Any], **kwargs) -> list[str]:
+    """Convert dictionaries into YAML and return the added/removed lines between them.
+
+    Uses a plain line-level diff (`SequenceMatcher.get_opcodes`) rather than `difflib.ndiff`.
+    `ndiff` additionally computes intraline ("? ") hints via its costly `_fancy_replace` pass, but
+    every caller here immediately discards "? " and "  " (equal) lines, so that work is pure waste
+    for wide, mostly-changed metadata like WDI's ~1500 columns.
+    """
     meta_a = yaml_dump(dict_a, **kwargs)
     meta_b = yaml_dump(dict_b, **kwargs)
 
-    lines = difflib.ndiff(meta_a.splitlines(keepends=True), meta_b.splitlines(keepends=True))  # ty: ignore
-    # do not print lines that are identical
-    lines = [line for line in lines if not line.startswith("  ")]
+    a_lines = _wrap_long_lines(meta_a)
+    b_lines = _wrap_long_lines(meta_b)
 
-    # do not print ? lines
-    lines = [line for line in lines if not line.strip().startswith("? ")]
+    lines = []
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a_lines, b_lines).get_opcodes():
+        if tag in ("delete", "replace"):
+            lines.extend("- " + line for line in a_lines[i1:i2])
+        if tag in ("insert", "replace"):
+            lines.extend("+ " + line for line in b_lines[j1:j2])
+    return lines
 
-    # add color
+
+def _format_diff(lines: list[str], tabs: int = 0, color: bool = True) -> str:
+    """Format pre-computed diff lines (from `_diff_lines`) as a colored/tabbed string."""
     if color:
         lines = ["[violet]" + line for line in lines]
 
@@ -752,6 +827,11 @@ def _dict_diff(dict_a: dict[str, Any], dict_b: dict[str, Any], tabs: int = 0, co
     else:
         # add tabs
         return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+
+
+def _dict_diff(dict_a: dict[str, Any], dict_b: dict[str, Any], tabs: int = 0, color: bool = True, **kwargs) -> str:
+    """Convert dictionaries into YAML and compare them using a line-level diff. Return colored diff as a string."""
+    return _format_diff(_diff_lines(dict_a, dict_b, **kwargs), tabs=tabs, color=color)
 
 
 def _df_to_str(df: pd.DataFrame, limit: int = 5) -> list[str]:
@@ -784,38 +864,178 @@ def _df_to_records(df: pd.DataFrame, limit: int = SAMPLE_LIMIT) -> list[dict[str
     return [{str(k): _fmt(v) for k, v in row.items()} for row in df_samp.to_dict("records")]
 
 
+# A zero-padded string ("004", "007") is an identifier, not a quantity — nothing measured is
+# written that way. Matches a leading zero followed by a digit, so "0.5" and "0" stay numeric.
+ZERO_PADDED_RE = re.compile(r"^-?0\d")
+
+
+def _is_code_column(s: pd.Series) -> bool:
+    """Whether ``s`` holds identifiers that merely look numeric, rather than quantities.
+
+    Zero-padding is the tell — ISO numeric country codes, area codes — and one padded value is
+    enough, since a code column stays a code column at the values that need no padding. Judge it
+    on the *whole* column: the padded codes may all sit on rows that didn't change, in which case
+    the changed-rows frame alone carries no evidence that the column is coded at all.
+    """
+    if pd.api.types.is_numeric_dtype(s):
+        return False
+    if isinstance(s.dtype, pd.CategoricalDtype):
+        # Categories are already deduplicated, so this costs nothing on a long column.
+        values = s.dtype.categories
+    elif pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
+        values = pd.unique(s.astype("object"))
+    else:
+        return False
+    return any(isinstance(v, str) and ZERO_PADDED_RE.match(v) for v in values)
+
+
+def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
+    """``s`` as float64 for BARD scoring, or None if its dtype can't carry a number at all.
+
+    A numeric indicator can carry a non-numeric **sentinel** in some rows — e.g.
+    `imf/trade`'s `china_imports_share_of_gdp` stores the literal string "China" on China's own
+    rows, since "China's imports as a share of China's GDP" is meaningless. That single string
+    makes the whole column `category`/`object` dtype, and a plain `is_numeric_dtype` gate would
+    hand the column to the unscoreable path, where it defaults to *maximal* severity — ranking
+    the column as the report's worst anomaly on the strength of its dtype alone.
+
+    So coerce instead: sentinels become NaN (they're then treated as coverage events rather than
+    revisions, which is what a value-to-sentinel flip is), and the genuinely numeric rows get
+    scored normally. Whether anything numeric actually survived the coercion is up to the caller,
+    which weighs both sides of the diff together — see `_changed_records`. Dtypes that can't hold
+    a number at all (datetimes, for one) return None and keep the unscoreable path.
+
+    Codes that merely *look* numeric are the risk in parsing strings, so a column `_is_code_column`
+    recognizes is rejected here too. Infinities are rejected differently — as missing rather than as
+    a whole unscoreable column: `pd.to_numeric` happily parses "Inf" (and a float column can hold
+    one outright), but BARD returns NaN for it, which would poison the column's median and, since
+    `_tier` reads NaN as no tier at all, drop the column out of the report's chips and watch list
+    without a word. An unmeasurable value is exactly what a sentinel is, so it's treated as one.
+    """
+    if pd.api.types.is_numeric_dtype(s):
+        return _finite(s.astype("float64"))
+    if isinstance(s.dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
+        if _is_code_column(s):
+            return None
+        return _finite(pd.to_numeric(s.astype("object"), errors="coerce").astype("float64"))
+    return None
+
+
+def _finite(s: pd.Series) -> pd.Series:
+    """``s`` with infinities blanked to NaN, so they're handled as sentinels rather than scored."""
+    return s.where(np.isfinite(s))
+
+
+def _has_numeric_content(s: pd.Series) -> bool:
+    """Whether ``s`` holds any value that can be compared as a number."""
+    coerced = _as_comparable_floats(s)
+    return coerced is not None and bool(coerced.notna().any())
+
+
+class ChangedRecords(NamedTuple):
+    """Sampled rows of a changed-values diff, plus how the rows behind them broke down."""
+
+    records: list[dict[str, str]]
+    sorted_by_score: bool
+    median_bard: float | None
+    appeared_count: int
+    disappeared_count: int
+    not_scored_count: int
+
+
 def _changed_records(
-    both: pd.DataFrame, col: str, limit: int = SAMPLE_LIMIT
-) -> tuple[list[dict[str, str]], bool, float | None]:
+    both: pd.DataFrame,
+    col: str,
+    limit: int = SAMPLE_LIMIT,
+    is_code_column: bool = False,
+    is_numeric_column: bool = False,
+) -> ChangedRecords:
     """Sample records for a changed-values diff.
 
-    For numeric columns, keep the most anomalous rows (largest first) and append an
-    "anomaly score" display column, so the report surfaces the biggest moves instead of a random
-    sample. The score is BARD (`etl.data_helpers.misc.bard`, the same metric Anomalist scores
-    changes with): bounded in [0, 1], symmetric, and resistant to blow-ups on tiny values. A
-    value appearing or disappearing (NaN on one side) counts as a maximal change (score 1). Other
-    dtypes keep the plain random sample.
+    `both` holds only the rows that changed, which is all the scoring needs but not always enough
+    to classify the column, since the evidence may sit entirely on rows that didn't change. Two
+    verdicts are therefore taken from the *full* columns and passed in: `is_code_column` when they
+    hold identifiers (see `_is_code_column`), whose padded values may all be unchanged, and
+    `is_numeric_column` when they hold numbers, which a sentinel-only edit leaves out of `both`
+    altogether — without it, editing the one sentinel in a numeric column would call the whole
+    column categorical and rank it maximal.
 
-    Returns (records, sorted_by_score, median_bard), where median_bard is the median score across
-    ALL changed rows (not just the sample) — the report uses it to sort columns, tables and
-    datasets by how big their differences typically are. None for non-numeric columns.
+    A value appearing or disappearing (NaN on one side) is a *coverage* event, not a value
+    *revision* — e.g. the newest year in a new dataset version, or a slow-cadence indicator whose
+    "latest" datapoint moves to a new year while the old one is dropped. Neither is an anomaly in
+    the sense BARD measures (how much a value that existed on both sides moved), so those rows are
+    excluded from the score entirely and counted separately as `appeared`/`disappeared` — reported
+    on their own axis (`ColumnDiffResult.coverage_severity`) instead of competing with genuine
+    revisions for the same score.
+
+    For numeric columns, the sample keeps the most anomalous *revised* rows first (largest BARD —
+    `etl.data_helpers.misc.bard`, the same metric Anomalist uses: bounded in [0, 1], symmetric,
+    resistant to blow-ups on tiny values), with appeared/disappeared rows sorted after them and
+    labeled as such instead of given a score. Other dtypes keep the plain random sample.
+
+    A sentinel-carrying column (see `_as_comparable_floats`) can also change from one non-numeric
+    value to another — a sentinel whose text was edited, or a gap filled with a sentinel. Both
+    sides coerce to NaN, so nothing numeric appeared, disappeared or moved: those rows are labeled
+    "not scored" rather than given a number or miscounted as a coverage event. They still show up
+    in the diff's changed-row count and in the sample, so the change stays visible.
+
+    Returns (records, sorted_by_score, median_bard, appeared_count, disappeared_count).
+    median_bard is the median BARD across all *revised* rows (not just the sample) — the report
+    uses it to sort columns, tables and datasets by how big their genuine revisions typically are.
+    It's 0.0 (not None) when there are no revised rows, so a column that's all coverage churn
+    scores as "no anomaly" rather than falling back to a non-numeric column's default of maximal.
+    None only for non-numeric columns, where old/new can't be told apart from a category flip.
     """
     old_col, new_col = f"{col} -", f"{col} +"
-    if not (pd.api.types.is_numeric_dtype(both[old_col]) and pd.api.types.is_numeric_dtype(both[new_col])):
-        return _df_to_records(both, limit=limit), False, None
+    old, new = _as_comparable_floats(both[old_col]), _as_comparable_floats(both[new_col])
+    # Being a numeric quantity is a property of the column, so decide it across both sides at
+    # once, and accept the full-column verdict over the changed rows. A version that drops the
+    # sentinel convention changes exactly the sentinel rows, leaving one side of `both` entirely
+    # non-numeric; an edit to the sentinel itself leaves both sides so. Judging those on `both`
+    # alone would call the indicator categorical and hand it maximal severity, the very failure
+    # this coercion exists to remove.
+    if is_code_column or old is None or new is None:
+        return ChangedRecords(_df_to_records(both, limit=limit), False, None, 0, 0, 0)
+    if not (is_numeric_column or old.notna().any() or new.notna().any()):
+        return ChangedRecords(_df_to_records(both, limit=limit), False, None, 0, 0, 0)
+    old_isna = old.isna().to_numpy()
+    new_isna = new.isna().to_numpy()
+    appeared = old_isna & ~new_isna
+    disappeared = ~old_isna & new_isna
+    revised = ~old_isna & ~new_isna
+    # Non-numeric on both sides: neither a revision nor a coverage event, but still a changed row,
+    # so it is counted here rather than left to be inferred away from the other two tallies.
+    not_scored = old_isna & new_isna
 
-    old = both[old_col].astype("float64")
-    new = both[new_col].astype("float64")
-    score = bard(old.to_numpy(), new.to_numpy())
-    # One-sided NaN = a value appeared or disappeared = maximal change.
-    score = np.where(np.isnan(score), 1.0, score)
-    median_bard = float(np.median(score)) if len(score) else None
+    score = np.full(len(both), np.nan)
+    score[revised] = bard(old.to_numpy()[revised], new.to_numpy()[revised])
+    median_bard = float(np.median(score[revised])) if revised.any() else 0.0
 
-    # Positional (iloc) selection is safe even if `both` has a non-unique index.
-    order = np.argsort(-score, kind="stable")[:limit]
+    # Revised rows rank by score (largest first); appeared/disappeared always sort after them —
+    # they're not ranked anomalies — with ties broken by original order (stable sort).
+    rank_key = np.where(revised, -score, np.inf)
+    order = np.argsort(rank_key, kind="stable")[:limit]
     top = both.iloc[order].copy()
-    top["anomaly score"] = [format_score(s) for s in score[order]]
-    return _df_to_records(top, limit=limit), True, median_bard
+
+    def _label(i: int) -> str:
+        if revised[i]:
+            return format_score(score[i])
+        if appeared[i]:
+            return "appeared"
+        if disappeared[i]:
+            return "disappeared"
+        # Non-numeric on both sides (sentinel to sentinel): not a coverage event either.
+        return "not scored"
+
+    top["anomaly score"] = [_label(i) for i in order]
+    return ChangedRecords(
+        _df_to_records(top, limit=limit),
+        True,
+        median_bard,
+        int(appeared.sum()),
+        int(disappeared.sum()),
+        int(not_scored.sum()),
+    )
 
 
 def _data_diff(
@@ -868,22 +1088,37 @@ def _data_diff(
         lines.append(
             f"~ Changed values: {neq.sum()} / {n} ({neq.sum() / n * 100:.2f}%)",
         )
-        samp_a = table_a.loc[neq, cols]
-        samp_b = table_b.loc[neq, cols]
+        # Merge as plain pandas DataFrames, not Table.merge/join. The OWID Table variants also
+        # combine per-column metadata (origins/sources) into the result, which is expensive for
+        # wide, heavily-sourced datasets like WDI — and wasted here since `both` is only used for
+        # its raw values (sampling/scoring below), never its metadata.
+        samp_a = pd.DataFrame(table_a.loc[neq, cols])
+        samp_b = pd.DataFrame(table_b.loc[neq, cols])
         if dims:
             both = samp_a.merge(samp_b, on=dims, suffixes=(" -", " +"))
         else:
             both = samp_a.join(samp_b, lsuffix=" -", rsuffix=" +")
         lines += _df_to_str(both)
-        records, sorted_by_score, median_bard = _changed_records(both, col)
+
+        # Classified on the full columns, not on `both`: the rows that prove a column is coded, or
+        # that it is numeric at all, may all be rows that didn't change.
+        changed = _changed_records(
+            both,
+            col,
+            is_code_column=_is_code_column(table_a[col]) or _is_code_column(table_b[col]),
+            is_numeric_column=_has_numeric_content(table_a[col]) or _has_numeric_content(table_b[col]),
+        )
         value_diffs.append(
             ValueDiff(
                 kind="changed",
                 count=int(neq.sum()),
                 total=int(n),
-                sample=records,
-                sorted_by_score=sorted_by_score,
-                median_bard=median_bard,
+                sample=changed.records,
+                sorted_by_score=changed.sorted_by_score,
+                median_bard=changed.median_bard,
+                appeared_count=changed.appeared_count,
+                disappeared_count=changed.disappeared_count,
+                not_scored_count=changed.not_scored_count,
             )
         )
 
@@ -1007,6 +1242,26 @@ def _match_dataset(path_to_ds: dict[str, Any], path: str) -> Dataset | None:
             return None
 
 
+def _is_superseded_remote_predecessor(path: str, path_to_ds_b: dict[str, Any]) -> bool:
+    """True if `path` is only in scope as a REMOTE-side fallback match for a newer local version.
+
+    `--changed` adds a changed dataset's predecessor version to the shared `--include` filter so
+    the REMOTE fetch includes it — `_match_dataset` then falls back to it when diffing the new
+    local version against something. But the union-of-keys loop in `cli()` also visits the
+    predecessor's own path directly; if that exact version isn't *also* built locally (the normal
+    case — only the new version was run), it compares against nothing and gets reported as a
+    separate, false "removed dataset", right back to the bug this scoping exists to avoid. Skip a
+    path here when it's absent locally but a newer version of the same
+    channel/namespace/short_name is present — `_match_dataset` already reaches it as a fallback
+    for that newer path, so it needs no standalone entry of its own.
+    """
+    if path in path_to_ds_b:
+        return False
+    channel, namespace, version, short_name = path.split("/")
+    pattern = re.compile(rf"^{re.escape(channel)}/{re.escape(namespace)}/([^/]+)/{re.escape(short_name)}$")
+    return any((match := pattern.match(k)) and match.group(1) > version for k in path_to_ds_b)
+
+
 def _load_catalog_datasets(
     catalog_path: str, channels: Iterable[CHANNEL], include: str | None, exclude: str | None
 ) -> dict[str, Any]:
@@ -1025,7 +1280,18 @@ def _table_metadata_dict(tab: Table) -> dict[str, Any]:
     origins = set()
     for col in tab.columns:
         origins.update(tab[col].metadata.origins)
-    d["origins"] = sorted(origins, key=lambda x: (x.title or "", x.title_snapshot or ""))
+    # Sort by enough fields to be a total order over real-world origins, not just a tie-breaker.
+    # For datasets like WDI, every origin shares the same title/title_snapshot (one indicator per
+    # column, but all indicators come from the same producer, description and citation
+    # boilerplate), so those two fields alone leave the sort a no-op tied to `set()`'s arbitrary
+    # iteration order. Two independently-built tables (old vs. new version) then serialize their
+    # ~1500 origins in unrelated orders, and the line-level diff below sees the whole list as
+    # reshuffled — every origin (unchanged fields included) shows as removed+added rather than
+    # only the handful of lines that actually changed. `url_main` disambiguates down to the
+    # individual indicator, making the order (and hence the diff) stable and content-based.
+    d["origins"] = sorted(
+        origins, key=lambda x: (x.title or "", x.title_snapshot or "", x.producer or "", x.url_main or "")
+    )
 
     # add columns
     # d["columns"] = {}
@@ -1105,9 +1371,14 @@ def _local_catalog_datasets(
     return mapping
 
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type(requests.RequestException),
+)
 def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
     uri = f"{DEFAULT_CATALOG_URL}{path}/index.json"
-    js = http_session.get(uri).json()
+    js = http_session.get(uri, timeout=30).json()
     # Drop deprecated provenance fields for backward compatibility with remote catalog entries
     # that were built before the Source -> Origin migration was fully rolled out.
     js.pop("origins", None)

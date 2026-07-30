@@ -630,6 +630,19 @@ def load_single_dag_file(filename: str | Path) -> Graph:
     return _parse_dag_yaml(_load_dag_yaml(str(filename)))
 
 
+def parse_dag_yaml_text(text: str) -> Graph:
+    """Flatten the ``steps:`` of a DAG YAML document given as text.
+
+    Same output shape as :func:`load_single_dag_file`, for callers that hold the
+    document's content rather than a file on disk (e.g. a historical version of a
+    DAG file read from git).
+    """
+    dag_yml = yaml.safe_load(text) or {}
+    if not dag_yml.get("steps"):
+        return {}
+    return _parse_dag_yaml(dag_yml)
+
+
 def _load_dag(filename: str | Path, prev_dag: dict[str, Any]):
     """
     Recursive helper to 1) load a dag itself, and 2) load any sub-dags

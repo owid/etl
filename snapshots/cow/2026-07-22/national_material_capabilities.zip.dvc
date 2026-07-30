@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: National Material Capabilities
+    description: |-
+      The National Material Capabilities data set contains annual values for total population, urban population, iron and steel production, energy consumption, military personnel, and military expenditure of all state members, currently from 1816-2022. The widely-used Composite Index of National Capability (CINC) index is based on these six variables and included in the data set.
+    version_producer: Version 7.0
+    # The data file (NMC-70-abridged.csv) inside the archive is dated 2026-02-25; v7.0 was re-hosted/announced mid-2026.
+    date_published: "2026-02-25"
+
+    # Citation
+    producer: Correlates of War
+    citation_full: |-
+      - Singer, J. David, Stuart Bremer, and John Stuckey. (1972). “Capability Distribution, Uncertainty, and Major Power War, 1820-1965.” in Bruce Russett (ed) Peace, War, and Numbers, Beverly Hills: Sage, 19-48.
+      - Singer, J. David. 1987. “Reconstructing the Correlates of War Dataset on Material Capabilities of States, 1816-1985” International Interactions, 14: 115-32.
+    attribution: Correlates of War - National Material Capabilities Version 7.0 (2026)
+    attribution_short: COW
+
+    # Files
+    url_main: https://correlatesofwar.org/data-sets/national-material-capabilities/
+    # The archive lives at https://correlatesofwar.org/wp-content/uploads/NMCv7.zip, but the host serves an
+    # incomplete TLS certificate chain that the verified ETL downloader rejects (browsers/curl tolerate it),
+    # so it is downloaded by hand and passed via --path-to-file. It is a zip-in-zip
+    # (NMCv7/NMC-v7-abridged.zip -> NMC-*-abridged.csv), unpacked in the meadow step.
+    date_accessed: '2026-07-22'
+
+    # License
+    license:
+      name: Correlates of War - FAQ
+      url: https://correlatesofwar.org/faq/
+outs:
+  - md5: 7a7c89b6578b5f67450c40cfb0c3d5f7
+    size: 4718898
+    path: national_material_capabilities.zip

@@ -23,8 +23,11 @@ power users).
 
 1. Open <https://claude.ai/code>.
     - **First-time users** are redirected to an onboarding flow: use the name
-      `etl` and `Trusted` or `Full` network access (you can switch to `Full`
-      later if `Trusted` turns out to be limiting).
+      `etl` and **`Full`** network access. `Trusted` blocks our own hosts —
+      `datasette-public.owid.io`, `api.ourworldindata.org` and
+      `catalog.ourworldindata.org` are all refused — which quietly breaks
+      indicator lookups and `etl diff`, and the failure looks like an
+      authentication error rather than a network one.
     - **Existing users** won't see onboarding: click the environment selector
       (":cloud: Default") above the chat input and create a new `etl`
       environment with the same settings.
@@ -39,8 +42,36 @@ power users).
         environment — only put values there that are okay to share within the
         org (like the 1Password ones above).
 
-3. Next to the environment selector is the repository picker — choose
+3. In the same settings, paste the [setup script](#setup-script) below.
+4. Next to the environment selector is the repository picker — choose
    `owid/etl`.
+
+### Setup script
+
+The sandbox ships a `uv` too old to read our `pyproject.toml` (it silently
+rewrites `uv.lock`) and an empty package cache, so every session starts slowly.
+This script fixes both. It runs once and the filesystem is snapshotted, so later
+sessions skip it; the snapshot rebuilds when you edit the environment settings
+and automatically after ~7 days.
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+# uv >= 0.10 is required. `uv self update` hits GitHub API rate limits here.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+
+# This runs before the session's repo is cloned, so clone it here to warm
+# ~/.cache/uv, which the snapshot keeps. (The .venv itself can't be reused — it
+# hard-codes absolute paths — but sessions rebuild it in seconds from cache.)
+git clone --depth 1 https://github.com/owid/etl /opt/etl-setup
+cd /opt/etl-setup
+uv sync --all-extras --group dev
+```
+
+Sessions still build their own `.venv` via `scripts/remote_setup.sh`, wired as a
+`SessionStart` hook.
 
 ## Create a dataset
 
@@ -62,6 +93,34 @@ From there:
 2. When you're happy, approve your changes in **chart-diff** (also linked in
    the PR).
 3. Merge the PR — this syncs your charts to production.
+
+## Drive cloud sessions from the terminal
+
+If you already work in the terminal, you don't have to switch to the browser to
+use the cloud environment — and you don't have to copy results back by hand.
+From the ETL repository:
+
+```bash
+claude --cloud "Run the cherry blossom step and report what breaks"
+```
+
+This starts a cloud session on the same environment while you keep working
+locally. The VM clones from GitHub rather than from your machine, so **push your
+branch first**. Then `/tasks` lists running sessions (each `claude --cloud` is
+its own, so they can run in parallel), and `/teleport` (or `/tp`) pulls one into
+your terminal with the branch checked out and the full conversation history
+loaded. Neither flag appears in `claude --help`, but both work.
+
+To debug the environment itself, run `check-tools` in a session for exact tool
+versions — the command only exists there — then reproduce against that version
+locally. There is no published image to run.
+
+!!! note
+
+    Cloud sessions get the repository's `CLAUDE.md`, `.claude/` skills and
+    agents, and the `SessionStart` hook, but **not** your personal
+    `~/.claude/CLAUDE.md`. Anything a cloud session needs to know has to live
+    in the repo — see [`.claude/docs/cloud-sandbox.md`](https://github.com/owid/etl/blob/master/.claude/docs/cloud-sandbox.md).
 
 ## Feedback
 

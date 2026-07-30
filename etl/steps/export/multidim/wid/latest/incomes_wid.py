@@ -23,13 +23,9 @@ EXTRAPOLATED = "no"
 # Override of description_key_welfare_type (world_inequality_database.meta.yml line 144) for the grouped
 # welfare_type=before_vs_after views. The OLD_* constants mirror the garden text verbatim — the assertion
 # in _replace_welfare_type_bullet catches drift in the source.
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX = "Income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance benefits, such as unemployment insurance — contributions to these are deducted, and the corresponding benefits are added back as income. This unusual choice is made because countries organize pensions very differently — in public systems, private ones, or a mix — and treating them in the same way avoids the comparison being driven by those differences."
-OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX = "Income is measured after taxes have been paid and most government benefits have been received. This includes not only cash benefits like social assistance, but also the value of public services like hospitals and schools, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by survey-based data sources."
-NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes and benefits, which are shown separately. Taxes and benefits typically increase the share going to poorer groups and reduce the share going to richer groups."
-
-# Sourced from the after_tax indicator's description_key. The before_vs_after view inherits from the
-# before_tax indicator, so this bullet is otherwise lost; we re-attach it as the last bullet.
-DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY = "Data on income after tax and benefits is less widely available than that before tax. Where it is missing, WID constructs distributions from the more widely available pre-tax data, combined with data on tax revenue and government expenditure. These estimates are more uncertain than where direct data is available. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/)."
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_BEFORE_TAX = "Before tax income is measured before taxes have been paid and most government benefits have been received. The exception is pensions and other social insurance benefits, such as unemployment insurance — contributions to these are deducted, and the corresponding benefits are added back as income. [Read more](#dod:wid-income-definition)."
+OLD_DESCRIPTION_KEY_WELFARE_TYPE_AFTER_TAX = "After tax income is measured after taxes have been paid and government benefits have been received. This includes not only cash benefits like social assistance, but also the value of public services like hospitals and schools, and collective spending, such as defense and infrastructure. This is a broader concept of income than used by survey-based data sources."
+NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured both before and after taxes have been paid and government benefits received, which are shown as separate series. Comparing the two gives a sense of the role of redistribution through a country's tax and benefits system."
 
 
 def run() -> None:
@@ -233,9 +229,8 @@ def _get_before_vs_after_metadata(tb, view):
             col_name,
         )
 
-        description_key = list(meta.description_key) if meta.description_key else []
+        description_key = _description_key_bullets(meta)
         description_key = _replace_welfare_type_bullet(description_key, col_name)
-        description_key = _append_after_tax_availability_bullet(description_key, tb, view)
 
         return {
             "title": title,
@@ -256,27 +251,27 @@ def _replace_welfare_type_bullet(description_key, col_name):
     return [NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER if b in old_welfare_keys else b for b in description_key]
 
 
-def _append_after_tax_availability_bullet(description_key, tb, view):
-    """Append the after_tax-only availability caveat (sourced from the after_tax indicator) as the last bullet."""
-    if DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY in description_key:
-        return description_key
-    after_tax_ind = next((i for i in view.indicators.y if "after_tax" in i.catalogPath), None)
-    if after_tax_ind:
-        after_tax_col = after_tax_ind.catalogPath.split("#")[-1]
-        after_tax_description_key = (
-            list(tb[after_tax_col].metadata.description_key or []) if after_tax_col in tb.columns else []
-        )
-        assert DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY in after_tax_description_key, (
-            f"DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY not found in {after_tax_col}.description_key — garden text changed, update the constant."
-        )
-        description_key.append(DESCRIPTION_KEY_AFTER_TAX_AVAILABILITY)
-    return description_key
-
-
 def _assert_and_replace(text, old, new, field, col_name):
     """Replace `old` with `new` in `text`; assert `old` was present so silent drift in the garden meta surfaces as a clear error."""
     assert old in text, f"'{old}' not found in {col_name}.{field} — garden text changed, update the replacement."
     return text.replace(old, new)
+
+
+def _description_key_bullets(meta):
+    """Return an indicator's description_key as a list of bullet strings.
+
+    The grapher channel stores description_key as a single markdown string (bullets joined with
+    "\\n- "); older builds stored a list. Normalize both to a list so bullets can be swapped.
+    """
+    dk = meta.description_key if meta else None
+    if dk is None:
+        return []
+    if not isinstance(dk, str):
+        return list(dk)
+    lines = [line.strip() for line in dk.split("\n") if line.strip()]
+    if lines and all(line.startswith("- ") for line in lines):
+        return [line[2:].strip() for line in lines]
+    return [dk.strip()]
 
 
 def _build_indicator_display_names(tb):

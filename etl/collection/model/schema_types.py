@@ -6,7 +6,7 @@ Run `python scripts/generate_schema_types.py` to regenerate.
 
 Provides strongly-typed interfaces for:
 - View configuration (based on multidim-schema.json, resolving $refs against the
-  vendored schemas/grapher-schema.010.json — refresh it with --refresh)
+  vendored schemas/grapher-schema.011.json — refresh it with --refresh)
 - View metadata (based on dataset-schema.json)
 """
 
@@ -384,8 +384,8 @@ class ViewMetadata(TypedDict, total=False):
 
     # Description of the indicator written by the producer, if any was given.
     description_from_producer: str
-    # List of key pieces of information about the indicator.
-    description_key: list[str | list[str]]
+    # Key information about the indicator as free-form markdown text. A YAML list of bullet points is also accepted and converted to a markdown list on load.
+    description_key: str | list[str | list[str]]
     # Relevant information about the processing of the indicator done by OWID.
     description_processing: str
     # One or a few lines that complement the title to have a short description of the indicator.
