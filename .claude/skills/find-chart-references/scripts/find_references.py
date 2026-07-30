@@ -48,7 +48,7 @@ COLUMNS = [
 ]  # fmt: skip
 
 
-def rec(subject_type, subject, subject_id, surface, kind, where, where_path="",
+def rec(subject_type, subject, subject_id, surface, kind, where, where_path="", *,
         surface_id=None, config_id=None, context="", query_string="", text="",
         published=True) -> dict:  # fmt: skip
     """One reference.
@@ -147,10 +147,11 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"{component or 'unknown'} ({r['post_type']})",
-                r["queryString"],
-                r["text"],
-                r["published"],
+                surface_id=r["post_slug"],
+                context=f"{component or 'unknown'} ({r['post_type']})",
+                query_string=r["queryString"],
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
     return out
@@ -186,10 +187,11 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"{component or 'unknown'} ({r['post_type']})",
-                target.split("?", 1)[1] if "?" in target else "",
-                r["text"],
-                r["published"],
+                surface_id=r["post_slug"],
+                context=f"{component or 'unknown'} ({r['post_type']})",
+                query_string=target.split("?", 1)[1] if "?" in target else "",
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
     return out
@@ -284,8 +286,9 @@ def sweep_data_insights(by_slug: dict[str, dict]) -> list[dict]:
                 EMBED,
                 r["post_slug"],
                 f"/data-insights/{r['post_slug']}",
-                "grapher-url in the insight's front matter",
-                url.split("?", 1)[1] if "?" in url else "",
+                surface_id=r["post_slug"],
+                context="grapher-url in the insight's front matter",
+                query_string=url.split("?", 1)[1] if "?" in url else "",
                 published=r["published"],
             )  # fmt: skip
         )
@@ -365,8 +368,9 @@ def sweep_wordpress(by_slug: dict[str, dict]) -> list[dict]:
                 LINK,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                "legacy post link",
-                target.split("?", 1)[1] if "?" in target else "",
+                surface_id=r["post_slug"],
+                context="legacy post link",
+                query_string=target.split("?", 1)[1] if "?" in target else "",
             )  # fmt: skip
         )
     return out
@@ -552,10 +556,11 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"{component or 'unknown'} ({r['post_type']})",
-                r["queryString"],
-                r["text"],
-                r["published"],
+                surface_id=r["post_slug"],
+                context=f"{component or 'unknown'} ({r['post_type']})",
+                query_string=r["queryString"],
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
 
@@ -575,7 +580,8 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 EMBED,
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
-                f"pinned to view {r['viewId']} — blocks re-publish if that view disappears",
+                surface_id=int(r["id"]),
+                context=f"pinned to view {r['viewId']} — blocks re-publish if that view disappears",
             )  # fmt: skip
         )
 
@@ -583,7 +589,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
         "SELECT source FROM multi_dim_redirects WHERE multiDimId = %(id)s", params={"id": mdim_id}
     )
     for r in redirects.to_dict("records"):
-        out.append(rec("mdim", slug, mdim_id, "redirect", LINK, r["source"], r["source"], "redirects here"))
+        out.append(rec("mdim", slug, mdim_id, "redirect", LINK, r["source"], r["source"], context="redirects here"))
     return out
 
 
@@ -607,10 +613,11 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"{component or 'unknown'} ({r['post_type']})",
-                r["queryString"],
-                r["text"],
-                r["published"],
+                surface_id=r["post_slug"],
+                context=f"{component or 'unknown'} ({r['post_type']})",
+                query_string=r["queryString"],
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
     return out
