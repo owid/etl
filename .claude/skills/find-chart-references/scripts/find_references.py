@@ -368,96 +368,118 @@ def parse_json_obj(value) -> dict:
 
 
 def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
+    """Charts rendering these indicators. Drafts can have no slug — they still render."""
     df = OWID_ENV.read_sql(
         "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.slug, c.publishedAt IS NOT NULL AS published "
         "FROM chart_dimensions cd JOIN charts c ON c.id = cd.chartId "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE cd.variableId IN %(ids)s ORDER BY cc.slug",
         params={"ids": tuple(variable_ids)},
     )
-    return [
-        rec(
-            "indicator",
-            str(r["variableId"]),
-            int(r["variableId"]),
-            "chart",
-            RENDER,
-            r["slug"],
-            f"/grapher/{r['slug']}",
-            f"chart id {r['chart_id']}",
-            published=r["published"],
-        )  # fmt: skip
-        for r in df.to_dict("records")
-    ]
+    out = []
+    for r in df.to_dict("records"):
+        slug = r["slug"] or ""
+        out.append(
+            rec(
+                "indicator",
+                str(r["variableId"]),
+                int(r["variableId"]),
+                "chart",
+                RENDER,
+                slug or f"chart {r['chart_id']} (no slug)",
+                f"/grapher/{slug}" if slug else "",
+                f"chart id {r['chart_id']}",
+                published=r["published"],
+            )  # fmt: skip
+        )
+    return out
+
+
+def entry_variable_id(entry, by_path: dict[str, int]) -> int | None:
+    """A `views[].indicators.*` entry -> variable id, tolerating every stored shape.
+
+    Entries are stored as an int id, a dict carrying `id`, a dict carrying only
+    `catalogPath`, or a bare catalogPath string. `by_path` maps the catalog paths of the
+    *requested* variables, so a path we don't care about resolves to None either way.
+    """
+    if isinstance(entry, dict):
+        if entry.get("id") is not None:
+            return int(entry["id"])
+        path = entry.get("catalogPath")
+        return by_path.get(path) if path else None
+    if isinstance(entry, bool):  # bool is an int subclass — never a variable id
+        return None
+    if isinstance(entry, int):
+        return entry
+    if isinstance(entry, str):
+        return by_path.get(entry)
+    return None
+
+
+def catalog_paths_of(variable_ids: list[int]) -> dict[str, int]:
+    """{catalogPath -> variable id} for the requested variables, for catalogPath-only configs."""
+    df = OWID_ENV.read_sql(
+        "SELECT id, catalogPath FROM variables WHERE id IN %(ids)s AND catalogPath IS NOT NULL",
+        params={"ids": tuple(variable_ids)},
+    )
+    return {str(p): int(i) for i, p in zip(df["id"], df["catalogPath"])}
 
 
 def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     """MDIM views rendering these indicators.
 
-    multi_dim_x_chart_configs.variableId records only the FIRST y indicator, so a
-    view plotting several indicators is invisible to that join — scan the stored
-    configs as well.
+    multi_dim_x_chart_configs.variableId records only the FIRST y indicator, so a view
+    plotting several indicators is invisible to that join — scan the stored configs as
+    well. Findings are keyed by (mdim, view, indicator), not by view: one view can render
+    several of the requested indicators, and each of them is a separate reference. Keying
+    by view alone would let the join's single row mask every other indicator in it.
     """
     ids = set(variable_ids)
-    out = []
+    by_path = catalog_paths_of(variable_ids)
+    out: list[dict] = []
+    seen: set[tuple] = set()
+
+    def emit(slug, catalog_path, published, view_id, variable_id: int) -> None:
+        if (slug, view_id, variable_id) in seen:
+            return
+        seen.add((slug, view_id, variable_id))
+        out.append(
+            rec(
+                "indicator",
+                str(variable_id),
+                variable_id,
+                "mdim view",
+                RENDER,
+                f"{slug}:{view_id}",
+                f"/grapher/{slug}",
+                catalog_path,
+                published=published,
+            )  # fmt: skip
+        )
+
     df = OWID_ENV.read_sql(
         "SELECT mx.variableId, md.slug, md.catalogPath, md.published, mx.viewId "
         "FROM multi_dim_x_chart_configs mx JOIN multi_dim_data_pages md ON md.id = mx.multiDimId "
         "WHERE mx.variableId IN %(ids)s",
         params={"ids": tuple(variable_ids)},
     )
-    seen = set()
     for r in df.to_dict("records"):
-        key = (r["slug"], r["viewId"])
-        seen.add(key)
-        out.append(
-            rec(
-                "indicator",
-                str(r["variableId"]),
-                int(r["variableId"]),
-                "mdim view",
-                RENDER,
-                f"{r['slug']}:{r['viewId']}",
-                f"/grapher/{r['slug']}",
-                r["catalogPath"],
-                published=r["published"],
-            )  # fmt: skip
-        )
+        emit(r["slug"], r["catalogPath"], r["published"], r["viewId"], int(r["variableId"]))
+
     configs = OWID_ENV.read_sql("SELECT slug, catalogPath, published, config FROM multi_dim_data_pages")
     for row in configs.to_dict("records"):
         cfg = row["config"]
         cfg = json.loads(cfg) if isinstance(cfg, str) else (cfg or {})
         for view in cfg.get("views", []):
             view_id = "__".join(f"{k}={v}" for k, v in sorted((view.get("dimensions") or {}).items()))
-            if (row["slug"], view_id) in seen:
-                continue
             indicators = view.get("indicators") or {}
-            hit = None
             for slot in ("y", "x", "size", "color"):
                 entries = indicators.get(slot)
                 if entries is None:
                     continue
                 for e in entries if isinstance(entries, list) else [entries]:
-                    vid = e.get("id") if isinstance(e, dict) else (e if isinstance(e, int) else None)
+                    vid = entry_variable_id(e, by_path)
                     if vid in ids:
-                        hit = int(vid)
-                        break
-                if hit:
-                    break
-            if hit:
-                seen.add((row["slug"], view_id))
-                out.append(
-                    rec(
-                        "indicator",
-                        str(hit),
-                        hit,
-                        "mdim view",
-                        RENDER,
-                        f"{row['slug']}:{view_id}",
-                        f"/grapher/{row['slug']}",
-                        row["catalogPath"],
-                        published=row["published"],
-                    )  # fmt: skip
-                )
+                        emit(row["slug"], row["catalogPath"], row["published"], view_id, int(vid))
     return out
 
 
@@ -651,7 +673,8 @@ def main() -> int:
         findings += sweep_mdim_views_of_indicators(variable_ids)
         findings += sweep_explorer_views_of_indicators(variable_ids)
         if args.transitive:
-            hop = resolve_chart_subjects([], sorted({f["where"] for f in chart_hits}))
+            # Slugless drafts have no URL, so nothing can reference them by slug.
+            hop = resolve_chart_subjects([], sorted({f["where"] for f in chart_hits if f["where_path"]}))
             if hop:
                 print(f"  transitive: sweeping articles for {len(hop)} chart slug(s)")
                 findings += sweep_gdoc_links(hop)

@@ -124,6 +124,12 @@ type; still ambiguous → reported, never guessed. Indicator-set subset/superset
 - `none` — no view shares the chart's indicators. **An accepted outcome** — only
   matched charts get redirects; don't force the rest.
 
+Either side carrying several indicators in one `x`/`size`/`color` slot has no
+chart-shaped signature, so it is **excluded from matching** rather than truncated
+to the first: a truncated signature can spuriously exact-match a counterpart that
+lacks the rest. Charts land in `none` with the reason in `note`; views are dropped
+from the target pool with a warning. `overrides.csv` can still force either.
+
 **Conflicts vs CLI-required.** Matched charts are checked (read-only SQL) against
 the same conditions the apply CLI validates. Two outcomes, and the distinction
 matters:
@@ -147,7 +153,9 @@ which its own validation rejects, so including them would abort the whole run.
 Preflight reports them as `MANUAL`; unpublish each one in the grapher admin. The
 exception is a chart carrying old slugs — hand-unpublishing deletes its
 `chart_slug_redirects` rows and those slugs become hard 404s, so take those to
-the Grapher team instead.
+the Grapher team instead. That manual unpublish breaks embeds exactly as the
+CLI's would, so `already_done` charts sit behind the same reference gate and
+appear in the step-4 audit alongside the proposed redirects.
 
 Many charts → one view is legitimate (e.g. a line chart and its map twin) —
 surfaced via `shared_target_chart_ids`, never collapsed.
@@ -248,10 +256,11 @@ one comes back `STALE`). Statuses: `OK` / `BLOCKER` / `EXISTS` / `DIFFERS` /
 
 It also **gates on embedded references**. Explorers, narrative charts, data
 insights, static viz and article chart blocks render the chart's own config, so
-the CLI's unpublish step breaks them with no error anywhere — the one failure mode
-the CLI itself cannot detect. Preflight counts them (current *and* old slugs) and
-exits non-zero while any remain. Migrate them (step 4 gives you each replacement
-URL), then re-run; `--no-references` skips the gate once they are handled.
+unpublishing the source breaks them with no error anywhere — the one failure mode
+the CLI itself cannot detect. Preflight counts them (current *and* old slugs, for
+proposed *and* `already_done` charts) and exits non-zero while any remain. Migrate
+them (step 4 gives you each replacement URL), then re-run; `--no-references` skips
+the gate once they are handled.
 
 Non-zero exit means **do not run the CLI yet**. Pass `--decisions` whenever a
 review happened; flagged charts are excluded (remove them from the CSV, or mark

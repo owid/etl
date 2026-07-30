@@ -59,14 +59,22 @@ LINK_FIX = "update the href"
 
 
 def load_redirects(path_arg: str) -> list[dict]:
+    """Proposed redirects, plus the charts already redirected at proposal time.
+
+    Both sets end the same way — the source chart unpublished, by the CLI for the proposed
+    rows and by hand for the already-redirected ones — so both need their embeds audited
+    first. Leaving `already_done` out would silently exempt exactly the charts a human is
+    told to unpublish manually.
+    """
     path = Path(path_arg)
     if path.is_dir():
         path = path / "mapping.json"
     if not path.exists():
         raise SystemExit(f"Not found: {path}. Run extract_and_match.py first.")
-    redirects = json.loads(path.read_text()).get("redirects", [])
+    mapping = json.loads(path.read_text())
+    redirects = mapping.get("redirects", []) + mapping.get("already_done", [])
     if not redirects:
-        raise SystemExit(f"{path} has no proposed redirects to audit.")
+        raise SystemExit(f"{path} has no proposed or already-applied redirects to audit.")
     return redirects
 
 
@@ -119,7 +127,8 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
     lines = [
         "# What references the charts being redirected",
         "",
-        f"{len(redirects)} chart(s) proposed for redirect. **{len(red)} reference(s) need manual work** "
+        f"{len(redirects)} chart(s) heading for unpublishing — proposed redirects, plus charts already "
+        f"redirected whose source chart is still published. **{len(red)} reference(s) need manual work** "
         f"— a redirect does not fix them. {len(yellow)} more are hyperlinks the 301 covers but that "
         "should be updated.",
         "",

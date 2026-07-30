@@ -283,9 +283,11 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
     """One line per chart: the surfaces that embed it and so break when it is unpublished.
 
     A redirect only rescues hyperlinks. Everything counted here holds the chart by id or
-    slug and renders its own config, so the CLI's unpublish step breaks it with no error
-    anywhere — which is why these gate readiness instead of merely being reported. Old
-    slugs are included: references written before a rename point at those.
+    slug and renders its own config, so unpublishing the source breaks it with no error
+    anywhere — which is why these gate readiness instead of merely being reported. That
+    holds whether the CLI unpublishes the chart or a human does (the `already_done` rows),
+    so pass both sets. Old slugs are included: references written before a rename point
+    at those.
 
     Pure SQL, so this works with read-only credentials (the admin references API needs
     ADMIN_API_KEY). Counts only — audit_references.py does the full sweep with
@@ -470,10 +472,12 @@ def main() -> int:
         for p in csv_problems:
             print(f"  {p}")
 
-    embeds = {} if args.no_references else embed_references(redirects)
+    # `already_done` rows are unpublished by hand, which breaks their embeds just as the
+    # CLI's unpublish step would — they belong behind the same gate.
+    embeds = {} if args.no_references else embed_references(redirects + already_done)
     if embeds:
-        print("\nSurfaces a redirect will NOT fix (these embed the chart and break when the CLI unpublishes it):")
-        for r in redirects:
+        print("\nSurfaces a redirect will NOT fix (these embed the chart and break when it is unpublished):")
+        for r in redirects + already_done:
             note = embeds.get(r["chart"]["id"])
             if note:
                 print(f"  {r['chart']['slug']}: {note}")
@@ -486,8 +490,9 @@ def main() -> int:
         print("It runs a single transaction — any one of these aborts the entire migration.")
     if embeds:
         print(f"\nNOT ready: {len(embeds)} source chart(s) are still embedded elsewhere. These do NOT abort the CLI —"
-              "\nthey break silently when it unpublishes the chart. Migrate them first (audit_references.py lists"
-              "\neach reference with its replacement URL); --no-references skips this gate once they are handled.")  # fmt: skip
+              "\nthey break silently the moment the chart is unpublished, by the CLI or by hand (MANUAL rows)."
+              "\nMigrate them first (audit_references.py lists each reference with its replacement URL);"
+              "\n--no-references skips this gate once they are handled.")  # fmt: skip
     if manual:
         print(f"\n{len(manual)} row(s) need a step outside the CLI — see MANUAL above.")
     if bad or csv_problems or embeds or manual:

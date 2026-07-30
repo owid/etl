@@ -175,23 +175,32 @@ def attach_chart_slots(charts: list[dict]) -> None:
         "WHERE chartId IN %(ids)s ORDER BY chartId, `order`",
         params={"ids": tuple(c["chart_id"] for c in charts)},
     )
-    slots: dict[int, dict] = defaultdict(lambda: {"y": [], "x": None, "size": None, "color": None})
+    slots: dict[int, dict] = defaultdict(lambda: {slot: [] for slot in ("y", *EXTRA_SLOTS)})
     for r in df.to_dict("records"):
         s = slots[r["chartId"]]
-        if r["property"] == "y":
-            s["y"].append(int(r["variableId"]))
-        elif r["property"] in EXTRA_SLOTS:
-            if s[r["property"]] is not None:
-                print(f"warning: chart {r['chartId']} has multiple '{r['property']}' dimensions — keeping the first")
-            else:
-                s[r["property"]] = int(r["variableId"])
+        if r["property"] in s:
+            s[r["property"]].append(int(r["variableId"]))
     for c in charts:
         s = slots[c["chart_id"]]
         if len(s["y"]) != len(set(s["y"])):
             print(f"warning: chart {c['chart_id']} ({c['chart_slug']}) repeats a y variable — deduplicated")
         c["y"] = frozenset(s["y"])
         for slot in EXTRA_SLOTS:
-            c[slot] = s[slot]
+            c[slot] = s[slot][0] if s[slot] else None
+        # A chart signature holds one indicator per x/size/color. Several distinct ones in a
+        # slot means the signature can't be represented — truncating to the first could
+        # spuriously exact-match a view that lacks the rest. Excluded, exactly as the
+        # view-side normalization excludes the mirror-image shape.
+        multi = [slot for slot in EXTRA_SLOTS if len(set(s[slot])) > 1]
+        c["exclude_reason"] = (
+            f"multiple indicators in {', '.join(repr(slot) for slot in multi)} — a chart slot holds one"
+            if multi
+            else ""
+        )
+        if multi:
+            print(
+                f"warning: chart {c['chart_id']} ({c['chart_slug']}) has {c['exclude_reason']} — excluded from matching"
+            )
         if not c["y"]:
             print(f"warning: chart {c['chart_id']} ({c['chart_slug']}) has no y indicators")
 
@@ -363,6 +372,10 @@ def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, st
 
     for c in charts:
         c.update({"quality": "none", "tiebreak": "", "target": None, "candidates": [], "near_misses": [], "note": ""})
+        if c.get("exclude_reason"):
+            # An override can still force a target: that is a human choosing deliberately.
+            c["note"] = c["exclude_reason"]
+            continue
         if not c["y"]:
             c["note"] = "chart has no y indicators"
             continue

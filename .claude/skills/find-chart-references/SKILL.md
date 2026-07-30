@@ -82,6 +82,12 @@ references written before a rename point at the old one):
 first y indicator, so multi-indicator views are invisible to the join alone),
 explorers (`explorer_variables`, aggregated per explorer).
 
+MDIM findings are keyed by **(mdim, view, indicator)**, not by view: one view can
+render several of the requested indicators, and each one is its own reference. The
+config scan resolves every stored indicator shape (an id, a `{id: …}` dict, a
+`{catalogPath: …}` dict, or a bare catalog-path string), so a view holding a
+catalog path is not silently skipped.
+
 **MDIM subjects**: article links/embeds, narrative charts pinned to a view
 (`parentMultiDimXChartConfigId`), and inbound `multi_dim_redirects`.
 
