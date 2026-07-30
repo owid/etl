@@ -238,8 +238,9 @@ def run() -> None:
     # Handle duplicate city names by keeping the first occurrence
     # (some cities appear multiple times with same name in different regions)
     tb_cities_raw = tb_cities_raw.drop_duplicates(subset=["country", "urban_center_name", "year"], keep="first")
+    # Copy the list per column, so the three columns don't share one mutable origins list.
     for col in ["urban_pop", "plausibility"]:
-        tb_cities_raw[col].metadata.origins = tb_cities_raw["country"].metadata.origins
+        tb_cities_raw[col].metadata.origins = list(tb_cities_raw["country"].metadata.origins)
 
     tb_cities_raw = tb_cities_raw.format(["country", "urban_center_name", "year"], short_name="ghsl_urban_centers_raw")
 
