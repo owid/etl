@@ -143,7 +143,7 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], incl
     # rather than superseding one in place; matching all of them would sweep unrelated, untouched
     # datasets into the comparison. Since those aren't part of `dataset_catalog_paths` and usually
     # aren't built locally either, `etl diff` would report each one as falsely "removed".
-    all_data_steps = {s.split("://", 1)[1] for s in DAG if s.startswith("data://")}
+    all_data_steps = {s.split("://", 1)[1] for s in DAG if s.startswith(("data://", "data-private://"))}
     sibling_versions = []
     for ds_path in dataset_catalog_paths:
         parts = ds_path.split("/")
@@ -167,9 +167,11 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], incl
     # swept into the result too, even though only the new version is actually changing.
     dag_steps = list(filter_to_subgraph(DAG, dataset_catalog_paths, downstream=True).keys())
 
-    # From data://... extract catalogPath
+    # From data://... extract catalogPath. Keep data-private:// steps too: dropping them here would
+    # return an empty list for a private-only change, so `etl run --modified --private` (and
+    # chart-diff/datadiff) would silently skip the affected private steps.
     # TODO: use StepPath from https://github.com/owid/etl/pull/3165 to refactor this
-    catalog_paths = [step.split("://")[1] for step in dag_steps if step.startswith("data://")]
+    catalog_paths = [step.split("://", 1)[1] for step in dag_steps if step.startswith(("data://", "data-private://"))]
     for sibling in sibling_versions:
         if sibling not in catalog_paths:
             catalog_paths.append(sibling)

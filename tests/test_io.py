@@ -192,3 +192,43 @@ steps:
     assert "grapher/malnutrition/2024-12-16/malnutrition" in result
     # (The repoint target also appears, as upstream deps always do in the subgraph expansion —
     # harmless, since an unchanged dataset diffs as identical.)
+
+
+@patch("etl.io.get_file_at_merge_base")
+@patch("etl.io.load_single_dag_file")
+@patch("etl.io.load_dag")
+def test_get_all_changed_catalog_paths_private_dag_only_dependency_change(
+    mock_load_dag, mock_load_single, mock_merge_base
+):
+    """A repoint of a data-private:// consumer must survive into the returned catalog paths.
+
+    The final projection kept only data:// nodes, so a private-only repoint returned an empty
+    list — `etl run --modified --private` then reported no modified steps and skipped the
+    rebuild, and chart-diff/datadiff filtered the private steps out as spurious.
+    """
+    mock_load_dag.return_value = {
+        "data-private://garden/worldbank_wdi/2026-07-27/wdi": set(),
+        "data-private://garden/malnutrition/2024-12-16/malnutrition": {
+            "data-private://garden/worldbank_wdi/2026-07-27/wdi"
+        },
+        "data-private://grapher/malnutrition/2024-12-16/malnutrition": {
+            "data-private://garden/malnutrition/2024-12-16/malnutrition"
+        },
+    }
+    mock_load_single.return_value = {
+        "data-private://garden/malnutrition/2024-12-16/malnutrition": {
+            "data-private://garden/worldbank_wdi/2026-07-27/wdi"
+        },
+    }
+    mock_merge_base.return_value = """
+steps:
+  data-private://garden/malnutrition/2024-12-16/malnutrition:
+    - data-private://garden/worldbank_wdi/2026-07-14/wdi
+"""
+
+    result = get_all_changed_catalog_paths({"dag/main.yml": {"status": "M", "diff": ""}})
+
+    # The repointed private consumer and its private downstream step are both returned, URI-less
+    # like their public counterparts.
+    assert "garden/malnutrition/2024-12-16/malnutrition" in result
+    assert "grapher/malnutrition/2024-12-16/malnutrition" in result
