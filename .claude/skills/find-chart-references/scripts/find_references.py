@@ -841,15 +841,15 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str) -> No
                         f"| {subject} | {cell(f['where'], 44)}{page_type}{draft} | {links} | {find} | {preview} |"
                     )
             else:
-                lines += ["| Subject | Where | Context | Preview |", "|---|---|---|---|"]
+                lines += ["| Subject | Where | Context | Open |", "|---|---|---|---|"]
                 for f in rows:
                     draft = "" if f["published"] else " ⚠️draft"
                     link = f"[🔗 open]({host}{f['where_path']})" if f["where_path"] else "—"
                     lines.append(
                         f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 72)}{draft} | "
                         f"{cell(f['context'], 44)} | "
-                        f"{'[👁 view](' + f['preview_url'] + ')' if f['preview_url'] else link}"
-                        f"{' · [✎ admin](' + f['admin_url'] + ')' if f['admin_url'] else ''} |"
+                        f"{'[✎ admin](' + f['admin_url'] + ') · ' if f['admin_url'] else ''}"
+                        f"{'[👁 view](' + f['preview_url'] + ')' if f['preview_url'] else link} |"
                     )
             lines.append("")
     lines += [
