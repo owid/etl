@@ -177,7 +177,7 @@ Admin overrides always win on a per-field basis. To "unlink" a field back to the
 ## When NOT to use this skill
 
 - **Chart with dropdowns / dimension selectors** → use `create-multidim`. Single-chart `.config.yml` files have `dimensions: []`; multi-dim ones don't.
-- **Brand-new chart from scratch and you want the structure auto-generated** → use `create-multidim` even for single charts; it writes the YAML skeleton, and you set `dimensions: []` after.
+- **Brand-new chart from scratch and you want the structure auto-generated** → use `create-multidim` even for single charts; it writes the YAML skeleton, and you set `dimensions: []` after. `create-multidim` knows nothing about `chart_config_id` (the field is rejected on real mdims), so once the config is single-chart, run `etl chart-config-id new <config.yml>` before pushing — otherwise the first run fails validation.
 - **Editing a chart that exists only in the admin (no `.config.yml`)** → adopt it into ETL first: write the `.config.yml`, then point it at the existing chart with `etl chart-config-id lookup <config.yml> --chart-id <id>` (see "The chart's identity"), and edit here. Tooling to generate the rest of the YAML from the live config (`chart_pull` CLI) is a Phase 1 follow-up.
 
 ## Related skills
