@@ -222,6 +222,7 @@ class AdminAPI:
             headers=self._headers(user_id),
             params={"catalogPath": catalog_path} if catalog_path else None,
             json=grapher_config,
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -252,6 +253,7 @@ class AdminAPI:
             headers=self._headers(user_id),
             params={"catalogPath": catalog_path} if catalog_path else None,
             json=grapher_config,
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -265,6 +267,7 @@ class AdminAPI:
         resp = http_session.delete(
             self.owid_env.admin_api + f"/charts/{chart_id}/etlConfig",
             headers=self._headers(user_id),
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
