@@ -913,8 +913,26 @@ def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
     without a word. An unmeasurable value is exactly what a sentinel is, so it's treated as one.
     """
     if pd.api.types.is_numeric_dtype(s):
-        return _finite(s.astype("float64"))
-    if isinstance(s.dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
+        return _finite(s)
+    if isinstance(s.dtype, pd.CategoricalDtype):
+        if _is_code_column(s):
+            return None
+        # Parse the (deduplicated) categories and index them by code, rather than parsing every
+        # row: a category column with a handful of distinct values is the cheap case, and
+        # `astype("object")` on a long one is the expensive one.
+        cats = pd.to_numeric(pd.Series(s.dtype.categories, dtype="object"), errors="coerce").to_numpy(
+            dtype="float64", na_value=np.nan
+        )
+        codes = s.cat.codes.to_numpy()
+        if len(cats) == 0:
+            # An all-missing categorical has no categories at all, so there is nothing to index
+            # into — `np.where` evaluates both branches eagerly, and `cats[0]` on an empty array
+            # would raise. Every row is missing, which row-wise coercion also produced as NaN.
+            values = np.full(len(s), np.nan)
+        else:
+            values = np.where(codes >= 0, cats[codes.clip(min=0)], np.nan)
+        return _finite(pd.Series(values, index=s.index, name=s.name))
+    if pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
         if _is_code_column(s):
             return None
         return _finite(pd.to_numeric(s.astype("object"), errors="coerce").astype("float64"))
@@ -922,12 +940,27 @@ def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
 
 
 def _finite(s: pd.Series) -> pd.Series:
-    """``s`` with infinities blanked to NaN, so they're handled as sentinels rather than scored."""
-    return s.where(np.isfinite(s))
+    """``s`` with infinities blanked to NaN, so they're handled as sentinels rather than scored.
+
+    Goes through numpy rather than `s.where(np.isfinite(s))`: on pandas' nullable dtypes (Float32,
+    Int64 — what garden tables are full of) the masked-array path costs ~34 ms per 15k-row column
+    against ~0.02 ms here. That is per column *per side*, so on a WDI-sized table (1,523 columns)
+    it turned dataset classification into ~2 minutes of pure overhead, and a whole-report run from
+    seconds into tens of minutes.
+    """
+    arr = s.to_numpy(dtype="float64", na_value=np.nan)
+    return pd.Series(np.where(np.isfinite(arr), arr, np.nan), index=s.index, name=s.name)
 
 
 def _has_numeric_content(s: pd.Series) -> bool:
-    """Whether ``s`` holds any value that can be compared as a number."""
+    """Whether ``s`` holds any value that can be compared as a number.
+
+    Short-circuits the common case: a numeric dtype needs no coercion, only the question of
+    whether any finite value survives — answered on the raw buffer instead of by materializing a
+    converted column and asking pandas.
+    """
+    if pd.api.types.is_numeric_dtype(s):
+        return bool(np.isfinite(s.to_numpy(dtype="float64", na_value=np.nan)).any())
     coerced = _as_comparable_floats(s)
     return coerced is not None and bool(coerced.notna().any())
 
