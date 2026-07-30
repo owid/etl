@@ -56,6 +56,13 @@ FIXES = {
     "wordpress": "update the link in the WordPress post",
 }
 LINK_FIX = "update the href"
+# Link-kind references whose href is generated rather than authored — there is nothing to
+# hand-edit, so the generic "update the href" would send the operator looking for a field
+# that doesn't exist.
+GENERATED_LINK_FIXES = {
+    "narrative chart": 'nothing to edit — the generated "Explore the data" link follows the redirect; '
+    "check the param collisions column",
+}
 
 
 def load_redirects(path_arg: str) -> list[dict]:
@@ -200,7 +207,10 @@ def main() -> int:
         new_url, collisions = replacement_url(r, qs, host)
         # Only an embed is broken by the redirect: it renders the chart's own config.
         severity = INFO if not ref["published"] else (RED if ref["kind"] == "embed" else YELLOW)
-        fix = LINK_FIX if ref["kind"] == "link" else FIXES.get(ref["surface"], "migrate this reference by hand")
+        if ref["kind"] == "link":
+            fix = GENERATED_LINK_FIXES.get(ref["surface"], LINK_FIX)
+        else:
+            fix = FIXES.get(ref["surface"], "migrate this reference by hand")
         findings.append(
             {
                 "severity": severity,

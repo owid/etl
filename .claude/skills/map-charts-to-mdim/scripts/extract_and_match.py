@@ -534,6 +534,16 @@ def check_conflicts(charts: list[dict], mdims: list[dict]) -> None:
     for c in matched:
         source, slug, t = f"/grapher/{c['chart_slug']}", c["chart_slug"], c["target"]
         reasons = []
+
+        # Collected BEFORE the already-redirected exit below. An `already_done` chart is
+        # unpublished by hand, and hand-unpublishing a chart that carries old slugs deletes
+        # its chart_slug_redirects rows and turns those URLs into hard 404s — so preflight
+        # needs oldSlugs on those entries precisely to refuse that. Everything derived from
+        # them (cli_required, the clash check) stays below: it only applies to rows the CLI
+        # will actually create.
+        rows = sorted(incoming_by_slug.get(slug, []), key=lambda r: r["old_slug"])
+        c["old_slugs"] = [r["old_slug"] for r in rows]
+
         prior = mdr_by_source.get(source)
         if prior is not None:
             if int(prior["multiDimId"]) == t["mdim_id"] and prior["viewConfigId"] == t["view_config_id"]:
@@ -550,9 +560,7 @@ def check_conflicts(charts: list[dict], mdims: list[dict]) -> None:
             reasons.append(f"target /grapher/{t['mdim_slug']} is itself a redirect source")
 
         # Handled by the CLI (and only by the CLI).
-        if slug in incoming_by_slug:
-            rows = sorted(incoming_by_slug[slug], key=lambda r: r["old_slug"])
-            c["old_slugs"] = [r["old_slug"] for r in rows]
+        if rows:
             c["cli_required"].append(f"{len(rows)} incoming chart_slug_redirects: {c['old_slugs']}")
             with_params = [r["old_slug"] for r in rows if r["target_query_param"]]
             if with_params:

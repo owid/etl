@@ -195,9 +195,9 @@ and `mapping.json` regenerates.
 ### 4. Audit what references the charts (ALWAYS offer; run when the user says yes)
 
 A redirect only rescues plain hyperlinks. Anything that **embeds** the chart —
-explorers, narrative charts, data insights, static viz, article chart blocks —
-resolves it by id or slug and keeps rendering the old config, so it breaks when
-the source chart is unpublished (which the apply step always does).
+explorers, data insights, static viz, article chart blocks — resolves it by id or
+slug and keeps rendering the old config, so it breaks when the source chart is
+unpublished (which the apply step always does).
 
 ```bash
 ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
@@ -226,12 +226,15 @@ Mention this step every time (like `/update-dataset` step 7); running it is the
 user's call, since a wide sweep costs tokens — but preflight gates on the same
 embedded references, so it becomes mandatory before applying.
 
-**Narrative charts are a known dead end.** They keep rendering (the config is
-fetched by UUID), but "Explore the data" points at the parent chart's slug and
-survives only via the 301 — and there is no API to repoint one, so a real fix is
-raw SQL by a Grapher dev. Report them; don't try to fix them here. Drafts to
-escalate the gap live in `ai/narrative-charts-slack-post.md` and
-`ai/narrative-charts-grapher-issue.md`.
+**Narrative charts do not block a migration.** One parented to a chart owns a
+materialized full config and renders from it, so unpublishing the parent leaves it
+intact; only its generated "Explore the data" href uses the parent slug, and the
+301 covers that. They are classified `link`, reported by preflight but never gated
+on — gating would strand every such chart behind raw SQL for no reader-visible
+gain. Do check the href's query params for collisions with the target view's
+dimensions (step 4 flags them). There is still no API to repoint one, so the
+*parent pointer* stays stale; drafts to escalate that live in
+`ai/narrative-charts-slack-post.md` and `ai/narrative-charts-grapher-issue.md`.
 
 ### 5. Apply — the grapher CLI (GATED, production only)
 
@@ -254,8 +257,8 @@ and the target MDIM's slug + reviewed view (an edited, deleted, renamed or rebui
 one comes back `STALE`). Statuses: `OK` / `BLOCKER` / `EXISTS` / `DIFFERS` /
 `GONE` / `STALE` / `MANUAL`.
 
-It also **gates on embedded references**. Explorers, narrative charts, data
-insights, static viz and article chart blocks render the chart's own config, so
+It also **gates on embedded references**. Explorers, data insights, static viz
+and article chart blocks render the chart's own config, so
 unpublishing the source breaks them with no error anywhere — the one failure mode
 the CLI itself cannot detect. Preflight counts them (current *and* old slugs, for
 proposed *and* `already_done` charts) and exits non-zero while any remain. Migrate

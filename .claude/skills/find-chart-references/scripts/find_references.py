@@ -9,8 +9,10 @@ how the surface holds the object, which is what decides whether a fix is needed:
   render  the surface resolves the object and draws it (a chart on an indicator, an
           MDIM view, an explorer view). Changing the object changes what readers see.
   embed   the surface embeds it by id/slug and renders its config directly (article
-          chart blocks, narrative charts, data insights, static viz, explorers).
-          A URL redirect does NOT fix these.
+          chart blocks, data insights, static viz, explorers). A URL redirect does
+          NOT fix these. A narrative chart counts only when its parent is an MDIM
+          view — one parented to a chart carries a copy of the config and so is a
+          `link`.
   link    a hyperlink. A redirect covers it; the href is still worth updating.
 
 Subjects (at least one; they can be combined):
@@ -212,8 +214,13 @@ def sweep_explorer_charts(by_slug: dict[str, dict]) -> list[dict]:
 def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
     """Narrative charts whose parent is one of these charts.
 
-    The narrative chart keeps rendering (its config is fetched by UUID), but its
-    "Explore the data" link is built from the parent's slug.
+    Classified as `link`, not `embed`: a narrative chart owns a materialized full config
+    of its own (written at creation) and renders from that, so unpublishing the parent
+    does not touch what readers see. The parent is joined in only to build the "Explore
+    the data" href from its slug, which a redirect covers.
+
+    The href carries `queryParamsForParentChart`, so it is still worth checking — those
+    params ride along to the target and can collide with an MDIM view's dimensions.
     """
     ids = tuple({v["id"] for v in by_slug.values()})
     df = OWID_ENV.read_sql(
@@ -231,10 +238,10 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
                 r["slug"],
                 int(r["chart_id"]),
                 "narrative chart",
-                EMBED,
+                LINK,
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
-                '"Explore the data" link is built from the parent chart slug',
+                'renders its own config; only its "Explore the data" link uses the parent slug',
                 "&".join(f"{k}={v}" for k, v in sorted(params.items())),
             )  # fmt: skip
         )

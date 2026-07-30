@@ -30,6 +30,7 @@ import csv
 import json
 from collections import defaultdict
 from pathlib import Path
+from urllib.parse import parse_qsl
 
 from etl.config import OWID_ENV
 
@@ -245,12 +246,31 @@ def existing_mdim_redirects(sources: tuple[str, ...]) -> dict[str, dict]:
     return {r["source"]: r for r in df.to_dict("records")}
 
 
+def cli_target_path(entry: dict) -> str:
+    """`/grapher/<mdim-slug>?<key-sorted dims>` — mirrors extract_and_match.py's CSV writer."""
+    t = entry["target"]
+    return f"/grapher/{t['mdimSlug']}" + (f"?{t['queryStr']}" if t.get("queryStr") else "")
+
+
+def normalized_target(target: str) -> tuple[str, tuple]:
+    """Path + key-sorted params, so a merely reordered query string isn't reported as drift."""
+    path, _, query = target.partition("?")
+    return path.rstrip("/"), tuple(sorted(parse_qsl(query, keep_blank_values=True)))
+
+
 def validate_cli_csv(path: Path, redirects: list[dict]) -> list[str]:
-    """Re-parse the CSV under the CLI's own rules and check it matches the vetted set."""
+    """Re-parse the CSV under the CLI's own rules and check it matches the vetted set.
+
+    Both halves of every row are checked. The CSV is meant to be hand-editable (flagged
+    rows get removed from it), and a leftover file from an earlier extraction can carry
+    the same sources with different targets — which would otherwise pass as vetted and let
+    the CLI apply a target nobody reviewed.
+    """
     problems = []
     if not path.exists():
         return [f"{path} is missing — re-run extract_and_match.py"]
     seen: list[str] = []
+    targets: dict[str, str] = {}
     for i, line in enumerate(path.read_text().split("\n")):
         if not line.strip():
             continue
@@ -270,12 +290,20 @@ def validate_cli_csv(path: Path, redirects: list[dict]) -> list[str]:
         if not target.startswith("/grapher/"):
             problems.append(f"line {i + 1}: target must be a /grapher/ path")
         seen.append(source)
-    dropped = {r["source"] for r in redirects} - set(seen)
-    extra = set(seen) - {r["source"] for r in redirects}
+        targets[source] = target
+    expected = {r["source"]: cli_target_path(r) for r in redirects}
+    dropped = set(expected) - set(seen)
+    extra = set(seen) - set(expected)
     if dropped:
         problems.append(f"in mapping.json but not in the CSV: {sorted(dropped)}")
     if extra:
         problems.append(f"in the CSV but not vetted here: {sorted(extra)} — re-run extract_and_match.py")
+    for source in sorted(set(seen) & set(expected)):
+        if normalized_target(targets[source]) != normalized_target(expected[source]):
+            problems.append(
+                f"{source}: the CSV points at {targets[source]!r} but the reviewed mapping says "
+                f"{expected[source]!r} — the CLI would apply an unreviewed target; re-run extract_and_match.py"
+            )
     return problems
 
 
@@ -321,14 +349,6 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
             params={"ids": ids},
         ),
     )
-    add_by_id(
-        "narrativeCharts",
-        OWID_ENV.read_sql(
-            "SELECT parentChartId AS chart_id, COUNT(*) AS n FROM narrative_charts "
-            "WHERE parentChartId IN %(ids)s GROUP BY parentChartId",
-            params={"ids": ids},
-        ),
-    )
     add_by_slug(
         "staticViz",
         OWID_ENV.read_sql(
@@ -366,6 +386,26 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
     )
 
     return {cid: ", ".join(f"{k} ({n})" for k, n in sorted(v.items())) for cid, v in counts.items() if v}
+
+
+def narrative_chart_links(redirects: list[dict]) -> dict[int, int]:
+    """Narrative charts parented to these charts. Reported, NOT gated.
+
+    A narrative chart renders from its own materialized config, so unpublishing the parent
+    leaves it intact; only its "Explore the data" href is built from the parent slug, and
+    the redirect covers that. Worth surfacing anyway, because that href carries
+    `queryParamsForParentChart` — params that ride along to the MDIM view and can collide
+    with its dimensions (audit_references.py flags the collisions).
+    """
+    ids = tuple(r["chart"]["id"] for r in redirects)
+    if not ids:
+        return {}
+    df = OWID_ENV.read_sql(
+        "SELECT parentChartId AS chart_id, COUNT(*) AS n FROM narrative_charts "
+        "WHERE parentChartId IN %(ids)s GROUP BY parentChartId",
+        params={"ids": ids},
+    )
+    return {int(r["chart_id"]): int(r["n"]) for r in df.to_dict("records")}
 
 
 def main() -> int:
@@ -482,6 +522,15 @@ def main() -> int:
             if note:
                 print(f"  {r['chart']['slug']}: {note}")
         print("  Run audit_references.py for the full list with replacement URLs.")
+
+    narratives = {} if args.no_references else narrative_chart_links(redirects + already_done)
+    if narratives:
+        print("\nNarrative charts on these source charts (NOT a blocker — they render their own config;")
+        print('only their "Explore the data" link follows the redirect, so check its query params):')
+        for r in redirects + already_done:
+            n = narratives.get(r["chart"]["id"])
+            if n:
+                print(f"  {r['chart']['slug']}: {n} narrative chart(s)")
 
     bad = [r for r in rows if r[2] not in ("OK", "MANUAL")]
     manual = [r for r in rows if r[2] == "MANUAL"]
