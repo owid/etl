@@ -45,12 +45,12 @@ Keep `selectedEntityColors` in step with every edit: on a **rename**, move the e
 **Getting most of the surface list.** `find-chart-references` (`--dataset-id`, plus
 `--transitive` for the article hop) returns each reference with its `query_string`
 (where `country=` pins live) and an `embed`/`render`/`link` classification. Use it
-instead of re-deriving the joins for **§1's chart list, §3's MDim views and narrative
-charts, and §4's `linkType IN ('grapher', 'guided-chart')` article rows** — it also
-expands chart slugs through `chart_slug_redirects`, which §4 requires.
+instead of re-deriving the joins for **§1's chart list, §3's MDim views and
+chart-parented narrative charts, and the §4 article rows that target a chart** — it
+also expands chart slugs through `chart_slug_redirects`, which §4 requires.
 
-Two joins below it does *not* replace — keep running them here until it enumerates
-those rows individually:
+What it does *not* replace — keep running these here until it enumerates the rows
+itself:
 
 - **§3 explorer views.** The sweep reports explorers aggregated per explorer
   (`explorer_variables`, one row carrying a view *count*), never one row per view, so
@@ -59,6 +59,11 @@ those rows individually:
 - **§4 raw-URL article links.** `linkType='url'` rows are swept for *chart* subjects
   only; the `--transitive` hop from a dataset/indicator subject does not run that
   scan. Keep it here.
+- **§3/§4 surfaces hanging off an MDim.** The `--transitive` hop is built from the
+  charts found, so gdoc `country=` links whose target is an **MDim slug**, and
+  narrative charts parented to an MDim view (`parentMultiDimXChartConfigId`, not
+  `parentChartId`), are outside it. Feed the MDim slugs the first sweep returned
+  back in as `--mdim <slug>` for a second pass — or keep the local joins.
 
 What stays here regardless is the part the sweep can't do at all: reading each
 surface's entity selection, checking it against entities-with-data, and grading the

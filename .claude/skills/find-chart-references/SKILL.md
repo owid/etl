@@ -118,10 +118,14 @@ State these when reporting; silence reads as full coverage.
 - Explorer hits on an indicator subject are **aggregated per explorer** (a view
   count, not a row per view) — a caller that needs each view's config still has to
   join `explorer_views` itself.
-- The `--transitive` hop covers articles (`grapher`/`guided-chart`), data insights
-  and narrative charts, but not `linkType='url'` article rows, static viz or
-  key-chart slots — those are swept for chart subjects only, so pass
-  `--chart-slugs` when you need them.
+- The `--transitive` hop is built from the **charts** an indicator subject resolved
+  to, so it covers their articles (`grapher`/`guided-chart`), data insights and
+  narrative charts — and nothing else. `linkType='url'` article rows, static viz and
+  key-chart slots are swept for chart subjects only; article links targeting an
+  **MDim or explorer**, and narrative charts parented to an MDim view, only appear
+  when that MDim/explorer is passed as its own subject. To close the loop, take the
+  MDim and explorer slugs the first run returned and re-run with `--mdim` /
+  `--explorer`.
 - Data insights are matched on `grapher-url`; one storing the reference elsewhere
   is missed.
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside

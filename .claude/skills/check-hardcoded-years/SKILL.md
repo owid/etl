@@ -63,13 +63,26 @@ Three exclusions keep that check from crying wolf; without them a WDI-scale swee
 **Getting most of the surface list.** `find-chart-references` (`--dataset-id` or
 `--variable-ids`, plus `--transitive` for the article hop) returns each reference
 with its `query_string` and an `embed`/`render`/`link` classification — use it
-instead of re-deriving the joins for the charts, MDim views, narrative charts and
-article rows below. One row in the table it does **not** replace: it reports
-explorers aggregated per explorer, not per view, so keep the `explorer_views` →
-`chart_configs` join to reach the configs whose pins this skill grades. What stays
-in this skill is everything downstream of the list: reading each surface's config,
-finding the pins, and grading them against the data's latest time. The table also
-remains authoritative for **where the fix goes**, which the sweep doesn't know.
+instead of re-deriving the joins for the charts, MDim views and chart-parented
+narrative charts below, and for the article rows that target a **chart**. Two
+things it does not give you on its own:
+
+- **Explorer view configs.** It reports explorers aggregated per explorer, not per
+  view, so keep the `explorer_views` → `chart_configs` join to reach the configs
+  whose pins this skill grades.
+- **Article `time=` pins on MDims and explorers, and MDim-parented narrative
+  charts.** The `--transitive` hop is built from the *charts* found, so it reaches
+  neither. The row below covers links to charts, MDims and explorers alike — to
+  keep that scope, take the MDim and explorer slugs the first sweep returned and
+  run a second pass with `--mdim <slug>` / `--explorer <slug>`, which sweeps their
+  article links and (for MDims) narrative charts pinned to a view. Skip the second
+  pass and those pins escape the audit — report them as unverified rather than
+  clean.
+
+What stays in this skill is everything downstream of the list: reading each
+surface's config, finding the pins, and grading them against the data's latest
+time. The table also remains authoritative for **where the fix goes**, which the
+sweep doesn't know.
 
 | Surface | Where the pins are | Where the fix goes |
 |---|---|---|
