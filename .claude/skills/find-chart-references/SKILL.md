@@ -100,8 +100,8 @@ interpret them — each caller keeps the analysis only it can do:
 
 | Skill | Uses the sweep for | Keeps |
 |---|---|---|
-| `check-hardcoded-years` | the surface list for a dataset/indicator, plus each reference's `query_string` (article `time=` pins) | reading configs for `minTime`/`maxTime`/`map.time`, grading pins against the data's latest time, the where-the-fix-goes table |
-| `check-empty-entities` | the same list, plus `query_string` (`country=` pins) and old-slug expansion | entity-selection vs entities-with-data checks, grading findings against production |
+| `check-hardcoded-years` | the surface list for a dataset/indicator, plus each reference's `query_string` (article `time=` pins) | reading configs for `minTime`/`maxTime`/`map.time`, grading pins against the data's latest time, the where-the-fix-goes table — and its own per-view `explorer_views` join, which this aggregation can't supply |
+| `check-empty-entities` | the same list, plus `query_string` (`country=` pins) and old-slug expansion | entity-selection vs entities-with-data checks, grading findings against production — plus the same per-view `explorer_views` join and its own `linkType='url'` article scan, neither of which a dataset-subject sweep reaches |
 | `update-dataset` (step 7) | one sweep shared by both audits above | the update workflow around them |
 | `review-data-pr` (§8d) | a cheap "which surfaces carry this dataset" check | judging whether the author's audit was complete |
 | `map-charts-to-mdim` | the sweep for the charts being redirected | replacement URLs, redirect severity, param-collision detection |
@@ -115,6 +115,13 @@ that's the point of the split.
 State these when reporting; silence reads as full coverage.
 
 - Non-ETL explorers whose config lives in the `explorers` TSV are not parsed.
+- Explorer hits on an indicator subject are **aggregated per explorer** (a view
+  count, not a row per view) — a caller that needs each view's config still has to
+  join `explorer_views` itself.
+- The `--transitive` hop covers articles (`grapher`/`guided-chart`), data insights
+  and narrative charts, but not `linkType='url'` article rows, static viz or
+  key-chart slots — those are swept for chart subjects only, so pass
+  `--chart-slugs` when you need them.
 - Data insights are matched on `grapher-url`; one storing the reference elsewhere
   is missed.
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside

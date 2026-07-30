@@ -60,14 +60,16 @@ Three exclusions keep that check from crying wolf; without them a WDI-scale swee
 
 ## Surfaces and where the fix lives
 
-**Getting the surface list.** `find-chart-references` sweeps every surface below
-from a dataset, indicator, chart, MDim or explorer subject, and returns each
-reference with its `query_string` and an `embed`/`render`/`link` classification —
-use it (`--dataset-id` or `--variable-ids`, plus `--transitive` for the article
-hop) rather than re-deriving the joins here. What stays in this skill is everything
-downstream of that list: reading each surface's config, finding the pins, and
-grading them against the data's latest time. The table remains authoritative for
-**where the fix goes**, which the sweep doesn't know.
+**Getting most of the surface list.** `find-chart-references` (`--dataset-id` or
+`--variable-ids`, plus `--transitive` for the article hop) returns each reference
+with its `query_string` and an `embed`/`render`/`link` classification — use it
+instead of re-deriving the joins for the charts, MDim views, narrative charts and
+article rows below. One row in the table it does **not** replace: it reports
+explorers aggregated per explorer, not per view, so keep the `explorer_views` →
+`chart_configs` join to reach the configs whose pins this skill grades. What stays
+in this skill is everything downstream of the list: reading each surface's config,
+finding the pins, and grading them against the data's latest time. The table also
+remains authoritative for **where the fix goes**, which the sweep doesn't know.
 
 | Surface | Where the pins are | Where the fix goes |
 |---|---|---|

@@ -42,14 +42,27 @@ Reading the whole selection is what catches the two failure modes similarity can
 
 Keep `selectedEntityColors` in step with every edit: on a **rename**, move the entry from the old name to the replacement (deleting it discards a deliberately assigned color — a visual regression); on a **drop**, delete the entry. Either way, don't leave a dangling color key. And check the excluded-countries file before proposing anything: an entity in `<short_name>.excluded_countries.json` (`IDA only`, `Arab World`, `Heavily-indebted poor countries`) can never have data, so a drop is the only option.
 
-**Getting the surface list.** `find-chart-references` sweeps every surface in §1–§4
-from a dataset or indicator subject and returns each reference with its
-`query_string` (where `country=` pins live) and an `embed`/`render`/`link`
-classification — use it (`--dataset-id`, plus `--transitive` for the article hop)
-rather than re-deriving the joins. It also expands chart subjects through
-`chart_slug_redirects`, which §4 requires. What stays here is the part it can't do:
-reading each surface's entity selection, checking it against entities-with-data, and
-grading the result against production.
+**Getting most of the surface list.** `find-chart-references` (`--dataset-id`, plus
+`--transitive` for the article hop) returns each reference with its `query_string`
+(where `country=` pins live) and an `embed`/`render`/`link` classification. Use it
+instead of re-deriving the joins for **§1's chart list, §3's MDim views and narrative
+charts, and §4's `linkType IN ('grapher', 'guided-chart')` article rows** — it also
+expands chart slugs through `chart_slug_redirects`, which §4 requires.
+
+Two joins below it does *not* replace — keep running them here until it enumerates
+those rows individually:
+
+- **§3 explorer views.** The sweep reports explorers aggregated per explorer
+  (`explorer_variables`, one row carrying a view *count*), never one row per view, so
+  it cannot hand you the per-view configs this check reads. Keep the `explorer_views`
+  → `chart_configs` join — and the legacy CSV-explorer caveat, which neither covers.
+- **§4 raw-URL article links.** `linkType='url'` rows are swept for *chart* subjects
+  only; the `--transitive` hop from a dataset/indicator subject does not run that
+  scan. Keep it here.
+
+What stays here regardless is the part the sweep can't do at all: reading each
+surface's entity selection, checking it against entities-with-data, and grading the
+result against production.
 
 ### 1. Charts
 
