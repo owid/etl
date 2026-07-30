@@ -95,6 +95,11 @@ class ValueDiff:
     # for numeric "changed" diffs.
     appeared_count: int = 0
     disappeared_count: int = 0
+    # Rows that changed but hold no comparable number on either side — a sentinel whose text was
+    # edited, say. Neither revisions nor coverage events, so they are tallied on their own rather
+    # than left to be inferred from `count` minus the other two, which would report them as
+    # revisions in the HTML breakdown.
+    not_scored_count: int = 0
 
     @property
     def pct(self) -> float:
@@ -653,13 +658,15 @@ def _render_value_diff(v: ValueDiff, sample_cap: int = SAMPLE_LIMIT) -> str:
         )
         head_note = f' <span class="head-note">— showing {what}{capped}</span>'
     breakdown = ""
-    if v.kind == "changed" and (v.appeared_count or v.disappeared_count):
-        revised = v.count - v.appeared_count - v.disappeared_count
-        bits = [f"{revised:,} revised"]
+    if v.kind == "changed" and (v.appeared_count or v.disappeared_count or v.not_scored_count):
+        revised = v.count - v.appeared_count - v.disappeared_count - v.not_scored_count
+        bits = [f"{revised:,} revised"] if revised else []
         if v.appeared_count:
             bits.append(f"{v.appeared_count:,} appeared")
         if v.disappeared_count:
             bits.append(f"{v.disappeared_count:,} disappeared")
+        if v.not_scored_count:
+            bits.append(f"{v.not_scored_count:,} not scored")
         breakdown = f' <span class="head-note">({", ".join(bits)})</span>'
     head = (
         f'<div class="vd-head {v.kind}">{_e(v.symbol)} {label}: '

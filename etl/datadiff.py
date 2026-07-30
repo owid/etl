@@ -7,7 +7,7 @@ import urllib.error
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, NamedTuple, cast
 
 import numpy as np
 import pandas as pd
@@ -926,14 +926,39 @@ def _finite(s: pd.Series) -> pd.Series:
     return s.where(np.isfinite(s))
 
 
+def _has_numeric_content(s: pd.Series) -> bool:
+    """Whether ``s`` holds any value that can be compared as a number."""
+    coerced = _as_comparable_floats(s)
+    return coerced is not None and bool(coerced.notna().any())
+
+
+class ChangedRecords(NamedTuple):
+    """Sampled rows of a changed-values diff, plus how the rows behind them broke down."""
+
+    records: list[dict[str, str]]
+    sorted_by_score: bool
+    median_bard: float | None
+    appeared_count: int
+    disappeared_count: int
+    not_scored_count: int
+
+
 def _changed_records(
-    both: pd.DataFrame, col: str, limit: int = SAMPLE_LIMIT, is_code_column: bool = False
-) -> tuple[list[dict[str, str]], bool, float | None, int, int]:
+    both: pd.DataFrame,
+    col: str,
+    limit: int = SAMPLE_LIMIT,
+    is_code_column: bool = False,
+    is_numeric_column: bool = False,
+) -> ChangedRecords:
     """Sample records for a changed-values diff.
 
     `both` holds only the rows that changed, which is all the scoring needs but not always enough
-    to classify the column: pass `is_code_column` when the *full* column shows it holds identifiers
-    (see `_is_code_column`), since its padded values may all sit on rows that didn't change.
+    to classify the column, since the evidence may sit entirely on rows that didn't change. Two
+    verdicts are therefore taken from the *full* columns and passed in: `is_code_column` when they
+    hold identifiers (see `_is_code_column`), whose padded values may all be unchanged, and
+    `is_numeric_column` when they hold numbers, which a sentinel-only edit leaves out of `both`
+    altogether — without it, editing the one sentinel in a numeric column would call the whole
+    column categorical and rank it maximal.
 
     A value appearing or disappearing (NaN on one side) is a *coverage* event, not a value
     *revision* — e.g. the newest year in a new dataset version, or a slow-cadence indicator whose
@@ -964,18 +989,23 @@ def _changed_records(
     old_col, new_col = f"{col} -", f"{col} +"
     old, new = _as_comparable_floats(both[old_col]), _as_comparable_floats(both[new_col])
     # Being a numeric quantity is a property of the column, so decide it across both sides at
-    # once: numeric content on *either* side is enough. `both` holds only the rows that changed,
-    # so one side can legitimately be all sentinels — a version that drops the sentinel convention
-    # changes exactly those rows, and old is then entirely non-numeric. Judging that side alone
-    # would call the indicator categorical and hand it maximal severity, the very failure this
-    # coercion exists to remove; judged jointly, it reads as the coverage event it is.
-    if is_code_column or old is None or new is None or not (old.notna().any() or new.notna().any()):
-        return _df_to_records(both, limit=limit), False, None, 0, 0
+    # once, and accept the full-column verdict over the changed rows. A version that drops the
+    # sentinel convention changes exactly the sentinel rows, leaving one side of `both` entirely
+    # non-numeric; an edit to the sentinel itself leaves both sides so. Judging those on `both`
+    # alone would call the indicator categorical and hand it maximal severity, the very failure
+    # this coercion exists to remove.
+    if is_code_column or old is None or new is None:
+        return ChangedRecords(_df_to_records(both, limit=limit), False, None, 0, 0, 0)
+    if not (is_numeric_column or old.notna().any() or new.notna().any()):
+        return ChangedRecords(_df_to_records(both, limit=limit), False, None, 0, 0, 0)
     old_isna = old.isna().to_numpy()
     new_isna = new.isna().to_numpy()
     appeared = old_isna & ~new_isna
     disappeared = ~old_isna & new_isna
     revised = ~old_isna & ~new_isna
+    # Non-numeric on both sides: neither a revision nor a coverage event, but still a changed row,
+    # so it is counted here rather than left to be inferred away from the other two tallies.
+    not_scored = old_isna & new_isna
 
     score = np.full(len(both), np.nan)
     score[revised] = bard(old.to_numpy()[revised], new.to_numpy()[revised])
@@ -998,7 +1028,14 @@ def _changed_records(
         return "not scored"
 
     top["anomaly score"] = [_label(i) for i in order]
-    return _df_to_records(top, limit=limit), True, median_bard, int(appeared.sum()), int(disappeared.sum())
+    return ChangedRecords(
+        _df_to_records(top, limit=limit),
+        True,
+        median_bard,
+        int(appeared.sum()),
+        int(disappeared.sum()),
+        int(not_scored.sum()),
+    )
 
 
 def _data_diff(
@@ -1063,22 +1100,25 @@ def _data_diff(
             both = samp_a.join(samp_b, lsuffix=" -", rsuffix=" +")
         lines += _df_to_str(both)
 
-        # Classified on the full columns, not on `both`: a code column's padded values may all sit
-        # on rows that didn't change, leaving the changed-rows frame with no sign that it is coded.
-        is_code_column = _is_code_column(table_a[col]) or _is_code_column(table_b[col])
-        records, sorted_by_score, median_bard, appeared_count, disappeared_count = _changed_records(
-            both, col, is_code_column=is_code_column
+        # Classified on the full columns, not on `both`: the rows that prove a column is coded, or
+        # that it is numeric at all, may all be rows that didn't change.
+        changed = _changed_records(
+            both,
+            col,
+            is_code_column=_is_code_column(table_a[col]) or _is_code_column(table_b[col]),
+            is_numeric_column=_has_numeric_content(table_a[col]) or _has_numeric_content(table_b[col]),
         )
         value_diffs.append(
             ValueDiff(
                 kind="changed",
                 count=int(neq.sum()),
                 total=int(n),
-                sample=records,
-                sorted_by_score=sorted_by_score,
-                median_bard=median_bard,
-                appeared_count=appeared_count,
-                disappeared_count=disappeared_count,
+                sample=changed.records,
+                sorted_by_score=changed.sorted_by_score,
+                median_bard=changed.median_bard,
+                appeared_count=changed.appeared_count,
+                disappeared_count=changed.disappeared_count,
+                not_scored_count=changed.not_scored_count,
             )
         )
 
