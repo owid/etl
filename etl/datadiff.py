@@ -865,7 +865,7 @@ def _df_to_records(df: pd.DataFrame, limit: int = SAMPLE_LIMIT) -> list[dict[str
 
 
 def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
-    """``s`` as float64 for BARD scoring, or None if it isn't a numeric quantity.
+    """``s`` as float64 for BARD scoring, or None if its dtype can't carry a number at all.
 
     A numeric indicator can carry a non-numeric **sentinel** in some rows — e.g.
     `imf/trade`'s `china_imports_share_of_gdp` stores the literal string "China" on China's own
@@ -876,16 +876,14 @@ def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
 
     So coerce instead: sentinels become NaN (they're then treated as coverage events rather than
     revisions, which is what a value-to-sentinel flip is), and the genuinely numeric rows get
-    scored normally. Columns that are actually categorical — where coercion leaves nothing
-    numeric to compare — still return None and keep the unscoreable path.
+    scored normally. Whether anything numeric actually survived the coercion is up to the caller,
+    which weighs both sides of the diff together — see `_changed_records`. Dtypes that can't hold
+    a number at all (datetimes, for one) return None and keep the unscoreable path.
     """
     if pd.api.types.is_numeric_dtype(s):
         return s.astype("float64")
     if isinstance(s.dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
-        coerced = pd.to_numeric(s.astype("object"), errors="coerce")
-        # Genuinely categorical when coercion salvages nothing.
-        if coerced.notna().any():
-            return coerced.astype("float64")
+        return pd.to_numeric(s.astype("object"), errors="coerce").astype("float64")
     return None
 
 
@@ -922,7 +920,13 @@ def _changed_records(
     """
     old_col, new_col = f"{col} -", f"{col} +"
     old, new = _as_comparable_floats(both[old_col]), _as_comparable_floats(both[new_col])
-    if old is None or new is None:
+    # Being a numeric quantity is a property of the column, so decide it across both sides at
+    # once: numeric content on *either* side is enough. `both` holds only the rows that changed,
+    # so one side can legitimately be all sentinels — a version that drops the sentinel convention
+    # changes exactly those rows, and old is then entirely non-numeric. Judging that side alone
+    # would call the indicator categorical and hand it maximal severity, the very failure this
+    # coercion exists to remove; judged jointly, it reads as the coverage event it is.
+    if old is None or new is None or not (old.notna().any() or new.notna().any()):
         return _df_to_records(both, limit=limit), False, None, 0, 0
     old_isna = old.isna().to_numpy()
     new_isna = new.isna().to_numpy()

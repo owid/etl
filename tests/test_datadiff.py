@@ -882,6 +882,55 @@ def test_sentinel_to_sentinel_row_is_not_counted_as_coverage():
     assert labels == ["0.65%", "disappeared", "not scored", "not scored"], labels
 
 
+def test_column_scored_when_only_one_side_is_numeric():
+    """Numeric content on either side is enough — a whole side can legitimately be sentinels.
+
+    `both` holds only the rows that changed, so a version that drops (or introduces) a sentinel
+    convention changes exactly the sentinel rows: one side is then entirely non-numeric. Judging
+    that side on its own would call the indicator categorical and give it maximal severity — the
+    failure the coercion exists to remove. It is a pure coverage event and scores as one.
+    """
+    dropped_sentinel = pd.DataFrame(
+        {
+            "year": [2000, 2001, 2002],
+            "a -": pd.Categorical(["China", "China", "China"]),
+            "a +": pd.Categorical(["0.7529", "0.8127", "2.4390"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared = _changed_records(dropped_sentinel, "a")
+    assert sorted_by_score
+    assert median_bard == 0.0, "no revisions to score, but that is a measured zero, not the 1.0 fallback"
+    assert (appeared, disappeared) == (3, 0)
+    assert all(r["anomaly score"] == "appeared" for r in records)
+
+    # And the mirror image: numbers replaced by a sentinel is a coverage loss.
+    added_sentinel = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["1.5000", "2.5000"]),
+            "a +": pd.Categorical(["China", "China"]),
+        }
+    )
+    _, sorted_by_score, median_bard, appeared, disappeared = _changed_records(added_sentinel, "a")
+    assert sorted_by_score and median_bard == 0.0
+    assert (appeared, disappeared) == (0, 2)
+
+
+def test_non_numeric_dtypes_stay_unscored():
+    """A dtype that can't hold a number at all keeps the unscoreable path."""
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.to_datetime(["2000-01-01", "2001-01-01"]),
+            "a +": pd.to_datetime(["2000-02-01", "2001-02-01"]),
+        }
+    )
+    _, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+
+
 def test_coverage_only_numeric_column_is_still_scored():
     """A numeric column with only removed rows has a measured severity, so it is not "not scored".
 
