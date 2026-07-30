@@ -133,7 +133,9 @@ explorer views (`explorer_variables` narrows to the explorers involved, then eac
 one's `explorer_views` → `chart_configs` says which of its views actually render the
 indicator). Explorer views are emitted **one row per view**, so a dataset powering a
 large explorer yields hundreds of rows — that is the price of every row carrying a
-`config_id`.
+`config_id`. Under `--transitive`, also the narrative charts parented to any chart
+**or MDIM view** that renders the indicators (`parentMultiDimXChartConfigId`): a
+narrative chart holds its own config, so skipping that hop leaves it unaudited.
 
 **MDIM subjects**: article links/embeds, narrative charts pinned to a view
 (`parentMultiDimXChartConfigId`), and inbound `multi_dim_redirects`.

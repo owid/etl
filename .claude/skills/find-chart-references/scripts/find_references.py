@@ -530,6 +530,49 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     return out
 
 
+def sweep_narrative_charts_of_mdim_views(mdim_rows: list[dict]) -> list[dict]:
+    """Narrative charts whose parent is one of these MDIM views.
+
+    A narrative chart can hang off an MDIM view as well as off a chart, and it carries
+    its own config — so a sweep that only walks charts leaves that config unaudited.
+    Both branches of the MDIM sweep record the view's `chart_configs` id, which is
+    `multi_dim_x_chart_configs.chartConfigId`, so that is the join back.
+    """
+    by_config = {r["config_id"]: r for r in mdim_rows if r["config_id"]}
+    if not by_config:
+        return []
+    df = OWID_ENV.read_sql(
+        "SELECT nc.id, nc.name, nc.chartConfigId, mx.chartConfigId AS view_config_id, "
+        "       mx.viewId, md.slug, md.published "
+        "FROM narrative_charts nc JOIN multi_dim_x_chart_configs mx ON mx.id = nc.parentMultiDimXChartConfigId "
+        "JOIN multi_dim_data_pages md ON md.id = mx.multiDimId "
+        "WHERE mx.chartConfigId IN %(c)s ORDER BY nc.name",
+        params={"c": tuple(by_config)},
+    )
+    out = []
+    for r in df.to_dict("records"):
+        parent = by_config.get(r["view_config_id"], {})
+        out.append(
+            rec(
+                "indicator",
+                parent.get("subject", ""),
+                parent.get("subject_id"),
+                "narrative chart",
+                EMBED,
+                r["name"],
+                f"/admin/narrative-charts/{r['id']}/edit",
+                surface_id=int(r["id"]),
+                # NOTE: as for chart-parented narrative charts, read the merged config via
+                # AdminAPI.get_narrative_chart(id)["configFull"] — the stored row lags a
+                # parent edit until the child is re-saved.
+                config_id=r["chartConfigId"],
+                context=f"pinned to MDIM view {r['slug']}:{r['viewId']}",
+                published=r["published"],
+            )  # fmt: skip
+        )
+    return out
+
+
 def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     """Explorer views rendering these indicators — one row per view, with its config id.
 
@@ -659,7 +702,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
         )
 
     nc = OWID_ENV.read_sql(
-        "SELECT nc.id, nc.name, mx.viewId FROM narrative_charts nc "
+        "SELECT nc.id, nc.name, nc.chartConfigId, mx.viewId FROM narrative_charts nc "
         "JOIN multi_dim_x_chart_configs mx ON mx.id = nc.parentMultiDimXChartConfigId "
         "WHERE mx.multiDimId = %(id)s",
         params={"id": mdim_id},
@@ -675,6 +718,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
                 surface_id=int(r["id"]),
+                config_id=r["chartConfigId"],
                 context=f"pinned to view {r['viewId']} — blocks re-publish if that view disappears",
             )  # fmt: skip
         )
@@ -809,6 +853,12 @@ def add_preview_urls(findings: list[dict], host: str) -> None:
             f["preview_url"] = f"{host}/explorers/{f['where']}"
         elif f["subject_type"] == "chart":
             f["preview_url"] = f"{host}/grapher/{f['subject']}{qs}"
+        elif f["subject_type"] == "mdim":
+            # A direct --mdim sweep: the reference points at the MDIM page itself, and
+            # the reference's own params say which of its views the reader lands on.
+            f["preview_url"] = f"{host}/grapher/{f['subject']}{qs}"
+        elif f["subject_type"] == "explorer":
+            f["preview_url"] = f"{host}/explorers/{f['subject']}{qs}"
         elif f["surface"] == "chart" and f["where_path"]:
             f["preview_url"] = f"{host}{f['where_path']}{qs}"
 
@@ -987,8 +1037,9 @@ def main() -> int:
     if variable_ids:
         print(f"indicator subjects: {len(variable_ids)} variable(s)")
         chart_hits = sweep_charts_of_indicators(variable_ids)
+        mdim_hits = sweep_mdim_views_of_indicators(variable_ids)
         findings += chart_hits
-        findings += sweep_mdim_views_of_indicators(variable_ids)
+        findings += mdim_hits
         findings += sweep_explorer_views_of_indicators(variable_ids)
         if args.transitive:
             hop = resolve_chart_subjects([], sorted({f["where"] for f in chart_hits}))
@@ -997,6 +1048,9 @@ def main() -> int:
                 findings += sweep_gdoc_links(hop)
                 findings += sweep_data_insights(hop)
                 findings += sweep_narrative_charts_of_charts(hop)
+            # A narrative chart can hang off an MDIM view instead of a chart, so the
+            # chart hop alone leaves those configs unaudited.
+            findings += sweep_narrative_charts_of_mdim_views(mdim_hits)
 
     for mdim in args.mdim:
         findings += sweep_mdim_subject(mdim)
