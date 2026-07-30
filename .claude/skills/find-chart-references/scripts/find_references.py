@@ -43,7 +43,7 @@ from etl.config import OWID_ENV
 RENDER, EMBED, LINK = "render", "embed", "link"
 
 COLUMNS = [
-    "subject_type", "subject", "subject_id", "surface", "kind",
+    "subject_type", "subject", "subject_label", "subject_id", "surface", "kind",
     "where", "where_path", "surface_id", "config_id", "context",
     "query_string", "text", "published",
 ]  # fmt: skip
@@ -63,6 +63,7 @@ def rec(subject_type, subject, subject_id, surface, kind, where, where_path="", 
     return {
         "subject_type": subject_type,
         "subject": subject,
+        "subject_label": str(subject),
         "subject_id": subject_id,
         "surface": surface,
         "kind": kind,
@@ -670,13 +671,37 @@ def deep_link(f: dict, host: str) -> str:
     return f"{base}#:~:text={encoded}"
 
 
+def label_indicator_subjects(findings: list[dict]) -> None:
+    """Replace bare variable ids with the indicator's name, so a reader can tell them apart."""
+    ids = {f["subject_id"] for f in findings if f["subject_type"] == "indicator" and f["subject_id"]}
+    if not ids:
+        return
+    df = OWID_ENV.read_sql("SELECT id, name FROM variables WHERE id IN %(i)s", params={"i": tuple(ids)})
+    names = {int(r["id"]): r["name"] for r in df.to_dict("records") if r["name"]}
+    for f in findings:
+        if f["subject_type"] == "indicator" and f["subject_id"] in names:
+            f["subject_label"] = f"{names[f['subject_id']]} ({f['subject_id']})"
+
+
+def cell(value: str, limit: int = 70) -> str:
+    """Table-safe cell: escape pipes and newlines, truncate runaway text."""
+    text = " ".join(str(value or "").split()).replace("|", "\\|")
+    return (text[: limit - 1] + "…") if len(text) > limit else text
+
+
 def write_markdown(findings: list[dict], path: str, host: str) -> None:
-    """Human-readable report: where each reference is, and how to open it."""
+    """Human-readable report: one table per surface, with links to open each reference."""
     by_kind: dict[str, list[dict]] = defaultdict(list)
     for f in findings:
         by_kind[f["kind"]].append(f)
 
-    lines = ["# What references these objects", ""]
+    lines = [
+        "# What references these objects",
+        "",
+        f"{len(findings)} reference(s). Grouped by how the surface holds the object, "
+        "because that decides whether a redirect or rename covers it.",
+        "",
+    ]
     for kind, blurb in [
         (EMBED, "Renders the object's own config — a redirect or rename does **not** fix these."),
         (RENDER, "Resolves and draws the object; changing it changes what readers see."),
@@ -690,22 +715,40 @@ def write_markdown(findings: list[dict], path: str, host: str) -> None:
         for f in group:
             by_surface[f["surface"]].append(f)
         for surface in sorted(by_surface):
-            lines += [f"### {surface} ({len(by_surface[surface])})", ""]
-            for f in by_surface[surface]:
-                draft = "" if f["published"] else " _(unpublished)_"
-                lines.append(f"- **{f['subject']}** in `{f['where']}`{draft} — {f['context']}")
-                if f["surface"] in GDOC_SURFACES:
-                    lines.append(f"    - 📄 Google Doc: {doc_url(f)}")
-                    if f["text"]:
-                        lines.append(f'    - 🔎 find in the doc: search for "{f["text"]}"')
-                    lines.append(f"    - 🔗 open at the reference: {deep_link(f, host)}")
-                elif f["where_path"]:
-                    lines.append(f"    - 🔗 {host}{f['where_path']}")
-                if f["query_string"]:
-                    lines.append(f"    - params: `{f['query_string']}`")
-                if f["config_id"]:
-                    lines.append(f"    - config: `{f['config_id']}`")
+            rows = by_surface[surface]
+            lines += [f"### {surface} ({len(rows)})", ""]
+            if surface in GDOC_SURFACES:
+                lines += [
+                    "| Subject | Article | Component | Open | Find in the doc | Params |",
+                    "|---|---|---|---|---|---|",
+                ]
+                for f in rows:
+                    draft = "" if f["published"] else " ⚠️draft"
+                    links = f"[📄 doc]({doc_url(f)}) · [🔗 page]({deep_link(f, host)})"
+                    find = f'"{cell(f["text"], 60)}"' if f["text"] else "—"
+                    lines.append(
+                        f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 44)}{draft} | "
+                        f"{cell(f['context'], 30)} | {links} | {find} | "
+                        f"{'`' + cell(f['query_string'], 40) + '`' if f['query_string'] else '—'} |"
+                    )
+            else:
+                lines += ["| Subject | Where | Open | Context | Params |", "|---|---|---|---|---|"]
+                for f in rows:
+                    draft = "" if f["published"] else " ⚠️draft"
+                    link = f"[🔗 open]({host}{f['where_path']})" if f["where_path"] else "—"
+                    lines.append(
+                        f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 72)}{draft} | {link} | "
+                        f"{cell(f['context'], 44)} | "
+                        f"{'`' + cell(f['query_string'], 40) + '`' if f['query_string'] else '—'} |"
+                    )
             lines.append("")
+    lines += [
+        "---",
+        "",
+        "📄 opens the Google Doc to edit · 🔗 opens the published page scrolled to the reference · "
+        '"Find in the doc" is the link text to search for once the doc is open.',
+        "",
+    ]
     Path(path).write_text("\n".join(lines))
 
 
@@ -771,6 +814,8 @@ def main() -> int:
         findings += sweep_mdim_subject(mdim)
     for explorer in args.explorer:
         findings += sweep_explorer_subject(explorer)
+
+    label_indicator_subjects(findings)
 
     order = {EMBED: 0, RENDER: 1, LINK: 2}
     # Coerce every sort key to str: any surface field can be NULL in the DB, and a

@@ -78,8 +78,9 @@ so `https://docs.google.com/document/d/<surface_id>/edit` opens the source docum
 
 ### `--markdown` — the report to hand a human
 
-`--markdown ai/refs.md` renders the findings grouped by `kind`, and for every article
-reference gives three ways to reach it:
+`--markdown ai/refs.md` renders **one table per surface**, grouped by `kind`, so a
+long list stays scannable. For every article reference the table gives three ways to
+reach it:
 
 - 📄 the **Google Doc** to edit,
 - 🔎 the **anchor text** to search for inside that doc,
@@ -88,6 +89,10 @@ reference gives three ways to reach it:
   opens the page scrolled to and highlighting the exact sentence.
 
 Block embeds have no anchor text, so those fall back to the plain article URL.
+
+Indicator subjects are labelled with the indicator's name (not a bare variable id),
+cells are truncated and pipe-escaped so the tables can't break, and drafts are marked
+⚠️. For spreadsheet work use `--csv`, which carries the untruncated values.
 
 ## Surface catalog
 
