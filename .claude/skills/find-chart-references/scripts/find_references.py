@@ -718,6 +718,16 @@ def label_indicator_subjects(findings: list[dict]) -> None:
             f["subject_label"] = f"{names[f['subject_id']]} ({f['subject_id']})"
 
 
+def is_all_charts(f: dict) -> bool:
+    """An entry in a topic page's auto-generated 'All charts' index.
+
+    Not authored in the doc: the block lists every chart carrying the page's tag, so it
+    updates itself and a retired chart simply drops out. There is nothing to edit and
+    nothing that breaks, which makes these rows noise in a 'what must I update' audit.
+    """
+    return (f.get("context") or "").startswith("all-charts")
+
+
 def search_hint(f: dict) -> str:
     """What to search for inside the Google Doc to land on this reference.
 
@@ -726,16 +736,14 @@ def search_hint(f: dict) -> str:
     slug exactly as recorded: `posts_gdocs_links.target` keeps what the author typed,
     which may be an old slug, and that is what is actually in the document.
     """
-    component = (f.get("context") or "").split(" (")[0]
-    # Some blocks aren't hand-placed, so "find it in the doc" is the wrong instruction.
-    if component == "all-charts":
-        return "n/a — auto-generated from the page's tags, not written in the doc"
+    # The cell holds the search string and nothing else, so it can be copied straight
+    # into the doc's find box. What each variant means is in the legend under the table.
     anchor = (f.get("text") or "").strip()
     if anchor:
-        return f'"{cell(anchor, 55)}"'
+        safe = cell(anchor, 55).replace("`", "'")
+        return f"`{safe}`"
     if f["subject_type"] == "chart":
-        where = "the insight's grapher-url" if component == "front-matter" else "the URL in the block"
-        return f"`{cell(f['subject'], 50)}` — {where}"
+        return f"`{cell(f['subject'], 55)}`"
     return "—"
 
 
@@ -806,7 +814,11 @@ def write_markdown(findings: list[dict], path: str, host: str) -> None:
         "---",
         "",
         "📄 opens the Google Doc to edit · 🔗 opens the published page scrolled to the reference · "
-        '"Find in the doc" is the link text to search for once the doc is open.',
+        "**Find in the doc** is a copy-paste search string for the Google Doc: the link text "
+        "for a prose hyperlink, or the chart slug for a block embed (the doc holds a bare "
+        "grapher URL there — and the slug is stored as the author typed it, so it matches "
+        "even when the doc still uses an old one). A `—` means there is nothing to search "
+        "for.",
         "",
     ]
     Path(path).write_text("\n".join(lines))
@@ -820,6 +832,8 @@ def main() -> int:
     ap.add_argument("--dataset-id", type=int, help="all variables of this dataset")
     ap.add_argument("--mdim", action="append", default=[], help="MDIM slug or catalogPath (repeatable)")
     ap.add_argument("--explorer", action="append", default=[], help="explorer slug (repeatable)")
+    ap.add_argument("--include-all-charts", action="store_true",
+                    help="keep topic pages' auto-generated 'All charts' entries (excluded by default)")  # fmt: skip
     ap.add_argument("--transitive", action="store_true",
                     help="for indicator/MDIM subjects, also sweep the articles referencing the charts found")  # fmt: skip
     ap.add_argument("--json", dest="json_out", help="write findings as JSON to this path")
@@ -874,6 +888,13 @@ def main() -> int:
         findings += sweep_mdim_subject(mdim)
     for explorer in args.explorer:
         findings += sweep_explorer_subject(explorer)
+
+    all_charts = [f for f in findings if is_all_charts(f)]
+    if all_charts and not args.include_all_charts:
+        findings = [f for f in findings if not is_all_charts(f)]
+        pages = sorted({f["where"] for f in all_charts})
+        print(f"excluded {len(all_charts)} 'All charts' index entries on {pages} "
+              "(auto-generated from the page's tags — nothing to edit; --include-all-charts to keep)")  # fmt: skip
 
     label_indicator_subjects(findings)
     add_preview_urls(findings, (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/"))
