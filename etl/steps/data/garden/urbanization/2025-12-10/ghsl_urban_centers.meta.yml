@@ -47,7 +47,7 @@ definitions:
     Historical figures that the producer rates as low plausibility are not shown, and appear as gaps.
 
   desc_key_largest_city_no_rerank: &desc_key_largest_city_no_rerank |-
-    The largest city is found by ranking a country's cities by population. Where the top city's figure is one we do not show, the value is left blank for that year rather than falling back to the second-largest city, which would otherwise be presented as the largest.
+    The largest city is found by ranking a country's cities by population. Where the top city's figure is one we do not show due to a "low" plausibility flag, the value is left blank for that year rather than falling back to the second-largest city, which would otherwise be presented as the largest.
 
   # Degurba descriptions to use for towns and suburbs variables.
   text_degurba_overview: &text_degurba_overview |-
