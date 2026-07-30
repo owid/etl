@@ -36,6 +36,7 @@ import argparse
 import json
 from collections import defaultdict
 from pathlib import Path
+from urllib.parse import quote
 
 from etl.config import OWID_ENV
 
@@ -128,7 +129,7 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
     """
     slugs = tuple(by_slug)
     df = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
         "WHERE pgl.target IN %(s)s AND pgl.linkType IN ('grapher', 'guided-chart') ORDER BY pg.slug",
@@ -147,7 +148,7 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                surface_id=r["post_slug"],
+                surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
                 text=r["text"],
@@ -163,7 +164,7 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
     clauses = " OR ".join(f"pgl.target LIKE %(t{i})s" for i in range(len(slugs)))
     params = {f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)}
     df = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
         f"FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
         f"WHERE pgl.linkType = 'url' AND ({clauses})",
@@ -187,7 +188,7 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                surface_id=r["post_slug"],
+                surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=target.split("?", 1)[1] if "?" in target else "",
                 text=r["text"],
@@ -266,8 +267,9 @@ def sweep_data_insights(by_slug: dict[str, dict]) -> list[dict]:
     """Data insights store the chart in content->>'$."grapher-url"', not in posts_gdocs_links."""
     slugs = tuple(by_slug)
     df = OWID_ENV.read_sql(
-        "SELECT post_slug, published, grapher_url, slug FROM ("
-        "  SELECT pg.slug AS post_slug, pg.published, pg.content->>'$.\"grapher-url\"' AS grapher_url,"
+        "SELECT gdoc_id, post_slug, published, grapher_url, slug FROM ("
+        "  SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.published,"
+        "         pg.content->>'$.\"grapher-url\"' AS grapher_url,"
         "         SUBSTRING_INDEX(SUBSTRING_INDEX(pg.content->>'$.\"grapher-url\"', '/grapher/', -1), '?', 1) AS slug"
         "  FROM posts_gdocs pg WHERE pg.type = 'data-insight'"
         "    AND pg.content->>'$.\"grapher-url\"' IS NOT NULL"
@@ -286,7 +288,7 @@ def sweep_data_insights(by_slug: dict[str, dict]) -> list[dict]:
                 EMBED,
                 r["post_slug"],
                 f"/data-insights/{r['post_slug']}",
-                surface_id=r["post_slug"],
+                surface_id=r["gdoc_id"],
                 context="grapher-url in the insight's front matter",
                 query_string=url.split("?", 1)[1] if "?" in url else "",
                 published=r["published"],
@@ -368,7 +370,7 @@ def sweep_wordpress(by_slug: dict[str, dict]) -> list[dict]:
                 LINK,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                surface_id=r["post_slug"],
+                surface_id=r["gdoc_id"],
                 context="legacy post link",
                 query_string=target.split("?", 1)[1] if "?" in target else "",
             )  # fmt: skip
@@ -559,7 +561,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                surface_id=r["post_slug"],
+                surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
                 text=r["text"],
@@ -598,7 +600,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
 
 def sweep_explorer_subject(explorer: str) -> list[dict]:
     df = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
         "WHERE pgl.linkType = 'explorer' AND pgl.target = %(s)s",
@@ -616,7 +618,7 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                surface_id=r["post_slug"],
+                surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
                 text=r["text"],
@@ -643,6 +645,70 @@ def summarize(findings: list[dict]) -> None:
         print(f"  ({unpublished} on unpublished/draft sources)")
 
 
+GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
+
+
+def doc_url(f: dict) -> str:
+    """Google Doc edit URL. posts_gdocs.id IS the Google Doc id, so this is a direct link."""
+    return f"https://docs.google.com/document/d/{f['surface_id']}/edit" if f["surface_id"] else ""
+
+
+def deep_link(f: dict, host: str) -> str:
+    """Published-article URL with a scroll-to-text fragment on the link's anchor text.
+
+    Opens the article scrolled to (and highlighting) the reference, which is the
+    fastest way to find it. Falls back to the plain article URL when the reference
+    is a block embed with no anchor text.
+    """
+    base = f"{host}{f['where_path']}"
+    anchor = (f.get("text") or "").strip()
+    if not anchor:
+        return base
+    # Text fragments need parentheses literal and hyphens percent-encoded (see
+    # apps/wizard/app_pages/chart_diff/citations.py:create_text_fragment_url).
+    encoded = quote(anchor[:200], safe="()").replace("-", "%2D")
+    return f"{base}#:~:text={encoded}"
+
+
+def write_markdown(findings: list[dict], path: str, host: str) -> None:
+    """Human-readable report: where each reference is, and how to open it."""
+    by_kind: dict[str, list[dict]] = defaultdict(list)
+    for f in findings:
+        by_kind[f["kind"]].append(f)
+
+    lines = ["# What references these objects", ""]
+    for kind, blurb in [
+        (EMBED, "Renders the object's own config — a redirect or rename does **not** fix these."),
+        (RENDER, "Resolves and draws the object; changing it changes what readers see."),
+        (LINK, "Hyperlinks. A redirect covers them, but the href is worth updating."),
+    ]:
+        group = by_kind.get(kind)
+        if not group:
+            continue
+        lines += [f"## {kind} ({len(group)})", "", blurb, ""]
+        by_surface: dict[str, list[dict]] = defaultdict(list)
+        for f in group:
+            by_surface[f["surface"]].append(f)
+        for surface in sorted(by_surface):
+            lines += [f"### {surface} ({len(by_surface[surface])})", ""]
+            for f in by_surface[surface]:
+                draft = "" if f["published"] else " _(unpublished)_"
+                lines.append(f"- **{f['subject']}** in `{f['where']}`{draft} — {f['context']}")
+                if f["surface"] in GDOC_SURFACES:
+                    lines.append(f"    - 📄 Google Doc: {doc_url(f)}")
+                    if f["text"]:
+                        lines.append(f'    - 🔎 find in the doc: search for "{f["text"]}"')
+                    lines.append(f"    - 🔗 open at the reference: {deep_link(f, host)}")
+                elif f["where_path"]:
+                    lines.append(f"    - 🔗 {host}{f['where_path']}")
+                if f["query_string"]:
+                    lines.append(f"    - params: `{f['query_string']}`")
+                if f["config_id"]:
+                    lines.append(f"    - config: `{f['config_id']}`")
+            lines.append("")
+    Path(path).write_text("\n".join(lines))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Find every surface that references a chart, indicator, MDIM or explorer.")
     ap.add_argument("--chart-ids", help="comma-separated chart ids")
@@ -655,6 +721,9 @@ def main() -> int:
                     help="for indicator/MDIM subjects, also sweep the articles referencing the charts found")  # fmt: skip
     ap.add_argument("--json", dest="json_out", help="write findings as JSON to this path")
     ap.add_argument("--csv", dest="csv_out", help="write findings as CSV to this path")
+    ap.add_argument("--markdown", dest="md_out",
+                    help="write a human-readable report (Google Doc links + scroll-to-reference links)")  # fmt: skip
+    ap.add_argument("--host", default=None, help="site for links (default: the DB environment's site)")
     args = ap.parse_args()
 
     def ints(value: str | None) -> list[int]:
@@ -720,8 +789,11 @@ def main() -> int:
             w.writeheader()
             w.writerows(findings)
         print(f"-> {args.csv_out}")
-    if not args.json_out and not args.csv_out:
-        print("\n(pass --json / --csv to save the findings)")
+    if args.md_out:
+        write_markdown(findings, args.md_out, (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/"))
+        print(f"-> {args.md_out}")
+    if not any([args.json_out, args.csv_out, args.md_out]):
+        print("\n(pass --json / --csv / --markdown to save the findings)")
     return 0
 
 

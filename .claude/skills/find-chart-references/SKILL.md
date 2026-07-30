@@ -72,7 +72,22 @@ Two fields carry the weight for callers:
 
 `surface_id` identifies the surface object itself (chart id,
 `multi_dim_x_chart_configs.id`, narrative chart id, explorer slug, tag id), for when
-you need to edit it rather than read it.
+you need to edit it rather than read it. **For any gdoc-backed surface (articles,
+data insights) it is the Google Doc id** — `posts_gdocs.id` is literally the Doc id,
+so `https://docs.google.com/document/d/<surface_id>/edit` opens the source document.
+
+### `--markdown` — the report to hand a human
+
+`--markdown ai/refs.md` renders the findings grouped by `kind`, and for every article
+reference gives three ways to reach it:
+
+- 📄 the **Google Doc** to edit,
+- 🔎 the **anchor text** to search for inside that doc,
+- 🔗 a **scroll-to-reference link** into the published article (a `#:~:text=` fragment,
+  built the same way as `chart_diff/citations.py:create_text_fragment_url`), which
+  opens the page scrolled to and highlighting the exact sentence.
+
+Block embeds have no anchor text, so those fall back to the plain article URL.
 
 ## Surface catalog
 
