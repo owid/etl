@@ -64,6 +64,7 @@ Assumptions:
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
+- **Append every generalizable lesson to `workbench/<short_name>/lessons.md` the moment you hit it**, not at the end. One entry per lesson: what you expected, what actually happened, and the general rule — plus which skill file should own it. Reconstructing these from memory after a long session loses the specifics that make a lesson usable (the exact column name, the threshold that separated signal from noise, the check that would have caught it earlier), and the ones worth keeping are exactly the ones that cost time mid-run. Fold them into the skills when the user asks, following [`feedback_skill_lessons_writeback`](../../../CLAUDE.md) conventions: phrase each as a general pattern with the incident as a trailing one-liner, and **re-read the target skill first** — a long-running branch can be several skill revisions behind `master`, so the section you remember may already have been rewritten by someone else's session.
 
 ## Checkpoints — when to pause
 
@@ -598,6 +599,17 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      STAGING=<branch> .venv/bin/etl indicator-upgrade auto
      ```
    - **`auto` can detect nothing for a legitimate version bump** ("No dataset migrations detected. Nothing to do."). Don't conclude there's nothing to remap — fall back to an explicit mapping: pair old/new variable ids by `shortName` across the two dataset ids, store with `WizardDB.add_variable_mapping(...)`, preview with `cli_upgrade_indicators(dry_run=True)`, then apply (mechanics under "Indicator Upgrader CLI for one-shot chart remaps" in Guardrails). Map **all** indicators, not just charted ones — the full mapping is also what gives Anomalist's upgrade detectors complete coverage (see Final QA). The new-version shortNames left **unpaired** by this mapping are exactly the new-indicator list from step 5 — cross-check the two; a mismatch usually means a missed rename.
+   - **The mapping only covers `old_version → new_version`; charts stranded on *older* versions stay stranded.** Previous cycles leave charts behind, and the upgrader cannot see them. After the main upgrade, sweep **every** version of the dataset, not just the one you bumped from:
+     ```sql
+     SELECT d.catalogPath, COUNT(DISTINCT c.id) AS charts,
+            COUNT(DISTINCT CASE WHEN c.publishedAt IS NOT NULL THEN c.id END) AS published
+     FROM charts c
+     JOIN chart_dimensions cd ON cd.chartId=c.id JOIN variables v ON cd.variableId=v.id
+     JOIN datasets d ON d.id=v.datasetId
+     WHERE d.catalogPath LIKE '<namespace>/%/<short_name>' GROUP BY 1
+     ```
+     Don't filter to published charts — drafts count too: the upgrader remaps them as well, a draft left on ghost variables can be published later with stale data, and its variable references block archiving the old version exactly like a published chart's.
+     **Scope the predicate to the namespace, and escape literal underscores in every substituted component — the namespace as well as the short name** (`LIKE 'worldbank\_wdi/%/fertility\_rate'`) — short names recur across namespaces (`fertility_rate` exists under both `demography` and `gapminder`), a suffix-only `LIKE '%<short_name>'` sweeps unrelated datasets into the results, and an unescaped `_` is a single-character wildcard in MySQL `LIKE`, so it can quietly match a similarly named dataset or namespace too; since the follow-on mapping pairs variables by `shortName` alone, either slip would redirect another dataset's charts onto your new variables. Anything on an older version is remappable the same way (one `WizardDB.add_variable_mapping` per old dataset id, paired by `shortName`). This matters beyond tidiness: the flagship chart for the very indicator an update exists to fix can be sitting on a version from months earlier and receive none of the new data. Whatever remains after the sweep is charts whose indicators have no `shortName` twin in the new version — which means **renamed or retired**, not automatically retired: a rename in an earlier cycle breaks the twin too, so first check the unpaired new-version shortNames and the producer's release notes for a successor, and map any true rename by hand (same `WizardDB.add_variable_mapping` mechanics, paired semantically instead of by `shortName`). Only the genuinely retired ones need a replace-or-retire decision and are the reason those old versions can't be archived. (WDI 2026-07: 27 charts recovered across three older versions, including `gdp-per-capita-worldbank` at ~455 views/day, stranded five months on `2026-02-27`; 8 remained on retired indicators.)
    - **CRITICAL**: After the upgrader finishes, always verify it actually worked by querying staging:
      ```bash
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
@@ -826,6 +838,18 @@ At the end of the workflow, update the PR description with:
 - A summary of key changes at the top
 - Collapsed `<details>` sections **only for the pipeline steps that changed in a non-obvious way**. Skip any step that's just the boilerplate generated by `etl update` — don't add a placeholder like "unchanged from boilerplate". The Summary already explains the why; per-step sections are only for the how, when the how isn't obvious from the diff.
 
+## A long-lived branch silently regresses shared charts
+
+A branch that sits open while another dataset update merges to `master` will serve **that dataset's old version** on its staging server, because staging builds from the branch. Any chart combining both datasets then differs from production on two axes: yours (intended) and theirs (a regression). Approving such a diff syncs the branch's stale config back to production and **reverts the other team's upgrade** on a published chart.
+
+It doesn't announce itself — CI is green, the chart renders, and the diff looks like the change you expected. So whenever a dataset update lands on `master` while your PR is open, or a chart diff shows a change you can't attribute to your own work, compare **every dimension** of the affected charts against production, not just the one you touched:
+
+```python
+# for each chart id: list (shortName, dataset version) per dimension on staging and on prod
+```
+
+The fix is to merge `master` in, rebuild, and remap only the affected charts' foreign dimensions. Two scoping notes: chart-diff only covers charts your branch's datasets touch, so charts using *only* the other dataset are stale on staging but never sync — leave them, they're not yours to fix and repointing them adds review load. And remap by editing those chart configs directly rather than via a variable-level mapping, which would sweep in other charts sharing the same variables and pull them into the review queue. (WDI 2026-07: an ODA update merged mid-PR; two `foreign-aid-*-vs-gdp-per-capita` charts would have reverted ODA to a seven-month-old version.)
+
 ## Downstream dependency check
 
 After completing the update, check if any other datasets depend on the **old** version of the updated dataset:
@@ -839,6 +863,7 @@ Filter out the old dataset's own DAG entries (snapshot → meadow → garden →
 If downstream dependents exist, **decide with the user** whether to bump them in this PR or defer to a follow-up:
 - **Tell the user** which datasets depend on the old version.
 - **Follow-up PR (default for a big fan-out):** add a "Downstream dependencies" section to the PR description (not collapsed) listing the dependents, to be repointed in a separate PR. This mirrors the historical two-PR pattern for foundational datasets (e.g. income_groups: chain-update PR, then a "🐝 Update all datasets to latest …" bulk-bump PR).
+- **Version-bumping a derived step inside the follow-up PR is a mini dataset update — run it as one.** When repointing makes a derived/OMM step's version predate its data (CLAUDE.md's versioning-hygiene rule) and the owner opts to bump it, use `.venv/bin/etl update data://garden/<ns>/<old_version>/<short_name> --include-usages --direct-only` — it works fine for snapshot-less derived steps — rather than `git mv` + a hand-edited DAG, and treat the bump's charts like any update's: new variable IDs mean an indicator upgrade on staging (`auto` detects nothing for a legit version bump — use the explicit `shortName`-paired mapping), then the step-7 audits (`check-hardcoded-years`, `check-empty-entities`) scoped to those charts. A hand-rolled `git mv` can reach the same end state, but it silently skips the audits and leaves no workbench trail. (WDI 2026-07 follow-up: `gdp_historical` was bumped by hand; the audits, run after the fact, found nothing — by luck, not by construction.)
 - **Bump in this PR (if the user wants it self-contained):** repoint every downstream ref and remove/archive the old chain in the same PR. Mechanics that bit this session:
   - Bulk-replace with a **negative-lookahead** so a prefix match doesn't corrupt sibling short_names — e.g. `re.sub(r"garden/wb/<old_v>/income_groups(?!_)", "garden/wb/<new_v>/income_groups", text)` leaves `income_groups_aggregations` alone.
   - **Remove the old own-chain block from `dag/main.yml` *before* the bulk sweep**, or the sweep turns the old definition into a duplicate of the new key. Relocate the new block into the old slot (nested form) as part of the same edit.
@@ -945,12 +970,20 @@ This is the **last step**, after the DAG archive has been committed. Don't auto-
   https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html
   ```
 
+**`etl approve` needs both sides pointed at the right databases: `STAGING` for the branch, `ENV_FILE_PROD` for production — and the tunnel the latter expects is usually down.** The command reads pending diffs from and writes approvals to the *global* environment, which only targets the branch staging DB when `STAGING` is set — run it without `STAGING=<branch>` (or `STAGING=1` from the branch checkout) and it quietly operates on your local dev DB instead, finding no pending diffs or approving in the wrong place. The production side comes from `ENV_FILE_PROD` (`ENV_FILE_PROD=.env.live STAGING=<branch> .venv/bin/etl approve …`) — without it the command asserts immediately. `.env.live` typically points at `127.0.0.1:3310`, an SSH tunnel that is often not running; the reliable path is Tailscale, where the production grapher DB is reachable directly as host `prod-db` on port 3306 with the same `live_grapher` credentials (the pattern `add-ivs-indicators/scripts/indicator_admin_table.py` already uses). Being on Tailscale redirects nothing by itself — `OWIDEnv.from_env_file()` reads `DB_HOST`/`DB_PORT` straight from whatever file `ENV_FILE_PROD` names — so make the redirect real before running the commands below: either set `DB_HOST=prod-db` / `DB_PORT=3306` in `.env.live` once (worth making permanent), or derive a one-off copy (gitignored by the `.env.*` pattern) and pass `ENV_FILE_PROD=.env.prod-db` instead:
+
+```bash
+sed -e 's/^DB_HOST=.*/DB_HOST=prod-db/' -e 's/^DB_PORT=.*/DB_PORT=3306/' .env.live > .env.prod-db
+```
+
+Note the approval writes to the *staging* chart-diff table and only reads production, so the prod connection is read-only.
+
 **Bulk-approve the easy chart diffs with `etl approve` before handing the rest to the human.** On a dataset with many charts (e.g. WDI has 400+), most pending diffs exist only because the update changed no values a human needs to eyeball — either the underlying data is byte-identical (a version bump minted new variable IDs but the values didn't change) or it changed by a negligible source-revision amount. Reviewing those by hand in Chart Diff is wasted effort; let `etl approve` clear them first:
 
 ```bash
-.venv/bin/etl approve --dry-run                        # exact data match only — safe default, see counts first
-.venv/bin/etl approve --dry-run --allow-small-changes   # also count tiny source revisions (see below)
-.venv/bin/etl approve --allow-small-changes             # apply for real once the dry-run counts look right
+ENV_FILE_PROD=.env.live STAGING=<branch> .venv/bin/etl approve --dry-run                       # exact data match only — safe default, see counts first
+ENV_FILE_PROD=.env.live STAGING=<branch> .venv/bin/etl approve --dry-run --allow-small-changes  # also count tiny source revisions (see below)
+ENV_FILE_PROD=.env.live STAGING=<branch> .venv/bin/etl approve --allow-small-changes            # apply for real once the dry-run counts look right
 ```
 
 - Plain `etl approve` only approves a chart when every dimension's underlying data is byte-identical between staging and prod (it hashes each dimension's actual data, not the raw variable ID — so a version bump that changed no values still gets approved).
@@ -976,6 +1009,8 @@ Include owidbot's data-diff summary in the hand-off so the user knows the scale 
 Tell the user something like: "Final QA: please review **[Anomalist](http://<container_name>/etl/wizard/anomalist)** and **[Chart Diff](http://<container_name>/etl/wizard/chart-diff)** in the Wizard, and the **[data-diff report](https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html)** for the dataset-level view — owidbot's summary: *❌ 21 changed · 2 new · 4 identical · 16 skipped*. If anything looks off, let me know and I'll investigate."
 
 These pages need a fresh staging build, so they're only meaningful after the PR's grapher upload to staging has completed and the staging server has rebuilt.
+
+**Close every hand-off with the open-items block defined in CLAUDE.md ("Close every report with what's still open") — in the PR body, not just chat** (chat scrolls away; the PR is what the reviewer and future-you actually read). An update generates far more loose ends than it closes; this workflow's usual danglers: content/gdoc edits and producer error reports (handed off), reader-facing config changes held for sign-off (proposed), audits offered but not run and anything the staging build didn't cover (unverified) — plus a **fourth bucket, deferred to a follow-up PR**, where the two-PR pattern is in play (downstream consumers to repoint, old-version archiving, charts on retired indicators): that list is the follow-up PR's scope, so losing it means redoing the analysis.
 
 **Before closing out, confirm both optional heavier audits were suggested.** Two checks are opt-in to *run* but **mandatory to offer** — the adversarial data & metadata review (`/adversarial-data-review`, step 6c-bis) and the empty-entity audit (`check-empty-entities`, step 7). It's easy to skip past them in a long session, which is exactly the failure this guard exists to catch. If you reach this hand-off and haven't yet surfaced either one to the user, do it now: name the skill, say briefly what it would catch and why you did or didn't recommend running it, and let the user decide. Never let the update finish having silently omitted the offer.
 

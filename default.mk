@@ -46,7 +46,7 @@ check-uv-default:
 			UV_PYTHON=$(PYTHON_VERSION) uv sync --all-extras --group dev; \
 		else \
 			uv sync --all-extras --group dev; \
-		fi; \
+		fi && \
 		touch .venv; \
 	fi
 
