@@ -108,8 +108,8 @@ Writes into `--out`:
 deliverables (`ai/explorer-mdim-redirects/`, one `admin_bulk_payload.json` per
 explorer), each JSON handed over must describe exactly ONE source page. For
 charts that means one file per chart, in `payloads/`. The combined
-`mapping.json` is the machine record consumed by `apply_redirects.py` — don't
-hand that one over as a copy-paste payload.
+`mapping.json` is the machine record that `preflight.py` and
+`audit_references.py` read — don't hand that one over as a copy-paste payload.
 
 **Matching**: a chart matches a view when the y-variable-ID sets are equal AND
 x/size/color agree (absent == absent). Several matching views → tiebreak on chart

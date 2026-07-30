@@ -7,8 +7,9 @@ Everything here is READ-ONLY: it queries the grapher DB via ``OWID_ENV``
 into ``--out``. The resolved environment is printed at startup — check it: a
 reachable local dev DB also passes the preflight, and extracting from the wrong
 environment produces a mapping that silently points at the wrong charts. No
-redirect is created — that's ``apply_redirects.py``, gated on explicit user
-confirmation.
+redirect is created here, or anywhere in this skill — applying is
+``yarn createMultiDimRedirectsFromCsv`` in owid-grapher, run by a human, after
+``preflight.py`` validates the proposal.
 
 Charts are selected by exactly one of ``--tag`` / ``--slugs`` / ``--dataset-id``
 and matched against the views of every published MDIM (or only those passed via
@@ -627,7 +628,7 @@ def write_proposal_csv(out: Path, charts: list[dict], id_to_path: dict[int, str]
 
 
 def chart_json(c: dict) -> dict:
-    # configMd5 lets apply_redirects.py detect charts edited after the proposal was written.
+    # configMd5 lets preflight.py detect charts edited after the proposal was written.
     return {"id": c["chart_id"], "slug": c["chart_slug"], "title": c["title"], "configMd5": c["config_md5"]}
 
 
@@ -729,7 +730,7 @@ def write_payloads(out: Path, charts: list[dict]) -> int:
 
     Mirrors the explorer→MDIM redirect deliverable convention: each payload file
     describes exactly ONE source page and its redirect. The combined mapping.json
-    stays the machine record for apply_redirects.py.
+    stays the machine record that preflight.py and audit_references.py read.
     """
     payload_dir = out / "payloads"
     payload_dir.mkdir(exist_ok=True)
