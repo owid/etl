@@ -1161,3 +1161,26 @@ def test_categorical_coercion_matches_row_wise_parsing():
     got = _as_comparable_floats(cat)
     assert got is not None
     pd.testing.assert_series_equal(got, expected, check_names=False, check_dtype=False)
+
+
+def test_all_missing_categorical_does_not_crash():
+    """An all-missing categorical has no categories, so there is nothing to index into.
+
+    `np.where` evaluates both branches eagerly, so indexing an empty category array raised
+    IndexError and aborted the whole data-diff — reachable whenever one dataset version adds
+    values to a column the other has entirely empty. Row-wise coercion returned all-NaN.
+    """
+    from etl.datadiff import _as_comparable_floats, _has_numeric_content
+
+    s = pd.Series([None, None, None], dtype="category")
+    # No categories at all, and every row's code is the -1 "missing" sentinel.
+    assert s.cat.categories.empty
+    assert s.cat.codes.tolist() == [-1, -1, -1]
+
+    out = _as_comparable_floats(s)
+    assert out is not None
+    assert out.isna().all()
+    assert len(out) == 3
+    assert list(out.index) == list(s.index)
+    # No numeric content, but crucially: no exception.
+    assert _has_numeric_content(s) is False

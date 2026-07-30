@@ -924,7 +924,13 @@ def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
             dtype="float64", na_value=np.nan
         )
         codes = s.cat.codes.to_numpy()
-        values = np.where(codes >= 0, cats[codes.clip(min=0)], np.nan)
+        if len(cats) == 0:
+            # An all-missing categorical has no categories at all, so there is nothing to index
+            # into — `np.where` evaluates both branches eagerly, and `cats[0]` on an empty array
+            # would raise. Every row is missing, which row-wise coercion also produced as NaN.
+            values = np.full(len(s), np.nan)
+        else:
+            values = np.where(codes >= 0, cats[codes.clip(min=0)], np.nan)
         return _finite(pd.Series(values, index=s.index, name=s.name))
     if pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
         if _is_code_column(s):
