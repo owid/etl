@@ -406,11 +406,14 @@ def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
             int(r["variableId"]),
             "chart",
             RENDER,
-            r["slug"],
-            f"/grapher/{r['slug']}",
+            # A chart can have no slug (drafts never given one). Label it by id rather
+            # than emitting a null `where`, which breaks any caller that sorts or groups.
+            r["slug"] or f"(chart {r['chart_id']}, no slug)",
+            f"/grapher/{r['slug']}" if r["slug"] else "",
             surface_id=int(r["chart_id"]),
             config_id=r["config_id"],
-            context=f"inheritance {'on' if r['inheritance'] else 'off'}",
+            context=f"inheritance {'on' if r['inheritance'] else 'off'}"
+            + ("" if r["slug"] else " — draft with no slug"),
             published=r["published"],
         )  # fmt: skip
         for r in df.to_dict("records")
@@ -701,7 +704,9 @@ def main() -> int:
         findings += sweep_explorer_subject(explorer)
 
     order = {EMBED: 0, RENDER: 1, LINK: 2}
-    findings.sort(key=lambda f: (order[f["kind"]], f["surface"], str(f["subject"]), f["where"]))
+    # Coerce every sort key to str: any surface field can be NULL in the DB, and a
+    # None here would abort the whole run at the very end.
+    findings.sort(key=lambda f: (order[f["kind"]], str(f["surface"]), str(f["subject"]), str(f["where"] or "")))
     summarize(findings)
 
     if args.json_out:
