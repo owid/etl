@@ -49,8 +49,14 @@ definitions:
   desc_key_largest_city_no_rerank: &desc_key_largest_city_no_rerank |-
     The largest city is found by ranking a country's cities by population. Where the top city's figure is one we do not show, the value is left blank for that year rather than falling back to the second-largest city, which would otherwise be presented as the largest.
 
+  # Two versions, because the capital indicators come in two shapes: a population, which really is a
+  # sum across countries, and a share, which divides that sum by the whole region's population and so
+  # is not additive at all.
   desc_key_capital_regional_keeps_all: &desc_key_capital_regional_keeps_all |-
     Figures for regions and income groups are the sum of their countries' capital cities, and include every capital the producer reports — including the few whose figures we do not show for individual countries. So a regional total can be higher than the sum of the countries shown on a chart.
+
+  desc_key_capital_share_regional_keeps_all: &desc_key_capital_share_regional_keeps_all |-
+    For regions and income groups, the capital city population used here is the combined population of their countries' capital cities, and includes every capital the producer reports — including the few whose figures we do not show for individual countries. Because the result is then expressed as a percentage of the whole region's population, the percentages shown for individual countries do not add up to it.
 
   # Degurba descriptions to use for towns and suburbs variables.
   text_degurba_overview: &text_degurba_overview |-
@@ -537,7 +543,7 @@ tables:
           - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
           - *desc_key_low_plausibility
-          - *desc_key_capital_regional_keeps_all
+          - *desc_key_capital_share_regional_keeps_all
         description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
@@ -556,7 +562,7 @@ tables:
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
-          - *desc_key_capital_regional_keeps_all
+          - *desc_key_capital_share_regional_keeps_all
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -577,7 +583,7 @@ tables:
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_crossborder_exclusion
           - *desc_key_low_plausibility
-          - *desc_key_capital_regional_keeps_all
+          - *desc_key_capital_share_regional_keeps_all
         description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
@@ -595,7 +601,7 @@ tables:
           - The total population includes both urban and rural populations.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_crossborder_exclusion
-          - *desc_key_capital_regional_keeps_all
+          - *desc_key_capital_share_regional_keeps_all
         display:
           numDecimalPlaces: 1
           isProjection: true
