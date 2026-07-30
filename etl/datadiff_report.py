@@ -289,6 +289,16 @@ class DatasetDiffResult:
         return sum(t.removed_row_count for t in self.tables)
 
     @property
+    def not_scored_count(self) -> int:
+        """Changed rows carrying no comparable number on either side — an edited sentinel, say.
+
+        They score zero on both the anomaly and the coverage axis, since nothing moved and nothing
+        appeared or disappeared, so a dataset whose only change is one of these would otherwise be
+        summarized as having added data.
+        """
+        return sum(v.not_scored_count for t in self.tables for c in t.columns for v in c.value_diffs)
+
+    @property
     def removed_labels(self) -> list[str]:
         seen: list[str] = []
         for t in self.tables:
@@ -867,12 +877,18 @@ def render_html(report: DiffReport) -> str:
     n_meta_only = sum(1 for ds in report.datasets if ds.is_metadata_only)
     if n_meta_only:
         strip_bits.append(f"📝 {n_meta_only} metadata-only")
-    n_new_only = sum(
-        1 for ds in report.datasets if ds.change_kind == "changed" and ds.tier == "none" and not ds.is_metadata_only
-    )
+    untiered = [
+        ds for ds in report.datasets if ds.change_kind == "changed" and ds.tier == "none" and not ds.is_metadata_only
+    ]
+    # An edited sentinel scores zero on both axes without anything having been added, so it needs
+    # its own bucket rather than being swept in with the datasets that only gained data.
+    n_new_only = sum(1 for ds in untiered if not ds.not_scored_count)
     if n_new_only:
         strip_bits.append(f"➕ {n_new_only} new-data-only")
-    n_diff = sum(tier_counts.values()) + n_meta_only + n_new_only
+    n_unscored_only = sum(1 for ds in untiered if ds.not_scored_count)
+    if n_unscored_only:
+        strip_bits.append(f"🔤 {n_unscored_only} non-numeric-only")
+    n_diff = sum(tier_counts.values()) + n_meta_only + n_new_only + n_unscored_only
     if strip_bits and n_diff >= 2:
         tier_strip = (
             f'<div class="tier-strip">Of the {n_diff:,} dataset{"s" if n_diff != 1 else ""} with '
@@ -898,11 +914,12 @@ def render_html(report: DiffReport) -> str:
             cov_label = _tier_counts_label(
                 _col_tier_counts([c for t in d.tables for c in t.columns], score=lambda c: c.coverage_severity)
             )
-            meta_html = (
-                f'<span class="top-meta">{_e(cov_label)} column(s) w/ shifted coverage</span>'
-                if cov_label
-                else '<span class="top-meta">new data only</span>'
-            )
+            if cov_label:
+                meta_html = f'<span class="top-meta">{_e(cov_label)} column(s) w/ shifted coverage</span>'
+            elif d.not_scored_count:
+                meta_html = '<span class="top-meta">non-numeric value changes only</span>'
+            else:
+                meta_html = '<span class="top-meta">new data only</span>'
         else:
             n_cols = sum(len(t.changed_columns) for t in d.tables)
             n_tables = sum(1 for t in d.tables if t.any_change)

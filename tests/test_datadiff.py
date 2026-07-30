@@ -1053,3 +1053,57 @@ def test_breakdown_counts_not_scored_rows_separately():
     only_sentinels = ValueDiff(kind="changed", count=2, total=10, median_bard=0.0, not_scored_count=2)
     breakdown = re.search(r"\((\d[^)]*)\)</span>", _render_value_diff(only_sentinels))
     assert breakdown and breakdown.group(1) == "2 not scored"
+
+
+def test_sentinel_only_dataset_is_not_summarized_as_new_data():
+    """A dataset whose only change is an edited sentinel added nothing, so don't say it did.
+
+    Such a change scores zero on both the anomaly and the coverage axis, which used to drop it
+    into the "new data only" bucket in the summary strip and the dataset watch list.
+    """
+    ds = DatasetDiffResult(
+        path="garden/n/v/ds",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="tab",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(
+                        name="a",
+                        kind="changed",
+                        changes=["changed data"],
+                        value_diffs=[ValueDiff(kind="changed", count=1, total=10, median_bard=0.0, not_scored_count=1)],
+                    )
+                ],
+            )
+        ],
+    )
+    assert ds.not_scored_count == 1
+    assert ds.severity == 0.0
+
+    # A second dataset, so the summary strip and the watch list have enough entries to render.
+    other = DatasetDiffResult(
+        path="garden/n/v/other",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="tab",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(
+                        name="a",
+                        kind="changed",
+                        changes=["changed data"],
+                        value_diffs=[ValueDiff(kind="changed", count=1, total=10, median_bard=0.5)],
+                    )
+                ],
+            )
+        ],
+    )
+
+    html = render_html(DiffReport(datasets=[ds, other]))
+    assert "new data only" not in html
+    assert "non-numeric value changes only" in html
+    assert "1 non-numeric-only" in html
+    assert "new-data-only" not in html
