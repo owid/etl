@@ -1,4 +1,5 @@
 import json
+from functools import cache
 from typing import Any
 from urllib.parse import quote
 
@@ -12,6 +13,13 @@ from etl.http import USER_AGENT
 from etl.http import session as http_session
 
 log = structlog.get_logger()
+
+# (connect, read) timeout for every call in this module. `requests` waits forever without
+# one, so an admin server that accepts the connection and then stops responding blocks the
+# calling thread indefinitely. On a full staging build that surfaced as two grapher upsert
+# steps that never returned: the run went silent after its last step and was only killed by
+# Buildkite's timeout 2.5 hours later. A bounded wait turns that into a step that fails.
+TIMEOUT = (10, 120)
 
 
 def is_502_error(exception):
@@ -53,6 +61,7 @@ class AdminAPI:
         resp = http_session.get(
             f"{self.owid_env.admin_api}/charts/{chart_id}.config.json",
             headers=self._headers(),
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         return js
@@ -61,6 +70,7 @@ class AdminAPI:
         resp = http_session.get(
             f"{self.owid_env.admin_api}/charts/{chart_id}.references.json",
             headers=self._headers(),
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         return js
@@ -82,6 +92,7 @@ class AdminAPI:
             headers=self._headers(user_id),
             json=config,
             params=params,
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -105,6 +116,7 @@ class AdminAPI:
             headers=self._headers(user_id),
             json=config,
             params=params,
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -116,6 +128,7 @@ class AdminAPI:
             f"{self.owid_env.admin_api}/charts/{chart_id}/setTags",
             headers=self._headers(user_id),
             json={"tags": tags},
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -133,6 +146,7 @@ class AdminAPI:
             f"{self.owid_env.admin_api}/site-redirects/new",
             headers=self._headers(user_id),
             json={"source": source, "target": target},
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js.get("success"):
@@ -145,6 +159,7 @@ class AdminAPI:
         resp = http_session.delete(
             f"{self.owid_env.admin_api}/site-redirects/{redirect_id}",
             headers=self._headers(user_id),
+            timeout=TIMEOUT,
         )
         return self._json_from_response(resp)
 
@@ -157,6 +172,7 @@ class AdminAPI:
             self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
             headers=self._headers(),
             json=grapher_config,
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -167,6 +183,7 @@ class AdminAPI:
         resp = http_session.delete(
             self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
             headers=self._headers(),
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -180,6 +197,7 @@ class AdminAPI:
             url,
             headers=self._headers(user_id),
             json={"config": mdim_config},
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -195,6 +213,7 @@ class AdminAPI:
             url,
             headers=self._headers(user_id),
             json={"tsv": tsv, "commitMessage": "Update explorer from ETL"},
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -211,6 +230,7 @@ class AdminAPI:
             f"{self.owid_env.admin_api}/dods",
             headers=self._headers(user_id),
             json=data,
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -226,6 +246,7 @@ class AdminAPI:
             f"{self.owid_env.admin_api}/dods/{dod_id}",
             headers=self._headers(user_id),
             json=data,
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         # NOTE: update DoD doesn't return `success`, but {dod: 1} (which is wrong, it should return DoD id)
@@ -238,7 +259,7 @@ class AdminAPI:
         resp = http_session.get(
             f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}.config.json",
             headers=self._headers(),
-            timeout=30,
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         return js
@@ -258,6 +279,7 @@ class AdminAPI:
             f"{self.owid_env.admin_api}/narrative-charts/{narrative_chart_id}",
             headers=self._headers(user_id),
             json={"config": config},
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js.get("success", True):  # Some endpoints don't return success
@@ -279,6 +301,7 @@ class AdminAPI:
             f"{self.owid_env.admin_api}/datasets/{dataset_id}/setArchived",
             headers=self._headers(user_id),
             json={"isArchived": is_archived},
+            timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js.get("success", True):
@@ -286,14 +309,26 @@ class AdminAPI:
         return js
 
 
+@cache
 def requests_with_retry() -> requests.Session:
+    """Session for admin calls that should survive a restarting staging server.
+
+    Cached, so callers share one connection pool. Building a session per call opened a
+    fresh connection for every request, which on a dataset like world_bank_pip means tens
+    of thousands of them in a single step.
+    """
     s = requests.Session()
     s.headers["User-Agent"] = USER_AGENT
     # 401 is included because staging's admin API can transiently reject a valid key while
     # grapher-build's DB migrations run concurrently with this build (see owid/ops#540).
-    retries = Retry(total=5, backoff_factor=1, status_forcelist=[401, 500, 502, 503, 504])
-    s.mount("http://", HTTPAdapter(max_retries=retries))
-    s.mount("https://", HTTPAdapter(max_retries=retries))
+    # `read=1` keeps a hung server from multiplying TIMEOUT by the full retry budget; the
+    # status retries are the ones worth spending.
+    retries = Retry(total=5, read=1, backoff_factor=1, status_forcelist=[401, 500, 502, 503, 504])
+    # One adapter for both schemes: pool_maxsize covers the upsert thread pool that calls
+    # put_grapher_config concurrently, so threads don't discard each other's connections.
+    adapter = HTTPAdapter(max_retries=retries, pool_maxsize=20)
+    s.mount("http://", adapter)
+    s.mount("https://", adapter)
     return s
 
 
