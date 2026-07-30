@@ -4,6 +4,7 @@ import re
 import shutil
 from unittest.mock import MagicMock, patch
 
+import numpy as np
 import pandas as pd
 import pytest
 from owid.catalog import Dataset, DatasetMeta, Table
@@ -1107,3 +1108,56 @@ def test_sentinel_only_dataset_is_not_summarized_as_new_data():
     assert "non-numeric value changes only" in html
     assert "1 non-numeric-only" in html
     assert "new-data-only" not in html
+
+
+def test_finite_and_numeric_content_are_cheap_on_nullable_dtypes():
+    """Column classification must not scale like a masked-array op.
+
+    `_finite` used to be `s.where(np.isfinite(s))`, which on pandas' nullable dtypes (what garden
+    tables are full of) cost ~34 ms per 15k-row column — per column *per side*. On a WDI-sized
+    table that is ~2 minutes of pure classification for one dataset, and it pushed a whole
+    owidbot data-diff run from under a minute to tens of minutes.
+    """
+    import time
+
+    from etl.datadiff import _finite, _has_numeric_content
+
+    values = np.arange(200_000, dtype="float32")
+    values[5] = np.nan
+    s = pd.Series(values, dtype="Float32")
+
+    t0 = time.perf_counter()
+    for _ in range(10):
+        _finite(s)
+        _has_numeric_content(s)
+    elapsed = time.perf_counter() - t0
+
+    # The old implementation took >0.3s for this loop; a generous ceiling still catches a
+    # regression to masked-array semantics without being flaky on a loaded machine.
+    assert elapsed < 0.5, f"classification got slow again: {elapsed:.3f}s for 10 iterations"
+
+
+def test_finite_blanks_infinities_on_nullable_and_plain_dtypes():
+    """The numpy path must keep `_finite`'s contract: infinities out, NaN and values preserved."""
+    from etl.datadiff import _finite
+
+    for dtype in ("Float64", "float64"):
+        s = pd.Series([1.0, np.inf, -np.inf, np.nan, 2.5], dtype=dtype)
+        out = _finite(s)
+        assert out.notna().tolist() == [True, False, False, False, True]
+        assert out.iloc[0] == 1.0 and out.iloc[4] == 2.5
+        assert list(out.index) == list(s.index)
+
+
+def test_categorical_coercion_matches_row_wise_parsing():
+    """The category-indexed fast path must equal parsing every row (the previous behavior)."""
+    from etl.datadiff import _as_comparable_floats
+
+    raw = ["1.5", "China", "2.5", None, "1.5", "Inf"]
+    cat = pd.Series(raw, dtype="category")
+    expected = pd.to_numeric(pd.Series(raw, dtype="object"), errors="coerce").astype("float64")
+    expected = expected.where(np.isfinite(expected))
+
+    got = _as_comparable_floats(cat)
+    assert got is not None
+    pd.testing.assert_series_equal(got, expected, check_names=False, check_dtype=False)
