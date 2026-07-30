@@ -7,7 +7,7 @@ import urllib.error
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, NamedTuple, cast
 
 import numpy as np
 import pandas as pd
@@ -864,10 +864,101 @@ def _df_to_records(df: pd.DataFrame, limit: int = SAMPLE_LIMIT) -> list[dict[str
     return [{str(k): _fmt(v) for k, v in row.items()} for row in df_samp.to_dict("records")]
 
 
+# A zero-padded string ("004", "007") is an identifier, not a quantity — nothing measured is
+# written that way. Matches a leading zero followed by a digit, so "0.5" and "0" stay numeric.
+ZERO_PADDED_RE = re.compile(r"^-?0\d")
+
+
+def _is_code_column(s: pd.Series) -> bool:
+    """Whether ``s`` holds identifiers that merely look numeric, rather than quantities.
+
+    Zero-padding is the tell — ISO numeric country codes, area codes — and one padded value is
+    enough, since a code column stays a code column at the values that need no padding. Judge it
+    on the *whole* column: the padded codes may all sit on rows that didn't change, in which case
+    the changed-rows frame alone carries no evidence that the column is coded at all.
+    """
+    if pd.api.types.is_numeric_dtype(s):
+        return False
+    if isinstance(s.dtype, pd.CategoricalDtype):
+        # Categories are already deduplicated, so this costs nothing on a long column.
+        values = s.dtype.categories
+    elif pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
+        values = pd.unique(s.astype("object"))
+    else:
+        return False
+    return any(isinstance(v, str) and ZERO_PADDED_RE.match(v) for v in values)
+
+
+def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
+    """``s`` as float64 for BARD scoring, or None if its dtype can't carry a number at all.
+
+    A numeric indicator can carry a non-numeric **sentinel** in some rows — e.g.
+    `imf/trade`'s `china_imports_share_of_gdp` stores the literal string "China" on China's own
+    rows, since "China's imports as a share of China's GDP" is meaningless. That single string
+    makes the whole column `category`/`object` dtype, and a plain `is_numeric_dtype` gate would
+    hand the column to the unscoreable path, where it defaults to *maximal* severity — ranking
+    the column as the report's worst anomaly on the strength of its dtype alone.
+
+    So coerce instead: sentinels become NaN (they're then treated as coverage events rather than
+    revisions, which is what a value-to-sentinel flip is), and the genuinely numeric rows get
+    scored normally. Whether anything numeric actually survived the coercion is up to the caller,
+    which weighs both sides of the diff together — see `_changed_records`. Dtypes that can't hold
+    a number at all (datetimes, for one) return None and keep the unscoreable path.
+
+    Codes that merely *look* numeric are the risk in parsing strings, so a column `_is_code_column`
+    recognizes is rejected here too. Infinities are rejected differently — as missing rather than as
+    a whole unscoreable column: `pd.to_numeric` happily parses "Inf" (and a float column can hold
+    one outright), but BARD returns NaN for it, which would poison the column's median and, since
+    `_tier` reads NaN as no tier at all, drop the column out of the report's chips and watch list
+    without a word. An unmeasurable value is exactly what a sentinel is, so it's treated as one.
+    """
+    if pd.api.types.is_numeric_dtype(s):
+        return _finite(s.astype("float64"))
+    if isinstance(s.dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
+        if _is_code_column(s):
+            return None
+        return _finite(pd.to_numeric(s.astype("object"), errors="coerce").astype("float64"))
+    return None
+
+
+def _finite(s: pd.Series) -> pd.Series:
+    """``s`` with infinities blanked to NaN, so they're handled as sentinels rather than scored."""
+    return s.where(np.isfinite(s))
+
+
+def _has_numeric_content(s: pd.Series) -> bool:
+    """Whether ``s`` holds any value that can be compared as a number."""
+    coerced = _as_comparable_floats(s)
+    return coerced is not None and bool(coerced.notna().any())
+
+
+class ChangedRecords(NamedTuple):
+    """Sampled rows of a changed-values diff, plus how the rows behind them broke down."""
+
+    records: list[dict[str, str]]
+    sorted_by_score: bool
+    median_bard: float | None
+    appeared_count: int
+    disappeared_count: int
+    not_scored_count: int
+
+
 def _changed_records(
-    both: pd.DataFrame, col: str, limit: int = SAMPLE_LIMIT
-) -> tuple[list[dict[str, str]], bool, float | None, int, int]:
+    both: pd.DataFrame,
+    col: str,
+    limit: int = SAMPLE_LIMIT,
+    is_code_column: bool = False,
+    is_numeric_column: bool = False,
+) -> ChangedRecords:
     """Sample records for a changed-values diff.
+
+    `both` holds only the rows that changed, which is all the scoring needs but not always enough
+    to classify the column, since the evidence may sit entirely on rows that didn't change. Two
+    verdicts are therefore taken from the *full* columns and passed in: `is_code_column` when they
+    hold identifiers (see `_is_code_column`), whose padded values may all be unchanged, and
+    `is_numeric_column` when they hold numbers, which a sentinel-only edit leaves out of `both`
+    altogether — without it, editing the one sentinel in a numeric column would call the whole
+    column categorical and rank it maximal.
 
     A value appearing or disappearing (NaN on one side) is a *coverage* event, not a value
     *revision* — e.g. the newest year in a new dataset version, or a slow-cadence indicator whose
@@ -882,6 +973,12 @@ def _changed_records(
     resistant to blow-ups on tiny values), with appeared/disappeared rows sorted after them and
     labeled as such instead of given a score. Other dtypes keep the plain random sample.
 
+    A sentinel-carrying column (see `_as_comparable_floats`) can also change from one non-numeric
+    value to another — a sentinel whose text was edited, or a gap filled with a sentinel. Both
+    sides coerce to NaN, so nothing numeric appeared, disappeared or moved: those rows are labeled
+    "not scored" rather than given a number or miscounted as a coverage event. They still show up
+    in the diff's changed-row count and in the sample, so the change stays visible.
+
     Returns (records, sorted_by_score, median_bard, appeared_count, disappeared_count).
     median_bard is the median BARD across all *revised* rows (not just the sample) — the report
     uses it to sort columns, tables and datasets by how big their genuine revisions typically are.
@@ -890,16 +987,25 @@ def _changed_records(
     None only for non-numeric columns, where old/new can't be told apart from a category flip.
     """
     old_col, new_col = f"{col} -", f"{col} +"
-    if not (pd.api.types.is_numeric_dtype(both[old_col]) and pd.api.types.is_numeric_dtype(both[new_col])):
-        return _df_to_records(both, limit=limit), False, None, 0, 0
-
-    old = both[old_col].astype("float64")
-    new = both[new_col].astype("float64")
+    old, new = _as_comparable_floats(both[old_col]), _as_comparable_floats(both[new_col])
+    # Being a numeric quantity is a property of the column, so decide it across both sides at
+    # once, and accept the full-column verdict over the changed rows. A version that drops the
+    # sentinel convention changes exactly the sentinel rows, leaving one side of `both` entirely
+    # non-numeric; an edit to the sentinel itself leaves both sides so. Judging those on `both`
+    # alone would call the indicator categorical and hand it maximal severity, the very failure
+    # this coercion exists to remove.
+    if is_code_column or old is None or new is None:
+        return ChangedRecords(_df_to_records(both, limit=limit), False, None, 0, 0, 0)
+    if not (is_numeric_column or old.notna().any() or new.notna().any()):
+        return ChangedRecords(_df_to_records(both, limit=limit), False, None, 0, 0, 0)
     old_isna = old.isna().to_numpy()
     new_isna = new.isna().to_numpy()
     appeared = old_isna & ~new_isna
     disappeared = ~old_isna & new_isna
     revised = ~old_isna & ~new_isna
+    # Non-numeric on both sides: neither a revision nor a coverage event, but still a changed row,
+    # so it is counted here rather than left to be inferred away from the other two tallies.
+    not_scored = old_isna & new_isna
 
     score = np.full(len(both), np.nan)
     score[revised] = bard(old.to_numpy()[revised], new.to_numpy()[revised])
@@ -910,10 +1016,26 @@ def _changed_records(
     rank_key = np.where(revised, -score, np.inf)
     order = np.argsort(rank_key, kind="stable")[:limit]
     top = both.iloc[order].copy()
-    top["anomaly score"] = [
-        format_score(score[i]) if revised[i] else ("appeared" if appeared[i] else "disappeared") for i in order
-    ]
-    return _df_to_records(top, limit=limit), True, median_bard, int(appeared.sum()), int(disappeared.sum())
+
+    def _label(i: int) -> str:
+        if revised[i]:
+            return format_score(score[i])
+        if appeared[i]:
+            return "appeared"
+        if disappeared[i]:
+            return "disappeared"
+        # Non-numeric on both sides (sentinel to sentinel): not a coverage event either.
+        return "not scored"
+
+    top["anomaly score"] = [_label(i) for i in order]
+    return ChangedRecords(
+        _df_to_records(top, limit=limit),
+        True,
+        median_bard,
+        int(appeared.sum()),
+        int(disappeared.sum()),
+        int(not_scored.sum()),
+    )
 
 
 def _data_diff(
@@ -978,17 +1100,25 @@ def _data_diff(
             both = samp_a.join(samp_b, lsuffix=" -", rsuffix=" +")
         lines += _df_to_str(both)
 
-        records, sorted_by_score, median_bard, appeared_count, disappeared_count = _changed_records(both, col)
+        # Classified on the full columns, not on `both`: the rows that prove a column is coded, or
+        # that it is numeric at all, may all be rows that didn't change.
+        changed = _changed_records(
+            both,
+            col,
+            is_code_column=_is_code_column(table_a[col]) or _is_code_column(table_b[col]),
+            is_numeric_column=_has_numeric_content(table_a[col]) or _has_numeric_content(table_b[col]),
+        )
         value_diffs.append(
             ValueDiff(
                 kind="changed",
                 count=int(neq.sum()),
                 total=int(n),
-                sample=records,
-                sorted_by_score=sorted_by_score,
-                median_bard=median_bard,
-                appeared_count=appeared_count,
-                disappeared_count=disappeared_count,
+                sample=changed.records,
+                sorted_by_score=changed.sorted_by_score,
+                median_bard=changed.median_bard,
+                appeared_count=changed.appeared_count,
+                disappeared_count=changed.disappeared_count,
+                not_scored_count=changed.not_scored_count,
             )
         )
 

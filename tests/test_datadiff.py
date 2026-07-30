@@ -16,6 +16,7 @@ from etl.datadiff import (
     _changed_records,
     _dataset_files_match,
     _diff_lines,
+    _is_code_column,
     _is_superseded_remote_predecessor,
     _table_metadata_dict,
 )
@@ -26,6 +27,9 @@ from etl.datadiff_report import (
     DiffReport,
     TableDiffResult,
     ValueDiff,
+    _render_value_diff,
+    _tier,
+    _tier_chip,
     render_html,
 )
 
@@ -159,7 +163,7 @@ def test_changed_records_sorts_numeric_by_change_size():
             "a +": [101.0, 250.0, 5.0],  # BARD ≈ 0.005, 0.43, 1.0
         }
     )
-    records, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
     assert sorted_by_score
     # Biggest changes (by anomaly score = BARD) first; growth from zero is maximal (score 1).
     assert [r["country"] for r in records] == ["from_zero", "big", "small"]
@@ -169,13 +173,13 @@ def test_changed_records_sorts_numeric_by_change_size():
     assert (appeared, disappeared) == (0, 0)
 
     # A sample larger than the limit keeps only the biggest movers.
-    top, _, _, _, _ = _changed_records(both, "a", limit=2)
+    top, _, _, _, _, _ = _changed_records(both, "a", limit=2)
     assert [r["country"] for r in top] == ["from_zero", "big"]
 
 
 def test_changed_records_non_numeric_falls_back_to_random_sample():
     both = pd.DataFrame({"country": ["UK", "US"], "a -": ["x", "y"], "a +": ["y", "z"]})
-    records, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
     assert not sorted_by_score
     assert median_bard is None
     assert (appeared, disappeared) == (0, 0)
@@ -195,7 +199,7 @@ def test_changed_records_appeared_and_disappeared_excluded_from_score():
             "a +": [5.0, float("nan"), 20.0],  # 2022: revised (BARD 1/3); 2023: disappeared; 2024: appeared
         }
     )
-    records, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
     assert sorted_by_score
     labels = {r["year"]: r["anomaly score"] for r in records}
     assert labels["2022"] == "33%"
@@ -213,7 +217,7 @@ def test_changed_records_all_appeared_disappeared_score_zero_median():
     non-numeric fallback of 1 -- otherwise a WDI-style "add a new year" update would still pin
     every such column's severity to maximal."""
     both = pd.DataFrame({"year": [2024, 2024], "a -": [float("nan"), float("nan")], "a +": [20.0, 30.0]})
-    records, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
     assert median_bard == 0.0
     assert (appeared, disappeared) == (2, 0)
     assert all(r["anomaly score"] == "appeared" for r in records)
@@ -787,3 +791,319 @@ def test_is_superseded_remote_predecessor():
     assert not _is_superseded_remote_predecessor(
         "garden/worldbank_wdi/2026-02-27/wdi", {"garden/other/2024-01-01/other": object()}
     )
+
+
+def test_numeric_column_with_sentinel_is_scored():
+    """A numeric column carrying a non-numeric sentinel must still be scored on its numeric rows.
+
+    Real case: `imf/trade.china_imports_share_of_gdp` stores the literal string "China" on
+    China's own rows (the ratio is meaningless there), which makes the whole column `category`
+    dtype. A dtype-only gate sent it to the unscoreable path, where severity defaults to 1.0 —
+    so a column whose genuine revisions were ~0.3% was reported as the worst anomaly (100%) in
+    the whole diff, above real 1.6% changes.
+    """
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001, 2002, 2003],
+            "a -": pd.Categorical(["0.7529", "0.8127", "China", "2.4390"]),
+            "a +": pd.Categorical(["0.7627", "0.8027", "China", "2.4305"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+
+    assert sorted_by_score, "a sentinel-carrying numeric column should be score-sorted like any numeric one"
+    assert median_bard is not None, "severity must be measured, not the non-numeric 1.0 fallback"
+    assert median_bard < 0.01, f"tiny revisions should score near zero, got {median_bard}"
+    # The sentinel rows coerce to NaN on both sides, so they are neither revisions nor coverage events.
+    assert (appeared, disappeared) == (0, 0)
+    assert len(records) == 4
+
+
+def test_genuinely_categorical_column_stays_unscored():
+    """A column with no numeric content at all keeps the unscoreable path (median_bard None),
+    so the report labels it "not scored" rather than inventing a number."""
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["estimate", "estimate"]),
+            "a +": pd.Categorical(["projection", "projection"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+    assert len(records) == 2
+
+
+def test_unscored_column_reports_not_scored_instead_of_100_percent():
+    """The 1.0 severity fallback must not be rendered as a measured "median anomaly score 100%"."""
+    categorical = ColumnDiffResult(
+        name="status",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="changed", count=2, total=2, median_bard=None)],
+    )
+    numeric = ColumnDiffResult(
+        name="gdp",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="changed", count=2, total=2, median_bard=1.0)],
+    )
+
+    assert not categorical.is_scored
+    assert numeric.is_scored
+
+    chip = _tier_chip(categorical.severity, categorical.kind, scored=categorical.is_scored)
+    assert "not scored" in chip and "100%" not in chip
+    # A genuine, measured 100% still says so.
+    assert "median anomaly score 100%" in _tier_chip(numeric.severity, numeric.kind, scored=numeric.is_scored)
+
+
+def test_sentinel_to_sentinel_row_is_not_counted_as_coverage():
+    """A row that is non-numeric on both sides is neither a revision nor a coverage event.
+
+    A sentinel whose text changes ("China" -> "n/a"), or a gap filled with a sentinel, coerces to
+    NaN on both sides. Nothing numeric appeared, disappeared or moved, so the row must not be
+    labeled "disappeared" in the sample while `disappeared_count` stays zero.
+    """
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001, 2002, 2003],
+            "a -": pd.Categorical(["0.7529", "China", "1.5000", None]),
+            "a +": pd.Categorical(["0.7627", "n/a", "China", "China"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+
+    assert sorted_by_score
+    assert median_bard is not None and median_bard < 0.01
+    # Only the numeric-to-sentinel row (1.5 -> "China") is a genuine coverage loss.
+    assert (appeared, disappeared) == (0, 1)
+    labels = sorted(r["anomaly score"] for r in records)
+    assert labels == ["0.65%", "disappeared", "not scored", "not scored"], labels
+
+
+def test_column_scored_when_only_one_side_is_numeric():
+    """Numeric content on either side is enough — a whole side can legitimately be sentinels.
+
+    `both` holds only the rows that changed, so a version that drops (or introduces) a sentinel
+    convention changes exactly the sentinel rows: one side is then entirely non-numeric. Judging
+    that side on its own would call the indicator categorical and give it maximal severity — the
+    failure the coercion exists to remove. It is a pure coverage event and scores as one.
+    """
+    dropped_sentinel = pd.DataFrame(
+        {
+            "year": [2000, 2001, 2002],
+            "a -": pd.Categorical(["China", "China", "China"]),
+            "a +": pd.Categorical(["0.7529", "0.8127", "2.4390"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(dropped_sentinel, "a")
+    assert sorted_by_score
+    assert median_bard == 0.0, "no revisions to score, but that is a measured zero, not the 1.0 fallback"
+    assert (appeared, disappeared) == (3, 0)
+    assert all(r["anomaly score"] == "appeared" for r in records)
+
+    # And the mirror image: numbers replaced by a sentinel is a coverage loss.
+    added_sentinel = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["1.5000", "2.5000"]),
+            "a +": pd.Categorical(["China", "China"]),
+        }
+    )
+    _, sorted_by_score, median_bard, appeared, disappeared, _ = _changed_records(added_sentinel, "a")
+    assert sorted_by_score and median_bard == 0.0
+    assert (appeared, disappeared) == (0, 2)
+
+
+def test_zero_padded_codes_stay_unscored():
+    """Identifiers that only look numeric must not be parsed into quantities.
+
+    Meadow tables carry ISO numeric country codes and the like as strings. Coercing them would
+    report "004" -> "008" as a BARD anomaly, so a column holding any zero-padded value is treated
+    as a code column — including the values in it that happen to need no padding.
+    """
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["004", "100"]),
+            "a +": pd.Categorical(["008", "112"]),
+        }
+    )
+    _, sorted_by_score, median_bard, appeared, disappeared, _ = _changed_records(both, "a")
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+
+    # Decimals below one are not zero-padding: a real quantity keeps its score.
+    decimals = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["0.7500", "0"]),
+            "a +": pd.Categorical(["0.8000", "0.1"]),
+        }
+    )
+    _, sorted_by_score, median_bard, _, _, _ = _changed_records(decimals, "a")
+    assert sorted_by_score and median_bard is not None
+
+
+def test_code_column_classified_on_full_column_not_changed_rows():
+    """The padded codes proving a column is coded may all sit on rows that didn't change.
+
+    `both` holds only changed rows, so if "004" stays "004" and only "100" -> "112" moves, the
+    frame carries no evidence of coding at all. `_is_code_column` therefore reads the full column
+    and the verdict is passed in.
+    """
+    full_column = pd.Series(pd.Categorical(["004", "100"]))
+    assert _is_code_column(full_column)
+    assert not _is_code_column(pd.Series(pd.Categorical(["0.75", "China"])))
+    assert not _is_code_column(pd.Series([0.75, 1.25]))
+
+    both = pd.DataFrame({"year": [2001], "a -": pd.Categorical(["100"]), "a +": pd.Categorical(["112"])})
+    # Without the full-column verdict the changed rows look like a plain quantity.
+    assert _changed_records(both, "a")[1:] == (True, pytest.approx(0.0566, abs=1e-3), 0, 0, 0)
+    assert _changed_records(both, "a", is_code_column=True)[1:] == (False, None, 0, 0, 0)
+
+
+def test_infinities_are_treated_as_sentinels_not_scored():
+    """An infinity must not poison the column's median and drop it out of the report.
+
+    `pd.to_numeric` parses "Inf", and a float column can hold one outright. BARD returns NaN for
+    it, `median_bard` becomes NaN, and `_tier` reads NaN as no tier — so the column silently loses
+    its chip and its place in the watch list. Infinities are blanked to NaN and handled like any
+    other unmeasurable value instead.
+    """
+    for side in (pd.Categorical(["Inf", "2.0"]), [float("inf"), 2.0]):
+        both = pd.DataFrame({"year": [2000, 2001], "a -": side, "a +": [1.0, 2.5]})
+        records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+        assert sorted_by_score
+        assert median_bard == pytest.approx(0.1111, abs=1e-3), "the median must come from the finite revision only"
+        assert (appeared, disappeared) == (1, 0)
+        assert not any("nan" in r["anomaly score"] for r in records)
+        assert _tier(median_bard) != "none"
+
+
+def test_non_numeric_dtypes_stay_unscored():
+    """A dtype that can't hold a number at all keeps the unscoreable path."""
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.to_datetime(["2000-01-01", "2001-01-01"]),
+            "a +": pd.to_datetime(["2000-02-01", "2001-02-01"]),
+        }
+    )
+    _, sorted_by_score, median_bard, appeared, disappeared, _ = _changed_records(both, "a")
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+
+
+def test_coverage_only_numeric_column_is_still_scored():
+    """A numeric column with only removed rows has a measured severity, so it is not "not scored".
+
+    Its `value_diffs` hold no `changed` entry at all; the absence of one is not evidence that the
+    column is categorical, and its severity (the share of rows lost) was measured, not defaulted.
+    """
+    coverage_only = ColumnDiffResult(
+        name="gdp",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="removed", count=1, total=4)],
+    )
+
+    assert coverage_only.is_scored
+    chip = _tier_chip(coverage_only.severity, coverage_only.kind, scored=coverage_only.is_scored)
+    assert "not scored" not in chip
+
+
+def test_sentinel_only_edit_keeps_the_column_numeric():
+    """Editing the sentinel of a numeric column must not reclassify the column as categorical.
+
+    If the numeric rows are unchanged, the only changed row is `"China" -> "N/A"` and `both` holds
+    no number on either side — yet the full columns prove the indicator is numeric-with-sentinels.
+    Without that verdict the column takes the 1.0 fallback and tops the report.
+    """
+    both = pd.DataFrame({"year": [2000], "a -": pd.Categorical(["China"]), "a +": pd.Categorical(["N/A"])})
+
+    assert _changed_records(both, "a")[1:] == (False, None, 0, 0, 0)
+
+    _, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(
+        both, "a", is_numeric_column=True
+    )
+    assert sorted_by_score
+    assert median_bard == 0.0, "no revision to score, but not the maximal fallback either"
+    assert (appeared, disappeared, not_scored) == (0, 0, 1)
+
+
+def test_breakdown_counts_not_scored_rows_separately():
+    """The HTML breakdown must agree with the row labels rather than inferring revisions.
+
+    Deriving revised as `count - appeared - disappeared` counted the not-scored rows as revisions.
+    """
+    v = ValueDiff(
+        kind="changed", count=4, total=10, median_bard=0.05, appeared_count=0, disappeared_count=1, not_scored_count=2
+    )
+    breakdown = re.search(r"\((\d[^)]*)\)</span>", _render_value_diff(v))
+    assert breakdown and breakdown.group(1) == "1 revised, 1 disappeared, 2 not scored"
+
+    # Nothing left to revise: the "0 revised" bit is dropped rather than printed.
+    only_sentinels = ValueDiff(kind="changed", count=2, total=10, median_bard=0.0, not_scored_count=2)
+    breakdown = re.search(r"\((\d[^)]*)\)</span>", _render_value_diff(only_sentinels))
+    assert breakdown and breakdown.group(1) == "2 not scored"
+
+
+def test_sentinel_only_dataset_is_not_summarized_as_new_data():
+    """A dataset whose only change is an edited sentinel added nothing, so don't say it did.
+
+    Such a change scores zero on both the anomaly and the coverage axis, which used to drop it
+    into the "new data only" bucket in the summary strip and the dataset watch list.
+    """
+    ds = DatasetDiffResult(
+        path="garden/n/v/ds",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="tab",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(
+                        name="a",
+                        kind="changed",
+                        changes=["changed data"],
+                        value_diffs=[ValueDiff(kind="changed", count=1, total=10, median_bard=0.0, not_scored_count=1)],
+                    )
+                ],
+            )
+        ],
+    )
+    assert ds.not_scored_count == 1
+    assert ds.severity == 0.0
+
+    # A second dataset, so the summary strip and the watch list have enough entries to render.
+    other = DatasetDiffResult(
+        path="garden/n/v/other",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="tab",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(
+                        name="a",
+                        kind="changed",
+                        changes=["changed data"],
+                        value_diffs=[ValueDiff(kind="changed", count=1, total=10, median_bard=0.5)],
+                    )
+                ],
+            )
+        ],
+    )
+
+    html = render_html(DiffReport(datasets=[ds, other]))
+    assert "new data only" not in html
+    assert "non-numeric value changes only" in html
+    assert "1 non-numeric-only" in html
+    assert "new-data-only" not in html
