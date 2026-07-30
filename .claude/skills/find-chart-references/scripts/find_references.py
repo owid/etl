@@ -664,6 +664,11 @@ def summarize(findings: list[dict]) -> None:
 GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
 
 
+def gdoc_preview_url(f: dict, admin: str) -> str:
+    """Admin preview of the article itself — renders the gdoc, including unpublished drafts."""
+    return f"{admin}/gdocs/{f['surface_id']}/preview" if f["surface_id"] else ""
+
+
 def doc_url(f: dict) -> str:
     """Google Doc edit URL. posts_gdocs.id IS the Google Doc id, so this is a direct link."""
     return f"https://docs.google.com/document/d/{f['surface_id']}/edit" if f["surface_id"] else ""
@@ -753,7 +758,7 @@ def cell(value: str, limit: int = 70) -> str:
     return (text[: limit - 1] + "…") if len(text) > limit else text
 
 
-def write_markdown(findings: list[dict], path: str, host: str) -> None:
+def write_markdown(findings: list[dict], path: str, host: str, admin: str) -> None:
     """Human-readable report: one table per surface, with links to open each reference."""
     by_kind: dict[str, list[dict]] = defaultdict(list)
     for f in findings:
@@ -783,8 +788,8 @@ def write_markdown(findings: list[dict], path: str, host: str) -> None:
             lines += [f"### {surface} ({len(rows)})", ""]
             if surface in GDOC_SURFACES:
                 lines += [
-                    "| Subject | Article | Open | Find in the doc | Preview |",
-                    "|---|---|---|---|---|",
+                    "| Chart | Article | Open | Find in the doc |",
+                    "|---|---|---|---|",
                 ]
                 for f in rows:
                     draft = "" if f["published"] else " ⚠️draft"
@@ -792,12 +797,16 @@ def write_markdown(findings: list[dict], path: str, host: str) -> None:
                     # the fix; the block type does not, and `kind` already implies it.
                     ptype = f["context"].split("(")[-1].rstrip(")") if "(" in f["context"] else ""
                     page_type = f" _{ptype}_" if ptype else ""
-                    links = f"[📄 doc]({doc_url(f)}) · [🔗 page]({deep_link(f, host)})"
+                    preview = f" · [👁 preview]({gdoc_preview_url(f, admin)})" if f["surface_id"] else ""
+                    links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host)})"
+                    subject = (
+                        f"[`{cell(f['subject_label'], 44)}`]({f['preview_url']})"
+                        if f["preview_url"]
+                        else f"`{cell(f['subject_label'], 44)}`"
+                    )
                     find = search_hint(f)
                     lines.append(
-                        f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 44)}{page_type}{draft} | "
-                        f"{links} | {find} | "
-                        f"{'[👁 view](' + f['preview_url'] + ')' if f['preview_url'] else '—'} |"
+                        f"| {subject} | {cell(f['where'], 44)}{page_type}{draft} | {links} | {find} | {preview} |"
                     )
             else:
                 lines += ["| Subject | Where | Context | Preview |", "|---|---|---|---|"]
@@ -813,7 +822,9 @@ def write_markdown(findings: list[dict], path: str, host: str) -> None:
     lines += [
         "---",
         "",
+        "The **chart name links to the view as that reference renders it** (its own params applied). "
         "📄 opens the Google Doc to edit · 🔗 opens the published page scrolled to the reference · "
+        "👁 opens the article in the admin previewer (works for unpublished drafts too). "
         "**Find in the doc** is a copy-paste search string for the Google Doc: the link text "
         "for a prose hyperlink, or the chart slug for a block embed (the doc holds a bare "
         "grapher URL there — and the slug is stored as the author typed it, so it matches "
@@ -917,7 +928,12 @@ def main() -> int:
             w.writerows(findings)
         print(f"-> {args.csv_out}")
     if args.md_out:
-        write_markdown(findings, args.md_out, (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/"))
+        write_markdown(
+            findings,
+            args.md_out,
+            (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/"),
+            (OWID_ENV.admin_site or "https://admin.owid.io/admin").rstrip("/"),
+        )
         print(f"-> {args.md_out}")
     if not any([args.json_out, args.csv_out, args.md_out]):
         print("\n(pass --json / --csv / --markdown to save the findings)")
