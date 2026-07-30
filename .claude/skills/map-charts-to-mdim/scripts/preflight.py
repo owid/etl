@@ -62,6 +62,10 @@ def load_decisions(path_arg: str) -> dict[int, dict]:
             # the target the decision was made on, used to detect stale decisions
             "target_mdim": (r.get("target_mdim") or "").strip(),
             "view_id": (r.get("view_id") or "").strip(),
+            # the source chart version it was made on: a re-run after the chart was edited
+            # regenerates mapping.json with the new md5, so `stale_charts` cannot see the
+            # drift — only the decision export still remembers what was reviewed.
+            "config_md5": (r.get("config_md5") or "").strip(),
         }
         for r in rows
     }
@@ -72,16 +76,21 @@ def apply_decisions(
 ) -> tuple[list[dict], list[tuple[dict, str]], list[dict], int]:
     """Drop entries whose chart the reviewer flagged; count kept entries that carry no decision.
 
-    A decision is bound to the proposal it was made on: if the export carries the reviewed
-    target (target_mdim/view_id) and it differs from the entry's current target, the decision
-    is stale and treated as no decision at all.
+    A decision is bound to the proposal it was made on, on BOTH sides: if the export carries
+    the reviewed target (target_mdim/view_id) or the reviewed source version (config_md5) and
+    either differs from the entry, the decision is stale and treated as no decision at all.
+    The source half matters because a re-run after the chart was edited rewrites mapping.json
+    with the new md5, so `stale_charts` compares new-against-new and sees nothing.
     """
     kept, flagged, stale, undecided = [], [], [], 0
     for e in entries:
         d = decisions.get(e["chart"]["id"], {})
         status = d.get("status", "")
         reviewed_target = (d.get("target_mdim", ""), d.get("view_id", ""))
-        if status and any(reviewed_target) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"]):
+        reviewed_md5 = d.get("config_md5", "")
+        drifted = any(reviewed_target) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"])
+        edited = bool(reviewed_md5) and bool(e["chart"].get("configMd5")) and reviewed_md5 != e["chart"]["configMd5"]
+        if status and (drifted or edited):
             stale.append(e)
             status = ""
         if status == "flagged":
@@ -384,6 +393,28 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
             params={"slugs": slugs},
         ),
     )
+
+    # An article can also record a chart block as a raw URL (linkType='url'), which the
+    # filter above misses; the sweep in find-chart-references already classifies the
+    # non-`span-*` ones as embeds, so the gate must agree with the audit. Here the '%'
+    # wildcards live in the parameter VALUES, not in the SQL string, so they don't collide
+    # with pymysql's own %-formatting.
+    clauses = " OR ".join(f"pgl.target LIKE %(t{i})s" for i in range(len(slugs)))
+    url_rows = OWID_ENV.read_sql(
+        "SELECT pgl.target FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
+        "WHERE pgl.linkType = 'url' AND pg.published = 1 "
+        "AND (pgl.componentType IS NULL OR LEFT(pgl.componentType, 5) <> 'span-') "
+        f"AND ({clauses})",
+        params={f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)},
+    )
+    for row in url_rows.to_dict("records"):
+        target = row["target"] or ""
+        if "archive.ourworldindata.org" in target:
+            continue  # archived snapshots are frozen by design
+        slug = target.split("/grapher/", 1)[-1].split("?")[0].split("#")[0].rstrip("/")
+        if slug in by_slug:
+            cid = by_slug[slug]
+            counts[cid]["articleEmbeds"] = counts[cid].get("articleEmbeds", 0) + 1
 
     return {cid: ", ".join(f"{k} ({n})" for k, n in sorted(v.items())) for cid, v in counts.items() if v}
 

@@ -67,6 +67,9 @@ def parse_proposal(mapping_dir: Path) -> list[dict]:
                 "chart_title": (r.get("chart_title") or "").strip(),
                 "chart_path": f"/grapher/{(r.get('chart_slug') or '').strip()}",
                 "quality": (r.get("match_quality") or "").strip(),
+                # Part of the decision fingerprint: an approval is made on a specific
+                # version of the source chart, not just on its id.
+                "config_md5": (r.get("chart_config_md5") or "").strip(),
                 "target_mdim": (r.get("target_mdim_slug") or "").strip(),
                 "view_id": (r.get("target_view_id") or "").strip(),
                 "target_path": target_path,
@@ -265,9 +268,12 @@ let order = RECORDS.map((_, i) => i);
 let pos = 0;
 
 // A decision is bound to the proposal it was made on: when a re-run of the extractor
-// changes a chart's proposed target, the saved approval/flag must not carry over to
-// the new, unreviewed target.
-function fp(rec) { return (rec.target_mdim || "") + "::" + (rec.view_id || ""); }
+// changes a chart's proposed target OR edits the source chart itself, the saved
+// approval/flag must not carry over. The source config md5 is in the fingerprint
+// because a reviewer approves a specific version of the chart, not just its id —
+// and once the mapping is regenerated, preflight's own configMd5 check compares the
+// new proposal against the DB and so cannot see that drift either.
+function fp(rec) { return (rec.target_mdim || "") + "::" + (rec.view_id || "") + "::" + (rec.config_md5 || ""); }
 (function pruneStaleDecisions() {
   let n = 0;
   for (const rec of RECORDS) {
@@ -371,8 +377,8 @@ function importJSON(file) {
       for (const row of rows) {
         if (!(row && row.id != null && (row.status || row.note))) continue;
         const rec = byId[String(row.id)];
-        const rowFp = (row.target_mdim || "") + "::" + (row.view_id || "");
-        if (!rec || rowFp !== fp(rec)) { skipped++; continue; }  // chart gone or target changed
+        const rowFp = (row.target_mdim || "") + "::" + (row.view_id || "") + "::" + (row.config_md5 || "");
+        if (!rec || rowFp !== fp(rec)) { skipped++; continue; }  // chart gone, target changed, or chart edited
         decisions[String(row.id)] = { status: row.status || null, note: row.note || "", target: rowFp };
         n++;
       }
@@ -562,7 +568,7 @@ function exportRows() {
     const d = decisions[r.id] || {};
     return {
       id: r.id, chart_slug: r.chart_slug, quality: r.quality,
-      target_mdim: r.target_mdim, view_id: r.view_id,
+      target_mdim: r.target_mdim, view_id: r.view_id, config_md5: r.config_md5,
       shared_with: r.shared_with, conflict: r.conflict,
       status: d.status || "", note: d.note || "",
       chart_url: chartUrl(r), mdim_url: mdimUrl(r),
@@ -577,7 +583,7 @@ function download(name, text, type) {
 function exportJSON() { download(REVIEW_NAME + "_chart_mdim_review.json", JSON.stringify(exportRows(), null, 2), "application/json"); }
 function exportCSV() {
   const rows = exportRows();
-  const cols = ["id", "chart_slug", "quality", "target_mdim", "view_id", "status", "note", "shared_with", "conflict", "chart_url", "mdim_url"];
+  const cols = ["id", "chart_slug", "quality", "target_mdim", "view_id", "config_md5", "status", "note", "shared_with", "conflict", "chart_url", "mdim_url"];
   const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
   const lines = [cols.join(",")];
   for (const r of rows) lines.push(cols.map((c) => esc(r[c])).join(","));

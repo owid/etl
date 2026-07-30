@@ -85,17 +85,24 @@ def resolve_chart_subjects(chart_ids: list[int], chart_slugs: list[str]) -> dict
         params=params,
     )
     charts = {int(r["id"]): r["slug"] for r in df.to_dict("records") if r["slug"]}
-    if not charts:
-        return {}
     by_slug = {slug: {"id": cid, "slug": slug} for cid, slug in charts.items()}
-    # Old slugs still reach the chart, so references may point at them.
-    old = OWID_ENV.read_sql(
-        "SELECT csr.slug AS old_slug, csr.chart_id FROM chart_slug_redirects csr WHERE csr.chart_id IN %(ids)s",
-        params={"ids": tuple(charts)},
-    )
-    for r in old.to_dict("records"):
-        cid = int(r["chart_id"])
-        by_slug[r["old_slug"]] = {"id": cid, "slug": charts[cid]}
+    if charts:
+        # Old slugs still reach the chart, so references may point at them.
+        old = OWID_ENV.read_sql(
+            "SELECT csr.slug AS old_slug, csr.chart_id FROM chart_slug_redirects csr WHERE csr.chart_id IN %(ids)s",
+            params={"ids": tuple(charts)},
+        )
+        for r in old.to_dict("records"):
+            cid = int(r["chart_id"])
+            by_slug[r["old_slug"]] = {"id": cid, "slug": charts[cid]}
+
+    # A subject that resolves to nothing is UNKNOWN, not "nothing references it". Report it
+    # loudly — otherwise a typo, a deletion, or a mixed request reads as a clean blast-radius
+    # result. Checked after the old-slug expansion, so passing an old slug isn't flagged.
+    missing = [str(i) for i in chart_ids if i not in charts] + [s for s in chart_slugs if s not in by_slug]
+    if missing:
+        print(f"  WARNING: {len(missing)} chart subject(s) did not resolve and were NOT swept: {sorted(missing)}")
+        print("           A blank result for these means UNKNOWN, not 'nothing references them'.")
     return by_slug
 
 
@@ -662,6 +669,8 @@ def main() -> int:
     findings: list[dict] = []
 
     by_slug = resolve_chart_subjects(chart_ids, chart_slugs)
+    if (chart_ids or chart_slugs) and not by_slug:
+        print("chart subjects: NONE of the requested charts resolved — no chart surface was swept.")
     if by_slug:
         print(f"chart subjects: {len({v['id'] for v in by_slug.values()})} chart(s), {len(by_slug)} slug(s) incl. old")
         findings += sweep_gdoc_links(by_slug)

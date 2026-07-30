@@ -54,7 +54,7 @@ EXTRA_SLOTS = ("x", "size", "color")
 QUALITIES = ("exact", "forced", "ambiguous", "near_miss", "none", "skipped")
 
 PROPOSAL_COLUMNS = [
-    "chart_id", "chart_slug", "chart_title", "chart_type", "chart_url", "y_variable_ids",
+    "chart_id", "chart_slug", "chart_title", "chart_type", "chart_url", "chart_config_md5", "y_variable_ids",
     "match_quality", "tiebreak", "target_mdim_catalog_path", "target_mdim_slug",
     "target_view_id", "target_view_config_id", "target_url", "target_view_title",
     "target_chart_type", "n_candidates", "candidate_view_ids", "near_miss_detail",
@@ -627,6 +627,7 @@ def write_proposal_csv(out: Path, charts: list[dict], id_to_path: dict[int, str]
             w.writerow({
                 "chart_id": c["chart_id"], "chart_slug": c["chart_slug"], "chart_title": c["title"],
                 "chart_type": c["chart_type"], "chart_url": f"{host}/grapher/{c['chart_slug']}",
+                "chart_config_md5": c["config_md5"],
                 "y_variable_ids": "|".join(str(i) for i in sorted(c["y"])),
                 "match_quality": c["quality"], "tiebreak": c["tiebreak"],
                 "target_mdim_catalog_path": t["mdim_catalog_path"] if t else "",
