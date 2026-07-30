@@ -3,7 +3,8 @@ from pathlib import Path
 
 from structlog import get_logger
 
-from etl.dag_helpers import load_dag
+from etl.dag_helpers import load_dag, load_single_dag_file, parse_dag_yaml_text
+from etl.git_helpers import get_file_at_merge_base
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.steps import filter_to_subgraph
 
@@ -30,6 +31,38 @@ def get_changed_steps(files_changed: dict[str, dict[str, str]]) -> list[str]:
         else:
             continue
 
+    return changed_steps
+
+
+def get_dag_dependency_changed_steps(files_changed: dict[str, dict[str, str]]) -> set[str]:
+    """Steps whose dependency lists changed in edited ``dag/*.yml`` files.
+
+    A dependency-only edit — e.g. repointing a consumer step from one input version to another —
+    touches no file under ``etl/steps/`` or ``snapshots/``, so :func:`get_changed_steps` cannot
+    see it; yet the step rebuilds to different content. Without this, ``--modified`` builds (and
+    the chart-diff / datadiff selections built on the same machinery) silently skip repointed
+    steps, and their value changes ship with the next full build unreviewed (WDI 2026-07: six
+    repointed consumers changed data that neither diff surfaced).
+
+    Diff each changed DAG file against its merge-base version and select every step whose
+    dependency set differs, including steps newly declared in the file. ``dag/archive/*`` is a
+    generated record of retired steps and is ignored.
+    """
+    changed_steps: set[str] = set()
+    for file_path, file_status in files_changed.items():
+        # files_changed values are {"status": ..., "diff": ...} dicts from get_changed_files,
+        # but plain status strings are also accepted (mirrors get_changed_steps' inputs in tests).
+        status = file_status.get("status") if isinstance(file_status, dict) else file_status
+        if status == "D":
+            continue
+        if not file_path.startswith("dag/") or file_path.startswith("dag/archive/") or not file_path.endswith(".yml"):
+            continue
+        current = load_single_dag_file(BASE_DIR / file_path)
+        base_text = get_file_at_merge_base(file_path)
+        base = parse_dag_yaml_text(base_text) if base_text else {}
+        for step, deps in current.items():
+            if set(deps or set()) != set(base.get(step) or set()):
+                changed_steps.add(step)
     return changed_steps
 
 
@@ -73,6 +106,16 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], incl
             else:
                 export_path = rel_export.with_suffix("").with_suffix("").as_posix()
             changed_export_uris.append(f"export://{export_path}")
+
+    # Dependency-only DAG edits (repoints) change a step's content without touching its files —
+    # select those steps too, so they enter the subgraph expansion below like any changed step.
+    for step_uri in sorted(get_dag_dependency_changed_steps(files_changed)):
+        if step_uri.startswith(("data://", "data-private://")):
+            ds_path = step_uri.split("://", 1)[1]
+            if ds_path not in dataset_catalog_paths:
+                dataset_catalog_paths.append(ds_path)
+        elif step_uri.startswith("export://") and step_uri not in changed_export_uris:
+            changed_export_uris.append(step_uri)
 
     if not dataset_catalog_paths:
         # No data steps changed. We can still have directly-changed export steps; return those when
