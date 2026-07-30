@@ -1,0 +1,233 @@
+"""Show where each chart being redirected is linked or embedded, and what to replace it with.
+
+READ-ONLY. The surface sweep itself lives in the `find-chart-references` skill — this script
+is the redirect-specific consumer: it runs that sweep for the proposal's source charts,
+then adds what only this workflow knows, namely the URL each reference should become.
+
+Severity, derived from the sweep's `kind`:
+  RED    embed — the redirect does NOT fix it. The surface holds the chart by id or
+         slug and renders its config directly, so it breaks when the source chart is
+         unpublished (which the apply CLI always does). Migrate before applying.
+  YELLOW link (the 301 covers it, but the href should be updated so readers don't
+         take an extra hop) or render (a key-chart slot: the topic page loses the
+         chart, so re-tag the MDIM — a follow-up, not a breakage).
+  INFO   the referencing page is unpublished or a draft.
+
+Replacement URLs merge each reference's own query string over the view's dimensions,
+which is what grapher's redirect handler does (functions/_common/redirectTools.ts).
+That merge is also a hazard: a link carrying ?metric=… overrides an MDIM dimension of
+the same name and lands the reader on the wrong view. Those collisions are flagged.
+
+Usage:
+    ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
+        .claude/skills/map-charts-to-mdim/scripts/audit_references.py \
+        --mapping ai/<name>-charts-mdim-mapping
+"""
+
+import argparse
+import csv
+import json
+import subprocess
+import sys
+import tempfile
+from collections import defaultdict
+from pathlib import Path
+from urllib.parse import parse_qsl, urlencode
+
+from etl.config import OWID_ENV
+
+FIND_REFERENCES = Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts" / "find_references.py"
+
+RED, YELLOW, INFO = "RED", "YELLOW", "INFO"
+
+REFERENCE_COLUMNS = [
+    "severity", "surface", "kind", "source_chart_slug", "where", "where_url", "context",
+    "old_url", "replacement_url", "param_collisions", "fix",
+]  # fmt: skip
+
+FIXES = {
+    "gdoc": "edit the article block to embed the MDIM view",
+    "gdoc (url link)": "update the href in the article",
+    "explorer": "repoint the explorer at the MDIM indicators, or retire the explorer",
+    "narrative chart": "no repointing API exists — see the narrative-chart escalation notes",
+    "data insight": "update the data insight's grapher-url",
+    "static viz": "regenerate the static visualization against the MDIM view",
+    "key chart": "re-tag the MDIM so the topic page keeps a key chart",
+    "wordpress": "update the link in the WordPress post",
+}
+LINK_FIX = "update the href"
+
+
+def load_redirects(path_arg: str) -> list[dict]:
+    path = Path(path_arg)
+    if path.is_dir():
+        path = path / "mapping.json"
+    if not path.exists():
+        raise SystemExit(f"Not found: {path}. Run extract_and_match.py first.")
+    redirects = json.loads(path.read_text()).get("redirects", [])
+    if not redirects:
+        raise SystemExit(f"{path} has no proposed redirects to audit.")
+    return redirects
+
+
+def run_find_references(redirects: list[dict]) -> list[dict]:
+    """Delegate the surface sweep to the find-chart-references skill."""
+    if not FIND_REFERENCES.exists():
+        raise SystemExit(f"Missing {FIND_REFERENCES} — the find-chart-references skill provides the surface sweep.")
+    slugs = ",".join(r["chart"]["slug"] for r in redirects)
+    with tempfile.NamedTemporaryFile("r", suffix=".json", delete=False) as tmp:
+        out_path = tmp.name
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(FIND_REFERENCES), "--chart-slugs", slugs, "--json", out_path],
+            capture_output=True,
+            text=True,
+        )
+        if proc.returncode != 0:
+            raise SystemExit(f"find_references.py failed:\n{proc.stdout}\n{proc.stderr}")
+        print(proc.stdout.rstrip())
+        return json.loads(Path(out_path).read_text())
+    finally:
+        Path(out_path).unlink(missing_ok=True)
+
+
+def replacement_url(r: dict, query_string: str, host: str) -> tuple[str, list[str]]:
+    """Target URL for a reference, plus any params that would clobber a view dimension."""
+    dims = dict(r["target"]["dimensions"])
+    extra = dict(parse_qsl(query_string.lstrip("?"), keep_blank_values=True)) if query_string else {}
+    collisions = sorted(k for k in extra if k in dims)
+    merged = {**dims, **extra}  # reference params win, mirroring grapher's own merge
+    return f"{host}/grapher/{r['target']['mdimSlug']}?{urlencode(sorted(merged.items()))}", collisions
+
+
+def write_csv(out: Path, findings: list[dict]) -> Path:
+    path = out / "references.csv"
+    with open(path, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=REFERENCE_COLUMNS)
+        w.writeheader()
+        for row in findings:
+            w.writerow({k: row.get(k, "") for k in REFERENCE_COLUMNS})
+    return path
+
+
+def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host: str) -> Path:
+    path = out / "references.md"
+    red = [f for f in findings if f["severity"] == RED]
+    yellow = [f for f in findings if f["severity"] == YELLOW]
+    info = [f for f in findings if f["severity"] == INFO]
+
+    lines = [
+        "# What references the charts being redirected",
+        "",
+        f"{len(redirects)} chart(s) proposed for redirect. **{len(red)} reference(s) need manual work** "
+        f"— a redirect does not fix them. {len(yellow)} more are hyperlinks the 301 covers but that "
+        "should be updated.",
+        "",
+        "Replacement URLs merge each reference's own query string over the MDIM view's dimensions, "
+        "the same way grapher's redirect handler does.",
+        "",
+    ]
+    sections = [
+        ("🔴 Needs manual migration", red, "These embed or resolve the chart directly and break when it is unpublished."),
+        ("🟡 Hyperlinks worth updating", yellow, "The 301 handles these; updating the href avoids an extra hop."),
+        ("ℹ️ Unpublished / draft", info, "No reader impact — listed for completeness."),
+    ]  # fmt: skip
+    for label, group, blurb in sections:
+        if not group:
+            continue
+        lines += [f"## {label} ({len(group)})", "", blurb, ""]
+        by_surface = defaultdict(list)
+        for f in group:
+            by_surface[f["surface"]].append(f)
+        for surface in sorted(by_surface):
+            lines += [f"### {surface} ({len(by_surface[surface])})", ""]
+            for f in by_surface[surface]:
+                where = f"[{f['where']}]({f['where_url']})" if f["where_url"] else f["where"]
+                lines.append(f"- **{f['source_chart_slug']}** in {where} — {f['context']}")
+                lines.append(f"    - now: {f['old_url']}")
+                lines.append(f"    - should be: {f['replacement_url']}")
+                if f["param_collisions"]:
+                    lines.append(
+                        f"    - ⚠️ query params `{f['param_collisions']}` collide with the view's dimensions "
+                        "and will override them — set the dimension explicitly or drop the param"
+                    )
+                lines.append(f"    - fix: {f['fix']}")
+            lines.append("")
+
+    lines += [
+        "## Coverage caveats",
+        "",
+        "See the `find-chart-references` skill for the full surface catalog and its known gaps "
+        "(non-ETL explorer TSVs, data insights storing the reference elsewhere, charts nested "
+        "in layout containers).",
+        "",
+    ]
+    path.write_text("\n".join(lines))
+    return path
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Audit what links or embeds the charts in a redirect proposal.")
+    ap.add_argument("--mapping", required=True, help="mapping.json path, or the folder containing it")
+    ap.add_argument("--host", default=None, help="Base URL for links (default: the DB environment's site)")
+    args = ap.parse_args()
+
+    mapping_dir = Path(args.mapping)
+    if not mapping_dir.is_dir():
+        mapping_dir = mapping_dir.parent
+    host = (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/")
+
+    redirects = load_redirects(args.mapping)
+    by_chart_id = {r["chart"]["id"]: r for r in redirects}
+
+    raw = run_find_references(redirects)
+
+    findings = []
+    for ref in raw:
+        r = by_chart_id.get(ref["subject_id"])
+        if r is None:
+            continue
+        qs = ref["query_string"]
+        new_url, collisions = replacement_url(r, qs, host)
+        # Only an embed is broken by the redirect: it renders the chart's own config.
+        severity = INFO if not ref["published"] else (RED if ref["kind"] == "embed" else YELLOW)
+        fix = LINK_FIX if ref["kind"] == "link" else FIXES.get(ref["surface"], "migrate this reference by hand")
+        findings.append(
+            {
+                "severity": severity,
+                "surface": ref["surface"],
+                "kind": ref["kind"],
+                "source_chart_slug": ref["subject"],
+                "where": ref["where"],
+                "where_url": f"{host}{ref['where_path']}" if ref["where_path"] else "",
+                "context": ref["context"] + (f' — "{ref["text"][:60]}"' if ref["text"] else ""),
+                "old_url": f"{host}/grapher/{ref['subject']}" + (f"?{qs.lstrip('?')}" if qs else ""),
+                "replacement_url": new_url,
+                "param_collisions": ",".join(collisions),
+                "fix": fix,
+            }
+        )
+
+    findings.sort(key=lambda f: ({RED: 0, YELLOW: 1, INFO: 2}[f["severity"]], f["surface"], f["source_chart_slug"]))
+
+    csv_path = write_csv(mapping_dir, findings)
+    md_path = write_markdown(mapping_dir, findings, redirects, host)
+
+    counts: dict[str, int] = defaultdict(int)
+    for f in findings:
+        counts[f["severity"]] += 1
+    print(f"\nreferences: {len(findings)}  (needs manual work: {counts[RED]} | "
+          f"hyperlinks to update: {counts[YELLOW]} | unpublished: {counts[INFO]})")  # fmt: skip
+    collisions = [f for f in findings if f["param_collisions"]]
+    if collisions:
+        print(f"\n⚠️  {len(collisions)} reference(s) carry query params that collide with the view's dimensions:")
+        for f in collisions:
+            print(f"  {f['where']}: {f['param_collisions']} (would override the target view)")
+
+    print(f"\n-> {csv_path}")
+    print(f"-> {md_path}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

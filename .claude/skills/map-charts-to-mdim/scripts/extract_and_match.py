@@ -18,12 +18,15 @@ between several matching views are broken by chart type; anything still
 ambiguous is reported, not proposed.
 
 Outputs into ``--out``:
-- ``charts.csv``            — the selected source charts and their indicator slots
-- ``multidim_views.csv``    — every candidate MDIM view (id A1.., B1.., ...)
-- ``mapping_proposal.csv``  — one row per chart with match quality + target view
-- ``mapping.json``          — redirect payload (confident, conflict-free matches only)
-- ``unmatched.md``          — human-readable report of everything not proposed
-- ``_sources.json``         — machine record of the run inputs (don't hand-edit)
+- ``charts.csv``                 — the selected source charts and their indicator slots
+- ``multidim_views.csv``         — every candidate MDIM view (id A1.., B1.., ...)
+- ``mapping_proposal.csv``       — one row per chart with match quality + target view
+- ``mapping.json``               — combined machine record (confident, conflict-free matches)
+- ``payloads/<slug>.json``       — one JSON per source chart, the copy-paste handoff unit
+- ``redirects_for_cli.csv``      — the apply input for `yarn createMultiDimRedirectsFromCsv`
+- ``migration_log_template.csv`` — (old_slug, mdim_slug, view_id, cutover_date) for analytics
+- ``unmatched.md``               — human-readable report of everything not proposed
+- ``_sources.json``              — machine record of the run inputs (don't hand-edit)
 
 Optional ``overrides.csv`` in ``--out`` (never overwritten; re-runs pick it up):
 ``chart_id,action,note`` where action is ``SKIP``, ``<mdim_catalog_path>|<view_id>``,
@@ -54,7 +57,7 @@ PROPOSAL_COLUMNS = [
     "match_quality", "tiebreak", "target_mdim_catalog_path", "target_mdim_slug",
     "target_view_id", "target_view_config_id", "target_url", "target_view_title",
     "target_chart_type", "n_candidates", "candidate_view_ids", "near_miss_detail",
-    "shared_target_chart_ids", "conflict", "note",
+    "shared_target_chart_ids", "conflict", "cli_required", "old_slugs", "cli_notes", "note",
 ]  # fmt: skip
 
 
@@ -428,13 +431,28 @@ def apply_overrides(charts: list[dict], views: list[dict], out: Path) -> None:
 
 
 def check_conflicts(charts: list[dict], mdims: list[dict]) -> None:
-    """Replicate grapher's validateMultiDimRedirect chain checks, read-only, at proposal time.
+    """Replicate the CLI's own validation, read-only, at proposal time.
 
-    Sets c["conflict"] (reason string) or c["already_done"]=True on matched charts.
+    The apply path is `yarn createMultiDimRedirectsFromCsv`, which runs ONE transaction:
+    any row it rejects aborts the whole migration. So every check here mirrors a check
+    the CLI performs, and a hit means "fix before running", not "skip this row".
+
+    Two situations the CLI *handles* and the admin API refuses — recorded as
+    c["cli_required"], NOT as conflicts:
+      - incoming chart_slug_redirects (old slugs pointing at this chart): the CLI's
+        replaceChartSlugRedirects deletes each row and re-creates it as a
+        multi_dim_redirects row aimed at the MDIM view, so old slugs keep working
+        in one hop. The admin API 400s on these.
+      - site redirects pointing AT this chart: replaceSiteRedirects repoints them.
+
+    Sets, on each matched chart: c["conflict"] (blocker string), c["cli_required"]
+    (list of reasons the CLI is mandatory), c["cli_notes"] (lossy-but-fine warnings),
+    c["old_slugs"] (aliases that will be migrated), or c["already_done"]=True.
     """
     matched = [c for c in charts if c["target"] is not None]
     for c in charts:
         c["conflict"], c["already_done"] = "", False
+        c["cli_required"], c["cli_notes"], c["old_slugs"] = [], [], []
     if not matched:
         return
     sources = tuple(f"/grapher/{c['chart_slug']}" for c in matched)
@@ -457,22 +475,31 @@ def check_conflicts(charts: list[dict], mdims: list[dict]) -> None:
     own_old = OWID_ENV.read_sql("SELECT slug FROM chart_slug_redirects WHERE slug IN %(s)s", params={"s": slugs})
     own_old_slugs = set(own_old["slug"])
 
+    # Old slugs pointing at each source chart. The CLI migrates these; it also drops
+    # their target_query_param (multi_dim_redirects has no column for it).
     incoming = OWID_ENV.read_sql(
-        "SELECT csr.slug AS old_slug, cc.slug AS chart_slug FROM chart_slug_redirects csr "
+        "SELECT csr.slug AS old_slug, csr.target_query_param, cc.slug AS chart_slug FROM chart_slug_redirects csr "
         "JOIN charts c ON c.id = csr.chart_id JOIN chart_configs cc ON cc.id = c.configId "
         "WHERE cc.slug IN %(s)s",
         params={"s": slugs},
     )
-    incoming_by_slug = defaultdict(list)
+    incoming_by_slug: dict[str, list[dict]] = defaultdict(list)
     for r in incoming.to_dict("records"):
-        incoming_by_slug[r["chart_slug"]].append(r["old_slug"])
+        incoming_by_slug[r["chart_slug"]].append(r)
 
-    redirected_mdim_slugs = set(
-        OWID_ENV.read_sql(
-            "SELECT DISTINCT mdp.slug FROM multi_dim_redirects mdr "
-            "JOIN multi_dim_data_pages mdp ON mdp.id = mdr.multiDimId WHERE mdp.slug IS NOT NULL"
-        )["slug"]
-    )
+    # Each migrated old slug is re-validated by the CLI as a NEW redirect source (after
+    # its chart_slug_redirects row is deleted), so it must not already be a source in
+    # `redirects` or `multi_dim_redirects`.
+    old_sources = tuple(f"/grapher/{r['old_slug']}" for rows in incoming_by_slug.values() for r in rows)
+    taken_old_sources: set[str] = set()
+    if old_sources:
+        taken_old_sources = set(
+            OWID_ENV.read_sql(
+                "SELECT source FROM redirects WHERE source IN %(s)s "
+                "UNION SELECT source FROM multi_dim_redirects WHERE source IN %(s)s",
+                params={"s": old_sources},
+            )["source"]
+        )
 
     # Target side, once per targeted MDIM: its own /grapher/<slug> must not be a redirect source.
     targeted_slugs = tuple({c["target"]["mdim_slug"] for c in matched})
@@ -501,22 +528,39 @@ def check_conflicts(charts: list[dict], mdims: list[dict]) -> None:
             reasons.append(f"already redirected to a DIFFERENT mdim view (multiDimId={prior['multiDimId']})")
         if source in site_sources:
             reasons.append(f"already a site redirect source -> {site_sources[source]}")
-        if source in site_targets:
-            reasons.append(f"chain: site redirect(s) point AT this chart: {site_targets[source]}")
-        if slug in incoming_by_slug:
-            reasons.append(f"chain: incoming chart_slug_redirects: {sorted(incoming_by_slug[slug])}")
         if slug in own_old_slugs:
             reasons.append("chart slug is itself an old slug in chart_slug_redirects")
-        if slug in redirected_mdim_slugs:
-            reasons.append("chart slug equals an MDIM slug that is already a redirect target")
         if slug == t["mdim_slug"]:
             reasons.append("self-redirect: chart slug equals the target MDIM slug")
         if f"/grapher/{t['mdim_slug']}" in bad_targets:
             reasons.append(f"target /grapher/{t['mdim_slug']} is itself a redirect source")
+
+        # Handled by the CLI (and only by the CLI).
+        if slug in incoming_by_slug:
+            rows = sorted(incoming_by_slug[slug], key=lambda r: r["old_slug"])
+            c["old_slugs"] = [r["old_slug"] for r in rows]
+            c["cli_required"].append(f"{len(rows)} incoming chart_slug_redirects: {c['old_slugs']}")
+            with_params = [r["old_slug"] for r in rows if r["target_query_param"]]
+            if with_params:
+                c["cli_notes"].append(
+                    f"target_query_param dropped when flattening: {with_params} "
+                    "(multi_dim_redirects has no column for it)"
+                )
+            clashing = [s for s in c["old_slugs"] if f"/grapher/{s}" in taken_old_sources]
+            if clashing:
+                reasons.append(f"old slug(s) already a redirect source elsewhere: {clashing}")
+        if source in site_targets:
+            c["cli_required"].append(f"site redirect(s) point AT this chart: {site_targets[source]}")
+
         c["conflict"] = "; ".join(reasons)
 
 
 # ----- Outputs ----------------------------------------------------------------------
+
+
+def proposed_charts(charts: list[dict]) -> list[dict]:
+    """Charts that go into the CLI CSV: matched, conflict-free, not already redirected."""
+    return [c for c in charts if c["target"] is not None and not c["conflict"] and not c["already_done"]]
 
 
 def fill_shared_targets(charts: list[dict]) -> None:
@@ -575,6 +619,9 @@ def write_proposal_csv(out: Path, charts: list[dict], id_to_path: dict[int, str]
                 "near_miss_detail": describe_near_miss(c, id_to_path),
                 "shared_target_chart_ids": c["shared_with"],
                 "conflict": "already redirected (same target) — nothing to do" if c["already_done"] else c["conflict"],
+                "cli_required": "; ".join(c["cli_required"]),
+                "old_slugs": "|".join(c["old_slugs"]),
+                "cli_notes": "; ".join(c["cli_notes"]),
                 "note": c["note"],
             })  # fmt: skip
 
@@ -603,7 +650,78 @@ def redirect_json(c: dict) -> dict:
     }
     if c["shared_with"]:
         entry["sharedTargetChartIds"] = [int(i) for i in c["shared_with"].split(",")]
+    if c["old_slugs"]:
+        # Aliases the CLI will migrate from chart_slug_redirects into multi_dim_redirects.
+        entry["oldSlugs"] = c["old_slugs"]
+    if c["cli_notes"]:
+        entry["notes"] = c["cli_notes"]
     return entry
+
+
+def cli_target_path(c: dict) -> str:
+    """`/grapher/<mdim-slug>?<key-sorted dims>` — the CLI re-sorts anyway, but match it."""
+    t = c["target"]
+    return f"/grapher/{t['mdim_slug']}" + (f"?{t['query_str']}" if t["query_str"] else "")
+
+
+def write_cli_csv(out: Path, charts: list[dict]) -> tuple[Path, int]:
+    """Write the `;`-delimited source;target file consumed by the grapher CLI.
+
+    Format per owid-grapher devTools/createMultiDimRedirectsFromCsv.ts parseCsvEntries():
+    two positional columns, `;` delimiter, a header tolerated ONLY on line 1, no comment
+    lines anywhere, no duplicate sources, both fields must start with "/". Sources carry
+    no query string — serving matches the bare path, so params there would never fire.
+    """
+    proposed = proposed_charts(charts)
+    path = out / "redirects_for_cli.csv"
+    lines = ["source;target"]
+    for c in proposed:
+        lines.append(f"/grapher/{c['chart_slug']};{cli_target_path(c)}")
+    path.write_text("\n".join(lines) + "\n")
+    validate_cli_csv(path)
+    return path, len(proposed)
+
+
+def validate_cli_csv(path: Path) -> None:
+    """Re-parse under the CLI's own rules — one bad row aborts its whole transaction."""
+    rows = [ln for ln in path.read_text().split("\n")]
+    seen: set[str] = set()
+    for i, line in enumerate(rows):
+        if not line.strip():
+            continue
+        fields = line.split(";")
+        if len(fields) != 2:
+            raise SystemExit(f"{path}:{i + 1}: expected exactly 2 `;`-separated fields, got {len(fields)}")
+        source, target = (f.strip() for f in fields)
+        if not source.startswith("/") or not target.startswith("/"):
+            if i == 0:
+                continue  # header, tolerated on line 1 only
+            raise SystemExit(f"{path}:{i + 1}: both fields must start with '/' (the CLI only skips a line-1 header)")
+        if source in seen:
+            raise SystemExit(f"{path}:{i + 1}: duplicate source {source!r} — the CLI rejects duplicates")
+        seen.add(source)
+        if "?" in source:
+            raise SystemExit(f"{path}:{i + 1}: source must not carry a query string ({source!r})")
+        if source.endswith("/") or not target.startswith("/grapher/"):
+            raise SystemExit(f"{path}:{i + 1}: source cannot end with '/' and target must be a /grapher/ path")
+
+
+def write_migration_log_template(out: Path, charts: list[dict]) -> Path:
+    """Analytics can't reconstruct this mapping after the fact — record it at cutover.
+
+    Post-cutover the source chart's view history goes chart_id = NULL, and
+    prod_semantic.redirects carries no multi_dim_redirects rows, so (old_slug -> mdim)
+    exists only in grapher MySQL and in this file.
+    """
+    path = out / "migration_log_template.csv"
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["old_slug", "mdim_slug", "view_id", "cutover_date"])
+        for c in proposed_charts(charts):
+            t = c["target"]
+            for slug in [c["chart_slug"], *c["old_slugs"]]:
+                w.writerow([slug, t["mdim_slug"], t["view_id"], ""])
+    return path
 
 
 def write_payloads(out: Path, charts: list[dict]) -> int:
@@ -617,19 +735,20 @@ def write_payloads(out: Path, charts: list[dict]) -> int:
     payload_dir.mkdir(exist_ok=True)
     for stale in payload_dir.glob("*.json"):
         stale.unlink()
-    proposed = [c for c in charts if c["target"] is not None and not c["conflict"] and not c["already_done"]]
+    proposed = proposed_charts(charts)
     for c in proposed:
         (payload_dir / f"{c['chart_slug']}.json").write_text(json.dumps(redirect_json(c), indent=2) + "\n")
     return len(proposed)
 
 
 def write_mapping_json(out: Path, charts: list[dict], mdims: list[dict], selection: dict) -> dict:
-    proposed = [c for c in charts if c["target"] is not None and not c["conflict"] and not c["already_done"]]
+    proposed = proposed_charts(charts)
     conflicted = [c for c in charts if c["target"] is not None and c["conflict"]]
     done = [c for c in charts if c["already_done"]]
     unmatched = [c for c in charts if c["target"] is None and c["quality"] != "skipped"]
     stats = {"charts": len(charts), **{q: sum(c["quality"] == q for c in charts) for q in QUALITIES},
-             "conflicts": len(conflicted), "already_done": len(done), "proposed": len(proposed)}  # fmt: skip
+             "conflicts": len(conflicted), "already_done": len(done), "proposed": len(proposed),
+             "cli_required": sum(1 for c in proposed if c["cli_required"])}  # fmt: skip
     data = {
         "selection": selection,
         "mdims": [{"id": m["id"], "catalogPath": m["catalog_path"], "slug": m["slug"]} for m in mdims],
@@ -701,16 +820,26 @@ def report(charts: list[dict], mdims: list[dict], views: list[dict], stats: dict
         + " | ".join(f"{q}: {stats[q]}" for q in QUALITIES)
         + f"  ->  proposed redirects: {stats['proposed']} (conflicts: {stats['conflicts']}, already done: {stats['already_done']})"
     )
+    proposed = proposed_charts(charts)
     per_mdim = defaultdict(set)
-    for c in charts:
-        if c["target"] is not None and not c["conflict"] and not c["already_done"]:
-            per_mdim[c["target"]["mdim_slug"]].add(c["target"]["view_id"])
+    for c in proposed:
+        per_mdim[c["target"]["mdim_slug"]].add(c["target"]["view_id"])
     for slug in sorted(per_mdim):
-        n_charts = sum(
-            1 for c in charts
-            if c["target"] is not None and not c["conflict"] and not c["already_done"] and c["target"]["mdim_slug"] == slug
-        )  # fmt: skip
+        n_charts = sum(1 for c in proposed if c["target"]["mdim_slug"] == slug)
         print(f"  {slug}: {n_charts} chart(s) -> {len(per_mdim[slug])} distinct view(s)")
+    cli_required = [c for c in proposed if c["cli_required"]]
+    if cli_required:
+        n_aliases = sum(len(c["old_slugs"]) for c in cli_required)
+        print(
+            f"\nCLI-only rows: {len(cli_required)} chart(s) carry {n_aliases} old slug(s)/inbound redirect(s).\n"
+            "  The CLI migrates these; the admin API rejects them as redirect chains. Never hand-unpublish\n"
+            "  these charts first — unpublishing deletes their chart_slug_redirects rows and the old slugs 404."
+        )
+        for c in cli_required:
+            for reason in c["cli_required"]:
+                print(f"  {c['chart_slug']}: {reason}")
+            for note in c["cli_notes"]:
+                print(f"  {c['chart_slug']}: NOTE {note}")
     shared = [c for c in charts if c["shared_with"]]
     if shared:
         print(f"rows pointing at a shared MDIM view: {len(shared)} (see shared_target_chart_ids)")
@@ -775,6 +904,8 @@ def main():
     write_proposal_csv(out, charts, id_to_path, host)
     stats = write_mapping_json(out, charts, mdims, selection)
     n_payloads = write_payloads(out, charts)
+    cli_csv, n_cli = write_cli_csv(out, charts)
+    log_template = write_migration_log_template(out, charts)
     write_unmatched_md(out, charts, id_to_path, host)
     (out / "_sources.json").write_text(json.dumps({
         "selection": selection,
@@ -785,8 +916,11 @@ def main():
 
     report(charts, mdims, views, stats, selection)
     print(f"\n-> {out}/mapping_proposal.csv  (review this; then build_review.py for the side-by-side HTML)")
-    print(f"-> {out}/mapping.json  (combined machine record for apply_redirects.py — gated, ask the user first)")
+    print(f"-> {out}/mapping.json  (combined machine record for preflight.py)")
     print(f"-> {out}/payloads/*.json  ({n_payloads} files, ONE source chart per JSON — the copy-paste handoff unit)")
+    print(f"-> {cli_csv}  ({n_cli} rows, the apply input for `yarn createMultiDimRedirectsFromCsv`)")
+    print(f"-> {log_template}  (stamp cutover_date when the CLI runs — analytics can't recover it later)")
+    print("\nNext: preflight.py to validate before the CLI runs (one bad row aborts its whole transaction).")
 
 
 if __name__ == "__main__":
