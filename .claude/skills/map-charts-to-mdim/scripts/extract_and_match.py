@@ -54,7 +54,7 @@ EXTRA_SLOTS = ("x", "size", "color")
 QUALITIES = ("exact", "forced", "ambiguous", "near_miss", "none", "skipped")
 
 PROPOSAL_COLUMNS = [
-    "chart_id", "chart_slug", "chart_title", "chart_type", "chart_url", "y_variable_ids",
+    "chart_id", "chart_slug", "chart_title", "chart_type", "chart_url", "chart_config_md5", "y_variable_ids",
     "match_quality", "tiebreak", "target_mdim_catalog_path", "target_mdim_slug",
     "target_view_id", "target_view_config_id", "target_url", "target_view_title",
     "target_chart_type", "n_candidates", "candidate_view_ids", "near_miss_detail",
@@ -175,23 +175,32 @@ def attach_chart_slots(charts: list[dict]) -> None:
         "WHERE chartId IN %(ids)s ORDER BY chartId, `order`",
         params={"ids": tuple(c["chart_id"] for c in charts)},
     )
-    slots: dict[int, dict] = defaultdict(lambda: {"y": [], "x": None, "size": None, "color": None})
+    slots: dict[int, dict] = defaultdict(lambda: {slot: [] for slot in ("y", *EXTRA_SLOTS)})
     for r in df.to_dict("records"):
         s = slots[r["chartId"]]
-        if r["property"] == "y":
-            s["y"].append(int(r["variableId"]))
-        elif r["property"] in EXTRA_SLOTS:
-            if s[r["property"]] is not None:
-                print(f"warning: chart {r['chartId']} has multiple '{r['property']}' dimensions — keeping the first")
-            else:
-                s[r["property"]] = int(r["variableId"])
+        if r["property"] in s:
+            s[r["property"]].append(int(r["variableId"]))
     for c in charts:
         s = slots[c["chart_id"]]
         if len(s["y"]) != len(set(s["y"])):
             print(f"warning: chart {c['chart_id']} ({c['chart_slug']}) repeats a y variable — deduplicated")
         c["y"] = frozenset(s["y"])
         for slot in EXTRA_SLOTS:
-            c[slot] = s[slot]
+            c[slot] = s[slot][0] if s[slot] else None
+        # A chart signature holds one indicator per x/size/color. Several distinct ones in a
+        # slot means the signature can't be represented — truncating to the first could
+        # spuriously exact-match a view that lacks the rest. Excluded, exactly as the
+        # view-side normalization excludes the mirror-image shape.
+        multi = [slot for slot in EXTRA_SLOTS if len(set(s[slot])) > 1]
+        c["exclude_reason"] = (
+            f"multiple indicators in {', '.join(repr(slot) for slot in multi)} — a chart slot holds one"
+            if multi
+            else ""
+        )
+        if multi:
+            print(
+                f"warning: chart {c['chart_id']} ({c['chart_slug']}) has {c['exclude_reason']} — excluded from matching"
+            )
         if not c["y"]:
             print(f"warning: chart {c['chart_id']} ({c['chart_slug']}) has no y indicators")
 
@@ -363,6 +372,10 @@ def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, st
 
     for c in charts:
         c.update({"quality": "none", "tiebreak": "", "target": None, "candidates": [], "near_misses": [], "note": ""})
+        if c.get("exclude_reason"):
+            # An override can still force a target: that is a human choosing deliberately.
+            c["note"] = c["exclude_reason"]
+            continue
         if not c["y"]:
             c["note"] = "chart has no y indicators"
             continue
@@ -521,6 +534,16 @@ def check_conflicts(charts: list[dict], mdims: list[dict]) -> None:
     for c in matched:
         source, slug, t = f"/grapher/{c['chart_slug']}", c["chart_slug"], c["target"]
         reasons = []
+
+        # Collected BEFORE the already-redirected exit below. An `already_done` chart is
+        # unpublished by hand, and hand-unpublishing a chart that carries old slugs deletes
+        # its chart_slug_redirects rows and turns those URLs into hard 404s — so preflight
+        # needs oldSlugs on those entries precisely to refuse that. Everything derived from
+        # them (cli_required, the clash check) stays below: it only applies to rows the CLI
+        # will actually create.
+        rows = sorted(incoming_by_slug.get(slug, []), key=lambda r: r["old_slug"])
+        c["old_slugs"] = [r["old_slug"] for r in rows]
+
         prior = mdr_by_source.get(source)
         if prior is not None:
             if int(prior["multiDimId"]) == t["mdim_id"] and prior["viewConfigId"] == t["view_config_id"]:
@@ -537,9 +560,7 @@ def check_conflicts(charts: list[dict], mdims: list[dict]) -> None:
             reasons.append(f"target /grapher/{t['mdim_slug']} is itself a redirect source")
 
         # Handled by the CLI (and only by the CLI).
-        if slug in incoming_by_slug:
-            rows = sorted(incoming_by_slug[slug], key=lambda r: r["old_slug"])
-            c["old_slugs"] = [r["old_slug"] for r in rows]
+        if rows:
             c["cli_required"].append(f"{len(rows)} incoming chart_slug_redirects: {c['old_slugs']}")
             with_params = [r["old_slug"] for r in rows if r["target_query_param"]]
             if with_params:
@@ -606,6 +627,7 @@ def write_proposal_csv(out: Path, charts: list[dict], id_to_path: dict[int, str]
             w.writerow({
                 "chart_id": c["chart_id"], "chart_slug": c["chart_slug"], "chart_title": c["title"],
                 "chart_type": c["chart_type"], "chart_url": f"{host}/grapher/{c['chart_slug']}",
+                "chart_config_md5": c["config_md5"],
                 "y_variable_ids": "|".join(str(i) for i in sorted(c["y"])),
                 "match_quality": c["quality"], "tiebreak": c["tiebreak"],
                 "target_mdim_catalog_path": t["mdim_catalog_path"] if t else "",

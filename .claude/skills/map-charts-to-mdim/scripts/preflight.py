@@ -30,6 +30,7 @@ import csv
 import json
 from collections import defaultdict
 from pathlib import Path
+from urllib.parse import parse_qsl
 
 from etl.config import OWID_ENV
 
@@ -61,6 +62,10 @@ def load_decisions(path_arg: str) -> dict[int, dict]:
             # the target the decision was made on, used to detect stale decisions
             "target_mdim": (r.get("target_mdim") or "").strip(),
             "view_id": (r.get("view_id") or "").strip(),
+            # the source chart version it was made on: a re-run after the chart was edited
+            # regenerates mapping.json with the new md5, so `stale_charts` cannot see the
+            # drift — only the decision export still remembers what was reviewed.
+            "config_md5": (r.get("config_md5") or "").strip(),
         }
         for r in rows
     }
@@ -71,16 +76,21 @@ def apply_decisions(
 ) -> tuple[list[dict], list[tuple[dict, str]], list[dict], int]:
     """Drop entries whose chart the reviewer flagged; count kept entries that carry no decision.
 
-    A decision is bound to the proposal it was made on: if the export carries the reviewed
-    target (target_mdim/view_id) and it differs from the entry's current target, the decision
-    is stale and treated as no decision at all.
+    A decision is bound to the proposal it was made on, on BOTH sides: if the export carries
+    the reviewed target (target_mdim/view_id) or the reviewed source version (config_md5) and
+    either differs from the entry, the decision is stale and treated as no decision at all.
+    The source half matters because a re-run after the chart was edited rewrites mapping.json
+    with the new md5, so `stale_charts` compares new-against-new and sees nothing.
     """
     kept, flagged, stale, undecided = [], [], [], 0
     for e in entries:
         d = decisions.get(e["chart"]["id"], {})
         status = d.get("status", "")
         reviewed_target = (d.get("target_mdim", ""), d.get("view_id", ""))
-        if status and any(reviewed_target) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"]):
+        reviewed_md5 = d.get("config_md5", "")
+        drifted = any(reviewed_target) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"])
+        edited = bool(reviewed_md5) and bool(e["chart"].get("configMd5")) and reviewed_md5 != e["chart"]["configMd5"]
+        if status and (drifted or edited):
             stale.append(e)
             status = ""
         if status == "flagged":
@@ -245,12 +255,31 @@ def existing_mdim_redirects(sources: tuple[str, ...]) -> dict[str, dict]:
     return {r["source"]: r for r in df.to_dict("records")}
 
 
+def cli_target_path(entry: dict) -> str:
+    """`/grapher/<mdim-slug>?<key-sorted dims>` — mirrors extract_and_match.py's CSV writer."""
+    t = entry["target"]
+    return f"/grapher/{t['mdimSlug']}" + (f"?{t['queryStr']}" if t.get("queryStr") else "")
+
+
+def normalized_target(target: str) -> tuple[str, tuple]:
+    """Path + key-sorted params, so a merely reordered query string isn't reported as drift."""
+    path, _, query = target.partition("?")
+    return path.rstrip("/"), tuple(sorted(parse_qsl(query, keep_blank_values=True)))
+
+
 def validate_cli_csv(path: Path, redirects: list[dict]) -> list[str]:
-    """Re-parse the CSV under the CLI's own rules and check it matches the vetted set."""
+    """Re-parse the CSV under the CLI's own rules and check it matches the vetted set.
+
+    Both halves of every row are checked. The CSV is meant to be hand-editable (flagged
+    rows get removed from it), and a leftover file from an earlier extraction can carry
+    the same sources with different targets — which would otherwise pass as vetted and let
+    the CLI apply a target nobody reviewed.
+    """
     problems = []
     if not path.exists():
         return [f"{path} is missing — re-run extract_and_match.py"]
     seen: list[str] = []
+    targets: dict[str, str] = {}
     for i, line in enumerate(path.read_text().split("\n")):
         if not line.strip():
             continue
@@ -270,12 +299,20 @@ def validate_cli_csv(path: Path, redirects: list[dict]) -> list[str]:
         if not target.startswith("/grapher/"):
             problems.append(f"line {i + 1}: target must be a /grapher/ path")
         seen.append(source)
-    dropped = {r["source"] for r in redirects} - set(seen)
-    extra = set(seen) - {r["source"] for r in redirects}
+        targets[source] = target
+    expected = {r["source"]: cli_target_path(r) for r in redirects}
+    dropped = set(expected) - set(seen)
+    extra = set(seen) - set(expected)
     if dropped:
         problems.append(f"in mapping.json but not in the CSV: {sorted(dropped)}")
     if extra:
         problems.append(f"in the CSV but not vetted here: {sorted(extra)} — re-run extract_and_match.py")
+    for source in sorted(set(seen) & set(expected)):
+        if normalized_target(targets[source]) != normalized_target(expected[source]):
+            problems.append(
+                f"{source}: the CSV points at {targets[source]!r} but the reviewed mapping says "
+                f"{expected[source]!r} — the CLI would apply an unreviewed target; re-run extract_and_match.py"
+            )
     return problems
 
 
@@ -283,9 +320,11 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
     """One line per chart: the surfaces that embed it and so break when it is unpublished.
 
     A redirect only rescues hyperlinks. Everything counted here holds the chart by id or
-    slug and renders its own config, so the CLI's unpublish step breaks it with no error
-    anywhere — which is why these gate readiness instead of merely being reported. Old
-    slugs are included: references written before a rename point at those.
+    slug and renders its own config, so unpublishing the source breaks it with no error
+    anywhere — which is why these gate readiness instead of merely being reported. That
+    holds whether the CLI unpublishes the chart or a human does (the `already_done` rows),
+    so pass both sets. Old slugs are included: references written before a rename point
+    at those.
 
     Pure SQL, so this works with read-only credentials (the admin references API needs
     ADMIN_API_KEY). Counts only — audit_references.py does the full sweep with
@@ -316,14 +355,6 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
             "SELECT ec.chartId AS chart_id, COUNT(DISTINCT ec.explorerSlug) AS n FROM explorer_charts ec "
             "JOIN explorers e ON e.slug = ec.explorerSlug "
             "WHERE ec.chartId IN %(ids)s AND e.isPublished = 1 GROUP BY ec.chartId",
-            params={"ids": ids},
-        ),
-    )
-    add_by_id(
-        "narrativeCharts",
-        OWID_ENV.read_sql(
-            "SELECT parentChartId AS chart_id, COUNT(*) AS n FROM narrative_charts "
-            "WHERE parentChartId IN %(ids)s GROUP BY parentChartId",
             params={"ids": ids},
         ),
     )
@@ -363,7 +394,49 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
         ),
     )
 
+    # An article can also record a chart block as a raw URL (linkType='url'), which the
+    # filter above misses; the sweep in find-chart-references already classifies the
+    # non-`span-*` ones as embeds, so the gate must agree with the audit. Here the '%'
+    # wildcards live in the parameter VALUES, not in the SQL string, so they don't collide
+    # with pymysql's own %-formatting.
+    clauses = " OR ".join(f"pgl.target LIKE %(t{i})s" for i in range(len(slugs)))
+    url_rows = OWID_ENV.read_sql(
+        "SELECT pgl.target FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
+        "WHERE pgl.linkType = 'url' AND pg.published = 1 "
+        "AND (pgl.componentType IS NULL OR LEFT(pgl.componentType, 5) <> 'span-') "
+        f"AND ({clauses})",
+        params={f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)},
+    )
+    for row in url_rows.to_dict("records"):
+        target = row["target"] or ""
+        if "archive.ourworldindata.org" in target:
+            continue  # archived snapshots are frozen by design
+        slug = target.split("/grapher/", 1)[-1].split("?")[0].split("#")[0].rstrip("/")
+        if slug in by_slug:
+            cid = by_slug[slug]
+            counts[cid]["articleEmbeds"] = counts[cid].get("articleEmbeds", 0) + 1
+
     return {cid: ", ".join(f"{k} ({n})" for k, n in sorted(v.items())) for cid, v in counts.items() if v}
+
+
+def narrative_chart_links(redirects: list[dict]) -> dict[int, int]:
+    """Narrative charts parented to these charts. Reported, NOT gated.
+
+    A narrative chart renders from its own materialized config, so unpublishing the parent
+    leaves it intact; only its "Explore the data" href is built from the parent slug, and
+    the redirect covers that. Worth surfacing anyway, because that href carries
+    `queryParamsForParentChart` — params that ride along to the MDIM view and can collide
+    with its dimensions (audit_references.py flags the collisions).
+    """
+    ids = tuple(r["chart"]["id"] for r in redirects)
+    if not ids:
+        return {}
+    df = OWID_ENV.read_sql(
+        "SELECT parentChartId AS chart_id, COUNT(*) AS n FROM narrative_charts "
+        "WHERE parentChartId IN %(ids)s GROUP BY parentChartId",
+        params={"ids": ids},
+    )
+    return {int(r["chart_id"]): int(r["n"]) for r in df.to_dict("records")}
 
 
 def main() -> int:
@@ -470,14 +543,25 @@ def main() -> int:
         for p in csv_problems:
             print(f"  {p}")
 
-    embeds = {} if args.no_references else embed_references(redirects)
+    # `already_done` rows are unpublished by hand, which breaks their embeds just as the
+    # CLI's unpublish step would — they belong behind the same gate.
+    embeds = {} if args.no_references else embed_references(redirects + already_done)
     if embeds:
-        print("\nSurfaces a redirect will NOT fix (these embed the chart and break when the CLI unpublishes it):")
-        for r in redirects:
+        print("\nSurfaces a redirect will NOT fix (these embed the chart and break when it is unpublished):")
+        for r in redirects + already_done:
             note = embeds.get(r["chart"]["id"])
             if note:
                 print(f"  {r['chart']['slug']}: {note}")
         print("  Run audit_references.py for the full list with replacement URLs.")
+
+    narratives = {} if args.no_references else narrative_chart_links(redirects + already_done)
+    if narratives:
+        print("\nNarrative charts on these source charts (NOT a blocker — they render their own config;")
+        print('only their "Explore the data" link follows the redirect, so check its query params):')
+        for r in redirects + already_done:
+            n = narratives.get(r["chart"]["id"])
+            if n:
+                print(f"  {r['chart']['slug']}: {n} narrative chart(s)")
 
     bad = [r for r in rows if r[2] not in ("OK", "MANUAL")]
     manual = [r for r in rows if r[2] == "MANUAL"]
@@ -486,8 +570,9 @@ def main() -> int:
         print("It runs a single transaction — any one of these aborts the entire migration.")
     if embeds:
         print(f"\nNOT ready: {len(embeds)} source chart(s) are still embedded elsewhere. These do NOT abort the CLI —"
-              "\nthey break silently when it unpublishes the chart. Migrate them first (audit_references.py lists"
-              "\neach reference with its replacement URL); --no-references skips this gate once they are handled.")  # fmt: skip
+              "\nthey break silently the moment the chart is unpublished, by the CLI or by hand (MANUAL rows)."
+              "\nMigrate them first (audit_references.py lists each reference with its replacement URL);"
+              "\n--no-references skips this gate once they are handled.")  # fmt: skip
     if manual:
         print(f"\n{len(manual)} row(s) need a step outside the CLI — see MANUAL above.")
     if bad or csv_problems or embeds or manual:

@@ -31,7 +31,7 @@ Every finding carries a `kind` that decides what a fix costs:
 | kind | meaning | does a URL redirect fix it? |
 |---|---|---|
 | `render` | the surface resolves the object and draws it — a chart on an indicator, an MDIM view, an explorer view, a key-chart slot | n/a — the object *is* the content |
-| `embed` | the surface holds it by id/slug and renders its config directly — article chart blocks, narrative charts, data insights, static viz, explorers | **No.** Must be migrated by hand |
+| `embed` | the surface holds it by id/slug and renders its config directly — article chart blocks, data insights, static viz, explorers, narrative charts pinned to an MDIM view | **No.** Must be migrated by hand |
 | `link` | a hyperlink in prose or a raw URL | Yes — but the href is still worth updating |
 
 The discriminator for articles is `posts_gdocs_links.componentType`: a `span-*`
@@ -120,7 +120,7 @@ references written before a rename point at the old one):
 |---|---|---|
 | articles | `posts_gdocs_links` (`grapher`, `guided-chart`) + `linkType='url'` scan | `embed` or `link` by `componentType` |
 | explorers | `explorer_charts` (by chart id) | `embed` |
-| narrative charts | `narrative_charts.parentChartId` | `embed` |
+| narrative charts | `narrative_charts.parentChartId` | `link` (renders its own config) |
 | data insights | `posts_gdocs.content->>'$."grapher-url"'` | `embed` |
 | static viz | `static_viz.grapherSlug` | `embed` |
 | key charts | `chart_tags` where `keyChartLevel > 0` | `render` |
@@ -136,6 +136,12 @@ large explorer yields hundreds of rows — that is the price of every row carryi
 `config_id`. Under `--transitive`, also the narrative charts parented to any chart
 **or MDIM view** that renders the indicators (`parentMultiDimXChartConfigId`): a
 narrative chart holds its own config, so skipping that hop leaves it unaudited.
+
+MDIM findings are keyed by **(mdim, view, indicator)**, not by view: one view can
+render several of the requested indicators, and each one is its own reference. The
+config scan resolves every stored indicator shape (an id, a `{id: …}` dict, a
+`{catalogPath: …}` dict, or a bare catalog-path string), so a view holding a
+catalog path is not silently skipped.
 
 **MDIM subjects**: article links/embeds, narrative charts pinned to a view
 (`parentMultiDimXChartConfigId`), and inbound `multi_dim_redirects`.
@@ -183,10 +189,16 @@ State these when reporting; silence reads as full coverage.
 
 ## Notes for skills that consume this
 
-- **Narrative charts survive the parent's death, visibly.** The config is fetched
-  by UUID, so the chart keeps rendering — but "Explore the data" is built from the
-  parent's slug, and there is **no API to repoint a narrative chart**
-  (`parentChartId`/`parentMultiDimXChartConfigId` are written only at creation).
+- **A narrative chart survives its parent chart being unpublished.** It owns a
+  materialized full config written at creation and renders from that; the parent is
+  joined in only to build the "Explore the data" href from its slug. So it is a
+  `link`, not an `embed`, and a redirect covers it — don't gate a migration on it.
+  Do check the href's query params, which ride along to the target.
+  There is still **no API to repoint a narrative chart**
+  (`parentChartId`/`parentMultiDimXChartConfigId` are written only at creation), so
+  the *parent pointer* stays stale. That matters for a narrative chart pinned to an
+  **MDIM view** — that one is a genuine `embed`, and it can block the MDIM's next
+  re-publish via an unguarded FK.
 - **Query-param collisions matter for redirects.** Grapher merges the incoming
   URL's params *over* the redirect target's, so a link carrying `?metric=…` will
   override an MDIM dimension of the same name. If you build replacement URLs,

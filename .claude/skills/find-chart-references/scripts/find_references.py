@@ -9,8 +9,10 @@ how the surface holds the object, which is what decides whether a fix is needed:
   render  the surface resolves the object and draws it (a chart on an indicator, an
           MDIM view, an explorer view). Changing the object changes what readers see.
   embed   the surface embeds it by id/slug and renders its config directly (article
-          chart blocks, narrative charts, data insights, static viz, explorers).
-          A URL redirect does NOT fix these.
+          chart blocks, data insights, static viz, explorers). A URL redirect does
+          NOT fix these. A narrative chart counts only when its parent is an MDIM
+          view — one parented to a chart carries a copy of the config and so is a
+          `link`.
   link    a hyperlink. A redirect covers it; the href is still worth updating.
 
 Subjects (at least one; they can be combined):
@@ -101,17 +103,24 @@ def resolve_chart_subjects(chart_ids: list[int], chart_slugs: list[str]) -> dict
         params=params,
     )
     charts = {int(r["id"]): r["slug"] for r in df.to_dict("records") if r["slug"]}
-    if not charts:
-        return {}
     by_slug = {slug: {"id": cid, "slug": slug} for cid, slug in charts.items()}
-    # Old slugs still reach the chart, so references may point at them.
-    old = OWID_ENV.read_sql(
-        "SELECT csr.slug AS old_slug, csr.chart_id FROM chart_slug_redirects csr WHERE csr.chart_id IN %(ids)s",
-        params={"ids": tuple(charts)},
-    )
-    for r in old.to_dict("records"):
-        cid = int(r["chart_id"])
-        by_slug[r["old_slug"]] = {"id": cid, "slug": charts[cid]}
+    if charts:
+        # Old slugs still reach the chart, so references may point at them.
+        old = OWID_ENV.read_sql(
+            "SELECT csr.slug AS old_slug, csr.chart_id FROM chart_slug_redirects csr WHERE csr.chart_id IN %(ids)s",
+            params={"ids": tuple(charts)},
+        )
+        for r in old.to_dict("records"):
+            cid = int(r["chart_id"])
+            by_slug[r["old_slug"]] = {"id": cid, "slug": charts[cid]}
+
+    # A subject that resolves to nothing is UNKNOWN, not "nothing references it". Report it
+    # loudly — otherwise a typo, a deletion, or a mixed request reads as a clean blast-radius
+    # result. Checked after the old-slug expansion, so passing an old slug isn't flagged.
+    missing = [str(i) for i in chart_ids if i not in charts] + [s for s in chart_slugs if s not in by_slug]
+    if missing:
+        print(f"  WARNING: {len(missing)} chart subject(s) did not resolve and were NOT swept: {sorted(missing)}")
+        print("           A blank result for these means UNKNOWN, not 'nothing references them'.")
     return by_slug
 
 
@@ -233,8 +242,13 @@ def sweep_explorer_charts(by_slug: dict[str, dict]) -> list[dict]:
 def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
     """Narrative charts whose parent is one of these charts.
 
-    The narrative chart keeps rendering (its config is fetched by UUID), but its
-    "Explore the data" link is built from the parent's slug.
+    Classified as `link`, not `embed`: a narrative chart owns a materialized full config
+    of its own (written at creation) and renders from that, so unpublishing the parent
+    does not touch what readers see. The parent is joined in only to build the "Explore
+    the data" href from its slug, which a redirect covers.
+
+    The href carries `queryParamsForParentChart`, so it is still worth checking — those
+    params ride along to the target and can collide with an MDIM view's dimensions.
     """
     ids = tuple({v["id"] for v in by_slug.values()})
     df = OWID_ENV.read_sql(
@@ -253,7 +267,7 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
                 r["slug"],
                 int(r["chart_id"]),
                 "narrative chart",
-                EMBED,
+                LINK,
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
                 surface_id=int(r["id"]),
@@ -261,7 +275,7 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
                 # parent edit. To inspect one, use AdminAPI.get_narrative_chart(id)["configFull"]
                 # rather than reading this row directly.
                 config_id=r["chartConfigId"],
-                context='"Explore the data" link is built from the parent chart slug',
+                context='renders its own config; only its "Explore the data" link uses the parent slug',
                 query_string="&".join(f"{k}={v}" for k, v in sorted(params.items())),
             )  # fmt: skip
         )
@@ -413,6 +427,7 @@ def parse_json_list(value) -> list:
 
 
 def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
+    """Charts rendering these indicators. Drafts can have no slug — they still render."""
     df = OWID_ENV.read_sql(
         "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.id AS config_id, cc.slug, "
         "       c.publishedAt IS NOT NULL AS published, c.isInheritanceEnabled AS inheritance "
@@ -441,21 +456,56 @@ def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
     ]
 
 
+def entry_variable_id(entry, by_path: dict[str, int]) -> int | None:
+    """A `views[].indicators.*` entry -> variable id, tolerating every stored shape.
+
+    Entries are stored as an int id, a dict carrying `id`, a dict carrying only
+    `catalogPath`, or a bare catalogPath string. `by_path` maps the catalog paths of the
+    *requested* variables, so a path we don't care about resolves to None either way.
+    """
+    if isinstance(entry, dict):
+        if entry.get("id") is not None:
+            return int(entry["id"])
+        path = entry.get("catalogPath")
+        return by_path.get(path) if path else None
+    if isinstance(entry, bool):  # bool is an int subclass — never a variable id
+        return None
+    if isinstance(entry, int):
+        return entry
+    if isinstance(entry, str):
+        return by_path.get(entry)
+    return None
+
+
+def catalog_paths_of(variable_ids: list[int]) -> dict[str, int]:
+    """{catalogPath -> variable id} for the requested variables, for catalogPath-only configs."""
+    df = OWID_ENV.read_sql(
+        "SELECT id, catalogPath FROM variables WHERE id IN %(ids)s AND catalogPath IS NOT NULL",
+        params={"ids": tuple(variable_ids)},
+    )
+    return {str(p): int(i) for i, p in zip(df["id"], df["catalogPath"])}
+
+
 def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     """MDIM views rendering these indicators.
 
-    multi_dim_x_chart_configs.variableId records only the FIRST y indicator, so a
-    view plotting several indicators is invisible to that join — scan the stored
-    configs as well.
+    multi_dim_x_chart_configs.variableId records only the FIRST y indicator, so a view
+    plotting several indicators is invisible to that join — scan the stored configs as
+    well. Findings are keyed by (mdim, view, indicator), not by view: one view can render
+    several of the requested indicators, and each of them is a separate reference. Keying
+    by view alone would let the join's single row mask every other indicator in it.
     """
     ids = set(variable_ids)
-    out = []
-    # Load the configs first and index each view's dimensions by its fullConfigId. The
-    # dimensions are what a preview URL needs, and taking them from the config avoids
-    # splitting viewId on "__" — a choice slug may itself contain underscores.
+    by_path = catalog_paths_of(variable_ids)
+    out: list[dict] = []
+    seen: set[tuple] = set()
+
+    # Index each view's dimensions by its fullConfigId. Dimensions are what a preview URL
+    # needs, and taking them from the config avoids splitting viewId on "__" — a choice
+    # slug may itself contain underscores.
     configs = OWID_ENV.read_sql("SELECT slug, catalogPath, published, config FROM multi_dim_data_pages")
-    dims_by_config_id: dict[str, dict] = {}
     parsed = []
+    dims_by_config_id: dict[str, dict] = {}
     for row in configs.to_dict("records"):
         cfg = row["config"]
         cfg = json.loads(cfg) if isinstance(cfg, str) else (cfg or {})
@@ -464,69 +514,56 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
             if view.get("fullConfigId"):
                 dims_by_config_id[view["fullConfigId"]] = view.get("dimensions") or {}
 
+    def emit(slug, catalog_path, published, view_id, variable_id, config_id, surface_id, dims, note=""):
+        if (slug, view_id, variable_id) in seen:
+            return
+        seen.add((slug, view_id, variable_id))
+        out.append(
+            rec(
+                "indicator",
+                str(variable_id),
+                variable_id,
+                "mdim view",
+                RENDER,
+                f"{slug}:{view_id}",
+                f"/grapher/{slug}",
+                surface_id=surface_id,
+                config_id=config_id,
+                context=catalog_path + note,
+                query_string=urlencode(sorted(dims.items())) if dims else "",
+                published=published,
+            )  # fmt: skip
+        )
+
     df = OWID_ENV.read_sql(
         "SELECT mx.variableId, mx.id AS mx_id, mx.chartConfigId, md.slug, md.catalogPath, md.published, mx.viewId "
         "FROM multi_dim_x_chart_configs mx JOIN multi_dim_data_pages md ON md.id = mx.multiDimId "
         "WHERE mx.variableId IN %(ids)s",
         params={"ids": tuple(variable_ids)},
     )
-    seen = set()
     for r in df.to_dict("records"):
-        key = (r["slug"], r["viewId"])
-        seen.add(key)
-        dims = dims_by_config_id.get(r["chartConfigId"], {})
-        out.append(
-            rec(
-                "indicator",
-                str(r["variableId"]),
-                int(r["variableId"]),
-                "mdim view",
-                RENDER,
-                f"{r['slug']}:{r['viewId']}",
-                f"/grapher/{r['slug']}",
-                surface_id=int(r["mx_id"]),
-                config_id=r["chartConfigId"],
-                context=r["catalogPath"],
-                query_string=urlencode(sorted(dims.items())) if dims else "",
-                published=r["published"],
-            )  # fmt: skip
-        )
+        emit(
+            r["slug"], r["catalogPath"], r["published"], r["viewId"], int(r["variableId"]),
+            r["chartConfigId"], int(r["mx_id"]), dims_by_config_id.get(r["chartConfigId"], {}),
+        )  # fmt: skip
+
+    # The join above records ONE variableId per view, so walk the configs for the rest.
     for row, cfg in parsed:
         for view in cfg.get("views", []):
-            view_id = "__".join(f"{k}={v}" for k, v in sorted((view.get("dimensions") or {}).items()))
-            if (row["slug"], view_id) in seen:
-                continue
+            dims = view.get("dimensions") or {}
+            view_id = "__".join(f"{k}={v}" for k, v in sorted(dims.items()))
             indicators = view.get("indicators") or {}
-            hit = None
             for slot in ("y", "x", "size", "color"):
                 entries = indicators.get(slot)
                 if entries is None:
                     continue
                 for e in entries if isinstance(entries, list) else [entries]:
-                    vid = e.get("id") if isinstance(e, dict) else (e if isinstance(e, int) else None)
+                    vid = entry_variable_id(e, by_path)
                     if vid in ids:
-                        hit = int(vid)
-                        break
-                if hit:
-                    break
-            if hit:
-                seen.add((row["slug"], view_id))
-                out.append(
-                    rec(
-                        "indicator",
-                        str(hit),
-                        hit,
-                        "mdim view",
-                        RENDER,
-                        f"{row['slug']}:{view_id}",
-                        f"/grapher/{row['slug']}",
-                        # fullConfigId is the view's chart_configs row (config_id elsewhere too)
-                        config_id=view.get("fullConfigId"),
-                        context=f"{row['catalogPath']} (found by config scan, not mx.variableId)",
-                        query_string=urlencode(sorted((view.get("dimensions") or {}).items())),
-                        published=row["published"],
-                    )  # fmt: skip
-                )
+                        emit(
+                            row["slug"], row["catalogPath"], row["published"], view_id, int(vid),
+                            view.get("fullConfigId"), None, dims,
+                        )  # fmt: skip
     return out
 
 
@@ -1027,6 +1064,8 @@ def main() -> int:
     findings: list[dict] = []
 
     by_slug = resolve_chart_subjects(chart_ids, chart_slugs)
+    if (chart_ids or chart_slugs) and not by_slug:
+        print("chart subjects: NONE of the requested charts resolved — no chart surface was swept.")
     if by_slug:
         print(f"chart subjects: {len({v['id'] for v in by_slug.values()})} chart(s), {len(by_slug)} slug(s) incl. old")
         findings += sweep_gdoc_links(by_slug)
@@ -1046,7 +1085,8 @@ def main() -> int:
         findings += mdim_hits
         findings += sweep_explorer_views_of_indicators(variable_ids)
         if args.transitive:
-            hop = resolve_chart_subjects([], sorted({f["where"] for f in chart_hits}))
+            # Slugless drafts have no URL, so nothing can reference them by slug.
+            hop = resolve_chart_subjects([], sorted({f["where"] for f in chart_hits if f["where_path"]}))
             if hop:
                 print(f"  transitive: sweeping articles for {len(hop)} chart slug(s)")
                 findings += sweep_gdoc_links(hop)

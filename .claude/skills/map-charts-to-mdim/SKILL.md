@@ -124,6 +124,12 @@ type; still ambiguous → reported, never guessed. Indicator-set subset/superset
 - `none` — no view shares the chart's indicators. **An accepted outcome** — only
   matched charts get redirects; don't force the rest.
 
+Either side carrying several indicators in one `x`/`size`/`color` slot has no
+chart-shaped signature, so it is **excluded from matching** rather than truncated
+to the first: a truncated signature can spuriously exact-match a counterpart that
+lacks the rest. Charts land in `none` with the reason in `note`; views are dropped
+from the target pool with a warning. `overrides.csv` can still force either.
+
 **Conflicts vs CLI-required.** Matched charts are checked (read-only SQL) against
 the same conditions the apply CLI validates. Two outcomes, and the distinction
 matters:
@@ -147,7 +153,9 @@ which its own validation rejects, so including them would abort the whole run.
 Preflight reports them as `MANUAL`; unpublish each one in the grapher admin. The
 exception is a chart carrying old slugs — hand-unpublishing deletes its
 `chart_slug_redirects` rows and those slugs become hard 404s, so take those to
-the Grapher team instead.
+the Grapher team instead. That manual unpublish breaks embeds exactly as the
+CLI's would, so `already_done` charts sit behind the same reference gate and
+appear in the step-4 audit alongside the proposed redirects.
 
 Many charts → one view is legitimate (e.g. a line chart and its map twin) —
 surfaced via `shared_target_chart_ids`, never collapsed.
@@ -187,9 +195,9 @@ and `mapping.json` regenerates.
 ### 4. Audit what references the charts (ALWAYS offer; run when the user says yes)
 
 A redirect only rescues plain hyperlinks. Anything that **embeds** the chart —
-explorers, narrative charts, data insights, static viz, article chart blocks —
-resolves it by id or slug and keeps rendering the old config, so it breaks when
-the source chart is unpublished (which the apply step always does).
+explorers, data insights, static viz, article chart blocks — resolves it by id or
+slug and keeps rendering the old config, so it breaks when the source chart is
+unpublished (which the apply step always does).
 
 ```bash
 ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
@@ -218,12 +226,15 @@ Mention this step every time (like `/update-dataset` step 7); running it is the
 user's call, since a wide sweep costs tokens — but preflight gates on the same
 embedded references, so it becomes mandatory before applying.
 
-**Narrative charts are a known dead end.** They keep rendering (the config is
-fetched by UUID), but "Explore the data" points at the parent chart's slug and
-survives only via the 301 — and there is no API to repoint one, so a real fix is
-raw SQL by a Grapher dev. Report them; don't try to fix them here. Drafts to
-escalate the gap live in `ai/narrative-charts-slack-post.md` and
-`ai/narrative-charts-grapher-issue.md`.
+**Narrative charts do not block a migration.** One parented to a chart owns a
+materialized full config and renders from it, so unpublishing the parent leaves it
+intact; only its generated "Explore the data" href uses the parent slug, and the
+301 covers that. They are classified `link`, reported by preflight but never gated
+on — gating would strand every such chart behind raw SQL for no reader-visible
+gain. Do check the href's query params for collisions with the target view's
+dimensions (step 4 flags them). There is still no API to repoint one, so the
+*parent pointer* stays stale; drafts to escalate that live in
+`ai/narrative-charts-slack-post.md` and `ai/narrative-charts-grapher-issue.md`.
 
 ### 5. Apply — the grapher CLI (GATED, production only)
 
@@ -246,12 +257,13 @@ and the target MDIM's slug + reviewed view (an edited, deleted, renamed or rebui
 one comes back `STALE`). Statuses: `OK` / `BLOCKER` / `EXISTS` / `DIFFERS` /
 `GONE` / `STALE` / `MANUAL`.
 
-It also **gates on embedded references**. Explorers, narrative charts, data
-insights, static viz and article chart blocks render the chart's own config, so
-the CLI's unpublish step breaks them with no error anywhere — the one failure mode
-the CLI itself cannot detect. Preflight counts them (current *and* old slugs) and
-exits non-zero while any remain. Migrate them (step 4 gives you each replacement
-URL), then re-run; `--no-references` skips the gate once they are handled.
+It also **gates on embedded references**. Explorers, data insights, static viz
+and article chart blocks render the chart's own config, so
+unpublishing the source breaks them with no error anywhere — the one failure mode
+the CLI itself cannot detect. Preflight counts them (current *and* old slugs, for
+proposed *and* `already_done` charts) and exits non-zero while any remain. Migrate
+them (step 4 gives you each replacement URL), then re-run; `--no-references` skips
+the gate once they are handled.
 
 Non-zero exit means **do not run the CLI yet**. Pass `--decisions` whenever a
 review happened; flagged charts are excluded (remove them from the CSV, or mark
