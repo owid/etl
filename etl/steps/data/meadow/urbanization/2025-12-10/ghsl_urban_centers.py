@@ -17,6 +17,21 @@ CITY_SIZE_CUTOFFS = {
     "above_10m": (10000000, float("inf")),
 }
 
+# The source rates the plausibility of every urban centre's population figure:
+# 0 = low, 1 = moderate, 2 = high, 3 = very high.
+#
+# We drop the values it rates "low", but only for the indicators that describe ONE named city
+# (capital, largest city, top 100). There, a low-plausibility figure is a false claim about a
+# specific place: in Angola, for instance, the source puts ~1 million people in the small town of
+# Uíge while Luanda's urban centre is absent until 1995, and it flags exactly those figures as low.
+#
+# The city-size aggregates below are deliberately NOT filtered. They sum every city in a country, so
+# dropping a misplaced city would remove people who really do live in that country and make the
+# totals too low. Filtering them would also be far more destructive than it looks: 38 country-years
+# would lose every one of their cities, and several countries would lose a fifth to two-thirds of
+# their urban population.
+LOW_PLAUSIBILITY = 0
+
 
 def run() -> None:
     #
@@ -41,6 +56,7 @@ def run() -> None:
             "BU_km2": "built_up_area",
             "CapitalFlag": "capital",
             "ID_UC_G0": "ID_MTUC_G0",
+            "Plausibility": "plausibility",
         }
     )
 
@@ -53,8 +69,16 @@ def run() -> None:
     tb_raw = tb_raw.dropna(subset=["urban_center_name"])
     tb_raw = tb_raw[tb_raw["urban_center_name"] != "N/A"]
 
+    # Sanity check: the plausibility flag must be present and use the documented 0-3 scale, since we
+    # rely on it below to decide which per-city figures to publish.
+    assert "plausibility" in tb_raw.columns, "Source is missing the Plausibility column."
+    unexpected_flags = set(tb_raw["plausibility"].dropna().unique()) - {0, 1, 2, 3}
+    assert not unexpected_flags, f"Unexpected plausibility flags: {sorted(unexpected_flags)}"
+
     # Create working table with selected columns for capitals/top 100.
-    tb = tb_raw[["ID_MTUC_G0", "country", "urban_center_name", "capital", "year", "urban_pop", "urban_area"]].copy()
+    tb = tb_raw[
+        ["ID_MTUC_G0", "country", "urban_center_name", "capital", "year", "urban_pop", "urban_area", "plausibility"]
+    ].copy()
 
     # Calculate urban density.
     tb["urban_density"] = tb["urban_pop"] / tb["urban_area"]
@@ -90,24 +114,52 @@ def run() -> None:
     tb_capitals = tb_capitals[~multi_capital_mask | preferred_mask].copy()
     tb_capitals = tb_capitals.drop(columns=["ID_MTUC_G0", "capital", "preferred_capital"])
 
+    # Drop the capital-city figures the source rates as low plausibility.
+    # A single-step drop is safe here: the capital is identified by the source's own capital flag (and
+    # our preference list above), never by ranking cities on population, so removing a capital's row
+    # cannot promote another city into its place. It just leaves a gap.
+    tb_capitals = tb_capitals[tb_capitals["plausibility"] != LOW_PLAUSIBILITY].drop(columns=["plausibility"])
+
     # Population and density of the largest city by country and year (by population).
+    # Take whole rows rather than a column-wise groupby().first(), so that the plausibility flag we
+    # check next belongs to the same city as the population figure it is rating.
     tb_largest_city = (
-        tb.sort_values("urban_pop", ascending=False)
-        .groupby(["country", "year"], as_index=False)
-        .first()[["country", "year", "urban_pop", "urban_density"]]
+        tb.dropna(subset=["urban_pop"])
+        .sort_values(["country", "year", "urban_pop"], ascending=[True, True, False])
+        .drop_duplicates(subset=["country", "year"], keep="first")[
+            ["country", "year", "urban_pop", "urban_density", "plausibility"]
+        ]
         .copy()
     )
+
+    # Blank the largest-city figures the source rates as low plausibility -- and do NOT re-rank.
+    # This indicator is derived by sorting a country's cities and taking the top one, so simply
+    # dropping the flagged city would let the sort fall through and publish the SECOND-biggest city as
+    # the largest. That is a worse error than the one we are fixing: Laos would be credited with Pakse
+    # (142k) instead of Vientiane (237k) for 2050-2100. So we blank the country-year instead.
+    implausible_largest = tb_largest_city["plausibility"] == LOW_PLAUSIBILITY
+    tb_largest_city.loc[implausible_largest, ["urban_pop", "urban_density"]] = float("nan")
+    tb_largest_city = tb_largest_city.drop(columns=["plausibility"])
+
     tb_largest_city = tb_largest_city.rename(
         columns={"urban_pop": "largest_city_pop", "urban_density": "largest_city_density"}
     )
 
     # Select the top 100 most populous cities in 2020.
+    # The ranking is deliberately taken from the unfiltered data: it defines which cities the indicator
+    # covers, and that membership should not depend on the quality flag of a single year's figure.
     tb_2020 = tb[tb["year"] == 2020]
     top_100_pop_2020 = tb_2020.nlargest(100, "urban_pop").drop_duplicates(subset=["ID_MTUC_G0"])
 
     # Filter the original Table to select the top urban centers.
     tb_top = tb[tb["ID_MTUC_G0"].isin(top_100_pop_2020["ID_MTUC_G0"])].copy()
-    tb_top = tb_top.drop(columns=["urban_area", "ID_MTUC_G0", "capital"])
+
+    # Drop the individual city-year figures the source rates as low plausibility. Each row here is one
+    # named city in one year, so a flagged figure can be removed on its own without affecting any other
+    # city or year, and the city stays in the top 100.
+    tb_top = tb_top[tb_top["plausibility"] != LOW_PLAUSIBILITY]
+
+    tb_top = tb_top.drop(columns=["urban_area", "ID_MTUC_G0", "capital", "plausibility"])
     tb_top = tb_top.rename(columns={"urban_density": "urban_density_top_100", "urban_pop": "urban_pop_top_100"})
 
     # Format the country column for top 100.
@@ -176,14 +228,18 @@ def run() -> None:
 
     #
     # Create a raw city-level table for matching purposes.
+    # This one keeps the plausibility flag, unfiltered, so the producer's quality rating stays
+    # inspectable downstream -- it is what lets us screen for cases like Uíge in the first place.
     #
-    tb_cities_raw = tb_raw[["country", "urban_center_name", "year", "urban_pop"]].copy()
+    tb_cities_raw = tb_raw[["country", "urban_center_name", "year", "urban_pop", "plausibility"]].copy()
     tb_cities_raw = tb_cities_raw.dropna(subset=["urban_center_name", "urban_pop"])
     tb_cities_raw = tb_cities_raw[tb_cities_raw["urban_pop"] > 0]
 
     # Handle duplicate city names by keeping the first occurrence
     # (some cities appear multiple times with same name in different regions)
     tb_cities_raw = tb_cities_raw.drop_duplicates(subset=["country", "urban_center_name", "year"], keep="first")
+    for col in ["urban_pop", "plausibility"]:
+        tb_cities_raw[col].metadata.origins = tb_cities_raw["country"].metadata.origins
 
     tb_cities_raw = tb_cities_raw.format(["country", "urban_center_name", "year"], short_name="ghsl_urban_centers_raw")
 

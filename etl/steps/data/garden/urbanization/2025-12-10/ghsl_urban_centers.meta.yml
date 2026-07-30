@@ -27,6 +27,26 @@ definitions:
   desc_capital_threshold_caveat: &desc_capital_threshold_caveat |-
     Capital cities are only included if they meet the threshold of at least 50,000 people in a contiguous urban area with a density of at least 1,500 people per km². Some capital cities (e.g., Canberra) do not appear in historical estimates because they did not meet this threshold, though they may appear in projections as they grow.
 
+  # The producer flags the plausibility of every city's population figure. We drop the values it rates
+  # "low" from the indicators that describe a single named city, but not from the city-size aggregates,
+  # which sum every city in a country. YAML cannot combine two anchors into one string, so the variants
+  # below repeat the shared wording.
+  desc_processing_low_plausibility: &desc_processing_low_plausibility |-
+    The producer rates how plausible each city's population figure is, on a four-point scale from low to very high. We do not show the figures it rates as "low". In those cases the population is sometimes placed in the wrong settlement: in Angola, for example, around one million people are assigned to the small town of Uíge, while Luanda is missing from the data before 1995. We leave these years blank rather than estimate them.
+
+  desc_processing_density_low_plausibility: &desc_processing_density_low_plausibility |-
+    Population density was calculated by dividing the population of the urban centre by its total land area.
+
+    The producer rates how plausible each city's population figure is, on a four-point scale from low to very high. We do not show the figures it rates as "low". In those cases the population is sometimes placed in the wrong settlement: in Angola, for example, around one million people are assigned to the small town of Uíge, while Luanda is missing from the data before 1995. We leave these years blank rather than estimate them.
+
+  desc_processing_largest_city_low_plausibility: &desc_processing_largest_city_low_plausibility |-
+    The producer rates how plausible each city's population figure is, on a four-point scale from low to very high. We do not show the figures it rates as "low". In those cases the population is sometimes placed in the wrong settlement: in Angola, for example, around one million people are assigned to the small town of Uíge, while Luanda is missing from the data before 1995.
+
+    The largest city is found by ranking a country's cities by population. Where the top city's figure is rated "low", we leave the value blank for that country and year. We do not fall back to the second-largest city, which would otherwise be shown as the largest.
+
+  desc_key_low_plausibility: &desc_key_low_plausibility |-
+    Figures that the producer rates as low plausibility are not shown, and appear as gaps. This affects a small number of cities and years, most visibly Luanda before 2010.
+
   # Degurba descriptions to use for towns and suburbs variables.
   text_degurba_overview: &text_degurba_overview |-
     The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.
@@ -352,6 +372,8 @@ tables:
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -368,6 +390,8 @@ tables:
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -390,7 +414,8 @@ tables:
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - Where a country has multiple capital cities, the density shown is for the administrative capital.
-        description_processing: *desc_processing_density
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_density_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -408,7 +433,8 @@ tables:
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - Where a country has multiple capital cities, the density shown is for the administrative capital.
-        description_processing: *desc_processing_density
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_density_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -430,6 +456,8 @@ tables:
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The ranking of the top 100 cities is fixed based on their population in 2020. Historical values show the population of those same cities across time.
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
@@ -443,6 +471,8 @@ tables:
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The ranking of the top 100 cities is fixed based on their population in 2020. Projected values show the population of those same cities in future years.
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
@@ -463,7 +493,8 @@ tables:
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The ranking of the top 100 cities is fixed based on their population in 2020. Historical values show the density of those same cities across time.
-        description_processing: *desc_processing_density
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_density_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
@@ -478,7 +509,8 @@ tables:
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The ranking of the top 100 cities is fixed based on their population in 2020. Projected values show the density of those same cities in future years.
-        description_processing: *desc_processing_density
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_density_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
@@ -503,6 +535,8 @@ tables:
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -520,6 +554,8 @@ tables:
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -539,6 +575,8 @@ tables:
           - The total population includes both urban and rural populations.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -555,6 +593,8 @@ tables:
           - The total population includes both urban and rural populations.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -577,6 +617,8 @@ tables:
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_largest_city_low_plausibility
         display:
           numDecimalPlaces: 1
 
@@ -591,6 +633,8 @@ tables:
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_largest_city_low_plausibility
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -608,6 +652,8 @@ tables:
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The largest city is determined by 2020 population and may differ from the capital city. The total population includes both urban and rural populations.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_largest_city_low_plausibility
         display:
           numDecimalPlaces: 1
 
@@ -622,6 +668,8 @@ tables:
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The largest city is determined by 2020 population and may differ from the capital city. The total population includes both urban and rural populations.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_largest_city_low_plausibility
         display:
           numDecimalPlaces: 1
           isProjection: true
