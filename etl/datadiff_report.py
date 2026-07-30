@@ -174,6 +174,18 @@ class ColumnDiffResult:
         """A changed column whose diff carries no value changes at all — only metadata edits."""
         return self.kind == "changed" and not self.value_diffs
 
+    @property
+    def is_scored(self) -> bool:
+        """Whether this column's severity is a measured median BARD rather than the fallback.
+
+        False only for a genuinely categorical changed column, whose `severity` is the 1.0
+        "a category flip has no meaningful size" default. The report labels those "not scored"
+        instead of quoting a 100% median it never computed.
+        """
+        if self.kind != "changed" or not self.value_diffs:
+            return True
+        return any(v.median_bard is not None for v in self.value_diffs if v.kind == "changed")
+
 
 @dataclass
 class TableDiffResult:
@@ -458,7 +470,7 @@ def dataset_watch_key(ds: DatasetDiffResult) -> tuple:
     return (tier_rank[ds.tier], lossy_first, -ds.severity, ds.path)
 
 
-def _tier_chip(severity: float, kind: ChangeKind = "changed", tier: Tier | None = None) -> str:
+def _tier_chip(severity: float, kind: ChangeKind = "changed", tier: Tier | None = None, scored: bool = True) -> str:
     """Colored triage chip for a single column: tier icon + its own median BARD score.
 
     Pass `tier` to override the severity-derived tier — a removed column is forced 🔴 regardless
@@ -467,11 +479,19 @@ def _tier_chip(severity: float, kind: ChangeKind = "changed", tier: Tier | None 
     dataset level — see `_rollup_tier_chip`, which a max-of-columns would make say "median" while
     actually showing the single worst column, and which saturates to 100% on any dataset wide
     enough that some column always has a genuine full anomaly (WDI-sized: ~1500 columns).
+
+    Pass `scored=False` for a column whose severity is the non-numeric 1.0 fallback rather than a
+    measured median: the chip then says "not scored" instead of claiming a 100% median that was
+    never computed.
     """
     tier = tier or _tier(severity)
     if tier == "none":
         return ""
-    label = {"removed": "removed", "new": "new"}.get(kind) or f"median anomaly score {format_score(severity)}"
+    if scored is False and kind == "changed":
+        # Unscoreable (categorical) column: severity is the 1.0 fallback, not a measurement.
+        label = "not scored (non-numeric)"
+    else:
+        label = {"removed": "removed", "new": "new"}.get(kind) or f"median anomaly score {format_score(severity)}"
     return f'<span class="chip tier {tier}">{TIER_ICONS[tier]} {_e(label)}</span>'
 
 
@@ -573,7 +593,8 @@ def _top_changes(
                     continue
                 if c.severity > 0:
                     pct = max((v.pct for v in c.value_diffs if v.kind != "new"), default=0.0)
-                    changes.append((c.severity, pct, ds.path, t.name, c.name, "anomaly"))
+                    axis = "anomaly" if c.is_scored else "unscored"
+                    changes.append((c.severity, pct, ds.path, t.name, c.name, axis))
                 elif c.coverage_severity > 0:
                     changes.append((c.coverage_severity, 0.0, ds.path, t.name, c.name, "coverage"))
     losses.sort(key=lambda r: (-r[0], r[2]))
@@ -662,7 +683,7 @@ def _render_value_diff(v: ValueDiff, sample_cap: int = SAMPLE_LIMIT) -> str:
 def _render_column(table_name: str, c: ColumnDiffResult, ds_path: str = "", sample_cap: int = SAMPLE_LIMIT) -> str:
     chips = "".join(f'<span class="chip">{_e(ch)}</span>' for ch in c.changes)
     dim = '<span class="chip dim">dim</span>' if c.is_dim else ""
-    tier = _tier_chip(c.severity, c.kind) if not c.is_dim else ""
+    tier = _tier_chip(c.severity, c.kind, scored=c.is_scored) if not c.is_dim else ""
     anchor = f' id="{_anchor(ds_path, table_name, c.name)}"' if ds_path else ""
     # Dims are navigation context, not indicators — the indicator tier filter skips them.
     # Metadata-only columns get their own filterable category ("meta") instead of a tier.
@@ -902,6 +923,11 @@ def render_html(report: DiffReport) -> str:
         if axis == "coverage":
             icon = "↕"
             meta = f"coverage churn {_e(format_score(severity))} (values appeared/disappeared)"
+        elif axis == "unscored":
+            # Categorical column: severity is the 1.0 fallback, not a measured median. Say so
+            # rather than quoting a 100% score that was never computed.
+            icon = TIER_ICONS.get(_tier(severity), "")
+            meta = f"not scored (non-numeric) · {pct:.0f}% of rows"
         else:
             icon = TIER_ICONS.get(_tier(severity), "")
             meta = f"median anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows"

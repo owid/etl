@@ -787,3 +787,73 @@ def test_is_superseded_remote_predecessor():
     assert not _is_superseded_remote_predecessor(
         "garden/worldbank_wdi/2026-02-27/wdi", {"garden/other/2024-01-01/other": object()}
     )
+
+
+def test_numeric_column_with_sentinel_is_scored():
+    """A numeric column carrying a non-numeric sentinel must still be scored on its numeric rows.
+
+    Real case: `imf/trade.china_imports_share_of_gdp` stores the literal string "China" on
+    China's own rows (the ratio is meaningless there), which makes the whole column `category`
+    dtype. A dtype-only gate sent it to the unscoreable path, where severity defaults to 1.0 —
+    so a column whose genuine revisions were ~0.3% was reported as the worst anomaly (100%) in
+    the whole diff, above real 1.6% changes.
+    """
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001, 2002, 2003],
+            "a -": pd.Categorical(["0.7529", "0.8127", "China", "2.4390"]),
+            "a +": pd.Categorical(["0.7627", "0.8027", "China", "2.4305"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+
+    assert sorted_by_score, "a sentinel-carrying numeric column should be score-sorted like any numeric one"
+    assert median_bard is not None, "severity must be measured, not the non-numeric 1.0 fallback"
+    assert median_bard < 0.01, f"tiny revisions should score near zero, got {median_bard}"
+    # The sentinel rows coerce to NaN on both sides, so they are neither revisions nor coverage events.
+    assert (appeared, disappeared) == (0, 0)
+    assert len(records) == 4
+
+
+def test_genuinely_categorical_column_stays_unscored():
+    """A column with no numeric content at all keeps the unscoreable path (median_bard None),
+    so the report labels it "not scored" rather than inventing a number."""
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["estimate", "estimate"]),
+            "a +": pd.Categorical(["projection", "projection"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared = _changed_records(both, "a")
+
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+    assert len(records) == 2
+
+
+def test_unscored_column_reports_not_scored_instead_of_100_percent():
+    """The 1.0 severity fallback must not be rendered as a measured "median anomaly score 100%"."""
+    from etl.datadiff_report import ColumnDiffResult, ValueDiff, _tier_chip
+
+    categorical = ColumnDiffResult(
+        name="status",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="changed", count=2, total=2, median_bard=None)],
+    )
+    numeric = ColumnDiffResult(
+        name="gdp",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="changed", count=2, total=2, median_bard=1.0)],
+    )
+
+    assert not categorical.is_scored
+    assert numeric.is_scored
+
+    chip = _tier_chip(categorical.severity, categorical.kind, scored=categorical.is_scored)
+    assert "not scored" in chip and "100%" not in chip
+    # A genuine, measured 100% still says so.
+    assert "median anomaly score 100%" in _tier_chip(numeric.severity, numeric.kind, scored=numeric.is_scored)

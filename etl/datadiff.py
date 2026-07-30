@@ -864,6 +864,31 @@ def _df_to_records(df: pd.DataFrame, limit: int = SAMPLE_LIMIT) -> list[dict[str
     return [{str(k): _fmt(v) for k, v in row.items()} for row in df_samp.to_dict("records")]
 
 
+def _as_comparable_floats(s: pd.Series) -> pd.Series | None:
+    """``s`` as float64 for BARD scoring, or None if it isn't a numeric quantity.
+
+    A numeric indicator can carry a non-numeric **sentinel** in some rows — e.g.
+    `imf/trade`'s `china_imports_share_of_gdp` stores the literal string "China" on China's own
+    rows, since "China's imports as a share of China's GDP" is meaningless. That single string
+    makes the whole column `category`/`object` dtype, and a plain `is_numeric_dtype` gate would
+    hand the column to the unscoreable path, where it defaults to *maximal* severity — ranking
+    the column as the report's worst anomaly on the strength of its dtype alone.
+
+    So coerce instead: sentinels become NaN (they're then treated as coverage events rather than
+    revisions, which is what a value-to-sentinel flip is), and the genuinely numeric rows get
+    scored normally. Columns that are actually categorical — where coercion leaves nothing
+    numeric to compare — still return None and keep the unscoreable path.
+    """
+    if pd.api.types.is_numeric_dtype(s):
+        return s.astype("float64")
+    if isinstance(s.dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
+        coerced = pd.to_numeric(s.astype("object"), errors="coerce")
+        # Genuinely categorical when coercion salvages nothing.
+        if coerced.notna().any():
+            return coerced.astype("float64")
+    return None
+
+
 def _changed_records(
     both: pd.DataFrame, col: str, limit: int = SAMPLE_LIMIT
 ) -> tuple[list[dict[str, str]], bool, float | None, int, int]:
@@ -890,11 +915,9 @@ def _changed_records(
     None only for non-numeric columns, where old/new can't be told apart from a category flip.
     """
     old_col, new_col = f"{col} -", f"{col} +"
-    if not (pd.api.types.is_numeric_dtype(both[old_col]) and pd.api.types.is_numeric_dtype(both[new_col])):
+    old, new = _as_comparable_floats(both[old_col]), _as_comparable_floats(both[new_col])
+    if old is None or new is None:
         return _df_to_records(both, limit=limit), False, None, 0, 0
-
-    old = both[old_col].astype("float64")
-    new = both[new_col].astype("float64")
     old_isna = old.isna().to_numpy()
     new_isna = new.isna().to_numpy()
     appeared = old_isna & ~new_isna
