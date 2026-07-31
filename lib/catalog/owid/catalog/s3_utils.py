@@ -119,9 +119,9 @@ def object_exists(s3_url: str, client: BaseClient | None = None) -> bool:
         True if the object exists, False if it does not.
 
     Raises:
-        UploadError: If the check fails for any reason other than the object being
-            absent (e.g. missing credentials, network error). A failed check is not
-            reported as "does not exist", so callers can't mistake it for one.
+        UploadError: If the check fails for any reason other than a 404 — missing or
+            insufficient credentials, or a network error. Only a 404 is reported as
+            "does not exist", so a broken check can't be mistaken for an absent object.
 
     Example:
         ```python
@@ -136,9 +136,7 @@ def object_exists(s3_url: str, client: BaseClient | None = None) -> bool:
     try:
         client.head_object(Bucket=bucket, Key=key)  # ty: ignore
     except ClientError as e:
-        # 404 (no such key) and 403 (no such key, when the caller lacks ListBucket) both
-        # mean "not there"; anything else is a real failure we must not swallow.
-        if e.response.get("ResponseMetadata", {}).get("HTTPStatusCode") in (403, 404):
+        if e.response.get("ResponseMetadata", {}).get("HTTPStatusCode") == 404:
             return False
         log.error(e)
         raise UploadError(e)

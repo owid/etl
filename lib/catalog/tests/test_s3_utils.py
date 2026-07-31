@@ -31,16 +31,18 @@ def test_object_exists():
     assert client.calls == [{"Bucket": "my-bucket", "Key": "ab/cdef"}]
 
 
-@pytest.mark.parametrize("status", [403, 404])
-def test_object_exists_missing(status):
-    """403 and 404 both mean 'not there' — 403 is what R2/S3 return when the caller can't list."""
-    assert not object_exists("s3://my-bucket/ab/cdef", client=MockClient(client_error(status)))  # ty: ignore
+def test_object_exists_missing():
+    assert not object_exists("s3://my-bucket/ab/cdef", client=MockClient(client_error(404)))  # ty: ignore
 
 
-def test_object_exists_raises_on_other_errors():
-    """A failed check must not be reported as 'does not exist', or callers would re-upload blindly."""
+@pytest.mark.parametrize("status", [401, 403, 500])
+def test_object_exists_raises_on_other_errors(status):
+    """A failed check must not be reported as 'does not exist', or callers would re-upload blindly.
+
+    403 in particular means our credentials are wrong, not that the object is absent.
+    """
     with pytest.raises(UploadError):
-        object_exists("s3://my-bucket/ab/cdef", client=MockClient(client_error(500)))  # ty: ignore
+        object_exists("s3://my-bucket/ab/cdef", client=MockClient(client_error(status)))  # ty: ignore
 
 
 def test_s3_bucket_key():
