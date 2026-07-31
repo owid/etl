@@ -51,9 +51,11 @@ ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
 Subjects (combinable): `--chart-ids` · `--chart-slugs` · `--variable-ids` ·
 `--dataset-id` · `--mdim <slug|catalogPath>` · `--explorer <slug>`.
 
-`--transitive` adds a second hop for indicator subjects: after finding the charts
-that render an indicator, sweep the articles referencing those charts. Off by
-default — it multiplies the work on a widely-charted dataset.
+`--transitive` adds a second hop for indicator subjects **only**: after finding the
+charts that render an indicator, sweep the articles referencing those charts. Off by
+default — it multiplies the work on a widely-charted dataset. It changes nothing for a
+`--mdim` or `--explorer` subject (their references are all direct), and the run says so
+rather than letting the flag imply a wider sweep than it made.
 
 Output rows: `subject_type, subject, subject_id, surface, kind, where, where_path,
 context, query_string, text, published`. `query_string` is what makes a

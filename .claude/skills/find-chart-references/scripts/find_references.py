@@ -24,9 +24,11 @@ Chart subjects are expanded to every old slug that still reaches them
 (`chart_slug_redirects`), because references written before a rename point at the
 old slug and are otherwise missed.
 
-`--transitive` adds a second hop for indicator/MDIM subjects: after finding the
-charts that render an indicator, also find the articles that reference those charts.
-Off by default — it multiplies the sweep on widely-charted datasets.
+`--transitive` adds a second hop for INDICATOR subjects only: after finding the charts
+that render an indicator, also find the articles that reference those charts. Off by
+default — it multiplies the sweep on widely-charted datasets. It does nothing for a
+`--mdim` or `--explorer` subject: an MDIM's own references are all direct, and the
+indirect hop from its views' indicators is `--variable-ids`/`--dataset-id` work.
 
 Usage:
     ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
@@ -752,7 +754,7 @@ def main() -> int:
     ap.add_argument("--mdim", action="append", default=[], help="MDIM slug or catalogPath (repeatable)")
     ap.add_argument("--explorer", action="append", default=[], help="explorer slug (repeatable)")
     ap.add_argument("--transitive", action="store_true",
-                    help="for indicator/MDIM subjects, also sweep the articles referencing the charts found")  # fmt: skip
+                    help="indicator subjects only: also sweep the articles referencing the charts found")  # fmt: skip
     ap.add_argument("--json", dest="json_out", help="write findings as JSON to this path")
     ap.add_argument("--csv", dest="csv_out", help="write findings as CSV to this path")
     ap.add_argument("--gaps-json", dest="gaps_out",
@@ -802,6 +804,11 @@ def main() -> int:
                 findings += sweep_gdoc_links(hop)
                 findings += sweep_data_insights(hop)
                 findings += sweep_narrative_charts_of_charts(hop)
+
+    # `--transitive` only has a second hop to make from an indicator. Passing it with just an
+    # MDIM or explorer subject would otherwise look like it widened the sweep when it did not.
+    if args.transitive and not variable_ids and (args.mdim or args.explorer):
+        print("  note: --transitive applies to indicator subjects only; it added nothing to this run.")
 
     for mdim in args.mdim:
         findings += sweep_mdim_subject(mdim)

@@ -160,6 +160,44 @@ def unpublished_sources(entries: list[dict]) -> set[str]:
     return {e["source"] for e in entries if e["chart"]["id"] in down}
 
 
+def drifted_aliases(entries: list[dict]) -> dict[str, str]:
+    """Source charts whose live alias set no longer matches the one recorded in the proposal.
+
+    The CLI does not take the aliases from the CSV: `replaceChartSlugRedirects` re-reads
+    `chart_slug_redirects` inside its own transaction and migrates every row it finds,
+    running `validatePathIsNotRedirectSource` on each. So an alias added after extraction is
+    migrated by a run that preflight validated without it — and one that collides aborts the
+    whole transaction after preflight said `Ready`. `stale_charts` cannot catch this: the
+    admin can add an alias through the redirects API without touching the chart config, so
+    neither the slug nor the md5 moves. The proposal-time list is also what `cli_blockers`
+    and `embed_references` work from, so a new alias is unvalidated and its references
+    ungated. Re-running the extractor is what puts it back under both checks.
+
+    Proposed rows only: an `already_done` row is not in the CSV, and its chart may be
+    unpublished, which deletes those rows by design (see `unserved_old_slugs`).
+    """
+    if not entries:
+        return {}
+    ids = tuple(e["chart"]["id"] for e in entries)
+    df = OWID_ENV.read_sql(
+        "SELECT chart_id, slug FROM chart_slug_redirects WHERE chart_id IN %(ids)s", params={"ids": ids}
+    )
+    live: dict[int, set[str]] = defaultdict(set)
+    for row in df.to_dict("records"):
+        live[int(row["chart_id"])].add(row["slug"])
+    drifted = {}
+    for e in entries:
+        recorded = {s for s in e.get("oldSlugs", []) if s}
+        current = live.get(e["chart"]["id"], set())
+        if current != recorded:
+            drifted[e["source"]] = (
+                f"the chart's old slug(s) changed since the proposal (now {sorted(current) or 'none'}, "
+                f"was {sorted(recorded) or 'none'}) — the CLI migrates the live set, so re-run "
+                "extract_and_match.py and re-review"
+            )
+    return drifted
+
+
 def unserved_old_slugs(entries: list[dict]) -> dict[str, list[str]]:
     """Recorded old slugs of a chart that no longer resolve anywhere.
 
@@ -579,6 +617,10 @@ def main() -> int:
     blockers = cli_blockers(redirects)
     stale = stale_charts(redirects + already_done)
     for source, reason in stale_targets(redirects + already_done).items():
+        stale.setdefault(source, reason)
+    # After the two md5 checks, so a chart that was edited reports that first — the alias
+    # drift is then just one consequence of the same re-run.
+    for source, reason in drifted_aliases(redirects).items():
         stale.setdefault(source, reason)
 
     rows = []
