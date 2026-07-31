@@ -269,50 +269,35 @@ Non-zero exit means **do not run the CLI yet**. Pass `--decisions` whenever a
 review happened; flagged charts are excluded (remove them from the CSV, or mark
 them `SKIP` in `overrides.csv` and re-run step 1).
 
-Then, from the **owid-grapher** repo:
+### Step 6 — hand the migration over
 
-```bash
-yarn createMultiDimRedirectsFromCsv /abs/path/to/redirects_for_cli.csv --dry-run
-```
+**The skill's output ends here.** Send `redirects_for_cli.csv` and `HANDOFF.md`
+to a Grapher developer, who runs the CLI themselves from the owid-grapher repo.
+Never run it — not even `--dry-run`, which still connects to the production DB.
+`HANDOFF.md` is written for that developer and already carries the commands and
+every caveat they need, so don't restate the procedure here or in chat; they
+will not have this skill.
 
-What the CLI does, in one transaction: creates each `multi_dim_redirects` row,
-**migrates every old `chart_slug_redirects` alias** into a redirect aimed
-straight at the MDIM view (one hop, no chain), and **unpublishes each source
-chart**. `--dry-run` rolls all of it back and skips unpublishing entirely.
+Two things stay on **our** side of the handoff, because the developer won't do
+them:
 
-Facts to surface to the user before the real run:
-
-- **Production only.** Redirect tables never sync staging→prod, and a staging
-  rehearsal leaves prod with the old charts still published and no redirects —
-  the migration hasn't half-happened, it hasn't happened.
-- **The CLI has no `--host`, no `--env`, and no production guard.** It reads
-  `GRAPHER_DB_*` from owid-grapher's `.env` (or `$PRIMARY_ENV_FILE`). Whichever
-  DB that points at is the one it writes.
-- **Unpublishing is mandatory, not optional.** A grapher redirect is only
-  consulted when the URL 404s, so a redirect over a still-published chart never
-  fires. The CLI handles it; don't treat it as a separate decision.
-- **Never hand-unpublish a source chart first.** Unpublishing deletes that
-  chart's `chart_slug_redirects` rows, so its old slugs become hard 404s. The
-  CLI's ordering (flatten aliases, then unpublish) is what preserves them.
-- **The admin API is not an alternative for these charts.** It rejects any
-  source with an existing slug redirect as a redirect chain, and its bulk
-  endpoint only accepts explorer sources.
-- **`chart_slug_redirects.target_query_param` is lost** in the flatten —
-  `old-slug → new-slug?tab=map` becomes `old-slug → mdim?<view dims>`. The
-  proposal flags which aliases carry one.
-- **Check with the Grapher team before a large run.** The CLI was written for
-  manual use by a Grapher dev and may lag recent redirect changes.
-
-Right after the run, stamp `cutover_date` in `migration_log_template.csv` and
-keep it. Analytics cannot reconstruct it later: `prod_semantic.redirects` holds
-no `multi_dim_redirects` rows, and once a chart stops being published its whole
-view history resolves to `chart_id = NULL` — retroactively, not just from the
-cutover. To rebuild a continuous series, query `grapher_views_detailed` on the
-raw `grapher` column for the pre-cutover period, the MDIM slug after it, and
-union the two. Expect a ~1 week tail of real views on the old URL (redirects
-fire only on 404 and Cloudflare serves the cached page meanwhile), and note that
-query params are stripped in analytics, so every MDIM dimension collapses into
-one slug.
+- **Say what the run will destroy.** It unpublishes every source chart, in the
+  same transaction as the redirects. Unpublishing is mandatory rather than
+  tidy-up — a grapher redirect is only consulted when the URL 404s — which is
+  exactly why step 4's embed gate has to be clear first. Anything that renders a
+  source chart's own config (explorer, data insight, static viz, article chart
+  block) breaks silently the moment it is unpublished, and no redirect repairs
+  that.
+- **Log the cutover.** Right after the developer confirms the run, stamp
+  `cutover_date` in `migration_log_template.csv` and keep it. Analytics cannot
+  reconstruct it later: `prod_semantic.redirects` holds no `multi_dim_redirects`
+  rows, and once a chart stops being published its whole view history resolves
+  to `chart_id = NULL` — retroactively, not just from the cutover. To rebuild a
+  continuous series, query `grapher_views_detailed` on the raw `grapher` column
+  for the pre-cutover period, the MDIM slug after it, and union the two. Expect
+  a ~1 week tail of real views on the old URL (redirects fire only on 404 and
+  Cloudflare serves the cached page meanwhile), and note that query params are
+  stripped in analytics, so every MDIM dimension collapses into one slug.
 
 ## Gotchas
 

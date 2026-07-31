@@ -51,13 +51,22 @@ ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
 Subjects (combinable): `--chart-ids` · `--chart-slugs` · `--variable-ids` ·
 `--dataset-id` · `--mdim <slug|catalogPath>` · `--explorer <slug>`.
 
-`--transitive` adds a second hop for indicator subjects: after finding the charts
-that render an indicator, sweep the articles referencing those charts. Off by
-default — it multiplies the work on a widely-charted dataset.
+`--transitive` adds a second hop for indicator subjects **only**: after finding the
+charts that render an indicator, sweep the articles referencing those charts. Off by
+default — it multiplies the work on a widely-charted dataset. It changes nothing for a
+`--mdim` or `--explorer` subject (their references are all direct), and the run says so
+rather than letting the flag imply a wider sweep than it made.
 
 Output rows: `subject_type, subject, subject_id, surface, kind, where, where_path,
 context, query_string, text, published`. `query_string` is what makes a
 replacement URL reconstructable (`country=`, `time=`, `tab=`), so don't drop it.
+
+Optional surfaces fail open (an absent legacy table, a subject that does not
+resolve): the run keeps going and prints `COVERAGE GAP: ...` for each, then repeats
+them all at the end. **Read that block before reporting a result** — those surfaces
+were not swept, so an empty answer for them means UNKNOWN, not "nothing references
+it". `--gaps-json <path>` writes the same list as JSON, which is how a wrapper
+carries them into its own report instead of leaving them in stdout.
 
 ## Surface catalog
 

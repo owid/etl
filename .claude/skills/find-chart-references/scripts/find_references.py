@@ -24,9 +24,11 @@ Chart subjects are expanded to every old slug that still reaches them
 (`chart_slug_redirects`), because references written before a rename point at the
 old slug and are otherwise missed.
 
-`--transitive` adds a second hop for indicator/MDIM subjects: after finding the
-charts that render an indicator, also find the articles that reference those charts.
-Off by default — it multiplies the sweep on widely-charted datasets.
+`--transitive` adds a second hop for INDICATOR subjects only: after finding the charts
+that render an indicator, also find the articles that reference those charts. Off by
+default — it multiplies the sweep on widely-charted datasets. It does nothing for a
+`--mdim` or `--explorer` subject: an MDIM's own references are all direct, and the
+indirect hop from its views' indicators is `--variable-ids`/`--dataset-id` work.
 
 Usage:
     ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
@@ -35,6 +37,7 @@ Usage:
 """
 
 import argparse
+import csv
 import json
 import re
 from collections import defaultdict
@@ -43,6 +46,24 @@ from pathlib import Path
 from etl.config import OWID_ENV
 
 RENDER, EMBED, LINK = "render", "embed", "link"
+
+# Frozen snapshots of the site. A link into one keeps rendering whatever it captured, so it
+# is never part of a blast radius — every raw-URL sweep has to drop it, or an archived copy
+# of a page is reported as a live reference somebody has to migrate.
+ARCHIVE_HOST = "archive.ourworldindata.org"
+
+# Surfaces this run could NOT sweep, and subjects that did not resolve. An empty result for
+# any of these means UNKNOWN, not "nothing references it", so they must survive past stdout:
+# `--gaps-json` hands them to whatever wraps this script (audit_references.py puts them in
+# its own Unverified bucket) instead of leaving a truncated sweep looking complete.
+COVERAGE_GAPS: list[str] = []
+
+
+def gap(message: str) -> None:
+    """Record a coverage gap and say so on stdout."""
+    COVERAGE_GAPS.append(message)
+    print(f"  COVERAGE GAP: {message}")
+
 
 COLUMNS = [
     "subject_type", "subject", "subject_id", "surface", "kind",
@@ -108,7 +129,7 @@ def resolve_chart_subjects(chart_ids: list[int], chart_slugs: list[str]) -> dict
     # result. Checked after the old-slug expansion, so passing an old slug isn't flagged.
     missing = [str(i) for i in chart_ids if i not in charts] + [s for s in chart_slugs if s not in by_slug]
     if missing:
-        print(f"  WARNING: {len(missing)} chart subject(s) did not resolve and were NOT swept: {sorted(missing)}")
+        gap(f"{len(missing)} chart subject(s) did not resolve and were NOT swept: {sorted(missing)}")
         print("           A blank result for these means UNKNOWN, not 'nothing references them'.")
     return by_slug
 
@@ -127,7 +148,7 @@ def resolve_variable_ids(variable_ids: list[int], dataset_id: int | None) -> lis
         resolved = {int(i) for i in found["id"]}
         missing = sorted(ids - resolved)
         if missing:
-            print(f"  WARNING: {len(missing)} requested indicator id(s) do not exist and were NOT swept: {missing}")
+            gap(f"{len(missing)} requested indicator id(s) do not exist and were NOT swept: {missing}")
             print("           A blank result for these means UNKNOWN, not 'nothing references them'.")
         if not resolved and dataset_id is None:
             raise SystemExit("None of the requested --variable-ids exist in the grapher DB — nothing to sweep.")
@@ -135,7 +156,7 @@ def resolve_variable_ids(variable_ids: list[int], dataset_id: int | None) -> lis
     if dataset_id is not None:
         df = OWID_ENV.read_sql("SELECT id FROM variables WHERE datasetId = %(d)s", params={"d": dataset_id})
         if df.empty:
-            print(f"  WARNING: dataset {dataset_id} has no indicators — check the dataset id.")
+            gap(f"dataset {dataset_id} has no indicators — check the dataset id; nothing was swept for it")
         ids |= {int(i) for i in df["id"]}
     return sorted(ids)
 
@@ -206,7 +227,7 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
     out = []
     for r in df.to_dict("records"):
         target = r["target"] or ""
-        if "archive.ourworldindata.org" in target:
+        if ARCHIVE_HOST in target:
             continue  # archived snapshots are frozen by design
         slug = target.split("/grapher/", 1)[-1].split("?")[0].split("#")[0].rstrip("/")
         if slug not in by_slug:
@@ -380,7 +401,7 @@ def sweep_wordpress(by_slug: dict[str, dict]) -> list[dict]:
             params=params,
         )
     except Exception as e:  # noqa: BLE001 - optional legacy surface; report as a coverage gap
-        print(f"  (WordPress sweep skipped: {type(e).__name__})")
+        gap(f"WordPress sweep skipped ({type(e).__name__}) — legacy posts were NOT checked")
         return []
     out = []
     for r in df.to_dict("records"):
@@ -551,7 +572,7 @@ def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
             params={"ids": tuple(variable_ids)},
         )
     except Exception as e:  # noqa: BLE001 - table shape varies across environments
-        print(f"  (explorer_variables sweep skipped: {type(e).__name__})")
+        gap(f"explorer_variables sweep skipped ({type(e).__name__}) — explorers on these indicators were NOT checked")
         return []
     return [
         rec(
@@ -623,7 +644,8 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
     )
     exact = re.compile(rf"/grapher/{re.escape(slug)}(?:[?#/]|$)")
     for r in raw.to_dict("records"):
-        if not exact.search(r["target"] or ""):
+        target = r["target"] or ""
+        if ARCHIVE_HOST in target or not exact.search(target):
             continue
         component = r["componentType"] or ""
         out.append(
@@ -636,7 +658,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 r["post_slug"],
                 f"/{r['post_slug']}",
                 f"raw URL, {component or 'unknown'} ({r['post_type']})",
-                url_query(r["target"] or "", r["queryString"] or ""),
+                url_query(target, r["queryString"] or ""),
                 r["text"],
                 r["published"],
             )  # fmt: skip
@@ -732,9 +754,11 @@ def main() -> int:
     ap.add_argument("--mdim", action="append", default=[], help="MDIM slug or catalogPath (repeatable)")
     ap.add_argument("--explorer", action="append", default=[], help="explorer slug (repeatable)")
     ap.add_argument("--transitive", action="store_true",
-                    help="for indicator/MDIM subjects, also sweep the articles referencing the charts found")  # fmt: skip
+                    help="indicator subjects only: also sweep the articles referencing the charts found")  # fmt: skip
     ap.add_argument("--json", dest="json_out", help="write findings as JSON to this path")
     ap.add_argument("--csv", dest="csv_out", help="write findings as CSV to this path")
+    ap.add_argument("--gaps-json", dest="gaps_out",
+                    help="write the surfaces this run could not sweep as JSON to this path")  # fmt: skip
     args = ap.parse_args()
 
     def ints(value: str | None) -> list[int]:
@@ -781,6 +805,11 @@ def main() -> int:
                 findings += sweep_data_insights(hop)
                 findings += sweep_narrative_charts_of_charts(hop)
 
+    # `--transitive` only has a second hop to make from an indicator. Passing it with just an
+    # MDIM or explorer subject would otherwise look like it widened the sweep when it did not.
+    if args.transitive and not variable_ids and (args.mdim or args.explorer):
+        print("  note: --transitive applies to indicator subjects only; it added nothing to this run.")
+
     for mdim in args.mdim:
         findings += sweep_mdim_subject(mdim)
     for explorer in args.explorer:
@@ -794,15 +823,21 @@ def main() -> int:
         Path(args.json_out).write_text(json.dumps(findings, indent=2) + "\n")
         print(f"\n-> {args.json_out}")
     if args.csv_out:
-        import csv as _csv
-
         with open(args.csv_out, "w", newline="") as f:
-            w = _csv.DictWriter(f, fieldnames=COLUMNS)
+            w = csv.DictWriter(f, fieldnames=COLUMNS)
             w.writeheader()
             w.writerows(findings)
         print(f"-> {args.csv_out}")
+    if args.gaps_out:
+        Path(args.gaps_out).write_text(json.dumps(COVERAGE_GAPS, indent=2) + "\n")
     if not args.json_out and not args.csv_out:
         print("\n(pass --json / --csv to save the findings)")
+    # Last thing on stdout, after the counts: a sweep that skipped a surface must not read
+    # as a complete answer just because the summary above it looks tidy.
+    if COVERAGE_GAPS:
+        print(f"\n{len(COVERAGE_GAPS)} coverage gap(s) — this sweep is NOT complete:")
+        for g in COVERAGE_GAPS:
+            print(f"  - {g}")
     return 0
 
 

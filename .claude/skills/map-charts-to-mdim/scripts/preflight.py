@@ -1,9 +1,9 @@
 """Validate a chart → MDIM redirect proposal before the grapher CLI runs it.
 
-READ-ONLY. This script never creates a redirect and never unpublishes a chart.
-Applying is done in owid-grapher:
-
-    yarn createMultiDimRedirectsFromCsv /abs/path/redirects_for_cli.csv --dry-run
+READ-ONLY. This script never creates a redirect and never unpublishes a chart, and
+neither does anything else in this skill. Applying is handed to a Grapher developer,
+who runs owid-grapher's `createMultiDimRedirectsFromCsv` in their own checkout; the
+commands live in the generated HANDOFF.md, which is what they receive.
 
 Why a preflight exists: that CLI runs **one transaction**, and any row it rejects
 aborts the entire migration. So every check here mirrors a check the CLI performs,
@@ -158,6 +158,78 @@ def unpublished_sources(entries: list[dict]) -> set[str]:
     )
     down = {int(i) for i in df["id"]}
     return {e["source"] for e in entries if e["chart"]["id"] in down}
+
+
+def drifted_aliases(entries: list[dict]) -> dict[str, str]:
+    """Source charts whose live alias set no longer matches the one recorded in the proposal.
+
+    The CLI does not take the aliases from the CSV: `replaceChartSlugRedirects` re-reads
+    `chart_slug_redirects` inside its own transaction and migrates every row it finds,
+    running `validatePathIsNotRedirectSource` on each. So an alias added after extraction is
+    migrated by a run that preflight validated without it — and one that collides aborts the
+    whole transaction after preflight said `Ready`. `stale_charts` cannot catch this: the
+    admin can add an alias through the redirects API without touching the chart config, so
+    neither the slug nor the md5 moves. The proposal-time list is also what `cli_blockers`
+    and `embed_references` work from, so a new alias is unvalidated and its references
+    ungated. Re-running the extractor is what puts it back under both checks.
+
+    Proposed rows only: an `already_done` row is not in the CSV, and its chart may be
+    unpublished, which deletes those rows by design (see `unserved_old_slugs`).
+    """
+    if not entries:
+        return {}
+    ids = tuple(e["chart"]["id"] for e in entries)
+    df = OWID_ENV.read_sql(
+        "SELECT chart_id, slug FROM chart_slug_redirects WHERE chart_id IN %(ids)s", params={"ids": ids}
+    )
+    live: dict[int, set[str]] = defaultdict(set)
+    for row in df.to_dict("records"):
+        live[int(row["chart_id"])].add(row["slug"])
+    drifted = {}
+    for e in entries:
+        recorded = {s for s in e.get("oldSlugs", []) if s}
+        current = live.get(e["chart"]["id"], set())
+        if current != recorded:
+            drifted[e["source"]] = (
+                f"the chart's old slug(s) changed since the proposal (now {sorted(current) or 'none'}, "
+                f"was {sorted(recorded) or 'none'}) — the CLI migrates the live set, so re-run "
+                "extract_and_match.py and re-review"
+            )
+    return drifted
+
+
+def unserved_old_slugs(entries: list[dict]) -> dict[str, list[str]]:
+    """Recorded old slugs of a chart that no longer resolve anywhere.
+
+    Unpublishing a chart in the grapher admin deletes its `chart_slug_redirects` rows
+    (`adminSiteServer/apiRoutes/charts.ts`: "Unpublishing chart, delete any existing
+    redirects to it"). So a row whose redirect is in place and whose chart is already
+    unpublished is only finished if something else now serves its old URLs — the CLI
+    re-creates them as `multi_dim_redirects` sources, a hand-unpublish does not. Without
+    this check that row reports DONE while its old URLs are hard 404s.
+    """
+    old = {e["source"]: [s for s in e.get("oldSlugs", []) if s] for e in entries}
+    old = {source: slugs for source, slugs in old.items() if slugs}
+    if not old:
+        return {}
+    every = sorted({s for slugs in old.values() for s in slugs})
+    sources = tuple(f"/grapher/{s}" for s in every)
+    served = set(
+        OWID_ENV.read_sql(
+            "SELECT source FROM redirects WHERE source IN %(s)s "
+            "UNION SELECT source FROM multi_dim_redirects WHERE source IN %(s)s",
+            params={"s": sources},
+        )["source"]
+    )
+    # A chart_slug_redirects row surviving means the alias still reaches the chart itself.
+    served |= {
+        f"/grapher/{s}"
+        for s in OWID_ENV.read_sql(
+            "SELECT slug FROM chart_slug_redirects WHERE slug IN %(s)s", params={"s": tuple(every)}
+        )["slug"]
+    }
+    dead = {source: [s for s in slugs if f"/grapher/{s}" not in served] for source, slugs in old.items()}
+    return {source: slugs for source, slugs in dead.items() if slugs}
 
 
 def stale_targets(entries: list[dict]) -> dict[str, str]:
@@ -546,6 +618,10 @@ def main() -> int:
     stale = stale_charts(redirects + already_done)
     for source, reason in stale_targets(redirects + already_done).items():
         stale.setdefault(source, reason)
+    # After the two md5 checks, so a chart that was edited reports that first — the alias
+    # drift is then just one consequence of the same re-run.
+    for source, reason in drifted_aliases(redirects).items():
+        stale.setdefault(source, reason)
 
     rows = []
     for r in redirects:
@@ -568,6 +644,7 @@ def main() -> int:
 
     # Re-verify the proposal-time redirects still exist and still point at the proposed target.
     unpublished = unpublished_sources(already_done)
+    dead_aliases = unserved_old_slugs(already_done)
     for r in already_done:
         source, t = r["source"], r["target"]
         if source in stale:
@@ -577,7 +654,14 @@ def main() -> int:
         if prior is not None and int(prior["multiDimId"]) == t["multiDimId"] and prior["viewConfigId"] == t["viewConfigId"]:  # fmt: skip
             # The CLI cannot finish these: their source is already a multi_dim_redirects
             # source, which its own validation rejects, so the row would abort the run.
-            if source in unpublished:
+            if source in unpublished and source in dead_aliases:
+                # The unpublish already happened, so this is not a warning about what a
+                # hand-unpublish would do — those URLs are 404ing now.
+                rows.append((source, t["url"], "MANUAL", f"redirect in place and the chart is unpublished, but its "
+                                                         f"old slug(s) {dead_aliases[source]} resolve nowhere any "
+                                                         f"more — the unpublish deleted them; ask the Grapher team "
+                                                         f"to add multi-dim redirects for them"))  # fmt: skip
+            elif source in unpublished:
                 rows.append((source, t["url"], "DONE", "redirect in place and the chart is already unpublished — "
                                                        "nothing left to do for this row"))  # fmt: skip
             elif r.get("oldSlugs"):
@@ -651,10 +735,14 @@ def main() -> int:
     if bad or csv_problems or blocking_embeds or manual:
         return 1
 
-    print(f"\nReady: {len(rows)} row(s) validate against the live DB. Rehearse, then apply, from owid-grapher:")
-    print(f"  yarn createMultiDimRedirectsFromCsv {csv_path.resolve()} --dry-run")
-    print("  (--dry-run rolls the transaction back and skips unpublishing entirely)")
-    print("Then stamp cutover_date in migration_log_template.csv — analytics cannot recover it later.")
+    # Deliberately prints no runnable command. Applying is a Grapher developer's job, in
+    # their own checkout, and HANDOFF.md — which is what they receive — already carries the
+    # commands. A ready-to-paste command here invites whoever ran the preflight to apply it.
+    print(f"\nReady: {len(rows)} row(s) validate against the live DB. Hand the migration over:")
+    print(f"  {csv_path.resolve()}")
+    print(f"  {(csv_path.parent / 'HANDOFF.md').resolve()}  (written for the developer who runs it)")
+    print("When they confirm the run, stamp cutover_date in migration_log_template.csv —")
+    print("analytics cannot recover it later.")
     return 0
 
 
