@@ -285,13 +285,21 @@ the rendered full config, not the old patch.
 
 **Replacement is manual, and that is a deliberate call.** owid/owid-grapher#6872
 asks for a repointing endpoint; it stays open but is **not being worked on**,
-because the per-migration volume is small enough that doing it by hand is cheaper
-than the API. Keep that judgement checkable rather than taking it on faith —
-production today (2026-07): 300 narrative charts, 299 parented to a chart, exactly
-1 to an MDIM view; a real migration touched far fewer (the Economic Inequality
-trial: 1 across 14 redirected charts). **Revisit the decision if a single migration
-would require replacing more than a handful**, and say so in the PR rather than
-grinding through them silently.
+because the number of narrative charts that can ever be in this situation is tiny.
+The population is not "all narrative charts" — it is narrative charts whose **parent
+chart is itself a redirect candidate**, i.e. has an exact MDIM-view match. Measured
+site-wide on production (2026-07) by applying this skill's own matching rule to every
+published chart with narrative children: 249 narrative charts across 190 parent
+charts, of which **5 parents match a published MDIM view — so 5 narrative charts
+total**, and that is the ceiling if every matchable chart were migrated, not a
+per-migration figure. (The Economic Inequality trial hit 1 of them.)
+
+Re-measure rather than trusting that number: it grows as MDIMs are published, since
+each new MDIM view can turn an existing chart into a candidate. `ai/` in this repo
+has the query; the shape is — narrative charts on published parents → those parents'
+indicator slots → compare against every published view's slot signature. **Revisit
+the decision if a single migration would require replacing more than a handful**,
+and say so in the PR rather than grinding through them silently.
 
 That issue also still stands for its *other* half, which replacement does not
 solve: a narrative chart pinned to an MDIM view blocks that MDIM's next re-publish
