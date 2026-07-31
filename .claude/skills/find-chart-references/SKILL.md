@@ -3,7 +3,7 @@ name: find-chart-references
 description: >-
   Find every OWID surface that references a chart, indicator, MDIM, or explorer —
   articles (links vs embeds), explorers, narrative charts, data insights, static viz,
-  key-chart slots, MDIM views, WordPress posts. Answers "what breaks or goes stale if
+  key-chart slots, MDIM views. Answers "what breaks or goes stale if
   this changes or goes away", and distinguishes surfaces a URL redirect fixes from
   surfaces that render the object themselves. Read-only, pure SQL. Trigger when the
   user asks "what references this chart/indicator", "where is this chart embedded",
@@ -58,8 +58,57 @@ default — it multiplies the work on a widely-charted dataset. It changes nothi
 rather than letting the flag imply a wider sweep than it made.
 
 Output rows: `subject_type, subject, subject_id, surface, kind, where, where_path,
-context, query_string, text, published`. `query_string` is what makes a
-replacement URL reconstructable (`country=`, `time=`, `tab=`), so don't drop it.
+surface_id, config_id, context, query_string, text, published`.
+
+Two fields carry the weight for callers:
+
+- **`config_id`** — the surface's `chart_configs.id`, present for every
+  config-bearing surface (charts, MDim views, explorer views, narrative charts). This
+  is what lets a caller inspect configs without re-deriving any joins: a single
+  `SELECT ... FROM chart_configs WHERE id IN (...)` covers charts, MDim views and
+  explorer views alike. **One exception:** for a narrative chart read
+  `AdminAPI.get_narrative_chart(id)["configFull"]` instead — the stored row lags a
+  parent edit until the child is re-saved. A row with an empty `config_id` has no
+  config to read: the `explorer` surface (as opposed to `explorer view`) is the
+  fallback for an indicator registered on an explorer whose view configs never name
+  it, and article, static-viz and key-chart rows never had one.
+- **`query_string`** — the reference's own URL params (`country=`, `time=`, `tab=`),
+  where article-level pins live and what makes a replacement URL reconstructable.
+
+**`admin_url`** is the chart's editor in **whichever environment was audited** — a
+staging sweep yields staging admin links, a production sweep yields `admin.owid.io`
+(tailscale suffixes are stripped, since the short host resolves and the long one is
+noise). MDim views deliberately have none: they are not editable in the admin, and
+their fix belongs in the ETL YAML.
+
+`surface_id` identifies the surface object itself (chart id,
+`multi_dim_x_chart_configs.id`, narrative chart id, explorer slug, tag id), for when
+you need to edit it rather than read it. **For any gdoc-backed surface (articles,
+data insights) it is the Google Doc id** — `posts_gdocs.id` is literally the Doc id,
+so `https://docs.google.com/document/d/<surface_id>/edit` opens the source document.
+
+### `--markdown` — the report to hand a human
+
+`--markdown ai/refs.md` renders **one table per surface**, grouped by `kind`, so a
+long list stays scannable. For every article reference the table gives three ways to
+reach it:
+
+- 📄 the **Google Doc** to edit,
+- 🔎 the **anchor text** to search for inside that doc,
+- 🔗 a **scroll-to-reference link** into the published article (a `#:~:text=` fragment,
+  built the same way as `chart_diff/citations.py:create_text_fragment_url`), which
+  opens the page scrolled to and highlighting the exact sentence.
+
+Every row also gets a **👁 preview** — the referenced view itself, as the reader sees
+it: the chart plus that reference's own params, or the MDIM at that view's exact
+dimensions. A slug alone doesn't tell you which of an MDIM's hundred views is in
+play, so this is what makes a row judgeable without opening the article.
+
+Block embeds have no anchor text, so those fall back to the plain article URL.
+
+Indicator subjects are labelled with the indicator's name (not a bare variable id),
+cells are truncated and pipe-escaped so the tables can't break, and drafts are marked
+⚠️. For spreadsheet work use `--csv`, which carries the untruncated values.
 
 Optional surfaces fail open (an absent legacy table, a subject that does not
 resolve): the run keeps going and prints `COVERAGE GAP: ...` for each, then repeats
@@ -84,12 +133,21 @@ references written before a rename point at the old one):
 | data insights | `posts_gdocs.content->>'$."grapher-url"'` | `embed` |
 | static viz | `static_viz.grapherSlug` | `embed` |
 | key charts | `chart_tags` where `keyChartLevel > 0` | `render` |
-| WordPress | `posts_links` (legacy; skipped if absent) | `link` |
+
+WordPress (`posts` / `posts_links`) is **not** swept, and adding it back would be a
+regression. Every published post there that links a chart 404s on the live site, and none
+of those slugs exists as a published gdoc — they are a dead mirror, not migrated content.
 
 **Indicator subjects**: charts (`chart_dimensions`), MDIM views
 (`multi_dim_x_chart_configs` **plus** a config scan — that column records only the
 first y indicator, so multi-indicator views are invisible to the join alone),
-explorers (`explorer_variables`, aggregated per explorer).
+explorer views (`explorer_variables` narrows to the explorers involved, then each
+one's `explorer_views` → `chart_configs` says which of its views actually render the
+indicator). Explorer views are emitted **one row per view**, so a dataset powering a
+large explorer yields hundreds of rows — that is the price of every row carrying a
+`config_id`. Under `--transitive`, also the narrative charts parented to any chart
+**or MDIM view** that renders the indicators (`parentMultiDimXChartConfigId`): a
+narrative chart holds its own config, so skipping that hop leaves it unaudited.
 
 MDIM findings are keyed by **(mdim, view, indicator)**, not by view: one view can
 render several of the requested indicators, and each one is its own reference. The
@@ -100,7 +158,16 @@ catalog path is not silently skipped.
 **MDIM subjects**: article links/embeds, narrative charts pinned to a view
 (`parentMultiDimXChartConfigId`), and inbound `multi_dim_redirects`.
 
-**Explorer subjects**: article links/embeds (`linkType='explorer'`).
+**Explorer subjects**: article links/embeds (`linkType='explorer'`) **plus a
+`linkType='url'` scan**, as for charts and MDIMs — an article that pastes
+`/explorers/<slug>?…` produces a url-typed row, and only that row carries the
+`country=`/`time=` pins the downstream audits grade.
+
+Raw-URL targets are un-wrapped before matching: a link pasted through Google Docs can
+arrive as `google.com/url?q=<encoded>` (or `?url=<encoded>`), with the real URL and its
+parameters inside. Every raw-URL sweep keeps wrapper rows as SQL candidates and decides
+the path in Python, because the `url=` form percent-encodes its slashes and a
+`LIKE '%/grapher/<slug>%'` prefilter would drop it before it could be decoded.
 
 ## Who uses this, and what stays theirs
 
@@ -109,8 +176,8 @@ interpret them — each caller keeps the analysis only it can do:
 
 | Skill | Uses the sweep for | Keeps |
 |---|---|---|
-| `check-hardcoded-years` | the surface list for a dataset/indicator, plus each reference's `query_string` (article `time=` pins) | reading configs for `minTime`/`maxTime`/`map.time`, grading pins against the data's latest time, the where-the-fix-goes table — and its own per-view `explorer_views` join, which this aggregation can't supply |
-| `check-empty-entities` | the same list, plus `query_string` (`country=` pins) and old-slug expansion | entity-selection vs entities-with-data checks, grading findings against production — plus the same per-view `explorer_views` join and its own `linkType='url'` article scan, neither of which a dataset-subject sweep reaches |
+| `check-hardcoded-years` | the surface list for a dataset/indicator, plus each reference's `query_string` (article `time=` pins) | reading configs for `minTime`/`maxTime`/`map.time`, grading pins against the data's latest time, the where-the-fix-goes table |
+| `check-empty-entities` | the same list, plus `query_string` (`country=` pins) and old-slug expansion | entity-selection vs entities-with-data checks, grading findings against production |
 | `update-dataset` (step 7) | one sweep shared by both audits above | the update workflow around them |
 | `review-data-pr` (§8d) | a cheap "which surfaces carry this dataset" check | judging whether the author's audit was complete |
 | `map-charts-to-mdim` | the sweep for the charts being redirected | replacement URLs, redirect severity, param-collision detection |
@@ -121,20 +188,28 @@ that's the point of the split.
 
 ## Known gaps
 
-State these when reporting; silence reads as full coverage.
+State these when reporting; silence reads as full coverage. `--markdown` now ends with
+a **Not searched** section carrying this list plus the limits of that particular run
+(no `--transitive` hop, excluded 'All charts' entries) — keep the two in step, and
+still state them yourself when you report on a `--json`/`--csv` run.
+
+Optional surfaces **fail open**: an absent legacy table or a subject that does not
+resolve prints `COVERAGE GAP: …`, is repeated at the end of the run, leads the
+report's **Not searched** section, and is available as JSON via `--gaps-json <path>`
+for a wrapper that builds its own report. An empty answer for one of those surfaces
+means UNKNOWN, not "nothing references it".
 
 - Non-ETL explorers whose config lives in the `explorers` TSV are not parsed.
-- Explorer hits on an indicator subject are **aggregated per explorer** (a view
-  count, not a row per view) — a caller that needs each view's config still has to
-  join `explorer_views` itself.
-- The `--transitive` hop is built from the **charts** an indicator subject resolved
-  to, so it covers their articles (`grapher`/`guided-chart`), data insights and
-  narrative charts — and nothing else. `linkType='url'` article rows, static viz and
-  key-chart slots are swept for chart subjects only; article links targeting an
-  **MDim or explorer**, and narrative charts parented to an MDim view, only appear
-  when that MDim/explorer is passed as its own subject. To close the loop, take the
-  MDim and explorer slugs the first run returned and re-run with `--mdim` /
-  `--explorer`.
+- **Legacy CSV-backed explorers** (`data://explorers/...` wide tables — e.g. the
+  poverty explorer) appear in no DB table: their data and selections live in the
+  explorer TSV, outside grapher configs. Report them as a coverage caveat rather
+  than letting them pass silently.
+- `linkType='url'` rows pointing at `archive.ourworldindata.org` are dropped as
+  frozen by design. As of 2026-07 every url-typed grapher row was an archive
+  snapshot — don't bet an audit on that classification continuing to hold.
+- Indicator-level `presentation.grapher_config` lives in garden/grapher
+  `.meta.yml`, not the DB. It is invisible here and needs a repo grep, and it fans
+  out to every thin MDim/explorer view that inherits it.
 - Data insights are matched on `grapher-url`; one storing the reference elsewhere
   is missed.
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside

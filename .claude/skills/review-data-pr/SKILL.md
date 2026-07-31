@@ -161,7 +161,7 @@ The author-side audit is optional to *run* in `/update-dataset` (the `check-empt
 
 If the author didn't run it, **you MUST offer it to the user** as an optional add-on to this review (name the token cost) — surfacing this offer is mandatory, never silently skip it — and recommend accepting when the risk is real: many charts remapped, hand-curated (non-auto) mappings, a restructure, or indicators whose country coverage shrank. Run the full sweep on opt-in.
 
-For a cheap version of the same question — *which* surfaces carry this dataset at all, without the per-view availability checks — run `find-chart-references --dataset-id <id>`. That bare form is the cheapest and covers charts, MDim views and explorers (the last aggregated per explorer). It stops there: the articles, data insights and narrative charts hanging off those charts need `--transitive`, which is what step 7 runs and what costs more on a widely-charted dataset. Add the flag when the review turns on those surfaces; skip it and call them unverified rather than clear. Either way it answers "did the author miss a surface entirely" in one query.
+For a cheap version of the same question — *which* surfaces carry this dataset at all, without the per-view availability checks — run `find-chart-references --dataset-id <id>`. It's the surface list both step-7 audits are built on, and it answers "did the author miss a surface entirely" in one query.
 
 Either way, do a cheap manual spot-check as part of the base review: open 2–3 of the most-viewed upgraded charts on staging (SVG render is enough) and confirm their pinned entity selections still draw lines — an empty published chart is a 🔴 however it's found, and a spot-check hit is itself a reason to recommend the full sweep.
 

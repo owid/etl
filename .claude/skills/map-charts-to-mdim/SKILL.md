@@ -102,6 +102,8 @@ Writes into `--out`:
 | `redirects_for_cli.csv` | **the apply input** — `;`-delimited `source;target` for the grapher CLI |
 | `migration_log_template.csv` | `(old_slug, mdim_slug, view_id, cutover_date)` — stamp the date at apply time |
 | `unmatched.md` | everything not proposed, with candidates/near-miss detail |
+| `mdim_suggestions.md` | **what the MDIMs would need** for the unmatched charts to become redirectable |
+| `HANDOFF.md` | standalone note for whoever runs the CLI — command, caveats, why the CLI |
 | `_sources.json` | machine record of run inputs (don't hand-edit) |
 
 **Handoff convention: one source per JSON.** Like the explorer→MDIM redirect
@@ -113,8 +115,10 @@ charts that means one file per chart, in `payloads/`. The combined
 
 **Matching**: a chart matches a view when the y-variable-ID sets are equal AND
 x/size/color agree (absent == absent). Several matching views → tiebreak on chart
-type; still ambiguous → reported, never guessed. Indicator-set subset/superset →
-`near_miss`, reported only. Quality labels:
+type; still ambiguous → reported, never guessed. **Any** partial indicator overlap
+that is not an exact match → `near_miss`, reported only — not just subset/superset:
+a chart plotting `{A, B}` against a view plotting `{A, C}` shares `A`, so calling
+it `none` would assert an overlap check that came out the other way. Quality labels:
 
 - `exact` — one view matches (possibly via the `chart_type` tiebreak — check the
   `tiebreak` column).
@@ -143,7 +147,9 @@ matters:
   source is already a redirect source, the chart's own slug is itself an old
   slug, the target MDIM's `/grapher/<slug>` is a redirect source, a self-redirect,
   or one of the old slugs is already a redirect source elsewhere. These land in
-  `mapping.json → conflicts[]` and are kept out of the CSV.
+  `mapping.json → conflicts[]` and are kept out of the CSV — and, because being
+  absent from the CSV is not the same as being finished, they are also listed in
+  `HANDOFF.md` with their blocker, next to the already-redirected rows.
 
 Charts already redirected to the same target are counted as `already_done` — no
 redirect to create, but they are still published (the extractor only selects
@@ -232,9 +238,99 @@ intact; only its generated "Explore the data" href uses the parent slug, and the
 301 covers that. They are classified `link`, reported by preflight but never gated
 on — gating would strand every such chart behind raw SQL for no reader-visible
 gain. Do check the href's query params for collisions with the target view's
-dimensions (step 4 flags them). There is still no API to repoint one, so the
-*parent pointer* stays stale; drafts to escalate that live in
-`ai/narrative-charts-slack-post.md` and `ai/narrative-charts-grapher-issue.md`.
+dimensions (step 4 flags them).
+
+**To actually fix one, replace it — don't try to repoint it.** The parent columns
+are INSERT-only, so there is no repointing API and never will be one by design; the
+route the Grapher devs endorse is to create a *new* narrative chart from the
+equivalent MDIM view and delete the old one. Three API facts set the order, and
+getting it wrong strands you:
+
+- **create** rejects a name that already exists, and requires kebab-case;
+- **delete** refuses while a **published** post references the name;
+- **update** writes only query params — there is **no rename**.
+
+So the obvious sequence (delete, then recreate under the same name) is blocked in
+precisely the case that matters — a narrative chart embedded in a published article.
+Two paths, and the references audit (step 4) tells you which applies:
+
+*No published post references it* → delete, then create the replacement with the
+same name. The name is preserved and nothing else changes.
+
+*A published post references it* (the usual case) → do it in this order:
+
+1. **Create** the replacement from the MDIM view, under a new kebab-case name.
+2. **Update the article(s)** to reference the new name.
+3. **Delete** the old one — now unreferenced, so the delete succeeds.
+
+Never delete first. The delete will fail, and unpublishing the article to force it
+through breaks the page for readers.
+
+**Do the create in the admin UI — it is deep-linkable to the right view:**
+
+```
+{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=<target.viewConfigId>
+```
+
+That opens the narrative-chart editor already parented to the MDIM view, so you
+set the name and the view's controls and save. Prefer this over the API: `AdminAPI`
+has `get_narrative_chart` and `update_narrative_chart` but **no create or delete**,
+so the API route means hand-rolled HTTP for both ends of the swap.
+
+If you do script it, the endpoints are `POST {admin_api}/narrative-charts` and
+`DELETE {admin_api}/narrative-charts/<id>`:
+
+```jsonc
+{
+  "type": "multiDim",
+  "name": "<kebab-case-name>",
+  "parentChartConfigId": "<the MDIM view's chart_configs.id>",
+  "config": { /* the OLD narrative chart's rendered full config */ }
+}
+```
+
+**You already have `parentChartConfigId`: it is `target.viewConfigId` in the
+redirect payload** for the chart this narrative chart hangs off
+(`payloads/<chart_slug>.json`, or `target_view_config_id` in
+`mapping_proposal.csv`). That is the MDIM view's `chart_configs.id` — the same
+value `find-chart-references` reports as `config_id` on an `mdim view` row. So
+"which MDIM view do I parent the replacement to" is answered by the proposal: it is
+the view the chart was going to redirect to. Get the
+`config` from `AdminAPI.get_narrative_chart(<old id>)["configFull"]`: the endpoint
+derives the patch itself by diffing what you pass against the new parent, so pass
+the rendered full config, not the old patch.
+
+**Replacement is manual, and that is a deliberate call.** owid/owid-grapher#6872
+asked for a repointing endpoint; it was **closed as not-planned** in favour of
+manual replacement,
+because the number of narrative charts that can ever be in this situation is tiny.
+The population is not "all narrative charts" — it is narrative charts whose **parent
+chart is itself a redirect candidate**, i.e. has an exact MDIM-view match. Measured
+site-wide on production (2026-07) by applying this skill's own matching rule to every
+published chart with narrative children: 249 narrative charts across 190 parent
+charts, of which **5 parents match a published MDIM view — so 5 narrative charts
+total**, and that is the ceiling if every matchable chart were migrated, not a
+per-migration figure. (The Economic Inequality trial hit 1 of them.)
+
+Re-measure rather than trusting that number: it grows as MDIMs are published, since
+each new MDIM view can turn an existing chart into a candidate. `ai/` in this repo
+has the query; the shape is — narrative charts on published parents → those parents'
+indicator slots → compare against every published view's slot signature. **Revisit
+the decision if a single migration would require replacing more than a handful**,
+and say so in the PR rather than grinding through them silently.
+
+**One problem from that issue is now untracked.** #6872 covered two things, and
+closing it closed both. Manual replacement solves the repointing half; it does
+nothing for the other — a narrative chart parented to an MDIM view blocks that
+MDIM's next re-publish, because `cleanUpOrphanedChartConfigs` deletes
+`multi_dim_x_chart_configs` rows with no narrative-chart guard and the FK refuses
+(`ER_ROW_IS_REFERENCED_2`). Renaming a dimension or choice slug is enough to
+trigger it, and it surfaces as a data update failing with an opaque FK error.
+Replacement makes this *more* likely, not less: every replacement creates a new
+MDIM-parented narrative chart. Production carries 1 today. If that count grows,
+re-file it as its own issue — the write-up is in
+`ai/narrative-charts-grapher-issue.md` (§2), alongside
+`ai/narrative-charts-slack-post.md`.
 
 ### 5. Apply — the grapher CLI (GATED, production only)
 

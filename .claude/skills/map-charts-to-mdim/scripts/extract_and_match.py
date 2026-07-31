@@ -408,19 +408,39 @@ def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, st
             else:
                 c["quality"], c["candidates"] = "ambiguous", candidates
         else:
-            near = [v for v in views if all(v[s] == c[s] for s in EXTRA_SLOTS) and (c["y"] < v["y"] or v["y"] < c["y"])]
+            # Any view sharing an indicator, not just one whose y set strictly contains or is
+            # contained by the chart's. A chart plotting {A, B} against a view plotting {A, C}
+            # is neither, yet A is shared — classifying that as "none" would have the
+            # suggestions report assert that no view carries any of the chart's indicators,
+            # which is exactly what it is not. That broader reading is what the CSV legend
+            # has always documented ("indicator sets overlap but differ").
+            near = [
+                v for v in views if all(v[s] == c[s] for s in EXTRA_SLOTS) and (v["y"] & c["y"]) and v["y"] != c["y"]
+            ]
             near.sort(key=lambda v: (-len(v["y"] & c["y"]), len(v["y"] ^ c["y"])))
             if near:
                 c["quality"], c["near_misses"] = "near_miss", near[:3]
 
 
 def describe_near_miss(c: dict, id_to_path: dict[int, str]) -> str:
+    """Both sides of the gap, per candidate view.
+
+    A near miss is any partial overlap, so the two sets can each hold indicators the other
+    lacks. Reporting only one side — or labelling the view's surplus as the chart's — states
+    the gap backwards, which is worse than not stating it.
+    """
+
+    def ids(values) -> str:
+        return ", ".join(f"{i} ({path_tail(id_to_path.get(i))})" for i in sorted(values))
+
     parts = []
     for v in c["near_misses"]:
-        extra = sorted(v["y"] - c["y"]) or sorted(c["y"] - v["y"])
-        side = "view extra" if v["y"] > c["y"] else "chart extra"
-        ids = ", ".join(f"{i} ({path_tail(id_to_path.get(i))})" for i in extra)
-        parts.append(f"{v['mdim_slug']}:{v['view_id']} [{side}: {ids}]")
+        sides = []
+        if v["y"] - c["y"]:
+            sides.append(f"view extra: {ids(v['y'] - c['y'])}")
+        if c["y"] - v["y"]:
+            sides.append(f"chart extra: {ids(c['y'] - v['y'])}")
+        parts.append(f"{v['mdim_slug']}:{v['view_id']} [{'; '.join(sides)}]")
     return " | ".join(parts)
 
 
@@ -817,6 +837,250 @@ def write_mapping_json(out: Path, charts: list[dict], mdims: list[dict], selecti
     return stats
 
 
+def indicator_names(ids: set[int]) -> dict[int, str]:
+    """{variable id -> name} for readable suggestions."""
+    if not ids:
+        return {}
+    df = OWID_ENV.read_sql("SELECT id, name FROM variables WHERE id IN %(i)s", params={"i": tuple(sorted(ids))})
+    return {int(i): n for i, n in zip(df["id"], df["name"]) if n}
+
+
+def write_mdim_suggestions(out: Path, charts: list[dict], id_to_path: dict[int, str], host: str) -> int:
+    """What would have to change in the MDIMs for the unmatched charts to be redirectable.
+
+    A near miss is not just a failure to match — it is a precise description of the gap:
+    the view carries an indicator the chart doesn't, or vice versa. Stated that way it
+    becomes an MDIM-authoring to-do, which is usually the real fix for a chart that has
+    no home yet. Charts with no overlap at all need a new view instead.
+    """
+    near = [c for c in charts if c["quality"] == "near_miss"]
+    # `quality` starts at "none" and `match_charts` bails out before searching for any chart
+    # it cannot represent (several indicators in one x/size/color slot, or no y at all),
+    # leaving that default in place with the reason in `note`. No overlap search ever ran
+    # for those, so listing them as "no view shares this chart's indicators" would assert
+    # something nobody checked — and could send someone off to author a view that already
+    # exists. They need the shape problem resolved first, so they get their own section.
+    none = [c for c in charts if c["quality"] == "none" and not c["note"]]
+    unchecked = [c for c in charts if c["quality"] == "none" and c["note"]]
+    wanted: set[int] = set()
+    for c in near + none:
+        wanted |= set(c["y"])
+        for v in c["near_misses"]:
+            wanted |= set(v["y"])
+    names = indicator_names(wanted)
+
+    def label(i: int) -> str:
+        return names.get(i) or path_tail(id_to_path.get(i)) or str(i)
+
+    lines = [
+        "# Suggested MDIM changes",
+        "",
+        "These charts have no redirect target today. Each entry says what the MDIM would",
+        "need for the chart to become redirectable — decide per case whether the MDIM",
+        "*should* carry it, or whether the chart simply retires without a successor.",
+        "",
+    ]
+
+    if near:
+        lines += [
+            f"## Close — indicator sets overlap but differ ({len(near)})",
+            "",
+            "The closest view shares at least one indicator with the chart and differs by the",
+            "ones listed — in either direction, or both at once. Adding a view with the chart's",
+            "exact indicator set is what makes the redirect possible.",
+            "",
+        ]
+        for c in near:
+            lines.append(f"### {c['chart_slug']} — [{c['title']}]({host}/grapher/{c['chart_slug']})")
+            lines.append("")
+            for v in c["near_misses"]:
+                view_extra = sorted(v["y"] - c["y"])
+                chart_extra = sorted(c["y"] - v["y"])
+                lines.append(f"- **{v['mdim_slug']}** view `{v['view_id']}` ([open]({v['url']}))")
+                if view_extra:
+                    names_s = ", ".join(f"`{label(i)}`" for i in view_extra)
+                    lines.append(f"    - the view also plots {names_s} — the chart does not")
+                if chart_extra:
+                    names_s = ", ".join(f"`{label(i)}`" for i in chart_extra)
+                    lines.append(f"    - the chart also plots {names_s} — the view does not")
+                lines.append(f"    - to redirect: add a view plotting exactly {len(c['y'])} indicator(s) — "
+                             + ", ".join(f"`{label(i)}`" for i in sorted(c["y"])))  # fmt: skip
+            lines.append("")
+
+    if none:
+        lines += [
+            f"## No overlap — would need a new view ({len(none)})",
+            "",
+            "No published MDIM view shares this chart's indicators at all. Redirecting these",
+            "means authoring a view for them, which is a bigger call than a near miss:",
+            "it is usually the question of whether the MDIM should cover this topic.",
+            "",
+        ]
+        for c in none:
+            inds = ", ".join(f"`{label(i)}`" for i in sorted(c["y"])[:4])
+            more = "" if len(c["y"]) <= 4 else f" (+{len(c['y']) - 4} more)"
+            lines.append(f"- **{c['chart_slug']}** — plots {inds}{more}")
+        lines.append("")
+
+    if unchecked:
+        lines += [
+            f"## Not searched — chart shape unsupported ({len(unchecked)})",
+            "",
+            "These were never compared against any view, so nothing here says whether a",
+            "matching view exists. The chart's shape has to be resolved first — then re-run",
+            "the match to find out which of the sections above it belongs in.",
+            "",
+        ]
+        for c in unchecked:
+            lines.append(f"- **{c['chart_slug']}** — {c['note']}")
+        lines.append("")
+
+    (out / "mdim_suggestions.md").write_text("\n".join(lines))
+    return len(near) + len(none) + len(unchecked)
+
+
+def write_handoff(out: Path, charts: list[dict], selection: dict, cli_csv: Path) -> Path:
+    """A note the person running the CLI can act on without having been in the session."""
+    proposed = proposed_charts(charts)
+    cli_only = [c for c in proposed if c["cli_required"]]
+    # Their redirect row already exists, so the CLI leaves them out of the CSV entirely —
+    # but the source chart can still be published, and a redirect over a published chart
+    # never fires. Running the CLI does not resolve them; someone has to. Omitting them
+    # would let the operator finish the run believing the migration was complete.
+    done = [c for c in charts if c["already_done"]]
+    # Matched, but blocked by a redirect that already points somewhere else. `proposed_charts`
+    # drops them and they are not `already_done`, so without this they appear nowhere in the
+    # handoff — and an operator who runs the CSV to completion would believe the migration was
+    # done while these charts stay published with no redirect to the MDIM. Same reason the
+    # already-redirected rows are listed: the CLI not touching a chart is not the chart
+    # being finished.
+    blocked = [c for c in charts if c["target"] is not None and c["conflict"] and not c["already_done"]]
+    lines = [
+        "# Chart → MDIM redirects: handoff",
+        "",
+        f"**{len(proposed)} redirects** proposed from `{selection['mode']}={selection['value']}`.",
+        f"Input file: `{cli_csv.name}` (in this folder).",
+        "",
+        *(
+            [
+                f"{len(done)} further chart(s) are already redirected and are **not** in the CSV — "
+                "they still need a manual check, see the end of this note.",
+                "",
+            ]  # fmt: skip
+            if done
+            else []
+        ),
+        *(
+            [
+                f"{len(blocked)} chart(s) matched a view but are **blocked** and are not in the CSV "
+                "either — running the CLI leaves them published and unredirected. See the end of "
+                "this note.",
+                "",
+            ]  # fmt: skip
+            if blocked
+            else []
+        ),
+        "## Run it",
+        "",
+        "From the **owid-grapher** repo, against **production**:",
+        "",
+        "```bash",
+        f"yarn createMultiDimRedirectsFromCsv {cli_csv.resolve()} --dry-run   # rehearse",
+        f"yarn createMultiDimRedirectsFromCsv {cli_csv.resolve()}             # for real",
+        "```",
+        "",
+        "## What it does, and what to know before running",
+        "",
+        "- It creates each `multi_dim_redirects` row, migrates any old `chart_slug_redirects`",
+        "  aliases onto the MDIM, **and unpublishes each source chart** — all in one",
+        "  transaction. `--dry-run` rolls the whole thing back and skips the unpublishing.",
+        "- **Unpublishing is required, not tidy-up**: a grapher redirect is only consulted",
+        "  when the URL 404s, so a redirect over a still-published chart never fires.",
+        "- **Don't hand-unpublish anything first.** Unpublishing deletes that chart's",
+        "  `chart_slug_redirects` rows, so its old slugs would become hard 404s. The CLI's",
+        "  ordering is what preserves them.",
+        "- **One transaction, all-or-nothing**: a single rejected row aborts the migration.",
+        "  `preflight.py` in this skill re-checks every row against the live DB first.",
+        "- **Production only** — redirect tables do not sync staging → production, and the",
+        "  CLI takes `GRAPHER_DB_*` from owid-grapher's `.env` with no environment guard.",
+        "",
+    ]
+    if cli_only:
+        n_alias = sum(len(c["old_slugs"]) for c in cli_only)
+        lines += [
+            f"## Why the CLI and not the admin ({len(cli_only)} of {len(proposed)})",
+            "",
+            f"These charts carry {n_alias} old slug(s) redirecting into them. The admin API",
+            "rejects those as redirect chains; the CLI migrates them onto the MDIM instead.",
+            "",
+        ]
+        for c in cli_only:
+            lines.append(f"- `{c['chart_slug']}` — old slugs: {', '.join(c['old_slugs'])}")
+        lines.append("")
+    if done:
+        with_aliases = [c for c in done if c["old_slugs"]]
+        lines += [
+            f"## Not in the CSV — handle these by hand ({len(done)})",
+            "",
+            "These charts already have the redirect row this run would have created, so the",
+            "CLI skips them. That is **not** the same as being finished: the redirect only",
+            "fires once the source chart stops being published. Check each one and unpublish",
+            "it if it is still live.",
+            "",
+        ]
+        for c in done:
+            t = c["target"]
+            alias = f" — **carries old slug(s)**: {', '.join(c['old_slugs'])}" if c["old_slugs"] else ""
+            lines.append(
+                f"- `{c['chart_slug']}` (chart {c['chart_id']}) → `{t['mdim_slug']}` view `{t['view_id']}`{alias}"
+            )
+        lines.append("")
+        if with_aliases:
+            lines += [
+                f"**Do not simply unpublish the {len(with_aliases)} marked above.** Unpublishing a",
+                "chart deletes its `chart_slug_redirects` rows, so those old slugs would become",
+                "hard 404s — the same trap the CLI's ordering avoids for the proposed rows. Those",
+                "aliases have to be migrated onto the MDIM first. `preflight.py` refuses these",
+                "entries for exactly this reason.",
+                "",
+            ]
+    if blocked:
+        lines += [
+            f"## Blocked — matched but not in the CSV ({len(blocked)})",
+            "",
+            "Each of these found a target view, but something already in the DB stops the row",
+            "from being created. The CLI will not migrate them and running it does not resolve",
+            "them: the chart stays published, with no redirect to the MDIM. Someone has to",
+            "decide per row — resolve the blocker, or accept that the chart is not migrating.",
+            "",
+        ]
+        for c in blocked:
+            t = c["target"]
+            lines.append(f"- `{c['chart_slug']}` (chart {c['chart_id']}) → `{t['mdim_slug']}` view `{t['view_id']}`")
+            lines.append(f"    - blocked by: {c['conflict']}")
+        lines += [
+            "",
+            "`unmatched.md` in this folder has the same rows alongside every other chart",
+            "that did not produce a redirect.",
+            "",
+        ]
+    lines += [
+        "## After the run",
+        "",
+        "Stamp `cutover_date` in `migration_log_template.csv` and keep it. Analytics cannot",
+        "reconstruct the mapping later: once a chart stops being published its whole view",
+        "history resolves to `chart_id = NULL`, and `prod_semantic.redirects` carries no",
+        "`multi_dim_redirects` rows.",
+        "",
+        "`references.md` lists what the redirect does *not* fix — embeds that render the",
+        "chart's own config and need editing by hand.",
+        "",
+    ]
+    path = out / "HANDOFF.md"
+    path.write_text("\n".join(lines))
+    return path
+
+
 def write_unmatched_md(out: Path, charts: list[dict], id_to_path: dict[int, str], host: str) -> None:
     lines = ["# Charts without a proposed redirect", ""]
     sections = [
@@ -982,6 +1246,8 @@ def main():
     cli_csv, n_cli = write_cli_csv(out, charts)
     log_template = write_migration_log_template(out, charts)
     write_unmatched_md(out, charts, id_to_path, host)
+    n_suggestions = write_mdim_suggestions(out, charts, id_to_path, host)
+    handoff = write_handoff(out, charts, selection, cli_csv)
     (out / "_sources.json").write_text(json.dumps({
         "selection": selection,
         "host": host,
@@ -995,6 +1261,8 @@ def main():
     print(f"-> {out}/payloads/*.json  ({n_payloads} files, ONE source chart per JSON — the copy-paste handoff unit)")
     print(f"-> {cli_csv}  ({n_cli} rows, the apply input for `yarn createMultiDimRedirectsFromCsv`)")
     print(f"-> {log_template}  (stamp cutover_date when the CLI runs — analytics can't recover it later)")
+    print(f"-> {out}/mdim_suggestions.md  ({n_suggestions} unmatched chart(s): what the MDIMs would need)")
+    print(f"-> {handoff}  (give this to whoever runs the CLI)")
     print("\nNext: preflight.py to validate before the CLI runs (one bad row aborts its whole transaction).")
 
 

@@ -60,38 +60,35 @@ Three exclusions keep that check from crying wolf; without them a WDI-scale swee
 
 ## Surfaces and where the fix lives
 
-**Getting most of the surface list.** `find-chart-references` (`--dataset-id` or
-`--variable-ids`, plus `--transitive` for the article hop) returns each reference
-with its `query_string` and an `embed`/`render`/`link` classification — use it
-instead of re-deriving the joins for the charts, MDim views and chart-parented
-narrative charts below, and for the article rows that target a **chart**. Two
-things it does not give you on its own:
+**Get the surface list from `find-chart-references`, not from your own joins:**
 
-- **Explorer view configs.** It reports explorers aggregated per explorer, not per
-  view, so keep the `explorer_views` → `chart_configs` join to reach the configs
-  whose pins this skill grades.
-- **Article `time=` pins on MDims and explorers, and MDim-parented narrative
-  charts.** The `--transitive` hop is built from the *charts* found, so it reaches
-  neither. The row below covers links to charts, MDims and explorers alike — to
-  keep that scope, take the MDim and explorer slugs the first sweep returned and
-  run a second pass with `--mdim <slug>` / `--explorer <slug>`, which sweeps their
-  article links and (for MDims) narrative charts pinned to a view. Skip the second
-  pass and those pins escape the audit — report them as unverified rather than
-  clean.
+```bash
+ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
+  .claude/skills/find-chart-references/scripts/find_references.py \
+  --dataset-id <new grapher dataset id> --transitive --json ai/refs.json
+```
 
-What stays in this skill is everything downstream of the list: reading each
-surface's config, finding the pins, and grading them against the data's latest
-time. The table also remains authoritative for **where the fix goes**, which the
-sweep doesn't know.
+Each row carries a `config_id` (`chart_configs.id`) for every config-bearing
+surface — charts, MDim views, explorer views, narrative charts — so fetching the
+configs to inspect is one `WHERE id IN (...)` against `chart_configs`, with no
+surface joins of your own. Article rows carry the `query_string`, which is where
+`time=` pins live. A `surface = "explorer"` row (as opposed to `explorer view`)
+carries no `config_id`: the indicator is registered on that explorer but no view
+config names it, so report it as unchecked rather than passing it.
 
-| Surface | Where the pins are | Where the fix goes |
-|---|---|---|
-| Charts | `chart_dimensions` → `charts` → `chart_configs.full` | Chart config edit — `AdminAPI` (`apps/chart_sync/admin_api.py`): `get_chart_config(id)`, set the field to `"latest"`, `update_chart(id, cfg)`. In an update, apply on **staging** with user sign-off — the edit rides Chart Diff to production at merge. General mode: hand the list to the user or get explicit sign-off per batch before touching production. |
-| MDim views | `multi_dim_x_chart_configs` → `chart_configs` (resolved configs) | The MDim YAML in `etl/steps/export/multidim/...` (view `config:` blocks / `common_view_config`), then re-run the export step. A DB-side fix is **overwritten at the next rebuild** — the YAML is the source of truth. |
-| Explorer views | `explorer_views` → `chart_configs` (join `explorers` for `isPublished`) | ETL-based explorers: `etl/steps/export/explorers/.../*.config.yml` + export re-run. Non-ETL explorers (no `explorer_views` rows; definition lives in `explorers.config`): the explorer admin TSV (`minTime`/`maxTime` columns in the graphers block, `time=` in `defaultView`) — report as a coverage caveat if you don't parse it. |
-| Narrative charts | merged parent+patch via `AdminAPI.get_narrative_chart` | Usually deliberate (ℹ️). If a pin must move, edit the narrative chart's patch via `AdminAPI.update_narrative_chart` — with user sign-off, as with any reader-facing change. |
-| Indicator-level configs | `presentation.grapher_config` in garden/grapher `.meta.yml` (repo grep below) | The `.meta.yml` + step re-run with `--grapher`. These propagate into every thin MDim/explorer view that inherits the indicator's config, so one pinned field here fans out to many views. |
-| Article references | `posts_gdocs_links` (join `posts_gdocs pg ON pg.id = pgl.sourceId` — the FK is `sourceId`, not a gdoc-named column — and filter `pg.published = 1`) whose `queryString` carries `time=` — embeds and hyperlinks to charts, MDims, and explorers alike | Gdoc edit (content follow-up). Same plumbing as `check-empty-entities` §4: resolve `target` through `chart_slug_redirects`, link each citation with a scroll-to-highlight URL via `find_chart_citations_in_content`, and verify fixes on the live article page, not the lagging Datasette mirror. |
+`--transitive` is not optional here. Narrative charts hang off a chart *or* an MDim
+view, and both hops live behind that flag — drop it and every narrative chart on the
+dataset goes unaudited. This skill's job starts after that: find the pins, grade them against the
+data's latest time, and route the fix.
+
+| Surface | Where the fix goes |
+|---|---|
+| Charts | Chart config edit — `AdminAPI` (`apps/chart_sync/admin_api.py`): `get_chart_config(id)`, set the field to `"latest"`, `update_chart(id, cfg)`. In an update, apply on **staging** with user sign-off — the edit rides Chart Diff to production at merge. General mode: hand the list to the user or get explicit sign-off per batch before touching production. |
+| MDim views | The MDim YAML in `etl/steps/export/multidim/...` (view `config:` blocks / `common_view_config`), then re-run the export step. A DB-side fix is **overwritten at the next rebuild** — the YAML is the source of truth. |
+| Explorer views | ETL-based explorers: `etl/steps/export/explorers/.../*.config.yml` + export re-run. Non-ETL explorers (no `explorer_views` rows; definition lives in `explorers.config`): the explorer admin TSV (`minTime`/`maxTime` columns in the graphers block, `time=` in `defaultView`) — report as a coverage caveat if you don't parse it. |
+| Narrative charts | Usually deliberate (ℹ️). Read the **merged** config via `AdminAPI.get_narrative_chart(id)["configFull"]`, not the `config_id` row — that stored full lags a parent edit. If a pin must move, edit the patch via `AdminAPI.update_narrative_chart`, with user sign-off. |
+| Indicator-level configs | The `.meta.yml` + step re-run with `--grapher`. Pins live in `presentation.grapher_config` (repo grep below) — **not a DB surface**, so the sweep won't find them; grep for them separately. These propagate into every thin MDim/explorer view that inherits the indicator's config, so one pinned field here fans out to many views. |
+| Article references | Gdoc edit (content follow-up). Link each citation with a scroll-to-highlight URL via `find_chart_citations_in_content`, and verify fixes on the live article page, not the lagging Datasette mirror. |
 
 **Parsing `time=` in URLs:** the grapher time param is a single value (`time=2019`) or a range (`time=1990..2020`, `time=earliest..2023`). Each **numeric** component is a pin — grade the end bound like `maxTime` (an embed with `time=..2019` keeps showing the old window after the data reaches 2025), the start bound like `minTime`. `earliest`/`latest` components are fine, and daily charts use ISO dates (`time=2020-01-01..latest`) — convert those to day offsets before grading: a day-axis variable advertises `display.zeroDay` in the same `metadata.json` (its `dimensions.years.values[].id` are day offsets from that date), so the component's comparable value is `(date.fromisoformat(part) - date.fromisoformat(zero_day)).days`. Skip `$time`-style template placeholders in country-page dynamic embeds. Article time pins are often deliberate framing of the surrounding prose, so default them to 🟡-at-worst and always hand them to content follow-up rather than editing configs.
 
@@ -195,13 +192,16 @@ def pins(cfg):
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             yield path, v
 
-cfgs = env.read_sql("""
-    SELECT DISTINCT c.id AS chart_id, cc.slug, cc.full AS config
-    FROM chart_dimensions cd
-    JOIN variables v ON cd.variableId = v.id
-    JOIN charts c ON c.id = cd.chartId
-    JOIN chart_configs cc ON cc.id = c.configId
-    WHERE v.datasetId = %(d)s""", params={"d": DATASET_ID})
+# Surfaces come from find-chart-references (--dataset-id ... --json refs.json);
+# every config-bearing row carries a config_id, so one query fetches them all.
+refs = [r for r in json.load(open("refs.json")) if r["config_id"]]
+ids = tuple({r["config_id"] for r in refs})
+if not ids:  # `WHERE id IN ()` is a MySQL syntax error, not an empty result
+    raise SystemExit("No config-bearing references — report the unchecked surfaces instead.")
+cfgs = env.read_sql(
+    "SELECT id, slug, full AS config FROM chart_configs WHERE id IN %(i)s",
+    params={"i": ids},
+)
 
 for _, row in cfgs.iterrows():
     cfg = json.loads(row["config"])
@@ -229,7 +229,9 @@ for _, row in cfgs.iterrows():
         ...  # collect (sev, surface, chart_id, slug, field, val, ref, deliberate)
 ```
 
-Repeat over `multi_dim_x_chart_configs`, `explorer_views`, narrative-chart merged configs, and parsed `posts_gdocs_links` query strings (`time=` components), then fold in the repo grep. Query gotchas: pymysql `%`-formats break on quoted literals — parameterize everything. **The public Datasette mirror is DuckDB**, not SQLite/MySQL — `json_type()` returns DuckDB type names (`UBIGINT`, `VARCHAR`, …), so don't filter numerics by type name in SQL; use `TRY_CAST(json_extract_string(cc.full, '$.maxTime') AS DOUBLE) IS NOT NULL` or pull `json_extract_string(...)` values and classify client-side.
+The same loop covers MDim views and explorer views — they are `chart_configs` rows too, and the sweep already returned their `config_id`. Two surfaces need their own handling: **narrative charts** (read `AdminAPI.get_narrative_chart(id)["configFull"]`, since the stored full lags a parent edit) and **article references** (parse the `time=` components out of each row's `query_string`). Then fold in the repo grep for indicator-level `presentation.grapher_config` pins, which live in YAML and are invisible to any DB sweep.
+
+Query gotchas: pymysql `%`-formats break on quoted literals — parameterize everything. **The public Datasette mirror is DuckDB**, not SQLite/MySQL — `json_type()` returns DuckDB type names (`UBIGINT`, `VARCHAR`, …), so don't filter numerics by type name in SQL; use `TRY_CAST(json_extract_string(cc.full, '$.maxTime') AS DOUBLE) IS NOT NULL` or pull `json_extract_string(...)` values and classify client-side.
 
 ## Report format
 

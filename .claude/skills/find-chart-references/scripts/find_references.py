@@ -42,10 +42,18 @@ import json
 import re
 from collections import defaultdict
 from pathlib import Path
+from urllib.parse import parse_qs, quote, urlencode, urlsplit
 
 from etl.config import OWID_ENV
 
 RENDER, EMBED, LINK = "render", "embed", "link"
+TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
+GOOGLE_REDIRECT_RE = re.compile(r"^https?://(?:www\.)?google\.[a-z.]+/url\?", re.IGNORECASE)
+# Every raw-URL sweep adds this to its SQL prefilter. A wrapper can percent-encode the
+# nested URL's slashes, in which case a `LIKE '%/grapher/<slug>%'` prefilter drops the row
+# before `unwrap_redirect` ever sees it — so wrapper rows are always candidates and the
+# path is decided in Python. Cheap: production holds four such rows in total.
+WRAPPER_LIKE = "%google.%/url?%"
 
 # Frozen snapshots of the site. A link into one keeps rendering whatever it captured, so it
 # is never part of a blast radius — every raw-URL sweep has to drop it, or an archived copy
@@ -54,8 +62,9 @@ ARCHIVE_HOST = "archive.ourworldindata.org"
 
 # Surfaces this run could NOT sweep, and subjects that did not resolve. An empty result for
 # any of these means UNKNOWN, not "nothing references it", so they must survive past stdout:
-# `--gaps-json` hands them to whatever wraps this script (audit_references.py puts them in
-# its own Unverified bucket) instead of leaving a truncated sweep looking complete.
+# they go into the `--markdown` report's "Not searched" section, and `--gaps-json` hands them
+# to whatever wraps this script (audit_references.py puts them in its own Unverified bucket).
+# Otherwise a truncated sweep reads as a complete audit.
 COVERAGE_GAPS: list[str] = []
 
 
@@ -66,25 +75,40 @@ def gap(message: str) -> None:
 
 
 COLUMNS = [
-    "subject_type", "subject", "subject_id", "surface", "kind",
-    "where", "where_path", "context", "query_string", "text", "published",
+    "subject_type", "subject", "subject_label", "subject_id", "surface", "kind",
+    "where", "where_path", "surface_id", "config_id", "context",
+    "query_string", "text", "published", "preview_url", "admin_url",
 ]  # fmt: skip
 
 
-def rec(subject_type, subject, subject_id, surface, kind, where, where_path="",
-        context="", query_string="", text="", published=True) -> dict:  # fmt: skip
+def rec(subject_type, subject, subject_id, surface, kind, where, where_path="", *,
+        surface_id=None, config_id=None, context="", query_string="", text="",
+        published=True) -> dict:  # fmt: skip
+    """One reference.
+
+    `surface_id` and `config_id` are the handles a caller needs to go further without
+    re-deriving the joins: `surface_id` identifies the surface object (chart id,
+    multi_dim_x_chart_configs.id, narrative chart id, explorer slug), and `config_id`
+    is its `chart_configs.id` where one exists — enough to fetch the rendered config
+    and inspect it (time pins, entity selections, FAUST text).
+    """
     return {
         "subject_type": subject_type,
         "subject": subject,
+        "subject_label": str(subject),
         "subject_id": subject_id,
         "surface": surface,
         "kind": kind,
         "where": where,
         "where_path": where_path,
+        "surface_id": surface_id,
+        "config_id": config_id,
         "context": context,
         "query_string": query_string or "",
         "text": text or "",
         "published": bool(published),
+        "preview_url": "",
+        "admin_url": "",
     }
 
 
@@ -172,7 +196,7 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
     """
     slugs = tuple(by_slug)
     df = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
         "WHERE pgl.target IN %(s)s AND pgl.linkType IN ('grapher', 'guided-chart') ORDER BY pg.slug",
@@ -191,13 +215,37 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"{component or 'unknown'} ({r['post_type']})",
-                r["queryString"],
-                r["text"],
-                r["published"],
+                surface_id=r["gdoc_id"],
+                context=f"{component or 'unknown'} ({r['post_type']})",
+                query_string=r["queryString"],
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
     return out
+
+
+def unwrap_redirect(target: str) -> str:
+    """The real URL behind a `google.com/url?…` wrapper, which is what a raw link often is.
+
+    Google Docs rewrites some pasted links into that wrapper, and the reference's own
+    parameters — the `country=`/`time=` pins the downstream audits grade — sit
+    percent-encoded inside the wrapper, behind its tracking query. Reading the target as-is
+    would both match the path in the wrong place and hand those audits `sa=`/`usg=` instead
+    of the pins.
+
+    Both parameter spellings are read: docs-style wrappers carry the URL in `q`, search-style
+    ones in `url` — and it is the `url` form that arrives fully percent-encoded, slashes
+    included, so it is the one a path-based filter would otherwise never see.
+    """
+    if not target or not GOOGLE_REDIRECT_RE.match(target):
+        return target or ""
+    params = parse_qs(urlsplit(target).query)
+    for key in ("q", "url"):
+        inner = params.get(key, [""])[0]
+        if inner.startswith("http"):
+            return inner
+    return target
 
 
 def url_query(target: str, fallback: str = "") -> str:
@@ -216,17 +264,18 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
     """Raw URL links (linkType='url') pointing at a live grapher page."""
     slugs = tuple(by_slug)
     clauses = " OR ".join(f"pgl.target LIKE %(t{i})s" for i in range(len(slugs)))
-    params = {f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)}
+    params: dict[str, str] = {f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)}
+    params["wrap"] = WRAPPER_LIKE
     df = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
         f"FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
-        f"WHERE pgl.linkType = 'url' AND ({clauses})",
+        f"WHERE pgl.linkType = 'url' AND ({clauses} OR pgl.target LIKE %(wrap)s)",
         params=params,
     )
     out = []
     for r in df.to_dict("records"):
-        target = r["target"] or ""
+        target = unwrap_redirect(r["target"])
         if ARCHIVE_HOST in target:
             continue  # archived snapshots are frozen by design
         slug = target.split("/grapher/", 1)[-1].split("?")[0].split("#")[0].rstrip("/")
@@ -242,10 +291,11 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"{component or 'unknown'} ({r['post_type']})",
-                url_query(target, r["queryString"] or ""),
-                r["text"],
-                r["published"],
+                surface_id=r["gdoc_id"],
+                context=f"{component or 'unknown'} ({r['post_type']})",
+                query_string=url_query(target, r["queryString"] or ""),
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
     return out
@@ -270,7 +320,8 @@ def sweep_explorer_charts(by_slug: dict[str, dict]) -> list[dict]:
             EMBED,
             r["explorerSlug"],
             f"/explorers/{r['explorerSlug']}",
-            "references the chart by id",
+            surface_id=r["explorerSlug"],
+            context="references the chart by id",
             published=r["isPublished"],
         )  # fmt: skip
         for r in df.to_dict("records")
@@ -290,7 +341,8 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
     """
     ids = tuple({v["id"] for v in by_slug.values()})
     df = OWID_ENV.read_sql(
-        "SELECT nc.id, nc.name, nc.parentChartId AS chart_id, nc.queryParamsForParentChart AS qp, cc.slug "
+        "SELECT nc.id, nc.name, nc.chartConfigId, nc.parentChartId AS chart_id, "
+        "       nc.queryParamsForParentChart AS qp, cc.slug "
         "FROM narrative_charts nc JOIN charts c ON c.id = nc.parentChartId "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE nc.parentChartId IN %(ids)s ORDER BY nc.name",
         params={"ids": ids},
@@ -307,8 +359,13 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
                 LINK,
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
-                'renders its own config; only its "Explore the data" link uses the parent slug',
-                "&".join(f"{k}={v}" for k, v in sorted(params.items())),
+                surface_id=int(r["id"]),
+                # NOTE: chart_configs.full for a narrative chart is materialized and lags a
+                # parent edit. To inspect one, use AdminAPI.get_narrative_chart(id)["configFull"]
+                # rather than reading this row directly.
+                config_id=r["chartConfigId"],
+                context='renders its own config; only its "Explore the data" link uses the parent slug',
+                query_string="&".join(f"{k}={v}" for k, v in sorted(params.items())),
             )  # fmt: skip
         )
     return out
@@ -318,8 +375,9 @@ def sweep_data_insights(by_slug: dict[str, dict]) -> list[dict]:
     """Data insights store the chart in content->>'$."grapher-url"', not in posts_gdocs_links."""
     slugs = tuple(by_slug)
     df = OWID_ENV.read_sql(
-        "SELECT post_slug, published, grapher_url, slug FROM ("
-        "  SELECT pg.slug AS post_slug, pg.published, pg.content->>'$.\"grapher-url\"' AS grapher_url,"
+        "SELECT gdoc_id, post_slug, published, grapher_url, slug FROM ("
+        "  SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.published,"
+        "         pg.content->>'$.\"grapher-url\"' AS grapher_url,"
         "         SUBSTRING_INDEX(SUBSTRING_INDEX(pg.content->>'$.\"grapher-url\"', '/grapher/', -1), '?', 1) AS slug"
         "  FROM posts_gdocs pg WHERE pg.type = 'data-insight'"
         "    AND pg.content->>'$.\"grapher-url\"' IS NOT NULL"
@@ -338,8 +396,9 @@ def sweep_data_insights(by_slug: dict[str, dict]) -> list[dict]:
                 EMBED,
                 r["post_slug"],
                 f"/data-insights/{r['post_slug']}",
-                "grapher-url in the insight's front matter",
-                url.split("?", 1)[1] if "?" in url else "",
+                surface_id=r["gdoc_id"],
+                context="grapher-url in the insight's front matter",
+                query_string=url.split("?", 1)[1] if "?" in url else "",
                 published=r["published"],
             )  # fmt: skip
         )
@@ -369,7 +428,7 @@ def sweep_key_charts(by_slug: dict[str, dict]) -> list[dict]:
     """Topic-page key-chart slots. MDIM tags don't participate in that rotation."""
     ids = tuple({v["id"] for v in by_slug.values()})
     df = OWID_ENV.read_sql(
-        "SELECT ct.chartId AS chart_id, t.name AS tag, ct.keyChartLevel, cc.slug "
+        "SELECT ct.chartId AS chart_id, ct.tagId, t.name AS tag, ct.keyChartLevel, cc.slug "
         "FROM chart_tags ct JOIN tags t ON t.id = ct.tagId "
         "JOIN charts c ON c.id = ct.chartId JOIN chart_configs cc ON cc.id = c.configId "
         "WHERE ct.chartId IN %(ids)s AND ct.keyChartLevel > 0 ORDER BY t.name",
@@ -383,46 +442,19 @@ def sweep_key_charts(by_slug: dict[str, dict]) -> list[dict]:
             "key chart",
             RENDER,
             r["tag"],
+            surface_id=int(r["tagId"]),
             context=f"keyChartLevel={r['keyChartLevel']}",
         )  # fmt: skip
         for r in df.to_dict("records")
     ]
 
 
-def sweep_wordpress(by_slug: dict[str, dict]) -> list[dict]:
-    """Legacy WordPress posts. The table may be absent on newer environments — fail open."""
-    slugs = tuple(by_slug)
-    clauses = " OR ".join(f"pl.target LIKE %(t{i})s" for i in range(len(slugs)))
-    params = {f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)}
-    try:
-        df = OWID_ENV.read_sql(
-            "SELECT p.slug AS post_slug, pl.target FROM posts_links pl JOIN posts p ON p.id = pl.sourceId "
-            f"WHERE p.status = 'publish' AND ({clauses})",
-            params=params,
-        )
-    except Exception as e:  # noqa: BLE001 - optional legacy surface; report as a coverage gap
-        gap(f"WordPress sweep skipped ({type(e).__name__}) — legacy posts were NOT checked")
-        return []
-    out = []
-    for r in df.to_dict("records"):
-        target = r["target"] or ""
-        slug = target.split("/grapher/", 1)[-1].split("?")[0].split("#")[0].rstrip("/")
-        if slug not in by_slug:
-            continue
-        out.append(
-            rec(
-                "chart",
-                slug,
-                by_slug[slug]["id"],
-                "wordpress",
-                LINK,
-                r["post_slug"],
-                f"/{r['post_slug']}",
-                "legacy post link",
-                target.split("?", 1)[1] if "?" in target else "",
-            )  # fmt: skip
-        )
-    return out
+# There is deliberately no WordPress sweep. The `posts` mirror is dead: every published row
+# that links a chart 404s on the live site, and none of those slugs exists as a published
+# gdoc, so they are not migrated content the gdoc sweeps already cover. The sweep that used
+# to live here also never worked — it matched `posts_links.target LIKE '%/grapher/%'`, but
+# that column holds the bare slug for `linkType='grapher'` rows, so it returned nothing while
+# 676 such links existed. Reinstating it would surface references to pages that all 404.
 
 
 # ----- Indicator surfaces ---------------------------------------------------------
@@ -440,6 +472,18 @@ def parse_json_obj(value) -> dict:
     return parsed if isinstance(parsed, dict) else {}
 
 
+def parse_json_list(value) -> list:
+    if not value:
+        return []
+    if isinstance(value, list):
+        return value
+    try:
+        parsed = json.loads(value)
+    except (json.JSONDecodeError, TypeError):
+        return []
+    return parsed if isinstance(parsed, list) else []
+
+
 def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
     """Charts rendering these indicators. Drafts can have no slug — they still render.
 
@@ -448,29 +492,32 @@ def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
     reader impact. The live state is `isPublished` in the config.
     """
     df = OWID_ENV.read_sql(
-        "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.slug, "
-        "COALESCE(cc.full->>'$.isPublished', 'false') = 'true' AS published "
+        "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.id AS config_id, cc.slug, "
+        "       COALESCE(cc.full->>'$.isPublished', 'false') = 'true' AS published, "
+        "       c.isInheritanceEnabled AS inheritance "
         "FROM chart_dimensions cd JOIN charts c ON c.id = cd.chartId "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE cd.variableId IN %(ids)s ORDER BY cc.slug",
         params={"ids": tuple(variable_ids)},
     )
-    out = []
-    for r in df.to_dict("records"):
-        slug = r["slug"] or ""
-        out.append(
-            rec(
-                "indicator",
-                str(r["variableId"]),
-                int(r["variableId"]),
-                "chart",
-                RENDER,
-                slug or f"chart {r['chart_id']} (no slug)",
-                f"/grapher/{slug}" if slug else "",
-                f"chart id {r['chart_id']}",
-                published=r["published"],
-            )  # fmt: skip
-        )
-    return out
+    return [
+        rec(
+            "indicator",
+            str(r["variableId"]),
+            int(r["variableId"]),
+            "chart",
+            RENDER,
+            # A chart can have no slug (drafts never given one). Label it by id rather
+            # than emitting a null `where`, which breaks any caller that sorts or groups.
+            r["slug"] or f"(chart {r['chart_id']}, no slug)",
+            f"/grapher/{r['slug']}" if r["slug"] else "",
+            surface_id=int(r["chart_id"]),
+            config_id=r["config_id"],
+            context=f"inheritance {'on' if r['inheritance'] else 'off'}"
+            + ("" if r["slug"] else " — draft with no slug"),
+            published=r["published"],
+        )  # fmt: skip
+        for r in df.to_dict("records")
+    ]
 
 
 def entry_variable_id(entry, by_path: dict[str, int]) -> int | None:
@@ -517,7 +564,21 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     out: list[dict] = []
     seen: set[tuple] = set()
 
-    def emit(slug, catalog_path, published, view_id, variable_id: int) -> None:
+    # Index each view's dimensions by its fullConfigId. Dimensions are what a preview URL
+    # needs, and taking them from the config avoids splitting viewId on "__" — a choice
+    # slug may itself contain underscores.
+    configs = OWID_ENV.read_sql("SELECT slug, catalogPath, published, config FROM multi_dim_data_pages")
+    parsed = []
+    dims_by_config_id: dict[str, dict] = {}
+    for row in configs.to_dict("records"):
+        cfg = row["config"]
+        cfg = json.loads(cfg) if isinstance(cfg, str) else (cfg or {})
+        parsed.append((row, cfg))
+        for view in cfg.get("views", []):
+            if view.get("fullConfigId"):
+                dims_by_config_id[view["fullConfigId"]] = view.get("dimensions") or {}
+
+    def emit(slug, catalog_path, published, view_id, variable_id, config_id, surface_id, dims, note=""):
         if (slug, view_id, variable_id) in seen:
             return
         seen.add((slug, view_id, variable_id))
@@ -530,26 +591,31 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
                 RENDER,
                 f"{slug}:{view_id}",
                 f"/grapher/{slug}",
-                catalog_path,
+                surface_id=surface_id,
+                config_id=config_id,
+                context=catalog_path + note,
+                query_string=urlencode(sorted(dims.items())) if dims else "",
                 published=published,
             )  # fmt: skip
         )
 
     df = OWID_ENV.read_sql(
-        "SELECT mx.variableId, md.slug, md.catalogPath, md.published, mx.viewId "
+        "SELECT mx.variableId, mx.id AS mx_id, mx.chartConfigId, md.slug, md.catalogPath, md.published, mx.viewId "
         "FROM multi_dim_x_chart_configs mx JOIN multi_dim_data_pages md ON md.id = mx.multiDimId "
         "WHERE mx.variableId IN %(ids)s",
         params={"ids": tuple(variable_ids)},
     )
     for r in df.to_dict("records"):
-        emit(r["slug"], r["catalogPath"], r["published"], r["viewId"], int(r["variableId"]))
+        emit(
+            r["slug"], r["catalogPath"], r["published"], r["viewId"], int(r["variableId"]),
+            r["chartConfigId"], int(r["mx_id"]), dims_by_config_id.get(r["chartConfigId"], {}),
+        )  # fmt: skip
 
-    configs = OWID_ENV.read_sql("SELECT slug, catalogPath, published, config FROM multi_dim_data_pages")
-    for row in configs.to_dict("records"):
-        cfg = row["config"]
-        cfg = json.loads(cfg) if isinstance(cfg, str) else (cfg or {})
+    # The join above records ONE variableId per view, so walk the configs for the rest.
+    for row, cfg in parsed:
         for view in cfg.get("views", []):
-            view_id = "__".join(f"{k}={v}" for k, v in sorted((view.get("dimensions") or {}).items()))
+            dims = view.get("dimensions") or {}
+            view_id = "__".join(f"{k}={v}" for k, v in sorted(dims.items()))
             indicators = view.get("indicators") or {}
             for slot in ("y", "x", "size", "color"):
                 entries = indicators.get(slot)
@@ -558,15 +624,81 @@ def sweep_mdim_views_of_indicators(variable_ids: list[int]) -> list[dict]:
                 for e in entries if isinstance(entries, list) else [entries]:
                     vid = entry_variable_id(e, by_path)
                     if vid in ids:
-                        emit(row["slug"], row["catalogPath"], row["published"], view_id, int(vid))
+                        emit(
+                            row["slug"], row["catalogPath"], row["published"], view_id, int(vid),
+                            view.get("fullConfigId"), None, dims,
+                        )  # fmt: skip
+    return out
+
+
+def sweep_narrative_charts_of_mdim_views(mdim_rows: list[dict]) -> list[dict]:
+    """Narrative charts whose parent is one of these MDIM views.
+
+    A narrative chart can hang off an MDIM view as well as off a chart, and it carries
+    its own config — so a sweep that only walks charts leaves that config unaudited.
+    Both branches of the MDIM sweep record the view's `chart_configs` id, which is
+    `multi_dim_x_chart_configs.chartConfigId`, so that is the join back.
+
+    One view can render several of the requested indicators — the MDIM sweep emits a row
+    per (mdim, view, indicator) for exactly that reason — so the parents are kept as a
+    LIST per config. Keyed by config alone, only the last indicator would survive, and
+    every per-indicator consumer would read "no narrative reference" for the others.
+    """
+    by_config: dict[str, list[dict]] = defaultdict(list)
+    for r in mdim_rows:
+        if r["config_id"]:
+            by_config[r["config_id"]].append(r)
+    if not by_config:
+        return []
+    df = OWID_ENV.read_sql(
+        "SELECT nc.id, nc.name, nc.chartConfigId, mx.chartConfigId AS view_config_id, "
+        "       mx.viewId, md.slug, md.published "
+        "FROM narrative_charts nc JOIN multi_dim_x_chart_configs mx ON mx.id = nc.parentMultiDimXChartConfigId "
+        "JOIN multi_dim_data_pages md ON md.id = mx.multiDimId "
+        "WHERE mx.chartConfigId IN %(c)s ORDER BY nc.name",
+        params={"c": tuple(by_config)},
+    )
+    out = []
+    for r in df.to_dict("records"):
+        # The query is filtered on the keys of `by_config`, so a miss is impossible — but
+        # fall back to one blank parent rather than dropping the narrative chart entirely,
+        # since an unattributed row is still a surface someone has to look at.
+        for parent in by_config.get(r["view_config_id"]) or [{}]:
+            out.append(
+                rec(
+                    "indicator",
+                    parent.get("subject", ""),
+                    parent.get("subject_id"),
+                    "narrative chart",
+                    EMBED,
+                    r["name"],
+                    f"/admin/narrative-charts/{r['id']}/edit",
+                    surface_id=int(r["id"]),
+                    # NOTE: as for chart-parented narrative charts, read the merged config via
+                    # AdminAPI.get_narrative_chart(id)["configFull"] — the stored row lags a
+                    # parent edit until the child is re-saved.
+                    config_id=r["chartConfigId"],
+                    context=f"pinned to MDIM view {r['slug']}:{r['viewId']}",
+                    published=r["published"],
+                )  # fmt: skip
+            )
     return out
 
 
 def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
-    """Explorers built on these indicators, aggregated per explorer (not per view)."""
+    """Explorer views rendering these indicators — one row per view, with its config id.
+
+    `explorer_variables` records which explorers use an indicator, not which of their
+    views do, and an explorer-level aggregate gives a caller nothing to inspect: the
+    pinned entities and time bounds live in each view's own grapher config. That link
+    is `explorer_views.chartConfigId` -> `chart_configs`, so narrow to the explorers
+    that use the indicators, then match inside their view configs. Every row then
+    carries a `config_id`, like a chart or an MDIM view.
+    """
+    ids = set(variable_ids)
     try:
-        df = OWID_ENV.read_sql(
-            "SELECT ev.variableId, ev.explorerSlug, e.isPublished, COUNT(*) AS n "
+        used = OWID_ENV.read_sql(
+            "SELECT ev.variableId, ev.explorerSlug, e.isPublished "
             "FROM explorer_variables ev JOIN explorers e ON e.slug = ev.explorerSlug "
             "WHERE ev.variableId IN %(ids)s GROUP BY ev.variableId, ev.explorerSlug, e.isPublished",
             params={"ids": tuple(variable_ids)},
@@ -574,20 +706,74 @@ def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
     except Exception as e:  # noqa: BLE001 - table shape varies across environments
         gap(f"explorer_variables sweep skipped ({type(e).__name__}) — explorers on these indicators were NOT checked")
         return []
-    return [
-        rec(
-            "indicator",
-            str(r["variableId"]),
-            int(r["variableId"]),
-            "explorer",
-            RENDER,
-            r["explorerSlug"],
-            f"/explorers/{r['explorerSlug']}",
-            f"{r['n']} view(s)",
-            published=r["isPublished"],
-        )  # fmt: skip
-        for r in df.to_dict("records")
-    ]
+    if used.empty:
+        return []
+    published = {r["explorerSlug"]: r["isPublished"] for r in used.to_dict("records")}
+
+    views = OWID_ENV.read_sql(
+        "SELECT ev.explorerSlug, ev.viewId, ev.dimensions, ev.chartConfigId, "
+        "       cc.full->'$.dimensions' AS config_dimensions "
+        "FROM explorer_views ev JOIN chart_configs cc ON cc.id = ev.chartConfigId "
+        "WHERE ev.explorerSlug IN %(s)s ORDER BY ev.explorerSlug, ev.viewId",
+        params={"s": tuple(published)},
+    )
+    out, covered = [], set()
+    for r in views.to_dict("records"):
+        hits = sorted(
+            {
+                int(d["variableId"])
+                for d in parse_json_list(r["config_dimensions"])
+                if isinstance(d, dict) and d.get("variableId") in ids
+            }
+        )
+        if not hits:
+            continue
+        covered.update((vid, r["explorerSlug"]) for vid in hits)
+        # `explorer_views.dimensions` holds the choice labels an explorer URL uses
+        # verbatim, so they double as the query string that opens this exact view.
+        choices = parse_json_obj(r["dimensions"])
+        # One row per matching indicator, as `sweep_charts_of_indicators` does: a view
+        # plotting two of them is a reference for both, and attributing it to only one
+        # would report the other as unreferenced.
+        for vid in hits:
+            out.append(
+                rec(
+                    "indicator",
+                    str(vid),
+                    vid,
+                    "explorer view",
+                    RENDER,
+                    f"{r['explorerSlug']}:{r['viewId']}",
+                    f"/explorers/{r['explorerSlug']}",
+                    surface_id=r["explorerSlug"],
+                    config_id=r["chartConfigId"],
+                    context=" · ".join(f"{k}: {v}" for k, v in sorted(choices.items())),
+                    query_string=urlencode(sorted(choices.items())) if choices else "",
+                    published=published[r["explorerSlug"]],
+                )  # fmt: skip
+            )
+    # An indicator can be registered against an explorer whose view configs never name
+    # it (a stale row, or views built outside `explorer_views`). Keep the explorer-level
+    # reference for those instead of dropping it — the empty `config_id` is the signal
+    # that there is no view config to inspect.
+    for r in used.to_dict("records"):
+        if (int(r["variableId"]), r["explorerSlug"]) in covered:
+            continue
+        out.append(
+            rec(
+                "indicator",
+                str(r["variableId"]),
+                int(r["variableId"]),
+                "explorer",
+                RENDER,
+                r["explorerSlug"],
+                f"/explorers/{r['explorerSlug']}",
+                surface_id=r["explorerSlug"],
+                context="used by the explorer, but no view config records it — nothing to inspect",
+                published=r["isPublished"],
+            )  # fmt: skip
+        )
+    return out
 
 
 # ----- MDIM / explorer subjects ---------------------------------------------------
@@ -606,7 +792,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
     out = []
 
     links = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.queryString, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
         "WHERE pgl.target = %(s)s AND pgl.linkType IN ('grapher', 'guided-chart')",
@@ -623,10 +809,11 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"{component or 'unknown'} ({r['post_type']})",
-                r["queryString"],
-                r["text"],
-                r["published"],
+                surface_id=r["gdoc_id"],
+                context=f"{component or 'unknown'} ({r['post_type']})",
+                query_string=r["queryString"],
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
 
@@ -636,36 +823,44 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
     # references entirely. The SQL prefilter is loose, so the path segment is re-checked in
     # Python — otherwise a longer slug that merely starts with this one matches too.
     raw = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
-        "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "       pgl.target, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
-        "WHERE pgl.linkType = 'url' AND pgl.target LIKE %(t)s",
-        params={"t": f"%/grapher/{slug}%"},
+        "WHERE pgl.linkType = 'url' AND (pgl.target LIKE %(t)s OR pgl.target LIKE %(wrap)s)",
+        params={"t": f"%/grapher/{slug}%", "wrap": WRAPPER_LIKE},
     )
     exact = re.compile(rf"/grapher/{re.escape(slug)}(?:[?#/]|$)")
     for r in raw.to_dict("records"):
-        target = r["target"] or ""
-        if ARCHIVE_HOST in target or not exact.search(target):
+        target = unwrap_redirect(r["target"])
+        if not exact.search(target):
             continue
+        if ARCHIVE_HOST in target:
+            continue  # archived snapshots are frozen by design
         component = r["componentType"] or ""
         out.append(
             rec(
                 "mdim",
                 slug,
                 mdim_id,
-                "gdoc",
+                "gdoc (url link)",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"raw URL, {component or 'unknown'} ({r['post_type']})",
-                url_query(target, r["queryString"] or ""),
-                r["text"],
-                r["published"],
+                surface_id=r["gdoc_id"],
+                context=f"raw URL, {component or 'unknown'} ({r['post_type']})",
+                # A raw URL carries its parameters in the target itself, so this SELECT omits
+                # `pgl.queryString` and `url_query` is called without a fallback. That column
+                # IS populated on some `linkType='url'` rows — but never on one whose target
+                # has no `?`, so the fallback it would feed is unreachable (checked against
+                # production 2026-07: 652 such rows, all of them with the query in the target).
+                query_string=url_query(target),
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
 
     nc = OWID_ENV.read_sql(
-        "SELECT nc.id, nc.name, mx.viewId FROM narrative_charts nc "
+        "SELECT nc.id, nc.name, nc.chartConfigId, mx.viewId FROM narrative_charts nc "
         "JOIN multi_dim_x_chart_configs mx ON mx.id = nc.parentMultiDimXChartConfigId "
         "WHERE mx.multiDimId = %(id)s",
         params={"id": mdim_id},
@@ -680,7 +875,9 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 EMBED,
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
-                f"pinned to view {r['viewId']} — blocks re-publish if that view disappears",
+                surface_id=int(r["id"]),
+                config_id=r["chartConfigId"],
+                context=f"pinned to view {r['viewId']} — blocks re-publish if that view disappears",
             )  # fmt: skip
         )
 
@@ -688,7 +885,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
         "SELECT source FROM multi_dim_redirects WHERE multiDimId = %(id)s", params={"id": mdim_id}
     )
     for r in redirects.to_dict("records"):
-        out.append(rec("mdim", slug, mdim_id, "redirect", LINK, r["source"], r["source"], "redirects here"))
+        out.append(rec("mdim", slug, mdim_id, "redirect", LINK, r["source"], r["source"], context="redirects here"))
     return out
 
 
@@ -701,7 +898,7 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
         return []
 
     df = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
         "WHERE pgl.linkType = 'explorer' AND pgl.target = %(s)s",
@@ -719,12 +916,76 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"{component or 'unknown'} ({r['post_type']})",
-                r["queryString"],
-                r["text"],
-                r["published"],
+                surface_id=r["gdoc_id"],
+                context=f"{component or 'unknown'} ({r['post_type']})",
+                query_string=r["queryString"],
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
+
+    # An article can paste the explorer's URL instead of linking it as an explorer item,
+    # which lands in the same table as `linkType='url'` and is invisible to the typed query
+    # above — exactly the gap the MDIM sweep closes with its own raw-URL pass. Those rows
+    # carry the `country=`/`time=` pins the downstream audits grade, so leaving them out
+    # lets a pin escape while the report still reads as full coverage. Same shape as the
+    # MDIM pass: loose SQL prefilter, path re-checked in Python so a longer slug that merely
+    # starts with this one does not match.
+    raw = OWID_ENV.read_sql(
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "       pgl.target, pgl.componentType, pgl.text "
+        "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
+        "WHERE pgl.linkType = 'url' AND (pgl.target LIKE %(t)s OR pgl.target LIKE %(wrap)s)",
+        params={"t": f"%/explorers/{explorer}%", "wrap": WRAPPER_LIKE},
+    )
+    exact = re.compile(rf"/explorers/{re.escape(explorer)}(?:[?#/]|$)")
+    for r in raw.to_dict("records"):
+        target = unwrap_redirect(r["target"])
+        if not exact.search(target):
+            continue
+        if ARCHIVE_HOST in target:
+            continue  # archived snapshots are frozen by design
+        component = r["componentType"] or ""
+        out.append(
+            rec(
+                "explorer",
+                explorer,
+                None,
+                "gdoc (url link)",
+                LINK if component.startswith("span-") else EMBED,
+                r["post_slug"],
+                f"/{r['post_slug']}",
+                surface_id=r["gdoc_id"],
+                context=f"raw URL, {component or 'unknown'} ({r['post_type']})",
+                # As in the MDIM pass: a raw URL carries its parameters in the target, so the
+                # SELECT omits `pgl.queryString` and `url_query` needs no fallback.
+                query_string=url_query(target),
+                text=r["text"],
+                published=r["published"],
+            )  # fmt: skip
+        )
+    return out
+
+
+def sweep_containers_for_articles(mdim_rows: list[dict], explorer_rows: list[dict]) -> list[dict]:
+    """Article references to the MDIMs / explorers whose views render the subject indicators.
+
+    The transitive chart hop only finds articles that name a *chart*. An article that
+    links the MDIM page or the explorer itself references the indicators just as much,
+    and carries the same `country=`/`time=` pins the downstream audits grade — so walk
+    the containers too. Rows keep their container as the subject: the reference is to
+    the page, not to any one indicator inside it.
+    """
+    mdims = sorted({f["where_path"].rsplit("/", 1)[-1] for f in mdim_rows if f["where_path"]})
+    explorers = sorted({f["surface_id"] for f in explorer_rows if f["surface_id"]})
+    if not mdims and not explorers:
+        return []
+    print(f"  transitive: sweeping articles for {len(mdims)} MDIM(s) and {len(explorers)} explorer(s)")
+    out = []
+    for slug in mdims:
+        out += [f for f in sweep_mdim_subject(slug) if f["surface"] in GDOC_SURFACES]
+    for slug in explorers:
+        out += [f for f in sweep_explorer_subject(slug) if f["surface"] in GDOC_SURFACES]
     return out
 
 
@@ -745,6 +1006,252 @@ def summarize(findings: list[dict]) -> None:
         print(f"  ({unpublished} on unpublished/draft sources)")
 
 
+GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
+
+
+def gdoc_preview_url(f: dict, admin: str) -> str:
+    """Admin preview of the article itself — renders the gdoc, including unpublished drafts."""
+    return f"{admin}/gdocs/{f['surface_id']}/preview" if f["surface_id"] else ""
+
+
+def doc_url(f: dict) -> str:
+    """Google Doc edit URL. posts_gdocs.id IS the Google Doc id, so this is a direct link."""
+    return f"https://docs.google.com/document/d/{f['surface_id']}/edit" if f["surface_id"] else ""
+
+
+def deep_link(f: dict, host: str) -> str:
+    """Published-article URL with a scroll-to-text fragment on the link's anchor text.
+
+    Opens the article scrolled to (and highlighting) the reference, which is the
+    fastest way to find it. Falls back to the plain article URL when the reference
+    is a block embed with no anchor text.
+    """
+    base = f"{host}{f['where_path']}"
+    anchor = (f.get("text") or "").strip()
+    if not anchor:
+        return base
+    # Text fragments need parentheses literal and hyphens percent-encoded (see
+    # apps/wizard/app_pages/chart_diff/citations.py:create_text_fragment_url).
+    encoded = quote(anchor[:200], safe="()").replace("-", "%2D")
+    return f"{base}#:~:text={encoded}"
+
+
+def admin_base() -> str:
+    """Admin root for whichever environment OWID_ENV resolves to.
+
+    Staging hosts carry a tailscale suffix that is noise in a link handed to a human
+    (and the short form resolves fine), so strip it.
+    """
+    admin = (OWID_ENV.admin_site or "https://admin.owid.io/admin").rstrip("/")
+    return TAILSCALE_SUFFIX_RE.sub("", admin)
+
+
+def add_admin_urls(findings: list[dict]) -> None:
+    """Every chart gets an edit link, in the environment being audited.
+
+    A reference is only actionable if you can open the thing to change it — for a chart
+    that is the admin editor, not the public page.
+    """
+    admin = admin_base()
+    for f in findings:
+        if f["surface"] == "narrative chart" and f["surface_id"]:
+            f["admin_url"] = f"{admin}/narrative-charts/{f['surface_id']}/edit"
+        elif f["surface"] == "chart" and f["surface_id"]:
+            f["admin_url"] = f"{admin}/charts/{f['surface_id']}/edit"
+        elif f["subject_type"] == "chart" and f["subject_id"]:
+            # The row is a reference *to* a chart (article, explorer, static viz…).
+            f["admin_url"] = f"{admin}/charts/{f['subject_id']}/edit"
+
+
+def add_preview_urls(findings: list[dict], host: str) -> None:
+    """The referenced view itself, as the reader sees it.
+
+    For an article reference that is the chart plus the reference's own params; for an
+    MDIM view it is the MDIM at that view's dimensions. This is what makes a row
+    judgeable — the slug alone doesn't tell you which view is in play.
+    """
+    for f in findings:
+        qs = f"?{f['query_string'].lstrip('?')}" if f["query_string"] else ""
+        if f["surface"] == "mdim view":
+            mdim_slug = f["where"].split(":", 1)[0]
+            f["preview_url"] = f"{host}/grapher/{mdim_slug}{qs}"
+        elif f["surface"] == "explorer view":
+            f["preview_url"] = f"{host}/explorers/{f['where'].split(':', 1)[0]}{qs}"
+        elif f["surface"] == "explorer":
+            f["preview_url"] = f"{host}/explorers/{f['where']}"
+        elif f["subject_type"] == "chart":
+            f["preview_url"] = f"{host}/grapher/{f['subject']}{qs}"
+        elif f["subject_type"] == "mdim":
+            # A direct --mdim sweep: the reference points at the MDIM page itself, and
+            # the reference's own params say which of its views the reader lands on.
+            f["preview_url"] = f"{host}/grapher/{f['subject']}{qs}"
+        elif f["subject_type"] == "explorer":
+            f["preview_url"] = f"{host}/explorers/{f['subject']}{qs}"
+        elif f["surface"] == "chart" and f["where_path"]:
+            f["preview_url"] = f"{host}{f['where_path']}{qs}"
+
+
+def label_indicator_subjects(findings: list[dict]) -> None:
+    """Replace bare variable ids with the indicator's name, so a reader can tell them apart."""
+    ids = {f["subject_id"] for f in findings if f["subject_type"] == "indicator" and f["subject_id"]}
+    if not ids:
+        return
+    df = OWID_ENV.read_sql("SELECT id, name FROM variables WHERE id IN %(i)s", params={"i": tuple(ids)})
+    names = {int(r["id"]): r["name"] for r in df.to_dict("records") if r["name"]}
+    for f in findings:
+        if f["subject_type"] == "indicator" and f["subject_id"] in names:
+            f["subject_label"] = f"{names[f['subject_id']]} ({f['subject_id']})"
+
+
+def is_all_charts(f: dict) -> bool:
+    """An entry in a topic page's auto-generated 'All charts' index.
+
+    Not authored in the doc: the block lists every chart carrying the page's tag, so it
+    updates itself and a retired chart simply drops out. There is nothing to edit and
+    nothing that breaks, which makes these rows noise in a 'what must I update' audit.
+    """
+    return (f.get("context") or "").startswith("all-charts")
+
+
+def search_hint(f: dict) -> str:
+    """What to search for inside the Google Doc to land on this reference.
+
+    A prose hyperlink has visible anchor text, so that phrase is the search term. A
+    block embed has none — the doc holds a bare grapher URL — so the slug is. Use the
+    slug exactly as recorded: `posts_gdocs_links.target` keeps what the author typed,
+    which may be an old slug, and that is what is actually in the document.
+    """
+    # The cell holds the search string and nothing else, so it can be copied straight
+    # into the doc's find box. What each variant means is in the legend under the table.
+    anchor = (f.get("text") or "").strip()
+    if anchor:
+        safe = cell(anchor, 55).replace("`", "'")
+        return f"`{safe}`"
+    if f["subject_type"] == "chart":
+        return f"`{cell(f['subject'], 55)}`"
+    return "—"
+
+
+def cell(value: str, limit: int = 70) -> str:
+    """Table-safe cell: escape pipes and newlines, truncate runaway text."""
+    text = " ".join(str(value or "").split()).replace("|", "\\|")
+    return (text[: limit - 1] + "…") if len(text) > limit else text
+
+
+# The surfaces this sweep structurally cannot see. They are stated in the report itself
+# rather than only in SKILL.md, because the report is what gets handed on: a reader who
+# never opens the skill would otherwise read a short table — or an empty one — as a
+# complete blast radius. Keep in step with the "Known gaps" section of SKILL.md.
+NOT_SEARCHED = [
+    "Non-ETL explorers whose config lives in the `explorers` TSV, and legacy CSV-backed "
+    "explorers (`data://explorers/…`, e.g. the poverty explorer): their views and selections "
+    "live outside grapher's config tables, so no query here can reach them.",
+    "`linkType='url'` article rows pointing at `archive.ourworldindata.org`, dropped as frozen by design.",
+    "Indicator-level `presentation.grapher_config`, which lives in garden/grapher `.meta.yml` "
+    "rather than the DB — invisible here, and it fans out to every thin MDIM/explorer view that "
+    "inherits it. Needs a repo grep.",
+    "Data insights that record the reference somewhere other than `grapher-url`.",
+    "Charts nested inside article layout containers, which may produce no `posts_gdocs_links` row at all.",
+]
+
+
+def write_markdown(findings: list[dict], path: str, host: str, admin: str, caveats: list[str] | None = None) -> None:
+    """Human-readable report: one table per surface, with links to open each reference.
+
+    `caveats` are the coverage limits of *this particular run* (a subject that did not
+    resolve, a hop that was not requested); `NOT_SEARCHED` holds the ones that always apply.
+    """
+    by_kind: dict[str, list[dict]] = defaultdict(list)
+    for f in findings:
+        by_kind[f["kind"]].append(f)
+
+    lines = [
+        "# What references these objects",
+        "",
+        f"{len(findings)} reference(s). Grouped by how the surface holds the object, "
+        "because that decides whether a redirect or rename covers it.",
+        "",
+    ]
+    for kind, blurb in [
+        (EMBED, "Renders the object's own config — a redirect or rename does **not** fix these."),
+        (RENDER, "Resolves and draws the object; changing it changes what readers see."),
+        (LINK, "Hyperlinks. A redirect covers them, but the href is worth updating."),
+    ]:
+        group = by_kind.get(kind)
+        if not group:
+            continue
+        lines += [f"## {kind} ({len(group)})", "", blurb, ""]
+        by_surface: dict[str, list[dict]] = defaultdict(list)
+        for f in group:
+            by_surface[f["surface"]].append(f)
+        for surface in sorted(by_surface):
+            rows = by_surface[surface]
+            lines += [f"### {surface} ({len(rows)})", ""]
+            if surface in GDOC_SURFACES:
+                lines += [
+                    "| Chart | Article | Open | Find in the doc |",
+                    "|---|---|---|---|",
+                ]
+                for f in rows:
+                    draft = "" if f["published"] else " ⚠️draft"
+                    # The page type (article / topic-page / data-insight) changes who owns
+                    # the fix; the block type does not, and `kind` already implies it.
+                    ptype = f["context"].split("(")[-1].rstrip(")") if "(" in f["context"] else ""
+                    page_type = f" _{ptype}_" if ptype else ""
+                    preview = f" · [👁 preview]({gdoc_preview_url(f, admin)})" if f["surface_id"] else ""
+                    links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host)})"
+                    if f["admin_url"]:
+                        links += f" · [✎ chart admin]({f['admin_url']})"
+                    subject = (
+                        f"[`{cell(f['subject_label'], 44)}`]({f['preview_url']})"
+                        if f["preview_url"]
+                        else f"`{cell(f['subject_label'], 44)}`"
+                    )
+                    find = search_hint(f)
+                    lines.append(f"| {subject} | {cell(f['where'], 44)}{page_type}{draft} | {links} | {find} |")
+            else:
+                lines += ["| Subject | Where | Context | Open |", "|---|---|---|---|"]
+                for f in rows:
+                    draft = "" if f["published"] else " ⚠️draft"
+                    link = f"[🔗 open]({host}{f['where_path']})" if f["where_path"] else "—"
+                    lines.append(
+                        f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 72)}{draft} | "
+                        f"{cell(f['context'], 44)} | "
+                        f"{'[✎ admin](' + f['admin_url'] + ') · ' if f['admin_url'] else ''}"
+                        f"{'[👁 view](' + f['preview_url'] + ')' if f['preview_url'] else link} |"
+                    )
+            lines.append("")
+    lines += [
+        "---",
+        "",
+        "The **chart name links to the view as that reference renders it** (its own params applied). "
+        "📄 opens the Google Doc to edit · 🔗 opens the published page scrolled to the reference · "
+        "👁 opens the article in the admin previewer (works for unpublished drafts too). "
+        "**Find in the doc** is a copy-paste search string for the Google Doc: the link text "
+        "for a prose hyperlink, or the chart slug for a block embed (the doc holds a bare "
+        "grapher URL there — and the slug is stored as the author typed it, so it matches "
+        "even when the doc still uses an old one). A `—` means there is nothing to search "
+        "for.",
+        "",
+        "## Not searched",
+        "",
+        "This section is the report's coverage boundary. The count above is what the sweep "
+        "*found*, not everything that exists — nothing below was checked, so a short or empty "
+        "table is not by itself a clean result.",
+        "",
+    ]
+    # A surface that failed open — an absent legacy table, a subject that did not resolve —
+    # is the sharpest caveat there is, because it is the one the reader has no other way of
+    # knowing about. It leads.
+    for note in COVERAGE_GAPS:
+        lines.append(f"- **NOT SWEPT in this run:** {note}")
+    for note in caveats or []:
+        lines.append(f"- **This run:** {note}")
+    lines += [f"- {note}" for note in NOT_SEARCHED]
+    lines.append("")
+    Path(path).write_text("\n".join(lines))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Find every surface that references a chart, indicator, MDIM or explorer.")
     ap.add_argument("--chart-ids", help="comma-separated chart ids")
@@ -753,12 +1260,17 @@ def main() -> int:
     ap.add_argument("--dataset-id", type=int, help="all variables of this dataset")
     ap.add_argument("--mdim", action="append", default=[], help="MDIM slug or catalogPath (repeatable)")
     ap.add_argument("--explorer", action="append", default=[], help="explorer slug (repeatable)")
+    ap.add_argument("--include-all-charts", action="store_true",
+                    help="keep topic pages' auto-generated 'All charts' entries (excluded by default)")  # fmt: skip
     ap.add_argument("--transitive", action="store_true",
                     help="indicator subjects only: also sweep the articles referencing the charts found")  # fmt: skip
     ap.add_argument("--json", dest="json_out", help="write findings as JSON to this path")
     ap.add_argument("--csv", dest="csv_out", help="write findings as CSV to this path")
+    ap.add_argument("--markdown", dest="md_out",
+                    help="write a human-readable report (Google Doc links + scroll-to-reference links)")  # fmt: skip
     ap.add_argument("--gaps-json", dest="gaps_out",
                     help="write the surfaces this run could not sweep as JSON to this path")  # fmt: skip
+    ap.add_argument("--host", default=None, help="site for links (default: the DB environment's site)")
     args = ap.parse_args()
 
     def ints(value: str | None) -> list[int]:
@@ -775,6 +1287,9 @@ def main() -> int:
 
     print(f"grapher DB: {OWID_ENV.name}")
     findings: list[dict] = []
+    # Coverage limits specific to this invocation, carried into the report so it can never
+    # present a partial sweep as a full one.
+    caveats: list[str] = []
 
     by_slug = resolve_chart_subjects(chart_ids, chart_slugs)
     if (chart_ids or chart_slugs) and not by_slug:
@@ -788,22 +1303,43 @@ def main() -> int:
         findings += sweep_data_insights(by_slug)
         findings += sweep_static_viz(by_slug)
         findings += sweep_key_charts(by_slug)
-        findings += sweep_wordpress(by_slug)
 
     if variable_ids:
         print(f"indicator subjects: {len(variable_ids)} variable(s)")
         chart_hits = sweep_charts_of_indicators(variable_ids)
+        mdim_hits = sweep_mdim_views_of_indicators(variable_ids)
         findings += chart_hits
-        findings += sweep_mdim_views_of_indicators(variable_ids)
-        findings += sweep_explorer_views_of_indicators(variable_ids)
+        findings += mdim_hits
+        explorer_hits = sweep_explorer_views_of_indicators(variable_ids)
+        findings += explorer_hits
         if args.transitive:
             # Slugless drafts have no URL, so nothing can reference them by slug.
             hop = resolve_chart_subjects([], sorted({f["where"] for f in chart_hits if f["where_path"]}))
             if hop:
                 print(f"  transitive: sweeping articles for {len(hop)} chart slug(s)")
                 findings += sweep_gdoc_links(hop)
+                # Raw-URL links are a separate table scan from the typed ones, and an
+                # article pinning `country=`/`time=` in a bare URL is exactly what the
+                # downstream audits look for — sweep both hops, not just the typed one.
+                findings += sweep_gdoc_url_links(hop)
                 findings += sweep_data_insights(hop)
                 findings += sweep_narrative_charts_of_charts(hop)
+            # A narrative chart can hang off an MDIM view instead of a chart, so the
+            # chart hop alone leaves those configs unaudited.
+            findings += sweep_narrative_charts_of_mdim_views(mdim_hits)
+            # An article can also link straight at the MDIM or explorer page whose views
+            # render these indicators, naming no chart at all. The chart hop above cannot
+            # see those, so sweep each distinct container for its own article references.
+            # Only the article surfaces are kept: the narrative-chart and redirect rows
+            # `sweep_mdim_subject` also returns are already emitted above, and re-adding
+            # them here would double-count them.
+            findings += sweep_containers_for_articles(mdim_hits, explorer_hits)
+        else:
+            caveats.append(
+                "`--transitive` was not passed, so no article, data-insight or narrative-chart "
+                "surface was swept for the indicator subjects — only the charts, MDIM views and "
+                "explorer views that render them directly."
+            )
 
     # `--transitive` only has a second hop to make from an indicator. Passing it with just an
     # MDIM or explorer subject would otherwise look like it widened the sweep when it did not.
@@ -815,8 +1351,25 @@ def main() -> int:
     for explorer in args.explorer:
         findings += sweep_explorer_subject(explorer)
 
+    all_charts = [f for f in findings if is_all_charts(f)]
+    if all_charts and not args.include_all_charts:
+        findings = [f for f in findings if not is_all_charts(f)]
+        pages = sorted({f["where"] for f in all_charts})
+        print(f"excluded {len(all_charts)} 'All charts' index entries on {pages} "
+              "(auto-generated from the page's tags — nothing to edit; --include-all-charts to keep)")  # fmt: skip
+        caveats.append(
+            f"{len(all_charts)} auto-generated 'All charts' index entries on {', '.join(pages)} were "
+            "excluded from the tables below (`--include-all-charts` keeps them)."
+        )
+
+    label_indicator_subjects(findings)
+    add_admin_urls(findings)
+    add_preview_urls(findings, (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/"))
+
     order = {EMBED: 0, RENDER: 1, LINK: 2}
-    findings.sort(key=lambda f: (order[f["kind"]], f["surface"], str(f["subject"]), f["where"]))
+    # Coerce every sort key to str: any surface field can be NULL in the DB, and a
+    # None here would abort the whole run at the very end.
+    findings.sort(key=lambda f: (order[f["kind"]], str(f["surface"]), str(f["subject"]), str(f["where"] or "")))
     summarize(findings)
 
     if args.json_out:
@@ -828,10 +1381,20 @@ def main() -> int:
             w.writeheader()
             w.writerows(findings)
         print(f"-> {args.csv_out}")
+    if args.md_out:
+        write_markdown(
+            findings,
+            args.md_out,
+            (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/"),
+            admin_base(),
+            caveats,
+        )
+        print(f"-> {args.md_out}")
     if args.gaps_out:
         Path(args.gaps_out).write_text(json.dumps(COVERAGE_GAPS, indent=2) + "\n")
-    if not args.json_out and not args.csv_out:
-        print("\n(pass --json / --csv to save the findings)")
+        print(f"-> {args.gaps_out}")
+    if not any([args.json_out, args.csv_out, args.md_out]):
+        print("\n(pass --json / --csv / --markdown to save the findings)")
     # Last thing on stdout, after the counts: a sweep that skipped a surface must not read
     # as a complete answer just because the summary above it looks tidy.
     if COVERAGE_GAPS:
