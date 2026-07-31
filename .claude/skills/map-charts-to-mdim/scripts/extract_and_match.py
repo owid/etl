@@ -813,7 +813,14 @@ def write_mdim_suggestions(out: Path, charts: list[dict], id_to_path: dict[int, 
     no home yet. Charts with no overlap at all need a new view instead.
     """
     near = [c for c in charts if c["quality"] == "near_miss"]
-    none = [c for c in charts if c["quality"] == "none"]
+    # `quality` starts at "none" and `match_charts` bails out before searching for any chart
+    # it cannot represent (several indicators in one x/size/color slot, or no y at all),
+    # leaving that default in place with the reason in `note`. No overlap search ever ran
+    # for those, so listing them as "no view shares this chart's indicators" would assert
+    # something nobody checked — and could send someone off to author a view that already
+    # exists. They need the shape problem resolved first, so they get their own section.
+    none = [c for c in charts if c["quality"] == "none" and not c["note"]]
+    unchecked = [c for c in charts if c["quality"] == "none" and c["note"]]
     wanted: set[int] = set()
     for c in near + none:
         wanted |= set(c["y"])
@@ -873,20 +880,47 @@ def write_mdim_suggestions(out: Path, charts: list[dict], id_to_path: dict[int, 
             lines.append(f"- **{c['chart_slug']}** — plots {inds}{more}")
         lines.append("")
 
+    if unchecked:
+        lines += [
+            f"## Not searched — chart shape unsupported ({len(unchecked)})",
+            "",
+            "These were never compared against any view, so nothing here says whether a",
+            "matching view exists. The chart's shape has to be resolved first — then re-run",
+            "the match to find out which of the sections above it belongs in.",
+            "",
+        ]
+        for c in unchecked:
+            lines.append(f"- **{c['chart_slug']}** — {c['note']}")
+        lines.append("")
+
     (out / "mdim_suggestions.md").write_text("\n".join(lines))
-    return len(near) + len(none)
+    return len(near) + len(none) + len(unchecked)
 
 
 def write_handoff(out: Path, charts: list[dict], selection: dict, cli_csv: Path) -> Path:
     """A note the person running the CLI can act on without having been in the session."""
     proposed = proposed_charts(charts)
     cli_only = [c for c in proposed if c["cli_required"]]
+    # Their redirect row already exists, so the CLI leaves them out of the CSV entirely —
+    # but the source chart can still be published, and a redirect over a published chart
+    # never fires. Running the CLI does not resolve them; someone has to. Omitting them
+    # would let the operator finish the run believing the migration was complete.
+    done = [c for c in charts if c["already_done"]]
     lines = [
         "# Chart → MDIM redirects: handoff",
         "",
         f"**{len(proposed)} redirects** proposed from `{selection['mode']}={selection['value']}`.",
         f"Input file: `{cli_csv.name}` (in this folder).",
         "",
+        *(
+            [
+                f"{len(done)} further chart(s) are already redirected and are **not** in the CSV — "
+                "they still need a manual check, see the end of this note.",
+                "",
+            ]  # fmt: skip
+            if done
+            else []
+        ),
         "## Run it",
         "",
         "From the **owid-grapher** repo, against **production**:",
@@ -924,6 +958,33 @@ def write_handoff(out: Path, charts: list[dict], selection: dict, cli_csv: Path)
         for c in cli_only:
             lines.append(f"- `{c['chart_slug']}` — old slugs: {', '.join(c['old_slugs'])}")
         lines.append("")
+    if done:
+        with_aliases = [c for c in done if c["old_slugs"]]
+        lines += [
+            f"## Not in the CSV — handle these by hand ({len(done)})",
+            "",
+            "These charts already have the redirect row this run would have created, so the",
+            "CLI skips them. That is **not** the same as being finished: the redirect only",
+            "fires once the source chart stops being published. Check each one and unpublish",
+            "it if it is still live.",
+            "",
+        ]
+        for c in done:
+            t = c["target"]
+            alias = f" — **carries old slug(s)**: {', '.join(c['old_slugs'])}" if c["old_slugs"] else ""
+            lines.append(
+                f"- `{c['chart_slug']}` (chart {c['chart_id']}) → `{t['mdim_slug']}` view `{t['view_id']}`{alias}"
+            )
+        lines.append("")
+        if with_aliases:
+            lines += [
+                f"**Do not simply unpublish the {len(with_aliases)} marked above.** Unpublishing a",
+                "chart deletes its `chart_slug_redirects` rows, so those old slugs would become",
+                "hard 404s — the same trap the CLI's ordering avoids for the proposed rows. Those",
+                "aliases have to be migrated onto the MDIM first. `preflight.py` refuses these",
+                "entries for exactly this reason.",
+                "",
+            ]
     lines += [
         "## After the run",
         "",

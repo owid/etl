@@ -867,6 +867,28 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
     return out
 
 
+def sweep_containers_for_articles(mdim_rows: list[dict], explorer_rows: list[dict]) -> list[dict]:
+    """Article references to the MDIMs / explorers whose views render the subject indicators.
+
+    The transitive chart hop only finds articles that name a *chart*. An article that
+    links the MDIM page or the explorer itself references the indicators just as much,
+    and carries the same `country=`/`time=` pins the downstream audits grade — so walk
+    the containers too. Rows keep their container as the subject: the reference is to
+    the page, not to any one indicator inside it.
+    """
+    mdims = sorted({f["where_path"].rsplit("/", 1)[-1] for f in mdim_rows if f["where_path"]})
+    explorers = sorted({f["surface_id"] for f in explorer_rows if f["surface_id"]})
+    if not mdims and not explorers:
+        return []
+    print(f"  transitive: sweeping articles for {len(mdims)} MDIM(s) and {len(explorers)} explorer(s)")
+    out = []
+    for slug in mdims:
+        out += [f for f in sweep_mdim_subject(slug) if f["surface"] in GDOC_SURFACES]
+    for slug in explorers:
+        out += [f for f in sweep_explorer_subject(slug) if f["surface"] in GDOC_SURFACES]
+    return out
+
+
 # ----- Reporting -------------------------------------------------------------------
 
 
@@ -1148,7 +1170,8 @@ def main() -> int:
         mdim_hits = sweep_mdim_views_of_indicators(variable_ids)
         findings += chart_hits
         findings += mdim_hits
-        findings += sweep_explorer_views_of_indicators(variable_ids)
+        explorer_hits = sweep_explorer_views_of_indicators(variable_ids)
+        findings += explorer_hits
         if args.transitive:
             # Slugless drafts have no URL, so nothing can reference them by slug.
             hop = resolve_chart_subjects([], sorted({f["where"] for f in chart_hits if f["where_path"]}))
@@ -1164,6 +1187,13 @@ def main() -> int:
             # A narrative chart can hang off an MDIM view instead of a chart, so the
             # chart hop alone leaves those configs unaudited.
             findings += sweep_narrative_charts_of_mdim_views(mdim_hits)
+            # An article can also link straight at the MDIM or explorer page whose views
+            # render these indicators, naming no chart at all. The chart hop above cannot
+            # see those, so sweep each distinct container for its own article references.
+            # Only the article surfaces are kept: the narrative-chart and redirect rows
+            # `sweep_mdim_subject` also returns are already emitted above, and re-adding
+            # them here would double-count them.
+            findings += sweep_containers_for_articles(mdim_hits, explorer_hits)
 
     for mdim in args.mdim:
         findings += sweep_mdim_subject(mdim)
