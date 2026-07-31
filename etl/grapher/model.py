@@ -516,6 +516,14 @@ class Chart(Base):
         )
         return copy.deepcopy(etl_config) if etl_config else None
 
+    def load_patch_config(self, session: Session) -> dict[str, Any]:
+        """Load the chart's admin patch layer (the config admins edit on top of the ETL layer)."""
+        assert self.id, "Chart must come from a database"
+        patch = session.scalar(
+            select(ChartConfig.patch).join(Chart, ChartConfig.id == Chart.configId).where(Chart.id == self.id)
+        )
+        return copy.deepcopy(patch) if patch else {}
+
     @classmethod
     def load_variables_checksums(cls, session: Session, chart_ids: list[int]) -> pd.DataFrame:
         """Load checksums for all variables from the chart and return them as a list of dicts."""
