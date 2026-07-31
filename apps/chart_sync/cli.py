@@ -17,6 +17,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import (
     ChartDiffsLoader,
     configs_are_equal,
     get_deleted_charts,
+    patch_is_pristine,
     same_config_uuid,
     tags_are_equal,
 )
@@ -244,6 +245,15 @@ def cli(
                     migrated_config = diff.source_chart.migrate_config(source_session, target_session)
                     migrated_etl_config = diff.source_chart.migrate_etl_config(source_session, target_session)
 
+                    # For ETL-managed charts, the admin patch is written to the target
+                    # only when someone deliberately edited it on staging. A pristine
+                    # patch must never overwrite the target's patch — production admin
+                    # edits (hotfixes) live there and belong to production.
+                    source_patch = (
+                        diff.source_chart.load_patch_config(source_session) if migrated_etl_config is not None else None
+                    )
+                    push_admin_patch = migrated_etl_config is None or not patch_is_pristine(source_patch)
+
                     # Get user who edited the chart
                     user_id = diff.source_chart.lastEditedByUserId
 
@@ -307,7 +317,8 @@ def cli(
                                         catalog_path=diff.source_chart.catalogPath,
                                         user_id=user_id,
                                     )
-                                target_api.update_chart(target_chart_id, migrated_config, user_id=user_id)
+                                if push_admin_patch:
+                                    target_api.update_chart(target_chart_id, migrated_config, user_id=user_id)
                                 target_api.set_tags(target_chart_id, source_tags, user_id=user_id)
 
                         # Rejected chart diff
@@ -349,7 +360,8 @@ def cli(
                                         catalog_path=diff.source_chart.catalogPath,
                                         user_id=user_id,
                                     )
-                                    target_api.update_chart(resp["chartId"], migrated_config, user_id=user_id)
+                                    if push_admin_patch:
+                                        target_api.update_chart(resp["chartId"], migrated_config, user_id=user_id)
                                 else:
                                     resp = target_api.create_chart(
                                         migrated_config, user_id=user_id, config_id=source_config_id

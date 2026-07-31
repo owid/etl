@@ -219,13 +219,78 @@ def _is_cross_env_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) ->
     return bool(source_chart.catalogPath and source_chart.catalogPath == target_chart.catalogPath)
 
 
+# Keys the ETL bootstrap (and the server-side rediff) leaves in a chart's admin
+# patch without any human having touched the chart in the admin.
+_PRISTINE_PATCH_KEYS = {"$schema", "id", "version", "slug", "isPublished"}
+
+# Keys that are environment- or bookkeeping-noise when comparing single config layers.
+_LAYER_NOISE_KEYS = ("id", "version", "$schema", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl")
+
+
+def patch_is_pristine(patch: dict[str, Any] | None) -> bool:
+    """True when a chart's admin patch carries no human edits.
+
+    A freshly ETL-created chart's patch holds only bootstrap keys (slug, schema,
+    version, id) and is unpublished. Anything beyond that — an extra key, or a
+    publication — is a deliberate admin action that chart-sync must carry.
+
+    Known limitation: a slug rename made in the staging admin is indistinguishable
+    from the bootstrap slug and reads as pristine.
+    """
+    if not patch:
+        return True
+    if patch.get("isPublished"):
+        return False
+    return set(patch.keys()) <= _PRISTINE_PATCH_KEYS
+
+
+def _layer_configs_equal(config_1: dict[str, Any] | None, config_2: dict[str, Any] | None) -> bool:
+    """Compare two single config layers (an etlConfig or a patch), ignoring noise keys.
+
+    Unlike `configs_are_equal`, layers have no `isInheritanceEnabled`, and their
+    `$schema` may differ across environments purely because one side was migrated
+    more recently — the production ETL run rewrites the layer anyway.
+    """
+    c1 = {k: v for k, v in (config_1 or {}).items() if k not in _LAYER_NOISE_KEYS}
+    c2 = {k: v for k, v in (config_2 or {}).items() if k not in _LAYER_NOISE_KEYS}
+    return pprint.pformat(c1, sort_dicts=True) == pprint.pformat(c2, sort_dicts=True)
+
+
+def etl_chart_has_branch_changes(
+    source_etl: dict[str, Any] | None,
+    target_etl: dict[str, Any] | None,
+    source_patch: dict[str, Any] | None,
+    target_patch: dict[str, Any] | None,
+) -> bool:
+    """Layer-aware replacement of the full-config comparison for ETL-managed charts.
+
+    A chart belongs in chart-diff only if the *branch* changed one of its layers:
+
+    - the ETL (code) layer differs between staging and production, or
+    - the staging admin patch was deliberately edited (non-pristine) and differs
+      from production's patch.
+
+    Production-only patch edits (e.g. a hotfix made in the production admin after
+    the staging server was created) are invisible to the branch: they are not the
+    branch's change, chart-sync must not overwrite them, so the chart is excluded.
+    """
+    if not _layer_configs_equal(source_etl, target_etl):
+        return True
+    if patch_is_pristine(source_patch):
+        return False
+    return not _layer_configs_equal(source_patch, target_patch)
+
+
 def _target_updated_at_for_review(source_chart: gm.Chart, target_chart: gm.Chart | None) -> dt.datetime | None:
     """Timestamp key used for approvals/conflicts.
 
-    Cross-environment twins did not exist in production when the staging chart
-    was reviewed, so their approvals were recorded with targetUpdatedAt=NULL.
+    Approvals bind to the production state that was on screen when the reviewer
+    approved. If production is edited afterwards, the approval must go stale —
+    for cross-environment twins too, otherwise a sync can overwrite the newer
+    production edit under a pre-existing approval. Only a chart with no
+    production counterpart at review time records NULL.
     """
-    if target_chart is None or _is_cross_env_twin(source_chart, target_chart):
+    if target_chart is None:
         return None
     return target_chart.updatedAt
 
@@ -257,6 +322,7 @@ class ChartDiff:
         score_indicators_anomalies: float | None = None,
         article_refs: list[ArticleRef] | None = None,
         staging_created_at: dt.datetime | None = None,
+        source_patch_config: dict[str, Any] | None = None,
     ):
         """Constructor of ChartDiff.
 
@@ -277,6 +343,9 @@ class ChartDiff:
         self.tags_edited = tags_edited
         # Creation time of the staging server (used to detect edits in production)
         self._staging_created_at = staging_created_at
+        # The source chart's admin patch layer (None when not loaded). Used to decide
+        # whether production edits on a cross-env twin can conflict with this diff.
+        self.source_patch_config = source_patch_config
 
         # Analytics, anomalies and other scores
         self.article_refs = article_refs if article_refs else []
@@ -396,7 +465,15 @@ class ChartDiff:
                 with Session(OWID_ENV.engine) as session:
                     staging_created_at = get_staging_creation_time(session)
             chart_edited_in_prod = self.target_chart.updatedAt > staging_created_at
-            if _is_cross_env_twin(self.source_chart, self.target_chart):
+            if _is_cross_env_twin(self.source_chart, self.target_chart) and (
+                self.source_patch_config is None or patch_is_pristine(self.source_patch_config)
+            ):
+                # A twin's production row is created/updated after the staging server
+                # exists, so its updatedAt alone signals nothing. While the staging
+                # patch is pristine, sync never writes the patch, so production admin
+                # edits are safe by construction. Once the staging patch carries
+                # deliberate edits, sync will write it — a production edit is then a
+                # real conflict again.
                 chart_edited_in_prod = False
 
             # If edited, check if conflict was resolved
@@ -548,6 +625,13 @@ class ChartDiff:
             # Article refs
             article_refs = article_refs_all.get(chart_id, [])
 
+            # Load the staging chart's admin patch for cross-env twins: `in_conflict`
+            # needs it to tell whether a production edit can actually conflict with
+            # anything this branch would sync.
+            source_patch_config = None
+            if target_chart is not None and _is_cross_env_twin(source_chart, target_chart):
+                source_patch_config = source_chart.load_patch_config(source_session)
+
             # Build Chart Diff object
             chart_diff: ChartDiff = cls(
                 source_chart=source_chart,
@@ -562,6 +646,7 @@ class ChartDiff:
                 score_indicators_anomalies=chart_anomalies_score,
                 article_refs=article_refs,
                 staging_created_at=staging_created_at,
+                source_patch_config=source_patch_config,
             )
 
             chart_diffs.append(chart_diff)
@@ -1057,23 +1142,38 @@ def _modified_chart_configs_on_staging(
 
     # get modified charts
     # NOTE: isInheritanceEnabled change needs to be detected too
-    base_q = """
+    def base_q(session: Session) -> str:
+        # A chart's rendered config (`configId`) and admin patch (`patchConfigId`) are each
+        # their own chart_configs row. The ETL layer (`patchConfigIdETL`) only exists once
+        # the grapher migration adding it has run — production may lag the staging server.
+        if _charts_table_has_etl_columns(session.get_bind()):
+            etl_select = "ccE.config as etlLayer,"
+            etl_join = "left join chart_configs as ccE on c.patchConfigIdETL = ccE.id"
+        else:
+            etl_select = "NULL as etlLayer,"
+            etl_join = ""
+        return f"""
     select
         c.id as chartId,
         MD5(CONCAT(cc.config, IFNULL(isInheritanceEnabled, 0))) as chartChecksum,
         cc.config as chartConfig,
+        ccP.config as chartPatch,
+        {etl_select}
         isInheritanceEnabled
     from charts as c
     join chart_configs as cc on c.configId = cc.id
+    join chart_configs as ccP on c.patchConfigId = ccP.id
+    {etl_join}
     where
     """
+
     where = """
         -- only compare charts that have been updated on staging server
         (
             c.lastEditedAt >= %(timestamp_staging_creation)s
         )
     """
-    query_source = base_q + where
+    query_source = base_q(source_session) + where
     params = {"timestamp_staging_creation": TIMESTAMP_STAGING_CREATION}
     # Add filter for chart IDs
     if chart_ids is not None:
@@ -1093,7 +1193,9 @@ def _modified_chart_configs_on_staging(
     where = """
         c.id in %(chart_ids)s
     """
-    target_df = read_sql(base_q + where, target_session, params={"chart_ids": tuple(source_df.chartId.unique())})
+    target_df = read_sql(
+        base_q(target_session) + where, target_session, params={"chart_ids": tuple(source_df.chartId.unique())}
+    )
 
     source_df = source_df.set_index("chartId")
     target_df = target_df.set_index("chartId")
@@ -1110,6 +1212,22 @@ def _modified_chart_configs_on_staging(
     ix = diff["configEdited"] & target_df["chartChecksum"].notnull()
     equal_configs = []
     for chart_id, row in diff.loc[ix].iterrows():
+        # ETL-managed charts (an etlConfig layer on both sides) are compared layer by
+        # layer: the chart is a branch change only if the branch changed a layer. A
+        # production-only patch edit (e.g. an admin hotfix after this staging server
+        # was created) must neither list the chart nor be overwritten by sync.
+        source_etl_raw = row.get("etlLayer")
+        target_etl_raw = target_df.loc[chart_id, "etlLayer"] if "etlLayer" in target_df.columns else None
+        if pd.notnull(source_etl_raw) and pd.notnull(target_etl_raw):
+            source_patch = json.loads(row["chartPatch"]) if pd.notnull(row.get("chartPatch")) else {}
+            target_patch_raw = target_df.loc[chart_id, "chartPatch"]
+            target_patch = json.loads(target_patch_raw) if pd.notnull(target_patch_raw) else {}
+            if not etl_chart_has_branch_changes(
+                json.loads(source_etl_raw), json.loads(target_etl_raw), source_patch, target_patch
+            ):
+                equal_configs.append(chart_id)
+            continue
+
         source_config = json.loads(row["chartConfig"])
         target_config = json.loads(target_df.loc[chart_id, "chartConfig"])
 
