@@ -233,3 +233,31 @@ def test_new_chart_config_id_is_valid_uuid7_and_time_ordered():
     assert generated.variant == uuid_module.RFC_4122
     # The top 48 bits are the unix-ms timestamp.
     assert before_ms <= generated.int >> 80 <= after_ms
+
+
+def _single_choice_mdim() -> Collection:
+    # A genuine mdim whose only dimension has a single choice in use — after
+    # `prune_dimensions()` its dimension list is empty, but it must NOT be
+    # reclassified as a single chart (it declared no `chart_config_id`).
+    return Collection(
+        catalog_path="animal_welfare/latest/my_mdim#my_mdim",
+        dimensions=[Dimension(slug="sex", name="Sex", choices=[DimensionChoice(slug="female", name="Female")])],
+        views=[View(dimensions={"sex": "female"}, indicators=ViewIndicators.from_dict({"y": "table#ind1"}))],
+        _definitions=Definitions(),
+    )
+
+
+def test_pruned_mdim_is_not_reclassified_as_chart():
+    collection = _single_choice_mdim()
+    collection.validate_chart_config_id()  # passes as an mdim
+    collection.prune_dimensions()
+    assert collection.dimensions == []
+    with pytest.raises(ValueError, match="pass `prune_dimensions=False`"):
+        collection.upsert_to_db(owid_env=object())  # type: ignore[arg-type]
+
+
+def test_declared_single_chart_routes_to_chart_upsert():
+    collection = _chart_collection("0191b6c7-5595-70b2-8d30-fa03fccd7add")
+    with patch("etl.collection.chart_upsert.upsert_collection_as_chart") as mock_upsert:
+        collection.upsert_to_db(owid_env=object())  # type: ignore[arg-type]
+    mock_upsert.assert_called_once()
