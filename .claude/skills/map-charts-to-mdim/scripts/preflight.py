@@ -160,6 +160,40 @@ def unpublished_sources(entries: list[dict]) -> set[str]:
     return {e["source"] for e in entries if e["chart"]["id"] in down}
 
 
+def unserved_old_slugs(entries: list[dict]) -> dict[str, list[str]]:
+    """Recorded old slugs of a chart that no longer resolve anywhere.
+
+    Unpublishing a chart in the grapher admin deletes its `chart_slug_redirects` rows
+    (`adminSiteServer/apiRoutes/charts.ts`: "Unpublishing chart, delete any existing
+    redirects to it"). So a row whose redirect is in place and whose chart is already
+    unpublished is only finished if something else now serves its old URLs — the CLI
+    re-creates them as `multi_dim_redirects` sources, a hand-unpublish does not. Without
+    this check that row reports DONE while its old URLs are hard 404s.
+    """
+    old = {e["source"]: [s for s in e.get("oldSlugs", []) if s] for e in entries}
+    old = {source: slugs for source, slugs in old.items() if slugs}
+    if not old:
+        return {}
+    every = sorted({s for slugs in old.values() for s in slugs})
+    sources = tuple(f"/grapher/{s}" for s in every)
+    served = set(
+        OWID_ENV.read_sql(
+            "SELECT source FROM redirects WHERE source IN %(s)s "
+            "UNION SELECT source FROM multi_dim_redirects WHERE source IN %(s)s",
+            params={"s": sources},
+        )["source"]
+    )
+    # A chart_slug_redirects row surviving means the alias still reaches the chart itself.
+    served |= {
+        f"/grapher/{s}"
+        for s in OWID_ENV.read_sql(
+            "SELECT slug FROM chart_slug_redirects WHERE slug IN %(s)s", params={"s": tuple(every)}
+        )["slug"]
+    }
+    dead = {source: [s for s in slugs if f"/grapher/{s}" not in served] for source, slugs in old.items()}
+    return {source: slugs for source, slugs in dead.items() if slugs}
+
+
 def stale_targets(entries: list[dict]) -> dict[str, str]:
     """Targets whose MDIM or reviewed view changed since the proposal was written.
 
@@ -568,6 +602,7 @@ def main() -> int:
 
     # Re-verify the proposal-time redirects still exist and still point at the proposed target.
     unpublished = unpublished_sources(already_done)
+    dead_aliases = unserved_old_slugs(already_done)
     for r in already_done:
         source, t = r["source"], r["target"]
         if source in stale:
@@ -577,7 +612,14 @@ def main() -> int:
         if prior is not None and int(prior["multiDimId"]) == t["multiDimId"] and prior["viewConfigId"] == t["viewConfigId"]:  # fmt: skip
             # The CLI cannot finish these: their source is already a multi_dim_redirects
             # source, which its own validation rejects, so the row would abort the run.
-            if source in unpublished:
+            if source in unpublished and source in dead_aliases:
+                # The unpublish already happened, so this is not a warning about what a
+                # hand-unpublish would do — those URLs are 404ing now.
+                rows.append((source, t["url"], "MANUAL", f"redirect in place and the chart is unpublished, but its "
+                                                         f"old slug(s) {dead_aliases[source]} resolve nowhere any "
+                                                         f"more — the unpublish deleted them; ask the Grapher team "
+                                                         f"to add multi-dim redirects for them"))  # fmt: skip
+            elif source in unpublished:
                 rows.append((source, t["url"], "DONE", "redirect in place and the chart is already unpublished — "
                                                        "nothing left to do for this row"))  # fmt: skip
             elif r.get("oldSlugs"):
