@@ -767,30 +767,36 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
     # references entirely. The SQL prefilter is loose, so the path segment is re-checked in
     # Python — otherwise a longer slug that merely starts with this one matches too.
     raw = OWID_ENV.read_sql(
-        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
-        "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
+        "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "       pgl.target, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
         "WHERE pgl.linkType = 'url' AND pgl.target LIKE %(t)s",
         params={"t": f"%/grapher/{slug}%"},
     )
     exact = re.compile(rf"/grapher/{re.escape(slug)}(?:[?#/]|$)")
     for r in raw.to_dict("records"):
-        if not exact.search(r["target"] or ""):
+        target = r["target"] or ""
+        if not exact.search(target):
             continue
+        if "archive.ourworldindata.org" in target:
+            continue  # archived snapshots are frozen by design
         component = r["componentType"] or ""
         out.append(
             rec(
                 "mdim",
                 slug,
                 mdim_id,
-                "gdoc",
+                "gdoc (url link)",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
                 f"/{r['post_slug']}",
-                f"raw URL, {component or 'unknown'} ({r['post_type']})",
-                r["queryString"],
-                r["text"],
-                r["published"],
+                surface_id=r["gdoc_id"],
+                context=f"raw URL, {component or 'unknown'} ({r['post_type']})",
+                # A raw URL carries its parameters in the target itself; `pgl.queryString` is
+                # only populated for the `grapher`/`guided-chart` link types handled above.
+                query_string=target.split("?", 1)[1] if "?" in target else "",
+                text=r["text"],
+                published=r["published"],
             )  # fmt: skip
         )
 
