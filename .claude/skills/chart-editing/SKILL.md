@@ -36,7 +36,6 @@ views:
       y:
         - catalogPath: "<dataset_short_name>#<indicator_short_name>"
     config:
-      $schema: "https://files.ourworldindata.org/schemas/grapher-schema.009.json"
       title: "Your chart title"
       subtitle: "One-line context for the chart."
       note: "Any caveats, sources of bias, methodology notes."
@@ -55,7 +54,7 @@ Key fields:
 - `chart_config_id` — **required**, the chart's identity in grapher (`charts.configId`). See "The chart's identity" below.
 - `dimensions: []` and exactly one view → this YAML pushes as a single chart, not an mdim page.
 - `views[0].indicators.y` — list of indicator catalog paths. For multi-series, list more than one.
-- `views[0].config` — the grapher config that becomes the chart's `etlConfig` in `chart_configs`. Same shape as a chart-admin export.
+- `views[0].config` — the grapher config that becomes the chart's `etlConfig` in `chart_configs`. Same shape as a chart-admin export. Omit `$schema` — the current default (`DEFAULT_GRAPHER_SCHEMA` in `etl/config.py`) is applied automatically, so pinning a version only ages badly.
 - No top-level `title:` or `default_selection:` block — those exist only for multidim data pages and are ignored for single charts.
 
 ## The chart's identity (`chart_config_id`)
@@ -128,15 +127,15 @@ Inside `views[0].config`:
 | Hide map timeline | `map.hideTimeline: true` | For point-in-time map charts |
 | Topic page tag | `topic_tags: ["Animal Welfare"]` | Top-level field, outside `views` |
 
-For the authoritative list, the grapher schema is at the URL in `$schema:` — currently `grapher-schema.009.json`.
+For the authoritative list, see the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`).
 
 ## Pushing to staging
 
 ```bash
-.venv/bin/etlr export://multidim/<namespace>/latest/<short_name> --export --force --only
+.venv/bin/etlr export://multidim/<namespace>/latest/<short_name> --export
 ```
 
-`--force --only` re-pushes even when nothing changed (useful when iterating on the YAML). The step prints `admin_url=http://staging-site-<branch>/admin/charts/<id>/edit` on success.
+Editing the YAML is enough to trigger a re-run — ETL's change detection picks it up, so no extra flags are needed. Reserve `--force --only` for re-pushing when *nothing* changed (and note `--only` skips dependency resolution, so it fails unless the upstream datasets are already built locally). The step prints `admin_url=http://staging-site-<branch>/admin/charts/<id>/edit` on success.
 
 ## Previewing
 
@@ -160,7 +159,7 @@ Read the resulting PNG with the `Read` tool to view the chart.
 
 1. Read the current `.config.yml` and the upstream dataset's `.meta.yml` (so you know what indicators exist and their default titles/units).
 2. Edit the YAML using the `Edit` tool. Preserve comments with `ruamel` if needed (see `etl.files.ruamel_load/dump`).
-3. Push: `.venv/bin/etlr export://multidim/<namespace>/latest/<short_name> --export --force --only`.
+3. Push: `.venv/bin/etlr export://multidim/<namespace>/latest/<short_name> --export`.
 4. Preview the PNG (see above) and iterate.
 5. Once the chart looks right, commit the `.config.yml` (and the DAG entry if newly added) on the working branch.
 

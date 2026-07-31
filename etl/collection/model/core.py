@@ -329,22 +329,33 @@ class Collection(MDIMBase):
         self.upsert_to_db(owid_env)
 
     def upsert_to_db(self, owid_env: OWIDEnv):
-        # Single-chart case: no dimensions means no multi-dim page, so we push to
-        # the charts table via the chart admin endpoint instead of `/multi-dims/`.
-        # The charts/mdims split is legacy — the longer-term goal is one table with
-        # grapher handling both (see #6069). A zero-dimension collection with
-        # multiple views is neither a chart nor a valid mdim, so we refuse it.
-        if len(self.dimensions) == 0:
+        # Single-chart case: no multi-dim page, so we push to the charts table via
+        # the chart admin endpoint instead of `/multi-dims/`. The charts/mdims split
+        # is legacy — the longer-term goal is one table with grapher handling both
+        # (see #6069). Chart mode is decided by the *declared* identity
+        # (`chart_config_id`, which `validate_chart_config_id` ties to declared
+        # `dimensions: []`), not by `self.dimensions` here: `prune_dimensions()` may
+        # have emptied the dimension list of a genuine mdim whose dimensions all had
+        # a single choice in use, and such an mdim must not be reclassified.
+        if self.chart_config_id is not None:
             if len(self.views) != 1:
                 raise ValueError(
-                    f"Collection '{self.catalog_path}' has no dimensions but "
-                    f"{len(self.views)} views. A zero-dimension collection must "
-                    f"have exactly one view (single-chart mode)."
+                    f"Collection '{self.catalog_path}' declares `chart_config_id` but has "
+                    f"{len(self.views)} views. A single-chart collection must have exactly one view."
                 )
             from etl.collection.chart_upsert import upsert_collection_as_chart
 
             upsert_collection_as_chart(self, owid_env)
             return
+
+        if len(self.dimensions) == 0:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has no dimensions left but does not declare "
+                f"`chart_config_id`. If this is a multidim whose dimensions were dropped because "
+                f"each had a single choice in use, pass `prune_dimensions=False` to `save()` to "
+                f"keep them. If it is meant to be a single chart, declare `chart_config_id` "
+                f"(see `etl chart-config-id --help`)."
+            )
 
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
