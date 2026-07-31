@@ -1,9 +1,9 @@
 """Validate a chart → MDIM redirect proposal before the grapher CLI runs it.
 
-READ-ONLY. This script never creates a redirect and never unpublishes a chart.
-Applying is done in owid-grapher:
-
-    yarn createMultiDimRedirectsFromCsv /abs/path/redirects_for_cli.csv --dry-run
+READ-ONLY. This script never creates a redirect and never unpublishes a chart, and
+neither does anything else in this skill. Applying is handed to a Grapher developer,
+who runs owid-grapher's `createMultiDimRedirectsFromCsv` in their own checkout; the
+commands live in the generated HANDOFF.md, which is what they receive.
 
 Why a preflight exists: that CLI runs **one transaction**, and any row it rejects
 aborts the entire migration. So every check here mirrors a check the CLI performs,
@@ -735,10 +735,14 @@ def main() -> int:
     if bad or csv_problems or blocking_embeds or manual:
         return 1
 
-    print(f"\nReady: {len(rows)} row(s) validate against the live DB. Rehearse, then apply, from owid-grapher:")
-    print(f"  yarn createMultiDimRedirectsFromCsv {csv_path.resolve()} --dry-run")
-    print("  (--dry-run rolls the transaction back and skips unpublishing entirely)")
-    print("Then stamp cutover_date in migration_log_template.csv — analytics cannot recover it later.")
+    # Deliberately prints no runnable command. Applying is a Grapher developer's job, in
+    # their own checkout, and HANDOFF.md — which is what they receive — already carries the
+    # commands. A ready-to-paste command here invites whoever ran the preflight to apply it.
+    print(f"\nReady: {len(rows)} row(s) validate against the live DB. Hand the migration over:")
+    print(f"  {csv_path.resolve()}")
+    print(f"  {(csv_path.parent / 'HANDOFF.md').resolve()}  (written for the developer who runs it)")
+    print("When they confirm the run, stamp cutover_date in migration_log_template.csv —")
+    print("analytics cannot recover it later.")
     return 0
 
 
