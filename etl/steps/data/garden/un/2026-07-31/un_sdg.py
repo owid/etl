@@ -40,7 +40,10 @@ def run(dest_dir: str) -> None:
     log.info("un_sdg.harmonize_countries")
     tb = paths.regions.harmonize_names(tb)
 
-    tb = fix_informality_indicators(tb)
+    # NOTE: Chile's informality series (8.3.1) used to be nulled before 2018 because the
+    # source reported an implausible spike at 2017 (~67% against ~43% in 2016 and ~33% in
+    # 2018). The UN corrected it in the 2026 Q2 release -- 2017 is now ~34.6% -- so the
+    # workaround was removed and Chile's 2010-2017 data is published again.
 
     tb = duplicate_latin_america_rows(tb)
 
@@ -162,17 +165,17 @@ def create_short_unit(long_unit: pd.Series) -> np.ndarray[Any, np.dtype[Any]]:
 
 def manual_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Some values for 15.2.1 is above 100% when this shouldn't be possible. This sets the max value to 100.
-    Returns:
-        pd.DataFrame with cleaned values for 15.2.1
+    Apply the source-error corrections we still need, and drop what we cannot visualise.
     """
     df = df.copy(deep=False)
 
     df["value"] = df["value"].astype(float)
-    df.loc[
-        (df["long_unit"] == "Percentage") & (df["value"] > 100) & (df["indicator"] == "15.2.1"),
-        "value",
-    ] = 100
+
+    # NOTE: a cap on indicator 15.2.1 values above 100 used to live here, keyed on
+    # `long_unit == "Percentage"`. No unit code carries that description any more (PERCENT
+    # resolves to "%"), so the branch could never fire, and the 2026 Q2 data has no 15.2.1
+    # value above 100 under any unit. Removed in the 2026-07-31 update. If >100 values
+    # reappear, add the cap back keyed on the unit the data actually uses.
 
     # Clean the IHR Capacity column, duplicate labelling of some attributes which doesn't work well with the grapher
     df["ihr_capacity"] = df["ihr_capacity"].replace(
@@ -216,15 +219,15 @@ def fix_indicator_12_2_2(df: pd.DataFrame) -> pd.DataFrame:
     """
     Fix data quality issues for indicator 12.2.2 (Domestic material consumption per unit of GDP).
 
-    Issue: In 2023, some countries (e.g., Canada) report zero values for the "Total or no breakdown"
-    category while missing data for individual product types. This appears to be incomplete data
-    submission rather than true zero consumption.
+    Negative values are replaced with zero, since negative consumption is not valid.
 
-    Solution:
-    1. Replace negative values with zero (negative consumption is not valid)
-    2. Replace zero values in 2023 with NaN to indicate missing data
-
-    This prevents misleading visualizations showing zero consumption when data is actually unavailable.
+    NOTE: this used to also replace zero values *in 2023 only* with NaN, on the assumption
+    that they were incomplete submissions. The 2026 Q2 data shows zeros for the "Total or no
+    breakdown" category are a stable feature of the series -- 26 countries report them in
+    every year from 2018 through 2024, not only 2023 -- so the year-specific rule nulled
+    2023 while leaving every other year (including the newly added 2024) untouched. It was
+    dropped in the 2026-07-31 update rather than extended to all years, so zeros are now
+    published as the source reports them. Re-check if a future release changes this pattern.
 
     Args:
         df: DataFrame containing UN SDG data
@@ -237,9 +240,6 @@ def fix_indicator_12_2_2(df: pd.DataFrame) -> pd.DataFrame:
 
     # Replace negative values with zero (negative consumption is invalid)
     df.loc[mask_12_2_2 & (df["value"] < 0), "value"] = 0
-
-    # Replace zeros in 2023 with NaN (likely incomplete data submission)
-    df.loc[mask_12_2_2 & (df["year"] == 2023) & (df["value"] == 0), "value"] = np.nan
 
     return df
 
@@ -487,18 +487,5 @@ def duplicate_latin_america_rows(df: pd.DataFrame) -> pd.DataFrame:
 
     if not df_lac.empty:
         df = pd.concat([df, df_lac], ignore_index=True)
-
-    return df
-
-
-def fix_informality_indicators(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Fix data quality issues for informality indicators (8.3.1).
-    This is for now a jump in the series for Chile in 2017 that needs to be fixed.
-    We make the data before 2018 null.
-    """
-
-    mask = (df["indicator"] == "8.3.1") & (df["country"] == "Chile") & (df["year"] < 2018)
-    df.loc[mask, "value"] = pd.NA
 
     return df
