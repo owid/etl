@@ -129,17 +129,20 @@ def stale_charts(entries: list[dict]) -> dict[str, str]:
 def stale_targets(entries: list[dict]) -> dict[str, str]:
     """Targets whose MDIM or reviewed view changed since the proposal was written.
 
-    The mirror of `stale_charts` on the target side. A deleted or renamed MDIM, or a
-    view whose config was regenerated, leaves the CSV pointing at a URL nobody
-    reviewed — and `cli_blockers` would not notice, because it only looks up MDIMs
-    that still exist under the recorded slug.
+    The mirror of `stale_charts` on the target side. A deleted, renamed or unpublished
+    MDIM, or a view whose config was regenerated, leaves the CSV pointing at a URL
+    nobody reviewed — and `cli_blockers` would not notice, because it only looks up
+    MDIMs that still exist under the recorded slug, and only for the proposed
+    redirects, never for the `already_done` rows.
     """
     ids = tuple({e["target"]["multiDimId"] for e in entries})
     if not ids:
         return {}
     # No ORDER BY: these configs are multi-MB JSON and sorting them server-side blows
     # the MySQL sort buffer (error 1038).
-    df = OWID_ENV.read_sql("SELECT id, slug, config FROM multi_dim_data_pages WHERE id IN %(ids)s", params={"ids": ids})
+    df = OWID_ENV.read_sql(
+        "SELECT id, slug, published, config FROM multi_dim_data_pages WHERE id IN %(ids)s", params={"ids": ids}
+    )
     current: dict[int, dict] = {}
     for row in df.to_dict("records"):
         cfg = row["config"]
@@ -148,7 +151,7 @@ def stale_targets(entries: list[dict]) -> dict[str, str]:
             v.get("fullConfigId"): "__".join(f"{k}={val}" for k, val in sorted((v.get("dimensions") or {}).items()))
             for v in cfg.get("views", [])
         }
-        current[int(row["id"])] = {"slug": row["slug"], "views": views}
+        current[int(row["id"])] = {"slug": row["slug"], "published": bool(row["published"]), "views": views}
 
     rerun = " — re-run extract_and_match.py and re-review"
     stale: dict[str, str] = {}
@@ -157,6 +160,14 @@ def stale_targets(entries: list[dict]) -> dict[str, str]:
         cur = current.get(t["multiDimId"])
         if cur is None:
             stale[e["source"]] = f"target MDIM (multiDimId={t['multiDimId']}) no longer exists{rerun}"
+        elif not cur["published"]:
+            # An unpublished target serves nothing, so the redirect — proposed or already in
+            # place — points at a dead URL. Never tell an operator to unpublish the chart
+            # that is currently the only thing serving that data.
+            stale[e["source"]] = (
+                f"target MDIM /grapher/{cur['slug']} is no longer published — publish it, "
+                f"or re-run extract_and_match.py to repoint this chart"
+            )
         elif cur["slug"] != t["mdimSlug"]:
             stale[e["source"]] = f"target MDIM slug changed since the proposal (now '{cur['slug']}'){rerun}"
         elif t["viewConfigId"] not in cur["views"]:

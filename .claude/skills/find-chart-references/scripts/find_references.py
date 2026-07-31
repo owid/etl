@@ -107,11 +107,30 @@ def resolve_chart_subjects(chart_ids: list[int], chart_slugs: list[str]) -> dict
 
 
 def resolve_variable_ids(variable_ids: list[int], dataset_id: int | None) -> list[int]:
-    ids = list(variable_ids)
+    """Requested indicator ids, checked against `variables`.
+
+    An id that does not exist matches nothing in every downstream query, so the sweep
+    would end with `references: 0` — the same output as a real indicator nothing points
+    at. Report the unresolved ids, as `resolve_chart_subjects` does for charts, so a
+    typo or a deleted indicator can never read as a clean blast radius.
+    """
+    ids = set(variable_ids)
+    if ids:
+        found = OWID_ENV.read_sql("SELECT id FROM variables WHERE id IN %(v)s", params={"v": tuple(sorted(ids))})
+        resolved = {int(i) for i in found["id"]}
+        missing = sorted(ids - resolved)
+        if missing:
+            print(f"  WARNING: {len(missing)} requested indicator id(s) do not exist and were NOT swept: {missing}")
+            print("           A blank result for these means UNKNOWN, not 'nothing references them'.")
+        if not resolved and dataset_id is None:
+            raise SystemExit("None of the requested --variable-ids exist in the grapher DB — nothing to sweep.")
+        ids = resolved
     if dataset_id is not None:
         df = OWID_ENV.read_sql("SELECT id FROM variables WHERE datasetId = %(d)s", params={"d": dataset_id})
-        ids += [int(i) for i in df["id"]]
-    return sorted(set(ids))
+        if df.empty:
+            print(f"  WARNING: dataset {dataset_id} has no indicators — check the dataset id.")
+        ids |= {int(i) for i in df["id"]}
+    return sorted(ids)
 
 
 # ----- Chart surfaces -------------------------------------------------------------
