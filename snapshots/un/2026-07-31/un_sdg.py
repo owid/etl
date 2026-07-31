@@ -63,7 +63,7 @@ def main(upload: bool) -> None:
         unit_desc = attributes_description(snap)
         unit_desc = pd.DataFrame(unit_desc.items(), columns=["AttCode", "AttValue"])
         log.info("Adding unit descriptions to catalog...")
-        Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_unit.csv").create_snapshot(data=unit_desc, upload=True)
+        Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_unit.csv").create_snapshot(data=unit_desc, upload=upload)
 
         log.info("Downloading dimension descriptions...")
         dim_desc = dimensions_description(snap)
@@ -72,13 +72,13 @@ def main(upload: bool) -> None:
             json.dump(dim_desc, fp)
 
         log.info("Adding dimension descriptions to catalog...")
-        Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_dimension.json").create_snapshot(filename=dim_file, upload=True)
+        Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_dimension.json").create_snapshot(filename=dim_file, upload=upload)
 
         # fetch the file locally
         log.info("Downloading data...")
         all_data = download_data(snap)
         log.info("Adding data to catalog...")
-        Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg.feather").create_snapshot(data=all_data, upload=True)
+        Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg.feather").create_snapshot(data=all_data, upload=upload)
 
 
 def create_metadata(snap: Snapshot) -> SnapshotMeta:
@@ -135,9 +135,13 @@ def download_data(snap: Snapshot) -> pd.DataFrame:
     all_data = []
     for goal in goal_codes:
         frames = download_goal(url=url, goal=goal, area_codes=area_codes)
-        rows = sum(len(f) for f in frames)
-        assert rows > 0, f"No rows returned for goal {goal}."
-        log.info("Downloaded goal", goal=goal, rows=rows, requests=len(frames))
+        # Count real observations rather than parsed rows: the API's NUL padding becomes one
+        # all-NaN row per response, so a header-only response still parses to a non-empty
+        # frame. Without this, a goal that returned no data would pass unnoticed here and be
+        # silently dropped in meadow.
+        observations = sum(count_observations(f) for f in frames)
+        assert observations > 0, f"No observations returned for goal {goal}."
+        log.info("Downloaded goal", goal=goal, observations=observations, requests=len(frames))
         all_data += frames
 
     # Every goal must have contributed data, otherwise we would silently publish a
@@ -177,10 +181,11 @@ def download_goal(url: str, goal: str, area_codes: list) -> list[pd.DataFrame]:
     for i in range(0, len(area_codes), AREA_CHUNK_SIZE):
         chunk = area_codes[i : i + AREA_CHUNK_SIZE]
         df = _read_goal_csv(_download_with_retries(url, goal, chunk, attempts=MAX_RETRIES))
-        log.info("Downloaded area batch", goal=goal, areas=f"{i}-{i + len(chunk)}", rows=len(df))
+        observations = count_observations(df)
+        log.info("Downloaded area batch", goal=goal, areas=f"{i}-{i + len(chunk)}", observations=observations)
         # Batches covering only aggregates/unused areas legitimately come back empty; keep
-        # only the ones with data so they don't muddy the concatenated dtypes.
-        if len(df) > 0:
+        # only the ones carrying observations so they don't muddy the concatenated dtypes.
+        if observations > 0:
             frames.append(df)
     return frames
 
@@ -211,6 +216,16 @@ def _download_with_retries(url: str, goal: str, area_codes: list, attempts: int)
             time.sleep(RETRY_BACKOFF_SECONDS)
     # Unreachable: the loop either returns or raises.
     raise AssertionError(f"Failed to download goal {goal}.")
+
+
+def count_observations(df: pd.DataFrame) -> int:
+    """Number of rows carrying an actual numeric value.
+
+    `Value` is the field meadow filters on, so this is the count that decides whether a
+    response really contributed data. It also excludes the all-NaN row the API's NUL padding
+    produces (see `_read_goal_csv`).
+    """
+    return int(pd.to_numeric(df["Value"], errors="coerce").notna().sum())
 
 
 def _read_goal_csv(content: bytes) -> pd.DataFrame:
