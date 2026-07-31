@@ -27,15 +27,15 @@ Re-state the whole block every time the work is revisited — carry open items f
 
 ## Team
 
-Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it."
+Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it." (An agent posting under its own bot account, e.g. `chatgpt-codex-connector[bot]`, skips the line: the platform already attributes the content.)
 
 1. **Attribute the work.** Put this blockquote as the *first line* of the content:
 
 ```
-> _Written by Claude <model name> — @<handle> at the wheel._
+> _Written by <assistant> <model name> — @<handle> at the wheel._
 ```
 
-Replace `<model name>` with the human-readable name of the model actually generating the content (e.g. "Sonnet 5", "Opus 4.8", "Fable 5", "Haiku 4.5") — not the literal string "Code". Keeping the "Claude" prefix makes the attribution recognizable even to readers unfamiliar with individual model names.
+Replace `<assistant>` with the product actually generating the content ("Claude", "Codex", "Copilot", ...) and `<model name>` with the human-readable name of its underlying model (e.g. "Fable 5", "Opus 4.8", "GPT-5.6"). For Claude, always use a model name, never the literal string "Code". Keeping the product prefix makes the attribution recognizable even to readers unfamiliar with individual model names.
 
 It applies to **every** surface, **every** time you post:
 - PR descriptions / bodies
