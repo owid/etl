@@ -102,6 +102,8 @@ Writes into `--out`:
 | `redirects_for_cli.csv` | **the apply input** — `;`-delimited `source;target` for the grapher CLI |
 | `migration_log_template.csv` | `(old_slug, mdim_slug, view_id, cutover_date)` — stamp the date at apply time |
 | `unmatched.md` | everything not proposed, with candidates/near-miss detail |
+| `mdim_suggestions.md` | **what the MDIMs would need** for the unmatched charts to become redirectable |
+| `HANDOFF.md` | standalone note for whoever runs the CLI — command, caveats, why the CLI |
 | `_sources.json` | machine record of run inputs (don't hand-edit) |
 
 **Handoff convention: one source per JSON.** Like the explorer→MDIM redirect
@@ -260,10 +262,21 @@ same name. The name is preserved and nothing else changes.
 Never delete first. The delete will fail, and unpublishing the article to force it
 through breaks the page for readers.
 
-The create call is:
+**Do the create in the admin UI — it is deep-linkable to the right view:**
+
+```
+{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=<target.viewConfigId>
+```
+
+That opens the narrative-chart editor already parented to the MDIM view, so you
+set the name and the view's controls and save. Prefer this over the API: `AdminAPI`
+has `get_narrative_chart` and `update_narrative_chart` but **no create or delete**,
+so the API route means hand-rolled HTTP for both ends of the swap.
+
+If you do script it, the endpoints are `POST {admin_api}/narrative-charts` and
+`DELETE {admin_api}/narrative-charts/<id>`:
 
 ```jsonc
-POST {admin_api}/narrative-charts
 {
   "type": "multiDim",
   "name": "<kebab-case-name>",

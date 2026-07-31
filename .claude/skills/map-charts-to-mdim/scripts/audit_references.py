@@ -27,6 +27,7 @@ Usage:
 import argparse
 import csv
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -39,6 +40,8 @@ from etl.config import OWID_ENV
 FIND_REFERENCES = Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts" / "find_references.py"
 
 RED, YELLOW, INFO = "RED", "YELLOW", "INFO"
+# Staging admin hosts carry a tailscale suffix that is noise in a link handed to a human.
+TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
 REFERENCE_COLUMNS = [
     "severity", "surface", "kind", "source_chart_slug", "where", "where_url", "context",
@@ -193,6 +196,7 @@ def main() -> int:
     if not mapping_dir.is_dir():
         mapping_dir = mapping_dir.parent
     host = (args.host or OWID_ENV.site or "https://ourworldindata.org").rstrip("/")
+    admin = TAILSCALE_SUFFIX_RE.sub("", (OWID_ENV.admin_site or "https://admin.owid.io/admin").rstrip("/"))
 
     redirects = load_redirects(args.mapping)
     by_chart_id = {r["chart"]["id"]: r for r in redirects}
@@ -212,6 +216,11 @@ def main() -> int:
             fix = GENERATED_LINK_FIXES.get(ref["surface"], LINK_FIX)
         else:
             fix = FIXES.get(ref["surface"], "migrate this reference by hand")
+        if ref["surface"] == "narrative chart":
+            # The admin's create page is deep-linkable to the parent view, and the view is
+            # the one this chart is being redirected to — so hand over the ready-made URL
+            # rather than the id to look up.
+            fix += f" — create the replacement at {admin}/narrative-charts/create?type=multiDim&chartConfigId={r['target']['viewConfigId']}"
         findings.append(
             {
                 "severity": severity,
