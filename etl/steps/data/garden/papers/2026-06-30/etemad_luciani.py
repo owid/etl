@@ -5,7 +5,6 @@ Harmonizes country names and converts fossil fuel production from million tonnes
 coverage begins.
 """
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -26,8 +25,10 @@ def run() -> None:
     # Process data.
     #
     # Harmonize country names (reusing the Shift Data Portal mapping, since the data comes from the same file).
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    tb = paths.regions.harmonize_names(
+        tb,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
     )
 
     # Convert fossil fuel production from Mtoe to TWh.

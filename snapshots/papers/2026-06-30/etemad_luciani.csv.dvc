@@ -9,7 +9,7 @@ meta:
     citation_full: |-
       Bouda Etemad and Jean Luciani, with Paul Bairoch and Jean-Claude Toutain, World Energy Production 1800-1985, Librairie Droz, Geneva, 1991, ISBN 2-600-56007-6.
       Data digitized and published by The Shift Project (The Shift Data Portal), with agreement of B. Etemad. https://github.com/dataforgoodfr/shiftdataportal
-    date_published: "1991-01-01"
+    date_published: "1991"
     date_accessed: "2026-07-07"
     url_main: https://www.theshiftdataportal.org/
     url_download: https://raw.githubusercontent.com/dataforgoodfr/shiftdataportal/b69de961ce4beb010661b444b6030fc14b6b9b24/server/data/WORLD_ENERGY_HISTORY_primary_energy_prod.csv

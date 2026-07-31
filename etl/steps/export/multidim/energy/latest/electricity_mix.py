@@ -603,6 +603,18 @@ SOURCE_FALLBACK_SCHEME = {
 LOG_METRICS = {"generation", "per_capita", "demand", "demand_per_capita", "carbon_intensity"}
 
 
+def _open_top_sentinel(edges: list[float]) -> float:
+    """Value to append after the bin edges so grapher renders an open-ended top bracket.
+
+    Grapher builds bins from consecutive pairs of `customNumericValues`, flags the last bin
+    as open-ended when its max sits below the data max, and tests membership against the
+    bin's min. So appending any value below the top edge yields a ">top edge" bracket. The
+    sentinel is derived from the edges rather than hard-coded, because a fixed value (e.g. 1)
+    stops being below the top edge on views whose values never reach it.
+    """
+    return edges[1] / 100
+
+
 def _log_thresholds(vmax: float | None, max_bins: int = 7) -> list[float] | None:
     """1-2-5 log-spaced bin edges from 0 up to the largest ladder value strictly below vmax.
 
@@ -667,9 +679,7 @@ def _map_config(source: str, metric: str, vmax: float | None = None, frequency: 
         edges = _log_thresholds(vmax)
         if edges:
             color_scale["binningStrategy"] = "manual"
-            # Trailing sentinel (smaller than the top edge) forces grapher to render an open-ended
-            # top bracket (">X"), independent of where the top edge sits relative to the data max.
-            color_scale["customNumericValues"] = edges + [1]
+            color_scale["customNumericValues"] = edges + [_open_top_sentinel(edges)]
     return {"colorScale": color_scale, "timeTolerance": 3}
 
 
