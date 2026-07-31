@@ -87,7 +87,7 @@ from typing import cast
 import click
 import questionary
 import requests
-from git import GitCommandError, InvalidGitRepositoryError, Repo
+from git import GitCommandError, InvalidGitRepositoryError, NoSuchPathError, Repo
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
@@ -762,17 +762,23 @@ Lists every local branch whose latest GitHub PR is **merged** or **closed** (usi
 state, not `git branch --merged`, so squash-merges are detected). Branches that have a git worktree
 are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool will:
 
-1. (Worktree branches only) Copy that worktree's Claude sessions — the `<uuid>.jsonl` transcripts and
+1. (Worktree branches only) Check the worktree for uncommitted changes that would block
+   `git worktree remove` — modified tracked files or untracked files, not counting `--share-data`'s
+   symlinks, which are handled in step 4. A dirty worktree is skipped with a warning *before
+   anything is copied or modified*, so the worktree stays fully intact; commit/discard the changes
+   (or `git worktree remove --force` it) and re-run. Dirty worktrees are flagged `(dirty)` in the
+   selection list.
+2. (Worktree branches only) Copy that worktree's Claude sessions — the `<uuid>.jsonl` transcripts and
    their `<uuid>/` subfolders under `~/.claude/projects/<encoded-worktree-path>/` — into the main
    repo's project dir, so they stay resumable with `claude --resume` after the worktree is gone.
-2. (Worktree branches only) Copy the worktree's gitignored `workbench/` and `ai/` scratch dirs into
+3. (Worktree branches only) Copy the worktree's gitignored `workbench/` and `ai/` scratch dirs into
    `workbench/<branch>/` and `ai/<branch>/` in the main repo (suffixed `-1`, `-2`... on the rare name
    clash), so the working notes/outputs survive the worktree removal without overwriting anything.
    Skipped for a dir created by `--share-data` (it's a symlink to the main repo already — nothing to
    salvage).
-3. Remove the git worktree (skipped with a warning if it has uncommitted changes). `--share-data`'s
-   symlinks are unlinked first so they don't themselves block the removal.
-4. Delete the local branch.
+4. Remove the git worktree. `--share-data`'s symlinks are unlinked first so they don't themselves
+   block the removal.
+5. Delete the local branch.
 
 Each branch is tagged `[merged]` or `[closed]` so you can see its PR outcome before selecting.
 
@@ -837,10 +843,20 @@ def clean_cli() -> None:
         print("Nothing to clean: no local branch has a merged or closed PR.")
         return
 
+    # Flag worktrees with blocking uncommitted changes in the selection list, so the user knows
+    # before picking that those branches will be skipped (clean_branch re-checks before mutating).
+    dirty = {
+        b: bool(worktree_blocking_changes(worktrees[b]))
+        for b in cleanable
+        if b in worktrees and worktrees[b] != main_worktree_path
+    }
+
     # Build the selection list ('all' first, then one entry per branch).
     choices = [questionary.Choice(title="all", value="__all__")]
     for branch in sorted(cleanable):
-        choices.append(questionary.Choice(title=_branch_label(branch, cleanable[branch], worktrees), value=branch))
+        choices.append(
+            questionary.Choice(title=_branch_label(branch, cleanable[branch], worktrees, dirty), value=branch)
+        )
 
     selected = questionary.select(
         message="Select a branch to clean (or 'all')",
@@ -891,6 +907,31 @@ def list_worktrees(repo) -> dict[str, Path]:
     return result
 
 
+def worktree_blocking_changes(worktree_path: Path) -> list[str]:
+    """Return the `git status --porcelain` lines that would make `git worktree remove` refuse.
+
+    `git worktree remove` refuses when the worktree has modified tracked files or untracked files
+    (ignored files don't count — they're deleted along with the worktree, which is why clean_branch
+    salvages workbench/ and ai/ first). The `--share-data` symlinks (data/ and the scratch dirs) are
+    excluded defensively: today's .gitignore patterns happen to match them, so they don't show up as
+    untracked, but if the ignore rules ever stop covering them they still must not count as blocking —
+    clean_branch unlinks them itself right before removal, since their real content lives in the
+    main repo.
+    """
+    if not worktree_path.exists():
+        # Registered but manually deleted (git lists it as prunable): nothing can block —
+        # `git worktree remove` on it simply prunes the stale registration.
+        return []
+    try:
+        lines = Repo(worktree_path).git.status("--porcelain").splitlines()
+    except (InvalidGitRepositoryError, NoSuchPathError, GitCommandError) as e:
+        # The directory exists but git can't read it as a worktree. Its state is unknowable, so
+        # report it as blocking: clean_branch then skips it untouched instead of half-mutating it.
+        return [f"(unreadable worktree: {e})"]
+    share_data_links = {name for name in ("data", *SHARED_SCRATCH_DIRS) if (worktree_path / name).is_symlink()}
+    return [line for line in lines if line[3:] not in share_data_links]
+
+
 def fetch_pr_state(branch: str) -> str | None:
     """Return the GitHub PR state for a branch: 'open', 'merged', 'closed', or None.
 
@@ -920,11 +961,13 @@ def fetch_pr_state(branch: str) -> str | None:
     return "closed"
 
 
-def _branch_label(branch: str, state: str, worktrees: dict[str, Path]) -> str:
-    """Build the questionary label for a branch, e.g. 'data-foo  [merged]  <- worktree'."""
+def _branch_label(branch: str, state: str, worktrees: dict[str, Path], dirty: dict[str, bool]) -> str:
+    """Build the questionary label for a branch, e.g. 'data-foo  [merged]  <- worktree (dirty)'."""
     label = f"{branch}  [{state}]"
     if branch in worktrees:
         label += "  <- worktree"
+        if dirty.get(branch):
+            label += " (dirty)"
     return label
 
 
@@ -1006,6 +1049,22 @@ def clean_branch(
         return
 
     if worktree_path is not None:
+        # A dirty worktree must be skipped BEFORE any mutation. Otherwise the salvage copies below
+        # would land in the main repo (the workbench/ai copy is not idempotent — a re-run after the
+        # user cleans up would create suffixed '-1' duplicates) and the --share-data symlinks would
+        # be unlinked, leaving a worktree that still exists but is missing its data/ dir.
+        blocking = worktree_blocking_changes(worktree_path)
+        if blocking:
+            details = "\n".join(f"    {line}" for line in blocking)
+            log.warning(
+                f"Skipping '{branch}': worktree '{worktree_path}' has uncommitted changes that would "
+                f"block `git worktree remove`:\n{details}\n"
+                f"  Nothing was copied or modified. Commit or discard the changes and re-run, or if "
+                f"they're disposable: git worktree remove --force '{worktree_path}'"
+            )
+            return
+
+    if worktree_path is not None:
         # Salvage anything the worktree holds but that's gitignored (so `git worktree remove` would
         # destroy it for good): the Claude sessions, plus the workbench/ and ai/ scratch dirs.
         # The session dir lives outside the worktree, but copy everything before removal on principle.
@@ -1018,23 +1077,23 @@ def clean_branch(
                 continue
             copy_dir_namespaced(src, main_worktree_path / name, branch)
 
-        # `git worktree remove` refuses a worktree with untracked files, and --share-data's
-        # symlinks (data/, workbench/, ai/) count as untracked. Unlink them ourselves first — safe,
-        # since their real content lives in the main repo, untouched — so only genuine leftover
-        # uncommitted/untracked work still blocks the plain removal below.
+        # Unlink --share-data's symlinks (data/, workbench/, ai/) before removal — safe, since
+        # their real content lives in the main repo, untouched. Defensive on two fronts: they must
+        # never block `git worktree remove` as untracked files (today's .gitignore happens to cover
+        # them, but that's incidental), and `git worktree remove` must never get a chance to
+        # traverse into the shared dirs they point to.
         for name in ("data", *SHARED_SCRATCH_DIRS):
             link = worktree_path / name
             if link.is_symlink():
                 link.unlink()
 
+        # Backstop only: dirty worktrees were already skipped above, but the removal can still fail
+        # (e.g. changes made between the check and now, or a submodule in the worktree).
         try:
             repo.git.worktree("remove", str(worktree_path))
             log.info(f"Removed worktree '{worktree_path}'.")
         except GitCommandError as e:
-            log.warning(
-                f"Could not remove worktree '{worktree_path}' (uncommitted changes?). "
-                f"Leaving branch '{branch}' in place.\n{e}"
-            )
+            log.warning(f"Could not remove worktree '{worktree_path}'. Leaving branch '{branch}' in place.\n{e}")
             return
 
     try:
