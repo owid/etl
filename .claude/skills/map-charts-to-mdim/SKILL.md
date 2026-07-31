@@ -283,9 +283,20 @@ the view the chart was going to redirect to. Get the
 derives the patch itself by diffing what you pass against the new parent, so pass
 the rendered full config, not the old patch.
 
-`ai/narrative-charts-grapher-issue.md` still stands for the *other* half of that
-issue — a narrative chart pinned to an MDIM view blocks that MDIM's next
-re-publish (unguarded FK), which replacement does not solve.
+**Replacement is manual, and that is a deliberate call.** owid/owid-grapher#6872
+asks for a repointing endpoint; it stays open but is **not being worked on**,
+because the per-migration volume is small enough that doing it by hand is cheaper
+than the API. Keep that judgement checkable rather than taking it on faith —
+production today (2026-07): 300 narrative charts, 299 parented to a chart, exactly
+1 to an MDIM view; a real migration touched far fewer (the Economic Inequality
+trial: 1 across 14 redirected charts). **Revisit the decision if a single migration
+would require replacing more than a handful**, and say so in the PR rather than
+grinding through them silently.
+
+That issue also still stands for its *other* half, which replacement does not
+solve: a narrative chart pinned to an MDIM view blocks that MDIM's next re-publish
+(unguarded FK). Drafts for both live in `ai/narrative-charts-slack-post.md` and
+`ai/narrative-charts-grapher-issue.md`.
 
 ### 5. Apply — the grapher CLI (GATED, production only)
 
