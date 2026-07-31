@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("wdi")
+    ds_garden = paths.load_dataset("gdp_historical")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("wdi", reset_index=False)
+    tb = ds_garden.read("gdp_historical", reset_index=False)
 
     #
     # Save outputs.
