@@ -152,7 +152,10 @@ catalog path is not silently skipped.
 `country=`/`time=` pins the downstream audits grade.
 
 Raw-URL targets are un-wrapped before matching: a link pasted through Google Docs can
-arrive as `google.com/url?q=<encoded>`, with the real URL and its parameters inside `q`.
+arrive as `google.com/url?q=<encoded>` (or `?url=<encoded>`), with the real URL and its
+parameters inside. Every raw-URL sweep keeps wrapper rows as SQL candidates and decides
+the path in Python, because the `url=` form percent-encodes its slashes and a
+`LIKE '%/grapher/<slug>%'` prefilter would drop it before it could be decoded.
 
 ## Who uses this, and what stays theirs
 
@@ -177,6 +180,12 @@ State these when reporting; silence reads as full coverage. `--markdown` now end
 a **Not searched** section carrying this list plus the limits of that particular run
 (no `--transitive` hop, excluded 'All charts' entries) — keep the two in step, and
 still state them yourself when you report on a `--json`/`--csv` run.
+
+Optional surfaces **fail open**: an absent legacy table or a subject that does not
+resolve prints `COVERAGE GAP: …`, is repeated at the end of the run, leads the
+report's **Not searched** section, and is available as JSON via `--gaps-json <path>`
+for a wrapper that builds its own report. An empty answer for one of those surfaces
+means UNKNOWN, not "nothing references it".
 
 - Non-ETL explorers whose config lives in the `explorers` TSV are not parsed.
 - **Legacy CSV-backed explorers** (`data://explorers/...` wide tables — e.g. the

@@ -115,8 +115,10 @@ charts that means one file per chart, in `payloads/`. The combined
 
 **Matching**: a chart matches a view when the y-variable-ID sets are equal AND
 x/size/color agree (absent == absent). Several matching views → tiebreak on chart
-type; still ambiguous → reported, never guessed. Indicator-set subset/superset →
-`near_miss`, reported only. Quality labels:
+type; still ambiguous → reported, never guessed. **Any** partial indicator overlap
+that is not an exact match → `near_miss`, reported only — not just subset/superset:
+a chart plotting `{A, B}` against a view plotting `{A, C}` shares `A`, so calling
+it `none` would assert an overlap check that came out the other way. Quality labels:
 
 - `exact` — one view matches (possibly via the `chart_type` tiebreak — check the
   `tiebreak` column).
@@ -145,7 +147,9 @@ matters:
   source is already a redirect source, the chart's own slug is itself an old
   slug, the target MDIM's `/grapher/<slug>` is a redirect source, a self-redirect,
   or one of the old slugs is already a redirect source elsewhere. These land in
-  `mapping.json → conflicts[]` and are kept out of the CSV.
+  `mapping.json → conflicts[]` and are kept out of the CSV — and, because being
+  absent from the CSV is not the same as being finished, they are also listed in
+  `HANDOFF.md` with their blocker, next to the already-redirected rows.
 
 Charts already redirected to the same target are counted as `already_done` — no
 redirect to create, but they are still published (the extractor only selects

@@ -46,6 +46,29 @@ from etl.config import OWID_ENV
 RENDER, EMBED, LINK = "render", "embed", "link"
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 GOOGLE_REDIRECT_RE = re.compile(r"^https?://(?:www\.)?google\.[a-z.]+/url\?", re.IGNORECASE)
+# Every raw-URL sweep adds this to its SQL prefilter. A wrapper can percent-encode the
+# nested URL's slashes, in which case a `LIKE '%/grapher/<slug>%'` prefilter drops the row
+# before `unwrap_redirect` ever sees it — so wrapper rows are always candidates and the
+# path is decided in Python. Cheap: production holds four such rows in total.
+WRAPPER_LIKE = "%google.%/url?%"
+
+# Frozen snapshots of the site. A link into one keeps rendering whatever it captured, so it
+# is never part of a blast radius — every raw-URL sweep has to drop it, or an archived copy
+# of a page is reported as a live reference somebody has to migrate.
+ARCHIVE_HOST = "archive.ourworldindata.org"
+
+# Surfaces this run could NOT sweep, and subjects that did not resolve. An empty result for
+# any of these means UNKNOWN, not "nothing references it", so they must survive past stdout:
+# they go into the `--markdown` report's "Not searched" section and, for a wrapper script,
+# into `--gaps-json` — otherwise a truncated sweep reads as a complete audit.
+COVERAGE_GAPS: list[str] = []
+
+
+def gap(message: str) -> None:
+    """Record a coverage gap and say so on stdout."""
+    COVERAGE_GAPS.append(message)
+    print(f"  COVERAGE GAP: {message}")
+
 
 COLUMNS = [
     "subject_type", "subject", "subject_label", "subject_id", "surface", "kind",
@@ -126,7 +149,7 @@ def resolve_chart_subjects(chart_ids: list[int], chart_slugs: list[str]) -> dict
     # result. Checked after the old-slug expansion, so passing an old slug isn't flagged.
     missing = [str(i) for i in chart_ids if i not in charts] + [s for s in chart_slugs if s not in by_slug]
     if missing:
-        print(f"  WARNING: {len(missing)} chart subject(s) did not resolve and were NOT swept: {sorted(missing)}")
+        gap(f"{len(missing)} chart subject(s) did not resolve and were NOT swept: {sorted(missing)}")
         print("           A blank result for these means UNKNOWN, not 'nothing references them'.")
     return by_slug
 
@@ -145,7 +168,7 @@ def resolve_variable_ids(variable_ids: list[int], dataset_id: int | None) -> lis
         resolved = {int(i) for i in found["id"]}
         missing = sorted(ids - resolved)
         if missing:
-            print(f"  WARNING: {len(missing)} requested indicator id(s) do not exist and were NOT swept: {missing}")
+            gap(f"{len(missing)} requested indicator id(s) do not exist and were NOT swept: {missing}")
             print("           A blank result for these means UNKNOWN, not 'nothing references them'.")
         if not resolved and dataset_id is None:
             raise SystemExit("None of the requested --variable-ids exist in the grapher DB — nothing to sweep.")
@@ -153,7 +176,7 @@ def resolve_variable_ids(variable_ids: list[int], dataset_id: int | None) -> lis
     if dataset_id is not None:
         df = OWID_ENV.read_sql("SELECT id FROM variables WHERE datasetId = %(d)s", params={"d": dataset_id})
         if df.empty:
-            print(f"  WARNING: dataset {dataset_id} has no indicators — check the dataset id.")
+            gap(f"dataset {dataset_id} has no indicators — check the dataset id; nothing was swept for it")
         ids |= {int(i) for i in df["id"]}
     return sorted(ids)
 
@@ -199,17 +222,26 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
 
 
 def unwrap_redirect(target: str) -> str:
-    """The real URL behind a `google.com/url?q=…` wrapper, which is what a raw link often is.
+    """The real URL behind a `google.com/url?…` wrapper, which is what a raw link often is.
 
     Google Docs rewrites some pasted links into that wrapper, and the reference's own
     parameters — the `country=`/`time=` pins the downstream audits grade — sit
-    percent-encoded inside `q`, behind the wrapper's own tracking query. Reading the
-    target as-is would both match the path in the wrong place and hand those audits
-    `sa=`/`usg=` instead of the pins.
+    percent-encoded inside the wrapper, behind its tracking query. Reading the target as-is
+    would both match the path in the wrong place and hand those audits `sa=`/`usg=` instead
+    of the pins.
+
+    Both parameter spellings are read: docs-style wrappers carry the URL in `q`, search-style
+    ones in `url` — and it is the `url` form that arrives fully percent-encoded, slashes
+    included, so it is the one a path-based filter would otherwise never see.
     """
     if not target or not GOOGLE_REDIRECT_RE.match(target):
         return target or ""
-    return parse_qs(urlsplit(target).query).get("q", [""])[0] or target
+    params = parse_qs(urlsplit(target).query)
+    for key in ("q", "url"):
+        inner = params.get(key, [""])[0]
+        if inner.startswith("http"):
+            return inner
+    return target
 
 
 def url_query(target: str, fallback: str = "") -> str:
@@ -228,18 +260,19 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
     """Raw URL links (linkType='url') pointing at a live grapher page."""
     slugs = tuple(by_slug)
     clauses = " OR ".join(f"pgl.target LIKE %(t{i})s" for i in range(len(slugs)))
-    params = {f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)}
+    params: dict[str, str] = {f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)}
+    params["wrap"] = WRAPPER_LIKE
     df = OWID_ENV.read_sql(
         "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
         f"FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
-        f"WHERE pgl.linkType = 'url' AND ({clauses})",
+        f"WHERE pgl.linkType = 'url' AND ({clauses} OR pgl.target LIKE %(wrap)s)",
         params=params,
     )
     out = []
     for r in df.to_dict("records"):
         target = unwrap_redirect(r["target"])
-        if "archive.ourworldindata.org" in target:
+        if ARCHIVE_HOST in target:
             continue  # archived snapshots are frozen by design
         slug = target.split("/grapher/", 1)[-1].split("?")[0].split("#")[0].rstrip("/")
         if slug not in by_slug:
@@ -425,7 +458,7 @@ def sweep_wordpress(by_slug: dict[str, dict]) -> list[dict]:
             params=params,
         )
     except Exception as e:  # noqa: BLE001 - optional legacy surface; report as a coverage gap
-        print(f"  (WordPress sweep skipped: {type(e).__name__})")
+        gap(f"WordPress sweep skipped ({type(e).__name__}) — legacy posts were NOT checked")
         return []
     out = []
     for r in df.to_dict("records"):
@@ -698,7 +731,7 @@ def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
             params={"ids": tuple(variable_ids)},
         )
     except Exception as e:  # noqa: BLE001 - table shape varies across environments
-        print(f"  (explorer_variables sweep skipped: {type(e).__name__})")
+        gap(f"explorer_variables sweep skipped ({type(e).__name__}) — explorers on these indicators were NOT checked")
         return []
     if used.empty:
         return []
@@ -820,15 +853,15 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
         "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
-        "WHERE pgl.linkType = 'url' AND pgl.target LIKE %(t)s",
-        params={"t": f"%/grapher/{slug}%"},
+        "WHERE pgl.linkType = 'url' AND (pgl.target LIKE %(t)s OR pgl.target LIKE %(wrap)s)",
+        params={"t": f"%/grapher/{slug}%", "wrap": WRAPPER_LIKE},
     )
     exact = re.compile(rf"/grapher/{re.escape(slug)}(?:[?#/]|$)")
     for r in raw.to_dict("records"):
         target = unwrap_redirect(r["target"])
         if not exact.search(target):
             continue
-        if "archive.ourworldindata.org" in target:
+        if ARCHIVE_HOST in target:
             continue  # archived snapshots are frozen by design
         component = r["componentType"] or ""
         out.append(
@@ -929,15 +962,15 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
         "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.componentType, pgl.text "
         "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
-        "WHERE pgl.linkType = 'url' AND pgl.target LIKE %(t)s",
-        params={"t": f"%/explorers/{explorer}%"},
+        "WHERE pgl.linkType = 'url' AND (pgl.target LIKE %(t)s OR pgl.target LIKE %(wrap)s)",
+        params={"t": f"%/explorers/{explorer}%", "wrap": WRAPPER_LIKE},
     )
     exact = re.compile(rf"/explorers/{re.escape(explorer)}(?:[?#/]|$)")
     for r in raw.to_dict("records"):
         target = unwrap_redirect(r["target"])
         if not exact.search(target):
             continue
-        if "archive.ourworldindata.org" in target:
+        if ARCHIVE_HOST in target:
             continue  # archived snapshots are frozen by design
         component = r["componentType"] or ""
         out.append(
@@ -1234,6 +1267,11 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
         "table is not by itself a clean result.",
         "",
     ]
+    # A surface that failed open — an absent legacy table, a subject that did not resolve —
+    # is the sharpest caveat there is, because it is the one the reader has no other way of
+    # knowing about. It leads.
+    for note in COVERAGE_GAPS:
+        lines.append(f"- **NOT SWEPT in this run:** {note}")
     for note in caveats or []:
         lines.append(f"- **This run:** {note}")
     lines += [f"- {note}" for note in NOT_SEARCHED]
@@ -1257,6 +1295,8 @@ def main() -> int:
     ap.add_argument("--csv", dest="csv_out", help="write findings as CSV to this path")
     ap.add_argument("--markdown", dest="md_out",
                     help="write a human-readable report (Google Doc links + scroll-to-reference links)")  # fmt: skip
+    ap.add_argument("--gaps-json", dest="gaps_out",
+                    help="write the surfaces this run could not sweep as JSON to this path")  # fmt: skip
     ap.add_argument("--host", default=None, help="site for links (default: the DB environment's site)")
     args = ap.parse_args()
 
@@ -1375,8 +1415,17 @@ def main() -> int:
             caveats,
         )
         print(f"-> {args.md_out}")
+    if args.gaps_out:
+        Path(args.gaps_out).write_text(json.dumps(COVERAGE_GAPS, indent=2) + "\n")
+        print(f"-> {args.gaps_out}")
     if not any([args.json_out, args.csv_out, args.md_out]):
         print("\n(pass --json / --csv / --markdown to save the findings)")
+    # Last thing on stdout, after the counts: a sweep that skipped a surface must not read
+    # as a complete answer just because the summary above it looks tidy.
+    if COVERAGE_GAPS:
+        print(f"\n{len(COVERAGE_GAPS)} coverage gap(s) — this sweep is NOT complete:")
+        for g in COVERAGE_GAPS:
+            print(f"  - {g}")
     return 0
 
 

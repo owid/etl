@@ -408,19 +408,39 @@ def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, st
             else:
                 c["quality"], c["candidates"] = "ambiguous", candidates
         else:
-            near = [v for v in views if all(v[s] == c[s] for s in EXTRA_SLOTS) and (c["y"] < v["y"] or v["y"] < c["y"])]
+            # Any view sharing an indicator, not just one whose y set strictly contains or is
+            # contained by the chart's. A chart plotting {A, B} against a view plotting {A, C}
+            # is neither, yet A is shared — classifying that as "none" would have the
+            # suggestions report assert that no view carries any of the chart's indicators,
+            # which is exactly what it is not. That broader reading is what the CSV legend
+            # has always documented ("indicator sets overlap but differ").
+            near = [
+                v for v in views if all(v[s] == c[s] for s in EXTRA_SLOTS) and (v["y"] & c["y"]) and v["y"] != c["y"]
+            ]
             near.sort(key=lambda v: (-len(v["y"] & c["y"]), len(v["y"] ^ c["y"])))
             if near:
                 c["quality"], c["near_misses"] = "near_miss", near[:3]
 
 
 def describe_near_miss(c: dict, id_to_path: dict[int, str]) -> str:
+    """Both sides of the gap, per candidate view.
+
+    A near miss is any partial overlap, so the two sets can each hold indicators the other
+    lacks. Reporting only one side — or labelling the view's surplus as the chart's — states
+    the gap backwards, which is worse than not stating it.
+    """
+
+    def ids(values) -> str:
+        return ", ".join(f"{i} ({path_tail(id_to_path.get(i))})" for i in sorted(values))
+
     parts = []
     for v in c["near_misses"]:
-        extra = sorted(v["y"] - c["y"]) or sorted(c["y"] - v["y"])
-        side = "view extra" if v["y"] > c["y"] else "chart extra"
-        ids = ", ".join(f"{i} ({path_tail(id_to_path.get(i))})" for i in extra)
-        parts.append(f"{v['mdim_slug']}:{v['view_id']} [{side}: {ids}]")
+        sides = []
+        if v["y"] - c["y"]:
+            sides.append(f"view extra: {ids(v['y'] - c['y'])}")
+        if c["y"] - v["y"]:
+            sides.append(f"chart extra: {ids(c['y'] - v['y'])}")
+        parts.append(f"{v['mdim_slug']}:{v['view_id']} [{'; '.join(sides)}]")
     return " | ".join(parts)
 
 
@@ -863,10 +883,11 @@ def write_mdim_suggestions(out: Path, charts: list[dict], id_to_path: dict[int, 
 
     if near:
         lines += [
-            f"## Close — one indicator apart ({len(near)})",
+            f"## Close — indicator sets overlap but differ ({len(near)})",
             "",
-            "The closest view differs from the chart by the indicators listed. Adding a view",
-            "with the chart's exact indicator set is what makes the redirect possible.",
+            "The closest view shares at least one indicator with the chart and differs by the",
+            "ones listed — in either direction, or both at once. Adding a view with the chart's",
+            "exact indicator set is what makes the redirect possible.",
             "",
         ]
         for c in near:
@@ -927,6 +948,13 @@ def write_handoff(out: Path, charts: list[dict], selection: dict, cli_csv: Path)
     # never fires. Running the CLI does not resolve them; someone has to. Omitting them
     # would let the operator finish the run believing the migration was complete.
     done = [c for c in charts if c["already_done"]]
+    # Matched, but blocked by a redirect that already points somewhere else. `proposed_charts`
+    # drops them and they are not `already_done`, so without this they appear nowhere in the
+    # handoff — and an operator who runs the CSV to completion would believe the migration was
+    # done while these charts stay published with no redirect to the MDIM. Same reason the
+    # already-redirected rows are listed: the CLI not touching a chart is not the chart
+    # being finished.
+    blocked = [c for c in charts if c["target"] is not None and c["conflict"] and not c["already_done"]]
     lines = [
         "# Chart → MDIM redirects: handoff",
         "",
@@ -940,6 +968,16 @@ def write_handoff(out: Path, charts: list[dict], selection: dict, cli_csv: Path)
                 "",
             ]  # fmt: skip
             if done
+            else []
+        ),
+        *(
+            [
+                f"{len(blocked)} chart(s) matched a view but are **blocked** and are not in the CSV "
+                "either — running the CLI leaves them published and unredirected. See the end of "
+                "this note.",
+                "",
+            ]  # fmt: skip
+            if blocked
             else []
         ),
         "## Run it",
@@ -1006,6 +1044,26 @@ def write_handoff(out: Path, charts: list[dict], selection: dict, cli_csv: Path)
                 "entries for exactly this reason.",
                 "",
             ]
+    if blocked:
+        lines += [
+            f"## Blocked — matched but not in the CSV ({len(blocked)})",
+            "",
+            "Each of these found a target view, but something already in the DB stops the row",
+            "from being created. The CLI will not migrate them and running it does not resolve",
+            "them: the chart stays published, with no redirect to the MDIM. Someone has to",
+            "decide per row — resolve the blocker, or accept that the chart is not migrating.",
+            "",
+        ]
+        for c in blocked:
+            t = c["target"]
+            lines.append(f"- `{c['chart_slug']}` (chart {c['chart_id']}) → `{t['mdim_slug']}` view `{t['view_id']}`")
+            lines.append(f"    - blocked by: {c['conflict']}")
+        lines += [
+            "",
+            "`unmatched.md` in this folder has the same rows alongside every other chart",
+            "that did not produce a redirect.",
+            "",
+        ]
     lines += [
         "## After the run",
         "",
