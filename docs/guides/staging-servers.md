@@ -8,6 +8,19 @@ tags:
 
 Dedicated staging servers are automatically created from every ETL pull request. That gives data manager the ability to share and test their changes before they are merged into the live site.
 
+## Using a specific owid-grapher branch
+
+By default, a staging server runs the `master` branch of owid-grapher.
+
+Sometimes your etl branch needs grapher changes that are not in master yet — for example, a new admin API endpoint that your etl code calls. To make the staging server deploy those changes, open a pull request in owid-grapher whose branch has the **same name** as your etl branch.
+
+Two details matter:
+
+- The pairing requires an open owid-grapher **pull request**. Pushing a branch to owid-grapher without opening a pull request does nothing: the staging server stays on master.
+- If you have no grapher changes of your own and only need an existing grapher branch deployed (a common case for stacked pull requests), base the owid-grapher pull request on that branch, add an empty commit, and open it as a draft. Close it when your etl pull request is merged or closed.
+
+If possible, open the owid-grapher pull request before creating the etl pull request, so the staging server picks the right grapher branch from the start.
+
 !!! note "PR staging servers URLs"
 
     You can visit your PR staging server at `http://staging-site-<branch>` or `https://<branch>.owid.pages.dev/`. Note that `<branch>` might differ from the exact branch name, for example `feature/123` will be `feature-123` (all symbols are changed to dashes, and the maximum length is of 50 characters).
