@@ -22,5 +22,5 @@ tables:
         unit: cases
         display:
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: "1995-01-02"

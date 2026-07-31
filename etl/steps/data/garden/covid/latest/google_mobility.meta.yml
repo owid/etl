@@ -6,7 +6,7 @@ definitions:
         - COVID-19
     display:
       numDecimalPlaces: 2
-      yearIsDay: true
+      timeInterval: day
       zeroDay: "2020-01-01"
     processing_level: minor
     description_processing: This indicator has been smoothed by averaging its values with a centered 7-day rolling window.

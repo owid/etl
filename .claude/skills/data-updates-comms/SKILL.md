@@ -153,6 +153,8 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    - Skip population-weighted variants and country-specific cuts.
    - If two charts tie on views but one has many y-vars changed (e.g. `probability-of-dying-by-age` with 18/18), that's a slightly stronger signal than "1 of 1 changed".
 
+   **A checksum change is not "gained the new year."** A base-year rebase or in-place revision marks *every* chart data-changed, including charts whose series still end at the previous year (recipient/sector tables that only update in the producer's detailed release, series absent from a preliminary file). For releases that add a partial year, additionally verify each picked view's indicators actually reach the new year (`metadata.json` → `dimensions.years`), and prefer the chart carrying the **release's headline measure** — the one where the announcement's own numbers are visible on open — even when its traffic is low (the announcement is how it gets discovered).
+
    Reuse `charts.selected_views` from `update-context.yml` only if it's already been built using this views-then-checksum process (older runs picked views by intuition and produced misleading recommendations like "life expectancy now updated" when the data was effectively unchanged, or "malaria deaths" when the chart gets ~3 views a day).
 
    Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale that names the change>**. Hyperlink each title to the admin **editor** URL, not the bare admin path:
@@ -219,6 +221,10 @@ The verbatim Slack prompt headings (do **not** rephrase, abbreviate, or change p
 | 10  | `Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)` |
 
 The table above is the single source of truth — if the Slack form's wording changes, update it here and nowhere else.
+
+### Basis discipline for every number (check before drafting #6–#8 and the chart views)
+
+Producers headline figures on *their* basis — often current prices where our charts are constant, or a measure our headline chart doesn't carry. Verify every number and ranking in the snippets against **our own charts**: a producer claim our charts contradict ("X overtook Y", a total a few percent off ours) must be explicitly attributed to the producer, made basis-robust (rounded so both bases agree), or dropped in favor of chart-native numbers. Rankings especially: enumerate the measure × price-basis combinations first — a "first time in history" headline may hold on exactly one of them. Put the reconciliation (which basis says what, what social copy may safely echo) in the *caveats* field for Charlie; keep reader-facing framing chart-native.
 
 ### Editorial framing (internal — do **not** copy into the output file)
 
@@ -322,4 +328,4 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 ## Related
 
 - `.claude/skills/update-dataset/SKILL.md` step 9 — the orchestrator entry point that should call this skill.
-- `.claude/skills/faust-metadata-audit/SKILL.md` — reuses the same grapher-channel metadata patterns for chart-view selection.
+- `.claude/skills/edit-faust-metadata/SKILL.md` — reuses the same grapher-channel metadata patterns for chart-view selection.

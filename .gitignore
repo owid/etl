@@ -31,7 +31,7 @@ playground.ipynb
 docs/_build
 docs/.vscode
 
-ai/
+ai
 *.xlsx
 *.zip
 *.dta
@@ -61,7 +61,7 @@ vscode_extensions/*/out/
 .claude/scheduled_tasks.lock
 CLAUDE.local.md
 
-workbench/
+workbench
 
 
 docs/architecture/metadata/reference/collections.md

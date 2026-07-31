@@ -1,10 +1,7 @@
 steps:
-  # Poverty and inequality dataset for comparison explorers (check steps for updating tables)
-  data://explorers/poverty_inequality/latest/poverty_inequality:
-    - data://explorers/wb/latest/world_bank_pip:
-      - data://garden/wb/2026-06-26/world_bank_pip_legacy
-    - data://explorers/wid/latest/world_inequality_database:
-      - data://garden/wid/2026-06-18/world_inequality_database_legacy
+  # World Bank PIP explorer tables (used by the poverty-wb and poverty-explorer explorers)
+  data://explorers/wb/latest/world_bank_pip:
+    - data://garden/wb/2026-06-26/world_bank_pip_legacy
 
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2026-06-26/world_bank_pip:
@@ -60,10 +57,6 @@ steps:
   export://multidim/wid/latest/wealth_wid:
     - data://grapher/wid/2026-06-18/world_inequality_database
 
-    # Legacy WID pipeline
-  data://garden/wid/2026-06-18/world_inequality_database_legacy:
-    - data://meadow/wid/2026-06-18/world_inequality_database
-
   #
   # Luxembourg Income Study
   #
@@ -74,6 +67,7 @@ steps:
         - snapshot://lis/2026-06-12/lis_inequality.csv
         - snapshot://lis/2026-06-12/lis_incomes.csv
         - snapshot://lis/2026-06-12/lis_relative_poverty.csv
+        - snapshot://lis/2026-06-12/lis_percentiles.csv
   export://explorers/lis/latest/poverty_lis:
     - data://grapher/lis/2026-06-12/luxembourg_income_study
   export://explorers/lis/latest/inequality_lis:
@@ -180,7 +174,7 @@ steps:
 
   # International dollars conversions (from PIP and WDI)
   data://external/owid_grapher/latest/int_dollar_conversions:
-    - data://garden/worldbank_wdi/2026-02-27/wdi
+    - data://garden/worldbank_wdi/2026-07-27/wdi
     - data://garden/wb/2026-06-26/world_bank_pip
     - data://garden/regions/2023-01-01/regions
     - data://garden/worldbank_icp/2024-05-30/icp_2021_currencies:

@@ -478,7 +478,7 @@ def parse_coal_prices(data: pr.ExcelFile) -> Table:
     return tb
 
 
-def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, license: License) -> Table:
+def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin) -> Table:
     sheet_name = "Approximate conversion factors"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
     tb = data.parse(sheet_name, skiprows=1, na_values=["-"])
@@ -532,11 +532,14 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, lice
     efficiency = efficiency.format(keys=["year"], short_name="statistical_review_of_world_energy_efficiency_factors")
 
     # Prepare table and variable metadata.
+    # NOTE: No `licenses` here — the origin already carries the producer's license, and passing the
+    # snapshot's deprecated top-level `meta.license` (which is None, since the license lives under
+    # `origin.license`) used to put a bare None in the list. That only surfaced much later, in the
+    # grapher upsert: `Variable.from_variable_metadata` calls `.to_dict()` on each license.
     efficiency["efficiency_factor"].metadata = VariableMeta(
         title="Thermal equivalent efficiency factors",
         description="Thermal equivalent efficiency factors used to convert non-fossil electricity to primary energy.",
         origins=[origin],
-        licenses=[license],
     )
 
     return efficiency
@@ -716,7 +719,7 @@ def run() -> None:
 
     # Parse thermal equivalent efficiency factors.
     tb_efficiency_factors = parse_thermal_equivalent_efficiency(
-        data=data_spreadsheet, origin=snap_spreadsheet.metadata.origin, license=snap_spreadsheet.metadata.license
+        data=data_spreadsheet, origin=snap_spreadsheet.metadata.origin
     )
 
     # Parse minerals production and reserves.

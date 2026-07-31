@@ -24,20 +24,44 @@ def test_calculate_checksum_data():
     assert db.calculate_checksum_data(df.iloc[::-1]) == "3523058000783533578"
 
 
+def _get_dataset_metadata():
+    return {"datasetName": "Dataset", "datasetVersion": "2024-12-31", "updatePeriodDays": 365}
+
+
 def test_calculate_checksum_metadata():
     meta = _get_metadata()
     df = _get_data()
+    ds_meta = _get_dataset_metadata()
 
     # Checksum should be deterministic
-    checksum = db.calculate_checksum_metadata(meta, df)
-    assert checksum == db.calculate_checksum_metadata(meta, df)
+    checksum = db.calculate_checksum_metadata(meta, df, ds_meta)
+    assert checksum == db.calculate_checksum_metadata(meta, df, ds_meta)
 
     # Different metadata should produce different checksums
     meta2 = VariableMeta(
         origins=[Origin(title="Different", producer="Producer")],
         presentation=VariablePresentationMeta(title_public="Title public"),
     )
-    assert checksum != db.calculate_checksum_metadata(meta2, df)
+    assert checksum != db.calculate_checksum_metadata(meta2, df, ds_meta)
+
+
+def test_calculate_checksum_metadata_depends_on_dataset_fields():
+    """Dataset-level fields are embedded in the indicator JSON, so they must flip the checksum.
+
+    Regression: they used to be invisible to the checksum, so clearing e.g. `update_period_days`
+    updated MySQL but never re-uploaded the JSON files in R2, which stayed stale indefinitely.
+    """
+    meta = _get_metadata()
+    df = _get_data()
+    checksum = db.calculate_checksum_metadata(meta, df, _get_dataset_metadata())
+
+    # Clearing update_period_days drops it from the JSON (and from the hashed dict).
+    cleared = {k: v for k, v in _get_dataset_metadata().items() if k != "updatePeriodDays"}
+    assert checksum != db.calculate_checksum_metadata(meta, df, cleared)
+
+    # Same for the other fields the JSON embeds.
+    for field, value in [("datasetName", "Renamed"), ("datasetVersion", "2025-01-01"), ("nonRedistributable", True)]:
+        assert checksum != db.calculate_checksum_metadata(meta, df, {**_get_dataset_metadata(), field: value})
 
 
 def test_calculate_checksum_metadata_invariant_to_empty_field_shapes():
@@ -53,11 +77,30 @@ def test_calculate_checksum_metadata_invariant_to_empty_field_shapes():
 
     meta_with_empties = VariableMeta(
         origins=[Origin(title="T", producer="P")],
-        description_key=[],
         licenses=[],
         sort=[],
     )
     meta_without_empties = VariableMeta(origins=[Origin(title="T", producer="P")])
-    assert db.calculate_checksum_metadata(meta_with_empties, df) == db.calculate_checksum_metadata(
-        meta_without_empties, df
+    ds_meta = _get_dataset_metadata()
+    assert db.calculate_checksum_metadata(meta_with_empties, df, ds_meta) == db.calculate_checksum_metadata(
+        meta_without_empties, df, ds_meta
     )
+
+
+def test_get_timespan_yearly():
+    df = pd.DataFrame({"year": [1961, 1980, 2009]})
+    assert db._get_timespan(df, VariableMeta()) == "1961-2009"
+
+
+def test_get_timespan_decade():
+    meta = VariableMeta(display={"timeInterval": "decade"})
+    # Decades coded by their first year: end snaps up to the decade's last year.
+    assert db._get_timespan(pd.DataFrame({"year": [1820, 1830, 2010]}), meta) == "1820-2019"
+    # Off-boundary representative years (e.g. mid-decade) snap to decade boundaries too.
+    assert db._get_timespan(pd.DataFrame({"year": [1825, 1835, 2015]}), meta) == "1820-2019"
+
+
+def test_get_timespan_subyearly_is_empty():
+    df = pd.DataFrame({"year": [0, 28, 59]})
+    for interval in ("day", "week", "month", "quarter"):
+        assert db._get_timespan(df, VariableMeta(display={"timeInterval": interval})) == ""

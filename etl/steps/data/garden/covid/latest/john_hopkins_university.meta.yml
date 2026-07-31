@@ -2,7 +2,7 @@ definitions:
   common:
     display:
       includeInTable: true
-      yearIsDay: true
+      timeInterval: day
       zeroDay: '2020-01-21'
     presentation:
       topic_tags:

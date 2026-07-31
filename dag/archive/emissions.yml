@@ -656,3 +656,8 @@ steps:
     - data://garden/climate_watch/2023-10-31/emissions_by_sector
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2023-03-31/population
+  # archived; last active in 402cbf2fbcec on 2026-07-14
+  data://grapher/emissions/2023-10-10/net_zero_tracker:
+    - data://garden/emissions/2023-10-10/net_zero_tracker:
+      - data://meadow/emissions/2023-10-10/net_zero_tracker:
+        - snapshot://emissions/2023-10-10/net_zero_tracker.xlsx

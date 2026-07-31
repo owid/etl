@@ -15,7 +15,7 @@ from typing import Any, cast
 
 import requests
 import sh
-from git import Repo
+from git import GitCommandError, Repo
 from structlog import get_logger
 
 from etl.config import TLS_VERIFY
@@ -86,9 +86,11 @@ class GithubRepo:
 
     def _git(self, *args: str, **kwargs: Any) -> str:
         "Execute a git command in the context of this repo."
+        # NOTE: since sh 2.0, commands return the decoded stdout as a str (pass
+        # _return_cmd=True to get the old RunningCommand object back).
         return cast(
             str,
-            sh.git("--no-pager", *args, _cwd=self.cache_dir.as_posix(), **kwargs).stdout.decode("utf8").strip(),  # ty: ignore[call-non-callable]
+            sh.git("--no-pager", *args, _cwd=self.cache_dir.as_posix(), **kwargs).strip(),  # ty: ignore[call-non-callable]
         )
 
     def is_up_to_date(self) -> bool:
@@ -150,6 +152,20 @@ def log_time(func):
 
 
 # @log_time
+def get_file_at_merge_base(file_path: str, base_branch: str = "master", repo_path: Path | str = BASE_DIR) -> str | None:
+    """Content of ``file_path`` at the merge base of ``origin/<base_branch>`` and HEAD.
+
+    Returns None when the file does not exist at the merge base, or when the merge base cannot
+    be resolved at all (e.g. no ``origin`` remote) — callers treat both as "no previous version".
+    """
+    repo = Repo(repo_path)
+    try:
+        merge_base = repo.git.merge_base(f"origin/{base_branch}", "HEAD").strip()
+        return repo.git.show(f"{merge_base}:{file_path}")
+    except GitCommandError:
+        return None
+
+
 def get_changed_files(
     current_branch: str | None = None,
     base_branch: str | None = None,

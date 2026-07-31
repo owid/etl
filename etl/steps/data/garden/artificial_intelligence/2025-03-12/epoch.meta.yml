@@ -27,7 +27,7 @@ tables:
           In cases where multiple domains were associated with a model, we consolidated these entries under the label "Multiple domains". We also identified domains associated with fewer than 20 notable systems and grouped these under the category 'Other'.
         display:
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       organization_categorization:
         title: Researcher affiliation
@@ -49,7 +49,7 @@ tables:
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       training_dataset_size__total:
         title: Training dataset size
@@ -63,7 +63,7 @@ tables:
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       training_computation_petaflop:
         title: Training computation (petaFLOP)
@@ -77,7 +77,7 @@ tables:
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
         presentation:
           grapher_config:
             title: Training computation
