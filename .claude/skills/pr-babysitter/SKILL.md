@@ -58,7 +58,7 @@ Loop (max <3> iterations, then stop and report):
      query($endCursor: String) {
        repository(owner: "<owner>", name: "<repo>") {
          pullRequest(number: <n>) {
-           reviews(last: 20) { totalCount nodes { author { login } submittedAt state } }
+           reviews(last: 20) { totalCount nodes { databaseId author { login } submittedAt state } }
            reviewThreads(first: 100, after: $endCursor) {
              pageInfo { hasNextPage endCursor }
              nodes { id isResolved comments(first: 1) { nodes { databaseId author { login } createdAt body } } }
@@ -68,8 +68,9 @@ Loop (max <3> iterations, then stop and report):
      }'
    ```
 
-   The bare thread query in step 6 is for *resolving* threads and carries neither author
-   nor timestamp — polling with it cannot tell a new Codex response from a historical
+   `databaseId` on each review is what the final sweep reports as its coverage boundary,
+   so don't drop it. The bare thread query in step 6 is for *resolving* threads and carries
+   neither author nor timestamp — polling with it cannot tell a new Codex response from a historical
    thread. `issues/<n>/comments` (the clean-pass verdict) and the trigger's reactions stay
    on REST; page the former with `--paginate`.
 
@@ -102,7 +103,14 @@ Loop (max <3> iterations, then stop and report):
    `--paginate` needs both the `$endCursor` variable and the `pageInfo` block — without them it silently returns one page, which is the failure this whole rule exists to prevent.
    then `gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "<id>"}) { thread { isResolved } } }'`.
    Leave threads you did not address open for the human.
-7. **Re-trigger** a fresh bare `@codex review` comment ONLY if you pushed a substantial code fix (metadata-only tweaks don't count). Post it the same way as setup step 1 (`gh api ... --method POST -f body="@codex review" --jq '.created_at'`) so the new polling threshold comes straight from the creation response. Then loop back to 1.
+7. **Re-trigger** a fresh bare `@codex review` comment ONLY if you pushed a substantial code fix (metadata-only tweaks don't count). Post it exactly as setup step 1 does, keeping **both** fields:
+
+   ```bash
+   gh api repos/<owner>/<repo>/issues/<n>/comments --method POST \
+     -f body="@codex review" --jq '{id, created_at}'
+   ```
+
+   Replace **both** stored values — the threshold *and* the trigger comment id. Keeping the old id means step 2 reads reactions from the previous trigger, where an existing `+1` declares the new round clean before Codex has answered it. Then loop back to 1.
 8. NEVER merge. Never force-push. Never edit `dag/archive/*`.
 
 Final report: status of every CI check; each finding with verdict (fixed+commit / rebutted+why); threads resolved; commits pushed; anything left for the human.
