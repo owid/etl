@@ -126,6 +126,29 @@ def stale_charts(entries: list[dict]) -> dict[str, str]:
     return stale
 
 
+def unpublished_sources(entries: list[dict]) -> set[str]:
+    """Sources whose chart is no longer published.
+
+    For an `already_done` row that is the finished state: the redirect exists and the
+    chart no longer shadows it, so nothing is left to do. Without this check preflight
+    keeps reporting the row `MANUAL` after the operator has done exactly what the
+    `MANUAL` note asked for, and a mixed batch can never reach `Ready`.
+
+    `charts.publishedAt` records the first publish and stays set after an unpublish, so
+    the live state is `isPublished` in the config.
+    """
+    ids = tuple(e["chart"]["id"] for e in entries)
+    if not ids:
+        return set()
+    df = OWID_ENV.read_sql(
+        "SELECT c.id FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
+        "WHERE c.id IN %(ids)s AND COALESCE(cc.full->>'$.isPublished', 'false') <> 'true'",
+        params={"ids": ids},
+    )
+    down = {int(i) for i in df["id"]}
+    return {e["source"] for e in entries if e["chart"]["id"] in down}
+
+
 def stale_targets(entries: list[dict]) -> dict[str, str]:
     """Targets whose MDIM or reviewed view changed since the proposal was written.
 
@@ -518,6 +541,7 @@ def main() -> int:
             rows.append((source, t["url"], "OK", "CLI required" if r.get("oldSlugs") else ""))
 
     # Re-verify the proposal-time redirects still exist and still point at the proposed target.
+    unpublished = unpublished_sources(already_done)
     for r in already_done:
         source, t = r["source"], r["target"]
         if source in stale:
@@ -527,7 +551,10 @@ def main() -> int:
         if prior is not None and int(prior["multiDimId"]) == t["multiDimId"] and prior["viewConfigId"] == t["viewConfigId"]:  # fmt: skip
             # The CLI cannot finish these: their source is already a multi_dim_redirects
             # source, which its own validation rejects, so the row would abort the run.
-            if r.get("oldSlugs"):
+            if source in unpublished:
+                rows.append((source, t["url"], "DONE", "redirect in place and the chart is already unpublished — "
+                                                       "nothing left to do for this row"))  # fmt: skip
+            elif r.get("oldSlugs"):
                 rows.append((source, t["url"], "MANUAL", f"redirect in place, chart still published — but it carries "
                                                          f"old slug(s) {r['oldSlugs']} that a hand-unpublish would turn "
                                                          f"into hard 404s; ask the Grapher team to migrate them"))  # fmt: skip
@@ -557,12 +584,18 @@ def main() -> int:
     # `already_done` rows are unpublished by hand, which breaks their embeds just as the
     # CLI's unpublish step would — they belong behind the same gate.
     embeds = {} if args.no_references else embed_references(redirects + already_done)
+    # ...but once a chart is unpublished the gate has nothing left to protect: those
+    # references are already broken. Keep reporting them — they still need migrating —
+    # without holding the batch back from `Ready` for a step nobody can now undo.
+    done_ids = {r["chart"]["id"] for r in already_done if r["source"] in unpublished}
+    blocking_embeds = {cid: n for cid, n in embeds.items() if cid not in done_ids}
     if embeds:
         print("\nSurfaces a redirect will NOT fix (these embed the chart and break when it is unpublished):")
         for r in redirects + already_done:
             note = embeds.get(r["chart"]["id"])
             if note:
-                print(f"  {r['chart']['slug']}: {note}")
+                done = "  (chart already unpublished — these are broken now)" if r["chart"]["id"] in done_ids else ""
+                print(f"  {r['chart']['slug']}: {note}{done}")
         print("  Run audit_references.py for the full list with replacement URLs.")
 
     narratives = {} if args.no_references else narrative_chart_links(redirects + already_done)
@@ -574,19 +607,22 @@ def main() -> int:
             if n:
                 print(f"  {r['chart']['slug']}: {n} narrative chart(s)")
 
-    bad = [r for r in rows if r[2] not in ("OK", "MANUAL")]
+    bad = [r for r in rows if r[2] not in ("OK", "MANUAL", "DONE")]
     manual = [r for r in rows if r[2] == "MANUAL"]
+    done = [r for r in rows if r[2] == "DONE"]
     if bad or csv_problems:
         print(f"\nNOT ready: {len(bad)} row(s) and {len(csv_problems)} CSV problem(s) would abort the CLI.")
         print("It runs a single transaction — any one of these aborts the entire migration.")
-    if embeds:
-        print(f"\nNOT ready: {len(embeds)} source chart(s) are still embedded elsewhere. These do NOT abort the CLI —"
-              "\nthey break silently the moment the chart is unpublished, by the CLI or by hand (MANUAL rows)."
+    if blocking_embeds:
+        print(f"\nNOT ready: {len(blocking_embeds)} source chart(s) are still embedded elsewhere. These do NOT abort "
+              "the CLI —\nthey break silently the moment the chart is unpublished, by the CLI or by hand (MANUAL rows)."
               "\nMigrate them first (audit_references.py lists each reference with its replacement URL);"
               "\n--no-references skips this gate once they are handled.")  # fmt: skip
     if manual:
         print(f"\n{len(manual)} row(s) need a step outside the CLI — see MANUAL above.")
-    if bad or csv_problems or embeds or manual:
+    if done:
+        print(f"{len(done)} row(s) are already finished (redirect in place, chart unpublished) — see DONE above.")
+    if bad or csv_problems or blocking_embeds or manual:
         return 1
 
     print(f"\nReady: {len(rows)} row(s) validate against the live DB. Rehearse, then apply, from owid-grapher:")

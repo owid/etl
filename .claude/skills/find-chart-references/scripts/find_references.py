@@ -36,6 +36,7 @@ Usage:
 
 import argparse
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -584,6 +585,39 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
             )  # fmt: skip
         )
 
+    # An article can paste the MDIM's URL instead of linking it as a grapher item, which
+    # lands in the same table as `linkType='url'`. The chart sweep already covers that row
+    # shape; without the counterpart here a direct --mdim report can miss reader-facing
+    # references entirely. The SQL prefilter is loose, so the path segment is re-checked in
+    # Python — otherwise a longer slug that merely starts with this one matches too.
+    raw = OWID_ENV.read_sql(
+        "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
+        "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
+        "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
+        "WHERE pgl.linkType = 'url' AND pgl.target LIKE %(t)s",
+        params={"t": f"%/grapher/{slug}%"},
+    )
+    exact = re.compile(rf"/grapher/{re.escape(slug)}(?:[?#/]|$)")
+    for r in raw.to_dict("records"):
+        if not exact.search(r["target"] or ""):
+            continue
+        component = r["componentType"] or ""
+        out.append(
+            rec(
+                "mdim",
+                slug,
+                mdim_id,
+                "gdoc",
+                LINK if component.startswith("span-") else EMBED,
+                r["post_slug"],
+                f"/{r['post_slug']}",
+                f"raw URL, {component or 'unknown'} ({r['post_type']})",
+                r["queryString"],
+                r["text"],
+                r["published"],
+            )  # fmt: skip
+        )
+
     nc = OWID_ENV.read_sql(
         "SELECT nc.id, nc.name, mx.viewId FROM narrative_charts nc "
         "JOIN multi_dim_x_chart_configs mx ON mx.id = nc.parentMultiDimXChartConfigId "
@@ -613,6 +647,13 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
 
 
 def sweep_explorer_subject(explorer: str) -> list[dict]:
+    # An unknown slug matches nothing in every query below, so the run would end with
+    # `references: 0` — the same output as an explorer nothing points at. Resolve it first,
+    # as the chart, indicator and MDIM subjects do.
+    if OWID_ENV.read_sql("SELECT slug FROM explorers WHERE slug = %(s)s", params={"s": explorer}).empty:
+        print(f"  (explorer not found: {explorer})")
+        return []
+
     df = OWID_ENV.read_sql(
         "SELECT pg.slug AS post_slug, pg.type AS post_type, pg.published, "
         "       pgl.target, pgl.queryString, pgl.componentType, pgl.text "
