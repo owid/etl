@@ -284,7 +284,8 @@ derives the patch itself by diffing what you pass against the new parent, so pas
 the rendered full config, not the old patch.
 
 **Replacement is manual, and that is a deliberate call.** owid/owid-grapher#6872
-asks for a repointing endpoint; it stays open but is **not being worked on**,
+asked for a repointing endpoint; it was **closed as not-planned** in favour of
+manual replacement,
 because the number of narrative charts that can ever be in this situation is tiny.
 The population is not "all narrative charts" — it is narrative charts whose **parent
 chart is itself a redirect candidate**, i.e. has an exact MDIM-view match. Measured
@@ -301,10 +302,18 @@ indicator slots → compare against every published view's slot signature. **Rev
 the decision if a single migration would require replacing more than a handful**,
 and say so in the PR rather than grinding through them silently.
 
-That issue also still stands for its *other* half, which replacement does not
-solve: a narrative chart pinned to an MDIM view blocks that MDIM's next re-publish
-(unguarded FK). Drafts for both live in `ai/narrative-charts-slack-post.md` and
-`ai/narrative-charts-grapher-issue.md`.
+**One problem from that issue is now untracked.** #6872 covered two things, and
+closing it closed both. Manual replacement solves the repointing half; it does
+nothing for the other — a narrative chart parented to an MDIM view blocks that
+MDIM's next re-publish, because `cleanUpOrphanedChartConfigs` deletes
+`multi_dim_x_chart_configs` rows with no narrative-chart guard and the FK refuses
+(`ER_ROW_IS_REFERENCED_2`). Renaming a dimension or choice slug is enough to
+trigger it, and it surfaces as a data update failing with an opaque FK error.
+Replacement makes this *more* likely, not less: every replacement creates a new
+MDIM-parented narrative chart. Production carries 1 today. If that count grows,
+re-file it as its own issue — the write-up is in
+`ai/narrative-charts-grapher-issue.md` (§2), alongside
+`ai/narrative-charts-slack-post.md`.
 
 ### 5. Apply — the grapher CLI (GATED, production only)
 
