@@ -277,3 +277,16 @@ def test_drop_dimension_keeping_single_value_errors():
 
     with pytest.raises(ValueError, match="Available values"):
         drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value="oecd")
+
+    # An indicator that has dimensions but not the one being filtered cannot be filtered, and keeping it
+    # would add views for values the caller excluded. It must fail instead.
+    from owid.catalog import Variable
+    from owid.catalog.core.meta import VariableMeta
+
+    tb["income__sex_male"] = Variable(
+        tb["income__sex_male__scale_sqrt"],
+        name="income__sex_male",
+        metadata=VariableMeta(original_short_name="income", dimensions={"sex": "male"}),
+    )
+    with pytest.raises(ValueError, match="have dimensions, but not 'equivalence_scale'"):
+        drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value="square root")
