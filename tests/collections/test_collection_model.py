@@ -887,6 +887,22 @@ def test_validate_dimension_slugs_not_grapher_query_params_reserved_slug():
         collection.validate_dimension_slugs_not_grapher_query_params()
 
 
+def test_validate_dimension_slugs_not_grapher_query_params_normalized_slug():
+    """
+    Test Collection.validate_dimension_slugs_not_grapher_query_params - compares snake_case forms.
+
+    Example: slug "Time" is persisted as "time" by save(), so it must fail; slug "stackMode" is
+    persisted as "stack_mode", which does not collide, so it must pass.
+    """
+    collection = _collection_with_dimension_slug("Time")
+
+    with pytest.raises(ValueError, match="collides with a query param reserved by Grapher"):
+        collection.validate_dimension_slugs_not_grapher_query_params()
+
+    # Should not raise any exception
+    _collection_with_dimension_slug("stackMode").validate_dimension_slugs_not_grapher_query_params()
+
+
 def test_validate_dimension_slugs_not_grapher_query_params_grandfathered_collection():
     """
     Test Collection.validate_dimension_slugs_not_grapher_query_params - allows grandfathered cases.
