@@ -66,6 +66,10 @@ def load_decisions(path_arg: str) -> dict[int, dict]:
             # regenerates mapping.json with the new md5, so `stale_charts` cannot see the
             # drift — only the decision export still remembers what was reviewed.
             "config_md5": (r.get("config_md5") or "").strip(),
+            # the same, on the target side: grapher edits a view's config in place, so a
+            # re-run rewrites mapping.json with the new md5 and `stale_targets` compares
+            # new-against-new. Absent from exports written before this field existed.
+            "view_config_md5": (r.get("view_config_md5") or "").strip(),
         }
         for r in rows
     }
@@ -77,10 +81,11 @@ def apply_decisions(
     """Drop entries whose chart the reviewer flagged; count kept entries that carry no decision.
 
     A decision is bound to the proposal it was made on, on BOTH sides: if the export carries
-    the reviewed target (target_mdim/view_id) or the reviewed source version (config_md5) and
-    either differs from the entry, the decision is stale and treated as no decision at all.
-    The source half matters because a re-run after the chart was edited rewrites mapping.json
-    with the new md5, so `stale_charts` compares new-against-new and sees nothing.
+    the reviewed target (target_mdim/view_id), the reviewed source version (config_md5) or the
+    reviewed target rendering (view_config_md5) and any of them differs from the entry, the
+    decision is stale and treated as no decision at all. The md5 halves matter because a re-run
+    after either end was edited rewrites mapping.json with the new md5s, so `stale_charts` and
+    `stale_targets` compare new-against-new and see nothing.
     """
     kept, flagged, stale, undecided = [], [], [], 0
     for e in entries:
@@ -88,9 +93,15 @@ def apply_decisions(
         status = d.get("status", "")
         reviewed_target = (d.get("target_mdim", ""), d.get("view_id", ""))
         reviewed_md5 = d.get("config_md5", "")
+        reviewed_view_md5 = d.get("view_config_md5", "")
         drifted = any(reviewed_target) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"])
         edited = bool(reviewed_md5) and bool(e["chart"].get("configMd5")) and reviewed_md5 != e["chart"]["configMd5"]
-        if status and (drifted or edited):
+        retargeted = (
+            bool(reviewed_view_md5)
+            and bool(e["target"].get("viewConfigMd5"))
+            and reviewed_view_md5 != e["target"]["viewConfigMd5"]
+        )
+        if status and (drifted or edited or retargeted):
             stale.append(e)
             status = ""
         if status == "flagged":

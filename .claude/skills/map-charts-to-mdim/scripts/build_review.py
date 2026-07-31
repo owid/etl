@@ -383,8 +383,9 @@ function importJSON(file) {
       for (const row of rows) {
         if (!(row && row.id != null && (row.status || row.note))) continue;
         const rec = byId[String(row.id)];
-        const rowFp = (row.target_mdim || "") + "::" + (row.view_id || "") + "::" + (row.config_md5 || "");
-        if (!rec || rowFp !== fp(rec)) { skipped++; continue; }  // chart gone, target changed, or chart edited
+        // Must stay in step with fp() — a shorter fingerprint here silently skips every row.
+        const rowFp = (row.target_mdim || "") + "::" + (row.view_id || "") + "::" + (row.config_md5 || "") + "::" + (row.view_config_md5 || "");
+        if (!rec || rowFp !== fp(rec)) { skipped++; continue; }  // chart gone, target changed, or either end edited
         decisions[String(row.id)] = { status: row.status || null, note: row.note || "", target: rowFp };
         n++;
       }
@@ -575,6 +576,7 @@ function exportRows() {
     return {
       id: r.id, chart_slug: r.chart_slug, quality: r.quality,
       target_mdim: r.target_mdim, view_id: r.view_id, config_md5: r.config_md5,
+      view_config_md5: r.view_config_md5,
       shared_with: r.shared_with, conflict: r.conflict,
       status: d.status || "", note: d.note || "",
       chart_url: chartUrl(r), mdim_url: mdimUrl(r),
@@ -589,7 +591,7 @@ function download(name, text, type) {
 function exportJSON() { download(REVIEW_NAME + "_chart_mdim_review.json", JSON.stringify(exportRows(), null, 2), "application/json"); }
 function exportCSV() {
   const rows = exportRows();
-  const cols = ["id", "chart_slug", "quality", "target_mdim", "view_id", "config_md5", "status", "note", "shared_with", "conflict", "chart_url", "mdim_url"];
+  const cols = ["id", "chart_slug", "quality", "target_mdim", "view_id", "config_md5", "view_config_md5", "status", "note", "shared_with", "conflict", "chart_url", "mdim_url"];
   const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
   const lines = [cols.join(",")];
   for (const r of rows) lines.push(cols.map((c) => esc(r[c])).join(","));

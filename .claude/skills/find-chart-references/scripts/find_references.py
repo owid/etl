@@ -80,6 +80,12 @@ def resolve_chart_subjects(chart_ids: list[int], chart_slugs: list[str]) -> dict
         params["ids"] = tuple(chart_ids)
     if chart_slugs:
         where.append("cc.slug IN %(slugs)s")
+        # A requested slug can itself be an old one that still reaches the chart — that is
+        # exactly the URL someone pastes when auditing. Resolving aliases here rather than
+        # only expanding them afterwards is what makes a sole old-slug subject work: the
+        # expansion below runs off the charts this query found, so without it nothing
+        # resolves and the live URL is reported as unresolved and never swept.
+        where.append("c.id IN (SELECT chart_id FROM chart_slug_redirects WHERE slug IN %(slugs)s)")
         params["slugs"] = tuple(chart_slugs)
     df = OWID_ENV.read_sql(
         f"SELECT c.id, cc.slug FROM charts c JOIN chart_configs cc ON cc.id = c.configId WHERE {' OR '.join(where)}",
