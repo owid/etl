@@ -1,13 +1,13 @@
 import tempfile
 import zipfile
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
-from owid.catalog import Origin
+from owid.catalog import Origin, s3_utils
 
-from etl import paths
-from etl.files import ruamel_load
+from etl import config, paths
+from etl.files import checksum_file, ruamel_load
 from etl.snapshot import Snapshot, SnapshotArchive, SnapshotMeta, _parse_snapshot_path
 
 
@@ -249,6 +249,45 @@ class TestDvcAdd:
         snapshot.dvc_add(upload=False)
 
         assert uploads == []
+
+
+# The snapshot the autoupdate build kept failing on: it is updated daily behind a long-lived PR, so
+# its local .dvc regularly holds an older md5 than the object already stored on R2.
+EPOCH_URI = "artificial_intelligence/2025-03-12/epoch_compute_intensive.csv"
+
+
+@pytest.mark.integration
+def test_dvc_add_skips_upload_of_snapshot_already_on_r2():
+    """Against real R2 and the real producer: never re-upload a snapshot that is already stored.
+
+    Reproduces the state that made the autoupdate build fail with ObjectLockedByBucketPolicy — the
+    downloaded content is unchanged, so its md5 is already on R2, but the local .dvc still holds an
+    older md5 and therefore can't be used to detect that.
+
+    Skips rather than passes when that state can't be reached, so a skip is never mistaken for a
+    verified run. Downloads into data/snapshots/ and restores the .dvc afterwards; never writes to
+    R2 — a genuine upload would need a brand new object in a locked production bucket.
+    """
+    snap = Snapshot(EPOCH_URI)
+    snap.download_from_source()
+
+    md5 = checksum_file(snap.path)
+    assert snap.metadata.outs is not None
+    if md5 == snap.metadata.outs[0]["md5"]:
+        pytest.skip(f"local .dvc already records the current content ({md5}), nothing to reproduce")
+    if not s3_utils.object_exists(f"s3://{config.R2_SNAPSHOTS_PUBLIC}/{md5[:2]}/{md5[2:]}"):
+        pytest.skip(f"content is new ({md5}), so dvc_add should upload it; not writing to production R2")
+
+    original_dvc = snap.metadata_path.read_text()
+    try:
+        with patch.object(s3_utils, "upload", side_effect=AssertionError("re-uploaded an object already on R2")):
+            snap.dvc_add(upload=True)
+
+        # The .dvc must still be brought up to date, or the snapshot would never be recorded.
+        # Checked on the file rather than snap.metadata, which is only read at construction.
+        assert ruamel_load(snap.metadata_path.read_text())["outs"][0]["md5"] == md5
+    finally:
+        snap.metadata_path.write_text(original_dvc)
 
 
 def test_snapshot_to_yaml():
