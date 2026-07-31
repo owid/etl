@@ -146,7 +146,13 @@ catalog path is not silently skipped.
 **MDIM subjects**: article links/embeds, narrative charts pinned to a view
 (`parentMultiDimXChartConfigId`), and inbound `multi_dim_redirects`.
 
-**Explorer subjects**: article links/embeds (`linkType='explorer'`).
+**Explorer subjects**: article links/embeds (`linkType='explorer'`) **plus a
+`linkType='url'` scan**, as for charts and MDIMs — an article that pastes
+`/explorers/<slug>?…` produces a url-typed row, and only that row carries the
+`country=`/`time=` pins the downstream audits grade.
+
+Raw-URL targets are un-wrapped before matching: a link pasted through Google Docs can
+arrive as `google.com/url?q=<encoded>`, with the real URL and its parameters inside `q`.
 
 ## Who uses this, and what stays theirs
 
@@ -167,7 +173,10 @@ that's the point of the split.
 
 ## Known gaps
 
-State these when reporting; silence reads as full coverage.
+State these when reporting; silence reads as full coverage. `--markdown` now ends with
+a **Not searched** section carrying this list plus the limits of that particular run
+(no `--transitive` hop, excluded 'All charts' entries) — keep the two in step, and
+still state them yourself when you report on a `--json`/`--csv` run.
 
 - Non-ETL explorers whose config lives in the `explorers` TSV are not parsed.
 - **Legacy CSV-backed explorers** (`data://explorers/...` wide tables — e.g. the
