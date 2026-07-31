@@ -646,6 +646,15 @@ steps:
     - data://garden/itopf/2026-05-06/oil_spills:
       - data://meadow/itopf/2026-05-06/oil_spills:
         - snapshot://itopf/2026-05-06/oil_spills.pdf
+  #
+  # UN SDG (2026)
+  #
+  data://grapher/un/2026-07-31/un_sdg:
+    - data://garden/un/2026-07-31/un_sdg:
+      - data://meadow/un/2026-07-31/un_sdg:
+        - snapshot://un/2026-07-31/un_sdg.feather
+      - snapshot://un/2026-07-31/un_sdg_dimension.json
+      - snapshot://un/2026-07-31/un_sdg_unit.csv
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
