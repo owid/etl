@@ -39,7 +39,7 @@ Loop (max <3> iterations, then stop and report):
 
    **Do NOT treat a reaction on the trigger comment as the review arriving, unless `content == "+1"`.** Within seconds of the trigger, Codex adds an acknowledgment reaction (👀-style) to the `@codex review` comment, then submits its real review minutes later (~4–9 min observed). Exiting the wait on *any* codex reaction declares the PR "clean" while a review with findings is still in flight — this silently skipped two P2 findings once. So: a **new review (reviews count increased)** is the findings signal; a reaction with `content == "+1"` is the ONLY clean-signal reaction. After any apparent "clean" verdict (from `+1` or an issue comment), cross-check that the reviews count did not also increase before you conclude there are no findings.
 
-   **Query the two `pulls/` surfaces via GraphQL `reviewThreads`, or pass `--paginate`.** Bare `gh api .../pulls/<n>/reviews` returns only the first 30 items, oldest first, so on a long-lived PR the newest review is not in the response and you will read a fresh review as silence (measured: page 1 fourteen hours stale, 41 reviews and 60 inline comments existing). GraphQL also hands you `isResolved` and the thread ids step 6 needs.
+   **Every one of these is a paginated connection — page all of them.** Bare `gh api .../pulls/<n>/reviews` returns only the first 30 items, oldest first, so on a long-lived PR the newest review is not in the response and you will read a fresh review as silence (measured: page 1 fourteen hours stale, with 41 reviews and 60 inline comments present). GraphQL `reviewThreads` is the better route — it also hands you `isResolved` and the thread ids step 6 needs — **but a bare `first: N` truncates exactly the same way**, so page it too (query form in step 6). Either add `--paginate` to the REST calls or use the paginated GraphQL query; never a bare first page of anything.
 
    Poll in SHORT bash calls (one `sleep 120` + all checks per call, repeated as separate tool calls) — never one long multi-minute loop, so that queued messages from the main session can reach you between calls. Give up after 30 minutes and say so in your report.
 
@@ -52,7 +52,20 @@ Loop (max <3> iterations, then stop and report):
    `> _Written by Claude <model name> — @<handle> at the wheel._`
    This is a public repo: plain language, no internal context, no names of people.
 6. **Resolve each thread you addressed** (replying does not resolve it): match the REST inline-comment id to `databaseId` of the thread's first comment in GraphQL —
-   `gh api graphql -f query='query { repository(owner: "<owner>", name: "<repo>") { pullRequest(number: <n>) { reviewThreads(first: 50) { nodes { id isResolved comments(first: 1) { nodes { databaseId } } } } } } }'`
+   ```bash
+   gh api graphql --paginate -f query='
+     query($endCursor: String) {
+       repository(owner: "<owner>", name: "<repo>") {
+         pullRequest(number: <n>) {
+           reviewThreads(first: 100, after: $endCursor) {
+             pageInfo { hasNextPage endCursor }
+             nodes { id isResolved comments(first: 1) { nodes { databaseId } } }
+           }
+         }
+       }
+     }'
+   ```
+   `--paginate` needs both the `$endCursor` variable and the `pageInfo` block — without them it silently returns one page, which is the failure this whole rule exists to prevent.
    then `gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "<id>"}) { thread { isResolved } } }'`.
    Leave threads you did not address open for the human.
 7. **Re-trigger** a fresh bare `@codex review` comment ONLY if you pushed a substantial code fix (metadata-only tweaks don't count). Record its exact timestamp and use it as the new polling threshold. Then loop back to 1.
@@ -67,7 +80,7 @@ Final report: status of every CI check; each finding with verdict (fixed+commit 
 - The agent must keep polling within its turn (ending the turn "to wait" strands the loop until someone resumes it) — but in short bash calls, never one long multi-minute loop: messages from the main session can only be delivered between tool calls, so a long sleep makes the agent unreachable.
 - Agents talk themselves into stopping with "monitors are armed, I'll act on events as they arrive" — there are no monitors; nothing runs after the turn ends. The prompt must say explicitly that polling means making the next tool call yourself, and that the turn ends exactly once, at the final report.
 - The same stall wears other disguises: backgrounding `gh pr checks --watch` (or any "waiter") and ending the turn "until its notification arrives". A backgrounded watcher notifies no one who can act. Even with all warnings in the prompt, agents stall this way 1–2 times per run — the main session's SendMessage corrective ("poll yourself in short calls; end the turn only at the final report") reliably restarts them, so budget for it rather than treating it as exceptional.
-- **Poll the review surfaces through GraphQL, not bare REST.** `gh api repos/<o>/<r>/pulls/<n>/reviews` (and `/comments`) returns only the FIRST PAGE — 30 items, oldest first — so on a long-lived PR the newest review is not in the response at all and the loop reads a fresh review as silence. Measured on a real PR: page 1's newest review was 14 hours stale (41 reviews and 60 inline comments existed; 30 of each were visible). Use the `reviewThreads` GraphQL query — which also gives you `isResolved` and the thread ids you need to resolve them — or pass `--paginate`. This cost ~25 minutes of a run: the review arrived in 4.5 minutes and the poller never saw it.
+- **Page every review surface, on both APIs.** `gh api repos/<o>/<r>/pulls/<n>/reviews` (and `/comments`) returns only the FIRST PAGE — 30 items, oldest first — so on a long-lived PR the newest review is not in the response at all and the loop reads a fresh review as silence. Measured on a real PR: page 1's newest review was 14 hours stale (41 reviews and 60 inline comments existed; 30 of each were visible). Use the `reviewThreads` GraphQL query — which also gives you `isResolved` and the thread ids you need to resolve them — or pass `--paginate`. This cost ~25 minutes of a run: the review arrived in 4.5 minutes and the poller never saw it. The GraphQL route has the same trap — a bare `reviewThreads(first: 50)` truncates just as silently, and a heavily-reviewed PR reaches that (one hit 30 threads across five rounds) — so page the connection with `$endCursor` + `pageInfo`, not just the REST calls.
 - Codex answers on three surfaces: a formal review (`pulls/<n>/reviews`), the inline finding comments (`pulls/<n>/comments`), and — when there are no findings — a plain issue comment ("Didn't find any major issues", `issues/<n>/comments`). Poll all three, or a clean pass strands the loop until the deadline.
 - A reaction on the trigger comment is NOT the review, unless `content == "+1"`. Codex adds a fast 👀-style acknowledgment reaction within seconds, then submits the real review minutes later (~4–9 min). Exiting on any reaction declared "clean" and silently skipped two P2 findings (PR 6506). Use a review-count increase as the findings signal and `+1` as the only clean-signal reaction; after any clean verdict cross-check the reviews count didn't also increase.
 - Replying to a review comment does NOT resolve the thread; resolution is a separate GraphQL mutation.
