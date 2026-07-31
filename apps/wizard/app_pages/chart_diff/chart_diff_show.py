@@ -338,6 +338,17 @@ class ChartDiffShow:
             )
 
     def _show_chart_diff_header(self):
+        # ETL-authored charts are edited in their ETL YAML; deliberate edits made in
+        # the staging admin are legal but should be a conscious choice.
+        if getattr(self.diff, "has_staging_admin_edits", False):
+            st.warning(
+                "This ETL-authored chart carries edits made in the **staging admin**. "
+                "Approving will sync them to production as an admin override on top of the ETL config. "
+                "Consider moving them into the chart's `.config.yml` in ETL instead, so they are versioned "
+                "and reviewed with the code — otherwise the ETL YAML and the chart will permanently disagree "
+                "on these fields."
+            )
+
         # Three columns: status, refresh, link
         col1, col2, col3 = st.columns([2, 3, 1], vertical_alignment="bottom")
 

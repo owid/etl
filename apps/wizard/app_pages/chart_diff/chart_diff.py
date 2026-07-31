@@ -323,6 +323,7 @@ class ChartDiff:
         article_refs: list[ArticleRef] | None = None,
         staging_created_at: dt.datetime | None = None,
         source_patch_config: dict[str, Any] | None = None,
+        target_patch_config: dict[str, Any] | None = None,
     ):
         """Constructor of ChartDiff.
 
@@ -343,9 +344,11 @@ class ChartDiff:
         self.tags_edited = tags_edited
         # Creation time of the staging server (used to detect edits in production)
         self._staging_created_at = staging_created_at
-        # The source chart's admin patch layer (None when not loaded). Used to decide
-        # whether production edits on a cross-env twin can conflict with this diff.
+        # The two admin patch layers (None when not loaded). Used to decide whether
+        # production edits on a cross-env twin can conflict with this diff, and to
+        # flag deliberate staging admin edits on ETL-managed charts.
         self.source_patch_config = source_patch_config
+        self.target_patch_config = target_patch_config
 
         # Analytics, anomalies and other scores
         self.article_refs = article_refs if article_refs else []
@@ -388,6 +391,19 @@ class ChartDiff:
     def is_rejected(self) -> bool:
         """Check if the chart has been rejected."""
         return self.approval_status == gm.ChartStatus.REJECTED.value
+
+    @property
+    def has_staging_admin_edits(self) -> bool:
+        """True when this ETL-managed chart carries deliberate admin edits made on staging.
+
+        Such edits will be synced to production as an admin override; the UI warns the
+        reviewer and suggests moving them into the chart's ETL config instead. A patch
+        identical to production's (e.g. a long-standing override on an adopted chart)
+        does not count — nothing new would be written.
+        """
+        if self.source_patch_config is None or patch_is_pristine(self.source_patch_config):
+            return False
+        return not _layer_configs_equal(self.source_patch_config, self.target_patch_config)
 
     @property
     def is_pending(self) -> bool:
@@ -625,12 +641,17 @@ class ChartDiff:
             # Article refs
             article_refs = article_refs_all.get(chart_id, [])
 
-            # Load the staging chart's admin patch for cross-env twins: `in_conflict`
-            # needs it to tell whether a production edit can actually conflict with
-            # anything this branch would sync.
+            # Load the admin patch layers for ETL-managed charts: `in_conflict` needs
+            # the source patch to tell whether a production edit can conflict with
+            # anything this branch would sync, and `has_staging_admin_edits` compares
+            # both patches to flag deliberate staging admin edits in the UI.
             source_patch_config = None
-            if target_chart is not None and _is_cross_env_twin(source_chart, target_chart):
+            target_patch_config = None
+            is_etl_managed = getattr(source_chart, "configIdETL", None) is not None
+            if is_etl_managed or (target_chart is not None and _is_cross_env_twin(source_chart, target_chart)):
                 source_patch_config = source_chart.load_patch_config(source_session)
+                if target_chart is not None:
+                    target_patch_config = target_chart.load_patch_config(target_session)
 
             # Build Chart Diff object
             chart_diff: ChartDiff = cls(
@@ -647,6 +668,7 @@ class ChartDiff:
                 article_refs=article_refs,
                 staging_created_at=staging_created_at,
                 source_patch_config=source_patch_config,
+                target_patch_config=target_patch_config,
             )
 
             chart_diffs.append(chart_diff)

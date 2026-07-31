@@ -224,3 +224,36 @@ def test_twin_conflict_depends_on_staging_patch():
         source_patch_config={**_bootstrap_patch(), "subtitle": "Staging override."},
     )
     assert diff.in_conflict
+
+
+def test_has_staging_admin_edits():
+    """The UI warning fires only for deliberate, new staging admin edits."""
+    from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
+
+    config_id = "0198c0e8-0000-7000-8000-000000000000"
+    source = _chart(100, datetime(2026, 1, 1), config_id=config_id)
+    target = _chart(200, datetime(2026, 1, 2), config_id=config_id)
+
+    def _diff(source_patch, target_patch):
+        return ChartDiff(
+            source_chart=source,
+            target_chart=target,
+            approval=None,
+            conflict=None,
+            source_patch_config=source_patch,
+            target_patch_config=target_patch,
+        )
+
+    # Pristine staging patch: nothing to warn about.
+    assert not _diff(_bootstrap_patch(), None).has_staging_admin_edits
+    # Long-standing override on an adopted chart, identical on both sides: no new edit.
+    patch = {**_bootstrap_patch(published=True), "note": "Old note."}
+    assert not _diff(patch, patch).has_staging_admin_edits
+    # Deliberate staging edit that differs from production: warn.
+    assert _diff(
+        {**_bootstrap_patch(), "subtitle": "Staging override."}, _bootstrap_patch(published=True)
+    ).has_staging_admin_edits
+    # New chart (no production counterpart) with deliberate edits: warn too.
+    assert _diff({**_bootstrap_patch(), "subtitle": "Staging override."}, None).has_staging_admin_edits
+    # Patch never loaded (non-ETL chart): never warn.
+    assert not _diff(None, None).has_staging_admin_edits
