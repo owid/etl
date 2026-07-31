@@ -232,9 +232,60 @@ intact; only its generated "Explore the data" href uses the parent slug, and the
 301 covers that. They are classified `link`, reported by preflight but never gated
 on — gating would strand every such chart behind raw SQL for no reader-visible
 gain. Do check the href's query params for collisions with the target view's
-dimensions (step 4 flags them). There is still no API to repoint one, so the
-*parent pointer* stays stale; drafts to escalate that live in
-`ai/narrative-charts-slack-post.md` and `ai/narrative-charts-grapher-issue.md`.
+dimensions (step 4 flags them).
+
+**To actually fix one, replace it — don't try to repoint it.** The parent columns
+are INSERT-only, so there is no repointing API and never will be one by design; the
+route the Grapher devs endorse is to create a *new* narrative chart from the
+equivalent MDIM view and delete the old one. Three API facts set the order, and
+getting it wrong strands you:
+
+- **create** rejects a name that already exists, and requires kebab-case;
+- **delete** refuses while a **published** post references the name;
+- **update** writes only query params — there is **no rename**.
+
+So the obvious sequence (delete, then recreate under the same name) is blocked in
+precisely the case that matters — a narrative chart embedded in a published article.
+Two paths, and the references audit (step 4) tells you which applies:
+
+*No published post references it* → delete, then create the replacement with the
+same name. The name is preserved and nothing else changes.
+
+*A published post references it* (the usual case) → do it in this order:
+
+1. **Create** the replacement from the MDIM view, under a new kebab-case name.
+2. **Update the article(s)** to reference the new name.
+3. **Delete** the old one — now unreferenced, so the delete succeeds.
+
+Never delete first. The delete will fail, and unpublishing the article to force it
+through breaks the page for readers.
+
+The create call is:
+
+```jsonc
+POST {admin_api}/narrative-charts
+{
+  "type": "multiDim",
+  "name": "<kebab-case-name>",
+  "parentChartConfigId": "<the MDIM view's chart_configs.id>",
+  "config": { /* the OLD narrative chart's rendered full config */ }
+}
+```
+
+**You already have `parentChartConfigId`: it is `target.viewConfigId` in the
+redirect payload** for the chart this narrative chart hangs off
+(`payloads/<chart_slug>.json`, or `target_view_config_id` in
+`mapping_proposal.csv`). That is the MDIM view's `chart_configs.id` — the same
+value `find-chart-references` reports as `config_id` on an `mdim view` row. So
+"which MDIM view do I parent the replacement to" is answered by the proposal: it is
+the view the chart was going to redirect to. Get the
+`config` from `AdminAPI.get_narrative_chart(<old id>)["configFull"]`: the endpoint
+derives the patch itself by diffing what you pass against the new parent, so pass
+the rendered full config, not the old patch.
+
+`ai/narrative-charts-grapher-issue.md` still stands for the *other* half of that
+issue — a narrative chart pinned to an MDIM view blocks that MDIM's next
+re-publish (unguarded FK), which replacement does not solve.
 
 ### 5. Apply — the grapher CLI (GATED, production only)
 

@@ -49,7 +49,8 @@ FIXES = {
     "gdoc": "edit the article block to embed the MDIM view",
     "gdoc (url link)": "update the href in the article",
     "explorer": "repoint the explorer at the MDIM indicators, or retire the explorer",
-    "narrative chart": "no repointing API exists — see the narrative-chart escalation notes",
+    "narrative chart": "replace it: create a new one from the MDIM view (parentChartConfigId = "
+    "that view's config_id), move the article references, then delete the old — see SKILL.md",
     "data insight": "update the data insight's grapher-url",
     "static viz": "regenerate the static visualization against the MDIM view",
     "key chart": "re-tag the MDIM so the topic page keeps a key chart",
