@@ -87,7 +87,7 @@ from typing import cast
 import click
 import questionary
 import requests
-from git import GitCommandError, InvalidGitRepositoryError, Repo
+from git import GitCommandError, InvalidGitRepositoryError, NoSuchPathError, Repo
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
@@ -918,7 +918,16 @@ def worktree_blocking_changes(worktree_path: Path) -> list[str]:
     clean_branch unlinks them itself right before removal, since their real content lives in the
     main repo.
     """
-    lines = Repo(worktree_path).git.status("--porcelain").splitlines()
+    if not worktree_path.exists():
+        # Registered but manually deleted (git lists it as prunable): nothing can block —
+        # `git worktree remove` on it simply prunes the stale registration.
+        return []
+    try:
+        lines = Repo(worktree_path).git.status("--porcelain").splitlines()
+    except (InvalidGitRepositoryError, NoSuchPathError, GitCommandError) as e:
+        # The directory exists but git can't read it as a worktree. Its state is unknowable, so
+        # report it as blocking: clean_branch then skips it untouched instead of half-mutating it.
+        return [f"(unreadable worktree: {e})"]
     share_data_links = {name for name in ("data", *SHARED_SCRATCH_DIRS) if (worktree_path / name).is_symlink()}
     return [line for line in lines if line[3:] not in share_data_links]
 

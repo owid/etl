@@ -6,6 +6,7 @@ A dirty worktree must be skipped before anything is copied or modified: a failed
 under suffixed names.
 """
 
+import shutil
 from pathlib import Path
 
 import pytest
@@ -86,6 +87,39 @@ def test_blocking_changes_excludes_share_data_symlinks(repo_with_worktree, tmp_p
     blocking = worktree_blocking_changes(worktree_path)
     assert len(blocking) == 1
     assert "untracked.txt" in blocking[0]
+
+
+def test_blocking_changes_missing_worktree_dir(repo_with_worktree):
+    """A registered worktree whose directory was manually deleted must not crash the pre-scan."""
+    _, worktree_path = repo_with_worktree
+    shutil.rmtree(worktree_path)
+    assert worktree_blocking_changes(worktree_path) == []
+
+
+def test_blocking_changes_unreadable_worktree_counts_as_blocking(repo_with_worktree):
+    _, worktree_path = repo_with_worktree
+    (worktree_path / ".git").write_text("gitdir: /nonexistent/gitdir")
+    blocking = worktree_blocking_changes(worktree_path)
+    assert len(blocking) == 1
+    assert "unreadable worktree" in blocking[0]
+
+
+def test_clean_branch_cleans_manually_deleted_worktree(repo_with_worktree, tmp_path):
+    """`git worktree remove` on a prunable (deleted) worktree succeeds, so cleaning completes."""
+    repo, worktree_path = repo_with_worktree
+    main_path = Path(repo.working_tree_dir).resolve()  # ty: ignore
+    shutil.rmtree(worktree_path)
+
+    clean_branch(
+        repo=repo,
+        branch="feature",
+        worktree_path=worktree_path,
+        main_project_dir=tmp_path / "claude_projects",
+        main_worktree_path=main_path,
+    )
+
+    assert "feature" not in [b.name for b in repo.branches]
+    assert str(worktree_path) not in repo.git.worktree("list", "--porcelain")
 
 
 def test_clean_branch_skips_dirty_worktree_without_mutating(repo_with_worktree, tmp_path):
