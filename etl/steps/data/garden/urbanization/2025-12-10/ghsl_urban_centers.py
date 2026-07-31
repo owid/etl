@@ -13,22 +13,31 @@ START_OF_PROJECTIONS = 2025
 
 # The source rates the plausibility of every city's population figure (0 = low, 1 = moderate,
 # 2 = high, 3 = very high) and the meadow step carries that rating through. We do not publish the
-# figures it rates "low", because in those cases the population is sometimes placed in the wrong
-# settlement: in Angola the source puts ~1 million people in the small town of Uíge (1.01M in 29 km²)
-# while Luanda's urban centre is absent until 1995, and it flags exactly those figures as low. The
-# same pattern shows up in Eritrea, South Sudan, Comoros and Cabo Verde.
+# figures it rates "low".
+#
+# Why those figures go wrong, per the JRC (July 2026): the underlying population grid is built from
+# only two census epochs per country -- 2006 and 2014 for Angola, 2001 and 2012 for Eritrea -- and the
+# rate of change between them is extrapolated across the whole 1975-2030 series. Where a city was
+# shrinking between its two census years, running that decline backwards inflates its early figures:
+# Angola's Uíge reaches 1.01M in 1975 in 29 km². Where a city was growing fast, the same procedure
+# extrapolates it back to almost nothing, which is why Luanda has no urban centre before 1995. The
+# rating flags precisely these thin-input cases, which is what makes it a good filter for us.
+#
+# Note this is a back-extrapolation artifact, not a spatial one: the population is not assigned to the
+# wrong place, so Uíge's early figures are its own and not Luanda's. A JRC update adding 1995 data for
+# Angola and 1984 data for Eritrea is expected to improve these cases.
 #
 # Two limits on that, both deliberate:
 #
 # 1. Only indicators built from ONE named city are filtered (capital, largest city, top 100). Every
 #    aggregate is left alone -- the city-size buckets, and the regional sums of capital population.
-#    An aggregate sums many cities, so dropping a misplaced one would delete people who really do
-#    live in that country. Filtering the city-size aggregates would also be far more destructive than
-#    it looks: 38 country-years would lose every one of their cities, and Bangladesh, Yemen, Sudan and
-#    Iran would each lose a fifth to two-thirds of their urban population.
+#    An aggregate sums many cities, so dropping a badly estimated one would delete people who really
+#    do live in that country. Filtering the city-size aggregates would also be far more destructive
+#    than it looks: 38 country-years would lose every one of their cities, and Bangladesh, Yemen, Sudan
+#    and Iran would each lose a fifth to two-thirds of their urban population.
 # 2. Only the historical estimates are filtered, never the projections. From 2025 on the rating mostly
-#    marks ordinary forecast uncertainty for small capitals rather than misplacement -- Vientiane is
-#    rated low from 2025, but it really is the largest city in Laos.
+#    marks ordinary forecast uncertainty for small capitals rather than a bad historical extrapolation
+#    -- Vientiane is rated low from 2025, but it really is the largest city in Laos.
 LOW_PLAUSIBILITY = 0
 
 # Regions for which aggregates will be created.
