@@ -89,25 +89,33 @@ def load_redirects(path_arg: str) -> list[dict]:
     return redirects
 
 
-def run_find_references(redirects: list[dict]) -> list[dict]:
-    """Delegate the surface sweep to the find-chart-references skill."""
+def run_find_references(redirects: list[dict]) -> tuple[list[dict], list[str]]:
+    """Delegate the surface sweep to the find-chart-references skill.
+
+    Returns its findings and the surfaces it could not sweep. The sweep fails open on
+    optional surfaces (a legacy table that is absent, a subject that does not resolve), so
+    a run that skipped one returns fewer references and no error — indistinguishable from a
+    clean result unless the gaps travel with the findings into this audit's own report.
+    """
     if not FIND_REFERENCES.exists():
         raise SystemExit(f"Missing {FIND_REFERENCES} — the find-chart-references skill provides the surface sweep.")
     slugs = ",".join(r["chart"]["slug"] for r in redirects)
     with tempfile.NamedTemporaryFile("r", suffix=".json", delete=False) as tmp:
         out_path = tmp.name
+    with tempfile.NamedTemporaryFile("r", suffix=".json", delete=False) as tmp:
+        gaps_path = tmp.name
     try:
-        proc = subprocess.run(
-            [sys.executable, str(FIND_REFERENCES), "--chart-slugs", slugs, "--json", out_path],
-            capture_output=True,
-            text=True,
-        )
+        cmd = [sys.executable, str(FIND_REFERENCES), "--chart-slugs", slugs]
+        cmd += ["--json", out_path, "--gaps-json", gaps_path]
+        proc = subprocess.run(cmd, capture_output=True, text=True)
         if proc.returncode != 0:
             raise SystemExit(f"find_references.py failed:\n{proc.stdout}\n{proc.stderr}")
         print(proc.stdout.rstrip())
-        return json.loads(Path(out_path).read_text())
+        gaps_raw = Path(gaps_path).read_text().strip()
+        return json.loads(Path(out_path).read_text()), (json.loads(gaps_raw) if gaps_raw else [])
     finally:
         Path(out_path).unlink(missing_ok=True)
+        Path(gaps_path).unlink(missing_ok=True)
 
 
 def replacement_url(r: dict, query_string: str, host: str) -> tuple[str, list[str]]:
@@ -129,7 +137,7 @@ def write_csv(out: Path, findings: list[dict]) -> Path:
     return path
 
 
-def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host: str) -> Path:
+def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host: str, gaps: list[str]) -> Path:
     path = out / "references.md"
     red = [f for f in findings if f["severity"] == RED]
     yellow = [f for f in findings if f["severity"] == YELLOW]
@@ -198,6 +206,17 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
         "Whether the redirects themselves apply cleanly is checked by `preflight.py`, not here."
     )
     lines += ["## What's still open", "", handed_off, "", proposed, "", unverified, ""]
+    # Gaps the sweep hit at RUN time, as opposed to the standing ones named above. Silence
+    # here would read as "everything was checked", which is the one wrong signal this
+    # section can send — so they are listed individually, not folded into the prose.
+    if gaps:
+        lines += [
+            f"This run also skipped {len(gaps)} surface(s) or subject(s) outright — an empty result for these "
+            "means UNKNOWN, not that nothing references them:",
+            "",
+            *[f"- {g}" for g in gaps],
+            "",
+        ]
     path.write_text("\n".join(lines))
     return path
 
@@ -217,7 +236,7 @@ def main() -> int:
     redirects = load_redirects(args.mapping)
     by_chart_id = {r["chart"]["id"]: r for r in redirects}
 
-    raw = run_find_references(redirects)
+    raw, gaps = run_find_references(redirects)
 
     findings = []
     for ref in raw:
@@ -256,13 +275,15 @@ def main() -> int:
     findings.sort(key=lambda f: ({RED: 0, YELLOW: 1, INFO: 2}[f["severity"]], f["surface"], f["source_chart_slug"]))
 
     csv_path = write_csv(mapping_dir, findings)
-    md_path = write_markdown(mapping_dir, findings, redirects, host)
+    md_path = write_markdown(mapping_dir, findings, redirects, host, gaps)
 
     counts: dict[str, int] = defaultdict(int)
     for f in findings:
         counts[f["severity"]] += 1
     print(f"\nreferences: {len(findings)}  (needs manual work: {counts[RED]} | "
           f"hyperlinks to update: {counts[YELLOW]} | unpublished: {counts[INFO]})")  # fmt: skip
+    if gaps:
+        print(f"  {len(gaps)} surface(s)/subject(s) were NOT swept — see 'What's still open' in the report.")
     collisions = [f for f in findings if f["param_collisions"]]
     if collisions:
         print(f"\n⚠️  {len(collisions)} reference(s) carry query params that collide with the view's dimensions:")

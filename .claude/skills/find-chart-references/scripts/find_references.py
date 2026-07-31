@@ -24,9 +24,11 @@ Chart subjects are expanded to every old slug that still reaches them
 (`chart_slug_redirects`), because references written before a rename point at the
 old slug and are otherwise missed.
 
-`--transitive` adds a second hop for indicator/MDIM subjects: after finding the
-charts that render an indicator, also find the articles that reference those charts.
-Off by default — it multiplies the sweep on widely-charted datasets.
+`--transitive` adds a second hop for INDICATOR subjects only: after finding the charts
+that render an indicator, also find the articles that reference those charts. Off by
+default — it multiplies the sweep on widely-charted datasets. It does nothing for a
+`--mdim` or `--explorer` subject: an MDIM's own references are all direct, and the
+indirect hop from its views' indicators is `--variable-ids`/`--dataset-id` work.
 
 Usage:
     ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
@@ -35,6 +37,7 @@ Usage:
 """
 
 import argparse
+import csv
 import json
 import re
 from collections import defaultdict
@@ -59,8 +62,9 @@ ARCHIVE_HOST = "archive.ourworldindata.org"
 
 # Surfaces this run could NOT sweep, and subjects that did not resolve. An empty result for
 # any of these means UNKNOWN, not "nothing references it", so they must survive past stdout:
-# they go into the `--markdown` report's "Not searched" section and, for a wrapper script,
-# into `--gaps-json` — otherwise a truncated sweep reads as a complete audit.
+# they go into the `--markdown` report's "Not searched" section, and `--gaps-json` hands them
+# to whatever wraps this script (audit_references.py puts them in its own Unverified bucket).
+# Otherwise a truncated sweep reads as a complete audit.
 COVERAGE_GAPS: list[str] = []
 
 
@@ -1290,7 +1294,7 @@ def main() -> int:
     ap.add_argument("--include-all-charts", action="store_true",
                     help="keep topic pages' auto-generated 'All charts' entries (excluded by default)")  # fmt: skip
     ap.add_argument("--transitive", action="store_true",
-                    help="for indicator/MDIM subjects, also sweep the articles referencing the charts found")  # fmt: skip
+                    help="indicator subjects only: also sweep the articles referencing the charts found")  # fmt: skip
     ap.add_argument("--json", dest="json_out", help="write findings as JSON to this path")
     ap.add_argument("--csv", dest="csv_out", help="write findings as CSV to this path")
     ap.add_argument("--markdown", dest="md_out",
@@ -1369,6 +1373,11 @@ def main() -> int:
                 "explorer views that render them directly."
             )
 
+    # `--transitive` only has a second hop to make from an indicator. Passing it with just an
+    # MDIM or explorer subject would otherwise look like it widened the sweep when it did not.
+    if args.transitive and not variable_ids and (args.mdim or args.explorer):
+        print("  note: --transitive applies to indicator subjects only; it added nothing to this run.")
+
     for mdim in args.mdim:
         findings += sweep_mdim_subject(mdim)
     for explorer in args.explorer:
@@ -1399,10 +1408,8 @@ def main() -> int:
         Path(args.json_out).write_text(json.dumps(findings, indent=2) + "\n")
         print(f"\n-> {args.json_out}")
     if args.csv_out:
-        import csv as _csv
-
         with open(args.csv_out, "w", newline="") as f:
-            w = _csv.DictWriter(f, fieldnames=COLUMNS)
+            w = csv.DictWriter(f, fieldnames=COLUMNS)
             w.writeheader()
             w.writerows(findings)
         print(f"-> {args.csv_out}")
