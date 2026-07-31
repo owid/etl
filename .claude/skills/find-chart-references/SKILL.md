@@ -102,11 +102,39 @@ catalog path is not silently skipped.
 
 **Explorer subjects**: article links/embeds (`linkType='explorer'`).
 
+## Who uses this, and what stays theirs
+
+This skill answers *which surfaces reference the object*. It deliberately does not
+interpret them — each caller keeps the analysis only it can do:
+
+| Skill | Uses the sweep for | Keeps |
+|---|---|---|
+| `check-hardcoded-years` | the surface list for a dataset/indicator, plus each reference's `query_string` (article `time=` pins) | reading configs for `minTime`/`maxTime`/`map.time`, grading pins against the data's latest time, the where-the-fix-goes table — and its own per-view `explorer_views` join, which this aggregation can't supply |
+| `check-empty-entities` | the same list, plus `query_string` (`country=` pins) and old-slug expansion | entity-selection vs entities-with-data checks, grading findings against production — plus the same per-view `explorer_views` join and its own `linkType='url'` article scan, neither of which a dataset-subject sweep reaches |
+| `update-dataset` (step 7) | one sweep shared by both audits above | the update workflow around them |
+| `review-data-pr` (§8d) | a cheap "which surfaces carry this dataset" check | judging whether the author's audit was complete |
+| `map-charts-to-mdim` | the sweep for the charts being redirected | replacement URLs, redirect severity, param-collision detection |
+| `edit-faust-metadata` | — (keeps `blast_radius.py`) | per-field inheritance analysis: which surfaces are *shielded* by their own patch override, which have no inheritance path. A generic sweep can't answer that |
+
+When a caller needs a surface this doesn't cover, add it here rather than locally —
+that's the point of the split.
+
 ## Known gaps
 
 State these when reporting; silence reads as full coverage.
 
 - Non-ETL explorers whose config lives in the `explorers` TSV are not parsed.
+- Explorer hits on an indicator subject are **aggregated per explorer** (a view
+  count, not a row per view) — a caller that needs each view's config still has to
+  join `explorer_views` itself.
+- The `--transitive` hop is built from the **charts** an indicator subject resolved
+  to, so it covers their articles (`grapher`/`guided-chart`), data insights and
+  narrative charts — and nothing else. `linkType='url'` article rows, static viz and
+  key-chart slots are swept for chart subjects only; article links targeting an
+  **MDim or explorer**, and narrative charts parented to an MDim view, only appear
+  when that MDim/explorer is passed as its own subject. To close the loop, take the
+  MDim and explorer slugs the first run returned and re-run with `--mdim` /
+  `--explorer`.
 - Data insights are matched on `grapher-url`; one storing the reference elsewhere
   is missed.
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside

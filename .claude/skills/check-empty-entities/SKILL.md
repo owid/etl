@@ -42,6 +42,33 @@ Reading the whole selection is what catches the two failure modes similarity can
 
 Keep `selectedEntityColors` in step with every edit: on a **rename**, move the entry from the old name to the replacement (deleting it discards a deliberately assigned color — a visual regression); on a **drop**, delete the entry. Either way, don't leave a dangling color key. And check the excluded-countries file before proposing anything: an entity in `<short_name>.excluded_countries.json` (`IDA only`, `Arab World`, `Heavily-indebted poor countries`) can never have data, so a drop is the only option.
 
+**Getting most of the surface list.** `find-chart-references` (`--dataset-id`, plus
+`--transitive` for the article hop) returns each reference with its `query_string`
+(where `country=` pins live) and an `embed`/`render`/`link` classification. Use it
+instead of re-deriving the joins for **§1's chart list, §3's MDim views and
+chart-parented narrative charts, and the §4 article rows that target a chart** — it
+also expands chart slugs through `chart_slug_redirects`, which §4 requires.
+
+What it does *not* replace — keep running these here until it enumerates the rows
+itself:
+
+- **§3 explorer views.** The sweep reports explorers aggregated per explorer
+  (`explorer_variables`, one row carrying a view *count*), never one row per view, so
+  it cannot hand you the per-view configs this check reads. Keep the `explorer_views`
+  → `chart_configs` join — and the legacy CSV-explorer caveat, which neither covers.
+- **§4 raw-URL article links.** `linkType='url'` rows are swept for *chart* subjects
+  only; the `--transitive` hop from a dataset/indicator subject does not run that
+  scan. Keep it here.
+- **§3/§4 surfaces hanging off an MDim.** The `--transitive` hop is built from the
+  charts found, so gdoc `country=` links whose target is an **MDim slug**, and
+  narrative charts parented to an MDim view (`parentMultiDimXChartConfigId`, not
+  `parentChartId`), are outside it. Feed the MDim slugs the first sweep returned
+  back in as `--mdim <slug>` for a second pass — or keep the local joins.
+
+What stays here regardless is the part the sweep can't do at all: reading each
+surface's entity selection, checking it against entities-with-data, and grading the
+result against production.
+
 ### 1. Charts
 
 For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`), parse `chart_configs.full`:
