@@ -850,9 +850,9 @@ def test_validate_dimension_uniqueness_single_dimension():
     collection.validate_dimension_uniqueness()
 
 
-def _collection_with_dimension_slug(slug: str, catalog_path: str = "test/latest/data#table") -> Collection:
+def _collection_with_dimension_slug(slug: str) -> Collection:
     return Collection(
-        catalog_path=catalog_path,
+        catalog_path="test/latest/data#table",
         title={"en": "Test"},
         default_selection=[],
         dimensions=[
@@ -901,25 +901,6 @@ def test_validate_dimension_slugs_not_grapher_query_params_normalized_slug():
 
     # Should not raise any exception
     _collection_with_dimension_slug("stackMode").validate_dimension_slugs_not_grapher_query_params()
-
-
-def test_validate_dimension_slugs_not_grapher_query_params_grandfathered_collection():
-    """
-    Test Collection.validate_dimension_slugs_not_grapher_query_params - allows grandfathered cases.
-
-    Example: The ipcc_scenarios explorer predates this validation and uses "region"; it must keep
-    passing so its published URLs don't change. The same slug fails for any other collection.
-    """
-    grandfathered = _collection_with_dimension_slug(
-        "region", catalog_path="emissions/latest/ipcc_scenarios#ipcc-scenarios"
-    )
-
-    # Should not raise any exception
-    grandfathered.validate_dimension_slugs_not_grapher_query_params()
-
-    other = _collection_with_dimension_slug("region")
-    with pytest.raises(ValueError, match="collides with a query param reserved by Grapher"):
-        other.validate_dimension_slugs_not_grapher_query_params()
 
 
 def test_validate_dimension_uniqueness_multiple_duplicates():

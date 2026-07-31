@@ -76,12 +76,6 @@ GRAPHER_RESERVED_QUERY_PARAMS = {
     "zoomToSelection",
 }
 
-# Collections that used a reserved slug before this validation existed, kept so their published
-# URLs don't change. Do not add new entries; rename the dimension slug instead.
-_RESERVED_QUERY_PARAM_EXCEPTIONS = {
-    ("emissions/latest/ipcc_scenarios#ipcc-scenarios", "region"),
-}
-
 
 class _GroupedViewsEntry(TypedDict):
     overwrite: bool
@@ -617,8 +611,6 @@ class Collection(MDIMBase):
         for dim in self.dimensions:
             slug = underscore(dim.slug)
             if slug in GRAPHER_RESERVED_QUERY_PARAMS:
-                if (self.catalog_path, slug) in _RESERVED_QUERY_PARAM_EXCEPTIONS:
-                    continue
                 raise ValueError(
                     f"Dimension slug '{slug}' in collection '{self.catalog_path}' collides with a query param "
                     f"reserved by Grapher. Rename the dimension slug. Reserved names: "
