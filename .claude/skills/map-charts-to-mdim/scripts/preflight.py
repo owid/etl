@@ -66,6 +66,10 @@ def load_decisions(path_arg: str) -> dict[int, dict]:
             # regenerates mapping.json with the new md5, so `stale_charts` cannot see the
             # drift — only the decision export still remembers what was reviewed.
             "config_md5": (r.get("config_md5") or "").strip(),
+            # the same, on the target side: grapher edits a view's config in place, so a
+            # re-run rewrites mapping.json with the new md5 and `stale_targets` compares
+            # new-against-new. Absent from exports written before this field existed.
+            "view_config_md5": (r.get("view_config_md5") or "").strip(),
         }
         for r in rows
     }
@@ -77,10 +81,11 @@ def apply_decisions(
     """Drop entries whose chart the reviewer flagged; count kept entries that carry no decision.
 
     A decision is bound to the proposal it was made on, on BOTH sides: if the export carries
-    the reviewed target (target_mdim/view_id) or the reviewed source version (config_md5) and
-    either differs from the entry, the decision is stale and treated as no decision at all.
-    The source half matters because a re-run after the chart was edited rewrites mapping.json
-    with the new md5, so `stale_charts` compares new-against-new and sees nothing.
+    the reviewed target (target_mdim/view_id), the reviewed source version (config_md5) or the
+    reviewed target rendering (view_config_md5) and any of them differs from the entry, the
+    decision is stale and treated as no decision at all. The md5 halves matter because a re-run
+    after either end was edited rewrites mapping.json with the new md5s, so `stale_charts` and
+    `stale_targets` compare new-against-new and see nothing.
     """
     kept, flagged, stale, undecided = [], [], [], 0
     for e in entries:
@@ -88,9 +93,15 @@ def apply_decisions(
         status = d.get("status", "")
         reviewed_target = (d.get("target_mdim", ""), d.get("view_id", ""))
         reviewed_md5 = d.get("config_md5", "")
+        reviewed_view_md5 = d.get("view_config_md5", "")
         drifted = any(reviewed_target) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"])
         edited = bool(reviewed_md5) and bool(e["chart"].get("configMd5")) and reviewed_md5 != e["chart"]["configMd5"]
-        if status and (drifted or edited):
+        retargeted = (
+            bool(reviewed_view_md5)
+            and bool(e["target"].get("viewConfigMd5"))
+            and reviewed_view_md5 != e["target"]["viewConfigMd5"]
+        )
+        if status and (drifted or edited or retargeted):
             stale.append(e)
             status = ""
         if status == "flagged":
@@ -176,6 +187,19 @@ def stale_targets(entries: list[dict]) -> dict[str, str]:
         }
         current[int(row["id"])] = {"slug": row["slug"], "published": bool(row["published"]), "views": views}
 
+    # Grapher updates a view's config row in place when the MDIM is re-exported, keeping
+    # the same id, so the checks above cannot see that the reviewed view now renders
+    # something else. Its md5 can — the mirror of `stale_charts`'s configMd5 check.
+    recorded_md5 = {e["target"]["viewConfigId"]: e["target"]["viewConfigMd5"] for e in entries if e["target"].get("viewConfigMd5")}  # fmt: skip
+    live_md5: dict[str, str] = {}
+    if recorded_md5:
+        live_md5 = dict(
+            OWID_ENV.read_sql(
+                "SELECT id, fullMd5 FROM chart_configs WHERE id IN %(ids)s",
+                params={"ids": tuple(recorded_md5)},
+            ).itertuples(index=False, name=None)
+        )
+
     rerun = " — re-run extract_and_match.py and re-review"
     stale: dict[str, str] = {}
     for e in entries:
@@ -200,6 +224,8 @@ def stale_targets(entries: list[dict]) -> dict[str, str]:
                 f"the reviewed view config now belongs to a different view "
                 f"(now '{cur['views'][t['viewConfigId']]}'){rerun}"
             )
+        elif t.get("viewConfigMd5") and live_md5.get(t["viewConfigId"], t["viewConfigMd5"]) != t["viewConfigMd5"]:
+            stale[e["source"]] = f"the reviewed target view's config changed since the proposal{rerun}"
     return stale
 
 

@@ -80,6 +80,12 @@ def resolve_chart_subjects(chart_ids: list[int], chart_slugs: list[str]) -> dict
         params["ids"] = tuple(chart_ids)
     if chart_slugs:
         where.append("cc.slug IN %(slugs)s")
+        # A requested slug can itself be an old one that still reaches the chart — that is
+        # exactly the URL someone pastes when auditing. Resolving aliases here rather than
+        # only expanding them afterwards is what makes a sole old-slug subject work: the
+        # expansion below runs off the charts this query found, so without it nothing
+        # resolves and the live URL is reported as unresolved and never swept.
+        where.append("c.id IN (SELECT chart_id FROM chart_slug_redirects WHERE slug IN %(slugs)s)")
         params["slugs"] = tuple(chart_slugs)
     df = OWID_ENV.read_sql(
         f"SELECT c.id, cc.slug FROM charts c JOIN chart_configs cc ON cc.id = c.configId WHERE {' OR '.join(where)}",
@@ -173,6 +179,18 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
     return out
 
 
+def url_query(target: str, fallback: str = "") -> str:
+    """Query string of a raw pasted URL, falling back to the column when it has none.
+
+    `posts_gdocs_links.queryString` is populated for grapher-item links, but a
+    `linkType='url'` row keeps its query inside `target` — so reading the column alone
+    drops exactly the parameters that select a view, and the reported reference collapses
+    to the base page.
+    """
+    without_fragment = (target or "").split("#", 1)[0]
+    return without_fragment.split("?", 1)[1] if "?" in without_fragment else fallback
+
+
 def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
     """Raw URL links (linkType='url') pointing at a live grapher page."""
     slugs = tuple(by_slug)
@@ -204,7 +222,7 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
                 r["post_slug"],
                 f"/{r['post_slug']}",
                 f"{component or 'unknown'} ({r['post_type']})",
-                target.split("?", 1)[1] if "?" in target else "",
+                url_query(target, r["queryString"] or ""),
                 r["text"],
                 r["published"],
             )  # fmt: skip
@@ -402,9 +420,15 @@ def parse_json_obj(value) -> dict:
 
 
 def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
-    """Charts rendering these indicators. Drafts can have no slug — they still render."""
+    """Charts rendering these indicators. Drafts can have no slug — they still render.
+
+    `charts.publishedAt` is the first-publish timestamp and survives an unpublish, so it
+    would report already-retired charts as live and have their references graded for
+    reader impact. The live state is `isPublished` in the config.
+    """
     df = OWID_ENV.read_sql(
-        "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.slug, c.publishedAt IS NOT NULL AS published "
+        "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.slug, "
+        "COALESCE(cc.full->>'$.isPublished', 'false') = 'true' AS published "
         "FROM chart_dimensions cd JOIN charts c ON c.id = cd.chartId "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE cd.variableId IN %(ids)s ORDER BY cc.slug",
         params={"ids": tuple(variable_ids)},
@@ -612,7 +636,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 r["post_slug"],
                 f"/{r['post_slug']}",
                 f"raw URL, {component or 'unknown'} ({r['post_type']})",
-                r["queryString"],
+                url_query(r["target"] or "", r["queryString"] or ""),
                 r["text"],
                 r["published"],
             )  # fmt: skip

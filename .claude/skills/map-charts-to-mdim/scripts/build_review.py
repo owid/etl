@@ -72,6 +72,9 @@ def parse_proposal(mapping_dir: Path) -> list[dict]:
                 "config_md5": (r.get("chart_config_md5") or "").strip(),
                 "target_mdim": (r.get("target_mdim_slug") or "").strip(),
                 "view_id": (r.get("target_view_id") or "").strip(),
+                # The target-side half of the fingerprint: an approval is also made on a
+                # specific rendering of the target view, not just on its slot in the MDIM.
+                "view_config_md5": (r.get("target_view_config_md5") or "").strip(),
                 "target_path": target_path,
                 "shared_with": (r.get("shared_target_chart_ids") or "").strip(),
                 "conflict": (r.get("conflict") or "").strip(),
@@ -268,12 +271,15 @@ let order = RECORDS.map((_, i) => i);
 let pos = 0;
 
 // A decision is bound to the proposal it was made on: when a re-run of the extractor
-// changes a chart's proposed target OR edits the source chart itself, the saved
-// approval/flag must not carry over. The source config md5 is in the fingerprint
-// because a reviewer approves a specific version of the chart, not just its id —
-// and once the mapping is regenerated, preflight's own configMd5 check compares the
-// new proposal against the DB and so cannot see that drift either.
-function fp(rec) { return (rec.target_mdim || "") + "::" + (rec.view_id || "") + "::" + (rec.config_md5 || ""); }
+// changes a chart's proposed target OR edits either end of the pair, the saved
+// approval/flag must not carry over. Both config md5s are in the fingerprint because a
+// reviewer approves a specific version of the source chart AND a specific rendering of
+// the target view, not just their ids — and once the mapping is regenerated, preflight's
+// own md5 checks compare the new proposal against the DB and so cannot see that drift
+// either. The target view's *config id* is deliberately not in here: grapher keys view
+// configs on the dimension-derived view id and updates the row in place on re-export, so
+// the id survives content changes and only ever changes together with view_id above.
+function fp(rec) { return (rec.target_mdim || "") + "::" + (rec.view_id || "") + "::" + (rec.config_md5 || "") + "::" + (rec.view_config_md5 || ""); }
 (function pruneStaleDecisions() {
   let n = 0;
   for (const rec of RECORDS) {
@@ -377,8 +383,9 @@ function importJSON(file) {
       for (const row of rows) {
         if (!(row && row.id != null && (row.status || row.note))) continue;
         const rec = byId[String(row.id)];
-        const rowFp = (row.target_mdim || "") + "::" + (row.view_id || "") + "::" + (row.config_md5 || "");
-        if (!rec || rowFp !== fp(rec)) { skipped++; continue; }  // chart gone, target changed, or chart edited
+        // Must stay in step with fp() — a shorter fingerprint here silently skips every row.
+        const rowFp = (row.target_mdim || "") + "::" + (row.view_id || "") + "::" + (row.config_md5 || "") + "::" + (row.view_config_md5 || "");
+        if (!rec || rowFp !== fp(rec)) { skipped++; continue; }  // chart gone, target changed, or either end edited
         decisions[String(row.id)] = { status: row.status || null, note: row.note || "", target: rowFp };
         n++;
       }
@@ -569,6 +576,7 @@ function exportRows() {
     return {
       id: r.id, chart_slug: r.chart_slug, quality: r.quality,
       target_mdim: r.target_mdim, view_id: r.view_id, config_md5: r.config_md5,
+      view_config_md5: r.view_config_md5,
       shared_with: r.shared_with, conflict: r.conflict,
       status: d.status || "", note: d.note || "",
       chart_url: chartUrl(r), mdim_url: mdimUrl(r),
@@ -583,7 +591,7 @@ function download(name, text, type) {
 function exportJSON() { download(REVIEW_NAME + "_chart_mdim_review.json", JSON.stringify(exportRows(), null, 2), "application/json"); }
 function exportCSV() {
   const rows = exportRows();
-  const cols = ["id", "chart_slug", "quality", "target_mdim", "view_id", "config_md5", "status", "note", "shared_with", "conflict", "chart_url", "mdim_url"];
+  const cols = ["id", "chart_slug", "quality", "target_mdim", "view_id", "config_md5", "view_config_md5", "status", "note", "shared_with", "conflict", "chart_url", "mdim_url"];
   const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
   const lines = [cols.join(",")];
   for (const r of rows) lines.push(cols.map((c) => esc(r[c])).join(","));
