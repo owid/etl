@@ -45,7 +45,7 @@ It applies to **every** surface, **every** time you post:
 
 Use the handle of the human directing the work (usually the current git user; ask if ambiguous).
 
-**The only exception** is a comment that is a bare mechanical token with *no prose* — a lone `@codex review` ping or a 👍. The moment your comment contains a sentence of explanation, it needs the line. When in doubt, include it.
+Besides the bot-account case above, **the only exception** is a comment that is a bare mechanical token with *no prose* — a lone `@codex review` ping or a 👍. The moment your comment contains a sentence of explanation, it needs the line. When in doubt, include it.
 
 2. **Use exact handles** from the list below when tagging colleagues. Don't guess — a wrong tag pings a real person. If a name isn't on this list, write the plain name (e.g. "Bastian") instead of `@`-tagging, and ask the user for the handle.
 
