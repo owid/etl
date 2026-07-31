@@ -449,43 +449,12 @@ def sweep_key_charts(by_slug: dict[str, dict]) -> list[dict]:
     ]
 
 
-def sweep_wordpress(by_slug: dict[str, dict]) -> list[dict]:
-    """Legacy WordPress posts. The table may be absent on newer environments — fail open."""
-    slugs = tuple(by_slug)
-    clauses = " OR ".join(f"pl.target LIKE %(t{i})s" for i in range(len(slugs)))
-    params = {f"t{i}": f"%/grapher/{s}%" for i, s in enumerate(slugs)}
-    try:
-        df = OWID_ENV.read_sql(
-            "SELECT p.id AS post_id, p.slug AS post_slug, pl.target "
-            "FROM posts_links pl JOIN posts p ON p.id = pl.sourceId "
-            f"WHERE p.status = 'publish' AND ({clauses})",
-            params=params,
-        )
-    except Exception as e:  # noqa: BLE001 - optional legacy surface; report as a coverage gap
-        gap(f"WordPress sweep skipped ({type(e).__name__}) — legacy posts were NOT checked")
-        return []
-    out = []
-    for r in df.to_dict("records"):
-        target = r["target"] or ""
-        slug = target.split("/grapher/", 1)[-1].split("?")[0].split("#")[0].rstrip("/")
-        if slug not in by_slug:
-            continue
-        out.append(
-            rec(
-                "chart",
-                slug,
-                by_slug[slug]["id"],
-                "wordpress",
-                LINK,
-                r["post_slug"],
-                f"/{r['post_slug']}",
-                # A WordPress post, not a gdoc — `posts.id`, with no Google Doc behind it.
-                surface_id=int(r["post_id"]),
-                context="legacy post link",
-                query_string=target.split("?", 1)[1] if "?" in target else "",
-            )  # fmt: skip
-        )
-    return out
+# There is deliberately no WordPress sweep. The `posts` mirror is dead: every published row
+# that links a chart 404s on the live site, and none of those slugs exists as a published
+# gdoc, so they are not migrated content the gdoc sweeps already cover. The sweep that used
+# to live here also never worked — it matched `posts_links.target LIKE '%/grapher/%'`, but
+# that column holds the bare slug for `linkType='grapher'` rows, so it returned nothing while
+# 676 such links existed. Reinstating it would surface references to pages that all 404.
 
 
 # ----- Indicator surfaces ---------------------------------------------------------
@@ -1334,7 +1303,6 @@ def main() -> int:
         findings += sweep_data_insights(by_slug)
         findings += sweep_static_viz(by_slug)
         findings += sweep_key_charts(by_slug)
-        findings += sweep_wordpress(by_slug)
 
     if variable_ids:
         print(f"indicator subjects: {len(variable_ids)} variable(s)")

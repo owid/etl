@@ -3,7 +3,7 @@ name: find-chart-references
 description: >-
   Find every OWID surface that references a chart, indicator, MDIM, or explorer —
   articles (links vs embeds), explorers, narrative charts, data insights, static viz,
-  key-chart slots, MDIM views, WordPress posts. Answers "what breaks or goes stale if
+  key-chart slots, MDIM views. Answers "what breaks or goes stale if
   this changes or goes away", and distinguishes surfaces a URL redirect fixes from
   surfaces that render the object themselves. Read-only, pure SQL. Trigger when the
   user asks "what references this chart/indicator", "where is this chart embedded",
@@ -133,7 +133,10 @@ references written before a rename point at the old one):
 | data insights | `posts_gdocs.content->>'$."grapher-url"'` | `embed` |
 | static viz | `static_viz.grapherSlug` | `embed` |
 | key charts | `chart_tags` where `keyChartLevel > 0` | `render` |
-| WordPress | `posts_links` (legacy; skipped if absent) | `link` |
+
+WordPress (`posts` / `posts_links`) is **not** swept, and adding it back would be a
+regression. Every published post there that links a chart 404s on the live site, and none
+of those slugs exists as a published gdoc — they are a dead mirror, not migrated content.
 
 **Indicator subjects**: charts (`chart_dimensions`), MDIM views
 (`multi_dim_x_chart_configs` **plus** a config scan — that column records only the

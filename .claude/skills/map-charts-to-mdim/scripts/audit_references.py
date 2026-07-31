@@ -57,7 +57,6 @@ FIXES = {
     "data insight": "update the data insight's grapher-url",
     "static viz": "regenerate the static visualization against the MDIM view",
     "key chart": "re-tag the MDIM so the topic page keeps a key chart",
-    "wordpress": "update the link in the WordPress post",
 }
 LINK_FIX = "update the href"
 # Link-kind references whose href is generated rather than authored — there is nothing to
