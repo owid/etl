@@ -89,6 +89,10 @@ COLS = [
     "tariff_regime__status",
     "type_of_ofdi_scheme",
     "type_of_speed",
+    # NOTE: added in the 2026 Q2 release, used only by SH_OOP_XPD_EARNNET40 (indicator 3.8.2).
+    # Every dimension column must be listed here, otherwise it is treated as a value column
+    # and the index loses its uniqueness.
+    "type_of_household",
 ]
 
 
