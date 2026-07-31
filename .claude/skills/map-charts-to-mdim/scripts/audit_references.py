@@ -174,14 +174,30 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
                 lines.append(f"    - fix: {f['fix']}")
             lines.append("")
 
-    lines += [
-        "## Coverage caveats",
-        "",
-        "See the `find-chart-references` skill for the full surface catalog and its known gaps "
-        "(non-ETL explorer TSVs, data insights storing the reference elsewhere, charts nested "
-        "in layout containers).",
-        "",
-    ]
+    # Nothing in this audit is applied by running it, and its coverage is not total — so it
+    # closes by separating what someone must act on from what nobody has checked, rather
+    # than leaving a reader to infer either from the sections above.
+    handed_off = (
+        f"**Handed off** — {len(red)} reference(s) under *Needs manual migration* above. Each names the "
+        "page or surface that holds it and the replacement URL to put there; whoever owns that page has "
+        "to make the edit, because unpublishing the chart breaks it and the redirect does not cover it."
+        if red
+        else "**Handed off** — nothing. No reference needs manual migration before the charts are unpublished."
+    )
+    proposed = (
+        f"**Proposed** — {len(yellow)} hyperlink(s) under *worth updating* above. The 301 keeps them working, "
+        "so updating each href is a call someone still has to make, not a blocker."
+        if yellow
+        else "**Proposed** — nothing. No hyperlink updates are pending a decision."
+    )
+    unverified = (
+        "**Unverified** — this audit does not cover non-ETL explorer TSVs, data insights that store the "
+        "reference somewhere other than the surfaces swept here, or charts nested inside layout containers; "
+        "see the `find-chart-references` skill for the full surface catalog and its known gaps. "
+        f"{len(info)} unpublished or draft reference(s) were found and listed but not graded for reader impact. "
+        "Whether the redirects themselves apply cleanly is checked by `preflight.py`, not here."
+    )
+    lines += ["## What's still open", "", handed_off, "", proposed, "", unverified, ""]
     path.write_text("\n".join(lines))
     return path
 

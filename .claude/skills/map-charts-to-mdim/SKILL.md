@@ -422,6 +422,17 @@ one slug.
   grapher validates a redirect against; the human-readable `view_id`
   (`dim=choice__dim=choice`, key-sorted) is for URLs and display. Both are in
   every artifact.
+- **`viewConfigId` does not change when the view's content does.** Re-exporting
+  an MDIM looks each view up by its dimension-derived view id and updates that
+  `chart_configs` row in place, so the id survives content edits and only ever
+  changes together with `view_id`. To tell whether the reviewed *rendering* still
+  holds, compare `viewConfigMd5` (`chart_configs.fullMd5`) — the target-side
+  mirror of a source chart's `configMd5`. Both md5s are in the review
+  fingerprint and in `preflight.py`'s staleness checks.
+- **`charts.publishedAt` is not the live publication flag.** It records the first
+  publish and stays set after an unpublish (308 production charts are in that
+  state), so chart selection and reference grading both read `isPublished` from
+  the config instead.
 - Stored MDIM configs mostly carry `{id, catalogPath}` per indicator, but older
   ones may have catalogPath-only or bare entries — the extractor normalizes all
   shapes and batch-resolves against `variables`.
