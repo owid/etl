@@ -178,7 +178,7 @@ def _create_table_with_dimensions():
     value of a dimension (equivalence_scale="square root") is wanted in a collection.
     """
     from owid.catalog import Table, Variable
-    from owid.catalog.meta import VariableMeta
+    from owid.catalog.core.meta import VariableMeta
 
     data = {
         "country": ["USA", "CAN"],
