@@ -1,5 +1,5 @@
 {
-    "_COMMENT": "This json file contains HARDCODED sources for the UN SDG indicators which do currently not have a single source in the UN SDG. These sources are retrieved from the metadata pdf, under 1. Data reporter or 3.f. Data compilers. When doing the UN SDG data update it is VERY IMPORTANT to check whether these sources are still the same and update them if necessary! A mapping in an excel file can be found under https://unstats.un.org/sdgs/iaeg-sdgs/tier-classification/. Last update 09/2024",
+    "_COMMENT": "This json file contains HARDCODED sources for the UN SDG indicators which do currently not have a single source in the UN SDG. These sources are retrieved from the metadata pdf, under 1. Data reporter or 3.f. Data compilers. When doing the UN SDG data update it is VERY IMPORTANT to check whether these sources are still the same and update them if necessary! A mapping in an excel file can be found under https://unstats.un.org/sdgs/iaeg-sdgs/tier-classification/. Last update 07/2026",
     "1.2.2": "National Government",
     "1.3.1": "International Labour Organization",
     "1.4.2": "World Bank and United Nations Human Settlements Programme",
@@ -131,5 +131,7 @@
     "9.3.1": "United Nations Industrial Development Organization",
     "9.5.1": "UNESCO Institute for Statistics",
     "9.5.2": "UNESCO Institute for Statistics",
-    "9.c.1": "International Telecommunication Union"
+    "9.c.1": "International Telecommunication Union",
+    "6.4.1": "Food and Agriculture Organization of the United Nations",
+    "6.6.1": "United Nations Environment Programme"
 }
