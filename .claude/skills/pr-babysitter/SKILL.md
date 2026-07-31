@@ -21,8 +21,10 @@ Only ONE babysitter per PR. If one is already running, message it (SendMessage) 
 
    ```bash
    gh api repos/<owner>/<repo>/issues/<n>/comments --method POST \
-     -f body="@codex review" --jq '.created_at'
+     -f body="@codex review" --jq '{id, created_at}'
    ```
+
+   Keep **both**: the timestamp is the polling threshold, and the id is what step 2 reads reactions from (`gh api repos/<owner>/<repo>/issues/comments/<id>/reactions`) to see the `+1` clean signal. Pass both to the agent.
 
    Don't post with `gh pr comment` and then search for the comment: that lookup is a paginated connection, and on a PR with more than 30 issue comments the trigger you just posted is not on the first page.
 2. Spawn a `general-purpose` background agent with the prompt template below, filled in. The agent works in the SAME checkout on the SAME branch — warn it that the main session may also push commits mid-loop. Cleaner when available: give it a dedicated worktree of the branch, which sidesteps the shared-dirty-tree hazards in the lessons below.
@@ -45,6 +47,31 @@ Loop (max <3> iterations, then stop and report):
    - `issues/<n>/comments` — a plain issue comment (e.g. "Didn't find any major issues") posted when Codex has NONE. This is the clean-pass verdict and it is NOT a review; watching only the reviews endpoint strands the loop forever on a clean pass.
 
    **Do NOT treat a reaction on the trigger comment as the review arriving, unless `content == "+1"`.** Within seconds of the trigger, Codex adds an acknowledgment reaction (👀-style) to the `@codex review` comment, then submits its real review minutes later (~4–9 min observed). Exiting the wait on *any* codex reaction declares the PR "clean" while a review with findings is still in flight — this silently skipped two P2 findings once. So: a **new review (reviews count increased)** is the findings signal; a reaction with `content == "+1"` is the ONLY clean-signal reaction. After any apparent "clean" verdict (from `+1` or an issue comment), cross-check that the reviews count did not also increase before you conclude there are no findings.
+
+   One paginated GraphQL call covers both `pulls/` surfaces with the fields you need to
+   judge them — author and timestamp per finding, plus `totalCount` for the
+   reviews-count cross-check. `reviews(last: 20)` returns the newest, so it needs no
+   cursor of its own:
+
+   ```bash
+   gh api graphql --paginate -f query='
+     query($endCursor: String) {
+       repository(owner: "<owner>", name: "<repo>") {
+         pullRequest(number: <n>) {
+           reviews(last: 20) { totalCount nodes { author { login } submittedAt state } }
+           reviewThreads(first: 100, after: $endCursor) {
+             pageInfo { hasNextPage endCursor }
+             nodes { id isResolved comments(first: 1) { nodes { databaseId author { login } createdAt body } } }
+           }
+         }
+       }
+     }'
+   ```
+
+   The bare thread query in step 6 is for *resolving* threads and carries neither author
+   nor timestamp — polling with it cannot tell a new Codex response from a historical
+   thread. `issues/<n>/comments` (the clean-pass verdict) and the trigger's reactions stay
+   on REST; page the former with `--paginate`.
 
    **Every one of these is a paginated connection — page all of them.** Bare `gh api .../pulls/<n>/reviews` returns only the first 30 items, oldest first, so on a long-lived PR the newest review is not in the response and you will read a fresh review as silence (measured: page 1 fourteen hours stale, with 41 reviews and 60 inline comments present). GraphQL `reviewThreads` is the better route — it also hands you `isResolved` and the thread ids step 6 needs — **but a bare `first: N` truncates exactly the same way**, so page it too (query form in step 6). Either add `--paginate` to the REST calls or use the paginated GraphQL query; never a bare first page of anything.
 
