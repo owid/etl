@@ -108,6 +108,44 @@ def list_s3_objects(s3_folder: str, client: BaseClient | None = None) -> list[st
     return keys
 
 
+def object_exists(s3_url: str, client: BaseClient | None = None) -> bool:
+    """Check whether an object exists in S3, without downloading it.
+
+    Args:
+        s3_url: S3 URL of the object (e.g., `s3://bucket/path/file.csv`).
+        client: Optional boto3 S3 client. If None, connects to R2 automatically.
+
+    Returns:
+        True if the object exists, False if it does not.
+
+    Raises:
+        UploadError: If the check fails for any reason other than the object being
+            absent (e.g. missing credentials, network error). A failed check is not
+            reported as "does not exist", so callers can't mistake it for one.
+
+    Example:
+        ```python
+        if not object_exists("s3://my-bucket/data/file.csv"):
+            upload("s3://my-bucket/data/file.csv", "local_file.csv")
+        ```
+    """
+    client = client or connect_r2()
+
+    bucket, key = s3_bucket_key(s3_url)
+
+    try:
+        client.head_object(Bucket=bucket, Key=key)  # ty: ignore
+    except ClientError as e:
+        # 404 (no such key) and 403 (no such key, when the caller lacks ListBucket) both
+        # mean "not there"; anything else is a real failure we must not swallow.
+        if e.response.get("ResponseMetadata", {}).get("HTTPStatusCode") in (403, 404):
+            return False
+        log.error(e)
+        raise UploadError(e)
+
+    return True
+
+
 def download(s3_url: str, filename: str, quiet: bool = False, client: BaseClient | None = None) -> None:
     """Download a file from S3 to local filesystem.
 
