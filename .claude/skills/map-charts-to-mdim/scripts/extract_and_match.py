@@ -56,7 +56,7 @@ QUALITIES = ("exact", "forced", "ambiguous", "near_miss", "none", "skipped")
 PROPOSAL_COLUMNS = [
     "chart_id", "chart_slug", "chart_title", "chart_type", "chart_url", "chart_config_md5", "y_variable_ids",
     "match_quality", "tiebreak", "target_mdim_catalog_path", "target_mdim_slug",
-    "target_view_id", "target_view_config_id", "target_url", "target_view_title",
+    "target_view_id", "target_view_config_id", "target_view_config_md5", "target_url", "target_view_title",
     "target_chart_type", "n_candidates", "candidate_view_ids", "near_miss_detail",
     "shared_target_chart_ids", "conflict", "cli_required", "old_slugs", "cli_notes", "note",
 ]  # fmt: skip
@@ -107,16 +107,23 @@ FROM charts c
 JOIN chart_configs cc ON cc.id = c.configId
 """
 
+# `charts.publishedAt` records the *first* publish and stays set after an unpublish — 308
+# production charts are unpublished with the timestamp still on them. Selecting on it would
+# put charts an editor has already retired into the migration CSV, and applying that CSV
+# would make their dead URLs resolve again. The live state is `isPublished` in the config,
+# the same test `preflight.py:unpublished_sources` uses.
+LIVE_PUBLISHED = "COALESCE(cc.full->>'$.isPublished', 'false') = 'true'"
 
-def resolve_charts(args) -> list[dict]:
-    """Return the selected published charts as dicts, per the chosen selection mode."""
+
+def resolve_charts(args) -> tuple[list[dict], dict]:
+    """Return the selected published charts as dicts, plus the selection that produced them."""
     if args.tag:
         df = OWID_ENV.read_sql(
             CHART_SELECT
-            + """
+            + f"""
             JOIN chart_tags ct ON ct.chartId = c.id
             JOIN tags t ON t.id = ct.tagId
-            WHERE c.publishedAt IS NOT NULL AND t.name = %(tag)s
+            WHERE {LIVE_PUBLISHED} AND t.name = %(tag)s
             """,
             params={"tag": args.tag},
         )
@@ -134,7 +141,7 @@ def resolve_charts(args) -> list[dict]:
         else:
             slugs = [s.strip() for s in raw.split(",") if s.strip()]
         df = OWID_ENV.read_sql(
-            CHART_SELECT + "WHERE c.publishedAt IS NOT NULL AND cc.slug IN %(slugs)s",
+            CHART_SELECT + f"WHERE {LIVE_PUBLISHED} AND cc.slug IN %(slugs)s",
             params={"slugs": tuple(slugs)},
         )
         missing = sorted(set(slugs) - set(df["chart_slug"]))
@@ -144,8 +151,8 @@ def resolve_charts(args) -> list[dict]:
     else:
         df = OWID_ENV.read_sql(
             CHART_SELECT
-            + """
-            WHERE c.publishedAt IS NOT NULL AND c.id IN (
+            + f"""
+            WHERE {LIVE_PUBLISHED} AND c.id IN (
                 SELECT DISTINCT cd.chartId FROM chart_dimensions cd
                 JOIN variables v ON v.id = cd.variableId
                 WHERE v.datasetId = %(ds)s
@@ -324,7 +331,7 @@ def get_mdims_and_views(restrict: list[str], host: str) -> tuple[list[dict], lis
             continue
         usable.append(v)
 
-    attach_view_chart_types(usable, [m["id"] for m in mdims])
+    attach_view_config_facts(usable, [m["id"] for m in mdims])
     return mdims, usable, id_to_path
 
 
@@ -349,16 +356,27 @@ def resolve_view_indicator_ids(views: list[dict]) -> None:
                     )
 
 
-def attach_view_chart_types(views: list[dict], mdim_ids: list[int]) -> None:
+def attach_view_config_facts(views: list[dict], mdim_ids: list[int]) -> None:
+    """Attach each view's chart type and the md5 of its rendered config.
+
+    The md5 is the target-side mirror of a chart's `config_md5`: a reviewer approves a
+    specific rendering of the target view, not just its slot in the MDIM. It cannot be
+    replaced by the view's config id — grapher keys view configs on the dimension-derived
+    view id and *updates the row in place* when an MDIM is re-exported
+    (adminSiteServer/multiDim.ts), so the id survives content changes and only ever
+    changes together with the view id, which is already tracked.
+    """
     df = OWID_ENV.read_sql(
-        "SELECT mx.chartConfigId AS cc_id, cc.chartType AS chart_type "
+        "SELECT mx.chartConfigId AS cc_id, cc.chartType AS chart_type, cc.fullMd5 AS config_md5 "
         "FROM multi_dim_x_chart_configs mx JOIN chart_configs cc ON cc.id = mx.chartConfigId "
         "WHERE mx.multiDimId IN %(ids)s",
         params={"ids": tuple(mdim_ids)},
     )
-    by_cc = dict(zip(df["cc_id"], df["chart_type"]))
+    by_cc = {r["cc_id"]: r for r in df.to_dict("records")}
     for v in views:
-        v["chart_type"] = by_cc.get(v["view_config_id"])
+        cc = by_cc.get(v["view_config_id"]) or {}
+        v["chart_type"] = cc.get("chart_type")
+        v["view_config_md5"] = cc.get("config_md5") or ""
 
 
 # ----- Matching -------------------------------------------------------------------
@@ -634,6 +652,7 @@ def write_proposal_csv(out: Path, charts: list[dict], id_to_path: dict[int, str]
                 "target_mdim_slug": t["mdim_slug"] if t else "",
                 "target_view_id": t["view_id"] if t else "",
                 "target_view_config_id": t["view_config_id"] if t else "",
+                "target_view_config_md5": t["view_config_md5"] if t else "",
                 "target_url": t["url"] if t else "",
                 "target_view_title": t["title"] if t else "",
                 "target_chart_type": t["chart_type"] if t else "",
@@ -665,6 +684,8 @@ def redirect_json(c: dict) -> dict:
             "mdimSlug": t["mdim_slug"],
             "viewId": t["view_id"],
             "viewConfigId": t["view_config_id"],
+            # Lets preflight.py detect a target view edited after the proposal was written.
+            "viewConfigMd5": t["view_config_md5"],
             "dimensions": t["dims"],
             "queryStr": t["query_str"],
             "url": t["url"],

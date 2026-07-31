@@ -176,6 +176,19 @@ def stale_targets(entries: list[dict]) -> dict[str, str]:
         }
         current[int(row["id"])] = {"slug": row["slug"], "published": bool(row["published"]), "views": views}
 
+    # Grapher updates a view's config row in place when the MDIM is re-exported, keeping
+    # the same id, so the checks above cannot see that the reviewed view now renders
+    # something else. Its md5 can — the mirror of `stale_charts`'s configMd5 check.
+    recorded_md5 = {e["target"]["viewConfigId"]: e["target"]["viewConfigMd5"] for e in entries if e["target"].get("viewConfigMd5")}  # fmt: skip
+    live_md5: dict[str, str] = {}
+    if recorded_md5:
+        live_md5 = dict(
+            OWID_ENV.read_sql(
+                "SELECT id, fullMd5 FROM chart_configs WHERE id IN %(ids)s",
+                params={"ids": tuple(recorded_md5)},
+            ).itertuples(index=False, name=None)
+        )
+
     rerun = " — re-run extract_and_match.py and re-review"
     stale: dict[str, str] = {}
     for e in entries:
@@ -200,6 +213,8 @@ def stale_targets(entries: list[dict]) -> dict[str, str]:
                 f"the reviewed view config now belongs to a different view "
                 f"(now '{cur['views'][t['viewConfigId']]}'){rerun}"
             )
+        elif t.get("viewConfigMd5") and live_md5.get(t["viewConfigId"], t["viewConfigMd5"]) != t["viewConfigMd5"]:
+            stale[e["source"]] = f"the reviewed target view's config changed since the proposal{rerun}"
     return stale
 
 
