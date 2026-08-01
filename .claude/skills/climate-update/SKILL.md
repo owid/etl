@@ -1,6 +1,6 @@
 ---
 name: climate-update
-description: Run OWID's monthly climate data update. Bumps all updateable climate-namespace datasets to one common version in a single PR with one announcement, skipping the frozen sources. Also supports a wildfires-only subset for fire season. Use when the user wants to update climate data, run the monthly climate update, or refresh wildfires mid-season.
+description: Run OWID's monthly climate data update. Bumps all updateable climate-namespace datasets to one common version in a single PR with one announcement, skipping the frozen sources. Use when the user wants to update climate data or run the monthly climate update. For a wildfires-only refresh during fire season, use the wildfires-update skill instead.
 metadata:
   internal: true
 ---
@@ -16,15 +16,19 @@ single-PR / single-announcement discipline. It delegates the per-dataset mechani
 the same branch.
 
 The matching reminder lives in `owid-issues/.github/workflows/update-climate.yml`
-(one monthly issue on the 10th). There are no per-dataset climate reminders.
+(one monthly issue on the 10th). Wildfires is the one dataset with a reminder of its
+own on top of that: `update-climate-wildfires.yml` fires weekly from May to the end of
+September.
 
 ## Modes
 
 - **Full monthly update** (default): bump every updateable dataset below to a common
   new version date.
 - **Wildfires-only subset**: bump just `weekly_wildfires` (and optionally
-  `yearly_burned_area`) to a new version. Use during peak fire season when wildfire
-  charts need fresher data than the monthly cadence. Same mechanics, narrower scope.
+  `yearly_burned_area`) to a new version, for the weekly in-season refresh. Follow
+  [`/wildfires-update`](../wildfires-update/SKILL.md), which covers the source's weekly
+  grid, its provisional last data point, and the snapshot's silent per-country failure
+  mode. Come back here only if you are bumping the whole batch.
 
 ## Updateable datasets (climate.yml "UPDATEABLE" section)
 
