@@ -75,7 +75,9 @@ def parse_ons(snap: Snapshot) -> Table:
     # Keep year-ending-December periods, which correspond to calendar years. Recent periods carry
     # "P" (provisional) and "R" (revised) flags after the period label.
     tb = tb[tb["period"].astype(str).str.contains("YE Dec")].copy()
+    # .str.extract returns a plain Series, so restore the column metadata afterwards.
     tb["year"] = 2000 + tb["period"].astype(str).str.extract(r"YE Dec (\d\d)")[0].astype(int)
+    tb["year"] = tb["year"].copy_metadata(tb["period"])
     tb["value"] = pr.to_numeric(tb["value"], errors="raise")
 
     flows = {"Immigration": "immigration", "Emigration": "emigration", "Net migration": "net_migration"}
