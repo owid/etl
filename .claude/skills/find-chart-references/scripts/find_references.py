@@ -44,13 +44,30 @@ from collections import defaultdict
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urlencode, urlsplit
 
-from reference_report import redirect_target_path
-
 from etl.config import OWID_ENV
 
 RENDER, EMBED, LINK = "render", "embed", "link"
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 GOOGLE_REDIRECT_RE = re.compile(r"^https?://(?:www\.)?google\.[a-z.]+/url\?", re.IGNORECASE)
+
+
+def redirect_target_path(target: str | None) -> str:
+    """Pathname of a site-redirect target, with a trailing slash normalized away.
+
+    A target may be a bare path, a path carrying a query and/or fragment, or an absolute URL,
+    and only its PATHNAME says which page it points at. A target that merely mentions another
+    page inside its query — `/article?next=/explorers/foo` — does not point at that page, so
+    substring-matching the raw string reports an unrelated redirect as an inbound chain.
+
+    It lives in this module, which imports no siblings by design (it is loaded by path, not as a
+    package), because the sweep and the redirect preflights must apply this rule IDENTICALLY:
+    the sweep decides whether to raise the finding and a preflight decides whether to block on
+    it. Two copies drifted once already, so consumers import this one.
+    """
+    path = urlsplit((target or "").strip()).path
+    return path.rstrip("/") or path
+
+
 # Every raw-URL sweep adds this to its SQL prefilter. A wrapper can percent-encode the
 # nested URL's slashes, in which case a `LIKE '%/grapher/<slug>%'` prefilter drops the row
 # before `unwrap_redirect` ever sees it — so wrapper rows are always candidates and the

@@ -30,6 +30,7 @@ from etl.config import OWID_ENV
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts"))
+from find_references import redirect_target_path  # noqa: E402
 from redirect_rules import (  # noqa: E402
     build_source_rules,
     drop_duplicate_entries,
@@ -39,7 +40,7 @@ from redirect_rules import (  # noqa: E402
     strip_payload,
     views_fingerprint,
 )
-from reference_report import redirect_target_path, reference_digest, run_sweep  # noqa: E402
+from reference_report import reference_digest, run_sweep  # noqa: E402
 
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 BLOCKER, WARN, OK = "BLOCKER", "WARN", "ok"

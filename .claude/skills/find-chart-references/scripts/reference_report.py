@@ -26,7 +26,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from urllib.parse import quote, urlsplit
+from urllib.parse import quote
 
 from etl.analytics.config import OWID_BASE_URL, POST_TYPE_TO_URL
 
@@ -118,24 +118,6 @@ def reference_digest(raw: list[dict], subject: str) -> str:
         if str(r.get("subject")) == str(subject)
     )
     return hashlib.sha256("\n".join(items).encode()).hexdigest()[:16]
-
-
-def redirect_target_path(target: str | None) -> str:
-    """Pathname of a site-redirect target, with a trailing slash normalized away.
-
-    A target may be a bare path, a path carrying a query and/or fragment, or an absolute URL,
-    and only its PATHNAME says which page it points at. A target that merely mentions another
-    page inside its query — `/article?next=/explorers/foo` — does not point at that page, so
-    substring-matching the raw string reports an unrelated redirect as an inbound chain. That
-    is a blocker on both sides, and acting on it means repointing or deleting a redirect that
-    had nothing to do with the migration.
-
-    It lives here, alongside the presentation helpers, because the sweep and the preflight must
-    apply this rule *identically*: the sweep decides whether to emit the finding and the
-    preflight decides whether to block on it, and two copies of the rule already drifted once.
-    """
-    path = urlsplit((target or "").strip()).path
-    return path.rstrip("/") or path
 
 
 def absolute_url(where_path: str, host: str, admin: str = "") -> str:
