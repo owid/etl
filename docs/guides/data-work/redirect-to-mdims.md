@@ -118,7 +118,9 @@ Then remove the ETL footprint. **Never delete a step without archiving it** (see
 3. Run `.venv/bin/etl archive-dag` and commit `dag/archive/*.yml` separately — it reads *committed*
    history. `git checkout` anything unrelated it sweeps in.
 4. Archive anything now orphaned upstream (a garden step that only fed this explorer) in a
-   second round.
+   second round. If one of those steps is a **migrated/backport dataset**, also delete its
+   now-orphaned `snapshots/backport/latest/dataset_<id>_*` mirror files — archiving the DAG
+   entry leaves them behind, and nothing else will ever point at them again.
 
 !!! danger "Grep before deleting a shared step"
     Some explorer data steps are read **off-DAG**, by scripts fetching their published CSVs

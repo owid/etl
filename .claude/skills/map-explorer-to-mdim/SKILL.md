@@ -310,7 +310,10 @@ Then remove the explorer's ETL footprint — and **never delete a step without a
 exist on disk today), remove the `dag/*.yml` entry, `make check`, **commit**; then run
 `.venv/bin/etl archive-dag` and commit `dag/archive/*.yml` separately, since it reads *committed*
 history. `git checkout` anything unrelated it sweeps in. Archive anything now orphaned
-upstream — a garden step that existed only to feed this explorer — in a second round.
+upstream — a garden step that existed only to feed this explorer — in a second round. If any of
+those is a **migrated/backport dataset**, delete its now-orphaned
+`snapshots/backport/latest/dataset_<id>_*` mirror files too: archiving the DAG entry leaves them
+on disk, and nothing will point at them again.
 
 > **Grep before deleting a shared explorer data step.** Some are consumed **off-DAG**, by
 > scripts fetching their published catalog CSVs by URL. Those consumers are invisible to

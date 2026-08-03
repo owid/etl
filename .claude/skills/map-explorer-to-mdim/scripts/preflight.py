@@ -35,12 +35,11 @@ from redirect_rules import (  # noqa: E402
     drop_duplicate_entries,
     duplicate_conditions,
     parse_explorer_views,
-    redirect_target_path,
     strip_empty,
     strip_payload,
     views_fingerprint,
 )
-from reference_report import reference_digest, run_sweep  # noqa: E402
+from reference_report import redirect_target_path, reference_digest, run_sweep  # noqa: E402
 
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 BLOCKER, WARN, OK = "BLOCKER", "WARN", "ok"

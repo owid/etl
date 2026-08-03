@@ -44,6 +44,8 @@ from collections import defaultdict
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urlencode, urlsplit
 
+from reference_report import redirect_target_path
+
 from etl.config import OWID_ENV
 
 RENDER, EMBED, LINK = "render", "embed", "link"
@@ -991,10 +993,11 @@ def sweep_explorer_inbound_redirects(explorer: str) -> list[dict]:
         "SELECT id, source, target FROM redirects WHERE target LIKE %(like)s",
         params={"like": f"%/explorers/{explorer}%"},
     )
-    pattern = re.compile(rf"/explorers/{re.escape(explorer)}(?:[?#/]|$)")
     out = []
     for r in df.to_dict("records"):
-        if not pattern.search(r["target"] or ""):
+        # Pathname equality, via the same helper the preflight blocks on: a redirect to another
+        # page that merely names this explorer in its query or fragment is not an inbound chain.
+        if redirect_target_path(r["target"]) != f"/explorers/{explorer}":
             continue
         out.append(
             rec(

@@ -23,7 +23,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import urlencode
 
 # Explorer TSV columns whose header ends in one of these are the dimension (widget) columns.
 WIDGET_SUFFIXES = ("Dropdown", "Radio", "Checkbox")
@@ -102,19 +102,6 @@ def views_fingerprint(dim_names: list[str], rows: list[list[str]]) -> str:
         "\t".join(f"{name}={value}" for name, value in zip(dim_names, row) if value != "") for row in rows
     )
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
-
-
-def redirect_target_path(target: str | None) -> str:
-    """Pathname of a site-redirect target, with a trailing slash normalized away.
-
-    A target may be a bare path, a path carrying a query and/or fragment, or an absolute URL,
-    and only its PATHNAME says which page it points at. A target that merely mentions another
-    page inside its query — `/article?next=/explorers/foo` — does not point at that page, so
-    substring-matching the raw string reports an unrelated redirect as a chain and blocks every
-    entry for that explorer.
-    """
-    path = urlsplit((target or "").strip()).path
-    return path.rstrip("/") or path
 
 
 def strip_empty(dims: dict) -> dict:
