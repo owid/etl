@@ -420,9 +420,24 @@ def narrative_section(
         # MDIM's DEFAULT view with default entities, so nothing below carries over on its own.
         render_cell = f"**[open the target view]({f['replacement_url']})** — the rendering to match"
 
+        # Resolved before the cells are built because both the "set by hand" list and the
+        # steps need it: the name is typed at creation time, and which name applies depends on
+        # whether a published page still holds the original.
+        if published_uses:
+            new_name = suggest_name(name, taken)
+            taken.add(new_name)
+            name_note = (
+                f"**`{new_name}`** — new (a published page still holds `{cell(name, 44)}`); checked: not in use"
+                if new_name
+                else f"a NEW name — a published page still holds `{cell(name, 44)}`"
+            )
+        else:
+            new_name = name
+            name_note = f"**`{name}`** — reuse the original, freed by the delete in step 1"
+
         # Everything the create does not carry over, in the order it gets done in the editor:
-        # pick the view, then its controls, then retype the authored text.
-        parts = []
+        # the name, then the view, then its controls, then the authored text.
+        parts = [f"**name**:<br>{name_note}"]
         dims = f.get("target_dimensions") or {}
         if dims:
             parts.append(
@@ -491,26 +506,17 @@ def narrative_section(
             "not carry over; compare against the original in the admin editor"
         )
         if published_uses:
-            # The name is permanent — there is no rename — so suggest one that survives, and
-            # one that `create` will actually accept.
-            suggestion = suggest_name(name, taken)
-            taken.add(suggestion)
-            name_hint = (
-                f", under a NEW name (`create` rejects an existing one) — suggested: **`{suggestion}`** "
-                "(checked: not in use)"
-                if suggestion
-                else ", under a NEW name (`create` rejects an existing one)"
-            )
             steps = (
-                f"1. **create**: {create_step}{name_hint}"
+                f"1. **create**: {create_step}, naming it as the third column says "
+                "(`create` rejects an existing name)"
                 f"<br>2. {set_step}"
-                "<br>3. **repoint** the page(s) to the new name"
+                f"<br>3. **repoint** the page(s) to `{cell(new_name or 'the new name', 44)}`"
                 "<br>4. **delete** the old one — succeeds once no published page references it"
             )
         else:
             steps = (
                 "1. **delete** the old one — nothing published references it, so this frees the name"
-                f"<br>2. **create**: {create_step}, reusing the SAME name — **`{name}`**"
+                f"<br>2. **create**: {create_step}, naming it as the third column says"
                 f"<br>3. {set_step}"
             )
         lines.append(f"| {chart_cell} | {render_cell} | {faust_cell} | {used_cell} | {steps} |")
