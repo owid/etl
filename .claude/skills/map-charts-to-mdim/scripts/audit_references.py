@@ -41,9 +41,19 @@ from collections import defaultdict
 from pathlib import Path
 from urllib.parse import parse_qsl, quote, urlencode
 
+from etl.analytics.config import OWID_BASE_URL, POST_TYPE_TO_URL
 from etl.config import OWID_ENV
 
 FIND_REFERENCES = Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts" / "find_references.py"
+
+# Public path prefix per gdoc type, derived from the repo's own routing map rather than
+# restated, so the two cannot drift: a data insight lives under /data-insights/, an author
+# under /team/, everything else at the root — and `None` means the type has no public URL
+# at all (fragment, homepage), so no link should be offered for it.
+POST_TYPE_PATH = {
+    post_type: None if base is None else base.removeprefix(OWID_BASE_URL)
+    for post_type, base in POST_TYPE_TO_URL.items()
+}
 
 RED, YELLOW, INFO = "RED", "YELLOW", "INFO"
 # Staging admin hosts carry a tailscale suffix that is noise in a link handed to a human.
@@ -167,6 +177,22 @@ def absolute_url(where_path: str, host: str, admin: str = "") -> str:
         origin = (admin or host).removesuffix("/").removesuffix("/admin")
         return f"{origin}{where_path}"
     return f"{host}{where_path}"
+
+
+def public_page_url(post_type: str, slug: str, host: str) -> str:
+    """Public URL of a gdoc, or "" when its type has no public route.
+
+    A gdoc's slug does NOT sit at the root for every type — a data insight is served under
+    /data-insights/ and an author page under /team/ — so building `host/<slug>` for all of
+    them points the reader at a 404. An unknown type falls back to the root, which is where
+    every currently routable type other than those two lives.
+    """
+    if not slug:
+        return ""
+    prefix = POST_TYPE_PATH.get(post_type, "")
+    if prefix is None:
+        return ""
+    return f"{host}/{prefix}{slug}"
 
 
 def deep_link(where_path: str, anchor: str, host: str, admin: str = "") -> str:
@@ -362,11 +388,8 @@ def narrative_section(
         if used_in:
             uses = []
             for u in sorted(used_in, key=lambda u: (not u["published"], u["slug"] or "")):
-                page = (
-                    f"[{cell(u['slug'], 34)}]({host}/{u['slug']})"
-                    if u["published"] and u["slug"]
-                    else f"`{cell(u['slug'] or '(no slug)', 34)}`"
-                )
+                page_url = public_page_url(u["type"], u["slug"], host) if u["published"] else ""
+                page = f"[{cell(u['slug'], 34)}]({page_url})" if page_url else f"`{cell(u['slug'] or '(no slug)', 34)}`"
                 draft = " ⚠️ **draft**" if not u["published"] else ""
                 uses.append(
                     f"{page} _{u['type']}_{draft}<br>`{u['componentType']}` block · "
@@ -565,8 +588,8 @@ def write_markdown(
             "→ delete** when a published page holds it, and the shorter **delete → create under the "
             "same name** when none does (any draft reference then keeps resolving untouched).",
             "",
-            'Create the replacement from the target view itself, using the chart\'s **"Create narrative '
-            'chart"** admin control — the MDIM page builds that control\'s target from whichever view '
+            "Create the replacement from the target view itself, using the chart's **\"Create narrative "
+            "chart\"** admin control — the MDIM page builds that control's target from whichever view "
             "is on screen, so the new chart is parented to the right view and inherits the controls "
             "you set. Do **not** use a bare `/admin/narrative-charts/create?chartConfigId=…` link: it "
             "opens a copy of the MDIM's default view instead of this one.",
