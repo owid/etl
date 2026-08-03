@@ -308,13 +308,13 @@ that is not the route (and no explorer config in the repo carries `isPublished: 
 Then remove the explorer's ETL footprint — and **never delete a step without archiving it**
 (see `CLAUDE.md`). Delete the step's `.py` **and its sibling `.config.yml`** (the periodic archive sweep only knows `.py`, which is why orphaned configs
 exist on disk today), remove the `dag/*.yml` entry, `make check`, **commit**; then run
-`etl archive-dag` and commit `dag/archive/*.yml` separately, since it reads *committed*
+`.venv/bin/etl archive-dag` and commit `dag/archive/*.yml` separately, since it reads *committed*
 history. `git checkout` anything unrelated it sweeps in. Archive anything now orphaned
 upstream — a garden step that existed only to feed this explorer — in a second round.
 
 > **Grep before deleting a shared explorer data step.** Some are consumed **off-DAG**, by
 > scripts fetching their published catalog CSVs by URL. Those consumers are invisible to
-> `etl archive-dag`, so the step looks like a safe leaf when it is not. Search for its catalog
+> `.venv/bin/etl archive-dag`, so the step looks like a safe leaf when it is not. Search for its catalog
 > URL first and keep it until every consumer is retired.
 
 Track these steps with `TodoWrite` in the chat. **Do not generate a checklist file**, and

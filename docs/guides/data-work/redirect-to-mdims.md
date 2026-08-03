@@ -115,14 +115,14 @@ Then remove the ETL footprint. **Never delete a step without archiving it** (see
 1. Delete the step's `.py` **and** its `.config.yml` — leaving an orphaned config has
    happened before.
 2. Remove the `dag/*.yml` entry, `make check`, **commit**.
-3. Run `etl archive-dag` and commit `dag/archive/*.yml` separately — it reads *committed*
+3. Run `.venv/bin/etl archive-dag` and commit `dag/archive/*.yml` separately — it reads *committed*
    history. `git checkout` anything unrelated it sweeps in.
 4. Archive anything now orphaned upstream (a garden step that only fed this explorer) in a
    second round.
 
 !!! danger "Grep before deleting a shared step"
     Some explorer data steps are read **off-DAG**, by scripts fetching their published CSVs
-    by URL. `etl archive-dag` cannot see those, so the step looks like a safe leaf when it
+    by URL. `.venv/bin/etl archive-dag` cannot see those, so the step looks like a safe leaf when it
     is not. Search for its catalog URL first, and keep it until every consumer is retired.
 
 ## Charts

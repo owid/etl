@@ -35,6 +35,7 @@ from redirect_rules import (  # noqa: E402
     drop_duplicate_entries,
     duplicate_conditions,
     parse_explorer_views,
+    redirect_target_path,
     strip_empty,
     strip_payload,
     views_fingerprint,
@@ -221,8 +222,13 @@ def site_redirect_rows(slugs: list[str]) -> tuple[dict[str, list], dict[str, lis
 
     Both are blockers, for different reasons: a source collision is
     `checkSourceNotSiteRedirectSource`, a target one is `checkSourceNotRedirectTarget` — the
-    chain check. The `LIKE` is re-checked in Python so `/explorers/inequality-wb` cannot
-    answer for `inequality`.
+    chain check. The `LIKE` is only a prefilter and is re-checked in Python, so
+    `/explorers/inequality-wb` cannot answer for `inequality`.
+
+    The target side compares the PATHNAME, not the raw string: a redirect to some other page
+    that merely mentions the explorer URL in a query or fragment (`/article?next=/explorers/foo`)
+    is not a chain, and matching it would block every entry for that explorer and send the
+    operator off to delete or repoint an unrelated redirect.
     """
     paths = [f"/explorers/{s}" for s in slugs]
     df = OWID_ENV.read_sql(
@@ -232,10 +238,11 @@ def site_redirect_rows(slugs: list[str]) -> tuple[dict[str, list], dict[str, lis
     as_source: dict[str, list] = defaultdict(list)
     as_target: dict[str, list] = defaultdict(list)
     for r in df.to_dict("records"):
+        target_path = redirect_target_path(r["target"])
         for slug in slugs:
             if r["source"] == f"/explorers/{slug}":
                 as_source[slug].append(r)
-            if re.search(rf"/explorers/{re.escape(slug)}(?:[?#/]|$)", r["target"] or ""):
+            if target_path == f"/explorers/{slug}":
                 as_target[slug].append(r)
     return as_source, as_target
 
