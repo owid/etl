@@ -153,11 +153,27 @@ def run_find_references(redirects: list[dict]) -> tuple[list[dict], list[str]]:
         Path(gaps_path).unlink(missing_ok=True)
 
 
-def deep_link(where_path: str, anchor: str, host: str) -> str:
+def absolute_url(where_path: str, host: str, admin: str = "") -> str:
+    """Absolute URL for a `where_path`, routing admin routes to the admin origin.
+
+    A narrative chart's `where_path` is its admin editor (`/admin/narrative-charts/…`),
+    which the public site does not serve — prefixing it with `host` produces a link that
+    404s. `admin` is an admin ROOT (".../admin") and the path already starts with
+    `/admin/`, so the root's suffix comes off before joining.
+    """
+    if not where_path:
+        return ""
+    if where_path.startswith("/admin/"):
+        origin = (admin or host).removesuffix("/").removesuffix("/admin")
+        return f"{origin}{where_path}"
+    return f"{host}{where_path}"
+
+
+def deep_link(where_path: str, anchor: str, host: str, admin: str = "") -> str:
     """Published-page URL scrolled to the reference via a text fragment (block embeds
     have no anchor text, so those fall back to the plain URL). Same encoding as
     find-chart-references / chart_diff citations: parentheses literal, hyphens escaped."""
-    base = f"{host}{where_path}" if where_path else ""
+    base = absolute_url(where_path, host, admin)
     if not base or not anchor:
         return base
     encoded = quote(anchor[:200], safe="()").replace("-", "%2D")
@@ -237,59 +253,61 @@ def narrative_section(group: list[dict], usages: dict[str, list[dict]], host: st
     `create` rejects an existing name, so the name can be reused — leaving any draft
     reference resolving untouched — exactly when nothing published holds it.
     """
-    lines: list[str] = []
+    lines = [
+        "| Narrative chart | Parent chart | Replicate this rendering | Used in (what to repoint) | Steps |",
+        "|---|---|---|---|---|",
+    ]
     for f in group:
         name = f["where"]
         used_in = usages.get(name, [])
         published_uses = [u for u in used_in if u["published"]]
-        lines += [
-            f"### `{name}`",
-            "",
-            f"- parent chart: [`{f['source_chart_slug']}`]({f['old_url']}) · "
-            f"[✎ open the narrative chart]({admin}/narrative-charts/{f['narrative_id']}/edit)",
-            f"- replacement should render: {f['replacement_url']}",
-        ]
-        if f["param_collisions"]:
-            lines.append(
-                f"- ⚠️ its stored query params `{f['param_collisions']}` collide with the target view's "
-                "dimensions and would override them"
-            )
-        if used_in:
-            lines.append(
-                f"- **used in {len(used_in)} page(s)** — "
-                + (
-                    "these are what the repoint step updates:"
-                    if published_uses
-                    else "none of them published, so reusing the name below keeps them resolving as they are:"
-                )
-            )
-            for u in sorted(used_in, key=lambda u: (not u["published"], u["slug"] or "")):
-                draft = "" if u["published"] else " ⚠️ **draft**"
-                page = (
-                    f"[{u['slug']}]({host}/{u['slug']})" if u["published"] and u["slug"] else f"`{u['slug'] or '(no slug)'}`"
-                )  # fmt: skip
-                lines.append(
-                    f"    - {page} _{u['type']}_{draft} — in a `{u['componentType']}` block · "
-                    f"[📄 doc](https://docs.google.com/document/d/{u['gdoc_id']}/edit) · "
-                    f"[👁 preview]({admin}/gdocs/{u['gdoc_id']}/preview) · search the doc for `{name}`"
-                )
-        else:
-            lines.append("- **not referenced by any page**")
         create = f"{admin}/narrative-charts/create?type=multiDim&chartConfigId={f['target_view_config_id']}"
-        if published_uses:
-            lines += [
-                f"- **step 1 — create** the replacement under a NEW name (`create` rejects an existing one): {create}",
-                "- **step 2 — repoint:** change the page(s) above to the new narrative chart's name",
-                "- **step 3 — delete:** remove the old narrative chart — the delete succeeds once no "
-                "published page references it, which is why it comes last",
-            ]
+
+        chart_cell = f"[`{cell(name, 40)}`]({admin}/narrative-charts/{f['narrative_id']}/edit)<br>_✎ admin editor_"
+        parent_cell = f"[`{cell(f['source_chart_slug'], 32)}`]({f['old_url']})"
+        # The create page takes only the parent view, so the reader has to reproduce the
+        # controls by hand — naming them beats making them diff two URLs.
+        params = f"<br>set: `{cell(f['stored_params'].replace('&', '`, `'), 90)}`" if f["stored_params"] else ""
+        collide = (
+            f"<br>⚠️ `{f['param_collisions']}` overrides a view dimension — choose it deliberately"
+            if f["param_collisions"]
+            else ""
+        )
+        render_cell = f"[open the target view]({f['replacement_url']}){params}{collide}"
+
+        if used_in:
+            uses = []
+            for u in sorted(used_in, key=lambda u: (not u["published"], u["slug"] or "")):
+                page = (
+                    f"[{cell(u['slug'], 34)}]({host}/{u['slug']})"
+                    if u["published"] and u["slug"]
+                    else f"`{cell(u['slug'] or '(no slug)', 34)}`"
+                )
+                draft = " ⚠️ **draft**" if not u["published"] else ""
+                uses.append(
+                    f"{page} _{u['type']}_{draft}<br>`{u['componentType']}` block · "
+                    f"[📄 doc](https://docs.google.com/document/d/{u['gdoc_id']}/edit) · "
+                    f"[👁 preview]({admin}/gdocs/{u['gdoc_id']}/preview) · find `{cell(name, 44)}`"
+                )
+            used_cell = "<br><br>".join(uses)
+            if not published_uses:
+                used_cell += "<br>_none published — reusing the name keeps these resolving_"
         else:
-            lines += [
-                "- **step 1 — delete** the old narrative chart: nothing published references it, so the "
-                "delete succeeds and frees the name",
-                f"- **step 2 — create** the replacement, reusing the SAME name (`{name}`): {create}",
-            ]
-        lines.append("")
+            used_cell = "_not referenced by any page_"
+
+        if published_uses:
+            steps = (
+                f"1. [**create**]({create}) under a NEW name (`create` rejects an existing one)"
+                "<br>2. **repoint** the page(s) to the new name"
+                "<br>3. **delete** the old one — succeeds once no published page references it"
+            )
+        else:
+            steps = (
+                "1. **delete** the old one — nothing published references it, so this frees the name"
+                f"<br>2. [**create**]({create}) the replacement, reusing the SAME name"
+            )
+        lines.append(f"| {chart_cell} | {parent_cell} | {render_cell} | {used_cell} | {steps} |")
+    lines.append("")
     return lines
 
 
@@ -601,12 +619,14 @@ def main() -> int:
             # config, and only its generated "Explore the data" link follows the redirect.
             # The admin's create page is deep-linkable to the target view, so hand over the
             # ready-made URL rather than an id to look up.
+            # The order (create-first vs delete-first) depends on whether a PUBLISHED page
+            # references it, which only the report's own section resolves — so this cell
+            # states the goal and points there rather than asserting one order for every row.
             fix = (
-                "recreate it manually and point references back at the new one: "
-                f"(1) create the replacement parented to the target MDIM view — {admin}/narrative-charts/create?type=multiDim&chartConfigId={r['target']['viewConfigId']} ; "
-                "(2) update the article(s) that reference it to the new name; "
-                "(3) delete the old one — the delete is refused while a published post still "
-                "references it, which is why the order matters (see SKILL.md)"
+                "recreate it manually from the target MDIM view and repoint the pages that use it — "
+                f"create the replacement at {admin}/narrative-charts/create?type=multiDim&chartConfigId={r['target']['viewConfigId']} ; "
+                "see the Narrative charts section of references.md for the pages involved and the "
+                "order the API forces"
             )
         elif is_gdoc:
             fallback = LINK_FIX if ref["kind"] == "link" else "migrate this reference by hand"
@@ -625,7 +645,7 @@ def main() -> int:
                 "source_chart_slug": ref["subject"],
                 "where": ref["where"],
                 # Scrolled to the reference when the anchor text allows it.
-                "where_url": deep_link(ref["where_path"], ref.get("text") or "", host),
+                "where_url": deep_link(ref["where_path"], ref.get("text") or "", host, admin),
                 # posts_gdocs.id IS the Google Doc id, so the edit link is direct; the
                 # admin previewer renders unpublished drafts the public URL 404s on.
                 "doc_edit_url": f"https://docs.google.com/document/d/{ref['surface_id']}/edit" if is_gdoc else "",
@@ -634,6 +654,9 @@ def main() -> int:
                 # Narrative rows carry the ids their own section needs: the narrative chart
                 # to open/delete, and the target view to parent the replacement to.
                 "narrative_id": ref["surface_id"] if ref["surface"] == "narrative chart" else "",
+                # The narrative chart's own stored controls (entities, tab, time). The admin
+                # create page cannot preset them, so the report names them for hand-copying.
+                "stored_params": qs if ref["surface"] == "narrative chart" else "",
                 "target_view_config_id": r["target"]["viewConfigId"],
                 "context": ref["context"] + (f' — "{ref["text"][:60]}"' if ref["text"] else ""),
                 "old_url": f"{host}/grapher/{ref['subject']}" + (f"?{qs.lstrip('?')}" if qs else ""),
