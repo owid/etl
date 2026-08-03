@@ -366,16 +366,16 @@ same name. The name is preserved and nothing else changes.
 Never delete first. The delete will fail, and unpublishing the article to force it
 through breaks the page for readers.
 
-**Do the create in the admin UI — it is deep-linkable to the right view:**
-
-```
-{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=<target.viewConfigId>
-```
-
-That opens the narrative-chart editor already parented to the MDIM view, so you
-set the name and the view's controls and save. Prefer this over the API: `AdminAPI`
+**Do the create from the target view in the site UI**, using the chart's own
+**"Create narrative chart"** admin control (see the rule above). Do **not** hand
+out `{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=…`: that
+route opens a copy of the MDIM's *default* view, so the replacement ends up
+parented to the wrong view. Prefer the UI over the API either way: `AdminAPI`
 has `get_narrative_chart` and `update_narrative_chart` but **no create or delete**,
-so the API route means hand-rolled HTTP for both ends of the swap.
+so the API route means hand-rolled HTTP for both ends of the swap. Whichever route
+you take, the new chart starts at the MDIM's default view with default entities —
+the dimension selection, the controls and the authored text all have to be set by
+hand afterwards.
 
 If you do script it, the endpoints are `POST {admin_api}/narrative-charts` and
 `DELETE {admin_api}/narrative-charts/<id>`:
