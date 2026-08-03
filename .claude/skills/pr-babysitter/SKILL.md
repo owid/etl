@@ -31,7 +31,7 @@ Only ONE babysitter per PR. If one is already running, message it (SendMessage) 
      -f body="@codex review" --jq '{id, created_at}'
    ```
 
-   Keep **all three**: the timestamp is the polling threshold, the id is what step 2 reads reactions from (`gh api repos/<owner>/<repo>/issues/comments/<id>/reactions`) to see the `+1` clean signal, and the SHA is what any verdict from this round actually covers. Pass all three to the agent. A findings review names its own commit, but a clean pass does not — so if the head moves mid-round, the recorded SHA is the only thing standing between "clean" and a claim about code Codex never saw.
+   Keep **all three**: the timestamp is the polling threshold, the id is what step 2 reads reactions from (`gh api repos/<owner>/<repo>/issues/comments/<id>/reactions`) to see the `+1` clean signal, and the SHA is what any verdict from this round actually covers. Pass all three to the agent. Both *written* verdicts name the commit they examined — a findings review in its body, a clean pass in its issue comment — so the recorded SHA is what step 2 matches them against; only the bare `+1` reaction names nothing, and that is exactly why it cannot stand alone as a clean signal.
 
    Don't post with `gh pr comment` and then search for the comment: that lookup is a paginated connection, and on a PR with more than 30 issue comments the trigger you just posted is not on the first page.
 2. Spawn a `general-purpose` background agent with the prompt template below, filled in. The agent works in the SAME checkout on the SAME branch — warn it that the main session may also push commits mid-loop. Cleaner when available: give it a dedicated worktree of the branch, which sidesteps the shared-dirty-tree hazards in the lessons below.
@@ -78,7 +78,7 @@ Loop (max <3> iterations, then stop and report):
      query($endCursor: String) {
        repository(owner: "<owner>", name: "<repo>") {
          pullRequest(number: <n>) {
-           reviews(last: 20) { totalCount nodes { databaseId author { login } submittedAt state } }
+           reviews(last: 20) { totalCount nodes { databaseId author { login } submittedAt state body } }
            reviewThreads(first: 100, after: $endCursor) {
              pageInfo { hasNextPage endCursor }
              nodes { id isResolved comments(first: 1) { nodes { databaseId author { login } createdAt body } } }
@@ -88,8 +88,9 @@ Loop (max <3> iterations, then stop and report):
      }'
    ```
 
-   `databaseId` on each review is what the final sweep reports as its coverage boundary,
-   so don't drop it. The bare thread query in step 6 is for *resolving* threads and carries
+   `databaseId` on each review is what the final sweep reports as its coverage boundary, and
+   `body` is where its `Reviewed commit:` line lives — drop either and the rule above cannot be
+   applied (the inline finding comments do not carry the SHA, only the review that groups them). The bare thread query in step 6 is for *resolving* threads and carries
    neither author nor timestamp — polling with it cannot tell a new Codex response from a historical
    thread. `issues/<n>/comments` (the clean-pass verdict) and the trigger's reactions stay
    on REST; page the former with `--paginate`.
