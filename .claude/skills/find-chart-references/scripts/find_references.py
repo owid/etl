@@ -51,13 +51,16 @@ TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 GOOGLE_REDIRECT_RE = re.compile(r"^https?://(?:www\.)?google\.[a-z.]+/url\?", re.IGNORECASE)
 
 
-def redirect_target_path(target: str | None) -> str:
-    """Pathname of a site-redirect target, with a trailing slash normalized away.
+def url_pathname(target: str | None) -> str:
+    """Pathname of a URL, with a trailing slash normalized away.
 
-    A target may be a bare path, a path carrying a query and/or fragment, or an absolute URL,
-    and only its PATHNAME says which page it points at. A target that merely mentions another
-    page inside its query — `/article?next=/explorers/foo` — does not point at that page, so
-    substring-matching the raw string reports an unrelated redirect as an inbound chain.
+    A URL may be a bare path, a path carrying a query and/or fragment, or absolute, and only its
+    PATHNAME says which page it points at. One that merely mentions another page inside its query
+    — `/article?next=/explorers/foo` — does not navigate there, so substring-matching the raw
+    string reports an unrelated page as a reference to that page.
+
+    Used for BOTH a site redirect's target and a gdoc's raw link target, because the consequence
+    is the same in both: a spurious match becomes a RED row, and a RED row blocks a preflight.
 
     It lives in this module, which imports no siblings by design (it is loaded by path, not as a
     package), because the sweep and the redirect preflights must apply this rule IDENTICALLY:
@@ -848,10 +851,11 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
         "WHERE pgl.linkType = 'url' AND (pgl.target LIKE %(t)s OR pgl.target LIKE %(wrap)s)",
         params={"t": f"%/grapher/{slug}%", "wrap": WRAPPER_LIKE},
     )
-    exact = re.compile(rf"/grapher/{re.escape(slug)}(?:[?#/]|$)")
     for r in raw.to_dict("records"):
         target = unwrap_redirect(r["target"])
-        if not exact.search(target):
+        # As in the explorer pass: compare the unwrapped url's pathname, so a link that merely
+        # names this slug inside another page's query is not counted as a reference to it.
+        if url_pathname(target) != f"/grapher/{slug}":
             continue
         if ARCHIVE_HOST in target:
             continue  # archived snapshots are frozen by design
@@ -963,10 +967,12 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
         "WHERE pgl.linkType = 'url' AND (pgl.target LIKE %(t)s OR pgl.target LIKE %(wrap)s)",
         params={"t": f"%/explorers/{explorer}%", "wrap": WRAPPER_LIKE},
     )
-    exact = re.compile(rf"/explorers/{re.escape(explorer)}(?:[?#/]|$)")
     for r in raw.to_dict("records"):
         target = unwrap_redirect(r["target"])
-        if not exact.search(target):
+        # Pathname of the UNWRAPPED url: a gdoc link to another page that merely carries this
+        # explorer's URL in its query or fragment does not navigate here, and a non-span
+        # component would be emitted as a RED row, which blocks the redirect preflight.
+        if url_pathname(target) != f"/explorers/{explorer}":
             continue
         if ARCHIVE_HOST in target:
             continue  # archived snapshots are frozen by design
@@ -1014,7 +1020,7 @@ def sweep_explorer_inbound_redirects(explorer: str) -> list[dict]:
     for r in df.to_dict("records"):
         # Pathname equality, via the same helper the preflight blocks on: a redirect to another
         # page that merely names this explorer in its query or fragment is not an inbound chain.
-        if redirect_target_path(r["target"]) != f"/explorers/{explorer}":
+        if url_pathname(r["target"]) != f"/explorers/{explorer}":
             continue
         out.append(
             rec(

@@ -30,7 +30,7 @@ from etl.config import OWID_ENV
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts"))
-from find_references import redirect_target_path  # noqa: E402
+from find_references import url_pathname  # noqa: E402
 from redirect_rules import (  # noqa: E402
     build_source_rules,
     drop_duplicate_entries,
@@ -239,7 +239,7 @@ def site_redirect_rows(slugs: list[str]) -> tuple[dict[str, list], dict[str, lis
     as_source: dict[str, list] = defaultdict(list)
     as_target: dict[str, list] = defaultdict(list)
     for r in df.to_dict("records"):
-        target_path = redirect_target_path(r["target"])
+        target_path = url_pathname(r["target"])
         for slug in slugs:
             if r["source"] == f"/explorers/{slug}":
                 as_source[slug].append(r)
@@ -324,15 +324,15 @@ def expected_row(rule, targets: dict[str, dict]) -> tuple[int | None, str | None
     return t["id"], t["views"].get(tuple(sorted(rule.target_dims.items())))
 
 
-def revalidate_targets(rules, targets: dict[str, dict]) -> tuple[list, list, list]:
-    """Per-rule target staleness: (missing_views, reslugged, retargeted_views).
+def revalidate_targets(rules, targets: dict[str, dict]) -> tuple[list, list, list, list]:
+    """Per-rule target staleness: (missing_views, reslugged, retargeted_views, broken_configs).
 
     An MDIM can be rebuilt, re-sliced or re-slugged while its catalogPath stays present and
     published, in which case the reviewed view no longer exists — and applying would reject
     those entries after creating others. It can also keep every view in place and only change
     what one of them renders, which nothing above notices.
     """
-    missing_views, reslugged, retargeted_views = [], [], []
+    missing_views, reslugged, retargeted_views, broken_configs = [], [], [], []
     for rule in rules:
         t = targets.get(rule.catalog_path)
         if t is None or not t["published"]:
@@ -348,15 +348,23 @@ def revalidate_targets(rules, targets: dict[str, dict]) -> tuple[list, list, lis
             unstorable = tuple(sorted(rule.target_dims.items())) in t["views"]
             missing_views.append((rule.source_view_id, rule.view_id, rule.target_dims, unstorable))
             continue
+        # A view naming a `fullConfigId` with no live row in `chart_configs` (or a row carrying
+        # no `fullMd5`) is a BROKEN target, not an unchanged one. Checked before the drift
+        # comparison and independently of whether a rendering was recorded, because the two
+        # absences mean opposite things: nothing recorded on our side is merely unknown, while
+        # nothing live is a target that cannot serve — and the endpoint would reject that row
+        # after creating the ones before it.
+        if config_id and not t["md5"].get(config_id):
+            broken_configs.append((rule.source_view_id, rule.view_id, config_id))
+            continue
         # Same view id, same dimensions, different rendering: grapher edits a view's chart
         # config in place. Skipped when no md5 was recorded (a run from before this was
         # tracked, or a catch-all, which points at whatever the default view happens to be) —
         # absence of a recorded rendering is not evidence of drift.
-        if rule.view_config_md5:
-            live = t["md5"].get(config_id or "", "")
-            if live and live != rule.view_config_md5:
+        if rule.view_config_md5 and config_id:
+            if t["md5"][config_id] != rule.view_config_md5:
                 retargeted_views.append((rule.source_view_id, rule.view_id))
-    return missing_views, reslugged, retargeted_views
+    return missing_views, reslugged, retargeted_views, broken_configs
 
 
 def catch_all_default(run: dict, targets: dict[str, dict]) -> tuple[str, str]:
@@ -703,7 +711,19 @@ def main() -> int:
             elif t["slug"] in taken_targets:
                 findings.append((BLOCKER, slug, f"target /grapher/{t['slug']} is itself a redirect source"))
 
-        missing_views, reslugged, retargeted_views = revalidate_targets(rules, targets)
+        missing_views, reslugged, retargeted_views, broken_configs = revalidate_targets(rules, targets)
+        if broken_configs:
+            sample = ", ".join(f"view {sid} -> {vid} (config {cid})" for sid, vid, cid in broken_configs[:4])
+            findings.append(
+                (
+                    BLOCKER,
+                    slug,
+                    f"{len(broken_configs)} target view(s) name a chart config that is missing from "
+                    f"`chart_configs`, or that carries no fullMd5 — the view cannot be stored as a redirect "
+                    f"target, so the endpoint would reject those rows AFTER creating the ones before them, with "
+                    f"no bulk undo. e.g. {sample}. Rebuild the MDIM, then re-extract and re-review.",
+                )
+            )
         if retargeted_views:
             sample = ", ".join(f"view {sid} -> {vid}" for sid, vid in retargeted_views[:4])
             findings.append(
