@@ -43,26 +43,26 @@ applies before running, and don't assume `.env.prod` exists:**
 
 1. **Staging branch** (often easiest): if you're on a `staging-site-<branch>` branch,
    `OWID_ENV` already points at that prod-clone DB — run the commands as-is, no prefix.
-2. **Production, read-only, via `.env.prod`**: prefix commands with
-   `ENV_FILE=.env.prod DATA_API_ENV=production`. **Only if `.env.prod` is present.**
+2. **Production, read-only, via an env file**: prefix commands with
+   `ENV_FILE=<prod creds> DATA_API_ENV=production`. Don't assume the file name — check
+   what exists (`ls -la .env*`); on some machines it is `.env.prod`, on others `.env.live`.
 3. **Some other credentials file**: the user may keep prod (or other) DB creds in a
    different env file — run with `ENV_FILE=<their file> [DATA_API_ENV=production]`.
 
 **Preflight — check, then ask if needed:**
 
 ```bash
-# Is .env.prod available?
-ls -la .env.prod 2>/dev/null && echo "found .env.prod" || echo "NO .env.prod"
+ls -la .env* 2>/dev/null          # which credentials files exist?
 
 # Connectivity test (swap the ENV_FILE prefix for whatever applies; drop it on a staging branch):
-ENV_FILE=.env.prod DATA_API_ENV=production .venv/bin/python -c \
+ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python -c \
   "from etl.config import OWID_ENV; print('DB OK:', OWID_ENV.read_sql('SELECT 1 AS x').iloc[0,0])"
 ```
 
-If `.env.prod` is missing **and** you're not on a staging branch with the data, **stop
-and ask the user which credentials / env file to use** (e.g. "I don't see `.env.prod` —
-which env file holds DB credentials that can reach the explorer + MDIMs? Or should I run
-this from a staging branch?"). Then use that file as the `ENV_FILE=` prefix for both
+If no prod credentials file exists **and** you're not on a staging branch with the data,
+**stop and ask the user which credentials / env file to use** (e.g. "which env file holds DB
+credentials that can reach the explorer + MDIMs? Or should I run this from a staging
+branch?"). Then use that file as the `ENV_FILE=` prefix for both
 script invocations below. Don't hardcode credentials.
 
 If the connection works but a query returns nothing, the scripts stop with a clear
@@ -262,11 +262,15 @@ curl -sI "https://ourworldindata.org/explorers/<slug>?<one view's params>" | gre
 # expect 302 + location: /grapher/<mdim>?<view dims>
 ```
 
-### 8. Retire the explorer's ETL step
+### 8. Retire the explorer, then its ETL step
 
-Once the redirect is verified, remove the explorer's ETL footprint — and **never delete a step
-without archiving it** (see `CLAUDE.md`). Delete the step's `.py` **and its sibling
-`.config.yml`** (the periodic archive sweep only knows `.py`, which is why orphaned configs
+**The explorer is unpublished or deleted BY HAND in the admin.** Removing the ETL step does
+not unpublish it — the `explorers` row survives, so it keeps showing up in listings and
+search. Do not flip `isPublished` in the step's `.config.yml` and re-run hoping to achieve it;
+that is not the route (and no explorer config in the repo carries `isPublished: false`).
+
+Then remove the explorer's ETL footprint — and **never delete a step without archiving it**
+(see `CLAUDE.md`). Delete the step's `.py` **and its sibling `.config.yml`** (the periodic archive sweep only knows `.py`, which is why orphaned configs
 exist on disk today), remove the `dag/*.yml` entry, `make check`, **commit**; then run
 `etl archive-dag` and commit `dag/archive/*.yml` separately, since it reads *committed*
 history. `git checkout` anything unrelated it sweeps in. Archive anything now orphaned

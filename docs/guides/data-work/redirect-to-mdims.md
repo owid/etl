@@ -76,9 +76,13 @@ Allow the bake plus a couple of minutes for the edge cache.
     It is checked on *every* `/explorers/*` request, before the explorer page is served. So
     creating it is what retires the explorer — you cannot stage the two separately.
 
-### 5. Retire the ETL step
+### 5. Retire the explorer and its ETL step
 
-**Never delete a step without archiving it** (see `CLAUDE.md`):
+**Unpublish or delete the explorer in the admin first — by hand.** Removing the ETL step does
+not unpublish anything: the explorer row stays in the DB, so it keeps appearing in listings
+and search. Flipping `isPublished` in the step's config and re-running is *not* the route.
+
+Then remove the ETL footprint. **Never delete a step without archiving it** (see `CLAUDE.md`):
 
 1. Delete the step's `.py` **and** its `.config.yml` — leaving an orphaned config has
    happened before.
