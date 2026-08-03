@@ -748,16 +748,18 @@ def main() -> int:
             # articles, not a repoint of the old one (the parent columns are INSERT-only —
             # see SKILL.md). Nothing breaks meanwhile: the chart renders its own saved
             # config, and only its generated "Explore the data" link follows the redirect.
-            # The admin's create page is deep-linkable to the target view, so hand over the
-            # ready-made URL rather than an id to look up.
-            # The order (create-first vs delete-first) depends on whether a PUBLISHED page
-            # references it, which only the report's own section resolves — so this cell
-            # states the goal and points there rather than asserting one order for every row.
+            # No create URL here: the admin's create route parents the new chart to the
+            # MDIM's DEFAULT view, not the target view, so handing one over in a cell that
+            # cannot show the surrounding caveats is how someone ends up with a replacement
+            # on the wrong view. The route that does work is the view's own control.
+            # The order (create-first vs delete-first) likewise depends on whether a
+            # PUBLISHED page references it, which only the report's own section resolves —
+            # so this cell states the goal and points there.
             fix = (
-                "recreate it manually from the target MDIM view and repoint the pages that use it — "
-                f"create the replacement at {admin}/narrative-charts/create?type=multiDim&chartConfigId={r['target']['viewConfigId']} ; "
-                "see the Narrative charts section of references.md for the pages involved and the "
-                "order the API forces"
+                f"recreate it manually: open the target view ({new_url}), set its controls, and use that "
+                "view's \"Create narrative chart\" admin control — the create route parents to the MDIM's "
+                "default view instead. Then repoint the pages that use it; see the Narrative charts "
+                "section of references.md for those pages, the text to re-apply, and the order the API forces"
             )
         elif is_gdoc:
             fallback = LINK_FIX if ref["kind"] == "link" else "migrate this reference by hand"
