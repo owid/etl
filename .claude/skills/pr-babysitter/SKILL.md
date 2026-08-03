@@ -17,19 +17,25 @@ Only ONE babysitter per PR. If one is already running, message it (SendMessage) 
 
 ## Setup (main session)
 
-0. **If a round is already in flight, harvest its verdict before starting another one.** Read all response surfaces for the *current* trigger first — an `issues/<n>/comments` clean pass ("Didn't find any major issues"), a `+1` from the Codex bot on the trigger comment or the PR body, or a new review with findings. Only then post a new trigger. Re-triggering resets the polling threshold, so a verdict that arrived for the previous trigger is discarded unread: the loop keeps waiting and the finding (or the clean pass that would have let you merge) is silently dropped. This bites hardest when the main session is pushing quickly — see the starvation lesson below, and prefer batching several edits into one round over one trigger per commit.
-1. Post the trigger and capture its timestamp **from the same call** — the creation response carries `created_at`, so there is no lookup to get wrong:
+0. **A round in flight must reach a verdict — or be explicitly written off — before you start another one.** Checking the surfaces once is not enough: a single empty read means Codex has not answered *yet*, and posting a new trigger on the strength of it moves the polling threshold so the answer, when it comes ~4–9 minutes later, is discarded exactly as if you had never checked. So:
+
+   - **Wait it out.** Poll the current trigger's surfaces — an `issues/<n>/comments` clean pass ("Didn't find any major issues"), a `+1` from the Codex bot on the trigger comment or the PR body, a new review with findings — until one of them fires. Then handle it, and only then trigger the next round. That handling is what makes the round *harvested*; reading a verdict and leaving its findings unaddressed is the same failure with extra steps.
+   - **Or write the round off, in writing.** If you genuinely cannot wait (the code moved so far that a verdict on the old SHA is worthless), say so in the relayed report and in the next trigger's context: which SHA that round covered, and that its verdict was abandoned unread. An abandoned round is an *unverified* item, never a silent gap.
+
+   Never a third option. "I checked and there was nothing, so I re-triggered" is the starvation bug in the lesson below.
+1. Post the trigger, capture its timestamp **from the same call**, and record the **head SHA the round covers** (`git rev-parse HEAD`, captured at trigger time). The creation response carries `created_at`, so there is no lookup to get wrong — but it carries no SHA, and a clean verdict arrives as a reaction or an issue comment with no commit identifier of its own, so without capturing the SHA yourself the loop cannot say what was actually reviewed and will happily label a newer head "clean". Pass all three to the agent:
 
    ```bash
+   git rev-parse HEAD   # the SHA this round covers
    gh api repos/<owner>/<repo>/issues/<n>/comments --method POST \
      -f body="@codex review" --jq '{id, created_at}'
    ```
 
-   Keep **both**: the timestamp is the polling threshold, and the id is what step 2 reads reactions from (`gh api repos/<owner>/<repo>/issues/comments/<id>/reactions`) to see the `+1` clean signal. Pass both to the agent.
+   Keep **all three**: the timestamp is the polling threshold, the id is what step 2 reads reactions from (`gh api repos/<owner>/<repo>/issues/comments/<id>/reactions`) to see the `+1` clean signal, and the SHA is what any verdict from this round actually covers. Pass all three to the agent. A findings review names its own commit, but a clean pass does not — so if the head moves mid-round, the recorded SHA is the only thing standing between "clean" and a claim about code Codex never saw.
 
    Don't post with `gh pr comment` and then search for the comment: that lookup is a paginated connection, and on a PR with more than 30 issue comments the trigger you just posted is not on the first page.
 2. Spawn a `general-purpose` background agent with the prompt template below, filled in. The agent works in the SAME checkout on the SAME branch — warn it that the main session may also push commits mid-loop. Cleaner when available: give it a dedicated worktree of the branch, which sidesteps the shared-dirty-tree hazards in the lessons below.
-2b. **Pace your own pushes.** One trigger per commit starves the loop: Codex takes ~4–9 minutes to answer, so a push every few minutes means every round is superseded before it reports, and nobody reads the verdicts. Measured on a real PR: eight commits and eight triggers in ~40 minutes produced two clean passes and four findings reviews that the loop never harvested — a human noticed the unread "Didn't find any major issues" comment. When the user is iterating rapidly, either batch the edits into one round, or run step 0 before each new trigger and record which SHA each verdict covers.
+2b. **Pace your own pushes.** One trigger per commit starves the loop: Codex takes ~4–9 minutes to answer, so a push every few minutes means every round is superseded before it reports, and nobody reads the verdicts. Measured on a real PR: eight commits and eight triggers in ~40 minutes produced two clean passes and four findings reviews that the loop never harvested — a human noticed the unread "Didn't find any major issues" comment. When the user is iterating rapidly, batch the edits into one round; if you cannot, step 0's write-off rule applies — an abandoned round gets named in the report, with its SHA, as unverified.
 3. When the completion notification arrives, relay the report. If the agent stops early (its notification says it is "waiting", "the monitor will notify me", "the waiter is still looping", or anything short of a final report), resume it with a message telling it to keep polling in short bash calls rather than ending its turn. **Expect to do this 1–2 times per run** — agents routinely stop early despite the prompt's warnings, so treat every non-final-report notification as a stall and send the corrective immediately (state the current trigger timestamp and any commits the main session pushed meanwhile).
 
 ## Agent prompt template
@@ -38,7 +44,7 @@ Fill every <placeholder>. Keep all rules — each one exists because its absence
 
 ---
 
-You are babysitting PR #<n> on <repo> (branch <branch>) until CI is green and the Codex review is addressed. Work from <repo path>, already checked out on <branch>. A "@codex review" comment was posted at <exact UTC timestamp>. The main session may push its own commits to this branch while you work.
+You are babysitting PR #<n> on <repo> (branch <branch>) until CI is green and the Codex review is addressed. Work from <repo path>, already checked out on <branch>. A "@codex review" comment was posted at <exact UTC timestamp>, and the branch head at that moment was <SHA> — that is the revision this round's verdict covers, whatever the head is by the time you report. The main session may push its own commits to this branch while you work.
 
 Loop (max <3> iterations, then stop and report):
 
@@ -115,7 +121,7 @@ Loop (max <3> iterations, then stop and report):
    Replace **both** stored values — the threshold *and* the trigger comment id. Keeping the old id means step 2 reads reactions from the previous trigger, where an existing `+1` declares the new round clean before Codex has answered it. Then loop back to 1.
 8. NEVER merge. Never force-push. Never edit `dag/archive/*`.
 
-Final report: status of every CI check; each finding with verdict (fixed+commit / rebutted+why); threads resolved; commits pushed; anything left for the human.
+Final report: status of every CI check; each finding with verdict (fixed+commit / rebutted+why); threads resolved; commits pushed; **the SHA each verdict covers** (the round's recorded head SHA, and the head at report time if they differ — a clean pass on an older revision says nothing about newer commits); anything left for the human.
 
 ---
 
