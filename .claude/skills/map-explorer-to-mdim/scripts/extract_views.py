@@ -69,7 +69,7 @@ def short_name_of(catalog_path: str) -> str:
 
 
 def get_mdim_views(catalog_path: str):
-    """Return (mdim_id, slug, published, dim_slugs, rows) for an MDIM.
+    """Return (mdim_id, slug, published, dim_slugs, rows, view_configs, default_view) for an MDIM.
 
     The id/slug/published triple travels into `_sources.json` so the payload can carry
     `mdimSlug` without a second DB round-trip, and so preflight can gate on publication:
@@ -105,7 +105,28 @@ def get_mdim_views(catalog_path: str):
         dim_slugs,
         rows,
         view_configs,
+        default_view(views, view_configs),
     )
+
+
+def default_view(views: list[dict], view_configs: list[dict]) -> dict:
+    """The view a bare `/grapher/<mdim-slug>` renders — the catch-all's real destination.
+
+    A catch-all redirect stores `viewConfigId = NULL`, so its target is whichever view the MDIM
+    resolves to for an empty selection; nothing in the payload pins it. Grapher's
+    `filterToAvailableChoices` walks the dimensions left to right and, with no choice selected,
+    takes `availableViewsBeforeSelection[0]`'s choice at every step — and the first view is in
+    every one of those filtered sets, since each step only keeps views matching choices already
+    taken from it. So an empty selection resolves to `views[0]`, and recording it needs no port
+    of the wider algorithm.
+
+    Kept in `_sources.json` and deliberately NOT in the payload: the endpoint has no field for
+    it, and adding one would change payload bytes that the byte-identical rebuild gate relies on.
+    """
+    if not views:
+        return {}
+    first, cfg = views[0], (view_configs[0] if view_configs else {})
+    return {"dimensions": dict(first.get("dimensions") or {}), **{k: cfg.get(k, "") for k in ("configId", "md5")}}
 
 
 def view_config_md5s(config_ids: list[str]) -> dict[str, str]:
@@ -243,6 +264,9 @@ def write_sources_json(out: Path, explorer_slug, dim_names, exp_rows, mdims, is_
                 "views": {
                     f"{m['prefix']}{i + 1}": vc for i, vc in enumerate(m.get("view_configs") or []) if vc["configId"]
                 },
+                # What a catch-all actually lands on. Recorded here rather than in the payload,
+                # which has no field for it and must stay byte-reproducible.
+                "defaultView": m.get("default_view") or {},
             }
             for m in mdims
         ],
@@ -302,7 +326,7 @@ def main():
     for i, cp in enumerate(args.mdim):
         prefix = chr(ord("A") + i)
         short = short_name_of(cp)
-        mdim_id, mdim_slug, published, dim_slugs, rows, view_configs = get_mdim_views(cp)
+        mdim_id, mdim_slug, published, dim_slugs, rows, view_configs, default = get_mdim_views(cp)
         p = write_mdim_csv(out, short, prefix, dim_slugs, rows)
         print(f"{prefix} {short}: {len(rows)} views, dims={dim_slugs} -> {p.name}")
         if not published:
@@ -324,6 +348,7 @@ def main():
                 "dim_slugs": dim_slugs,
                 "rows": rows,
                 "view_configs": view_configs,
+                "default_view": default,
             }
         )
 

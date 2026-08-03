@@ -192,6 +192,17 @@ best-fitting MDIM with **no query params**, which grapher renders as that MDIM's
 (hence `viewId: null`, `dimensions: {}`). The best-fitting MDIM is the one most views resolve
 to, or whatever `DEFAULT_MDIM` in `mapping_rules.py` overrides it to.
 
+> **The catch-all's destination is the only one nothing pins.** Its row stores
+> `viewConfigId = NULL`, so it resolves at request time to whichever view the MDIM renders for
+> an empty selection — the **first view in config order** (grapher's `filterToAvailableChoices`
+> takes the first available view's choice at every dimension). Rebuilding the MDIM can reorder
+> its views, or edit that view's config in place, and the bare explorer URL then lands somewhere
+> nobody reviewed. Extraction records that view in `_sources.json` (not in the payload, which
+> must stay byte-reproducible) and preflight **warns** when it moves. A warning, not a blocker:
+> the destination is a moving reference by construction, so blocking would flip an approved
+> catch-all to NOT READY on any unrelated MDIM rebuild. To pin it, give the catch-all an
+> explicit target view instead.
+
 The script prints a validation report: how many explorer views resolved, distinct MDIM
 views hit per MDIM, how many rows share a target, and **FLAGS** for any explorer view that
 didn't resolve to a real MDIM view (fix the rules and re-run until there are no flags).

@@ -289,6 +289,9 @@ def target_state(catalog_paths: set[str]) -> dict[str, dict]:
             "slug": r["slug"] or "",
             "published": bool(r["published"]),
             "views": views,
+            # (signature, configId) of the view an empty selection resolves to — the catch-all's
+            # unpinned destination. First in config order; `views` preserves that order.
+            "default": next(iter(views.items()), ()),
         }
     live_md5 = view_config_md5s(config_ids)
     for t in out.values():
@@ -354,6 +357,46 @@ def revalidate_targets(rules, targets: dict[str, dict]) -> tuple[list, list, lis
             if live and live != rule.view_config_md5:
                 retargeted_views.append((rule.source_view_id, rule.view_id))
     return missing_views, reslugged, retargeted_views
+
+
+def catch_all_default(run: dict, targets: dict[str, dict]) -> tuple[str, str]:
+    """(status, message): does the catch-all still land where it did at extraction?
+
+    The catch-all row stores `viewConfigId = NULL`, so unlike every mapped rule its destination
+    is not pinned by anything in the payload — it is whichever view the MDIM resolves for an
+    empty selection, which is `views[0]` (see `extract_views.default_view`). Rebuilding the MDIM
+    can reorder its views, or edit that view's config in place, and the bare explorer URL then
+    lands somewhere nobody reviewed while every other check stays green.
+
+    A WARNING, not a blocker, and deliberately so: the destination is a moving reference by
+    construction, so any unrelated MDIM rebuild would otherwise flip an approved catch-all to
+    NOT READY with re-extraction the only way to clear it. Silent when nothing was recorded —
+    a run from before this was tracked has nothing to compare, which is not evidence of drift.
+    """
+    target = (run["payload"].get("catchAll") or {}).get("target") or {}
+    path = target.get("catalogPath")
+    recorded = next(
+        (m.get("defaultView") or {} for m in run["sources"].get("mdims") or [] if m.get("catalogPath") == path),
+        {},
+    )
+    t = targets.get(path)
+    if not recorded or t is None or not t["published"] or not t["default"]:
+        return OK, ""
+    live_dims, live_config = t["default"]
+    if dict(live_dims) != (recorded.get("dimensions") or {}):
+        return (
+            WARN,
+            f"the catch-all's DEFAULT view moved since extraction: {recorded.get('dimensions')} -> {dict(live_dims)}. "
+            "The bare explorer URL, and every unresolved view, now land on a view nobody reviewed. Re-extract to "
+            "review the new default, or set an explicit target for the catch-all.",
+        )
+    if recorded.get("md5") and live_config and live_config in t["md5"] and t["md5"][live_config] != recorded["md5"]:
+        return (
+            WARN,
+            "the catch-all's default view is the same view but its config was EDITED since extraction, so the bare "
+            "explorer URL renders something other than what was reviewed. Re-extract and re-check that view.",
+        )
+    return OK, ""
 
 
 def target_is_redirect_source(mdim_slugs: set[str]) -> set[str]:
@@ -750,6 +793,10 @@ def main() -> int:
             findings.append((WARN, slug, note))
         if not (run["payload"].get("catchAll") or {}).get("target"):
             findings.append((WARN, slug, "no catch-all — the bare explorer URL keeps serving the explorer"))
+        else:
+            status, message = catch_all_default(run, targets)
+            if status != OK:
+                findings.append((status, slug, message))
 
     if not args.no_references:
         status, message = reference_gate(out, slugs)
