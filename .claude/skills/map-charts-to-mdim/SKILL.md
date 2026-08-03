@@ -280,13 +280,18 @@ groups per chart, in the order they get applied in the editor:
 
 1. **view dimensions** — the target view's own dimension values (from the
    proposal), because the new chart opens on the MDIM's default view;
-2. **controls** — entity selection, tab, time, timeline/map toggles, taken from
-   the narrative chart's `chart_configs.patch` (the delta its author typed on
-   top of the parent) plus its stored `queryParamsForParentChart`. The two
-   encode the same state, so a URL param is dropped when the patch already
-   carries the equivalent config key (`country` ↔ `selectedEntityNames`,
-   `focus` ↔ `focusedSeriesNames`, `time` ↔ `minTime`/`maxTime`) — otherwise the
-   cell asks for one setting twice in two spellings;
+2. **controls** — taken from the narrative chart's `chart_configs.patch` (the
+   delta its author typed on top of the parent) plus its stored
+   `queryParamsForParentChart`, and listed **chart type first** (it decides
+   which other controls exist), **then the entity selection** (the most visible
+   thing to get wrong), then the rest alphabetically. Entities are always shown
+   by **name**, never as codes: a URL param spells them `ZWE~MDG`, so those are
+   resolved against `entities` before display (unknown codes pass through). The
+   patch and the params encode the same state, so a URL param is dropped when
+   the patch already carries the equivalent config key (`country` ↔
+   `selectedEntityNames`, `focus` ↔ `focusedSeriesNames`, `time` ↔
+   `minTime`/`maxTime`) — otherwise the cell asks for one setting twice in two
+   spellings, and the config form is what the editor's fields expose;
 3. **FAUST text** — `title`, `subtitle`, `note`, `sourceDesc`,
    `hideAnnotationFieldsInTitle` from the patch. Miss these and the replacement
    silently renders the *view's* wording instead of the text the article was

@@ -288,6 +288,13 @@ PARAM_CONFIG_EQUIVALENT = {
     "time": ("minTime", "maxTime"),
     "region": ("map",),
 }
+# The order someone rebuilds a chart in: the chart type first, because it decides which other
+# controls exist at all; then the entity selection, the most visible thing to get wrong; then
+# whatever else was overridden, alphabetically.
+CONTROL_ORDER = ("chartTypes", "selectedEntityNames", "country")
+# Params whose values are entity CODES. Codes are what a URL carries, but names are what the
+# editor's entity picker shows, so they are resolved before being handed to a human.
+ENTITY_CODE_PARAMS = ("country", "focus")
 
 
 def narrative_overrides(findings: list[dict]) -> dict[str, dict]:
@@ -331,6 +338,21 @@ def narrative_overrides(findings: list[dict]) -> dict[str, dict]:
             (faust if key in FAUST_KEYS else controls)[key] = value
         out[nid] = {"faust": faust, "controls": controls}
     return out
+
+
+def entity_names(codes: set[str]) -> dict[str, str]:
+    """{entity code -> name}, so a `country=ZWE~MDG` param can be shown the way the editor's
+    entity picker shows it. Unknown codes are simply left as-is by the caller."""
+    codes = {c for c in codes if c}
+    if not codes:
+        return {}
+    df = OWID_ENV.read_sql("SELECT code, name FROM entities WHERE code IN %(c)s", params={"c": tuple(sorted(codes))})
+    return dict(zip(df["code"], df["name"]))
+
+
+def control_sort_key(key: str) -> tuple:
+    """Chart type, then the entity selection, then everything else alphabetically."""
+    return (CONTROL_ORDER.index(key), "") if key in CONTROL_ORDER else (len(CONTROL_ORDER), key)
 
 
 def render_override(value) -> str:
@@ -389,11 +411,19 @@ def narrative_section(
         for key, value in parse_qsl(f["stored_params"], keep_blank_values=True):
             if any(equiv in config_controls for equiv in PARAM_CONFIG_EQUIVALENT.get(key, (key,))):
                 continue
+            # A URL param spells entities as codes; the editor's picker speaks names.
+            if key in ENTITY_CODE_PARAMS and value:
+                codes = value.split("~")
+                names = entity_names(set(codes))
+                value = [names.get(c, c) for c in codes]
             controls[key] = value
         if controls:
             parts.append(
-                "**controls** (entity selection, tab, time — not inherited):<br>"
-                + ", ".join(f"`{k}` = {render_override(v) or '(empty)'}" for k, v in sorted(controls.items()))
+                "**controls** (chart type, entity selection, tab, time — not inherited):<br>"
+                + ", ".join(
+                    f"`{k}` = {render_override(v) or '(empty)'}"
+                    for k, v in sorted(controls.items(), key=lambda kv: control_sort_key(kv[0]))
+                )
             )
         faust = ovr.get("faust") or {}
         if faust:
