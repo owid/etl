@@ -29,7 +29,6 @@ fossil-fuels-share-energy,Share of primary energy consumption from fossil fuels,
 gas-share-energy,Share of primary energy consumption from gas,/grapher/energy-mix?source=gas&metric=share,https://archive.ourworldindata.org/20260727-182932/grapher/gas-share-energy.html
 global-energy-consumption-source,Global primary energy consumption by source,/grapher/primary-energy-by-source,https://archive.ourworldindata.org/20260727-170715/grapher/global-energy-consumption-source.html
 global-energy-substitution,Global primary energy consumption by source,/grapher/global-primary-energy-by-source,https://archive.ourworldindata.org/20260727-170715/grapher/global-energy-substitution.html
-global-fossil-fuel-consumption,Global fossil fuel consumption,/grapher/energy-mix?source=fossil_fuels&metric=by_source,https://archive.ourworldindata.org/20260727-170715/grapher/global-fossil-fuel-consumption.html
 global-primary-energy,Global direct primary energy consumption,/grapher/global-primary-energy-by-source,https://archive.ourworldindata.org/20260727-170715/grapher/global-primary-energy.html
 global-primary-energy-share-inc-biomass,Share of global primary energy consumption by source,/grapher/share-of-global-primary-energy-by-source,https://archive.ourworldindata.org/20260727-170715/grapher/global-primary-energy-share-inc-biomass.html
 hydro-share-energy,Share of primary energy consumption from hydroelectric power,/grapher/energy-mix?source=hydro&metric=share,https://archive.ourworldindata.org/20260727-182932/grapher/hydro-share-energy.html
