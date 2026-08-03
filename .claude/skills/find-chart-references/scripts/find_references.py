@@ -890,12 +890,18 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
 
 
 def sweep_explorer_subject(explorer: str) -> list[dict]:
-    # An unknown slug matches nothing in every query below, so the run would end with
-    # `references: 0` — the same output as an explorer nothing points at. Resolve it first,
-    # as the chart, indicator and MDIM subjects do.
+    # An unknown slug matches nothing in every query below, so a run would end with
+    # `references: 0` — the same output as an explorer nothing points at. But unlike a chart,
+    # an explorer that is GONE is the normal end state of a migration, and pages can still
+    # link to it: every query here keys on the slug, not on a row id, so they all work for a
+    # deleted explorer. So record a gap and keep sweeping instead of returning empty — a
+    # retired explorer's leftover links are exactly what someone needs to find, and
+    # returning [] hid them. A typo now surfaces as a gap rather than a bare print.
     if OWID_ENV.read_sql("SELECT slug FROM explorers WHERE slug = %(s)s", params={"s": explorer}).empty:
-        print(f"  (explorer not found: {explorer})")
-        return []
+        gap(
+            f"explorer '{explorer}' is not in the `explorers` table — swept its references anyway "
+            "(already retired?). If the slug is simply wrong, every count for it is a false zero."
+        )
 
     df = OWID_ENV.read_sql(
         "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
@@ -962,6 +968,46 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
                 query_string=url_query(target),
                 text=r["text"],
                 published=r["published"],
+            )  # fmt: skip
+        )
+
+    out += sweep_explorer_inbound_redirects(explorer)
+    return out
+
+
+def sweep_explorer_inbound_redirects(explorer: str) -> list[dict]:
+    """Site redirects pointing AT this explorer.
+
+    Symmetric with the `redirect` surface the MDIM subject already reports, and load-bearing
+    rather than informational: an explorer path that is the target of a site redirect cannot
+    be given an MDIM redirect at all — the admin endpoint rejects it as a chain, and because
+    it caches its per-source checks, that one row fails every entry for the explorer. So this
+    is a blocker a consumer needs to surface before it tries to apply anything.
+
+    The `LIKE` prefilter is re-checked in Python for the same reason the URL passes are: a
+    prefix match would let `/explorers/inequality-wb` answer for `inequality`.
+    """
+    df = OWID_ENV.read_sql(
+        "SELECT id, source, target FROM redirects WHERE target LIKE %(like)s",
+        params={"like": f"%/explorers/{explorer}%"},
+    )
+    pattern = re.compile(rf"/explorers/{re.escape(explorer)}(?:[?#/]|$)")
+    out = []
+    for r in df.to_dict("records"):
+        if not pattern.search(r["target"] or ""):
+            continue
+        out.append(
+            rec(
+                "explorer",
+                explorer,
+                None,
+                "site redirect",
+                LINK,
+                r["source"],
+                r["source"],
+                surface_id=int(r["id"]),
+                context=f"site redirect id={r['id']} points here — blocks creating an MDIM redirect (chain)",
+                query_string=url_query(r["target"]),
             )  # fmt: skip
         )
     return out
