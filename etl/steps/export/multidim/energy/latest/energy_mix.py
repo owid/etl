@@ -278,6 +278,12 @@ COMMON_VIEW_EXTRAS = {
 # Carbon intensity of energy (CO2 per unit of total energy supply) lives in the Global Carbon Budget,
 # which already divides emissions by this same TES. Referenced by short path, expanded via the dep.
 CARBON_INTENSITY_INDICATOR = "carbon_intensity_of_energy#emissions_total_per_unit_energy"
+# Explicit brackets, because this is the one map-bearing view that would otherwise fall back to
+# grapher's automatic (ckmeans) binning. That starts the lowest bin at the data minimum and leaves it
+# open below, so a quantity whose floor is zero got a "<150 g" bracket that hid the ~25 countries
+# under 150 g, 8 of them under 100 g. Zero floor, 50 g steps through the dense 150-350 g band, open
+# above (the top bracket is where the few outliers above 350 g land).
+CARBON_INTENSITY_MAP_EDGES = [0, 100, 150, 200, 250, 300, 350]
 
 
 def add_carbon_intensity_view(c) -> None:
@@ -291,7 +297,14 @@ def add_carbon_intensity_view(c) -> None:
             "Measured in grams of CO₂ emitted per [kilowatt-hour](#dod:watt-hours) of "
             "[total energy supply](#dod:total-energy-supply)."
         ),
-        "map": {"colorScale": {"baseColorScheme": "YlOrBr"}, "timeTolerance": 3},
+        "map": {
+            "colorScale": {
+                "baseColorScheme": "YlOrBr",
+                "binningStrategy": "manual",
+                "customNumericValues": CARBON_INTENSITY_MAP_EDGES + [_open_top_sentinel(CARBON_INTENSITY_MAP_EDGES)],
+            },
+            "timeTolerance": 3,
+        },
         **COMMON_VIEW_EXTRAS,
     }
     view = View(
