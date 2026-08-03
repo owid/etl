@@ -64,6 +64,12 @@ steps:
       - data://meadow/child_labor/2026-08-03/child_work_incidence_italy:
         - snapshot://child_labor/2026-08-03/child_work_incidence_italy.csv
 
+  # US youth labor-force participation, 1870-1930, published vs corrected (Carter and Sutch, 1996)
+  data://grapher/child_labor/2026-08-03/child_work_incidence_us:
+    - data://garden/child_labor/2026-08-03/child_work_incidence_us:
+      - data://meadow/child_labor/2026-08-03/child_work_incidence_us:
+        - snapshot://child_labor/2026-08-03/child_work_incidence_us.csv
+
   data://grapher/child_labor/2026-05-08/child_labor_long_run:
     - data://garden/child_labor/2026-05-08/child_labor_long_run:
       - data://meadow/child_labor/2026-05-08/child_labor_long_run:
