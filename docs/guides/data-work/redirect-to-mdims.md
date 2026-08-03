@@ -101,6 +101,13 @@ It matches charts to MDIM views by indicator ID and reports **every place each c
 linked or embedded** with the replacement URL. Embedded references break at unpublish and no
 redirect repairs them, so migrate those first.
 
+**Review the matches before applying.** The skill also builds an HTML page showing each
+chart beside the MDIM view it would redirect to, with approve/flag controls; decisions
+persist in the browser and export to JSON, which the preflight then reads so flagged charts
+are excluded. To force or suppress a match, put the chart id in `overrides.csv` and re-run —
+only matches it is confident about are proposed, and the rest are reported rather than
+guessed.
+
 ### 2. Re-create any narrative charts
 
 There is no way to repoint one, so each is re-created from the MDIM view and the article
