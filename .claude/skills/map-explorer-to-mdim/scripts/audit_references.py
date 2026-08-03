@@ -41,7 +41,7 @@ from etl.config import OWID_ENV
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts"))
-from redirect_rules import build_source_rules, choice_values, resolve_explorer_url  # noqa: E402
+from redirect_rules import build_source_rules, choice_values, payload_digest, resolve_explorer_url  # noqa: E402
 from reference_report import (  # noqa: E402
     INFO,
     RED,
@@ -115,6 +115,9 @@ def load_mappings(paths: list[str]) -> dict[str, dict]:
         dim_names, choices = choice_values(d)
         out[slug] = {
             "mapping": mapping,
+            # Digested BEFORE resolve_missing_slugs mutates the mapping in memory, so it is a
+            # digest of the file on disk — which is what preflight can recompute.
+            "mappingDigest": payload_digest(mapping),
             "dir": d,
             "rules": build_source_rules(mapping),
             "dim_names": dim_names,
@@ -234,6 +237,13 @@ def write_manifest(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
     re-runs the sweep and recomputes them, so an audit that no longer describes the live site —
     a page that added an embed since, or a folder reused from another migration — is rejected
     instead of being read as clean.
+
+    `mappingDigests` binds the audit to the mapping its ADVICE came from, which the reference
+    digest cannot: every replacement URL in `references.md` is derived from the mapping, so
+    rebuilding the mapping with different targets invalidates that advice while the explorer's
+    own references stay identical. Nothing live reveals the difference. Following stale advice
+    migrates an embed to the wrong MDIM view, and once the embed no longer names the explorer no
+    later sweep can find it — so this is the one staleness that cannot be caught after the fact.
     """
     per: dict[str, int] = {slug: 0 for slug in runs}
     for row in rows:
@@ -242,6 +252,7 @@ def write_manifest(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
         "explorers": sorted(runs),
         "referenceCounts": per,
         "referenceDigests": {slug: reference_digest(raw, slug) for slug in sorted(runs)},
+        "mappingDigests": {slug: runs[slug]["mappingDigest"] for slug in sorted(runs)},
         "total": len(rows),
         "gaps": gaps,
     }

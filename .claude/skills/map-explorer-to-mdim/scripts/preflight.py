@@ -36,6 +36,7 @@ from redirect_rules import (  # noqa: E402
     drop_duplicate_entries,
     duplicate_conditions,
     parse_explorer_views,
+    payload_digest,
     strip_empty,
     strip_payload,
     views_fingerprint,
@@ -446,7 +447,7 @@ def reference_gate(out: Path, slugs: list[str]) -> tuple[str, str]:
     return OK, f"{len(rows)} reference(s) audited, none embedded"
 
 
-def audit_freshness(out: Path, slugs: list[str]) -> tuple[str, str]:
+def audit_freshness(out: Path, slugs: list[str], runs: dict[str, dict]) -> tuple[str, str]:
     """(status, message): does the audit on disk still describe the live site?
 
     `reference_gate` reads a CSV an earlier run produced, so by itself it cannot see anything
@@ -456,10 +457,35 @@ def audit_freshness(out: Path, slugs: list[str]) -> tuple[str, str]:
     prevent. So the sweep is re-run here and compared against the digest the audit recorded.
     """
     manifest_path = out / "references_manifest.json"
-    recorded = {}
+    recorded, recorded_mappings = {}, {}
     if manifest_path.exists():
-        recorded = json.loads(manifest_path.read_text()).get("referenceDigests") or {}
-    stale_record = sorted(set(slugs) - set(recorded))
+        manifest = json.loads(manifest_path.read_text())
+        recorded = manifest.get("referenceDigests") or {}
+        recorded_mappings = manifest.get("mappingDigests") or {}
+
+    # The audit's ADVICE — every replacement URL in references.md — comes from the mapping, not
+    # from the live site, so a mapping rebuilt with different targets since the audit leaves the
+    # reference digest matching while the advice is wrong. Checked first, because this is the
+    # staleness that cannot be recovered from: once an operator has repointed an embed at the
+    # wrong view, it no longer names the explorer and no later sweep will ever surface it.
+    drifted_mappings = []
+    for slug in slugs:
+        run = runs.get(slug)
+        mapping_path = (run["dir"] / "mapping.json") if run else None
+        if slug not in recorded_mappings or mapping_path is None or not mapping_path.exists():
+            continue  # covered by the unverifiable-audit blocker below
+        if payload_digest(json.loads(mapping_path.read_text())) != recorded_mappings[slug]:
+            drifted_mappings.append(slug)
+    if drifted_mappings:
+        return (
+            BLOCKER,
+            f"STALE AUDIT ADVICE — the mapping changed since the audit for {drifted_mappings}, so every "
+            "replacement URL in references.md was computed from different target views. Migrating an embed to "
+            "one of those sends it to the wrong view, and it then stops naming the explorer, so no later sweep "
+            "can find the mistake. Re-run audit_references.py before touching any reference.",
+        )
+
+    stale_record = sorted(set(slugs) - (set(recorded) & set(recorded_mappings)))
     if stale_record:
         # A blocker, for the same reason a missing references.csv is one: this branch does not
         # run the sweep, so nothing at all has looked at the live site. Warning would let
@@ -467,9 +493,9 @@ def audit_freshness(out: Path, slugs: list[str]) -> tuple[str, str]:
         # redirect breaks it on the next request.
         return (
             BLOCKER,
-            f"UNVERIFIABLE AUDIT — no reference digest recorded for {stale_record}, so references.csv cannot be "
-            "checked against the live site and anything added since it ran is invisible. Re-run "
-            "audit_references.py (it records the digest) before applying.",
+            f"UNVERIFIABLE AUDIT — no reference and mapping digest recorded for {stale_record}, so "
+            "references.csv cannot be checked against the live site, nor its replacement URLs against the "
+            "mapping they came from. Re-run audit_references.py (it records both) before applying.",
         )
     raw, gaps = run_sweep([arg for slug in slugs for arg in ("--explorer", slug)])
     drifted = sorted(slug for slug in slugs if reference_digest(raw, slug) != recorded[slug])
@@ -726,9 +752,10 @@ def main() -> int:
             findings.append((WARN, slug, "no catch-all — the bare explorer URL keeps serving the explorer"))
 
     if not args.no_references:
-        for gate in (reference_gate, audit_freshness):
-            status, message = gate(out, slugs)
-            findings.append((status, "(all)", message))
+        status, message = reference_gate(out, slugs)
+        findings.append((status, "(all)", message))
+        status, message = audit_freshness(out, slugs, runs)
+        findings.append((status, "(all)", message))
 
     print(f"{'status':8} {'explorer':38} note")
     print("-" * 150)

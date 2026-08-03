@@ -104,6 +104,18 @@ def views_fingerprint(dim_names: list[str], rows: list[list[str]]) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
+def payload_digest(payload: dict) -> str:
+    """Stable digest of a mapping or payload — what a consumer's advice was computed from.
+
+    An audit's replacement URLs are derived from the mapping, so rebuilding the mapping with
+    different targets silently invalidates `references.md` while the explorer's own references
+    are unchanged. Nothing about the live site reveals that, which is why the artifact is
+    digested and not merely dated: an operator following stale advice migrates an embed to the
+    wrong MDIM view, and once the embed no longer names the explorer, no later sweep can find it.
+    """
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
+
+
 def strip_empty(dims: dict) -> dict:
     """Drop empty-valued keys from a source condition.
 

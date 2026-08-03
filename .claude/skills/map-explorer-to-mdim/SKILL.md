@@ -262,6 +262,13 @@ and compares. Without that, the gate reads a CSV from an earlier run and cannot 
 added an embed since, or an audit folder carried over from another migration — both of which
 would read as a clean audit while the redirect is about to break something live.
 
+It also records `mappingDigests`, binding the audit to the mapping its **advice** came from.
+Every replacement URL in `references.md` is derived from the mapping, so rebuilding the mapping
+with different targets invalidates that advice while the explorer's own references — and so the
+reference digest — stay identical. This is the one staleness with no second chance: an operator
+who repoints an embed at the wrong view leaves it no longer naming the explorer, so no later
+sweep can ever surface the mistake. Preflight blocks on it before the reference gate reports.
+
 **Unverifiable is a blocker, not a warning**, in all three cases — no extraction pair, no
 `mapping.json`, no reference digest. A warning does not reach the exit code, so `Ready` would
 print over a report stating in plain words that the payload's provenance is unknown. Re-running
