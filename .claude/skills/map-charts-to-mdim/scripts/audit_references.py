@@ -282,11 +282,15 @@ FAUST_KEYS = ("title", "subtitle", "note", "sourceDesc", "hideAnnotationFieldsIn
 SKIP_OVERRIDE_KEYS = ("dimensions", "$schema", "id", "slug", "isPublished", "version")
 # Grapher URL params and the config keys holding the same state. Used to keep the "set by
 # hand" list from naming one setting twice in two spellings.
+# Dotted entries are NESTED config keys: `region` lives at `map.region`, and only that
+# subkey represents it. Matching the whole `map` object instead would drop `region` from the
+# checklist whenever the patch overrode any unrelated map setting (`map.colorScale`,
+# `map.hideTimeline`), leaving the replacement focused on the wrong area with nothing said.
 PARAM_CONFIG_EQUIVALENT = {
     "country": ("selectedEntityNames",),
     "focus": ("focusedSeriesNames",),
     "time": ("minTime", "maxTime"),
-    "region": ("map",),
+    "region": ("map.region",),
 }
 # The order someone rebuilds a chart in: the chart type first, because it decides which other
 # controls exist at all; then the entity selection, the most visible thing to get wrong; then
@@ -373,6 +377,19 @@ def entity_names(codes: set[str]) -> dict[str, str]:
     return dict(zip(df["code"], df["name"]))
 
 
+def has_config_key(config: dict, key: str) -> bool:
+    """Whether `config` carries `key`, where a dotted key means a nested subkey.
+
+    `map.region` must match only an actual region override, not the presence of any `map`
+    object: a patch that set `map.colorScale` and nothing else would otherwise be read as
+    already carrying the region.
+    """
+    head, _, rest = key.partition(".")
+    if head not in config:
+        return False
+    return not rest or (isinstance(config[head], dict) and has_config_key(config[head], rest))
+
+
 def control_sort_key(key: str) -> tuple:
     """Chart type, then the entity selection, then everything else alphabetically."""
     return (CONTROL_ORDER.index(key), "") if key in CONTROL_ORDER else (len(CONTROL_ORDER), key)
@@ -441,7 +458,7 @@ def narrative_section(
         dims = f.get("target_dimensions") or {}
         if dims:
             parts.append(
-                "**view dimensions** (the create starts on the MDIM's default view):<br>"
+                "**view dimensions** (the new chart opens at the view's defaults):<br>"
                 + ", ".join(f"`{k}` = {v}" for k, v in sorted(dims.items()))
             )
         # The stored URL params and the config patch describe the same state in two
@@ -451,7 +468,7 @@ def narrative_section(
         config_controls = ovr.get("controls") or {}
         controls = dict(config_controls)
         for key, value in parse_qsl(f["stored_params"], keep_blank_values=True):
-            if any(equiv in config_controls for equiv in PARAM_CONFIG_EQUIVALENT.get(key, (key,))):
+            if any(has_config_key(config_controls, equiv) for equiv in PARAM_CONFIG_EQUIVALENT.get(key, (key,))):
                 continue
             # A URL param spells entities as codes; the editor's picker speaks names.
             if key in ENTITY_CODE_PARAMS and value:
@@ -501,9 +518,9 @@ def narrative_section(
             "(visible when logged in)"
         )
         set_step = (
-            "**set everything in the third column by hand** — the new chart opens on the MDIM's "
-            "default view with default entities, so the dimensions, controls and authored text do "
-            "not carry over; compare against the original in the admin editor"
+            "**set everything in the third column by hand** — the control parents the new chart to the "
+            "right view, but its state opens at that view's defaults, so the dimensions, controls and "
+            "authored text do not carry over; compare against the original in the admin editor"
         )
         if published_uses:
             steps = (
@@ -691,10 +708,11 @@ def write_markdown(
             'chart"** admin control — not a bare `/admin/narrative-charts/create?chartConfigId=…` '
             "link, which opens a copy of the MDIM's default view.",
             "",
-            "**Then expect to rebuild the view by hand.** Creating a narrative chart from an MDIM "
-            "starts it on the MDIM's **default view with default entities** — the dimension selection, "
-            "the entity selection, the tab and time settings, and any text the original authored on "
-            "top of its parent all fail to carry over. The **Set by hand after creating** column lists "
+            "**Then expect to rebuild the state by hand.** The control gets the parent view right, "
+            "but the new chart opens at **that view's defaults** — the dimension selection, the entity "
+            "selection and the tab and time settings all come up at defaults, and any text the "
+            "original authored on top of its parent never transfers at all. (A bare create link is "
+            "worse: it also parents to the wrong view.) The **Set by hand after creating** column lists "
             "exactly those groups per chart, in the order to apply them. Miss the text and the "
             "replacement silently renders the view's own wording instead of the wording the article "
             "was written around; miss the controls and it renders the wrong countries.",
