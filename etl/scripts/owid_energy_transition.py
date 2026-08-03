@@ -105,7 +105,7 @@ BANNER_TEMPLATE = (
     f"[explained in this article]({EXPLAINER_URL}). "
     f"On {CUTOVER_DATE} this chart will be replaced by "
     "[an updated version]({successor_url}). "
-    "This version will remain available as an [archived chart]({archive_url})."
+    "The version shown here will remain available as an [archived chart]({archive_url})."
 )
 
 
