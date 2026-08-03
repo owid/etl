@@ -26,10 +26,10 @@ Only ONE babysitter per PR. If one is already running, message it (SendMessage) 
 1. Post the trigger, capture its timestamp **from the same call**, and record the **head SHA the round covers** — the PR's *remote* head, which is the revision GitHub hands Codex. Read it from the PR, never from local `HEAD`: a local branch that is ahead (an uncommitted-then-committed fix not yet pushed) or behind gives a SHA Codex will never name, and step 2's matching rule then rejects the real verdict until the deadline. The creation response carries `created_at`, so there is no lookup to get wrong, but no SHA — and the recorded SHA is what step 2 matches Codex's own `Reviewed commit:` line against, which is the only way to attribute a verdict to a round when several are in flight or the head has moved. Pass all three to the agent:
 
    ```bash
-   gh api repos/<owner>/<repo>/pulls/<n> --jq .head.sha   # the REMOTE head — what Codex reviews
    gh api repos/<owner>/<repo>/issues/<n>/comments --method POST \
      -f body="@codex review" --jq '{id, created_at}'
-   ```
+   gh api repos/<owner>/<repo>/pulls/<n> --jq .head.sha   # AFTER the trigger: the remote head
+   ```                                                    # Codex will actually pick up
 
    Keep **all three**: the timestamp is the polling threshold, the id is what step 2 reads reactions from (`gh api repos/<owner>/<repo>/issues/comments/<id>/reactions`) to see the `+1` clean signal, and the SHA is what any verdict from this round actually covers. Pass all three to the agent. Both *written* verdicts name the commit they examined — a findings review in its body, a clean pass in its issue comment — so the recorded SHA is what step 2 matches them against; only the bare `+1` reaction names nothing. That does not make it worthless — a Codex-authored `+1` is conclusive on its own when no other round could be answering (it was the only verdict PR 6590 ever produced) — but it is unattributable, so it cannot carry a round whose answer might be confused with another's. Same condition as step 2's rule; don't read it as stricter here, or a `+1`-only round waits to the deadline for a verdict that already arrived.
 
@@ -63,7 +63,21 @@ Loop (max <3> iterations, then stop and report):
    `240588d338` for `240588d33…`). This is the only reliable discriminator: a timestamp filter
    accepts a *late answer from a previous round* as this round's verdict, which on a clean pass
    would declare the current head reviewed when an older revision was. If the SHA does not
-   match, the verdict belongs to another round — log it, do not act on it as this round's.
+   match, decide by **which way** it differs, because no capture order is atomic — the main
+   session can push between the trigger and the head read, so Codex may legitimately review a
+   revision newer than the one recorded:
+
+   ```bash
+   git fetch -q origin && git merge-base --is-ancestor <recorded-sha> <reviewed-sha> \
+     && echo "same-or-newer: this round's verdict, covering <reviewed-sha>" \
+     || echo "older: a superseded round's answer — log and keep waiting"
+   ```
+
+   Same-or-newer → **accept it**, and report the SHA Codex named rather than the one you
+   recorded. Strictly older → it is a previous round's late answer; log it and keep waiting.
+   Never let a mismatch alone stall the loop to the deadline: the discriminator exists to
+   *label* verdicts, not to gate them, and treating "not equal" as "not mine" turns a stale-
+   answer guard into a hang the moment a push races the trigger.
    A `+1` reaction carries no SHA and so cannot be attributed at all; treat it as a clean
    signal only when no other round could be answering, and prefer the issue comment whenever
    one exists.
@@ -127,10 +141,10 @@ Loop (max <3> iterations, then stop and report):
 7. **Re-trigger** a fresh bare `@codex review` comment ONLY if you pushed a substantial code fix (metadata-only tweaks don't count). Post it exactly as setup step 1 does, capturing **all three** fields:
 
    ```bash
-   git push && gh api repos/<owner>/<repo>/pulls/<n> --jq .head.sha   # push first, then read the
-                                                                     # REMOTE head: your fix commit
+   git push                                               # land the fix BEFORE triggering
    gh api repos/<owner>/<repo>/issues/<n>/comments --method POST \
      -f body="@codex review" --jq '{id, created_at}'
+   gh api repos/<owner>/<repo>/pulls/<n> --jq .head.sha   # AFTER the trigger, as in step 1
    ```
 
    Replace **all three** stored values — the threshold, the trigger comment id, *and* the head SHA (again from the remote, after the push has landed: an unpushed fix commit yields a SHA Codex never sees). Keeping the old id means step 2 reads reactions from the previous trigger, where an existing `+1` declares the new round clean before Codex has answered it. Keeping the old SHA is subtler and worse: the round's verdict then gets reported against the revision you just replaced, so a clean pass reads as covering code Codex never saw, and the revision it did see goes unnamed. Then loop back to 1.
@@ -152,7 +166,8 @@ Final report: status of every CI check; each finding with verdict (fixed+commit 
 - **A `+1` verdict must be authored by the Codex bot, not just well-timed.** Humans routinely 👍 a PR description; content + timestamp alone would read that as a clean pass, and the reviews-count cross-check can't save you while the real findings review is still in flight (it hasn't been submitted yet, so the count hasn't moved). Always check the reaction's `user.login` before treating any `+1` as a verdict, in both reaction locations — and match it as a prefix (`chatgpt-codex-connector`), because REST renders the bot login as `chatgpt-codex-connector[bot]` while GraphQL renders it without the suffix; an exact-string check copied from the wrong API silently rejects every genuine verdict and stalls the loop to its deadline.
 - Replying to a review comment does NOT resolve the thread; resolution is a separate GraphQL mutation.
 - Every re-trigger resets the polling threshold; deleted trigger comments make timestamps lie — always pin the threshold to a comment that still exists.
-- **The round's SHA is the PR's REMOTE head, not local `HEAD`.** GitHub sends Codex the pushed revision, so a local branch that is ahead (a fix committed but not yet pushed) or behind records a SHA Codex will never name — and the matching rule below then rejects the genuine verdict until the deadline, turning a safety check into a hang. Read it with `gh api repos/<o>/<r>/pulls/<n> --jq .head.sha`, after the push has landed.
+- **The round's SHA is the PR's REMOTE head, not local `HEAD`.** GitHub sends Codex the pushed revision, so a local branch that is ahead (a fix committed but not yet pushed) or behind records a SHA Codex will never name. Read it with `gh api repos/<o>/<r>/pulls/<n> --jq .head.sha`, after the push has landed and after posting the trigger.
+- **No capture order is atomic — so the SHA labels verdicts, it must not gate them.** A push can always race the gap between the trigger and the head read, in which case Codex reviews a *newer* revision than the one recorded and its correctly-attributed verdict never equals the stored SHA. Any rule that discards non-equal SHAs converts that race into a 30-minute hang. Compare by ancestry instead (`git merge-base --is-ancestor recorded reviewed`): same-or-newer is this round's verdict — accept it and report the SHA Codex named; strictly older is a superseded round's late answer — log it and keep waiting.
 - **Attribute verdicts by `Reviewed commit:`, never by timestamp alone.** Codex stamps the SHA it examined into both verdict kinds — the findings review body and the clean-pass issue comment (`**Reviewed commit:** 240588d338`). Without matching it against the round's recorded head SHA, a late answer from an abandoned or superseded round passes the timestamp filter and is read as the current round's verdict; on a clean pass that silently certifies a revision Codex never saw. The `+1` reaction is the one verdict with no SHA in it, which is why it cannot be the sole clean signal whenever another round might still answer.
 - **Rapid re-triggering starves the loop — harvest before re-triggering.** Every new `@codex review` resets the polling threshold, so any verdict that arrived for the previous trigger is discarded unread. On a PR taking eight commits and eight triggers in ~40 minutes, Codex answered every round (two clean passes, four findings reviews) and the loop harvested none of them, because each answer landed after its trigger had already been superseded; the unread clean pass was spotted by a human, not by the loop. Two guards, both in Setup above: **step 0** — read every surface for the current trigger before posting a new one — and **pacing** — batch edits into one round instead of triggering per commit. Also state, in every relayed report, which SHA the verdict covers: with a moving head, "clean" without a SHA is unfalsifiable.
 - **A concluded loop is not a closed review.** Codex posted a second findings review ~25 minutes after the first, with no new trigger and no new push, after the babysitter had legitimately finished its round (PR 6561: a P1 sat unaddressed until a human noticed). Hence the final-sweep rule in step 2 — and when relaying a babysitter's report, treat its "latest review id seen" as the coverage boundary, not as proof the review is over.
