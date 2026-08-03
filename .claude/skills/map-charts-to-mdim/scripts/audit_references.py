@@ -230,7 +230,13 @@ def narrative_chart_usages(names: set[str]) -> dict[str, list[dict]]:
 
 
 def narrative_section(group: list[dict], usages: dict[str, list[dict]], host: str, admin: str) -> list[str]:
-    """One block per narrative chart: what it is, where it is used, and the ordered steps."""
+    """One block per narrative chart: what it is, where it is used, and the ordered steps.
+
+    Which of the two orders applies is decided by whether a PUBLISHED page references it
+    (the rule SKILL.md states): the delete only refuses for published references, and
+    `create` rejects an existing name, so the name can be reused — leaving any draft
+    reference resolving untouched — exactly when nothing published holds it.
+    """
     lines: list[str] = []
     for f in group:
         name = f["where"]
@@ -240,7 +246,7 @@ def narrative_section(group: list[dict], usages: dict[str, list[dict]], host: st
             f"### `{name}`",
             "",
             f"- parent chart: [`{f['source_chart_slug']}`]({f['old_url']}) · "
-            f"[✎ open the narrative chart]({host}/admin/narrative-charts/{f['narrative_id']}/edit)",
+            f"[✎ open the narrative chart]({admin}/narrative-charts/{f['narrative_id']}/edit)",
             f"- replacement should render: {f['replacement_url']}",
         ]
         if f["param_collisions"]:
@@ -249,7 +255,14 @@ def narrative_section(group: list[dict], usages: dict[str, list[dict]], host: st
                 "dimensions and would override them"
             )
         if used_in:
-            lines.append(f"- **used in {len(used_in)} page(s)** — these are what step 2 repoints:")
+            lines.append(
+                f"- **used in {len(used_in)} page(s)** — "
+                + (
+                    "these are what the repoint step updates:"
+                    if published_uses
+                    else "none of them published, so reusing the name below keeps them resolving as they are:"
+                )
+            )
             for u in sorted(used_in, key=lambda u: (not u["published"], u["slug"] or "")):
                 draft = "" if u["published"] else " ⚠️ **draft**"
                 page = (
@@ -261,19 +274,22 @@ def narrative_section(group: list[dict], usages: dict[str, list[dict]], host: st
                     f"[👁 preview]({admin}/gdocs/{u['gdoc_id']}/preview) · search the doc for `{name}`"
                 )
         else:
-            lines.append(
-                "- **not referenced by any page** — so the shortcut applies: delete it first, then "
-                "recreate the replacement under the SAME name (nothing blocks the delete)"
-            )
-        lines += [
-            f"- **step 1 — create:** {admin}/narrative-charts/create?type=multiDim&chartConfigId={f['target_view_config_id']}",
-            "- **step 2 — repoint:** change the page(s) above to the new narrative chart's name"
-            if used_in
-            else "- **step 2 — repoint:** nothing to repoint",
-            "- **step 3 — delete:** remove the old narrative chart"
-            + (" (only possible once the published page(s) above no longer reference it)" if published_uses else ""),
-            "",
-        ]
+            lines.append("- **not referenced by any page**")
+        create = f"{admin}/narrative-charts/create?type=multiDim&chartConfigId={f['target_view_config_id']}"
+        if published_uses:
+            lines += [
+                f"- **step 1 — create** the replacement under a NEW name (`create` rejects an existing one): {create}",
+                "- **step 2 — repoint:** change the page(s) above to the new narrative chart's name",
+                "- **step 3 — delete:** remove the old narrative chart — the delete succeeds once no "
+                "published page references it, which is why it comes last",
+            ]
+        else:
+            lines += [
+                "- **step 1 — delete** the old narrative chart: nothing published references it, so the "
+                "delete succeeds and frees the name",
+                f"- **step 2 — create** the replacement, reusing the SAME name (`{name}`): {create}",
+            ]
+        lines.append("")
     return lines
 
 
@@ -433,11 +449,12 @@ def write_markdown(
             "",
             "A narrative chart renders its own saved config, so nothing breaks when its parent chart "
             'is unpublished — only its generated "Explore the data" link follows the redirect. The '
-            "plan for each one: **recreate it manually from the target MDIM view and point the pages "
-            "that use it back at the new one** — **create** the replacement, **repoint** the pages, "
-            "then **delete** the old one. That order is forced by the API: the delete is refused while "
-            "a published page still references it, and there is no rename, so the name can only be "
-            "reused when nothing references the old one.",
+            "plan for each one: **recreate it manually from the target MDIM view**. There is no "
+            "repointing API and no rename, and the API forces which order applies — the delete is "
+            "refused while a **published** page references it, and `create` rejects a name that "
+            "already exists. So each block below carries the order that fits it: **create → repoint "
+            "→ delete** when a published page holds it, and the shorter **delete → create under the "
+            "same name** when none does (any draft reference then keeps resolving untouched).",
             "",
         ]
         lines += narrative_section(narrative, narrative_chart_usages({f["where"] for f in narrative}), host, admin)

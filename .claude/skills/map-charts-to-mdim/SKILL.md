@@ -252,15 +252,16 @@ no replacement is possible either, because the block is built from `charts` ×
 `chart_tags` only and cannot list MDIMs; featuring the MDIM on a topic page is
 a separate gdoc-authoring change. **Narrative charts get their own section
 (before the All charts summary)**, one block per chart, with the explicit
-recreate → repoint → delete steps, the deep-linked admin create URL, and — the
-part that decides the order — **the pages that actually embed it**, resolved by
+numbered steps, the deep-linked admin create URL, and — the part that decides
+the order — **the pages that actually embed it**, resolved by
 a second hop the sweep doesn't make (`posts_gdocs_links` on
 `linkType='narrative-chart'`, both `narrative-chart` and `key-insights`
-components), each with its doc link and the name to search for. A published page
-among them makes create-then-repoint-then-delete mandatory; when nothing
-references it at all, the report says so and offers the delete-first shortcut
-that reuses the same name. **ℹ️** unpublished/draft pages
-close the report.
+components), each with its doc link and the name to search for. Each block
+carries only the order that applies to it, on the rule above: a **published**
+page among the users makes create → repoint → delete mandatory; with none, the
+block emits the delete → create shortcut that reuses the same name (a draft
+reference then keeps resolving, since pages reference the name). **ℹ️**
+unpublished/draft pages close the report.
 
 Pure SQL, so read-only credentials are enough. It sweeps both the current slug
 and every old slug that reaches the chart — references written before a rename
