@@ -280,6 +280,14 @@ FAUST_KEYS = ("title", "subtitle", "note", "sourceDesc", "hideAnnotationFieldsIn
 # the new parent view supplies them, and re-applying the old ones would repoint the chart
 # at the source chart's indicators, undoing the migration.
 SKIP_OVERRIDE_KEYS = ("dimensions", "$schema", "id", "slug", "isPublished", "version")
+# Grapher URL params and the config keys holding the same state. Used to keep the "set by
+# hand" list from naming one setting twice in two spellings.
+PARAM_CONFIG_EQUIVALENT = {
+    "country": ("selectedEntityNames",),
+    "focus": ("focusedSeriesNames",),
+    "time": ("minTime", "maxTime"),
+    "region": ("map",),
+}
 
 
 def narrative_overrides(findings: list[dict]) -> dict[str, dict]:
@@ -345,7 +353,7 @@ def narrative_section(
     reference resolving untouched — exactly when nothing published holds it.
     """
     lines = [
-        "| Narrative chart | Create from this view | Text to re-apply | Used in (what to repoint) | Steps |",
+        "| Narrative chart | Target rendering | Set by hand after creating | Used in (what to repoint) | Steps |",
         "|---|---|---|---|---|",
     ]
     for f in group:
@@ -358,32 +366,46 @@ def narrative_section(
             f"[`{cell(name, 40)}`]({admin}/narrative-charts/{f['narrative_id']}/edit) _✎ admin editor_"
             f"<br>parent: [`{cell(f['source_chart_slug'], 32)}`]({f['old_url']})"
         )
-        # This link is the create entry point, not just a preview: the MDIM page's own
-        # "Create narrative chart" control builds its create path from whichever view is on
-        # screen (site/multiDim/MultiDim.tsx), so opening the target view with these params
-        # and using that control parents the new chart to the right view AND carries the
-        # controls over — which the standalone create?chartConfigId= deep link does not do.
-        params = f"<br>controls: `{cell(f['stored_params'].replace('&', '`, `'), 90)}`" if f["stored_params"] else ""
-        collide = (
-            f"<br>⚠️ `{f['param_collisions']}` overrides a view dimension — choose it deliberately"
-            if f["param_collisions"]
-            else ""
-        )
-        controls_left = {k: v for k, v in (ovr.get("controls") or {}).items() if k not in ("tab",)}
-        extra_controls = (
-            "<br>also set: " + ", ".join(f"`{k}` = {render_override(v)}" for k, v in sorted(controls_left.items()))
-            if controls_left
-            else ""
-        )
-        render_cell = f"**[open the target view]({f['replacement_url']})**{params}{collide}{extra_controls}"
+        # The link is the reference rendering to reproduce, and the page the create control
+        # lives on. It is NOT a shortcut: creating from an MDIM starts the new chart at the
+        # MDIM's DEFAULT view with default entities, so nothing below carries over on its own.
+        render_cell = f"**[open the target view]({f['replacement_url']})** — the rendering to match"
 
+        # Everything the create does not carry over, in the order it gets done in the editor:
+        # pick the view, then its controls, then retype the authored text.
+        parts = []
+        dims = f.get("target_dimensions") or {}
+        if dims:
+            parts.append(
+                "**view dimensions** (the create starts on the MDIM's default view):<br>"
+                + ", ".join(f"`{k}` = {v}" for k, v in sorted(dims.items()))
+            )
+        # The stored URL params and the config patch describe the same state in two
+        # encodings, so a param is listed only when the patch has no equivalent config key —
+        # otherwise the cell asks for the entity selection twice, as `country` and again as
+        # `selectedEntityNames`. The config form wins: that is what the editor's fields are.
+        config_controls = ovr.get("controls") or {}
+        controls = dict(config_controls)
+        for key, value in parse_qsl(f["stored_params"], keep_blank_values=True):
+            if any(equiv in config_controls for equiv in PARAM_CONFIG_EQUIVALENT.get(key, (key,))):
+                continue
+            controls[key] = value
+        if controls:
+            parts.append(
+                "**controls** (entity selection, tab, time — not inherited):<br>"
+                + ", ".join(f"`{k}` = {render_override(v) or '(empty)'}" for k, v in sorted(controls.items()))
+            )
         faust = ovr.get("faust") or {}
         if faust:
-            faust_cell = "the original overrides these — the view will NOT supply them:<br>" + "<br>".join(
-                f"`{k}`: {cell(render_override(v), 110)}" for k, v in sorted(faust.items())
+            parts.append(
+                "**text the original overrides** — the view will NOT supply it:<br>"
+                + "<br>".join(f"`{k}`: {cell(render_override(v), 110)}" for k, v in sorted(faust.items()))
             )
         else:
-            faust_cell = "_no text overrides — it inherits FAUST from its parent, so the view's own text applies_"
+            parts.append("_no text overrides — FAUST is inherited, so the view's own text applies_")
+        if f["param_collisions"]:
+            parts.append(f"⚠️ `{f['param_collisions']}` collides with a view dimension — choose it deliberately")
+        faust_cell = "<br><br>".join(parts)
 
         if used_in:
             uses = []
@@ -403,14 +425,18 @@ def narrative_section(
             used_cell = "_not referenced by any page_"
 
         create_step = (
-            'open the target view, set its controls, then use the chart\'s **"Create narrative chart"** '
-            "admin control (visible when logged in) — it parents the new chart to the view on screen"
+            'open the target view and use the chart\'s **"Create narrative chart"** admin control '
+            "(visible when logged in)"
+        )
+        set_step = (
+            "**set everything in the third column by hand** — the new chart opens on the MDIM's "
+            "default view with default entities, so the dimensions, controls and authored text do "
+            "not carry over; compare against the original in the admin editor"
         )
         if published_uses:
             steps = (
                 f"1. **create**: {create_step}, under a NEW name (`create` rejects an existing one)"
-                "<br>2. **re-apply** the text overrides in the middle column, and check the title/subtitle/"
-                "footnote against the original"
+                f"<br>2. {set_step}"
                 "<br>3. **repoint** the page(s) to the new name"
                 "<br>4. **delete** the old one — succeeds once no published page references it"
             )
@@ -418,7 +444,7 @@ def narrative_section(
             steps = (
                 "1. **delete** the old one — nothing published references it, so this frees the name"
                 f"<br>2. **create**: {create_step}, reusing the SAME name"
-                "<br>3. **re-apply** the text overrides in the middle column"
+                f"<br>3. {set_step}"
             )
         lines.append(f"| {chart_cell} | {render_cell} | {faust_cell} | {used_cell} | {steps} |")
     lines.append("")
@@ -589,15 +615,16 @@ def write_markdown(
             "same name** when none does (any draft reference then keeps resolving untouched).",
             "",
             "Create the replacement from the target view itself, using the chart's **\"Create narrative "
-            "chart\"** admin control — the MDIM page builds that control's target from whichever view "
-            "is on screen, so the new chart is parented to the right view and inherits the controls "
-            "you set. Do **not** use a bare `/admin/narrative-charts/create?chartConfigId=…` link: it "
-            "opens a copy of the MDIM's default view instead of this one.",
+            'chart"** admin control — not a bare `/admin/narrative-charts/create?chartConfigId=…` '
+            "link, which opens a copy of the MDIM's default view.",
             "",
-            "Then re-apply the text overrides in the **Text to re-apply** column. FAUST (title, "
-            "subtitle, footnote) that the original authored on top of its parent does not come from "
-            "the new view — miss it and the replacement silently renders the view's own wording "
-            "instead of the text the article was written around.",
+            "**Then expect to rebuild the view by hand.** Creating a narrative chart from an MDIM "
+            "starts it on the MDIM's **default view with default entities** — the dimension selection, "
+            "the entity selection, the tab and time settings, and any text the original authored on "
+            "top of its parent all fail to carry over. The **Set by hand after creating** column lists "
+            "exactly those groups per chart, in the order to apply them. Miss the text and the "
+            "replacement silently renders the view's own wording instead of the wording the article "
+            "was written around; miss the controls and it renders the wrong countries.",
             "",
         ]
         lines += narrative_section(
@@ -790,6 +817,9 @@ def main() -> int:
                 # The narrative chart's own stored controls (entities, tab, time). The admin
                 # create page cannot preset them, so the report names them for hand-copying.
                 "stored_params": qs if ref["surface"] == "narrative chart" else "",
+                # Creating from an MDIM starts at its DEFAULT view, so the dimension
+                # selection has to be re-made by hand too — the report has to name it.
+                "target_dimensions": dict(r["target"]["dimensions"]) if ref["surface"] == "narrative chart" else {},
                 "target_view_config_id": r["target"]["viewConfigId"],
                 "context": ref["context"] + (f' — "{ref["text"][:60]}"' if ref["text"] else ""),
                 "old_url": f"{host}/grapher/{ref['subject']}" + (f"?{qs.lstrip('?')}" if qs else ""),

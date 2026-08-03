@@ -273,17 +273,29 @@ and inherits the controls set on it. A bare
 looks equivalent but opens a copy of the MDIM's **default** view — verified in
 practice — so never hand that out as the create step.
 
-**Re-apply the original's FAUST.** A narrative chart's `chart_configs.patch` is
-the delta its author typed on top of the parent, and text overrides in it
-(`title`, `subtitle`, `note`, `sourceDesc`, `hideAnnotationFieldsInTitle`) do
-**not** carry over to a replacement built from an MDIM view — the replacement
-would silently render the view's own wording instead of the text the article was
-written around. The report diffs each patch against the target view's config and
-lists only what genuinely differs, splitting FAUST text (retype verbatim) from
-view controls (entity selection, tab, time, timeline/map toggles). `dimensions`
-and `$schema` are excluded on purpose: the new parent view supplies them, and
-re-applying the old ones would repoint the chart at the retired chart's
-indicators.
+**Creating from an MDIM starts at its DEFAULT view — nothing carries over.**
+Not the dimension selection, not the entity selection, not tab/time, not the
+text. So the report's **"Set by hand after creating"** column lists all three
+groups per chart, in the order they get applied in the editor:
+
+1. **view dimensions** — the target view's own dimension values (from the
+   proposal), because the new chart opens on the MDIM's default view;
+2. **controls** — entity selection, tab, time, timeline/map toggles, taken from
+   the narrative chart's `chart_configs.patch` (the delta its author typed on
+   top of the parent) plus its stored `queryParamsForParentChart`. The two
+   encode the same state, so a URL param is dropped when the patch already
+   carries the equivalent config key (`country` ↔ `selectedEntityNames`,
+   `focus` ↔ `focusedSeriesNames`, `time` ↔ `minTime`/`maxTime`) — otherwise the
+   cell asks for one setting twice in two spellings;
+3. **FAUST text** — `title`, `subtitle`, `note`, `sourceDesc`,
+   `hideAnnotationFieldsInTitle` from the patch. Miss these and the replacement
+   silently renders the *view's* wording instead of the text the article was
+   written around.
+
+Every group is diffed against the target view's config, so only genuine
+differences are asked for. `dimensions` and `$schema` are excluded from the patch
+on purpose: the new parent view supplies them, and re-applying the old ones would
+repoint the chart at the retired chart's indicators.
 
 **Admin routes need the admin origin.** A narrative chart's `where_path` is
 `/admin/narrative-charts/<id>/edit`, and the public site does not serve
