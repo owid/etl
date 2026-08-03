@@ -141,10 +141,7 @@ own — and any narrative charts, which are step 2.
 
 **Review the matches before applying.** The skill also builds an HTML page showing each
 chart beside the MDIM view it would redirect to, with approve/flag controls; decisions
-persist in the browser and export to JSON, which the preflight then reads so flagged charts
-are excluded. To force or suppress a match, put the chart id in `overrides.csv` and re-run —
-only matches it is confident about are proposed, and the rest are reported rather than
-guessed.
+persist in the browser and export to JSON, so the skill can read and adjust the matches.
 
 ### 2. Re-create any narrative charts
 
