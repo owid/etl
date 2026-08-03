@@ -33,7 +33,7 @@ import sys
 import tempfile
 from collections import defaultdict
 from pathlib import Path
-from urllib.parse import parse_qsl, urlencode
+from urllib.parse import parse_qsl, quote, urlencode
 
 from etl.config import OWID_ENV
 
@@ -44,9 +44,16 @@ RED, YELLOW, INFO = "RED", "YELLOW", "INFO"
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
 REFERENCE_COLUMNS = [
-    "severity", "surface", "kind", "source_chart_slug", "where", "where_url", "context",
+    "severity", "surface", "kind", "source_chart_slug", "where", "where_url",
+    "doc_edit_url", "doc_preview_url", "find_in_doc", "context",
     "old_url", "replacement_url", "param_collisions", "fix",
 ]  # fmt: skip
+
+# Surfaces whose fix is a Google Doc edit. For these the report renders a table with the
+# doc link and a copy-paste search hint (the find-chart-references convention) — handing
+# someone a page URL without saying where in the doc the reference sits makes them
+# re-derive exactly what the sweep already knew.
+GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
 
 FIXES = {
     "gdoc": "edit the article block to embed the MDIM view",
@@ -117,6 +124,26 @@ def run_find_references(redirects: list[dict]) -> tuple[list[dict], list[str]]:
         Path(gaps_path).unlink(missing_ok=True)
 
 
+def deep_link(where_path: str, anchor: str, host: str) -> str:
+    """Published-page URL scrolled to the reference via a text fragment (block embeds
+    have no anchor text, so those fall back to the plain URL). Same encoding as
+    find-chart-references / chart_diff citations: parentheses literal, hyphens escaped."""
+    base = f"{host}{where_path}" if where_path else ""
+    if not base or not anchor:
+        return base
+    encoded = quote(anchor[:200], safe="()").replace("-", "%2D")
+    return f"{base}#:~:text={encoded}"
+
+
+def find_in_doc(ref: dict) -> str:
+    """Copy-paste search string for the Google Doc's find box (find-chart-references
+    convention): the visible anchor text for a prose hyperlink; for a block embed the doc
+    holds a bare grapher URL, so the slug — exactly as the author typed it, which is what
+    `posts_gdocs_links.target` stores and may be an old slug."""
+    anchor = " ".join((ref.get("text") or "").split())
+    return anchor or ref["subject"]
+
+
 def replacement_url(r: dict, query_string: str, host: str) -> tuple[str, list[str]]:
     """Target URL for a reference, plus any params that would clobber a view dimension."""
     dims = dict(r["target"]["dimensions"])
@@ -134,6 +161,61 @@ def write_csv(out: Path, findings: list[dict]) -> Path:
         for row in findings:
             w.writerow({k: row.get(k, "") for k in REFERENCE_COLUMNS})
     return path
+
+
+def cell(value: str, limit: int = 70, marker: str = "…") -> str:
+    """Table-safe cell: escape pipes and newlines, truncate runaway text.
+
+    Pass marker="" for copy-paste search strings: an appended ellipsis is a character
+    that does not exist in the doc, so the copied text would match nothing — a bare
+    literal prefix still finds the spot. Pipes are escaped after truncating so the cut
+    can never leave half an escape sequence behind.
+    """
+    text = " ".join(str(value or "").split())
+    if len(text) > limit:
+        text = text[: limit - 1] + marker
+    return text.replace("|", "\\|")
+
+
+def gdoc_table(group: list[dict]) -> list[str]:
+    """One table per fix, one row per reference: doc links + the search string that lands on it.
+
+    The 'Replace with' cell links the full replacement URL under a readable label; the
+    raw URL is in references.csv for copy-paste. Fix instructions live above each table
+    rather than in a column — and because a (severity, surface) group can mix fixes (an
+    unpublished doc can hold both an embed and a prose link, and the INFO section does
+    not split by kind), the group is rendered as one table per fix, keeping every row
+    under the instruction that applies to it.
+    """
+    by_fix = defaultdict(list)
+    for f in group:
+        by_fix[f["fix"]].append(f)
+    lines: list[str] = []
+    for fix in sorted(by_fix):
+        if lines:
+            lines.append("")
+        lines += [f"Fix: {fix}", ""]
+        lines += ["| Source chart | Where | Open | Find in doc | Replace with |", "|---|---|---|---|---|"]
+        for f in by_fix[fix]:
+            source = f"[`{cell(f['source_chart_slug'], 44)}`]({f['old_url']})"
+            opens = " · ".join(
+                part
+                for part in (
+                    f"[📄 doc]({f['doc_edit_url']})" if f["doc_edit_url"] else "",
+                    f"[👁 preview]({f['doc_preview_url']})" if f["doc_preview_url"] else "",
+                    f"[🔗 page]({f['where_url']})" if f["where_url"] else "",
+                )
+                if part
+            )
+            # marker="" — this cell is copied into the doc's find box verbatim, so it must
+            # stay a literal prefix of the text in the doc.
+            find = f"`{cell(f['find_in_doc'], 55, marker='')}`" if f["find_in_doc"] else "—"
+            target_label = cell(f["replacement_url"].split("/grapher/", 1)[-1], 60)
+            replace = f"[`{target_label}`]({f['replacement_url']})"
+            if f["param_collisions"]:
+                replace += f" ⚠️ params `{f['param_collisions']}` override view dimensions"
+            lines.append(f"| {source} | {cell(f['where'], 44)} | {opens} | {find} | {replace} |")
+    return lines
 
 
 def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host: str, gaps: list[str]) -> Path:
@@ -168,17 +250,23 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
             by_surface[f["surface"]].append(f)
         for surface in sorted(by_surface):
             lines += [f"### {surface} ({len(by_surface[surface])})", ""]
-            for f in by_surface[surface]:
-                where = f"[{f['where']}]({f['where_url']})" if f["where_url"] else f["where"]
-                lines.append(f"- **{f['source_chart_slug']}** in {where} — {f['context']}")
-                lines.append(f"    - now: {f['old_url']}")
-                lines.append(f"    - should be: {f['replacement_url']}")
-                if f["param_collisions"]:
-                    lines.append(
-                        f"    - ⚠️ query params `{f['param_collisions']}` collide with the view's dimensions "
-                        "and will override them — set the dimension explicitly or drop the param"
-                    )
-                lines.append(f"    - fix: {f['fix']}")
+            group = by_surface[surface]
+            # Google-Doc-backed surfaces get the table treatment: doc link, previewer,
+            # scrolled page link, and the search string that lands on the reference.
+            if all(f["doc_edit_url"] for f in group):
+                lines += gdoc_table(group)
+            else:
+                for f in group:
+                    where = f"[{f['where']}]({f['where_url']})" if f["where_url"] else f["where"]
+                    lines.append(f"- **{f['source_chart_slug']}** in {where} — {f['context']}")
+                    lines.append(f"    - now: {f['old_url']}")
+                    lines.append(f"    - should be: {f['replacement_url']}")
+                    if f["param_collisions"]:
+                        lines.append(
+                            f"    - ⚠️ query params `{f['param_collisions']}` collide with the view's dimensions "
+                            "and will override them — set the dimension explicitly or drop the param"
+                        )
+                    lines.append(f"    - fix: {f['fix']}")
             lines.append("")
 
     # Nothing in this audit is applied by running it, and its coverage is not total — so it
@@ -204,6 +292,19 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
         f"{len(info)} unpublished or draft reference(s) were found and listed but not graded for reader impact. "
         "Whether the redirects themselves apply cleanly is checked by `preflight.py`, not here."
     )
+    lines += [
+        "---",
+        "",
+        "In the tables, the **source chart links to the reference's own URL** (its params applied) and "
+        "**Replace with links to the target MDIM view** the same reference should become. "
+        "📄 opens the Google Doc to edit · 👁 opens the article in the admin previewer (works for "
+        "unpublished drafts too) · 🔗 opens the published page scrolled to the reference. "
+        "**Find in doc** is a copy-paste search string for the Google Doc's find box: the link text for "
+        "a prose hyperlink, or the chart slug for a block embed (the doc holds a bare grapher URL "
+        "there — and the slug is stored as the author typed it, so it matches even when the doc still "
+        "uses an old one).",
+        "",
+    ]
     lines += ["## What's still open", "", handed_off, "", proposed, "", unverified, ""]
     # Gaps the sweep hit at RUN time, as opposed to the standing ones named above. Silence
     # here would read as "everything was checked", which is the one wrong signal this
@@ -255,6 +356,7 @@ def main() -> int:
             # the one this chart is being redirected to — so hand over the ready-made URL
             # rather than the id to look up.
             fix += f" — create the replacement at {admin}/narrative-charts/create?type=multiDim&chartConfigId={r['target']['viewConfigId']}"
+        is_gdoc = ref["surface"] in GDOC_SURFACES and ref.get("surface_id")
         findings.append(
             {
                 "severity": severity,
@@ -262,7 +364,13 @@ def main() -> int:
                 "kind": ref["kind"],
                 "source_chart_slug": ref["subject"],
                 "where": ref["where"],
-                "where_url": f"{host}{ref['where_path']}" if ref["where_path"] else "",
+                # Scrolled to the reference when the anchor text allows it.
+                "where_url": deep_link(ref["where_path"], ref.get("text") or "", host),
+                # posts_gdocs.id IS the Google Doc id, so the edit link is direct; the
+                # admin previewer renders unpublished drafts the public URL 404s on.
+                "doc_edit_url": f"https://docs.google.com/document/d/{ref['surface_id']}/edit" if is_gdoc else "",
+                "doc_preview_url": f"{admin}/gdocs/{ref['surface_id']}/preview" if is_gdoc else "",
+                "find_in_doc": find_in_doc(ref) if is_gdoc else "",
                 "context": ref["context"] + (f' — "{ref["text"][:60]}"' if ref["text"] else ""),
                 "old_url": f"{host}/grapher/{ref['subject']}" + (f"?{qs.lstrip('?')}" if qs else ""),
                 "replacement_url": new_url,
