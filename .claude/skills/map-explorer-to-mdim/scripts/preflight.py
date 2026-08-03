@@ -85,7 +85,14 @@ def extraction_conditions(d: Path) -> dict[int, dict[str, str]] | None:
         return None
     grid: dict[int, dict[str, str]] = {}
     with open(views_path, newline="") as f:
-        for row in csv.DictReader(f):
+        reader = csv.DictReader(f)
+        # `_sources.json` names dimension_1..N and the CSV carries those columns; extraction
+        # writes both from one list, so they can only disagree if the two files come from
+        # different runs. That is precisely what this check exists to catch, so refuse to
+        # compare rather than silently read a short row as a set of empty values.
+        if [f"dimension_{i}" for i in range(1, len(names) + 1)] != [c for c in (reader.fieldnames or []) if c != "id"]:
+            return None
+        for row in reader:
             values = [(row.get(f"dimension_{i}") or "").strip() for i in range(1, len(names) + 1)]
             grid[int(row["id"])] = strip_empty(dict(zip(names, values)))
     return grid
@@ -107,8 +114,9 @@ def payload_binding(run: dict) -> tuple[str, str]:
     if grid is None:
         return (
             WARN,
-            "no explorer_views.csv/_sources.json pair beside the payload — cannot confirm it was built from "
-            "this extraction, so a stale payload would go unnoticed",
+            "no usable explorer_views.csv/_sources.json pair beside the payload (missing, or the two disagree "
+            "on the dimension columns) — cannot confirm the payload was built from this extraction, so a "
+            "stale payload would go unnoticed here",
         )
     entries = run["payload"].get("redirects") or []
     mismatched, unknown = [], []
