@@ -78,10 +78,9 @@ def run_sweep(subject_args: list[str]) -> tuple[list[dict], list[str]]:
 
 
 # The identity of a reference, for freshness purposes: which surface, of what kind, on which
-# page, pointing where. Presentation-only fields (`context`, `text`, the resolved URLs) are
-# excluded on purpose — prose changing next to a link is not a new reference, and treating it
-# as one trains people to re-run an audit to clear noise, which is how a real change gets
-# waved through.
+# page, pointing where. Presentation-only fields (`text`, the resolved URLs) are excluded on
+# purpose — prose changing next to a link is not a new reference, and treating it as one trains
+# people to re-run an audit to clear noise, which is how a real change gets waved through.
 REFERENCE_DIGEST_FIELDS = (
     "surface",
     "kind",
@@ -102,9 +101,19 @@ def reference_digest(raw: list[dict], subject: str) -> str:
     added an embed after the audit ran, or an audit folder carried over from an earlier
     migration, both leave the gate reporting a clean audit while the change is about to break
     something live. Order-insensitive, because SQL row order is not a fact about the site.
+
+    The ArchieML component joins the fields above because consumers derive SEVERITY from it, not
+    from `kind` alone: an `explorer-tiles` reference survives a redirect while a `chart` embed
+    breaks, and both are `kind == "embed"` on the same page with the same ids. Swapping one for
+    the other turns a harmless row into a blocker without moving any other field, so the
+    component is digested — normalized, so the prose it is parsed out of still is not.
     """
     items = sorted(
-        json.dumps([r.get(f) for f in REFERENCE_DIGEST_FIELDS], sort_keys=True, ensure_ascii=False)
+        json.dumps(
+            [archie_component(r)] + [r.get(f) for f in REFERENCE_DIGEST_FIELDS],
+            sort_keys=True,
+            ensure_ascii=False,
+        )
         for r in raw
         if str(r.get("subject")) == str(subject)
     )
@@ -149,6 +158,35 @@ def deep_link(where_path: str, anchor: str, host: str, admin: str = "") -> str:
     find-chart-references / chart_diff citations: parentheses literal, hyphens escaped."""
     base = absolute_url(where_path, host, admin)
     if not base or not anchor:
+        return base
+    encoded = quote(anchor[:200], safe="()").replace("-", "%2D")
+    return f"{base}#:~:text={encoded}"
+
+
+def page_deep_link(ref: dict, host: str, admin: str = "") -> str:
+    """Public URL of the page holding this reference, scrolled to it — "" when it has none.
+
+    The base cannot be taken from `where_path` alone. The gdoc-link sweep builds it as
+    `/<slug>` for every gdoc type, but a data insight is served under `/data-insights/` and an
+    author page under `/team/`, so those links 404 — and a prose link has anchor text, so the
+    text fragment attaches successfully and makes the wrong base look like a working link. The
+    page TYPE therefore decides the base whenever it is one the site routes, and `where_path`
+    is used where it is the authority instead: admin routes, and surfaces whose type is not a
+    routed gdoc type (a narrative chart's editor URL, or the data-insight front-matter surface,
+    whose `where_path` already carries the right prefix).
+    """
+    ptype = page_type(ref)
+    if ptype and POST_TYPE_PATH.get(ptype, "") is None:
+        return ""  # fragment / homepage: no reader-facing URL exists
+    base = ""
+    if ptype in POST_TYPE_PATH and ref.get("where"):
+        base = public_page_url(ptype, ref["where"], host)
+    if not base:
+        base = absolute_url(ref.get("where_path") or "", host, admin)
+    if not base:
+        return ""
+    anchor = ref.get("text") or ""
+    if not anchor:
         return base
     encoded = quote(anchor[:200], safe="()").replace("-", "%2D")
     return f"{base}#:~:text={encoded}"

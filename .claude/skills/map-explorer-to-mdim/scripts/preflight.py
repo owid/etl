@@ -116,11 +116,16 @@ def payload_binding(run: dict) -> tuple[str, str]:
     """
     grid = extraction_conditions(run["dir"])
     if grid is None:
+        # A blocker, not a warning: warnings do not reach the exit code, so `Ready` would print
+        # over a report that says the payload's provenance is unknown. Same rule the reference
+        # gate already applies to a missing references.csv — "we could not check" must not land
+        # in the same bucket as "we checked and it is fine".
         return (
-            WARN,
-            "no usable explorer_views.csv/_sources.json pair beside the payload (missing, or the two disagree "
-            "on the dimension columns) — cannot confirm the payload was built from this extraction, so a "
-            "stale payload would go unnoticed here",
+            BLOCKER,
+            "UNVERIFIABLE PAYLOAD — no usable explorer_views.csv/_sources.json pair beside it (missing, or the "
+            "two disagree on the dimension columns), so nothing confirms this payload was built from this "
+            "extraction. Re-run extract_views.py and build_mapping.py, and re-review, rather than posting "
+            "source conditions no artifact backs.",
         )
     entries = run["payload"].get("redirects") or []
     mismatched, unknown = [], []
@@ -169,7 +174,12 @@ def payload_matches_build(run: dict) -> tuple[str, str]:
     """
     mapping_path = run["dir"] / "mapping.json"
     if not mapping_path.exists():
-        return WARN, "no mapping.json beside the payload — cannot confirm the two came from the same build"
+        return (
+            BLOCKER,
+            "UNVERIFIABLE PAYLOAD — no mapping.json beside it, so nothing confirms the payload and the reviewed "
+            "proposal came from the same build. Re-run build_mapping.py; a warning here would let `Ready` print "
+            "over a payload whose targets no artifact backs.",
+        )
     mapping = json.loads(mapping_path.read_text())
     strict, _, clashes = strip_payload(mapping)
     # Either duplicate-handling outcome is legitimate: the builder aborts on clashes unless
@@ -444,10 +454,15 @@ def audit_freshness(out: Path, slugs: list[str]) -> tuple[str, str]:
         recorded = json.loads(manifest_path.read_text()).get("referenceDigests") or {}
     stale_record = sorted(set(slugs) - set(recorded))
     if stale_record:
+        # A blocker, for the same reason a missing references.csv is one: this branch does not
+        # run the sweep, so nothing at all has looked at the live site. Warning would let
+        # `Ready` print while an embed added since that audit stays invisible — and creating the
+        # redirect breaks it on the next request.
         return (
-            WARN,
-            f"the audit recorded no verifiable reference digest for {stale_record} (it predates them), so a "
-            "reference added since cannot be detected here — re-run audit_references.py to make it checkable",
+            BLOCKER,
+            f"UNVERIFIABLE AUDIT — no reference digest recorded for {stale_record}, so references.csv cannot be "
+            "checked against the live site and anything added since it ran is invisible. Re-run "
+            "audit_references.py (it records the digest) before applying.",
         )
     raw, gaps = run_sweep([arg for slug in slugs for arg in ("--explorer", slug)])
     drifted = sorted(slug for slug in slugs if reference_digest(raw, slug) != recorded[slug])

@@ -260,8 +260,13 @@ The reference gate is bound to live state the same way. `audit_references.py` re
 `referenceDigests` entry per explorer in `references_manifest.json`; preflight re-runs the sweep
 and compares. Without that, the gate reads a CSV from an earlier run and cannot see a page that
 added an embed since, or an audit folder carried over from another migration — both of which
-would read as a clean audit while the redirect is about to break something live. An audit
-predating the digests reports as unverifiable rather than clean.
+would read as a clean audit while the redirect is about to break something live.
+
+**Unverifiable is a blocker, not a warning**, in all three cases — no extraction pair, no
+`mapping.json`, no reference digest. A warning does not reach the exit code, so `Ready` would
+print over a report stating in plain words that the payload's provenance is unknown. Re-running
+`extract_views.py` / `build_mapping.py` / `audit_references.py` is the cheap way to clear any of
+them; posting an artifact nothing backs is not.
 
 A retired explorer whose redirects are all live reports `DONE` and exits 0. That is the
 finished state, not an error. But retirement does not retire the **target** side: an MDIM that

@@ -52,8 +52,8 @@ from reference_report import (  # noqa: E402
     YELLOW,
     archie_component,
     cell,
-    deep_link,
     find_in_doc,
+    page_deep_link,
     page_type,
     public_page_url,
     run_sweep,
@@ -777,7 +777,7 @@ def main() -> int:
                 "source_chart_slug": ref["subject"],
                 "where": ref["where"],
                 # Scrolled to the reference when the anchor text allows it.
-                "where_url": deep_link(ref["where_path"], ref.get("text") or "", host, admin),
+                "where_url": page_deep_link(ref, host, admin),
                 # posts_gdocs.id IS the Google Doc id, so the edit link is direct; the
                 # admin previewer renders unpublished drafts the public URL 404s on.
                 "doc_edit_url": f"https://docs.google.com/document/d/{ref['surface_id']}/edit" if is_gdoc else "",

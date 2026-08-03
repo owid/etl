@@ -44,16 +44,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "find-chart-referen
 from redirect_rules import build_source_rules, choice_values, resolve_explorer_url  # noqa: E402
 from reference_report import (  # noqa: E402
     INFO,
-    POST_TYPE_PATH,
     RED,
     TAILSCALE_SUFFIX_RE,
     YELLOW,
     archie_component,
     cell,
-    deep_link,
     find_in_doc,
+    page_deep_link,
     page_type,
-    public_page_url,
     reference_digest,
     run_sweep,
 )
@@ -151,13 +149,12 @@ def resolve_missing_slugs(runs: dict[str, dict]) -> None:
 
 
 def _where_url(ref: dict, host: str, admin: str) -> str:
-    """Public URL of the referencing page, scrolled to the reference — "" when it has none."""
-    ptype = page_type(ref)
-    if ptype and POST_TYPE_PATH.get(ptype, "") is None:
-        return ""  # fragment / homepage: no reader-facing URL exists
-    return deep_link(ref["where_path"], ref.get("text") or "", host, admin) or public_page_url(
-        ptype, ref["where"], host
-    )
+    """Public URL of the referencing page, scrolled to the reference — "" when it has none.
+
+    Shared, because resolving the base from the page TYPE rather than from `where_path` is what
+    keeps a data-insight or author page from being linked at the site root, where it 404s.
+    """
+    return page_deep_link(ref, host, admin)
 
 
 def severity_of(ref: dict, component: str) -> str:
