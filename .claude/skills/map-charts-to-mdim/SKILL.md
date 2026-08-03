@@ -238,12 +238,18 @@ ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
 
 The sweep itself is the shared `find-chart-references` skill; this script is the
 redirect-specific consumer that adds the replacement URLs. It writes
-`references.csv` + `references.md`, one row per reference. Severity: **🔴**
-embed — the surface renders the chart's own config, so the redirect does not fix
-it and it breaks on unpublish; migrate before applying · **🟡** hyperlink (the
-301 covers it, update the href anyway) or all-charts-block slot on a topic page
-(a `chart_tags` row with a keyChartLevel — tag the MDIM in its place) ·
-**ℹ️** unpublished/draft.
+`references.csv` + `references.md`, one row per reference. The report is
+organized by what the reader does, not by severity tier: **embedded charts and
+text links sit adjacent in one "Google Doc edits" section** (one editing pass
+per doc covers both — 🔴 embeds break on unpublish and gate the CLI, 🟡 links
+stay functional behind the 301), with reader-facing section names ("Embedded
+charts", "Text links", "Front-matter chart URLs") rather than raw ArchieML
+tokens (those live in the CSV's `component` column). **Topic-page All charts
+entries collapse to a per-page summary and need NO action**: the block lists
+only published charts (`GdocPost.loadRelatedCharts` filters on `isPublished` —
+verified in grapher), so entries drop out on their own at the next bake; tag
+the MDIM with the topic only to provide a replacement entry. **ℹ️**
+unpublished/draft pages close the report.
 
 Pure SQL, so read-only credentials are enough. It sweeps both the current slug
 and every old slug that reaches the chart — references written before a rename

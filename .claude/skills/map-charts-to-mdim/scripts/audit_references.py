@@ -9,9 +9,15 @@ Severity, derived from the sweep's `kind`:
          slug and renders its config directly, so it breaks when the source chart is
          unpublished (which the apply CLI always does). Migrate before applying.
   YELLOW link (the 301 covers it, but the href should be updated so readers don't
-         take an extra hop) or render (an all-charts-block slot: the topic page loses
-         the chart, so tag the MDIM in its place — a follow-up, not a breakage).
-  INFO   the referencing page is unpublished or a draft.
+         take an extra hop).
+  INFO   no action required: the referencing page is unpublished/draft, or the row is
+         a topic page's All charts entry — that block lists only published charts
+         (GdocPost.loadRelatedCharts filters on isPublished), so the entry drops out
+         on its own at the next bake.
+
+The report is organized by what the reader does, not by severity tier: embedded charts
+and text links sit adjacent in one "Google Doc edits" section (one editing pass per doc
+covers both), and All charts entries collapse to a per-topic-page summary.
 
 Replacement URLs merge each reference's own query string over the view's dimensions,
 which is what grapher's redirect handler does (functions/_common/redirectTools.ts).
@@ -63,13 +69,28 @@ GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
 # reader loses, not by the DB mechanism.
 SURFACE_LABELS = {"key chart": "all-charts block (topic page)"}
 
+# Reader-facing section names for the ArchieML component tokens — "chart" and "span-link"
+# mean nothing to someone who doesn't write ArchieML. The raw token stays in the CSV's
+# `component` column.
+COMPONENT_LABELS = {
+    "chart": "Embedded charts",
+    "span-link": "Text links",
+    "front-matter": "Front-matter chart URLs",
+}
+# Blocking edits first: embedded charts and front-matter URLs break on unpublish, text
+# links merely go through an extra 301 hop.
+COMPONENT_ORDER = ("chart", "front-matter", "span-link")
+
 FIXES = {
     "explorer": "repoint the explorer at the MDIM indicators, or retire the explorer",
     "narrative chart": "replace it: create a new one from the MDIM view (parentChartConfigId = "
     "that view's config_id), move the article references, then delete the old — see SKILL.md",
     "static viz": "regenerate the static visualization against the MDIM view",
-    "key chart": "tag the MDIM with the same topic (and key-chart level) so it takes the "
-    "chart's place in the topic page's All charts block",
+    # No action: the All charts block lists only published charts (GdocPost.loadRelatedCharts
+    # filters on isPublished), so entries drop out at the next bake — nothing breaks or goes
+    # stale. Tagging the MDIM is optional curation, not repair.
+    "key chart": "no action needed — the entry drops out of the All charts block automatically; "
+    "tag the MDIM with the topic only if you want a replacement entry",
 }
 # Gdoc-backed references: the fix depends on the ArchieML component being edited (and for
 # chart blocks, on whether the block embeds the chart or merely stores its URL).
@@ -257,92 +278,141 @@ def gdoc_table(group: list[dict]) -> list[str]:
     return lines
 
 
+def bullet_list(group: list[dict]) -> list[str]:
+    """Fallback rendering for references without a Google Doc behind them."""
+    lines: list[str] = []
+    for f in group:
+        where = f"[{f['where']}]({f['where_url']})" if f["where_url"] else f["where"]
+        lines.append(f"- **{f['source_chart_slug']}** in {where} — {f['context']}")
+        lines.append(f"    - now: {f['old_url']}")
+        lines.append(f"    - should be: {f['replacement_url']}")
+        if f["param_collisions"]:
+            lines.append(
+                f"    - ⚠️ query params `{f['param_collisions']}` collide with the view's dimensions "
+                "and will override them — set the dimension explicitly or drop the param"
+            )
+        lines.append(f"    - fix: {f['fix']}")
+    return lines
+
+
 def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host: str, gaps: list[str]) -> Path:
     path = out / "references.md"
-    red = [f for f in findings if f["severity"] == RED]
-    yellow = [f for f in findings if f["severity"] == YELLOW]
-    info = [f for f in findings if f["severity"] == INFO]
+    # The reader's partition is by what they DO, not by severity tiers: one editing pass
+    # per Google Doc covers embeds and links alike, so those sit adjacent in one section;
+    # the topic-page All charts blocks need no action at all (verified: the block lists
+    # only published charts) and collapse to a per-page summary.
+    allcharts = [f for f in findings if f["surface"] == "key chart"]
+    drafts = [f for f in findings if f["severity"] == INFO and f["surface"] != "key chart"]
+    doc_edits = [f for f in findings if f["severity"] in (RED, YELLOW) and f["doc_edit_url"]]
+    other = [f for f in findings if f["severity"] in (RED, YELLOW) and not f["doc_edit_url"]]
+    embeds = [f for f in doc_edits if f["severity"] == RED]
+    links = [f for f in doc_edits if f["severity"] == YELLOW]
 
     lines = [
         "# What references the charts being redirected",
         "",
         f"{len(redirects)} chart(s) heading for unpublishing — proposed redirects, plus charts already "
-        f"redirected whose source chart is still published. **{len(red)} reference(s) need manual work** "
-        f"— a redirect does not fix them. {len(yellow)} more are hyperlinks the 301 covers but that "
-        "should be updated.",
+        f"redirected whose source chart is still published. **{len(embeds)} embedded reference(s) break "
+        f"when the charts are unpublished** and must be migrated before the CLI runs; {len(links)} text "
+        "link(s) keep working via the 301 but belong in the same editing pass. Topic-page All charts "
+        "blocks update themselves — summarized below, no action needed.",
         "",
         "Replacement URLs merge each reference's own query string over the MDIM view's dimensions, "
         "the same way grapher's redirect handler does.",
         "",
     ]
-    sections = [
-        ("🔴 Needs manual migration", red, "These embed or resolve the chart directly and break when it is unpublished."),
-        ("🟡 Hyperlinks worth updating", yellow, "The 301 handles these; updating the href avoids an extra hop."),
-        ("ℹ️ Unpublished / draft", info, "No reader impact — listed for completeness."),
-    ]  # fmt: skip
-    for label, group, blurb in sections:
-        if not group:
-            continue
-        lines += [f"## {label} ({len(group)})", "", blurb, ""]
-        # Gdoc-backed references group by ArchieML component (chart / span-link /
-        # front-matter): a data insight IS a gdoc, and the editor cares which construct
-        # they are touching, not which page type holds it (that is the Where column).
-        # Everything else groups by its (relabeled) surface.
-        by_group = defaultdict(list)
-        for f in group:
-            by_group[f["component"] or SURFACE_LABELS.get(f["surface"], f["surface"])].append(f)
-        for group_name in sorted(by_group):
-            lines += [f"### {group_name} ({len(by_group[group_name])})", ""]
-            group = by_group[group_name]
-            # Google-Doc-backed references get the table treatment: doc link, previewer,
-            # scrolled page link, and the search string that lands on the reference.
-            if all(f["doc_edit_url"] for f in group):
-                lines += gdoc_table(group)
-            else:
-                for f in group:
-                    where = f"[{f['where']}]({f['where_url']})" if f["where_url"] else f["where"]
-                    lines.append(f"- **{f['source_chart_slug']}** in {where} — {f['context']}")
-                    lines.append(f"    - now: {f['old_url']}")
-                    lines.append(f"    - should be: {f['replacement_url']}")
-                    if f["param_collisions"]:
-                        lines.append(
-                            f"    - ⚠️ query params `{f['param_collisions']}` collide with the view's dimensions "
-                            "and will override them — set the dimension explicitly or drop the param"
-                        )
-                    lines.append(f"    - fix: {f['fix']}")
+
+    if doc_edits:
+        lines += [
+            f"## 📝 Google Doc edits ({len(doc_edits)})",
+            "",
+            "Embedded charts and text links are listed together — one editing pass per doc covers "
+            "both. 🔴 sections break on unpublish (do these before the CLI runs); 🟡 sections stay "
+            "functional behind the 301.",
+            "",
+        ]
+        by_comp = defaultdict(list)
+        for f in doc_edits:
+            by_comp[f["component"]].append(f)
+        ordered = [c for c in COMPONENT_ORDER if c in by_comp] + sorted(set(by_comp) - set(COMPONENT_ORDER))
+        for comp in ordered:
+            group = by_comp[comp]
+            emoji = "🔴" if any(g["severity"] == RED for g in group) else "🟡"
+            lines += [f"### {emoji} {COMPONENT_LABELS.get(comp, comp)} ({len(group)})", ""]
+            lines += gdoc_table(group)
+            lines.append("")
+
+    if allcharts:
+        by_page = defaultdict(list)
+        for f in allcharts:
+            by_page[f["where"]].append(f)
+        lines += [
+            f"## 📊 All charts blocks on topic pages ({len(allcharts)} entries — no action needed)",
+            "",
+            "These blocks list only published charts (grapher's `GdocPost.loadRelatedCharts` filters "
+            "on `isPublished`), so the entries drop out on their own at the next bake — nothing breaks "
+            "or goes stale. Tag the MDIMs with these topics only if you want replacement entries.",
+            "",
+            "| Topic page | Charts affected |",
+            "|---|---|",
+        ]
+        for page in sorted(by_page):
+            lines.append(f"| {page} | {len(by_page[page])} |")
+        lines.append("")
+
+    if other:
+        by_surface = defaultdict(list)
+        for f in other:
+            by_surface[SURFACE_LABELS.get(f["surface"], f["surface"])].append(f)
+        lines += [f"## Other surfaces ({len(other)})", ""]
+        for surface in sorted(by_surface):
+            lines += [f"### {surface} ({len(by_surface[surface])})", ""]
+            lines += bullet_list(by_surface[surface])
+            lines.append("")
+
+    if drafts:
+        lines += [f"## ℹ️ Unpublished / draft ({len(drafts)})", "", "No reader impact — listed for completeness.", ""]
+        by_comp = defaultdict(list)
+        for f in drafts:
+            by_comp[f["component"] or SURFACE_LABELS.get(f["surface"], f["surface"])].append(f)
+        for comp in sorted(by_comp):
+            group = by_comp[comp]
+            lines += [f"### {COMPONENT_LABELS.get(comp, comp)} ({len(group)})", ""]
+            lines += gdoc_table(group) if all(f["doc_edit_url"] for f in group) else bullet_list(group)
             lines.append("")
 
     # Nothing in this audit is applied by running it, and its coverage is not total — so it
     # closes by separating what someone must act on from what nobody has checked, rather
     # than leaving a reader to infer either from the sections above.
     handed_off = (
-        f"**Handed off** — {len(red)} reference(s) under *Needs manual migration* above. Each names the "
-        "page or surface that holds it and the replacement URL to put there; whoever owns that page has "
-        "to make the edit, because unpublishing the chart breaks it and the redirect does not cover it."
-        if red
+        f"**Handed off** — {len(embeds)} embedded reference(s) in the 🔴 sections above. Each names the "
+        "doc that holds it and the replacement URL to put there; whoever owns that page has to make the "
+        "edit, because unpublishing the chart breaks it and the redirect does not cover it."
+        if embeds
         else "**Handed off** — nothing. No reference needs manual migration before the charts are unpublished."
     )
     proposed = (
-        f"**Proposed** — {len(yellow)} hyperlink(s) under *worth updating* above. The 301 keeps them working, "
-        "so updating each href is a call someone still has to make, not a blocker."
-        if yellow
-        else "**Proposed** — nothing. No hyperlink updates are pending a decision."
+        f"**Proposed** — {len(links)} text link(s) in the 🟡 sections above"
+        + (f" and {len(other)} reference(s) under *Other surfaces*" if other else "")
+        + ". The 301 keeps them working, so updating each is a call someone still has to make, not a blocker."
+        if links or other
+        else "**Proposed** — nothing. No link updates are pending a decision."
     )
     unverified = (
         "**Unverified** — this audit does not cover non-ETL explorer TSVs, data insights that store the "
         "reference somewhere other than the surfaces swept here, or charts nested inside layout containers; "
         "see the `find-chart-references` skill for the full surface catalog and its known gaps. "
-        f"{len(info)} unpublished or draft reference(s) were found and listed but not graded for reader impact. "
+        f"{len(drafts)} unpublished or draft reference(s) were found and listed but not graded for reader impact. "
         "Whether the redirects themselves apply cleanly is checked by `preflight.py`, not here."
     )
     lines += [
         "---",
         "",
-        "Google-Doc-backed references are grouped by the **ArchieML component** holding them "
-        "(`chart` block, `span-link`, `front-matter`) — the page type (article, data insight, …) is "
-        "italicized in the Where column. In the tables, the **source chart links to the reference's "
-        "own URL** (its params applied) and **Replace with links to the target MDIM view** the same "
-        "reference should become. "
+        "**Embedded charts** are chart blocks rendered on the page; **text links** are hyperlinks in "
+        "prose; **front-matter chart URLs** are the `grapher-url` field in a data insight's header. "
+        "The page type (article, data insight, …) is italicized in the Where column. In the tables, "
+        "the **source chart links to the reference's own URL** (its params applied) and **Replace "
+        "with links to the target MDIM view** the same reference should become. "
         "📄 opens the Google Doc to edit · 👁 opens the page in the admin previewer (works for "
         "unpublished drafts too) · 🔗 opens the published page scrolled to the reference. "
         "**Find in doc** is a copy-paste search string for the Google Doc's find box: the link text for "
@@ -393,6 +463,10 @@ def main() -> int:
         new_url, collisions = replacement_url(r, qs, host)
         # Only an embed is broken by the redirect: it renders the chart's own config.
         severity = INFO if not ref["published"] else (RED if ref["kind"] == "embed" else YELLOW)
+        if ref["surface"] == "key chart":
+            # Verified no-action: the All charts block only lists published charts, so the
+            # entry disappears on its own when the CLI unpublishes the source.
+            severity = INFO
         is_gdoc = ref["surface"] in GDOC_SURFACES and ref.get("surface_id")
         component = archie_component(ref) if is_gdoc else ""
         if is_gdoc:
@@ -439,8 +513,10 @@ def main() -> int:
     counts: dict[str, int] = defaultdict(int)
     for f in findings:
         counts[f["severity"]] += 1
+    n_allcharts = sum(1 for f in findings if f["surface"] == "key chart")
     print(f"\nreferences: {len(findings)}  (needs manual work: {counts[RED]} | "
-          f"hyperlinks to update: {counts[YELLOW]} | unpublished: {counts[INFO]})")  # fmt: skip
+          f"links to update: {counts[YELLOW]} | no action (all-charts blocks): {n_allcharts} | "
+          f"drafts: {counts[INFO] - n_allcharts})")  # fmt: skip
     if gaps:
         print(f"  {len(gaps)} surface(s)/subject(s) were NOT swept — see 'What's still open' in the report.")
     collisions = [f for f in findings if f["param_collisions"]]
