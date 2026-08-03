@@ -1,0 +1,72 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Child Labor
+      attribution_short: Carter and Sutch
+    description_key:
+      - These are labor-force participation rates of children and youths aged 10-15 in the United States, drawn from the population censuses.
+      - The "corrected" series reflects the authors' central finding: the published 1880 census understated the number of young workers, so its labor-force participation rates are too low. Using the 1880 census microdata, the authors recover the missing workers and revise the 1880 figures upward.
+      - The correction changes only the 1880 values; in every other census year the corrected and originally published rates are the same.
+    description_processing: |-
+      Only the "Youths, 10-15 yrs" rows of the source's Table 1 are used, keeping both the originally published census rates and the authors' corrected rates by sex.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  owners:
+    - Bertha Rohenkohl
+
+tables:
+  child_labor_incidence_us:
+    variables:
+      incidence_boys:
+        title: Labor-force participation of boys aged 10-15 (as published)
+        presentation:
+          title_public: Labor-force participation of boys aged 10-15
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of boys aged 10-15 in the United States recorded as labor-force participants, as originally published in the census.
+        display:
+          name: Boys (as published)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      incidence_girls:
+        title: Labor-force participation of girls aged 10-15 (as published)
+        presentation:
+          title_public: Labor-force participation of girls aged 10-15
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of girls aged 10-15 in the United States recorded as labor-force participants, as originally published in the census.
+        display:
+          name: Girls (as published)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      corrected_incidence_boys:
+        title: Labor-force participation of boys aged 10-15 (corrected)
+        presentation:
+          title_public: Labor-force participation of boys aged 10-15 (corrected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of boys aged 10-15 in the United States who were labor-force participants, after correcting the 1880 census undercount.
+        display:
+          name: Boys (corrected)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      corrected_incidence_girls:
+        title: Labor-force participation of girls aged 10-15 (corrected)
+        presentation:
+          title_public: Labor-force participation of girls aged 10-15 (corrected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of girls aged 10-15 in the United States who were labor-force participants, after correcting the 1880 census undercount.
+        display:
+          name: Girls (corrected)
+          numDecimalPlaces: 1
+          tolerance: 5

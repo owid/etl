@@ -1,0 +1,33 @@
+# NOTE: Manually transcribed by OWID from Table 1 of the paper (the "Youths, 10-15 yrs"
+# rows), covering both the labor-force participation rates as published in the census and
+# the authors' corrected rates. The other Table 1 rows (married women, older men) and the
+# rest of the paper are not included. In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Fixing the Facts: Editing of the 1880 U.S. Census of Occupations with Implications for Long-Term Labor-Force Trends and the Sociology of Official Statistics"
+    description: |-
+      This journal article re-examines how the 1880 US Census of occupations was edited and shows that the editorial conventions applied to it distorted long-run labor-force trends, including the labor-force participation of children and youths aged 10-15.
+
+      Using the 1880 Public Use Microdata Sample, the authors reconstruct the youth labor-force participation rates that the published census understated, and report both the originally published rates and their corrected estimates by sex.
+    date_published: "1996"
+
+    # Citation
+    producer: Carter and Sutch
+    citation_full: |-
+      Carter, S. B., & Sutch, R. (1996). Fixing the Facts: Editing of the 1880 U.S. Census of Occupations with Implications for Long-Term Labor-Force Trends and the Sociology of Official Statistics. Historical Methods: A Journal of Quantitative and Interdisciplinary History, 29(1), 5-24. https://doi.org/10.1080/01615440.1996.10112726
+
+    # Files
+    url_main: https://doi.org/10.1080/01615440.1996.10112726
+    date_accessed: '2026-08-03'
+
+    # License
+    license:
+      name: © Carter and Sutch (1996)
+outs:
+  - md5: 91b02f9f0babe502bfb5a7e929e3d2ff
+    size: 267
+    path: child_labor_incidence_us.csv
