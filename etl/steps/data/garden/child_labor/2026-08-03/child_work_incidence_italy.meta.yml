@@ -7,9 +7,8 @@ definitions:
         - Child Labor
       attribution_short: Toniolo and Vecchi
     description_key:
-      - "\"Child work\" here means the economic activity of children, as recorded in Italian population censuses. The authors use it as a broader concept than \"child labor\", which the International Labour Organization reserves for work that is damaging to the child."
+      - "\"Child work\" here means the economic activity of children, as recorded in Italian population censuses. This is a broader concept than \"child labor\" used in current estimates, which is defined by the International Labour Organization."
       - Incidence is the share of all children aged 10-14 who are economically active, estimated from published census data using corrections to keep the figures comparable across censuses.
-      - The initially large gap between boys and girls narrows over time, with the two rates converging by the early 1930s.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
