@@ -7,7 +7,7 @@ definitions:
         - War & Peace
       grapher_config:
         note: &preliminary_note |-
-          Data for 2026 is incomplete and includes deaths within the first half-year. It is based on quarterly reports from the source, which come with a higher level of uncertainty, and in many cases can be underestimates.
+          Data for 2026 is incomplete and includes deaths within the first half of the year. It is based on quarterly reports from the source, which come with a higher level of uncertainty, and in many cases can be underestimates.
     display:
       numDecimalPlaces: 0
 
