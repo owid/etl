@@ -58,6 +58,12 @@ steps:
   #
   # Child labor in the long run (multiple sources)
   #
+  # Incidence of child work in Italy, 1881-1961, by sex (Toniolo and Vecchi, 2007)
+  data://grapher/child_labor/2026-08-03/child_work_incidence_italy:
+    - data://garden/child_labor/2026-08-03/child_work_incidence_italy:
+      - data://meadow/child_labor/2026-08-03/child_work_incidence_italy:
+        - snapshot://child_labor/2026-08-03/child_work_incidence_italy.csv
+
   data://grapher/child_labor/2026-05-08/child_labor_long_run:
     - data://garden/child_labor/2026-05-08/child_labor_long_run:
       - data://meadow/child_labor/2026-05-08/child_labor_long_run:
