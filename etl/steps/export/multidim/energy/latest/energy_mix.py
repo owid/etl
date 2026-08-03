@@ -262,6 +262,19 @@ def _decomposition_title(source: str, base_metric: str) -> str:
     return f"{stem} per person, by source" if base_metric == "per_capita" else f"{stem} by source"
 
 
+# Fields that the views built here have to repeat, because they are assembled after
+# create_collection and so do not inherit `definitions.common_views` from the config.yml.
+# Keep in sync with that block.
+COMMON_VIEW_EXTRAS = {
+    "originUrl": "https://ourworldindata.org/energy",
+    "relatedQuestions": [
+        {
+            "text": "Why has our energy data changed?",
+            "url": "https://ourworldindata.org/how-primary-energy-is-measured-has-changed-across-our-charts",
+        }
+    ],
+}
+
 # Carbon intensity of energy (CO2 per unit of total energy supply) lives in the Global Carbon Budget,
 # which already divides emissions by this same TES. Referenced by short path, expanded via the dep.
 CARBON_INTENSITY_INDICATOR = "carbon_intensity_of_energy#emissions_total_per_unit_energy"
@@ -279,7 +292,7 @@ def add_carbon_intensity_view(c) -> None:
             "[total energy supply](#dod:total-energy-supply)."
         ),
         "map": {"colorScale": {"baseColorScheme": "YlOrBr"}, "timeTolerance": 3},
-        "originUrl": "https://ourworldindata.org/energy",
+        **COMMON_VIEW_EXTRAS,
     }
     view = View(
         dimensions={"source": "total", "metric": "carbon_intensity"},
@@ -300,7 +313,7 @@ def add_decomposition_views(c) -> None:
         "tab": "chart",
         "hasMapTab": False,
         "hideRelativeToggle": False,
-        "originUrl": "https://ourworldindata.org/energy",
+        **COMMON_VIEW_EXTRAS,
     }
     single_views = {(v.dimensions.get("source"), v.dimensions.get("metric")): v for v in c.views}
     for source, constituents in AGGREGATE_DECOMPOSITION.items():

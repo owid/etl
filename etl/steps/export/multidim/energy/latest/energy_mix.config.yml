@@ -12,6 +12,13 @@ definitions:
   common_views:
     - config:
         originUrl: "https://ourworldindata.org/energy"
+        # Every view here is built on total energy supply, so every view changed when the
+        # Energy Institute moved off the substitution method. The explainer is therefore a
+        # blanket related question, unlike in the electricity and fossil-fuel multidims,
+        # where the underlying values are identical under both methods.
+        relatedQuestions:
+          - text: "Why has our energy data changed?"
+            url: "https://ourworldindata.org/how-primary-energy-is-measured-has-changed-across-our-charts"
 dimensions:
   - slug: "source"
     name: "Source"
