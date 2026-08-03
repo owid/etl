@@ -241,7 +241,8 @@ redirect-specific consumer that adds the replacement URLs. It writes
 `references.csv` + `references.md`, one row per reference. Severity: **🔴**
 embed — the surface renders the chart's own config, so the redirect does not fix
 it and it breaks on unpublish; migrate before applying · **🟡** hyperlink (the
-301 covers it, update the href anyway) or key-chart slot (re-tag the MDIM) ·
+301 covers it, update the href anyway) or all-charts-block slot on a topic page
+(a `chart_tags` row with a keyChartLevel — tag the MDIM in its place) ·
 **ℹ️** unpublished/draft.
 
 Pure SQL, so read-only credentials are enough. It sweeps both the current slug

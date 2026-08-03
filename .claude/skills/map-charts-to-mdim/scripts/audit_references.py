@@ -9,8 +9,8 @@ Severity, derived from the sweep's `kind`:
          slug and renders its config directly, so it breaks when the source chart is
          unpublished (which the apply CLI always does). Migrate before applying.
   YELLOW link (the 301 covers it, but the href should be updated so readers don't
-         take an extra hop) or render (a key-chart slot: the topic page loses the
-         chart, so re-tag the MDIM — a follow-up, not a breakage).
+         take an extra hop) or render (an all-charts-block slot: the topic page loses
+         the chart, so tag the MDIM in its place — a follow-up, not a breakage).
   INFO   the referencing page is unpublished or a draft.
 
 Replacement URLs merge each reference's own query string over the view's dimensions,
@@ -44,7 +44,7 @@ RED, YELLOW, INFO = "RED", "YELLOW", "INFO"
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
 REFERENCE_COLUMNS = [
-    "severity", "surface", "kind", "source_chart_slug", "where", "where_url",
+    "severity", "surface", "component", "kind", "source_chart_slug", "where", "where_url",
     "doc_edit_url", "doc_preview_url", "find_in_doc", "context",
     "old_url", "replacement_url", "param_collisions", "fix",
 ]  # fmt: skip
@@ -52,18 +52,33 @@ REFERENCE_COLUMNS = [
 # Surfaces whose fix is a Google Doc edit. For these the report renders a table with the
 # doc link and a copy-paste search hint (the find-chart-references convention) — handing
 # someone a page URL without saying where in the doc the reference sits makes them
-# re-derive exactly what the sweep already knew.
+# re-derive exactly what the sweep already knew. In the report they are NOT grouped by
+# these sweep surfaces — a data insight IS a gdoc; what matters to the person editing the
+# doc is the ArchieML component they are touching, so the tables group by that instead
+# (see archie_component).
 GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
 
+# The sweep's `key chart` surface is a chart_tags row with a keyChartLevel — what it feeds
+# on the site is the topic page's "All charts" block ordering, so name it by what the
+# reader loses, not by the DB mechanism.
+SURFACE_LABELS = {"key chart": "all-charts block (topic page)"}
+
 FIXES = {
-    "gdoc": "edit the article block to embed the MDIM view",
-    "gdoc (url link)": "update the href in the article",
     "explorer": "repoint the explorer at the MDIM indicators, or retire the explorer",
     "narrative chart": "replace it: create a new one from the MDIM view (parentChartConfigId = "
     "that view's config_id), move the article references, then delete the old — see SKILL.md",
-    "data insight": "update the data insight's grapher-url",
     "static viz": "regenerate the static visualization against the MDIM view",
-    "key chart": "re-tag the MDIM so the topic page keeps a key chart",
+    "key chart": "tag the MDIM with the same topic (and key-chart level) so it takes the "
+    "chart's place in the topic page's All charts block",
+}
+# Gdoc-backed references: the fix depends on the ArchieML component being edited (and for
+# chart blocks, on whether the block embeds the chart or merely stores its URL).
+COMPONENT_FIXES = {
+    ("chart", "embed"): "edit the chart block to embed the MDIM view",
+    ("chart", "link"): "update the chart block's grapher URL",
+    ("span-link", "link"): "update the href",
+    ("front-matter", "embed"): "update the grapher-url in the front matter",
+    ("front-matter", "link"): "update the grapher-url in the front matter",
 }
 LINK_FIX = "update the href"
 # Link-kind references whose href is generated rather than authored — there is nothing to
@@ -133,6 +148,27 @@ def deep_link(where_path: str, anchor: str, host: str) -> str:
         return base
     encoded = quote(anchor[:200], safe="()").replace("-", "%2D")
     return f"{base}#:~:text={encoded}"
+
+
+def archie_component(ref: dict) -> str:
+    """The ArchieML component this reference lives in: chart, span-link, front-matter, …
+
+    The sweep encodes it as the head of `context` ("chart (article)", "span-link
+    (data-insight)"); the data-insight surface spells its front-matter reference out in
+    prose instead, so normalize that to the same token. This is what the gdoc tables
+    group by — the person editing the doc cares which construct they are touching, not
+    whether the page is an article or a data insight (both are gdocs).
+    """
+    head = ref["context"].split(" — ")[0]
+    if head.startswith("grapher-url"):
+        return "front-matter"
+    return head.split(" (")[0].strip()
+
+
+def page_type(ref: dict) -> str:
+    """article / data-insight / topic-page / fragment — the parenthesized tail of context."""
+    m = re.search(r"\(([^)]+)\)", ref["context"].split(" — ")[0])
+    return m.group(1) if m else ""
 
 
 def find_in_doc(ref: dict) -> str:
@@ -214,7 +250,10 @@ def gdoc_table(group: list[dict]) -> list[str]:
             replace = f"[`{target_label}`]({f['replacement_url']})"
             if f["param_collisions"]:
                 replace += f" ⚠️ params `{f['param_collisions']}` override view dimensions"
-            lines.append(f"| {source} | {cell(f['where'], 44)} | {opens} | {find} | {replace} |")
+            # The page type moved into this cell when the sections stopped separating
+            # gdocs from data insights — it changes who owns the fix.
+            where = cell(f["where"], 44) + (f" _{f['page_type']}_" if f.get("page_type") else "")
+            lines.append(f"| {source} | {where} | {opens} | {find} | {replace} |")
     return lines
 
 
@@ -245,13 +284,17 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
         if not group:
             continue
         lines += [f"## {label} ({len(group)})", "", blurb, ""]
-        by_surface = defaultdict(list)
+        # Gdoc-backed references group by ArchieML component (chart / span-link /
+        # front-matter): a data insight IS a gdoc, and the editor cares which construct
+        # they are touching, not which page type holds it (that is the Where column).
+        # Everything else groups by its (relabeled) surface.
+        by_group = defaultdict(list)
         for f in group:
-            by_surface[f["surface"]].append(f)
-        for surface in sorted(by_surface):
-            lines += [f"### {surface} ({len(by_surface[surface])})", ""]
-            group = by_surface[surface]
-            # Google-Doc-backed surfaces get the table treatment: doc link, previewer,
+            by_group[f["component"] or SURFACE_LABELS.get(f["surface"], f["surface"])].append(f)
+        for group_name in sorted(by_group):
+            lines += [f"### {group_name} ({len(by_group[group_name])})", ""]
+            group = by_group[group_name]
+            # Google-Doc-backed references get the table treatment: doc link, previewer,
             # scrolled page link, and the search string that lands on the reference.
             if all(f["doc_edit_url"] for f in group):
                 lines += gdoc_table(group)
@@ -295,9 +338,12 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
     lines += [
         "---",
         "",
-        "In the tables, the **source chart links to the reference's own URL** (its params applied) and "
-        "**Replace with links to the target MDIM view** the same reference should become. "
-        "📄 opens the Google Doc to edit · 👁 opens the article in the admin previewer (works for "
+        "Google-Doc-backed references are grouped by the **ArchieML component** holding them "
+        "(`chart` block, `span-link`, `front-matter`) — the page type (article, data insight, …) is "
+        "italicized in the Where column. In the tables, the **source chart links to the reference's "
+        "own URL** (its params applied) and **Replace with links to the target MDIM view** the same "
+        "reference should become. "
+        "📄 opens the Google Doc to edit · 👁 opens the page in the admin previewer (works for "
         "unpublished drafts too) · 🔗 opens the published page scrolled to the reference. "
         "**Find in doc** is a copy-paste search string for the Google Doc's find box: the link text for "
         "a prose hyperlink, or the chart slug for a block embed (the doc holds a bare grapher URL "
@@ -347,7 +393,12 @@ def main() -> int:
         new_url, collisions = replacement_url(r, qs, host)
         # Only an embed is broken by the redirect: it renders the chart's own config.
         severity = INFO if not ref["published"] else (RED if ref["kind"] == "embed" else YELLOW)
-        if ref["kind"] == "link":
+        is_gdoc = ref["surface"] in GDOC_SURFACES and ref.get("surface_id")
+        component = archie_component(ref) if is_gdoc else ""
+        if is_gdoc:
+            fallback = LINK_FIX if ref["kind"] == "link" else "migrate this reference by hand"
+            fix = COMPONENT_FIXES.get((component, ref["kind"]), fallback)
+        elif ref["kind"] == "link":
             fix = GENERATED_LINK_FIXES.get(ref["surface"], LINK_FIX)
         else:
             fix = FIXES.get(ref["surface"], "migrate this reference by hand")
@@ -356,11 +407,12 @@ def main() -> int:
             # the one this chart is being redirected to — so hand over the ready-made URL
             # rather than the id to look up.
             fix += f" — create the replacement at {admin}/narrative-charts/create?type=multiDim&chartConfigId={r['target']['viewConfigId']}"
-        is_gdoc = ref["surface"] in GDOC_SURFACES and ref.get("surface_id")
         findings.append(
             {
                 "severity": severity,
                 "surface": ref["surface"],
+                "component": component,
+                "page_type": page_type(ref) if is_gdoc else "",
                 "kind": ref["kind"],
                 "source_chart_slug": ref["subject"],
                 "where": ref["where"],
