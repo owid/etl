@@ -6,6 +6,14 @@ definitions:
     presentation:
       topic_tags:
         - Migration
+      grapher_config:
+        selectedEntityNames:
+          - United Kingdom
+        addCountryMode: disabled
+        hideAnnotationFieldsInTitle:
+          entity: true
+        hideSeriesLabels: true
+        originUrl: https://ourworldindata.org/migration
 
   # The construction of the series: five sources, five periods. Shared by all six indicators.
   uk_sources: |-
