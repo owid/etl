@@ -41,6 +41,12 @@ You write the routing rules; it emits **one `admin_bulk_payload.json` per explor
 that file, not `mapping.json` — the payload has empty-valued source dimensions stripped, and
 keeping them routes those views to the catch-all instead of their targets.
 
+**Review the matches before applying.** `/review-explorer-mdim-mapping` builds an HTML page
+showing each explorer view beside the MDIM view it would redirect to, with approve/flag
+controls; decisions persist in the browser and export to JSON. Correct a wrong match by
+editing `mapping_rules.py` and re-running the build — the HTML is a review surface, not an
+editor.
+
 ### 3. Clear site redirects involving the explorer
 
 A `/explorers/<slug>` that is already a site redirect's **source**, or its **target**, makes
