@@ -123,7 +123,12 @@ tab, an editor adds continent colors to a line chart — and requiring them to a
 literally drops same-y pairs into `none` with no report at all (equal y sets means
 they aren't even a near miss). A match made across such a difference says so in
 the proposal's `note` column. Content indicators (a scatter's GDP-per-capita x, a
-"political regime" coloring) are never stripped. Several matching views → tiebreak
+"political regime" coloring) are never stripped. Two guardrails keep the rule from
+overreaching: a **scatter's x slot is never stripped** — on a `ScatterPlot`,
+`x=population` is the plotted relationship, not decoration (size/color there still
+are) — and the population pattern is **end-anchored** to the raw head-count columns
+(`#population`, `#population_historical`, `#population_projection`), because the
+same dataset also carries population *density* columns that are content. Several matching views → tiebreak
 on chart type; still ambiguous → reported, never guessed. **Any** partial indicator overlap
 that is not an exact match → `near_miss`, reported only — not just subset/superset:
 a chart plotting `{A, B}` against a view plotting `{A, C}` shares `A`, so calling

@@ -18,8 +18,9 @@ every slot: same set of y variables, same x/size/color (absent == absent) —
 after stripping *decoration* indicators (population as Marimekko width / bubble
 size, owid_region as continent coloring) from x/size/color on both sides, since
 charts and views carry those inconsistently without changing what data is
-plotted. Ties between several matching views are broken by chart type; anything
-still ambiguous is reported, not proposed.
+plotted. A scatter's x axis is exempt — there population is the plotted
+relationship, not decoration. Ties between several matching views are broken by
+chart type; anything still ambiguous is reported, not proposed.
 
 Outputs into ``--out``:
 - ``charts.csv``                 — the selected source charts and their indicator slots
@@ -62,14 +63,21 @@ EXTRA_SLOTS = ("x", "size", "color")
 # continent. Requiring these slots to agree exactly silently dropped
 # same-y-different-decoration pairs into `none` — with equal y sets they are not even a
 # near miss, so nothing reported the gap. They are stripped from x/size/color (never
-# from y) on BOTH sides before matching; the raw slots stay in charts.csv /
+# from y) on BOTH sides before matching — except a scatter's x slot, which is the plotted
+# relationship itself (see `effective()`); the raw slots stay in charts.csv /
 # multidim_views.csv, and an exact match made across a decoration difference says so in
 # the proposal's `note` column. Only these two families qualify — a color like
 # "political regime" or a scatter x like GDP per capita is content and stays in the
 # match key. (Matched against catalogPath, so version bumps keep matching; legacy
 # variables with a NULL catalogPath are conservatively treated as content.)
+# Both alternatives are end-anchored: the demography `population` dataset also carries
+# population *density* columns (`population_density#population_density`,
+# `historical#population_density_historical`, `projections#population_density_projection`)
+# which an unanchored `#population` prefix would swallow — density is content, not
+# decoration. The anchored family is exactly the raw head-counts: `#population`,
+# `#population_historical`, `#population_projection`.
 DECORATION_PATTERN = re.compile(
-    r"/population/[^/#]+#population"  # demography population + population_historical
+    r"/population/[^/#]+#population(_historical|_projection)?$"  # demography population head-counts
     r"|/regions/regions#\w+_region$"  # owid_region & friends (continent coloring)
 )
 QUALITIES = ("exact", "forced", "ambiguous", "near_miss", "none", "skipped")
@@ -407,10 +415,20 @@ def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, st
     """Set match_quality / target / candidates / near-miss info on each chart dict."""
 
     def effective(rec) -> tuple:
-        """x/size/color with decoration indicators treated as absent."""
-        return tuple(
-            None if rec[s] and DECORATION_PATTERN.search(id_to_path.get(rec[s]) or "") else rec[s] for s in EXTRA_SLOTS
-        )
+        """x/size/color with decoration indicators treated as absent.
+
+        On a scatter the x axis IS the content — population there is the plotted
+        relationship (e.g. "GDP per capita vs. population"), not Marimekko bar-width
+        decoration — so ScatterPlot records keep their x slot literal on both sides.
+        A scatter's size=population (bubble size) and color=owid_region stay decoration.
+        """
+        slots = []
+        for s in EXTRA_SLOTS:
+            vid = rec[s]
+            content_slot = s == "x" and rec["chart_type"] == "ScatterPlot"
+            strip = vid and not content_slot and DECORATION_PATTERN.search(id_to_path.get(vid) or "")
+            slots.append(None if strip else vid)
+        return tuple(slots)
 
     def slot_label(vid) -> str:
         return f"{vid} ({path_tail(id_to_path.get(vid))})" if vid else "absent"
