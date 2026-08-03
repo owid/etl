@@ -133,12 +133,6 @@ steps:
             - snapshot://oecd/2024-07-01/passenger_travel.csv
         - data://garden/demography/2023-03-31/population
 
-  # European Society for Cardiology datasets
-  data://grapher/cardiovascular_diseases/2023-10-10/esc:
-    - data://garden/cardiovascular_diseases/2023-10-10/esc:
-        - data://meadow/cardiovascular_diseases/2023-10-10/esc:
-            - snapshot://cardiovascular_diseases/2023-10-10/esc.csv
-
   # WHO Cardiovascular diseases deaths
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
@@ -327,25 +321,17 @@ steps:
             - snapshot://health/2024-09-05/seattle_pathogens.csv
 
   # International Agency for Research on Cancer
-  data://grapher/cancer/2024-08-30/gco_alcohol:
-    - data://garden/cancer/2024-08-30/gco_alcohol:
-        - data://meadow/cancer/2024-08-30/gco_alcohol:
-            - snapshot://cancer/2024-08-30/gco_alcohol.csv
   data://grapher/cancer/2024-09-06/gco_infections:
     - data://garden/cancer/2024-09-06/gco_infections:
         - data://meadow/cancer/2024-09-06/gco_infections:
             - snapshot://cancer/2024-09-06/gco_infections.csv
         - data://garden/regions/2023-01-01/regions
 
-  # Cancer diagnosis routes and survival rates
+  # Cancer diagnosis routes
   data://grapher/cancer/2024-09-13/diagnosis_routes_by_route:
     - data://garden/cancer/2024-09-13/diagnosis_routes_by_route:
         - data://meadow/cancer/2024-09-13/diagnosis_routes_by_route:
             - snapshot://cancer/2024-09-13/diagnosis_routes_by_route.csv
-  data://grapher/cancer/2024-09-13/diagnosis_routes_survival:
-    - data://garden/cancer/2024-09-13/diagnosis_routes_survival:
-        - data://meadow/cancer/2024-09-13/diagnosis_routes_survival:
-            - snapshot://cancer/2024-09-13/diagnosis_routes_survival.csv
 
   # Antibiotics data
   data://grapher/antibiotics/2024-10-09/gram:
@@ -902,11 +888,6 @@ steps:
   data-private://grapher/ihme_gbd/2025-11-18/gbd_child_treemap:
     - data-private://garden/ihme_gbd/2025-11-18/gbd_child_treemap
 
-  # European Society for Cardiology datasets
-  data://grapher/cardiovascular_diseases/2025-10-21/esc:
-    - data://garden/cardiovascular_diseases/2025-10-21/esc:
-        - data://meadow/cardiovascular_diseases/2025-10-21/esc:
-            - snapshot://cardiovascular_diseases/2025-10-21/esc.csv
   data://grapher/who/2025-12-01/hpv_vaccination_coverage:
     - data://garden/who/2025-12-01/hpv_vaccination_coverage:
         - data://meadow/who/2025-07-15/vaccination_coverage

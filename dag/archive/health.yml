@@ -1139,3 +1139,23 @@ steps:
         - snapshot://who/2023-10-13/medical_devices_atlas_pet.csv
         - snapshot://who/2023-10-13/medical_devices_atlas_ct.csv
         - snapshot://who/2023-10-13/medical_devices_atlas_mri.csv
+  # archived; last active in 7638681e6045 on 2026-08-03
+  data://grapher/cancer/2024-09-13/diagnosis_routes_survival:
+    - data://garden/cancer/2024-09-13/diagnosis_routes_survival:
+      - data://meadow/cancer/2024-09-13/diagnosis_routes_survival:
+        - snapshot://cancer/2024-09-13/diagnosis_routes_survival.csv
+  # archived; last active in 7638681e6045 on 2026-08-03
+  data://grapher/cancer/2024-08-30/gco_alcohol:
+    - data://garden/cancer/2024-08-30/gco_alcohol:
+      - data://meadow/cancer/2024-08-30/gco_alcohol:
+        - snapshot://cancer/2024-08-30/gco_alcohol.csv
+  # archived; last active in 7638681e6045 on 2026-08-03
+  data://grapher/cardiovascular_diseases/2023-10-10/esc:
+    - data://garden/cardiovascular_diseases/2023-10-10/esc:
+      - data://meadow/cardiovascular_diseases/2023-10-10/esc:
+        - snapshot://cardiovascular_diseases/2023-10-10/esc.csv
+  # archived; last active in 7638681e6045 on 2026-08-03
+  data://grapher/cardiovascular_diseases/2025-10-21/esc:
+    - data://garden/cardiovascular_diseases/2025-10-21/esc:
+      - data://meadow/cardiovascular_diseases/2025-10-21/esc:
+        - snapshot://cardiovascular_diseases/2025-10-21/esc.csv
