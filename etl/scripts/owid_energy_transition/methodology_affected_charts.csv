@@ -1,0 +1,75 @@
+slug,title
+abs-change-energy-consumption,Absolute annual change in primary energy consumption
+annual-change-hydro,Annual change in hydropower generation
+annual-change-in-solar-and-wind-energy-generation,Annual change in solar and wind energy generation
+annual-change-low-carbon-energy,Annual change in low-carbon energy generation
+annual-change-nuclear,Annual change in nuclear energy generation
+annual-change-primary-energy-source,Year-to-year change in primary energy consumption by source
+annual-change-renewables,Annual change in renewable energy generation
+annual-change-solar,Annual change in solar energy generation
+annual-change-wind,Annual change in wind energy generation
+annual-percentage-change-hydro,Annual percentage change in hydropower generation
+annual-percentage-change-in-solar-and-wind-energy-generation,Annual percentage change in solar and wind energy generation
+annual-percentage-change-low-carbon,Annual percentage change in low-carbon energy generation
+annual-percentage-change-nuclear,Annual percentage change in nuclear energy generation
+annual-percentage-change-renewables,Annual percentage change in renewable energy generation
+annual-percentage-change-solar,Annual percentage change in solar energy generation
+annual-percentage-change-wind,Annual percentage change in wind energy generation
+annual-primary-energy-fossil-vs-low-carbon,Year-to-year change in primary energy consumption from fossil fuels vs. low-carbon energy
+biofuel-production,Biofuel energy production
+biofuels-production-by-region,Biofuel production by region
+carbon-intensity-vs-gdp,Carbon intensity vs. GDP per capita
+change-energy-consumption,Annual change in primary energy consumption
+co2-per-unit-energy,Carbon intensity of energy
+coal-energy-share,Share of primary energy consumption from coal
+electricity-as-a-share-of-primary-energy,Electricity as a share of primary energy
+energy-consumption-by-source-and-country,Energy consumption by source
+energy-intensity,Energy intensity
+energy-intensity-vs-gdp,Energy intensity vs. GDP per capita
+energy-use-per-person-vs-gdp-per-capita,Energy use per person vs. GDP per capita
+fossil-fuels-share-energy,Share of primary energy consumption from fossil fuels
+gas-share-energy,Share of primary energy consumption from gas
+global-energy-consumption-source,Global primary energy consumption by source
+global-energy-substitution,Global primary energy consumption by source
+global-primary-energy,Global direct primary energy consumption
+global-primary-energy-share-inc-biomass,Share of global primary energy consumption by source
+hydro-share-energy,Share of primary energy consumption from hydroelectric power
+kaya-identity-co2,Kaya identity: drivers of CO₂ emissions
+low-carbon-energy-consumption,Low-carbon energy consumption
+low-carbon-share-energy,Share of primary energy consumption from low-carbon sources
+nuclear-primary-energy,Share of primary energy consumption from nuclear
+oil-share-energy,Share of primary energy consumption from oil
+per-capita-energy-consumption-from-solar-and-wind,Per capita energy consumption from solar and wind
+per-capita-energy-source-stacked,"Per capita energy from fossil fuels, nuclear and renewables"
+per-capita-energy-stacked,Per capita primary energy consumption by source
+per-capita-energy-use,Energy use per person
+per-capita-hydro,Per capita energy consumption from hydropower
+per-capita-low-carbon-energy,Per capita consumption of low-carbon energy
+per-capita-low-carbon-vs-gdp,Per capita consumption of low-carbon energy vs. GDP per capita
+per-capita-nuclear,Per capita energy consumption from nuclear
+per-capita-renewables,Per capita energy consumption from renewables
+per-capita-solar,Per capita energy consumption from solar
+per-capita-wind,Per capita energy consumption from wind
+percentage-change-energy-by-source,Year-to-year percentage change in primary energy consumption
+primary-energy-cons,Primary energy consumption
+primary-energy-consumption-by-region,Primary energy consumption by world region
+primary-energy-consumption-by-source,Primary direct energy consumption by source
+primary-energy-consumption-from-solar,Primary energy consumption from solar
+primary-energy-consumption-from-solar-and-wind,Primary energy consumption from solar and wind
+primary-energy-fossil-nuclear-renewables,"Direct primary energy consumption from fossil fuels, nuclear, and renewables"
+primary-energy-hydro,Primary energy consumption from hydropower
+primary-energy-nuclear,Primary energy consumption from nuclear
+primary-energy-renewables,Primary energy consumption from renewables
+primary-energy-share-nuclear-renewables,Share of primary energy consumption that comes from nuclear and renewables
+primary-energy-source-bar,Primary energy consumption by source
+primary-energy-wind,Primary energy consumption from wind
+primary-sub-energy-source,Primary energy consumption by source
+renewable-energy-consumption,Renewable energy consumption
+renewable-share-energy,Share of primary energy consumption from renewable sources
+share-energy-source-sub,Share of energy consumption by source
+share-of-low-carbon-energy-vs-gdp,Share of primary energy that is low-carbon vs. GDP per capita
+share-of-primary-energy-consumption-by-source,Share of direct primary energy consumption by source
+share-of-primary-energy-from-solar-and-wind,Share of primary energy consumption from solar and wind
+solar-share-energy,Share of primary energy consumption from solar
+sub-energy-fossil-renewables-nuclear,"Primary energy consumption from fossil fuels, nuclear and renewables"
+wind-share-energy,Share of primary energy consumption from wind
