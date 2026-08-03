@@ -10,15 +10,6 @@ definitions:
         chartTypes:
           - LineChart
         hasMapTab: false
-        comparisonLines:
-          - xEquals: 1855
-            label: Ships beyond Europe; no Europe, no air travel. Ireland excluded because UK. Includes travelers
-          - xEquals: 1923
-            label: Same but Ireland now excluded because European
-          - xEquals: 1964
-            label: Long-term migrants, all countries. Travelers now excluded
-          - xEquals: 1991
-            label: Asylum seekers now included
         selectedEntityNames:
           - United Kingdom
         addCountryMode: disabled
