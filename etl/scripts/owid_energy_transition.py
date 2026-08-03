@@ -92,11 +92,20 @@ ARCHIVE_REDIRECTS = {
 }
 
 EXPLAINER_URL = "https://ourworldindata.org/how-primary-energy-is-measured-has-changed-across-our-charts"
-# Markdown, rendered inside the chart frame. Keep it to one sentence: it sits above the title.
+# The date the bannered charts are redirected to their successors.
+CUTOVER_DATE = "1 October 2026"
+# Markdown, rendered inside the chart frame above the title, so it is read before the chart. Three
+# sentences, one per link: why the numbers changed, what replaces this chart and when, and where this
+# version survives. The successor and archive links are per chart, from AFFECTED_CSV.
+#
+# The archive link is deliberately not phrased as "until then": the archived copy is permanent, and
+# after the cutover it is the only place these values exist, since the slug redirects away.
 BANNER_TEMPLATE = (
-    "This chart is no longer updated. Energy is now measured as "
-    f"[total energy supply]({EXPLAINER_URL}), which changes these values. "
-    "See the current data in [{successor_label}]({successor_url})."
+    "The way energy is measured in this chart has changed, as "
+    f"[explained in this article]({EXPLAINER_URL}). "
+    f"On {CUTOVER_DATE} this chart will be replaced by "
+    "[an updated version]({successor_url}). "
+    "This version will remain available as an [archived chart]({archive_url})."
 )
 
 
@@ -424,32 +433,42 @@ def _put_deprecation_notice(env: OWIDEnv, chart_id: int, config_full: dict, noti
         raise click.ClickException(f"chart {chart_id}: {body}")
 
 
-def set_banners(env: OWIDEnv, dry_run: bool, clear: bool = False) -> None:
-    """Set (or clear) the deprecation notice on the methodology-affected charts."""
+def banner_targets() -> pd.DataFrame:
+    """The charts that get a banner, with the successor each one points at.
+
+    Only the charts being retired: the five that are updated in place keep their slug, so their
+    successor is themselves and a banner would be nonsense. Their FAUST carries the change instead.
+    """
     affected = pd.read_csv(AFFECTED_CSV)
-    redirects = pd.read_csv(REDIRECTS_CSV).set_index("source")
+    return affected[affected["action"] != "update"].reset_index(drop=True)
+
+
+def set_banners(env: OWIDEnv, dry_run: bool, clear: bool = False) -> None:
+    """Set (or clear) the deprecation notice on the charts being retired."""
+    import json
+
+    targets = banner_targets()
     ids = _read(
         env,
         """SELECT cc.slug, c.id, cc.patch FROM charts c JOIN chart_configs cc ON c.configId = cc.id
            WHERE cc.slug IN %(slugs)s""",
-        slugs=tuple(affected["slug"]),
+        slugs=tuple(targets["slug"]),
     ).set_index("slug")
-    for slug in affected["slug"]:
-        if slug not in ids.index:
-            log.warning("chart_not_in_production", slug=slug)
+    for row in targets.itertuples():
+        if row.slug not in ids.index:
+            log.warning("chart_not_in_production", slug=row.slug)
             continue
-        target = redirects["target"].get(f"/grapher/{slug}")
-        if not clear and target is None:
-            # Every affected chart needs a successor to point at before it can be bannered; the
-            # redirect plan is where that is decided.
-            log.warning("no_successor_in_redirect_plan_skipping", slug=slug)
+        if not clear and not row.archive:
+            # Without an archived copy the banner would promise a version that does not exist.
+            log.error("no_archive_snapshot_skipping", slug=row.slug)
             continue
-        notice = None if clear else BANNER_TEMPLATE.format(successor_label="our updated chart", successor_url=target)
-        log.info("banner", slug=slug, action="clear" if clear else "set")
+        notice = None if clear else BANNER_TEMPLATE.format(successor_url=row.successor, archive_url=row.archive)
+        log.info("banner", slug=row.slug, action="clear" if clear else "set", successor=row.successor)
         if not dry_run:
-            import json
-
-            _put_deprecation_notice(env, int(ids.loc[slug, "id"]), json.loads(ids.loc[slug, "patch"]), notice)
+            _put_deprecation_notice(env, int(ids.loc[row.slug, "id"]), json.loads(ids.loc[row.slug, "patch"]), notice)
+    log.info(
+        "banner_total", charts=len(targets), skipped_updated_in_place=len(pd.read_csv(AFFECTED_CSV)) - len(targets)
+    )
 
 
 def create_archive_redirects(env: OWIDEnv, dry_run: bool) -> None:
