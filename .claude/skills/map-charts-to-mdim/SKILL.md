@@ -238,11 +238,86 @@ ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
 
 The sweep itself is the shared `find-chart-references` skill; this script is the
 redirect-specific consumer that adds the replacement URLs. It writes
-`references.csv` + `references.md`, one row per reference. Severity: **🔴**
-embed — the surface renders the chart's own config, so the redirect does not fix
-it and it breaks on unpublish; migrate before applying · **🟡** hyperlink (the
-301 covers it, update the href anyway) or key-chart slot (re-tag the MDIM) ·
-**ℹ️** unpublished/draft.
+`references.csv` + `references.md`, one row per reference. The report is
+organized by what the reader does, not by severity tier: **embedded charts and
+text links sit adjacent in one "Google Doc edits" section** (one editing pass
+per doc covers both — 🔴 embeds break on unpublish and gate the CLI, 🟡 links
+stay functional behind the 301), with reader-facing section names ("Embedded
+charts", "Text links", "Front-matter chart URLs") rather than raw ArchieML
+tokens (those live in the CSV's `component` column). **Topic-page All charts
+entries collapse to a per-page summary and need NO action**: the block lists
+only published charts (`GdocPost.loadRelatedCharts` filters on `isPublished` —
+verified in grapher), so entries drop out on their own at the next bake — and
+no replacement is possible either, because the block is built from `charts` ×
+`chart_tags` only and cannot list MDIMs; featuring the MDIM on a topic page is
+a separate gdoc-authoring change. **Narrative charts get their own table
+(before the All charts summary)**, one row per chart: the admin editor link and
+parent chart; **"create from this view"** — the target view carrying that
+narrative chart's stored controls, which is both the rendering to match and the
+place to create from; **"text to re-apply"** (see below); **the pages that
+actually embed it**, resolved by a second hop the sweep doesn't make
+(`posts_gdocs_links` on `linkType='narrative-chart'`, both `narrative-chart` and
+`key-insights` components), each with its doc link and the name to search for;
+and the ordered steps. Each row carries only the order that applies to it, on
+the rule above: a **published** page among the users makes create → repoint →
+delete mandatory; with none, the row emits the delete → create shortcut that
+reuses the same name (a draft reference then keeps resolving, since pages
+reference the name). **ℹ️** unpublished/draft pages close the report.
+
+**Create from the view, not from a create link.** Tell the operator to open the
+target view and use the chart's own **"Create narrative chart"** admin control:
+the MDIM page builds that control's target from whichever view is on screen
+(`site/multiDim/MultiDim.tsx`), so the new chart is parented to the right view
+and inherits the controls set on it. A bare
+`/admin/narrative-charts/create?type=multiDim&chartConfigId=<viewConfigId>` link
+looks equivalent but opens a copy of the MDIM's **default** view — verified in
+practice — so never hand that out as the create step.
+
+**Creating from an MDIM starts at its DEFAULT view — nothing carries over.**
+Not the dimension selection, not the entity selection, not tab/time, not the
+text. So the report's **"Set by hand after creating"** column lists all three
+groups per chart, in the order they get applied in the editor:
+
+1. **view dimensions** — the target view's own dimension values (from the
+   proposal), because the new chart opens on the MDIM's default view;
+2. **controls** — taken from the narrative chart's `chart_configs.patch` (the
+   delta its author typed on top of the parent) plus its stored
+   `queryParamsForParentChart`, and listed **chart type first** (it decides
+   which other controls exist), **then the entity selection** (the most visible
+   thing to get wrong), then the rest alphabetically. Entities are always shown
+   by **name**, never as codes: a URL param spells them `ZWE~MDG`, so those are
+   resolved against `entities` before display (unknown codes pass through). The
+   patch and the params encode the same state, so a URL param is dropped when
+   the patch already carries the equivalent config key (`country` ↔
+   `selectedEntityNames`, `focus` ↔ `focusedSeriesNames`, `time` ↔
+   `minTime`/`maxTime`) — otherwise the cell asks for one setting twice in two
+   spellings, and the config form is what the editor's fields expose;
+3. **FAUST text** — `title`, `subtitle`, `note`, `sourceDesc`,
+   `hideAnnotationFieldsInTitle` from the patch. Miss these and the replacement
+   silently renders the *view's* wording instead of the text the article was
+   written around.
+
+Every group is diffed against the target view's config, so only genuine
+differences are asked for. `dimensions` and `$schema` are excluded from the patch
+on purpose: the new parent view supplies them, and re-applying the old ones would
+repoint the chart at the retired chart's indicators.
+
+**Suggest the replacement's name, and check it is free.** When a published page
+holds the original name the replacement needs a different one — and that name is
+**permanent**, since `create` rejects an existing name and there is no rename, so
+it is not a staging name to tidy up after the delete. The report suggests
+`<original>-mdim` (falling back to `-mdim-2`, `-mdim-3`, …), validated against
+every name in `narrative_charts` so the suggestion cannot be the one thing
+`create` refuses; suggestions handed out within a run are reserved as they go. In
+the delete-first case there is nothing to suggest — the row names the original,
+which the delete frees for reuse.
+
+**Admin routes need the admin origin.** A narrative chart's `where_path` is
+`/admin/narrative-charts/<id>/edit`, and the public site does not serve
+`/admin` — prefixing it with the site host yields a link that 404s. Both the
+sweep and this consumer route such paths through a helper
+(`admin_url` / `absolute_url`) that strips the admin root's own `/admin` suffix
+before joining, or the result carries `/admin/admin/`.
 
 Pure SQL, so read-only credentials are enough. It sweeps both the current slug
 and every old slug that reaches the chart — references written before a rename

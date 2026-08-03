@@ -1019,14 +1019,33 @@ def doc_url(f: dict) -> str:
     return f"https://docs.google.com/document/d/{f['surface_id']}/edit" if f["surface_id"] else ""
 
 
-def deep_link(f: dict, host: str) -> str:
+def admin_url(where_path: str, host: str, admin: str = "") -> str:
+    """Absolute URL for a `where_path`, routing admin routes to the admin origin.
+
+    `admin` is an admin ROOT (".../admin"), while an admin `where_path` already starts
+    with `/admin/`, so the root's own suffix has to come off before joining or the result
+    carries `/admin/admin/`.
+    """
+    if not where_path:
+        return ""
+    if where_path.startswith("/admin/"):
+        origin = (admin or host).removesuffix("/").removesuffix("/admin")
+        return f"{origin}{where_path}"
+    return f"{host}{where_path}"
+
+
+def deep_link(f: dict, host: str, admin: str = "") -> str:
     """Published-article URL with a scroll-to-text fragment on the link's anchor text.
 
     Opens the article scrolled to (and highlighting) the reference, which is the
     fastest way to find it. Falls back to the plain article URL when the reference
     is a block embed with no anchor text.
+
+    Some `where_path`s are admin routes, not public ones (a narrative chart's editor).
+    Those must resolve against the admin origin — the public site does not serve
+    `/admin/...`, so prefixing them with `host` yields a link that 404s.
     """
-    base = f"{host}{f['where_path']}"
+    base = admin_url(f["where_path"], host, admin)
     anchor = (f.get("text") or "").strip()
     if not anchor:
         return base
@@ -1199,7 +1218,7 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
                     ptype = f["context"].split("(")[-1].rstrip(")") if "(" in f["context"] else ""
                     page_type = f" _{ptype}_" if ptype else ""
                     preview = f" · [👁 preview]({gdoc_preview_url(f, admin)})" if f["surface_id"] else ""
-                    links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host)})"
+                    links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host, admin)})"
                     if f["admin_url"]:
                         links += f" · [✎ chart admin]({f['admin_url']})"
                     subject = (
@@ -1213,7 +1232,7 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
                 lines += ["| Subject | Where | Context | Open |", "|---|---|---|---|"]
                 for f in rows:
                     draft = "" if f["published"] else " ⚠️draft"
-                    link = f"[🔗 open]({host}{f['where_path']})" if f["where_path"] else "—"
+                    link = f"[🔗 open]({admin_url(f['where_path'], host, admin)})" if f["where_path"] else "—"
                     lines.append(
                         f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 72)}{draft} | "
                         f"{cell(f['context'], 44)} | "
