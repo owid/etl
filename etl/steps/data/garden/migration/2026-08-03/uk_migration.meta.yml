@@ -9,6 +9,7 @@ definitions:
       grapher_config:
         chartTypes:
           - LineChart
+        hasMapTab: false
         selectedEntityNames:
           - United Kingdom
         addCountryMode: disabled
