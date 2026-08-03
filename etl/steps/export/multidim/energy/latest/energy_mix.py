@@ -187,19 +187,22 @@ SOURCE_COMPOSITION = {
 }
 
 
-# (source, metric) views where the composition reads better as a footnote than inline in the subtitle
-# (the per-person renewables view, whose subtitle is already carrying the "per person" phrasing).
-COMPOSITION_AS_NOTE = {("renewables", "per_capita")}
-
-
 def _view_subtitle(source: str, metric: str) -> str:
-    unit = METRIC_UNIT_PHRASE[metric]
-    note = SOURCE_COMPOSITION.get(source)
-    if (source, metric) in COMPOSITION_AS_NOTE:
-        note = None
-    # Lead with the unit ("Measured in terawatt-hours of total energy supply."), then the composition
-    # note. A period keeps it robust across all metrics (the annual-change unit is not a "Measured…").
-    return f"{unit} {note}" if note else unit
+    # The subtitle carries the unit and nothing else. What a composite source is made of goes in the
+    # footnote (see _view_note), for every source and metric alike: it is a definition the reader can
+    # consult, not part of what the chart is showing.
+    return METRIC_UNIT_PHRASE[metric]
+
+
+def _view_note(source: str) -> str | None:
+    """Footnote for a view: what the source is made of, then any caveat about its constituents.
+
+    Both sentences can apply at once. Low-carbon energy is the sum of nuclear and renewables, and
+    "renewables" itself then needs defining, so the two are joined rather than split across the
+    subtitle and the footnote.
+    """
+    parts = [SOURCE_COMPOSITION.get(source), SOURCE_NOTES.get(source)]
+    return " ".join(p for p in parts if p) or None
 
 
 # Aggregates that can be decomposed "by source", mapped to their constituent individual sources.
@@ -842,9 +845,7 @@ def set_view_titles(c, dims_max: dict) -> None:
         config["title"] = _view_title(source, metric)
         config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric, dims_max.get((source, metric)))
-        note = SOURCE_NOTES.get(source)
-        if (source, metric) in COMPOSITION_AS_NOTE:
-            note = SOURCE_COMPOSITION[source]
+        note = _view_note(source)
         if note:
             config["note"] = note
         v.config = config

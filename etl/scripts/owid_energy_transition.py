@@ -41,9 +41,9 @@ exactly this case. ``check`` prints the affected charts so the count is never gu
   0. check                     prerequisites, and the chain-conflict list
   1. publish-multidims         MANUAL. Nothing else works first: every redirect target is
                                /grapher/<mdim-slug>, and both mapping skills read *published* views.
-  2. banners                   set the deprecation notice on the methodology-affected charts. Must
-                               happen while they are still published, and before the archival bake,
-                               because only published charts are archived.
+  2. banners                   set the deprecation notice on the charts being retired. Must happen
+                               while they are still published, and before the archival bake, because
+                               only published charts get archived.
   3. archival-bake             MANUAL trigger, so the frozen copies carry the banner.
   4. explorer-redirects        the 38 fossil-fuel explorer views, via the admin bulk endpoint.
   5. archive-redirects         the two charts with no successor, to their frozen copies.
@@ -75,7 +75,7 @@ DATA_DIR = Path(__file__).parent / "owid_energy_transition"
 # migration review tool; kept here so this script is reproducible without it.
 REDIRECTS_CSV = DATA_DIR / "redirects.csv"
 # The charts whose values change because of the methodology switch, so they get a banner first.
-AFFECTED_CSV = DATA_DIR / "methodology_affected_charts.csv"
+BANNER_CSV = DATA_DIR / "banner_charts.csv"
 
 # Slugs the three multidims must be published under. Every redirect target depends on these.
 MDIM_SLUGS = {
@@ -134,9 +134,9 @@ STEPS: list[Step] = [
         name="banners",
         manual=False,
         instructions="""
-        Sets the deprecation notice on the methodology-affected charts (see
-        methodology_affected_charts.csv), through the admin API so the R2 config and the revision
-        history stay in sync.
+        Sets the deprecation notice on the charts listed in banner_charts.csv, through the admin API
+        so the R2 config and the revision history stay in sync. That list is the set of charts the
+        migration review marked "keep the old chart with a banner".
 
         Requires the owid-grapher deprecation-notice feature to be deployed to production.
 
@@ -266,7 +266,7 @@ def check(env: OWIDEnv) -> list[str]:
     """Read-only prerequisites and guardrails. Returns a list of problems, empty if all clear."""
     problems: list[str] = []
     redirects = pd.read_csv(REDIRECTS_CSV)
-    affected = pd.read_csv(AFFECTED_CSV)
+    affected = pd.read_csv(BANNER_CSV)
 
     # -- Capabilities -----------------------------------------------------------------------
     with env.get_engine().connect() as con:
@@ -434,13 +434,14 @@ def _put_deprecation_notice(env: OWIDEnv, chart_id: int, config_full: dict, noti
 
 
 def banner_targets() -> pd.DataFrame:
-    """The charts that get a banner, with the successor each one points at.
+    """The charts that get a banner, with the successor and archived copy each one points at.
 
-    Only the charts being retired: the five that are updated in place keep their slug, so their
-    successor is themselves and a banner would be nonsense. Their FAUST carries the change instead.
+    Read verbatim from banner_charts.csv, which lists the charts the migration review recorded as
+    "keep the old chart with a banner". That is an editorial decision per chart, not something
+    derived from measuring how much the values moved: a chart can be retired while barely moving,
+    and one that moves a lot can still be updated in place with its text rewritten.
     """
-    affected = pd.read_csv(AFFECTED_CSV)
-    return affected[affected["action"] != "update"].reset_index(drop=True)
+    return pd.read_csv(BANNER_CSV)
 
 
 def set_banners(env: OWIDEnv, dry_run: bool, clear: bool = False) -> None:
@@ -466,9 +467,7 @@ def set_banners(env: OWIDEnv, dry_run: bool, clear: bool = False) -> None:
         log.info("banner", slug=row.slug, action="clear" if clear else "set", successor=row.successor)
         if not dry_run:
             _put_deprecation_notice(env, int(ids.loc[row.slug, "id"]), json.loads(ids.loc[row.slug, "patch"]), notice)
-    log.info(
-        "banner_total", charts=len(targets), skipped_updated_in_place=len(pd.read_csv(AFFECTED_CSV)) - len(targets)
-    )
+    log.info("banner_total", charts=len(targets))
 
 
 def create_archive_redirects(env: OWIDEnv, dry_run: bool) -> None:
