@@ -1131,3 +1131,11 @@ steps:
     - data://garden/antibiotics/2026-06-30/glass_enrolment:
       - data://meadow/antibiotics/2026-06-30/glass_enrolment:
         - snapshot://antibiotics/2026-06-30/glass_enrolment.xlsx
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/who/2023-10-13/medical_devices_atlas:
+    - data://garden/who/2023-10-13/medical_devices_atlas:
+      - data://meadow/who/2023-10-13/medical_devices_atlas:
+        - snapshot://who/2023-10-13/medical_devices_atlas_gc_nm.csv
+        - snapshot://who/2023-10-13/medical_devices_atlas_pet.csv
+        - snapshot://who/2023-10-13/medical_devices_atlas_ct.csv
+        - snapshot://who/2023-10-13/medical_devices_atlas_mri.csv
