@@ -202,6 +202,81 @@ def find_in_doc(ref: dict) -> str:
     return anchor or ref["subject"]
 
 
+def narrative_chart_usages(names: set[str]) -> dict[str, list[dict]]:
+    """{narrative chart name -> the pages embedding it}, for the repoint step.
+
+    A second hop past the sweep, which answers "what references the CHART"; this answers
+    "what references the NARRATIVE CHART hanging off it" — and that is what decides the
+    recreate ORDER, so the report cannot tell someone to "update the article(s)" without
+    it. The delete endpoint refuses while a PUBLISHED post references the narrative chart,
+    which makes create-then-repoint-then-delete mandatory in that case; when nothing
+    references it, the simpler delete-then-recreate-under-the-same-name is available.
+
+    Both component types that can hold one are matched (`narrative-chart` blocks and
+    `key-insights` slides).
+    """
+    if not names:
+        return {}
+    df = OWID_ENV.read_sql(
+        "SELECT l.target AS name, l.componentType, g.id AS gdoc_id, g.slug, g.published, g.type "
+        "FROM posts_gdocs_links l JOIN posts_gdocs g ON g.id = l.sourceId "
+        "WHERE l.linkType = 'narrative-chart' AND l.target IN %(names)s",
+        params={"names": tuple(sorted(names))},
+    )
+    usages: dict[str, list[dict]] = defaultdict(list)
+    for r in df.to_dict("records"):
+        usages[r["name"]].append(r)
+    return usages
+
+
+def narrative_section(group: list[dict], usages: dict[str, list[dict]], host: str, admin: str) -> list[str]:
+    """One block per narrative chart: what it is, where it is used, and the ordered steps."""
+    lines: list[str] = []
+    for f in group:
+        name = f["where"]
+        used_in = usages.get(name, [])
+        published_uses = [u for u in used_in if u["published"]]
+        lines += [
+            f"### `{name}`",
+            "",
+            f"- parent chart: [`{f['source_chart_slug']}`]({f['old_url']}) · "
+            f"[✎ open the narrative chart]({host}/admin/narrative-charts/{f['narrative_id']}/edit)",
+            f"- replacement should render: {f['replacement_url']}",
+        ]
+        if f["param_collisions"]:
+            lines.append(
+                f"- ⚠️ its stored query params `{f['param_collisions']}` collide with the target view's "
+                "dimensions and would override them"
+            )
+        if used_in:
+            lines.append(f"- **used in {len(used_in)} page(s)** — these are what step 2 repoints:")
+            for u in sorted(used_in, key=lambda u: (not u["published"], u["slug"] or "")):
+                draft = "" if u["published"] else " ⚠️ **draft**"
+                page = (
+                    f"[{u['slug']}]({host}/{u['slug']})" if u["published"] and u["slug"] else f"`{u['slug'] or '(no slug)'}`"
+                )  # fmt: skip
+                lines.append(
+                    f"    - {page} _{u['type']}_{draft} — in a `{u['componentType']}` block · "
+                    f"[📄 doc](https://docs.google.com/document/d/{u['gdoc_id']}/edit) · "
+                    f"[👁 preview]({admin}/gdocs/{u['gdoc_id']}/preview) · search the doc for `{name}`"
+                )
+        else:
+            lines.append(
+                "- **not referenced by any page** — so the shortcut applies: delete it first, then "
+                "recreate the replacement under the SAME name (nothing blocks the delete)"
+            )
+        lines += [
+            f"- **step 1 — create:** {admin}/narrative-charts/create?type=multiDim&chartConfigId={f['target_view_config_id']}",
+            "- **step 2 — repoint:** change the page(s) above to the new narrative chart's name"
+            if used_in
+            else "- **step 2 — repoint:** nothing to repoint",
+            "- **step 3 — delete:** remove the old narrative chart"
+            + (" (only possible once the published page(s) above no longer reference it)" if published_uses else ""),
+            "",
+        ]
+    return lines
+
+
 def replacement_url(r: dict, query_string: str, host: str) -> tuple[str, list[str]]:
     """Target URL for a reference, plus any params that would clobber a view dimension."""
     dims = dict(r["target"]["dimensions"])
@@ -296,7 +371,9 @@ def bullet_list(group: list[dict]) -> list[str]:
     return lines
 
 
-def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host: str, gaps: list[str]) -> Path:
+def write_markdown(
+    out: Path, findings: list[dict], redirects: list[dict], host: str, gaps: list[str], admin: str = ""
+) -> Path:
     path = out / "references.md"
     # The reader's partition is by what they DO, not by severity tiers: one editing pass
     # per Google Doc covers embeds and links alike, so those sit adjacent in one section;
@@ -356,18 +433,14 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
             "",
             "A narrative chart renders its own saved config, so nothing breaks when its parent chart "
             'is unpublished — only its generated "Explore the data" link follows the redirect. The '
-            "plan for each one: **recreate it manually from the target MDIM view and point the "
-            "referencing article(s) back at the new one**, in this order —",
-            "",
-            "1. **Create** the replacement parented to the MDIM view (each item below carries the "
-            "ready-made admin create link — it opens the editor already parented to the right view).",
-            "2. **Repoint** the article(s) that reference the old narrative chart to the new name.",
-            "3. **Delete** the old narrative chart. The delete is refused while a published post "
-            "still references it, which is why it comes last.",
+            "plan for each one: **recreate it manually from the target MDIM view and point the pages "
+            "that use it back at the new one** — **create** the replacement, **repoint** the pages, "
+            "then **delete** the old one. That order is forced by the API: the delete is refused while "
+            "a published page still references it, and there is no rename, so the name can only be "
+            "reused when nothing references the old one.",
             "",
         ]
-        lines += bullet_list(narrative)
-        lines.append("")
+        lines += narrative_section(narrative, narrative_chart_usages({f["where"] for f in narrative}), host, admin)
 
     if allcharts:
         by_page = defaultdict(list)
@@ -541,6 +614,10 @@ def main() -> int:
                 "doc_edit_url": f"https://docs.google.com/document/d/{ref['surface_id']}/edit" if is_gdoc else "",
                 "doc_preview_url": f"{admin}/gdocs/{ref['surface_id']}/preview" if is_gdoc else "",
                 "find_in_doc": find_in_doc(ref) if is_gdoc else "",
+                # Narrative rows carry the ids their own section needs: the narrative chart
+                # to open/delete, and the target view to parent the replacement to.
+                "narrative_id": ref["surface_id"] if ref["surface"] == "narrative chart" else "",
+                "target_view_config_id": r["target"]["viewConfigId"],
                 "context": ref["context"] + (f' — "{ref["text"][:60]}"' if ref["text"] else ""),
                 "old_url": f"{host}/grapher/{ref['subject']}" + (f"?{qs.lstrip('?')}" if qs else ""),
                 "replacement_url": new_url,
@@ -552,7 +629,7 @@ def main() -> int:
     findings.sort(key=lambda f: ({RED: 0, YELLOW: 1, INFO: 2}[f["severity"]], f["surface"], f["source_chart_slug"]))
 
     csv_path = write_csv(mapping_dir, findings)
-    md_path = write_markdown(mapping_dir, findings, redirects, host, gaps)
+    md_path = write_markdown(mapping_dir, findings, redirects, host, gaps, admin)
 
     counts: dict[str, int] = defaultdict(int)
     for f in findings:
