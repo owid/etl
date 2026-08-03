@@ -10,7 +10,7 @@ def run() -> None:
     #
     # Load inputs.
     #
-    snap = paths.load_snapshot("child_labor_incidence_us.csv")
+    snap = paths.load_snapshot("child_work_incidence_us.csv")
     tb = snap.read_csv()
 
     #

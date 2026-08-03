@@ -11,8 +11,8 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset and read its table.
-    ds_garden = paths.load_dataset("child_labor_incidence_us")
-    tb = ds_garden.read("child_labor_incidence_us")
+    ds_garden = paths.load_dataset("child_work_incidence_us")
+    tb = ds_garden.read("child_work_incidence_us")
 
     #
     # Process data.

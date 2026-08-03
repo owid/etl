@@ -1,7 +1,7 @@
 """Script to create a snapshot of dataset.
 
 The data file (manually transcribed from the paper) is provided manually. Run with:
-  etls child_labor/2026-08-03/child_labor_incidence_us --path-to-file <path>
+  etls child_labor/2026-08-03/child_work_incidence_us --path-to-file <path>
 """
 
 from etl.helpers import PathFinder

@@ -30,4 +30,4 @@ meta:
 outs:
   - md5: 91b02f9f0babe502bfb5a7e929e3d2ff
     size: 267
-    path: child_labor_incidence_us.csv
+    path: child_work_incidence_us.csv

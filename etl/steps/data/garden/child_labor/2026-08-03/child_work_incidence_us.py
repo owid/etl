@@ -50,8 +50,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    ds_meadow = paths.load_dataset("child_labor_incidence_us")
-    tb = ds_meadow["child_labor_incidence_us"].reset_index()
+    ds_meadow = paths.load_dataset("child_work_incidence_us")
+    tb = ds_meadow["child_work_incidence_us"].reset_index()
 
     #
     # Process data.

@@ -14,12 +14,13 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: Incidence of child work in the United States, 1870-1930
   update_period_days: 0
   owners:
     - Bertha Rohenkohl
 
 tables:
-  child_labor_incidence_us:
+  child_work_incidence_us:
     variables:
       incidence_boys:
         title: Incidence of child work among boys aged 10-15 (as published)
