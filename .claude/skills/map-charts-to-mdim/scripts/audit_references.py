@@ -163,39 +163,58 @@ def write_csv(out: Path, findings: list[dict]) -> Path:
     return path
 
 
-def cell(value: str, limit: int = 70) -> str:
-    """Table-safe cell: escape pipes and newlines, truncate runaway text."""
-    text = " ".join(str(value or "").split()).replace("|", "\\|")
-    return (text[: limit - 1] + "…") if len(text) > limit else text
+def cell(value: str, limit: int = 70, marker: str = "…") -> str:
+    """Table-safe cell: escape pipes and newlines, truncate runaway text.
+
+    Pass marker="" for copy-paste search strings: an appended ellipsis is a character
+    that does not exist in the doc, so the copied text would match nothing — a bare
+    literal prefix still finds the spot. Pipes are escaped after truncating so the cut
+    can never leave half an escape sequence behind.
+    """
+    text = " ".join(str(value or "").split())
+    if len(text) > limit:
+        text = text[: limit - 1] + marker
+    return text.replace("|", "\\|")
 
 
 def gdoc_table(group: list[dict]) -> list[str]:
-    """One row per reference: doc links + the search string that lands on it.
+    """One table per fix, one row per reference: doc links + the search string that lands on it.
 
     The 'Replace with' cell links the full replacement URL under a readable label; the
-    raw URL is in references.csv for copy-paste. Fix instructions are uniform within a
-    (severity, surface) group, so they live in the line above the table, not a column.
+    raw URL is in references.csv for copy-paste. Fix instructions live above each table
+    rather than in a column — and because a (severity, surface) group can mix fixes (an
+    unpublished doc can hold both an embed and a prose link, and the INFO section does
+    not split by kind), the group is rendered as one table per fix, keeping every row
+    under the instruction that applies to it.
     """
-    fixes = sorted({f["fix"] for f in group})
-    lines = ["Fix: " + " / ".join(fixes), ""]
-    lines += ["| Source chart | Where | Open | Find in doc | Replace with |", "|---|---|---|---|---|"]
+    by_fix = defaultdict(list)
     for f in group:
-        source = f"[`{cell(f['source_chart_slug'], 44)}`]({f['old_url']})"
-        opens = " · ".join(
-            part
-            for part in (
-                f"[📄 doc]({f['doc_edit_url']})" if f["doc_edit_url"] else "",
-                f"[👁 preview]({f['doc_preview_url']})" if f["doc_preview_url"] else "",
-                f"[🔗 page]({f['where_url']})" if f["where_url"] else "",
+        by_fix[f["fix"]].append(f)
+    lines: list[str] = []
+    for fix in sorted(by_fix):
+        if lines:
+            lines.append("")
+        lines += [f"Fix: {fix}", ""]
+        lines += ["| Source chart | Where | Open | Find in doc | Replace with |", "|---|---|---|---|---|"]
+        for f in by_fix[fix]:
+            source = f"[`{cell(f['source_chart_slug'], 44)}`]({f['old_url']})"
+            opens = " · ".join(
+                part
+                for part in (
+                    f"[📄 doc]({f['doc_edit_url']})" if f["doc_edit_url"] else "",
+                    f"[👁 preview]({f['doc_preview_url']})" if f["doc_preview_url"] else "",
+                    f"[🔗 page]({f['where_url']})" if f["where_url"] else "",
+                )
+                if part
             )
-            if part
-        )
-        find = f"`{cell(f['find_in_doc'], 55)}`" if f["find_in_doc"] else "—"
-        target_label = cell(f["replacement_url"].split("/grapher/", 1)[-1], 60)
-        replace = f"[`{target_label}`]({f['replacement_url']})"
-        if f["param_collisions"]:
-            replace += f" ⚠️ params `{f['param_collisions']}` override view dimensions"
-        lines.append(f"| {source} | {cell(f['where'], 44)} | {opens} | {find} | {replace} |")
+            # marker="" — this cell is copied into the doc's find box verbatim, so it must
+            # stay a literal prefix of the text in the doc.
+            find = f"`{cell(f['find_in_doc'], 55, marker='')}`" if f["find_in_doc"] else "—"
+            target_label = cell(f["replacement_url"].split("/grapher/", 1)[-1], 60)
+            replace = f"[`{target_label}`]({f['replacement_url']})"
+            if f["param_collisions"]:
+                replace += f" ⚠️ params `{f['param_collisions']}` override view dimensions"
+            lines.append(f"| {source} | {cell(f['where'], 44)} | {opens} | {find} | {replace} |")
     return lines
 
 
