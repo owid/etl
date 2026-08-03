@@ -63,8 +63,8 @@ Each row gives you:
 - a per-explorer summary: how many references break, how many are just links, and whether
   anything blocks the redirect.
 
-Start with the 🔴 sections — those are the embeds. It also flags links whose parameters no
-longer match any view: those land on the MDIM's default view, so they need a deliberate
+Start with the 🔴 sections — those are the embeds. The report also flags links whose parameters
+no longer match any view: those land on the MDIM's default view, so they need a deliberate
 choice rather than a straight swap.
 
 ### 3. Clear site redirects involving the explorer
