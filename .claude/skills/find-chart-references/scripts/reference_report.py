@@ -19,6 +19,7 @@ the opposite (the redirect *deletes* matched source params and lets view params 
 the table columns differ. Sharing either would make one consumer subtly wrong.
 """
 
+import hashlib
 import json
 import re
 import subprocess
@@ -74,6 +75,40 @@ def run_sweep(subject_args: list[str]) -> tuple[list[dict], list[str]]:
     finally:
         Path(out_path).unlink(missing_ok=True)
         Path(gaps_path).unlink(missing_ok=True)
+
+
+# The identity of a reference, for freshness purposes: which surface, of what kind, on which
+# page, pointing where. Presentation-only fields (`context`, `text`, the resolved URLs) are
+# excluded on purpose — prose changing next to a link is not a new reference, and treating it
+# as one trains people to re-run an audit to clear noise, which is how a real change gets
+# waved through.
+REFERENCE_DIGEST_FIELDS = (
+    "surface",
+    "kind",
+    "where",
+    "where_path",
+    "surface_id",
+    "config_id",
+    "query_string",
+    "published",
+)
+
+
+def reference_digest(raw: list[dict], subject: str) -> str:
+    """Stable digest of the live references the sweep just found for one subject.
+
+    An audit records this; a preflight recomputes it and compares. Without that binding, a gate
+    reading the audit's CSV cannot tell whether the CSV still describes the site: a page that
+    added an embed after the audit ran, or an audit folder carried over from an earlier
+    migration, both leave the gate reporting a clean audit while the change is about to break
+    something live. Order-insensitive, because SQL row order is not a fact about the site.
+    """
+    items = sorted(
+        json.dumps([r.get(f) for f in REFERENCE_DIGEST_FIELDS], sort_keys=True, ensure_ascii=False)
+        for r in raw
+        if str(r.get("subject")) == str(subject)
+    )
+    return hashlib.sha256("\n".join(items).encode()).hexdigest()[:16]
 
 
 def absolute_url(where_path: str, host: str, admin: str = "") -> str:

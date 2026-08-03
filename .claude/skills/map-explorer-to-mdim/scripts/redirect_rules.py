@@ -20,6 +20,7 @@ Ported from owid-grapher (read `origin/master`, not a stale checkout):
 
 import csv
 import hashlib
+import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlencode
@@ -304,14 +305,44 @@ def resolve_explorer_url(
     return ResolvedUrl(url=url, rule=rule, match=match, stale_params=stale, leftover_params=leftover)
 
 
+def strip_payload(mapping: dict) -> tuple[dict, int, list[tuple[SourceRule, SourceRule]]]:
+    """(apply-ready payload, empties removed, colliding rule pairs) for a mapping. Pure.
+
+    The single definition of how `mapping.json` becomes `admin_bulk_payload.json`, so the
+    builder that writes the payload and the preflight that re-derives it to check the payload
+    was actually built from the mapping beside it cannot drift apart. Whoever writes a payload
+    with `--allow-duplicate-conditions` finishes the job with `drop_duplicate_entries`.
+    """
+    payload = json.loads(json.dumps(mapping))  # deep copy; mapping.json must stay unstripped
+    stripped = 0
+    for holder in [payload.get("catchAll") or {}, *(payload.get("redirects") or [])]:
+        dims = (holder.get("source") or {}).get("dimensions")
+        if not dims:
+            continue
+        kept = strip_empty(dims)
+        stripped += len(dims) - len(kept)
+        holder["source"]["dimensions"] = kept
+    return payload, stripped, duplicate_conditions(build_source_rules(payload))
+
+
+def drop_duplicate_entries(payload: dict, clashes: list[tuple[SourceRule, SourceRule]]) -> dict:
+    """Remove the later entry of each colliding pair — the one the endpoint would reject.
+
+    Matches on `sourceViewId`: `clashes` holds SourceRule objects built from the payload, so
+    comparing object identity against the payload's own dicts could never match, and the rows
+    a report claimed to drop would still be posted and then rejected.
+    """
+    drop = {b.source_view_id for _, b in clashes if b.source_view_id is not None}
+    payload["redirects"] = [r for r in payload.get("redirects") or [] if r.get("sourceViewId") not in drop]
+    return payload
+
+
 def choice_values(mapping_dir: Path) -> tuple[list[str], dict[str, set[str]]]:
     """(dimension names, value set per dimension) from a run's `explorer_views.csv`.
 
     The CSV stores dimensions positionally (`dimension_1…`), so the names come from
     `_sources.json`; this reads the pair together so callers cannot mismatch them.
     """
-    import json
-
     sources = json.loads((mapping_dir / "_sources.json").read_text())
     names = list(sources["explorer"]["dimensions"])
     values: dict[str, set[str]] = {name: set() for name in names}

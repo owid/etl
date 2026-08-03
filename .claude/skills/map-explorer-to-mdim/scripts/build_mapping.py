@@ -39,9 +39,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from redirect_rules import (  # noqa: E402
-    build_source_rules,
-    duplicate_conditions,
-    strip_empty,
+    drop_duplicate_entries,
+    strip_payload,
     views_fingerprint,
 )
 
@@ -238,17 +237,9 @@ def write_admin_payload(out: Path, mapping: dict, allow_duplicates: bool) -> tup
     One file per explorer is a correctness requirement, not a convention — the endpoint's
     schema has a single `catchAll`, so a merged file would silently drop all but one.
     """
-    payload = json.loads(json.dumps(mapping))  # deep copy; mapping.json must stay unstripped
-    stripped = 0
-    for holder in [payload.get("catchAll") or {}, *(payload.get("redirects") or [])]:
-        dims = (holder.get("source") or {}).get("dimensions")
-        if not dims:
-            continue
-        kept = strip_empty(dims)
-        stripped += len(dims) - len(kept)
-        holder["source"]["dimensions"] = kept
-
-    clashes = duplicate_conditions(build_source_rules(payload))
+    # Via the shared transform, so preflight can re-derive this byte-for-byte and prove the
+    # payload on disk was built from the mapping.json beside it.
+    payload, stripped, clashes = strip_payload(mapping)
     errors = [
         f"views {a.source_view_id or 'catchAll'} and {b.source_view_id or 'catchAll'} both reduce to "
         f"condition {a.condition or '{}'} — the endpoint rejects the second, so it would never serve"
@@ -262,11 +253,7 @@ def write_admin_payload(out: Path, mapping: dict, allow_duplicates: bool) -> tup
             "--allow-duplicate-conditions to drop the later duplicates and report them."
         )
     if errors:
-        # Match on sourceViewId: `clashes` holds SourceRule objects built from the payload, so
-        # comparing object identity against the payload's own dicts could never match and the
-        # rows the report claimed to drop would still be posted — and then rejected.
-        drop = {b.source_view_id for _, b in clashes if b.source_view_id is not None}
-        payload["redirects"] = [r for r in payload.get("redirects") or [] if r.get("sourceViewId") not in drop]
+        payload = drop_duplicate_entries(payload, clashes)
 
     path = out / "admin_bulk_payload.json"
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")

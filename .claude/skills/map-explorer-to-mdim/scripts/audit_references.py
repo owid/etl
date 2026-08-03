@@ -54,6 +54,7 @@ from reference_report import (  # noqa: E402
     find_in_doc,
     page_type,
     public_page_url,
+    reference_digest,
     run_sweep,
 )
 
@@ -224,13 +225,18 @@ def build_rows(runs: dict[str, dict], raw: list[dict], host: str, admin: str) ->
     return rows
 
 
-def write_manifest(out: Path, runs: dict[str, dict], rows: list[dict], gaps: list[str]) -> Path:
-    """Record WHICH explorers were audited, and with what result.
+def write_manifest(out: Path, runs: dict[str, dict], rows: list[dict], gaps: list[str], raw: list[dict]) -> Path:
+    """Record WHICH explorers were audited, with what result, and against what live state.
 
     Necessary because a clean audit produces no rows: an explorer nothing references
     contributes nothing to references.csv, so a consumer deriving coverage from the rows alone
     cannot tell "audited, found nothing" from "never audited" — and would gate on it forever.
     The manifest is the positive record of the run.
+
+    `referenceDigests` makes that record *verifiable* rather than merely present: preflight
+    re-runs the sweep and recomputes them, so an audit that no longer describes the live site —
+    a page that added an embed since, or a folder reused from another migration — is rejected
+    instead of being read as clean.
     """
     per: dict[str, int] = {slug: 0 for slug in runs}
     for row in rows:
@@ -238,6 +244,7 @@ def write_manifest(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
     manifest = {
         "explorers": sorted(runs),
         "referenceCounts": per,
+        "referenceDigests": {slug: reference_digest(raw, slug) for slug in sorted(runs)},
         "total": len(rows),
         "gaps": gaps,
     }
@@ -492,7 +499,7 @@ def main() -> int:
     rows = build_rows(runs, raw, host, admin)
     csv_path = write_csv(out, rows)
     md_path = write_markdown(out, runs, rows, gaps)
-    manifest_path = write_manifest(out, runs, rows, gaps)
+    manifest_path = write_manifest(out, runs, rows, gaps, raw)
 
     counts: dict[str, int] = defaultdict(int)
     for row in rows:

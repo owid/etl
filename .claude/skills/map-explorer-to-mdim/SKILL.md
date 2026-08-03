@@ -243,11 +243,25 @@ exist that differ from the payload; or embedded references are outstanding. A **
 `references.csv` is a blocker too — "never looked" must not read like "looked and found
 nothing".
 
-That payload-vs-extraction check earns its place: the payload and `_sources.json` are separate
-files, so re-running `extract_views.py` without a successful rebuild — or with a rebuild that
-aborted on duplicate conditions, which happens *after* `mapping.json` is written but *before*
-the payload is — leaves the OLD payload beside the NEW extraction. The fingerprint check passes
-in that state, because it validates the extraction, not the rules about to be posted.
+Two of those checks exist because **nothing else ties the payload to the run that produced it**,
+and an aborted or skipped rebuild leaves a stale one in place. `build_mapping.py` writes
+`mapping_proposal.csv` and `mapping.json` *before* `admin_bulk_payload.json`, and aborts between
+them on duplicate conditions — so the artifacts a human reviews can describe one build while the
+payload about to be posted comes from another, with the fingerprint check none the wiser (it
+validates the extraction, not the rules). Preflight therefore checks both ends:
+
+- the payload's **source conditions** against `explorer_views.csv` + `_sources.json`, which
+  catches an extraction re-run with no rebuild at all;
+- the payload **as a whole** against the transform of the `mapping.json` beside it, which is
+  what catches a rebuild that aborted in between — including one where only the *targets*
+  changed, invisible to any source-side check.
+
+The reference gate is bound to live state the same way. `audit_references.py` records a
+`referenceDigests` entry per explorer in `references_manifest.json`; preflight re-runs the sweep
+and compares. Without that, the gate reads a CSV from an earlier run and cannot see a page that
+added an embed since, or an audit folder carried over from another migration — both of which
+would read as a clean audit while the redirect is about to break something live. An audit
+predating the digests reports as unverifiable rather than clean.
 
 A retired explorer whose redirects are all live reports `DONE` and exits 0. That is the
 finished state, not an error. But retirement does not retire the **target** side: an MDIM that

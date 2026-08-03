@@ -29,13 +29,17 @@ from pathlib import Path
 from etl.config import OWID_ENV
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts"))
 from redirect_rules import (  # noqa: E402
     build_source_rules,
+    drop_duplicate_entries,
     duplicate_conditions,
     parse_explorer_views,
     strip_empty,
+    strip_payload,
     views_fingerprint,
 )
+from reference_report import reference_digest, run_sweep  # noqa: E402
 
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 BLOCKER, WARN, OK = "BLOCKER", "WARN", "ok"
@@ -148,6 +152,38 @@ def payload_binding(run: dict) -> tuple[str, str]:
         + "; ".join(parts)
         + ". Re-run build_mapping.py and re-review; an aborted build leaves the previous payload in place, "
         "and the fingerprint check alone cannot see that."
+    )
+
+
+def payload_matches_build(run: dict) -> tuple[str, str]:
+    """(status, message): is the payload the one this run's `mapping.json` produces?
+
+    `payload_binding` only ties the payload's SOURCE side to the extraction, which leaves the
+    target side loose — and the targets are what a reviewer signs off on. `mapping.json` is
+    written from the current build immediately BEFORE the payload, and the payload is a pure
+    function of it, so re-deriving that transform proves the two came from the same build. This
+    is what catches a build that aborted between them (duplicate conditions do exactly that,
+    after mapping.json is written): `mapping_proposal.csv` and `mapping.json` then describe the
+    targets a human reviewed, while the payload still carries the previous run's, with no
+    source-side difference to give it away.
+    """
+    mapping_path = run["dir"] / "mapping.json"
+    if not mapping_path.exists():
+        return WARN, "no mapping.json beside the payload — cannot confirm the two came from the same build"
+    mapping = json.loads(mapping_path.read_text())
+    strict, _, clashes = strip_payload(mapping)
+    # Either duplicate-handling outcome is legitimate: the builder aborts on clashes unless
+    # --allow-duplicate-conditions was passed, in which case it drops the later ones.
+    candidates = [strict]
+    if clashes:
+        candidates.append(drop_duplicate_entries(json.loads(json.dumps(strict)), clashes))
+    if any(run["payload"] == candidate for candidate in candidates):
+        return OK, "payload is exactly what mapping.json builds — same build"
+    return BLOCKER, (
+        "STALE PAYLOAD — admin_bulk_payload.json is not what mapping.json next to it builds, so the two are "
+        "from different runs. mapping.json and mapping_proposal.csv are written BEFORE the payload, so a build "
+        "that aborted in between leaves a reviewed proposal beside an unreviewed payload — including different "
+        "targets. Re-run build_mapping.py and re-review before applying."
     )
 
 
@@ -393,6 +429,40 @@ def reference_gate(out: Path, slugs: list[str]) -> tuple[str, str]:
     return OK, f"{len(rows)} reference(s) audited, none embedded"
 
 
+def audit_freshness(out: Path, slugs: list[str]) -> tuple[str, str]:
+    """(status, message): does the audit on disk still describe the live site?
+
+    `reference_gate` reads a CSV an earlier run produced, so by itself it cannot see anything
+    that changed since — a page that added an explorer embed after the audit, or an audit folder
+    carried over from another migration. In both cases it reports a clean audit while the
+    redirect is about to break something live, which is the exact failure the gate exists to
+    prevent. So the sweep is re-run here and compared against the digest the audit recorded.
+    """
+    manifest_path = out / "references_manifest.json"
+    recorded = {}
+    if manifest_path.exists():
+        recorded = json.loads(manifest_path.read_text()).get("referenceDigests") or {}
+    stale_record = sorted(set(slugs) - set(recorded))
+    if stale_record:
+        return (
+            WARN,
+            f"the audit recorded no verifiable reference digest for {stale_record} (it predates them), so a "
+            "reference added since cannot be detected here — re-run audit_references.py to make it checkable",
+        )
+    raw, gaps = run_sweep([arg for slug in slugs for arg in ("--explorer", slug)])
+    drifted = sorted(slug for slug in slugs if reference_digest(raw, slug) != recorded[slug])
+    if drifted:
+        return (
+            BLOCKER,
+            f"the live references for {drifted} no longer match the audit — something links or embeds those "
+            "explorers that references.csv does not list (or this folder's audit is from another run). Re-run "
+            "audit_references.py and re-read references.md before applying.",
+        )
+    if gaps:
+        return WARN, f"live references still match the audit, but the sweep reported {len(gaps)} gap(s): {gaps[:3]}"
+    return OK, f"live references still match the audit for {len(slugs)} explorer(s)"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Validate explorer redirect payloads before applying.")
     ap.add_argument("--mapping", action="append", required=True, help="A mapping dir (repeatable)")
@@ -437,8 +507,9 @@ def main() -> int:
             )
             continue
 
-        status, message = payload_binding(run)
-        findings.append((status, slug, message))
+        for check in (payload_binding, payload_matches_build):
+            status, message = check(run)
+            findings.append((status, slug, message))
 
         if retired:
             # No explorer row means no TSV to re-fingerprint, so the source side cannot be
@@ -633,8 +704,9 @@ def main() -> int:
             findings.append((WARN, slug, "no catch-all — the bare explorer URL keeps serving the explorer"))
 
     if not args.no_references:
-        status, message = reference_gate(out, slugs)
-        findings.append((status, "(all)", message))
+        for gate in (reference_gate, audit_freshness):
+            status, message = gate(out, slugs)
+            findings.append((status, "(all)", message))
 
     print(f"{'status':8} {'explorer':38} note")
     print("-" * 150)
