@@ -111,17 +111,18 @@ Loop (max <3> iterations, then stop and report):
    `--paginate` needs both the `$endCursor` variable and the `pageInfo` block — without them it silently returns one page, which is the failure this whole rule exists to prevent.
    then `gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "<id>"}) { thread { isResolved } } }'`.
    Leave threads you did not address open for the human.
-7. **Re-trigger** a fresh bare `@codex review` comment ONLY if you pushed a substantial code fix (metadata-only tweaks don't count). Post it exactly as setup step 1 does, keeping **both** fields:
+7. **Re-trigger** a fresh bare `@codex review` comment ONLY if you pushed a substantial code fix (metadata-only tweaks don't count). Post it exactly as setup step 1 does, capturing **all three** fields:
 
    ```bash
+   git rev-parse HEAD   # the SHA this NEW round covers — your fix commit, not the old head
    gh api repos/<owner>/<repo>/issues/<n>/comments --method POST \
      -f body="@codex review" --jq '{id, created_at}'
    ```
 
-   Replace **both** stored values — the threshold *and* the trigger comment id. Keeping the old id means step 2 reads reactions from the previous trigger, where an existing `+1` declares the new round clean before Codex has answered it. Then loop back to 1.
+   Replace **all three** stored values — the threshold, the trigger comment id, *and* the head SHA. Keeping the old id means step 2 reads reactions from the previous trigger, where an existing `+1` declares the new round clean before Codex has answered it. Keeping the old SHA is subtler and worse: the round's verdict then gets reported against the revision you just replaced, so a clean pass reads as covering code Codex never saw, and the revision it did see goes unnamed. Then loop back to 1.
 8. NEVER merge. Never force-push. Never edit `dag/archive/*`.
 
-Final report: status of every CI check; each finding with verdict (fixed+commit / rebutted+why); threads resolved; commits pushed; **the SHA each verdict covers** (the round's recorded head SHA, and the head at report time if they differ — a clean pass on an older revision says nothing about newer commits); anything left for the human.
+Final report: status of every CI check; each finding with verdict (fixed+commit / rebutted+why); threads resolved; commits pushed; **the SHA each verdict covers** — the SHA recorded for the round that produced it (refreshed on every re-trigger, per step 7), plus the head at report time when they differ, since a clean pass on an older revision says nothing about newer commits; anything left for the human.
 
 ---
 
