@@ -92,20 +92,20 @@ ARCHIVE_REDIRECTS = {
 }
 
 EXPLAINER_URL = "https://ourworldindata.org/how-primary-energy-is-measured-has-changed-across-our-charts"
-# The date the bannered charts are redirected to their successors.
-CUTOVER_DATE = "1 October 2026"
-# Markdown, rendered inside the chart frame above the title, so it is read before the chart. Three
-# sentences, one per link: why the numbers changed, what replaces this chart and when, and where this
-# version survives. The successor and archive links are per chart, from AFFECTED_CSV.
+# The date the bannered charts are redirected to their successors. Spelled out with the year,
+# because an archived page keeps this text indefinitely and "October 1st" alone would age badly.
+CUTOVER_DATE = "October 1, 2026"
+# Markdown, rendered inside the chart frame above the title, so it is read before the chart. Kept to
+# two sentences carrying three links, because the banner competes with the title for space.
 #
-# The archive link is deliberately not phrased as "until then": the archived copy is permanent, and
-# after the cutover it is the only place these values exist, since the slug redirects away.
+# "The old version" rather than "the current chart": after the first sentence introduces an updated
+# version, "current" reads as though it were the new one. And the archive is not framed as temporary,
+# because after the cutover it is the only place these values exist, the slug having redirected away.
 BANNER_TEMPLATE = (
-    "The way energy is measured in this chart has changed, as "
-    f"[explained in this article]({EXPLAINER_URL}). "
     f"On {CUTOVER_DATE} this chart will be replaced by "
-    "[an updated version]({successor_url}). "
-    "The version shown here will remain available as an [archived chart]({archive_url})."
+    "[an updated version]({successor_url}) that uses "
+    f"[a different methodology]({EXPLAINER_URL}). "
+    "The old version will remain available in [the archive]({archive_url})."
 )
 
 
