@@ -98,9 +98,11 @@ def run() -> None:
         is_country = ~(country_level.isin(AGGREGATE_ENTITIES) | country_level.str.contains("(EI)", regex=False))
         tb_countries = tb[is_country]
         for column, dims in column_dimensions.items():
-            dims_max[(dims["source"], dims["metric"], frequency)] = float(
-                tb_countries[column].astype("float64").quantile(0.99)
-            )
+            series = tb_countries[column].astype("float64")
+            # Signed metrics are sized from the *absolute* magnitude, so the symmetric bins cover the
+            # export side too; taking the raw 99th percentile would size them from the import tail alone.
+            series = series.abs() if dims["metric"] in DIVERGING_METRICS else series
+            dims_max[(dims["source"], dims["metric"], frequency)] = float(series.quantile(0.99))
             tb[column].m.dimensions = dims
             tb[column].m.original_short_name = "electricity"
 
@@ -117,6 +119,17 @@ def run() -> None:
                 "chartTypes": ["LineChart", "DiscreteBar", "Dumbbell", "SlopeChart"],
             }
         )
+
+    # Scale-free metrics get one magnitude shared by both frequencies, so a source with no hand-tuned
+    # brackets still gets the same legend annually and monthly. Sizing each frequency from its own 99th
+    # percentile would give e.g. bioenergy's share 5-point steps to 25% annually and 2-point steps to
+    # 20% monthly, for a quantity that does not change scale with the period.
+    for source, metric, _ in list(dims_max):
+        if metric in SCALE_FREE_METRICS:
+            shared = max(dims_max.get((source, metric, f), 0.0) for f in ("annual", "monthly"))
+            for f in ("annual", "monthly"):
+                if (source, metric, f) in dims_max:
+                    dims_max[(source, metric, f)] = shared
 
     c = paths.create_collection(
         config=paths.load_collection_config(),
@@ -601,6 +614,12 @@ SOURCE_FALLBACK_SCHEME = {
 # open-ended top bracket (">X"). Percentages (share_of_generation, imports_share) stay closed, and
 # the signed net-imports metric is diverging.
 LOG_METRICS = {"generation", "per_capita", "demand", "demand_per_capita", "carbon_intensity"}
+# Metrics that are signed: their map bins are symmetric around zero and open at both ends, so being a
+# net importer and a net exporter read as opposite sides of the same scale.
+DIVERGING_METRICS = {"net_imports"}
+# Ratios and percentages: a month's value is on the same scale as a year's, so unlike the absolute
+# magnitudes these keep the annual brackets at monthly frequency instead of being re-binned.
+SCALE_FREE_METRICS = {"share_of_generation", "imports_share", "carbon_intensity"}
 
 
 def _open_top_sentinel(edges: list[float]) -> float:
@@ -630,6 +649,26 @@ def _log_thresholds(vmax: float | None, max_bins: int = 7) -> list[float] | None
     return [0] + below[-(max_bins - 1) :]
 
 
+def _diverging_thresholds(vabs: float | None, levels: int = 4) -> list[float] | None:
+    """Symmetric 1-3-10 bin edges around zero for a signed metric, open at both ends.
+
+    A leading value greater than the most-negative edge and a trailing value smaller than the
+    most-positive edge make grapher render open-ended "<" and ">" brackets on both sides, so the
+    extremes of trade in either direction stay visible. Same construction as the energy-mix
+    annual-change maps.
+    """
+    if vabs is None or not (vabs > 0):
+        return None
+    ladder = [m * 10**p for p in range(-3, 13) for m in (1, 3)]
+    below = [v for v in ladder if v <= vabs]
+    if not below:
+        return None
+    pos = [round(v, 6) for v in below[-levels:]]
+    edges = [-v for v in reversed(pos)] + [0] + pos
+    # Sentinels (the innermost non-zero edges) at the array ends force open brackets on both sides.
+    return [-pos[0]] + edges + [pos[0]]
+
+
 def _share_thresholds(vmax: float | None) -> tuple[list[float], bool] | None:
     """Bin edges for share-of-total metrics (bounded 0-100), following the original charts.
 
@@ -648,9 +687,12 @@ def _share_thresholds(vmax: float | None) -> tuple[list[float], bool] | None:
 
 
 def _map_config(source: str, metric: str, vmax: float | None = None, frequency: str = "annual") -> dict:
-    # Annual reuses the hand-tuned brackets from the original charts; monthly values are ~1/12 the size,
-    # so the monthly map is auto-binned from the monthly 99th percentile instead of the annual brackets.
-    scheme = ORIGINAL_MAP_SCHEMES.get((source, metric)) if frequency == "annual" else None
+    # Annual reuses the hand-tuned brackets from the original charts; monthly absolute magnitudes are
+    # ~1/12 the size, so they are re-binned from the monthly 99th percentile instead. Ratios and
+    # percentages do not shrink with the period, so they keep the annual brackets at both frequencies:
+    # otherwise toggling frequency silently changes the legend for the same quantity.
+    reuse_original = frequency == "annual" or metric in SCALE_FREE_METRICS
+    scheme = ORIGINAL_MAP_SCHEMES.get((source, metric)) if reuse_original else None
     if scheme is not None and len(scheme.get("customNumericValues", [])) >= 3:
         # The original chart had explicit manual brackets: reproduce them verbatim, so the brackets,
         # color scheme, open-ended bins, and special bins (e.g. the nuclear "No nuclear" =0 bucket) all
@@ -675,6 +717,13 @@ def _map_config(source: str, metric: str, vmax: float | None = None, frequency: 
             color_scale["binningStrategy"] = "manual"
             # The trailing sentinel (smaller than the top edge) makes the top bracket open-ended.
             color_scale["customNumericValues"] = edges + ([edges[1] / 100] if open_top else [])
+    elif metric in DIVERGING_METRICS:
+        # Signed metric: symmetric bins around zero, so the map never leaves the importer/exporter
+        # boundary in the middle of a bracket, which grapher's automatic binning is free to do.
+        edges = _diverging_thresholds(vmax)
+        if edges:
+            color_scale["binningStrategy"] = "manual"
+            color_scale["customNumericValues"] = edges
     elif metric in LOG_METRICS:
         edges = _log_thresholds(vmax)
         if edges:

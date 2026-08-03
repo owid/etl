@@ -281,9 +281,10 @@ CARBON_INTENSITY_INDICATOR = "carbon_intensity_of_energy#emissions_total_per_uni
 # Explicit brackets, because this is the one map-bearing view that would otherwise fall back to
 # grapher's automatic (ckmeans) binning. That starts the lowest bin at the data minimum and leaves it
 # open below, so a quantity whose floor is zero got a "<150 g" bracket that hid the ~25 countries
-# under 150 g, 8 of them under 100 g. Zero floor, 50 g steps through the dense 150-350 g band, open
-# above (the top bracket is where the few outliers above 350 g land).
-CARBON_INTENSITY_MAP_EDGES = [0, 100, 150, 200, 250, 300, 350]
+# under 150 g, 8 of them under 100 g. Even 50 g steps from a zero floor, open above: log spacing would
+# be wrong here, because carbon intensity is a ratio clustered in a narrow band (nearly every country
+# sits between 100 and 350 g) rather than a heavy-tailed magnitude.
+CARBON_INTENSITY_MAP_EDGES = [0, 50, 100, 150, 200, 250, 300, 350]
 
 
 def add_carbon_intensity_view(c) -> None:
