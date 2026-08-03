@@ -67,6 +67,15 @@ def load_runs(paths: list[str]) -> dict[str, dict]:
             )
         payload = json.loads(payload_path.read_text())
         slug = payload["explorer"]["slug"]
+        # Keying by slug means a second dir for the same explorer would REPLACE the first, so one
+        # of the payloads the operator explicitly passed would never be validated while still
+        # looking like part of the ready batch. audit_references.py already refuses this; refuse
+        # it here too rather than silently validating whichever came last.
+        if slug in runs:
+            raise SystemExit(
+                f"Two --mapping dirs both describe explorer {slug!r}: {runs[slug]['dir']} and {d}. "
+                "Pass one dir per explorer — otherwise only one of those payloads gets validated."
+            )
         sources_path = d / "_sources.json"
         runs[slug] = {
             "dir": d,
@@ -666,8 +675,22 @@ def main() -> int:
                         )
                     )
             else:
+                # A blocker, like the other unverifiable states: this is the ONLY check that
+                # compares the payload's source side against the LIVE explorer, so without a
+                # recorded fingerprint nothing would notice views reordered, added or relabelled
+                # since extraction — and every positional view id in the payload would be
+                # pointing at whatever now sits in that row. `payload_binding` cannot substitute
+                # for it: it compares the payload against `explorer_views.csv`, and a legacy run
+                # has both equally stale. Unlike the retired case below, this one is clearable —
+                # re-run extract_views.py and rebuild.
                 findings.append(
-                    (WARN, slug, "no viewsFingerprint recorded (extracted before they existed) — staleness unchecked")
+                    (
+                        BLOCKER,
+                        slug,
+                        "UNVERIFIABLE SOURCE — no viewsFingerprint recorded (extracted before they existed), so "
+                        "the payload's source conditions were never compared against the live explorer. Re-run "
+                        "extract_views.py, re-review and rebuild before applying.",
+                    )
                 )
 
         for r in as_source.get(slug, []):
