@@ -48,10 +48,12 @@ def parse_explorer_views(tsv: str) -> tuple[list[str], list[list[str]]]:
     names: list[str] = []
     rows: list[list[str]] = []
     in_block = False
+    seen_block = False
     for line in lines:
         if not line.startswith("\t"):
             in_block = line.strip() == "graphers"
             if in_block:
+                seen_block = True
                 dim_cols, names = [], []
             continue
         if not in_block:
@@ -64,6 +66,18 @@ def parse_explorer_views(tsv: str) -> tuple[list[str], list[list[str]]]:
                     names.append(dim_name(col))
             continue
         rows.append([(cells[i].strip() if i < len(cells) else "") for i in dim_cols])
+    # Fail loudly rather than returning an empty grid. An empty grid extracts cleanly,
+    # fingerprints cleanly, and builds a catch-all-only payload that silently discards every
+    # per-view redirect — so it has to be an error, not a quiet zero.
+    if not seen_block:
+        raise SystemExit("No 'graphers' block found in the explorer TSV — cannot read its views.")
+    if not names:
+        raise SystemExit(
+            "The explorer's `graphers` block has no dimension columns (no header ending in "
+            f"{'/'.join(WIDGET_SUFFIXES)}) — cannot map views without dimensions."
+        )
+    if not rows:
+        raise SystemExit("The explorer's `graphers` block declares dimensions but contains no view rows.")
     return names, rows
 
 

@@ -224,6 +224,28 @@ def build_rows(runs: dict[str, dict], raw: list[dict], host: str, admin: str) ->
     return rows
 
 
+def write_manifest(out: Path, runs: dict[str, dict], rows: list[dict], gaps: list[str]) -> Path:
+    """Record WHICH explorers were audited, and with what result.
+
+    Necessary because a clean audit produces no rows: an explorer nothing references
+    contributes nothing to references.csv, so a consumer deriving coverage from the rows alone
+    cannot tell "audited, found nothing" from "never audited" — and would gate on it forever.
+    The manifest is the positive record of the run.
+    """
+    per: dict[str, int] = {slug: 0 for slug in runs}
+    for row in rows:
+        per[row["explorer"]] = per.get(row["explorer"], 0) + 1
+    manifest = {
+        "explorers": sorted(runs),
+        "referenceCounts": per,
+        "total": len(rows),
+        "gaps": gaps,
+    }
+    path = out / "references_manifest.json"
+    path.write_text(json.dumps(manifest, indent=2) + "\n")
+    return path
+
+
 def write_csv(out: Path, rows: list[dict]) -> Path:
     path = out / "references.csv"
     with open(path, "w", newline="") as f:
@@ -470,6 +492,7 @@ def main() -> int:
     rows = build_rows(runs, raw, host, admin)
     csv_path = write_csv(out, rows)
     md_path = write_markdown(out, runs, rows, gaps)
+    manifest_path = write_manifest(out, runs, rows, gaps)
 
     counts: dict[str, int] = defaultdict(int)
     for row in rows:
@@ -486,6 +509,7 @@ def main() -> int:
             print(f"  {row['explorer']} in {row['where']}: {row['stale_params'] or row['match']}")
     print(f"\n-> {csv_path}")
     print(f"-> {md_path}")
+    print(f"-> {manifest_path}  (which explorers were audited — preflight reads this)")
     return 0
 
 

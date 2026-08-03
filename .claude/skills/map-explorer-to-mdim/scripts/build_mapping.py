@@ -253,8 +253,11 @@ def write_admin_payload(out: Path, mapping: dict, allow_duplicates: bool) -> tup
             "--allow-duplicate-conditions to drop the later duplicates and report them."
         )
     if errors:
-        drop = {id(b) for _, b in clashes}
-        payload["redirects"] = [r for r in payload.get("redirects") or [] if id(r) not in drop]
+        # Match on sourceViewId: `clashes` holds SourceRule objects built from the payload, so
+        # comparing object identity against the payload's own dicts could never match and the
+        # rows the report claimed to drop would still be posted — and then rejected.
+        drop = {b.source_view_id for _, b in clashes if b.source_view_id is not None}
+        payload["redirects"] = [r for r in payload.get("redirects") or [] if r.get("sourceViewId") not in drop]
 
     path = out / "admin_bulk_payload.json"
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")

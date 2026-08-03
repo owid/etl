@@ -157,11 +157,18 @@ def reference_gate(out: Path, slugs: list[str]) -> tuple[str, str]:
         return BLOCKER, f"no references.csv in {out} — run audit_references.py first (or pass --no-references)"
     with open(path, newline="") as f:
         rows = list(csv.DictReader(f))
-    audited = {r["explorer"] for r in rows}
+    # Coverage comes from the audit's manifest, never from the rows: an explorer nothing
+    # references contributes no rows, so deriving it from the CSV alone would report a
+    # perfectly clean audit as "not audited" and gate on it forever, unclearable by re-running.
+    manifest_path = out / "references_manifest.json"
+    if manifest_path.exists():
+        audited = set(json.loads(manifest_path.read_text()).get("explorers") or [])
+    else:
+        audited = {r["explorer"] for r in rows}  # pre-manifest run: best effort
     unaudited = sorted(set(slugs) - audited)
     breaks = [r for r in rows if r["severity"] == "RED" and r["surface"] != "site redirect"]
-    if unaudited and not breaks:
-        return BLOCKER, f"references.csv does not cover {unaudited} — re-run audit_references.py for every explorer"
+    if unaudited:
+        return BLOCKER, f"the audit did not cover {unaudited} — re-run audit_references.py for every explorer"
     if breaks:
         per = defaultdict(int)
         for r in breaks:
