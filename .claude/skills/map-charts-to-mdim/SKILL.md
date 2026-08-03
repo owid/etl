@@ -142,6 +142,17 @@ it `none` would assert an overlap check that came out the other way. Quality lab
 - `none` — no view shares the chart's indicators. **An accepted outcome** — only
   matched charts get redirects; don't force the rest.
 
+**Twin suspects.** ID matching is blind to one real equivalence: a dataset that
+publishes the same series in two tables (WID/LIS do — `inequality#share_top_10__…`
+for the standalone charts vs `incomes#share__…quantile_10…` for the MDIM; verified
+value-identical). The extractor flags these — unmatched charts whose y comes from
+the same dataset as a slot-compatible view with a similar column name — in the run
+report and in `mdim_suggestions.md` as **twin suspects**, with the exact
+`overrides.csv` line to use. A suspect is NOT a match: verify first that the two
+indicators' values are identical (fetch both
+`api.ourworldindata.org/v1/indicators/<id>.data.json` and compare every
+entity-year), then force it, citing the verification in the override note.
+
 Either side carrying several indicators in one `x`/`size`/`color` slot has no
 chart-shaped signature, so it is **excluded from matching** rather than truncated
 to the first: a truncated signature can spuriously exact-match a counterpart that
@@ -482,3 +493,11 @@ this SKILL.md (and check whether the sibling `map-explorer-to-mdim` /
   that gains or changes a target gets its saved approval/note pruned on next
   load. Before re-running the extractor mid-review, have the reviewer export
   (⬇ JSON); unchanged rows re-import cleanly.
+- **A reviewer flagging an unmatched row with "the target should be X" is the
+  twin-variable signal** (2026-08: 3 of 3 such flags were twins — same dataset,
+  two tables, identical values). The workflow is: verify values via the
+  indicators API, force via `overrides.csv`, re-run. The old flag then reads as
+  stale in `preflight.py --decisions` (a decision exported with an empty target
+  no longer matches the now-targeted row — deliberate, or the flag would silently
+  drop the freshly forced redirect from the CSV); the forced rows just need a
+  quick re-approve + re-export.

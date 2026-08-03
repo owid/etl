@@ -80,12 +80,19 @@ def apply_decisions(
 ) -> tuple[list[dict], list[tuple[dict, str]], list[dict], int]:
     """Drop entries whose chart the reviewer flagged; count kept entries that carry no decision.
 
-    A decision is bound to the proposal it was made on, on BOTH sides: if the export carries
-    the reviewed target (target_mdim/view_id), the reviewed source version (config_md5) or the
-    reviewed target rendering (view_config_md5) and any of them differs from the entry, the
-    decision is stale and treated as no decision at all. The md5 halves matter because a re-run
-    after either end was edited rewrites mapping.json with the new md5s, so `stale_charts` and
-    `stale_targets` compare new-against-new and see nothing.
+    A decision is bound to the proposal it was made on, on BOTH sides: if the reviewed target
+    (target_mdim/view_id), the reviewed source version (config_md5) or the reviewed target
+    rendering (view_config_md5) differs from the entry, the decision is stale and treated as
+    no decision at all. The md5 halves matter because a re-run after either end was edited
+    rewrites mapping.json with the new md5s, so `stale_charts` and `stale_targets` compare
+    new-against-new and see nothing.
+
+    An EMPTY reviewed target is itself a mismatch, not missing data: every entry here has a
+    target, so a decision exported with no target was made while the chart had no proposed
+    redirect (near_miss/none) — typically a flag saying "the target should be X" that a later
+    `overrides.csv` force resolved. Honoring that flag would silently drop the freshly forced
+    redirect. (Cost: exports from before the target columns existed all read as stale, which
+    only raises the undecided count — conservative, never excluding.)
     """
     kept, flagged, stale, undecided = [], [], [], 0
     for e in entries:
@@ -94,7 +101,7 @@ def apply_decisions(
         reviewed_target = (d.get("target_mdim", ""), d.get("view_id", ""))
         reviewed_md5 = d.get("config_md5", "")
         reviewed_view_md5 = d.get("view_config_md5", "")
-        drifted = any(reviewed_target) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"])
+        drifted = bool(status) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"])
         edited = bool(reviewed_md5) and bool(e["chart"].get("configMd5")) and reviewed_md5 != e["chart"]["configMd5"]
         retargeted = (
             bool(reviewed_view_md5)
