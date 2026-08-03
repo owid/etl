@@ -499,15 +499,20 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
         ),
     )
     # Block-level components render the chart; `span-*` is a hyperlink in prose, which the
-    # 301 covers. LEFT() rather than LIKE: a literal '%' in the SQL string would collide
-    # with pymysql's own parameter formatting.
+    # 301 covers, and `all-charts` is a topic page's auto-generated chart index — the block
+    # lists every chart carrying the page's tag, so an unpublished chart simply drops out
+    # and nothing breaks (find-chart-references excludes these rows for the same reason —
+    # the gate must agree with the audit, or preflight blocks on a reference the audit
+    # rightly never lists). LEFT() rather than LIKE: a literal '%' in the SQL string would
+    # collide with pymysql's own parameter formatting.
     add_by_slug(
         "articleEmbeds",
         OWID_ENV.read_sql(
             "SELECT pgl.target AS slug, COUNT(*) AS n FROM posts_gdocs_links pgl "
             "JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
             "WHERE pgl.target IN %(slugs)s AND pgl.linkType IN ('grapher', 'guided-chart') "
-            "AND pg.published = 1 AND (pgl.componentType IS NULL OR LEFT(pgl.componentType, 5) <> 'span-') "
+            "AND pg.published = 1 AND (pgl.componentType IS NULL "
+            "OR (LEFT(pgl.componentType, 5) <> 'span-' AND pgl.componentType <> 'all-charts')) "
             "GROUP BY pgl.target",
             params={"slugs": slugs},
         ),

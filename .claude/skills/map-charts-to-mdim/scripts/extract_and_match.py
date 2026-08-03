@@ -14,9 +14,13 @@ redirect is created here, or anywhere in this skill — applying is
 Charts are selected by exactly one of ``--tag`` / ``--slugs`` / ``--dataset-id``
 and matched against the views of every published MDIM (or only those passed via
 repeatable ``--mdim``). A chart matches a view when their indicator IDs agree on
-every slot: same set of y variables, same x/size/color (absent == absent). Ties
-between several matching views are broken by chart type; anything still
-ambiguous is reported, not proposed.
+every slot: same set of y variables, same x/size/color (absent == absent) —
+after stripping *decoration* indicators (population as Marimekko width / bubble
+size, owid_region as continent coloring) from x/size/color on both sides, since
+charts and views carry those inconsistently without changing what data is
+plotted. A scatter's x axis is exempt — there population is the plotted
+relationship, not decoration. Ties between several matching views are broken by
+chart type; anything still ambiguous is reported, not proposed.
 
 Outputs into ``--out``:
 - ``charts.csv``                 — the selected source charts and their indicator slots
@@ -43,6 +47,7 @@ Usage:
 import argparse
 import csv
 import json
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 from urllib.parse import urlencode
@@ -51,6 +56,30 @@ from etl.config import OWID_ENV
 
 PUBLIC_HOST = "https://ourworldindata.org"
 EXTRA_SLOTS = ("x", "size", "color")
+
+# Decoration indicators style a chart without changing what data it plots, and charts vs
+# MDIM views carry them inconsistently: an MDIM view adds x=population so its Marimekko
+# tab has bar widths, a chart editor adds color=owid_region to color countries by
+# continent. Requiring these slots to agree exactly silently dropped
+# same-y-different-decoration pairs into `none` — with equal y sets they are not even a
+# near miss, so nothing reported the gap. They are stripped from x/size/color (never
+# from y) on BOTH sides before matching — except a scatter's x slot, which is the plotted
+# relationship itself (see `effective()`); the raw slots stay in charts.csv /
+# multidim_views.csv, and an exact match made across a decoration difference says so in
+# the proposal's `note` column. Only these two families qualify — a color like
+# "political regime" or a scatter x like GDP per capita is content and stays in the
+# match key. (Matched against catalogPath, so version bumps keep matching; legacy
+# variables with a NULL catalogPath are conservatively treated as content.)
+# Both alternatives are end-anchored: the demography `population` dataset also carries
+# population *density* columns (`population_density#population_density`,
+# `historical#population_density_historical`, `projections#population_density_projection`)
+# which an unanchored `#population` prefix would swallow — density is content, not
+# decoration. The anchored family is exactly the raw head-counts: `#population`,
+# `#population_historical`, `#population_projection`.
+DECORATION_PATTERN = re.compile(
+    r"/population/[^/#]+#population(_historical|_projection)?$"  # demography population head-counts
+    r"|/regions/regions#\w+_region$"  # owid_region & friends (continent coloring)
+)
 QUALITIES = ("exact", "forced", "ambiguous", "near_miss", "none", "skipped")
 
 PROPOSAL_COLUMNS = [
@@ -384,9 +413,29 @@ def attach_view_config_facts(views: list[dict], mdim_ids: list[int]) -> None:
 
 def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, str]) -> None:
     """Set match_quality / target / candidates / near-miss info on each chart dict."""
+
+    def effective(rec) -> tuple:
+        """x/size/color with decoration indicators treated as absent.
+
+        On a scatter the x axis IS the content — population there is the plotted
+        relationship (e.g. "GDP per capita vs. population"), not Marimekko bar-width
+        decoration — so ScatterPlot records keep their x slot literal on both sides.
+        A scatter's size=population (bubble size) and color=owid_region stay decoration.
+        """
+        slots = []
+        for s in EXTRA_SLOTS:
+            vid = rec[s]
+            content_slot = s == "x" and rec["chart_type"] == "ScatterPlot"
+            strip = vid and not content_slot and DECORATION_PATTERN.search(id_to_path.get(vid) or "")
+            slots.append(None if strip else vid)
+        return tuple(slots)
+
+    def slot_label(vid) -> str:
+        return f"{vid} ({path_tail(id_to_path.get(vid))})" if vid else "absent"
+
     by_key: dict[tuple, list[dict]] = defaultdict(list)
     for v in views:
-        by_key[(v["y"], v["x"], v["size"], v["color"])].append(v)
+        by_key[(v["y"], *effective(v))].append(v)
 
     for c in charts:
         c.update({"quality": "none", "tiebreak": "", "target": None, "candidates": [], "near_misses": [], "note": ""})
@@ -397,7 +446,8 @@ def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, st
         if not c["y"]:
             c["note"] = "chart has no y indicators"
             continue
-        candidates = by_key.get((c["y"], c["x"], c["size"], c["color"]), [])
+        c_eff = effective(c)
+        candidates = by_key.get((c["y"], *c_eff), [])
         if len(candidates) == 1:
             c["quality"], c["target"] = "exact", candidates[0]
         elif len(candidates) > 1:
@@ -414,12 +464,21 @@ def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, st
             # suggestions report assert that no view carries any of the chart's indicators,
             # which is exactly what it is not. That broader reading is what the CSV legend
             # has always documented ("indicator sets overlap but differ").
-            near = [
-                v for v in views if all(v[s] == c[s] for s in EXTRA_SLOTS) and (v["y"] & c["y"]) and v["y"] != c["y"]
-            ]
+            near = [v for v in views if effective(v) == c_eff and (v["y"] & c["y"]) and v["y"] != c["y"]]
             near.sort(key=lambda v: (-len(v["y"] & c["y"]), len(v["y"] ^ c["y"])))
             if near:
                 c["quality"], c["near_misses"] = "near_miss", near[:3]
+
+        # A match made across a decoration difference is still a match, but the reviewer
+        # should see that the two sides did not agree literally.
+        if c["target"] is not None:
+            diffs = [
+                f"{s}: chart {slot_label(c[s])} vs view {slot_label(c['target'][s])}"
+                for s in EXTRA_SLOTS
+                if c[s] != c["target"][s]
+            ]
+            if diffs:
+                c["note"] = "decoration difference ignored — " + "; ".join(diffs)
 
 
 def describe_near_miss(c: dict, id_to_path: dict[int, str]) -> str:

@@ -114,8 +114,22 @@ charts that means one file per chart, in `payloads/`. The combined
 `audit_references.py` read — don't hand that one over as a copy-paste payload.
 
 **Matching**: a chart matches a view when the y-variable-ID sets are equal AND
-x/size/color agree (absent == absent). Several matching views → tiebreak on chart
-type; still ambiguous → reported, never guessed. **Any** partial indicator overlap
+x/size/color agree (absent == absent) — after **decoration indicators** are
+stripped from x/size/color on both sides: population as Marimekko width / bubble
+size, and `regions#owid_region` as continent coloring (matched by catalogPath, so
+version bumps don't matter). Charts and views carry these inconsistently without
+changing what data is plotted — an MDIM view adds `x=population` for its Marimekko
+tab, an editor adds continent colors to a line chart — and requiring them to agree
+literally drops same-y pairs into `none` with no report at all (equal y sets means
+they aren't even a near miss). A match made across such a difference says so in
+the proposal's `note` column. Content indicators (a scatter's GDP-per-capita x, a
+"political regime" coloring) are never stripped. Two guardrails keep the rule from
+overreaching: a **scatter's x slot is never stripped** — on a `ScatterPlot`,
+`x=population` is the plotted relationship, not decoration (size/color there still
+are) — and the population pattern is **end-anchored** to the raw head-count columns
+(`#population`, `#population_historical`, `#population_projection`), because the
+same dataset also carries population *density* columns that are content. Several matching views → tiebreak
+on chart type; still ambiguous → reported, never guessed. **Any** partial indicator overlap
 that is not an exact match → `near_miss`, reported only — not just subset/superset:
 a chart plotting `{A, B}` against a view plotting `{A, C}` shares `A`, so calling
 it `none` would assert an overlap check that came out the other way. Quality labels:
@@ -451,3 +465,20 @@ them:
 After a real run, fold anything the matcher or these docs got wrong back into
 this SKILL.md (and check whether the sibling `map-explorer-to-mdim` /
 `review-explorer-mdim-mapping` skills need the same fix).
+
+- **Same-y charts vanishing into `none` is the matcher's blind spot** — when a
+  reviewer reports a "clear equivalent" the run missed, diff the two sides'
+  x/size/color slots first (charts.csv vs multidim_views.csv): the y sets being
+  equal means the miss can only be a slot disagreement, and if it's a decoration
+  indicator the fix belongs in `DECORATION_PATTERN`, not in `overrides.csv`.
+  (2026-08: population + owid_region cost 5 of 19 Economic Inequality matches.)
+- **Preflight's embed gate must classify exactly like `find-chart-references`.**
+  It re-implements the embed count in SQL for read-only use, so any component
+  the sweep exempts (e.g. `all-charts` — a topic page's auto-generated index
+  where a retired chart just drops out) must be exempted there too, or preflight
+  blocks on a reference the audit rightly never lists.
+- **Re-runs that add targets invalidate those rows' review decisions** — the
+  review HTML fingerprints each decision on (target, both config md5s), so a row
+  that gains or changes a target gets its saved approval/note pruned on next
+  load. Before re-running the extractor mid-review, have the reviewer export
+  (⬇ JSON); unchanged rows re-import cleanly.
