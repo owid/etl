@@ -68,6 +68,43 @@ def short_name_of(catalog_path: str) -> str:
     return catalog_path.split("#", 1)[1] if "#" in catalog_path else catalog_path.rstrip("/").split("/")[-1]
 
 
+def unique_short_names(catalog_paths: list[str]) -> list[str]:
+    """One short name per MDIM, disambiguated when two paths would derive the same one.
+
+    That name is load-bearing well beyond a filename: it names `multidim_<short>_views.csv`, it
+    keys every per-MDIM dict in `build_mapping.py` (catalogPath, slug, view metadata, the view
+    lookup table), and it is what `mapping_rules.py` returns from `route()`. So two MDIMs
+    deriving the same name would overwrite one another's views and silently send every rule that
+    named it to whichever MDIM was extracted last — a wrong target that validates cleanly all
+    the way through preflight, because every artifact agrees on it.
+
+    Collisions are easy to hit: `.../pip/gini#gini` and `.../wid/gini#gini` both reduce to
+    `gini`. A colliding name is qualified with its catalogPath's namespace, which is what
+    distinguishes them in practice and stays readable in `route()`. A name that does not collide
+    is returned untouched, so existing runs are completely unaffected.
+    """
+    base = [short_name_of(cp) for cp in catalog_paths]
+    out: list[str] = []
+    for cp, short in zip(catalog_paths, base):
+        if base.count(short) == 1:
+            out.append(short)
+            continue
+        parts = cp.split("#", 1)[0].strip("/").split("/")
+        namespace = parts[1] if len(parts) > 1 else parts[0]
+        out.append(f"{namespace}_{short}")
+    # Qualifying can still collide (same namespace and table, different version). Fail loudly
+    # rather than overwrite, since there is no further qualifier that would stay readable.
+    if len(set(out)) != len(out):
+        clashing = sorted({s for s in out if out.count(s) > 1})
+        raise SystemExit(
+            f"Two --mdim paths still derive the same short name after qualifying by namespace: {clashing}.\n  "
+            + "\n  ".join(f"{s} <- {cp}" for s, cp in zip(out, catalog_paths) if s in clashing)
+            + "\nEvery artifact and every mapping rule keys on that name, so one MDIM's views would "
+            "overwrite the other's. Map these MDIMs in separate runs."
+        )
+    return out
+
+
 def get_mdim_views(catalog_path: str):
     """Return (mdim_id, slug, published, dim_slugs, rows, view_configs, default_view) for an MDIM.
 
@@ -323,9 +360,11 @@ def main():
 
     # MDIMs
     mdims = []
-    for i, cp in enumerate(args.mdim):
+    # Resolved up front, and for all paths together, because disambiguation is only possible with
+    # every path in view — and because nothing should be written until the names are known unique.
+    shorts = unique_short_names(list(args.mdim))
+    for i, (cp, short) in enumerate(zip(args.mdim, shorts)):
         prefix = chr(ord("A") + i)
-        short = short_name_of(cp)
         mdim_id, mdim_slug, published, dim_slugs, rows, view_configs, default = get_mdim_views(cp)
         p = write_mdim_csv(out, short, prefix, dim_slugs, rows)
         print(f"{prefix} {short}: {len(rows)} views, dims={dim_slugs} -> {p.name}")

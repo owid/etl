@@ -486,7 +486,13 @@ def reference_gate(out: Path, slugs: list[str]) -> tuple[str, str]:
     else:
         audited = {r["explorer"] for r in rows}  # pre-manifest run: best effort
     unaudited = sorted(set(slugs) - audited)
-    breaks = [r for r in rows if r["severity"] == "RED" and r["surface"] != "site redirect"]
+    # Restricted to the explorers being preflighted, as the coverage check above already is.
+    # A combined audit covers several explorers, so counting every RED row would fail a ready
+    # payload over an embed belonging to one that is not in this run — and re-running the same
+    # combined audit could never clear it.
+    breaks = [
+        r for r in rows if r["severity"] == "RED" and r["surface"] != "site redirect" and r["explorer"] in set(slugs)
+    ]
     if unaudited:
         return BLOCKER, f"the audit did not cover {unaudited} — re-run audit_references.py for every explorer"
     if breaks:
