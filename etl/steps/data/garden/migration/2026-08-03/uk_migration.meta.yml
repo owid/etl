@@ -51,6 +51,7 @@ definitions:
     We chose 2012 as the junction because it is the first year covered by the administrative estimates, which the Office for National Statistics considers more accurate than the survey-based method used at the end of the Bank of England dataset. That dataset continues to 2016 using the older survey-based estimates; we discarded those years in favor of the administrative figures.
 
 dataset:
+  title: Long-run migration flows for the United Kingdom
   update_period_days: 365
   owners:
     - Edouard Mathieu
