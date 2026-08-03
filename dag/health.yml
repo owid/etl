@@ -139,15 +139,6 @@ steps:
         - data://meadow/cardiovascular_diseases/2023-10-10/esc:
             - snapshot://cardiovascular_diseases/2023-10-10/esc.csv
 
-  # WHO Medical Devices Atlas
-  data://grapher/who/2023-10-13/medical_devices_atlas:
-    - data://garden/who/2023-10-13/medical_devices_atlas:
-        - data://meadow/who/2023-10-13/medical_devices_atlas:
-            - snapshot://who/2023-10-13/medical_devices_atlas_mri.csv
-            - snapshot://who/2023-10-13/medical_devices_atlas_ct.csv
-            - snapshot://who/2023-10-13/medical_devices_atlas_pet.csv
-            - snapshot://who/2023-10-13/medical_devices_atlas_gc_nm.csv
-
   # WHO Cardiovascular diseases deaths
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
