@@ -11,7 +11,7 @@ definitions:
   uk_sources: |-
     Our World in Data maintains this long-run series on British migration by combining five sources. The Bank of England joined the first four into a continuous series in its research dataset "A millennium of macroeconomic data". We added the fifth from the Office for National Statistics.
 
-    - **1853–1963 — ship passenger counts.** Passengers traveling by ship between the United Kingdom and ports outside Europe and the Mediterranean.
+    - **1850s–1963 — ship passenger counts.** Passengers traveling by ship between the United Kingdom and ports outside Europe and the Mediterranean.
       - The UK Passenger Acts required ship captains to file lists of their passengers, and officials counted everyone on board, whatever their nationality and whatever the reason for their journey — tourists and business travelers as well as migrants.
       - These statistics miss people moving to or from other European countries, and anyone traveling by air.
       - Early records of arrivals are less complete than records of departures, and the Bank of England filled a few missing years of arrivals (1856, 1857, 1862, and 1868) by carrying over or averaging neighboring years.
