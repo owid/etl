@@ -51,9 +51,7 @@ payload has them removed.
 
 **Review the matches before applying.** `/review-explorer-mdim-mapping` builds an HTML page
 showing each explorer view beside the MDIM view it would redirect to, with approve/flag
-controls; decisions persist in the browser and export to JSON. Correct a wrong match by
-editing `mapping_rules.py` and re-running the build — the HTML is a review surface, not an
-editor.
+controls; decisions persist in the browser and export to JSON. You can let Claude know about this corrections in the matches.
 
 ### 3. Clear site redirects involving the explorer
 
@@ -61,10 +59,18 @@ A `/explorers/<slug>` that is already a site redirect's **source**, or its **tar
 the bulk endpoint reject the redirect — and it caches per-source checks, so one row fails
 *every* entry for that explorer. Fix at `/admin/site-redirects`:
 
-- **source** `/explorers/<slug>` → delete the row.
-- **target** `/explorers/<slug>` → **repoint**, don't delete: many are real URLs and
-  deleting one creates a 404. Delete then re-create with the MDIM as target. Only a vanity
-  path nothing links to should just go.
+- **source** `/explorers/<slug>` → delete the row. The explorer URL is being redirected to
+  the MDIM instead, and a site redirect on the same path would win anyway.
+- **target** `/explorers/<slug>` → **repoint it rather than deleting it.** Delete the row,
+  then re-create it with the MDIM URL as the target.
+
+  The reason to repoint: that row's *source* is usually a URL readers still follow — an old
+  chart slug, or a renamed explorer. Deleting it without re-creating turns that URL into a
+  404. `references.md` gives you the MDIM URL to use for each one.
+
+  Deleting outright is fine only when nothing links to the source. The live example is
+  `/poverty-explorer-launch`, a one-off announcement URL from when the explorer shipped:
+  nothing points at it, so it can simply go.
 
 Either action re-bakes automatically.
 
