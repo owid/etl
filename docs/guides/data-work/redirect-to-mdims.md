@@ -15,12 +15,11 @@ is the order of operations.
 
 ## First: the MDIM has to be ready
 
-Publish it, and **add the MDIM views you want as featured metrics by hand**. Nothing
-propagates them — a topic page's *All charts* block is built from charts only, so it cannot
-list an MDIM, and an explorer's featured position disappears with the explorer.
+Publish it, and **add the MDIM views you want as featured metrics by hand**. Nothing propagates charts and explorers here.
 
-An unpublished MDIM is refused as a redirect target, and even if a row existed the baker
-filters on publication, so the redirect would serve nothing.
+Note that a topic page's *All charts* won't show a redirected MDim, because the block is built from charts only. Have that in mind if you are redirecting charts touching multiple topic pages.
+
+An unpublished MDIM is refused as a redirect target, and even if a row existed the baker filters on publication, so the redirect would serve nothing.
 
 ## Explorers
 
@@ -29,17 +28,26 @@ Steps 1–3 are reversible; step 4 is not.
 ### 1. Replace the references in articles
 
 Anything that **embeds** an explorer breaks the moment the redirect exists — the embed
-renders by fetching the explorer page and parsing it, so a 302 leaves it blank. Prose links
-survive on the 302 but should be updated anyway.
+renders by fetching the explorer page and parsing it, so a redirect leaves it blank. Prose links
+survive on the redirect but should be updated anyway.
 
-`/map-explorer-to-mdim` lists every reference with its replacement URL and the view it will
-land on. Do the edits now.
+`/map-explorer-to-mdim` lists every reference with its replacement URL and where to edit in the Google Doc.
 
 ### 2. Run `/map-explorer-to-mdim`
 
-You write the routing rules; it emits **one `admin_bulk_payload.json` per explorer**. Post
-that file, not `mapping.json` — the payload has empty-valued source dimensions stripped, and
-keeping them routes those views to the catch-all instead of their targets.
+The skill reads the explorer's views and the target MDIM's views, then asks you to write the
+routing rules: which explorer view corresponds to which MDIM view. That is the only manual
+part, and it is per explorer.
+
+It then writes two JSON files per explorer, and only one of them is for posting:
+
+- **`admin_bulk_payload.json`** — this is the file you paste in step 4.
+- `mapping.json` — the record of the mapping, useful for reference and diffing.
+
+Posting `mapping.json` by mistake is not obvious, so it is worth knowing why: it keeps the
+blank dimension values that a view leaves unset, and a blank never matches a real URL. Those
+views would quietly land on the MDIM's default view instead of the one you mapped them to. The
+payload has them removed.
 
 **Review the matches before applying.** `/review-explorer-mdim-mapping` builds an HTML page
 showing each explorer view beside the MDIM view it would redirect to, with approve/flag

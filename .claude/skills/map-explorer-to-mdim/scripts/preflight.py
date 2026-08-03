@@ -183,6 +183,48 @@ def target_is_redirect_source(mdim_slugs: set[str]) -> set[str]:
     return taken | set(df["slug"])
 
 
+def compare_applied(rules, applied: list[dict], targets: dict[str, dict], admin: str) -> tuple[str, str]:
+    """(status, message) comparing the redirects already in the DB with the payload.
+
+    Called for BOTH a live and an already-retired explorer. Presence of *some* rows is not
+    completion: a partial or wrong bulk run leaves a subset behind — often just the catch-all —
+    and if the explorer has since been deleted there is nothing else left to notice it. So the
+    conditions AND their targets are compared before anything is called done.
+    """
+
+    # A catch-all row stores sourceQueryParams as SQL NULL, so this cannot assume a JSON
+    # string — json.loads(None) raises, and every explorer that already has a catch-all
+    # applied would crash here rather than being compared.
+    def condition_of(row: dict) -> tuple:
+        raw = row["sourceQueryParams"]
+        params = json.loads(raw) if isinstance(raw, str) else (raw or {})
+        return tuple(sorted((params or {}).items()))
+
+    have = {condition_of(r): (r["multiDimId"], r["viewConfigId"]) for r in applied}
+    want = {tuple(sorted(r.condition.items())): expected_row(r, targets) for r in rules}
+    if set(have) != set(want):
+        missing, extra = len(set(want) - set(have)), len(set(have) - set(want))
+        return (
+            BLOCKER,
+            f"{len(applied)} redirect(s) exist but the set differs from the payload ({missing} missing, "
+            f"{extra} unexpected) — a partial or superseded run. There is NO bulk delete: remove the "
+            f"unexpected rows one at a time at {admin}/multi-dim-redirects, then apply the payload.",
+        )
+    retargeted = {c for c in want if have[c] != want[c]}
+    if retargeted:
+        return (
+            BLOCKER,
+            f"all {len(want)} source condition(s) exist but {len(retargeted)} point at a DIFFERENT target than "
+            f"the payload. Remove those rows at {admin}/multi-dim-redirects before re-applying — the endpoint "
+            "would reject them as duplicate sources.",
+        )
+    return (
+        OK,
+        f"DONE — all {len(want)} redirect(s) already applied and pointing at the payload's targets. Do not "
+        "paste it again; the endpoint rejects duplicate source conditions.",
+    )
+
+
 def reference_gate(out: Path, slugs: list[str]) -> tuple[str, str]:
     """(status, message) from the audit's own report — the surfaces the redirect breaks.
 
@@ -254,14 +296,19 @@ def main() -> int:
 
         if row is None:
             if applied:
-                done.add(slug)
-                findings.append(
-                    (
-                        OK,
-                        slug,
-                        f"DONE — explorer retired and {len(applied)} redirect(s) already live. Nothing to apply.",
+                status, message = compare_applied(rules, applied, targets, admin)
+                if status == OK:
+                    done.add(slug)
+                    findings.append((OK, slug, f"DONE — explorer retired; {message.removeprefix('DONE — ')}"))
+                else:
+                    findings.append(
+                        (
+                            status,
+                            slug,
+                            f"explorer is already retired, but its redirects are INCOMPLETE: {message} "
+                            "(the explorer row is gone, so nothing else would surface this)",
+                        )
                     )
-                )
                 continue
             findings.append(
                 (BLOCKER, slug, "explorer is not in the `explorers` table and has no redirects — wrong slug?")
@@ -364,8 +411,13 @@ def main() -> int:
                 continue  # already reported above
             if rule.mdim_slug and rule.mdim_slug != t["slug"]:
                 reslugged.append((rule.mdim_slug, t["slug"]))
-            if rule.target_dims and tuple(sorted(rule.target_dims.items())) not in t["views"]:
-                missing_views.append((rule.source_view_id, rule.view_id, rule.target_dims))
+            # Resolve through expected_row rather than testing signature membership: a view can
+            # be present but carry no `fullConfigId`, in which case it cannot be stored as a
+            # viewConfigId at all — the chart-side extractor drops such views from its target
+            # pool for the same reason. Membership alone would let that reach `Ready`.
+            if rule.target_dims and expected_row(rule, targets)[1] is None:
+                unstorable = tuple(sorted(rule.target_dims.items())) in t["views"]
+                missing_views.append((rule.source_view_id, rule.view_id, rule.target_dims, unstorable))
         for was, now in sorted(set(reslugged)):
             findings.append(
                 (
@@ -376,13 +428,20 @@ def main() -> int:
                 )
             )
         if missing_views:
-            sample = "; ".join(f"view {sid} ({vid}) -> {dims}" for sid, vid, dims in missing_views[:3])
+            sample = "; ".join(f"view {sid} ({vid}) -> {dims}" for sid, vid, dims, _ in missing_views[:3])
+            no_config = sum(1 for *_, unstorable in missing_views if unstorable)
+            detail = (
+                f" {no_config} of them still exist but carry no fullConfigId, so they cannot be stored as a "
+                "redirect target at all."
+                if no_config
+                else ""
+            )
             findings.append(
                 (
                     BLOCKER,
                     slug,
-                    f"{len(missing_views)} target view(s) no longer exist in the live MDIM config — the MDIM was "
-                    f"rebuilt or re-sliced since extraction. e.g. {sample}. Re-extract, re-review, rebuild.",
+                    f"{len(missing_views)} target view(s) are not usable in the live MDIM config — rebuilt or "
+                    f"re-sliced since extraction.{detail} e.g. {sample}. Re-extract, re-review, rebuild.",
                 )
             )
 
@@ -397,47 +456,10 @@ def main() -> int:
             )
 
         if applied:
-            have = {
-                tuple(sorted((json.loads(r["sourceQueryParams"]) or {}).items())): (r["multiDimId"], r["viewConfigId"])
-                for r in applied
-            }
-            want = {tuple(sorted(r.condition.items())): expected_row(r, targets) for r in rules}
-            if set(have) != set(want):
-                findings.append(
-                    (
-                        BLOCKER,
-                        slug,
-                        f"{len(applied)} redirect(s) already exist for this explorer and differ from the payload "
-                        f"({len(set(want) - set(have))} to add, {len(set(have) - set(want))} unexpected). There is "
-                        f"NO bulk delete: remove them one at a time at {admin}/multi-dim-redirects before "
-                        "re-applying.",
-                    )
-                )
-            else:
-                # Every condition is present. Whether that is DONE or a conflict depends on the
-                # TARGETS: re-posting an identical payload is rejected as duplicate sources, and
-                # a set pointing somewhere else must never read as ready.
-                retargeted = {c for c in want if have[c] != want[c]}
-                if retargeted:
-                    findings.append(
-                        (
-                            BLOCKER,
-                            slug,
-                            f"all {len(want)} source condition(s) already exist but {len(retargeted)} point at a "
-                            f"DIFFERENT target than the payload. Remove those rows at {admin}/multi-dim-redirects "
-                            "before re-applying — the endpoint would reject them as duplicate sources.",
-                        )
-                    )
-                else:
-                    done.add(slug)
-                    findings.append(
-                        (
-                            OK,
-                            slug,
-                            f"DONE — all {len(want)} redirect(s) already applied and pointing at the payload's "
-                            "targets. Do not paste it again; the endpoint rejects duplicate source conditions.",
-                        )
-                    )
+            status, message = compare_applied(rules, applied, targets, admin)
+            if status == OK:
+                done.add(slug)
+            findings.append((status, slug, message))
 
         n_skipped = sum(1 for e in run["payload"].get("redirects") or [] if not e.get("target"))
         if n_skipped:
