@@ -340,6 +340,29 @@ def narrative_overrides(findings: list[dict]) -> dict[str, dict]:
     return out
 
 
+def suggest_name(original: str, taken: set[str]) -> str:
+    """A free kebab-case name for a replacement narrative chart.
+
+    Only needed when a published page still holds the original name: `create` rejects an
+    existing name and there is no rename, so the name picked here is PERMANENT — it is not a
+    temporary staging name that can be tidied up after the old chart is deleted. Hence a
+    suffix that stays recognisable to whoever finds it in a doc (`-mdim`, the MDIM-parented
+    version) rather than a bare counter, with counters only as a fallback.
+
+    Every candidate is checked against the names already in use, so the suggestion cannot be
+    the one thing `create` refuses.
+    """
+    for candidate in (f"{original}-mdim", *(f"{original}-mdim-{n}" for n in range(2, 10))):
+        if candidate not in taken:
+            return candidate
+    return ""
+
+
+def taken_narrative_names() -> set[str]:
+    """Every narrative chart name in use — `create` rejects a duplicate."""
+    return set(OWID_ENV.read_sql("SELECT name FROM narrative_charts")["name"])
+
+
 def entity_names(codes: set[str]) -> dict[str, str]:
     """{entity code -> name}, so a `country=ZWE~MDG` param can be shown the way the editor's
     entity picker shows it. Unknown codes are simply left as-is by the caller."""
@@ -378,6 +401,10 @@ def narrative_section(
         "| Narrative chart | Target rendering | Set by hand after creating | Used in (what to repoint) | Steps |",
         "|---|---|---|---|---|",
     ]
+    # Names already in use, so a suggested replacement name is one `create` will accept. The
+    # names suggested in this run are added as they are handed out: two narrative charts on
+    # the same parent would otherwise both be told to use the same free name.
+    taken = taken_narrative_names()
     for f in group:
         name = f["where"]
         used_in = usages.get(name, [])
@@ -464,8 +491,18 @@ def narrative_section(
             "not carry over; compare against the original in the admin editor"
         )
         if published_uses:
+            # The name is permanent — there is no rename — so suggest one that survives, and
+            # one that `create` will actually accept.
+            suggestion = suggest_name(name, taken)
+            taken.add(suggestion)
+            name_hint = (
+                f", under a NEW name (`create` rejects an existing one) — suggested: **`{suggestion}`** "
+                "(checked: not in use)"
+                if suggestion
+                else ", under a NEW name (`create` rejects an existing one)"
+            )
             steps = (
-                f"1. **create**: {create_step}, under a NEW name (`create` rejects an existing one)"
+                f"1. **create**: {create_step}{name_hint}"
                 f"<br>2. {set_step}"
                 "<br>3. **repoint** the page(s) to the new name"
                 "<br>4. **delete** the old one — succeeds once no published page references it"
@@ -473,7 +510,7 @@ def narrative_section(
         else:
             steps = (
                 "1. **delete** the old one — nothing published references it, so this frees the name"
-                f"<br>2. **create**: {create_step}, reusing the SAME name"
+                f"<br>2. **create**: {create_step}, reusing the SAME name — **`{name}`**"
                 f"<br>3. {set_step}"
             )
         lines.append(f"| {chart_cell} | {render_cell} | {faust_cell} | {used_cell} | {steps} |")

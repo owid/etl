@@ -302,6 +302,16 @@ differences are asked for. `dimensions` and `$schema` are excluded from the patc
 on purpose: the new parent view supplies them, and re-applying the old ones would
 repoint the chart at the retired chart's indicators.
 
+**Suggest the replacement's name, and check it is free.** When a published page
+holds the original name the replacement needs a different one — and that name is
+**permanent**, since `create` rejects an existing name and there is no rename, so
+it is not a staging name to tidy up after the delete. The report suggests
+`<original>-mdim` (falling back to `-mdim-2`, `-mdim-3`, …), validated against
+every name in `narrative_charts` so the suggestion cannot be the one thing
+`create` refuses; suggestions handed out within a run are reserved as they go. In
+the delete-first case there is nothing to suggest — the row names the original,
+which the delete frees for reuse.
+
 **Admin routes need the admin origin.** A narrative chart's `where_path` is
 `/admin/narrative-charts/<id>/edit`, and the public site does not serve
 `/admin` — prefixing it with the site host yields a link that 404s. Both the
