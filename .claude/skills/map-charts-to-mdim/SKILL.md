@@ -251,19 +251,39 @@ verified in grapher), so entries drop out on their own at the next bake — and
 no replacement is possible either, because the block is built from `charts` ×
 `chart_tags` only and cannot list MDIMs; featuring the MDIM on a topic page is
 a separate gdoc-authoring change. **Narrative charts get their own table
-(before the All charts summary)**, one row per chart: the admin editor link, the
-parent chart, a **"replicate this rendering"** link — the target view carrying
-that narrative chart's own stored controls, since the admin create page accepts
-only `type` + `chartConfigId` and cannot preset them, so the row also names the
-params to set by hand — **the pages that actually embed it**, resolved by a
-second hop the sweep doesn't make (`posts_gdocs_links` on
-`linkType='narrative-chart'`, both `narrative-chart` and `key-insights`
-components), each with its doc link and the name to search for, and the ordered
-steps. Each row carries only the order that applies to it, on the rule above: a
-**published** page among the users makes create → repoint → delete mandatory;
-with none, the row emits the delete → create shortcut that reuses the same name
-(a draft reference then keeps resolving, since pages reference the name).
-**ℹ️** unpublished/draft pages close the report.
+(before the All charts summary)**, one row per chart: the admin editor link and
+parent chart; **"create from this view"** — the target view carrying that
+narrative chart's stored controls, which is both the rendering to match and the
+place to create from; **"text to re-apply"** (see below); **the pages that
+actually embed it**, resolved by a second hop the sweep doesn't make
+(`posts_gdocs_links` on `linkType='narrative-chart'`, both `narrative-chart` and
+`key-insights` components), each with its doc link and the name to search for;
+and the ordered steps. Each row carries only the order that applies to it, on
+the rule above: a **published** page among the users makes create → repoint →
+delete mandatory; with none, the row emits the delete → create shortcut that
+reuses the same name (a draft reference then keeps resolving, since pages
+reference the name). **ℹ️** unpublished/draft pages close the report.
+
+**Create from the view, not from a create link.** Tell the operator to open the
+target view and use the chart's own **"Create narrative chart"** admin control:
+the MDIM page builds that control's target from whichever view is on screen
+(`site/multiDim/MultiDim.tsx`), so the new chart is parented to the right view
+and inherits the controls set on it. A bare
+`/admin/narrative-charts/create?type=multiDim&chartConfigId=<viewConfigId>` link
+looks equivalent but opens a copy of the MDIM's **default** view — verified in
+practice — so never hand that out as the create step.
+
+**Re-apply the original's FAUST.** A narrative chart's `chart_configs.patch` is
+the delta its author typed on top of the parent, and text overrides in it
+(`title`, `subtitle`, `note`, `sourceDesc`, `hideAnnotationFieldsInTitle`) do
+**not** carry over to a replacement built from an MDIM view — the replacement
+would silently render the view's own wording instead of the text the article was
+written around. The report diffs each patch against the target view's config and
+lists only what genuinely differs, splitting FAUST text (retype verbatim) from
+view controls (entity selection, tab, time, timeline/map toggles). `dimensions`
+and `$schema` are excluded on purpose: the new parent view supplies them, and
+re-applying the old ones would repoint the chart at the retired chart's
+indicators.
 
 **Admin routes need the admin origin.** A narrative chart's `where_path` is
 `/admin/narrative-charts/<id>/edit`, and the public site does not serve

@@ -245,7 +245,72 @@ def narrative_chart_usages(names: set[str]) -> dict[str, list[dict]]:
     return usages
 
 
-def narrative_section(group: list[dict], usages: dict[str, list[dict]], host: str, admin: str) -> list[str]:
+# A narrative chart's authored patch, split by what a human has to redo in the new editor.
+# FAUST text is copied verbatim and is the easiest thing to lose: it does not come from the
+# parent, so a replacement built only from the view silently renders the VIEW's title and
+# subtitle instead of the ones the article was written around.
+FAUST_KEYS = ("title", "subtitle", "note", "sourceDesc", "hideAnnotationFieldsInTitle")
+# Controls: everything else worth reproducing. `dimensions` and `$schema` are excluded —
+# the new parent view supplies them, and re-applying the old ones would repoint the chart
+# at the source chart's indicators, undoing the migration.
+SKIP_OVERRIDE_KEYS = ("dimensions", "$schema", "id", "slug", "isPublished", "version")
+
+
+def narrative_overrides(findings: list[dict]) -> dict[str, dict]:
+    """{narrative chart id -> its authored overrides, minus what the target view already has}.
+
+    Read from `chart_configs.patch` (the authored delta), not `full`: the patch is exactly
+    what a human typed on top of the parent, which is exactly what has to be retyped on top
+    of the new one. Each override is compared against the TARGET view's config so the report
+    only asks for what actually differs — a title the view already carries needs no work.
+    """
+    ids = {str(f["narrative_id"]) for f in findings if f.get("narrative_id")}
+    view_ids = {f["target_view_config_id"] for f in findings if f.get("target_view_config_id")}
+    if not ids:
+        return {}
+    patches = OWID_ENV.read_sql(
+        "SELECT nc.id, cc.patch FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId "
+        "WHERE nc.id IN %(ids)s",
+        params={"ids": tuple(sorted(ids))},
+    )
+    views = (
+        OWID_ENV.read_sql(
+            "SELECT id, full FROM chart_configs WHERE id IN %(ids)s", params={"ids": tuple(sorted(view_ids))}
+        )
+        if view_ids
+        else None
+    )
+    view_cfg = {r["id"]: json.loads(r["full"] or "{}") for r in views.to_dict("records")} if views is not None else {}
+    by_narrative = {str(r["id"]): json.loads(r["patch"] or "{}") for r in patches.to_dict("records")}
+
+    out: dict[str, dict] = {}
+    for f in findings:
+        nid = str(f.get("narrative_id") or "")
+        patch = by_narrative.get(nid)
+        if patch is None:
+            continue
+        target = view_cfg.get(f.get("target_view_config_id"), {})
+        faust, controls = {}, {}
+        for key, value in patch.items():
+            if key in SKIP_OVERRIDE_KEYS or target.get(key) == value:
+                continue
+            (faust if key in FAUST_KEYS else controls)[key] = value
+        out[nid] = {"faust": faust, "controls": controls}
+    return out
+
+
+def render_override(value) -> str:
+    """Compact one-line rendering of an override value for a table cell."""
+    if isinstance(value, list):
+        return ", ".join(str(v) for v in value) or "(empty)"
+    if isinstance(value, dict):
+        return ", ".join(f"{k}={v}" for k, v in value.items())
+    return str(value)
+
+
+def narrative_section(
+    group: list[dict], usages: dict[str, list[dict]], overrides: dict[str, dict], host: str, admin: str
+) -> list[str]:
     """One block per narrative chart: what it is, where it is used, and the ordered steps.
 
     Which of the two orders applies is decided by whether a PUBLISHED page references it
@@ -254,26 +319,45 @@ def narrative_section(group: list[dict], usages: dict[str, list[dict]], host: st
     reference resolving untouched — exactly when nothing published holds it.
     """
     lines = [
-        "| Narrative chart | Parent chart | Replicate this rendering | Used in (what to repoint) | Steps |",
+        "| Narrative chart | Create from this view | Text to re-apply | Used in (what to repoint) | Steps |",
         "|---|---|---|---|---|",
     ]
     for f in group:
         name = f["where"]
         used_in = usages.get(name, [])
         published_uses = [u for u in used_in if u["published"]]
-        create = f"{admin}/narrative-charts/create?type=multiDim&chartConfigId={f['target_view_config_id']}"
+        ovr = overrides.get(str(f.get("narrative_id") or ""), {})
 
-        chart_cell = f"[`{cell(name, 40)}`]({admin}/narrative-charts/{f['narrative_id']}/edit)<br>_✎ admin editor_"
-        parent_cell = f"[`{cell(f['source_chart_slug'], 32)}`]({f['old_url']})"
-        # The create page takes only the parent view, so the reader has to reproduce the
-        # controls by hand — naming them beats making them diff two URLs.
-        params = f"<br>set: `{cell(f['stored_params'].replace('&', '`, `'), 90)}`" if f["stored_params"] else ""
+        chart_cell = (
+            f"[`{cell(name, 40)}`]({admin}/narrative-charts/{f['narrative_id']}/edit) _✎ admin editor_"
+            f"<br>parent: [`{cell(f['source_chart_slug'], 32)}`]({f['old_url']})"
+        )
+        # This link is the create entry point, not just a preview: the MDIM page's own
+        # "Create narrative chart" control builds its create path from whichever view is on
+        # screen (site/multiDim/MultiDim.tsx), so opening the target view with these params
+        # and using that control parents the new chart to the right view AND carries the
+        # controls over — which the standalone create?chartConfigId= deep link does not do.
+        params = f"<br>controls: `{cell(f['stored_params'].replace('&', '`, `'), 90)}`" if f["stored_params"] else ""
         collide = (
             f"<br>⚠️ `{f['param_collisions']}` overrides a view dimension — choose it deliberately"
             if f["param_collisions"]
             else ""
         )
-        render_cell = f"[open the target view]({f['replacement_url']}){params}{collide}"
+        controls_left = {k: v for k, v in (ovr.get("controls") or {}).items() if k not in ("tab",)}
+        extra_controls = (
+            "<br>also set: " + ", ".join(f"`{k}` = {render_override(v)}" for k, v in sorted(controls_left.items()))
+            if controls_left
+            else ""
+        )
+        render_cell = f"**[open the target view]({f['replacement_url']})**{params}{collide}{extra_controls}"
+
+        faust = ovr.get("faust") or {}
+        if faust:
+            faust_cell = "the original overrides these — the view will NOT supply them:<br>" + "<br>".join(
+                f"`{k}`: {cell(render_override(v), 110)}" for k, v in sorted(faust.items())
+            )
+        else:
+            faust_cell = "_no text overrides — it inherits FAUST from its parent, so the view's own text applies_"
 
         if used_in:
             uses = []
@@ -295,18 +379,25 @@ def narrative_section(group: list[dict], usages: dict[str, list[dict]], host: st
         else:
             used_cell = "_not referenced by any page_"
 
+        create_step = (
+            'open the target view, set its controls, then use the chart\'s **"Create narrative chart"** '
+            "admin control (visible when logged in) — it parents the new chart to the view on screen"
+        )
         if published_uses:
             steps = (
-                f"1. [**create**]({create}) under a NEW name (`create` rejects an existing one)"
-                "<br>2. **repoint** the page(s) to the new name"
-                "<br>3. **delete** the old one — succeeds once no published page references it"
+                f"1. **create**: {create_step}, under a NEW name (`create` rejects an existing one)"
+                "<br>2. **re-apply** the text overrides in the middle column, and check the title/subtitle/"
+                "footnote against the original"
+                "<br>3. **repoint** the page(s) to the new name"
+                "<br>4. **delete** the old one — succeeds once no published page references it"
             )
         else:
             steps = (
                 "1. **delete** the old one — nothing published references it, so this frees the name"
-                f"<br>2. [**create**]({create}) the replacement, reusing the SAME name"
+                f"<br>2. **create**: {create_step}, reusing the SAME name"
+                "<br>3. **re-apply** the text overrides in the middle column"
             )
-        lines.append(f"| {chart_cell} | {parent_cell} | {render_cell} | {used_cell} | {steps} |")
+        lines.append(f"| {chart_cell} | {render_cell} | {faust_cell} | {used_cell} | {steps} |")
     lines.append("")
     return lines
 
@@ -470,12 +561,29 @@ def write_markdown(
             "plan for each one: **recreate it manually from the target MDIM view**. There is no "
             "repointing API and no rename, and the API forces which order applies — the delete is "
             "refused while a **published** page references it, and `create` rejects a name that "
-            "already exists. So each block below carries the order that fits it: **create → repoint "
+            "already exists. So each row below carries the order that fits it: **create → repoint "
             "→ delete** when a published page holds it, and the shorter **delete → create under the "
             "same name** when none does (any draft reference then keeps resolving untouched).",
             "",
+            'Create the replacement from the target view itself, using the chart\'s **"Create narrative '
+            'chart"** admin control — the MDIM page builds that control\'s target from whichever view '
+            "is on screen, so the new chart is parented to the right view and inherits the controls "
+            "you set. Do **not** use a bare `/admin/narrative-charts/create?chartConfigId=…` link: it "
+            "opens a copy of the MDIM's default view instead of this one.",
+            "",
+            "Then re-apply the text overrides in the **Text to re-apply** column. FAUST (title, "
+            "subtitle, footnote) that the original authored on top of its parent does not come from "
+            "the new view — miss it and the replacement silently renders the view's own wording "
+            "instead of the text the article was written around.",
+            "",
         ]
-        lines += narrative_section(narrative, narrative_chart_usages({f["where"] for f in narrative}), host, admin)
+        lines += narrative_section(
+            narrative,
+            narrative_chart_usages({f["where"] for f in narrative}),
+            narrative_overrides(narrative),
+            host,
+            admin,
+        )
 
     if allcharts:
         by_page = defaultdict(list)
