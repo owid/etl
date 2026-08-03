@@ -180,9 +180,17 @@ def archie_component(ref: dict) -> str:
 
 
 def page_type(ref: dict) -> str:
-    """article / data-insight / topic-page / fragment — the parenthesized tail of context."""
+    """article / data insight / topic-page / fragment — the parenthesized tail of context.
+
+    The data-insight surface spells its front-matter reference out in prose with no
+    parenthesized suffix, so fall back to the surface name. Without that fallback those
+    rows lose the page-type marker exactly where it now matters most: articles and data
+    insights share one table, and the Where column is the only thing distinguishing them.
+    """
     m = re.search(r"\(([^)]+)\)", ref["context"].split(" — ")[0])
-    return m.group(1) if m else ""
+    if m:
+        return m.group(1)
+    return ref["surface"] if ref["surface"] == "data insight" else ""
 
 
 def find_in_doc(ref: dict) -> str:
@@ -296,24 +304,26 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
     # only published charts) and collapse to a per-page summary.
     allcharts = [f for f in findings if f["surface"] == "key chart"]
     drafts = [f for f in findings if f["severity"] == INFO and f["surface"] != "key chart"]
-    doc_edits = [f for f in findings if f["severity"] in (RED, YELLOW) and f["doc_edit_url"]]
-    narrative = [f for f in findings if f["severity"] in (RED, YELLOW) and f["surface"] == "narrative chart"]
-    other = [
-        f
-        for f in findings
-        if f["severity"] in (RED, YELLOW) and not f["doc_edit_url"] and f["surface"] != "narrative chart"
-    ]
-    embeds = [f for f in doc_edits if f["severity"] == RED]
-    links = [f for f in doc_edits if f["severity"] == YELLOW]
+    actionable = [f for f in findings if f["severity"] in (RED, YELLOW)]
+    doc_edits = [f for f in actionable if f["doc_edit_url"]]
+    narrative = [f for f in actionable if f["surface"] == "narrative chart"]
+    other = [f for f in actionable if not f["doc_edit_url"] and f["surface"] != "narrative chart"]
+    # Every RED finding blocks, wherever it lives: an explorer or static viz that embeds the
+    # chart has no Google Doc behind it, but it renders the chart's own config and breaks on
+    # unpublish exactly like an article embed does — and preflight gates on all of them.
+    # Scoping this to doc-backed rows would have the report announce "no embeds to migrate"
+    # while a blocking surface sat under Proposed being described as 301-covered.
+    embeds = [f for f in actionable if f["severity"] == RED]
+    links = [f for f in actionable if f["severity"] == YELLOW]
 
     lines = [
         "# What references the charts being redirected",
         "",
         f"{len(redirects)} chart(s) heading for unpublishing — proposed redirects, plus charts already "
         f"redirected whose source chart is still published. **{len(embeds)} embedded reference(s) break "
-        f"when the charts are unpublished** and must be migrated before the CLI runs; {len(links)} text "
-        "link(s) keep working via the 301 but belong in the same editing pass. Topic-page All charts "
-        "blocks update themselves — summarized below, no action needed.",
+        f"when the charts are unpublished** and must be migrated before the CLI runs (every 🔴 section "
+        f"below, doc-backed or not); {len(links)} link(s) keep working via the 301 but belong in the same "
+        "editing pass. Topic-page All charts blocks update themselves — summarized below, no action needed.",
         "",
         "Replacement URLs merge each reference's own query string over the MDIM view's dimensions, "
         "the same way grapher's redirect handler does.",
@@ -385,8 +395,12 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
             by_surface[SURFACE_LABELS.get(f["surface"], f["surface"])].append(f)
         lines += [f"## Other surfaces ({len(other)})", ""]
         for surface in sorted(by_surface):
-            lines += [f"### {surface} ({len(by_surface[surface])})", ""]
-            lines += bullet_list(by_surface[surface])
+            group = by_surface[surface]
+            # Same 🔴/🟡 marking as the doc sections: a RED row here blocks the CLI just as
+            # hard, so it must not read as a lower tier merely for lacking a doc link.
+            emoji = "🔴" if any(g["severity"] == RED for g in group) else "🟡"
+            lines += [f"### {emoji} {surface} ({len(group)})", ""]
+            lines += bullet_list(group)
             lines.append("")
 
     if drafts:
@@ -404,17 +418,19 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
     # closes by separating what someone must act on from what nobody has checked, rather
     # than leaving a reader to infer either from the sections above.
     handed_off = (
-        f"**Handed off** — {len(embeds)} embedded reference(s) in the 🔴 sections above. Each names the "
-        "doc that holds it and the replacement URL to put there; whoever owns that page has to make the "
-        "edit, because unpublishing the chart breaks it and the redirect does not cover it."
+        f"**Handed off** — {len(embeds)} embedded reference(s), in every 🔴 section above. Each names the "
+        "surface that holds it and the replacement URL to put there; whoever owns it has to make the edit, "
+        "because unpublishing the chart breaks it and the redirect does not cover it. `preflight.py` gates "
+        "on this same set."
         if embeds
         else "**Handed off** — nothing. No reference needs manual migration before the charts are unpublished."
     )
     proposed = (
-        f"**Proposed** — {len(links)} text link(s) in the 🟡 sections above"
-        + (f" and {len(other)} reference(s) under *Other surfaces*" if other else "")
-        + ". The 301 keeps them working, so updating each is a call someone still has to make, not a blocker."
-        if links or other
+        f"**Proposed** — {len(links)} link-kind reference(s) in the 🟡 sections above"
+        + (f", including {len(narrative)} narrative chart(s) to recreate" if narrative else "")
+        + ". The 301 keeps every one of them working, so acting on each is a call someone still has to "
+        "make, not a blocker."
+        if links
         else "**Proposed** — nothing. No link updates are pending a decision."
     )
     unverified = (
