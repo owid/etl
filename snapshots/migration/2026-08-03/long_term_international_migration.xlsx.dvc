@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Long-term international migration, provisional
+    description: |-
+      Estimates of long-term international immigration, emigration, and net migration for the United Kingdom, published by the Office for National Statistics. A long-term migrant is someone who changes their country of usual residence for at least 12 months.
+
+      The ONS builds these estimates mainly from administrative records — visa and border data from the Home Office, and National Insurance registrations — rather than surveys. They replaced the survey-based estimates as the official measure of UK migration, and cover rolling 12-month periods from the year ending June 2012 onward. The ONS classifies them as official statistics in development: recent periods are provisional and revised as more data becomes available.
+    date_published: "2026-05-21"
+    version_producer: year ending December 2025
+
+    # Citation
+    producer: UK Office for National Statistics
+    citation_full: |-
+      Office for National Statistics (2026). Long-term international migration, provisional: year ending December 2025. Released 21 May 2026.
+
+    # Files
+    url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/internationalmigration/datasets/longterminternationalimmigrationemigrationandnetmigrationflowsprovisional
+    url_download: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/populationandmigration/internationalmigration/datasets/longterminternationalimmigrationemigrationandnetmigrationflowsprovisional/yearendingdecember2025/may2026publicationspreadsheet.xlsx
+    date_accessed: "2026-08-03"
+
+    # License
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+outs:
+  - md5: 39ff4f419ae283234fec147d7de81668
+    size: 168193
+    path: long_term_international_migration.xlsx

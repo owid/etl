@@ -89,6 +89,14 @@ steps:
         - data://garden/demography/2024-07-15/population
 
 
+  # Long-run migration flows for the United Kingdom (Bank of England + ONS)
+  data://grapher/migration/2026-08-03/uk_migration:
+    - data://garden/migration/2026-08-03/uk_migration:
+      - data://meadow/migration/2026-08-03/uk_migration:
+        - snapshot://migration/2026-07-29/millennium_of_macroeconomic_data.xlsx
+        - snapshot://migration/2026-08-03/long_term_international_migration.xlsx
+      - data://garden/demography/2024-07-15/population
+
   # UN DESA migration flows S3 JSON export (2024)
   export://s3/un_migration/latest/migration_stock_flows_json:
     - data://garden/demography/2024-07-15/population
