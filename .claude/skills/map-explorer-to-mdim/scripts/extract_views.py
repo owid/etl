@@ -31,48 +31,23 @@ import argparse
 import csv
 import json
 import re
+import sys
 from pathlib import Path
 
 from sqlalchemy import text
 
 from etl.config import OWID_ENV
 
-WIDGET_SUFFIXES = ("Dropdown", "Radio", "Checkbox")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from redirect_rules import (  # noqa: E402
+    parse_explorer_views,
+    views_fingerprint,
+)
 
 
 def slugify(value: str) -> str:
     """Lowercase + underscores; only used to *suggest* value->slug matches."""
     return re.sub(r"_+", "_", re.sub(r"[^a-z0-9]+", "_", value.strip().lower())).strip("_")
-
-
-def dim_name(col: str) -> str:
-    """'Disaster Type Dropdown' -> 'Disaster Type'."""
-    parts = col.split(" ")
-    return " ".join(parts[:-1]) if parts and parts[-1] in WIDGET_SUFFIXES else col
-
-
-# ----- Explorer -----------------------------------------------------------------
-
-
-def parse_explorer_views(tsv: str):
-    """Return (dim_names, rows) from the graphers block of an explorer TSV."""
-    lines = tsv.split("\n")
-    try:
-        gi = next(i for i, ln in enumerate(lines) if ln.rstrip("\r") == "graphers")
-    except StopIteration:
-        raise SystemExit("No 'graphers' block found in explorer TSV.")
-
-    header = lines[gi + 1].split("\t")
-    dim_cols = [(j, dim_name(name)) for j, name in enumerate(header) if name.split(" ")[-1] in WIDGET_SUFFIXES]
-    dim_names = [name for _, name in dim_cols]
-
-    rows = []
-    for ln in lines[gi + 2 :]:
-        if not ln.startswith("\t"):  # blank line or next top-level key ends the block
-            break
-        fields = ln.split("\t")
-        rows.append([fields[j] if j < len(fields) else "" for j, _ in dim_cols])
-    return dim_names, rows
 
 
 def write_explorer_csv(out: Path, dim_names, rows) -> Path:
@@ -94,9 +69,15 @@ def short_name_of(catalog_path: str) -> str:
 
 
 def get_mdim_views(catalog_path: str):
-    """Return (dim_slugs, rows) for a published MDIM from multi_dim_data_pages.config."""
+    """Return (mdim_id, slug, published, dim_slugs, rows) for an MDIM.
+
+    The id/slug/published triple travels into `_sources.json` so the payload can carry
+    `mdimSlug` without a second DB round-trip, and so preflight can gate on publication:
+    the bulk endpoint refuses a redirect to an unpublished MDIM at create time, and the
+    baker filters on `published` again, so an unpublished target silently produces nothing.
+    """
     df = OWID_ENV.read_sql(
-        text("SELECT config FROM multi_dim_data_pages WHERE catalogPath = :cp"),
+        text("SELECT id, slug, published, config FROM multi_dim_data_pages WHERE catalogPath = :cp"),
         params={"cp": catalog_path},
     )
     if df.empty:
@@ -110,7 +91,7 @@ def get_mdim_views(catalog_path: str):
     used = set().union(*(v["dimensions"].keys() for v in views)) if views else set()
     dim_slugs = [s for s in order if s in used]  # config order, only dims that vary in views
     rows = [[v["dimensions"].get(s, "") for s in dim_slugs] for v in views]
-    return dim_slugs, rows
+    return int(df["id"].iloc[0]), df["slug"].iloc[0] or "", bool(df["published"].iloc[0]), dim_slugs, rows
 
 
 def write_mdim_csv(out: Path, short: str, prefix: str, dim_slugs, rows) -> Path:
@@ -204,18 +185,34 @@ def build_scaffold(out: Path, explorer_slug, dim_names, exp_rows, mdims) -> Path
     return path
 
 
-def write_sources_json(out: Path, explorer_slug, dim_names, mdims) -> Path:
+def write_sources_json(out: Path, explorer_slug, dim_names, exp_rows, mdims, is_published, config_md5) -> Path:
     """Persist the identifiers build_mapping.py needs to emit the redirect mapping.json.
 
-    mdims: list of dicts {short, prefix, catalog_path, dim_slugs, rows}.
+    mdims: list of dicts {short, prefix, catalog_path, mdim_id, slug, published, dim_slugs, rows}.
+
+    `viewsFingerprint` is the staleness signal an explorer view has never had — its id is
+    positional row order, so a re-saved TSV renumbers every id that `mapping_proposal.csv`,
+    the review HTML and `sourceViewId` key on, with nothing to detect it. `configMd5` is
+    kept only as a secondary signal: it flips on any FAUST edit, so gating on it would force
+    a needless re-review (see preflight's EDITED warning).
     """
     data = {
-        "explorer": {"slug": explorer_slug, "dimensions": dim_names},
+        "explorer": {
+            "slug": explorer_slug,
+            "dimensions": dim_names,
+            "isPublished": is_published,
+            "viewCount": len(exp_rows),
+            "viewsFingerprint": views_fingerprint(dim_names, exp_rows),
+            "configMd5": config_md5,
+        },
         "mdims": [
             {
                 "short": m["short"],
                 "prefix": m["prefix"],
                 "catalogPath": m["catalog_path"],
+                "multiDimId": m["mdim_id"],
+                "slug": m["slug"],
+                "published": m["published"],
                 "dimensions": m["dim_slugs"],
             }
             for m in mdims
@@ -258,24 +255,49 @@ def main():
     check_db_connection()
 
     # Explorer
-    df = OWID_ENV.read_sql(text("SELECT tsv FROM explorers WHERE slug = :slug"), params={"slug": args.explorer})
+    df = OWID_ENV.read_sql(
+        text("SELECT tsv, isPublished, configMd5 FROM explorers WHERE slug = :slug"),
+        params={"slug": args.explorer},
+    )
     if df.empty:
         raise SystemExit(f"Explorer not found: {args.explorer!r}")
+    is_published = bool(df["isPublished"].iloc[0])
+    config_md5 = df["configMd5"].iloc[0] or ""
     dim_names, exp_rows = parse_explorer_views(df["tsv"].iloc[0])
     p = write_explorer_csv(out, dim_names, exp_rows)
     print(f"explorer: {len(exp_rows)} views, dims={dim_names} -> {p.name}")
+    print(f"  fingerprint {views_fingerprint(dim_names, exp_rows)} | isPublished={is_published}")
 
     # MDIMs
     mdims = []
     for i, cp in enumerate(args.mdim):
         prefix = chr(ord("A") + i)
         short = short_name_of(cp)
-        dim_slugs, rows = get_mdim_views(cp)
+        mdim_id, mdim_slug, published, dim_slugs, rows = get_mdim_views(cp)
         p = write_mdim_csv(out, short, prefix, dim_slugs, rows)
         print(f"{prefix} {short}: {len(rows)} views, dims={dim_slugs} -> {p.name}")
-        mdims.append({"short": short, "prefix": prefix, "catalog_path": cp, "dim_slugs": dim_slugs, "rows": rows})
+        if not published:
+            # Early signal only — preflight is the gate. Worth saying here because every
+            # later step looks healthy while the redirect would produce nothing at all.
+            print(
+                f"  WARNING: {cp} is NOT published. The bulk endpoint refuses a redirect to an "
+                "unpublished MDIM, and the baker filters on published again — so this target "
+                "would silently serve no redirect. Publish it before applying."
+            )
+        mdims.append(
+            {
+                "short": short,
+                "prefix": prefix,
+                "catalog_path": cp,
+                "mdim_id": mdim_id,
+                "slug": mdim_slug,
+                "published": published,
+                "dim_slugs": dim_slugs,
+                "rows": rows,
+            }
+        )
 
-    p = write_sources_json(out, args.explorer, dim_names, mdims)
+    p = write_sources_json(out, args.explorer, dim_names, exp_rows, mdims, is_published, config_md5)
     print(f"sources -> {p.name}")
 
     p = build_scaffold(out, args.explorer, dim_names, exp_rows, mdims)
