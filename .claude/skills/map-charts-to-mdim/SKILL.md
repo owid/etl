@@ -247,9 +247,13 @@ charts", "Text links", "Front-matter chart URLs") rather than raw ArchieML
 tokens (those live in the CSV's `component` column). **Topic-page All charts
 entries collapse to a per-page summary and need NO action**: the block lists
 only published charts (`GdocPost.loadRelatedCharts` filters on `isPublished` —
-verified in grapher), so entries drop out on their own at the next bake; tag
-the MDIM with the topic only to provide a replacement entry. **ℹ️**
-unpublished/draft pages close the report.
+verified in grapher), so entries drop out on their own at the next bake — and
+no replacement is possible either, because the block is built from `charts` ×
+`chart_tags` only and cannot list MDIMs; featuring the MDIM on a topic page is
+a separate gdoc-authoring change. **Narrative charts get their own section
+(before the All charts summary)** with the explicit recreate → repoint → delete
+steps and the deep-linked admin create URL. **ℹ️** unpublished/draft pages
+close the report.
 
 Pure SQL, so read-only credentials are enough. It sweeps both the current slug
 and every old slug that reaches the chart — references written before a rename

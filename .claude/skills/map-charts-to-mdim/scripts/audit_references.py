@@ -83,14 +83,14 @@ COMPONENT_ORDER = ("chart", "front-matter", "span-link")
 
 FIXES = {
     "explorer": "repoint the explorer at the MDIM indicators, or retire the explorer",
-    "narrative chart": "replace it: create a new one from the MDIM view (parentChartConfigId = "
-    "that view's config_id), move the article references, then delete the old — see SKILL.md",
     "static viz": "regenerate the static visualization against the MDIM view",
-    # No action: the All charts block lists only published charts (GdocPost.loadRelatedCharts
-    # filters on isPublished), so entries drop out at the next bake — nothing breaks or goes
-    # stale. Tagging the MDIM is optional curation, not repair.
-    "key chart": "no action needed — the entry drops out of the All charts block automatically; "
-    "tag the MDIM with the topic only if you want a replacement entry",
+    # No action possible or needed: the All charts block lists only published charts
+    # (GdocPost.loadRelatedCharts filters on isPublished), so entries drop out at the next
+    # bake — and the block is built from charts × chart_tags only, so an MDIM cannot be
+    # tagged into it as a replacement. Featuring the MDIM on the topic page is a separate
+    # gdoc-authoring change, not part of this migration.
+    "key chart": "no action — the entry drops out of the All charts block automatically, and the "
+    "block cannot list MDIMs (it is built from charts only), so there is no replacement to add",
 }
 # Gdoc-backed references: the fix depends on the ArchieML component being edited (and for
 # chart blocks, on whether the block embeds the chart or merely stores its URL).
@@ -102,13 +102,6 @@ COMPONENT_FIXES = {
     ("front-matter", "link"): "update the grapher-url in the front matter",
 }
 LINK_FIX = "update the href"
-# Link-kind references whose href is generated rather than authored — there is nothing to
-# hand-edit, so the generic "update the href" would send the operator looking for a field
-# that doesn't exist.
-GENERATED_LINK_FIXES = {
-    "narrative chart": 'nothing to edit — the generated "Explore the data" link follows the redirect; '
-    "check the param collisions column",
-}
 
 
 def load_redirects(path_arg: str) -> list[dict]:
@@ -304,7 +297,12 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
     allcharts = [f for f in findings if f["surface"] == "key chart"]
     drafts = [f for f in findings if f["severity"] == INFO and f["surface"] != "key chart"]
     doc_edits = [f for f in findings if f["severity"] in (RED, YELLOW) and f["doc_edit_url"]]
-    other = [f for f in findings if f["severity"] in (RED, YELLOW) and not f["doc_edit_url"]]
+    narrative = [f for f in findings if f["severity"] in (RED, YELLOW) and f["surface"] == "narrative chart"]
+    other = [
+        f
+        for f in findings
+        if f["severity"] in (RED, YELLOW) and not f["doc_edit_url"] and f["surface"] != "narrative chart"
+    ]
     embeds = [f for f in doc_edits if f["severity"] == RED]
     links = [f for f in doc_edits if f["severity"] == YELLOW]
 
@@ -342,6 +340,25 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
             lines += gdoc_table(group)
             lines.append("")
 
+    if narrative:
+        lines += [
+            f"## 🎨 Narrative charts ({len(narrative)})",
+            "",
+            "A narrative chart renders its own saved config, so nothing breaks when its parent chart "
+            'is unpublished — only its generated "Explore the data" link follows the redirect. The '
+            "plan for each one: **recreate it manually from the target MDIM view and point the "
+            "referencing article(s) back at the new one**, in this order —",
+            "",
+            "1. **Create** the replacement parented to the MDIM view (each item below carries the "
+            "ready-made admin create link — it opens the editor already parented to the right view).",
+            "2. **Repoint** the article(s) that reference the old narrative chart to the new name.",
+            "3. **Delete** the old narrative chart. The delete is refused while a published post "
+            "still references it, which is why it comes last.",
+            "",
+        ]
+        lines += bullet_list(narrative)
+        lines.append("")
+
     if allcharts:
         by_page = defaultdict(list)
         for f in allcharts:
@@ -351,7 +368,9 @@ def write_markdown(out: Path, findings: list[dict], redirects: list[dict], host:
             "",
             "These blocks list only published charts (grapher's `GdocPost.loadRelatedCharts` filters "
             "on `isPublished`), so the entries drop out on their own at the next bake — nothing breaks "
-            "or goes stale. Tag the MDIMs with these topics only if you want replacement entries.",
+            "or goes stale. There is also **no replacement to add**: the block is built from "
+            "`charts` × `chart_tags` only, so an MDIM cannot appear in it. If a topic page should "
+            "feature the MDIM, that is a separate gdoc-authoring change, not part of this migration.",
             "",
             "| Topic page | Charts affected |",
             "|---|---|",
@@ -469,18 +488,27 @@ def main() -> int:
             severity = INFO
         is_gdoc = ref["surface"] in GDOC_SURFACES and ref.get("surface_id")
         component = archie_component(ref) if is_gdoc else ""
-        if is_gdoc:
+        if ref["surface"] == "narrative chart":
+            # The intended end-state is a manual replacement pointed back at by the same
+            # articles, not a repoint of the old one (the parent columns are INSERT-only —
+            # see SKILL.md). Nothing breaks meanwhile: the chart renders its own saved
+            # config, and only its generated "Explore the data" link follows the redirect.
+            # The admin's create page is deep-linkable to the target view, so hand over the
+            # ready-made URL rather than an id to look up.
+            fix = (
+                "recreate it manually and point references back at the new one: "
+                f"(1) create the replacement parented to the target MDIM view — {admin}/narrative-charts/create?type=multiDim&chartConfigId={r['target']['viewConfigId']} ; "
+                "(2) update the article(s) that reference it to the new name; "
+                "(3) delete the old one — the delete is refused while a published post still "
+                "references it, which is why the order matters (see SKILL.md)"
+            )
+        elif is_gdoc:
             fallback = LINK_FIX if ref["kind"] == "link" else "migrate this reference by hand"
             fix = COMPONENT_FIXES.get((component, ref["kind"]), fallback)
         elif ref["kind"] == "link":
-            fix = GENERATED_LINK_FIXES.get(ref["surface"], LINK_FIX)
+            fix = LINK_FIX
         else:
             fix = FIXES.get(ref["surface"], "migrate this reference by hand")
-        if ref["surface"] == "narrative chart":
-            # The admin's create page is deep-linkable to the parent view, and the view is
-            # the one this chart is being redirected to — so hand over the ready-made URL
-            # rather than the id to look up.
-            fix += f" — create the replacement at {admin}/narrative-charts/create?type=multiDim&chartConfigId={r['target']['viewConfigId']}"
         findings.append(
             {
                 "severity": severity,
