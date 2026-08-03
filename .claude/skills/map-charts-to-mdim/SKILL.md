@@ -273,10 +273,12 @@ and inherits the controls set on it. A bare
 looks equivalent but opens a copy of the MDIM's **default** view — verified in
 practice — so never hand that out as the create step.
 
-**Creating from an MDIM starts at its DEFAULT view — nothing carries over.**
-Not the dimension selection, not the entity selection, not tab/time, not the
-text. So the report's **"Set by hand after creating"** column lists all three
-groups per chart, in the order they get applied in the editor:
+**The new chart opens at the parent view's defaults — the state does not carry
+over.** The control gets the *parent* right, but not the state on top of it: the
+dimension selection, the entity selection and tab/time all come up at defaults,
+and authored text never transfers at all. So the report's **"Set by hand after
+creating"** column lists all three groups per chart, in the order they get
+applied in the editor:
 
 1. **view dimensions** — the target view's own dimension values (from the
    proposal), because the new chart opens on the MDIM's default view;
@@ -367,15 +369,20 @@ Never delete first. The delete will fail, and unpublishing the article to force 
 through breaks the page for readers.
 
 **Do the create from the target view in the site UI**, using the chart's own
-**"Create narrative chart"** admin control (see the rule above). Do **not** hand
-out `{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=…`: that
-route opens a copy of the MDIM's *default* view, so the replacement ends up
-parented to the wrong view. Prefer the UI over the API either way: `AdminAPI`
-has `get_narrative_chart` and `update_narrative_chart` but **no create or delete**,
-so the API route means hand-rolled HTTP for both ends of the swap. Whichever route
-you take, the new chart starts at the MDIM's default view with default entities —
-the dimension selection, the controls and the authored text all have to be set by
-hand afterwards.
+**"Create narrative chart"** admin control (see the rule above). The three routes
+do NOT behave alike, so don't describe them interchangeably:
+
+| route | parent view | state to redo by hand |
+|---|---|---|
+| the view's **"Create narrative chart"** control | the view on screen — correct | the entity selection and other controls open at that view's defaults, and authored FAUST never transfers |
+| a bare `{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=…` link | the MDIM's **default** view — wrong | everything, on top of a parent you then cannot change |
+| scripted `POST {admin_api}/narrative-charts` | whatever `parentChartConfigId` you send | nothing you include in the `config` you post |
+
+So: use the control, then set what the report's **Set by hand after creating**
+column lists. Never hand out the bare create link. Prefer the UI over the API
+anyway — `AdminAPI` has `get_narrative_chart` and `update_narrative_chart` but
+**no create or delete**, so scripting means hand-rolled HTTP for both ends of the
+swap.
 
 If you do script it, the endpoints are `POST {admin_api}/narrative-charts` and
 `DELETE {admin_api}/narrative-charts/<id>`:

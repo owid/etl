@@ -458,7 +458,7 @@ def narrative_section(
         dims = f.get("target_dimensions") or {}
         if dims:
             parts.append(
-                "**view dimensions** (the create starts on the MDIM's default view):<br>"
+                "**view dimensions** (the new chart opens at the view's defaults):<br>"
                 + ", ".join(f"`{k}` = {v}" for k, v in sorted(dims.items()))
             )
         # The stored URL params and the config patch describe the same state in two
@@ -518,9 +518,9 @@ def narrative_section(
             "(visible when logged in)"
         )
         set_step = (
-            "**set everything in the third column by hand** — the new chart opens on the MDIM's "
-            "default view with default entities, so the dimensions, controls and authored text do "
-            "not carry over; compare against the original in the admin editor"
+            "**set everything in the third column by hand** — the control parents the new chart to the "
+            "right view, but its state opens at that view's defaults, so the dimensions, controls and "
+            "authored text do not carry over; compare against the original in the admin editor"
         )
         if published_uses:
             steps = (
@@ -708,10 +708,11 @@ def write_markdown(
             'chart"** admin control — not a bare `/admin/narrative-charts/create?chartConfigId=…` '
             "link, which opens a copy of the MDIM's default view.",
             "",
-            "**Then expect to rebuild the view by hand.** Creating a narrative chart from an MDIM "
-            "starts it on the MDIM's **default view with default entities** — the dimension selection, "
-            "the entity selection, the tab and time settings, and any text the original authored on "
-            "top of its parent all fail to carry over. The **Set by hand after creating** column lists "
+            "**Then expect to rebuild the state by hand.** The control gets the parent view right, "
+            "but the new chart opens at **that view's defaults** — the dimension selection, the entity "
+            "selection and the tab and time settings all come up at defaults, and any text the "
+            "original authored on top of its parent never transfers at all. (A bare create link is "
+            "worse: it also parents to the wrong view.) The **Set by hand after creating** column lists "
             "exactly those groups per chart, in the order to apply them. Miss the text and the "
             "replacement silently renders the view's own wording instead of the wording the article "
             "was written around; miss the controls and it renders the wrong countries.",
