@@ -327,25 +327,17 @@ steps:
             - snapshot://health/2024-09-05/seattle_pathogens.csv
 
   # International Agency for Research on Cancer
-  data://grapher/cancer/2024-08-30/gco_alcohol:
-    - data://garden/cancer/2024-08-30/gco_alcohol:
-        - data://meadow/cancer/2024-08-30/gco_alcohol:
-            - snapshot://cancer/2024-08-30/gco_alcohol.csv
   data://grapher/cancer/2024-09-06/gco_infections:
     - data://garden/cancer/2024-09-06/gco_infections:
         - data://meadow/cancer/2024-09-06/gco_infections:
             - snapshot://cancer/2024-09-06/gco_infections.csv
         - data://garden/regions/2023-01-01/regions
 
-  # Cancer diagnosis routes and survival rates
+  # Cancer diagnosis routes
   data://grapher/cancer/2024-09-13/diagnosis_routes_by_route:
     - data://garden/cancer/2024-09-13/diagnosis_routes_by_route:
         - data://meadow/cancer/2024-09-13/diagnosis_routes_by_route:
             - snapshot://cancer/2024-09-13/diagnosis_routes_by_route.csv
-  data://grapher/cancer/2024-09-13/diagnosis_routes_survival:
-    - data://garden/cancer/2024-09-13/diagnosis_routes_survival:
-        - data://meadow/cancer/2024-09-13/diagnosis_routes_survival:
-            - snapshot://cancer/2024-09-13/diagnosis_routes_survival.csv
 
   # Antibiotics data
   data://grapher/antibiotics/2024-10-09/gram:
