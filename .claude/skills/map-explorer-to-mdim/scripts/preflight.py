@@ -33,6 +33,7 @@ from redirect_rules import (  # noqa: E402
     build_source_rules,
     duplicate_conditions,
     parse_explorer_views,
+    strip_empty,
     views_fingerprint,
 )
 
@@ -68,6 +69,78 @@ def load_runs(paths: list[str]) -> dict[str, dict]:
             "sources": json.loads(sources_path.read_text()) if sources_path.exists() else {},
         }
     return runs
+
+
+def extraction_conditions(d: Path) -> dict[int, dict[str, str]] | None:
+    """{sourceViewId -> source condition} implied by the extraction sitting in this run's folder.
+
+    None when the pair of files needed to derive it is not there, which is the only honest
+    answer for a run predating them — the caller reports that as unchecked rather than clean.
+    """
+    sources_path, views_path = d / "_sources.json", d / "explorer_views.csv"
+    if not (sources_path.exists() and views_path.exists()):
+        return None
+    names = list((json.loads(sources_path.read_text()).get("explorer") or {}).get("dimensions") or [])
+    if not names:
+        return None
+    grid: dict[int, dict[str, str]] = {}
+    with open(views_path, newline="") as f:
+        for row in csv.DictReader(f):
+            values = [(row.get(f"dimension_{i}") or "").strip() for i in range(1, len(names) + 1)]
+            grid[int(row["id"])] = strip_empty(dict(zip(names, values)))
+    return grid
+
+
+def payload_binding(run: dict) -> tuple[str, str]:
+    """(status, message): was `admin_bulk_payload.json` built from the extraction beside it?
+
+    The payload and `_sources.json` are separate files loaded independently, so nothing ties one
+    to the other. Re-running extract_views.py refreshes `_sources.json`; if the rebuild that
+    should follow never happens — or aborts partway, which it does on duplicate conditions,
+    AFTER mapping.json is written but BEFORE the payload is — the OLD payload is left beside the
+    NEW extraction. The live-vs-recorded fingerprint check then passes (it validates the fresh
+    extraction) while every rule about to be posted still comes from the stale payload, and
+    preflight reports Ready for source conditions the explorer no longer has. So the payload's
+    own conditions are compared against the view grid on disk, not just its fingerprint.
+    """
+    grid = extraction_conditions(run["dir"])
+    if grid is None:
+        return (
+            WARN,
+            "no explorer_views.csv/_sources.json pair beside the payload — cannot confirm it was built from "
+            "this extraction, so a stale payload would go unnoticed",
+        )
+    entries = run["payload"].get("redirects") or []
+    mismatched, unknown = [], []
+    for entry in entries:
+        vid = entry.get("sourceViewId")
+        if vid not in grid:
+            unknown.append(vid)
+        elif grid[vid] != strip_empty((entry.get("source") or {}).get("dimensions") or {}):
+            mismatched.append(vid)
+    # A view missing from the payload is expected in exactly one case: its condition collapsed
+    # onto an earlier rule's and --allow-duplicate-conditions dropped it, in which case that
+    # condition is still represented by the rule that kept it. Anything else is a view the
+    # payload never mapped — an extraction that gained rows since it was built.
+    represented = {tuple(sorted(strip_empty((e.get("source") or {}).get("dimensions") or {}).items())) for e in entries}
+    represented.add(())  # the catch-all constrains nothing, so it stands in for an all-empty row
+    covered = {e.get("sourceViewId") for e in entries}
+    absent = [i for i in sorted(grid) if i not in covered and tuple(sorted(grid[i].items())) not in represented]
+    if not (mismatched or unknown or absent):
+        return OK, f"payload matches the {len(grid)}-view extraction beside it"
+    parts = []
+    if mismatched:
+        parts.append(f"{len(mismatched)} entry(ies) carry dimensions the extraction does not (e.g. {mismatched[:5]})")
+    if unknown:
+        parts.append(f"{len(unknown)} entry(ies) name view ids the extraction no longer has (e.g. {unknown[:5]})")
+    if absent:
+        parts.append(f"{len(absent)} extracted view(s) have no entry in the payload (e.g. {absent[:5]})")
+    return BLOCKER, (
+        "STALE PAYLOAD — admin_bulk_payload.json was not built from the extraction beside it: "
+        + "; ".join(parts)
+        + ". Re-run build_mapping.py and re-review; an aborted build leaves the previous payload in place, "
+        "and the fingerprint check alone cannot see that."
+    )
 
 
 def live_explorer_state(slugs: list[str]) -> dict[str, dict]:
@@ -348,65 +421,70 @@ def main() -> int:
         rules = run["rules"]
         row = live.get(slug)
         applied = existing.get(slug, [])
+        retired = row is None
 
-        if row is None:
-            if applied:
-                status, message = compare_applied(rules, applied, targets, admin)
-                if status == OK:
-                    done.add(slug)
-                    findings.append((OK, slug, f"DONE — explorer retired; {message.removeprefix('DONE — ')}"))
-                else:
-                    findings.append(
-                        (
-                            status,
-                            slug,
-                            f"explorer is already retired, but its redirects are INCOMPLETE: {message} "
-                            "(the explorer row is gone, so nothing else would surface this)",
-                        )
-                    )
-                continue
+        if retired and not applied:
             findings.append(
                 (BLOCKER, slug, "explorer is not in the `explorers` table and has no redirects — wrong slug?")
             )
             continue
 
-        if row["isPublished"]:
+        status, message = payload_binding(run)
+        findings.append((status, slug, message))
+
+        if retired:
+            # No explorer row means no TSV to re-fingerprint, so the source side cannot be
+            # rechecked against anything live. Everything on the TARGET side still decides
+            # whether the stored redirects serve what was reviewed, so the checks below run for a
+            # retired explorer too — an MDIM that has since been unpublished, rebuilt, re-slugged
+            # or edited in place breaks redirects that are already in the DB, and matching stored
+            # ids alone would report that as done.
             findings.append(
                 (
                     WARN,
                     slug,
-                    "explorer is still PUBLISHED — creating the redirect darkens it immediately (the redirect "
-                    "is checked on every /explorers/* request, ahead of the page itself)",
+                    "explorer row is gone, so its view grid cannot be re-fingerprinted against the live TSV — "
+                    "only the extraction on disk backs the payload's source conditions",
                 )
             )
-
-        recorded = (run["sources"].get("explorer") or {}).get("viewsFingerprint")
-        if recorded:
-            dim_names, live_rows = parse_explorer_views(row["tsv"])
-            actual = views_fingerprint(dim_names, live_rows)
-            if actual != recorded:
-                findings.append(
-                    (
-                        BLOCKER,
-                        slug,
-                        f"STALE — the explorer's views changed since extraction ({recorded} -> {actual}, "
-                        f"{(run['sources']['explorer'].get('viewCount'))} -> {len(live_rows)} views). Every "
-                        "positional view id in the payload is now untrustworthy: re-run extract_views.py, "
-                        "re-review, rebuild.",
-                    )
-                )
-            elif (run["sources"].get("explorer") or {}).get("configMd5") not in (None, "", row["configMd5"]):
+        else:
+            if row["isPublished"]:
                 findings.append(
                     (
                         WARN,
                         slug,
-                        "EDITED — the explorer's config changed but its view grid did not; mapping still valid",
+                        "explorer is still PUBLISHED — creating the redirect darkens it immediately (the redirect "
+                        "is checked on every /explorers/* request, ahead of the page itself)",
                     )
                 )
-        else:
-            findings.append(
-                (WARN, slug, "no viewsFingerprint recorded (extracted before they existed) — staleness unchecked")
-            )
+
+            recorded = (run["sources"].get("explorer") or {}).get("viewsFingerprint")
+            if recorded:
+                dim_names, live_rows = parse_explorer_views(row["tsv"])
+                actual = views_fingerprint(dim_names, live_rows)
+                if actual != recorded:
+                    findings.append(
+                        (
+                            BLOCKER,
+                            slug,
+                            f"STALE — the explorer's views changed since extraction ({recorded} -> {actual}, "
+                            f"{(run['sources']['explorer'].get('viewCount'))} -> {len(live_rows)} views). Every "
+                            "positional view id in the payload is now untrustworthy: re-run extract_views.py, "
+                            "re-review, rebuild.",
+                        )
+                    )
+                elif (run["sources"].get("explorer") or {}).get("configMd5") not in (None, "", row["configMd5"]):
+                    findings.append(
+                        (
+                            WARN,
+                            slug,
+                            "EDITED — the explorer's config changed but its view grid did not; mapping still valid",
+                        )
+                    )
+            else:
+                findings.append(
+                    (WARN, slug, "no viewsFingerprint recorded (extracted before they existed) — staleness unchecked")
+                )
 
         for r in as_source.get(slug, []):
             findings.append(
@@ -507,20 +585,42 @@ def main() -> int:
 
         if applied:
             status, message = compare_applied(rules, applied, targets, admin)
-            if status == OK:
+            # `compare_applied` only compares stored ids against the payload, so on its own it
+            # would call a migration done while the checks above say the target side no longer
+            # renders what was reviewed. A slug carrying a blocker is never done.
+            if status == OK and any(f[0] == BLOCKER and f[1] == slug for f in findings):
+                status, message = (
+                    WARN,
+                    f"the {len(rules)} stored redirect(s) do match the payload's targets, but the blocker(s) above "
+                    "mean the target side no longer serves what was reviewed — NOT done",
+                )
+            elif status == OK:
                 done.add(slug)
+                if retired:
+                    message = f"DONE — explorer retired; {message.removeprefix('DONE — ')}"
+            elif retired:
+                message = (
+                    f"explorer is already retired, but its redirects are INCOMPLETE: {message} "
+                    "(the explorer row is gone, so nothing else would surface this)"
+                )
             findings.append((status, slug, message))
 
         n_skipped = sum(1 for e in run["payload"].get("redirects") or [] if not e.get("target"))
         if n_skipped:
-            findings.append(
-                (
-                    WARN,
-                    slug,
-                    f"{n_skipped} view(s) unresolved — the endpoint reports them `skipped`; those URLs keep "
-                    "serving the explorer until the catch-all takes them",
+            if (run["payload"].get("catchAll") or {}).get("target"):
+                note = (
+                    f"{n_skipped} view(s) unresolved — the endpoint reports them `skipped`, so they get no rule of "
+                    "their own and the catch-all (which constrains no params) matches them instead: those URLs do "
+                    "NOT keep serving the explorer, they land on the target MDIM's DEFAULT view with the "
+                    "explorer's own params still on the URL. Fine only if those views have no MDIM equivalent — "
+                    "otherwise resolve them and rebuild before applying."
                 )
-            )
+            else:
+                note = (
+                    f"{n_skipped} view(s) unresolved — the endpoint reports them `skipped` and there is no "
+                    "catch-all, so those URLs keep serving the explorer"
+                )
+            findings.append((WARN, slug, note))
         if not (run["payload"].get("catchAll") or {}).get("target"):
             findings.append((WARN, slug, "no catch-all — the bare explorer URL keeps serving the explorer"))
 

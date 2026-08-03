@@ -179,6 +179,13 @@ The **source** view is identified by the explorer slug + dimension **name→disp
 **slug→choice-slug** (the MDIM URL query params). Unresolved views are kept with
 `target: null` so the API can see the full picture; a consumer typically skips them.
 
+> **An unresolved view is not a view left alone.** The endpoint reports `target: null` entries
+> as `skipped`, so they get no rule of their own — and the catch-all constrains no params, so
+> it matches them instead. Those URLs land on the target MDIM's **default** view, carrying the
+> explorer's own params into the grapher URL, rather than on anything equivalent to the view
+> that was asked for. Leaving views unresolved is a deliberate call (they may genuinely have no
+> MDIM counterpart), never a no-op; preflight reports the count so it gets made on purpose.
+
 **`catchAll` is always present**: it redirects the bare explorer URL (no query params) — and
 serves as the sensible fallback for any view a consumer doesn't route individually — to the
 best-fitting MDIM with **no query params**, which grapher renders as that MDIM's default view
@@ -231,12 +238,22 @@ every entry for that explorer**. Blockers: the explorer path is already a site-r
 source, or the *target* of one (the chain case); the slug collides with a chart's old slug; a
 target MDIM is missing or unpublished; the target `/grapher/<slug>` is itself a redirect
 source; two views share a source condition; the view fingerprint no longer matches the live
-explorer; redirects already exist that differ from the payload; or embedded references are
-outstanding. A **missing** `references.csv` is a blocker too — "never looked" must not read
-like "looked and found nothing".
+explorer; the payload was not built from the extraction sitting beside it; redirects already
+exist that differ from the payload; or embedded references are outstanding. A **missing**
+`references.csv` is a blocker too — "never looked" must not read like "looked and found
+nothing".
+
+That payload-vs-extraction check earns its place: the payload and `_sources.json` are separate
+files, so re-running `extract_views.py` without a successful rebuild — or with a rebuild that
+aborted on duplicate conditions, which happens *after* `mapping.json` is written but *before*
+the payload is — leaves the OLD payload beside the NEW extraction. The fingerprint check passes
+in that state, because it validates the extraction, not the rules about to be posted.
 
 A retired explorer whose redirects are all live reports `DONE` and exits 0. That is the
-finished state, not an error.
+finished state, not an error. But retirement does not retire the **target** side: an MDIM that
+has since been unpublished, rebuilt, re-slugged or edited in place breaks redirects that are
+already in the DB, and no explorer row is left to notice it. So every target check runs for a
+retired explorer too, and a slug carrying any blocker is never reported `DONE`.
 
 Non-zero exit means **do not post anything**.
 
