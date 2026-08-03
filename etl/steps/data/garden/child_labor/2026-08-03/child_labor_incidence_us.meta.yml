@@ -7,7 +7,7 @@ definitions:
         - Child Labor
       attribution_short: Carter and Sutch
     description_key:
-      - These are labor-force participation rates of children and youths aged 10-15 in the United States, drawn from the population censuses.
+      - This data shows the share of children and youths aged 10-15 in the United States who are recorded as working (as a percentage of all children in that age bracket). The data is based on population censuses, with some adjustments to make the figures comparable across censuses.
       - The "corrected" series reflects the authors' central finding: the published 1880 census understated the number of young workers, so its labor-force participation rates are too low. Using the 1880 census microdata, the authors recover the missing workers and revise the 1880 figures upward.
       - The correction changes only the 1880 values; in every other census year the corrected and originally published rates are the same.
     description_processing: |-
