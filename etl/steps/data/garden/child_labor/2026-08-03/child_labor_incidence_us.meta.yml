@@ -24,9 +24,9 @@ tables:
   child_labor_incidence_us:
     variables:
       incidence_boys:
-        title: Labor-force participation of boys aged 10-15 (as published)
+        title: Incidence of child labor among boys aged 10-15 (as published)
         presentation:
-          title_public: Labor-force participation of boys aged 10-15
+          title_public: Incidence of child labor among boys aged 10-15
         unit: "%"
         short_unit: "%"
         description_short: Share of boys aged 10-15 in the United States recorded as labor-force participants, as originally published in the census.
@@ -36,9 +36,9 @@ tables:
           tolerance: 5
 
       incidence_girls:
-        title: Labor-force participation of girls aged 10-15 (as published)
+        title: Incidence of child labor among girls aged 10-15 (as published)
         presentation:
-          title_public: Labor-force participation of girls aged 10-15
+          title_public: Incidence of child labor among girls aged 10-15
         unit: "%"
         short_unit: "%"
         description_short: Share of girls aged 10-15 in the United States recorded as labor-force participants, as originally published in the census.
@@ -48,9 +48,9 @@ tables:
           tolerance: 5
 
       corrected_incidence_boys:
-        title: Labor-force participation of boys aged 10-15 (corrected)
+        title: Incidence of child labor among boys aged 10-15 (corrected)
         presentation:
-          title_public: Labor-force participation of boys aged 10-15 (corrected)
+          title_public: Incidence of child labor among boys aged 10-15 (corrected)
         unit: "%"
         short_unit: "%"
         description_short: Share of boys aged 10-15 in the United States who were labor-force participants, after correcting the 1880 census undercount.
@@ -60,9 +60,9 @@ tables:
           tolerance: 5
 
       corrected_incidence_girls:
-        title: Labor-force participation of girls aged 10-15 (corrected)
+        title: Incidence of child labor among girls aged 10-15 (corrected)
         presentation:
-          title_public: Labor-force participation of girls aged 10-15 (corrected)
+          title_public: Incidence of child labor among girls aged 10-15 (corrected)
         unit: "%"
         short_unit: "%"
         description_short: Share of girls aged 10-15 in the United States who were labor-force participants, after correcting the 1880 census undercount.
