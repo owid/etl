@@ -25,21 +25,18 @@ An unpublished MDIM is refused as a redirect target, and even if a row existed t
 
 Steps 1–3 are reversible; step 4 is not.
 
-### 1. Replace the references in articles
-
-Anything that **embeds** an explorer breaks the moment the redirect exists — the embed
-renders by fetching the explorer page and parsing it, so a redirect leaves it blank. Prose links
-survive on the redirect but should be updated anyway.
-
-`/map-explorer-to-mdim` lists every reference with its replacement URL and where to edit in the Google Doc.
-
-### 2. Run `/map-explorer-to-mdim`
+### 1. Run `/map-explorer-to-mdim`
 
 The skill reads the explorer's views and the target MDIM's views, then asks you to write the
 routing rules: which explorer view corresponds to which MDIM view. That is the only manual
 part, and it is per explorer.
 
-It then writes two JSON files per explorer, and only one of them is for posting:
+**Review the matches before applying.** `/review-explorer-mdim-mapping` builds an HTML page
+showing each explorer view beside the MDIM view it would redirect to, with approve/flag
+controls; decisions persist in the browser and export to JSON. You can let Claude know about
+these corrections in the matches.
+
+It writes two JSON files per explorer, and only one of them is for posting:
 
 - **`admin_bulk_payload.json`** — this is the file you paste in step 4.
 - `mapping.json` — the record of the mapping, useful for reference and diffing.
@@ -49,9 +46,26 @@ blank dimension values that a view leaves unset, and a blank never matches a rea
 views would quietly land on the MDIM's default view instead of the one you mapped them to. The
 payload has them removed.
 
-**Review the matches before applying.** `/review-explorer-mdim-mapping` builds an HTML page
-showing each explorer view beside the MDIM view it would redirect to, with approve/flag
-controls; decisions persist in the browser and export to JSON. You can let Claude know about this corrections in the matches.
+It also sweeps the site for everything pointing at the explorer, which is step 2.
+
+### 2. Replace the references in articles
+
+Anything that **embeds** an explorer breaks the moment the redirect exists — the embed
+renders by fetching the explorer page and parsing it, so a redirect leaves it blank. Prose
+links survive on the redirect but should be updated anyway.
+
+Work from **`references.md`** (and `references.csv`, the same rows for sorting and filtering).
+Each row gives you:
+
+- the page holding the reference, and a link straight into its **Google Doc**;
+- the **text to search for** in that doc, so you land on the right block;
+- the **replacement URL**, and which MDIM view that link will actually resolve to;
+- a per-explorer summary: how many references break, how many are just links, and whether
+  anything blocks the redirect.
+
+Start with the 🔴 sections — those are the embeds. It also flags links whose parameters no
+longer match any view: those land on the MDIM's default view, so they need a deliberate
+choice rather than a straight swap.
 
 ### 3. Clear site redirects involving the explorer
 
@@ -115,9 +129,15 @@ Then remove the ETL footprint. **Never delete a step without archiving it** (see
 
 ### 1. Run `/map-charts-to-mdim`
 
-It matches charts to MDIM views by indicator ID and reports **every place each chart is
-linked or embedded** with the replacement URL. Embedded references break at unpublish and no
-redirect repairs them, so migrate those first.
+It matches charts to MDIM views by indicator ID, and writes **`references.md`** — the file you
+work from before anything is applied (plus `references.csv` for sorting and filtering). Same
+shape as the explorer one: the page holding each reference, a link into its Google Doc, the
+text to search for, and the replacement URL.
+
+Work the 🔴 sections first: those are embeds, they break when the chart is unpublished, and no
+redirect repairs them. 🟡 rows keep working through the redirect but are worth updating. It
+also lists the topic-page *All charts* entries, which need nothing — they drop out on their
+own — and any narrative charts, which are step 2.
 
 **Review the matches before applying.** The skill also builds an HTML page showing each
 chart beside the MDIM view it would redirect to, with approve/flag controls; decisions

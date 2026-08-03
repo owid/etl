@@ -120,8 +120,8 @@ def chart_slug_collisions(slugs: list[str]) -> set[str]:
 
 
 def target_state(catalog_paths: set[str]) -> dict[str, dict]:
-    """{catalogPath -> {id, slug, published, views}} where `views` maps a view's dimension
-    signature to its `fullConfigId`.
+    """{catalogPath -> {id, slug, published, views, md5}} where `views` maps a view's dimension
+    signature to its `fullConfigId`, and `md5` that config id to the config's current `fullMd5`.
 
     The view map is what makes target-side staleness detectable. Checking only that the MDIM
     row exists and is published passes an MDIM that was rebuilt, re-sliced or re-slugged after
@@ -129,6 +129,11 @@ def target_state(catalog_paths: set[str]) -> dict[str, dict]:
     longer exist, and applying it would reject some entries AFTER creating others (there is no
     transaction, and no bulk undo). It also yields the expected `viewConfigId` per rule, which
     is what distinguishes "already applied" from "applied differently".
+
+    The md5 map covers the case none of that catches: grapher edits a view's chart config IN
+    PLACE, so swapping its indicators or changing its rendering leaves both the dimension
+    signature and the `fullConfigId` untouched. Without the md5 a mapping reviewed against the
+    old rendering reaches Ready and sends readers somewhere materially different.
     """
     if not catalog_paths:
         return {}
@@ -137,18 +142,33 @@ def target_state(catalog_paths: set[str]) -> dict[str, dict]:
         params={"c": tuple(sorted(catalog_paths))},
     )
     out: dict[str, dict] = {}
+    config_ids: set[str] = set()
     for r in df.to_dict("records"):
         cfg = json.loads(r["config"]) if isinstance(r["config"], str) else (r["config"] or {})
         views = {
             tuple(sorted((v.get("dimensions") or {}).items())): v.get("fullConfigId") for v in cfg.get("views") or []
         }
+        config_ids |= {c for c in views.values() if c}
         out[r["catalogPath"]] = {
             "id": int(r["id"]),
             "slug": r["slug"] or "",
             "published": bool(r["published"]),
             "views": views,
         }
+    live_md5 = view_config_md5s(config_ids)
+    for t in out.values():
+        t["md5"] = {cid: live_md5.get(cid, "") for cid in t["views"].values() if cid}
     return out
+
+
+def view_config_md5s(config_ids: set[str]) -> dict[str, str]:
+    """{chart_configs.id -> fullMd5} for a set of MDIM view configs."""
+    if not config_ids:
+        return {}
+    df = OWID_ENV.read_sql(
+        "SELECT id, fullMd5 FROM chart_configs WHERE id IN %(ids)s", params={"ids": tuple(sorted(config_ids))}
+    )
+    return dict(zip(df["id"], df["fullMd5"]))
 
 
 def expected_row(rule, targets: dict[str, dict]) -> tuple[int | None, str | None]:
@@ -164,6 +184,41 @@ def expected_row(rule, targets: dict[str, dict]) -> tuple[int | None, str | None
     if not rule.target_dims:
         return t["id"], None
     return t["id"], t["views"].get(tuple(sorted(rule.target_dims.items())))
+
+
+def revalidate_targets(rules, targets: dict[str, dict]) -> tuple[list, list, list]:
+    """Per-rule target staleness: (missing_views, reslugged, retargeted_views).
+
+    An MDIM can be rebuilt, re-sliced or re-slugged while its catalogPath stays present and
+    published, in which case the reviewed view no longer exists — and applying would reject
+    those entries after creating others. It can also keep every view in place and only change
+    what one of them renders, which nothing above notices.
+    """
+    missing_views, reslugged, retargeted_views = [], [], []
+    for rule in rules:
+        t = targets.get(rule.catalog_path)
+        if t is None or not t["published"]:
+            continue  # reported separately, per catalogPath
+        if rule.mdim_slug and rule.mdim_slug != t["slug"]:
+            reslugged.append((rule.mdim_slug, t["slug"]))
+        # Resolve through expected_row rather than testing signature membership: a view can be
+        # present but carry no `fullConfigId`, in which case it cannot be stored as a
+        # viewConfigId at all — the chart-side extractor drops such views from its target pool
+        # for the same reason. Membership alone would let that reach `Ready`.
+        _, config_id = expected_row(rule, targets)
+        if rule.target_dims and config_id is None:
+            unstorable = tuple(sorted(rule.target_dims.items())) in t["views"]
+            missing_views.append((rule.source_view_id, rule.view_id, rule.target_dims, unstorable))
+            continue
+        # Same view id, same dimensions, different rendering: grapher edits a view's chart
+        # config in place. Skipped when no md5 was recorded (a run from before this was
+        # tracked, or a catch-all, which points at whatever the default view happens to be) —
+        # absence of a recorded rendering is not evidence of drift.
+        if rule.view_config_md5:
+            live = t["md5"].get(config_id or "", "")
+            if live and live != rule.view_config_md5:
+                retargeted_views.append((rule.source_view_id, rule.view_id))
+    return missing_views, reslugged, retargeted_views
 
 
 def target_is_redirect_source(mdim_slugs: set[str]) -> set[str]:
@@ -400,24 +455,19 @@ def main() -> int:
             elif t["slug"] in taken_targets:
                 findings.append((BLOCKER, slug, f"target /grapher/{t['slug']} is itself a redirect source"))
 
-        # Per-RULE target revalidation. An MDIM can be rebuilt, re-sliced or re-slugged while
-        # its catalogPath stays present and published, in which case the reviewed view no
-        # longer exists — and applying would reject those entries after creating others.
-        missing_views = []
-        reslugged = []
-        for rule in rules:
-            t = targets.get(rule.catalog_path)
-            if t is None or not t["published"]:
-                continue  # already reported above
-            if rule.mdim_slug and rule.mdim_slug != t["slug"]:
-                reslugged.append((rule.mdim_slug, t["slug"]))
-            # Resolve through expected_row rather than testing signature membership: a view can
-            # be present but carry no `fullConfigId`, in which case it cannot be stored as a
-            # viewConfigId at all — the chart-side extractor drops such views from its target
-            # pool for the same reason. Membership alone would let that reach `Ready`.
-            if rule.target_dims and expected_row(rule, targets)[1] is None:
-                unstorable = tuple(sorted(rule.target_dims.items())) in t["views"]
-                missing_views.append((rule.source_view_id, rule.view_id, rule.target_dims, unstorable))
+        missing_views, reslugged, retargeted_views = revalidate_targets(rules, targets)
+        if retargeted_views:
+            sample = ", ".join(f"view {sid} -> {vid}" for sid, vid in retargeted_views[:4])
+            findings.append(
+                (
+                    BLOCKER,
+                    slug,
+                    f"{len(retargeted_views)} target view(s) have been EDITED since extraction — same view id and "
+                    f"same dimensions, but a different rendered config, so the redirect would send readers to "
+                    f"materially different content than was reviewed. e.g. {sample}. Re-extract and re-review.",
+                )
+            )
+
         for was, now in sorted(set(reslugged)):
             findings.append(
                 (

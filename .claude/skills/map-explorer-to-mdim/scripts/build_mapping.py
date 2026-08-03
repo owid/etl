@@ -146,10 +146,18 @@ def write_mapping_json(
     # because an empty string reads like a real empty slug — the consumers resolve a missing
     # one from the DB instead.
     slug_of = {m["short"]: m.get("slug") for m in mdims_meta if m.get("slug")}
+    # {mdim short -> {view id -> {configId, md5}}}: the rendering each target was reviewed
+    # against. Carried so preflight can detect a view whose config was edited in place, which
+    # changes neither its id nor its dimensions.
+    views_of = {m["short"]: (m.get("views") or {}) for m in mdims_meta}
 
-    def with_slug(mdim: str, target: dict) -> dict:
+    def with_slug(mdim: str, target: dict, view_id: str = "") -> dict:
         if slug_of.get(mdim):
             target["mdimSlug"] = slug_of[mdim]
+        reviewed = views_of.get(mdim, {}).get(view_id) if view_id else None
+        if reviewed:
+            target["viewConfigId"] = reviewed.get("configId", "")
+            target["viewConfigMd5"] = reviewed.get("md5", "")
         return target
 
     catch_all = {
@@ -179,6 +187,7 @@ def write_mapping_json(
                     "viewId": m.view_id,
                     "dimensions": m.target,
                 },
+                m.view_id,
             )
             sharers = ids_by_target[(m.mdim, m.view_id)]
             if len(sharers) > 1:

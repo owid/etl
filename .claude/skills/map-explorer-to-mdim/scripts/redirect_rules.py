@@ -61,7 +61,13 @@ def parse_explorer_views(tsv: str) -> tuple[list[str], list[list[str]]]:
         cells = line[1:].split("\t")
         if not names and not dim_cols:
             for i, col in enumerate(cells):
-                if col.strip().endswith(WIDGET_SUFFIXES):
+                # Strip BEFORE both the suffix test and dim_name: a CRLF file leaves "\r" on the
+                # last header, which the test tolerates but dim_name does not — so the suffix
+                # survived and the dimension was named "Foo Dropdown" instead of "Foo". That
+                # name becomes the redirect's condition key, so every URL for those views would
+                # miss its rule and fall through to the catch-all, silently.
+                col = col.strip()
+                if col.endswith(WIDGET_SUFFIXES):
                     dim_cols.append(i)
                     names.append(dim_name(col))
             continue
@@ -121,6 +127,9 @@ class SourceRule:
     catalog_path: str
     view_id: str  # "A2"; "" for the catch-all's default view
     target_dims: dict[str, str] = field(default_factory=dict)
+    # The rendering this target was reviewed against. Empty for runs extracted before it was
+    # recorded, and for a catch-all (which points at whatever the MDIM's default view is).
+    view_config_md5: str = ""
 
     @property
     def specificity(self) -> int:
@@ -148,6 +157,7 @@ def build_source_rules(mapping: dict) -> list[SourceRule]:
                 catalog_path=t.get("catalogPath", ""),
                 view_id=t.get("viewId") or "",
                 target_dims=dict(t.get("dimensions") or {}),
+                view_config_md5=t.get("viewConfigMd5") or "",
             )
         )
     for entry in mapping.get("redirects") or []:
@@ -164,6 +174,7 @@ def build_source_rules(mapping: dict) -> list[SourceRule]:
                 catalog_path=t.get("catalogPath", ""),
                 view_id=t.get("viewId") or "",
                 target_dims=dict(t.get("dimensions") or {}),
+                view_config_md5=t.get("viewConfigMd5") or "",
             )
         )
     return rules

@@ -91,7 +91,31 @@ def get_mdim_views(catalog_path: str):
     used = set().union(*(v["dimensions"].keys() for v in views)) if views else set()
     dim_slugs = [s for s in order if s in used]  # config order, only dims that vary in views
     rows = [[v["dimensions"].get(s, "") for s in dim_slugs] for v in views]
-    return int(df["id"].iloc[0]), df["slug"].iloc[0] or "", bool(df["published"].iloc[0]), dim_slugs, rows
+    # Each view's rendered config id, and its md5. The md5 is the only thing that changes when
+    # grapher edits a view's config IN PLACE — the id and the dimensions both survive that — so
+    # without it a mapping reviewed against the old rendering passes every check while pointing
+    # at materially different content. The chart-side workflow tracks the same field.
+    config_ids = [v.get("fullConfigId") for v in views]
+    md5s = view_config_md5s([c for c in config_ids if c])
+    view_configs = [{"configId": c, "md5": md5s.get(c, "")} for c in config_ids]
+    return (
+        int(df["id"].iloc[0]),
+        df["slug"].iloc[0] or "",
+        bool(df["published"].iloc[0]),
+        dim_slugs,
+        rows,
+        view_configs,
+    )
+
+
+def view_config_md5s(config_ids: list[str]) -> dict[str, str]:
+    """{chart_configs.id -> fullMd5} for a set of MDIM view configs."""
+    if not config_ids:
+        return {}
+    df = OWID_ENV.read_sql(
+        "SELECT id, fullMd5 FROM chart_configs WHERE id IN %(ids)s", params={"ids": tuple(sorted(set(config_ids)))}
+    )
+    return dict(zip(df["id"], df["fullMd5"]))
 
 
 def write_mdim_csv(out: Path, short: str, prefix: str, dim_slugs, rows) -> Path:
@@ -214,6 +238,11 @@ def write_sources_json(out: Path, explorer_slug, dim_names, exp_rows, mdims, is_
                 "slug": m["slug"],
                 "published": m["published"],
                 "dimensions": m["dim_slugs"],
+                # Keyed by the same A1/B2… ids as multidim_<short>_views.csv, so build_mapping
+                # can attach the reviewed rendering to each target without re-reading the DB.
+                "views": {
+                    f"{m['prefix']}{i + 1}": vc for i, vc in enumerate(m.get("view_configs") or []) if vc["configId"]
+                },
             }
             for m in mdims
         ],
@@ -273,7 +302,7 @@ def main():
     for i, cp in enumerate(args.mdim):
         prefix = chr(ord("A") + i)
         short = short_name_of(cp)
-        mdim_id, mdim_slug, published, dim_slugs, rows = get_mdim_views(cp)
+        mdim_id, mdim_slug, published, dim_slugs, rows, view_configs = get_mdim_views(cp)
         p = write_mdim_csv(out, short, prefix, dim_slugs, rows)
         print(f"{prefix} {short}: {len(rows)} views, dims={dim_slugs} -> {p.name}")
         if not published:
@@ -294,6 +323,7 @@ def main():
                 "published": published,
                 "dim_slugs": dim_slugs,
                 "rows": rows,
+                "view_configs": view_configs,
             }
         )
 
