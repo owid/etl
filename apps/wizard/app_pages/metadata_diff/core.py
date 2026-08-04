@@ -65,6 +65,11 @@ class ViewBundle:
     dimensions: dict[str, str]
     metadata: dict[str, Any]  # merged metadata fields (flat, METADATA_FIELDS keys)
     chart: dict[str, Any]  # chart config text fields (CHART_FIELDS keys)
+    # The indicator layer *before* MDIM overrides: the raw `variables` metadata. Diffing this
+    # (rather than the merged text) tells us whether a change is shared with charts/other MDIMs
+    # (the indicator itself changed) or contained to this MDIM (only an override changed).
+    base: dict[str, Any] = field(default_factory=dict)
+    indicator_id: int | None = None  # id of the view's first y-indicator in this environment
 
 
 @dataclass
@@ -73,10 +78,20 @@ class ViewDiff:
     is_new: bool = False  # view does not exist in target (production)
     # field name -> {"old": ..., "new": ...}; descriptionKey values are lists of strings.
     fields: dict[str, dict[str, Any]] = field(default_factory=dict)
+    # Staging id of the view's first y-indicator — the key for the blast-radius lookup.
+    indicator_id: int | None = None
+    # Subset of METADATA_FIELDS whose *indicator-layer* value changed (i.e. the change is not
+    # just an MDIM override). These are the changes that also propagate to charts / other MDIMs.
+    indicator_changed_fields: set[str] = field(default_factory=set)
 
     @property
     def changed(self) -> bool:
         return self.is_new or bool(self.fields)
+
+    @property
+    def affects_indicator(self) -> bool:
+        """Whether any user-visible change here comes from the shared indicator metadata."""
+        return bool(self.indicator_changed_fields)
 
 
 def _is_nan(value: Any) -> bool:
@@ -126,12 +141,15 @@ def build_view_bundle(
     - `chart_config`: the view's chart config (`chart_configs.full`).
     """
     base: dict[str, Any] = {}
+    indicator_id: int | None = None
     if variable_row:
         for key in METADATA_FIELDS:
             base[key] = _parse_json_maybe(variable_row.get(key))
         # The site falls back to the internal name when no public title is set.
         if not base.get("titlePublic"):
             base["titlePublic"] = variable_row.get("name")
+        if variable_row.get("id") is not None:
+            indicator_id = int(variable_row["id"])
 
     merged = base
     for override in (config_metadata, view.get("metadata")):
@@ -142,7 +160,7 @@ def build_view_bundle(
     if chart_config:
         chart = {key: chart_config.get(key) for key in CHART_FIELDS}
 
-    return ViewBundle(dimensions=view["dimensions"], metadata=merged, chart=chart)
+    return ViewBundle(dimensions=view["dimensions"], metadata=merged, chart=chart, base=base, indicator_id=indicator_id)
 
 
 def _dims_key(dimensions: dict[str, str]) -> tuple[tuple[str, str], ...]:
@@ -175,7 +193,7 @@ def diff_views(
     diffs = []
     for src in source_bundles:
         target = target_by_key.get(_dims_key(src.dimensions))
-        view_diff = ViewDiff(dimensions=src.dimensions, is_new=target is None)
+        view_diff = ViewDiff(dimensions=src.dimensions, is_new=target is None, indicator_id=src.indicator_id)
 
         for fields, attr, prefix in (
             (METADATA_FIELDS, "metadata", ""),
@@ -188,6 +206,15 @@ def diff_views(
                 new = _normalize(src_values.get(key))
                 if old != new:
                     view_diff.fields[prefix + key] = {"old": old, "new": new}
+
+        # Indicator-layer diff: compare the raw indicator metadata (before overrides) between the
+        # two environments. A field that changed *here* propagates to every chart / other MDIM that
+        # uses this indicator. A field that changed only in the merged text (an MDIM override) does
+        # not. We skip new views: a brand-new MDIM view does not, by itself, change any indicator.
+        if target is not None:
+            for key in METADATA_FIELDS:
+                if _normalize(src.base.get(key)) != _normalize(target.base.get(key)):
+                    view_diff.indicator_changed_fields.add(key)
 
         diffs.append(view_diff)
     return diffs

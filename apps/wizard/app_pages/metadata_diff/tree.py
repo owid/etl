@@ -62,7 +62,26 @@ def _build_tree(
     return group(list(range(len(view_diffs))), 0)
 
 
-def _render_node(node: dict[str, Any], view_diffs: list[ViewDiff], leaf_hrefs: list[str]) -> str:
+def _impact_badge(impact: dict[str, int] | None) -> str:
+    """Small '↗ affects N charts / M MDIMs' marker for a leaf whose change escapes the MDIM."""
+    if not impact:
+        return ""
+    bits = []
+    if impact.get("charts"):
+        bits.append(f"{impact['charts']} chart{'s' if impact['charts'] != 1 else ''}")
+    if impact.get("mdims"):
+        bits.append(f"{impact['mdims']} MDIM{'s' if impact['mdims'] != 1 else ''}")
+    if not bits:
+        return ""
+    return f'<span class="mdd-impact" title="This change is in the shared indicator metadata">&#8599; {" · ".join(bits)}</span>'
+
+
+def _render_node(
+    node: dict[str, Any],
+    view_diffs: list[ViewDiff],
+    leaf_hrefs: list[str],
+    leaf_badges: list[str],
+) -> str:
     changed = node["changed"] > 0
     status = "changed" if changed else "unchanged"
 
@@ -78,12 +97,12 @@ def _render_node(node: dict[str, Any], view_diffs: list[ViewDiff], leaf_hrefs: l
         return (
             f'<div class="mdd-node mdd-leafnode mdd-n-{status}">'
             f'<a class="{cls}" data-view="{i}" href="{html.escape(leaf_hrefs[i])}" target="_blank" rel="noopener">'
-            f'{html.escape(node["name"])}{badge}<span class="mdd-golink">&#8599;</span></a>'
+            f'{html.escape(node["name"])}{badge}{leaf_badges[i]}<span class="mdd-golink">&#8599;</span></a>'
             f"</div>"
         )
 
     counter = f'<span class="mdd-count">{node["changed"]}/{node["total"]}</span>' if changed else ""
-    children = "".join(_render_node(child, view_diffs, leaf_hrefs) for child in node["children"])
+    children = "".join(_render_node(child, view_diffs, leaf_hrefs, leaf_badges) for child in node["children"])
     return (
         f'<div class="mdd-node mdd-n-{status}">'
         f'<div class="mdd-box mdd-branch mdd-{status}" role="button" title="Click to collapse/expand">'
@@ -93,21 +112,41 @@ def _render_node(node: dict[str, Any], view_diffs: list[ViewDiff], leaf_hrefs: l
     )
 
 
+def _impact_preview_line(impact: dict[str, int] | None) -> str:
+    """A '↗ Also affects …' line appended to a leaf's hover preview."""
+    if not impact:
+        return ""
+    bits = []
+    if impact.get("charts"):
+        bits.append(f"{impact['charts']} chart{'s' if impact['charts'] != 1 else ''}")
+    if impact.get("mdims"):
+        bits.append(f"{impact['mdims']} other MDIM{'s' if impact['mdims'] != 1 else ''}")
+    if not bits:
+        return ""
+    return f'<p class="mdd-impact-line">&#8599; Shared indicator change — also affects {" and ".join(bits)}.</p>'
+
+
 def render_tree_html(
     catalog_path: str,
     dimensions: list[dict[str, Any]],
     view_diffs: list[ViewDiff],
     dim_param_prefix: str = "d_",
+    external_impacts: list[dict[str, int]] | None = None,
 ) -> tuple[str, int]:
     """Render the Blast Radius component. Returns (html, initial_height_px).
 
     The component resizes its own iframe to fit its content (collapse, filter), so the
     returned height is only the initial estimate.
+
+    `external_impacts` (per view index) carries the count of charts / other MDIMs that share the
+    view's changed indicator, surfaced as a leaf marker and a preview line.
     """
     tree = _build_tree(dimensions, view_diffs)
     n_changed = sum(1 for v in view_diffs if v.changed)
+    impacts = external_impacts or [{} for _ in view_diffs]
 
-    previews = [diff_preview_html(v) for v in view_diffs]
+    previews = [diff_preview_html(v) + _impact_preview_line(impacts[i]) for i, v in enumerate(view_diffs)]
+    leaf_badges = [_impact_badge(impacts[i]) for i in range(len(view_diffs))]
     leaf_hrefs = [
         "?"
         + urllib.parse.urlencode(
@@ -117,7 +156,7 @@ def render_tree_html(
     ]
 
     dim_names = " &#8594; ".join(html.escape(d.get("name") or d["slug"]) for d in dimensions)
-    body = "".join(_render_node(node, view_diffs, leaf_hrefs) for node in tree)
+    body = "".join(_render_node(node, view_diffs, leaf_hrefs, leaf_badges) for node in tree)
 
     show_unchanged_default = "false" if n_changed else "true"
     visible_leaves = n_changed if n_changed else len(view_diffs)
@@ -147,6 +186,9 @@ def render_tree_html(
                             background: #ffe8cc; border-radius: 8px; padding: 1px 6px; }}
     #mdd-root .mdd-badge-new {{ margin-left: 7px; font-size: 10px; color: #1971c2; background: #d0ebff;
                                 border-radius: 8px; padding: 1px 6px; }}
+    #mdd-root .mdd-impact {{ margin-left: 7px; font-size: 10px; color: #9c36b5; background: #f3d9fa;
+                             border-radius: 8px; padding: 1px 6px; font-weight: 600; }}
+    #mdd-tooltip .mdd-impact-line {{ margin: 6px 0 0; color: #9c36b5; font-weight: 600; }}
     #mdd-root .mdd-caret {{ display: inline-block; margin-right: 6px; transition: transform .15s; }}
     #mdd-root .mdd-golink {{ margin-left: 7px; color: #1971c2; font-size: 12px; }}
     #mdd-root .mdd-leaf {{ text-decoration: none; }}
@@ -169,6 +211,7 @@ def render_tree_html(
       <span><span class="mdd-dot" style="background:#e8590c"></span>Changed</span>
       <span><span class="mdd-dot" style="background:#1971c2"></span>New view</span>
       <span><span class="mdd-dot" style="background:#d9d9d9"></span>No change</span>
+      <span><span class="mdd-dot" style="background:#9c36b5"></span>&#8599; Affects charts/other MDIMs</span>
     </span>
     <span class="mdd-dims">Controls: {dim_names}</span>
     <span><b>{n_changed}</b> of {len(view_diffs)} views changed</span>
