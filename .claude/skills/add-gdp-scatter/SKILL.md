@@ -48,6 +48,19 @@ Mirrors the admin's `applyDefaultsForScatter` and the extra moves we agreed on:
 4. Sets `xAxis` to `scaleType: log` + `canChangeScaleType: true`.
 5. **Y-axis log toggle (not forced):** when the source scatter is `scaleType: log`, only enable the toggle (`canChangeScaleType: true`) and leave the default **linear**. `yAxis` is shared across all views, so forcing log would flip the line/bar views too. **Mirrors explicit `yAxis` min/max bounds** the source sets (each bound copied independently) — **except a non-zero `min` is NOT mirrored when the target has a bar/area view** (`DiscreteBar`/`Marimekko`/`Stacked*`), because those need a zero baseline and a scatter-tuned non-zero min would make bars start above zero (misleading). A degenerate `min: 0` + `max: 0` (collapsed axis) is treated as junk — never replicated, and stripped if already present. Note: y-axis bounds affect all views, not just scatter.
 
+### The scatter's single-year default needs no config (usually)
+
+A recurring question: *the scatter should show only the latest year, without affecting the other views — is that possible?* **Yes, and Grapher already does it — do not set `minTime`/`maxTime` for this.**
+
+`minTime`/`maxTime` are **global**. Only the map has its own time (`map.time` / `map.startTime` in `MapConfigInterface`); there is no per-chart-type time override, so pinning them to the latest year would collapse a LineChart to a single point.
+
+Grapher handles it at runtime instead. `checkSingleTimeSelectionPreferred` returns true for the `ScatterPlot` tab whenever the scatter is **not the primary chart type** and the chart is not in relative mode, and `adjustStateForTab` → `ensureTimeHandlesAreSensibleForTab` then collapses both time handles onto the end (latest) time. That is runtime state, so the line/bar/map views keep their full range. Since the applier *appends* `ScatterPlot`, it is never `chartTypes[0]` and the condition holds by construction.
+
+Two things follow:
+
+- **The admin editor does not show this.** `adjustStateForTab` is skipped when `isEditor` — deliberately, so switching tabs cannot mutate the authored config on save (grapher #6794). So a scatter that shows a time range *in the editor* is still a single year for readers. Verify on the published/staging chart page, not in `/admin/charts/<id>/edit`.
+- **`hideTimeline: true` breaks it.** With a hidden timeline, `timelineHandleTimeBounds` reads the **authored** `minTime`/`maxTime` on every chart tab and ignores the runtime handles, so the collapse never takes effect — and the reader has no slider to fix it. Authored `minTime == maxTime` is then the only fix, and it is only safe when every other tab is single-time anyway (`DiscreteBar`/`StackedDiscreteBar`/`Marimekko`). With a `LineChart`, `SlopeChart` or single-indicator `Dumbbell` in the mix, one global time cannot serve both — un-hide the timeline or accept the range. The script emits a `WARN` for each case. (2026-08-04: chart 1253, `DiscreteBar` + `hideTimeline`, needed `minTime`/`maxTime` = `latest`; the other 16 targets in that batch needed nothing.)
+
 ### Cross-view safety (which fields are global)
 
 `yAxis` (scaleType, min, max) is the only config the skill writes that meaningfully bleeds into the non-scatter views — hence the log-toggle and zero-baseline handling above. The others were checked and are safe: `xAxis.scaleType: log` is ignored by Line/DiscreteBar (they hardcode a linear time axis) and has no visible effect on Slope; the `color` dimension does **not** recolor line/bar (they color by entity); `size` is scatter-only (not even in the table tab); `matchingEntitiesOnly` is honored only by Scatter and Marimekko.

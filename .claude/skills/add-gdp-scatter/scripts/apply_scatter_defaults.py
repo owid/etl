@@ -64,6 +64,10 @@ STACKED_FAMILY = {"StackedArea", "StackedBar", "StackedDiscreteBar"}
 # Chart types that draw bars/areas from a baseline — they need a ZERO y-axis min,
 # so a non-zero min tuned for the scatter must not be mirrored onto them.
 BAR_AREA_FAMILY = {"DiscreteBar", "Marimekko", "StackedArea", "StackedBar", "StackedDiscreteBar"}
+# Tabs that can ONLY show a single time (grapher's checkOnlySingleTimeSelectionPossible).
+# Dumbbell is deliberately excluded: it is single-time only with >=2 y indicators and needs
+# a RANGE with one, so treat it as range-capable.
+SINGLE_TIME_ONLY_FAMILY = {"DiscreteBar", "StackedDiscreteBar", "Marimekko"}
 SCHEMA_DEFAULT_CHART_TYPES = ["LineChart", "DiscreteBar"]
 
 CHART_ID_RE = re.compile(r"/charts/(\d+)")
@@ -338,6 +342,31 @@ def process_row(
     excluded = src_cfg.get("excludedEntityNames")
     if excluded:
         notes.append(f"WARN: source excludes {excluded} (not applied on target)")
+
+    # A hidden timeline defeats Grapher's automatic single-year scatter. Normally
+    # `checkSingleTimeSelectionPreferred` collapses the two time handles when the scatter
+    # is a secondary tab, so the scatter shows one year while the other views keep their
+    # full range — no config needed. But with `hideTimeline`,
+    # `GrapherState.timelineHandleTimeBounds` reads the AUTHORED minTime/maxTime on every
+    # chart tab and ignores the runtime handles, so the collapse never takes effect and
+    # the reader has no slider to fix it. Authored `minTime == maxTime` is then the only
+    # way to get a single-year scatter — but that is safe only when every other view is
+    # single-time anyway; a LineChart/SlopeChart/single-indicator Dumbbell needs a range,
+    # and one global time cannot serve both.
+    if cfg.get("hideTimeline") and cfg.get("minTime") != cfg.get("maxTime"):
+        other_tabs = set(cfg.get("chartTypes") or []) - {"ScatterPlot"}
+        if other_tabs and other_tabs <= SINGLE_TIME_ONLY_FAMILY:
+            notes.append(
+                f"WARN: hideTimeline with minTime != maxTime — scatter will show a time RANGE and the reader "
+                f"has no timeline to collapse it. Other views {sorted(other_tabs)} are single-time anyway, "
+                f"so setting minTime=maxTime='latest' is safe"
+            )
+        else:
+            notes.append(
+                f"WARN: hideTimeline with minTime != maxTime — scatter will show a time RANGE with no timeline "
+                f"to collapse it, and {sorted(other_tabs)} needs a range, so no single global time serves both. "
+                f"Un-hide the timeline or leave the scatter as a range"
+            )
 
     y_var_id = (tgt_y or {}).get("variableId")
     if y_var_id is not None:
