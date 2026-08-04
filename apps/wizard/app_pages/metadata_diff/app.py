@@ -445,11 +445,10 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
         "Chart",
         key="chart",
         placeholder="Chart slug, id, or grapher URL (e.g. daily-mean-income)",
-        help="A standalone chart's 'what you should know' text is its indicator's metadata. "
-        "Multi-indicator charts (scatters) have no data page, so their WYSK isn't shown to readers.",
+        help="Select a chart to see changes to its data page.",
     )
     if not ref:
-        st.info("Enter a chart slug, ID, or grapher URL.")
+        st.info("Select a chart to see changes to its data page.")
         return
 
     src = build_chart_bundle(source_engine, ref)
@@ -457,6 +456,14 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
         st.warning(f"No published chart found for “{ref}”. Check the slug/id.")
         return
     src_bundle, chart = src
+
+    # Grapher renders a data page only for single-indicator charts — say so when it doesn't.
+    if not chart.get("has_data_page", True):
+        st.warning(
+            f"**{chart.get('title') or chart['slug']}** is a **multi-indicator chart** "
+            f"({chart['n_indicators']} indicators) — it has **no data page**, so this text isn't shown to "
+            "readers here. The diff below is the indicator's metadata for reference only."
+        )
     tgt = build_chart_bundle(target_engine, str(chart["slug"]))
     target_bundle = tgt[0] if tgt is not None else None
 

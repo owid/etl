@@ -141,28 +141,32 @@ def resolve_chart(engine: Engine, ref: str) -> dict[str, Any] | None:
     return {str(k): v for k, v in df.iloc[0].to_dict().items()}
 
 
-def _chart_primary_indicator(engine: Engine, chart_id: int) -> int | None:
-    """The chart's first y-indicator — whose metadata the data page renders."""
-    df = read_sql(
-        "select variableId from chart_dimensions where chartId = %(id)s and property = 'y' order by `order` limit 1",
-        engine=engine,
-        params={"id": int(chart_id)},
-    )
-    if df.empty:
-        return None
-    return int(df.iloc[0]["variableId"])
-
-
 def build_chart_bundle(engine: Engine, ref: str) -> tuple[ViewBundle, dict[str, Any]] | None:
     """Build a single-"view" bundle for a standalone chart: its y-indicator metadata + its FAUST.
 
-    Returns (bundle, chart) or None if the chart can't be resolved. The bundle has empty dimensions,
-    so it matches its baseline counterpart in `diff_views`.
+    Returns (bundle, chart) or None if the chart can't be resolved. The chart dict also carries
+    `n_indicators` and `has_data_page` — grapher renders a data page (and thus this WYSK text) only
+    for single-indicator charts; a scatter/multi-series chart has none. The bundle has empty
+    dimensions, so it matches its baseline counterpart in `diff_views`.
     """
     chart = resolve_chart(engine, ref)
     if chart is None:
         return None
-    vid = _chart_primary_indicator(engine, int(chart["chartId"]))
+    dims = read_sql(
+        "select variableId, property from chart_dimensions where chartId = %(id)s order by `order`",
+        engine=engine,
+        params={"id": int(chart["chartId"])},
+    )
+    chart["n_indicators"] = int(dims["variableId"].nunique()) if not dims.empty else 0
+    chart["has_data_page"] = chart["n_indicators"] == 1
+    # Primary y-indicator (fall back to the first dimension) — whose metadata the data page renders.
+    y = dims[dims["property"] == "y"] if not dims.empty else dims
+    if not y.empty:
+        vid: int | None = int(y.iloc[0]["variableId"])
+    elif not dims.empty:
+        vid = int(dims.iloc[0]["variableId"])
+    else:
+        vid = None
     variable_row = fetch_variable_rows(engine, [vid]).get(vid) if vid is not None else None
     chart_config = {"title": chart.get("title"), "subtitle": chart.get("subtitle"), "note": chart.get("note")}
     bundle = build_view_bundle(
