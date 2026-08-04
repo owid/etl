@@ -7,9 +7,10 @@ definitions:
         - CO2 & Greenhouse Gas Emissions
     unit: grams of CO₂ per kilowatt-hour
     short_unit: gCO₂/kWh
+    description_key:
+      - Energy here is total energy supply, measured as the Energy Institute has reported it since 2025. Under its previous approach, renewables and nuclear were scaled up to a fossil-fuel equivalent, which made the total energy larger and so the carbon intensity lower than shown here.
     description_processing: |-
       - Carbon intensity of energy is calculated by dividing fossil CO₂ emissions (from the Global Carbon Budget) by total energy supply (from our energy mix dataset), expressed in grams of CO₂ per kilowatt-hour.
-      - Total energy supply follows the physical energy content method used by the Energy Institute's Statistical Review of World Energy since its 2025 release. This replaces the older substitution method, under which renewables and nuclear were scaled up to a fossil-fuel-equivalent; because that scaling raised the denominator, the substitution-method intensity was lower than the value shown here.
 
 dataset:
   title: Carbon intensity of energy

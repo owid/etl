@@ -4,8 +4,10 @@ definitions:
     presentation:
       topic_tags:
         - Energy
+    description_key:
+      - Energy here is total energy supply. Wind, solar and hydropower are counted as the electricity they generate. Nuclear is counted as the heat produced in its reactors, of which about a third becomes electricity.
+      - The Energy Institute moved to this approach in 2025. Before that it scaled renewables and nuclear up to the amount of fossil fuel that would have been needed to generate the same electricity, which made wind, solar and hydropower look roughly two and a half times larger than they do here, and nuclear about a fifth smaller.
     description_processing: |-
-      - Energy is measured as Total Energy Supply (TES), following the physical energy content method used by the Energy Institute's Statistical Review of World Energy since its 2025 release. Fossil fuels are counted by their gross calorific value; wind, solar and hydropower are counted as the electricity they generate; and nuclear is counted as the heat input to its reactors (using an assumed thermal efficiency of around 33%).
       - The total energy supply is extended to countries not covered by the Statistical Review using the U.S. Energy Information Administration's (EIA) total energy consumption. The Statistical Review is prioritized where both sources are available.
       - The World series is extended back to 1800 using Vaclav Smil's historical estimates (2017), for years before the Statistical Review begins (1965). Only commercially-traded energy sources are included (traditional biomass, which Smil reports but the Statistical Review does not, is excluded so the series stays on a single basis with no step at the splice).
 
@@ -22,9 +24,13 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Energy from traditional biomass (fuelwood, charcoal, crop residues, and dung), measured in [terawatt-hours](#dod:watt-hours). This is not part of total energy supply and is shown separately.
+        # Not total energy supply, so the shared key points about how it is measured do not apply here.
+        description_key:
+          - Traditional biomass is fuelwood, charcoal, crop residues and dung, burned mostly for cooking and heating. It is not part of total energy supply, which covers only fuels that are traded commercially.
+          - Estimates are highly uncertain. Figures across the literature span roughly a factor of two, and only a global total is available.
         description_processing: |-
-          - Traditional biomass (fuelwood, charcoal, crop residues, and dung) is estimated by Vaclav Smil (2017) from per-capita consumption and population, and is available for the World only. The level is highly uncertain, with estimates across the literature spanning roughly a factor of two.
-          - Smil's series ends in 2015; for later years we hold the last available value constant, because there is no reliable recent measurement of traditional biomass use. It is kept separate from total energy supply, which follows the Statistical Review's commercially-traded scope.
+          - Traditional biomass comes from Vaclav Smil's historical estimates (2017), which cover the World only.
+          - Smil's series ends in 2015; for later years we hold the last available value constant, because there is no reliable recent measurement of traditional biomass use. We keep it separate from total energy supply, which follows the Statistical Review's commercially-traded scope.
         display:
           name: Traditional biomass
         presentation:
@@ -704,6 +710,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_key:
+          - Traditional biomass is fuelwood, charcoal, crop residues and dung, burned mostly for cooking and heating. Total energy supply normally excludes it, so it is added back into the total here.
+          - Estimates of traditional biomass are highly uncertain. Figures across the literature span roughly a factor of two, and only a global total is available.
         display:
           name: Traditional biomass
         presentation:
