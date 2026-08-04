@@ -13,7 +13,10 @@ Mechanism notes:
   reachable; before that this script had to use the site `redirects` table instead.
 - The redirect is consulted only when /grapher/<old-slug> returns a 404, so the unpublish is
   what makes it fire — and, because the create call triggers no static build, also what bakes
-  it. Hence the order: create, re-point aliases, unpublish last.
+  it. Hence the order: create, re-point aliases, unpublish last. One exception, and it is why
+  every bail-out rolls the row back: a row touched in the last week is ALSO written into
+  `_redirects` as an unconditional 302 to defeat the CDN cache, so a fresh row on a slug whose
+  chart is still published does fire.
 - The stored params are only a base: the visitor's own query params override them key by key.
 - `chart_slug_redirects` is per-environment and does NOT sync to production, so prod is a
   separate `--apply --allow-production` run once the scatter views ship there.
@@ -207,7 +210,7 @@ def classify_api_error(exc: Exception) -> tuple[str, str]:
     return "ERROR", msg[:120]
 
 
-def build_plan(api: AdminAPI, payload: list[dict]) -> list[dict]:
+def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[dict]:
     """Resolve every pair and decide what apply would do — all read-only.
 
     Runs in both modes on purpose: the audit is only a dry run if it reports the same
@@ -286,6 +289,15 @@ def build_plan(api: AdminAPI, payload: list[dict]) -> list[dict]:
         # have to be re-pointed at the target or those URLs become hard 404s. Always read, even
         # under --skip-alias-repoint: the audit should still say what the unpublish will destroy.
         rec["aliases"] = [a for a in api.get_chart_redirects(rec["src_id"]) if a["slug"] != src]
+        if skip_aliases and rec["aliases"]:
+            # "Leave the aliases alone" and "unpublish the source" are incompatible: the unpublish
+            # deletes every redirect pointing at the source, so the flag would silently turn the
+            # very slugs it promises to spare into hard 404s. Refuse the row instead — move the
+            # aliases by hand, or drop the flag and let the script move them.
+            rec |= {
+                "status": "BLOCKED",
+                "note": f"--skip-alias-repoint, but the unpublish would delete {len(rec['aliases'])} alias(es) of the source",
+            }
     return rows
 
 
@@ -311,6 +323,38 @@ def repoint_alias(api: AdminAPI, alias: dict, src_id: int, tgt_id: int) -> tuple
             return "CRITICAL", f"re-point failed AND restore failed: {note} / restore: {str(e2)[:60]}"
         return status, f"{note} (alias restored on the source)"
     return "REPOINTED", ""
+
+
+def rollback_primary(api: AdminAPI, rec: dict, created_id: int | None) -> str:
+    """Undo this row's own redirect mutation, for any bail-out that leaves the source published.
+
+    A `chart_slug_redirects` row touched in the last week is baked into `_redirects` as an
+    unconditional 302, listed ahead of the site redirects (`getRecentChartSlugRedirects`) — that
+    copy does not wait for a 404 the way the edge lookup does. So a fresh row on a still-published
+    slug sends readers away from a live chart, and every path that decides to keep the source
+    published has to take the row back out again.
+
+    For an `UPDATE` that means restoring the row that was replaced, not just deleting the
+    replacement: deleting alone would end the run having destroyed a redirect it only meant to
+    re-point. The delete triggers the static build, unlike the create.
+    """
+    if created_id is None:
+        return ""
+    try:
+        api.delete_chart_redirect(created_id)
+    except Exception as e:
+        return f"; ROLLBACK FAILED, delete redirect {created_id} by hand: {str(e)[:50]}"
+    prior = rec.get("prior")
+    if not prior:
+        return "; redirect rolled back"
+    try:
+        api.create_chart_redirect(prior["chart_id"], rec["src"], prior["param"] or None)
+    except Exception as e:
+        return (
+            f"; redirect deleted but the one it replaced was NOT restored — re-create {rec['src']}"
+            f" -> chart {prior['chart_id']} by hand: {str(e)[:50]}"
+        )
+    return "; redirect rolled back and the one it replaced restored"
 
 
 def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
@@ -357,6 +401,8 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
             status, note = classify_api_error(e)
             return action | {"status": status, "note": note}
 
+    # `skip_aliases` only ever skips a no-op here: build_plan BLOCKS a source that still has
+    # aliases under that flag, since the unpublish below would delete them.
     if not skip_aliases:
         for alias in rec["aliases"]:
             status, note = repoint_alias(api, alias, src_id, tgt_id)
@@ -364,12 +410,15 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
         stuck = [slug for slug, status, _ in action["aliases"] if status != "REPOINTED"]
         if stuck:
             # An alias that failed to move is back on the source, and the unpublish would delete
-            # it — the exact hard 404 this step exists to prevent. Leave the source published;
-            # the redirect just stays dormant until a re-run finishes the job.
-            return action | {
-                "status": "CRITICAL",
-                "unpublish": f"NOT unpublished: fix and re-run, {len(stuck)} alias(es) still on the source ({', '.join(stuck)})",
-            }
+            # it — the exact hard 404 this step exists to prevent. Leave the source published and
+            # let a re-run finish the job. The primary redirect cannot be left behind though: the
+            # alias delete already triggered a bake, so a row this fresh is a live 302 away from
+            # the chart we just decided to keep serving (see rollback_primary).
+            note = f"NOT unpublished: fix and re-run, {len(stuck)} alias(es) still on the source ({', '.join(stuck)})"
+            moved = [slug for slug, status, _ in action["aliases"] if status == "REPOINTED"]
+            if moved:
+                note += f"; {len(moved)} alias(es) already moved to the target and left there"
+            return action | {"status": "CRITICAL", "unpublish": note + rollback_primary(api, rec, created_id)}
 
     if not src_cfg.get("isPublished"):
         action["unpublish"] = "already unpublished"
@@ -379,16 +428,9 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
         api.update_chart(src_id, src_cfg)
         action["unpublish"] = "unpublished"
     except Exception as e:
-        # The source is still live while a fresh redirect row exists, and that row bakes into
-        # `_redirects` as a live 302 for a week — so take it back out. The delete also
-        # triggers the static build, unlike the create.
-        note = f"unpublish failed: {str(e)[:70]}"
-        if created_id is not None:
-            try:
-                api.delete_chart_redirect(created_id)
-                note += "; redirect rolled back"
-            except Exception as e2:
-                note += f"; ROLLBACK FAILED, delete redirect {created_id} by hand: {str(e2)[:50]}"
+        # The source is still live, so the redirect this row created has to come back out — and an
+        # UPDATE has to put back the one it replaced. See rollback_primary.
+        note = f"unpublish failed: {str(e)[:70]}" + rollback_primary(api, rec, created_id)
         if action["aliases"]:
             note += "; re-pointed aliases were NOT rolled back — restore them on the source by hand"
         action |= {"status": "CRITICAL", "unpublish": note}
@@ -400,7 +442,11 @@ def main() -> int:
     parser.add_argument(
         "--apply", action="store_true", help="create redirects + unpublish sources (otherwise audit only)"
     )
-    parser.add_argument("--skip-alias-repoint", action="store_true", help="leave the sources' own old slugs alone")
+    parser.add_argument(
+        "--skip-alias-repoint",
+        action="store_true",
+        help="leave the sources' own old slugs alone; BLOCKS any source that still has one, since the unpublish would delete it",
+    )
     parser.add_argument("--allow-production", action="store_true", help="required to --apply against production")
     args = parser.parse_args()
 
@@ -419,7 +465,7 @@ def main() -> int:
         print("\nREFUSED: --apply against production unpublishes live charts. Re-run with --allow-production.")
         return 2
 
-    plan = build_plan(api, payload)
+    plan = build_plan(api, payload, skip_aliases=args.skip_alias_repoint)
 
     # ---- REFERENCES AUDIT (of the OLD source charts) ----
     audited = [r for r in plan if r.get("src_id")]
@@ -494,7 +540,12 @@ def main() -> int:
         else:
             print(f"{pair:>13}  {rec['src']:<52} {rec['status']:<11} {rec['note']}")
             for alias in rec["aliases"]:
-                print(f"{'alias':>13}  {alias['slug']:<52} {'WOULD_REPOINT':<11} {target}")
+                if args.skip_alias_repoint:
+                    print(
+                        f"{'alias':>13}  {alias['slug']:<52} {'LEFT_ALONE':<11} re-point it by hand, or drop the flag"
+                    )
+                else:
+                    print(f"{'alias':>13}  {alias['slug']:<52} {'WOULD_REPOINT':<11} {target}")
 
     if args.apply:
         applied = [r for r in plan if r["status"] in ACTIONABLE]

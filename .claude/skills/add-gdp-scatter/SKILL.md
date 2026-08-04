@@ -116,7 +116,7 @@ echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect
 echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py --apply
 ```
 
-Other flags: `--skip-alias-repoint` (leave the sources' own old slugs alone — they are still audited), `--allow-production` (required to `--apply` when `OWID_ENV` resolves to production, which it does on `master`).
+Other flags: `--skip-alias-repoint` (leave the sources' own old slugs alone — they are still audited, and any source that still has one is `BLOCKED`, because the unpublish would delete it), `--allow-production` (required to `--apply` when `OWID_ENV` resolves to production, which it does on `master`).
 
 ### Pre-checks
 
@@ -130,6 +130,7 @@ All read-only, so the audit reports the verdict `--apply` will act on:
 | `CHAINED` | the *target's* slug is itself redirected away (chart, site or mdim redirect) |
 | `CONFLICT` | the source slug is already claimed — by a chart redirect to a different chart, or by a `multi_dim_redirects` row, which **wins** over chart redirects (the mdim map is merged second in `_grapherRedirects.json`) |
 | `SITE_EXISTS` | a site redirect already serves this source. It bakes as a static 301 matched before the grapher route runs, so ours would be dead weight — delete it first if you want the chart redirect's param merging |
+| `BLOCKED` | `--skip-alias-repoint` on a source that still has old slugs of its own. The two cannot both hold: the unpublish deletes every redirect pointing at the source, so sparing them means not unpublishing. Move them by hand, or drop the flag |
 
 ### References audit of the OLD chart
 
@@ -162,7 +163,9 @@ The order is forced by which calls trigger a bake:
 2. **Re-point the source's own old slugs** at the target. Unpublishing a chart deletes every `chart_slug_redirects` row pointing at it, so without this step those URLs become hard 404s. Each alias is deleted and re-created on the target — the UNIQUE constraint on `slug` leaves no other way. An alias's own query params are *not* carried over (they were written for the old chart) but are reported.
 3. **Unpublish the source.** This is both what makes the redirect fire (it only resolves on a 404) and what triggers the static build.
 
-Both failure directions are handled so no URL is ever left unserved: if any alias fails to move it is restored on the source and **the unpublish is skipped** (the source stays live, the redirect stays dormant, and a re-run finishes the job) — otherwise the unpublish would delete the restored row and create exactly the 404 step 2 exists to prevent. If the unpublish itself fails, the freshly created redirect is rolled back, because a redirect row on a still-published slug bakes as a live 302 for a week. Either way the row reports `CRITICAL` with what to do.
+Both failure directions are handled so no URL is ever left unserved. If any alias fails to move, it is restored on the source and **the unpublish is skipped** — otherwise the unpublish would delete the restored row and create exactly the 404 step 2 exists to prevent. If the unpublish itself fails, the source is likewise left published. Either way the row reports `CRITICAL` with what to do.
+
+**Every bail-out that leaves the source published also rolls the redirect back**, including the skipped-unpublish one: a row touched in the last week bakes as an unconditional static 302 that does *not* wait for a 404 (see the mechanism notes), so leaving it behind would send readers away from the chart the bail-out just decided to keep serving. For an `UPDATE` the rollback re-creates the row that was replaced, rather than only deleting the replacement — deleting alone would end the run having destroyed a redirect it meant to re-point. Anything the rollback cannot undo is named in the report with the manual repair.
 
 ### Mechanism / environment notes
 
