@@ -3,9 +3,7 @@ meta:
     producer: Ember
     title: Monthly Electricity Data
     description: |-
-      This dataset contains monthly electricity generation, emissions and demand data for 88 geographies representing more than 90% of global power demand.
-
-      You can find more about Ember's methodology in [this document](https://files.ember-energy.org/public-downloads/ember_electricity_data_methodology.pdf).
+      Monthly electricity generation, emissions and demand data for a wide range of countries and regions. You can find more about Ember's methodology in [this document](https://files.ember-energy.org/public-downloads/ember_electricity_data_methodology.pdf).
     citation_full: |-
       Ember - Monthly Electricity Data (2026).
 
