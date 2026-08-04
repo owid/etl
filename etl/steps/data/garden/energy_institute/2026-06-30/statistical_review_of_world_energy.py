@@ -18,12 +18,9 @@ Under TES (physical energy content method):
 
 """
 
-import json
-
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -632,7 +629,7 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
     return tb
 
 
-def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def create_region_aggregates(tb: Table) -> Table:
     # Sanity checks around the "Other *" regions. These are values that cannot be assigned to individual countries, but should be included in region aggregates.
     # Check that the additional members mentioned in REGIONS (defined above) are as expected.
     other_regions_found = set(tb[tb["country"].str.contains("(EI)", regex=False)]["country"])
@@ -660,11 +657,9 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
     #         assert not ((len(_tb_ei_region) > 0) and (len(_tb_ei_subregions) > 0))
 
     # Add region aggregates.
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb,
         regions=REGIONS,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
         ignore_overlaps_of_zeros=True,
         accepted_overlaps=KNOWN_OVERLAPS,
@@ -715,10 +710,8 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
     return tb
 
 
-def fix_zeros_in_nonexisting_regions(tb: Table, ds_regions: Dataset) -> Table:
-    ussr_successors = set(
-        ds_regions["regions"].loc[json.loads(ds_regions["regions"].loc["OWID_USS"]["successors"])]["name"]
-    )
+def fix_zeros_in_nonexisting_regions(tb: Table) -> Table:
+    ussr_successors = set(paths.regions.get_region("USSR")["successors"])
     for column in tb.drop(columns=["country", "year"]).columns:
         if column in ["gas_reserves_tcm"]:
             # For gas reserves, the data already contains nans. Simply double check, and do nothing.
@@ -862,12 +855,6 @@ def run() -> None:
     tb_meadow = ds_meadow.read("statistical_review_of_world_energy")
     tb_meadow_prices = ds_meadow.read("statistical_review_of_world_energy_prices")
 
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
     #
     # Process data.
     #
@@ -875,9 +862,7 @@ def run() -> None:
     tb = tb_meadow[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = paths.regions.harmonize_names(tb)
 
     # Correct known upstream data errors (see the accompanying .corrections.yml).
     tb = paths.apply_corrections(tb)
@@ -892,10 +877,10 @@ def run() -> None:
     tb = create_additional_variables(tb=tb)
 
     # Create region aggregates and fix various related issues.
-    tb = create_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    tb = create_region_aggregates(tb=tb)
 
     # Remove spurious zeros in nonexisting regions (e.g. USSR after its dissolution).
-    tb = fix_zeros_in_nonexisting_regions(tb=tb, ds_regions=ds_regions)
+    tb = fix_zeros_in_nonexisting_regions(tb=tb)
 
     # Sanity-check the output data.
     sanity_check_outputs(tb=tb)
