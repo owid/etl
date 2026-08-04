@@ -291,115 +291,6 @@ def add_reserves_to_production_ratio(tb: Table, tb_review: Table) -> Table:
     return tb
 
 
-def add_variable_metadata(tb: Table) -> Table:
-    fuel_names = {"coal": "Coal", "oil": "Oil", "gas": "Gas"}
-    for fuel, name in fuel_names.items():
-        specs = {
-            f"{fuel}_production_twh": (f"{name} production", "terawatt-hours", "TWh"),
-            f"{fuel}_production_per_capita_kwh": (
-                f"{name} production per capita",
-                "kilowatt-hours per person",
-                "kWh",
-            ),
-            f"{fuel}_consumption_twh": (f"{name} consumption", "terawatt-hours", "TWh"),
-            f"{fuel}_consumption_per_capita_kwh": (
-                f"{name} consumption per capita",
-                "kilowatt-hours per person",
-                "kWh",
-            ),
-            f"{fuel}_production_annual_change_twh": (
-                f"Annual change in {name.lower()} production",
-                "terawatt-hours",
-                "TWh",
-            ),
-            f"{fuel}_production_annual_change_pct": (f"Annual change in {name.lower()} production (%)", "%", "%"),
-            f"{fuel}_reserves_to_production_ratio": (
-                f"{name} reserves-to-production ratio",
-                "years",
-                "years",
-            ),
-        }
-        for column, (title, unit, short_unit) in specs.items():
-            if column in tb.columns:
-                tb[column].metadata.title = title
-                tb[column].metadata.unit = unit
-                tb[column].metadata.short_unit = short_unit
-                # Set display.name to the fuel's clean name so stacked-chart series read "Coal", not
-                # "Coal production" (some columns otherwise inherit the full title as display.name).
-                display = dict(tb[column].metadata.display or {})
-                display["name"] = name
-                tb[column].metadata.display = display
-
-    # Physical-unit production columns have per-fuel units (tonnes for coal and oil, cubic meters for
-    # gas), so they can't use the uniform loop above.
-    # Titles carry the unit to stay unique from the energy-content columns (grapher requires unique
-    # variable titles per dataset). The multidim overrides the view titles, so this only shows in the admin.
-    physical_specs = {
-        "coal_production_tonnes": ("Coal production (tonnes)", "tonnes", "t", "Coal"),
-        "oil_production_m3": ("Oil production (cubic meters)", "cubic meters", "m³", "Oil"),
-        "gas_production_m3": ("Gas production (cubic meters)", "cubic meters", "m³", "Gas"),
-        "coal_production_per_capita_tonnes": ("Coal production per capita (tonnes)", "tonnes per person", "t", "Coal"),
-        "oil_production_per_capita_m3": (
-            "Oil production per capita (cubic meters)",
-            "cubic meters per person",
-            "m³",
-            "Oil",
-        ),
-        "gas_production_per_capita_m3": (
-            "Gas production per capita (cubic meters)",
-            "cubic meters per person",
-            "m³",
-            "Gas",
-        ),
-        "coal_reserves_tonnes": ("Coal reserves", "tonnes", "t", "Coal"),
-        "oil_reserves_m3": ("Oil reserves", "cubic meters", "m³", "Oil"),
-        "gas_reserves_m3": ("Gas reserves", "cubic meters", "m³", "Gas"),
-        "coal_reserves_per_capita_tonnes": ("Coal reserves per capita", "tonnes per person", "t", "Coal"),
-        "oil_reserves_per_capita_m3": ("Oil reserves per capita", "cubic meters per person", "m³", "Oil"),
-        "gas_reserves_per_capita_m3": ("Gas reserves per capita", "cubic meters per person", "m³", "Gas"),
-    }
-    # Trade and consumption columns (from EIA): totals and per-capita variants, with per-fuel units.
-    trade_units = {
-        "coal": ("tonnes", "t", "tonnes per person", "t"),
-        "gas": ("cubic meters", "m³", "cubic meters per person", "m³"),
-        "oil": ("cubic meters", "m³", "cubic meters per person", "m³"),
-    }
-    trade_metric_names = {
-        "consumption": "consumption",
-        "imports": "imports",
-        "exports": "exports",
-        "net_imports": "net imports",
-    }
-    for fuel, (unit, short_unit, unit_pc, short_unit_pc) in trade_units.items():
-        # Totals and per-capita variants share the same base-unit suffix (tonnes or m3).
-        suffix = TRADE_SUFFIXES[fuel]
-        pc_suffix = suffix
-        for metric, metric_name in trade_metric_names.items():
-            name = fuel_names[fuel]
-            title = f"{name} {metric_name}"
-            title_pc = f"{name} {metric_name} per capita"
-            if metric == "consumption":
-                # The energy-content consumption columns own the plain titles (grapher requires
-                # unique variable titles per dataset), so the physical ones carry the unit.
-                title = f"{title} ({unit})"
-                title_pc = f"{title_pc} ({unit_pc.removesuffix(' per person')})"
-            physical_specs[f"{fuel}_{metric}_{suffix}"] = (title, unit, short_unit, name)
-            physical_specs[f"{fuel}_{metric}_per_capita_{pc_suffix}"] = (
-                title_pc,
-                unit_pc,
-                short_unit_pc,
-                name,
-            )
-    for column, (title, unit, short_unit, name) in physical_specs.items():
-        tb[column].metadata.title = title
-        tb[column].metadata.unit = unit
-        tb[column].metadata.short_unit = short_unit
-        display = dict(tb[column].metadata.display or {})
-        display["name"] = name
-        tb[column].metadata.display = display
-    return tb
-
-
 def add_total_fossil_fuels(tb: Table) -> Table:
     """Add total fossil fuel production (coal + oil + gas), absolute and per capita."""
     specs = {
@@ -508,9 +399,6 @@ def run() -> None:
 
     # Add World reserves-to-production ratios.
     tb = add_reserves_to_production_ratio(tb=tb, tb_review=tb_review)
-
-    # Set variable metadata.
-    tb = add_variable_metadata(tb=tb)
 
     # Sanity checks.
     sanity_check_outputs(tb=tb)
