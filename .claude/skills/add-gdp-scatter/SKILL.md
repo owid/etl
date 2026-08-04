@@ -91,7 +91,11 @@ Push uses `apps.chart_sync.admin_api.AdminAPI.update_chart(id, cfg)`.
 
 4. **Show both tables to the user** verbatim (or formatted as markdown).
 
-5. **Follow up on display names.** Where a target ended up with a manual `display.name` but the ETL variable already defines a reasonable one (or `variable.name` is clean), use `AskUserQuestion` to let the user pick which manual overrides to drop. Then run a small inline Python block to delete the `name` key from `display` on each chosen chart (preserving `unit`/`shortUnit`/etc.), via the same `AdminAPI.update_chart` flow.
+5. **Follow up on display names — and do it LAST.** Where a target ended up with a manual `display.name` but the ETL variable already defines a reasonable one (or `variable.name` is clean), use `AskUserQuestion` to let the user pick which manual overrides to drop. Then run a small inline Python block to delete the `name` key from `display` on each chosen chart (preserving `unit`/`shortUnit`/etc.), via the same `AdminAPI.update_chart` flow.
+
+   **A later applier run silently undoes this.** Step 3 mirrors the source's manual y `display.name` onto the target whenever the two differ, so any name that came *from the source* is re-applied by the next run — the "idempotent re-run" verification in "Verifying after a run" will quietly revert the decision. Do this step after the final applier run, and if you must re-run afterwards, re-apply the drops. Check the run notes to tell the two cases apart: a `y.display.name: None → '…'` note means the applier added it from the source (it will come back), while a name that appears in the Y-DIM table with no such note was already on the target (it will not).
+
+   Watch for the reverse case too: a target with **no** manual name falls back to the ETL `display.name`, which can be a bare dimension label like `"Mean"` — fine on a line chart next to its title, but an unlabeled-looking axis on the scatter. Offer to set one.
 
 ## Edge cases
 
