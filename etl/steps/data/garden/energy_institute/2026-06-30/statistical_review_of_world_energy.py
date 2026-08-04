@@ -16,10 +16,6 @@ Under TES (physical energy content method):
   the heat input is estimated using assumed thermal efficiencies (33% for nuclear). Compared to the
   old substitution method, nuclear is roughly 20% higher (0.33 vs ~0.40 basis).
 
-This step keeps all the country-coverage logic of previous releases (nuclear zero-filling, region
-aggregates, "Other *" region handling, and removal of spurious zeros for non-existing regions). What
-changed relative to the 2025-06-27 step is that we no longer reconstruct primary energy consumption in
-input-equivalents (the substitution method); the headline series is now Total Energy Supply.
 """
 
 import json

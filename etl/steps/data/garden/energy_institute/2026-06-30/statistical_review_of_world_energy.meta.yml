@@ -11,6 +11,112 @@ definitions:
   description_processing_oil_production_twh: &description-processing-oil-production-twh |-
     * Oil production is approximately converted from million tonnes to energy using a standard average oil-equivalent conversion factor of 41.868 petajoules per million tonnes. We then convert 1 petajoule to 0.278 terawatt-hours.
 
+  # Descriptions given by the producer, quoted from the footnotes of the corresponding sheets of the
+  # Statistical Review workbook (the sheet is named above each one).
+  # Sheet(s): "Total Energy Supply (TES) -EJ".
+  producer_total_energy_supply: &producer-total-energy-supply >-
+    In this review, energy supply comprises commercially-traded fuels, including modern renewables used to generate
+    electricity. Energy from non-fossil fuel combustible electricity generation is accounted for on their input heat
+    requirements and non-combustible renewables on the energy content of their gross electrical output. See the appendix
+    or https://www.energyinst.org/statistical-review for more details on this methodology.
+  # Sheet(s): "Coal Production - mt", "Coal Production - EJ".
+  producer_coal_production: &producer-coal-production >-
+    Commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous)
+    coal, and other commercial solid fuels. Includes coal produced for Coal-to-Liquids and Coal-to-Gas transformations.
+  # Sheet(s): "Coal Consumption - EJ".
+  producer_coal_consumption: &producer-coal-consumption >-
+    Commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous)
+    coal, and other commercial solid fuels. Excludes coal converted to liquid or gaseous fuels, but includes coal
+    consumed in transformation processes. Differences between these consumption figures and the world production
+    statistics are accounted for by stock changes, and unavoidable disparities in the definition, measurement or
+    conversion of coal supply and demand data.
+  # Sheet(s): "Coal - Reserves".
+  producer_coal_reserves: &producer-coal-reserves >-
+    Total proved reserves of coal: generally taken to be those quantities that geological and engineering information
+    indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and
+    operating conditions. The data series for total proved coal reserves does not necessarily meet the definitions,
+    guidelines and practices used for determining proved reserves at company level, for instance as published by the US
+    Securities and Exchange Commission, nor does it necessarily represent the EI's view of proved reserves by country.
+  # Sheet(s): "Gas Production - EJ".
+  producer_gas_production: &producer-gas-production >-
+    Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+  # Sheet(s): "Gas Production - Bcm".
+  producer_gas_production_bcm: &producer-gas-production-bcm >-
+    Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation. As far as
+    possible, the data above represents standard cubic metres (measured at 15°C and 1013 mbar); as they are derived
+    directly from measures of energy content using an average conversion factor and have been standardized using a Gross
+    Calorific Value (GCV) of 40 MJ/m3, they do not necessarily equate with gas volumes expressed in specific national
+    terms.
+  # Sheet(s): "Gas Production - bcf".
+  producer_gas_production_bcfd: &producer-gas-production-bcfd >-
+    Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation. As the data above
+    are derived directly from measures of energy content, they do not necessarily equate with gas volumes expressed in
+    specific national terms.
+  # Sheet(s): "Gas Consumption - EJ", "Gas Consumption - Bcf".
+  producer_gas_consumption: &producer-gas-consumption >-
+    Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in
+    Gas-to-Liquids transformation. The difference between these world consumption figures and the world production
+    statistics is due to variations in stocks at storage facilities and liquefaction plants, together with unavoidable
+    disparities in the definition, measurement or conversion of gas supply and demand data.
+  # Sheet(s): "Gas Consumption - Bcm".
+  producer_gas_consumption_bcm: &producer-gas-consumption-bcm >-
+    Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in
+    Gas-to-Liquids transformation. As far as possible, the data above represent standard cubic metres (measured at 15°C
+    and 1013 mbar); as they are derived directly from measures of energy content using an average conversion factor and
+    have been standardized using a Gross Calorific Value (GCV) of 40 MJ/m3, they do not necessarily equate with gas
+    volumes expressed in specific national terms. The difference between these world consumption figures and the world
+    production statistics is due to variations in stocks at storage facilities and liquefaction plants, together with
+    unavoidable disparities in the definition, measurement or conversion of gas supply and demand data.
+  # Sheet(s): "Gas - Proved reserves".
+  producer_gas_reserves: &producer-gas-reserves >-
+    Total proved reserves of natural gas: generally taken to be those quantities that geological and engineering
+    information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing
+    economic and operating conditions. The data series for total proved natural gas does not necessarily meet the
+    definitions, guidelines and practices used for determining proved reserves at company level, for instance as
+    published by the US Securities and Exchange Commission, nor does it necessarily represent the EI's view of proved
+    reserves by country. As far as possible, the data above represents standard cubic metres (measured at 15°C and 1013
+    mbar) and has been standardized using a gross calorific value (GCV) of 40 MJ/m3.
+  # Sheet(s): "Oil Production - tonnes", "Oil Production - barrels".
+  producer_oil_production: &producer-oil-production >-
+    Includes crude oil, shale oil, oil sands, condensates (lease condensate or gas condensates that require further
+    refining) and NGLs (natural gas liquids - ethane, LPG and naphtha separated from the production of natural gas).
+    Excludes liquid fuels from other sources such as biofuels and synthetic derivatives of coal and natural gas. This
+    also excludes liquid fuel adjustment factors such as refinery processing gain. Excludes oil shales/kerogen extracted
+    in solid form.
+  # Sheet(s): "Oil Consumption - Tonnes", "Oil Consumption - barrels", "Oil Consumption - EJ".
+  producer_oil_consumption: &producer-oil-consumption >-
+    Inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline
+    (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences
+    between these world consumption figures and world production statistics are accounted for by stock changes,
+    consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition,
+    measurement or conversion of oil supply and demand data.
+  # Sheet(s): "Oil - Proved reserves".
+  producer_oil_reserves: &producer-oil-reserves >-
+    Total proved reserves of oil: generally taken to be those quantities that geological and engineering information
+    indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and
+    operating conditions. The data series for total proved oil reserves does not necessarily meet the definitions,
+    guidelines and practices used for determining proved reserves at company level, for instance as published by the US
+    Securities and Exchange Commission, nor does it necessarily represent the EI's view of proved reserves by country.
+    Reserves include gas condensate and natural gas liquids (NGLs) as well as crude oil.
+  # Sheet(s): "Biofuels production - PJ", "Biofuels consumption - PJ".
+  producer_biofuels: &producer-biofuels >-
+    Includes biogasoline (such as ethanol) and biodiesel (including sustainable aviation fuels). Volumes have been
+    adjusted for energy content.
+  # Sheet(s): "Electricity Generation - TWh", "Coal / Gas / Oil inputs - Elec generation".
+  producer_electricity_generation: &producer-electricity-generation >-
+    Based on gross output.
+  # Sheet(s): "Nuclear Generation - TWh", "Solar Generation - TWh", "Wind Generation - TWh", "Geo Biomass Other - TWh".
+  producer_generation_gross: &producer-generation-gross >-
+    Based on gross generation and not accounting for cross-border electricity supply.
+  # Sheet(s): "Hydro Generation - TWh".
+  producer_hydro_generation: &producer-hydro-generation >-
+    Based on gross primary hydroelectric generation and not accounting for cross-border electricity supply.
+  # Sheet(s): "Nuclear / Hydro / Solar / Wind Consumption - EJ", "Geo Biomass Other - EJ", "Renewables Consumption -EJ".
+  producer_consumption_gross: &producer-consumption-gross >-
+    Based on gross generation and not accounting for cross-border electricity supply. Energy from non-combustible
+    renewable generation is accounted for on the energy content of their gross electrical output. See the appendix or
+    https://www.energyinst.org/statistical-review for more details on this methodology.
+
 dataset:
   update_period_days: 365
 
@@ -65,6 +171,7 @@ tables:
         short_unit: 'EJ'
         description_short: |-
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
+        description_from_producer: *producer-biofuels
         presentation:
           title_public: 'Biofuels consumption'
       biofuels_consumption_twh:  # Added by OWID.
@@ -73,6 +180,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
+        description_from_producer: *producer-biofuels
         display:
           name: Biofuels
         presentation:
@@ -89,6 +197,7 @@ tables:
         short_unit: 'PJ'
         description_short: |-
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
+        description_from_producer: *producer-biofuels
         presentation:
           title_public: 'Biofuels production'
       biofuels_production_twh:  # Added by OWID.
@@ -97,6 +206,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
+        description_from_producer: *producer-biofuels
         display:
           name: Biofuels
         presentation:
@@ -107,6 +217,7 @@ tables:
         short_unit: 'EJ'
         description_short: |-
           Total energy supply, in exajoules. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Other renewables (including geothermal and biomass)'
         description_processing: *description-processing-other-renewables
@@ -116,6 +227,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Total energy supply, in terawatt-hours. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         display:
           name: Other renewables
         presentation:
@@ -127,6 +239,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Figures are based on gross generation and do not account for cross-border electricity supply.
+        description_from_producer: *producer-generation-gross
         display:
           name: Other renewables
         presentation:
@@ -145,6 +258,7 @@ tables:
         short_unit: 'EJ'
         description_key:
           - Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Excludes coal converted to liquid or gaseous fuels, but includes coal consumed in transformation processes. Differences between the consumption figures and the world production statistics are accounted for by stock changes, and unavoidable disparities in the definition, measurement or conversion of coal supply and demand data.
+        description_from_producer: *producer-coal-consumption
         presentation:
           title_public: 'Coal consumption'
       coal_consumption_twh:  # Added by OWID.
@@ -153,6 +267,7 @@ tables:
         short_unit: 'TWh'
         description_key:
           - Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Excludes coal converted to liquid or gaseous fuels, but includes coal consumed in transformation processes. Differences between the consumption figures and the world production statistics are accounted for by stock changes, and unavoidable disparities in the definition, measurement or conversion of coal supply and demand data.
+        description_from_producer: *producer-coal-consumption
         display:
           name: Coal
         presentation:
@@ -163,6 +278,7 @@ tables:
         short_unit: 'EJ'
         description_key:
           - Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Includes coal produced for Coal-to-Liquids and Coal-to-Gas transformations.
+        description_from_producer: *producer-coal-production
         presentation:
           title_public: 'Coal production'
       coal_production_twh:  # Added by OWID.
@@ -171,6 +287,7 @@ tables:
         short_unit: 'TWh'
         description_key:
           - Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Includes coal produced for Coal-to-Liquids and Coal-to-Gas transformations.
+        description_from_producer: *producer-coal-production
         display:
           name: Coal production
         presentation:
@@ -181,6 +298,7 @@ tables:
         short_unit: 'Mt'
         description_key:
           - Includes commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous) coal, and other commercial solid fuels. Includes coal produced for Coal-to-Liquids and Coal-to-Gas transformations.
+        description_from_producer: *producer-coal-production
         presentation:
           title_public: 'Coal production'
       cobalt_production_kt:
@@ -195,6 +313,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Based on gross output.
+        description_from_producer: *producer-electricity-generation
         presentation:
           title_public: 'Total electricity generation'
       coal_electricity_generation_twh:
@@ -203,6 +322,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Based on gross output.
+        description_from_producer: *producer-electricity-generation
         presentation:
           title_public: 'Electricity generation from coal'
       gas_electricity_generation_twh:
@@ -211,6 +331,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Based on gross output.
+        description_from_producer: *producer-electricity-generation
         presentation:
           title_public: 'Electricity generation from gas'
       oil_electricity_generation_twh:
@@ -219,6 +340,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Based on gross output.
+        description_from_producer: *producer-electricity-generation
         presentation:
           title_public: 'Electricity generation from oil'
       gas_consumption_bcfd:
@@ -227,6 +349,7 @@ tables:
         short_unit: 'BCFD'
         description_key:
           - Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in Gas-to-Liquids transformation. The difference between the world consumption figures and the world production statistics is due to variations in stocks at storage facilities and liquefaction plants, together with unavoidable disparities in the definition, measurement or conversion of gas supply and demand data.
+        description_from_producer: *producer-gas-consumption
         presentation:
           title_public: 'Gas consumption'
       gas_consumption_bcm:
@@ -235,6 +358,7 @@ tables:
         short_unit: 'BCM'
         description_key:
           - Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in Gas-to-Liquids transformation. As far as possible, the data represent standard cubic meters (measured at 15C and 1013 mbar); as they are derived directly from measures of energy content using an average conversion factor and have been standardized using a Gross Calorific Value (GCV) of 40 MJ/m3, they do not necessarily equate with gas volumes expressed in specific national terms. The difference between the world consumption figures and the world production statistics is due to variations in stocks at storage facilities and liquefaction plants, together with unavoidable disparities in the definition, measurement or conversion of gas supply and demand data.
+        description_from_producer: *producer-gas-consumption-bcm
         presentation:
           title_public: 'Gas consumption'
       gas_consumption_ej:
@@ -243,6 +367,7 @@ tables:
         short_unit: 'EJ'
         description_key:
           - Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in Gas-to-Liquids transformation. The difference between the world consumption figures and the world production statistics is due to variations in stocks at storage facilities and liquefaction plants, together with unavoidable disparities in the definition, measurement or conversion of gas supply and demand data.
+        description_from_producer: *producer-gas-consumption
         presentation:
           title_public: 'Gas consumption'
       gas_consumption_twh:  # Added by OWID.
@@ -251,6 +376,7 @@ tables:
         short_unit: 'TWh'
         description_key:
           - Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in Gas-to-Liquids transformation. The difference between the world consumption figures and the world production statistics is due to variations in stocks at storage facilities and liquefaction plants, together with unavoidable disparities in the definition, measurement or conversion of gas supply and demand data.
+        description_from_producer: *producer-gas-consumption
         display:
           name: Gas
         presentation:
@@ -261,6 +387,7 @@ tables:
         short_unit: 'BCFD'
         description_key:
           - Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation. As the data are derived directly from measures of energy content, they do not necessarily equate with gas volumes expressed in specific national terms.
+        description_from_producer: *producer-gas-production-bcfd
         presentation:
           title_public: 'Gas production'
       gas_production_bcm:
@@ -269,6 +396,7 @@ tables:
         short_unit: 'BCM'
         description_key:
           - Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation. As far as possible, the data represents standard cubic meters (measured at 15C and 1013 mbar); as they are derived directly from measures of energy content using an average conversion factor and have been standardized using a Gross Calorific Value (GCV) of 40 MJ/m3, they do not necessarily equate with gas volumes expressed in specific national terms.
+        description_from_producer: *producer-gas-production-bcm
         presentation:
           title_public: 'Gas production'
       gas_production_ej:
@@ -276,6 +404,7 @@ tables:
         unit: 'exajoules'
         short_unit: 'EJ'
         description_short: Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        description_from_producer: *producer-gas-production
         presentation:
           title_public: 'Gas production'
       gas_production_twh:  # Added by OWID.
@@ -284,6 +413,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        description_from_producer: *producer-gas-production
         display:
           name: Gas production
         presentation:
@@ -306,6 +436,7 @@ tables:
         short_unit: 'EJ'
         description_short: |-
           Total energy supply. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Hydropower consumption'
         description_processing: *description-processing-nuclear-solar-wind-hydro
@@ -315,6 +446,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Total energy supply. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         display:
           name: Hydropower
         presentation:
@@ -326,6 +458,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Figures are based on gross primary hydroelectric generation and do not account for cross-border electricity supply.
+        description_from_producer: *producer-hydro-generation
         display:
           name: Hydropower
         presentation:
@@ -354,6 +487,7 @@ tables:
         short_unit: 'EJ'
         description_short: |-
           Total energy supply. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Nuclear consumption'
         description_processing: *description-processing-nuclear-solar-wind-hydro
@@ -363,6 +497,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Total energy supply. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         display:
           name: Nuclear
         presentation:
@@ -374,6 +509,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Figures are based on gross generation and do not account for cross-border electricity supply.
+        description_from_producer: *producer-generation-gross
         display:
           name: Nuclear
         presentation:
@@ -384,6 +520,7 @@ tables:
         short_unit: 'EJ'
         description_key:
           - Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+        description_from_producer: *producer-oil-consumption
         presentation:
           title_public: 'Oil consumption'
       oil_consumption_twh:  # Added by OWID.
@@ -392,6 +529,7 @@ tables:
         short_unit: 'TWh'
         description_key:
           - Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+        description_from_producer: *producer-oil-consumption
         display:
           name: Oil
         presentation:
@@ -402,6 +540,7 @@ tables:
         short_unit: 'kBD'
         description_key:
           - Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+        description_from_producer: *producer-oil-consumption
         presentation:
           title_public: 'Oil consumption'
       oil_consumption_m3d:
@@ -410,6 +549,7 @@ tables:
         short_unit: 'm³/day'
         description_key:
           - Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+        description_from_producer: *producer-oil-consumption
         presentation:
           title_public: 'Oil consumption'
       oil_consumption_mt:
@@ -418,6 +558,7 @@ tables:
         short_unit: 'Mt'
         description_key:
           - Includes inland demand plus international aviation and marine bunkers and refinery fuel and loss. Consumption of biogasoline (such as ethanol) and biodiesel are excluded while derivatives of coal and natural gas are included. Differences between the world consumption figures and world production statistics are accounted for by stock changes, consumption of non-petroleum additives and substitute fuels and unavoidable disparities in the definition, measurement or conversion of oil supply and demand data.
+        description_from_producer: *producer-oil-consumption
         presentation:
           title_public: 'Oil consumption'
       # oilprod_crudecond_kbd:
@@ -438,6 +579,7 @@ tables:
         short_unit: 'Mt'
         description_key:
           - Includes crude oil, shale oil, oil sands, condensates (lease condensate or gas condensates that require further refining) and NGLs (natural gas liquids - ethane, LPG and naphtha separated from the production of natural gas). Excludes liquid fuels from other sources such as biofuels and synthetic derivatives of coal and natural gas. This also excludes liquid fuel adjustment factors such as refinery processing gain. Excludes oil shales/kerogen extracted in solid form.
+        description_from_producer: *producer-oil-production
         presentation:
           title_public: 'Oil production'
       oil_production_twh:  # Added by OWID.
@@ -447,6 +589,7 @@ tables:
         description_key:
           - Includes crude oil, shale oil, oil sands, condensates (lease condensate or gas condensates that require further refining) and NGLs (natural gas liquids - ethane, LPG and naphtha separated from the production of natural gas). Excludes liquid fuels from other sources such as biofuels and synthetic derivatives of coal and natural gas. This also excludes liquid fuel adjustment factors such as refinery processing gain. Excludes oil shales/kerogen extracted in solid form.
         description_processing: *description-processing-oil-production-twh
+        description_from_producer: *producer-oil-production
         display:
           name: Oil production
         presentation:
@@ -463,6 +606,7 @@ tables:
         short_unit: 'BBL'
         description_key:
           - "Estimates have been compiled using a combination of primary official sources, third-party data from the OPEC Secretariat, World Oil, Oil & Gas Journal and Chinese reserves based on official data and information in the public domain. Canadian oil sands 'under active development' are an official estimate. Venezuelan Orinoco Belt reserves are based on the OPEC Secretariat and government announcements. Reserves and R/P ratio for Canada includes Canadian oil sands. Reserves and R/P ratio for Venezuela includes the Orinoco Belt. Saudi Arabia's oil reserves include NGLs from 2017. Total proved reserves of oil are generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved oil reserves does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate. Reserves include gas condensate and natural gas liquids (NGLs) as well as crude oil."
+        description_from_producer: *producer-oil-reserves
         presentation:
           title_public: 'Oil proved reserves'
       oil_reserves_t:
@@ -471,6 +615,7 @@ tables:
         short_unit: 't'
         description_key:
           - "Estimates have been compiled using a combination of primary official sources, third-party data from the OPEC Secretariat, World Oil, Oil & Gas Journal and Chinese reserves based on official data and information in the public domain. Canadian oil sands 'under active development' are an official estimate. Venezuelan Orinoco Belt reserves are based on the OPEC Secretariat and government announcements. Reserves and R/P ratio for Canada includes Canadian oil sands. Reserves and R/P ratio for Venezuela includes the Orinoco Belt. Saudi Arabia's oil reserves include NGLs from 2017. Total proved reserves of oil are generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved oil reserves does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate. Reserves include gas condensate and natural gas liquids (NGLs) as well as crude oil."
+        description_from_producer: *producer-oil-reserves
         presentation:
           title_public: 'Oil proved reserves'
       total_energy_supply_ej:
@@ -479,6 +624,7 @@ tables:
         short_unit: 'EJ'
         description_short: |-
           Total energy supply comprises commercially-traded fuels, including modern renewables used to generate electricity. It is reported using the Physical Energy Content method.
+        description_from_producer: *producer-total-energy-supply
         presentation:
           title_public: 'Total energy supply'
       total_energy_supply_twh:  # Added by OWID.
@@ -487,6 +633,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Total energy supply comprises commercially-traded fuels, including modern renewables used to generate electricity. It is reported using the Physical Energy Content method.
+        description_from_producer: *producer-total-energy-supply
         display:
           name: Total energy supply
         presentation:
@@ -545,6 +692,7 @@ tables:
         short_unit: 'EJ'
         description_short: |-
           Total energy supply from renewables (wind, solar, hydro, geothermal, biomass and other renewables), in exajoules. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Renewables consumption'
       renewables_consumption_twh:  # Added by OWID.
@@ -553,6 +701,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Total energy supply from renewables (wind, solar, hydro, geothermal, biomass and other renewables), in terawatt-hours. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         display:
           name: Renewables
         presentation:
@@ -563,6 +712,7 @@ tables:
         short_unit: 'EJ'
         description_short: |-
           Total energy supply, in exajoules. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Solar consumption'
         description_processing: *description-processing-nuclear-solar-wind-hydro
@@ -572,6 +722,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Total energy supply, in terawatt-hours. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         display:
           name: Solar
         presentation:
@@ -583,6 +734,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Figures are based on gross generation and do not account for cross-border electricity supply.
+        description_from_producer: *producer-generation-gross
         display:
           name: Solar
         presentation:
@@ -593,6 +745,7 @@ tables:
         short_unit: 'EJ'
         description_short: |-
           Total energy supply, in exajoules. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Wind consumption'
         description_processing: *description-processing-nuclear-solar-wind-hydro
@@ -602,6 +755,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Total energy supply, in terawatt-hours. It does not account for cross-border electricity supply.
+        description_from_producer: *producer-consumption-gross
         display:
           name: Wind
         presentation:
@@ -613,6 +767,7 @@ tables:
         short_unit: 'TWh'
         description_short: |-
           Figures are based on gross generation and do not account for cross-border electricity supply.
+        description_from_producer: *producer-generation-gross
         display:
           name: Wind
         presentation:
@@ -627,12 +782,14 @@ tables:
         title: 'Coal reserves (anthracite and bituminous) - Mt'
         unit: 'million tonnes'
         short_unit: 'Mt'
+        description_from_producer: *producer-coal-reserves
         presentation:
           title_public: 'Coal reserves (anthracite and bituminous)'
       coal_reserves_subbituminous_and_lignite_mt:
         title: 'Coal reserves (sub-bituminous and lignite) - Mt'
         unit: 'million tonnes'
         short_unit: 'Mt'
+        description_from_producer: *producer-coal-reserves
         presentation:
           title_public: 'Coal reserves (sub-bituminous and lignite)'
       coal_reserves_mt:
@@ -641,6 +798,7 @@ tables:
         short_unit: 'Mt'
         description_key:
           - "Total proved reserves of coal are generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved coal reserves does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate."
+        description_from_producer: *producer-coal-reserves
         presentation:
           title_public: 'Coal proved reserves'
 
@@ -650,6 +808,7 @@ tables:
         short_unit: 'm³'
         description_key:
           - "Total proved reserves of natural gas is generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved natural gas does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate. As far as possible, the data represents standard cubic meters (measured at 15C and 1013 mbar) and has been standardized using a gross calorific value (GCV) of 40 MJ/m3."
+        description_from_producer: *producer-gas-reserves
         presentation:
           title_public: 'Gas proved reserves'
   statistical_review_of_world_energy_prices:

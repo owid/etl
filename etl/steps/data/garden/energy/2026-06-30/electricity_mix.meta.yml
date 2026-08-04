@@ -627,6 +627,11 @@ dataset:
 tables:
   electricity_mix:
     title: Electricity mix
+    common:
+      # These series come from Ember from 2000 onwards, with the Statistical Review only covering the
+      # earlier years, so the Statistical Review's notes about its own series would be inherited here as
+      # if they described the whole series.
+      description_from_producer: null
     variables:
       <<: *shared_variables
       population:
