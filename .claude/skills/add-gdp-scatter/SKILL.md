@@ -141,6 +141,25 @@ Plus a table of **article references that need a hand edit**, from `posts_gdocs_
 - an **embed** (any `componentType` that isn't `span-*`) resolves to the target chart but renders the target's **default tab** — `makeGrapherLinkedChart` builds its URL without a query string, so `tab=scatter` never reaches it;
 - a **link** carrying its own `tab=` or `time=` keeps those values, because the visitor's params override the stored ones.
 
+### Re-point every reference at the new scatter view
+
+**Recommend this every time, and do it before applying.** The redirect is a safety net for readers who arrive by an old URL — it is not the fix for our own content. Every OWID surface that points at the retired chart should be edited to point at the target chart's scatter view instead:
+
+```
+/grapher/<target-slug>?tab=scatter&time=latest
+```
+
+merged with whatever query string the reference already carries (its own params win, same rule as the redirect — so a reference with `tab=` or `time=` of its own needs a decision, not a blind merge). Two reasons it can't wait: an **embed** never gets fixed by a redirect at all (it resolves the chart itself and renders the target's default tab), and a **link** works but sends readers through an extra hop that will outlive everyone's memory of why it exists.
+
+The script's own table covers only gdoc links and embeds — enough to spot the param collisions, not a full sweep. For the complete surface list use the shared **`find-chart-references`** skill, which is what `/map-charts-to-mdim` does for the same problem (see `scripts/audit_references.py` there: it calls `run_sweep` from `find-chart-references/scripts/reference_report.py` and adds only the replacement URL, which is the workflow-specific part):
+
+```bash
+.venv/bin/python .claude/skills/find-chart-references/scripts/find_references.py \
+  --chart-slugs '<old-slug-1>,<old-slug-2>' --markdown ai/scatter-references.md
+```
+
+Include the sources' **aliases** in `--chart-slugs`: an article may well link an even older slug. The sweep catches what `get_chart_references` counts but doesn't locate — explorers, data insights, static viz, narrative charts, key-chart slots, WordPress posts — and it reports its own **gaps**, so a surface it couldn't check is visible rather than silently absent. Triage it the way that skill does: an **embed** is 🔴 and blocks the row (it breaks the moment the source is unpublished), a **link** is 🟡 (the 301 covers it; update the href anyway), and an unpublished or draft page is ℹ️.
+
 ### Narrative charts
 
 **They do not block the retirement.** A narrative chart parented to a chart owns a materialized full config and renders from it, so unpublishing the parent leaves it intact (`isPublished` is in `NARRATIVE_CHART_PROPS_TO_OMIT`). Its only use of the parent slug is the "Explore the data" href, which `GrapherState.canonicalUrlIfIsNarrativeChart` builds as `/grapher/<parent-slug>` + `queryParamsForParentChart` — so the redirect covers it. `narrativeCharts` is therefore counted but deliberately **not** part of the `MANUAL` gate.
