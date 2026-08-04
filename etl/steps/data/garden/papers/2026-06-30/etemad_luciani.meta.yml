@@ -4,6 +4,9 @@ definitions:
       topic_tags:
         - Energy
 
+    description_processing: |
+      - The source reports one hybrid entity, 'Russian Federation & USSR'. Its data ends in 1979, before the USSR dissolved, so it is treated as the USSR throughout. The years before 1922 therefore cover the Russian Empire, for which we have no separate entity.
+      - The source's own regional and bloc aggregates (its Africa, Europe, OECD, OPEC and similar) are excluded: they are defined differently from our own regions, and they stop in 1979.
 dataset:
   update_period_days: 365
   owners:
