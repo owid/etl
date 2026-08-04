@@ -29,6 +29,8 @@ _AC_CSS = """
     #ac-root li.ac-li { margin: 3px 0; }
     #ac-root a.ac-item { color: #1971c2; text-decoration: none; }
     #ac-root a.ac-item:hover { text-decoration: underline; }
+    #ac-root .ac-flag { color: #e8590c; font-size: 11px; background: #fff4e6; border-radius: 6px; padding: 1px 5px; margin-left: 6px; white-space: nowrap; }
+    #ac-root .ac-note { color: #888; font-size: 11px; margin: 10px 0 0; line-height: 1.45; }
     #ac-root .ac-pager { margin-top: 10px; display: flex; gap: 10px; align-items: center; color: #777; font-size: 12px; }
     #ac-root .ac-pager button { font-size: 12px; padding: 2px 9px; cursor: pointer; }
     #ac-root .ac-pager button:disabled { opacity: .4; cursor: default; }
@@ -97,25 +99,39 @@ def render_affected_charts_html(
     is reused as every chart's hover tooltip. Links open each chart on this staging server, where
     the change is live. Returns (html, initial_height_px).
     """
+    no_dp_title = "Scatter / multi-indicator chart — no data page, so this text is not shown to readers here"
     items = []
     for i, c in enumerate(charts):
         slug = c.get("slug")
         label = html.escape(str(c.get("title") or slug or f"chart {c.get('chartId')}"))
         href = f"{staging_site}/grapher/{slug}" if slug else "#"
+        flag = (
+            ""
+            if c.get("wysk_shown", True)
+            else f' <span class="ac-flag" title="{no_dp_title}">&#9888; no data page</span>'
+        )
         items.append(
             f'<li class="ac-li" data-i="{i}"><a class="ac-item" href="{html.escape(href)}" '
-            f'target="_blank" rel="noopener">{label}</a></li>'
+            f'target="_blank" rel="noopener">{label}</a>{flag}</li>'
         )
 
     n = len(charts)
+    n_no_dp = sum(1 for c in charts if not c.get("wysk_shown", True))
     paged = n > per_page
     header = (
-        f'<p class="ac-header">These <b>{n}</b> chart{"s" if n != 1 else ""} on this staging server use this '
-        "indicator, so each shows this same change. Chart Diff won’t surface it (it’s a garden-template "
-        "metadata edit, not a config change) — <b>hover</b> a chart to preview the change, <b>click</b> to "
-        "open it on <b>this staging server</b>, where the change is live. &nbsp;"
+        f'<p class="ac-header">These <b>{n}</b> chart{"s" if n != 1 else ""} also use this indicator, so each '
+        "inherits this same change. Hover a chart to preview it, or click to open it on <b>this staging "
+        "server</b>. &nbsp;"
         f'<a href="{html.escape(chart_diff_url)}" target="_blank" rel="noopener">Open all in Chart Diff &#8599;</a></p>'
     )
+    note = "Charts always show the indicator’s own text — unlike MDim views, they can’t be overridden individually."
+    if n_no_dp:
+        verb, plural = ("is a", "") if n_no_dp == 1 else ("are", "s")
+        note = (
+            f"<b>&#9888; {n_no_dp}</b> of these {verb} scatter / multi-indicator chart{plural} with no data "
+            "page, so the change is <b>not shown to readers</b> there. " + note
+        )
+    footnote = f'<p class="ac-note">{note}</p>'
     pager_style = "" if paged else ' style="display:none"'
     pager = (
         f'<div class="ac-pager"{pager_style}>'
@@ -140,12 +156,13 @@ def render_affected_charts_html(
         + "".join(items)
         + "</ol>"
         + pager
+        + footnote
         + '<div id="ac-tooltip"></div>'
         + script
         + "</div>"
     )
-    height = 110 + min(n, per_page) * 30 + (44 if paged else 0)
-    return body, min(height, 640)
+    height = 130 + min(n, per_page) * 30 + (44 if paged else 0) + (28 if n_no_dp else 0)
+    return body, min(height, 680)
 
 
 def _build_tree(

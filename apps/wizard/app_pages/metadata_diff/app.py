@@ -315,7 +315,7 @@ def render_view_diff_page(
         jump_col, _jump_spacer = st.columns([2, 3])
         with jump_col:
             st.selectbox(
-                f"⚡ Jump to a changed view ({len(changed_views)})",
+                f"⚡ Changes detected — jump to a changed view ({len(changed_views)})",
                 options=[""] + list(range(len(changed_views))),
                 format_func=_jump_label,
                 key="mdd_jump",
@@ -455,8 +455,9 @@ def main() -> None:
             options=df_mdims.index.tolist(),
             format_func=_format_mdim,
             on_change=_clear_view_params,
-            help="✏️ = the MDim config differs from the baseline. Texts can also change "
-            "through indicator metadata without a config change — the diff below catches both.",
+            help="Select the MDim to review — type in the box to search it. "
+            "✏️ marks MDims whose config differs from the baseline; texts can also change through "
+            "indicator metadata without a config change, and the diff catches both.",
         )
     with col_mode:
         mode = url_persist(st.radio)(

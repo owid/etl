@@ -22,11 +22,19 @@ def _chunked(values: list, size: int = 500):
 
 
 def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
-    """indicator id -> published charts that use it (chartId, slug, title)."""
+    """indicator id -> published charts that use it (chartId, slug, title, wysk_shown).
+
+    `wysk_shown` is whether the chart actually renders the indicator's "what you should know"
+    data page. Grapher shows a data page only for single-indicator charts; a chart that combines
+    several indicators (a scatter's x+y, a multi-series line) has no single data page, so an edit
+    to this indicator's description_key is NOT visible to readers there. We approximate this with
+    the chart's distinct-variable count (1 → data page shown; >1 → not shown).
+    """
     result: dict[int, list[dict[str, Any]]] = {int(i): [] for i in indicator_ids}
     ids = [int(i) for i in set(indicator_ids)]
     if not ids:
         return result
+    all_chart_ids: set[int] = set()
     for chunk in _chunked(ids):
         placeholders = ", ".join(["%s"] * len(chunk))
         df = read_sql(
@@ -48,10 +56,27 @@ def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[in
             result[int(record["variableId"])].append(
                 {"chartId": int(record["chartId"]), "slug": record["slug"], "title": record["title"]}
             )
-    # De-duplicate charts that reference the same indicator through several dimensions.
+            all_chart_ids.add(int(record["chartId"]))
+
+    # How many distinct indicators each affected chart uses — the data-page signal.
+    n_vars: dict[int, int] = {}
+    for chunk in _chunked(sorted(all_chart_ids)):
+        placeholders = ", ".join(["%s"] * len(chunk))
+        df = read_sql(
+            f"select chartId, count(distinct variableId) as n from chart_dimensions "
+            f"where chartId in ({placeholders}) group by chartId",
+            engine=engine,
+            params=tuple(chunk),
+        )
+        for record in df.to_dict("records"):
+            n_vars[int(record["chartId"])] = int(record["n"])
+
+    # De-duplicate charts that reference the same indicator through several dimensions, and attach
+    # the data-page flag.
     for vid, charts in result.items():
         seen: dict[int, dict[str, Any]] = {}
         for c in charts:
+            c["wysk_shown"] = n_vars.get(c["chartId"], 1) == 1
             seen.setdefault(c["chartId"], c)
         result[vid] = list(seen.values())
     return result
