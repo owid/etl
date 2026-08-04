@@ -272,7 +272,7 @@ def inline_diff_html(old: str, new: str, side: str = "both") -> str:
     return "".join(parts)
 
 
-def diff_preview_html(view_diff: ViewDiff, max_fields: int = 3, max_chars: int = 280) -> str:
+def diff_preview_html(view_diff: ViewDiff, max_fields: int = 3, max_chars: int = 320) -> str:
     """Compact HTML preview of a view's changes, used in the tree hover tooltips."""
     if view_diff.is_new:
         return '<p class="mdd-new">New view — it does not exist in production.</p>'
@@ -303,12 +303,26 @@ def diff_preview_html(view_diff: ViewDiff, max_fields: int = 3, max_chars: int =
 
 
 def _truncate_html(rendered: str, max_chars: int) -> str:
-    """Truncate rendered diff HTML without breaking tags (crude but safe: cut on text length)."""
-    if len(rendered) <= max_chars:
+    """Truncate rendered diff HTML to `max_chars` of *visible* text (tags don't count).
+
+    Counting tag characters against the budget made the preview cut off right after the change;
+    measuring only visible text keeps a few more words of context after the edit.
+    """
+    visible = 0
+    i = 0
+    n = len(rendered)
+    while i < n and visible < max_chars:
+        if rendered[i] == "<":
+            close = rendered.find(">", i)
+            if close == -1:
+                break
+            i = close + 1
+        else:
+            visible += 1
+            i += 1
+    if i >= n:
         return rendered
-    # Cut at a tag boundary to avoid splitting an HTML tag in half.
-    cut = rendered.rfind("<", 0, max_chars)
-    safe = rendered[: cut if cut > 0 else max_chars]
+    safe = rendered[:i]
     # Close any dangling del/ins so the tooltip doesn't bleed styling.
     for tag in ("del", "ins"):
         if safe.count(f"<{tag}") > safe.count(f"</{tag}>"):

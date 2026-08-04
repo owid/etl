@@ -70,7 +70,7 @@ def _impact_badge(impact: dict[str, int] | None) -> str:
     if impact.get("charts"):
         bits.append(f"{impact['charts']} chart{'s' if impact['charts'] != 1 else ''}")
     if impact.get("mdims"):
-        bits.append(f"{impact['mdims']} MDIM{'s' if impact['mdims'] != 1 else ''}")
+        bits.append(f"{impact['mdims']} MDim{'s' if impact['mdims'] != 1 else ''}")
     if not bits:
         return ""
     return f'<span class="mdd-impact" title="This change is in the shared indicator metadata">&#8599; {" · ".join(bits)}</span>'
@@ -120,7 +120,7 @@ def _impact_preview_line(impact: dict[str, int] | None) -> str:
     if impact.get("charts"):
         bits.append(f"{impact['charts']} chart{'s' if impact['charts'] != 1 else ''}")
     if impact.get("mdims"):
-        bits.append(f"{impact['mdims']} other MDIM{'s' if impact['mdims'] != 1 else ''}")
+        bits.append(f"{impact['mdims']} other MDim{'s' if impact['mdims'] != 1 else ''}")
     if not bits:
         return ""
     return f'<p class="mdd-impact-line">&#8599; Shared indicator change — also affects {" and ".join(bits)}.</p>'
@@ -167,7 +167,9 @@ def render_tree_html(
 <div id="mdd-root" class="mdd-hide-unchanged">
   <style>
     #mdd-root {{ font-family: -apple-system, system-ui, sans-serif; font-size: 13px; color: #333; }}
-    #mdd-root .mdd-toolbar {{ margin-bottom: 10px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }}
+    #mdd-root .mdd-toolbar {{ margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px; }}
+    #mdd-root .mdd-row-top {{ display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }}
+    #mdd-root .mdd-summary {{ color: #333; }}
     #mdd-root .mdd-dims {{ color: #777; }}
     #mdd-root .mdd-hint {{ color: #999; font-size: 12px; margin-bottom: 8px; }}
     #mdd-root .mdd-legend span {{ margin-right: 12px; }}
@@ -206,15 +208,17 @@ def render_tree_html(
     #mdd-root ins.mdd-ins, #mdd-tooltip ins.mdd-ins {{ background: #d3f9d8; color: #2b8a3e; text-decoration: none; }}
   </style>
   <div class="mdd-toolbar">
-    <label><input type="checkbox" id="mdd-show-unchanged"> Show unchanged views</label>
-    <span class="mdd-legend">
-      <span><span class="mdd-dot" style="background:#e8590c"></span>Changed</span>
-      <span><span class="mdd-dot" style="background:#1971c2"></span>New view</span>
-      <span><span class="mdd-dot" style="background:#d9d9d9"></span>No change</span>
-      <span><span class="mdd-dot" style="background:#9c36b5"></span>&#8599; Affects charts/other MDIMs</span>
-    </span>
-    <span class="mdd-dims">Controls: {dim_names}</span>
-    <span><b>{n_changed}</b> of {len(view_diffs)} views changed</span>
+    <div class="mdd-row-top">
+      <label><input type="checkbox" id="mdd-show-unchanged"> Show unchanged views</label>
+      <span class="mdd-legend">
+        <span><span class="mdd-dot" style="background:#e8590c"></span>Changed</span>
+        <span><span class="mdd-dot" style="background:#1971c2"></span>New view</span>
+        <span><span class="mdd-dot" style="background:#d9d9d9"></span>No change</span>
+        <span><span class="mdd-dot" style="background:#9c36b5"></span>&#8599; Affects charts/other MDims</span>
+      </span>
+    </div>
+    <div class="mdd-dims">Controls: {dim_names}</div>
+    <div class="mdd-summary"><b>{n_changed}</b> of {len(view_diffs)} views changed</div>
   </div>
   <div class="mdd-hint">Hover over a view to preview its changes; click it to open the View diff in a
     new tab. Click a branch to collapse/expand it.</div>

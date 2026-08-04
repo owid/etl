@@ -1,15 +1,15 @@
-"""Metadata Diff: review how a branch changes the user-visible metadata texts of MDIMs.
+"""Metadata Diff: review how a branch changes the user-visible metadata texts of MDims.
 
 Two connected views, against a selectable baseline (production, or staging-site-master to
 isolate this branch's changes from production deploy lag):
-- "Blast radius": a horizontal tree of all views of an MDIM (following its control
+- "Blast radius": a horizontal tree of all views of an MDim (following its control
   order), colored by whether the view's texts differ between this staging server and
   the baseline. Leaves link to the View diff.
 - "View diff": side-by-side baseline/staging comparison of the changed texts of one
-  view, with the MDIM controls as navigation.
+  view, with the MDim controls as navigation.
 
 Unlike the config diff in chart-diff, this compares the *rendered* texts end users see:
-indicator metadata (e.g. `description_key`) merged with any MDIM view-level overrides —
+indicator metadata (e.g. `description_key`) merged with any MDim view-level overrides —
 so it also catches changes coming from garden step templates.
 """
 
@@ -95,13 +95,13 @@ def compute_diff(
     _target_engine: Engine,
     cache_key: str,
 ) -> tuple[list[dict[str, Any]], list[ViewDiff]]:
-    """Diff every view of an MDIM between staging and the selected baseline.
+    """Diff every view of an MDim between staging and the selected baseline.
 
     `cache_key` busts the cache when configs or the baseline change; indicator metadata
     changes are picked up by the TTL.
     """
     source_config = load_mdim_config(_source_engine, catalog_path)
-    assert source_config is not None, f"MDIM {catalog_path} not found in staging."
+    assert source_config is not None, f"MDim {catalog_path} not found in staging."
     target_config = load_mdim_config(_target_engine, catalog_path)
 
     source_bundles = build_env_bundles(_source_engine, source_config)
@@ -111,14 +111,14 @@ def compute_diff(
     return dimensions, diff_views(source_bundles, target_bundles)
 
 
-@st.cache_data(ttl=300, show_spinner="Finding affected charts and MDIMs…")
+@st.cache_data(ttl=300, show_spinner="Finding affected charts and MDims…")
 def compute_usage(
     indicator_ids: tuple[int, ...],
     catalog_path: str,
     _source_engine: Engine,
     cache_key: str,
 ) -> dict[int, dict[str, list[dict[str, Any]]]]:
-    """For each changed indicator, the charts and *other* MDIMs on this staging server that use it."""
+    """For each changed indicator, the charts and *other* MDims on this staging server that use it."""
     ids = list(indicator_ids)
     if not ids:
         return {}
@@ -162,7 +162,7 @@ def _view_label(view: ViewDiff, dimensions: list[dict[str, Any]]) -> str:
 
 
 def _clear_view_params() -> None:
-    """Drop the previous MDIM's view-selector params when another MDIM is selected."""
+    """Drop the previous MDim's view-selector params when another MDim is selected."""
     for key in list(st.query_params.keys()):
         if key.startswith(DIM_PARAM_PREFIX):
             st.query_params.pop(key, None)
@@ -211,11 +211,11 @@ def _plain_text_html(value: Any) -> str:
 
 
 def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]]]]) -> None:
-    """The 'does this also affect charts / other MDIMs?' flag for one view, with an expandable list."""
+    """The 'does this also affect charts / other MDims?' flag for one view, with an expandable list."""
     if not view.affects_indicator:
         st.caption(
             "🔒 **MDim-only change** — the underlying indicator metadata is unchanged, so no standalone "
-            "charts or other MDIMs are affected. (The change comes from an MDIM-level override.)"
+            "charts or other MDims are affected. (The change comes from an MDim-level override.)"
         )
         return
 
@@ -225,7 +225,7 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
     if n_c == 0 and n_m == 0:
         st.info(
             "↗ This change is in the **shared indicator metadata**, but no published charts or other "
-            "MDIMs currently use this indicator — so nothing else is affected."
+            "MDims currently use this indicator — so nothing else is affected."
         )
         return
 
@@ -233,7 +233,7 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
     if n_c:
         parts.append(f"**{n_c}** chart{'s' if n_c != 1 else ''}")
     if n_m:
-        parts.append(f"**{n_m}** other MDIM{'s' if n_m != 1 else ''}")
+        parts.append(f"**{n_m}** other MDim{'s' if n_m != 1 else ''}")
     st.warning(
         "↗ This change is in the **shared indicator metadata** — it also affects "
         + " and ".join(parts)
@@ -251,7 +251,7 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
                 else:
                     st.markdown(f"- {label}")
         if mdims:
-            st.markdown(f"**Other MDIMs** ({n_m})")
+            st.markdown(f"**Other MDims** ({n_m})")
             for m in mdims:
                 st.markdown(f"- `{m.get('catalogPath')}`")
 
@@ -264,7 +264,7 @@ def render_view_diff_page(
     baseline: str,
     usage: dict[int, dict[str, list[dict[str, Any]]]],
 ) -> None:
-    """The View diff page: MDIM controls as navigation + side-by-side text diffs."""
+    """The View diff page: MDim controls as navigation + side-by-side text diffs."""
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
 
     # --- Jump straight to a changed view -----------------------------------------
@@ -302,7 +302,7 @@ def render_view_diff_page(
             on_change=_jump_to_changed,
         )
 
-    # --- MDIM controls (navigation across views) ---------------------------------
+    # --- MDim controls (navigation across views) ---------------------------------
     st.caption("🟡 marks a control option that leads to a changed view — follow the dots to the changes.")
     selection: dict[str, str] = {}
     columns = st.columns(min(4, max(1, len(dimensions))))
@@ -324,7 +324,7 @@ def render_view_diff_page(
             if v.changed and all(v.dimensions.get(s) == c for s, c in selection.items())
         }
         names = {c["slug"]: (c.get("name") or c["slug"]) for c in dim.get("choices", [])}
-        # Drop a stale URL value (e.g. after switching MDIM) so the widget doesn't crash.
+        # Drop a stale URL value (e.g. after switching MDim) so the widget doesn't crash.
         if st.query_params.get(key) not in available:
             st.query_params.pop(key, None)
             st.session_state.pop(key, None)
@@ -350,7 +350,7 @@ def render_view_diff_page(
 
     # --- Header: status + links --------------------------------------------------
     baseline_name = BASELINES[baseline]
-    # NOTE: `published_target` is NaN when the MDIM doesn't exist in the baseline (left join).
+    # NOTE: `published_target` is NaN when the MDim doesn't exist in the baseline (left join).
     baseline_slug = mdim_row.get("slug_target") if mdim_row.get("published_target") == 1 else None
     baseline_url = _view_url(_baseline_env(baseline), catalog_path, baseline_slug, view.dimensions)
     staging_url = _view_url(SOURCE, catalog_path, None, view.dimensions)
@@ -367,7 +367,7 @@ def render_view_diff_page(
     else:
         st.success("No changes in this view. " + " · ".join(links))
 
-    # --- Blast radius: does this change escape the MDIM? --------------------------
+    # --- Blast radius: does this change escape the MDim? --------------------------
     if view.changed and not view.is_new:
         _render_impact(view, usage)
 
@@ -376,7 +376,7 @@ def render_view_diff_page(
     for field_name in changed_fields:
         change = view.fields[field_name]
         shared = field_name in view.indicator_changed_fields
-        tag = " · :orange[↗ shared — also on charts / other MDIMs]" if shared else " · :gray[MDim-only]"
+        tag = " · :orange[↗ shared — also on charts / other MDims]" if shared else " · :gray[MDim-only]"
         st.markdown(f"##### {field_label(field_name)}{tag}")
         col_old, col_new = st.columns(2)
         with col_old:
@@ -390,7 +390,7 @@ def render_view_diff_page(
 def main() -> None:
     st.title(":material/difference: Metadata Diff")
     st.caption(
-        "Review how this staging server changes the metadata texts end users see on MDIMs "
+        "Review how this staging server changes the metadata texts end users see on MDims "
         "(e.g. *What you should know about this data*), view by view, against a baseline. "
         "This includes changes coming from garden step templates, which don't show up in config diffs."
     )
@@ -417,7 +417,7 @@ def main() -> None:
 
     df_mdims = get_mdim_changes(source_engine, target_engine)
     if df_mdims.empty:
-        st.warning("No MDIMs found on this staging server.")
+        st.warning("No MDims found on this staging server.")
         return
 
     def _format_mdim(path: str) -> str:
@@ -428,15 +428,15 @@ def main() -> None:
             return f"{path} ✏️"
         return path
 
-    col_select, col_mode = st.columns([3, 1], vertical_alignment="bottom")
+    col_select, col_mode, _spacer = st.columns([2, 1, 1], vertical_alignment="bottom")
     with col_select:
         catalog_path = url_persist(st.selectbox)(
-            "MDIM",
+            "MDim",
             key="mdim",
             options=df_mdims.index.tolist(),
             format_func=_format_mdim,
             on_change=_clear_view_params,
-            help="✏️ = the MDIM config differs from the baseline. Texts can also change "
+            help="✏️ = the MDim config differs from the baseline. Texts can also change "
             "through indicator metadata without a config change — the diff below catches both.",
         )
     with col_mode:
@@ -444,13 +444,13 @@ def main() -> None:
             "Mode",
             key="mode",
             options=["tree", "view"],
-            format_func=lambda m: "🌳 Blast radius" if m == "tree" else "🔍 View diff",
+            format_func=lambda m: "💥 Blast radius" if m == "tree" else "🔍 View diff",
             horizontal=True,
             label_visibility="collapsed",
         )
 
     if not catalog_path:
-        st.info("Select an MDIM.")
+        st.info("Select an MDim.")
         return
 
     dimensions, view_diffs = compute_diff(
@@ -461,10 +461,10 @@ def main() -> None:
     )
 
     if not view_diffs:
-        st.warning("This MDIM has no views.")
+        st.warning("This MDim has no views.")
         return
 
-    # Blast radius: which charts / other MDIMs use the indicators whose metadata this branch changed.
+    # Blast radius: which charts / other MDims use the indicators whose metadata this branch changed.
     changed_indicator_ids = sorted(
         {v.indicator_id for v in view_diffs if v.affects_indicator and v.indicator_id is not None}
     )
@@ -480,7 +480,7 @@ def main() -> None:
     else:
         n_changed = sum(1 for v in view_diffs if v.changed)
         if n_changed == 0:
-            st.success("No metadata changes in any view of this MDIM. The tree below shows all views.")
+            st.success("No metadata changes in any view of this MDim. The tree below shows all views.")
         external_impacts = [_impact_counts(v, usage) for v in view_diffs]
         tree_html, height = render_tree_html(
             catalog_path,
