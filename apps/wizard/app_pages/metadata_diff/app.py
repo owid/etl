@@ -277,10 +277,18 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
             )
             with st.popover(btn_label, use_container_width=True):
                 _render_affected_lists(view, charts, mdims)
-        # MDim views can instead scope the change to themselves — on-demand (opens only if clicked).
+        # MDim views can instead scope the change to themselves. The checkbox *records the decision*
+        # (it's what the PR will act on); the exact edits/code are revealed on demand only.
         if unit == "view":
-            with st.popover("✏️ Change only this view (MDim override)", use_container_width=True):
-                _render_override_body(view)
+            dims_key = "-".join(f"{k}={val}" for k, val in sorted(view.dimensions.items()))
+            if st.checkbox(
+                "✏️ Change only this view",
+                key=f"override::{dims_key}",
+                help="Scope this shared change to THIS view only — an MDim override instead of a shared "
+                "indicator change. Ticking records the decision for the PR; open the details for the exact edits.",
+            ):
+                with st.popover("Override details & code", use_container_width=True):
+                    _render_override_body(view)
 
 
 def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]) -> None:
@@ -433,17 +441,32 @@ def render_review_page(
     st.caption("Each row is one distinct change — a shared indicator edit is judged once here, not view by view.")
 
     for i, g in enumerate(groups):
-        with st.container(border=True):
-            imp = usage.get(g.indicator_id, {}) if (g.affects_indicator and g.indicator_id is not None) else {}
-            charts, mdims = imp.get("charts", []), imp.get("mdims", [])
-            reach_bits = [f"**{len(g.view_dims)}** view{'s' if len(g.view_dims) != 1 else ''} in this MDim"]
-            if charts:
-                reach_bits.append(f"**{len(charts)}** chart{'s' if len(charts) != 1 else ''}")
-            if mdims:
-                reach_bits.append(f"**{len(mdims)}** other MDim{'s' if len(mdims) != 1 else ''}")
+        status_key = f"rev-status::{catalog_path}::{i}"
+        comment_key = f"rev-comment::{catalog_path}::{i}"
+        status = st.session_state.get(status_key, _REVIEW_STATUSES[0])
+        comment = st.session_state.get(comment_key, "").strip()
+
+        imp = usage.get(g.indicator_id, {}) if (g.affects_indicator and g.indicator_id is not None) else {}
+        charts, mdims = imp.get("charts", []), imp.get("mdims", [])
+        reach_bits = [f"**{len(g.view_dims)}** view{'s' if len(g.view_dims) != 1 else ''} in this MDim"]
+        if charts:
+            reach_bits.append(f"**{len(charts)}** chart{'s' if len(charts) != 1 else ''}")
+        if mdims:
+            reach_bits.append(f"**{len(mdims)}** other MDim{'s' if len(mdims) != 1 else ''}")
+
+        # Collapse once a decision is reached — but keep a 🚩 flag open until its comment is written,
+        # so "flag then type" works (approving collapses immediately; flagging waits for the note).
+        expanded = status.startswith("⏳") or (status.startswith("🚩") and not comment)
+        reach_word = f"{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}"
+        if charts:
+            reach_word += f" · {len(charts)} chart{'s' if len(charts) != 1 else ''}"
+        header = f"{status.split()[0]} {field_label(g.field)} — {'shared' if g.affects_indicator else 'override'} · {reach_word}"
+        if comment:
+            header += "  💬"
+
+        with st.expander(header, expanded=expanded):
             scope = "🔗 shared indicator metadata" if g.affects_indicator else "🔒 MDim override"
-            st.markdown(f"##### {field_label(g.field)} · {scope}")
-            st.caption("Affects " + " · ".join(reach_bits))
+            st.caption(f"{scope} — affects " + " · ".join(reach_bits))
             c1, c2 = st.columns(2)
             with c1:
                 st.markdown(f":gray[**{baseline_name.capitalize()}**]")
@@ -453,13 +476,11 @@ def render_review_page(
                 st.markdown(_render_text_html(g.new, g.old, side="new"), unsafe_allow_html=True)
             s1, s2 = st.columns([1, 3])
             with s1:
-                st.radio(
-                    "Sign-off", _REVIEW_STATUSES, key=f"rev-status::{catalog_path}::{i}", label_visibility="collapsed"
-                )
+                st.radio("Sign-off", _REVIEW_STATUSES, key=status_key, label_visibility="collapsed")
             with s2:
                 st.text_area(
                     "Comment",
-                    key=f"rev-comment::{catalog_path}::{i}",
+                    key=comment_key,
                     placeholder="Optional note or suggested wording for the author…",
                     label_visibility="collapsed",
                 )
@@ -677,6 +698,17 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
     _render_diff_body(diff, baseline_name, links, usage, unit="chart")
 
 
+_ALL_NS = "(all namespaces)"
+
+
+def _mdim_namespace(catalog_path: str) -> str:
+    """Namespace segment of an MDim catalogPath (e.g. 'emissions'), used to filter the picker."""
+    parts = catalog_path.split("#", 1)[0].strip("/").split("/")
+    if parts and parts[0] == "grapher":
+        parts = parts[1:]
+    return parts[0] if parts else catalog_path
+
+
 def main() -> None:
     st.title(":material/difference: Metadata Diff")
     st.caption(
@@ -734,12 +766,27 @@ def main() -> None:
             return f"{path} ✏️"
         return path
 
-    col_select, _spacer = st.columns([3, 1], vertical_alignment="bottom")
+    namespaces = sorted({_mdim_namespace(p) for p in df_mdims.index})
+    col_ns, col_select = st.columns([1, 3], vertical_alignment="bottom")
+    with col_ns:
+        ns_filter = url_persist(st.selectbox)(
+            "Namespace",
+            key="mdim_ns",
+            options=[_ALL_NS] + namespaces,
+            on_change=_clear_view_params,
+            help="Filter the MDim list to one namespace, so you can scope a review to a dataset area "
+            "instead of every MDim.",
+        )
+    mdim_options = [p for p in df_mdims.index if ns_filter in (_ALL_NS, None) or _mdim_namespace(p) == ns_filter]
+    # Drop a persisted MDim that the namespace filter no longer includes, so the widget doesn't crash.
+    if st.query_params.get("mdim") not in mdim_options:
+        st.query_params.pop("mdim", None)
+        st.session_state.pop("mdim", None)
     with col_select:
         catalog_path = url_persist(st.selectbox)(
             "MDim",
             key="mdim",
-            options=df_mdims.index.tolist(),
+            options=mdim_options,
             format_func=_format_mdim,
             on_change=_clear_view_params,
             help="Select the MDim to review — type in the box to search it. "
