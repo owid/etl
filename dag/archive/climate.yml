@@ -2648,3 +2648,23 @@ steps:
   # archived; last active in f46ee351db40 on 2026-07-27
   data://grapher/climate/2026-07-10/wildfires_by_year:
     - data://garden/climate/2026-07-10/weekly_wildfires
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/climate/2026-07-27/wildfires_by_week_average:
+    - data://grapher/climate/2026-07-27/wildfires_by_week
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://garden/climate/2026-07-27/weekly_wildfires:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/climate/2026-07-27/weekly_wildfires
+    - data://garden/faostat/2026-02-25/faostat_rl
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://meadow/climate/2026-07-27/weekly_wildfires:
+    - snapshot://climate/2026-07-27/weekly_wildfires.csv
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/climate/2026-07-27/wildfires_by_week:
+    - data://garden/climate/2026-07-27/weekly_wildfires
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/climate/2026-07-27/wildfires_by_year:
+    - data://garden/climate/2026-07-27/weekly_wildfires
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/climate/2026-07-27/weekly_wildfires:
+    - data://garden/climate/2026-07-27/weekly_wildfires

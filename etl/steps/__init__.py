@@ -55,6 +55,19 @@ DAG = dict[str, set[str]]
 INSTANT_METADATA_DIFF = {}
 
 
+class StepFailedError(Exception):
+    """A step's code raised in the child process (fork or subprocess) that ran it.
+
+    The message carries the child's traceback, since the exception itself has none worth printing:
+    its own frames are the runner's, and across a process pool they arrive wrapped in
+    `_RemoteTraceback` plumbing.
+
+    This must be a regular Exception rather than a `sys.exit(exit_code)`: the runners catch
+    `Exception` to log which step failed and to honour `--continue-on-failure`, and a `SystemExit`
+    would sail past those handlers and end the run without naming the step or printing anything.
+    """
+
+
 def compile_steps(
     dag: DAG,
     subdag: DAG,
@@ -682,9 +695,18 @@ class DataStep(Step):
         else:
             self._run_py_subprocess()
 
+    def _child_failure_message(self, traceback_path: Path, exit_code: int) -> str:
+        """Describe a failed child: the traceback it left behind, if it got that far, and the step."""
+        try:
+            child_traceback = traceback_path.read_text().rstrip() + "\n"
+        except OSError:
+            child_traceback = ""
+        return f"{child_traceback}Step {self} failed with exit code {exit_code}"
+
     def _run_py_fork(self) -> None:
         """Run the step in a forked child process (Linux only)."""
         import resource
+        import tempfile
         import traceback
 
         # Apply the same virtual-memory limit that prlimit would enforce
@@ -695,6 +717,12 @@ class DataStep(Step):
                 )
             except ValueError:
                 pass  # not all systems support RLIMIT_AS
+
+        # Somewhere for the child to leave its traceback; see the child branch below. Created here
+        # so the name is unique per run and both processes know it.
+        traceback_fd, traceback_file = tempfile.mkstemp(prefix="etl-step-traceback-", suffix=".txt")
+        os.close(traceback_fd)
+        traceback_path = Path(traceback_file)
 
         # Flush before forking to prevent the child from inheriting (and
         # potentially re-flushing) buffered output from the parent, which
@@ -730,18 +758,31 @@ class DataStep(Step):
                 run_module_run(step_module, self._dest_dir.as_posix())
                 os._exit(0)
             except BaseException:
-                traceback.print_exc()
+                # Hand the traceback to the parent through a file rather than writing it to the
+                # stdout this child shares with its siblings. A traceback easily exceeds PIPE_BUF,
+                # above which a write is neither atomic nor guaranteed to complete in one call, so
+                # concurrent children would interleave into an unreadable mix. The parent puts it in
+                # StepFailedError's message, and the runners print one failure at a time, labelled
+                # with the step it belongs to.
+                try:
+                    traceback_path.write_text(traceback.format_exc())
+                except OSError:
+                    # Last resort, interleaved or not: never lose the traceback.
+                    traceback.print_exc()
                 os._exit(1)
         else:
             # ---------- parent process ----------
-            _, status = os.waitpid(pid, 0)
-            if os.WIFEXITED(status):
-                exit_code = os.WEXITSTATUS(status)
-                if exit_code != 0:
-                    sys.exit(exit_code)
-            elif os.WIFSIGNALED(status):
-                sig = os.WTERMSIG(status)
-                raise Exception(f"Step {self} was killed by signal {sig}")
+            try:
+                _, status = os.waitpid(pid, 0)
+                if os.WIFEXITED(status):
+                    exit_code = os.WEXITSTATUS(status)
+                    if exit_code != 0:
+                        raise StepFailedError(self._child_failure_message(traceback_path, exit_code))
+                elif os.WIFSIGNALED(status):
+                    sig = os.WTERMSIG(status)
+                    raise Exception(f"Step {self} was killed by signal {sig}")
+            finally:
+                traceback_path.unlink(missing_ok=True)
 
     def _run_py_subprocess(self) -> None:
         """Run the step in a new subprocess (fallback for non-Linux or debug mode)."""
@@ -769,7 +810,7 @@ class DataStep(Step):
         try:
             subprocess.check_call(args, env=env)
         except subprocess.CalledProcessError as e:
-            sys.exit(e.returncode)
+            raise StepFailedError(f"Step {self} failed with exit code {e.returncode} (traceback above)") from e
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""

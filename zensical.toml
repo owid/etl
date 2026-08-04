@@ -30,10 +30,12 @@ nav = [
             { "Updating data" = "guides/data-work/update-data.md" },
             { "Update charts" = "guides/data-work/update-charts.md" },
             { "MDIMs and Explorers" = "guides/data-work/mdims.md" },
+            { "Redirect to MDIMs" = "guides/data-work/redirect-to-mdims.md" },
             { "Export data" = "guides/data-work/export-data.md" },
             { "Publish indicator metadata" = "guides/data-work/create-gsheet.md" },
             { "Wizard" = "guides/wizard.md" },
             { "AI workflow" = "guides/data-work/ai-workflow.md" },
+            { "Claude Code on the web" = "guides/data-work/claude-code-web.md" },
             { "CLI" = "guides/etl-cli.md" },
         ] },
         { "Other tasks" = [

@@ -1131,3 +1131,31 @@ steps:
     - data://garden/antibiotics/2026-06-30/glass_enrolment:
       - data://meadow/antibiotics/2026-06-30/glass_enrolment:
         - snapshot://antibiotics/2026-06-30/glass_enrolment.xlsx
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/who/2023-10-13/medical_devices_atlas:
+    - data://garden/who/2023-10-13/medical_devices_atlas:
+      - data://meadow/who/2023-10-13/medical_devices_atlas:
+        - snapshot://who/2023-10-13/medical_devices_atlas_gc_nm.csv
+        - snapshot://who/2023-10-13/medical_devices_atlas_pet.csv
+        - snapshot://who/2023-10-13/medical_devices_atlas_ct.csv
+        - snapshot://who/2023-10-13/medical_devices_atlas_mri.csv
+  # archived; last active in 7638681e6045 on 2026-08-03
+  data://grapher/cancer/2024-09-13/diagnosis_routes_survival:
+    - data://garden/cancer/2024-09-13/diagnosis_routes_survival:
+      - data://meadow/cancer/2024-09-13/diagnosis_routes_survival:
+        - snapshot://cancer/2024-09-13/diagnosis_routes_survival.csv
+  # archived; last active in 7638681e6045 on 2026-08-03
+  data://grapher/cancer/2024-08-30/gco_alcohol:
+    - data://garden/cancer/2024-08-30/gco_alcohol:
+      - data://meadow/cancer/2024-08-30/gco_alcohol:
+        - snapshot://cancer/2024-08-30/gco_alcohol.csv
+  # archived; last active in 7638681e6045 on 2026-08-03
+  data://grapher/cardiovascular_diseases/2023-10-10/esc:
+    - data://garden/cardiovascular_diseases/2023-10-10/esc:
+      - data://meadow/cardiovascular_diseases/2023-10-10/esc:
+        - snapshot://cardiovascular_diseases/2023-10-10/esc.csv
+  # archived; last active in 7638681e6045 on 2026-08-03
+  data://grapher/cardiovascular_diseases/2025-10-21/esc:
+    - data://garden/cardiovascular_diseases/2025-10-21/esc:
+      - data://meadow/cardiovascular_diseases/2025-10-21/esc:
+        - snapshot://cardiovascular_diseases/2025-10-21/esc.csv
