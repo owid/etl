@@ -321,7 +321,16 @@ The grapher frontend keeps its own copy of the regions and a few hand-maintained
 curl -s "https://catalog.ourworldindata.org/external/owid_grapher/latest/regions/regions.csv?nocache" | grep -c "PROVIDER_"
 ```
 
-A non-zero count means it's ready. If you're waiting, poll this every few minutes rather than running the updater blind. (To preview earlier you can point the updater at a staging catalog, but the committed PR should be regenerated from prod.)
+A non-zero count means it's ready. If you're waiting, poll this every few minutes rather than running the updater blind.
+
+> **Preview from your ETL branch's staging catalog while you wait.** The updater reads `ETL_REGIONS_URL` if it's set (`devTools/regionsUpdater/update.ts`), and every ETL staging server publishes its own catalog on port 8881 with the same schema as prod. So you can regenerate `regions.data.ts` — and everything downstream of it, including the colors and the test page — before the ETL PR is anywhere near merged:
+>
+> ```bash
+> ETL_REGIONS_URL="http://staging-site-<etl-branch>.tail6e23.ts.net:8881/external/owid_grapher/latest/regions/regions.csv" \
+>   yarn runRegionsUpdater
+> ```
+>
+> `<etl-branch>` is **truncated to 28 characters** in the host name. Use this for previews and for the color review only — before merging the grapher PR, re-run `yarn runRegionsUpdater` with no env var so the committed file is prod-derived (see *Renaming existing regions* for why a stale/hand-edited `regions.data.ts` is a trap).
 
 Work in the `owid-grapher` repo on a new branch. There are two ways to register a provider — `regionGroupLabels` in `RegionGroups.ts` documents the split in its own comments: *"…where we have region definition about what constitutes these regions in regions.ts"* vs *"…we don't have region definitions … (we recognize them by their suffix)"*. They correspond to the `RegionDataProvider` and `AdditionalRegionDataProvider` types. *(Earlier drafts of this skill called these "Path A / Path B" — that's not a codebase term; ignore that wording.)*
 
@@ -372,7 +381,17 @@ When a Grapher chart plots a region entity (e.g. `"Sub-Saharan Africa (ILO)"`) a
 
 ### Region colors — two dictionaries, two jobs
 
-Both live in `packages/@ourworldindata/grapher/src/color/CustomSchemes.ts`, and every provider needs an entry in **both**:
+**Colors are not an ETL artifact.** Nothing you can write in `regions.meta.override.yml` sets a region's color. The ETL side sets exactly one thing — `baseColorScheme: OwidCategoricalMap` (Step 6b), which decides that colors are looked up *by region name*. The color values themselves are TypeScript in owid-grapher, so the whole color conversation happens in the Step 9 PR, on an owid-grapher branch:
+
+| Where | What it can show | Good for |
+|---|---|---|
+| ETL staging (`staging-site-<etl-branch>`) | the region chart with **fallback** colors — muted map palette handed out in legend order, because the names aren't pinned yet | checking the *indicator*: membership, legend order, labels. **Not** the color proposal |
+| owid-grapher staging (`staging-site-<grapher-branch>`) → `/admin/test-region-maps` | the real thing: your pinned map colors on a map, beside the chart colors on a line chart | **this is where you present the colors** |
+| Production `/admin/test-region-maps` | every provider as currently deployed | picking which provider to mirror, before you write a line |
+
+So the answer to *"where do I show the colors while I'm working in ETL?"* is: you don't — you open the grapher branch and show them from its staging server. You don't have to wait for the ETL PR to merge to do that; regenerate `regions.data.ts` from your ETL branch's staging catalog (see the `ETL_REGIONS_URL` note at the top of Step 9), push the grapher branch, and its test page renders the new provider with your proposed colors. Re-run the updater against prod before that PR merges.
+
+Both dictionaries live in `packages/@ourworldindata/grapher/src/color/CustomSchemes.ts`, and every provider needs an entry in **both**:
 
 | Dictionary | For | Vocabulary | Backs |
 |---|---|---|---|
@@ -427,12 +446,14 @@ Confirm the provider appears in `regionGroupLabels` and the relevant label recor
 
 ### Get the colors signed off
 
-Colors are a design call, and what the skill produces is a **first stab** — it always goes to a human. Sequence:
+Colors are a design call, and what the skill produces is a **first stab** — it always goes to a human. All of this happens on the **owid-grapher** PR, not the ETL one:
 
-1. **Open the PR** (above) with the proposed colors in the body: a `region → chart color → map color` table (constant names *and* hex), the provider you mirrored, and the staging test-page link.
+1. **Open the PR** (above) with the proposed colors in the body: a `region → chart color → map color` table (constant names *and* hex), the provider you mirrored, and the link to **this branch's** test page — `http://staging-site-<grapher-branch>/admin/test-region-maps`. Wait for the staging server to build before sharing the link; open it yourself first.
 2. **Ask Marwa** — draft a Slack message to `@mrwbkrm` with that same table and link, asking her to look at the rendered maps on the test page (point at the *"Providers with hard-coded region colors"* section). Don't request the code review yet.
 3. **Apply her changes**, push, and only then **request review from Sophia** — `gh pr edit <n> --add-reviewer sophiamersmann`.
 4. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
+
+> **You can start this before the ETL PR merges** — the color review only needs `regions.data.ts` to know the new provider, and the `ETL_REGIONS_URL` preview gives you that from your ETL branch's staging catalog. What you must **not** do is merge the grapher PR on a staging-derived `regions.data.ts`: re-run `yarn runRegionsUpdater` against prod once the regions are live there, and push that regeneration as the last commit. The colors don't change in that regeneration — only the region data does.
 
 ### Renaming existing regions (not a fresh add)
 
