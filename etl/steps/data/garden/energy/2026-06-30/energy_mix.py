@@ -362,12 +362,6 @@ def add_biomass_inclusive_shares(tb: Table) -> Table:
     for source, name in BIOMASS_SHARE_SOURCES.items():
         col = f"{source}_share_including_biomass_pct"
         tb[col] = (100 * tb[f"{source}_twh"] / total_with_biomass).clip(upper=100)
-        tb[col].metadata.title = f"{name} as a share of primary energy (including traditional biomass)"
-        tb[col].metadata.unit = "%"
-        tb[col].metadata.short_unit = "%"
-        display = dict(tb[col].metadata.display or {})
-        display["name"] = name
-        tb[col].metadata.display = display
     return tb
 
 
@@ -401,37 +395,6 @@ def add_per_gdp(tb: Table, ds_gdp: Dataset) -> Table:
     tb = add_gdp_to_table(tb=tb, ds_gdp=ds_gdp, gdp_col="gdp")
     tb["total_energy_supply_per_gdp_kwh_per_dollar"] = tb["total_energy_supply_twh"] / tb["gdp"] * TWH_TO_KWH
     tb = tb.drop(columns=["gdp"], errors="raise")
-    return tb
-
-
-def add_variable_metadata(tb: Table) -> Table:
-    """Set title, unit and short unit for all generated variables."""
-    metric_specs = {
-        "twh": ("{name}", "terawatt-hours", "TWh"),
-        "per_capita_kwh": ("{name} per capita", "kilowatt-hours per person", "kWh"),
-        "share_pct": ("{name} as a share of total energy supply", "%", "%"),
-        "annual_change_twh": ("Annual change in {name_lower}", "terawatt-hours", "TWh"),
-        "annual_change_pct": ("Annual change in {name_lower} (%)", "%", "%"),
-    }
-    source_names = {**SOURCE_NAMES, "total_energy_supply": "Total energy supply"}
-    for column in tb.columns:
-        for suffix, (title_template, unit, short_unit) in metric_specs.items():
-            for source, name in source_names.items():
-                if column == f"{source}_{suffix}":
-                    tb[column].metadata.title = title_template.format(name=name, name_lower=name.lower())
-                    tb[column].metadata.unit = unit
-                    tb[column].metadata.short_unit = short_unit
-                    # Set display.name to the source's clean name, so stacked-chart series are labelled
-                    # correctly. Aggregates (e.g. renewables) otherwise inherit a stray display.name from
-                    # the arithmetic that built them (renewables was showing up as "Biofuels").
-                    display = dict(tb[column].metadata.display or {})
-                    display["name"] = name
-                    tb[column].metadata.display = display
-    # Per-GDP variable.
-    if "total_energy_supply_per_gdp_kwh_per_dollar" in tb.columns:
-        tb["total_energy_supply_per_gdp_kwh_per_dollar"].metadata.title = "Total energy supply per unit of GDP"
-        tb["total_energy_supply_per_gdp_kwh_per_dollar"].metadata.unit = "kilowatt-hours per dollar"
-        tb["total_energy_supply_per_gdp_kwh_per_dollar"].metadata.short_unit = "kWh"
     return tb
 
 
@@ -501,9 +464,6 @@ def run() -> None:
 
     # Remove outliers.
     tb = tb[~tb["country"].isin(OUTLIERS)].reset_index(drop=True)
-
-    # Set variable metadata.
-    tb = add_variable_metadata(tb=tb)
 
     # Sanity checks.
     sanity_check_outputs(tb=tb)
