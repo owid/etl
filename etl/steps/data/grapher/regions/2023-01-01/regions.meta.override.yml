@@ -118,6 +118,7 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -146,6 +147,7 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -185,6 +187,7 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -231,6 +234,7 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -264,6 +268,7 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -297,6 +302,7 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -328,6 +334,7 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -356,6 +363,24 @@ tables:
           - Asia Pacific (IEA)
         origins:
           - *origins_iea_regions
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
+              colorScale:
+                baseColorScheme: OwidCategoricalMap    # name-keyed region colors
+                customCategoryLabels:
+                  "North America (IEA)": "North America"
+                  "Central and South America (IEA)": "Central and South America"
+                  "Africa (IEA)": "Africa"
+                  "Middle East (IEA)": "Middle East"
+                  "Europe (IEA)": "Europe"
+                  "Eurasia (IEA)": "Eurasia"
+                  "Asia Pacific (IEA)": "Asia Pacific"
+                customHiddenCategories:
+                  "No data": true
 
       # Energy Institute
       ei_region:
@@ -378,6 +403,7 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -412,6 +438,7 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -443,6 +470,7 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -477,6 +505,7 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -514,6 +543,7 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -548,6 +578,7 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -584,6 +615,7 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -620,6 +652,7 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -666,6 +699,7 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
@@ -715,6 +749,7 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
                 baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:

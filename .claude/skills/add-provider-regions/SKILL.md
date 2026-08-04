@@ -215,6 +215,7 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
             hideAnnotationFieldsInTitle:
               time: true                        # hide the placeholder data year in titles
             map:
+              tooltipUseCustomLabels: true          # tooltip shows the stripped label too — see below
               colorScale:
                 baseColorScheme: OwidCategoricalMap    # name-keyed region colors — see Step 9
                 customCategoryLabels:
@@ -225,6 +226,8 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
                 # keyed by region name; a block here would override them and fork the
                 # source of truth.
 ```
+
+> **`customCategoryLabels` alone only fixes the legend.** Hovering a country still shows the raw `"<Region> (<Provider>)"`, because the map tooltip falls back to the unformatted value unless **`map.tooltipUseCustomLabels: true`** is set (`MapChartState.formatValueForTooltip` — it looks up the bin's label only behind that flag). Set both, always, and give **every** region in `sort` a label entry: a region you miss keeps its suffix in the legend *and* the tooltip while its siblings lose theirs, which reads as a data error rather than a missing config line.
 
 > **Set the palette, don't hardcode the colors.** A categorical map with no `baseColorScheme` falls back to `BuGn` — a sequential green ramp (`MapChartState.ts:53`). Region colors are only looked up by name when the map is on **`OwidCategoricalMap`**, the scheme that carries `colorMap: MapContinentColors`. Setting it on the *indicator* means every chart built on it inherits the palette (the same inheritance that already carries `customCategoryLabels`). A chart's **own** patch still wins over the inherited value, so once the chart exists, confirm on staging that it isn't patched to something else (`world-regions-according-to-pew` is patched to `continents` — a *chart* palette on a map, which pulls the strong colors instead of the muted ones).
 
