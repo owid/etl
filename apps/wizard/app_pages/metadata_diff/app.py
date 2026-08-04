@@ -500,12 +500,15 @@ def main() -> None:
 
     source_engine, target_engine = get_engines(baseline)
 
-    target = url_persist(st.radio)(
-        "Review",
-        key="target",
+    target = url_persist(st.segmented_control)(
+        label="Review",
         options=["mdim", "chart"],
-        format_func=lambda t: "🧭 MDim" if t == "mdim" else "📈 Individual chart",
-        horizontal=True,
+        format_func=lambda x: {
+            "mdim": ":material/dashboard: MDim",
+            "chart": ":material/show_chart: Individual chart",
+        }[x],
+        key="target",
+        value="mdim",
         label_visibility="collapsed",
     )
     if target == "chart":
