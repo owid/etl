@@ -446,18 +446,25 @@ def _review_markdown(
     return "\n".join(lines)
 
 
-def _signoff_options(g: Any, n_charts: int, n_mdims: int) -> tuple[list[str], dict[str, str]]:
+def _signoff_options(g: Any, n_charts: int, n_mdims: int, allow_scope: bool = True) -> tuple[list[str], dict[str, str]]:
     """Sign-off options for a change. A *shared* change that fans out to other surfaces gets a
     reach-explicit 'Apply to all (N charts…)' (so approving it is a conscious act, not a default click)
-    and an explicit 'Scope to this view' alternative — the guardrail against silently repainting charts."""
+    and — where a per-view override is possible (MDim views, not standalone charts) — an explicit
+    'Scope to this view' alternative. The guardrail against silently repainting charts."""
     if g.affects_indicator and (n_charts + n_mdims) > 0:
         reach = f"{n_charts} chart{'s' if n_charts != 1 else ''}"
         if n_mdims:
             reach += f" · {n_mdims} MDim{'s' if n_mdims != 1 else ''}"
         approve = f"✅ Apply to all ({reach})"
-        scope = "✏️ Scope to this view" if len(g.view_dims) == 1 else f"✏️ Scope to these {len(g.view_dims)} views"
-        options = ["⏳ Pending", approve, scope, "🚩 Flag"]
-        return options, {approve: "approved", scope: "scoped", "🚩 Flag": "flagged"}
+        options = ["⏳ Pending", approve]
+        to_db = {approve: "approved"}
+        if allow_scope:
+            scope = "✏️ Scope to this view" if len(g.view_dims) == 1 else f"✏️ Scope to these {len(g.view_dims)} views"
+            options.append(scope)
+            to_db[scope] = "scoped"
+        options.append("🚩 Flag")
+        to_db["🚩 Flag"] = "flagged"
+        return options, to_db
     approve = "✅ Approve"
     return ["⏳ Pending", approve, "🚩 Flag"], {approve: "approved", "🚩 Flag": "flagged"}
 
@@ -816,6 +823,106 @@ def render_view_diff_page(
     _render_diff_body(view, baseline_name, baseline_url, staging_url, usage, unit="view")
 
 
+def _render_chart_review(
+    chart: dict[str, Any],
+    diff: ViewDiff,
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
+    source_engine: Engine,
+) -> None:
+    """Per-chart sign-off on its indicator text change — same DB lock-in + gate as the MDim review,
+    keyed by the chart slug. A standalone chart can't be overridden, so there's no 'scope' option."""
+    groups = group_changes([diff])
+    if not groups:
+        return
+    catalog_root = f"chart:{chart['slug']}"
+    reviews = load_reviews(source_engine, catalog_root)
+    reviewer = _reviewer()
+
+    resolved: list[dict[str, Any]] = []
+    for g in groups:
+        change_key, content_hash = change_group_identity(catalog_root, g)
+        imp = usage.get(g.indicator_id, {}) if (g.affects_indicator and g.indicator_id is not None) else {}
+        options, to_db = _signoff_options(g, len(imp.get("charts", [])), len(imp.get("mdims", [])), allow_scope=False)
+        from_db = {v: k for k, v in to_db.items()}
+        row = reviews.get(change_key)
+        stale = bool(row) and row.get("contentHash") != content_hash
+        if row and not stale:
+            seed_label = from_db.get(row.get("status"), "⏳ Pending")
+            seed_comment = row.get("comment") or ""
+        else:
+            seed_label, seed_comment = "⏳ Pending", ""
+        resolved.append(
+            {
+                "g": g,
+                "change_key": change_key,
+                "content_hash": content_hash,
+                "stale": stale,
+                "options": options,
+                "to_db": to_db,
+                "seed_label": seed_label,
+                "seed_comment": seed_comment,
+                "reviewer": (row or {}).get("reviewer"),
+                "updatedAt": (row or {}).get("updatedAt"),
+            }
+        )
+
+    for r in resolved:
+        sk, ck = _review_status_key(catalog_root, r["change_key"]), _review_comment_key(catalog_root, r["change_key"])
+        if sk not in st.session_state:
+            st.session_state[sk] = r["seed_label"]
+        if ck not in st.session_state:
+            st.session_state[ck] = r["seed_comment"]
+
+    def _eff(r: dict[str, Any]) -> str:
+        if r["stale"]:
+            return "stale"
+        label = st.session_state.get(_review_status_key(catalog_root, r["change_key"]), r["seed_label"])
+        return r["to_db"].get(label, "pending")
+
+    states = [_eff(r) for r in resolved]
+    n = len(states)
+    n_appr = states.count("approved")
+
+    st.divider()
+    if n_appr == n and n > 0:
+        st.success(f"🔒 **Signed off** — all {n} change{'s' if n != 1 else ''} approved (locked to the current text).")
+    else:
+        st.warning(f"🔒 **Not signed off** — {n_appr}/{n} approved. Sign off each change below to lock it in.")
+
+    def _make_save(change_key: str, content_hash: str, to_db: dict[str, str]):
+        sk, ck = _review_status_key(catalog_root, change_key), _review_comment_key(catalog_root, change_key)
+
+        def _save() -> None:
+            label = st.session_state.get(sk, "⏳ Pending")
+            comment = (st.session_state.get(ck) or "").strip() or None
+            db_status = to_db.get(label)
+            if db_status is None:
+                delete_review(source_engine, change_key)
+            else:
+                upsert_review(source_engine, catalog_root, change_key, content_hash, db_status, comment, reviewer)
+
+        return _save
+
+    for r in resolved:
+        g = r["g"]
+        sk, ck = _review_status_key(catalog_root, r["change_key"]), _review_comment_key(catalog_root, r["change_key"])
+        eff = _eff(r)
+        save = _make_save(r["change_key"], r["content_hash"], r["to_db"])
+        st.markdown(f"**{field_label(g.field)}**" + ("  ⚠️ edited since review" if r["stale"] else ""))
+        if r["stale"]:
+            st.caption(
+                "Edited since it was last reviewed — the previous sign-off no longer counts. Re-review to lock in."
+            )
+        c1, c2 = st.columns([1, 3])
+        with c1:
+            st.radio("Sign-off", r["options"], key=sk, on_change=save, label_visibility="collapsed")
+        with c2:
+            st.text_area("Comment", key=ck, on_change=save, placeholder="Optional note…", label_visibility="collapsed")
+        if r["reviewer"] and not r["stale"] and eff != "pending":
+            when = f" · {r['updatedAt']}" if r.get("updatedAt") else ""
+            st.caption(f"Signed off by **{r['reviewer']}**{when}")
+
+
 def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> None:
     """Review a standalone chart's data-page WYSK (the indicator metadata it inherits), vs the baseline."""
     baseline_name = BASELINES[baseline]
@@ -867,6 +974,9 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
     baseline_url = f"{_baseline_env(baseline).site}/grapher/{chart['slug']}"
     staging_url = f"{SOURCE.site}/grapher/{chart['slug']}"
     _render_diff_body(diff, baseline_name, baseline_url, staging_url, usage, unit="chart")
+
+    if diff.changed and not diff.is_new:
+        _render_chart_review(chart, diff, usage, source_engine)
 
 
 _ALL_NS = "(all namespaces)"
