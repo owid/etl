@@ -19,9 +19,9 @@ tables:
       volume_index:
         title: Trade volume index
         unit: index 1800=1
-        description_short: World trade index, based on the average of exports and imports values, adjusted for inflation (1800 = 1).
+        description_short: BERTHA World trade index, based on the average of exports and imports values, adjusted for inflation (1800 = 1).
         description_key:
-          - One of the defining developments of the past two centuries has been the increasing integration of national economies into a single global system. This indicator illustrates the expansion of trade and the growing interconnectedness of the world economy since 1800.
+          - BERTHA One of the defining developments of the past two centuries has been the increasing integration of national economies into a single global system. This indicator illustrates the expansion of trade and the growing interconnectedness of the world economy since 1800.
           - It shows the volume of world trade, measuring the goods exchanged across national borders. To compare trade over time, researchers construct an index that averages exports and imports and set a baseline year (here, 1800 = 1) to track how global trade has evolved.
           - The historical component is based on [Federico & Tena-Junguito (2016)](https://link.springer.com/article/10.1007/s10290-017-0279-z), who compiled trade statistics from hundreds of historical sources covering nearly every country and colony from 1800 to 1938, adjusting all estimates to 1913 borders. Their original index was expressed relative to 1913 = 100; here, we have re-indexed it so that 1800 = 1.
           - "Because definitions varied, the researchers standardized the historical data to modern UN conventions: smuggling, re-exports, transit trade, and bullion were excluded; fiscal years were aligned with calendar years; imports were valued including freight, and exports excluding it. Researchers used detailed price indexes to correct for inflation and shipping costs."
