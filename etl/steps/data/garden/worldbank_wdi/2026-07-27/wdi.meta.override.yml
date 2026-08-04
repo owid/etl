@@ -842,6 +842,9 @@ tables:
         display:
           numSignificantFigures: 2
           tolerance: 5
+      fp_cpi_totl_zg:
+        description_key:
+          - This data shows the annual percentage changes in the consumer price index, which reflect changes in the cost to the average consumer of acquiring a basket of goods and services. For regional and global aggregates, the source constructs it using the median value for the group.
       sn_itk_defc_zs:
         title: Prevalence of undernourishment (% of population)
         unit: '% of population'
