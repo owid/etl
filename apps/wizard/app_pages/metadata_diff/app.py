@@ -222,8 +222,18 @@ def _plain_text_html(value: Any) -> str:
     return f'<div class="mdd-text">{html.escape(str(value))}</div>'
 
 
+def _orange_banner(html_msg: str) -> None:
+    """A theme-safe orange banner (matches the 🟠 'shared indicator metadata' idea). Takes HTML."""
+    st.markdown(
+        '<div style="background:rgba(232,89,12,0.12);border-left:4px solid #e8590c;'
+        f'padding:10px 14px;border-radius:6px;">{html_msg}</div>',
+        unsafe_allow_html=True,
+    )
+
+
 def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]]]], unit: str = "view") -> None:
-    """The 'does this also affect charts / other MDims?' flag for one view, with an expandable list."""
+    """The 'does this also affect charts / other MDims?' flag for one view, with the affected list and
+    (for MDim views) the 'change only this view' override — both as on-demand buttons on the right."""
     if not view.affects_indicator:
         if unit == "chart":
             st.caption(
@@ -239,36 +249,38 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
 
     charts, mdims = _view_impact(view, usage)
     n_c, n_m = len(charts), len(mdims)
-
-    if n_c == 0 and n_m == 0:
-        st.info(
-            "This change is in the **shared indicator metadata**, but no published charts or other "
-            "MDims currently use this indicator — so nothing else is affected."
-        )
-        return
-
     parts = []
     if n_c:
-        parts.append(f"**{n_c}** chart{'s' if n_c != 1 else ''}")
+        parts.append(f"<b>{n_c}</b> chart{'s' if n_c != 1 else ''}")
     if n_m:
-        parts.append(f"**{n_m}** other MDim{'s' if n_m != 1 else ''}")
+        parts.append(f"<b>{n_m}</b> other MDim{'s' if n_m != 1 else ''}")
 
-    # Yellow warning box (matching the status box above) with the button right next to it.
     col_msg, col_btn = st.columns([5, 2], vertical_alignment="center")
     with col_msg:
-        st.warning(
-            "This change is in the **shared indicator metadata** — it also affects "
-            + " and ".join(parts)
-            + " that use this indicator."
-        )
+        if parts:
+            _orange_banner(
+                "This change is in the <b>shared indicator metadata</b> — it also affects "
+                + " and ".join(parts)
+                + " that use this indicator."
+            )
+        else:
+            _orange_banner(
+                "This change is in the <b>shared indicator metadata</b>, but no published charts or other "
+                "MDims currently use this indicator — so nothing else is affected."
+            )
     with col_btn:
-        btn_label = (
-            f"📊 Show {n_c} affected chart{'s' if n_c != 1 else ''}"
-            if n_c
-            else f"🧭 Show {n_m} affected MDim{'s' if n_m != 1 else ''}"
-        )
-        with st.popover(btn_label, use_container_width=True):
-            _render_affected_lists(view, charts, mdims)
+        if n_c or n_m:
+            btn_label = (
+                f"📊 Show {n_c} affected chart{'s' if n_c != 1 else ''}"
+                if n_c
+                else f"🧭 Show {n_m} affected MDim{'s' if n_m != 1 else ''}"
+            )
+            with st.popover(btn_label, use_container_width=True):
+                _render_affected_lists(view, charts, mdims)
+        # MDim views can instead scope the change to themselves — on-demand (opens only if clicked).
+        if unit == "view":
+            with st.popover("✏️ Change only this view (MDim override)", use_container_width=True):
+                _render_override_body(view)
 
 
 def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]) -> None:
@@ -287,31 +299,22 @@ def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]
             st.markdown(f"- `{m.get('catalogPath')}`")
 
 
-def _render_override_control(view_diff: ViewDiff) -> None:
-    """Checkbox to scope a shared change to THIS view only.
+def _render_override_body(view_diff: ViewDiff) -> None:
+    """Popover content: scope a shared change to THIS view only.
 
     The change currently lives in the shared indicator, so it reaches every chart / MDim view above.
-    Ticking scopes it here: keep the indicator (and all those other surfaces) on the old text, and
-    apply the new text as a view override. That's two edits — a garden revert + this override — so we
-    spell out both and generate the override snippet (set to the new/staging text).
+    Scoping it here keeps the indicator (and all those other surfaces) on the old text and applies the
+    new text as a view override — two edits (a garden revert + this override), both spelled out. The
+    generated snippet is set to the new/staging text.
     """
     shared_fields = [f for f in FIELD_ORDER if f in view_diff.fields and f in view_diff.indicator_changed_fields]
     if not shared_fields:
-        return
-
-    dims_key = "-".join(f"{k}={v}" for k, v in sorted(view_diff.dimensions.items()))
-    if not st.checkbox(
-        "Change only this view — not the shared indicator metadata",
-        key=f"override-{dims_key}",
-        help="The change is currently in the shared indicator, so it reaches every chart and MDim view "
-        "listed above. Tick to scope it to THIS view only: the indicator (and all those other surfaces) "
-        "keep the old text, and the new text is applied here as a view override.",
-    ):
+        st.caption("No shared-indicator field to scope in this view.")
         return
 
     fields_str = ", ".join(f"`{field_label(f)}`" for f in shared_fields)
     st.markdown(
-        "To make this a **view-only** change, do both:\n\n"
+        "Scope this change to **only this view**, in two edits:\n\n"
         f"1. **Revert the shared change** ({fields_str}) in the indicator's garden `.meta.yml`, so every "
         "other chart and MDim view keeps the old text.\n"
         "2. **Add this override** to the MDim's Python step (after its `c.views` are built) — it re-applies "
@@ -340,9 +343,6 @@ def _render_diff_body(
 
     if view_diff.changed and not view_diff.is_new:
         _render_impact(view_diff, usage, unit=unit)
-        # Right below the "affects N charts" flag: let the reviewer scope a shared change to this view.
-        if unit == "view" and view_diff.affects_indicator:
-            _render_override_control(view_diff)
 
     for field_name in [f for f in FIELD_ORDER if f in view_diff.fields]:
         change = view_diff.fields[field_name]
@@ -485,10 +485,10 @@ def render_view_diff_page(
     # 🟡 dots below help once a dropdown is open, but this is the glance-able shortcut). Written via
     # a callback because url_persist only reads the URL when a control's state is still empty.
     changed_views = [v for v in view_diffs if v.changed]
+    # Which changed views have been opened (scoped to this MDim) — drives the reviewed count + dot colours.
+    visited: set[int] = st.session_state.setdefault(f"mdd_visited::{catalog_path}", set())
     if changed_views:
         n_changed = len(changed_views)
-        # Which changed views have been opened (scoped to this MDim) — drives the reviewed count/markers.
-        visited: set[int] = st.session_state.setdefault(f"mdd_visited::{catalog_path}", set())
 
         # The changed view (if any) the current control selection is sitting on — so "Next" is relative
         # to where you are, and the current view counts as reviewed.
@@ -548,8 +548,9 @@ def render_view_diff_page(
 
     # --- MDim controls (navigation across views) ---------------------------------
     st.caption(
-        "🟡 marks a control option that leads to a changed view — follow the dots, or use "
-        "**Next change ▶** to step through them one by one."
+        "🟡 marks a control option that leads to a changed view; it turns 🟢 once you've viewed that "
+        "change (viewed — not necessarily approved). Follow the dots, or use **Next change ▶** to step "
+        "through them one by one."
     )
     selection: dict[str, str] = {}
     columns = st.columns(min(4, max(1, len(dimensions))))
@@ -570,16 +571,29 @@ def render_view_diff_page(
             for v in view_diffs
             if v.changed and all(v.dimensions.get(s) == c for s, c in selection.items())
         }
+        # A changed choice turns 🟢 once every changed view reachable through it has been viewed.
+        viewed_choices = set()
+        for choice in changed_choices:
+            reachable = [
+                j
+                for j, cv in enumerate(changed_views)
+                if cv.dimensions.get(dim_slug) == choice
+                and all(cv.dimensions.get(s) == c for s, c in selection.items())
+            ]
+            if reachable and all(j in visited for j in reachable):
+                viewed_choices.add(choice)
         names = {c["slug"]: (c.get("name") or c["slug"]) for c in dim.get("choices", [])}
         # Drop a stale URL value (e.g. after switching MDim) so the widget doesn't crash.
         if st.query_params.get(key) not in available:
             st.query_params.pop(key, None)
             st.session_state.pop(key, None)
 
-        def _fmt(slug, names=names, changed_choices=changed_choices):
+        def _fmt(slug, names=names, changed_choices=changed_choices, viewed_choices=viewed_choices):
             # Prefix (not suffix) so the marker survives the selectbox's "…" truncation and shows
             # in the collapsed box too.
             label = names.get(slug, slug)
+            if slug in viewed_choices:
+                return f"🟢 {label}"
             return f"🟡 {label}" if slug in changed_choices else label
 
         with columns[i % len(columns)]:
@@ -720,7 +734,7 @@ def main() -> None:
             return f"{path} ✏️"
         return path
 
-    col_select, col_mode, _spacer = st.columns([2, 1, 1], vertical_alignment="bottom")
+    col_select, _spacer = st.columns([3, 1], vertical_alignment="bottom")
     with col_select:
         catalog_path = url_persist(st.selectbox)(
             "MDim",
@@ -732,19 +746,24 @@ def main() -> None:
             "✏️ marks MDims whose config differs from the baseline; texts can also change through "
             "indicator metadata without a config change, and the diff catches both.",
         )
-    with col_mode:
-        mode = url_persist(st.radio)(
-            "Mode",
-            key="mode",
-            options=["tree", "view", "review"],
-            format_func=lambda m: {"tree": "💥 Blast radius", "view": "🔍 View diff", "review": "📋 Review"}[m],
-            horizontal=True,
-            label_visibility="collapsed",
-        )
 
     if not catalog_path:
         st.info("Select an MDim.")
         return
+
+    mode = url_persist(st.radio)(
+        "Mode",
+        key="mode",
+        options=["tree", "view", "review"],
+        format_func=lambda m: {"tree": "💥 Blast radius", "view": "🔍 View diff", "review": "📋 Review"}[m],
+        captions=[
+            "how far each change reaches",
+            "the proposed metadata changes, view by view",
+            "sign off & comment on each change",
+        ],
+        horizontal=True,
+        label_visibility="collapsed",
+    )
 
     dimensions, view_diffs = compute_diff(
         catalog_path,
