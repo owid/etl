@@ -325,12 +325,20 @@ A non-zero count means it's ready. If you're waiting, poll this every few minute
 
 > **Preview from your ETL branch's staging catalog while you wait.** The updater reads `ETL_REGIONS_URL` if it's set (`devTools/regionsUpdater/update.ts`), and every ETL staging server publishes its own catalog on port 8881 with the same schema as prod. So you can regenerate `regions.data.ts` — and everything downstream of it, including the colors and the test page — before the ETL PR is anywhere near merged:
 >
+> **The host name is not the branch name — derive it, don't hand-write it.** `etl.config.get_container_name()` replaces `/`, `.` and `_` with `-`, strips a leading `staging-site-`, truncates what's left to **28 characters**, then drops any trailing hyphen. Substituting the raw branch (or truncating it yourself) silently produces a host that is either unreachable or, worse, *another* branch's staging server. Get it from the **etl** repo:
+>
 > ```bash
-> ETL_REGIONS_URL="http://staging-site-<etl-branch>.tail6e23.ts.net:8881/external/owid_grapher/latest/regions/regions.csv" \
+> .venv/bin/python -c "from etl.config import get_container_name; print(get_container_name('<etl-branch>'))"
+> ```
+>
+> Then, in **owid-grapher**, use that value (it already carries the `staging-site-` prefix):
+>
+> ```bash
+> ETL_REGIONS_URL="http://<container-name>.tail6e23.ts.net:8881/external/owid_grapher/latest/regions/regions.csv" \
 >   yarn runRegionsUpdater
 > ```
 >
-> `<etl-branch>` is **truncated to 28 characters** in the host name. Use this for previews and for the color review only — before merging the grapher PR, re-run `yarn runRegionsUpdater` with no env var so the committed file is prod-derived (see *Renaming existing regions* for why a stale/hand-edited `regions.data.ts` is a trap).
+> Use this for previews and for the color review only — before merging the grapher PR, re-run `yarn runRegionsUpdater` with no env var so the committed file is prod-derived (see *Renaming existing regions* for why a stale/hand-edited `regions.data.ts` is a trap).
 
 Work in the `owid-grapher` repo on a new branch. There are two ways to register a provider — `regionGroupLabels` in `RegionGroups.ts` documents the split in its own comments: *"…where we have region definition about what constitutes these regions in regions.ts"* vs *"…we don't have region definitions … (we recognize them by their suffix)"*. They correspond to the `RegionDataProvider` and `AdditionalRegionDataProvider` types. *(Earlier drafts of this skill called these "Path A / Path B" — that's not a codebase term; ignore that wording.)*
 
@@ -431,7 +439,7 @@ Colors are looked up **by region name**, not by legend position (`ColorScale.ts`
 
 The admin has a page that renders every provider's regions as a real map next to a fake line chart — i.e. `MapContinentColors` and `ContinentColors` side by side. Use it before showing the colors to anyone:
 
-- **This branch:** `http://staging-site-<branch>/admin/test-region-maps` (owid-grapher staging, once the branch has built)
+- **This branch:** `http://<container-name>/admin/test-region-maps` (owid-grapher staging, once the branch has built). Same naming rule as above — derive `<container-name>` from the *grapher* branch with `get_container_name()`, never by pasting the branch in raw.
 - **Production:** <https://admin.owid.io/admin/test> → the **Region maps** bullet — direct link <https://admin.owid.io/admin/test-region-maps>
 
 The page splits into *Providers with hard-coded region colors* and *Providers without*. **Your provider must land in the first section**; if it doesn't, a region is missing from one of the two dictionaries (the check requires the name in *both*). Then compare it against the provider you mirrored: same hues in the same places, no two regions of the tier reading as the same color, and the map muted where the line chart is strong.
@@ -448,7 +456,7 @@ Confirm the provider appears in `regionGroupLabels` and the relevant label recor
 
 Colors are a design call, and what the skill produces is a **first stab** — it always goes to a human. All of this happens on the **owid-grapher** PR, not the ETL one:
 
-1. **Open the PR** (above) with the proposed colors in the body: a `region → chart color → map color` table (constant names *and* hex), the provider you mirrored, and the link to **this branch's** test page — `http://staging-site-<grapher-branch>/admin/test-region-maps`. Wait for the staging server to build before sharing the link; open it yourself first.
+1. **Open the PR** (above) with the proposed colors in the body: a `region → chart color → map color` table (constant names *and* hex), the provider you mirrored, and the link to **this branch's** test page — `http://<container-name>/admin/test-region-maps`, with `<container-name>` derived as above. Wait for the staging server to build before sharing the link; open it yourself first.
 2. **Ask Marwa** — draft a Slack message to `@mrwbkrm` with that same table and link, asking her to look at the rendered maps on the test page (point at the *"Providers with hard-coded region colors"* section). Don't request the code review yet.
 3. **Apply her changes**, push, and only then **request review from Sophia** — `gh pr edit <n> --add-reviewer sophiamersmann`.
 4. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
