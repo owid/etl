@@ -114,8 +114,22 @@ charts that means one file per chart, in `payloads/`. The combined
 `audit_references.py` read — don't hand that one over as a copy-paste payload.
 
 **Matching**: a chart matches a view when the y-variable-ID sets are equal AND
-x/size/color agree (absent == absent). Several matching views → tiebreak on chart
-type; still ambiguous → reported, never guessed. **Any** partial indicator overlap
+x/size/color agree (absent == absent) — after **decoration indicators** are
+stripped from x/size/color on both sides: population as Marimekko width / bubble
+size, and `regions#owid_region` as continent coloring (matched by catalogPath, so
+version bumps don't matter). Charts and views carry these inconsistently without
+changing what data is plotted — an MDIM view adds `x=population` for its Marimekko
+tab, an editor adds continent colors to a line chart — and requiring them to agree
+literally drops same-y pairs into `none` with no report at all (equal y sets means
+they aren't even a near miss). A match made across such a difference says so in
+the proposal's `note` column. Content indicators (a scatter's GDP-per-capita x, a
+"political regime" coloring) are never stripped. Two guardrails keep the rule from
+overreaching: a **scatter's x slot is never stripped** — on a `ScatterPlot`,
+`x=population` is the plotted relationship, not decoration (size/color there still
+are) — and the population pattern is **end-anchored** to the raw head-count columns
+(`#population`, `#population_historical`, `#population_projection`), because the
+same dataset also carries population *density* columns that are content. Several matching views → tiebreak
+on chart type; still ambiguous → reported, never guessed. **Any** partial indicator overlap
 that is not an exact match → `near_miss`, reported only — not just subset/superset:
 a chart plotting `{A, B}` against a view plotting `{A, C}` shares `A`, so calling
 it `none` would assert an overlap check that came out the other way. Quality labels:
@@ -127,6 +141,17 @@ it `none` would assert an overlap check that came out the other way. Quality lab
 - `near_miss` — overlapping but unequal indicator sets; the diff is spelled out.
 - `none` — no view shares the chart's indicators. **An accepted outcome** — only
   matched charts get redirects; don't force the rest.
+
+**Twin suspects.** ID matching is blind to one real equivalence: a dataset that
+publishes the same series in two tables (WID/LIS do — `inequality#share_top_10__…`
+for the standalone charts vs `incomes#share__…quantile_10…` for the MDIM; verified
+value-identical). The extractor flags these — unmatched charts whose y comes from
+the same dataset as a slot-compatible view with a similar column name — in the run
+report and in `mdim_suggestions.md` as **twin suspects**, with the exact
+`overrides.csv` line to use. A suspect is NOT a match: verify first that the two
+indicators' values are identical (fetch both
+`api.ourworldindata.org/v1/indicators/<id>.data.json` and compare every
+entity-year), then force it, citing the verification in the override note.
 
 Either side carrying several indicators in one `x`/`size`/`color` slot has no
 chart-shaped signature, so it is **excluded from matching** rather than truncated
@@ -213,11 +238,88 @@ ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
 
 The sweep itself is the shared `find-chart-references` skill; this script is the
 redirect-specific consumer that adds the replacement URLs. It writes
-`references.csv` + `references.md`, one row per reference. Severity: **🔴**
-embed — the surface renders the chart's own config, so the redirect does not fix
-it and it breaks on unpublish; migrate before applying · **🟡** hyperlink (the
-301 covers it, update the href anyway) or key-chart slot (re-tag the MDIM) ·
-**ℹ️** unpublished/draft.
+`references.csv` + `references.md`, one row per reference. The report is
+organized by what the reader does, not by severity tier: **embedded charts and
+text links sit adjacent in one "Google Doc edits" section** (one editing pass
+per doc covers both — 🔴 embeds break on unpublish and gate the CLI, 🟡 links
+stay functional behind the 301), with reader-facing section names ("Embedded
+charts", "Text links", "Front-matter chart URLs") rather than raw ArchieML
+tokens (those live in the CSV's `component` column). **Topic-page All charts
+entries collapse to a per-page summary and need NO action**: the block lists
+only published charts (`GdocPost.loadRelatedCharts` filters on `isPublished` —
+verified in grapher), so entries drop out on their own at the next bake — and
+no replacement is possible either, because the block is built from `charts` ×
+`chart_tags` only and cannot list MDIMs; featuring the MDIM on a topic page is
+a separate gdoc-authoring change. **Narrative charts get their own table
+(before the All charts summary)**, one row per chart: the admin editor link and
+parent chart; **"create from this view"** — the target view carrying that
+narrative chart's stored controls, which is both the rendering to match and the
+place to create from; **"text to re-apply"** (see below); **the pages that
+actually embed it**, resolved by a second hop the sweep doesn't make
+(`posts_gdocs_links` on `linkType='narrative-chart'`, both `narrative-chart` and
+`key-insights` components), each with its doc link and the name to search for;
+and the ordered steps. Each row carries only the order that applies to it, on
+the rule above: a **published** page among the users makes create → repoint →
+delete mandatory; with none, the row emits the delete → create shortcut that
+reuses the same name (a draft reference then keeps resolving, since pages
+reference the name). **ℹ️** unpublished/draft pages close the report.
+
+**Create from the view, not from a create link.** Tell the operator to open the
+target view and use the chart's own **"Create narrative chart"** admin control:
+the MDIM page builds that control's target from whichever view is on screen
+(`site/multiDim/MultiDim.tsx`), so the new chart is parented to the right view
+and inherits the controls set on it. A bare
+`/admin/narrative-charts/create?type=multiDim&chartConfigId=<viewConfigId>` link
+looks equivalent but opens a copy of the MDIM's **default** view — verified in
+practice — so never hand that out as the create step.
+
+**The new chart opens at the parent view's defaults — the state does not carry
+over.** The control gets the *parent* right, but not the state on top of it: the
+dimension selection, the entity selection and tab/time all come up at defaults,
+and authored text never transfers at all. So the report's **"Set by hand after
+creating"** column lists all three groups per chart, in the order they get
+applied in the editor:
+
+1. **view dimensions** — the target view's own dimension values (from the
+   proposal), because the new chart opens on the MDIM's default view;
+2. **controls** — taken from the narrative chart's `chart_configs.patch` (the
+   delta its author typed on top of the parent) plus its stored
+   `queryParamsForParentChart`, and listed **chart type first** (it decides
+   which other controls exist), **then the entity selection** (the most visible
+   thing to get wrong), then the rest alphabetically. Entities are always shown
+   by **name**, never as codes: a URL param spells them `ZWE~MDG`, so those are
+   resolved against `entities` before display (unknown codes pass through). The
+   patch and the params encode the same state, so a URL param is dropped when
+   the patch already carries the equivalent config key (`country` ↔
+   `selectedEntityNames`, `focus` ↔ `focusedSeriesNames`, `time` ↔
+   `minTime`/`maxTime`) — otherwise the cell asks for one setting twice in two
+   spellings, and the config form is what the editor's fields expose;
+3. **FAUST text** — `title`, `subtitle`, `note`, `sourceDesc`,
+   `hideAnnotationFieldsInTitle` from the patch. Miss these and the replacement
+   silently renders the *view's* wording instead of the text the article was
+   written around.
+
+Every group is diffed against the target view's config, so only genuine
+differences are asked for. `dimensions` and `$schema` are excluded from the patch
+on purpose: the new parent view supplies them, and re-applying the old ones would
+repoint the chart at the retired chart's indicators.
+
+**Suggest the replacement's name, and check it is free.** When a published page
+holds the original name the replacement needs a different one — and that name is
+**permanent**, since `create` rejects an existing name and there is no rename, so
+it is not a staging name to tidy up after the delete. The report suggests
+`<original>-mdim` (falling back to `-mdim-2`, `-mdim-3`, …), validated against
+every name in `narrative_charts` so the suggestion cannot be the one thing
+`create` refuses; suggestions handed out within a run are reserved as they go. In
+the delete-first case there is nothing to suggest — the row names the original,
+which the delete frees for reuse.
+
+**Admin routes need the admin origin.** A narrative chart's `where_path` is
+`/admin/narrative-charts/<id>/edit`, and the public site does not serve
+`/admin` — prefixing it with the site host yields a link that 404s. Both the
+sweep and this consumer route such paths through a helper
+(`admin_url` / `absolute_url`) that strips the admin root's own `/admin` suffix
+before joining, or the result carries `/admin/admin/`.
 
 Pure SQL, so read-only credentials are enough. It sweeps both the current slug
 and every old slug that reaches the chart — references written before a rename
@@ -266,16 +368,21 @@ same name. The name is preserved and nothing else changes.
 Never delete first. The delete will fail, and unpublishing the article to force it
 through breaks the page for readers.
 
-**Do the create in the admin UI — it is deep-linkable to the right view:**
+**Do the create from the target view in the site UI**, using the chart's own
+**"Create narrative chart"** admin control (see the rule above). The three routes
+do NOT behave alike, so don't describe them interchangeably:
 
-```
-{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=<target.viewConfigId>
-```
+| route | parent view | state to redo by hand |
+|---|---|---|
+| the view's **"Create narrative chart"** control | the view on screen — correct | the entity selection and other controls open at that view's defaults, and authored FAUST never transfers |
+| a bare `{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=…` link | the MDIM's **default** view — wrong | everything, on top of a parent you then cannot change |
+| scripted `POST {admin_api}/narrative-charts` | whatever `parentChartConfigId` you send | nothing you include in the `config` you post |
 
-That opens the narrative-chart editor already parented to the MDIM view, so you
-set the name and the view's controls and save. Prefer this over the API: `AdminAPI`
-has `get_narrative_chart` and `update_narrative_chart` but **no create or delete**,
-so the API route means hand-rolled HTTP for both ends of the swap.
+So: use the control, then set what the report's **Set by hand after creating**
+column lists. Never hand out the bare create link. Prefer the UI over the API
+anyway — `AdminAPI` has `get_narrative_chart` and `update_narrative_chart` but
+**no create or delete**, so scripting means hand-rolled HTTP for both ends of the
+swap.
 
 If you do script it, the endpoints are `POST {admin_api}/narrative-charts` and
 `DELETE {admin_api}/narrative-charts/<id>`:
@@ -451,3 +558,28 @@ them:
 After a real run, fold anything the matcher or these docs got wrong back into
 this SKILL.md (and check whether the sibling `map-explorer-to-mdim` /
 `review-explorer-mdim-mapping` skills need the same fix).
+
+- **Same-y charts vanishing into `none` is the matcher's blind spot** — when a
+  reviewer reports a "clear equivalent" the run missed, diff the two sides'
+  x/size/color slots first (charts.csv vs multidim_views.csv): the y sets being
+  equal means the miss can only be a slot disagreement, and if it's a decoration
+  indicator the fix belongs in `DECORATION_PATTERN`, not in `overrides.csv`.
+  (2026-08: population + owid_region cost 5 of 19 Economic Inequality matches.)
+- **Preflight's embed gate must classify exactly like `find-chart-references`.**
+  It re-implements the embed count in SQL for read-only use, so any component
+  the sweep exempts (e.g. `all-charts` — a topic page's auto-generated index
+  where a retired chart just drops out) must be exempted there too, or preflight
+  blocks on a reference the audit rightly never lists.
+- **Re-runs that add targets invalidate those rows' review decisions** — the
+  review HTML fingerprints each decision on (target, both config md5s), so a row
+  that gains or changes a target gets its saved approval/note pruned on next
+  load. Before re-running the extractor mid-review, have the reviewer export
+  (⬇ JSON); unchanged rows re-import cleanly.
+- **A reviewer flagging an unmatched row with "the target should be X" is the
+  twin-variable signal** (2026-08: 3 of 3 such flags were twins — same dataset,
+  two tables, identical values). The workflow is: verify values via the
+  indicators API, force via `overrides.csv`, re-run. The old flag then reads as
+  stale in `preflight.py --decisions` (a decision exported with an empty target
+  no longer matches the now-targeted row — deliberate, or the flag would silently
+  drop the freshly forced redirect from the CSV); the forced rows just need a
+  quick re-approve + re-export.

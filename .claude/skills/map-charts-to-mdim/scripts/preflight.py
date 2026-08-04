@@ -80,12 +80,19 @@ def apply_decisions(
 ) -> tuple[list[dict], list[tuple[dict, str]], list[dict], int]:
     """Drop entries whose chart the reviewer flagged; count kept entries that carry no decision.
 
-    A decision is bound to the proposal it was made on, on BOTH sides: if the export carries
-    the reviewed target (target_mdim/view_id), the reviewed source version (config_md5) or the
-    reviewed target rendering (view_config_md5) and any of them differs from the entry, the
-    decision is stale and treated as no decision at all. The md5 halves matter because a re-run
-    after either end was edited rewrites mapping.json with the new md5s, so `stale_charts` and
-    `stale_targets` compare new-against-new and see nothing.
+    A decision is bound to the proposal it was made on, on BOTH sides: if the reviewed target
+    (target_mdim/view_id), the reviewed source version (config_md5) or the reviewed target
+    rendering (view_config_md5) differs from the entry, the decision is stale and treated as
+    no decision at all. The md5 halves matter because a re-run after either end was edited
+    rewrites mapping.json with the new md5s, so `stale_charts` and `stale_targets` compare
+    new-against-new and see nothing.
+
+    An EMPTY reviewed target is itself a mismatch, not missing data: every entry here has a
+    target, so a decision exported with no target was made while the chart had no proposed
+    redirect (near_miss/none) — typically a flag saying "the target should be X" that a later
+    `overrides.csv` force resolved. Honoring that flag would silently drop the freshly forced
+    redirect. (Cost: exports from before the target columns existed all read as stale, which
+    only raises the undecided count — conservative, never excluding.)
     """
     kept, flagged, stale, undecided = [], [], [], 0
     for e in entries:
@@ -94,7 +101,7 @@ def apply_decisions(
         reviewed_target = (d.get("target_mdim", ""), d.get("view_id", ""))
         reviewed_md5 = d.get("config_md5", "")
         reviewed_view_md5 = d.get("view_config_md5", "")
-        drifted = any(reviewed_target) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"])
+        drifted = bool(status) and reviewed_target != (e["target"]["mdimSlug"], e["target"]["viewId"])
         edited = bool(reviewed_md5) and bool(e["chart"].get("configMd5")) and reviewed_md5 != e["chart"]["configMd5"]
         retargeted = (
             bool(reviewed_view_md5)
@@ -314,11 +321,24 @@ def cli_blockers(redirects: list[dict]) -> dict[str, list[str]]:
     sources = tuple(r["source"] for r in redirects)
     slugs = tuple(r["chart"]["slug"] for r in redirects)
 
-    site_sources = dict(
-        OWID_ENV.read_sql(
-            "SELECT source, target FROM redirects WHERE source IN %(s)s", params={"s": sources}
-        ).itertuples(index=False, name=None)
-    )
+    # Both directions, and both the current and the old slugs. `extract_and_match.py` reads
+    # both at proposal time; reading only `source` here meant a site redirect created AFTER
+    # extraction was never re-detected, leaving `cli_required` frozen at proposal time — and
+    # the CLI's guarantee to repoint such a row is the reason `cli_required` exists.
+    old_slug_paths = tuple(f"/grapher/{s}" for r in redirects for s in r.get("oldSlugs", []))
+    all_paths = tuple({*sources, *old_slug_paths})
+    site_rows = OWID_ENV.read_sql(
+        "SELECT source, target FROM redirects WHERE source IN %(s)s OR target IN %(s)s",
+        params={"s": all_paths},
+    ).to_dict("records")
+    site_sources = {r["source"]: r["target"] for r in site_rows if r["source"] in sources}
+    site_targets: dict[str, list[str]] = defaultdict(list)
+    old_slug_targets: dict[str, list[str]] = defaultdict(list)
+    for r in site_rows:
+        if r["target"] in sources:
+            site_targets[r["target"]].append(r["source"])
+        elif r["target"] in old_slug_paths:
+            old_slug_targets[r["target"]].append(r["source"])
     own_old_slugs = set(
         OWID_ENV.read_sql("SELECT slug FROM chart_slug_redirects WHERE slug IN %(s)s", params={"s": slugs})["slug"]
     )
@@ -362,7 +382,12 @@ def cli_blockers(redirects: list[dict]) -> dict[str, list[str]]:
     for r in redirects:
         source, slug, t = r["source"], r["chart"]["slug"], r["target"]
         if source in site_sources:
-            reasons[source].append(f"already a site redirect source -> {site_sources[source]}")
+            reasons[source].append(
+                f"already a site redirect source -> {site_sources[source]}. This is not a retryable CLI "
+                "error: a site redirect is served by the asset layer BEFORE the 404 handler that consults "
+                "MDIM redirects, so this URL can never reach the MDIM view. Delete or repoint that "
+                "`redirects` row, or accept that the chart URL keeps going where it points."
+            )
         if slug in own_old_slugs:
             reasons[source].append("chart slug is itself an old slug in chart_slug_redirects")
         if slug == t["mdimSlug"]:
@@ -375,6 +400,45 @@ def cli_blockers(redirects: list[dict]) -> dict[str, list[str]]:
         if clashing:
             reasons[source].append(f"old slug(s) already a redirect source elsewhere: {clashing}")
     return reasons
+
+
+def site_redirect_notes(redirects: list[dict]) -> dict[str, list[str]]:
+    """Non-blocking site-redirect facts the CLI operator should still know.
+
+    Two kinds, both re-read here rather than trusted from proposal time:
+
+    - a site redirect pointing AT a source chart. The CLI repoints it (`replaceSiteRedirects`),
+      so it is not a blocker — but the admin API rejects exactly this shape, which is why the
+      CLI is mandatory. Detecting it only at extraction meant one created afterwards silently
+      weakened that warning.
+    - a site redirect pointing at one of the chart's OLD slugs. The CLI repoints only the
+      source, so this becomes a 2-hop chain after the run: X -> /grapher/<old> -> MDIM view.
+      It still resolves, so it is a note, not a blocker — but it is invisible otherwise.
+    """
+    notes: dict[str, list[str]] = defaultdict(list)
+    if not redirects:
+        return notes
+    sources = tuple(r["source"] for r in redirects)
+    old_by_source = {r["source"]: [f"/grapher/{s}" for s in r.get("oldSlugs", [])] for r in redirects}
+    all_paths = tuple({*sources, *(p for paths in old_by_source.values() for p in paths)})
+    rows = OWID_ENV.read_sql(
+        "SELECT source, target FROM redirects WHERE target IN %(s)s", params={"s": all_paths}
+    ).to_dict("records")
+    for r in redirects:
+        pointing_here = [x["source"] for x in rows if x["target"] == r["source"]]
+        if pointing_here:
+            notes[r["source"]].append(
+                f"site redirect(s) point AT this chart: {pointing_here} — the CLI repoints them; the admin "
+                "API would reject this shape, so the CLI is mandatory"
+            )
+        for old in old_by_source[r["source"]]:
+            via = [x["source"] for x in rows if x["target"] == old]
+            if via:
+                notes[r["source"]].append(
+                    f"site redirect(s) {via} point at the OLD slug {old}, which the CLI does not repoint — "
+                    "after the run they resolve via a 2-hop chain. Repoint them at the MDIM view to avoid it."
+                )
+    return notes
 
 
 def existing_mdim_redirects(sources: tuple[str, ...]) -> dict[str, dict]:
@@ -499,15 +563,20 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
         ),
     )
     # Block-level components render the chart; `span-*` is a hyperlink in prose, which the
-    # 301 covers. LEFT() rather than LIKE: a literal '%' in the SQL string would collide
-    # with pymysql's own parameter formatting.
+    # 301 covers, and `all-charts` is a topic page's auto-generated chart index — the block
+    # lists every chart carrying the page's tag, so an unpublished chart simply drops out
+    # and nothing breaks (find-chart-references excludes these rows for the same reason —
+    # the gate must agree with the audit, or preflight blocks on a reference the audit
+    # rightly never lists). LEFT() rather than LIKE: a literal '%' in the SQL string would
+    # collide with pymysql's own parameter formatting.
     add_by_slug(
         "articleEmbeds",
         OWID_ENV.read_sql(
             "SELECT pgl.target AS slug, COUNT(*) AS n FROM posts_gdocs_links pgl "
             "JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
             "WHERE pgl.target IN %(slugs)s AND pgl.linkType IN ('grapher', 'guided-chart') "
-            "AND pg.published = 1 AND (pgl.componentType IS NULL OR LEFT(pgl.componentType, 5) <> 'span-') "
+            "AND pg.published = 1 AND (pgl.componentType IS NULL "
+            "OR (LEFT(pgl.componentType, 5) <> 'span-' AND pgl.componentType <> 'all-charts')) "
             "GROUP BY pgl.target",
             params={"slugs": slugs},
         ),
@@ -615,6 +684,7 @@ def main() -> int:
     sources = tuple(r["source"] for r in redirects + already_done)
     existing = existing_mdim_redirects(sources)
     blockers = cli_blockers(redirects)
+    notes = site_redirect_notes(redirects)
     stale = stale_charts(redirects + already_done)
     for source, reason in stale_targets(redirects + already_done).items():
         stale.setdefault(source, reason)
@@ -699,6 +769,15 @@ def main() -> int:
     # without holding the batch back from `Ready` for a step nobody can now undo.
     done_ids = {r["chart"]["id"] for r in already_done if r["source"] in unpublished}
     blocking_embeds = {cid: n for cid, n in embeds.items() if cid not in done_ids}
+    if notes:
+        print(
+            "\nSite redirects touching these charts (NOT blockers — listed so the CLI's repointing is not a "
+            "surprise, and so the 2-hop case can be avoided):"
+        )
+        for note_source, messages in sorted(notes.items()):
+            for message in messages:
+                print(f"  {note_source.removeprefix('/grapher/')}: {message}")
+
     if embeds:
         print("\nSurfaces a redirect will NOT fix (these embed the chart and break when it is unpublished):")
         for r in redirects + already_done:

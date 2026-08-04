@@ -14,9 +14,13 @@ redirect is created here, or anywhere in this skill — applying is
 Charts are selected by exactly one of ``--tag`` / ``--slugs`` / ``--dataset-id``
 and matched against the views of every published MDIM (or only those passed via
 repeatable ``--mdim``). A chart matches a view when their indicator IDs agree on
-every slot: same set of y variables, same x/size/color (absent == absent). Ties
-between several matching views are broken by chart type; anything still
-ambiguous is reported, not proposed.
+every slot: same set of y variables, same x/size/color (absent == absent) —
+after stripping *decoration* indicators (population as Marimekko width / bubble
+size, owid_region as continent coloring) from x/size/color on both sides, since
+charts and views carry those inconsistently without changing what data is
+plotted. A scatter's x axis is exempt — there population is the plotted
+relationship, not decoration. Ties between several matching views are broken by
+chart type; anything still ambiguous is reported, not proposed.
 
 Outputs into ``--out``:
 - ``charts.csv``                 — the selected source charts and their indicator slots
@@ -43,6 +47,7 @@ Usage:
 import argparse
 import csv
 import json
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 from urllib.parse import urlencode
@@ -51,6 +56,30 @@ from etl.config import OWID_ENV
 
 PUBLIC_HOST = "https://ourworldindata.org"
 EXTRA_SLOTS = ("x", "size", "color")
+
+# Decoration indicators style a chart without changing what data it plots, and charts vs
+# MDIM views carry them inconsistently: an MDIM view adds x=population so its Marimekko
+# tab has bar widths, a chart editor adds color=owid_region to color countries by
+# continent. Requiring these slots to agree exactly silently dropped
+# same-y-different-decoration pairs into `none` — with equal y sets they are not even a
+# near miss, so nothing reported the gap. They are stripped from x/size/color (never
+# from y) on BOTH sides before matching — except a scatter's x slot, which is the plotted
+# relationship itself (see `effective()`); the raw slots stay in charts.csv /
+# multidim_views.csv, and an exact match made across a decoration difference says so in
+# the proposal's `note` column. Only these two families qualify — a color like
+# "political regime" or a scatter x like GDP per capita is content and stays in the
+# match key. (Matched against catalogPath, so version bumps keep matching; legacy
+# variables with a NULL catalogPath are conservatively treated as content.)
+# Both alternatives are end-anchored: the demography `population` dataset also carries
+# population *density* columns (`population_density#population_density`,
+# `historical#population_density_historical`, `projections#population_density_projection`)
+# which an unanchored `#population` prefix would swallow — density is content, not
+# decoration. The anchored family is exactly the raw head-counts: `#population`,
+# `#population_historical`, `#population_projection`.
+DECORATION_PATTERN = re.compile(
+    r"/population/[^/#]+#population(_historical|_projection)?$"  # demography population head-counts
+    r"|/regions/regions#\w+_region$"  # owid_region & friends (continent coloring)
+)
 QUALITIES = ("exact", "forced", "ambiguous", "near_miss", "none", "skipped")
 
 PROPOSAL_COLUMNS = [
@@ -384,9 +413,29 @@ def attach_view_config_facts(views: list[dict], mdim_ids: list[int]) -> None:
 
 def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, str]) -> None:
     """Set match_quality / target / candidates / near-miss info on each chart dict."""
+
+    def effective(rec) -> tuple:
+        """x/size/color with decoration indicators treated as absent.
+
+        On a scatter the x axis IS the content — population there is the plotted
+        relationship (e.g. "GDP per capita vs. population"), not Marimekko bar-width
+        decoration — so ScatterPlot records keep their x slot literal on both sides.
+        A scatter's size=population (bubble size) and color=owid_region stay decoration.
+        """
+        slots = []
+        for s in EXTRA_SLOTS:
+            vid = rec[s]
+            content_slot = s == "x" and rec["chart_type"] == "ScatterPlot"
+            strip = vid and not content_slot and DECORATION_PATTERN.search(id_to_path.get(vid) or "")
+            slots.append(None if strip else vid)
+        return tuple(slots)
+
+    def slot_label(vid) -> str:
+        return f"{vid} ({path_tail(id_to_path.get(vid))})" if vid else "absent"
+
     by_key: dict[tuple, list[dict]] = defaultdict(list)
     for v in views:
-        by_key[(v["y"], v["x"], v["size"], v["color"])].append(v)
+        by_key[(v["y"], *effective(v))].append(v)
 
     for c in charts:
         c.update({"quality": "none", "tiebreak": "", "target": None, "candidates": [], "near_misses": [], "note": ""})
@@ -397,7 +446,8 @@ def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, st
         if not c["y"]:
             c["note"] = "chart has no y indicators"
             continue
-        candidates = by_key.get((c["y"], c["x"], c["size"], c["color"]), [])
+        c_eff = effective(c)
+        candidates = by_key.get((c["y"], *c_eff), [])
         if len(candidates) == 1:
             c["quality"], c["target"] = "exact", candidates[0]
         elif len(candidates) > 1:
@@ -414,12 +464,80 @@ def match_charts(charts: list[dict], views: list[dict], id_to_path: dict[int, st
             # suggestions report assert that no view carries any of the chart's indicators,
             # which is exactly what it is not. That broader reading is what the CSV legend
             # has always documented ("indicator sets overlap but differ").
-            near = [
-                v for v in views if all(v[s] == c[s] for s in EXTRA_SLOTS) and (v["y"] & c["y"]) and v["y"] != c["y"]
-            ]
+            near = [v for v in views if effective(v) == c_eff and (v["y"] & c["y"]) and v["y"] != c["y"]]
             near.sort(key=lambda v: (-len(v["y"] & c["y"]), len(v["y"] ^ c["y"])))
             if near:
                 c["quality"], c["near_misses"] = "near_miss", near[:3]
+
+        # A match made across a decoration difference is still a match, but the reviewer
+        # should see that the two sides did not agree literally.
+        if c["target"] is not None:
+            diffs = [
+                f"{s}: chart {slot_label(c[s])} vs view {slot_label(c['target'][s])}"
+                for s in EXTRA_SLOTS
+                if c[s] != c["target"][s]
+            ]
+            if diffs:
+                c["note"] = "decoration difference ignored — " + "; ".join(diffs)
+
+    find_twin_suspects(charts, views, id_to_path, effective)
+
+
+def find_twin_suspects(charts: list[dict], views: list[dict], id_to_path: dict[int, str], effective) -> None:
+    """Flag unmatched charts whose equivalent view may exist under DIFFERENT variable ids.
+
+    ID-based matching is blind to one real shape: a dataset publishing the same series in
+    two tables (e.g. WID/LIS `inequality#share_top_10__…` for standalone charts vs
+    `incomes#share__…quantile_10…` for the MDIM — verified value-identical). The chart and
+    the view then share no variable id, so the pair lands in `none`/`near_miss` with
+    nothing pointing at the equivalence, and only a human staring at both panes catches it.
+
+    This is a SUSPECT list, not a match: same dataset + similar column name does not prove
+    the values agree, so the suggestion report tells the reviewer to compare the two
+    indicators' data (api.ourworldindata.org) and force via overrides.csv only if
+    identical. Heuristic: y variables from the same dataset, overlapping head tokens (the
+    indicator stem before the first `__` — keeps `gini` from pairing with `mean` just
+    because both carry the same long dimension suffix), Jaccard ≥ 0.5 on full column
+    tokens, and slot-compatible (a scatter's content x still has to agree).
+    """
+
+    def col(vid: int) -> str:
+        cp = id_to_path.get(vid) or ""
+        return cp.split("#", 1)[1] if "#" in cp else ""
+
+    def norm(t: str) -> str:
+        # '1pct'/'10pct' and '1'/'10' are the same quantile spelled two ways (share_top_1
+        # vs quantile_richest_1pct) — without this the real twin loses to a wrong-quantile
+        # view whose tokens happen to align better.
+        return t.removesuffix("pct")
+
+    def tokens(ids) -> set[str]:
+        return {norm(t) for i in ids for t in col(i).replace("__", "_").split("_") if t}
+
+    def heads(ids) -> set[str]:
+        return {norm(t) for i in ids for t in col(i).split("__", 1)[0].split("_") if t}
+
+    def datasets(ids) -> set[str]:
+        # 'grapher/ns/version/dataset/table#col' -> 'grapher/ns/version/dataset'
+        return {"/".join(p[:4]) for i in ids if len(p := (id_to_path.get(i) or "").split("/")) >= 4}
+
+    for c in charts:
+        c["twin_suspects"] = []
+        if c["quality"] not in ("near_miss", "none") or c["note"] or not c["y"]:
+            continue
+        c_ds, c_heads, c_tok, c_eff = datasets(c["y"]), heads(c["y"]), tokens(c["y"]), effective(c)
+        suspects = []
+        for v in views:
+            if v["y"] & c["y"] or effective(v) != c_eff:
+                continue  # shared ids are already near-miss territory; slot mismatch can't redirect
+            if not (datasets(v["y"]) & c_ds) or not (heads(v["y"]) & c_heads):
+                continue
+            v_tok = tokens(v["y"])
+            jaccard = len(c_tok & v_tok) / len(c_tok | v_tok)
+            if jaccard >= 0.5:
+                suspects.append((jaccard, v))
+        suspects.sort(key=lambda t: (-t[0], t[1]["row_id"]))
+        c["twin_suspects"] = suspects[:2]
 
 
 def describe_near_miss(c: dict, id_to_path: dict[int, str]) -> str:
@@ -867,10 +985,29 @@ def write_mdim_suggestions(out: Path, charts: list[dict], id_to_path: dict[int, 
         wanted |= set(c["y"])
         for v in c["near_misses"]:
             wanted |= set(v["y"])
+        for _, v in c.get("twin_suspects", []):
+            wanted |= set(v["y"])
     names = indicator_names(wanted)
 
     def label(i: int) -> str:
         return names.get(i) or path_tail(id_to_path.get(i)) or str(i)
+
+    def twin_lines(c: dict) -> list[str]:
+        """Twin-variable suspects: possibly the same series under different variable ids."""
+        out = []
+        for jaccard, v in c.get("twin_suspects", []):
+            chart_ids = ", ".join(str(i) for i in sorted(c["y"]))
+            view_ids = ", ".join(str(i) for i in sorted(v["y"]))
+            out += [
+                f"    - ⚠️ **twin suspect** ({jaccard:.0%} column-name overlap): **{v['mdim_slug']}** view "
+                f"`{v['view_id']}` ([open]({v['url']})) plots the same dataset's "
+                + ", ".join(f"`{label(i)}`" for i in sorted(v["y"]))
+                + f" — possibly the same series under different variable ids (chart {chart_ids} vs view {view_ids}). "
+                f"Compare their values (api.ourworldindata.org/v1/indicators/<id>.data.json); "
+                f"if identical, force via overrides.csv: "
+                f"`{c['chart_id']},{v['mdim_catalog_path']}|{v['view_id']},<why>`",
+            ]
+        return out
 
     lines = [
         "# Suggested MDIM changes",
@@ -905,6 +1042,7 @@ def write_mdim_suggestions(out: Path, charts: list[dict], id_to_path: dict[int, 
                     lines.append(f"    - the chart also plots {names_s} — the view does not")
                 lines.append(f"    - to redirect: add a view plotting exactly {len(c['y'])} indicator(s) — "
                              + ", ".join(f"`{label(i)}`" for i in sorted(c["y"])))  # fmt: skip
+            lines += twin_lines(c)
             lines.append("")
 
     if none:
@@ -920,6 +1058,7 @@ def write_mdim_suggestions(out: Path, charts: list[dict], id_to_path: dict[int, 
             inds = ", ".join(f"`{label(i)}`" for i in sorted(c["y"])[:4])
             more = "" if len(c["y"]) <= 4 else f" (+{len(c['y']) - 4} more)"
             lines.append(f"- **{c['chart_slug']}** — plots {inds}{more}")
+            lines += twin_lines(c)
         lines.append("")
 
     if unchecked:
@@ -1166,6 +1305,18 @@ def report(charts: list[dict], mdims: list[dict], views: list[dict], stats: dict
     for slug in sorted(per_mdim):
         n_charts = sum(1 for c in proposed if c["target"]["mdim_slug"] == slug)
         print(f"  {slug}: {n_charts} chart(s) -> {len(per_mdim[slug])} distinct view(s)")
+    # An override may since have forced the chart (that's the twin workflow completing) —
+    # only still-unmatched charts belong in this nudge.
+    twins = [c for c in charts if c.get("twin_suspects") and c["quality"] in ("near_miss", "none")]
+    if twins:
+        print(
+            f"\ntwin suspects: {len(twins)} unmatched chart(s) may equal a view under DIFFERENT variable ids\n"
+            "  (same dataset, similar column names — e.g. the series published in two tables).\n"
+            "  See mdim_suggestions.md: verify the values are identical, then force via overrides.csv."
+        )
+        for c in twins:
+            for jaccard, v in c["twin_suspects"]:
+                print(f"  {c['chart_slug']} ~ {v['mdim_slug']}?{v['query_str']}  ({jaccard:.0%})")
     cli_required = [c for c in proposed if c["cli_required"]]
     if cli_required:
         n_aliases = sum(len(c["old_slugs"]) for c in cli_required)
