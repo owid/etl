@@ -120,7 +120,7 @@ The canonical items, in order:
 7. Build the review HTML (`build_review.py`) and hand it to the topic owner.
 8. Apply the reviewer's flagged notes; regenerate the HTML and re-import their JSON.
 9. Chart-diff sign-off on staging, then merge.
-10. **Confirm the scatter views actually reached production.** Do not assume the merge did it — chart-sync has silently not carried this migration before (batch 1, PR #6173: merged with every row ✅ on staging, and production still had no `ScatterPlot` tab weeks later).
+10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. That is what happened to batch 1 (PR #6173) — deliberately, as it turned out: the `target_query_param` needed for Part 2 did not exist yet, so the batch was left unpushed and restarted later rather than half-migrated. Either way, check production directly rather than inferring it from the merge.
 11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*. Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why.
 12. Narrative charts on the sources: replace where the parent is being retired (create → re-point articles → delete; never delete first).
 13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict.
