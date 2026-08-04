@@ -81,6 +81,14 @@ def prepare_eia_data(tb_eia: Table) -> Table:
     tb = tb_eia.reset_index()[list(columns)].rename(columns=columns, errors="raise")
     # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix).
     tb = tb[~tb["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
+    # Drop EIA's USSR. Its figures are on a different basis from the two sources that bracket them:
+    # for coal production it sits 31% above Etemad & Luciani's last year (1979) and 24% above the
+    # Statistical Review where they overlap (1981-1984), with the same gap in consumption. Since the
+    # Statistical Review only reports USSR production for those four years, keeping EIA would splice
+    # three incompatible levels into one series and show jumps that are source seams, not history.
+    # The USSR therefore ends where the Statistical Review ends it, in 1984; Russia starts in 1985 as
+    # its own (smaller) entity, which is the Statistical Review's own convention.
+    tb = tb[tb["country"] != "USSR"].reset_index(drop=True)
     return tb
 
 
