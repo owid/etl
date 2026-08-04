@@ -274,17 +274,6 @@ def run() -> None:
             view.metadata = view.metadata or {}
             view.metadata["description_key"] = new_bullets
 
-    # TEST (metadata-diff tool check): prepend "BERTHA" to the first WYSK bullet of the mean views.
-    for view in c.views:
-        if view.matches(indicator="mean") and view.indicators.y:
-            col_name = view.indicators.y[0].catalogPath.split("#")[-1]
-            source_bullets = _description_key_bullets(tb, col_name)
-            if source_bullets:
-                new_bullets = list(source_bullets)
-                new_bullets[0] = f"BERTHA {new_bullets[0]}"
-                view.metadata = view.metadata or {}
-                view.metadata["description_key"] = new_bullets
-
     #
     # Save garden dataset.
     #
