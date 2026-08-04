@@ -4,10 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Energy
-  description_processing_other_renewables: &description-processing-other-renewables |-
-    * Total energy supply for "other renewables" (mostly geothermal and biomass) is reported by the Statistical Review of World Energy using the Physical Energy Content method, where the heat input to power generation is estimated using assumed thermal efficiencies (for example, around 33% for biomass). This replaces the "substitution" method used up to the 2024 release, which instead inflated gross electricity generation to a fossil-fuel input-equivalent.
-  description_processing_nuclear_solar_wind_hydro: &description-processing-nuclear-solar-wind-hydro |-
-    * Total energy supply is reported by the Statistical Review of World Energy using the Physical Energy Content method. Non-combustible renewables (hydro, solar and wind) are counted as the gross amount of electricity they generate. Nuclear is counted as the heat input to its reactors, estimated by dividing gross electricity generation by an assumed thermal efficiency of around 33%. This replaces the "substitution" method used up to the 2024 release, which instead inflated gross electricity generation to a fossil-fuel input-equivalent (dividing by around 41%).
   description_processing_oil_production_twh: &description-processing-oil-production-twh |-
     * Oil production is approximately converted from million tonnes to energy using a standard average oil-equivalent conversion factor of 41.868 petajoules per million tonnes. We then convert 1 petajoule to 0.278 terawatt-hours.
 
@@ -17,8 +13,7 @@ definitions:
   producer_total_energy_supply: &producer-total-energy-supply >-
     In this review, energy supply comprises commercially-traded fuels, including modern renewables used to generate
     electricity. Energy from non-fossil fuel combustible electricity generation is accounted for on their input heat
-    requirements and non-combustible renewables on the energy content of their gross electrical output. See the appendix
-    or https://www.energyinst.org/statistical-review for more details on this methodology.
+    requirements and non-combustible renewables on the energy content of their gross electrical output. See https://www.energyinst.org/statistical-review for more details on this methodology.
   # Sheet(s): "Coal Production - mt", "Coal Production - EJ".
   producer_coal_production: &producer-coal-production >-
     Commercial solid fuels only, i.e. bituminous coal and anthracite (hard coal), and lignite and brown (sub-bituminous)
@@ -114,7 +109,7 @@ definitions:
   # Sheet(s): "Nuclear / Hydro / Solar / Wind Consumption - EJ", "Geo Biomass Other - EJ", "Renewables Consumption -EJ".
   producer_consumption_gross: &producer-consumption-gross >-
     Based on gross generation and not accounting for cross-border electricity supply. Energy from non-combustible
-    renewable generation is accounted for on the energy content of their gross electrical output. See the appendix or
+    renewable generation is accounted for on the energy content of their gross electrical output. See
     https://www.energyinst.org/statistical-review for more details on this methodology.
 
 dataset:
@@ -220,7 +215,6 @@ tables:
         description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Other renewables (including geothermal and biomass)'
-        description_processing: *description-processing-other-renewables
       other_renewables_consumption_twh:  # Added by OWID.
         title: 'Other renewables (including geothermal and biomass) - TWh'
         unit: 'terawatt-hours'
@@ -232,7 +226,6 @@ tables:
           name: Other renewables
         presentation:
           title_public: 'Other renewables (including geothermal and biomass)'
-        description_processing: *description-processing-other-renewables
       other_renewables_electricity_generation_twh:
         title: 'Other renewables (including geothermal and biomass) electricity generation - TWh'
         unit: 'terawatt-hours'
@@ -439,7 +432,6 @@ tables:
         description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Hydropower consumption'
-        description_processing: *description-processing-nuclear-solar-wind-hydro
       hydro_consumption_twh:  # Added by OWID.
         title: 'Hydro consumption - TWh'
         unit: 'terawatt-hours'
@@ -451,7 +443,6 @@ tables:
           name: Hydropower
         presentation:
           title_public: 'Hydropower consumption'
-        description_processing: *description-processing-nuclear-solar-wind-hydro
       hydro_electricity_generation_twh:
         title: 'Hydro generation - TWh'
         unit: 'terawatt-hours'
@@ -490,7 +481,6 @@ tables:
         description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Nuclear consumption'
-        description_processing: *description-processing-nuclear-solar-wind-hydro
       nuclear_consumption_twh:  # Added by OWID.
         title: 'Nuclear consumption - TWh'
         unit: 'terawatt-hours'
@@ -502,7 +492,6 @@ tables:
           name: Nuclear
         presentation:
           title_public: 'Nuclear consumption'
-        description_processing: *description-processing-nuclear-solar-wind-hydro
       nuclear_electricity_generation_twh:
         title: 'Nuclear generation - TWh'
         unit: 'terawatt-hours'
@@ -715,7 +704,6 @@ tables:
         description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Solar consumption'
-        description_processing: *description-processing-nuclear-solar-wind-hydro
       solar_consumption_twh:  # Added by OWID.
         title: 'Solar consumption - TWh'
         unit: 'terawatt-hours'
@@ -727,7 +715,6 @@ tables:
           name: Solar
         presentation:
           title_public: 'Solar consumption'
-        description_processing: *description-processing-nuclear-solar-wind-hydro
       solar_electricity_generation_twh:
         title: 'Solar generation - TWh'
         unit: 'terawatt-hours'
@@ -748,7 +735,6 @@ tables:
         description_from_producer: *producer-consumption-gross
         presentation:
           title_public: 'Wind consumption'
-        description_processing: *description-processing-nuclear-solar-wind-hydro
       wind_consumption_twh:  # Added by OWID.
         title: 'Wind consumption - TWh'
         unit: 'terawatt-hours'
@@ -760,7 +746,6 @@ tables:
           name: Wind
         presentation:
           title_public: 'Wind consumption'
-        description_processing: *description-processing-nuclear-solar-wind-hydro
       wind_electricity_generation_twh:
         title: 'Wind generation - TWh'
         unit: 'terawatt-hours'
