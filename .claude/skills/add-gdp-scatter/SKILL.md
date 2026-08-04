@@ -202,6 +202,8 @@ Per-row flags are split so the "With warnings" filter stays worth using. **Warni
 
 Decisions are fingerprinted on both configs' `fullMd5` plus the GDP variable id, so a re-run of the applier (which rewrites the target) invalidates stale approvals instead of silently keeping them.
 
+**After fixing a flagged chart, the reviewer has to reload.** The panes are iframes and are only re-pointed when their URL changes, so a config edit made on staging is invisible behind the browser cache — a reviewer checking their own fix sees the old chart and reasonably concludes nothing happened. Press **`r`** / hit **↻ Reload frames** to force a refetch. Regenerating the HTML is also worth doing after a round of fixes, because it refreshes the `fullMd5` fingerprints: import the reviewer's exported JSON into the new file and exactly the rows whose config changed come back as *to review*, while every untouched decision carries over.
+
 ## Verifying after a run
 
 - Open `OWID_ENV.chart_site(slug)` for one of the targets and switch to the Scatter tab.

@@ -324,7 +324,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <span class="pill saved" id="c-saved" title="Stored in this browser and restored automatically when you reopen this file.">✓ saved</span>
     </div>
     <span class="spacer"></span>
-    <span class="kbd">keys: <b>←</b>/<b>→</b> nav · <b>a</b> approve · <b>f</b> flag · <b>c</b> clear · <b>v</b> toggle view</span>
+    <span class="kbd">keys: <b>←</b>/<b>→</b> nav · <b>a</b> approve · <b>f</b> flag · <b>c</b> clear · <b>v</b> toggle view · <b>r</b> reload frames</span>
     <button class="ghost" id="btn-autosave" onclick="linkSaveFile()">🔗 Auto-save to file…</button>
     <button class="ghost" onclick="toggleSettings()">⚙ Settings</button>
     <button class="ghost" onclick="document.getElementById('importer').click()">⬆ Import</button>
@@ -393,6 +393,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     <button onclick="go(-1)">◀ Prev</button>
     <select id="jump" onchange="jumpTo(this.value)"></select>
     <button onclick="go(1)">Next ▶</button>
+    <button class="ghost" onclick="reloadFrames()" title="Refetch both charts — use after changing a config on staging">↻ Reload frames</button>
   </div>
   <button class="approve" onclick="decide('approved')">✓ Approve</button>
   <button class="flag" onclick="decide('flagged')">⚠ Flag</button>
@@ -675,9 +676,19 @@ function render() {
   fillJump();
 }
 
+// Frames are only re-pointed when their URL changes, so an edit made on staging after this
+// file was opened stays invisible behind the browser's cache. `bust` is bumped by the Reload
+// button to force both frames to refetch; grapher ignores unknown query params.
+let bust = 0;
 function setFrame(id, u) {
   const f = document.getElementById(id);
-  if (f.getAttribute("data-src") !== u) { f.src = u; f.setAttribute("data-src", u); }
+  const src = bust ? u + (u.includes("?") ? "&" : "?") + "_r=" + bust : u;
+  if (f.getAttribute("data-src") !== src) { f.src = src; f.setAttribute("data-src", src); }
+}
+function reloadFrames() {
+  bust++;
+  render();
+  toast("Reloaded both frames — picks up config changes made on staging since this file was opened.");
 }
 
 function go(delta) { pos = Math.max(0, Math.min(order.length - 1, pos + delta)); render(); }
@@ -751,6 +762,7 @@ document.addEventListener("keydown", (e) => {
   else if (e.key.toLowerCase() === "f") decide("flagged");
   else if (e.key.toLowerCase() === "c") decide(null);
   else if (e.key.toLowerCase() === "v") setView(viewMode === "redirect" ? "default" : "redirect");
+  else if (e.key.toLowerCase() === "r") reloadFrames();
 });
 
 buildEndpointInputs();
