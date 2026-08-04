@@ -355,7 +355,7 @@ def render_tree_html(
   </style>
   <div class="mdd-toolbar">
     <div class="mdd-row-top">
-      <label><input type="checkbox" id="mdd-show-unchanged"> Show unchanged views</label>
+      <label><input type="checkbox" id="mdd-show-unchanged"> Show all views</label>
       <span class="mdd-legend">
         <span><span class="mdd-dot" style="background:#e8590c"></span>Changed</span>
         <span><span class="mdd-dot" style="background:#1971c2"></span>New view</span>
