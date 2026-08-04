@@ -33,15 +33,13 @@ def run() -> None:
     # The raw file splits some fuels into unlabeled sub-components (e.g. coal types) across several rows.
     # Sum them per country, year and energy family. This is verified to be correct: the summed countries
     # exactly reproduce the file's own World totals.
-    origins = tb["energy"].metadata.origins
     tb = tb.groupby(["country", "year", "energy_family"], as_index=False, observed=True)["energy"].sum(min_count=1)
-    tb["energy"].metadata.origins = origins
 
     # Pivot the energy families into columns (values are in million tonnes of oil equivalent).
     tb = tb.pivot(index=["country", "year"], columns="energy_family", values="energy", join_column_levels_with="_")
 
-    # Underscore column names and set an appropriate index.
-    tb = tb.underscore().format(["country", "year"], short_name=paths.short_name)
+    # Set an appropriate index and sort conveniently (format underscores the pivoted column names).
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
