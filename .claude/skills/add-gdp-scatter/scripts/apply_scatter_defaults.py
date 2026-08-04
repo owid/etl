@@ -35,20 +35,23 @@ from etl.db import get_engine
 from etl.grapher.io import variable_data_df_from_s3
 
 GDP_SOURCES = {
-    "world bank": 1204826,
-    "wdi": 1204826,
+    # World Bank: WDI 2026-07-27. Bumped from 1204826 (WDI 2026-02-27) on 2026-08-04 —
+    # every published "X vs. GDP per capita" scatter already plots this id, so a target
+    # pinned to the older one would disagree with the source it was migrated from.
+    "world bank": 1294305,
+    "wdi": 1294305,
     "maddison": 900793,
     "maddison project database": 900793,
     "pwt": 1108541,
     "penn world table": 1108541,
 }
-GDP_LABEL = {1204826: "World Bank", 900793: "Maddison", 1108541: "PWT"}
-GDP_COVERAGE = {1204826: 1990, 1108541: 1950, 900793: 1}
+GDP_LABEL = {1294305: "World Bank", 900793: "Maddison", 1108541: "PWT"}
+GDP_COVERAGE = {1294305: 1990, 1108541: 1950, 900793: 1}
 
 # catalogPath patterns used to detect when a newer version of each GDP-per-capita
 # indicator has landed in the catalog since this script was last updated.
 GDP_CATALOG_PATTERNS = {
-    1204826: "grapher/worldbank_wdi/%/wdi/wdi#ny_gdp_pcap_pp_kd",
+    1294305: "grapher/worldbank_wdi/%/wdi/wdi#ny_gdp_pcap_pp_kd",
     900793: "grapher/ggdc/%/maddison_project_database/maddison_project_database#gdp_per_capita",
     1108541: "grapher/ggdc/%/penn_world_table/penn_world_table#rgdpo_pc",
 }
@@ -74,6 +77,7 @@ def short_admin_host() -> str:
 
 def edit_link(chart_id: int) -> str:
     return f"{short_admin_host()}/charts/{chart_id}/edit"
+
 
 _data_cache: dict[int, Any] = {}
 _pop_variant_cache: dict[int, bool] = {}
@@ -231,10 +235,7 @@ def process_row(
         added.append(f"x={gdp_var_id}")
     if "color" not in props:
         dims.append({"variableId": color_target, "property": "color"})
-        added.append(
-            f"color={color_target}"
-            + (" (from source)" if color_target != CONTINENTS_ID else "")
-        )
+        added.append(f"color={color_target}" + (" (from source)" if color_target != CONTINENTS_ID else ""))
     if "size" not in props:
         if src_size is None:
             # Source scatter has no size dim — skip on target too.
@@ -323,12 +324,16 @@ def process_row(
 
     # 8) Warnings (no action)
     if not cfg.get("selectedEntityNames"):
-        notes.append("WARN: target has no selectedEntityNames — line/bar/slope views will fall back to Grapher defaults")
+        notes.append(
+            "WARN: target has no selectedEntityNames — line/bar/slope views will fall back to Grapher defaults"
+        )
 
     # On scatter, relative mode renders as "Display average annual change". We want
     # the toggle available but OFF by default, i.e. stackMode must not be "relative".
     if cfg.get("stackMode") == "relative":
-        notes.append("WARN: stackMode=relative — scatter defaults to 'average annual change'; set to absolute to disable the default")
+        notes.append(
+            "WARN: stackMode=relative — scatter defaults to 'average annual change'; set to absolute to disable the default"
+        )
 
     excluded = src_cfg.get("excludedEntityNames")
     if excluded:
@@ -388,10 +393,7 @@ def print_action_table(results: list[dict]) -> None:
     print("-" * 180)
     for r in results:
         link = edit_link(r["chart"]) if isinstance(r["chart"], int) else ""
-        print(
-            f"{r['chart']:>6}  {r['src']:>6}  {r['gdp_source']:<13}  {r['status']:<8}  "
-            f"{link:<60}  {r['notes']}"
-        )
+        print(f"{r['chart']:>6}  {r['src']:>6}  {r['gdp_source']:<13}  {r['status']:<8}  {link:<60}  {r['notes']}")
 
 
 def print_display_name_table(api: AdminAPI, results: list[dict]) -> None:
@@ -423,7 +425,10 @@ def print_display_name_table(api: AdminAPI, results: list[dict]) -> None:
     print("Y-DIM DISPLAY NAMES (manual vs ETL)")
     hdrs = ("chart", "varId", "manual (on chart)", "ETL display.name", "variable.name")
     widths = [max(len(str(r[i])) for r in [hdrs] + rows) for i in range(5)]
-    def line(r): return "  ".join(str(c).ljust(widths[i]) for i, c in enumerate(r))
+
+    def line(r):
+        return "  ".join(str(c).ljust(widths[i]) for i, c in enumerate(r))
+
     print(line(hdrs))
     print("-" * (sum(widths) + 8))
     for r in rows:
@@ -434,8 +439,7 @@ def check_gdp_versions() -> None:
     print("GDP-PER-CAPITA VERSION CHECK")
     for hardcoded_id, pattern in GDP_CATALOG_PATTERNS.items():
         latest = OWID_ENV.read_sql(
-            "SELECT id, catalogPath FROM variables "
-            "WHERE catalogPath LIKE %(p)s ORDER BY id DESC LIMIT 1",
+            "SELECT id, catalogPath FROM variables WHERE catalogPath LIKE %(p)s ORDER BY id DESC LIMIT 1",
             params={"p": pattern},
         )
         label = GDP_LABEL[hardcoded_id]
