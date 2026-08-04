@@ -33,7 +33,12 @@ from apps.wizard.app_pages.metadata_diff.core import (
     field_label,
     inline_diff_html,
 )
-from apps.wizard.app_pages.metadata_diff.data import build_env_bundles, get_mdim_changes, load_mdim_config
+from apps.wizard.app_pages.metadata_diff.data import (
+    build_chart_bundle,
+    build_env_bundles,
+    get_mdim_changes,
+    load_mdim_config,
+)
 from apps.wizard.app_pages.metadata_diff.tree import render_affected_charts_html, render_tree_html
 from apps.wizard.app_pages.metadata_diff.usage import charts_using_indicators, mdims_using_indicators
 from apps.wizard.utils.components import url_persist
@@ -215,13 +220,19 @@ def _plain_text_html(value: Any) -> str:
     return f'<div class="mdd-text">{html.escape(str(value))}</div>'
 
 
-def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]]]]) -> None:
+def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]]]], unit: str = "view") -> None:
     """The 'does this also affect charts / other MDims?' flag for one view, with an expandable list."""
     if not view.affects_indicator:
-        st.caption(
-            "🔒 **MDim-only change** — the underlying indicator metadata is unchanged, so no standalone "
-            "charts or other MDims are affected. (The change comes from an MDim-level override.)"
-        )
+        if unit == "chart":
+            st.caption(
+                "🔒 **Chart-only change** — this is the chart's own config text (title/subtitle/footnote); "
+                "the indicator metadata is unchanged, so no other charts or MDims are affected."
+            )
+        else:
+            st.caption(
+                "🔒 **MDim-only change** — the underlying indicator metadata is unchanged, so no standalone "
+                "charts or other MDims are affected. (The change comes from an MDim-level override.)"
+            )
         return
 
     charts, mdims = _view_impact(view, usage)
@@ -272,6 +283,37 @@ def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]
         st.markdown(f"**Other MDims ({len(mdims)})** — also use this indicator:")
         for m in mdims:
             st.markdown(f"- `{m.get('catalogPath')}`")
+
+
+def _render_diff_body(
+    view_diff: ViewDiff,
+    baseline_name: str,
+    links: list[str],
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
+    unit: str = "view",
+) -> None:
+    """Status banner + blast-radius flag + side-by-side field diffs — shared by MDim views and charts."""
+    if view_diff.is_new:
+        st.info(f"This {unit} is **new** — it does not exist in {baseline_name}. " + " · ".join(links))
+    elif view_diff.changed:
+        n = len(view_diff.fields)
+        st.warning(f"**{n} field{'s' if n > 1 else ''} changed** in this {unit}. " + " · ".join(links))
+    else:
+        st.success(f"No changes in this {unit}. " + " · ".join(links))
+
+    if view_diff.changed and not view_diff.is_new:
+        _render_impact(view_diff, usage, unit=unit)
+
+    for field_name in [f for f in FIELD_ORDER if f in view_diff.fields]:
+        change = view_diff.fields[field_name]
+        st.markdown(f"##### {field_label(field_name)}")
+        col_old, col_new = st.columns(2)
+        with col_old:
+            st.markdown(f":gray[**{baseline_name.capitalize()}**]")
+            st.markdown(_render_text_html(change["old"], change["new"], side="old"), unsafe_allow_html=True)
+        with col_new:
+            st.markdown(":green[**This staging server**]")
+            st.markdown(_render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
 
 
 def render_view_diff_page(
@@ -380,38 +422,62 @@ def render_view_diff_page(
     if view.changed:
         links.append(f"[Data page — this staging server]({staging_url})")
 
-    if view.is_new:
-        st.info(f"This view is **new** — it does not exist in {baseline_name}. " + " · ".join(links))
-    elif view.changed:
-        n = len(view.fields)
-        st.warning(f"**{n} field{'s' if n > 1 else ''} changed** in this view. " + " · ".join(links))
-    else:
-        st.success("No changes in this view. " + " · ".join(links))
+    _render_diff_body(view, baseline_name, links, usage, unit="view")
 
-    # --- Blast radius: does this change escape the MDim? --------------------------
-    if view.changed and not view.is_new:
-        _render_impact(view, usage)
 
-    # --- Field diffs --------------------------------------------------------------
-    changed_fields = [f for f in FIELD_ORDER if f in view.fields]
-    for field_name in changed_fields:
-        change = view.fields[field_name]
-        st.markdown(f"##### {field_label(field_name)}")
-        col_old, col_new = st.columns(2)
-        with col_old:
-            st.markdown(f":gray[**{baseline_name.capitalize()}**]")
-            st.markdown(_render_text_html(change["old"], change["new"], side="old"), unsafe_allow_html=True)
-        with col_new:
-            st.markdown(":green[**This staging server**]")
-            st.markdown(_render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
+def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> None:
+    """Review a standalone chart's data-page WYSK (the indicator metadata it inherits), vs the baseline."""
+    baseline_name = BASELINES[baseline]
+    ref = st.text_input(
+        "Chart",
+        key="chart",
+        placeholder="Chart slug, id, or grapher URL (e.g. daily-mean-income)",
+        help="A standalone chart's 'what you should know' text is its indicator's metadata. "
+        "Multi-indicator charts (scatters) have no data page, so their WYSK isn't shown to readers.",
+    )
+    if not ref:
+        st.info("Enter a chart slug, id, or grapher URL to review its data-page text.")
+        return
+
+    src = build_chart_bundle(source_engine, ref)
+    if src is None:
+        st.warning(f"No published chart found for “{ref}”. Check the slug/id.")
+        return
+    src_bundle, chart = src
+    tgt = build_chart_bundle(target_engine, str(chart["slug"]))
+    target_bundle = tgt[0] if tgt is not None else None
+
+    diff = diff_views([src_bundle], [target_bundle] if target_bundle is not None else [])[0]
+
+    # Blast radius on the chart's indicator — but exclude the chart itself from its own affected list.
+    usage: dict[int, dict[str, list[dict[str, Any]]]] = {}
+    if diff.affects_indicator and diff.indicator_id is not None:
+        raw = compute_usage(
+            (diff.indicator_id,),
+            f"chart:{chart['slug']}",
+            source_engine,
+            cache_key=f"{baseline}-chart-{chart['slug']}",
+        )
+        cur = int(chart["chartId"])
+        usage = {
+            vid: {"charts": [c for c in e.get("charts", []) if c.get("chartId") != cur], "mdims": e.get("mdims", [])}
+            for vid, e in raw.items()
+        }
+
+    st.markdown(f"#### {chart.get('title') or chart['slug']}")
+    baseline_url = f"{_baseline_env(baseline).site}/grapher/{chart['slug']}"
+    staging_url = f"{SOURCE.site}/grapher/{chart['slug']}"
+    links = [f"[Data page — {baseline_name}]({baseline_url})", f"[Data page — this staging server]({staging_url})"]
+    _render_diff_body(diff, baseline_name, links, usage, unit="chart")
 
 
 def main() -> None:
     st.title(":material/difference: Metadata Diff")
     st.caption(
-        "Review how this staging server changes the metadata texts end users see on MDims "
-        "(e.g. *What you should know about this data*), view by view, against a baseline. "
-        "This includes changes coming from garden step templates, which don't show up in config diffs."
+        "Review how this staging server changes the metadata texts end users see — on **MDims** "
+        "(view by view) or on an **individual chart's data page** (e.g. *What you should know about "
+        "this data*) — against a baseline. This includes changes coming from garden step templates, "
+        "which don't show up in config diffs."
     )
 
     baseline = url_persist(st.radio)(
@@ -433,6 +499,18 @@ def main() -> None:
         st.warning("No production env file found — comparing against `staging-site-master` instead.")
 
     source_engine, target_engine = get_engines(baseline)
+
+    target = url_persist(st.radio)(
+        "Review",
+        key="target",
+        options=["mdim", "chart"],
+        format_func=lambda t: "🧭 MDim" if t == "mdim" else "📈 Individual chart",
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    if target == "chart":
+        _chart_flow(source_engine, target_engine, baseline)
+        return
 
     df_mdims = get_mdim_changes(source_engine, target_engine)
     if df_mdims.empty:

@@ -111,6 +111,66 @@ def fetch_chart_text(engine: Engine, config_uuids: list[str]) -> dict[str, dict[
     return out
 
 
+def resolve_chart(engine: Engine, ref: str) -> dict[str, Any] | None:
+    """Resolve a published chart by numeric id, slug, or a grapher URL. Returns its id/slug/FAUST."""
+    ref = (ref or "").strip()
+    if not ref:
+        return None
+    if ref.isdigit():
+        where, params = "c.id = %(v)s", {"v": int(ref)}
+    else:
+        slug = ref.rstrip("/").split("/")[-1].split("?")[0]  # tolerate a full /grapher/<slug>?… URL
+        where, params = "cc.slug = %(v)s", {"v": slug}
+    df = read_sql(
+        f"""
+        select c.id as chartId,
+               cc.slug as slug,
+               cc.full ->> '$.title' as title,
+               cc.full ->> '$.subtitle' as subtitle,
+               cc.full ->> '$.note' as note
+        from charts c
+        join chart_configs cc on cc.id = c.configId
+        where {where} and c.publishedAt is not null
+        limit 1
+        """,
+        engine=engine,
+        params=params,
+    )
+    if df.empty:
+        return None
+    return {str(k): v for k, v in df.iloc[0].to_dict().items()}
+
+
+def _chart_primary_indicator(engine: Engine, chart_id: int) -> int | None:
+    """The chart's first y-indicator — whose metadata the data page renders."""
+    df = read_sql(
+        "select variableId from chart_dimensions where chartId = %(id)s and property = 'y' order by `order` limit 1",
+        engine=engine,
+        params={"id": int(chart_id)},
+    )
+    if df.empty:
+        return None
+    return int(df.iloc[0]["variableId"])
+
+
+def build_chart_bundle(engine: Engine, ref: str) -> tuple[ViewBundle, dict[str, Any]] | None:
+    """Build a single-"view" bundle for a standalone chart: its y-indicator metadata + its FAUST.
+
+    Returns (bundle, chart) or None if the chart can't be resolved. The bundle has empty dimensions,
+    so it matches its baseline counterpart in `diff_views`.
+    """
+    chart = resolve_chart(engine, ref)
+    if chart is None:
+        return None
+    vid = _chart_primary_indicator(engine, int(chart["chartId"]))
+    variable_row = fetch_variable_rows(engine, [vid]).get(vid) if vid is not None else None
+    chart_config = {"title": chart.get("title"), "subtitle": chart.get("subtitle"), "note": chart.get("note")}
+    bundle = build_view_bundle(
+        view={"dimensions": {}}, config_metadata=None, variable_row=variable_row, chart_config=chart_config
+    )
+    return bundle, chart
+
+
 def build_env_bundles(engine: Engine, config: dict[str, Any]) -> list[ViewBundle]:
     """Build a ViewBundle for every view of an MDIM config, resolving lookups in bulk."""
     views = config.get("views") or []

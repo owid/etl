@@ -84,6 +84,28 @@ def test_new_view_does_not_flag_indicator_change():
     assert not diff.affects_indicator
 
 
+def test_chart_shaped_bundle_diff():
+    """A standalone chart = a single bundle with empty dims: indicator text (shared) + chart FAUST (local)."""
+    src = build_view_bundle(
+        {"dimensions": {}},
+        None,
+        _var(10, description_key=["BER a", "b"]),
+        {"title": "T", "subtitle": "New", "note": "N"},
+    )
+    tgt = build_view_bundle(
+        {"dimensions": {}}, None, _var(7, description_key=["a", "b"]), {"title": "T", "subtitle": "Old", "note": "N"}
+    )
+
+    [d] = diff_views([src], [tgt])
+
+    assert d.changed
+    assert "descriptionKey" in d.fields  # indicator-level change (shared → affects other charts/MDims)
+    assert "chart.subtitle" in d.fields  # chart-config change (local to this chart)
+    assert d.affects_indicator and "descriptionKey" in d.indicator_changed_fields
+    assert "subtitle" not in d.indicator_changed_fields  # chart FAUST is never an indicator change
+    assert d.indicator_id == 10
+
+
 def test_indicator_ids_in_mdim_config_scans_all_axes():
     config = {
         "views": [
