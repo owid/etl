@@ -215,10 +215,13 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
             hideAnnotationFieldsInTitle:
               time: true                        # hide the placeholder data year in titles
             map:
+              tooltipUseCustomLabels: true          # tooltip shows the stripped label too — see below
               colorScale:
                 baseColorScheme: OwidCategoricalMap    # name-keyed region colors — see Step 9
                 customCategoryLabels:
-                  "<Region> (<Provider>)": "<Region>"   # strip the suffix on the legend
+                  # one entry per region in `sort` — drops the suffix from the
+                  # legend, and from the tooltip via the flag above
+                  "<Region> (<Provider>)": "<Region>"
                 customHiddenCategories:
                   "No data": true
                 # No customCategoryColors. Colors live in MapContinentColors (Step 9),
@@ -226,9 +229,19 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
                 # source of truth.
 ```
 
+> **`customCategoryLabels` alone only fixes the legend.** Hovering a country still shows the raw `"<Region> (<Provider>)"`, because the map tooltip falls back to the unformatted value unless **`map.tooltipUseCustomLabels: true`** is set (`MapChartState.formatValueForTooltip` — it looks up the bin's label only behind that flag). Set both, always, and give **every** region in `sort` a label entry: a region you miss keeps its suffix in the legend *and* the tooltip while its siblings lose theirs, which reads as a data error rather than a missing config line.
+
 > **Set the palette, don't hardcode the colors.** A categorical map with no `baseColorScheme` falls back to `BuGn` — a sequential green ramp (`MapChartState.ts:53`). Region colors are only looked up by name when the map is on **`OwidCategoricalMap`**, the scheme that carries `colorMap: MapContinentColors`. Setting it on the *indicator* means every chart built on it inherits the palette (the same inheritance that already carries `customCategoryLabels`). A chart's **own** patch still wins over the inherited value, so once the chart exists, confirm on staging that it isn't patched to something else (`world-regions-according-to-pew` is patched to `continents` — a *chart* palette on a map, which pulls the strong colors instead of the muted ones).
 
-> **Ordering rule for `sort`:** order the regions so they read **roughly left-to-right across a world map** — i.e. by approximate west-to-east longitude, starting with North America. A good default sweep is: North America → (Central/South America or Latin America) → Europe → Africa → Middle East → (CIS / Central Asia) → Asia (Pacific) → Oceania. Drop the regions the provider doesn't have and keep the rest in this relative order. This `sort` drives the **map legend order** (colors themselves are keyed by region name, not by position — Step 9), so keep the same order in the owid-grapher `customRegionDisplayOrder[<provider>]` (Step 9) and in the region-definition chart (Step 7) so the legend, the chart, and the hover all agree.
+> **Ordering rule for `sort`:** the map legend renders as a single row in `sort` order, so order the regions to read **left-to-right across a world map**. The house sweep is:
+>
+> **(North/Northern) America → Latin America / Caribbean → Africa (north to south within the slot) → Middle East / North Africa → Europe → CIS / Russia / Central Asia → South Asia → East and South-East Asia → Australia and New Zealand → Oceania**
+>
+> Drop what the provider doesn't have, keep the rest in this relative order. Three wrinkles worth knowing. **Europe sits after Africa and the Middle East**, because Europe and Africa share the same longitudes (Europe north, Africa south) so west-to-east alone can't separate them — the convention sweeps the southern band first. At sub-region granularity, a "Western Asia" that the provider models as *part of Asia* stays in the Asia block rather than moving up to the Middle East slot (compare `un_m49_2` with `ei`). And **which Africa regions land in the Africa slot depends on how the provider splits the continent**: where Africa has its own sub-regions they run north to south inside the slot — `Northern Africa` then `Sub-Saharan Africa` (`un_m49_2`, `ilo_2`), or `Northern Africa` then the compass sub-regions (`fao_2`). Where instead North Africa is folded into a *Middle East and North Africa* bucket, that bucket is not part of the Africa slot at all — it takes the Middle East slot — so `Sub-Saharan Africa` is alone in the Africa slot and therefore comes first (`wb`, `unsdg`, `pew`, `wid`, `fao_sdg`).
+>
+> **The order is defined twice — keep the two equal.** This `sort` drives the published map's legend; `customRegionDisplayOrder[<provider>]` in owid-grapher's `RegionTooltipData.ts` (Step 9) drives the legend of the mini-map in the region hover. When they diverge, the same provider lists its regions in two different orders on the same page. Treat `customRegionDisplayOrder` as the reference and copy it into `sort` verbatim; if you're adding a new provider, write the order once and paste it into both.
+
+> **Reordering is only color-safe once the regions are pinned.** For a region with a `MapContinentColors` entry, `sort` moves legend positions and nothing else — the color follows the name. For a region **without** one, `OwidCategoricalMap` falls back to handing out palette colors *by position*, so reordering silently recolors the map. Check every region of the tier against `MapContinentColors` before touching `sort`: if any are unpinned, pin them first (Step 9, with the design sign-off) and reorder in the same change, or leave the order alone and say why in a `# NOTE:` beside it. The two edits look independent and are not.
 
 **6c. Cross-tier back-fill** — if Step 3 found a region shared across tiers, add the masked back-fill to `grapher/regions/2023-01-01/regions.py` after the inversion loop (see the existing `process_un_definitions` example for the shape).
 
