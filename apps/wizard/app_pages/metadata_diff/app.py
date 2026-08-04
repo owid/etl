@@ -240,11 +240,11 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
     if n_m:
         parts.append(f"**{n_m}** other MDim{'s' if n_m != 1 else ''}")
 
-    # Warning triangle + the message, with a button (popover) right next to it that reveals the list.
+    # Yellow warning box (matching the status box above) with the button right next to it.
     col_msg, col_btn = st.columns([5, 2], vertical_alignment="center")
     with col_msg:
-        st.markdown(
-            "⚠️ This change is in the **shared indicator metadata** — it also affects "
+        st.warning(
+            "This change is in the **shared indicator metadata** — it also affects "
             + " and ".join(parts)
             + " that use this indicator."
         )
@@ -312,13 +312,15 @@ def render_view_diff_page(
             suffix = f"  —  ↗ {len(charts)} charts" if charts else ""
             return f"{marker} {_view_label(cv, dimensions)}{suffix}"
 
-        st.selectbox(
-            f"⚡ Jump to a changed view ({len(changed_views)})",
-            options=[""] + list(range(len(changed_views))),
-            format_func=_jump_label,
-            key="mdd_jump",
-            on_change=_jump_to_changed,
-        )
+        jump_col, _jump_spacer = st.columns([2, 3])
+        with jump_col:
+            st.selectbox(
+                f"⚡ Jump to a changed view ({len(changed_views)})",
+                options=[""] + list(range(len(changed_views))),
+                format_func=_jump_label,
+                key="mdd_jump",
+                on_change=_jump_to_changed,
+            )
 
     # --- MDim controls (navigation across views) ---------------------------------
     st.caption("🟡 marks a control option that leads to a changed view — follow the dots to the changes.")
@@ -373,9 +375,10 @@ def render_view_diff_page(
     baseline_url = _view_url(_baseline_env(baseline), catalog_path, baseline_slug, view.dimensions)
     staging_url = _view_url(SOURCE, catalog_path, None, view.dimensions)
 
-    links = [f"[Current view ({baseline_name})]({baseline_url})"]
+    # These links open the indicator's data page (where these "what you should know" texts render).
+    links = [f"[Data page — {baseline_name}]({baseline_url})"]
     if view.changed:
-        links.append(f"[Changed view (this staging server)]({staging_url})")
+        links.append(f"[Data page — this staging server]({staging_url})")
 
     if view.is_new:
         st.info(f"This view is **new** — it does not exist in {baseline_name}. " + " · ".join(links))
@@ -393,9 +396,7 @@ def render_view_diff_page(
     changed_fields = [f for f in FIELD_ORDER if f in view.fields]
     for field_name in changed_fields:
         change = view.fields[field_name]
-        shared = field_name in view.indicator_changed_fields
-        tag = " · :orange[shared — also on charts / other MDims]" if shared else " · :gray[MDim-only]"
-        st.markdown(f"##### {field_label(field_name)}{tag}")
+        st.markdown(f"##### {field_label(field_name)}")
         col_old, col_new = st.columns(2)
         with col_old:
             st.markdown(f":gray[**{baseline_name.capitalize()}**]")
