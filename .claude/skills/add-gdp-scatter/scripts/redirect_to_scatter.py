@@ -4,7 +4,7 @@ the new target charts (part 2 of the add-gdp-scatter workflow).
 Reads a JSON list of `{grapher_url, target_chart_url}` from stdin (public
 ourworldindata.org/grapher/<slug> URLs). Report-first: without `--apply` it audits what
 references each OLD chart and prints the plan, mutating nothing. With `--apply` it registers
-the old slug as a chart redirect on the TARGET chart carrying `?tab=scatter&time=latest`,
+the old slug as a chart redirect on the TARGET chart carrying `?tab=scatter&time=latest&country=`,
 re-points the old chart's own aliases at the target, and unpublishes the old chart.
 
 Mechanism notes:
@@ -34,11 +34,23 @@ from etl.config import OWID_ENV
 SLUG_RE = re.compile(r"/grapher/([^/?#]+)")
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
-# Query string stored on the redirect: open the scatter tab on the latest year.
-TARGET_QUERY = "tab=scatter&time=latest"
+# Query string stored on the redirect. Every part of it is load-bearing, because a tab
+# supplied in the URL does NOT get the adjustments a tab CLICK does: `adjustStateForTab`
+# (which collapses the scatter's time handles and clears its entity selection) is reached
+# only from `onTabChange` <- the ContentSwitchers control, while a URL tab goes through
+# `populateFromQueryParams` -> `setTab`, which just assigns the tab. So each adjustment has
+# to be supplied explicitly here or the reader arriving by an old slug gets a different
+# chart from the reader who clicks the tab:
+#   tab=scatter  the view itself
+#   time=latest  what ensureTimeHandlesAreSensibleForTab would have collapsed to
+#   country=     what ensureEntitySelectionIsSensibleForTab would have cleared;
+#                `parseCountryParam` returns valid([]) for a present-but-empty value, and
+#                `setSelectedEntities([])` clears, so the scatter shows every entity
+#                unhighlighted instead of emphasising the target's line/bar selection
+TARGET_QUERY = "tab=scatter&time=latest&country="
 
 # Params on a referencing link that would override TARGET_QUERY at redirect time.
-OVERRIDING_PARAMS = ("tab=", "time=")
+OVERRIDING_PARAMS = ("tab=", "time=", "country=")
 
 # Reference categories a redirect alone does NOT fix — these BLOCK the row.
 # narrativeCharts is deliberately not here: one parented to a chart owns a materialized full

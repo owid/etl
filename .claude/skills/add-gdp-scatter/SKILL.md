@@ -74,7 +74,7 @@ if (!this.isEditor) {
 So they always happen together, or not at all. `adjustStateForTab` has exactly one production caller, `onTabChange`, which in turn has exactly one: the `ContentSwitchers` tab control. A tab supplied in the URL takes a different path — `populateFromQueryParams` → `setTab`, which only assigns `this.tab`. Three consequences:
 
 - **Clicking the scatter tab**: time collapses to the latest year *and* the selection is cleared. The scatter matches the old standalone chart.
-- **Landing directly on `?tab=scatter`**: neither happens. The scatter opens on the authored time range with the authored entities highlighted — **unless the URL says otherwise**. This is the path **Part 2's redirect uses**, and it is why the stored query params are `tab=scatter&time=latest`: `time=latest` supplies via URL what the click would have done. There is no equivalent for the selection in the current redirect, but `country=` (present and empty) would do it — `parseCountryParam` returns `valid([])` for an empty value and `setSelectedEntities([])` clears. Untested through the redirect's param merging; verify in a browser before relying on it.
+- **Landing directly on `?tab=scatter`**: neither happens. The scatter opens on the authored time range with the authored entities highlighted — **unless the URL says otherwise**. This is the path **Part 2's redirect uses**, which is why every part of its stored `tab=scatter&time=latest&country=` is load-bearing: each param hand-supplies one adjustment the click would have made. `time=latest` stands in for `ensureTimeHandlesAreSensibleForTab`, and `country=` (present, empty) for `ensureEntitySelectionIsSensibleForTab` — `parseCountryParam` returns `valid([])` for an empty value and `setSelectedEntities([])` clears, so the scatter shows every entity unhighlighted. **Whenever a new tab-click adjustment is added upstream, a matching param has to be added here** or the two paths drift apart again. `country=` has not yet been exercised through a live redirect — confirm in a browser on the first `--apply` run (see "Verifying Part 2").
 - **The admin editor shows neither**, because of the `isEditor` guard — deliberate, so switching tabs cannot mutate the authored config on save (grapher #6794). A scatter that looks wrong in `/admin/charts/<id>/edit` may be fine for readers. Verify on the chart page.
 
 ### The target's entity selection highlights the scatter, it does not filter it
@@ -194,9 +194,9 @@ Two consequences worth knowing before someone reports it as a bug:
 
 ## Part 2: retire the old standalone scatter charts
 
-Once the targets have their scatter view, each old standalone "X vs. GDP per capita" chart is retired by registering **its slug as a chart redirect on the target chart** carrying `?tab=scatter&time=latest`, then unpublishing it. Use `scripts/redirect_to_scatter.py`.
+Once the targets have their scatter view, each old standalone "X vs. GDP per capita" chart is retired by registering **its slug as a chart redirect on the target chart** carrying `?tab=scatter&time=latest&country=`, then unpublishing it. Use `scripts/redirect_to_scatter.py`.
 
-That is the same thing as opening the target chart's admin editor, going to **Refs → "Alternative URLs for this chart"**, and filling in both fields: the old slug under **URL**, and `tab=scatter&time=latest` under **Target query params (optional)**. That second field is new (grapher #6674, Jul 2026) and is what makes this possible — before it, `chart_slug_redirects` could only map slug → chart id, so this skill had to use the site `redirects` table instead.
+That is the same thing as opening the target chart's admin editor, going to **Refs → "Alternative URLs for this chart"**, and filling in both fields: the old slug under **URL**, and `tab=scatter&time=latest&country=` under **Target query params (optional)**. That second field is new (grapher #6674, Jul 2026) and is what makes this possible — before it, `chart_slug_redirects` could only map slug → chart id, so this skill had to use the site `redirects` table instead.
 
 Input: JSON list of `{grapher_url, target_chart_url}` (public `ourworldindata.org/grapher/<slug>` URLs).
 
@@ -238,7 +238,7 @@ Plus a table of **article references that need a hand edit**, from `posts_gdocs_
 **Recommend this every time, and do it before applying.** The redirect is a safety net for readers who arrive by an old URL — it is not the fix for our own content. Every OWID surface that points at the retired chart should be edited to point at the target chart's scatter view instead:
 
 ```
-/grapher/<target-slug>?tab=scatter&time=latest
+/grapher/<target-slug>?tab=scatter&time=latest&country=
 ```
 
 merged with whatever query string the reference already carries (its own params win, same rule as the redirect — so a reference with `tab=` or `time=` of its own needs a decision, not a blind merge). Two reasons it can't wait: an **embed** never gets fixed by a redirect at all (it resolves the chart itself and renders the target's default tab), and a **link** works but sends readers through an extra hop that will outlive everyone's memory of why it exists.
@@ -256,11 +256,11 @@ Include the sources' **aliases** in `--chart-slugs`: an article may well link an
 
 **They do not block the retirement.** A narrative chart parented to a chart owns a materialized full config and renders from it, so unpublishing the parent leaves it intact (`isPublished` is in `NARRATIVE_CHART_PROPS_TO_OMIT`). Its only use of the parent slug is the "Explore the data" href, which `GrapherState.canonicalUrlIfIsNarrativeChart` builds as `/grapher/<parent-slug>` + `queryParamsForParentChart` — so the redirect covers it. `narrativeCharts` is therefore counted but deliberately **not** part of the `MANUAL` gate.
 
-The one thing to check is those params: they arrive as *incoming* params on the redirect, so a narrative chart with its own `tab` or `time` overrides `tab=scatter&time=latest`. The script lists every narrative chart on the sources with its params and says which way each will land.
+The one thing to check is those params: they arrive as *incoming* params on the redirect, so a narrative chart with its own `tab` or `time` overrides `tab=scatter&time=latest&country=`. The script lists every narrative chart on the sources with its params and says which way each will land.
 
 **To actually fix one, replace it — the parent columns are INSERT-only, so there is no re-pointing API and never will be** (owid/owid-grapher#6872, closed as not-planned). Order matters, because `create` rejects a duplicate name, `delete` is refused while a **published** post references the name, and `update` writes only query params — there is no rename:
 
-1. **Create** the replacement from `/grapher/<target-slug>?tab=scatter&time=latest` using that chart's own **"Create narrative chart"** control, under a new kebab-case name. Use the control, not a bare create link — it parents to the view on screen. Entity selection and other controls open at the target's defaults and authored FAUST never transfers, so redo those by hand.
+1. **Create** the replacement from `/grapher/<target-slug>?tab=scatter&time=latest&country=` using that chart's own **"Create narrative chart"** control, under a new kebab-case name. Use the control, not a bare create link — it parents to the view on screen. Entity selection and other controls open at the target's defaults and authored FAUST never transfers, so redo those by hand.
 2. **Update the article(s)** to reference the new name.
 3. **Delete** the old one — now unreferenced, so it succeeds. **Never delete first.**
 
@@ -292,8 +292,9 @@ Both failure directions are handled so no URL is ever left unserved. If any alia
 
 ### Verifying Part 2
 
-- `curl -sI <site>/grapher/<old-slug>` → 301 to `/grapher/<target-slug>?tab=scatter&time=latest`.
+- `curl -sI <site>/grapher/<old-slug>` → 301 to `/grapher/<target-slug>?tab=scatter&time=latest&country=`.
 - `curl -sI '<site>/grapher/<old-slug>?tab=chart'` → `Location` keeps `tab=chart`, proving incoming params win.
-- `curl -s <site>/grapher/_grapherRedirects.json | jq '."<old-slug>"'` → `"<target-slug>?tab=scatter&time=latest"` (bare slugs on both sides — the baker passes an empty URL prefix).
+- `curl -s <site>/grapher/_grapherRedirects.json | jq '."<old-slug>"'` → `"<target-slug>?tab=scatter&time=latest&country="` (bare slugs on both sides — the baker passes an empty URL prefix).
 - Each re-pointed alias resolves to the same target.
 - Re-run the script: every row comes back `EXISTS` and nothing is mutated.
+- **Open the redirected URL in a browser** and check the two things no `curl` can: the scatter opens on a **single latest year** (not a range with connecting trails), and **no entities are highlighted** — i.e. `time=latest` and the empty `country=` both survived the param merge and did the job the tab click would have done. Compare against clicking the scatter tab on the target directly; the two should look the same. If `country=` was dropped somewhere in the merge, the target's line/bar selection will show up emphasized — that is the symptom to look for.
