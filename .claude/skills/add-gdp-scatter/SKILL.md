@@ -56,10 +56,26 @@ A recurring question: *the scatter should show only the latest year, without aff
 
 Grapher handles it at runtime instead. `checkSingleTimeSelectionPreferred` returns true for the `ScatterPlot` tab whenever the scatter is **not the primary chart type** and the chart is not in relative mode, and `adjustStateForTab` → `ensureTimeHandlesAreSensibleForTab` then collapses both time handles onto the end (latest) time. That is runtime state, so the line/bar/map views keep their full range. Since the applier *appends* `ScatterPlot`, it is never `chartTypes[0]` and the condition holds by construction.
 
-Two things follow:
+**But it only fires when the reader CLICKS the tab** — see the shared caveat below.
 
-- **The admin editor does not show this.** `adjustStateForTab` is skipped when `isEditor` — deliberately, so switching tabs cannot mutate the authored config on save (grapher #6794). So a scatter that shows a time range *in the editor* is still a single year for readers. Verify on the published/staging chart page, not in `/admin/charts/<id>/edit`.
-- **`hideTimeline: true` breaks it.** With a hidden timeline, `timelineHandleTimeBounds` reads the **authored** `minTime`/`maxTime` on every chart tab and ignores the runtime handles, so the collapse never takes effect — and the reader has no slider to fix it. Authored `minTime == maxTime` is then the only fix, and it is only safe when every other tab is single-time anyway (`DiscreteBar`/`StackedDiscreteBar`/`Marimekko`). With a `LineChart`, `SlopeChart` or single-indicator `Dumbbell` in the mix, one global time cannot serve both — un-hide the timeline or accept the range. The script emits a `WARN` for each case. (2026-08-04: chart 1253, `DiscreteBar` + `hideTimeline`, needed `minTime`/`maxTime` = `latest`; the other 16 targets in that batch needed nothing.)
+Also: **`hideTimeline: true` breaks it even on a tab click.** With a hidden timeline, `timelineHandleTimeBounds` reads the **authored** `minTime`/`maxTime` on every chart tab and ignores the runtime handles, so the collapse never takes effect — and the reader has no slider to fix it. Authored `minTime == maxTime` is then the only fix, and it is only safe when every other tab is single-time anyway (`DiscreteBar`/`StackedDiscreteBar`/`Marimekko`). With a `LineChart`, `SlopeChart` or single-indicator `Dumbbell` in the mix, one global time cannot serve both — un-hide the timeline or accept the range. The script emits a `WARN` for each case. (2026-08-04: chart 1253, `DiscreteBar` + `hideTimeline`, needed `minTime`/`maxTime` = `latest`; the other 16 targets in that batch needed nothing.)
+
+### `adjustStateForTab` fires on a tab CLICK only — not on a direct URL load
+
+Both scatter adjustments — collapsing the time handles **and** clearing the entity selection — live in the same function behind the same guard:
+
+```ts
+if (!this.isEditor) {
+    this.ensureEntitySelectionIsSensibleForTab(tab)
+    this.ensureTimeHandlesAreSensibleForTab(tab)
+}
+```
+
+So they always happen together, or not at all. `adjustStateForTab` has exactly one production caller, `onTabChange`, which in turn has exactly one: the `ContentSwitchers` tab control. A tab supplied in the URL takes a different path — `populateFromQueryParams` → `setTab`, which only assigns `this.tab`. Three consequences:
+
+- **Clicking the scatter tab**: time collapses to the latest year *and* the selection is cleared. The scatter matches the old standalone chart.
+- **Landing directly on `?tab=scatter`**: neither happens. The scatter opens on the authored time range with the authored entities highlighted — **unless the URL says otherwise**. This is the path **Part 2's redirect uses**, and it is why the stored query params are `tab=scatter&time=latest`: `time=latest` supplies via URL what the click would have done. There is no equivalent for the selection in the current redirect, but `country=` (present and empty) would do it — `parseCountryParam` returns `valid([])` for an empty value and `setSelectedEntities([])` clears. Untested through the redirect's param merging; verify in a browser before relying on it.
+- **The admin editor shows neither**, because of the `isEditor` guard — deliberate, so switching tabs cannot mutate the authored config on save (grapher #6794). A scatter that looks wrong in `/admin/charts/<id>/edit` may be fine for readers. Verify on the chart page.
 
 ### The target's entity selection highlights the scatter, it does not filter it
 
@@ -67,10 +83,9 @@ Targets normally carry a `selectedEntityNames` list for their line/bar view (4�
 
 - `ScatterPlotChartState.seriesNamesToHighlight` uses the selection to **highlight** only; every entity is still plotted.
 - Axis domains narrow to the selection only via `pointsForAxisDomains`, and only when **`zoomToSelection`** is set. Check that field — with it, a scatter's axes really would zoom to the highlighted subset.
-- On a **tab switch**, `ensureEntitySelectionIsSensibleForTab` clears the selection entirely (`CHART_TYPES_THAT_SHOW_ALL_ENTITIES` is `[ScatterPlot, Marimekko]`) so long as it is still the authored one — the scatter then looks exactly like the old standalone chart.
-- On a **direct load of `?tab=scatter`** it does *not* clear, because `adjustStateForTab` is only called from `onTabChange`. The authored selection survives and those entities render highlighted.
+- On a **tab click**, `ensureEntitySelectionIsSensibleForTab` clears the selection entirely (`CHART_TYPES_THAT_SHOW_ALL_ENTITIES` is `[ScatterPlot, Marimekko]`) so long as it is still the authored one — the scatter then looks exactly like the old standalone chart. On a **direct URL load it does not**, for the reason in the section above; the authored entities render highlighted.
 
-That last case is what **Part 2's redirect produces**, so a reader arriving by a retired scatter's URL sees the same data and axes but with a few countries emphasized — visually unlike the chart they used to get. Decide per batch whether that is acceptable; incoming query params win over the stored ones, so a `&country=` in the redirect can override the selection.
+That second case is what **Part 2's redirect produces**, so a reader arriving by a retired scatter's URL sees the same data and axes but with a few countries emphasized — visually unlike the chart they used to get, and unlike what a reader who clicks the tab gets. Decide per batch whether that is acceptable, and see the `country=` note above for the fix.
 
 ### Cross-view safety (which fields are global)
 
