@@ -278,6 +278,7 @@ def render_tree_html(
     view_diffs: list[ViewDiff],
     dim_param_prefix: str = "d_",
     external_impacts: list[dict[str, int]] | None = None,
+    self_url: str = "",
 ) -> tuple[str, int]:
     """Render the Blast Radius component. Returns (html, initial_height_px).
 
@@ -304,8 +305,11 @@ def render_tree_html(
 
     previews = [diff_preview_html(v) + _impact_preview_line(impacts[i]) for i, v in enumerate(view_diffs)]
     leaf_badges = [_impact_badge(impacts[i]) for i in range(len(view_diffs))]
+    # Absolute URL to this page, so the link resolves against the Wizard app (not the component
+    # iframe's own origin) — otherwise a relative "?query" opens a broken URL in the new tab.
     leaf_hrefs = [
-        "?"
+        self_url
+        + "?"
         + urllib.parse.urlencode(
             {"mdim": catalog_path, "mode": "view", **{(dim_param_prefix + s): c for s, c in v.dimensions.items()}}
         )

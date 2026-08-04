@@ -862,6 +862,7 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
             for vid, e in raw.items()
         }
 
+    st.markdown(DIFF_CSS, unsafe_allow_html=True)  # same diff styling as the MDim view page
     st.markdown(f"#### {chart.get('title') or chart['slug']}")
     baseline_url = f"{_baseline_env(baseline).site}/grapher/{chart['slug']}"
     staging_url = f"{SOURCE.site}/grapher/{chart['slug']}"
@@ -1021,6 +1022,7 @@ def main() -> None:
             view_diffs,
             dim_param_prefix=DIM_PARAM_PREFIX,
             external_impacts=external_impacts,
+            self_url=f"{SOURCE.wizard_url}/metadata-diff",
         )
         # NOTE: nothing should be rendered below the component — it resizes itself to its
         # content, and Streamlit-rendered siblings would overlap during the resize.
