@@ -254,6 +254,7 @@ def render_view_diff_page(
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
 
     # --- MDIM controls (navigation across views) ---------------------------------
+    st.caption("🟡 marks a control option that leads to a changed view — follow the dots to the changes.")
     selection: dict[str, str] = {}
     columns = st.columns(min(4, max(1, len(dimensions))))
     for i, dim in enumerate(dimensions):
@@ -266,17 +267,29 @@ def render_view_diff_page(
                 choice = v.dimensions.get(dim_slug)
                 if choice is not None and choice not in available:
                     available.append(choice)
+        # Choices from which at least one *changed* view is reachable given the current selection —
+        # so the user can drill straight to the changes instead of hunting blindly.
+        changed_choices = {
+            v.dimensions.get(dim_slug)
+            for v in view_diffs
+            if v.changed and all(v.dimensions.get(s) == c for s, c in selection.items())
+        }
         names = {c["slug"]: (c.get("name") or c["slug"]) for c in dim.get("choices", [])}
         # Drop a stale URL value (e.g. after switching MDIM) so the widget doesn't crash.
         if st.query_params.get(key) not in available:
             st.query_params.pop(key, None)
             st.session_state.pop(key, None)
+
+        def _fmt(slug, names=names, changed_choices=changed_choices):
+            label = names.get(slug, slug)
+            return f"{label}  🟡" if slug in changed_choices else label
+
         with columns[i % len(columns)]:
             selection[dim_slug] = url_persist(st.selectbox)(
                 dim.get("name") or dim_slug,
                 key=key,
                 options=available,
-                format_func=lambda slug, names=names: names.get(slug, slug),
+                format_func=_fmt,
             )
 
     view = next((v for v in view_diffs if v.dimensions == selection), None)
