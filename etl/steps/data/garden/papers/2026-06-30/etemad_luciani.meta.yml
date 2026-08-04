@@ -12,14 +12,14 @@ tables:
   etemad_luciani:
     variables:
       coal_production_twh:
-        title: Coal production (Etemad & Luciani)
+        title: Coal production
         unit: terawatt-hours
         short_unit: TWh
       oil_production_twh:
-        title: Oil production (Etemad & Luciani)
+        title: Oil production
         unit: terawatt-hours
         short_unit: TWh
       gas_production_twh:
-        title: Gas production (Etemad & Luciani)
+        title: Gas production
         unit: terawatt-hours
         short_unit: TWh

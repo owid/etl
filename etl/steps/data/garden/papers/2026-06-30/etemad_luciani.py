@@ -1,13 +1,14 @@
-"""Garden step for Etemad & Luciani's historical energy production data (1900-1979).
-
-"""
+"""Garden step for Etemad & Luciani's historical energy production data (1900-1979)."""
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Conversion factor: 1 Mtoe = 41.868 PJ, and 1 PJ = 1000 / 3600 TWh.
+# The tonne of oil equivalent is a conventional unit, defined as exactly 41.868 gigajoules by the UN's
+# International Recommendations for Energy Statistics (paragraph 4.21, see
+# https://unstats.un.org/unsd/energystats/methodology/documents/IRES-web.pdf).
+# So 1 Mtoe = 41.868 PJ, and 1 PJ = 1000 / 3600 TWh, giving 1 Mtoe = 11.63 TWh.
 MTOE_TO_TWH = 41.868 * 1e3 / 3600
 
 
