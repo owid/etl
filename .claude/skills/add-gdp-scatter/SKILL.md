@@ -177,6 +177,28 @@ It uses `/* */` comments deliberately: `read_analytics` flattens the SQL onto on
 
 The source charts are scatter-vs-GDP charts, so their title/subtitle/footnote describe the GDP relationship ("… vs. GDP per capita", "GDP per capita is adjusted for inflation and differences in living costs between countries", etc.). The target's primary view is **not** the scatter, so that framing does not belong on it. **Whenever porting any text from a source chart to a target (title, subtitle, footnote, display name), strip every GDP-per-capita clause first** — the "vs. GDP per capita" phrasing and the inflation/living-costs boilerplate tail. Port only the part describing the target's own indicator.
 
+## Reviewing the migration side-by-side
+
+`scripts/build_review.py` renders a self-contained HTML for stepping through each pair — the **old standalone scatter** on the left, the **scatter view the target gained** on the right — with approve / flag / note per row. Decisions persist in `localStorage`, mirror to a JSON on disk (Chrome/Edge), and import back. Same shape as `map-charts-to-mdim/scripts/build_review.py`; it takes the applier's own JSON on stdin, so the reviewed set is exactly the applied set:
+
+```bash
+echo '<JSON>' | STAGING=1 .venv/bin/python \
+  .claude/skills/add-gdp-scatter/scripts/build_review.py --name scatter_batch2
+```
+
+What it adds over the mdim reviewer, because the asymmetry here is different: on the left the scatter **was** the whole chart, on the right it is one tab among several. So every row makes the target's secondary status explicit — a `SECONDARY · tab N of M · opens on <tab>` badge, and the full tab list as chips with **★ on the tab readers actually land on** and the scatter highlighted. Watch for a default of **Map** or **Table**: grapher adds those outside `chartTypes`, so readers may not land on a chart tab at all.
+
+The right pane toggles (or press `v`) between the two states a URL can produce:
+
+- **Redirect view** — `?tab=scatter&time=latest&country=`, exactly what a reader following the retired slug gets.
+- **Default view** — what a reader opening the target sees first.
+
+The third state — after a reader *clicks* the scatter tab — no URL can reproduce (see "`adjustStateForTab` fires on a tab CLICK only"). Open the Default view and click the scatter tab **inside the frame**: it should match the Redirect view. That comparison is the practical check that the redirect's `time=`/`country=` params really stand in for the click, which is the one thing about Part 2 that has never been verified live.
+
+Per-row flags are split so the "With warnings" filter stays worth using. **Warnings** are possible defects — no `ScatterPlot` tab, scatter as the primary type, `hideTimeline` with a time range, `stackMode: relative`, source `excludedEntityNames` that the target will not carry. **Context** is expected-but-needed-to-read-the-panes, e.g. that the target selects N entities which both routes should clear — so if you *do* see highlighting, one of the two mechanisms failed. Keep new checks on the right side of that line; a warning on every row is the same as no warnings.
+
+Decisions are fingerprinted on both configs' `fullMd5` plus the GDP variable id, so a re-run of the applier (which rewrites the target) invalidates stale approvals instead of silently keeping them.
+
 ## Verifying after a run
 
 - Open `OWID_ENV.chart_site(slug)` for one of the targets and switch to the Scatter tab.
