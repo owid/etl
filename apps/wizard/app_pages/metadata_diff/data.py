@@ -95,6 +95,54 @@ def delete_review(engine: Engine, change_key: str) -> None:
         con.execute(text("delete from metadata_review where changeKey = :ck"), {"ck": change_key})
 
 
+# --- Author scope decisions ---------------------------------------------------------------------
+# The AUTHOR's per-change decision — "apply to all charts/views" vs "scope to only these views" —
+# stored separately from the reviewer's sign-off. The reviewer is shown this decision and approves
+# or rejects it (they don't set the scope themselves).
+_SCOPE_TABLE_DDL = """
+CREATE TABLE IF NOT EXISTS metadata_scope (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    catalogPath VARCHAR(500) NOT NULL,
+    changeKey VARCHAR(64) NOT NULL,
+    scope VARCHAR(16) NOT NULL,
+    author VARCHAR(255),
+    updatedAt DATETIME NOT NULL,
+    UNIQUE KEY uniq_scope_key (changeKey),
+    KEY idx_scope_catalog (catalogPath)
+)
+"""
+
+
+def _ensure_scope_table(engine: Engine) -> None:
+    with engine.begin() as con:
+        con.execute(text(_SCOPE_TABLE_DDL))
+
+
+def load_scopes(engine: Engine, catalog_path: str) -> dict[str, str]:
+    """The author's scope decisions for one MDim, keyed by changeKey → 'all' | 'scoped'."""
+    _ensure_scope_table(engine)
+    df = read_sql(
+        "select changeKey, scope from metadata_scope where catalogPath = %(cp)s",
+        engine=engine,
+        params={"cp": catalog_path},
+    )
+    return {str(r["changeKey"]): str(r["scope"]) for _, r in df.iterrows()}
+
+
+def set_scope(engine: Engine, catalog_path: str, change_key: str, scope: str, author: str | None) -> None:
+    """Record the author's scope decision for a change."""
+    _ensure_scope_table(engine)
+    with engine.begin() as con:
+        con.execute(
+            text(
+                "insert into metadata_scope (catalogPath, changeKey, scope, author, updatedAt) "
+                "values (:cp, :ck, :sc, :au, :ts) "
+                "on duplicate key update scope=values(scope), author=values(author), updatedAt=values(updatedAt)"
+            ),
+            {"cp": catalog_path, "ck": change_key, "sc": scope, "au": author, "ts": datetime.now(timezone.utc)},
+        )
+
+
 def get_mdim_changes(source_engine: Engine, target_engine: Engine) -> pd.DataFrame:
     """All MDIMs on the staging server, flagging those whose config differs from production.
 

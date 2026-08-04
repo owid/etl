@@ -36,6 +36,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_changes,
     inline_diff_html,
     override_snippet,
+    text_change_key,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     build_chart_bundle,
@@ -44,6 +45,8 @@ from apps.wizard.app_pages.metadata_diff.data import (
     get_mdim_changes,
     load_mdim_config,
     load_reviews,
+    load_scopes,
+    set_scope,
     upsert_review,
 )
 from apps.wizard.app_pages.metadata_diff.tree import render_affected_charts_html, render_tree_html
@@ -282,18 +285,6 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
             )
             with st.popover(btn_label, use_container_width=True):
                 _render_affected_lists(view, charts, mdims)
-        # MDim views can instead scope the change to themselves. The checkbox *records the decision*
-        # (it's what the PR will act on); the exact edits/code are revealed on demand only.
-        if unit == "view":
-            dims_key = "-".join(f"{k}={val}" for k, val in sorted(view.dimensions.items()))
-            if st.checkbox(
-                "✏️ Change only this view",
-                key=f"override::{dims_key}",
-                help="Scope this shared change to THIS view only — an MDim override instead of a shared "
-                "indicator change. Ticking records the decision for the PR; open the details for the exact edits.",
-            ):
-                with st.popover("Override details & code", use_container_width=True):
-                    _render_override_body(view)
 
 
 def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]) -> None:
@@ -312,30 +303,50 @@ def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]
             st.markdown(f"- `{m.get('catalogPath')}`")
 
 
-def _render_override_body(view_diff: ViewDiff) -> None:
-    """Popover content: scope a shared change to THIS view only.
+def _render_author_scope(
+    catalog_path: str,
+    view_diff: ViewDiff,
+    field_name: str,
+    change: dict[str, Any],
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
+    source_engine: Engine,
+    scopes: dict[str, str],
+) -> None:
+    """The AUTHOR's per-change scope toggle on the View diff: apply everywhere the indicator is shared,
+    or scope to only this view. Persisted (`metadata_scope`) so the reviewer is *shown* the decision —
+    the reviewer approves or rejects it, they don't set it."""
+    key = text_change_key(catalog_path, field_name, change["old"], change["new"])
+    imp = usage.get(view_diff.indicator_id, {}) if view_diff.indicator_id is not None else {}
+    n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
+    reach = f"{n_c} chart{'s' if n_c != 1 else ''}"
+    if n_m:
+        reach += f" · {n_m} other MDim{'s' if n_m != 1 else ''}"
 
-    The change currently lives in the shared indicator, so it reaches every chart / MDim view above.
-    Scoping it here keeps the indicator (and all those other surfaces) on the old text and applies the
-    new text as a view override — two edits (a garden revert + this override), both spelled out. The
-    generated snippet is set to the new/staging text.
-    """
-    shared_fields = [f for f in FIELD_ORDER if f in view_diff.fields and f in view_diff.indicator_changed_fields]
-    if not shared_fields:
-        st.caption("No shared-indicator field to scope in this view.")
-        return
+    sk = f"scope::{key}"
+    if sk not in st.session_state:
+        st.session_state[sk] = "scoped" if scopes.get(key) == "scoped" else "all"
 
-    fields_str = ", ".join(f"`{field_label(f)}`" for f in shared_fields)
-    st.markdown(
-        "Scope this change to **only this view**, in two edits:\n\n"
-        f"1. **Revert the shared change** ({fields_str}) in the indicator's garden `.meta.yml`, so every "
-        "other chart and MDim view keeps the old text.\n"
-        "2. **Add this override** to the MDim's Python step (after its `c.views` are built) — it re-applies "
-        "the new text to this view alone:"
+    def _save() -> None:
+        set_scope(source_engine, catalog_path, key, st.session_state.get(sk, "all"), _reviewer())
+
+    labels = {"all": f"Apply to all — {reach}", "scoped": "Scope to only this view"}
+    st.radio(
+        "This change applies to",
+        options=["all", "scoped"],
+        format_func=lambda x: labels[x],
+        key=sk,
+        on_change=_save,
+        horizontal=True,
+        help="The author's decision: does this shared change apply everywhere the indicator is used, or "
+        "only to this view? The reviewer is shown this and approves or rejects it — they don't set it.",
     )
-    for f in shared_fields:
-        st.markdown(f"**{field_label(f)}**")
-        st.code(override_snippet(view_diff, f, view_diff.fields[f]["new"]), language="python")
+    if st.session_state.get(sk) == "scoped":
+        with st.popover("Override code (scope to this view)", use_container_width=True):
+            st.caption(
+                "To apply only here: **revert the shared change** in the indicator's garden `.meta.yml`, "
+                "then add this override to the MDim's Python step (after its `c.views` are built):"
+            )
+            st.code(override_snippet(view_diff, field_name, change["new"]), language="python")
 
 
 def _render_diff_body(
@@ -345,11 +356,14 @@ def _render_diff_body(
     staging_url: str,
     usage: dict[int, dict[str, list[dict[str, Any]]]],
     unit: str = "view",
+    catalog_path: str = "",
+    source_engine: Engine | None = None,
+    scopes: dict[str, str] | None = None,
 ) -> None:
     """Status banner + blast-radius flag + side-by-side field diffs — shared by MDim views and charts.
 
     The per-env page link lives on each column header (e.g. WYSK → the indicator's data page), not in
-    the status line.
+    the status line. On MDim views, each shared field also gets the author's scope toggle.
     """
     if view_diff.is_new:
         st.info(
@@ -380,6 +394,9 @@ def _render_diff_body(
         with col_new:
             st.markdown(f":green[**This staging server**] · [{link_kind}]({staging_url})")
             st.markdown(_render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
+        # Author's scope decision (MDim views, shared fields only): apply-to-all vs scope-to-this-view.
+        if unit == "view" and source_engine is not None and field_name in view_diff.indicator_changed_fields:
+            _render_author_scope(catalog_path, view_diff, field_name, change, usage, source_engine, scopes or {})
 
 
 def _reviewer() -> str | None:
@@ -446,41 +463,22 @@ def _review_markdown(
     return "\n".join(lines)
 
 
-def _signoff_options(g: Any, n_charts: int, n_mdims: int, allow_scope: bool = True) -> tuple[list[str], dict[str, str]]:
-    """Sign-off options for a change. A *shared* change that fans out to other surfaces gets a
-    reach-explicit 'Apply to all (N charts…)' (so approving it is a conscious act, not a default click)
-    and — where a per-view override is possible (MDim views, not standalone charts) — an explicit
-    'Scope to this view' alternative. The guardrail against silently repainting charts."""
-    if g.affects_indicator and (n_charts + n_mdims) > 0:
-        reach = f"{n_charts} chart{'s' if n_charts != 1 else ''}"
-        if n_mdims:
-            reach += f" · {n_mdims} MDim{'s' if n_mdims != 1 else ''}"
-        approve = f"✅ Apply to all ({reach})"
-        options = ["⏳ Pending", approve]
-        to_db = {approve: "approved"}
-        if allow_scope:
-            scope = "✏️ Scope to this view" if len(g.view_dims) == 1 else f"✏️ Scope to these {len(g.view_dims)} views"
-            options.append(scope)
-            to_db[scope] = "scoped"
-        options.append("🚩 Flag")
-        to_db["🚩 Flag"] = "flagged"
-        return options, to_db
-    approve = "✅ Approve"
-    return ["⏳ Pending", approve, "🚩 Flag"], {approve: "approved", "🚩 Flag": "flagged"}
+# The reviewer only accepts or rejects — the scope decision belongs to the author (View diff toggle).
+_REVIEW_STATUSES = ["⏳ Pending", "✅ Approve", "🚩 Flag"]
+_STATUS_TO_DB = {"✅ Approve": "approved", "🚩 Flag": "flagged"}
+_STATUS_FROM_DB = {"approved": "✅ Approve", "flagged": "🚩 Flag"}
 
 
-def _render_scope_guidance(g: Any) -> None:
-    """The two edits to scope a shared change to just its MDim view(s), with per-view override snippets."""
-    st.markdown(
-        f"Scope **{field_label(g.field)}** to this MDim's view(s) only, in two edits:\n\n"
-        "1. **Revert the shared change** in the indicator's garden `.meta.yml`, so the other charts and "
-        "MDims keep the old text.\n"
-        "2. **Add the override(s)** below to the MDim's Python step (after its `c.views` are built):"
-    )
-    for d in g.view_dims[:5]:
-        st.code(override_snippet(ViewDiff(dimensions=d), g.field, g.new), language="python")
-    if len(g.view_dims) > 5:
-        st.caption(f"…and {len(g.view_dims) - 5} more view(s) in this group — repeat the pattern.")
+def _scope_label(scope: str, g: Any, usage: dict[int, dict[str, list[dict[str, Any]]]]) -> str:
+    """Human-readable summary of the author's scope decision, for the reviewer."""
+    if not g.affects_indicator:
+        return "🔒 MDim override (local to this view)"
+    imp = usage.get(g.indicator_id, {}) if g.indicator_id is not None else {}
+    n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
+    reach = f"{n_c} chart{'s' if n_c != 1 else ''}" + (f" · {n_m} other MDim{'s' if n_m else ''}" if n_m else "")
+    if scope == "scoped":
+        return "✏️ Author: **scope to these views only** (other surfaces revert)"
+    return f"🔗 Author: **apply to all** — {reach}"
 
 
 def render_review_page(
@@ -492,9 +490,9 @@ def render_review_page(
     usage: dict[int, dict[str, list[dict[str, Any]]]],
     source_engine: Engine,
 ) -> None:
-    """Review mode: distinct changes, each with a DB-persisted, content-bound sign-off + comment, a
-    lock-in gate summary, and a punch-list export. A shared change that fans out to charts must be
-    approved via a reach-explicit 'Apply to all' (or scoped to this view) — the guardrail."""
+    """Review mode: each distinct change with a DB-persisted, content-bound reviewer sign-off (Approve /
+    Flag) + comment, the AUTHOR's scope decision shown for context, a lock-in gate, and a punch-list.
+    The reviewer accepts or rejects; the scope decision is the author's (set on the View diff)."""
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
     groups = group_changes(view_diffs)
     if not groups:
@@ -504,21 +502,20 @@ def render_review_page(
     baseline_name = BASELINES[baseline]
     baseline_slug = mdim_row.get("slug_target") if mdim_row.get("published_target") == 1 else None
     reviews = load_reviews(source_engine, catalog_path)
+    scopes = load_scopes(source_engine, catalog_path)
     reviewer = _reviewer()
 
-    # Resolve each group's persisted decision, applying content-hash lock-in: a stored decision counts
-    # only while the text is unchanged; any edit makes it "stale" and reverts it to Pending.
+    # Resolve each group: reviewer sign-off (content-hash lock-in) + the author's scope decision.
     resolved: list[dict[str, Any]] = []
     for g in groups:
         change_key, content_hash = change_group_identity(catalog_path, g)
+        scope = scopes.get(text_change_key(catalog_path, g.field, g.old, g.new), "all")
         imp = usage.get(g.indicator_id, {}) if (g.affects_indicator and g.indicator_id is not None) else {}
         charts, mdims = imp.get("charts", []), imp.get("mdims", [])
-        options, to_db = _signoff_options(g, len(charts), len(mdims))
-        from_db = {v: k for k, v in to_db.items()}
         row = reviews.get(change_key)
         stale = bool(row) and row.get("contentHash") != content_hash
         if row and not stale:
-            seed_label = from_db.get(row.get("status"), "⏳ Pending")
+            seed_label = _STATUS_FROM_DB.get(row.get("status"), "⏳ Pending")
             seed_comment = row.get("comment") or ""
         else:
             seed_label, seed_comment = "⏳ Pending", ""
@@ -528,10 +525,9 @@ def render_review_page(
                 "change_key": change_key,
                 "content_hash": content_hash,
                 "stale": stale,
+                "scope": scope,
                 "charts": charts,
                 "mdims": mdims,
-                "options": options,
-                "to_db": to_db,
                 "seed_label": seed_label,
                 "seed_comment": seed_comment,
                 "reviewer": (row or {}).get("reviewer"),
@@ -551,13 +547,12 @@ def render_review_page(
         if r["stale"]:
             return "stale"
         label = st.session_state.get(_review_status_key(catalog_path, r["change_key"]), r["seed_label"])
-        return r["to_db"].get(label, "pending")
+        return _STATUS_TO_DB.get(label, "pending")
 
     states = [_effective(r) for r in resolved]
     n = len(states)
-    n_appr, n_scope, n_flag, n_stale, n_pend = (
+    n_appr, n_flag, n_stale, n_pend = (
         states.count("approved"),
-        states.count("scoped"),
         states.count("flagged"),
         states.count("stale"),
         states.count("pending"),
@@ -570,8 +565,6 @@ def render_review_page(
         bits = []
         if n_pend:
             bits.append(f"**{n_pend}** pending")
-        if n_scope:
-            bits.append(f"**{n_scope}** to scope to view")
         if n_flag:
             bits.append(f"**{n_flag}** flagged")
         if n_stale:
@@ -584,13 +577,13 @@ def render_review_page(
         "any later edit reopens that change for re-review."
     )
 
-    def _make_save(change_key: str, content_hash: str, to_db: dict[str, str]):
+    def _make_save(change_key: str, content_hash: str):
         sk, ck = _review_status_key(catalog_path, change_key), _review_comment_key(catalog_path, change_key)
 
         def _save() -> None:
             label = st.session_state.get(sk, "⏳ Pending")
             comment = (st.session_state.get(ck) or "").strip() or None
-            db_status = to_db.get(label)
+            db_status = _STATUS_TO_DB.get(label)
             if db_status is None:
                 delete_review(source_engine, change_key)
             else:
@@ -606,27 +599,21 @@ def render_review_page(
         comment = (st.session_state.get(ck) or "").strip()
         stale = r["stale"]
         eff = _effective(r)
-        charts, mdims = r["charts"], r["mdims"]
 
-        reach_bits = [f"**{len(g.view_dims)}** view{'s' if len(g.view_dims) != 1 else ''} in this MDim"]
-        if charts:
-            reach_bits.append(f"**{len(charts)}** chart{'s' if len(charts) != 1 else ''}")
-        if mdims:
-            reach_bits.append(f"**{len(mdims)}** other MDim{'s' if len(mdims) != 1 else ''}")
         reach_word = f"{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}"
-        if charts:
-            reach_word += f" · {len(charts)} chart{'s' if len(charts) != 1 else ''}"
+        if r["charts"]:
+            reach_word += f" · {len(r['charts'])} chart{'s' if len(r['charts']) != 1 else ''}"
 
         icon = "⚠️" if stale else status.split()[0]
-        header = f"{icon} {field_label(g.field)} — {'shared' if g.affects_indicator else 'override'} · {reach_word}"
+        header = f"{icon} {field_label(g.field)} — {reach_word}"
         if comment:
             header += "  💬"
         if stale:
             header += "  · edited since review"
 
-        # Collapse once decided (approved / scoped); a 🚩 flag waits for its comment; stale/pending stay open.
+        # Collapse once decided; a 🚩 flag waits for its comment; stale/pending stay open.
         expanded = stale or eff == "pending" or (eff == "flagged" and not comment)
-        save = _make_save(change_key, r["content_hash"], r["to_db"])
+        save = _make_save(change_key, r["content_hash"])
 
         # Per-group representative view, for the data-page links on the column headers.
         rep_dims = g.view_dims[0] if g.view_dims else {}
@@ -640,8 +627,7 @@ def render_review_page(
                     "⚠️ This text was **edited since it was last reviewed**, so the previous sign-off no "
                     "longer counts. Re-review to lock it in."
                 )
-            scope = "🔗 shared indicator metadata" if g.affects_indicator else "🔒 MDim override"
-            st.caption(f"{scope} — affects " + " · ".join(reach_bits))
+            st.caption(_scope_label(r["scope"], g, usage))
             c1, c2 = st.columns(2)
             with c1:
                 st.markdown(f":gray[**{baseline_name.capitalize()}**] · [{link_kind}]({b_url})")
@@ -651,7 +637,7 @@ def render_review_page(
                 st.markdown(_render_text_html(g.new, g.old, side="new"), unsafe_allow_html=True)
             s1, s2 = st.columns([1, 3])
             with s1:
-                st.radio("Sign-off", r["options"], key=sk, on_change=save, label_visibility="collapsed")
+                st.radio("Sign-off", _REVIEW_STATUSES, key=sk, on_change=save, label_visibility="collapsed")
             with s2:
                 st.text_area(
                     "Comment",
@@ -660,9 +646,6 @@ def render_review_page(
                     placeholder="Optional note or suggested wording for the author…",
                     label_visibility="collapsed",
                 )
-            if eff == "scoped":
-                with st.popover("Override details & code", use_container_width=True):
-                    _render_scope_guidance(g)
             if r["reviewer"] and not stale and eff != "pending":
                 when = f" · {r['updatedAt']}" if r.get("updatedAt") else ""
                 st.caption(f"Signed off by **{r['reviewer']}**{when}")
@@ -679,9 +662,11 @@ def render_view_diff_page(
     mdim_row: Any,
     baseline: str,
     usage: dict[int, dict[str, list[dict[str, Any]]]],
+    source_engine: Engine,
 ) -> None:
     """The View diff page: MDim controls as navigation + side-by-side text diffs."""
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
+    scopes = load_scopes(source_engine, catalog_path)
 
     # --- Jump straight to a changed view -----------------------------------------
     # Direct navigation to the changes, so the user doesn't have to hunt through the controls (the
@@ -820,17 +805,30 @@ def render_view_diff_page(
     baseline_url = _view_url(_baseline_env(baseline), catalog_path, baseline_slug, view.dimensions)
     staging_url = _view_url(SOURCE, catalog_path, None, view.dimensions)
 
-    _render_diff_body(view, baseline_name, baseline_url, staging_url, usage, unit="view")
+    _render_diff_body(
+        view,
+        baseline_name,
+        baseline_url,
+        staging_url,
+        usage,
+        unit="view",
+        catalog_path=catalog_path,
+        source_engine=source_engine,
+        scopes=scopes,
+    )
 
 
 def _render_chart_review(
     chart: dict[str, Any],
     diff: ViewDiff,
-    usage: dict[int, dict[str, list[dict[str, Any]]]],
     source_engine: Engine,
+    baseline_name: str,
+    baseline_url: str,
+    staging_url: str,
 ) -> None:
-    """Per-chart sign-off on its indicator text change — same DB lock-in + gate as the MDim review,
-    keyed by the chart slug. A standalone chart can't be overridden, so there's no 'scope' option."""
+    """Per-chart review: each changed field is a collapsible holding its diff + an Approve/Flag decision
+    (no comment box), collapsing once decided — same DB lock-in as the MDim review, keyed by chart slug.
+    A standalone chart can't be overridden, so there's no scope decision."""
     groups = group_changes([diff])
     if not groups:
         return
@@ -841,43 +839,31 @@ def _render_chart_review(
     resolved: list[dict[str, Any]] = []
     for g in groups:
         change_key, content_hash = change_group_identity(catalog_root, g)
-        imp = usage.get(g.indicator_id, {}) if (g.affects_indicator and g.indicator_id is not None) else {}
-        options, to_db = _signoff_options(g, len(imp.get("charts", [])), len(imp.get("mdims", [])), allow_scope=False)
-        from_db = {v: k for k, v in to_db.items()}
         row = reviews.get(change_key)
         stale = bool(row) and row.get("contentHash") != content_hash
-        if row and not stale:
-            seed_label = from_db.get(row.get("status"), "⏳ Pending")
-            seed_comment = row.get("comment") or ""
-        else:
-            seed_label, seed_comment = "⏳ Pending", ""
+        seed_label = _STATUS_FROM_DB.get(row.get("status"), "⏳ Pending") if (row and not stale) else "⏳ Pending"
         resolved.append(
             {
                 "g": g,
                 "change_key": change_key,
                 "content_hash": content_hash,
                 "stale": stale,
-                "options": options,
-                "to_db": to_db,
                 "seed_label": seed_label,
-                "seed_comment": seed_comment,
                 "reviewer": (row or {}).get("reviewer"),
                 "updatedAt": (row or {}).get("updatedAt"),
             }
         )
 
     for r in resolved:
-        sk, ck = _review_status_key(catalog_root, r["change_key"]), _review_comment_key(catalog_root, r["change_key"])
+        sk = _review_status_key(catalog_root, r["change_key"])
         if sk not in st.session_state:
             st.session_state[sk] = r["seed_label"]
-        if ck not in st.session_state:
-            st.session_state[ck] = r["seed_comment"]
 
     def _eff(r: dict[str, Any]) -> str:
         if r["stale"]:
             return "stale"
         label = st.session_state.get(_review_status_key(catalog_root, r["change_key"]), r["seed_label"])
-        return r["to_db"].get(label, "pending")
+        return _STATUS_TO_DB.get(label, "pending")
 
     states = [_eff(r) for r in resolved]
     n = len(states)
@@ -889,38 +875,46 @@ def _render_chart_review(
     else:
         st.warning(f"🔒 **Not signed off** — {n_appr}/{n} approved. Sign off each change below to lock it in.")
 
-    def _make_save(change_key: str, content_hash: str, to_db: dict[str, str]):
-        sk, ck = _review_status_key(catalog_root, change_key), _review_comment_key(catalog_root, change_key)
+    def _make_save(change_key: str, content_hash: str):
+        sk = _review_status_key(catalog_root, change_key)
 
         def _save() -> None:
-            label = st.session_state.get(sk, "⏳ Pending")
-            comment = (st.session_state.get(ck) or "").strip() or None
-            db_status = to_db.get(label)
+            db_status = _STATUS_TO_DB.get(st.session_state.get(sk, "⏳ Pending"))
             if db_status is None:
                 delete_review(source_engine, change_key)
             else:
-                upsert_review(source_engine, catalog_root, change_key, content_hash, db_status, comment, reviewer)
+                upsert_review(source_engine, catalog_root, change_key, content_hash, db_status, None, reviewer)
 
         return _save
 
     for r in resolved:
         g = r["g"]
-        sk, ck = _review_status_key(catalog_root, r["change_key"]), _review_comment_key(catalog_root, r["change_key"])
+        sk = _review_status_key(catalog_root, r["change_key"])
         eff = _eff(r)
-        save = _make_save(r["change_key"], r["content_hash"], r["to_db"])
-        st.markdown(f"**{field_label(g.field)}**" + ("  ⚠️ edited since review" if r["stale"] else ""))
-        if r["stale"]:
-            st.caption(
-                "Edited since it was last reviewed — the previous sign-off no longer counts. Re-review to lock in."
+        stale = r["stale"]
+        status = st.session_state.get(sk, r["seed_label"])
+        save = _make_save(r["change_key"], r["content_hash"])
+        icon = "⚠️" if stale else status.split()[0]
+        header = f"{icon} {field_label(g.field)}" + ("  · edited since review" if stale else "")
+        link_kind = "chart ↗" if g.field.startswith(CHART_FIELD_PREFIX) else "data page ↗"
+        with st.expander(header, expanded=(stale or eff == "pending")):
+            if stale:
+                st.warning(
+                    "⚠️ Edited since it was last reviewed — the previous sign-off no longer counts. Re-review to lock in."
+                )
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown(f":gray[**{baseline_name.capitalize()}**] · [{link_kind}]({baseline_url})")
+                st.markdown(_render_text_html(g.old, g.new, side="old"), unsafe_allow_html=True)
+            with c2:
+                st.markdown(f":green[**This staging server**] · [{link_kind}]({staging_url})")
+                st.markdown(_render_text_html(g.new, g.old, side="new"), unsafe_allow_html=True)
+            st.radio(
+                "Sign-off", _REVIEW_STATUSES, key=sk, on_change=save, horizontal=True, label_visibility="collapsed"
             )
-        c1, c2 = st.columns([1, 3])
-        with c1:
-            st.radio("Sign-off", r["options"], key=sk, on_change=save, label_visibility="collapsed")
-        with c2:
-            st.text_area("Comment", key=ck, on_change=save, placeholder="Optional note…", label_visibility="collapsed")
-        if r["reviewer"] and not r["stale"] and eff != "pending":
-            when = f" · {r['updatedAt']}" if r.get("updatedAt") else ""
-            st.caption(f"Signed off by **{r['reviewer']}**{when}")
+            if r["reviewer"] and not stale and eff != "pending":
+                when = f" · {r['updatedAt']}" if r.get("updatedAt") else ""
+                st.caption(f"Signed off by **{r['reviewer']}**{when}")
 
 
 def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> None:
@@ -973,10 +967,20 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
     st.markdown(f"#### {chart.get('title') or chart['slug']}")
     baseline_url = f"{_baseline_env(baseline).site}/grapher/{chart['slug']}"
     staging_url = f"{SOURCE.site}/grapher/{chart['slug']}"
-    _render_diff_body(diff, baseline_name, baseline_url, staging_url, usage, unit="chart")
+    links = f"[{baseline_name} (data page)]({baseline_url}) · [this staging server (data page)]({staging_url})"
 
-    if diff.changed and not diff.is_new:
-        _render_chart_review(chart, diff, usage, source_engine)
+    if diff.is_new:
+        st.info(f"This chart is **new** — it does not exist in {baseline_name}. " + links)
+        return
+    if not diff.changed:
+        st.success("No changes to this chart's data-page text. " + links)
+        return
+
+    nf = len(diff.fields)
+    st.warning(f"**{nf} field{'s' if nf != 1 else ''} changed** in this chart.")
+    _render_impact(diff, usage, unit="chart")
+    # Each changed field: collapsible with its diff + Approve/Flag decision (decision right after content).
+    _render_chart_review(chart, diff, source_engine, baseline_name, baseline_url, staging_url)
 
 
 _ALL_NS = "(all namespaces)"
@@ -1116,7 +1120,9 @@ def main() -> None:
     )
 
     if mode == "view":
-        render_view_diff_page(catalog_path, dimensions, view_diffs, df_mdims.loc[catalog_path], baseline, usage)
+        render_view_diff_page(
+            catalog_path, dimensions, view_diffs, df_mdims.loc[catalog_path], baseline, usage, source_engine
+        )
     elif mode == "review":
         render_review_page(
             catalog_path, dimensions, view_diffs, df_mdims.loc[catalog_path], baseline, usage, source_engine

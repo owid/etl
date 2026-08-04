@@ -331,6 +331,18 @@ def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
     return sorted((groups[k] for k in order), key=lambda g: (-len(g.view_dims), g.field))
 
 
+def text_change_key(catalog_path: str, field: str, old: Any, new: Any) -> str:
+    """View-agnostic, content-bound key for one distinct text change (the AUTHOR's scope decision).
+
+    Unlike `change_group_identity` (per group of views), this keys only on (MDim, field, old→new), so
+    the same distinct change maps to ONE decision whether the author sets it from a single view (View
+    diff) or the reviewer sees it grouped (Review). Content-bound: editing the text mints a new key,
+    so the scope decision resets with the text.
+    """
+    content = json.dumps([old, new], sort_keys=True, default=str)
+    return hashlib.sha256(f"{catalog_path}\x1f{field}\x1f{content}".encode()).hexdigest()
+
+
 def change_group_identity(catalog_path: str, group: ChangeGroup) -> tuple[str, str]:
     """Stable ``(change_key, content_hash)`` for a change group — the review lock-in identity.
 
