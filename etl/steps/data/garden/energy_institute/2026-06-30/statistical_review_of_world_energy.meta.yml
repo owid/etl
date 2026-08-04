@@ -118,11 +118,11 @@ definitions:
 
   # Key points for readers.
   key_reserves: &key-reserves
-    - Proved reserves are the amounts that can be extracted from known deposits under current prices and technology.
-      They are not an estimate of how much coal, oil or gas exists underground.
+    - Proved reserves are the quantities that can be recovered from known deposits under existing economic and
+      operating conditions. They are not an estimate of how much coal, oil or gas exists underground.
   key_oil_consumption: &key-oil-consumption
-    - Consumption covers fuel burned within a country, plus fuel sold there for international flights and shipping,
-      and fuel used or lost in refineries.
+    - Consumption covers demand within the country, plus fuel for international aviation and shipping, plus fuel used
+      or lost in refineries.
     - Ethanol and biodiesel are counted separately, under biofuels. Liquid fuels made from coal or gas are included
       here.
 
