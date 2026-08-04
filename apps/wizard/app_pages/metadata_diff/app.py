@@ -372,39 +372,71 @@ def render_view_diff_page(
     # a callback because url_persist only reads the URL when a control's state is still empty.
     changed_views = [v for v in view_diffs if v.changed]
     if changed_views:
+        n_changed = len(changed_views)
+        # Which changed views have been opened (scoped to this MDim) — drives the reviewed count/markers.
+        visited: set[int] = st.session_state.setdefault(f"mdd_visited::{catalog_path}", set())
 
-        def _jump_to_changed() -> None:
-            raw = st.session_state.get("mdd_jump")
-            if raw in (None, ""):
-                return
-            target = changed_views[int(raw)]
+        # The changed view (if any) the current control selection is sitting on — so "Next" is relative
+        # to where you are, and the current view counts as reviewed.
+        cur_sel = {dim["slug"]: st.query_params.get(DIM_PARAM_PREFIX + dim["slug"]) for dim in dimensions}
+        cur_idx = next(
+            (
+                i
+                for i, cv in enumerate(changed_views)
+                if cv.dimensions and all(cur_sel.get(s) == c for s, c in cv.dimensions.items())
+            ),
+            None,
+        )
+        if cur_idx is not None:
+            visited.add(cur_idx)
+
+        def _goto(idx: int) -> None:
+            target = changed_views[idx % n_changed]
             for dim in dimensions:
                 slug = dim["slug"]
                 if slug in target.dimensions:
                     st.session_state[DIM_PARAM_PREFIX + slug] = target.dimensions[slug]
                     st.query_params[DIM_PARAM_PREFIX + slug] = target.dimensions[slug]
+            visited.add(idx % n_changed)
+
+        def _jump_to_changed() -> None:
+            raw = st.session_state.get("mdd_jump")
+            if raw not in (None, ""):
+                _goto(int(raw))
 
         def _jump_label(i: Any) -> str:
             if i == "":
                 return "Select a changed view…"
             cv = changed_views[int(i)]
-            marker = "🆕" if cv.is_new else "🟡"
-            charts, mdims = _view_impact(cv, usage)
+            # 🟢 once reviewed, 🟡 not yet, 🆕 for a view that doesn't exist in the baseline.
+            marker = "🆕" if cv.is_new else ("🟢" if int(i) in visited else "🟡")
+            charts, _ = _view_impact(cv, usage)
             suffix = f"  —  ↗ {len(charts)} charts" if charts else ""
             return f"{marker} {_view_label(cv, dimensions)}{suffix}"
 
-        jump_col, _jump_spacer = st.columns([2, 3])
+        jump_col, nav_col, _spacer = st.columns([2, 1, 2], vertical_alignment="bottom")
         with jump_col:
             st.selectbox(
-                f"⚡ Changes detected — jump to a changed view ({len(changed_views)})",
-                options=[""] + list(range(len(changed_views))),
+                f"⚡ Changes detected — jump to a changed view ({len(visited)}/{n_changed} reviewed)",
+                options=[""] + list(range(n_changed)),
                 format_func=_jump_label,
                 key="mdd_jump",
                 on_change=_jump_to_changed,
             )
+        with nav_col:
+            st.button(
+                "Next change ▶",
+                on_click=_goto,
+                args=(0 if cur_idx is None else cur_idx + 1,),
+                use_container_width=True,
+                help="Jump to the next view with changes (cycles back to the first at the end).",
+            )
 
     # --- MDim controls (navigation across views) ---------------------------------
-    st.caption("🟡 marks a control option that leads to a changed view — follow the dots to the changes.")
+    st.caption(
+        "🟡 marks a control option that leads to a changed view — follow the dots, or use "
+        "**Next change ▶** to step through them one by one."
+    )
     selection: dict[str, str] = {}
     columns = st.columns(min(4, max(1, len(dimensions))))
     for i, dim in enumerate(dimensions):
