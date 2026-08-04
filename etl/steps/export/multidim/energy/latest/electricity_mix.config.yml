@@ -89,7 +89,7 @@ dimensions:
         description: "Net electricity imports as a share of demand"
       - slug: "carbon_intensity"
         name: "Carbon intensity"
-        description: "Carbon intensity of electricity, in grams of CO2 per kilowatt-hour"
+        description: "Carbon intensity of electricity, in grams of CO₂ per kilowatt-hour"
       - slug: "by_source"
         name: "By source"
         description: "Electricity generation broken down by source, stacked"

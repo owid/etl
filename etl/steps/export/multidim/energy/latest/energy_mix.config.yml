@@ -95,7 +95,7 @@ dimensions:
         description: "Energy supply per person, broken down by source, stacked"
       - slug: "carbon_intensity"
         name: "Carbon intensity"
-        description: "CO2 emitted per unit of total energy supply"
+        description: "CO₂ emitted per unit of total energy supply"
 views:
   # Views are generated programmatically in the step.
   []
