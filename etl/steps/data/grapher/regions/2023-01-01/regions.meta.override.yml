@@ -222,13 +222,16 @@ tables:
           Level-3 (most granular) regions defined by the United Nations.
         type: ordinal
         sort:
-          - Caribbean (UN M49)
           - Central America (UN M49)
+          - Caribbean (UN M49)
           - South America (UN M49)
-          - Eastern Africa (UN M49)
+          - Western Africa (UN M49)
           - Middle Africa (UN M49)
           - Southern Africa (UN M49)
-          - Western Africa (UN M49)
+          - Eastern Africa (UN M49)
+          # NOTE: not aligned to customRegionDisplayOrder yet. These seven regions have no
+          # entry in MapContinentColors, so their colors come from palette *position* —
+          # reordering would silently recolor them. Reorder together with pinning them.
         origins:
           - *origins_un_m49
         presentation:
