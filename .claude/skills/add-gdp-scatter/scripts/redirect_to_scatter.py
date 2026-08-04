@@ -368,7 +368,14 @@ def rollback_primary(api: AdminAPI, rec: dict, created_id: int | None) -> str:
 def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
     """Create/refresh the redirect, re-point the source's aliases, unpublish the source."""
     src_id, tgt_id, src = rec["src_id"], rec["tgt_id"], rec["src"]
-    action: dict[str, Any] = {"status": rec["status"], "note": rec["note"], "aliases": [], "unpublish": ""}
+    action: dict[str, Any] = {
+        "status": rec["status"],
+        "note": rec["note"],
+        "aliases": [],
+        "unpublish": "",
+        # Set when this row changed nothing that triggers a static build — see the unpublish branch.
+        "needs_bake": False,
+    }
 
     # Read the source config before mutating anything, so an auth/permission failure lands
     # here rather than half-way through.
@@ -429,22 +436,14 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
             return action | {"status": "CRITICAL", "unpublish": note + rollback_primary(api, rec, created_id)}
 
     if not src_cfg.get("isPublished"):
-        action["unpublish"] = "already unpublished"
-        # With no unpublish to trigger the bake, a CREATE on an already-unpublished source has
-        # nothing bake the redirect: the create endpoint doesn't, and there was no delete either
-        # (an UPDATE deletes the row it replaces, and a re-pointed alias is deleted too — both of
-        # those do trigger one). So ask for the deploy, or the row would sit out of the baked
-        # redirect map, serving nothing, until an unrelated mutation picked it up.
-        if rec["status"] == "CREATE" and not action["aliases"]:
-            try:
-                api.trigger_static_build()
-                action["unpublish"] += "; deploy triggered to bake the new redirect"
-            except Exception as e:
-                action |= {
-                    "status": "CRITICAL",
-                    "unpublish": f"already unpublished; DEPLOY FAILED, trigger one by hand or the "
-                    f"redirect stays unbaked: {str(e)[:60]}",
-                }
+        # Nothing on this path triggers the static build that puts the row into the baked redirect
+        # map: the create endpoint doesn't, and there is no unpublish to do it either. (An UPDATE
+        # and a re-pointed alias each delete a row, and the delete route does trigger one.) EXISTS
+        # counts as well as CREATE: the row may have been written by an earlier run whose deploy
+        # failed, or by hand in the chart editor, which bakes nothing either — so "it was already
+        # there" is no evidence that it ever went live. main() deploys once for the whole run.
+        action["needs_bake"] = rec["status"] in ("CREATE", "EXISTS") and not action["aliases"]
+        action["unpublish"] = "already unpublished" + ("; needs a deploy" if action["needs_bake"] else "")
         return action
     try:
         src_cfg["isPublished"] = False
@@ -550,6 +549,7 @@ def main() -> int:
     print(f"{'pair':>13}  {'src_slug':<52} {'status':<11} note")
     print("-" * 150)
     critical = False
+    needs_bake = False
     for rec in plan:
         pair = f"{rec.get('src_id') or '-'}->{rec.get('tgt_id') or '-'}"
         target = f"-> {rec['tgt']}?{TARGET_QUERY}"
@@ -560,6 +560,7 @@ def main() -> int:
             for slug, status, alias_note in action["aliases"]:
                 print(f"{'alias':>13}  {slug:<52} {status:<11} {alias_note or target}")
             critical = critical or action["status"] == "CRITICAL" or any(a[1] == "CRITICAL" for a in action["aliases"])
+            needs_bake = needs_bake or action["needs_bake"]
         else:
             print(f"{pair:>13}  {rec['src']:<52} {rec['status']:<11} {rec['note']}")
             for alias in rec["aliases"]:
@@ -571,6 +572,18 @@ def main() -> int:
                     print(f"{'alias':>13}  {alias['slug']:<52} {'WOULD_REPOINT':<11} {target}")
 
     if args.apply:
+        if needs_bake:
+            # One deploy covers the whole run: every row above that reported "needs a deploy" only
+            # created a redirect (or found one already there) on a source that was already
+            # unpublished, and nothing in that path bakes.
+            try:
+                api.trigger_static_build()
+                print("\nDeploy triggered — nothing else in this run would have baked those redirects.")
+            except Exception as e:
+                critical = True
+                print(f"\nDEPLOY FAILED: {str(e)[:100]}")
+                print("  Trigger one by hand (admin → Deploy), or those redirects stay out of the baked map.")
+
         applied = [r for r in plan if r["status"] in ACTIONABLE]
         print("\nVERIFY once the bake finishes (the unpublish triggers it, or the explicit deploy):")
         for rec in applied[:3]:
