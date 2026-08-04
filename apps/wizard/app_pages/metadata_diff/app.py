@@ -28,12 +28,13 @@ from apps.wizard.app_pages.metadata_diff.core import (
     METADATA_FIELDS,
     ViewDiff,
     as_bullets,
+    diff_preview_html,
     diff_views,
     field_label,
     inline_diff_html,
 )
 from apps.wizard.app_pages.metadata_diff.data import build_env_bundles, get_mdim_changes, load_mdim_config
-from apps.wizard.app_pages.metadata_diff.tree import render_tree_html
+from apps.wizard.app_pages.metadata_diff.tree import render_affected_charts_html, render_tree_html
 from apps.wizard.app_pages.metadata_diff.usage import charts_using_indicators, mdims_using_indicators
 from apps.wizard.utils.components import url_persist
 from etl import config
@@ -254,22 +255,21 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
             else f"🧭 Show {n_m} affected MDim{'s' if n_m != 1 else ''}"
         )
         with st.popover(btn_label, use_container_width=True):
-            _render_affected_lists(view.indicator_id, charts, mdims)
+            _render_affected_lists(view, charts, mdims)
 
 
-def _render_affected_lists(indicator_id: int | None, charts: list[dict], mdims: list[dict]) -> None:
-    """The lists of affected charts / other MDims shown inside the popover."""
+def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]) -> None:
+    """The affected charts (paginated, hover-to-preview) and other MDims shown inside the popover."""
     if charts:
-        chart_diff_url = f"{SOURCE.wizard_url}/chart-diff?diff-type=charts&indicator_id={indicator_id}"
-        st.markdown(f"**Charts ({len(charts)})** — [open all in Chart Diff ↗]({chart_diff_url})")
-        for c in charts:
-            label = c.get("title") or c.get("slug") or f"chart {c.get('chartId')}"
-            if c.get("slug"):
-                st.markdown(f"- [{label}]({SOURCE.site}/grapher/{c['slug']})")
-            else:
-                st.markdown(f"- {label}")
+        chart_diff_url = f"{SOURCE.wizard_url}/chart-diff?diff-type=charts&indicator_id={view.indicator_id}"
+        # The charts all inherit this view's indicator, so they all show the same change — build the
+        # preview once from the indicator-layer fields and reuse it as every chart's hover tooltip.
+        indicator_fields = {f: view.fields[f] for f in view.indicator_changed_fields if f in view.fields}
+        preview_html = diff_preview_html(ViewDiff(dimensions=view.dimensions, fields=indicator_fields))
+        component_html, height = render_affected_charts_html(charts, preview_html, SOURCE.site, chart_diff_url)
+        components.html(component_html, height=height, scrolling=True)
     if mdims:
-        st.markdown(f"**Other MDims ({len(mdims)})**")
+        st.markdown(f"**Other MDims ({len(mdims)})** — also use this indicator:")
         for m in mdims:
             st.markdown(f"- `{m.get('catalogPath')}`")
 

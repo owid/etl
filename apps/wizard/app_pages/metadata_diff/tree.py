@@ -19,6 +19,135 @@ from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_preview_html
 MAX_HEIGHT_PX = 4000
 
 
+# CSS/JS for the affected-charts component kept as plain (non-f) strings so their literal
+# braces don't need escaping.
+_AC_CSS = """
+    #ac-root { font-family: -apple-system, system-ui, sans-serif; font-size: 13px; color: #333; }
+    #ac-root .ac-header { color: #555; margin: 0 0 8px; line-height: 1.45; }
+    #ac-root .ac-header a { color: #1971c2; }
+    #ac-root ol.ac-list { margin: 0; padding-left: 22px; }
+    #ac-root li.ac-li { margin: 3px 0; }
+    #ac-root a.ac-item { color: #1971c2; text-decoration: none; }
+    #ac-root a.ac-item:hover { text-decoration: underline; }
+    #ac-root .ac-pager { margin-top: 10px; display: flex; gap: 10px; align-items: center; color: #777; font-size: 12px; }
+    #ac-root .ac-pager button { font-size: 12px; padding: 2px 9px; cursor: pointer; }
+    #ac-root .ac-pager button:disabled { opacity: .4; cursor: default; }
+    #ac-tooltip { position: fixed; display: none; z-index: 10; max-width: 460px; background: #fff;
+                  border: 1px solid #bbb; border-radius: 6px; box-shadow: 0 3px 14px rgba(0,0,0,.2);
+                  padding: 10px 12px; font-size: 12.5px; line-height: 1.45; white-space: normal; }
+    #ac-tooltip .mdd-field { margin-bottom: 6px; }
+    #ac-tooltip .mdd-field b { display: block; color: #555; margin-bottom: 2px; }
+    #ac-tooltip ul.mdd-bullets { margin: 2px 0 2px 16px; padding: 0; }
+    #ac-tooltip del.mdd-del { background: #ffe3e3; color: #c92a2a; text-decoration: line-through; }
+    #ac-tooltip ins.mdd-ins { background: #d3f9d8; color: #2b8a3e; text-decoration: none; }
+"""
+
+_AC_JS = """
+    const root = document.getElementById("ac-root");
+    const tooltip = document.getElementById("ac-tooltip");
+    const items = Array.from(root.querySelectorAll("li.ac-li"));
+    const info = document.getElementById("ac-info");
+    const prevBtn = document.getElementById("ac-prev");
+    const nextBtn = document.getElementById("ac-next");
+    let page = 0;
+    const pages = Math.max(1, Math.ceil(items.length / PER));
+    const fit = () => {
+      const fe = window.frameElement;
+      if (!fe) return;
+      const h = document.documentElement.scrollHeight + 16;
+      fe.style.height = h + "px"; fe.setAttribute("height", h);
+    };
+    const render = () => {
+      items.forEach((li, i) => { li.style.display = (Math.floor(i / PER) === page) ? "" : "none"; });
+      const start = page * PER + 1, end = Math.min((page + 1) * PER, items.length);
+      if (info) info.textContent = start + "\\u2013" + end + " of " + items.length;
+      if (prevBtn) prevBtn.disabled = page === 0;
+      if (nextBtn) nextBtn.disabled = page >= pages - 1;
+      fit();
+    };
+    if (prevBtn) prevBtn.addEventListener("click", () => { if (page > 0) { page--; render(); } });
+    if (nextBtn) nextBtn.addEventListener("click", () => { if (page < pages - 1) { page++; render(); } });
+    root.querySelectorAll("a.ac-item").forEach(a => {
+      a.addEventListener("mousemove", (ev) => {
+        tooltip.innerHTML = PREVIEW;
+        tooltip.style.display = "block";
+        const pad = 14; let x = ev.clientX + pad, y = ev.clientY + pad;
+        const r = tooltip.getBoundingClientRect();
+        if (x + r.width > window.innerWidth - 10) x = Math.max(10, ev.clientX - r.width - pad);
+        if (y + r.height > window.innerHeight - 10) y = Math.max(10, ev.clientY - r.height - pad);
+        tooltip.style.left = x + "px"; tooltip.style.top = y + "px";
+      });
+      a.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
+    });
+    window.addEventListener("load", render);
+    render();
+"""
+
+
+def render_affected_charts_html(
+    charts: list[dict[str, Any]],
+    preview_html: str,
+    staging_site: str,
+    chart_diff_url: str,
+    per_page: int = 10,
+) -> tuple[str, int]:
+    """Self-contained component: paginated affected-chart links with a hover preview of the change.
+
+    All listed charts use the same indicator, so they show the same metadata change; `preview_html`
+    is reused as every chart's hover tooltip. Links open each chart on this staging server, where
+    the change is live. Returns (html, initial_height_px).
+    """
+    items = []
+    for i, c in enumerate(charts):
+        slug = c.get("slug")
+        label = html.escape(str(c.get("title") or slug or f"chart {c.get('chartId')}"))
+        href = f"{staging_site}/grapher/{slug}" if slug else "#"
+        items.append(
+            f'<li class="ac-li" data-i="{i}"><a class="ac-item" href="{html.escape(href)}" '
+            f'target="_blank" rel="noopener">{label}</a></li>'
+        )
+
+    n = len(charts)
+    paged = n > per_page
+    header = (
+        f'<p class="ac-header">These <b>{n}</b> chart{"s" if n != 1 else ""} on this staging server use this '
+        "indicator, so each shows this same change. Chart Diff won’t surface it (it’s a garden-template "
+        "metadata edit, not a config change) — <b>hover</b> a chart to preview the change, <b>click</b> to "
+        "open it on <b>this staging server</b>, where the change is live. &nbsp;"
+        f'<a href="{html.escape(chart_diff_url)}" target="_blank" rel="noopener">Open all in Chart Diff &#8599;</a></p>'
+    )
+    pager_style = "" if paged else ' style="display:none"'
+    pager = (
+        f'<div class="ac-pager"{pager_style}>'
+        '<button id="ac-prev">&#8249; Prev</button><span id="ac-info"></span>'
+        '<button id="ac-next">Next &#8250;</button></div>'
+    )
+    script = (
+        "<script>\n  const PREVIEW = "
+        + json.dumps(preview_html)
+        + ";\n  const PER = "
+        + str(per_page)
+        + ";\n"
+        + _AC_JS
+        + "\n</script>"
+    )
+    body = (
+        '<div id="ac-root"><style>'
+        + _AC_CSS
+        + "</style>"
+        + header
+        + '<ol class="ac-list">'
+        + "".join(items)
+        + "</ol>"
+        + pager
+        + '<div id="ac-tooltip"></div>'
+        + script
+        + "</div>"
+    )
+    height = 110 + min(n, per_page) * 30 + (44 if paged else 0)
+    return body, min(height, 640)
+
+
 def _build_tree(
     dimensions: list[dict[str, Any]],
     view_diffs: list[ViewDiff],
