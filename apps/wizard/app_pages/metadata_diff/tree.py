@@ -291,6 +291,17 @@ def render_tree_html(
     n_changed = sum(1 for v in view_diffs if v.changed)
     impacts = external_impacts or [{} for _ in view_diffs]
 
+    # Legend: only show states that actually occur here (e.g. drop "New view" when nothing is new).
+    legend_items = [("#e8590c", "Changed")]
+    if any(v.is_new for v in view_diffs):
+        legend_items.append(("#1971c2", "New view"))
+    legend_items.append(("#d9d9d9", "No change"))
+    if any((imp.get("charts") or imp.get("mdims")) for imp in impacts):
+        legend_items.append(("#9c36b5", "&#8599; Affects charts/other MDims"))
+    legend_html = "".join(
+        f'<span><span class="mdd-dot" style="background:{color}"></span>{label}</span>' for color, label in legend_items
+    )
+
     previews = [diff_preview_html(v) + _impact_preview_line(impacts[i]) for i, v in enumerate(view_diffs)]
     leaf_badges = [_impact_badge(impacts[i]) for i in range(len(view_diffs))]
     leaf_hrefs = [
@@ -356,12 +367,7 @@ def render_tree_html(
   <div class="mdd-toolbar">
     <div class="mdd-row-top">
       <label><input type="checkbox" id="mdd-show-unchanged"> Show all views</label>
-      <span class="mdd-legend">
-        <span><span class="mdd-dot" style="background:#e8590c"></span>Changed</span>
-        <span><span class="mdd-dot" style="background:#1971c2"></span>New view</span>
-        <span><span class="mdd-dot" style="background:#d9d9d9"></span>No change</span>
-        <span><span class="mdd-dot" style="background:#9c36b5"></span>&#8599; Affects charts/other MDims</span>
-      </span>
+      <span class="mdd-legend">{legend_html}</span>
     </div>
     <div class="mdd-dims">Controls: {dim_names}</div>
     <div class="mdd-summary"><b>{n_changed}</b> of {len(view_diffs)} views changed</div>
