@@ -32,6 +32,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     diff_views,
     field_label,
     inline_diff_html,
+    override_snippet,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     build_chart_bundle,
@@ -314,6 +315,18 @@ def _render_diff_body(
         with col_new:
             st.markdown(":green[**This staging server**]")
             st.markdown(_render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
+
+        # Override generator: offered only for MDim views, and only when the change is shared
+        # (indicator-level) — i.e. when pinning this one view to the old text is a real decision.
+        if unit == "view" and field_name in view_diff.indicator_changed_fields:
+            with st.expander("⚙️ Keep this view on the baseline text (generate MDim override)"):
+                st.caption(
+                    "This change lives in the shared indicator metadata, so it propagates to every chart "
+                    "and MDim view using this indicator. To keep **only this view** on the previous wording, "
+                    "paste this into the MDim's Python step (after its `c.views` are built) and edit the value "
+                    "if you want something other than a straight pin-to-baseline:"
+                )
+                st.code(override_snippet(view_diff, field_name, change["old"]), language="python")
 
 
 def render_view_diff_page(

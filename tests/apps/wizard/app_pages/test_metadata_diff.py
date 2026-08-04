@@ -5,7 +5,12 @@ indicator metadata (propagates to charts / other MDIMs) vs. one that comes from 
 override (contained to the MDIM).
 """
 
-from apps.wizard.app_pages.metadata_diff.core import build_view_bundle, diff_views
+from apps.wizard.app_pages.metadata_diff.core import (
+    ViewDiff,
+    build_view_bundle,
+    diff_views,
+    override_snippet,
+)
 from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
 
 
@@ -104,6 +109,24 @@ def test_chart_shaped_bundle_diff():
     assert d.affects_indicator and "descriptionKey" in d.indicator_changed_fields
     assert "subtitle" not in d.indicator_changed_fields  # chart FAUST is never an indicator change
     assert d.indicator_id == 10
+
+
+def test_override_snippet_pins_view_to_baseline():
+    """The generator emits a real MDim .py override idiom, routing each field to the right container."""
+    v = ViewDiff(dimensions={"decile": "p50", "welfare": "income"}, fields={})
+
+    # descriptionKey (list) -> view.metadata, snake_case key, one bullet per line
+    dk = override_snippet(v, "descriptionKey", ["Bullet one.", "Bullet two."])
+    assert 'if view.matches(decile="p50", welfare="income"):' in dk
+    assert "view.metadata = view.metadata or {}" in dk
+    assert 'view.metadata["description_key"] = [' in dk and '"Bullet one.",' in dk
+
+    # titlePublic -> nested under presentation
+    assert 'setdefault("presentation", {})["title_public"] = "T"' in override_snippet(v, "titlePublic", "T")
+
+    # chart field -> view.config
+    cs = override_snippet(v, "chart.subtitle", "S")
+    assert "view.config = view.config or {}" in cs and 'view.config["subtitle"] = "S"' in cs
 
 
 def test_indicator_ids_in_mdim_config_scans_all_axes():

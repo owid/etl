@@ -243,6 +243,51 @@ def field_label(field_name: str) -> str:
     return METADATA_FIELDS[field_name]
 
 
+# Where a per-view override for a given diff field lives in the MDim's Python step:
+# (view attribute, nested dict key or None, snake_case metadata/config key).
+_OVERRIDE_TARGET: dict[str, tuple[str, str | None, str]] = {
+    "titlePublic": ("metadata", "presentation", "title_public"),
+    "descriptionShort": ("metadata", None, "description_short"),
+    "descriptionKey": ("metadata", None, "description_key"),
+    "descriptionProcessing": ("metadata", None, "description_processing"),
+    "descriptionFromProducer": ("metadata", None, "description_from_producer"),
+    "chart.title": ("config", None, "title"),
+    "chart.subtitle": ("config", None, "subtitle"),
+    "chart.note": ("config", None, "note"),
+}
+
+
+def _py_value(val: Any, indent: str = "        ") -> str:
+    """Render a value as a Python literal; lists get one item per line for readable bullet overrides."""
+    if isinstance(val, list):
+        if not val:
+            return "[]"
+        inner = "\n".join(f"{indent}    {json.dumps(v, ensure_ascii=False)}," for v in val)
+        return "[\n" + inner + f"\n{indent}]"
+    return json.dumps(val, ensure_ascii=False)
+
+
+def override_snippet(view: ViewDiff, field_name: str, old_value: Any) -> str:
+    """A copy-pasteable MDim `.py` block that pins THIS view's field to `old_value` (the baseline text).
+
+    Mirrors the real override idiom (`view.metadata = view.metadata or {}; view.metadata[...] = ...`)
+    used in e.g. wb/latest/incomes_pip.py.
+    """
+    container, nested, key = _OVERRIDE_TARGET[field_name]
+    dims = ", ".join(f"{slug}={json.dumps(choice, ensure_ascii=False)}" for slug, choice in view.dimensions.items())
+    value = _py_value(old_value)
+    lines = [
+        "for view in c.views:",
+        f"    if view.matches({dims}):",
+        f"        view.{container} = view.{container} or {{}}",
+    ]
+    if nested:
+        lines.append(f'        view.{container}.setdefault("{nested}", {{}})["{key}"] = {value}')
+    else:
+        lines.append(f'        view.{container}["{key}"] = {value}')
+    return "\n".join(lines)
+
+
 # ---------------------------------------------------------------------------
 # Inline word-level diff rendering (shared by the tree tooltips and the view page)
 # ---------------------------------------------------------------------------
