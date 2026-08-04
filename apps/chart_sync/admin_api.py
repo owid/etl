@@ -41,7 +41,8 @@ class AdminAPI:
             headers["x-act-as-user"] = str(user_id)
         return headers
 
-    def _json_from_response(self, resp: requests.Response) -> dict:
+    def _raise_for_response(self, resp: requests.Response) -> None:
+        """Log and raise on a failed response. Split out for the routes that answer without a body."""
         if resp.status_code != 200:
             log.error("Admin API error", status_code=resp.status_code, text=resp.text)
         if resp.status_code == 401 and not self.api_key:
@@ -51,6 +52,9 @@ class AdminAPI:
                 f'Generate it with: ssh owid@owid-admin-prod "cd ~/owid-grapher && yarn createAdminApiKey{user_id_hint}"'
             )
         resp.raise_for_status()
+
+    def _json_from_response(self, resp: requests.Response) -> dict:
+        self._raise_for_response(resp)
         try:
             js = resp.json()
         except (json.JSONDecodeError, requests.exceptions.JSONDecodeError) as e:
@@ -237,6 +241,24 @@ class AdminAPI:
             timeout=TIMEOUT,
         )
         return self._json_from_response(resp)
+
+    def trigger_static_build(self) -> None:
+        """Enqueue a static build — the admin's "Manually triggered deploy".
+
+        Most mutating routes trigger one themselves, but a few don't: `create_chart_redirect` is the
+        notable one, so a redirect written that way does not reach the baked redirect map (and so
+        does not serve) until some unrelated mutation happens to bake the site. Call this when a run
+        might not have triggered a build any other way. The deploy queue coalesces changes, so
+        calling it alongside a mutation that already triggered one costs nothing.
+
+        The route answers with an empty body, hence no return value and no JSON parsing.
+        """
+        resp = http_session.put(
+            f"{self.owid_env.admin_api}/deploy",
+            headers=self._headers(),
+            timeout=TIMEOUT,
+        )
+        self._raise_for_response(resp)
 
     def put_grapher_config(self, variable_id: int, grapher_config: dict[str, Any]) -> dict:
         # If schema is missing, use the default one

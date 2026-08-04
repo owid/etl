@@ -226,6 +226,7 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
         rows.append(rec)
 
     slugs = tuple(sorted({s for r in rows for s in (r["src"], r["tgt"]) if s != "-"}))
+    batch_sources = {r["src"] for r in rows if r["src"] != "-"}
     ids = chart_ids_for_slugs(slugs)
     existing = chart_redirects_for_slugs(slugs)
     site_sources, mdim_sources = shadowing_sources(slugs)
@@ -254,7 +255,14 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
             rec |= {"status": "SKIPPED", "note": "target not published"}
             continue
 
-        # The target's own slug must not be redirected away, or we'd build a chain.
+        # The target's own slug must not be redirected away, or we'd build a chain. The batch is
+        # checked alongside the database, because a chain formed *within* one input is invisible to
+        # the DB queries above and is worse than a chain: retiring the target unpublishes it, and
+        # that deletes every redirect pointing at it — including the one this row just created. The
+        # source would be left unpublished with no redirect at all, i.e. a hard 404.
+        if tgt in batch_sources:
+            rec |= {"status": "CHAINED", "note": "another row in this batch retires the target"}
+            continue
         if tgt in existing:
             rec |= {"status": "CHAINED", "note": f"target slug is an old slug of chart {existing[tgt]['chart_id']}"}
             continue
@@ -422,6 +430,21 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
 
     if not src_cfg.get("isPublished"):
         action["unpublish"] = "already unpublished"
+        # With no unpublish to trigger the bake, a CREATE on an already-unpublished source has
+        # nothing bake the redirect: the create endpoint doesn't, and there was no delete either
+        # (an UPDATE deletes the row it replaces, and a re-pointed alias is deleted too — both of
+        # those do trigger one). So ask for the deploy, or the row would sit out of the baked
+        # redirect map, serving nothing, until an unrelated mutation picked it up.
+        if rec["status"] == "CREATE" and not action["aliases"]:
+            try:
+                api.trigger_static_build()
+                action["unpublish"] += "; deploy triggered to bake the new redirect"
+            except Exception as e:
+                action |= {
+                    "status": "CRITICAL",
+                    "unpublish": f"already unpublished; DEPLOY FAILED, trigger one by hand or the "
+                    f"redirect stays unbaked: {str(e)[:60]}",
+                }
         return action
     try:
         src_cfg["isPublished"] = False
@@ -549,7 +572,7 @@ def main() -> int:
 
     if args.apply:
         applied = [r for r in plan if r["status"] in ACTIONABLE]
-        print("\nVERIFY once the bake finishes (the unpublish triggered it):")
+        print("\nVERIFY once the bake finishes (the unpublish triggers it, or the explicit deploy):")
         for rec in applied[:3]:
             url = OWID_ENV.chart_site(rec["src"])
             print(f"  curl -sI {url}   # 301 -> /grapher/{rec['tgt']}?{TARGET_QUERY}")

@@ -127,7 +127,7 @@ All read-only, so the audit reports the verdict `--apply` will act on:
 | `CREATE` / `UPDATE` | ready. `UPDATE` = a redirect for this slug exists with the wrong query params |
 | `EXISTS` | redirect already correct — the alias re-point and the unpublish still run |
 | `SKIPPED` | source == target, or the target has no `ScatterPlot` tab / isn't published. **This is the wrong-staging-server detector**, and what protects charts we couldn't generate a scatter for (e.g. StackedArea) |
-| `CHAINED` | the *target's* slug is itself redirected away (chart, site or mdim redirect) |
+| `CHAINED` | the *target's* slug is itself redirected away (chart, site or mdim redirect), **or another row in the same batch retires it**. The in-batch case is the worse one: retiring the target unpublishes it, which deletes every redirect pointing at it — including the one that row just created — leaving that source unpublished with no redirect at all |
 | `CONFLICT` | the source slug is already claimed — by a chart redirect to a different chart, or by a `multi_dim_redirects` row, which **wins** over chart redirects (the mdim map is merged second in `_grapherRedirects.json`) |
 | `SITE_EXISTS` | a site redirect already serves this source. It bakes as a static 301 matched before the grapher route runs, so ours would be dead weight — delete it first if you want the chart redirect's param merging |
 | `BLOCKED` | `--skip-alias-repoint` on a source that still has old slugs of its own. The two cannot both hold: the unpublish deletes every redirect pointing at the source, so sparing them means not unpublishing. Move them by hand, or drop the flag |
@@ -192,6 +192,7 @@ Both failure directions are handled so no URL is ever left unserved. If any alia
 - **Resolution is 404-only** at the edge, then a **301** with `max-age=86400`. A fresh row additionally gets a static **302** in `_redirects` for one week, listed ahead of the site redirects, to defeat the CDN cache.
 - **The stored params are only a base**: the visitor's own query params override them key by key. Good for `?country=`/`?region=` links, which keep their selection through the hop.
 - `POST /charts/<id>/redirects/new` triggers **no** static build (the delete and the unpublish do), and validates nothing — no duplicate, chain or self-redirect check. Hence the pre-checks above.
+- **A source that is already unpublished bakes nothing**, so the redirect would serve nothing until an unrelated mutation happened to bake the site. For that one combination — `CREATE` with no aliases to re-point — the script asks for a deploy itself (`PUT /deploy`, the admin's "Manually triggered deploy"). Every other path already has a delete or an unpublish doing it.
 - `chart_slug_redirects` is **per-environment** and is **not** synced staging→production by chart-diff. Run on staging to test, then re-run `--apply --allow-production` against production `admin.owid.io` once the scatter views are live there.
 - `OWID_ENV` (hence the admin host) is derived from the current git branch — be on the branch whose staging holds the scatter views. On `master` it resolves to **production**, which is what the guard is for.
 - Once the redirect exists, `isSlugUsedInRedirect` blocks re-publishing the source (or any chart) on that slug. **To undo, delete the redirect rows first, then re-publish** — the reverse order is rejected.
