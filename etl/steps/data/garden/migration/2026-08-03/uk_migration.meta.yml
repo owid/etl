@@ -56,9 +56,7 @@ definitions:
   england_method: |-
     This data is not a direct count of migrants — no migration records exist for most of this period. Wrigley and Schofield reconstructed England's population from the registers of baptisms and burials kept by Church of England parishes, and estimated net migration as a residual: the part of the change in population that births and deaths cannot explain.
 
-    Because it is a residual, the estimate counts everyone who crossed England's borders — including people who moved to or from Wales, Scotland, or Ireland, not only those who moved to or from other countries. It also absorbs any errors in the registration of baptisms and burials. England is defined here without Monmouthshire, which historical records grouped with Wales.
-
-    Negative values mean more people left England than arrived. The reconstruction shows a net outflow of people in every year from 1541 to 1870.
+    Because it is a residual, the estimate counts everyone who crossed England's borders — including people who moved to or from Wales, Scotland, or Ireland, not only those who moved to or from other countries. It also absorbs any errors in the registration of baptisms and burials.
 
     The original estimates are totals for five-year periods, which the Bank of England interpolated to annual values. Year-to-year changes are therefore smooth by construction, and the data is best read as showing broad levels and trends rather than what happened in any single year.
 
