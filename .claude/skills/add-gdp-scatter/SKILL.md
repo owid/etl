@@ -61,6 +61,17 @@ Two things follow:
 - **The admin editor does not show this.** `adjustStateForTab` is skipped when `isEditor` — deliberately, so switching tabs cannot mutate the authored config on save (grapher #6794). So a scatter that shows a time range *in the editor* is still a single year for readers. Verify on the published/staging chart page, not in `/admin/charts/<id>/edit`.
 - **`hideTimeline: true` breaks it.** With a hidden timeline, `timelineHandleTimeBounds` reads the **authored** `minTime`/`maxTime` on every chart tab and ignores the runtime handles, so the collapse never takes effect — and the reader has no slider to fix it. Authored `minTime == maxTime` is then the only fix, and it is only safe when every other tab is single-time anyway (`DiscreteBar`/`StackedDiscreteBar`/`Marimekko`). With a `LineChart`, `SlopeChart` or single-indicator `Dumbbell` in the mix, one global time cannot serve both — un-hide the timeline or accept the range. The script emits a `WARN` for each case. (2026-08-04: chart 1253, `DiscreteBar` + `hideTimeline`, needed `minTime`/`maxTime` = `latest`; the other 16 targets in that batch needed nothing.)
 
+### The target's entity selection highlights the scatter, it does not filter it
+
+Targets normally carry a `selectedEntityNames` list for their line/bar view (4–20 entities is typical) while the source scatters carry **none** — they show every country. That asymmetry does not hide data on the new scatter view:
+
+- `ScatterPlotChartState.seriesNamesToHighlight` uses the selection to **highlight** only; every entity is still plotted.
+- Axis domains narrow to the selection only via `pointsForAxisDomains`, and only when **`zoomToSelection`** is set. Check that field — with it, a scatter's axes really would zoom to the highlighted subset.
+- On a **tab switch**, `ensureEntitySelectionIsSensibleForTab` clears the selection entirely (`CHART_TYPES_THAT_SHOW_ALL_ENTITIES` is `[ScatterPlot, Marimekko]`) so long as it is still the authored one — the scatter then looks exactly like the old standalone chart.
+- On a **direct load of `?tab=scatter`** it does *not* clear, because `adjustStateForTab` is only called from `onTabChange`. The authored selection survives and those entities render highlighted.
+
+That last case is what **Part 2's redirect produces**, so a reader arriving by a retired scatter's URL sees the same data and axes but with a few countries emphasized — visually unlike the chart they used to get. Decide per batch whether that is acceptable; incoming query params win over the stored ones, so a `&country=` in the redirect can override the selection.
+
 ### Cross-view safety (which fields are global)
 
 `yAxis` (scaleType, min, max) is the only config the skill writes that meaningfully bleeds into the non-scatter views — hence the log-toggle and zero-baseline handling above. The others were checked and are safe: `xAxis.scaleType: log` is ignored by Line/DiscreteBar (they hardcode a linear time axis) and has no visible effect on Slope; the `color` dimension does **not** recolor line/bar (they color by entity); `size` is scatter-only (not even in the table tab); `matchingEntitiesOnly` is honored only by Scatter and Marimekko.
