@@ -103,6 +103,32 @@ That second case is what **Part 2's redirect produces**, so a reader arriving by
 
 Push uses `apps.chart_sync.admin_api.AdminAPI.update_chart(id, cfg)`.
 
+## Run this as a checklist in the chat
+
+**Create a `TodoWrite` list covering the WHOLE migration on the first step, before touching anything** — not just the part being worked on now. This migration's failure mode is not getting a step wrong, it is losing a step: the work spans two scripts, a human review round, a merge, and a production run, with days between them. Anything not on the list from the start gets discovered later by a reader hitting a 404 or an article rendering the wrong tab.
+
+So **the reference sweep and Part 2 go on the list as pending from the very beginning**, even when the request is only "add the scatter views". They are the two that get forgotten, and they are the two that break things for readers.
+
+The canonical items, in order:
+
+1. Confirm the branch / which admin host `OWID_ENV` resolves to (on `master` that is **production**).
+2. Pre-flight every row (`preflight_targets.py`); report and drop the blocked ones.
+3. Act on the GDP version `WARN` — bump `GDP_SOURCES` *before* applying if the sources plot a newer id.
+4. Apply (`apply_scatter_defaults.py`).
+5. Verify every target: `ScatterPlot` present, log x-axis, and the **current** GDP id on `x`.
+6. Display-name follow-up — **after the final applier run**, or the next run re-mirrors it.
+7. Build the review HTML (`build_review.py`) and hand it to the topic owner.
+8. Apply the reviewer's flagged notes; regenerate the HTML and re-import their JSON.
+9. Chart-diff sign-off on staging, then merge.
+10. **Confirm the scatter views actually reached production.** Do not assume the merge did it — chart-sync has silently not carried this migration before (batch 1, PR #6173: merged with every row ✅ on staging, and production still had no `ScatterPlot` tab weeks later).
+11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*. Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why.
+12. Narrative charts on the sources: replace where the parent is being retired (create → re-point articles → delete; never delete first).
+13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict.
+14. Part 2 `--apply` on staging, then the browser checks in "Verifying Part 2".
+15. Part 2 `--apply --allow-production` once the scatter views are live on production, then the same checks against the live site.
+
+Keep the list alive across turns: carry the untouched items forward rather than reporting only the delta, and say when one clears. Items 11–15 stay visible as pending the entire time Part 1 is being worked on.
+
 ## Workflow
 
 1. **Parse the pasted table** into a JSON list, one object per row with keys `chart_admin_url`, `target_chart_admin_url`, `gdp_source`. Strip the header. Accept tab- or comma- separated.
