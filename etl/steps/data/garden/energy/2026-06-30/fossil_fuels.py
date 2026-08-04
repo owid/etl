@@ -275,7 +275,7 @@ def add_reserves_to_production_ratio(tb: Table, tb_review: Table) -> Table:
         "coal_production_mt",
         "oil_reserves_bbl",
         "oil_production_mt",
-        "gas_reserves_tcm",
+        "gas_reserves_m3",
         "gas_production_bcm",
     ]
     world = tb_review[tb_review["country"] == "World"][["country", "year"] + columns].copy()
@@ -285,7 +285,7 @@ def add_reserves_to_production_ratio(tb: Table, tb_review: Table) -> Table:
     world["coal_production"] = world["coal_production_mt"] * MILLION_TONNES_TO_TONNES
     world["oil_reserves"] = world["oil_reserves_bbl"] * BILLION_BARRELS_TO_TONNES
     world["oil_production"] = world["oil_production_mt"] * MILLION_TONNES_TO_TONNES
-    world["gas_reserves"] = world["gas_reserves_tcm"] * TRILLION_CUBIC_METERS_TO_CUBIC_METERS
+    world["gas_reserves"] = world["gas_reserves_m3"]
     world["gas_production"] = world["gas_production_bcm"] * BILLION_CUBIC_METERS_TO_CUBIC_METERS
 
     # Reserves-to-production ratio (years of fossil fuels left at current production).

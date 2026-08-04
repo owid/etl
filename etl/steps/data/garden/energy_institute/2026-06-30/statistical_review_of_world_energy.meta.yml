@@ -288,14 +288,6 @@ tables:
           name: Gas production
         presentation:
           title_public: 'Gas production'
-      gas_reserves_tcm:
-        title: 'Gas proved reserves - TCM'
-        unit: 'trillion cubic meters'
-        short_unit: 'TCM'
-        description_key:
-          - "Total proved reserves of natural gas is generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved natural gas does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate. As far as possible, the data represents standard cubic meters (measured at 15C and 1013 mbar) and has been standardized using a gross calorific value (GCV) of 40 MJ/m3."
-        presentation:
-          title_public: 'Gas proved reserves'
       graphite_production_kt:
         title: 'Graphite production - kt'
         unit: 'thousand tonnes'
@@ -652,6 +644,14 @@ tables:
         presentation:
           title_public: 'Coal proved reserves'
 
+      gas_reserves_m3:
+        title: 'Gas proved reserves - m³'
+        unit: 'cubic meters'
+        short_unit: 'm³'
+        description_key:
+          - "Total proved reserves of natural gas is generally taken to be those quantities that geological and engineering information indicates with reasonable certainty can be recovered in the future from known reservoirs under existing economic and operating conditions. The data series for total proved natural gas does not necessarily meet the definitions, guidelines and practices used for determining proved reserves at company level, for instance as published by the US Securities and Exchange Commission, nor does it necessarily represent BP's view of proved reserves by country. Reserves-to-production (R/P) ratio: If the reserves remaining at the end of any year are divided by the production in that year, the result is the length of time that those remaining reserves would last if production were to continue at that rate. As far as possible, the data represents standard cubic meters (measured at 15C and 1013 mbar) and has been standardized using a gross calorific value (GCV) of 40 MJ/m3."
+        presentation:
+          title_public: 'Gas proved reserves'
   statistical_review_of_world_energy_prices:
     variables:
       # Coal prices.

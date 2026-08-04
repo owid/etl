@@ -33,6 +33,9 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Unit conversion for gas reserves, which the source reports in trillion cubic meters.
+TRILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e12
+
 # Unit conversion factors.
 # Exajoules to terawatt-hours.
 EJ_TO_TWH = 1e6 / 3600
@@ -900,6 +903,13 @@ def run() -> None:
 
     # Sanity-check the output data.
     sanity_check_outputs(tb=tb)
+
+    # Convert gas reserves from trillion cubic meters to cubic meters. Done here rather than in the
+    # grapher step because it changes the values, and it is the unit every consumer wants: the
+    # fossil-fuels step reports reserves in cubic meters, as does the chart. The tcm name is kept until
+    # this point because the checks above are written against the source's own column names.
+    tb = tb.rename(columns={"gas_reserves_tcm": "gas_reserves_m3"}, errors="raise")
+    tb["gas_reserves_m3"] *= TRILLION_CUBIC_METERS_TO_CUBIC_METERS
 
     # Set an appropriate index to main table and sort conveniently.
     tb = tb.format(sort_columns=True)
