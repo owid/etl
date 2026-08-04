@@ -22,6 +22,7 @@ tables:
         title: Coal consumption per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person.
         display:
           name: Coal
         presentation:
@@ -30,6 +31,7 @@ tables:
         title: Coal consumption per capita (tonnes)
         unit: tonnes per person
         short_unit: t
+        description_short: Measured in tonnes per person.
         display:
           name: Coal
         presentation:
@@ -38,6 +40,7 @@ tables:
         title: Coal consumption (tonnes)
         unit: tonnes
         short_unit: t
+        description_short: Measured in tonnes.
         display:
           name: Coal
         presentation:
@@ -46,6 +49,7 @@ tables:
         title: Coal consumption
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Coal
         presentation:
@@ -54,6 +58,7 @@ tables:
         title: Coal exports per capita
         unit: tonnes per person
         short_unit: t
+        description_short: Measured in tonnes per person.
         display:
           name: Coal
         presentation:
@@ -62,6 +67,7 @@ tables:
         title: Coal exports
         unit: tonnes
         short_unit: t
+        description_short: Measured in tonnes.
         display:
           name: Coal
         presentation:
@@ -70,6 +76,7 @@ tables:
         title: Coal imports per capita
         unit: tonnes per person
         short_unit: t
+        description_short: Measured in tonnes per person.
         display:
           name: Coal
         presentation:
@@ -78,6 +85,7 @@ tables:
         title: Coal imports
         unit: tonnes
         short_unit: t
+        description_short: Measured in tonnes.
         display:
           name: Coal
         presentation:
@@ -86,6 +94,7 @@ tables:
         title: Coal net imports per capita
         unit: tonnes per person
         short_unit: t
+        description_short: Measured in tonnes per person. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
         display:
           name: Coal
         presentation:
@@ -94,6 +103,7 @@ tables:
         title: Coal net imports
         unit: tonnes
         short_unit: t
+        description_short: Measured in tonnes. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
         display:
           name: Coal
         presentation:
@@ -102,6 +112,7 @@ tables:
         title: Annual change in coal production (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in coal production relative to the previous year.
         display:
           name: Coal
         presentation:
@@ -110,6 +121,7 @@ tables:
         title: Annual change in coal production
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in coal production relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Coal
         presentation:
@@ -118,6 +130,7 @@ tables:
         title: Coal production per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person.
         display:
           name: Coal
         presentation:
@@ -126,6 +139,7 @@ tables:
         title: Coal production per capita (tonnes)
         unit: tonnes per person
         short_unit: t
+        description_short: Measured in tonnes per person.
         display:
           name: Coal
         presentation:
@@ -134,6 +148,7 @@ tables:
         title: Coal production (tonnes)
         unit: tonnes
         short_unit: t
+        description_short: Measured in tonnes.
         display:
           name: Coal
         presentation:
@@ -142,6 +157,7 @@ tables:
         title: Coal production
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Coal
         presentation:
@@ -150,6 +166,7 @@ tables:
         title: Coal reserves per capita
         unit: tonnes per person
         short_unit: t
+        description_short: Proved reserves, measured in tonnes per person, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
         display:
           name: Coal
         presentation:
@@ -158,6 +175,7 @@ tables:
         title: Coal reserves-to-production ratio
         unit: years
         short_unit: years
+        description_short: Number of years that proved reserves of coal would last if production continued at its current rate.
         display:
           name: Coal
         presentation:
@@ -166,6 +184,7 @@ tables:
         title: Coal reserves
         unit: tonnes
         short_unit: t
+        description_short: Proved reserves, measured in tonnes, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
         display:
           name: Coal
         presentation:
@@ -174,6 +193,7 @@ tables:
         title: Gas consumption (cubic meters)
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters.
         display:
           name: Gas
         presentation:
@@ -182,6 +202,7 @@ tables:
         title: Gas consumption per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person.
         display:
           name: Gas
         presentation:
@@ -190,6 +211,7 @@ tables:
         title: Gas consumption per capita (cubic meters)
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person.
         display:
           name: Gas
         presentation:
@@ -198,6 +220,7 @@ tables:
         title: Gas consumption
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Gas
         presentation:
@@ -206,6 +229,7 @@ tables:
         title: Gas exports
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters.
         display:
           name: Gas
         presentation:
@@ -214,6 +238,7 @@ tables:
         title: Gas exports per capita
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person.
         display:
           name: Gas
         presentation:
@@ -222,6 +247,7 @@ tables:
         title: Gas imports
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters.
         display:
           name: Gas
         presentation:
@@ -230,6 +256,7 @@ tables:
         title: Gas imports per capita
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person.
         display:
           name: Gas
         presentation:
@@ -238,6 +265,7 @@ tables:
         title: Gas net imports
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
         display:
           name: Gas
         presentation:
@@ -246,6 +274,7 @@ tables:
         title: Gas net imports per capita
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
         display:
           name: Gas
         presentation:
@@ -254,6 +283,7 @@ tables:
         title: Annual change in gas production (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in gas production relative to the previous year. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
         display:
           name: Gas
         presentation:
@@ -262,6 +292,7 @@ tables:
         title: Annual change in gas production
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in gas production relative to the previous year, measured in [terawatt-hours](#dod:watt-hours). Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
         display:
           name: Gas
         presentation:
@@ -270,6 +301,7 @@ tables:
         title: Gas production (cubic meters)
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
         display:
           name: Gas
         presentation:
@@ -278,6 +310,7 @@ tables:
         title: Gas production per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
         display:
           name: Gas
         presentation:
@@ -286,6 +319,7 @@ tables:
         title: Gas production per capita (cubic meters)
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
         display:
           name: Gas
         presentation:
@@ -294,6 +328,7 @@ tables:
         title: Gas production
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
         display:
           name: Gas
         presentation:
@@ -302,6 +337,7 @@ tables:
         title: Gas reserves
         unit: cubic meters
         short_unit: m³
+        description_short: Proved reserves, measured in cubic meters, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
         display:
           name: Gas
         presentation:
@@ -310,6 +346,7 @@ tables:
         title: Gas reserves per capita
         unit: cubic meters per person
         short_unit: m³
+        description_short: Proved reserves, measured in cubic meters per person, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
         display:
           name: Gas
         presentation:
@@ -318,6 +355,7 @@ tables:
         title: Gas reserves-to-production ratio
         unit: years
         short_unit: years
+        description_short: Number of years that proved reserves of gas would last if production continued at its current rate.
         display:
           name: Gas
         presentation:
@@ -326,6 +364,7 @@ tables:
         title: Oil consumption (cubic meters)
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters. Includes all petroleum products and other liquid fuels, such as biofuels.
         display:
           name: Oil
         presentation:
@@ -334,6 +373,7 @@ tables:
         title: Oil consumption per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Includes refined petroleum products and other liquid fuels.
         display:
           name: Oil
         presentation:
@@ -342,6 +382,7 @@ tables:
         title: Oil consumption per capita (cubic meters)
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person. Includes all petroleum products and other liquid fuels, such as biofuels.
         display:
           name: Oil
         presentation:
@@ -350,6 +391,7 @@ tables:
         title: Oil consumption
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Includes refined petroleum products and other liquid fuels.
         display:
           name: Oil
         presentation:
@@ -358,6 +400,7 @@ tables:
         title: Oil exports
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters. Includes crude oil and lease condensate; refined petroleum products are not included.
         display:
           name: Oil
         presentation:
@@ -366,6 +409,7 @@ tables:
         title: Oil exports per capita
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person. Includes crude oil and lease condensate; refined petroleum products are not included.
         display:
           name: Oil
         presentation:
@@ -374,6 +418,7 @@ tables:
         title: Oil imports
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters. Includes crude oil and lease condensate; refined petroleum products are not included.
         display:
           name: Oil
         presentation:
@@ -382,6 +427,7 @@ tables:
         title: Oil imports per capita
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person. Includes crude oil and lease condensate; refined petroleum products are not included.
         display:
           name: Oil
         presentation:
@@ -390,6 +436,7 @@ tables:
         title: Oil net imports
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters. Net imports are imports minus exports; negative values indicate that the country exports more than it imports. Includes crude oil and lease condensate; refined petroleum products are not included.
         display:
           name: Oil
         presentation:
@@ -398,6 +445,7 @@ tables:
         title: Oil net imports per capita
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person. Net imports are imports minus exports; negative values indicate that the country exports more than it imports. Includes crude oil and lease condensate; refined petroleum products are not included.
         display:
           name: Oil
         presentation:
@@ -406,6 +454,7 @@ tables:
         title: Annual change in oil production (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in oil production relative to the previous year.
         display:
           name: Oil
         presentation:
@@ -414,6 +463,7 @@ tables:
         title: Annual change in oil production
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in oil production relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Oil
         presentation:
@@ -422,6 +472,7 @@ tables:
         title: Oil production (cubic meters)
         unit: cubic meters
         short_unit: m³
+        description_short: Measured in cubic meters. Includes crude oil and lease condensate.
         display:
           name: Oil
         presentation:
@@ -430,6 +481,7 @@ tables:
         title: Oil production per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Includes crude oil, condensates, natural gas liquids, and other liquid fuels.
         display:
           name: Oil
         presentation:
@@ -438,6 +490,7 @@ tables:
         title: Oil production per capita (cubic meters)
         unit: cubic meters per person
         short_unit: m³
+        description_short: Measured in cubic meters per person. Includes crude oil and lease condensate.
         display:
           name: Oil
         presentation:
@@ -446,6 +499,7 @@ tables:
         title: Oil production
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Includes crude oil, condensates, natural gas liquids, and other liquid fuels.
         display:
           name: Oil
         presentation:
@@ -454,6 +508,7 @@ tables:
         title: Oil reserves
         unit: cubic meters
         short_unit: m³
+        description_short: Proved reserves, measured in cubic meters, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information. Includes crude oil and lease condensate.
         display:
           name: Oil
         presentation:
@@ -462,6 +517,7 @@ tables:
         title: Oil reserves per capita
         unit: cubic meters per person
         short_unit: m³
+        description_short: Proved reserves, measured in cubic meters per person, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information. Includes crude oil and lease condensate.
         display:
           name: Oil
         presentation:
@@ -470,6 +526,7 @@ tables:
         title: Oil reserves-to-production ratio
         unit: years
         short_unit: years
+        description_short: Number of years that proved reserves of oil would last if production continued at its current rate.
         display:
           name: Oil
         presentation:
@@ -478,6 +535,7 @@ tables:
         title: Fossil fuel consumption per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Fossil fuels include coal, oil, and gas.
         display:
           name: Fossil fuels
         presentation:
@@ -486,6 +544,7 @@ tables:
         title: Fossil fuel consumption
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Fossil fuels include coal, oil, and gas.
         display:
           name: Fossil fuels
         presentation:
@@ -494,6 +553,7 @@ tables:
         title: Fossil fuel production per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Fossil fuels include coal, oil, and gas.
         display:
           name: Fossil fuels
         presentation:
@@ -502,6 +562,7 @@ tables:
         title: Fossil fuel production
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Fossil fuels include coal, oil, and gas.
         display:
           name: Fossil fuels
         presentation:

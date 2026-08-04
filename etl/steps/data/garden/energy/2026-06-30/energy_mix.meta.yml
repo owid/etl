@@ -33,6 +33,7 @@ tables:
         title: Annual change in biofuels (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Biofuels
         presentation:
@@ -41,6 +42,7 @@ tables:
         title: Annual change in biofuels
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Biofuels
         presentation:
@@ -49,6 +51,7 @@ tables:
         title: Biofuels per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Biofuels
         presentation:
@@ -57,6 +60,7 @@ tables:
         title: Biofuels as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Biofuels
         presentation:
@@ -65,6 +69,7 @@ tables:
         title: Biofuels as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Biofuels
         presentation:
@@ -73,6 +78,7 @@ tables:
         title: Biofuels
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Biofuels
         presentation:
@@ -81,6 +87,7 @@ tables:
         title: Annual change in coal (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Coal
         presentation:
@@ -89,6 +96,7 @@ tables:
         title: Annual change in coal
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Coal
         presentation:
@@ -97,6 +105,7 @@ tables:
         title: Coal per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Coal
         presentation:
@@ -105,6 +114,7 @@ tables:
         title: Coal as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Coal
         presentation:
@@ -113,6 +123,7 @@ tables:
         title: Coal as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Coal
         presentation:
@@ -121,6 +132,7 @@ tables:
         title: Coal
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Coal
         presentation:
@@ -129,6 +141,7 @@ tables:
         title: Annual change in fossil fuels (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Fossil fuels
         presentation:
@@ -137,6 +150,7 @@ tables:
         title: Annual change in fossil fuels
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Fossil fuels
         presentation:
@@ -145,6 +159,7 @@ tables:
         title: Fossil fuels per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Fossil fuels
         presentation:
@@ -153,6 +168,7 @@ tables:
         title: Fossil fuels as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Fossil fuels
         presentation:
@@ -161,6 +177,7 @@ tables:
         title: Fossil fuels
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Fossil fuels
         presentation:
@@ -169,6 +186,7 @@ tables:
         title: Annual change in gas (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Gas
         presentation:
@@ -177,6 +195,7 @@ tables:
         title: Annual change in gas
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Gas
         presentation:
@@ -185,6 +204,7 @@ tables:
         title: Gas per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Gas
         presentation:
@@ -193,6 +213,7 @@ tables:
         title: Gas as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Gas
         presentation:
@@ -201,6 +222,7 @@ tables:
         title: Gas as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Gas
         presentation:
@@ -209,6 +231,7 @@ tables:
         title: Gas
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Gas
         presentation:
@@ -217,6 +240,7 @@ tables:
         title: Annual change in hydropower (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Hydropower
         presentation:
@@ -225,6 +249,7 @@ tables:
         title: Annual change in hydropower
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Hydropower
         presentation:
@@ -233,6 +258,7 @@ tables:
         title: Hydropower per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Hydropower
         presentation:
@@ -241,6 +267,7 @@ tables:
         title: Hydropower as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Hydropower
         presentation:
@@ -249,6 +276,7 @@ tables:
         title: Hydropower as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Hydropower
         presentation:
@@ -257,6 +285,7 @@ tables:
         title: Hydropower
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Hydropower
         presentation:
@@ -265,6 +294,7 @@ tables:
         title: Annual change in low-carbon energy (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Low-carbon energy
         presentation:
@@ -273,6 +303,7 @@ tables:
         title: Annual change in low-carbon energy
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Low-carbon energy
         presentation:
@@ -281,6 +312,7 @@ tables:
         title: Low-carbon energy per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Low-carbon energy
         presentation:
@@ -289,6 +321,7 @@ tables:
         title: Low-carbon energy as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Low-carbon energy
         presentation:
@@ -297,6 +330,7 @@ tables:
         title: Low-carbon energy
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Low-carbon energy
         presentation:
@@ -305,6 +339,7 @@ tables:
         title: Annual change in nuclear (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Nuclear
         presentation:
@@ -313,6 +348,7 @@ tables:
         title: Annual change in nuclear
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Nuclear
         presentation:
@@ -321,6 +357,7 @@ tables:
         title: Nuclear per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Nuclear
         presentation:
@@ -329,6 +366,7 @@ tables:
         title: Nuclear as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Nuclear
         presentation:
@@ -337,6 +375,7 @@ tables:
         title: Nuclear as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Nuclear
         presentation:
@@ -345,6 +384,7 @@ tables:
         title: Nuclear
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Nuclear
         presentation:
@@ -353,6 +393,7 @@ tables:
         title: Annual change in oil (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Oil
         presentation:
@@ -361,6 +402,7 @@ tables:
         title: Annual change in oil
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Oil
         presentation:
@@ -369,6 +411,7 @@ tables:
         title: Oil per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Oil
         presentation:
@@ -377,6 +420,7 @@ tables:
         title: Oil as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Oil
         presentation:
@@ -385,6 +429,7 @@ tables:
         title: Oil as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Oil
         presentation:
@@ -393,6 +438,7 @@ tables:
         title: Oil
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Oil
         presentation:
@@ -401,6 +447,7 @@ tables:
         title: Annual change in other renewables (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Other renewables
         presentation:
@@ -409,6 +456,7 @@ tables:
         title: Annual change in other renewables
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Other renewables
         presentation:
@@ -417,6 +465,7 @@ tables:
         title: Other renewables per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Other renewables
         presentation:
@@ -425,6 +474,7 @@ tables:
         title: Other renewables as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Other renewables
         presentation:
@@ -433,6 +483,7 @@ tables:
         title: Other renewables as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Other renewables
         presentation:
@@ -441,6 +492,7 @@ tables:
         title: Other renewables
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Other renewables
         presentation:
@@ -449,6 +501,7 @@ tables:
         title: Annual change in renewables (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Renewables
         presentation:
@@ -457,6 +510,7 @@ tables:
         title: Annual change in renewables
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Renewables
         presentation:
@@ -465,6 +519,7 @@ tables:
         title: Renewables per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Renewables
         presentation:
@@ -473,6 +528,7 @@ tables:
         title: Renewables as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Renewables
         presentation:
@@ -481,6 +537,7 @@ tables:
         title: Renewables
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Renewables
         presentation:
@@ -489,6 +546,7 @@ tables:
         title: Annual change in solar and wind (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Solar and wind
         presentation:
@@ -497,6 +555,7 @@ tables:
         title: Annual change in solar and wind
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Solar and wind
         presentation:
@@ -505,6 +564,7 @@ tables:
         title: Solar and wind per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Solar and wind
         presentation:
@@ -513,6 +573,7 @@ tables:
         title: Solar and wind as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Solar and wind
         presentation:
@@ -521,6 +582,7 @@ tables:
         title: Solar and wind
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Solar and wind
         presentation:
@@ -529,6 +591,7 @@ tables:
         title: Annual change in solar (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Solar
         presentation:
@@ -537,6 +600,7 @@ tables:
         title: Annual change in solar
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Solar
         presentation:
@@ -545,6 +609,7 @@ tables:
         title: Solar per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Solar
         presentation:
@@ -553,6 +618,7 @@ tables:
         title: Solar as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Solar
         presentation:
@@ -561,6 +627,7 @@ tables:
         title: Solar as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Solar
         presentation:
@@ -569,6 +636,7 @@ tables:
         title: Solar
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Solar
         presentation:
@@ -577,6 +645,7 @@ tables:
         title: Annual change in total energy supply (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Total energy supply
         presentation:
@@ -585,6 +654,7 @@ tables:
         title: Annual change in total energy supply
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Total energy supply
         presentation:
@@ -593,6 +663,7 @@ tables:
         title: Total energy supply per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Total energy supply
         presentation:
@@ -601,12 +672,14 @@ tables:
         title: Total energy supply per unit of GDP
         unit: kilowatt-hours per dollar
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per international-$ of GDP.
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_per_gdp_kwh_per_dollar.title}'
       total_energy_supply_twh:
         title: Total energy supply
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Total energy supply
         presentation:
@@ -615,6 +688,7 @@ tables:
         title: Traditional biomass as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Traditional biomass
         presentation:
@@ -623,6 +697,7 @@ tables:
         title: Annual change in wind (%)
         unit: '%'
         short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         display:
           name: Wind
         presentation:
@@ -631,6 +706,7 @@ tables:
         title: Annual change in wind
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Wind
         presentation:
@@ -639,6 +715,7 @@ tables:
         title: Wind per capita
         unit: kilowatt-hours per person
         short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
         display:
           name: Wind
         presentation:
@@ -647,6 +724,7 @@ tables:
         title: Wind as a share of primary energy (including traditional biomass)
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         display:
           name: Wind
         presentation:
@@ -655,6 +733,7 @@ tables:
         title: Wind as a share of total energy supply
         unit: '%'
         short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         display:
           name: Wind
         presentation:
@@ -663,6 +742,7 @@ tables:
         title: Wind
         unit: terawatt-hours
         short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
         display:
           name: Wind
         presentation:
