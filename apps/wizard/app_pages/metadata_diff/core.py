@@ -288,6 +288,48 @@ def override_snippet(view: ViewDiff, field_name: str, value: Any) -> str:
     return "\n".join(lines)
 
 
+@dataclass
+class ChangeGroup:
+    """One distinct text change, shared by every view that renders it — the review unit.
+
+    "Review by distinct text": a shared indicator change renders identically across every view using
+    that indicator, so it collapses to one group the reviewer judges once (rather than view-by-view).
+    """
+
+    field: str
+    old: Any
+    new: Any
+    view_dims: list[dict[str, str]] = field(default_factory=list)
+    affects_indicator: bool = False
+    indicator_id: int | None = None
+
+
+def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
+    """Collapse per-view field changes into distinct (field, old→new) groups, ranked by reach (views)."""
+    groups: dict[tuple[str, str, str], ChangeGroup] = {}
+    order: list[tuple[str, str, str]] = []
+    for v in view_diffs:
+        if not v.changed:
+            continue
+        for fld, change in v.fields.items():
+            key = (
+                fld,
+                json.dumps(change.get("old"), sort_keys=True, default=str),
+                json.dumps(change.get("new"), sort_keys=True, default=str),
+            )
+            g = groups.get(key)
+            if g is None:
+                g = ChangeGroup(field=fld, old=change.get("old"), new=change.get("new"))
+                groups[key] = g
+                order.append(key)
+            g.view_dims.append(v.dimensions)
+            if fld in v.indicator_changed_fields:
+                g.affects_indicator = True
+                if g.indicator_id is None:
+                    g.indicator_id = v.indicator_id
+    return sorted((groups[k] for k in order), key=lambda g: (-len(g.view_dims), g.field))
+
+
 # ---------------------------------------------------------------------------
 # Inline word-level diff rendering (shared by the tree tooltips and the view page)
 # ---------------------------------------------------------------------------

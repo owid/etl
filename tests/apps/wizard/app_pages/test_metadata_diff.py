@@ -9,6 +9,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     ViewDiff,
     build_view_bundle,
     diff_views,
+    group_changes,
     override_snippet,
 )
 from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
@@ -127,6 +128,34 @@ def test_override_snippet_routes_each_field():
     # chart field -> view.config
     cs = override_snippet(v, "chart.subtitle", "S")
     assert "view.config = view.config or {}" in cs and 'view.config["subtitle"] = "S"' in cs
+
+
+def test_group_changes_collapses_shared_text_and_ranks_by_reach():
+    """The review unit: identical changes across views collapse to one group, ranked by reach."""
+    shared = {"descriptionKey": {"old": ["a"], "new": ["a", "NEW"]}}
+    v1 = ViewDiff(
+        dimensions={"m": "mean", "w": "income"},
+        fields=shared,
+        indicator_id=10,
+        indicator_changed_fields={"descriptionKey"},
+    )
+    v2 = ViewDiff(
+        dimensions={"m": "mean", "w": "consumption"},
+        fields=shared,
+        indicator_id=10,
+        indicator_changed_fields={"descriptionKey"},
+    )
+    v3 = ViewDiff(
+        dimensions={"m": "median", "w": "income"}, fields={"descriptionShort": {"old": "x", "new": "y"}}
+    )  # override
+
+    groups = group_changes([v1, v2, v3])
+
+    assert len(groups) == 2  # the two identical shared changes collapse into one
+    top = groups[0]  # ranked by reach: the 2-view group first
+    assert top.field == "descriptionKey" and len(top.view_dims) == 2
+    assert top.affects_indicator and top.indicator_id == 10
+    assert groups[1].field == "descriptionShort" and not groups[1].affects_indicator
 
 
 def test_indicator_ids_in_mdim_config_scans_all_axes():

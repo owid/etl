@@ -31,6 +31,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     diff_preview_html,
     diff_views,
     field_label,
+    group_changes,
     inline_diff_html,
     override_snippet,
 )
@@ -355,6 +356,119 @@ def _render_diff_body(
             st.markdown(_render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
 
 
+_REVIEW_STATUSES = ["⏳ Pending", "✅ Approve", "🚩 Flag"]
+
+
+def _dims_str(dims: dict[str, str]) -> str:
+    return ", ".join(f"{k}={v}" for k, v in dims.items()) or "(default view)"
+
+
+def _as_plaintext(val: Any) -> str:
+    if isinstance(val, list):
+        return " · ".join(str(x) for x in val)
+    if val in (None, ""):
+        return "—"
+    return str(val)
+
+
+def _review_markdown(
+    catalog_path: str,
+    baseline_name: str,
+    groups: list[Any],
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
+) -> str:
+    """Compile the reviewer's sign-off + comments into a copy-pasteable punch-list for the author."""
+    flagged = sum(
+        1 for i in range(len(groups)) if st.session_state.get(f"rev-status::{catalog_path}::{i}", "").startswith("🚩")
+    )
+    lines = [f"# Metadata review — `{catalog_path}`", "", f"_Baseline: {baseline_name}_", ""]
+    lines.append(f"**{len(groups)} distinct change(s)** — {flagged} flagged.")
+    lines.append("")
+    for i, g in enumerate(groups):
+        status = st.session_state.get(f"rev-status::{catalog_path}::{i}", _REVIEW_STATUSES[0])
+        comment = st.session_state.get(f"rev-comment::{catalog_path}::{i}", "").strip()
+        scope = "shared indicator metadata" if g.affects_indicator else "MDim override"
+        reach = f"{len(g.view_dims)} view(s)"
+        if g.affects_indicator and g.indicator_id is not None:
+            n_charts = len(usage.get(g.indicator_id, {}).get("charts", []))
+            if n_charts:
+                reach += f", {n_charts} chart(s)"
+        lines.append(f"## {field_label(g.field)} — {status}")
+        lines.append(f"- **Scope:** {scope}; affects {reach}")
+        views = "; ".join(_dims_str(d) for d in g.view_dims[:8]) + (" …" if len(g.view_dims) > 8 else "")
+        lines.append(f"- **Views:** {views}")
+        lines.append(f"- **Before:** {_as_plaintext(g.old)}")
+        lines.append(f"- **After:** {_as_plaintext(g.new)}")
+        if comment:
+            lines.append(f"- **💬 Comment:** {comment}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def render_review_page(
+    catalog_path: str,
+    dimensions: list[dict[str, Any]],
+    view_diffs: list[ViewDiff],
+    baseline: str,
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
+) -> None:
+    """Review mode: every distinct change in one place, each with sign-off + comment, plus a punch-list."""
+    st.markdown(DIFF_CSS, unsafe_allow_html=True)
+    groups = group_changes(view_diffs)
+    if not groups:
+        st.success("No metadata changes in any view of this MDim — nothing to review.")
+        return
+
+    baseline_name = BASELINES[baseline]
+    n_shared = sum(1 for g in groups if g.affects_indicator)
+    reviewed = sum(
+        1
+        for i in range(len(groups))
+        if not st.session_state.get(f"rev-status::{catalog_path}::{i}", _REVIEW_STATUSES[0]).startswith("⏳")
+    )
+    st.markdown(
+        f"**{len(groups)} distinct text change{'s' if len(groups) != 1 else ''}** to review "
+        f"({n_shared} shared / indicator-level), ranked by reach · **{reviewed}/{len(groups)} signed off**."
+    )
+    st.caption("Each row is one distinct change — a shared indicator edit is judged once here, not view by view.")
+
+    for i, g in enumerate(groups):
+        with st.container(border=True):
+            imp = usage.get(g.indicator_id, {}) if (g.affects_indicator and g.indicator_id is not None) else {}
+            charts, mdims = imp.get("charts", []), imp.get("mdims", [])
+            reach_bits = [f"**{len(g.view_dims)}** view{'s' if len(g.view_dims) != 1 else ''} in this MDim"]
+            if charts:
+                reach_bits.append(f"**{len(charts)}** chart{'s' if len(charts) != 1 else ''}")
+            if mdims:
+                reach_bits.append(f"**{len(mdims)}** other MDim{'s' if len(mdims) != 1 else ''}")
+            scope = "🔗 shared indicator metadata" if g.affects_indicator else "🔒 MDim override"
+            st.markdown(f"##### {field_label(g.field)} · {scope}")
+            st.caption("Affects " + " · ".join(reach_bits))
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown(f":gray[**{baseline_name.capitalize()}**]")
+                st.markdown(_render_text_html(g.old, g.new, side="old"), unsafe_allow_html=True)
+            with c2:
+                st.markdown(":green[**This staging server**]")
+                st.markdown(_render_text_html(g.new, g.old, side="new"), unsafe_allow_html=True)
+            s1, s2 = st.columns([1, 3])
+            with s1:
+                st.radio(
+                    "Sign-off", _REVIEW_STATUSES, key=f"rev-status::{catalog_path}::{i}", label_visibility="collapsed"
+                )
+            with s2:
+                st.text_area(
+                    "Comment",
+                    key=f"rev-comment::{catalog_path}::{i}",
+                    placeholder="Optional note or suggested wording for the author…",
+                    label_visibility="collapsed",
+                )
+
+    st.divider()
+    with st.expander("📋 Review summary — copy as Markdown for the author"):
+        st.code(_review_markdown(catalog_path, baseline_name, groups, usage), language="markdown")
+
+
 def render_view_diff_page(
     catalog_path: str,
     dimensions: list[dict[str, Any]],
@@ -622,8 +736,8 @@ def main() -> None:
         mode = url_persist(st.radio)(
             "Mode",
             key="mode",
-            options=["tree", "view"],
-            format_func=lambda m: "💥 Blast radius" if m == "tree" else "🔍 View diff",
+            options=["tree", "view", "review"],
+            format_func=lambda m: {"tree": "💥 Blast radius", "view": "🔍 View diff", "review": "📋 Review"}[m],
             horizontal=True,
             label_visibility="collapsed",
         )
@@ -656,6 +770,8 @@ def main() -> None:
 
     if mode == "view":
         render_view_diff_page(catalog_path, dimensions, view_diffs, df_mdims.loc[catalog_path], baseline, usage)
+    elif mode == "review":
+        render_review_page(catalog_path, dimensions, view_diffs, baseline, usage)
     else:
         n_changed = sum(1 for v in view_diffs if v.changed)
         if n_changed == 0:
