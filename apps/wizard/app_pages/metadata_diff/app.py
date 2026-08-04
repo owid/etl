@@ -341,31 +341,44 @@ def _render_override_body(view_diff: ViewDiff) -> None:
 def _render_diff_body(
     view_diff: ViewDiff,
     baseline_name: str,
-    links: list[str],
+    baseline_url: str,
+    staging_url: str,
     usage: dict[int, dict[str, list[dict[str, Any]]]],
     unit: str = "view",
 ) -> None:
-    """Status banner + blast-radius flag + side-by-side field diffs — shared by MDim views and charts."""
-    if view_diff.is_new:
-        st.info(f"This {unit} is **new** — it does not exist in {baseline_name}. " + " · ".join(links))
-    elif view_diff.changed:
-        n = len(view_diff.fields)
-        st.warning(f"**{n} field{'s' if n > 1 else ''} changed** in this {unit}. " + " · ".join(links))
-    else:
-        st.success(f"No changes in this {unit}. " + " · ".join(links))
+    """Status banner + blast-radius flag + side-by-side field diffs — shared by MDim views and charts.
 
-    if view_diff.changed and not view_diff.is_new:
-        _render_impact(view_diff, usage, unit=unit)
+    The per-env page link lives on each column header (e.g. WYSK → the indicator's data page), not in
+    the status line.
+    """
+    if view_diff.is_new:
+        st.info(
+            f"This {unit} is **new** — it does not exist in {baseline_name}. "
+            f"[{baseline_name} (data page)]({baseline_url}) · [this staging server (data page)]({staging_url})"
+        )
+        return
+    if not view_diff.changed:
+        st.success(
+            f"No changes in this {unit}. "
+            f"[{baseline_name} (data page)]({baseline_url}) · [this staging server (data page)]({staging_url})"
+        )
+        return
+
+    n = len(view_diff.fields)
+    st.warning(f"**{n} field{'s' if n > 1 else ''} changed** in this {unit}.")
+    _render_impact(view_diff, usage, unit=unit)
 
     for field_name in [f for f in FIELD_ORDER if f in view_diff.fields]:
         change = view_diff.fields[field_name]
         st.markdown(f"##### {field_label(field_name)}")
+        # WYSK / description fields render on the indicator's data page; chart FAUST on the chart itself.
+        link_kind = "chart ↗" if field_name.startswith(CHART_FIELD_PREFIX) else "data page ↗"
         col_old, col_new = st.columns(2)
         with col_old:
-            st.markdown(f":gray[**{baseline_name.capitalize()}**]")
+            st.markdown(f":gray[**{baseline_name.capitalize()}**] · [{link_kind}]({baseline_url})")
             st.markdown(_render_text_html(change["old"], change["new"], side="old"), unsafe_allow_html=True)
         with col_new:
-            st.markdown(":green[**This staging server**]")
+            st.markdown(f":green[**This staging server**] · [{link_kind}]({staging_url})")
             st.markdown(_render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
 
 
@@ -682,11 +695,12 @@ def render_view_diff_page(
             )
 
     # --- MDim controls (navigation across views) ---------------------------------
-    st.caption(
-        "🟡 marks a control option that leads to a changed view; it turns 🟢 once you've viewed that "
-        "change (viewed — not necessarily approved). Follow the dots, or use **Next change ▶** to step "
-        "through them one by one."
-    )
+    if changed_views:
+        st.caption(
+            "🟡 marks a control option that leads to a changed view; it turns 🟢 once you've viewed that "
+            "change (viewed — not necessarily approved).  \n"
+            "Follow the dots, or use **Next change ▶** to step through them one by one."
+        )
     selection: dict[str, str] = {}
     columns = st.columns(min(4, max(1, len(dimensions))))
     for i, dim in enumerate(dimensions):
@@ -751,12 +765,7 @@ def render_view_diff_page(
     baseline_url = _view_url(_baseline_env(baseline), catalog_path, baseline_slug, view.dimensions)
     staging_url = _view_url(SOURCE, catalog_path, None, view.dimensions)
 
-    # These links open the indicator's data page (where these "what you should know" texts render).
-    links = [f"[Data page — {baseline_name}]({baseline_url})"]
-    if view.changed:
-        links.append(f"[Data page — this staging server]({staging_url})")
-
-    _render_diff_body(view, baseline_name, links, usage, unit="view")
+    _render_diff_body(view, baseline_name, baseline_url, staging_url, usage, unit="view")
 
 
 def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> None:
@@ -808,8 +817,7 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
     st.markdown(f"#### {chart.get('title') or chart['slug']}")
     baseline_url = f"{_baseline_env(baseline).site}/grapher/{chart['slug']}"
     staging_url = f"{SOURCE.site}/grapher/{chart['slug']}"
-    links = [f"[Data page — {baseline_name}]({baseline_url})", f"[Data page — this staging server]({staging_url})"]
-    _render_diff_body(diff, baseline_name, links, usage, unit="chart")
+    _render_diff_body(diff, baseline_name, baseline_url, staging_url, usage, unit="chart")
 
 
 _ALL_NS = "(all namespaces)"
@@ -912,18 +920,18 @@ def main() -> None:
         st.info("Select an MDim.")
         return
 
-    mode = url_persist(st.radio)(
+    mode = url_persist(st.segmented_control)(
         "Mode",
         key="mode",
         options=["tree", "view", "review"],
         format_func=lambda m: {"tree": "💥 Blast radius", "view": "🔍 View diff", "review": "📋 Review"}[m],
-        captions=[
-            "how far each change reaches",
-            "the proposed metadata changes, view by view",
-            "sign off & comment on each change",
-        ],
-        horizontal=True,
+        value="tree",
         label_visibility="collapsed",
+    )
+    mode = mode or "tree"  # segmented_control returns None if deselected
+    st.caption(
+        "**Blast radius**: how far each change reaches · **View diff**: the proposed changes, view by "
+        "view · **Review**: sign off & comment on each change."
     )
 
     dimensions, view_diffs = compute_diff(
