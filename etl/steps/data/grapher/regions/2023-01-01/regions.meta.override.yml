@@ -119,6 +119,7 @@ tables:
           grapher_config:
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Northern America (UN)": "Northern America"
                   "Latin America and the Caribbean (UN)": "Latin America and the Caribbean"
@@ -146,6 +147,7 @@ tables:
           grapher_config:
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Americas (UN M49)": "Americas"
                   "Africa (UN M49)": "Africa"
@@ -189,6 +191,7 @@ tables:
           grapher_config:
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   # Americas
                   "Northern America (UN M49)": "Northern America"
@@ -234,6 +237,7 @@ tables:
           grapher_config:
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Central America (UN M49)": "Central America"
                   "Caribbean (UN M49)": "Caribbean"
@@ -266,6 +270,7 @@ tables:
           grapher_config:
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Europe and Northern America (UN SDG)": "Europe and Northern America"
                   "Latin America and the Caribbean (UN SDG)": "Latin America and the Caribbean"
@@ -298,6 +303,7 @@ tables:
           grapher_config:
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "North America (WB)": "North America"
                   "Latin America and Caribbean (WB)": "Latin America and Caribbean"
@@ -328,6 +334,7 @@ tables:
           grapher_config:
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Americas (WHO)": "Americas"
                   "Africa (WHO)": "Africa"
@@ -377,14 +384,7 @@ tables:
               time: true
             map:
               colorScale:
-                customCategoryColors:
-                  "North America (EI)": "#CC7641"
-                  "South and Central America (EI)": "#B04E74"
-                  "Europe (EI)": "#526F9B"
-                  "CIS (EI)": "#92D3DE"
-                  "Middle East (EI)": "#C3A27C"
-                  "Africa (EI)": "#A07AB8"
-                  "Asia Pacific (EI)": "#6FA54F"
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "North America (EI)": "North America"
                   "South and Central America (EI)": "South and Central America"
@@ -418,14 +418,7 @@ tables:
               time: true
             map:
               colorScale:
-                customCategoryColors:
-                  "North America (Ember)": "#CC7641"
-                  "Latin America and Caribbean (Ember)": "#B04E74"
-                  "Europe (Ember)": "#526F9B"
-                  "Africa (Ember)": "#A07AB8"
-                  "Middle East (Ember)": "#C3A27C"
-                  "Asia (Ember)": "#238A84"
-                  "Oceania (Ember)": "#5FB8C8"
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Africa (Ember)": "Africa"
                   "Asia (Ember)": "Asia"
@@ -456,6 +449,7 @@ tables:
           grapher_config:
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "North America (Pew)": "North America"
                   "Latin America-Caribbean (Pew)": "Latin America-Caribbean"
@@ -489,6 +483,7 @@ tables:
               time: true
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Western offshoots (Maddison)": "Western offshoots"
                   "Western Europe (Maddison)": "Western Europe"
@@ -525,6 +520,7 @@ tables:
               time: true
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "North America (WID)": "North America"
                   "Latin America (WID)": "Latin America"
@@ -558,6 +554,7 @@ tables:
               time: true
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Africa (ILO)": "Africa"
                   "Americas (ILO)": "Americas"
@@ -593,6 +590,7 @@ tables:
               time: true
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Northern Africa (ILO)": "Northern Africa"
                   "Sub-Saharan Africa (ILO)": "Sub-Saharan Africa"
@@ -628,6 +626,7 @@ tables:
               time: true
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Africa (FAO)": "Africa"
                   "Americas (FAO)": "Americas"
@@ -673,6 +672,7 @@ tables:
               time: true
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Northern Africa (FAO)": "Northern Africa"
                   "Eastern Africa (FAO)": "Eastern Africa"
@@ -721,6 +721,7 @@ tables:
               time: true
             map:
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Sub-Saharan Africa (FAO)": "Sub-Saharan Africa"
                   "Northern America and Europe (FAO)": "Northern America and Europe"
