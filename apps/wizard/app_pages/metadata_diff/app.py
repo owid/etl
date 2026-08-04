@@ -305,7 +305,7 @@ def render_view_diff_page(
     # --- MDIM controls (navigation across views) ---------------------------------
     st.caption("🟡 marks a control option that leads to a changed view — follow the dots to the changes.")
     selection: dict[str, str] = {}
-    columns = st.columns(min(3, max(1, len(dimensions))))
+    columns = st.columns(min(4, max(1, len(dimensions))))
     for i, dim in enumerate(dimensions):
         dim_slug = dim["slug"]
         key = DIM_PARAM_PREFIX + dim_slug
