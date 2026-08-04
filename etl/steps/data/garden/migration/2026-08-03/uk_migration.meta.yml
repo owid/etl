@@ -64,10 +64,10 @@ definitions:
     Net Emigration - England (excluding Monmouthshire). Source: Wrigley and Schofield (1989), interpolated quinquennial estimates. These estimates naturally cover migration flows to and from other parts of the UK as well as to overseas countries.
 
   england_processing: |-
-    The source publishes this series as net emigration, where positive values mean more people leaving. We flipped the sign to show net migration, consistent with our United Kingdom indicators, and converted the figures from thousands of people to people.
+    The source publishes this series as net emigration, where positive values mean more people leaving. We flipped the sign to show net migration, and converted the figures from thousands of people to people.
 
   england_processing_share: |-
-    The source publishes this series as net emigration per 1,000 people, where positive values mean more people leaving. We flipped the sign to show net migration, consistent with our United Kingdom indicators, and expressed the rate as a percentage of the population. The population estimates in the denominator come from the same reconstruction by Wrigley and Schofield.
+    The source publishes this series as net emigration per 1,000 people, where positive values mean more people leaving. We flipped the sign to show net migration, and expressed the rate as a percentage of the population. The population estimates in the denominator come from the same reconstruction by Wrigley and Schofield.
 
   uk_processing_shares: |-
     We combined two sources into one series:
