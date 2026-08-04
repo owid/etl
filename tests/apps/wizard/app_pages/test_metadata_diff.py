@@ -111,7 +111,7 @@ def test_chart_shaped_bundle_diff():
     assert d.indicator_id == 10
 
 
-def test_override_snippet_pins_view_to_baseline():
+def test_override_snippet_routes_each_field():
     """The generator emits a real MDim .py override idiom, routing each field to the right container."""
     v = ViewDiff(dimensions={"decile": "p50", "welfare": "income"}, fields={})
 

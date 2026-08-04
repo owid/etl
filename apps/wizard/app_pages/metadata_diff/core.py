@@ -267,15 +267,15 @@ def _py_value(val: Any, indent: str = "        ") -> str:
     return json.dumps(val, ensure_ascii=False)
 
 
-def override_snippet(view: ViewDiff, field_name: str, old_value: Any) -> str:
-    """A copy-pasteable MDim `.py` block that pins THIS view's field to `old_value` (the baseline text).
+def override_snippet(view: ViewDiff, field_name: str, value: Any) -> str:
+    """A copy-pasteable MDim `.py` block that sets THIS view's field to `value` as a view override.
 
     Mirrors the real override idiom (`view.metadata = view.metadata or {}; view.metadata[...] = ...`)
     used in e.g. wb/latest/incomes_pip.py.
     """
     container, nested, key = _OVERRIDE_TARGET[field_name]
     dims = ", ".join(f"{slug}={json.dumps(choice, ensure_ascii=False)}" for slug, choice in view.dimensions.items())
-    value = _py_value(old_value)
+    value = _py_value(value)
     lines = [
         "for view in c.views:",
         f"    if view.matches({dims}):",

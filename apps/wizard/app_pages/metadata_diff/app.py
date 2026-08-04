@@ -286,6 +286,41 @@ def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]
             st.markdown(f"- `{m.get('catalogPath')}`")
 
 
+def _render_override_control(view_diff: ViewDiff) -> None:
+    """Checkbox to scope a shared change to THIS view only.
+
+    The change currently lives in the shared indicator, so it reaches every chart / MDim view above.
+    Ticking scopes it here: keep the indicator (and all those other surfaces) on the old text, and
+    apply the new text as a view override. That's two edits — a garden revert + this override — so we
+    spell out both and generate the override snippet (set to the new/staging text).
+    """
+    shared_fields = [f for f in FIELD_ORDER if f in view_diff.fields and f in view_diff.indicator_changed_fields]
+    if not shared_fields:
+        return
+
+    dims_key = "-".join(f"{k}={v}" for k, v in sorted(view_diff.dimensions.items()))
+    if not st.checkbox(
+        "Change only this view — not the shared indicator metadata",
+        key=f"override-{dims_key}",
+        help="The change is currently in the shared indicator, so it reaches every chart and MDim view "
+        "listed above. Tick to scope it to THIS view only: the indicator (and all those other surfaces) "
+        "keep the old text, and the new text is applied here as a view override.",
+    ):
+        return
+
+    fields_str = ", ".join(f"`{field_label(f)}`" for f in shared_fields)
+    st.markdown(
+        "To make this a **view-only** change, do both:\n\n"
+        f"1. **Revert the shared change** ({fields_str}) in the indicator's garden `.meta.yml`, so every "
+        "other chart and MDim view keeps the old text.\n"
+        "2. **Add this override** to the MDim's Python step (after its `c.views` are built) — it re-applies "
+        "the new text to this view alone:"
+    )
+    for f in shared_fields:
+        st.markdown(f"**{field_label(f)}**")
+        st.code(override_snippet(view_diff, f, view_diff.fields[f]["new"]), language="python")
+
+
 def _render_diff_body(
     view_diff: ViewDiff,
     baseline_name: str,
@@ -304,6 +339,9 @@ def _render_diff_body(
 
     if view_diff.changed and not view_diff.is_new:
         _render_impact(view_diff, usage, unit=unit)
+        # Right below the "affects N charts" flag: let the reviewer scope a shared change to this view.
+        if unit == "view" and view_diff.affects_indicator:
+            _render_override_control(view_diff)
 
     for field_name in [f for f in FIELD_ORDER if f in view_diff.fields]:
         change = view_diff.fields[field_name]
@@ -315,18 +353,6 @@ def _render_diff_body(
         with col_new:
             st.markdown(":green[**This staging server**]")
             st.markdown(_render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
-
-        # Override generator: offered only for MDim views, and only when the change is shared
-        # (indicator-level) — i.e. when pinning this one view to the old text is a real decision.
-        if unit == "view" and field_name in view_diff.indicator_changed_fields:
-            with st.expander("⚙️ Keep this view on the baseline text (generate MDim override)"):
-                st.caption(
-                    "This change lives in the shared indicator metadata, so it propagates to every chart "
-                    "and MDim view using this indicator. To keep **only this view** on the previous wording, "
-                    "paste this into the MDim's Python step (after its `c.views` are built) and edit the value "
-                    "if you want something other than a straight pin-to-baseline:"
-                )
-                st.code(override_snippet(view_diff, field_name, change["old"]), language="python")
 
 
 def render_view_diff_page(
