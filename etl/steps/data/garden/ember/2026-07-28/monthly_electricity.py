@@ -69,9 +69,6 @@ def run() -> None:
 
     sanity_check_inputs(tb)
 
-    # Keep the Ember origin to reattach after pivoting/merging (those operations drop column-level origins).
-    origins = tb["generation__twh"].metadata.origins
-
     # Generation by source -> one column per source.
     gen = tb[tb["electricity_source"].isin(GENERATION_SOURCE_TO_COLUMN)].copy()
     gen["column"] = gen["electricity_source"].map(GENERATION_SOURCE_TO_COLUMN)
@@ -93,11 +90,6 @@ def run() -> None:
     tb_wide = wide
     for extra in [demand, net_imports, emissions]:
         tb_wide = pr.merge(tb_wide, extra, on=["country", "date"], how="left")
-
-    # Reattach the Ember origin to every indicator.
-    for column in tb_wide.columns:
-        if column not in ["country", "date"]:
-            tb_wide[column].metadata.origins = origins
 
     tb_wide = tb_wide.format(keys=["country", "date"], short_name=paths.short_name)
 
