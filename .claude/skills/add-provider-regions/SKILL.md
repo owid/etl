@@ -219,7 +219,9 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
               colorScale:
                 baseColorScheme: OwidCategoricalMap    # name-keyed region colors — see Step 9
                 customCategoryLabels:
-                  "<Region> (<Provider>)": "<Region>"   # strip the suffix on the legend
+                  # one entry per region in `sort` — drops the suffix from the
+                  # legend, and from the tooltip via the flag above
+                  "<Region> (<Provider>)": "<Region>"
                 customHiddenCategories:
                   "No data": true
                 # No customCategoryColors. Colors live in MapContinentColors (Step 9),
