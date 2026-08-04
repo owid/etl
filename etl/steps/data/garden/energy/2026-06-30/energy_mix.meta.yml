@@ -4,9 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Energy
-    description_key:
-      - Energy here is total energy supply. Wind, solar and hydropower are counted as the electricity they generate. Nuclear is counted as the heat produced in its reactors, of which about a third becomes electricity.
-      - The Energy Institute moved to this approach in 2025. Before that it scaled renewables and nuclear up to the amount of fossil fuel that would have been needed to generate the same electricity, which made wind, solar and hydropower look roughly two and a half times larger than they do here, and nuclear about a fifth smaller.
     description_processing: |-
       - The total energy supply is extended to countries not covered by the Statistical Review using the U.S. Energy Information Administration's (EIA) total energy consumption. The Statistical Review is prioritized where both sources are available.
       - The World series is extended back to 1800 using Vaclav Smil's historical estimates (2017), for years before the Statistical Review begins (1965). Only commercially-traded energy sources are included (traditional biomass, which Smil reports but the Statistical Review does not, is excluded so the series stays on a single basis with no step at the splice).

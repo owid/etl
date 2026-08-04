@@ -116,13 +116,10 @@ definitions:
     renewable generation is accounted for on the energy content of their gross electrical output. See
     https://www.energyinst.org/statistical-review for more details on this methodology.
 
-  # Key points for readers. These are ours, in plain language; the producer's own wording is kept
-  # verbatim in description_from_producer.
+  # Key points for readers.
   key_reserves: &key-reserves
     - Proved reserves are the amounts that can be extracted from known deposits under current prices and technology.
       They are not an estimate of how much coal, oil or gas exists underground.
-    - These figures are for the end of 2020. The Energy Institute has not updated its reserves tables since then, and
-      says the methodology and timing of future updates are under review.
   key_oil_consumption: &key-oil-consumption
     - Consumption covers fuel burned within a country, plus fuel sold there for international flights and shipping,
       and fuel used or lost in refineries.
