@@ -79,6 +79,12 @@ definitions:
     date_accessed: "2026-04-24"
     citation_full: Ember - Yearly Electricity Data (2026).
     attribution_short: Ember
+  origins_ihme_gbd: &origins_ihme_gbd
+    producer: IHME, Global Burden of Disease
+    title: Global Burden of Disease, Location Hierarchy
+    url_main: https://ghdx.healthdata.org/record/global-burden-disease-study-2021-gbd-2021-cause-rei-and-location-hierarchies
+    date_accessed: "2026-08-04"
+    attribution_short: IHME-GBD
 
 tables:
   regions:
@@ -764,5 +770,99 @@ tables:
                   "Eastern Asia and South-eastern Asia (FAO)": "Eastern Asia and South-eastern Asia"
                   "Australia and New Zealand (FAO)": "Australia and New Zealand"
                   "Oceania excluding Australia and New Zealand (FAO)": "Oceania excluding Australia and New Zealand"
+                customHiddenCategories:
+                  "No data": true
+
+      # IHME GBD (super-regions)
+      ihme_gbd_1_region:
+        title: World super-regions according to IHME
+        description_short: |-
+          Super-regions as defined by the Institute for Health Metrics and Evaluation (IHME) in its Global Burden of Disease (GBD) study.
+        type: ordinal
+        sort:
+          - "High-income (IHME GBD)"
+          - "Latin America and Caribbean (IHME GBD)"
+          - "Central Europe, Eastern Europe, and Central Asia (IHME GBD)"
+          - "Sub-Saharan Africa (IHME GBD)"
+          - "North Africa and Middle East (IHME GBD)"
+          - "South Asia (IHME GBD)"
+          - "Southeast Asia, East Asia, and Oceania (IHME GBD)"
+        origins:
+          - *origins_ihme_gbd
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "High-income (IHME GBD)": "High-income"
+                  "Latin America and Caribbean (IHME GBD)": "Latin America and Caribbean"
+                  "Central Europe, Eastern Europe, and Central Asia (IHME GBD)": "Central Europe, Eastern Europe, and Central Asia"
+                  "Sub-Saharan Africa (IHME GBD)": "Sub-Saharan Africa"
+                  "North Africa and Middle East (IHME GBD)": "North Africa and Middle East"
+                  "South Asia (IHME GBD)": "South Asia"
+                  "Southeast Asia, East Asia, and Oceania (IHME GBD)": "Southeast Asia, East Asia, and Oceania"
+                customHiddenCategories:
+                  "No data": true
+
+      # IHME GBD (regions)
+      ihme_gbd_2_region:
+        title: World regions according to IHME
+        description_short: |-
+          Regions as defined by the Institute for Health Metrics and Evaluation (IHME) in its Global Burden of Disease (GBD) study.
+        type: ordinal
+        sort:
+          - "High-income North America (IHME GBD)"
+          - "Caribbean (IHME GBD)"
+          - "Central Latin America (IHME GBD)"
+          - "Andean Latin America (IHME GBD)"
+          - "Tropical Latin America (IHME GBD)"
+          - "Southern Latin America (IHME GBD)"
+          - "Western Europe (IHME GBD)"
+          - "Central Europe (IHME GBD)"
+          - "Eastern Europe (IHME GBD)"
+          - "Western Sub-Saharan Africa (IHME GBD)"
+          - "Central Sub-Saharan Africa (IHME GBD)"
+          - "Eastern Sub-Saharan Africa (IHME GBD)"
+          - "Southern Sub-Saharan Africa (IHME GBD)"
+          - "North Africa and Middle East (IHME GBD)"
+          - "Central Asia (IHME GBD)"
+          - "South Asia (IHME GBD)"
+          - "East Asia (IHME GBD)"
+          - "Southeast Asia (IHME GBD)"
+          - "High-income Asia Pacific (IHME GBD)"
+          - "Australasia (IHME GBD)"
+          - "Oceania (IHME GBD)"
+        origins:
+          - *origins_ihme_gbd
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                customCategoryLabels:
+                  "High-income North America (IHME GBD)": "High-income North America"
+                  "Caribbean (IHME GBD)": "Caribbean"
+                  "Central Latin America (IHME GBD)": "Central Latin America"
+                  "Andean Latin America (IHME GBD)": "Andean Latin America"
+                  "Tropical Latin America (IHME GBD)": "Tropical Latin America"
+                  "Southern Latin America (IHME GBD)": "Southern Latin America"
+                  "Western Europe (IHME GBD)": "Western Europe"
+                  "Central Europe (IHME GBD)": "Central Europe"
+                  "Eastern Europe (IHME GBD)": "Eastern Europe"
+                  "Western Sub-Saharan Africa (IHME GBD)": "Western Sub-Saharan Africa"
+                  "Central Sub-Saharan Africa (IHME GBD)": "Central Sub-Saharan Africa"
+                  "Eastern Sub-Saharan Africa (IHME GBD)": "Eastern Sub-Saharan Africa"
+                  "Southern Sub-Saharan Africa (IHME GBD)": "Southern Sub-Saharan Africa"
+                  "North Africa and Middle East (IHME GBD)": "North Africa and Middle East"
+                  "Central Asia (IHME GBD)": "Central Asia"
+                  "South Asia (IHME GBD)": "South Asia"
+                  "East Asia (IHME GBD)": "East Asia"
+                  "Southeast Asia (IHME GBD)": "Southeast Asia"
+                  "High-income Asia Pacific (IHME GBD)": "High-income Asia Pacific"
+                  "Australasia (IHME GBD)": "Australasia"
+                  "Oceania (IHME GBD)": "Oceania"
                 customHiddenCategories:
                   "No data": true
