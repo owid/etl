@@ -63,7 +63,12 @@ LINE_FAMILY = {"LineChart", "SlopeChart", "DiscreteBar", "Marimekko", "ScatterPl
 STACKED_FAMILY = {"StackedArea", "StackedBar", "StackedDiscreteBar"}
 # Chart types that draw bars/areas from a baseline — they need a ZERO y-axis min,
 # so a non-zero min tuned for the scatter must not be mirrored onto them.
-BAR_AREA_FAMILY = {"DiscreteBar", "Marimekko", "StackedArea", "StackedBar", "StackedDiscreteBar"}
+# DiscreteBar is deliberately NOT here: `DiscreteBarChart.yAxisConfig` hardcodes
+# `min: undefined` and anchors at `x0 = 0`, so it ignores `yAxis.min` outright ("the
+# author-configured minimum is usually intended for the line chart"). Withholding the
+# source's min from a DiscreteBar target protects nothing and costs the scatter a
+# well-fitted axis. Of the rest, only these override nothing and so really do respect it.
+BAR_AREA_FAMILY = {"Marimekko", "StackedArea", "StackedBar", "StackedDiscreteBar"}
 # Tabs that can ONLY show a single time (grapher's checkOnlySingleTimeSelectionPossible).
 # Dumbbell is deliberately excluded: it is single-time only with >=2 y indicators and needs
 # a RANGE with one, so treat it as range-capable.
@@ -325,6 +330,17 @@ def process_row(
             tgt_display["name"] = src_name
             tgt_y["display"] = tgt_display
             notes.append(f"y.display.name: {prev!r} → {src_name!r}")
+
+    # 7b) comparisonLines mirror. These are a scatter's reference lines (e.g. `yEquals: 1`
+    # for a ratio-to-a-benchmark indicator) and are usually the whole point of the source
+    # chart's framing, so losing them silently makes the migrated view say less than the
+    # chart it replaces. Only added when the target has none — never overwrite an existing
+    # set, same rule as the dimensions. `comparisonLines` is global config, but a reference
+    # line that is meaningful for the y indicator is meaningful on the line/bar views too.
+    src_lines = src_cfg.get("comparisonLines")
+    if src_lines and not cfg.get("comparisonLines"):
+        cfg["comparisonLines"] = src_lines
+        notes.append(f"comparisonLines mirrored from source: {json.dumps(src_lines)}")
 
     # 8) Warnings (no action)
     if not cfg.get("selectedEntityNames"):
