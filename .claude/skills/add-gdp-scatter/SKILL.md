@@ -120,7 +120,7 @@ The canonical items, in order:
 7. Build the review HTML (`build_review.py`) and hand it to the topic owner.
 8. Apply the reviewer's flagged notes; regenerate the HTML and re-import their JSON.
 9. Chart-diff sign-off on staging, then merge.
-10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. That is what happened to batch 1 (PR #6173) — deliberately, as it turned out: the `target_query_param` needed for Part 2 did not exist yet, so the batch was left unpushed and restarted later rather than half-migrated. Either way, check production directly rather than inferring it from the merge.
+10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. An abandoned first attempt (PR #6173, merged 2026-06-24) left production untouched on all seven of its pairs — deliberately: the `target_query_param` needed for Part 2 did not exist yet, so it was dropped and the migration restarted from scratch rather than left half-done. Whatever the reason, check production directly rather than inferring it from the merge.
 11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*. Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why.
 12. Narrative charts on the sources: replace where the parent is being retired (create → re-point articles → delete; never delete first).
 13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict.
@@ -212,7 +212,7 @@ The source charts are scatter-vs-GDP charts, so their title/subtitle/footnote de
 
 ```bash
 echo '<JSON>' | STAGING=1 .venv/bin/python \
-  .claude/skills/add-gdp-scatter/scripts/build_review.py --name scatter_batch2
+  .claude/skills/add-gdp-scatter/scripts/build_review.py --name scatter_batch1
 ```
 
 What it adds over the mdim reviewer, because the asymmetry here is different: on the left the scatter **was** the whole chart, on the right it is one tab among several. So every row makes the target's secondary status explicit — a `SECONDARY · tab N of M · opens on <tab>` badge, and the full tab list as chips with **★ on the tab readers actually land on** and the scatter highlighted. Watch for a default of **Map** or **Table**: grapher adds those outside `chartTypes`, so readers may not land on a chart tab at all.

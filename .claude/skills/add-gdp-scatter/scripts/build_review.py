@@ -30,7 +30,7 @@ Usage::
 
     echo '<JSON>' | STAGING=1 .venv/bin/python \\
         .claude/skills/add-gdp-scatter/scripts/build_review.py \\
-        [--name scatter_batch2] [--output ai/scatter_review.html]
+        [--name scatter_batch1] [--output ai/scatter_review.html]
 """
 
 import argparse
