@@ -147,6 +147,20 @@ def _impact_counts(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
     return {"charts": len(charts), "mdims": len(mdims)}
 
 
+def _view_label(view: ViewDiff, dimensions: list[dict[str, Any]]) -> str:
+    """Human-readable 'Choice · Choice · …' label for a view, in dimension order."""
+    parts = []
+    for dim in dimensions:
+        slug = view.dimensions.get(dim["slug"])
+        if slug is None:
+            continue
+        names = {c["slug"]: (c.get("name") or c["slug"]) for c in dim.get("choices", [])}
+        name = names.get(slug, slug)
+        if name and str(name).strip():
+            parts.append(str(name))
+    return " · ".join(parts) if parts else "(view)"
+
+
 def _clear_view_params() -> None:
     """Drop the previous MDIM's view-selector params when another MDIM is selected."""
     for key in list(st.query_params.keys()):
@@ -253,10 +267,45 @@ def render_view_diff_page(
     """The View diff page: MDIM controls as navigation + side-by-side text diffs."""
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
 
+    # --- Jump straight to a changed view -----------------------------------------
+    # Direct navigation to the changes, so the user doesn't have to hunt through the controls (the
+    # 🟡 dots below help once a dropdown is open, but this is the glance-able shortcut). Written via
+    # a callback because url_persist only reads the URL when a control's state is still empty.
+    changed_views = [v for v in view_diffs if v.changed]
+    if changed_views:
+
+        def _jump_to_changed() -> None:
+            raw = st.session_state.get("mdd_jump")
+            if raw in (None, ""):
+                return
+            target = changed_views[int(raw)]
+            for dim in dimensions:
+                slug = dim["slug"]
+                if slug in target.dimensions:
+                    st.session_state[DIM_PARAM_PREFIX + slug] = target.dimensions[slug]
+                    st.query_params[DIM_PARAM_PREFIX + slug] = target.dimensions[slug]
+
+        def _jump_label(i: Any) -> str:
+            if i == "":
+                return "Select a changed view…"
+            cv = changed_views[int(i)]
+            marker = "🆕" if cv.is_new else "🟡"
+            charts, mdims = _view_impact(cv, usage)
+            suffix = f"  —  ↗ {len(charts)} charts" if charts else ""
+            return f"{marker} {_view_label(cv, dimensions)}{suffix}"
+
+        st.selectbox(
+            f"⚡ Jump to a changed view ({len(changed_views)})",
+            options=[""] + list(range(len(changed_views))),
+            format_func=_jump_label,
+            key="mdd_jump",
+            on_change=_jump_to_changed,
+        )
+
     # --- MDIM controls (navigation across views) ---------------------------------
     st.caption("🟡 marks a control option that leads to a changed view — follow the dots to the changes.")
     selection: dict[str, str] = {}
-    columns = st.columns(min(4, max(1, len(dimensions))))
+    columns = st.columns(min(3, max(1, len(dimensions))))
     for i, dim in enumerate(dimensions):
         dim_slug = dim["slug"]
         key = DIM_PARAM_PREFIX + dim_slug
@@ -281,8 +330,10 @@ def render_view_diff_page(
             st.session_state.pop(key, None)
 
         def _fmt(slug, names=names, changed_choices=changed_choices):
+            # Prefix (not suffix) so the marker survives the selectbox's "…" truncation and shows
+            # in the collapsed box too.
             label = names.get(slug, slug)
-            return f"{label}  🟡" if slug in changed_choices else label
+            return f"🟡 {label}" if slug in changed_choices else label
 
         with columns[i % len(columns)]:
             selection[dim_slug] = url_persist(st.selectbox)(

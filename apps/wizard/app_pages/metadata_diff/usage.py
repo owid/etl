@@ -39,7 +39,6 @@ def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[in
             join charts c on c.id = cd.chartId
             join chart_configs cc on cc.id = c.configId
             where cd.variableId in ({placeholders})
-              and cd.property = 'y'
               and c.publishedAt is not null
             """,
             engine=engine,
