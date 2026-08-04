@@ -99,7 +99,7 @@ def render_affected_charts_html(
     is reused as every chart's hover tooltip. Links open each chart on this staging server, where
     the change is live. Returns (html, initial_height_px).
     """
-    no_dp_title = "Scatter / multi-indicator chart — no data page, so this text is not shown to readers here"
+    no_dp_title = "Multi-indicator chart — no data page, so this text is not shown to readers here"
     items = []
     for i, c in enumerate(charts):
         slug = c.get("slug")
@@ -124,14 +124,14 @@ def render_affected_charts_html(
         "server</b>. &nbsp;"
         f'<a href="{html.escape(chart_diff_url)}" target="_blank" rel="noopener">Open all in Chart Diff &#8599;</a></p>'
     )
-    note = "Charts always show the indicator’s own text — unlike MDim views, they can’t be overridden individually."
+    footnote = ""
     if n_no_dp:
         verb, plural = ("is a", "") if n_no_dp == 1 else ("are", "s")
         note = (
-            f"<b>&#9888; {n_no_dp}</b> of these {verb} scatter / multi-indicator chart{plural} with no data "
-            "page, so the change is <b>not shown to readers</b> there. " + note
+            f"<b>&#9888; {n_no_dp}</b> of these {verb} multi-indicator chart{plural} with no data page, so "
+            "the change is <b>not shown to readers</b> there."
         )
-    footnote = f'<p class="ac-note">{note}</p>'
+        footnote = f'<p class="ac-note">{note}</p>'
     pager_style = "" if paged else ' style="display:none"'
     pager = (
         f'<div class="ac-pager"{pager_style}>'
