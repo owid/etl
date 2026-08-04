@@ -10,7 +10,7 @@ Coal, oil and gas production come from (in priority order):
 - NIC / Fouquet UK historical energy, for United Kingdom coal before 1900.
 
 Etemad is prioritized over EIA for the pre-1965 fill so the historical series joins the Statistical
-Review without the step that EIA's (slightly higher) values would introduce at the 1965 splice.
+Review.
 
 The dataset also includes:
 - Consumption in energy units, combined from the same sources as production (Statistical Review,
@@ -38,6 +38,7 @@ MILLION_TONNES_TO_TONNES = 1e6
 TRILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e12
 BILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e9
 # A barrel is a volume unit, so barrels convert to cubic meters exactly (no density assumption).
+# From the National Institute of Standards and Technology's Guide for the Use of the International System of Units (SI), page 45 of https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication811e2008.pdf
 BARREL_TO_CUBIC_METERS = 0.1589873
 BILLION_BARRELS_TO_CUBIC_METERS = 1e9 * BARREL_TO_CUBIC_METERS
 # EIA reports oil trade and consumption in thousand barrels per day; convert to cubic meters per year.
@@ -133,12 +134,9 @@ def add_physical_production(tb: Table, tb_eia: Table) -> Table:
     """Add fossil fuel production in physical units, from EIA.
 
     Coal in tonnes, oil and gas in cubic meters. EIA reports coal in million tonnes, gas in billion
-    cubic meters, and crude oil in thousand barrels per day; all are converted to base units here so
-    grapher can apply magnitude prefixes itself. These units differ by fuel and cannot be summed across
-    fuels (unlike the energy-content series in terawatt-hours), so there is no cross-fuel total. EIA is
-    preferred over the Statistical Review here (as it already is for reserves and trade): it covers
-    roughly three times as many producing countries and matches the physical production previously
-    published in the fossil fuels explorer.
+    cubic meters, and crude oil in thousand barrels per day; all are converted to base units here.
+    These units differ by fuel and cannot be summed across fuels, so there is no cross-fuel total. EIA is
+    preferred over the Statistical Review here, as it covers significantly more producing countries.
     """
     tb_eia = tb_eia.reset_index()[
         ["country", "year", "coal_production_mt", "natural_gas_production", "crude_oil_production"]
@@ -160,11 +158,9 @@ def add_reserves(tb: Table, tb_eia: Table) -> Table:
     """Add fossil fuel proved reserves in physical units, from EIA.
 
     Coal in tonnes, oil and gas in cubic meters (oil is reported in billion barrels and converted
-    exactly, since barrels are a volume unit). Reserves are stored in base units so grapher can apply
-    magnitude prefixes itself. EIA is preferred over the Statistical Review for reserves: it covers
-    roughly three times as many countries, extends further (oil and gas through 2021, coal through
-    2023, versus 2020 for the Statistical Review, with coal for 2020 alone), and matches the numbers
-    previously published in the fossil fuels explorer.
+    exactly, since barrels are a volume unit). Reserves are stored in base units.
+    EIA is preferred over the Statistical Review for reserves, as it covers significantly more countries,
+    extends further, and matches the numbers previously published in the fossil fuels explorer.
     """
     columns = {
         "coal_reserves": "coal_reserves_mt",
