@@ -53,6 +53,24 @@ definitions:
 
     We chose 2012 as the junction because it is the first year covered by the administrative estimates, which the Office for National Statistics considers more accurate than the survey-based method used at the end of the Bank of England dataset. That dataset continues to 2016 using the older survey-based estimates; we discarded those years in favor of the administrative figures.
 
+  england_method: |-
+    This data is not a direct count of migrants — no migration records exist for most of this period. Wrigley and Schofield reconstructed England's population from the registers of baptisms and burials kept by Church of England parishes, and estimated net migration as a residual: the part of the change in population that births and deaths cannot explain.
+
+    Because it is a residual, the estimate counts everyone who crossed England's borders — including people who moved to or from Wales, Scotland, or Ireland, not only those who moved to or from other countries. It also absorbs any errors in the registration of baptisms and burials. England is defined here without Monmouthshire, which historical records grouped with Wales.
+
+    Negative values mean more people left England than arrived. The reconstruction shows a net outflow of people in every year from 1541 to 1870.
+
+    The original estimates are totals for five-year periods, which the Bank of England interpolated to annual values. Year-to-year changes are therefore smooth by construction, and the data is best read as showing broad levels and trends rather than what happened in any single year.
+
+  england_producer_note: |-
+    Net Emigration - England (excluding Monmouthshire). Source: Wrigley and Schofield (1989), interpolated quinquennial estimates. These estimates naturally cover migration flows to and from other parts of the UK as well as to overseas countries.
+
+  england_processing: |-
+    The source publishes this series as net emigration, where positive values mean more people leaving. We flipped the sign to show net migration, consistent with our United Kingdom indicators, and converted the figures from thousands of people to people.
+
+  england_processing_share: |-
+    The source publishes this series as net emigration per 1,000 people, where positive values mean more people leaving. We flipped the sign to show net migration, consistent with our United Kingdom indicators, and expressed the rate as a percentage of the population. The population estimates in the denominator come from the same reconstruction by Wrigley and Schofield.
+
   uk_processing_shares: |-
     We combined two sources into one series:
 
@@ -62,7 +80,7 @@ definitions:
     We chose 2012 as the junction because it is the first year covered by the administrative estimates, which the Office for National Statistics considers more accurate than the survey-based method used at the end of the Bank of England dataset. That dataset continues to 2016 using the older survey-based estimates; we discarded those years in favor of the administrative figures.
 
 dataset:
-  title: Long-run migration flows for the United Kingdom
+  title: Long-run migration flows for the United Kingdom and England
   update_period_days: 365
   owners:
     - Edouard Mathieu
@@ -162,6 +180,45 @@ tables:
         presentation:
           grapher_config:
             note: "{definitions.uk_net_sign}"
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 2
+          numDecimalPlaces: 2
+
+  england_net_migration:
+    title: Net migration to England
+    variables:
+      net_migration:
+        title: Net migration to England
+        unit: people
+        short_unit: ""
+        description_short: Estimated number of people moving to England each year, minus the number leaving. Negative values mean more people left than arrived.
+        description_key: |-
+          {definitions.england_method}
+        description_from_producer: "{definitions.england_producer_note}"
+        description_processing: "{definitions.england_processing}"
+        processing_level: minor
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - England
+        display:
+          numDecimalPlaces: 0
+
+      net_migration_share_of_population:
+        title: Net migration to England as a share of the population
+        unit: "%"
+        short_unit: "%"
+        description_short: Estimated number of people moving to England each year, minus the number leaving, as a share of the population. Negative values mean more people left than arrived.
+        description_key: |-
+          {definitions.england_method}
+        description_from_producer: "{definitions.england_producer_note}"
+        description_processing: "{definitions.england_processing_share}"
+        processing_level: minor
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - England
         display:
           roundingMode: significantFigures
           numSignificantFigures: 2

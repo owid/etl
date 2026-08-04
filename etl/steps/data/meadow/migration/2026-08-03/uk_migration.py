@@ -8,6 +8,9 @@
   immigration, emigration and net migration built from administrative data, covering rolling
   12-month periods from the year ending June 2012 to the year ending December 2025. We keep the
   year-ending-December periods, which correspond to calendar years.
+- Bank of England workbook, sheet A19c: net emigration from England (excluding Monmouthshire),
+  1541-1870, in thousands and per 1,000 people, from Wrigley and Schofield's parish-register
+  reconstruction as interpolated to annual values by the Bank of England.
 """
 
 import pandas as pd
@@ -62,6 +65,30 @@ def parse_bank_of_england(snap: Snapshot) -> Table:
     return tb
 
 
+def parse_england(snap: Snapshot) -> Table:
+    """Parse sheet A19c: net emigration from England, 1541-1870."""
+    tb = snap.read_excel(sheet_name="A19c. English Net Migration", header=None, skiprows=7)
+    tb = tb[[0, 1, 2]]
+    # Renaming integer column labels scrambles column-level metadata, so restore it explicitly.
+    columns = {0: "year", 1: "net_emigration", 2: "net_emigration_per_1000"}
+    metadata = {name: tb[index].metadata.copy() for index, name in columns.items()}
+    tb = tb.rename(columns=columns)
+    for name, meta in metadata.items():
+        tb[name].metadata = meta
+
+    tb = tb[pd.to_numeric(tb["year"], errors="coerce").notna()]
+    tb["year"] = tb["year"].astype(int)
+    for col in ["net_emigration", "net_emigration_per_1000"]:
+        tb[col] = pr.to_numeric(tb[col], errors="coerce")
+    tb = tb.dropna(subset=["net_emigration"])
+
+    assert tb["year"].min() == 1541 and tb["year"].max() == 1870, "Expected coverage 1541-1870."
+    assert len(tb) == 330, "Expected a continuous annual series (330 years)."
+    # Spot-check the first value of Wrigley and Schofield's series (in thousands).
+    assert abs(tb.loc[tb["year"] == 1541, "net_emigration"].item() - 3.3928) < 1e-6
+    return tb
+
+
 def parse_ons(snap: Snapshot) -> Table:
     """Parse Table 1 of the ONS spreadsheet: keep all-nationalities flows for calendar years."""
     tb = snap.read_excel(sheet_name="1", header=None, skiprows=6)
@@ -110,6 +137,7 @@ def run() -> None:
     #
     tb_boe = parse_bank_of_england(snap_boe)
     tb_ons = parse_ons(snap_ons)
+    tb_england = parse_england(snap_boe)
 
     #
     # Save outputs.
@@ -118,6 +146,7 @@ def run() -> None:
         tables=[
             tb_boe.format(["year"], short_name="bank_of_england_flows"),
             tb_ons.format(["year"], short_name="ons_flows"),
+            tb_england.format(["year"], short_name="england_net_migration"),
         ],
         default_metadata=snap_boe.metadata,
     )

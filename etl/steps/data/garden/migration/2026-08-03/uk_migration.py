@@ -42,6 +42,14 @@ def sanity_check_inputs(tb_boe: Table, tb_ons: Table) -> None:
     assert 1 < ons_2012["immigration"] / (boe_2012["immigration"] * 1000) < 1.5, "Unexpected gap at the 2012 join."
 
 
+def sanity_check_england(tb: Table) -> None:
+    assert not tb["year"].duplicated().any(), "Duplicate years in the England table."
+    assert len(tb) == 330, "Expected 330 years of England data."
+    # Wrigley and Schofield's reconstruction shows a net outflow (negative net migration) in every year.
+    assert (tb["net_migration"] < 0).all(), "Unexpected net inflow year in the England series."
+    assert tb["net_migration_share_of_population"].between(-0.5, 0).all(), "Share outside the plausible range."
+
+
 def sanity_check_outputs(tb: Table) -> None:
     assert not tb["year"].duplicated().any(), "Duplicate years."
     t = tb.set_index("year")
@@ -72,6 +80,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("uk_migration")
     tb_boe = ds_meadow.read("bank_of_england_flows")
     tb_ons = ds_meadow.read("ons_flows")
+    tb_england = ds_meadow.read("england_net_migration")
 
     sanity_check_inputs(tb_boe, tb_ons)
 
@@ -100,10 +109,24 @@ def run() -> None:
 
     sanity_check_outputs(tb)
 
-    tb = tb.format(["country", "year"], short_name="uk_migration_flows")
+    # England, 1541-1870: the source publishes net emigration (positive = people leaving). Flip the
+    # sign to net migration, consistent with the UK indicators, and express the source's per-1,000
+    # rate as a percentage share of the population.
+    tb_england["country"] = "England"
+    tb_england["net_migration"] = -tb_england["net_emigration"] * 1000
+    tb_england["net_migration_share_of_population"] = -tb_england["net_emigration_per_1000"] / 10
+    tb_england = tb_england.drop(columns=["net_emigration", "net_emigration_per_1000"])
+
+    sanity_check_england(tb_england)
 
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[
+            tb.format(["country", "year"], short_name="uk_migration_flows"),
+            tb_england.format(["country", "year"], short_name="england_net_migration"),
+        ],
+        default_metadata=ds_meadow.metadata,
+    )
     ds_garden.save()
