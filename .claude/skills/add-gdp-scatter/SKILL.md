@@ -22,9 +22,11 @@ https://admin.owid.io/admin/charts/6305/edit	https://admin.owid.io/admin/charts/
 - `chart_admin_url` — the existing reference scatter chart used as the source of parity hints (yAxis log, y `display.name`, color/size override, tolerance, exclusions).
 - `target_chart_admin_url` — the chart the user wants to gain a scatter view.
 - `gdp_source` — one of (case-insensitive, substring matches accepted):
-  - `World Bank` / `WDI` → variableId `1204826`
+  - `World Bank` / `WDI` → variableId `1294305` (WDI 2026-07-27)
   - `Maddison` / `Maddison Project Database` → `900793`
   - `PWT` / `Penn World Table` → `1108541`
+
+  `GDP_SOURCES` in the script is the authority on these ids; the WDI one goes stale on every WDI update — see the version check below.
 
 The admin host that gets written to is `OWID_ENV.admin_api`, which auto-resolves to `staging-site-<branch>` on a feature branch. Confirm the branch before running.
 
@@ -63,7 +65,20 @@ Push uses `apps.chart_sync.admin_api.AdminAPI.update_chart(id, cfg)`.
 
 1. **Parse the pasted table** into a JSON list, one object per row with keys `chart_admin_url`, `target_chart_admin_url`, `gdp_source`. Strip the header. Accept tab- or comma- separated.
 
-2. **Run the script**, piping the JSON via stdin:
+2. **Pre-flight every row before writing anything** with `scripts/preflight_targets.py`. The applier does not validate that a target *can* take a scatter view — it returns `OK` on rows that change nothing useful — so this check has to happen first:
+
+   ```bash
+   echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/preflight_targets.py
+   ```
+
+   It reads each target's **production** config (the state a staging DB was cloned from, so the baseline holds even if an earlier run already touched staging) and checks the four conditions from "Picking targets": published, not already a `ScatterPlot`, not stacked-family, exactly one `y` dimension, and that `y` is the source's non-GDP indicator. Report the blocked rows to the user and drop them. Add `--emit` to pipe the runnable subset straight into the applier:
+
+   ```bash
+   echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/preflight_targets.py --emit \
+     | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/apply_scatter_defaults.py
+   ```
+
+3. **Run the script**, piping the JSON via stdin:
 
    ```bash
    echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/apply_scatter_defaults.py
@@ -74,9 +89,9 @@ Push uses `apps.chart_sync.admin_api.AdminAPI.update_chart(id, cfg)`.
    - **PER-ROW ACTIONS** — `chart`, `src`, `gdp_source`, `status`, `notes`. Statuses: `OK`, `SKIPPED` (e.g. stacked-family chart), `FAIL`, `ERR_PUT`, `ERROR`.
    - **Y-DIM DISPLAY NAMES** — `chart`, `varId`, manual `display.name` (on chart), ETL `display.name` (from `variables.display`), catalog `variable.name`. Only populated for `OK` rows.
 
-3. **Show both tables to the user** verbatim (or formatted as markdown).
+4. **Show both tables to the user** verbatim (or formatted as markdown).
 
-4. **Follow up on display names.** Where a target ended up with a manual `display.name` but the ETL variable already defines a reasonable one (or `variable.name` is clean), use `AskUserQuestion` to let the user pick which manual overrides to drop. Then run a small inline Python block to delete the `name` key from `display` on each chosen chart (preserving `unit`/`shortUnit`/etc.), via the same `AdminAPI.update_chart` flow.
+5. **Follow up on display names.** Where a target ended up with a manual `display.name` but the ETL variable already defines a reasonable one (or `variable.name` is clean), use `AskUserQuestion` to let the user pick which manual overrides to drop. Then run a small inline Python block to delete the `name` key from `display` on each chosen chart (preserving `unit`/`shortUnit`/etc.), via the same `AdminAPI.update_chart` flow.
 
 ## Edge cases
 
@@ -123,6 +138,16 @@ The source charts are scatter-vs-GDP charts, so their title/subtitle/footnote de
 
 - Open `OWID_ENV.chart_site(slug)` for one of the targets and switch to the Scatter tab.
 - Re-run the same input. The script is idempotent — all changes are guarded by "if absent" / "if not equal" checks; a second run should print `OK` with empty / minimal notes.
+- Confirm every target got the **current** GDP id on `x` (`GDP_SOURCES`), not a stale one carried over from an earlier run.
+
+### An admin write drops an empty `colorScale`, which chart-diff then reports
+
+`configs_are_equal` compares the whole config minus `id`, `isPublished`, `bakedGrapherURL`, `adminBaseUrl`, `dataApiUrl` and `version` — so **`colorScale` is compared**. The admin API normalizes an empty `colorScale: {}` to null and drops the key on *any* write, and pushing `{}` back does not stick (verified — it re-normalizes). A target whose production config has `colorScale: {}` therefore shows an extra "colorScale removed" line in its chart-diff forever after being touched.
+
+Two consequences worth knowing before someone reports it as a bug:
+
+- It is cosmetic. Nothing renders differently, and **`colorScale` with real content is preserved** — e.g. `customHiddenCategories` survived intact on a Marimekko target.
+- **Reverting a chart on staging does not remove it from chart-diff.** The revert is itself an admin write, so a chart restored to its exact production config still appears, differing only by the dropped `colorScale`. If a reverted chart shows up with no visible change, this is why — check `colorScale` before hunting for a real difference.
 
 ## Part 2: retire the old standalone scatter charts
 
