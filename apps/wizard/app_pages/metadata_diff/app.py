@@ -27,6 +27,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELDS,
     METADATA_FIELDS,
     ViewDiff,
+    as_bullets,
     diff_views,
     field_label,
     inline_diff_html,
@@ -179,6 +180,9 @@ def _view_url(env, catalog_path: str, published_slug: str | None, dims: dict[str
 
 def _render_text_html(value: Any, other: Any, side: str) -> str:
     """One side of the side-by-side diff, with word-level highlights against the other side."""
+    # Reflect the field's real structure: a description_key stored as a "- a\n- b" markdown string
+    # (or a JSON list) renders as bullets; genuine prose renders as prose.
+    value, other = as_bullets(value), as_bullets(other)
     old, new = (other, value) if side == "new" else (value, other)
 
     def _one(o: Any, n: Any) -> str:
@@ -224,7 +228,7 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
 
     if n_c == 0 and n_m == 0:
         st.info(
-            "↗ This change is in the **shared indicator metadata**, but no published charts or other "
+            "This change is in the **shared indicator metadata**, but no published charts or other "
             "MDims currently use this indicator — so nothing else is affected."
         )
         return
@@ -234,26 +238,40 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
         parts.append(f"**{n_c}** chart{'s' if n_c != 1 else ''}")
     if n_m:
         parts.append(f"**{n_m}** other MDim{'s' if n_m != 1 else ''}")
-    st.warning(
-        "↗ This change is in the **shared indicator metadata** — it also affects "
-        + " and ".join(parts)
-        + " that use this indicator."
-    )
 
-    with st.expander(f"Show the {n_c + n_m} affected surface{'s' if (n_c + n_m) != 1 else ''}"):
-        if charts:
-            chart_diff_url = f"{SOURCE.wizard_url}/chart-diff?diff-type=charts&indicator_id={view.indicator_id}"
-            st.markdown(f"**Charts** — [open all {n_c} in Chart Diff ↗]({chart_diff_url})")
-            for c in charts:
-                label = c.get("title") or c.get("slug") or f"chart {c.get('chartId')}"
-                if c.get("slug"):
-                    st.markdown(f"- [{label}]({SOURCE.site}/grapher/{c['slug']})")
-                else:
-                    st.markdown(f"- {label}")
-        if mdims:
-            st.markdown(f"**Other MDims** ({n_m})")
-            for m in mdims:
-                st.markdown(f"- `{m.get('catalogPath')}`")
+    # Warning triangle + the message, with a button (popover) right next to it that reveals the list.
+    col_msg, col_btn = st.columns([5, 2], vertical_alignment="center")
+    with col_msg:
+        st.markdown(
+            "⚠️ This change is in the **shared indicator metadata** — it also affects "
+            + " and ".join(parts)
+            + " that use this indicator."
+        )
+    with col_btn:
+        btn_label = (
+            f"📊 Show {n_c} affected chart{'s' if n_c != 1 else ''}"
+            if n_c
+            else f"🧭 Show {n_m} affected MDim{'s' if n_m != 1 else ''}"
+        )
+        with st.popover(btn_label, use_container_width=True):
+            _render_affected_lists(view.indicator_id, charts, mdims)
+
+
+def _render_affected_lists(indicator_id: int | None, charts: list[dict], mdims: list[dict]) -> None:
+    """The lists of affected charts / other MDims shown inside the popover."""
+    if charts:
+        chart_diff_url = f"{SOURCE.wizard_url}/chart-diff?diff-type=charts&indicator_id={indicator_id}"
+        st.markdown(f"**Charts ({len(charts)})** — [open all in Chart Diff ↗]({chart_diff_url})")
+        for c in charts:
+            label = c.get("title") or c.get("slug") or f"chart {c.get('chartId')}"
+            if c.get("slug"):
+                st.markdown(f"- [{label}]({SOURCE.site}/grapher/{c['slug']})")
+            else:
+                st.markdown(f"- {label}")
+    if mdims:
+        st.markdown(f"**Other MDims ({len(mdims)})**")
+        for m in mdims:
+            st.markdown(f"- `{m.get('catalogPath')}`")
 
 
 def render_view_diff_page(
@@ -376,7 +394,7 @@ def render_view_diff_page(
     for field_name in changed_fields:
         change = view.fields[field_name]
         shared = field_name in view.indicator_changed_fields
-        tag = " · :orange[↗ shared — also on charts / other MDims]" if shared else " · :gray[MDim-only]"
+        tag = " · :orange[shared — also on charts / other MDims]" if shared else " · :gray[MDim-only]"
         st.markdown(f"##### {field_label(field_name)}{tag}")
         col_old, col_new = st.columns(2)
         with col_old:

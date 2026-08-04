@@ -163,6 +163,23 @@ def build_view_bundle(
     return ViewBundle(dimensions=view["dimensions"], metadata=merged, chart=chart, base=base, indicator_id=indicator_id)
 
 
+def as_bullets(value: Any) -> Any:
+    """Normalize a value to a bullet list when it is one, so it can be rendered structurally.
+
+    `variables.descriptionKey` reaches us either as a JSON list OR as a single markdown string
+    with bullets joined by "\\n- " (how the grapher channel serializes multi-bullet keys). Return a
+    list of bullet strings when the value is a bullet list in either form; leave genuine prose
+    (and non-strings) untouched, so the renderer shows bullets as bullets and prose as prose.
+    """
+    if isinstance(value, list):
+        return value
+    if isinstance(value, str):
+        lines = [line.strip() for line in value.splitlines() if line.strip()]
+        if lines and all(line.startswith("- ") for line in lines):
+            return [line[2:].strip() for line in lines]
+    return value
+
+
 def _dims_key(dimensions: dict[str, str]) -> tuple[tuple[str, str], ...]:
     return tuple(sorted(dimensions.items()))
 
@@ -281,7 +298,7 @@ def diff_preview_html(view_diff: ViewDiff, max_fields: int = 3, max_chars: int =
 
     blocks = []
     for field_name, change in list(view_diff.fields.items())[:max_fields]:
-        old, new = change["old"], change["new"]
+        old, new = as_bullets(change["old"]), as_bullets(change["new"])
         if isinstance(old, list) or isinstance(new, list):
             old_list = old if isinstance(old, list) else [old]
             new_list = new if isinstance(new, list) else [new]
