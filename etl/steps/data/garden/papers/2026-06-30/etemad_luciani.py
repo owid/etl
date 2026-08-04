@@ -1,8 +1,5 @@
 """Garden step for Etemad & Luciani's historical energy production data (1900-1979).
 
-Harmonizes country names and converts fossil fuel production from million tonnes of oil equivalent
-(Mtoe) to terawatt-hours. Used to extend fossil fuel production before the Statistical Review and EIA
-coverage begins.
 """
 
 from etl.helpers import PathFinder
