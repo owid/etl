@@ -5,9 +5,11 @@ environments being compared (staging = "source", production = "target"). Read-on
 """
 
 import json
+from datetime import datetime, timezone
 from typing import Any
 
 import pandas as pd
+from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from structlog import get_logger
 
@@ -15,6 +17,82 @@ from apps.wizard.app_pages.metadata_diff.core import METADATA_FIELDS, ViewBundle
 from etl.db import read_sql
 
 log = get_logger()
+
+
+# --- Review persistence -------------------------------------------------------------------------
+# A self-contained app-state table on the staging (source) DB, so review decisions are durable and
+# shared across sessions/reviewers — analogous to `chart_diff_approvals`. Lives on the branch's
+# staging DB, so it is inherently branch-scoped (no branch column needed).
+_REVIEW_TABLE_DDL = """
+CREATE TABLE IF NOT EXISTS metadata_review (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    catalogPath VARCHAR(500) NOT NULL,
+    changeKey VARCHAR(64) NOT NULL,
+    contentHash VARCHAR(64) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    comment TEXT,
+    reviewer VARCHAR(255),
+    updatedAt DATETIME NOT NULL,
+    UNIQUE KEY uniq_change_key (changeKey),
+    KEY idx_catalog (catalogPath)
+)
+"""
+
+
+def _ensure_review_table(engine: Engine) -> None:
+    with engine.begin() as con:
+        con.execute(text(_REVIEW_TABLE_DDL))
+
+
+def load_reviews(engine: Engine, catalog_path: str) -> dict[str, dict[str, Any]]:
+    """Persisted review rows for one MDim, keyed by changeKey (contentHash binds each to its text)."""
+    _ensure_review_table(engine)
+    df = read_sql(
+        "select changeKey, contentHash, status, comment, reviewer, updatedAt "
+        "from metadata_review where catalogPath = %(cp)s",
+        engine=engine,
+        params={"cp": catalog_path},
+    )
+    return {str(r["changeKey"]): {str(k): v for k, v in r.to_dict().items()} for _, r in df.iterrows()}
+
+
+def upsert_review(
+    engine: Engine,
+    catalog_path: str,
+    change_key: str,
+    content_hash: str,
+    status: str,
+    comment: str | None,
+    reviewer: str | None,
+) -> None:
+    """Record a decision, bound to the current contentHash (a later text edit makes it stale)."""
+    _ensure_review_table(engine)
+    with engine.begin() as con:
+        con.execute(
+            text(
+                "insert into metadata_review "
+                "(catalogPath, changeKey, contentHash, status, comment, reviewer, updatedAt) "
+                "values (:cp, :ck, :ch, :st, :cm, :rv, :ts) "
+                "on duplicate key update contentHash=values(contentHash), status=values(status), "
+                "comment=values(comment), reviewer=values(reviewer), updatedAt=values(updatedAt)"
+            ),
+            {
+                "cp": catalog_path,
+                "ck": change_key,
+                "ch": content_hash,
+                "st": status,
+                "cm": comment,
+                "rv": reviewer,
+                "ts": datetime.now(timezone.utc),
+            },
+        )
+
+
+def delete_review(engine: Engine, change_key: str) -> None:
+    """Reset a change back to Pending (remove its row)."""
+    _ensure_review_table(engine)
+    with engine.begin() as con:
+        con.execute(text("delete from metadata_review where changeKey = :ck"), {"ck": change_key})
 
 
 def get_mdim_changes(source_engine: Engine, target_engine: Engine) -> pd.DataFrame:

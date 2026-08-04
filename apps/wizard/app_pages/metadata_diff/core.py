@@ -10,6 +10,7 @@ and "target" (production, i.e. the baseline), matching chart-diff's naming.
 """
 
 import difflib
+import hashlib
 import html
 import json
 from dataclasses import dataclass, field
@@ -328,6 +329,20 @@ def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
                 if g.indicator_id is None:
                     g.indicator_id = v.indicator_id
     return sorted((groups[k] for k in order), key=lambda g: (-len(g.view_dims), g.field))
+
+
+def change_group_identity(catalog_path: str, group: ChangeGroup) -> tuple[str, str]:
+    """Stable ``(change_key, content_hash)`` for a change group — the review lock-in identity.
+
+    ``change_key`` identifies the *slot* (this MDim, this field, this set of views) so a stored review
+    can be found again; ``content_hash`` binds it to the exact old→new text, so ANY later edit makes the
+    stored review stale — it no longer matches — and forces a re-review. This mirrors how Chart Diff
+    binds an approval to a chart's ``sourceUpdatedAt``/``targetUpdatedAt``.
+    """
+    dims_sig = json.dumps(sorted(json.dumps(d, sort_keys=True) for d in group.view_dims))
+    change_key = hashlib.sha256(f"{catalog_path}\x1f{group.field}\x1f{dims_sig}".encode()).hexdigest()
+    content_hash = hashlib.sha256(json.dumps([group.old, group.new], sort_keys=True, default=str).encode()).hexdigest()
+    return change_key, content_hash
 
 
 # ---------------------------------------------------------------------------

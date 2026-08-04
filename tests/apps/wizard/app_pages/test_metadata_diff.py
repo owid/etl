@@ -8,6 +8,7 @@ override (contained to the MDIM).
 from apps.wizard.app_pages.metadata_diff.core import (
     ViewDiff,
     build_view_bundle,
+    change_group_identity,
     diff_views,
     group_changes,
     override_snippet,
@@ -156,6 +157,21 @@ def test_group_changes_collapses_shared_text_and_ranks_by_reach():
     assert top.field == "descriptionKey" and len(top.view_dims) == 2
     assert top.affects_indicator and top.indicator_id == 10
     assert groups[1].field == "descriptionShort" and not groups[1].affects_indicator
+
+
+def test_change_group_identity_is_content_bound():
+    """Lock-in: same slot keeps its change_key, but any text edit changes content_hash (→ stale)."""
+    base = dict(dimensions={"m": "mean"}, indicator_id=10, indicator_changed_fields={"descriptionKey"})
+    [g1] = group_changes([ViewDiff(fields={"descriptionKey": {"old": ["a"], "new": ["a", "NEW"]}}, **base)])
+    [g2] = group_changes([ViewDiff(fields={"descriptionKey": {"old": ["a"], "new": ["a", "NEW"]}}, **base)])
+    [g3] = group_changes([ViewDiff(fields={"descriptionKey": {"old": ["a"], "new": ["a", "EDITED"]}}, **base)])
+
+    k1, h1 = change_group_identity("grapher/x/mdim", g1)
+    k2, h2 = change_group_identity("grapher/x/mdim", g2)
+    k3, h3 = change_group_identity("grapher/x/mdim", g3)
+
+    assert (k1, h1) == (k2, h2)  # identical change → identical identity (approval persists)
+    assert k3 == k1 and h3 != h1  # edited text → same slot key, new hash → stored approval goes stale
 
 
 def test_indicator_ids_in_mdim_config_scans_all_axes():
