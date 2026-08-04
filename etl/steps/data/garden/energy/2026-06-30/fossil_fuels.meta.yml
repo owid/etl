@@ -24,363 +24,485 @@ tables:
         short_unit: kWh
         display:
           name: Coal
+        presentation:
+          title_public: Coal consumption per capita
       coal_consumption_per_capita_tonnes:
         title: Coal consumption per capita (tonnes)
         unit: tonnes per person
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal consumption per capita (tonnes)
       coal_consumption_tonnes:
         title: Coal consumption (tonnes)
         unit: tonnes
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal consumption (tonnes)
       coal_consumption_twh:
         title: Coal consumption
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Coal
+        presentation:
+          title_public: Coal consumption
       coal_exports_per_capita_tonnes:
         title: Coal exports per capita
         unit: tonnes per person
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal exports per capita
       coal_exports_tonnes:
         title: Coal exports
         unit: tonnes
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal exports
       coal_imports_per_capita_tonnes:
         title: Coal imports per capita
         unit: tonnes per person
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal imports per capita
       coal_imports_tonnes:
         title: Coal imports
         unit: tonnes
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal imports
       coal_net_imports_per_capita_tonnes:
         title: Coal net imports per capita
         unit: tonnes per person
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal net imports per capita
       coal_net_imports_tonnes:
         title: Coal net imports
         unit: tonnes
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal net imports
       coal_production_annual_change_pct:
         title: Annual change in coal production (%)
         unit: '%'
         short_unit: '%'
         display:
           name: Coal
+        presentation:
+          title_public: Annual change in coal production (%)
       coal_production_annual_change_twh:
         title: Annual change in coal production
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Coal
+        presentation:
+          title_public: Annual change in coal production
       coal_production_per_capita_kwh:
         title: Coal production per capita
         unit: kilowatt-hours per person
         short_unit: kWh
         display:
           name: Coal
+        presentation:
+          title_public: Coal production per capita
       coal_production_per_capita_tonnes:
         title: Coal production per capita (tonnes)
         unit: tonnes per person
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal production per capita (tonnes)
       coal_production_tonnes:
         title: Coal production (tonnes)
         unit: tonnes
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal production (tonnes)
       coal_production_twh:
         title: Coal production
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Coal
+        presentation:
+          title_public: Coal production
       coal_reserves_per_capita_tonnes:
         title: Coal reserves per capita
         unit: tonnes per person
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal reserves per capita
       coal_reserves_to_production_ratio:
         title: Coal reserves-to-production ratio
         unit: years
         short_unit: years
         display:
           name: Coal
+        presentation:
+          title_public: Coal reserves-to-production ratio
       coal_reserves_tonnes:
         title: Coal reserves
         unit: tonnes
         short_unit: t
         display:
           name: Coal
+        presentation:
+          title_public: Coal reserves
       gas_consumption_m3:
         title: Gas consumption (cubic meters)
         unit: cubic meters
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas consumption (cubic meters)
       gas_consumption_per_capita_kwh:
         title: Gas consumption per capita
         unit: kilowatt-hours per person
         short_unit: kWh
         display:
           name: Gas
+        presentation:
+          title_public: Gas consumption per capita
       gas_consumption_per_capita_m3:
         title: Gas consumption per capita (cubic meters)
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas consumption per capita (cubic meters)
       gas_consumption_twh:
         title: Gas consumption
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Gas
+        presentation:
+          title_public: Gas consumption
       gas_exports_m3:
         title: Gas exports
         unit: cubic meters
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas exports
       gas_exports_per_capita_m3:
         title: Gas exports per capita
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas exports per capita
       gas_imports_m3:
         title: Gas imports
         unit: cubic meters
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas imports
       gas_imports_per_capita_m3:
         title: Gas imports per capita
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas imports per capita
       gas_net_imports_m3:
         title: Gas net imports
         unit: cubic meters
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas net imports
       gas_net_imports_per_capita_m3:
         title: Gas net imports per capita
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas net imports per capita
       gas_production_annual_change_pct:
         title: Annual change in gas production (%)
         unit: '%'
         short_unit: '%'
         display:
           name: Gas
+        presentation:
+          title_public: Annual change in gas production (%)
       gas_production_annual_change_twh:
         title: Annual change in gas production
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Gas
+        presentation:
+          title_public: Annual change in gas production
       gas_production_m3:
         title: Gas production (cubic meters)
         unit: cubic meters
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas production (cubic meters)
       gas_production_per_capita_kwh:
         title: Gas production per capita
         unit: kilowatt-hours per person
         short_unit: kWh
         display:
           name: Gas
+        presentation:
+          title_public: Gas production per capita
       gas_production_per_capita_m3:
         title: Gas production per capita (cubic meters)
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas production per capita (cubic meters)
       gas_production_twh:
         title: Gas production
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Gas
+        presentation:
+          title_public: Gas production
       gas_reserves_m3:
         title: Gas reserves
         unit: cubic meters
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas reserves
       gas_reserves_per_capita_m3:
         title: Gas reserves per capita
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Gas
+        presentation:
+          title_public: Gas reserves per capita
       gas_reserves_to_production_ratio:
         title: Gas reserves-to-production ratio
         unit: years
         short_unit: years
         display:
           name: Gas
+        presentation:
+          title_public: Gas reserves-to-production ratio
       oil_consumption_m3:
         title: Oil consumption (cubic meters)
         unit: cubic meters
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil consumption (cubic meters)
       oil_consumption_per_capita_kwh:
         title: Oil consumption per capita
         unit: kilowatt-hours per person
         short_unit: kWh
         display:
           name: Oil
+        presentation:
+          title_public: Oil consumption per capita
       oil_consumption_per_capita_m3:
         title: Oil consumption per capita (cubic meters)
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil consumption per capita (cubic meters)
       oil_consumption_twh:
         title: Oil consumption
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Oil
+        presentation:
+          title_public: Oil consumption
       oil_exports_m3:
         title: Oil exports
         unit: cubic meters
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil exports
       oil_exports_per_capita_m3:
         title: Oil exports per capita
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil exports per capita
       oil_imports_m3:
         title: Oil imports
         unit: cubic meters
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil imports
       oil_imports_per_capita_m3:
         title: Oil imports per capita
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil imports per capita
       oil_net_imports_m3:
         title: Oil net imports
         unit: cubic meters
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil net imports
       oil_net_imports_per_capita_m3:
         title: Oil net imports per capita
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil net imports per capita
       oil_production_annual_change_pct:
         title: Annual change in oil production (%)
         unit: '%'
         short_unit: '%'
         display:
           name: Oil
+        presentation:
+          title_public: Annual change in oil production (%)
       oil_production_annual_change_twh:
         title: Annual change in oil production
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Oil
+        presentation:
+          title_public: Annual change in oil production
       oil_production_m3:
         title: Oil production (cubic meters)
         unit: cubic meters
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil production (cubic meters)
       oil_production_per_capita_kwh:
         title: Oil production per capita
         unit: kilowatt-hours per person
         short_unit: kWh
         display:
           name: Oil
+        presentation:
+          title_public: Oil production per capita
       oil_production_per_capita_m3:
         title: Oil production per capita (cubic meters)
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil production per capita (cubic meters)
       oil_production_twh:
         title: Oil production
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Oil
+        presentation:
+          title_public: Oil production
       oil_reserves_m3:
         title: Oil reserves
         unit: cubic meters
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil reserves
       oil_reserves_per_capita_m3:
         title: Oil reserves per capita
         unit: cubic meters per person
         short_unit: m³
         display:
           name: Oil
+        presentation:
+          title_public: Oil reserves per capita
       oil_reserves_to_production_ratio:
         title: Oil reserves-to-production ratio
         unit: years
         short_unit: years
         display:
           name: Oil
+        presentation:
+          title_public: Oil reserves-to-production ratio
       total_consumption_per_capita_kwh:
         title: Fossil fuel consumption per capita
         unit: kilowatt-hours per person
         short_unit: kWh
         display:
           name: Fossil fuels
+        presentation:
+          title_public: Fossil fuel consumption per capita
       total_consumption_twh:
         title: Fossil fuel consumption
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Fossil fuels
+        presentation:
+          title_public: Fossil fuel consumption
       total_production_per_capita_kwh:
         title: Fossil fuel production per capita
         unit: kilowatt-hours per person
         short_unit: kWh
         display:
           name: Fossil fuels
+        presentation:
+          title_public: Fossil fuel production per capita
       total_production_twh:
         title: Fossil fuel production
         unit: terawatt-hours
         short_unit: TWh
         display:
           name: Fossil fuels
+        presentation:
+          title_public: Fossil fuel production
