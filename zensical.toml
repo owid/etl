@@ -35,6 +35,7 @@ nav = [
             { "Publish indicator metadata" = "guides/data-work/create-gsheet.md" },
             { "Wizard" = "guides/wizard.md" },
             { "AI workflow" = "guides/data-work/ai-workflow.md" },
+            { "Claude Code on the web" = "guides/data-work/claude-code-web.md" },
             { "CLI" = "guides/etl-cli.md" },
         ] },
         { "Other tasks" = [
