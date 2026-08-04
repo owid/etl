@@ -436,7 +436,7 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
         "Multi-indicator charts (scatters) have no data page, so their WYSK isn't shown to readers.",
     )
     if not ref:
-        st.info("Enter a chart slug, id, or grapher URL to review its data-page text.")
+        st.info("Enter a chart slug, ID, or grapher URL.")
         return
 
     src = build_chart_bundle(source_engine, ref)
@@ -505,7 +505,7 @@ def main() -> None:
         options=["mdim", "chart"],
         format_func=lambda x: {
             "mdim": ":material/dashboard: MDim",
-            "chart": ":material/show_chart: Individual chart",
+            "chart": ":material/show_chart: Charts",
         }[x],
         key="target",
         value="mdim",
