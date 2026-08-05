@@ -29,6 +29,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELDS,
     METADATA_FIELDS,
     OVERRIDE_TARGET,
+    ChangeGroup,
     ViewDiff,
     as_bullets,
     change_group_identity,
@@ -421,8 +422,22 @@ def _render_diff_body(
 
 
 def _reviewer() -> str | None:
-    """Best-effort identity of the person signing off (for the audit trail)."""
-    return os.getenv("GITHUB_USER") or os.getenv("USER") or None
+    """Identity of the person signing off (audit trail) — the name set in the sidebar, if any."""
+    return (st.session_state.get("mdd_reviewer") or "").strip() or None
+
+
+def _detected_identity() -> str:
+    """Best-effort *default* for the reviewer field — the Streamlit-authenticated user, else a GitHub
+    handle from the environment. Never the container's OS user, which is `owid` on staging (the old
+    `os.getenv("USER")` default is exactly why every sign-off read "owid")."""
+    try:
+        user = st.user  # populated only when Streamlit-native auth is configured
+        val = getattr(user, "email", None) or getattr(user, "name", None)
+        if val:
+            return str(val)
+    except Exception:
+        pass
+    return os.getenv("GITHUB_USER") or ""
 
 
 def _dims_str(dims: dict[str, str]) -> str:
@@ -496,6 +511,9 @@ def _decision(catalog_root: str, r: dict[str, Any]) -> str:
 # Shared instruction header — spells out what each review decision means, so it never has to be
 # re-explained to whoever executes the PR.
 _BRIEF_LEGEND = [
+    "**▶ To open the PR:** copy this whole brief, paste it to Claude Code, and ask it to open the PR — it "
+    "carries the changes, the checks to run, and a ready-to-paste PR description.",
+    "",
     "**How to action each change (from the review decisions):**",
     "- ✅ **Approve → add to the PR** — apply the edit shown.",
     "- 🚩 **Flag → hold** — do NOT add; the reviewer wants a change (see the note).",
@@ -575,6 +593,81 @@ def _markdown_output(text: str, filename: str, key: str) -> None:
     st.download_button("⬇ Download .md", data=text, file_name=filename, mime="text/markdown", key=f"dl_{key}")
 
 
+def _change_one_liner(g: ChangeGroup) -> str:
+    """One-line summary of an approved change for the PR-description draft."""
+    label = field_label(g.field)
+    if g.field.startswith(CHART_FIELD_PREFIX):
+        return f"**{label}** — chart config (edited on the chart itself, not the ETL repo)"
+    where = "shared indicator metadata" if g.affects_indicator else "MDim-level override"
+    return f"**{label}** — {where}"
+
+
+def _ship_section(approved_groups: list[ChangeGroup], baseline_name: str) -> list[str]:
+    """The 'best of both' tail of the brief: a rigor checklist (blast radius, make check, metadata quality
+    checks, staging rebuild + verify, Codex) plus a ready-to-paste PR description — so the copied brief is a
+    complete, rigorous spec for opening the PR, not just a list of edits."""
+    # Distinct garden datasets touched by shared-indicator edits, for concrete rebuild/upsert commands.
+    datasets: list[str] = []
+    for g in approved_groups:
+        parsed = parse_catalog_path(g.catalog_path)
+        if parsed:
+            ds = parsed[0].replace("etl/steps/data/garden/", "")
+            if ds not in datasets:
+                datasets.append(ds)
+    if datasets:
+        build = "\n".join(
+            f"  - `.venv/bin/etlr garden/{ds} grapher/{ds} --private` → "
+            f"`STAGING=1 .venv/bin/etlr grapher://grapher/{ds} --grapher`"
+            for ds in datasets
+        )
+    else:
+        build = (
+            "  - rebuild the edited garden step(s), then `STAGING=1 .venv/bin/etlr grapher://grapher/<step> --grapher`"
+        )
+
+    shared = any(g.affects_indicator for g in approved_groups)
+    blast = (
+        "shared indicator metadata — reaches every chart / MDim view using the indicator(s); see per-change **Reach** above"
+        if shared
+        else "contained — no surface beyond the target is affected"
+    )
+    fields = ", ".join(sorted({field_label(g.field) for g in approved_groups}))
+
+    out = [
+        "## 🚀 Ship it — run before opening the PR",
+        "_Scope every check to the edited text only._",
+        "- [ ] **Blast radius** reviewed (see *Reach* above) — apply-to-all vs scope decided",
+        "- [ ] `make check`",
+        "- [ ] **Typos** — `/check-metadata-typos`",
+        "- [ ] **Jinja spacing** — `/check-metadata-spacing`",
+        "- [ ] **Style guide** — `/check-metadata-style`",
+        "- [ ] **Claims vs the producer** — `/adversarial-data-review` (only the new/edited text, against the source's docs)",
+        "- [ ] **Rebuild + upsert to staging:**",
+        build,
+        "- [ ] **Verify on staging** — indicator metadata API / data page",
+        "- [ ] **Open the PR** with the description below; post a bare `@codex review`; run the pr-babysitter loop",
+        "",
+        "## 📝 PR description (draft — paste as the PR body)",
+        "> _Written by <assistant> <model name> — @<handle> at the wheel._",
+        "",
+        f"Update user-facing metadata ({fields}) — {len(approved_groups)} change(s), reviewed and approved in the "
+        "Metadata Diff tool.",
+        "",
+        "**Changes**",
+        *[f"- {_change_one_liner(g)}" for g in approved_groups],
+        "",
+        f"**Blast radius:** {blast}.",
+        "**Checks:** `make check` · typos · Jinja spacing · style guide · claims-vs-producer.",
+        f"**Reviewed against baseline:** {baseline_name} (Metadata Diff tool).",
+        "**Verification:** staging preview — <link>.",
+        "",
+        "**Still open**",
+        "- _Handed off / Proposed / Unverified — fill from the checklist results before merge._",
+        "",
+    ]
+    return out
+
+
 def _pr_brief_markdown(
     catalog_path: str,
     baseline_name: str,
@@ -642,6 +735,8 @@ def _pr_brief_markdown(
 
     if pending:
         lines += _pending_lines(f"## ⏳ Pending — no action ({len(pending)})", pending)
+    if approved:
+        lines += _ship_section([r["g"] for r in approved], baseline_name)
     return "\n".join(lines)
 
 
@@ -702,6 +797,8 @@ def _chart_pr_brief_markdown(
 
     if pending:
         lines += _pending_lines(f"## ⏳ Pending — no action ({len(pending)})", pending)
+    if approved:
+        lines += _ship_section([r["g"] for r in approved], baseline_name)
     return "\n".join(lines)
 
 
@@ -903,8 +1000,8 @@ def render_review_page(
         _markdown_output(_review_markdown(catalog_path, baseline_name, resolved, usage), "review-summary.md", "review")
     with st.expander("🔀 PR brief — changes to execute (all charts / only this view)"):
         st.caption(
-            "Every change with its exact target (shared garden `.meta.yml` vs a scoped MDim override) and "
-            "the scope decision — ready to drive the PR. Markdown for now."
+            "A complete PR spec — the changes, the checks to run, and a ready PR description. **Copy it and "
+            "paste it to Claude Code, asking it to open the PR.**"
         )
         _markdown_output(_pr_brief_markdown(catalog_path, baseline_name, resolved, usage), "pr-brief.md", "mdim_brief")
 
@@ -1188,8 +1285,8 @@ def _render_chart_review(
     st.divider()
     with st.expander("🔀 PR brief — changes to execute"):
         st.caption(
-            "Each change with its target — the indicator's garden `.meta.yml` (shared) or the chart's own "
-            "config — ready to drive the PR. Markdown for now."
+            "A complete PR spec — the changes, the checks to run, and a ready PR description. **Copy it and "
+            "paste it to Claude Code, asking it to open the PR.**"
         )
         _markdown_output(
             _chart_pr_brief_markdown(chart, baseline_name, resolved, usage, catalog_root), "pr-brief.md", "chart_brief"
@@ -1301,6 +1398,16 @@ def main() -> None:
         st.warning("No production env file found — comparing against `staging-site-master` instead.")
 
     source_engine, target_engine = get_engines(baseline)
+
+    # Who's signing off — attributed to every Approve/Flag decision. Default to a detected identity
+    # (never the container's OS user), and let the reviewer correct it.
+    st.session_state.setdefault("mdd_reviewer", _detected_identity())
+    st.sidebar.text_input(
+        "Reviewer (your name or GitHub handle)",
+        key="mdd_reviewer",
+        help="Recorded with every Approve/Flag sign-off. Set this before you review — it's whoever is at "
+        "the wheel, not the staging container.",
+    )
 
     target = url_persist(st.segmented_control)(
         label="Review",
