@@ -493,15 +493,52 @@ How the board is laid out — match it rather than inventing a spot:
 - **A fresh provider fills the AFTER column only**, and needs no note: there is no "before" when the regions were never colored. The BEFORE column and the note column are for *recolors* of already-published regions (see *Renaming existing regions*), where the point is the change.
 - Name the frame `<provider-full-name-slug>-regions-<defined_by>` — e.g. `food-and-agriculture-organization-regions-fao_2`, `united-nations-regions-un_m49_3`. (On the older paired rows a trailing ` 1`/` 2` distinguishes before/after; don't imitate it for a single new frame.)
 
-The maps are grapher's own SVG export pasted in, which is why each one still carries its country vectors and a `categorical-color-legend` group. Reproduce that with `figma.createNodeFromSvg`, fed from the chart SVG on **your branch's** staging server so the colors are the agreed ones:
+The maps are grapher's own SVG export, which is why each one still carries its country vectors and a `categorical-color-legend` group. Pull the SVG from **your branch's** staging server so the colors are the agreed ones, naming the file exactly what the layer should be called — the upload uses the filename as the layer name, so this is also how you get the naming convention for free:
 
 ```bash
-curl -s "http://<container-name>/grapher/<chart-slug>.svg?tab=map" -o /tmp/<slug>.svg
+curl -s "http://<container-name>/grapher/<chart-slug>.svg?tab=map" \
+  -o "<provider-full-name-slug>-regions-<defined_by>.svg"
 ```
 
-Then `use_figma` to insert it — **load the `figma-use` skill first** (it's a hard prerequisite for that tool), switch to the page with `await figma.setCurrentPageAsync(page)` since it isn't the default one, and return the created node ids. Finish by screenshotting the new row (`await node.screenshot()`) and showing it to the user: an SVG that imported at the wrong scale or landed on top of a neighboring row is obvious in a picture and invisible in the node list.
+**Get it into the file with `upload_assets`, not `createNodeFromSvg`.** The latter looks like the obvious tool and cannot work here: the plugin sandbox has no `fetch`, so the SVG would have to be inlined into `use_figma`'s `code`, which caps at **50,000 characters** — a grapher map SVG is ~165 KB and minifies to ~162 KB, since it is nearly all path data. `upload_assets` imports an `image/svg+xml` as an editable vector tree with no size problem (10 MB cap):
 
-If the provider has no published region chart to export, there is nothing to paste — build the chart first (Step 7) or skip the board and say so, rather than hand-drawing an approximation of a map.
+```bash
+# count: 1 returns a single-use submitUrl, valid 10 minutes
+curl -s -X POST "<submitUrl>" \
+  -F "file=@<provider-full-name-slug>-regions-<defined_by>.svg;type=image/svg+xml"
+# → {"success":true, ..., "placedOnNodeId":"<id>"}   ← keep this id
+```
+
+Then place it with `use_figma` (**load the `figma-use` skill first** — hard prerequisite for that tool). Three things bite, in this order:
+
+- **It lands on whatever page is open in the desktop app**, not the page you last set with `setCurrentPageAsync` — in practice the file's cover page. Never search for it by page; take `placedOnNodeId` from the POST response and reparent explicitly.
+- **It imports at the SVG's natural size** (850×600 for a grapher map), not the board's row size. `resize()` on a frame does **not** scale its children — it would crop the map. Use `node.rescale(594 / node.width)`.
+- **Grow Frame 99's height before positioning the row.** A row placed past the old height is clipped and looks like the import silently failed.
+
+```js
+const page = figma.root.children.find((p) => p.id === "1627:409")
+await figma.setCurrentPageAsync(page)
+const node = await figma.getNodeByIdAsync("<placedOnNodeId>")
+const frame99 = await figma.getNodeByIdAsync("1733:1130")
+
+const lastRow = frame99.children
+    .filter((c) => c.type === "FRAME" && c.width > 500)
+    .reduce((a, b) => (b.y > a.y ? b : a))
+const newY = Math.round(lastRow.y + 481)          // row pitch
+
+node.rescale(594 / node.width)                    // 850x600 -> 594x419
+frame99.resize(frame99.width, Math.max(frame99.height, newY + node.height + 60))
+frame99.appendChild(node)                         // x/y are parent-relative AFTER this
+node.x = 2420                                     // AFTER column
+node.y = newY
+return { mutatedNodeIds: [node.id, frame99.id], placedAt: { x: node.x, y: node.y } }
+```
+
+Finish by screenshotting the row (`get_screenshot` on the node, or `await node.screenshot()`) and showing it to the user. Do this even when the numbers came back right: a wrong scale or a row sitting on top of its neighbor is obvious in a picture and invisible in a node list. The screenshot doubles as the first honest look at the palette on a real map — legend labels included, so it also catches a missing `customCategoryLabels` entry leaving one region with its `(Provider)` suffix.
+
+If the provider has no published region chart to export, there is nothing to upload — build the chart first (Step 7) or skip the board and say so, rather than hand-drawing an approximation of a map.
+
+> **Trial runs are cheap; leaving debris is not.** This whole flow was validated by inserting a row and removing it again. If you do that, restore what you touched in the same breath — `node.remove()` **and** `frame99.resize(frame99.width, <original height>)`, since growing the board is a mutation the row's deletion doesn't undo. Record the original height before you change it.
 
 ### Renaming existing regions (not a fresh add)
 
