@@ -20,10 +20,13 @@ definitions:
         originUrl: https://ourworldindata.org/migration
 
   ireland_sources: |-
-    Our World in Data maintains this long-run series on Irish migration by combining three sources from the Central Statistics Office and its predecessors:
+    Our World in Data maintains this long-run series on Irish migration by combining various datasets from the Central Statistics Office and its predecessors.
 
-    - **1871–1951 — averages for the periods between censuses.** The census reports of 1926 and 2022 estimated net emigration for each period between censuses as a residual: the change in population, minus registered births, plus registered deaths. Civil registration of births and deaths began in 1864, so 1871 is the first census this method can start from. Each year shows the average for its period.
-    - **From 1951 — annual estimates.** The Central Statistics Office's annual net migration estimates, which it revises after each census.
+    The series rests almost entirely on the same method: net migration is estimated as a "census residual" — the change in population between two censuses, minus registered births, plus registered deaths.
+
+    - Between 1871 and 1951, net migration is estimated as the residual between two censuses, divided by the number of years between censuses. Civil registration of births and deaths began in 1864, so 1871 is the first census from which the method can start.
+    - Since 1951, net migration has been estimated annually. The Central Statistics Office still distributes the residual between two censuses over the years between them, but it tries to estimate the best value for each year, using sources such as labor force surveys and administrative records.
+    - Recent years after the most recent census are provisional, and entirely based on labor force surveys and administrative records.
 
     All figures cover the same area — the 26 counties of today's Republic of Ireland. The census reports restate the pre-independence results for this area, so independence in 1922 does not create a break in the series.
 
