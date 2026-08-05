@@ -44,7 +44,7 @@ def _column_dimensions() -> dict:
     for fuel in FUELS:
         dims[f"{fuel}_production_twh"] = {"fuel": fuel, "metric": "production", "per_capita": "total"}
         dims[f"{fuel}_production_per_capita_kwh"] = {"fuel": fuel, "metric": "production", "per_capita": "per_capita"}
-        # Consumption in energy units (Statistical Review, extended with EIA; same blend as production).
+        # Consumption in energy units (Statistical Review, extended with EIA — same blend as production).
         dims[f"{fuel}_consumption_twh"] = {"fuel": fuel, "metric": "consumption", "per_capita": "total"}
         dims[f"{fuel}_consumption_per_capita_kwh"] = {
             "fuel": fuel,

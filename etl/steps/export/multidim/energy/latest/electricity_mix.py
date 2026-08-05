@@ -42,7 +42,7 @@ SOURCE_COLUMN_PREFIX = {
     "renewables": "renewable",
     # Standalone views use the clean excluding-bioenergy series (geo/wave/tidal only; starts where the
     # split exists, no pre-2000 cliff). The stacked "by source" views instead swap in the gap-filled
-    # coalesced column (other_renewables_generation) to keep full history; see add_decomposition_views.
+    # coalesced column (other_renewables_generation) to keep full history — see add_decomposition_views.
     "other_renewables": "other_renewables_excluding_bioenergy",
     "bioenergy": "bioenergy",
     "low_carbon": "low_carbon",

@@ -60,7 +60,7 @@ tables:
         description_processing: |-
           We combine two sources: data center electricity consumption from the IEA (the numerator) and total electricity demand from [Ember](https://ember-energy.org/data/electricity-data-explorer/?tab=main&chart=trend&data=demand&fuel=total) (the denominator).
 
-          For each region, we build the denominator by summing Ember's electricity demand across the IEA member countries in that region. For the global estimate, we use Ember's world total directly rather than summing across the IEA's regional aggregates. The IEA does not publish a Eurasia aggregate in this dataset, and Eurasia includes Russia (one of the world's largest electricity consumers), so summing across the IEA regions would exclude Eurasia entirely and undercount global electricity demand.
+          For each region, we build the denominator by summing Ember's electricity demand across the IEA member countries in that region. For the global estimate, we use Ember's world total directly rather than summing across the IEA's regional aggregates. The IEA does not publish a Eurasia aggregate in this dataset, and Eurasia includes Russia — one of the world's largest electricity consumers — so summing across the IEA regions would exclude Eurasia entirely and undercount global electricity demand.
 
           This produces a global share of approximately 1.5% in 2025, consistent with the IEA's own reporting.
         display:
