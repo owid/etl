@@ -1486,7 +1486,7 @@ def main() -> None:
     mode = mode or "tree"  # segmented_control returns None if deselected
     st.caption(
         "**Blast radius**: how far each change reaches · **View diff**: the proposed changes, view by "
-        "view · **Review**: sign off & comment on each change."
+        "view · **Review**: sign off, comment & prepare a PR."
     )
 
     dimensions, view_diffs = compute_diff(
