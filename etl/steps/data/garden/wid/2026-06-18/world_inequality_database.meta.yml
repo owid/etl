@@ -128,7 +128,7 @@ definitions:
     <%- elif welfare_type == "after tax disposable" %>
     Income is measured after taxes have been paid and most government benefits have been received. It does not include the value of public services like hospitals and schools, and collective spending, such as defense and infrastructure, so it does not add up to national income.
     <%- elif welfare_type == "wealth" %>
-    This measure is related to household net wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
+    Wealth is defined as household net wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.
     <%- endif %>
 
   description_key_ppp: |-
