@@ -418,6 +418,7 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
             "South America": [],
         }
     )
+    drifted = {}
     for region in segments_not_combined:
         _remove_combination = []
         for col in combined.drop(columns=["country", "year"]).columns:
@@ -440,14 +441,18 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
                         assert compared["year"].min() == 1990 if region == "European Union (27)" else 2000, (
                             "Minimum year changed."
                         )
-        error = f"Expected discrepancies between Statistical Review and Ember data for aggregate regions may have changed for region: {region}. Current discrepant indicators: {_remove_combination}. Use this list in 'segments_not_combined'."
         if set(segments_not_combined[region]) != set(_remove_combination):
-            log.error(error)
+            drifted[region] = sorted(_remove_combination)
 
         for col in _remove_combination:
             # Remove data for years prior to 2000 (which correspond to the Statistical Review).
             # NOTE: This may need to be generalized if Ember adds data prior to 2000 (which is the case already for European countries, but they are so far not affected by the discrepancies).
             combined.loc[(combined["country"] == region) & (combined["year"] < 2000), col] = np.nan
+
+    assert not drifted, (
+        "Expected discrepancies between Statistical Review and Ember data for aggregate regions have changed. "
+        f"Update 'segments_not_combined' with the measured lists: {drifted}"
+    )
 
     return combined
 
