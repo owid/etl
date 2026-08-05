@@ -24,7 +24,7 @@ tables:
         # Not total energy supply, so the shared key points about how it is measured do not apply here.
         description_key:
           - Traditional biomass is fuelwood, charcoal, crop residues and dung. It is not part of total energy supply, which covers only fuels that are traded commercially.
-          - Only a global total is available.
+          - Traditional biomass is only available at the global level.
         description_processing: |-
           - Traditional biomass comes from Vaclav Smil's historical estimates (2017), which cover the World only.
           - Smil's series ends in 2015; for later years we hold the last available value constant. We keep it separate from total energy supply, which follows the Statistical Review's commercially-traded scope.
@@ -708,8 +708,9 @@ tables:
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
         description_key:
-          - Traditional biomass is fuelwood, charcoal, crop residues and dung. Total energy supply normally excludes it, so it is added back into the total here.
-          - Only a global total of traditional biomass is available.
+          - Traditional biomass is fuelwood, charcoal, crop residues and dung.
+          - Total energy supply covers only commercially-traded fuels, so shares on this chart are measured against total energy supply plus traditional biomass.
+          - Traditional biomass is only available at the global level.
         display:
           name: Traditional biomass
         presentation:
