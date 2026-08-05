@@ -35,7 +35,7 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(REPO_ROOT))
@@ -203,10 +203,26 @@ def sweep_charts(env: OWIDEnv, variable_ids: list[int], field: str | None) -> li
 
 
 def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[str]) -> list[dict]:
+    # Index every view's dimensions by its `fullConfigId`, which is what
+    # `multi_dim_x_chart_configs.chartConfigId` points at. Dimensions are what selects a view
+    # in a URL, and reading them out of the config avoids parsing `viewId`: that column holds
+    # `dim=choice` pairs joined by `__`, and a choice slug can itself contain `__` (and even a
+    # trailing space), so there is no safe way to split it back into dimensions.
+    all_mdims = env.read_sql("SELECT catalogPath, slug, published, config FROM multi_dim_data_pages")
+    parsed = []
+    dims_by_config_id: dict[str, dict] = {}
+    for row in all_mdims.to_dict(orient="records"):
+        config = json.loads(row["config"]) if isinstance(row["config"], str) else (row["config"] or {})
+        parsed.append((row, config))
+        for view in config.get("views", []):
+            if view.get("fullConfigId"):
+                dims_by_config_id[view["fullConfigId"]] = view.get("dimensions") or {}
+
     clause, params = _in_clause(variable_ids, "v")
     df = env.read_sql(
         f"""
-        SELECT md.catalogPath AS mdim_catalog_path, md.slug, md.published, mx.viewId, mx.id AS mx_id
+        SELECT md.catalogPath AS mdim_catalog_path, md.slug, md.published, mx.viewId, mx.id AS mx_id,
+               mx.chartConfigId
         FROM multi_dim_x_chart_configs mx
         JOIN multi_dim_data_pages md ON md.id = mx.multiDimId
         WHERE mx.variableId IN ({clause})
@@ -214,13 +230,13 @@ def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[
         params=params,
     )
     views = df.to_dict(orient="records")
+    for v in views:
+        v["dims"] = dims_by_config_id.get(v["chartConfigId"], {})
     seen = {(v["mdim_catalog_path"], v["viewId"]) for v in views}
 
     # Client-side scan: mx.variableId only records one variable per view; multi-indicator views
     # carrying an affected variable in other y slots are found by scanning the configs.
-    all_mdims = env.read_sql("SELECT catalogPath, slug, published, config FROM multi_dim_data_pages")
-    for _, row in all_mdims.iterrows():
-        config = json.loads(row["config"]) if isinstance(row["config"], str) else row["config"]
+    for row, config in parsed:
         for view in config.get("views", []):
             y = view.get("indicators", {}).get("y", [])
             if not isinstance(y, list):
@@ -240,6 +256,8 @@ def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[
                             "published": row["published"],
                             "viewId": json.dumps(view.get("dimensions", {})),
                             "mx_id": None,
+                            "chartConfigId": view.get("fullConfigId"),
+                            "dims": view.get("dimensions") or {},
                         }
                     )
     return views
@@ -407,12 +425,16 @@ def render_markdown(result: dict[str, Any], branch: str) -> str:
     if result["mdim_views"]:
         lines.append("### MDim views")
         for v in result["mdim_views"]:
-            # `viewId` is already the dimension query string (`dim=choice&…`), so it appends
-            # straight onto both the reader URL and the admin collection preview.
-            admin = f"{site}/admin/grapher/{quote(str(v['mdim_catalog_path']), safe='')}?{v['viewId']}"
+            # A view is selected by its dimensions as URL query params, so the suffix is built
+            # from the view's own `dimensions` — NOT from `viewId`, which is a `__`-joined list
+            # of `dim=choice` pairs and lands on the default view if pasted after `?`. When the
+            # dimensions can't be resolved, link to the MDim itself rather than to a wrong view.
+            qs = urlencode(sorted((v.get("dims") or {}).items()))
+            suffix = f"?{qs}" if qs else ""
+            admin = f"{site}/admin/grapher/{quote(str(v['mdim_catalog_path']), safe='')}{suffix}"
             links = f"[admin preview]({admin})"
             if v["published"] and v.get("slug"):
-                links = f"[{v['slug']}?{v['viewId']}]({site}/grapher/{v['slug']}?{v['viewId']}) — " + links
+                links = f"[{v['slug']}{suffix}]({site}/grapher/{v['slug']}{suffix}) — " + links
             pub = "" if v["published"] else " (unpublished)"
             lines.append(f"- `{v['mdim_catalog_path']}` view `{v['viewId']}`{pub} — {links}")
         lines.append("")
